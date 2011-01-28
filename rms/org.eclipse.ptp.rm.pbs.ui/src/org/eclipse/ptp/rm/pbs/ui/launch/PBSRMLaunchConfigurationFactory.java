@@ -13,7 +13,7 @@ package org.eclipse.ptp.rm.pbs.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
@@ -28,7 +28,7 @@ public class PBSRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurati
 	 * #getResourceManagerClass()
 	 */
 	@Override
-	public Class<? extends IPResourceManager> getResourceManagerClass() {
+	public Class<? extends IResourceManagerControl> getResourceManagerClass() {
 		return PBSResourceManager.class;
 	}
 
@@ -41,7 +41,7 @@ public class PBSRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurati
 	 * org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IPResourceManager rm, ILaunchConfigurationDialog dialog)
+	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManagerControl rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
 		return new PBSRMLaunchConfigurationDynamicTab(rm, dialog);
 	}

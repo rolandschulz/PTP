@@ -37,7 +37,6 @@ import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
@@ -258,10 +257,9 @@ public class ModelManager implements IModelManager {
 		 */
 		fServiceManager.getActiveConfiguration();
 
-		for (IPResourceManager rm : getUniverse().getResourceManagers()) {
-			IResourceManagerControl rmControl = (IResourceManagerControl) rm;
-			if (rmControl.getConfiguration().getAutoStart()) {
-				rmsNeedStarting.add(rmControl);
+		for (IResourceManagerControl rm : getUniverse().getResourceManagers()) {
+			if (rm.getConfiguration().getAutoStart()) {
+				rmsNeedStarting.add(rm);
 			}
 		}
 
@@ -348,7 +346,7 @@ public class ModelManager implements IModelManager {
 	 * @see org.eclipse.ptp.core.IModelManager#stopResourceManagers()
 	 */
 	public void stopResourceManagers() throws CoreException {
-		IPResourceManager[] resourceManagers;
+		IResourceManagerControl[] resourceManagers;
 		synchronized (universe) {
 			resourceManagers = universe.getResourceManagers();
 		}
@@ -370,7 +368,7 @@ public class ModelManager implements IModelManager {
 	 * @param rms
 	 *            collection of resource managers
 	 */
-	private void fireChangedResourceManager(final Collection<IPResourceManager> rms) {
+	private void fireChangedResourceManager(final Collection<IResourceManagerControl> rms) {
 		IChangedResourceManagerEvent event = new ChangedResourceManagerEvent(this, rms);
 		for (Object listener : resourceManagerListeners.getListeners()) {
 			((IModelManagerChildListener) listener).handleEvent(event);
@@ -382,7 +380,7 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @param rm
 	 */
-	private void fireNewResourceManager(final IPResourceManager rm) {
+	private void fireNewResourceManager(final IResourceManagerControl rm) {
 		INewResourceManagerEvent event = new NewResourceManagerEvent(this, rm);
 		for (Object listener : resourceManagerListeners.getListeners()) {
 			((IModelManagerChildListener) listener).handleEvent(event);
@@ -394,7 +392,7 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @param rm
 	 */
-	private void fireRemoveResourceManager(final IPResourceManager rm) {
+	private void fireRemoveResourceManager(final IResourceManagerControl rm) {
 		IRemoveResourceManagerEvent event = new RemoveResourceManagerEvent(this, rm);
 		for (Object listener : resourceManagerListeners.getListeners()) {
 			((IModelManagerChildListener) listener).handleEvent(event);
@@ -444,7 +442,7 @@ public class ModelManager implements IModelManager {
 		}
 	}
 
-	private void updateResourceManager(IPResourceManager rm) {
+	private void updateResourceManager(IResourceManagerControl rm) {
 		fireChangedResourceManager(Arrays.asList(rm));
 	}
 

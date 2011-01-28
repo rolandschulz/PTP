@@ -69,8 +69,7 @@ public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider impleme
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IResourceManagerControl.class) {
-			IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse();
-			return new MPICH2ResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+			return new MPICH2ResourceManager((IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
 		}
 		return null;
 	}

@@ -22,6 +22,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
@@ -47,7 +48,8 @@ public class ConsoleManager implements IModelManagerChildListener, IResourceMana
 	public ConsoleManager() {
 		imm = PTPCorePlugin.getDefault().getModelManager();
 		imm.addListener(this);
-		for (IPResourceManager rm : imm.getUniverse().getResourceManagers()) {
+		for (IResourceManagerControl rmc : imm.getUniverse().getResourceManagers()) {
+			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 			rm.addChildListener(this);
 		}
 	}
@@ -149,7 +151,8 @@ public class ConsoleManager implements IModelManagerChildListener, IResourceMana
 	 * (org.eclipse.ptp.core.events.INewResourceManagerEvent)
 	 */
 	public void handleEvent(INewResourceManagerEvent e) {
-		e.getResourceManager().addChildListener(this);
+		IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+		rm.addChildListener(this);
 	}
 
 	/*
@@ -195,7 +198,8 @@ public class ConsoleManager implements IModelManagerChildListener, IResourceMana
 	 * (org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
 	 */
 	public void handleEvent(IRemoveResourceManagerEvent e) {
-		e.getResourceManager().removeChildListener(this);
+		IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+		rm.removeChildListener(this);
 	}
 
 	/**
@@ -204,7 +208,8 @@ public class ConsoleManager implements IModelManagerChildListener, IResourceMana
 	 */
 	public void shutdown() {
 		imm.removeListener(this);
-		for (IPResourceManager rm : imm.getUniverse().getResourceManagers()) {
+		for (IResourceManagerControl rmc : imm.getUniverse().getResourceManagers()) {
+			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 			rm.removeChildListener(this);
 			for (IPJob job : rm.getJobs()) {
 				removeConsole(job);

@@ -20,7 +20,7 @@
 package org.eclipse.ptp.internal.core.events;
 
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 
 /**
@@ -30,9 +30,9 @@ import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 public class RemoveResourceManagerEvent implements IRemoveResourceManagerEvent {
 
 	private final IModelManager mm;
-	private final IPResourceManager rm;
+	private final IResourceManagerControl rm;
 
-	public RemoveResourceManagerEvent(IModelManager mm, IPResourceManager rm) {
+	public RemoveResourceManagerEvent(IModelManager mm, IResourceManagerControl rm) {
 		this.mm = mm;
 		this.rm = rm;
 	}
@@ -41,19 +41,17 @@ public class RemoveResourceManagerEvent implements IRemoveResourceManagerEvent {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachine
+	 * org.eclipse.ptp.core.events.IRemoveResourceManagerEvent#getResourceManager
 	 * ()
 	 */
-	public IPResourceManager getResourceManager() {
+	public IResourceManagerControl getResourceManager() {
 		return rm;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource
-	 * ()
+	 * @see org.eclipse.ptp.core.events.IRemoveResourceManagerEvent#getSource()
 	 */
 	public IModelManager getSource() {
 		return mm;

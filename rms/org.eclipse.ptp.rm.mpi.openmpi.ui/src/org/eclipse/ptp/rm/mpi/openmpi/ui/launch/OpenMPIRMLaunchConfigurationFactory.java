@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.mpi.openmpi.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManager;
@@ -25,13 +25,13 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManager;
 public class OpenMPIRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory {
 
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IPResourceManager rm, ILaunchConfigurationDialog dialog)
+	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManagerControl rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
 		return new NewOpenMPIRMLaunchConfigurationDynamicTab(rm, dialog);
 	}
 
 	@Override
-	public Class<? extends IPResourceManager> getResourceManagerClass() {
+	public Class<? extends IResourceManagerControl> getResourceManagerClass() {
 		return OpenMPIResourceManager.class;
 	}
 

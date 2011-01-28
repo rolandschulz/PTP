@@ -49,8 +49,8 @@ import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringSetAttribute;
 import org.eclipse.ptp.core.attributes.StringSetAttributeDefinition;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -295,7 +295,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	private Composite mainPanel;
 	private TabFolder tabbedPane;
 	private ILaunchConfigurationWorkingCopy currentLaunchConfig;
-	private IPResourceManager currentRM;
+	private IResourceManagerControl currentRM;
 	private BooleanRowWidget llSubmitMode;
 	private boolean allFieldsValid = true;
 	private String errorMessage;
@@ -376,7 +376,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 	private TextRowWidget llWallClockLimitSoft = null;
 
-	public IBMLLRMLaunchConfigurationDynamicTab(IPResourceManager rm, ILaunchConfigurationDialog dialog) {
+	public IBMLLRMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":IBMLLRMLaunchConfigurationDynamicTab entered."); //$NON-NLS-1$
@@ -440,7 +440,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param attrName
 	 *            The name of the attribute to be added to launch attributes
 	 */
-	private void addAttribute(IPResourceManager rm, ILaunchConfiguration config, Vector<StringAttribute> attrs, String attrName) {
+	private void addAttribute(IResourceManagerControl rm, ILaunchConfiguration config, Vector<StringAttribute> attrs,
+			String attrName) {
 		String attrValue;
 		String defaultValue;
 		StringAttribute attr;
@@ -487,7 +488,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #canSave(org.eclipse.swt.widgets.Control,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation canSave(Control control, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IResourceManagerControl rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":canSave entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
@@ -556,7 +557,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Checkbox button for this attribute
 	 */
-	private BooleanRowWidget createBooleanOption(Composite parent, IPResourceManager rm, String id) {
+	private BooleanRowWidget createBooleanOption(Composite parent, IResourceManagerControl rm, String id) {
 		BooleanRowWidget widget;
 		StringSetAttributeDefinition attrDef;
 
@@ -590,7 +591,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @return Checkbox button for this attribute
 	 */
 	@SuppressWarnings("unused")
-	private CheckboxRowWidget createCheckbox(Composite parent, IPResourceManager rm, String id) {
+	private CheckboxRowWidget createCheckbox(Composite parent, IResourceManagerControl rm, String id) {
 		CheckboxRowWidget widget;
 		StringAttributeDefinition attrDef;
 
@@ -621,7 +622,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            Attribute id for rm attribute this widget represents
 	 * @return ComboRowWidget used by this attribute
 	 */
-	private ComboRowWidget createCombobox(Composite parent, IPResourceManager rm, String id, int selector_id) {
+	private ComboRowWidget createCombobox(Composite parent, IResourceManagerControl rm, String id, int selector_id) {
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -651,7 +652,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param queue
 	 *            Currently selected queue
 	 */
-	public void createControl(Composite parent, IPResourceManager rm, IPQueue queue) {
+	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createControl entered."); //$NON-NLS-1$
 		IIBMLLResourceManagerConfiguration config;
@@ -705,7 +706,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @return Text entry widget
 	 */
 	@SuppressWarnings("unused")
-	private DualFieldRowWidget createDualField(Composite parent, IPResourceManager rm, String id1, String id2) {
+	private DualFieldRowWidget createDualField(Composite parent, IResourceManagerControl rm, String id1, String id2) {
 		DualFieldRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr1;
 		IAttributeDefinition<?, ?, ?> attr2;
@@ -740,7 +741,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @return Editable ComboRowWidget used by this attribute
 	 */
 	@SuppressWarnings("unused")
-	private ComboRowWidget createEditableCombobox(Composite parent, IPResourceManager rm, String id, int selector_id) {
+	private ComboRowWidget createEditableCombobox(Composite parent, IResourceManagerControl rm, String id, int selector_id) {
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -780,7 +781,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            this widget
 	 * @return Text entry field for this attribute
 	 */
-	private FileSelectorRowWidget createFileSelector(Composite parent, IPResourceManager rm, String id, int selectorID) {
+	private FileSelectorRowWidget createFileSelector(Composite parent, IResourceManagerControl rm, String id, int selectorID) {
 		FileSelectorRowWidget widget;
 		StringAttributeDefinition attr;
 
@@ -807,7 +808,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createGeneralTab(IPResourceManager rm) {
+	private void createGeneralTab(IResourceManagerControl rm) {
 		TabItem tab;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -832,7 +833,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createLimitsTab(IPResourceManager rm) {
+	private void createLimitsTab(IResourceManagerControl rm) {
 		TabItem tab;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -855,7 +856,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param rm
 	 *            The resource manager associated with this launch configuration
 	 */
-	private void createModeBox(IPResourceManager rm) {
+	private void createModeBox(IResourceManagerControl rm) {
 		GridData gd;
 		GridLayout layout;
 		Composite pane;
@@ -888,7 +889,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createNodesNetworkTab(IPResourceManager rm) {
+	private void createNodesNetworkTab(IResourceManagerControl rm) {
 		TabItem tab;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -919,7 +920,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createRuntimeTab(IPResourceManager rm) {
+	private void createRuntimeTab(IResourceManagerControl rm) {
 		TabItem tab;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -947,7 +948,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createSchedulingBasicTab(IPResourceManager rm) {
+	private void createSchedulingBasicTab(IResourceManagerControl rm) {
 		TabItem tab;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -970,7 +971,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createSchedulingRequirementsTab(IPResourceManager rm) {
+	private void createSchedulingRequirementsTab(IResourceManagerControl rm) {
 		TabItem tab;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -992,7 +993,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createSchedulingResourcesTab(IPResourceManager rm) {
+	private void createSchedulingResourcesTab(IResourceManagerControl rm) {
 		TabItem tab;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1040,7 +1041,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            Attribute id for rm attribute this widget represents
 	 * @return TextRowWidget entry widget
 	 */
-	private TextRowWidget createTextWidget(Composite parent, IPResourceManager rm, String id) {
+	private TextRowWidget createTextWidget(Composite parent, IResourceManagerControl rm, String id) {
 		TextRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -1133,7 +1134,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            The name of the attribute
 	 * @return The value of the attribute
 	 */
-	private String getAttrDefaultValue(IPResourceManager rm, String attrName) {
+	private String getAttrDefaultValue(IResourceManagerControl rm, String attrName) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1168,8 +1169,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            The current launch configuration
 	 */
 	@SuppressWarnings("unchecked")
-	public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(IPResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration, String mode) throws CoreException {
+	public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(IResourceManagerControl rm,
+			IPQueue queue, ILaunchConfiguration configuration, String mode) throws CoreException {
 		Vector<StringAttribute> attrs;
 		StringAttribute attrArray[];
 
@@ -1211,7 +1212,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            The name of the attribute
 	 * @return The value of the attribute
 	 */
-	private String getAttrInitialValue(ILaunchConfiguration config, IPResourceManager rm, String attrName) {
+	private String getAttrInitialValue(ILaunchConfiguration config, IResourceManagerControl rm, String attrName) {
 		String value;
 		IAttributeDefinition<?, ?, ?> rmAttrDef;
 
@@ -1289,7 +1290,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            The name of the attribute
 	 * @return The value of the attribute
 	 */
-	private String getAttrLocalDefaultValue(IPResourceManager rm, String attrName) {
+	private String getAttrLocalDefaultValue(IResourceManagerControl rm, String attrName) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 		String localDefaultEnv;
 
@@ -1356,15 +1357,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 				+ ":getDirectory entered."); //$NON-NLS-1$
 		if (remoteUIService != null) {
 			String dirName;
-			
+
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
 			dirName = getFileDialogPath(pathAttrID);
 			if (dirName.length() == 0) {
 				dirName = remoteConnection.getWorkingDirectory();
 			}
-			selectedFile = fmgr.browseDirectory(parentShell, Messages.getString(titleID), dirName, 0)
-					.toString();
+			selectedFile = fmgr.browseDirectory(parentShell, Messages.getString(titleID), dirName, 0).toString();
 		}
 		if (selectedFile != null) {
 			String parentDir;
@@ -1426,14 +1426,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		if (remoteUIService != null) {
 			File inputFile;
 			String inputDir;
-			
+
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
 			inputDir = getFileDialogPath(pathAttrID);
 			if (inputDir.length() == 0) {
 				inputDir = remoteConnection.getWorkingDirectory();
-			}
-			else {
+			} else {
 				inputFile = new File(inputDir);
 				inputDir = inputFile.getParent();
 				if (inputDir == null) {
@@ -1520,14 +1519,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		if (remoteUIService != null) {
 			String outputPath;
 			File outputDir;
-			
+
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
 			outputPath = getFileDialogPath(pathAttrID);
 			if (outputPath.length() == 0) {
 				outputPath = remoteConnection.getWorkingDirectory();
-			}
-			else {
+			} else {
 				outputDir = new File(outputPath);
 				outputPath = outputDir.getParent();
 				if (outputPath == null) {
@@ -1554,7 +1552,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, IResourceManagerControl rm, IPQueue queue,
+			ILaunchConfiguration configuration) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":initializeFrom entered."); //$NON-NLS-1$
 		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
@@ -1575,7 +1574,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManagerControl rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":isValid entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
@@ -1660,7 +1659,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":performApply entered."); //$NON-NLS-1$
 		currentLaunchConfig = configuration;
@@ -1755,7 +1754,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * 
 	 * @param config
 	 */
-	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config, IPResourceManager rm) {
+	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config, IResourceManagerControl rm) {
 		Object widget;
 		Iterator<Object> i;
 
@@ -1816,7 +1815,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param control
 	 *            The widget to obtain the value from
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, IPResourceManager rm, String attr, TextRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, IResourceManagerControl rm, String attr,
+			TextRowWidget control) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1950,7 +1950,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManagerControl rm, IPQueue queue) {
 		IAttribute<?, ?, ?> rmAttrs[];
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -2035,7 +2035,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            The resource manager currently associated with the launch
 	 *            configuration
 	 */
-	private void setInitialValues(ILaunchConfiguration config, IPResourceManager rm) {
+	private void setInitialValues(ILaunchConfiguration config, IResourceManagerControl rm) {
 		Object widget;
 		Iterator<Object> i;
 

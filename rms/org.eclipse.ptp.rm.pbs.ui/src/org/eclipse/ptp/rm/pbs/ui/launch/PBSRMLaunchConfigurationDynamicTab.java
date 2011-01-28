@@ -36,6 +36,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
@@ -137,7 +138,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 * #setResourceManager(org.eclipse.ptp.core.elements.IPResourceManager)
 		 */
 		@Override
-		public void setResourceManager(IPResourceManager rm) {
+		public void setResourceManager(IResourceManagerControl rm) {
 			super.setResourceManager(rm);
 		}
 
@@ -451,7 +452,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * 
 	 * @param resourceManager
 	 */
-	public PBSRMLaunchConfigurationDynamicTab(IPResourceManager rm, ILaunchConfigurationDialog dialog) {
+	public PBSRMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		try {
 			setResourceManager(rm);
@@ -477,7 +478,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * which adds widgets on the basis of the PBS Job Attributes present in the
 	 * template.
 	 */
-	public void createControl(Composite parent, IPResourceManager rm, IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) throws CoreException {
 		control = WidgetUtils.createComposite(parent, 1);
 		setResourceManager(rm);
 		if (parent instanceof ScrolledComposite)
@@ -495,8 +496,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	/**
 	 * Sends only the realized script as attribute.<br>
 	 */
-	public IAttribute<?, ?, ?>[] getAttributes(IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
-			throws CoreException {
+	public IAttribute<?, ?, ?>[] getAttributes(IResourceManagerControl rm, IPQueue queue, ILaunchConfiguration configuration,
+			String mode) throws CoreException {
 		setResourceManager(rm);
 		IPBSResourceManagerConfiguration rmConfig = (IPBSResourceManagerConfiguration) getResourceManager().getConfiguration();
 		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
@@ -562,7 +563,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	@Override
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
 		setResourceManager(rm);
 		RMLaunchValidation rmv = super.performApply(configuration, getResourceManager(), queue);
 		return rmv;
@@ -577,7 +578,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
 		setResourceManager(rm);
 		return new RMLaunchValidation(true, null);
 	}
@@ -798,7 +799,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	/*
 	 * For consistency.
 	 */
-	private synchronized void setResourceManager(IPResourceManager resourceManager) {
+	private synchronized void setResourceManager(IResourceManagerControl resourceManager) {
 		pbsRM = (PBSResourceManager) resourceManager;
 	}
 }

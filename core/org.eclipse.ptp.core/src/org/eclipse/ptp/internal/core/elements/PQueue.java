@@ -31,8 +31,8 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes.State;
 import org.eclipse.ptp.core.elements.events.IQueueChangeEvent;
@@ -42,9 +42,11 @@ import org.eclipse.ptp.internal.core.elements.events.QueueChangeEvent;
 public class PQueue extends Parent implements IPQueueControl {
 	private final ListenerList fElementListeners = new ListenerList();
 	private final Map<String, IPJobControl> fJobs = new HashMap<String, IPJobControl>();
+	private final IResourceManagerControl fResourceManager;
 
-	public PQueue(String id, IResourceManagerControl rm, IAttribute<?, ?, ?>[] attrs) {
-		super(id, rm, attrs);
+	public PQueue(String id, IResourceManagerControl rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
+		super(id, parent, attrs);
+		fResourceManager = rm;
 		/*
 		 * Create required attributes.
 		 */
@@ -137,8 +139,8 @@ public class PQueue extends Parent implements IPQueueControl {
 	 * 
 	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
 	 */
-	public IPResourceManager getResourceManager() {
-		return (IPResourceManager) getParent();
+	public IResourceManagerControl getResourceManager() {
+		return fResourceManager;
 	}
 
 	/*

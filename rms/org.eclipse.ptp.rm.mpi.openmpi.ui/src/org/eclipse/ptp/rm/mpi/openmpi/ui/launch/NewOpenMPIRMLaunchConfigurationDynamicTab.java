@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rm.mpi.openmpi.ui.launch;
 
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
 
 /**
@@ -24,7 +24,7 @@ public class NewOpenMPIRMLaunchConfigurationDynamicTab extends ExtendableRMLaunc
 	/**
 	 * @since 2.0
 	 */
-	public NewOpenMPIRMLaunchConfigurationDynamicTab(IPResourceManager rm, ILaunchConfigurationDialog dialog) {
+	public NewOpenMPIRMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		addDynamicTab(new BasicOpenMpiRMLaunchConfigurationDynamicTab(dialog));
 		addDynamicTab(new AdvancedOpenMpiRMLaunchConfigurationDynamicTab(rm, dialog));

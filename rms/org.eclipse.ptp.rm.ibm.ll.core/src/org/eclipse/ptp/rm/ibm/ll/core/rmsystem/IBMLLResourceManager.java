@@ -27,12 +27,17 @@ package org.eclipse.ptp.rm.ibm.ll.core.rmsystem;
 import java.util.BitSet;
 import java.util.Collection;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.rm.ibm.ll.core.IBMLLCorePlugin;
 import org.eclipse.ptp.rm.ibm.ll.core.rtsystem.IBMLLProxyRuntimeClient;
 import org.eclipse.ptp.rm.ibm.ll.core.rtsystem.IBMLLRuntimeSystem;
 import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
@@ -41,11 +46,11 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 public class IBMLLResourceManager extends AbstractRuntimeResourceManager {
 
-	private final Integer IBMLLRMID;
-
-	public IBMLLResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
-		super(id.toString(), universe, config);
-		IBMLLRMID = id;
+	/**
+	 * @since 5.0
+	 */
+	public IBMLLResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(universe, config);
 	}
 
 	/*
@@ -149,10 +154,16 @@ public class IBMLLResourceManager extends AbstractRuntimeResourceManager {
 	 * ()
 	 */
 	@Override
-	protected IRuntimeSystem doCreateRuntimeSystem() {
+	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
 		IIBMLLResourceManagerConfiguration config = (IIBMLLResourceManagerConfiguration) getConfiguration();
-		/* load up the control and monitoring systems for OMPI */
-		IBMLLProxyRuntimeClient runtimeProxy = new IBMLLProxyRuntimeClient(config, IBMLLRMID);
+		IPResourceManager rm = (IPResourceManager) getAdapter(IPResourceManager.class);
+		int baseId;
+		try {
+			baseId = Integer.parseInt(rm.getID());
+		} catch (NumberFormatException e) {
+			throw new CoreException(new Status(IStatus.ERROR, IBMLLCorePlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
+		}
+		IBMLLProxyRuntimeClient runtimeProxy = new IBMLLProxyRuntimeClient(config, baseId);
 		return new IBMLLRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}
 

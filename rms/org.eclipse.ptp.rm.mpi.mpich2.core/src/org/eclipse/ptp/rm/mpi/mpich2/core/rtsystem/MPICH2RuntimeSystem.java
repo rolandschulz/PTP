@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
@@ -29,7 +29,7 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfigu
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 
@@ -38,12 +38,14 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/** The queue that dispatches jobs to mpi. */
 	private String queueID;
 	/** Mapping of discovered hosts and their ID for IPNode elements. */
-	private Map<String,String> nodeNameToIDMap = new HashMap<String, String>();
+	private final Map<String, String> nodeNameToIDMap = new HashMap<String, String>();
 
-	public MPICH2RuntimeSystem(Integer rmid,
-			IMPICH2ResourceManagerConfiguration config,
+	/**
+	 * @since 2.0
+	 */
+	public MPICH2RuntimeSystem(IResourceManagerControl rm, IMPICH2ResourceManagerConfiguration config,
 			AttributeDefinitionManager attrDefMgr) {
-		super(rmid, config, attrDefMgr);
+		super(rm, config, attrDefMgr);
 	}
 
 	@Override
@@ -101,8 +103,13 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 		return job;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doFilterEvents(org.eclipse.ptp.core.elements.IPElement, boolean, org.eclipse.ptp.core.attributes.AttributeManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doFilterEvents
+	 * (org.eclipse.ptp.core.elements.IPElement, boolean,
+	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
 	protected void doFilterEvents(IPElement element, boolean filterChildren, AttributeManager filterAttributes)
@@ -112,7 +119,9 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doShutdown()
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doShutdown()
 	 */
 	@Override
 	protected void doShutdown() throws CoreException {
@@ -121,7 +130,10 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartEvents()
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartEvents
+	 * ()
 	 */
 	@Override
 	protected void doStartEvents() throws CoreException {
@@ -130,7 +142,10 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartup(org.eclipse.core.runtime.IProgressMonitor)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartup(
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
@@ -139,7 +154,9 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStopEvents()
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStopEvents()
 	 */
 	@Override
 	protected void doStopEvents() throws CoreException {
@@ -149,7 +166,6 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	protected void setMachineID(String machineID) {
 		this.machineID = machineID;
 	}
-
 
 	protected void setQueueID(String queueID) {
 		this.queueID = queueID;

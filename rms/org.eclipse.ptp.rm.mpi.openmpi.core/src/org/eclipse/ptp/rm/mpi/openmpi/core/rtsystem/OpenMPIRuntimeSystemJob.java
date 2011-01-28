@@ -25,14 +25,13 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
@@ -114,8 +113,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 */
 	private void terminateProcesses() {
 		final OpenMPIRuntimeSystem rtSystem = (OpenMPIRuntimeSystem) getRtSystem();
-		final IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager()
-				.getResourceManagerFromUniqueName(rtSystem.getRmConfiguration().getUniqueName());
+		IPResourceManager rm = (IPResourceManager) rtSystem.getResourceManager().getAdapter(IPResourceManager.class);
 		if (rm != null) {
 			final IPJob ipJob = rm.getJobById(getJobID());
 			if (ipJob != null) {
@@ -379,8 +377,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 */
 		final IOpenMPIResourceManagerConfiguration configuration = (IOpenMPIResourceManagerConfiguration) getRtSystem()
 				.getRmConfiguration();
-		final IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager()
-				.getResourceManagerFromUniqueName(configuration.getUniqueName());
+		IPResourceManager rm = (IPResourceManager) getRtSystem().getResourceManager().getAdapter(IPResourceManager.class);
 		final IPJob ipJob = rm.getJobById(getJobID());
 		IntegerAttribute numProcsAttr = ipJob.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
 		assert numProcsAttr != null;

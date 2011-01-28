@@ -28,8 +28,11 @@ import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
  */
 public abstract class AbstractToolResourceManager extends AbstractRuntimeResourceManager {
 
-	public AbstractToolResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config) {
-		super(id, universe, config);
+	/**
+	 * @since 3.0
+	 */
+	public AbstractToolResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(universe, config);
 	}
 
 	/*

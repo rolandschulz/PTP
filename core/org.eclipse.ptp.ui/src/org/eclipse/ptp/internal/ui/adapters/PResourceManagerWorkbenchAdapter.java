@@ -134,7 +134,7 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
 		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
-				((IPResourceManager) object).getResourceManagerId());
+				((IPResourceManager) object).getResourceManager().getResourceManagerId());
 		if (presentation != null) {
 			final Image image = presentation.getImage(object);
 			if (image != null) {
@@ -153,7 +153,7 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	@Override
 	public String getLabel(Object object) {
 		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
-				((IPResourceManager) object).getResourceManagerId());
+				((IPResourceManager) object).getResourceManager().getResourceManagerId());
 		if (presentation != null) {
 			final String label = presentation.getText(object);
 			if (label != null) {

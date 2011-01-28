@@ -14,7 +14,7 @@ package org.eclipse.ptp.core.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 
 /**
  * This event is generated when the attributes or configuration of one or more
@@ -29,7 +29,7 @@ public interface IChangedResourceManagerEvent {
 	 * 
 	 * @return resource managers that have changed
 	 */
-	public Collection<IPResourceManager> getResourceManagers();
+	public Collection<IResourceManagerControl> getResourceManagers();
 
 	/**
 	 * Get the source of the event

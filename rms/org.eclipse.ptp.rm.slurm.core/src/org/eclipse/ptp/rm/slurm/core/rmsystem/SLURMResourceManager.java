@@ -16,6 +16,9 @@ package org.eclipse.ptp.rm.slurm.core.rmsystem;
 import java.util.BitSet;
 import java.util.Collection;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
@@ -24,6 +27,8 @@ import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.rm.slurm.core.SLURMCorePlugin;
 import org.eclipse.ptp.rm.slurm.core.SLURMJobAttributes;
 import org.eclipse.ptp.rm.slurm.core.SLURMNodeAttributes;
 import org.eclipse.ptp.rm.slurm.core.messages.Messages;
@@ -38,11 +43,11 @@ import org.eclipse.swt.widgets.Shell;
 
 public class SLURMResourceManager extends AbstractRuntimeResourceManager {
 
-	private final Integer SLURMRMID;
-
-	public SLURMResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
-		super(id.toString(), universe, config);
-		SLURMRMID = id;
+	/**
+	 * @since 5.0
+	 */
+	public SLURMResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(universe, config);
 	}
 
 	/*
@@ -146,11 +151,17 @@ public class SLURMResourceManager extends AbstractRuntimeResourceManager {
 	 * ()
 	 */
 	@Override
-	protected IRuntimeSystem doCreateRuntimeSystem() {
+	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
 		IRuntimeSystem slurmRMS;
 		ISLURMResourceManagerConfiguration config = (ISLURMResourceManagerConfiguration) getConfiguration();
-		/* load up the control and monitoring systems for SLURM */
-		SLURMProxyRuntimeClient runtimeProxy = new SLURMProxyRuntimeClient(config, SLURMRMID);
+		IPResourceManager rm = (IPResourceManager) getAdapter(IPResourceManager.class);
+		int baseId;
+		try {
+			baseId = Integer.parseInt(rm.getID());
+		} catch (NumberFormatException e) {
+			throw new CoreException(new Status(IStatus.ERROR, SLURMCorePlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
+		}
+		SLURMProxyRuntimeClient runtimeProxy = new SLURMProxyRuntimeClient(config, baseId);
 		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
 		attrDefMgr.setAttributeDefinitions(SLURMJobAttributes.getDefaultAttributeDefinitions());
 		attrDefMgr.setAttributeDefinitions(SLURMNodeAttributes.getDefaultAttributeDefinitions());

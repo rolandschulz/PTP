@@ -12,14 +12,14 @@ package org.eclipse.ptp.rm.ui.launch;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.rm.ui.utils.DataSource;
 
 public abstract class RMLaunchConfigurationDynamicTabDataSource extends DataSource {
 	private final BaseRMLaunchConfigurationDynamicTab page;
 	private IPQueue queue;
-	private IPResourceManager resourceManager;
+	private IResourceManagerControl resourceManager;
 	private ILaunchConfiguration configuration;
 	private ILaunchConfigurationWorkingCopy configurationWorkingCopy;
 
@@ -49,14 +49,14 @@ public abstract class RMLaunchConfigurationDynamicTabDataSource extends DataSour
 	/**
 	 * @since 2.0
 	 */
-	public void setResourceManager(IPResourceManager resourceManager) {
+	public void setResourceManager(IResourceManagerControl resourceManager) {
 		this.resourceManager = resourceManager;
 	}
 
 	/**
 	 * @since 2.0
 	 */
-	public IPResourceManager getResourceManager() {
+	public IResourceManagerControl getResourceManager() {
 		return resourceManager;
 	}
 

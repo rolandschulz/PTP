@@ -24,8 +24,8 @@ import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.slurm.core.SLURMJobAttributes;
@@ -84,7 +84,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 	private Composite control;
 
-	public SLURMRMLaunchConfigurationDynamicTab(IPResourceManager rm, ILaunchConfigurationDialog dialog) {
+	public SLURMRMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 	}
 
@@ -96,9 +96,9 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #canSave(org.eclipse.swt.widgets.Control,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation canSave(Control control, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IResourceManagerControl rm, IPQueue queue) {
 		try {
-			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
+			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
 			@SuppressWarnings("unused")
 			IntegerAttribute iattr0 = new IntegerAttribute(numProcsAttrDef, nProcsString);
 		} catch (IllegalValueException e) {
@@ -106,7 +106,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		}
 
 		try {
-			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
+			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef();
 			@SuppressWarnings("unused")
 			IntegerAttribute iattr1 = new IntegerAttribute(jobNumNodesAttrDef, nNodesString);
 		} catch (IllegalValueException e) {
@@ -114,7 +114,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		}
 
 		try {
-			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
+			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef();
 			@SuppressWarnings("unused")
 			IntegerAttribute iattr2 = new IntegerAttribute(jobTimeLimitAttrDef, tLimitString);
 		} catch (IllegalValueException e) {
@@ -123,15 +123,15 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 		// Not necessary to check following StringAttribute
 
-		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef();
 		@SuppressWarnings("unused")
 		StringAttribute sattr3 = new StringAttribute(jobPartitionAttrDef, partString);
 
-		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef();
 		@SuppressWarnings("unused")
 		StringAttribute sattr4 = new StringAttribute(jobReqNodeListAttrDef, reqNodeListString);
 
-		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef();
 		@SuppressWarnings("unused")
 		StringAttribute sattr5 = new StringAttribute(jobExcNodeListAttrDef, excNodeListString);
 
@@ -146,7 +146,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #createControl(org.eclipse.swt.widgets.Composite,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public void createControl(Composite parent, IPResourceManager rm, IPQueue queue) {
+	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout(1, true));
 		GridData gd;
@@ -289,13 +289,13 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * org.eclipse.ptp.core.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public IAttribute<?, ?, ?>[] getAttributes(IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
-			throws CoreException {
+	public IAttribute<?, ?, ?>[] getAttributes(IResourceManagerControl rm, IPQueue queue, ILaunchConfiguration configuration,
+			String mode) throws CoreException {
 
 		int jobnumProcs = configuration.getAttribute(ATTR_NUMPROCS, -1);
 		IntegerAttribute iattr0 = null;
 		try {
-			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
+			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
 			iattr0 = new IntegerAttribute(numProcsAttrDef, jobnumProcs);
 		} catch (IllegalValueException e) {
 			return new IAttribute[] { iattr0 };
@@ -304,7 +304,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		int jobNumNodes = configuration.getAttribute(ATTR_NUMNODES, -1);
 		IntegerAttribute iattr1 = null;
 		try {
-			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
+			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef();
 			iattr1 = new IntegerAttribute(jobNumNodesAttrDef, jobNumNodes);
 		} catch (IllegalValueException e) {
 			return new IAttribute[1];
@@ -313,7 +313,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		int jobTimeLimit = configuration.getAttribute(ATTR_TIMELIMIT, -1);
 		IntegerAttribute iattr2 = null;
 		try {
-			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
+			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef();
 			iattr2 = new IntegerAttribute(jobTimeLimitAttrDef, jobTimeLimit);
 		} catch (IllegalValueException e) {
 			return new IAttribute[2];
@@ -322,21 +322,21 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		String jobPartition = configuration.getAttribute(ATTR_JOBPARTITION, "");//$NON-NLS-1$
 		StringAttribute sattr3 = null;
 		if (jobPartition.length() > 0) {
-			StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+			StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef();
 			sattr3 = new StringAttribute(jobPartitionAttrDef, jobPartition);
 		}
 
 		String jobReqNodeList = configuration.getAttribute(ATTR_JOBREQNODELIST, "");//$NON-NLS-1$
 		StringAttribute sattr4 = null;
 		if (jobReqNodeList.length() > 0) {
-			StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+			StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef();
 			sattr4 = new StringAttribute(jobReqNodeListAttrDef, jobReqNodeList);
 		}
 
 		String jobExcNodeList = configuration.getAttribute(ATTR_JOBEXCNODELIST, "");//$NON-NLS-1$
 		StringAttribute sattr5 = null;
 		if (jobExcNodeList.length() > 0) {
-			StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+			StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef();
 			sattr5 = new StringAttribute(jobExcNodeListAttrDef, jobExcNodeList);
 		}
 
@@ -392,14 +392,15 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, IResourceManagerControl rm, IPQueue queue,
+			ILaunchConfiguration configuration) {
 
 		int jobnumProcs;
 		try {
 			jobnumProcs = configuration.getAttribute(ATTR_NUMPROCS, 1);
 		} catch (CoreException e) {
 			try {
-				IntegerAttributeDefinition nProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
+				IntegerAttributeDefinition nProcsAttrDef = getJobNumProcsAttrDef();
 				nProcsText.setText(nProcsAttrDef.create().getValueAsString());
 			} catch (IllegalValueException e1) {
 				return new RMLaunchValidation(false, JOB_NUMBER_OF_PROCESSES_LABEL + e.getMessage() + " : " + e1.getMessage()); //$NON-NLS-1$
@@ -413,7 +414,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 			jobNumNodes = configuration.getAttribute(ATTR_NUMNODES, 1);
 		} catch (CoreException e) {
 			try {
-				IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
+				IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef();
 				nNodesText.setText(jobNumNodesAttrDef.create().getValueAsString());
 			} catch (IllegalValueException e1) {
 				return new RMLaunchValidation(false, JOB_NUMBER_OF_NODES_LABEL + e.getMessage() + " : " + e1.getMessage());//$NON-NLS-1$
@@ -427,7 +428,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 			jobTimeLimit = configuration.getAttribute(ATTR_TIMELIMIT, 5);
 		} catch (CoreException e) {
 			try {
-				IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
+				IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef();
 				tLimitText.setText(jobTimeLimitAttrDef.create().getValueAsString());
 			} catch (IllegalValueException e1) {
 				return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL + e.getMessage() + " : " + e1.getMessage()); //$NON-NLS-1$
@@ -440,7 +441,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		try {
 			jobPartition = configuration.getAttribute(ATTR_JOBPARTITION, "");//$NON-NLS-1$
 		} catch (CoreException e) {
-			StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+			StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef();
 			partText.setText(jobPartitionAttrDef.create().getValueAsString());
 			return new RMLaunchValidation(false, JOB_PARTITION_LABEL + e.getMessage());
 		}
@@ -450,7 +451,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		try {
 			jobReqNodeList = configuration.getAttribute(ATTR_JOBREQNODELIST, "");//$NON-NLS-1$
 		} catch (CoreException e) {
-			StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+			StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef();
 			reqNodeListText.setText(jobReqNodeListAttrDef.create().getValueAsString());
 			return new RMLaunchValidation(false, JOB_REQUESTED_NODELIST_LABEL + e.getMessage());
 		}
@@ -460,7 +461,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		try {
 			jobExcNodeList = configuration.getAttribute(ATTR_JOBEXCNODELIST, "");//$NON-NLS-1$
 		} catch (CoreException e) {
-			StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+			StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef();
 			excNodeListText.setText(jobExcNodeListAttrDef.create().getValueAsString());
 			return new RMLaunchValidation(false, JOB_EXCLUDED_NODELIST_LABEL + e.getMessage());
 		}
@@ -478,10 +479,10 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
 
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManagerControl rm, IPQueue queue) {
 
 		try {
-			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
+			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
 			IntegerAttribute iattr = new IntegerAttribute(numProcsAttrDef, nProcsString);
 			if (iattr.getValue() < 1) {
 				return new RMLaunchValidation(false, Messages.SLURMConfigurationWizardPage_numProcsInvalid);
@@ -491,7 +492,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		}
 
 		try {
-			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
+			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef();
 			IntegerAttribute iattr = new IntegerAttribute(jobNumNodesAttrDef, nNodesString);
 			if (iattr.getValue() < 1) {
 				return new RMLaunchValidation(false, Messages.SLURMConfigurationWizardPage_numNodesInvalid);
@@ -501,7 +502,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		}
 
 		try {
-			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
+			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef();
 			IntegerAttribute iattr = new IntegerAttribute(jobTimeLimitAttrDef, tLimitString);
 			if (iattr.getValue() < 1) {
 				return new RMLaunchValidation(false, Messages.SLURMConfigurationWizardPage_timeLimitInvalid);
@@ -512,15 +513,15 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 		// Not necessary to check following StringAttribute
 
-		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef();
 		@SuppressWarnings("unused")
 		StringAttribute sattr0 = new StringAttribute(jobPartitionAttrDef, partString);
 
-		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef();
 		@SuppressWarnings("unused")
 		StringAttribute sattr1 = new StringAttribute(jobReqNodeListAttrDef, reqNodeListString);
 
-		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef();
 		@SuppressWarnings("unused")
 		StringAttribute sattr2 = new StringAttribute(jobExcNodeListAttrDef, excNodeListString);
 
@@ -535,11 +536,11 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
 
 		IntegerAttribute iattr0 = null;
 		try {
-			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
+			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
 			iattr0 = new IntegerAttribute(numProcsAttrDef, nProcsString);
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_NUMBER_OF_PROCESSES_LABEL + e.getMessage());
@@ -548,7 +549,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 		IntegerAttribute iattr1 = null;
 		try {
-			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
+			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef();
 			iattr1 = new IntegerAttribute(jobNumNodesAttrDef, nNodesString);
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_NUMBER_OF_NODES_LABEL + e.getMessage());
@@ -557,7 +558,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 		IntegerAttribute iattr2 = null;
 		try {
-			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
+			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef();
 			iattr2 = new IntegerAttribute(jobTimeLimitAttrDef, tLimitString);
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL + e.getMessage());
@@ -565,7 +566,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		configuration.setAttribute(ATTR_TIMELIMIT, iattr2.getValue());
 
 		StringAttribute sattr0 = null;
-		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef();
 		sattr0 = new StringAttribute(jobPartitionAttrDef, partString);
 		if (sattr0.getValue().length() > 0)
 			configuration.setAttribute(ATTR_JOBPARTITION, sattr0.getValue());
@@ -573,7 +574,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 			configuration.removeAttribute(ATTR_JOBPARTITION);
 
 		StringAttribute sattr1 = null;
-		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef();
 		sattr1 = new StringAttribute(jobReqNodeListAttrDef, reqNodeListString);
 		if (sattr1.getValue().length() > 0)
 			configuration.setAttribute(ATTR_JOBREQNODELIST, sattr1.getValue());
@@ -581,7 +582,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 			configuration.removeAttribute(ATTR_JOBREQNODELIST);
 
 		StringAttribute sattr2 = null;
-		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef();
 		sattr2 = new StringAttribute(jobExcNodeListAttrDef, excNodeListString);
 		if (sattr2.getValue().length() > 0)
 			configuration.setAttribute(ATTR_JOBEXCNODELIST, sattr2.getValue());
@@ -599,35 +600,35 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
 		try {
-			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
+			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
 			configuration.setAttribute(ATTR_NUMPROCS, numProcsAttrDef.create().getValue());
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_NUMBER_OF_PROCESSES_LABEL + e.getMessage());
 		}
 
 		try {
-			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
+			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef();
 			configuration.setAttribute(ATTR_NUMNODES, jobNumNodesAttrDef.create().getValue());
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_NUMBER_OF_NODES_LABEL + e.getMessage());
 		}
 
 		try {
-			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
+			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef();
 			configuration.setAttribute(ATTR_TIMELIMIT, jobTimeLimitAttrDef.create().getValue());
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL + e.getMessage());
 		}
 
-		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef();
 		configuration.setAttribute(ATTR_JOBPARTITION, jobPartitionAttrDef.create().getValue());
 
-		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef();
 		configuration.setAttribute(ATTR_JOBREQNODELIST, jobReqNodeListAttrDef.create().getValue());
 
-		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef();
 		configuration.setAttribute(ATTR_JOBEXCNODELIST, jobExcNodeListAttrDef.create().getValue());
 
 		return success;
@@ -641,27 +642,27 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param queue
 	 * @return
 	 */
-	private IntegerAttributeDefinition getJobNumProcsAttrDef(IPResourceManager rm, IPQueue queue) {
+	private IntegerAttributeDefinition getJobNumProcsAttrDef() {
 		return SLURMJobAttributes.getJobNumberOfProcsAttributeDefinition();
 	}
 
-	private IntegerAttributeDefinition getJobNumNodesAttrDef(IPResourceManager rm, IPQueue queue) {
+	private IntegerAttributeDefinition getJobNumNodesAttrDef() {
 		return SLURMJobAttributes.getJobNumberOfNodesAttributeDefinition();
 	}
 
-	private IntegerAttributeDefinition getJobTimeLimitAttrDef(IPResourceManager rm, IPQueue queue) {
+	private IntegerAttributeDefinition getJobTimeLimitAttrDef() {
 		return SLURMJobAttributes.getJobTimelimitAttributeDefinition();
 	}
 
-	private StringAttributeDefinition getJobPartitionAttrDef(IPResourceManager rm, IPQueue queue) {
+	private StringAttributeDefinition getJobPartitionAttrDef() {
 		return SLURMJobAttributes.getJobPartitionAttributeDefinition();
 	}
 
-	private StringAttributeDefinition getJobReqNodeListAttrDef(IPResourceManager rm, IPQueue queue) {
+	private StringAttributeDefinition getJobReqNodeListAttrDef() {
 		return SLURMJobAttributes.getJobReqNodeListAttributeDefinition();
 	}
 
-	private StringAttributeDefinition getJobExcNodeListAttrDef(IPResourceManager rm, IPQueue queue) {
+	private StringAttributeDefinition getJobExcNodeListAttrDef() {
 		return SLURMJobAttributes.getJobExcNodeListAttributeDefinition();
 	}
 

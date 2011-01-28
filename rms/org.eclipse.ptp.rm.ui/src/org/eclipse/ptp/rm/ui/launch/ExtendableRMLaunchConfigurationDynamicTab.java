@@ -19,8 +19,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
@@ -62,7 +62,7 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation canSave(Control control, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IResourceManagerControl rm, IPQueue queue) {
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.canSave(control, rm, queue);
 			if (!validation.isSuccess())
@@ -83,7 +83,7 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	/**
 	 * @since 2.0
 	 */
-	public void createControl(Composite parent, IPResourceManager rm, IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		control.setLayout(layout);
@@ -112,8 +112,8 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	/**
 	 * @since 2.0
 	 */
-	public IAttribute<?, ?, ?>[] getAttributes(IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
-			throws CoreException {
+	public IAttribute<?, ?, ?>[] getAttributes(IResourceManagerControl rm, IPQueue queue, ILaunchConfiguration configuration,
+			String mode) throws CoreException {
 		List<IAttribute<?, ?, ?>> attributes = new ArrayList<IAttribute<?, ?, ?>>();
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			IAttribute<?, ?, ?> attributeArray[] = tabControl.getAttributes(rm, queue, configuration, mode);
@@ -161,7 +161,7 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IPResourceManager rm, IPQueue queue,
+	public RMLaunchValidation initializeFrom(Control control, IResourceManagerControl rm, IPQueue queue,
 			ILaunchConfiguration configuration) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
@@ -184,7 +184,7 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManagerControl rm, IPQueue queue) {
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.isValid(launchConfig, rm, queue);
 			if (!validation.isSuccess())
@@ -205,7 +205,7 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.performApply(configuration, rm, queue);
@@ -227,7 +227,7 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.setDefaults(configuration, rm, queue);

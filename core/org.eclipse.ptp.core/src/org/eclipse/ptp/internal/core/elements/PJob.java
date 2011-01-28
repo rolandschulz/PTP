@@ -41,7 +41,6 @@ import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.AttributeIndexSet;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
@@ -65,7 +64,7 @@ public class PJob extends Parent implements IPJobControl {
 	private final BitSet currentProcessJobRanks = new BitSet();
 	private final ListenerList elementListeners = new ListenerList();
 	private final ProcessOutput processOutput;
-	private final IPResourceManager fResourceManager;
+	private final IResourceManagerControl fResourceManager;
 	private final Map<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>> processAttributesMap = new HashMap<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>>();
 
 	public PJob(String id, IResourceManagerControl rm, IAttribute<?, ?, ?>[] attrs) {
@@ -99,7 +98,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * 
 	 * @see org.eclipse.ptp.core.elements.IPJob#getResourceManager()
 	 */
-	public IPResourceManager getResourceManager() {
+	public IResourceManagerControl getResourceManager() {
 		return fResourceManager;
 	}
 

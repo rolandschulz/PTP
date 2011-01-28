@@ -681,11 +681,12 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		SubMonitor progress = SubMonitor.convert(monitor, 30);
 
 		try {
-			IPResourceManager rm = getResourceManager(configuration);
-			if (rm == null) {
+			IResourceManagerControl rmc = getResourceManager(configuration);
+			if (rmc == null) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
 			}
+			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 
 			AttributeManager attrMgr = new AttributeManager();
 
@@ -830,7 +831,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected IAttribute<?, ?, ?>[] getResourceAttributes(ILaunchConfiguration configuration, String mode) throws CoreException {
 
-		IPResourceManager rm = getResourceManager(configuration);
+		IResourceManagerControl rm = getResourceManager(configuration);
 
 		final AbstractRMLaunchConfigurationFactory rmFactory = PTPLaunchPlugin.getDefault().getRMLaunchConfigurationFactory(rm);
 		if (rmFactory == null) {
@@ -949,7 +950,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			IPDebugger debugger, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			final IPResourceManager rm = getResourceManager(configuration);
+			final IResourceManagerControl rm = getResourceManager(configuration);
 			if (rm == null) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));

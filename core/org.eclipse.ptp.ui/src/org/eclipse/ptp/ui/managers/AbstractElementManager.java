@@ -26,8 +26,6 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
@@ -211,20 +209,6 @@ public abstract class AbstractElementManager implements IElementManager {
 	 * IElement)
 	 */
 	public abstract Image getImage(IElement element);
-
-	/**
-	 * Get Resource Managers
-	 * 
-	 * @return
-	 * @since 5.0
-	 */
-	public IPResourceManager[] getResourceManagers() {
-		IPUniverse universe = modelPresentation.getUniverse();
-		if (universe == null) {
-			return new IPResourceManager[0];
-		}
-		return universe.getResourceManagers();
-	}
 
 	/*
 	 * (non-Javadoc)

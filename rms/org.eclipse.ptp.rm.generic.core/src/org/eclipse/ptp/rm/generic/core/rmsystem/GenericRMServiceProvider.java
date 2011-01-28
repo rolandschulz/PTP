@@ -67,8 +67,7 @@ public class GenericRMServiceProvider extends AbstractToolRMServiceProvider {
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IResourceManagerControl.class) {
-			IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse();
-			return new GenericResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+			return new GenericResourceManager((IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
 		}
 		return null;
 	}

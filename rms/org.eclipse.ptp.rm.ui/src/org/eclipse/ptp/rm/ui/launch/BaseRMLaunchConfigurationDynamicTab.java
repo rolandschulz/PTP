@@ -14,8 +14,8 @@ package org.eclipse.ptp.rm.ui.launch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.swt.graphics.Image;
@@ -48,7 +48,7 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation canSave(Control control, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IResourceManagerControl rm, IPQueue queue) {
 		if (dataSource.canSave())
 			return new RMLaunchValidation(true, null);
 		return new RMLaunchValidation(false, dataSource.getErrorMessage());
@@ -81,7 +81,7 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IPResourceManager rm, IPQueue queue,
+	public RMLaunchValidation initializeFrom(Control control, IResourceManagerControl rm, IPQueue queue,
 			ILaunchConfiguration configuration) {
 		dataSource.setResourceManager(rm);
 		dataSource.setQueue(queue);
@@ -106,7 +106,7 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManagerControl rm, IPQueue queue) {
 		if (dataSource.canAccept())
 			return new RMLaunchValidation(true, null);
 		return new RMLaunchValidation(false, dataSource.getErrorMessage());
@@ -124,7 +124,7 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
 		dataSource.setResourceManager(rm);
 		dataSource.setQueue(queue);
 		dataSource.setConfigurationWorkingCopy(configuration);

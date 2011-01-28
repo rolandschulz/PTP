@@ -25,28 +25,26 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ui.PlatformUI;
 
-public class StartResourceManagersObjectActionDelegate extends
-		AbstractResourceManagerSelectionActionDelegate {
+public class StartResourceManagersObjectActionDelegate extends AbstractResourceManagerSelectionActionDelegate {
 
 	public void run(IAction action) {
-		
+
 		for (IResourceManagerMenuContribution menuContrib : getMenuContribs()) {
-			final IPResourceManager rmManager = 
-				(IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
+			final IResourceManagerControl rmManager = (IResourceManagerControl) menuContrib
+					.getAdapter(IResourceManagerControl.class);
 
 			if (!isEnabledFor(rmManager)) {
 				continue;
 			}
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor)
-						throws InvocationTargetException, InterruptedException {
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
 						rmManager.startUp(monitor);
 					} catch (CoreException e) {
@@ -63,19 +61,23 @@ public class StartResourceManagersObjectActionDelegate extends
 				Throwable t = e.getCause();
 				IStatus status = null;
 				if (t != null && t instanceof CoreException) {
-					status = ((CoreException)t).getStatus();
+					status = ((CoreException) t).getStatus();
 				}
-				UIUtils.showErrorDialog(Messages.StartResourceManagersObjectActionDelegate_0, Messages.StartResourceManagersObjectActionDelegate_1, status);
+				UIUtils.showErrorDialog(Messages.StartResourceManagersObjectActionDelegate_0,
+						Messages.StartResourceManagersObjectActionDelegate_1, status);
 			} catch (InterruptedException e) {
 				// Do nothing. Operation has been canceled.
 			}
 		}
 	}
 
+	/**
+	 * @since 5.0
+	 */
 	@Override
-	protected boolean isEnabledFor(IPResourceManager rmManager) {
+	protected boolean isEnabledFor(IResourceManagerControl rmManager) {
 		if (rmManager.getState() == ResourceManagerAttributes.State.STOPPED) {
-			return true;		
+			return true;
 		}
 		return false;
 	}

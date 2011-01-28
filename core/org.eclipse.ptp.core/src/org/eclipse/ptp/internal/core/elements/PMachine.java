@@ -33,7 +33,6 @@ import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
@@ -52,9 +51,11 @@ public class PMachine extends Parent implements IPMachineControl {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
 	private String arch = Messages.PMachine_0;
+	private final IResourceManagerControl fResourceManager;
 
-	public PMachine(String id, IResourceManagerControl rm, IAttribute<?, ?, ?>[] attrs) {
-		super(id, rm, attrs);
+	public PMachine(String id, IResourceManagerControl rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
+		super(id, parent, attrs);
+		fResourceManager = rm;
 		/*
 		 * Create required attributes.
 		 */
@@ -251,8 +252,8 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * 
 	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
 	 */
-	public IPResourceManager getResourceManager() {
-		return (IPResourceManager) getParent();
+	public IResourceManagerControl getResourceManager() {
+		return fResourceManager;
 	}
 
 	/*

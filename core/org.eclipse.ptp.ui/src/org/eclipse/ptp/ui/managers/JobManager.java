@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -155,7 +156,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 		}
 		IPJob job = getJob();
 		if (job != null) {
-			IPResourceManager rm = job.getResourceManager();
+			IResourceManagerControl rm = job.getResourceManager();
 			if (rm != null) {
 				return rm.getName() + ": " + job.getName(); //$NON-NLS-1$
 			}
@@ -224,7 +225,8 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 */
 	public IPQueue[] getQueues() {
 		if (cur_queue != null) {
-			return cur_queue.getResourceManager().getQueues();
+			IPResourceManager rm = (IPResourceManager) cur_queue.getResourceManager().getAdapter(IPResourceManager.class);
+			return rm.getQueues();
 		}
 		return new IPQueue[] {};
 	}
@@ -270,7 +272,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public Image getImage(IElement element) {
 		IPJob job = getJob();
 		if (job != null) {
-			IPResourceManager rm = job.getResourceManager();
+			IResourceManagerControl rm = job.getResourceManager();
 			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
 					rm.getResourceManagerId());
 			if (presentation != null) {
@@ -310,11 +312,10 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 * @see org.eclipse.ptp.ui.IElementManager#initial()
 	 */
 	public IPElement initial(IPUniverse universe) {
-		for (IPResourceManager rm : universe.getResourceManagers()) {
-			for (IPQueue queue : rm.getQueues()) {
-				for (IPJob job : queue.getJobs()) {
-					addJob(job);
-				}
+		for (IResourceManagerControl rmc : universe.getResourceManagers()) {
+			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+			for (IPJob job : rm.getJobs()) {
+				addJob(job);
 			}
 		}
 
@@ -376,7 +377,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public void removeAllStoppedJobs() {
 		Map<String, IPResourceManager> rms = new HashMap<String, IPResourceManager>();
 		for (IPJob job : getJobs()) {
-			IPResourceManager rm = job.getResourceManager();
+			IPResourceManager rm = (IPResourceManager) job.getResourceManager().getAdapter(IPResourceManager.class);
 			if (!rms.containsKey(rm.getID())) {
 				rm.removeTerminatedJobs();
 				rms.put(rm.getID(), rm);

@@ -135,8 +135,8 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	private final Map<String, IPNodeControl> nodesById = Collections.synchronizedMap(new HashMap<String, IPNodeControl>());
 	private final Map<String, IPQueueControl> queuesById = Collections.synchronizedMap(new HashMap<String, IPQueueControl>());
 
-	public AbstractResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config) {
-		super(id, universe, getDefaultAttributes(config));
+	public AbstractResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(universe.getNextResourceManagerId(), universe, getDefaultAttributes(config));
 		this.config = config;
 
 		machineNodeListener = new IMachineChildListener() {
@@ -203,6 +203,9 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	@SuppressWarnings({ "rawtypes" })
 	public Object getAdapter(Class adapter) {
 		if (adapter.isInstance(this)) {
+			return this;
+		}
+		if (adapter == IPResourceManager.class) {
 			return this;
 		}
 		if (adapter == IResourceManagerConfiguration.class) {
@@ -365,6 +368,18 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	 */
 	public IPQueue[] getQueues() {
 		return getQueueControls().toArray(new IPQueueControl[0]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getResourceManager()
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IResourceManagerControl getResourceManager() {
+		return this;
 	}
 
 	/*
@@ -1107,7 +1122,7 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	 * @return newly created machine model element
 	 */
 	protected IPMachineControl newMachine(String machineId, AttributeManager attrs) {
-		return new PMachine(machineId, this, attrs.getAttributes());
+		return new PMachine(machineId, this, this, attrs.getAttributes());
 	}
 
 	/**
@@ -1135,7 +1150,7 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	 * @return newly created queue model element
 	 */
 	protected IPQueueControl newQueue(String queueId, AttributeManager attrs) {
-		return new PQueue(queueId, this, attrs.getAttributes());
+		return new PQueue(queueId, this, this, attrs.getAttributes());
 	}
 
 	/**

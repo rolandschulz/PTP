@@ -32,8 +32,10 @@ import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -122,11 +124,10 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/** Job to monitor remote system and is executed periodically. */
 	private Job periodicMonitorJob;
 
-	/** The RM id of the RM manager that created the RTS. */
-	private final String rmID;
-
 	/** Progress monitor for startup. Used to cancel startup if necessary */
 	private IProgressMonitor startupMonitor = null;
+
+	private final IResourceManagerControl fResourceManager;
 
 	/** Attribute definitions for the RTS. */
 	protected AttributeDefinitionManager attrMgr;
@@ -145,9 +146,11 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 */
 	protected IToolRMConfiguration rmConfiguration;
 
-	public AbstractToolRuntimeSystem(Integer id, IToolRMConfiguration config, AttributeDefinitionManager manager) {
-		this.rmID = id.toString();
-		this.nextID = id.intValue() + 1;
+	/**
+	 * @since 3.0
+	 */
+	public AbstractToolRuntimeSystem(IResourceManagerControl rm, IToolRMConfiguration config, AttributeDefinitionManager manager) {
+		fResourceManager = rm;
 		this.jobNumber = 0;
 		this.rmConfiguration = config;
 		this.attrMgr = manager;
@@ -322,7 +325,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		attrMgr.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.UP));
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
 		mgr.setAttributeManager(new RangeSet(id), attrMgr);
-		fireRuntimeNewMachineEvent(eventFactory.newRuntimeNewMachineEvent(rmID, mgr));
+		IPResourceManager rm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		fireRuntimeNewMachineEvent(eventFactory.newRuntimeNewMachineEvent(rm.getID(), mgr));
 
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: new machine #{1}", rmConfiguration.getName(), id); //$NON-NLS-1$
 
@@ -425,7 +429,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		AttributeManager attrMgr = new AttributeManager();
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
 		mgr.setAttributeManager(new RangeSet(id), attrMgr);
-		fireRuntimeNewQueueEvent(eventFactory.newRuntimeNewQueueEvent(rmID, mgr));
+		IPResourceManager rm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		fireRuntimeNewQueueEvent(eventFactory.newRuntimeNewQueueEvent(rm.getID(), mgr));
 
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: new queue #{1}", rmConfiguration.getName(), id); //$NON-NLS-1$
 
@@ -458,8 +463,11 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		return rmConfiguration;
 	}
 
-	public String getRmID() {
-		return rmID;
+	/**
+	 * @since 3.0
+	 */
+	public IResourceManagerControl getResourceManager() {
+		return fResourceManager;
 	}
 
 	public abstract AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration();
