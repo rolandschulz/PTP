@@ -28,6 +28,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl.JobControlOperation;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -497,7 +498,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public void terminateJob() throws CoreException {
 		IPJob job = getJob();
 		if (job != null) {
-			job.getResourceManager().terminateJob(job);
+			job.getResourceManager().control(job, JobControlOperation.TERMINATE, null);
 		}
 	}
 
