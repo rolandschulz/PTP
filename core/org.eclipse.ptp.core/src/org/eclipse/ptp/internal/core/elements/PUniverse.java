@@ -27,7 +27,6 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 
 public class PUniverse extends Parent implements IPUniverseControl {
@@ -92,24 +91,6 @@ public class PUniverse extends Parent implements IPUniverseControl {
 	 */
 	public synchronized String getNextResourceManagerId() {
 		return Integer.toString(nextResourceManagerId++ << RMID_SHIFT);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPUniverse#getResourceManager(java.lang
-	 * .String)
-	 */
-	public IPResourceManager getResourceManager(String id) {
-		synchronized (resourceManagers) {
-			for (IResourceManagerControl resourceManager : resourceManagers) {
-				if (resourceManager.getID().equals(id)) {
-					return (IPResourceManager) resourceManager.getAdapter(IPResourceManager.class);
-				}
-			}
-		}
-		return null;
 	}
 
 	/*

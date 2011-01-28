@@ -175,7 +175,8 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	 */
 	@Override
 	public Object getParent(Object object) {
-		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(object);
+		IResourceManagerControl rmc = (IResourceManagerControl) getResourceManager(object);
+		IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 		if (rm != null) {
 			return rm.getParent();
 		}
