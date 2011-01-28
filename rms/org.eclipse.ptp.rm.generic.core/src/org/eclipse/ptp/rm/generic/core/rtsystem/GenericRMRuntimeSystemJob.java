@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
@@ -173,7 +172,7 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				if (!procZero.isEmpty()) {
 					final AttributeManager attributes = new AttributeManager(ProcessAttributes.getStdoutAttributeDefinition()
 							.create(line));
-					((IPJobControl) job).addProcessAttributes(procZero, attributes);
+					job.addProcessAttributes(procZero, attributes);
 				}
 				DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}: {1}", getJobID(), line); //$NON-NLS-1$
 			}
@@ -198,7 +197,7 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				if (!procZero.isEmpty()) {
 					final AttributeManager attributes = new AttributeManager(ProcessAttributes.getStderrAttributeDefinition()
 							.create(line));
-					((IPJobControl) job).addProcessAttributes(procZero, attributes);
+					job.addProcessAttributes(procZero, attributes);
 				}
 				DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}: {1}", getJobID(), line); //$NON-NLS-1$
 			}

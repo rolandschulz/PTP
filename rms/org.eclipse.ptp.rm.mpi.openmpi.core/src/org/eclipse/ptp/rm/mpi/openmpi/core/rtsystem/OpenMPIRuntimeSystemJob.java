@@ -29,7 +29,6 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -410,7 +409,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				if (!procZero.isEmpty()) {
 					final AttributeManager attributes = new AttributeManager(ProcessAttributes.getStdoutAttributeDefinition()
 							.create(line));
-					((IPJobControl) ipJob).addProcessAttributes(procZero, attributes);
+					ipJob.addProcessAttributes(procZero, attributes);
 				}
 				DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}: {1}", getJobID(), line); //$NON-NLS-1$
 			}
@@ -439,7 +438,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				if (!procZero.isEmpty()) {
 					final AttributeManager attributes = new AttributeManager(ProcessAttributes.getStderrAttributeDefinition()
 							.create(line));
-					((IPJobControl) ipJob).addProcessAttributes(procZero, attributes);
+					ipJob.addProcessAttributes(procZero, attributes);
 				}
 				DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}: {1}", getJobID(), line); //$NON-NLS-1$
 			}
@@ -732,9 +731,8 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	void setProcessAttribute(final IPJob job, int index, final StringAttribute attr) {
 		final BitSet processIndices = new BitSet();
 		processIndices.set(index);
-		IPJobControl jobCtl = (IPJobControl) job;
 		final AttributeManager attrMgr = new AttributeManager(attr);
-		jobCtl.addProcessAttributes(processIndices, attrMgr);
+		job.addProcessAttributes(processIndices, attrMgr);
 	}
 
 }

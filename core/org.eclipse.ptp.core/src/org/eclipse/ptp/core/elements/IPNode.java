@@ -42,6 +42,13 @@ public interface IPNode extends IPElement {
 	public void addElementListener(INodeListener listener);
 
 	/**
+	 * @param job
+	 * @param processRanks
+	 * @since 5.0
+	 */
+	public void addJobProcessRanks(IPJob job, BitSet processRanks);
+
+	/**
 	 * Get the job ranks for processes associated with this node and this job
 	 * 
 	 * @param job
@@ -94,4 +101,11 @@ public interface IPNode extends IPElement {
 	 * @param listener
 	 */
 	public void removeElementListener(INodeListener listener);
+
+	/**
+	 * @param job
+	 * @param processRanks
+	 * @since 5.0
+	 */
+	public void removeJobProcessRanks(IPJob job, BitSet processRanks);
 }

@@ -35,7 +35,6 @@ import org.eclipse.ptp.core.IServiceConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
@@ -156,7 +155,7 @@ public class ModelManager implements IModelManager {
 	protected final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
 	protected IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
 
-	protected IPUniverseControl universe = new PUniverse();
+	protected IPUniverse universe = new PUniverse();
 
 	public ModelManager() {
 		fServiceManager.addEventListener(fServiceEventListener, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED

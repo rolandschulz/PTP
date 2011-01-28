@@ -16,7 +16,6 @@
 package org.eclipse.ptp.rm.pbs.ui;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
@@ -73,7 +72,7 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IResourceManagerControl.class) {
-			return new PBSResourceManager((IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
+			return new PBSResourceManager(PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
 		}
 		return null;
 	}

@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rm.core.AbstractToolsAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManager;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem.MPICH2RuntimeSystem;
@@ -31,7 +31,7 @@ public class MPICH2ResourceManager extends AbstractToolResourceManager {
 	/**
 	 * @since 2.0
 	 */
-	public MPICH2ResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+	public MPICH2ResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
 		super(universe, config);
 	}
 

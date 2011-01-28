@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import java.util.Collection;
+
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
@@ -29,6 +31,15 @@ public interface IPQueue extends IPElement {
 	 * @param listener
 	 */
 	public void addElementListener(IQueueListener listener);
+
+	/**
+	 * Add the collection of jobs to the queue.
+	 * 
+	 * @param jobs
+	 *            collection of IJobControls
+	 * @since 5.0
+	 */
+	public void addJobs(Collection<IPJob> jobs);
 
 	/**
 	 * Get the jobs in this queue. Returns an empty array if there are no jobs
@@ -58,4 +69,13 @@ public interface IPQueue extends IPElement {
 	 * @param listener
 	 */
 	public void removeElementListener(IQueueListener listener);
+
+	/**
+	 * Remove job from the queue
+	 * 
+	 * @param jobs
+	 *            to remove
+	 * @since 5.0
+	 */
+	public void removeJobs(Collection<IPJob> jobs);
 }

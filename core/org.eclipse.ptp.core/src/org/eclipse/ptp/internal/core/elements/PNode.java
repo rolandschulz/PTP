@@ -30,12 +30,10 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
-import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
@@ -51,14 +49,14 @@ import org.eclipse.ptp.internal.core.elements.events.NewProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.NodeChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveProcessEvent;
 
-public class PNode extends Parent implements IPNodeControl, IJobChildListener {
+public class PNode extends Parent implements IPNode, IJobChildListener {
 
 	private final ListenerList childListeners = new ListenerList();
 	private final ListenerList elementListeners = new ListenerList();
 	// discover which job ranks for a given job are running on this node
-	private final Map<IPJobControl, BitSet> jobProcessRanksMap = new HashMap<IPJobControl, BitSet>();
+	private final Map<IPJob, BitSet> jobProcessRanksMap = new HashMap<IPJob, BitSet>();
 
-	public PNode(String id, IPMachineControl mac, IAttribute<?, ?, ?>[] attrs) {
+	public PNode(String id, IPMachine mac, IAttribute<?, ?, ?>[] attrs) {
 		super(id, mac, attrs);
 		/*
 		 * Create required attributes.
@@ -97,9 +95,9 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.core.elementcontrols.IPNodeControl#addJobProcessRanks
-	 * (org.eclipse.ptp.core.elementcontrols.IPJobControl, java.util.BitSet)
+	 * (org.eclipse.ptp.core.elementcontrols.IPJob, java.util.BitSet)
 	 */
-	public void addJobProcessRanks(IPJobControl job, BitSet processRanks) {
+	public void addJobProcessRanks(IPJob job, BitSet processRanks) {
 		// add the incoming process indices to the
 		// existing process indices for this job
 		BitSet jobProcessRanks = jobProcessRanksMap.get(job);
@@ -218,20 +216,10 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	 * org.eclipse.ptp.core.elementcontrols.IPNodeControl#getMachineControl()
 	 */
 	public IPMachine getMachine() {
-		return getMachineControl();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPNodeControl#getMachineControl()
-	 */
-	public IPMachineControl getMachineControl() {
 		IPElement current = this;
 		do {
-			if (current instanceof IPMachineControl) {
-				return (IPMachineControl) current;
+			if (current instanceof IPMachine) {
+				return (IPMachine) current;
 			}
 		} while ((current = current.getParent()) != null);
 		return null;
@@ -289,8 +277,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	 * (org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
 	 */
 	public void handleEvent(IRemoveProcessEvent e) {
-		IPJobControl job = (IPJobControl) e.getJob();
-		removeJobProcessRanks(job, e.getProcesses());
+		removeJobProcessRanks(e.getJob(), e.getProcesses());
 	}
 
 	/*
@@ -320,9 +307,9 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.core.elementcontrols.IPNodeControl#removeJobProcessRanks
-	 * (org.eclipse.ptp.core.elementcontrols.IPJobControl, java.util.BitSet)
+	 * (org.eclipse.ptp.core.elementcontrols.IPJob, java.util.BitSet)
 	 */
-	public void removeJobProcessRanks(IPJobControl job, BitSet ranks) {
+	public void removeJobProcessRanks(IPJob job, BitSet ranks) {
 		// remove the removed process indices from the jobProcesses's set of
 		// process indices for this job.
 
