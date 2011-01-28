@@ -926,7 +926,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				if (traceText) {
 					if (index == 0)
 						System.out.println(" ");
-					System.out.println("col " + index + " attrname=" + attrname + " IFeedbackItem val=" + itemVal);
+					
+					if(traceText)System.out.println("col " + index + " attrname=" + attrname + " IFeedbackItem val=" + itemVal);
 				}
 				 if(itemVal!=null) {
 					 if(attrname.equals("filename")) {
@@ -936,7 +937,11 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					 }
 					 return itemVal;
 				 }
-				 return "";
+				 String value=itemVal;
+				 if((itemVal==null) ||(itemVal.length()==0)) {
+					 itemVal="["+attrname+"]";
+				 }
+				 return value;
 
 			} catch (Exception ce) {
 				return ("STTMV error"); //$NON-NLS-1$
