@@ -17,16 +17,16 @@
 package org.eclipse.ptp.core.elementcontrols;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
-public interface IResourceManagerControl extends IPElement {
+public interface IResourceManagerControl extends IAdaptable {
 	/**
 	 * @since 5.0
 	 */

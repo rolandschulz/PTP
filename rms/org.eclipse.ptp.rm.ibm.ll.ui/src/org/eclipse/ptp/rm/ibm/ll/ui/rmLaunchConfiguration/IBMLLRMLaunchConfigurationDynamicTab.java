@@ -51,6 +51,7 @@ import org.eclipse.ptp.core.attributes.StringSetAttribute;
 import org.eclipse.ptp.core.attributes.StringSetAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -1950,12 +1951,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManagerControl rmc, IPQueue queue) {
 		IAttribute<?, ?, ?> rmAttrs[];
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setDefaults entered."); //$NON-NLS-1$
 		currentLaunchConfig = config;
+		IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 		rmAttrs = rm.getAttributes();
 		for (int i = 0; i < rmAttrs.length; i++) {
 			try {

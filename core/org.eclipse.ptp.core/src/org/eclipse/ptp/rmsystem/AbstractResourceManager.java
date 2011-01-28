@@ -1128,7 +1128,7 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	 * @since 5.0
 	 */
 	protected IPJobControl newJob(String jobId, AttributeManager attrs) {
-		return new PJob(jobId, this, attrs.getAttributes());
+		return new PJob(jobId, this, this, attrs.getAttributes());
 	}
 
 	/**
