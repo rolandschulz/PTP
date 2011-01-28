@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.core.util.DebugUtil;
@@ -58,8 +57,7 @@ public class ResourceManagerPersistence {
 
 	private static final String TAG_RESOURCEMANGER_RUNNING = "IsRunning"; //$NON-NLS-1$
 
-	public static void saveResourceManagers(File file,
-			IResourceManagerControl[] resourceManagers) {
+	public static void saveResourceManagers(File file, IResourceManagerControl[] resourceManagers) {
 		if (DebugUtil.RM_TRACING) {
 			System.out.println(Messages.ResourceManagerPersistence_0 + file.getAbsolutePath());
 		}
@@ -85,13 +83,10 @@ public class ResourceManagerPersistence {
 		}
 	}
 
-	private static void saveResourceManagers(XMLMemento memento,
-			IResourceManagerControl[] resourceManagers) {
+	private static void saveResourceManagers(XMLMemento memento, IResourceManagerControl[] resourceManagers) {
 		for (int i = 0; i < resourceManagers.length; ++i) {
 			IMemento child = memento.createChild(TAG_RESOURCEMANGER);
-			child.putString(
-					TAG_RESOURCEMANGER_ID,
-					resourceManagers[i].getConfiguration().getResourceManagerId());
+			child.putString(TAG_RESOURCEMANGER_ID, resourceManagers[i].getConfiguration().getResourceManagerId());
 			child.putInteger(TAG_RESOURCEMANAGER_INDEX, i);
 			boolean isRunning = resourceManagers[i].getState().equals(ResourceManagerAttributes.State.STARTED);
 			child.putString(TAG_RESOURCEMANGER_RUNNING, isRunning ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -100,13 +95,11 @@ public class ResourceManagerPersistence {
 		}
 	}
 
-	private final List<IResourceManagerControl> resourceManagers =
-			new ArrayList<IResourceManagerControl>();
+	private final List<IResourceManagerControl> resourceManagers = new ArrayList<IResourceManagerControl>();
 
 	private IResourceManagerControl savedCurrentResourceManager;
 
-	private final List<IResourceManagerControl> rmsNeedStarting =
-			new ArrayList<IResourceManagerControl>();
+	private final List<IResourceManagerControl> rmsNeedStarting = new ArrayList<IResourceManagerControl>();
 
 	public IResourceManagerControl[] getResourceManagerControls() {
 		return resourceManagers.toArray(new IResourceManagerControl[0]);
@@ -116,8 +109,7 @@ public class ResourceManagerPersistence {
 		return rmsNeedStarting.toArray(new IResourceManagerControl[0]);
 	}
 
-	private IResourceManagerFactory getResourceManagerFactory(
-			IResourceManagerFactory[] factories, String id) {
+	private IResourceManagerFactory getResourceManagerFactory(IResourceManagerFactory[] factories, String id) {
 		for (int i = 0; i < factories.length; i++) {
 			if (factories[i].getId().equals(id))
 				return factories[i];
@@ -126,7 +118,7 @@ public class ResourceManagerPersistence {
 		return null;
 	}
 
-	public IPResourceManager getSavedCurrentResourceManager() {
+	public IResourceManagerControl getSavedCurrentResourceManager() {
 		return savedCurrentResourceManager;
 	}
 
@@ -138,8 +130,7 @@ public class ResourceManagerPersistence {
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	public void loadResourceManagers(File file,
-			IResourceManagerFactory[] factories) throws CoreException {
+	public void loadResourceManagers(File file, IResourceManagerFactory[] factories) throws CoreException {
 		rmsNeedStarting.clear();
 		resourceManagers.clear();
 
@@ -168,8 +159,7 @@ public class ResourceManagerPersistence {
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	private void loadResourceManagers(XMLMemento memento,
-			IResourceManagerFactory[] factories) throws CoreException {
+	private void loadResourceManagers(XMLMemento memento, IResourceManagerFactory[] factories) throws CoreException {
 		IMemento[] children = memento.getChildren(TAG_RESOURCEMANGER);
 		ArrayList<IStatus> statuses = new ArrayList<IStatus>();
 		final IResourceManagerControl[] tmpRMs = new IResourceManagerControl[children.length];
@@ -180,8 +170,7 @@ public class ResourceManagerPersistence {
 			final int index = children[i].getInteger(TAG_RESOURCEMANAGER_INDEX).intValue();
 			String isRunningRep = children[i].getString(TAG_RESOURCEMANGER_RUNNING);
 			boolean isRunning = "true".equalsIgnoreCase(isRunningRep); //$NON-NLS-1$
-			IResourceManagerFactory factory = getResourceManagerFactory(
-					factories, resourceManagerId);
+			IResourceManagerFactory factory = getResourceManagerFactory(factories, resourceManagerId);
 			if (factory != null) {
 				final IMemento grandchild = children[i].getChild(TAG_RESOURCEMANGER_CONFIGURATION);
 				IResourceManagerConfiguration configuration = factory.loadConfiguration(grandchild);
@@ -201,8 +190,7 @@ public class ResourceManagerPersistence {
 
 		resourceManagers.addAll(rms);
 		if (statuses.size() > 0) {
-			throw new CoreException(new MultiStatus(PTPCorePlugin.PLUGIN_ID,
-					IStatus.ERROR, statuses.toArray(new IStatus[0]),
+			throw new CoreException(new MultiStatus(PTPCorePlugin.PLUGIN_ID, IStatus.ERROR, statuses.toArray(new IStatus[0]),
 					Messages.ResourceManagerPersistence_2, null));
 		}
 	}

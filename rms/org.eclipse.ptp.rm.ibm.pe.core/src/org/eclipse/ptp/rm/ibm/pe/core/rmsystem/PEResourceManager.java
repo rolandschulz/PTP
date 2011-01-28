@@ -27,12 +27,17 @@ package org.eclipse.ptp.rm.ibm.pe.core.rmsystem;
 import java.util.BitSet;
 import java.util.Collection;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.rm.ibm.pe.core.PECorePlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.rtsystem.PEProxyRuntimeClient;
 import org.eclipse.ptp.rm.ibm.pe.core.rtsystem.PERuntimeSystem;
 import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
@@ -41,11 +46,11 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 public class PEResourceManager extends AbstractRuntimeResourceManager {
 
-	private final Integer PERMID;
-
-	public PEResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
-		super(id.toString(), universe, config);
-		PERMID = id;
+	/**
+	 * @since 5.0
+	 */
+	public PEResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(universe, config);
 	}
 
 	/*
@@ -149,10 +154,16 @@ public class PEResourceManager extends AbstractRuntimeResourceManager {
 	 * ()
 	 */
 	@Override
-	protected IRuntimeSystem doCreateRuntimeSystem() {
+	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
 		IPEResourceManagerConfiguration config = (IPEResourceManagerConfiguration) getConfiguration();
-		/* load up the control and monitoring systems for OMPI */
-		PEProxyRuntimeClient runtimeProxy = new PEProxyRuntimeClient(config, PERMID);
+		IPResourceManager rm = (IPResourceManager) getAdapter(IPResourceManager.class);
+		int baseId;
+		try {
+			baseId = Integer.parseInt(rm.getID());
+		} catch (NumberFormatException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PECorePlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
+		}
+		PEProxyRuntimeClient runtimeProxy = new PEProxyRuntimeClient(config, baseId);
 		return new PERuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}
 

@@ -29,9 +29,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
@@ -75,13 +75,13 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 	private Combo resourceManagerCombo = null;
 
-	private IPResourceManager resourceManager = null;
-	private final Map<Integer, IPResourceManager> resourceManagers = new HashMap<Integer, IPResourceManager>();
-	private final HashMap<IPResourceManager, Integer> resourceManagerIndices = new HashMap<IPResourceManager, Integer>();
+	private IResourceManagerControl resourceManager = null;
+	private final Map<Integer, IResourceManagerControl> resourceManagers = new HashMap<Integer, IResourceManagerControl>();
+	private final HashMap<IResourceManagerControl, Integer> resourceManagerIndices = new HashMap<IResourceManagerControl, Integer>();
 	// The composite that holds the RM's attributes for the launch configuration
 	private ScrolledComposite launchAttrsScrollComposite;
 
-	private final Map<IPResourceManager, IRMLaunchConfigurationDynamicTab> rmDynamicTabs = new HashMap<IPResourceManager, IRMLaunchConfigurationDynamicTab>();
+	private final Map<IResourceManagerControl, IRMLaunchConfigurationDynamicTab> rmDynamicTabs = new HashMap<IResourceManagerControl, IRMLaunchConfigurationDynamicTab>();
 
 	private final ContentsChangedListener launchContentsChangedListener = new ContentsChangedListener();
 
@@ -130,7 +130,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 		IPUniverse universe = modelManager.getUniverse();
-		IPResourceManager[] rms = universe.getResourceManagers();
+		IResourceManagerControl[] rms = universe.getResourceManagers();
 		new Label(comp, SWT.NONE).setText(Messages.ApplicationTab_RM_Selection_Label);
 
 		resourceManagerCombo = new Combo(comp, SWT.READ_ONLY);
@@ -302,7 +302,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		IPResourceManager rm = getResourceManagerDefault();
+		IResourceManagerControl rm = getResourceManagerDefault();
 		if (rm == null) {
 			setErrorMessage(Messages.ResourcesTab_No_Resource_Manager);
 			return;
@@ -351,7 +351,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @return
 	 * @throws CoreException
 	 */
-	private IRMLaunchConfigurationDynamicTab createRMLaunchConfigurationDynamicTab(final IPResourceManager rm) throws CoreException {
+	private IRMLaunchConfigurationDynamicTab createRMLaunchConfigurationDynamicTab(final IResourceManagerControl rm)
+			throws CoreException {
 
 		final AbstractRMLaunchConfigurationFactory rmFactory = PTPLaunchPlugin.getDefault().getRMLaunchConfigurationFactory(rm);
 		if (rmFactory == null)
@@ -376,11 +377,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * 
 	 * @return resource manager
 	 */
-	private IPResourceManager getResourceManagerDefault() {
+	private IResourceManagerControl getResourceManagerDefault() {
 		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 		IPUniverse universe = modelManager.getUniverse();
 		if (universe != null) {
-			IPResourceManager[] rms = universe.getResourceManagers();
+			IResourceManagerControl[] rms = universe.getResourceManagers();
 			if (rms.length != 1)
 				return null;
 			return rms[0];
@@ -391,7 +392,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/**
 	 * @return
 	 */
-	private IPResourceManager getResourceManagerFromCombo() {
+	private IResourceManagerControl getResourceManagerFromCombo() {
 		if (resourceManagerCombo != null) {
 			int i = resourceManagerCombo.getSelectionIndex();
 			return resourceManagers.get(i);
@@ -406,7 +407,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param rm
 	 * @return
 	 */
-	private IRMLaunchConfigurationDynamicTab getRMLaunchConfigurationDynamicTab(final IPResourceManager rm) {
+	private IRMLaunchConfigurationDynamicTab getRMLaunchConfigurationDynamicTab(final IResourceManagerControl rm) {
 		if (!rmDynamicTabs.containsKey(rm))
 			try {
 				IRMLaunchConfigurationDynamicTab rmDynamicTab = createRMLaunchConfigurationDynamicTab(rm);
@@ -440,7 +441,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param resource
 	 *            manager
 	 */
-	private void setResourceManagerComboSelection(IPResourceManager rm) {
+	private void setResourceManagerComboSelection(IResourceManagerControl rm) {
 		final Integer results = resourceManagerIndices.get(rm);
 		int i = 0;
 		if (results != null)
@@ -458,7 +459,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param queue
 	 * @param launchConfiguration
 	 */
-	private void updateLaunchAttributeControls(IPResourceManager rm, IPQueue queue, ILaunchConfiguration launchConfiguration) {
+	private void updateLaunchAttributeControls(IResourceManagerControl rm, IPQueue queue, ILaunchConfiguration launchConfiguration) {
 		final ScrolledComposite launchAttrsScrollComp = getLaunchAttrsScrollComposite();
 		launchAttrsScrollComp.setContent(null);
 		for (Control child : launchAttrsScrollComp.getChildren())

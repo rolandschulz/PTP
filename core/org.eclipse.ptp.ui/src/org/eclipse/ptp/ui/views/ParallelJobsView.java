@@ -46,6 +46,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -201,7 +202,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 			 * Add resource manager child listener so we get notified when new
 			 * machines are added to the model.
 			 */
-			final IPResourceManager rm = e.getResourceManager();
+			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
 			rm.addChildListener(resourceManagerListener);
 		}
 
@@ -217,7 +218,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 			 * Removed resource manager child listener when resource manager is
 			 * removed.
 			 */
-			e.getResourceManager().removeChildListener(resourceManagerListener);
+			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			rm.removeChildListener(resourceManagerListener);
 		}
 	}
 
@@ -546,7 +548,9 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	public void dispose() {
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		synchronized (mm) {
-			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
+			for (IResourceManagerControl rmc : mm.getUniverse().getResourceManagers()) {
+				final IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+
 				for (IPJob job : rm.getJobs()) {
 					job.removeChildListener(jobChildListener);
 				}
@@ -958,7 +962,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 			 * a RM if a new event arrives while we're doing this, but is it a
 			 * problem?
 			 */
-			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
+			for (IResourceManagerControl rmc : mm.getUniverse().getResourceManagers()) {
+				final IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 				rm.addChildListener(resourceManagerListener);
 			}
 			mm.addListener(modelManagerListener);

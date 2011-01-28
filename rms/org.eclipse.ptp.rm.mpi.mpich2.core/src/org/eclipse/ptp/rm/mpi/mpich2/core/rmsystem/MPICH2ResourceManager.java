@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
-
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rm.core.AbstractToolsAttributes;
@@ -22,28 +22,32 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class MPICH2ResourceManager extends AbstractToolResourceManager {
 
-	private Integer MPICH2_RMID;
 	private MPICH2RuntimeSystem rts = null;
 
-	public MPICH2ResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
-		super(id.toString(), universe, config);
-		MPICH2_RMID = id;
+	/**
+	 * @since 2.0
+	 */
+	public MPICH2ResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(universe, config);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateRuntimeSystem()
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateRuntimeSystem
+	 * ()
 	 */
 	@Override
-	protected IRuntimeSystem doCreateRuntimeSystem() {
+	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
 		IMPICH2ResourceManagerConfiguration config = (IMPICH2ResourceManagerConfiguration) getConfiguration();
 		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
 		attrDefMgr.setAttributeDefinitions(AbstractToolsAttributes.getDefaultAttributeDefinitions());
-		rts = new MPICH2RuntimeSystem(MPICH2_RMID, config, attrDefMgr);
+		rts = new MPICH2RuntimeSystem(this, config, attrDefMgr);
 		return rts;
 	}
 }

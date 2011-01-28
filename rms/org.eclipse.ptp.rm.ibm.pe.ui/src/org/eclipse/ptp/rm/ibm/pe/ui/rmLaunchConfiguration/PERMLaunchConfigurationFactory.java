@@ -24,7 +24,7 @@ package org.eclipse.ptp.rm.ibm.pe.ui.rmLaunchConfiguration;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManager;
@@ -40,7 +40,7 @@ public class PERMLaunchConfigurationFactory extends AbstractRMLaunchConfiguratio
 	 * org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IPResourceManager rm, ILaunchConfigurationDialog dialog)
+	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManagerControl rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
 		return new PERMLaunchConfigurationDynamicTab(rm, dialog);
 	}
@@ -53,7 +53,7 @@ public class PERMLaunchConfigurationFactory extends AbstractRMLaunchConfiguratio
 	 * #getResourceManagerClass()
 	 */
 	@Override
-	public Class<? extends IPResourceManager> getResourceManagerClass() {
+	public Class<? extends IResourceManagerControl> getResourceManagerClass() {
 		return PEResourceManager.class;
 	}
 

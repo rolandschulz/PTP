@@ -11,8 +11,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.messages.Messages;
@@ -129,7 +129,7 @@ public class TerminateJobFromListAction extends Action {
 				try {
 					IPJob job = (IPJob) selJobs[i];
 
-					IPResourceManager rm = job.getResourceManager();
+					IResourceManagerControl rm = job.getResourceManager();
 					if (job.getState() != JobAttributes.State.COMPLETED) {
 						rm.terminateJob(job);
 					}

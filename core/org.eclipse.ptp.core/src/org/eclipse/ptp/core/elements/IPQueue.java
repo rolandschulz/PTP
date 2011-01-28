@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 
@@ -39,10 +40,10 @@ public interface IPQueue extends IPElement {
 	/**
 	 * Get the resource manager that controls this queue.
 	 * 
-	 * @return IPResourceManager
+	 * @return IResourceManagerControl
 	 * @since 5.0
 	 */
-	public IPResourceManager getResourceManager();
+	public IResourceManagerControl getResourceManager();
 
 	/**
 	 * Get the internal state of the process.

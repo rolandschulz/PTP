@@ -24,6 +24,7 @@ import java.util.Set;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
@@ -189,7 +190,7 @@ public interface IPJob extends IPElement {
 	 * 
 	 * @since 5.0
 	 */
-	public IPResourceManager getResourceManager();
+	public IResourceManagerControl getResourceManager();
 
 	/**
 	 * @param processJobRank

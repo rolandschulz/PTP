@@ -25,31 +25,29 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.messages.Messages;
 
-public class StopResourceManagersObjectActionDelegate
-extends AbstractResourceManagerSelectionActionDelegate {
+public class StopResourceManagersObjectActionDelegate extends AbstractResourceManagerSelectionActionDelegate {
 
 	public void run(IAction action) {
-		
+
 		for (IResourceManagerMenuContribution menuContrib : getMenuContribs()) {
-			IPResourceManager rmManager = (IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
+			IResourceManagerControl rmManager = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
 
 			if (!isEnabledFor(rmManager)) {
 				continue;
 			}
-			
+
 			/*
 			 * Only ask if we are really shutting down the RM
 			 */
 			ResourceManagerAttributes.State state = rmManager.getState();
 			if (state == ResourceManagerAttributes.State.STARTED) {
-				boolean shutdown = MessageDialog.openConfirm(getTargetShell(),
-						Messages.StopResourceManagersObjectActionDelegate_0,
+				boolean shutdown = MessageDialog.openConfirm(getTargetShell(), Messages.StopResourceManagersObjectActionDelegate_0,
 						NLS.bind(Messages.StopResourceManagersObjectActionDelegate_1, rmManager.getName()));
 				if (!shutdown) {
 					return;
@@ -60,11 +58,9 @@ extends AbstractResourceManagerSelectionActionDelegate {
 				rmManager.shutdown();
 			} catch (CoreException e) {
 				final String message = NLS.bind(Messages.StopResourceManagersObjectActionDelegate_2, rmManager.getName());
-				Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID,
-						1, message, e);
-				ErrorDialog dlg = new ErrorDialog(getTargetShell(),
-						Messages.StopResourceManagersObjectActionDelegate_3, message, status,
-						IStatus.ERROR);
+				Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1, message, e);
+				ErrorDialog dlg = new ErrorDialog(getTargetShell(), Messages.StopResourceManagersObjectActionDelegate_3, message,
+						status, IStatus.ERROR);
 				dlg.open();
 				PTPUIPlugin.log(status);
 			}
@@ -72,11 +68,10 @@ extends AbstractResourceManagerSelectionActionDelegate {
 	}
 
 	@Override
-	protected boolean isEnabledFor(IPResourceManager rmManager) {
+	protected boolean isEnabledFor(IResourceManagerControl rmManager) {
 		ResourceManagerAttributes.State state = rmManager.getState();
-		if (state == ResourceManagerAttributes.State.STARTING ||
-				state == ResourceManagerAttributes.State.STARTED ||
-				state == ResourceManagerAttributes.State.ERROR) {
+		if (state == ResourceManagerAttributes.State.STARTING || state == ResourceManagerAttributes.State.STARTED
+				|| state == ResourceManagerAttributes.State.ERROR) {
 			return true;
 		}
 		return false;

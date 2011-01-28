@@ -24,14 +24,13 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
@@ -68,8 +67,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 */
 	private void initializeProcesses() {
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
-		final IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager()
-				.getResourceManagerFromUniqueName(getRtSystem().getRmConfiguration().getUniqueName());
+		IPResourceManager rm = (IPResourceManager) rtSystem.getResourceManager().getAdapter(IPResourceManager.class);
 		final IPJob ipJob = rm.getJobById(getJobID());
 		IntegerAttribute numProcsAttr = ipJob.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
 		getRtSystem().createProcesses(getJobID(), numProcsAttr.getValue().intValue());
@@ -85,8 +83,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 */
 	private void terminateProcesses() {
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
-		final IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager()
-				.getResourceManagerFromUniqueName(getRtSystem().getRmConfiguration().getUniqueName());
+		IPResourceManager rm = (IPResourceManager) rtSystem.getResourceManager().getAdapter(IPResourceManager.class);
 		final IPJob ipJob = rm.getJobById(getJobID());
 
 		/*
@@ -137,8 +134,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 	@Override
 	protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException {
-		final IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager()
-				.getResourceManagerFromUniqueName(getRtSystem().getRmConfiguration().getUniqueName());
+		IPResourceManager rm = (IPResourceManager) getRtSystem().getResourceManager().getAdapter(IPResourceManager.class);
 		final IPJob ipJob = rm.getJobById(getJobID());
 
 		initializeProcesses();

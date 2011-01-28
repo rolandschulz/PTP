@@ -90,8 +90,7 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IResourceManagerControl.class) {
-			IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse();
-			return new OpenMPIResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+			return new OpenMPIResourceManager((IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
 		}
 		return null;
 	}

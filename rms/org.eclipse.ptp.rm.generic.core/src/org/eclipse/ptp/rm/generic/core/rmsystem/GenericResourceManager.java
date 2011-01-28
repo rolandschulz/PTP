@@ -26,12 +26,10 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
  */
 public class GenericResourceManager extends AbstractToolResourceManager {
 
-	private final Integer GENERIC_RMID;
 	private GenericRMRuntimeSystem rts = null;
 
-	public GenericResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
-		super(id.toString(), universe, config);
-		GENERIC_RMID = id;
+	public GenericResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(universe, config);
 	}
 
 	/*
@@ -46,7 +44,7 @@ public class GenericResourceManager extends AbstractToolResourceManager {
 		IToolRMConfiguration config = (IToolRMConfiguration) getConfiguration();
 		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
 		attrDefMgr.setAttributeDefinitions(AbstractToolsAttributes.getDefaultAttributeDefinitions());
-		rts = new GenericRMRuntimeSystem(GENERIC_RMID, config, attrDefMgr);
+		rts = new GenericRMRuntimeSystem(this, config, attrDefMgr);
 		return rts;
 	}
 }

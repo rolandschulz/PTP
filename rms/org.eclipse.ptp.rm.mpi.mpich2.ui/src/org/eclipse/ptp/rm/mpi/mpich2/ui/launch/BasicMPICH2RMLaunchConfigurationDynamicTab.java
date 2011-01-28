@@ -22,8 +22,8 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2LaunchAttributes;
@@ -262,7 +262,7 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConf
 	/**
 	 * @since 2.0
 	 */
-	public void createControl(Composite parent, IPResourceManager rm, IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -333,8 +333,8 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConf
 	/**
 	 * @since 2.0
 	 */
-	public IAttribute<?, ?, ?>[] getAttributes(IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
-			throws CoreException {
+	public IAttribute<?, ?, ?>[] getAttributes(IResourceManagerControl rm, IPQueue queue, ILaunchConfiguration configuration,
+			String mode) throws CoreException {
 
 		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
 
@@ -370,7 +370,7 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConf
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
 		configuration.setAttribute(MPICH2LaunchConfiguration.ATTR_NUMPROCS, MPICH2LaunchConfigurationDefaults.ATTR_NUMPROCS);
 		configuration.setAttribute(MPICH2LaunchConfiguration.ATTR_NOLOCAL, MPICH2LaunchConfigurationDefaults.ATTR_NOLOCAL);
 		configuration.setAttribute(MPICH2LaunchConfiguration.ATTR_USEPREFIX, MPICH2LaunchConfigurationDefaults.ATTR_USEPREFIX);

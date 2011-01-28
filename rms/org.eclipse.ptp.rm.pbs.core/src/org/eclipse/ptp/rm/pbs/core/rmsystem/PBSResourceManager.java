@@ -13,12 +13,17 @@ package org.eclipse.ptp.rm.pbs.core.rmsystem;
 import java.util.BitSet;
 import java.util.Collection;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.rm.pbs.core.Activator;
 import org.eclipse.ptp.rm.pbs.core.rtsystem.PBSProxyRuntimeClient;
 import org.eclipse.ptp.rm.pbs.core.rtsystem.PBSRuntimeSystem;
 import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
@@ -27,11 +32,11 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 public class PBSResourceManager extends AbstractRuntimeResourceManager {
 
-	private final Integer PBSRMID;
-
-	public PBSResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
-		super(id.toString(), universe, config);
-		PBSRMID = id;
+	/**
+	 * @since 5.0
+	 */
+	public PBSResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(universe, config);
 	}
 
 	/*
@@ -135,10 +140,16 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	 * ()
 	 */
 	@Override
-	protected IRuntimeSystem doCreateRuntimeSystem() {
+	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
 		IPBSResourceManagerConfiguration config = (IPBSResourceManagerConfiguration) getConfiguration();
-		/* load up the control and monitoring systems for PBS */
-		PBSProxyRuntimeClient runtimeProxy = new PBSProxyRuntimeClient(config, PBSRMID);
+		IPResourceManager rm = (IPResourceManager) getAdapter(IPResourceManager.class);
+		int baseId;
+		try {
+			baseId = Integer.parseInt(rm.getID());
+		} catch (NumberFormatException e) {
+			throw new CoreException(new Status(IStatus.ERROR, Activator.getUniqueIdentifier(), e.getLocalizedMessage()));
+		}
+		PBSProxyRuntimeClient runtimeProxy = new PBSProxyRuntimeClient(config, baseId);
 		return new PBSRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}
 

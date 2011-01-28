@@ -182,7 +182,8 @@ public class ResourceManagerView extends ViewPart {
 		 * handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
 		 */
 		public synchronized void handleEvent(INewResourceManagerEvent e) {
-			final IPResourceManager resourceManager = e.getResourceManager();
+			final IPResourceManager resourceManager = (IPResourceManager) e.getResourceManager()
+					.getAdapter(IPResourceManager.class);
 			resourceManagers.add(resourceManager);
 			resourceManager.addElementListener(rmListener);
 			resourceManager.addChildListener(rmChildListener);
@@ -197,7 +198,8 @@ public class ResourceManagerView extends ViewPart {
 		 * handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
 		 */
 		public synchronized void handleEvent(IRemoveResourceManagerEvent e) {
-			final IPResourceManager resourceManager = e.getResourceManager();
+			final IPResourceManager resourceManager = (IPResourceManager) e.getResourceManager()
+					.getAdapter(IPResourceManager.class);
 			resourceManagers.remove(resourceManager);
 			resourceManager.removeElementListener(rmListener);
 			resourceManager.removeChildListener(rmChildListener);
@@ -242,7 +244,7 @@ public class ResourceManagerView extends ViewPart {
 		public Font getFont(Object element) {
 			IPResourceManager rm = getResourceManager(element);
 			RMManager rmManager = PTPUIPlugin.getDefault().getRMManager();
-			if (rm != null && rmManager != null && rm.getUniqueName().equals(rmManager.getSelected())) {
+			if (rm != null && rmManager != null && rm.getResourceManager().getUniqueName().equals(rmManager.getSelected())) {
 				return selectedFont;
 			}
 			return unSelectedFont;
@@ -489,7 +491,7 @@ public class ResourceManagerView extends ViewPart {
 		public void handleEvent(IResourceManagerChangeEvent e) {
 			IPResourceManager rm = e.getSource();
 			if (rmManager != null && rm.getState() == ResourceManagerAttributes.State.STOPPED
-					&& rm.getUniqueName().equals(rmManager.getSelected())) {
+					&& rm.getResourceManager().getUniqueName().equals(rmManager.getSelected())) {
 				rmManager.fireSetDefaultRMEvent(null);
 			}
 			refreshViewer(rm);
@@ -684,7 +686,8 @@ public class ResourceManagerView extends ViewPart {
 		 * Add us to any existing RM's. I guess it's possible we could miss a RM
 		 * if a new event arrives while we're doing this, but is it a problem?
 		 */
-		for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
+		for (IResourceManagerControl rmc : mm.getUniverse().getResourceManagers()) {
+			final IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 			rm.addElementListener(rmListener);
 		}
 		mm.addListener(mmChildListener);

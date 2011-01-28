@@ -84,8 +84,7 @@ public class LLServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IResourceManagerControl.class) {
-			IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse();
-			return new IBMLLResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+			return new IBMLLResourceManager((IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
 		}
 		return null;
 	}

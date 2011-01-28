@@ -90,21 +90,22 @@ public class PUniverse extends Parent implements IPUniverseControl {
 	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#
 	 * getNextResourceManagerId()
 	 */
-	public synchronized int getNextResourceManagerId() {
-		return (nextResourceManagerId++ << RMID_SHIFT);
+	public synchronized String getNextResourceManagerId() {
+		return Integer.toString(nextResourceManagerId++ << RMID_SHIFT);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.IPUniverse#findResourceManagerById(java.lang.String)
+	 * org.eclipse.ptp.core.elements.IPUniverse#getResourceManager(java.lang
+	 * .String)
 	 */
 	public IPResourceManager getResourceManager(String id) {
 		synchronized (resourceManagers) {
-			for (IPResourceManager resourceManager : resourceManagers) {
+			for (IResourceManagerControl resourceManager : resourceManagers) {
 				if (resourceManager.getID().equals(id)) {
-					return resourceManager;
+					return (IPResourceManager) resourceManager.getAdapter(IPResourceManager.class);
 				}
 			}
 		}
@@ -135,22 +136,9 @@ public class PUniverse extends Parent implements IPUniverseControl {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.core.elementcontrols.IPUniverseControl#removeResourceManager
-	 * (org.eclipse.ptp.core.elements.IPResourceManager)
+	 * (org.eclipse.ptp.core.elements.IResourceManagerControl)
 	 */
-	public void removeResourceManager(IPResourceManager removedManager) {
+	public void removeResourceManager(IResourceManagerControl removedManager) {
 		resourceManagers.remove(removedManager);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPUniverseControl#removeResourceManagers
-	 * (org.eclipse.ptp.core.elements.IPResourceManager[])
-	 */
-	public void removeResourceManagers(IPResourceManager[] removedRMs) {
-		for (IPResourceManager rm : removedRMs) {
-			removeResourceManager(rm);
-		}
 	}
 }

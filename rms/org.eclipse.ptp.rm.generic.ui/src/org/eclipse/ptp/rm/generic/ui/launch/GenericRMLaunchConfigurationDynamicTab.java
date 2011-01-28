@@ -18,14 +18,14 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
 
 public class GenericRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfigurationDynamicTab {
 
-	public GenericRMLaunchConfigurationDynamicTab(IPResourceManager rm, ILaunchConfigurationDialog dialog) {
+	public GenericRMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 	}
 
@@ -39,8 +39,8 @@ public class GenericRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchCo
 	 * org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
 	 */
 	@Override
-	public IAttribute<?, ?, ?>[] getAttributes(IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
-			throws CoreException {
+	public IAttribute<?, ?, ?>[] getAttributes(IResourceManagerControl rm, IPQueue queue, ILaunchConfiguration configuration,
+			String mode) throws CoreException {
 		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
 
 		/*

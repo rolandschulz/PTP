@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
@@ -31,8 +32,8 @@ public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 	/** The queue that dispatches jobs */
 	private String fQueueID;
 
-	public GenericRMRuntimeSystem(Integer openmpi_rmid, IToolRMConfiguration config, AttributeDefinitionManager attrDefMgr) {
-		super(openmpi_rmid, config, attrDefMgr);
+	public GenericRMRuntimeSystem(IResourceManagerControl rm, IToolRMConfiguration config, AttributeDefinitionManager attrDefMgr) {
+		super(rm, config, attrDefMgr);
 	}
 
 	@Override

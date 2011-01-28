@@ -18,12 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
@@ -51,24 +47,6 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	 *            listener to add to the list of listeners
 	 */
 	public void addElementListener(IResourceManagerListener listener);
-
-	/**
-	 * Get the attribute definition corresponding to the attrId. This will only
-	 * check for attribute definitions that the RM knows about.
-	 * 
-	 * @param attrId
-	 *            ID of the attribute definition
-	 * @return the attribute definition corresponding to the attribute
-	 *         definition ID
-	 */
-	public IAttributeDefinition<?, ?, ?> getAttributeDefinition(String attrId);
-
-	/**
-	 * Get a string description of this RM
-	 * 
-	 * @return string describing the RM
-	 */
-	public String getDescription();
 
 	/**
 	 * Find a job object using its ID Returns null if no node is found.
@@ -106,13 +84,6 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	public IPMachine[] getMachines();
 
 	/**
-	 * Get the name of this RM
-	 * 
-	 * @return string name of the RM
-	 */
-	public String getName();
-
-	/**
 	 * Find a node object using its ID Returns null if no node is found.
 	 * 
 	 * @param id
@@ -140,11 +111,11 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	public IPQueue[] getQueues();
 
 	/**
-	 * Returns the extension point id of the resource manager
+	 * Get the controlling resource manager
 	 * 
-	 * @return the extension point id of the resource manager
+	 * @return
 	 */
-	public String getResourceManagerId();
+	public IResourceManagerControl getResourceManager();
 
 	/**
 	 * Get the state of this RM
@@ -152,15 +123,6 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	 * @return state value representing the state of the RM
 	 */
 	public ResourceManagerAttributes.State getState();
-
-	/**
-	 * Get a unique name that can be used to identify this resource manager
-	 * persistently between PTP invocations. Used by the
-	 * ResourceManagerPersistence.
-	 * 
-	 * @return string representing a unique name for the resource manager
-	 */
-	public String getUniqueName();
 
 	/**
 	 * Remove listener for child events
@@ -183,63 +145,4 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	 * determined by its state attribute.
 	 */
 	public void removeTerminatedJobs();
-
-	/**
-	 * Shutdown the resource manager.
-	 * 
-	 * @throws CoreException
-	 *             this exception is thrown if the shutdown command fails
-	 */
-	public void shutdown() throws CoreException;
-
-	/**
-	 * Start up the resource manager. This could potentially take a long time
-	 * (or forever), particularly if the RM is located on a remote system.
-	 * 
-	 * Callers can assume that the operation was successful if no exception is
-	 * thrown and the monitor was not cancelled. However, the resource manager
-	 * may still fail later due to some other condition.
-	 * 
-	 * @param monitor
-	 *            the progress monitor to use for reporting progress to the
-	 *            user. It is the caller's responsibility to call done() on the
-	 *            given monitor. Accepts null, indicating that no progress
-	 *            should be reported and that the operation cannot be cancelled.
-	 * @throws CoreException
-	 *             this exception is thrown if the resource manager fails to
-	 *             start
-	 */
-	public void startUp(IProgressMonitor monitor) throws CoreException;
-
-	/**
-	 * Submit a job. The attribute manager must contain the appropriate
-	 * attributes for a successful job launch (e.g. the queue, etc.).
-	 * 
-	 * The method will return after an INewJobEvent has been received confirming
-	 * that the job has been submitted.
-	 * 
-	 * @param configuration
-	 *            launch configuration used to submit the job
-	 * @param attrMgr
-	 *            attribute manager containing the job launch attributes
-	 * @param monitor
-	 *            progress monitor for monitoring job submission.
-	 * @return a job object representing the submitted job
-	 * @throws CoreException
-	 *             if the job submission fails or was canceled
-	 */
-	public IPJob submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException;
-
-	/**
-	 * Terminate the job. The action this takes depends on the RM implementation
-	 * and the state of the job. For queued but not running jobs, this would be
-	 * equivalent to canceling the job. For running jobs, this would mean
-	 * halting its execution.
-	 * 
-	 * @param job
-	 *            job object representing the job to be canceled.
-	 * @throws CoreException
-	 */
-	public void terminateJob(IPJob job) throws CoreException;
 }

@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
@@ -80,7 +81,7 @@ public interface IPMachine extends IPElement {
 	 * @return the machine's parent resource manager
 	 * @since 5.0
 	 */
-	public IPResourceManager getResourceManager();
+	public IResourceManagerControl getResourceManager();
 
 	/**
 	 * Get the state of the machine

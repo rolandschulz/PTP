@@ -146,8 +146,11 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	private IRuntimeSystem runtimeSystem;
 	private volatile int jobSubIdCounter = 0;
 
-	public AbstractRuntimeResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config) {
-		super(id, universe, config);
+	/**
+	 * @since 5.0
+	 */
+	public AbstractRuntimeResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(universe, config);
 	}
 
 	/*
@@ -582,7 +585,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		for (String elementId : e.getElementIds()) {
 			IPMachineControl machine = getMachineControl(elementId);
 			if (machine != null) {
-				IPResourceManager rm = machine.getResourceManager();
+				IPResourceManager rm = (IPResourceManager) machine.getParent();
 				List<IPMachineControl> machines = map.get(rm);
 				if (machines == null) {
 					machines = new ArrayList<IPMachineControl>();
@@ -654,7 +657,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		for (String elementId : e.getElementIds()) {
 			IPQueueControl queue = getQueueControl(elementId);
 			if (queue != null) {
-				IPResourceManager rm = queue.getResourceManager();
+				IPResourceManager rm = (IPResourceManager) queue.getParent();
 				List<IPQueueControl> queues = map.get(rm);
 				if (queues == null) {
 					queues = new ArrayList<IPQueueControl>();
