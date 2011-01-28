@@ -54,6 +54,20 @@ public interface IResourceManagerControl extends IPElement {
 	};
 
 	/**
+	 * Perform control operation on job.
+	 * 
+	 * @param job
+	 *            job object representing the job to be canceled.
+	 * @param operation
+	 *            operation to perform on the job
+	 * @param monitor
+	 *            progress monitor for monitoring operation
+	 * @throws CoreException
+	 * @since 5.0
+	 */
+	public void control(IPJob job, JobControlOperation operation, IProgressMonitor monitor) throws CoreException;
+
+	/**
 	 * Safely dispose of this Resource Manager.
 	 */
 	public void dispose();
@@ -130,15 +144,6 @@ public interface IResourceManagerControl extends IPElement {
 	public void setConfiguration(IResourceManagerConfiguration config);
 
 	/**
-	 * Shutdown the resource manager.
-	 * 
-	 * @throws CoreException
-	 *             this exception is thrown if the shutdown command fails
-	 * @since 5.0
-	 */
-	public void shutdown() throws CoreException;
-
-	/**
 	 * Start up the resource manager. This could potentially take a long time
 	 * (or forever), particularly if the RM is located on a remote system.
 	 * 
@@ -156,7 +161,16 @@ public interface IResourceManagerControl extends IPElement {
 	 *             start
 	 * @since 5.0
 	 */
-	public void startUp(IProgressMonitor monitor) throws CoreException;
+	public void start(IProgressMonitor monitor) throws CoreException;
+
+	/**
+	 * Stop the resource manager.
+	 * 
+	 * @throws CoreException
+	 *             this exception is thrown if the stop command fails
+	 * @since 5.0
+	 */
+	public void stop() throws CoreException;
 
 	/**
 	 * Submit a job. The attribute manager must contain the appropriate
@@ -178,17 +192,4 @@ public interface IResourceManagerControl extends IPElement {
 	 */
 	public IPJob submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException;
-
-	/**
-	 * Terminate the job. The action this takes depends on the RM implementation
-	 * and the state of the job. For queued but not running jobs, this would be
-	 * equivalent to canceling the job. For running jobs, this would mean
-	 * halting its execution.
-	 * 
-	 * @param job
-	 *            job object representing the job to be canceled.
-	 * @throws CoreException
-	 * @since 5.0
-	 */
-	public void terminateJob(IPJob job) throws CoreException;
 }

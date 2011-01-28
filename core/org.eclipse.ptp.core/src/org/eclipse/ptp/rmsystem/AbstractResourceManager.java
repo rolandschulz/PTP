@@ -135,6 +135,9 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	private final Map<String, IPNodeControl> nodesById = Collections.synchronizedMap(new HashMap<String, IPNodeControl>());
 	private final Map<String, IPQueueControl> queuesById = Collections.synchronizedMap(new HashMap<String, IPQueueControl>());
 
+	/**
+	 * @since 5.0
+	 */
 	public AbstractResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(universe.getNextResourceManagerId(), universe, getDefaultAttributes(config));
 		this.config = config;
@@ -188,7 +191,7 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	public void dispose() {
 		listeners.clear();
 		try {
-			shutdown();
+			stop();
 		} catch (CoreException e) {
 		}
 		doDispose();
@@ -488,9 +491,12 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#shutdown()
+	 * @see org.eclipse.ptp.rm.IResourceManager#stop()
 	 */
-	public void shutdown() throws CoreException {
+	/**
+	 * @since 5.0
+	 */
+	public void stop() throws CoreException {
 		switch (getState()) {
 		case ERROR:
 			setState(ResourceManagerAttributes.State.STOPPED);
@@ -510,10 +516,12 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#startUp(IProgressMonitor
-	 * monitor)
+	 * @see org.eclipse.ptp.rm.IResourceManager#start(IProgressMonitor monitor)
 	 */
-	public void startUp(IProgressMonitor monitor) throws CoreException {
+	/**
+	 * @since 5.0
+	 */
+	public void start(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		if (getState() == ResourceManagerAttributes.State.STOPPED || getState() == ResourceManagerAttributes.State.ERROR) {
 			setState(ResourceManagerAttributes.State.STARTING);
@@ -549,11 +557,17 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#terminateJob(org.eclipse
-	 * .ptp.core.elements.IPJob)
+	 * org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#control(
+	 * org.eclipse.ptp.core.elements.IPJob,
+	 * org.eclipse.ptp.core.elementcontrols.
+	 * IResourceManagerControl.JobControlOperation,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void terminateJob(IPJob job) throws CoreException {
-		doTerminateJob(job);
+	/**
+	 * @since 5.0
+	 */
+	public void control(IPJob job, JobControlOperation operation, IProgressMonitor monitor) throws CoreException {
+		doControlJob(job, operation, monitor);
 	}
 
 	private void addJobAttributes(Collection<IPJobControl> jobControls, IAttribute<?, ?, ?>[] attrs) {
@@ -861,13 +875,18 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 			throws CoreException;
 
 	/**
-	 * Terminate a job.
+	 * Control a job.
 	 * 
 	 * @param job
 	 *            job to terminate
+	 * @param operation
+	 *            operation to perform on job
+	 * @param monitor
+	 *            progress monitor
 	 * @throws CoreException
+	 * @since 5.0
 	 */
-	protected abstract void doTerminateJob(IPJob job) throws CoreException;
+	protected abstract void doControlJob(IPJob job, JobControlOperation operation, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Send IChangedJobEvent to registered listeners

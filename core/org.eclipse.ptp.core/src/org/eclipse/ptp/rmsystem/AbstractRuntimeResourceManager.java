@@ -980,16 +980,15 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				synchronized (jobSubmissions) {
 					jobSubmissions.remove(sub.getId());
 				}
-				throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(), IStatus.CANCEL,
-						Messages.AbstractRuntimeResourceManager_cancelled, null));
+				throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(),
+						Messages.AbstractRuntimeResourceManager_cancelled));
 
 			case SUBMITTED:
 				job = sub.getJob();
 				break;
 
 			case ERROR:
-				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
-						sub.getErrorReason(), null));
+				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), sub.getErrorReason()));
 			}
 		} finally {
 			monitor.done();
@@ -1002,12 +1001,24 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doTerminateJob(org.eclipse
-	 * .ptp.core.elements.IPJob)
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doControlJob(org.eclipse
+	 * .ptp.core.elements.IPJob,
+	 * org.eclipse.ptp.core.elementcontrols.IResourceManagerControl
+	 * .JobControlOperation, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected void doTerminateJob(IPJob job) throws CoreException {
-		runtimeSystem.terminateJob(job);
+	protected void doControlJob(IPJob job, JobControlOperation operation, IProgressMonitor monitor) throws CoreException {
+		switch (operation) {
+		case SUSPEND:
+		case RESUME:
+		case HOLD:
+		case RELEASE:
+			throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(),
+					Messages.AbstractRuntimeResourceManager_operationNotSupported));
+		case TERMINATE:
+			runtimeSystem.terminateJob(job);
+			break;
+		}
 	}
 
 	/**

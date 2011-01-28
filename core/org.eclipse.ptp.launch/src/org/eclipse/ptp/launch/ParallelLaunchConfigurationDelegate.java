@@ -36,6 +36,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl.JobControlOperation;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -149,7 +150,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	private void terminateJob(final IPJob job) {
 		try {
 			IResourceManagerControl rm = job.getResourceManager();
-			rm.terminateJob(job);
+			rm.control(job, JobControlOperation.TERMINATE, null);
 		} catch (CoreException e1) {
 			// Ignore, but log
 			PTPLaunchPlugin.log(e1);
