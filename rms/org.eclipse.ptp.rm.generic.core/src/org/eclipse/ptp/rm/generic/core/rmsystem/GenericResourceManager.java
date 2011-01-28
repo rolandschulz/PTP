@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rm.generic.core.rmsystem;
 
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rm.core.AbstractToolsAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManager;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
@@ -28,7 +28,7 @@ public class GenericResourceManager extends AbstractToolResourceManager {
 
 	private GenericRMRuntimeSystem rts = null;
 
-	public GenericResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+	public GenericResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
 		super(universe, config);
 	}
 

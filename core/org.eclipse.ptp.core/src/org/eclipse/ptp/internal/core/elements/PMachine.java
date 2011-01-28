@@ -28,10 +28,9 @@ import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
-import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
+import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes.State;
@@ -47,7 +46,7 @@ import org.eclipse.ptp.internal.core.elements.events.MachineChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewNodeEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveNodeEvent;
 
-public class PMachine extends Parent implements IPMachineControl {
+public class PMachine extends Parent implements IPMachine {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
 	private String arch = Messages.PMachine_0;
@@ -106,9 +105,8 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * (java.util.Collection,
 	 * org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
 	 */
-	public void addNodeAttributes(Collection<IPNodeControl> nodeControls, IAttribute<?, ?, ?>[] attrs) {
-		List<IPNode> nodes = new ArrayList<IPNode>(nodeControls.size());
-		for (IPNodeControl node : nodeControls) {
+	public void addNodeAttributes(Collection<IPNode> nodes, IAttribute<?, ?, ?>[] attrs) {
+		for (IPNode node : nodes) {
 			node.addAttributes(attrs);
 		}
 		fireChangedNodes(nodes);
@@ -121,12 +119,9 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodes(java.util
 	 * .Collection)
 	 */
-	public void addNodes(Collection<IPNodeControl> nodeControls) {
-		List<IPNode> nodes = new ArrayList<IPNode>(nodeControls.size());
-
-		for (IPNodeControl node : nodeControls) {
+	public void addNodes(Collection<IPNode> nodes) {
+		for (IPNode node : nodes) {
 			addChild(node);
-			nodes.add(node);
 		}
 
 		try {
@@ -217,24 +212,9 @@ public class PMachine extends Parent implements IPMachineControl {
 	public IPNode getNodeById(String id) {
 		IPElement element = findChild(id);
 		if (element != null) {
-			return (IPNodeControl) element;
+			return (IPNode) element;
 		}
 		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPMachineControl#getNodeControls()
-	 */
-	public Collection<IPNodeControl> getNodeControls() {
-		IPElement[] children = getChildren();
-		List<IPNodeControl> nodes = new ArrayList<IPNodeControl>(children.length);
-		for (IPElement element : children) {
-			nodes.add((IPNodeControl) element);
-		}
-		return nodes;
 	}
 
 	/*
@@ -243,7 +223,11 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * @see org.eclipse.ptp.core.elements.IPMachine#getNodes()
 	 */
 	public IPNode[] getNodes() {
-		Collection<IPNodeControl> nodes = getNodeControls();
+		IPElement[] children = getChildren();
+		List<IPNode> nodes = new ArrayList<IPNode>(children.length);
+		for (IPElement element : children) {
+			nodes.add((IPNode) element);
+		}
 		return nodes.toArray(new IPNode[nodes.size()]);
 	}
 
@@ -291,15 +275,11 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPMachineControl#removeNode(org.
-	 * eclipse.ptp.core.elementcontrols.IPNodeControl)
+	 * org.eclipse.ptp.core.elements.IPMachine#removeNodes(java.util.Collection)
 	 */
-	public void removeNodes(Collection<IPNodeControl> nodeControls) {
-		List<IPNode> nodes = new ArrayList<IPNode>(nodeControls.size());
-
-		for (IPNodeControl node : nodeControls) {
+	public void removeNodes(Collection<IPNode> nodes) {
+		for (IPNode node : nodes) {
 			removeChild(node);
-			nodes.add(node);
 		}
 
 		try {

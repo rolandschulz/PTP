@@ -33,7 +33,6 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
@@ -221,8 +220,11 @@ public class PSession implements IPSession, IPDIEventListener {
 		return (PDebugTarget) launch.getDebugTarget(tasks);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPSession#fireDebugEvent(int, int, org.eclipse.ptp.debug.core.event.IPDebugInfo)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.IPSession#fireDebugEvent(int, int,
+	 * org.eclipse.ptp.debug.core.event.IPDebugInfo)
 	 */
 	public void fireDebugEvent(int type, int details, IPDebugInfo info) {
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, type, details, info));
@@ -495,7 +497,7 @@ public class PSession implements IPSession, IPDIEventListener {
 			processIndices.set(task);
 		}
 		EnumeratedAttribute<State> attr = ProcessAttributes.getStateAttributeDefinition().create(state);
-		((IPJobControl) job).addProcessAttributes(processIndices, new AttributeManager(attr));
+		job.addProcessAttributes(processIndices, new AttributeManager(attr));
 	}
 
 	/**
@@ -739,6 +741,6 @@ public class PSession implements IPSession, IPDIEventListener {
 			processIndices.set(task);
 		}
 		StringAttribute attr = ProcessAttributes.getStdoutAttributeDefinition().create(output);
-		((IPJobControl) job).addProcessAttributes(processIndices, new AttributeManager(attr));
+		job.addProcessAttributes(processIndices, new AttributeManager(attr));
 	}
 }

@@ -22,6 +22,7 @@ import java.util.BitSet;
 import java.util.Set;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
@@ -41,7 +42,6 @@ import org.eclipse.ptp.core.elements.listeners.IJobListener;
  * @author Nathan DeBardeleben
  */
 public interface IPJob extends IPElement {
-
 	/**
 	 * Add a listener for child events relating to this job.
 	 * 
@@ -55,6 +55,24 @@ public interface IPJob extends IPElement {
 	 * @param listener
 	 */
 	public void addElementListener(IJobListener listener);
+
+	/**
+	 * Add attributes to a collection of processes.
+	 * 
+	 * @param jobRanks
+	 *            job ranks of processes to be modified
+	 * @param attributes
+	 *            AttributeManager for the attributes to add to each process
+	 * @since 5.0
+	 */
+	public void addProcessAttributes(BitSet jobRanks, AttributeManager attributes);
+
+	/**
+	 * @param jobRanks
+	 * @param attrs
+	 * @since 5.0
+	 */
+	public void addProcessesByJobRanks(BitSet jobRanks, AttributeManager attrs);
 
 	/**
 	 * Get the launch configuration that was used to launch this job
@@ -242,7 +260,23 @@ public interface IPJob extends IPElement {
 	public void removeElementListener(IJobListener listener);
 
 	/**
+	 * Remove processes from the job
+	 * 
+	 * @param jobRanks
+	 * @since 5.0
+	 */
+	public void removeProcessesByJobRanks(BitSet jobRanks);
+
+	/**
 	 * Sets this job to be a debug job
 	 */
 	public void setDebug();
+
+	/**
+	 * Set the launch configuration that was used to launch this job.
+	 * 
+	 * @param configuration
+	 * @since 5.0
+	 */
+	public void setLaunchConfiguration(ILaunchConfiguration configuration);
 }

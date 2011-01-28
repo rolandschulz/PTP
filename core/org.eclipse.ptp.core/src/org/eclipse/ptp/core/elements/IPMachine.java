@@ -18,6 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import java.util.Collection;
+
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
@@ -48,6 +51,26 @@ public interface IPMachine extends IPElement {
 	 * @param listener
 	 */
 	public void addElementListener(IMachineListener listener);
+
+	/**
+	 * Add attributes to a collection of nodes.
+	 * 
+	 * @param nodes
+	 *            collection of IPNodeControls
+	 * @param attrs
+	 *            array of attributes to add to each node
+	 * @since 5.0
+	 */
+	public void addNodeAttributes(Collection<IPNode> nodes, IAttribute<?, ?, ?>[] attrs);
+
+	/**
+	 * Add a collection of nodes to the machine.
+	 * 
+	 * @param node
+	 *            collection of IPNodeControls
+	 * @since 5.0
+	 */
+	public void addNodes(Collection<IPNode> nodes);
 
 	/**
 	 * Returns the architecture of this Machine.
@@ -103,6 +126,15 @@ public interface IPMachine extends IPElement {
 	 * @param listener
 	 */
 	public void removeElementListener(IMachineListener listener);
+
+	/**
+	 * Remove a collection of nodes from this machine
+	 * 
+	 * @param nodes
+	 *            to remove
+	 * @since 5.0
+	 */
+	public void removeNodes(Collection<IPNode> nodes);
 
 	/**
 	 * Sets the architecture of this machine. At this time there are no

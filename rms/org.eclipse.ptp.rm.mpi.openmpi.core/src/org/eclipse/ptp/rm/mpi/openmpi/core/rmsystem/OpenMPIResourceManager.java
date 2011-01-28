@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rm.core.AbstractToolsAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
@@ -31,7 +31,7 @@ public class OpenMPIResourceManager extends AbstractToolResourceManager {
 	/**
 	 * @since 4.0
 	 */
-	public OpenMPIResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config) {
+	public OpenMPIResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
 		super(universe, config);
 	}
 

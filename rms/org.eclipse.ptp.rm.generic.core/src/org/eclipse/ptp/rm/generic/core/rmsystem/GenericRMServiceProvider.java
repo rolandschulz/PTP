@@ -12,7 +12,6 @@ package org.eclipse.ptp.rm.generic.core.rmsystem;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
 import org.eclipse.ptp.rm.generic.core.GenericRMCorePlugin;
@@ -67,7 +66,7 @@ public class GenericRMServiceProvider extends AbstractToolRMServiceProvider {
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IResourceManagerControl.class) {
-			return new GenericResourceManager((IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
+			return new GenericResourceManager(PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
 		}
 		return null;
 	}

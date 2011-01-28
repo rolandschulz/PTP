@@ -25,11 +25,11 @@ import java.util.List;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 
-public class PUniverse extends Parent implements IPUniverseControl {
+public class PUniverse extends Parent implements IPUniverse {
 	private static final int RMID_SHIFT = 24;
 
 	private static IAttribute<?, ?, ?>[] getDefaultAttributes(String name) {

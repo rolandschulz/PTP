@@ -12,7 +12,6 @@ package org.eclipse.ptp.rm.ibm.ll.ui;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLCorePlugin;
@@ -84,7 +83,7 @@ public class LLServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IResourceManagerControl.class) {
-			return new IBMLLResourceManager((IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
+			return new IBMLLResourceManager(PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
 		}
 		return null;
 	}

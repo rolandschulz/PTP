@@ -18,30 +18,27 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes.State;
 import org.eclipse.ptp.core.elements.events.IQueueChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 import org.eclipse.ptp.internal.core.elements.events.QueueChangeEvent;
 
-public class PQueue extends Parent implements IPQueueControl {
+public class PQueue extends Parent implements IPQueue {
 	private final ListenerList fElementListeners = new ListenerList();
-	private final Map<String, IPJobControl> fJobs = new HashMap<String, IPJobControl>();
+	private final Map<String, IPJob> fJobs = new HashMap<String, IPJob>();
 	private final IResourceManagerControl fResourceManager;
 
 	public PQueue(String id, IResourceManagerControl rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
@@ -75,9 +72,9 @@ public class PQueue extends Parent implements IPQueueControl {
 	 * org.eclipse.ptp.core.elementcontrols.IPQueueControl#addJobs(java.util
 	 * .Collection)
 	 */
-	public void addJobs(Collection<IPJobControl> jobControls) {
+	public void addJobs(Collection<IPJob> jobs) {
 		synchronized (fJobs) {
-			for (IPJobControl job : jobControls) {
+			for (IPJob job : jobs) {
 				fJobs.put(job.getID(), job);
 			}
 		}
@@ -112,26 +109,10 @@ public class PQueue extends Parent implements IPQueueControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#getJobControls()
-	 */
-	public Collection<IPJobControl> getJobControls() {
-		synchronized (fJobs) {
-			List<IPJobControl> jobs = new ArrayList<IPJobControl>(fJobs.size());
-			for (IPJobControl job : fJobs.values()) {
-				jobs.add(job);
-			}
-			return jobs;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.core.elements.IPQueue#getJobs()
 	 */
 	public IPJob[] getJobs() {
-		Collection<IPJobControl> jobs = getJobControls();
-		return jobs.toArray(new IPJobControl[jobs.size()]);
+		return fJobs.values().toArray(new IPJob[fJobs.size()]);
 	}
 
 	/*
@@ -170,9 +151,9 @@ public class PQueue extends Parent implements IPQueueControl {
 	 * org.eclipse.ptp.core.elementcontrols.IPQueueControl#removeJobs(java.util
 	 * .Collection)
 	 */
-	public void removeJobs(Collection<IPJobControl> jobControls) {
+	public void removeJobs(Collection<IPJob> jobs) {
 		synchronized (fJobs) {
-			for (IPJobControl job : jobControls) {
+			for (IPJob job : jobs) {
 				fJobs.remove(job);
 			}
 		}

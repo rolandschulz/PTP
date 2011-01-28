@@ -12,7 +12,6 @@ package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
@@ -69,7 +68,7 @@ public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider impleme
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IResourceManagerControl.class) {
-			return new MPICH2ResourceManager((IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
+			return new MPICH2ResourceManager(PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
 		}
 		return null;
 	}

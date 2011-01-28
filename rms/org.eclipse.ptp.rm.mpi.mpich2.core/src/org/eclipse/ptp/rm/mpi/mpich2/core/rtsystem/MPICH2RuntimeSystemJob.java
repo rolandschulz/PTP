@@ -28,7 +28,6 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -176,8 +175,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 								final BitSet processIndices = new BitSet();
 								processIndices.set(index);
 								final StringAttribute attr = ProcessAttributes.getStdoutAttributeDefinition().create(line);
-								final IPJobControl ipJobControl = (IPJobControl) ipJob;
-								ipJobControl.addProcessAttributes(processIndices, new AttributeManager(attr));
+								ipJob.addProcessAttributes(processIndices, new AttributeManager(attr));
 							}
 							DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", getJobID(), line); //$NON-NLS-1$
 						}
@@ -230,8 +228,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 								processIndices.set(index);
 								AttributeManager attrManager = new AttributeManager(ProcessAttributes
 										.getStderrAttributeDefinition().create(line));
-								final IPJobControl ipJobControl = (IPJobControl) ipJob;
-								ipJobControl.addProcessAttributes(processIndices, attrManager);
+								ipJob.addProcessAttributes(processIndices, attrManager);
 							}
 							DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", getJobID(), line); //$NON-NLS-1$
 						}
