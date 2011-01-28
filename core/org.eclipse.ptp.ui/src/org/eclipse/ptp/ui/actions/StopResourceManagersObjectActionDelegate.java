@@ -55,7 +55,7 @@ public class StopResourceManagersObjectActionDelegate extends AbstractResourceMa
 			}
 
 			try {
-				rmManager.shutdown();
+				rmManager.stop();
 			} catch (CoreException e) {
 				final String message = NLS.bind(Messages.StopResourceManagersObjectActionDelegate_2, rmManager.getName());
 				Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1, message, e);

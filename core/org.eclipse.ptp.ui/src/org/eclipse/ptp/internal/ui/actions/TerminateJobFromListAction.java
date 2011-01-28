@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl.JobControlOperation;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
@@ -131,7 +132,7 @@ public class TerminateJobFromListAction extends Action {
 
 					IResourceManagerControl rm = job.getResourceManager();
 					if (job.getState() != JobAttributes.State.COMPLETED) {
-						rm.terminateJob(job);
+						rm.control(job, JobControlOperation.TERMINATE, null);
 					}
 					// TODO: Look for job change event to wait for jobs to be
 					// finished.

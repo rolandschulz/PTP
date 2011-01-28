@@ -46,7 +46,7 @@ public class StartResourceManagersObjectActionDelegate extends AbstractResourceM
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
-						rmManager.startUp(monitor);
+						rmManager.start(monitor);
 					} catch (CoreException e) {
 						throw new InvocationTargetException(e);
 					}

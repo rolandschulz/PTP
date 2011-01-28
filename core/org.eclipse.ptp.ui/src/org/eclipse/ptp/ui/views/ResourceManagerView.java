@@ -614,7 +614,7 @@ public class ResourceManagerView extends ViewPart {
 							IRunnableWithProgress runnable = new IRunnableWithProgress() {
 								public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 									try {
-										rm.startUp(monitor);
+										rm.start(monitor);
 									} catch (CoreException e) {
 										throw new InvocationTargetException(e);
 									}
@@ -646,7 +646,7 @@ public class ResourceManagerView extends ViewPart {
 							}
 							if (shutdown) {
 								try {
-									rm.shutdown();
+									rm.stop();
 								} catch (CoreException e) {
 									final String message = NLS.bind(Messages.ResourceManagerView_UnableToStop, rm.getName());
 									Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1, message, e);
