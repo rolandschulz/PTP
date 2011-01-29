@@ -18,7 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import java.util.BitSet;
+import java.util.Collection;
+
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
@@ -47,6 +52,99 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	 *            listener to add to the list of listeners
 	 */
 	public void addElementListener(IResourceManagerListener listener);
+
+	/**
+	 * Update attributes on a collection of machines.
+	 * 
+	 * @param machines
+	 *            machines to update
+	 * @param attrs
+	 *            attributes to update
+	 * @return true if updated
+	 */
+	public void addMachineAttributes(Collection<IPMachine> machines, IAttribute<?, ?, ?>[] attrs);
+
+	/**
+	 * Update attributes on a collection of jobs.
+	 * 
+	 * @param jobs
+	 *            jobs to update
+	 * @param attrs
+	 *            attributes to update
+	 * @return true if updated
+	 * @since 5.0
+	 */
+	public void addJobAttributes(Collection<IPJob> jobs, IAttribute<?, ?, ?>[] attrs);
+
+	/**
+	 * Add attributes to a collection of queues.
+	 * 
+	 * @param queues
+	 *            collection of queues
+	 * @param attrs
+	 *            array of attributes to add to each queue
+	 * @since 5.0
+	 */
+	public void addQueueAttributes(Collection<IPQueue> queues, IAttribute<?, ?, ?>[] attrs);
+
+	/**
+	 * Add a collection of jobs to the model. This will result in a INewJobEvent
+	 * being propagated to listeners on the RM. Supports either the old
+	 * hierarchy where a parent queue is supplied, or each job can contain a
+	 * queue attribute specifying the job queue.
+	 * 
+	 * @param queue
+	 *            jobs will be added to the queue if specified
+	 * @param jobs
+	 *            collection of jobs to add
+	 * @since 5.0
+	 */
+	public void addJobs(IPQueue queue, Collection<IPJob> jobs);
+
+	/**
+	 * Add a collection of machines to the model. This will result in a
+	 * INewMachineEvent being propagated to listeners on the RM.
+	 * 
+	 * @param machineControls
+	 *            Collection of IMachineControls
+	 */
+	public void addMachines(Collection<IPMachine> machines);
+
+	/**
+	 * Add a collection of nodes to the model. This will result in a
+	 * INewNodeEvent being propagated to listeners on the machine.
+	 * 
+	 * @param machine
+	 *            parent of the nodes
+	 * @param nodes
+	 *            collection of IPNodeControls
+	 * @since 5.0
+	 */
+	public void addNodes(IPMachine machine, Collection<IPNode> nodes);
+
+	/**
+	 * Add a collection of processes to the model. This involves adding the
+	 * processes to a job *and* to a node. The node information is an attribute
+	 * on the process. This will result in a INewProcessEvent being propagated
+	 * to listeners on the job and nodes.
+	 * 
+	 * @param job
+	 *            parent of the processes
+	 * @param processJobRanks
+	 *            set of job ranks within job
+	 * @param attrs
+	 * @since 5.0
+	 */
+	public void addProcessesByJobRanks(IPJob job, BitSet processJobRanks, AttributeManager attrs);
+
+	/**
+	 * Add a collection of processes to the model. This will result in a
+	 * INewProcessEvent being propagated to listeners on the job.
+	 * 
+	 * @param queues
+	 *            collection of IPQueueControls
+	 */
+	public void addQueues(Collection<IPQueue> queues);
 
 	/**
 	 * Find a job object using its ID Returns null if no node is found.
@@ -141,8 +239,87 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	public void removeElementListener(IResourceManagerListener listener);
 
 	/**
+	 * @param job
+	 * @since 5.0
+	 */
+	public void removeJobs(Collection<IPJob> jobs);
+
+	/**
+	 * @param machine
+	 * @since 5.0
+	 */
+	public void removeMachines(IPResourceManager rm, Collection<IPMachine> machines);
+
+	/**
+	 * Remove nodes from the machine.
+	 * 
+	 * @param machine
+	 *            machine containing the nodes to remove
+	 * @param nodes
+	 *            nodes to remove from the model
+	 * @since 5.0
+	 */
+	public void removeNodes(IPMachine machine, Collection<IPNode> nodes);
+
+	/**
+	 * @param queue
+	 * @since 5.0
+	 */
+	public void removeQueues(IPResourceManager rm, Collection<IPQueue> queues);
+
+	/**
 	 * Remove all terminated jobs from the resource manager. A terminated job is
 	 * determined by its state attribute.
 	 */
 	public void removeTerminatedJobs();
+
+	/**
+	 * Create a new queue for the model
+	 * 
+	 * @param queueId
+	 *            ID for the queue
+	 * @param attrs
+	 *            initial attributes for the queue
+	 * @return newly created queue model element
+	 * @since 5.0
+	 */
+	public IPQueue newQueue(String queueId, AttributeManager attrs);
+
+	/**
+	 * Create a new node for the model
+	 * 
+	 * @param machine
+	 *            machine that this node belongs to
+	 * @param nodeId
+	 *            ID for the node
+	 * @param attrs
+	 *            initial attributes for the node
+	 * @return newly created node model element
+	 * @since 5.0
+	 */
+	public IPNode newNode(IPMachine machine, String nodeId, AttributeManager attrs);
+
+	/**
+	 * Create a new machine for the model.
+	 * 
+	 * @param machineId
+	 *            ID for the machine
+	 * @param attrs
+	 *            initial attributes for the machine
+	 * @return newly created machine model element
+	 * @since 5.0
+	 */
+	public IPMachine newMachine(String machineId, AttributeManager attrs);
+
+	/**
+	 * Create a new job for the model.
+	 * 
+	 * @param jobId
+	 *            job ID for the job
+	 * @param attrs
+	 *            initial attributes for the job
+	 * @return newly created job model element
+	 * @since 5.0
+	 */
+	public IPJob newJob(String jobId, AttributeManager attrs);
 }

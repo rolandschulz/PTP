@@ -24,7 +24,7 @@ import java.util.List;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
@@ -49,6 +49,7 @@ public abstract class AbstractResourceManagerSelectionActionDelegate implements 
 		run(action);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void selectionChanged(IAction action, ISelection selection) {
 		IStructuredSelection ss = (IStructuredSelection) selection;
 		menuContribs.clear();
@@ -79,8 +80,7 @@ public abstract class AbstractResourceManagerSelectionActionDelegate implements 
 		}
 		boolean isEnabled = true;
 		for (IResourceManagerMenuContribution menuContrib : menuContribs) {
-			final IResourceManagerControl rmManager = (IResourceManagerControl) menuContrib
-					.getAdapter(IResourceManagerControl.class);
+			final IPResourceManager rmManager = (IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
 			if (rmManager == null) {
 				return false;
 			}
@@ -97,5 +97,5 @@ public abstract class AbstractResourceManagerSelectionActionDelegate implements 
 	 * @return - is this rmManager allowed with this action
 	 * @since 5.0
 	 */
-	protected abstract boolean isEnabledFor(IResourceManagerControl rmManager);
+	protected abstract boolean isEnabledFor(IPResourceManager rmManager);
 }

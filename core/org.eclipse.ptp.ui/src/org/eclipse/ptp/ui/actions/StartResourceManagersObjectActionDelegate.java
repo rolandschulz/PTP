@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.UIUtils;
@@ -37,8 +37,7 @@ public class StartResourceManagersObjectActionDelegate extends AbstractResourceM
 	public void run(IAction action) {
 
 		for (IResourceManagerMenuContribution menuContrib : getMenuContribs()) {
-			final IResourceManagerControl rmManager = (IResourceManagerControl) menuContrib
-					.getAdapter(IResourceManagerControl.class);
+			final IPResourceManager rmManager = (IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
 
 			if (!isEnabledFor(rmManager)) {
 				continue;
@@ -46,7 +45,7 @@ public class StartResourceManagersObjectActionDelegate extends AbstractResourceM
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
-						rmManager.start(monitor);
+						rmManager.getResourceManager().start(monitor);
 					} catch (CoreException e) {
 						throw new InvocationTargetException(e);
 					}
@@ -75,7 +74,7 @@ public class StartResourceManagersObjectActionDelegate extends AbstractResourceM
 	 * @since 5.0
 	 */
 	@Override
-	protected boolean isEnabledFor(IResourceManagerControl rmManager) {
+	protected boolean isEnabledFor(IPResourceManager rmManager) {
 		if (rmManager.getState() == ResourceManagerAttributes.State.STOPPED) {
 			return true;
 		}

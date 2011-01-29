@@ -56,7 +56,7 @@ public interface IPUniverse extends IPElement {
 	 * @return IPResourceManager[]
 	 * @since 5.0
 	 */
-	public IResourceManagerControl[] getResourceManagers();
+	public IPResourceManager[] getResourceManagers();
 
 	/**
 	 * @since 5.0

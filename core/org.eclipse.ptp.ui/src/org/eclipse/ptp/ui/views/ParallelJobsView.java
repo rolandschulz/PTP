@@ -46,7 +46,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -548,9 +547,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	public void dispose() {
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		synchronized (mm) {
-			for (IResourceManagerControl rmc : mm.getUniverse().getResourceManagers()) {
-				final IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
-
+			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 				for (IPJob job : rm.getJobs()) {
 					job.removeChildListener(jobChildListener);
 				}
@@ -962,8 +959,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 			 * a RM if a new event arrives while we're doing this, but is it a
 			 * problem?
 			 */
-			for (IResourceManagerControl rmc : mm.getUniverse().getResourceManagers()) {
-				final IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 				rm.addChildListener(resourceManagerListener);
 			}
 			mm.addListener(modelManagerListener);

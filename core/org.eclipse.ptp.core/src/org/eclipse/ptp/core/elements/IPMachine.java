@@ -56,7 +56,7 @@ public interface IPMachine extends IPElement {
 	 * Add attributes to a collection of nodes.
 	 * 
 	 * @param nodes
-	 *            collection of IPNodeControls
+	 *            collection of nodes
 	 * @param attrs
 	 *            array of attributes to add to each node
 	 * @since 5.0
@@ -67,17 +67,10 @@ public interface IPMachine extends IPElement {
 	 * Add a collection of nodes to the machine.
 	 * 
 	 * @param node
-	 *            collection of IPNodeControls
+	 *            collection of nodes
 	 * @since 5.0
 	 */
 	public void addNodes(Collection<IPNode> nodes);
-
-	/**
-	 * Returns the architecture of this Machine.
-	 * 
-	 * @return The architecture of this Machine
-	 */
-	public String getArch();
 
 	/**
 	 * Given a node id, attempts to find it as a Node object contained in this
@@ -135,16 +128,6 @@ public interface IPMachine extends IPElement {
 	 * @since 5.0
 	 */
 	public void removeNodes(Collection<IPNode> nodes);
-
-	/**
-	 * Sets the architecture of this machine. At this time there are no
-	 * standards for how this String should be formatted and the String is
-	 * really only used for printing out information about this Machine.
-	 * 
-	 * @param arch
-	 *            The architecture of this machine
-	 */
-	public void setArch(String arch);
 
 	/**
 	 * Counts all the Nodes associated with this Machine and returns that as an

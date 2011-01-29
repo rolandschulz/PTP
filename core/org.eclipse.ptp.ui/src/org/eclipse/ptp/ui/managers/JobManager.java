@@ -313,8 +313,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 * @see org.eclipse.ptp.ui.IElementManager#initial()
 	 */
 	public IPElement initial(IPUniverse universe) {
-		for (IResourceManagerControl rmc : universe.getResourceManagers()) {
-			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+		for (IPResourceManager rm : universe.getResourceManagers()) {
 			for (IPJob job : rm.getJobs()) {
 				addJob(job);
 			}

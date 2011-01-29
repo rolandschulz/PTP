@@ -211,7 +211,7 @@ public class ModelManager implements IModelManager {
 	public IResourceManagerControl getResourceManagerFromUniqueName(String rmUniqueName) {
 		IResourceManagerControl[] rms;
 		synchronized (universe) {
-			rms = universe.getResourceManagers();
+			rms = universe.getResourceManagerControls();
 		}
 
 		for (IResourceManagerControl rm : rms) {
@@ -256,7 +256,7 @@ public class ModelManager implements IModelManager {
 		 */
 		fServiceManager.getActiveConfiguration();
 
-		for (IResourceManagerControl rm : getUniverse().getResourceManagers()) {
+		for (IResourceManagerControl rm : getUniverse().getResourceManagerControls()) {
 			if (rm.getConfiguration().getAutoStart()) {
 				rmsNeedStarting.add(rm);
 			}
@@ -347,7 +347,7 @@ public class ModelManager implements IModelManager {
 	public void stopResourceManagers() throws CoreException {
 		IResourceManagerControl[] resourceManagers;
 		synchronized (universe) {
-			resourceManagers = universe.getResourceManagers();
+			resourceManagers = universe.getResourceManagerControls();
 		}
 		for (int i = 0; i < resourceManagers.length; ++i) {
 			resourceManagers[i].stop();

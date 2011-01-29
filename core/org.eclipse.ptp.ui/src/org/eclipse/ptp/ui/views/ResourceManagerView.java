@@ -53,7 +53,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -607,14 +606,14 @@ public class ResourceManagerView extends ViewPart {
 			public void doubleClick(DoubleClickEvent event) {
 				ITreeSelection selection = (ITreeSelection) event.getSelection();
 				if (!selection.isEmpty()) {
-					if (selection.getFirstElement() instanceof IResourceManagerControl) {
-						final IResourceManagerControl rm = (IResourceManagerControl) selection.getFirstElement();
+					if (selection.getFirstElement() instanceof IPResourceManager) {
+						final IPResourceManager rm = (IPResourceManager) selection.getFirstElement();
 						if (rm.getState() == ResourceManagerAttributes.State.STOPPED
 								|| rm.getState() == ResourceManagerAttributes.State.ERROR) {
 							IRunnableWithProgress runnable = new IRunnableWithProgress() {
 								public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 									try {
-										rm.start(monitor);
+										rm.getResourceManager().start(monitor);
 									} catch (CoreException e) {
 										throw new InvocationTargetException(e);
 									}
@@ -646,7 +645,7 @@ public class ResourceManagerView extends ViewPart {
 							}
 							if (shutdown) {
 								try {
-									rm.stop();
+									rm.getResourceManager().stop();
 								} catch (CoreException e) {
 									final String message = NLS.bind(Messages.ResourceManagerView_UnableToStop, rm.getName());
 									Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1, message, e);
@@ -686,8 +685,7 @@ public class ResourceManagerView extends ViewPart {
 		 * Add us to any existing RM's. I guess it's possible we could miss a RM
 		 * if a new event arrives while we're doing this, but is it a problem?
 		 */
-		for (IResourceManagerControl rmc : mm.getUniverse().getResourceManagers()) {
-			final IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+		for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 			rm.addElementListener(rmListener);
 		}
 		mm.addListener(mmChildListener);
@@ -820,23 +818,13 @@ public class ResourceManagerView extends ViewPart {
 				break;
 			} else {
 				final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
-				IResourceManagerControl rmc = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
-				if (rmc != null) {
-					if (rmc.getState() != ResourceManagerAttributes.State.STOPPED) {
+				IPResourceManager rm = (IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
+				if (rm != null) {
+					if (rm.getState() != ResourceManagerAttributes.State.STOPPED) {
 						inContextForEditRM = false;
 						inContextForRemoveRM = false;
 					} else {
 						inContextForSelectRM = false;
-					}
-				} else {
-					IResourceManager rm = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
-					if (rm != null) {
-						if (rm.getSessionStatus() != IResourceManager.SessionStatus.STOPPED) {
-							inContextForEditRM = false;
-							inContextForRemoveRM = false;
-						} else {
-							inContextForSelectRM = false;
-						}
 					}
 				}
 			}

@@ -38,7 +38,6 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
@@ -784,7 +783,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * RM is not running.
 	 */
 	private String rmNotRunningWarning() {
-		IPResourceManager rm = getResourceManager();
+		IResourceManagerControl rm = getResourceManager();
 		StringBuffer text = new StringBuffer();
 		if (rm != null) {
 			text.append(Messages.PBSAttributeTemplateManager_rmState);
