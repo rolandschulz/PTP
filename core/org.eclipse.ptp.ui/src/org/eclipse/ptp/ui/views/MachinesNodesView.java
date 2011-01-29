@@ -1086,8 +1086,7 @@ public class MachinesNodesView extends ViewPart {
 			 * a RM if a new event arrives while we're doing this, but is it a
 			 * problem?
 			 */
-			for (IResourceManagerControl rmc : mm.getUniverse().getResourceManagers()) {
-				final IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 				rm.addChildListener(resourceManagerListener);
 				/*
 				 * We need to get the current state of the nodes on this

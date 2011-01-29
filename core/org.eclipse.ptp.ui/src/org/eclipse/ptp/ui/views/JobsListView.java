@@ -33,7 +33,6 @@ import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
@@ -285,8 +284,7 @@ public class JobsListView extends ViewPart {
 				 * not do this!
 				 */
 				Set<IPJob> jobs = new HashSet<IPJob>();
-				for (IResourceManagerControl rmc : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
-					final IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+				for (IPResourceManager rm : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
 					jobs.addAll(getAllJobs(rm));
 				}
 				return jobs.toArray(new IPJob[0]);
@@ -326,8 +324,7 @@ public class JobsListView extends ViewPart {
 		 * Add us to any existing RM's. I guess it's possible we could miss a RM
 		 * if a new event arrives while we're doing this, but is it a problem?
 		 */
-		for (IResourceManagerControl rmc : mm.getUniverse().getResourceManagers()) {
-			final IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+		for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 			rm.addChildListener(resourceManagerListener);
 		}
 		mm.addListener(modelManagerListener);
@@ -546,8 +543,7 @@ public class JobsListView extends ViewPart {
 				}
 			}
 		} else {
-			for (IResourceManagerControl rmc : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
-				IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+			for (IPResourceManager rm : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
 				for (IPQueue queue : rm.getQueues()) {
 					IPJob job = getFirstJob(queue);
 					if (job != null) {

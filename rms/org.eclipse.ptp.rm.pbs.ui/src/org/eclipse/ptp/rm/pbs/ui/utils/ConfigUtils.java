@@ -26,6 +26,7 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
 import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.ui.data.AttributePlaceholder;
@@ -108,7 +109,8 @@ public class ConfigUtils implements IPBSNonNLSConstants {
 	/**
 	 * For refreshing queue (destination) info from the RM Model definition
 	 */
-	public static String[] getCurrentQueues(PBSResourceManager rm) {
+	public static String[] getCurrentQueues(PBSResourceManager rmc) {
+		IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 		String[] items = new String[0];
 		if (rm != null) {
 			IPQueue[] queues = rm.getQueues();

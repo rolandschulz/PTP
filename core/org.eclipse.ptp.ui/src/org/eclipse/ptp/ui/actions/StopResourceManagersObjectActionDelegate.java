@@ -25,7 +25,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -36,7 +36,7 @@ public class StopResourceManagersObjectActionDelegate extends AbstractResourceMa
 	public void run(IAction action) {
 
 		for (IResourceManagerMenuContribution menuContrib : getMenuContribs()) {
-			IResourceManagerControl rmManager = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
+			IPResourceManager rmManager = (IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
 
 			if (!isEnabledFor(rmManager)) {
 				continue;
@@ -55,7 +55,7 @@ public class StopResourceManagersObjectActionDelegate extends AbstractResourceMa
 			}
 
 			try {
-				rmManager.stop();
+				rmManager.getResourceManager().stop();
 			} catch (CoreException e) {
 				final String message = NLS.bind(Messages.StopResourceManagersObjectActionDelegate_2, rmManager.getName());
 				Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1, message, e);
@@ -68,7 +68,7 @@ public class StopResourceManagersObjectActionDelegate extends AbstractResourceMa
 	}
 
 	@Override
-	protected boolean isEnabledFor(IResourceManagerControl rmManager) {
+	protected boolean isEnabledFor(IPResourceManager rmManager) {
 		ResourceManagerAttributes.State state = rmManager.getState();
 		if (state == ResourceManagerAttributes.State.STARTING || state == ResourceManagerAttributes.State.STARTED
 				|| state == ResourceManagerAttributes.State.ERROR) {

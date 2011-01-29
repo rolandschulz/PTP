@@ -50,7 +50,6 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
@@ -1203,8 +1202,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			 * a RM if a new event arrives while we're doing this, but is it a
 			 * problem?
 			 */
-			for (IResourceManagerControl rmc : mm.getUniverse().getResourceManagers()) {
-				final IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 				rm.addChildListener(resourceManagerListener);
 			}
 
@@ -1233,8 +1231,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * Add us as a child listener to any existing machines
 		 */
-		for (IResourceManagerControl rmc : universe.getResourceManagers()) {
-			final IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+		for (IPResourceManager rm : universe.getResourceManagers()) {
 			for (IPMachine machine : rm.getMachines()) {
 				machine.addChildListener(machineListener);
 			}

@@ -49,7 +49,7 @@ import org.eclipse.ptp.internal.core.elements.events.RemoveNodeEvent;
 public class PMachine extends Parent implements IPMachine {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
-	private String arch = Messages.PMachine_0;
+	private final String arch = Messages.PMachine_0;
 	private final IResourceManagerControl fResourceManager;
 
 	public PMachine(String id, IResourceManagerControl rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
@@ -197,15 +197,6 @@ public class PMachine extends Parent implements IPMachine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IPMachine#getArch()
-	 */
-	public synchronized String getArch() {
-		return arch;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.eclipse.ptp.core.elements.IPMachine#getNodeById(java.lang.String)
 	 */
@@ -290,15 +281,6 @@ public class PMachine extends Parent implements IPMachine {
 		}
 
 		fireRemoveNodes(nodes);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.elements.IPMachine#setArch(java.lang.String)
-	 */
-	public synchronized void setArch(String arch) {
-		this.arch = arch;
 	}
 
 	/*

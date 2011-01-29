@@ -130,7 +130,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 		IPUniverse universe = modelManager.getUniverse();
-		IResourceManagerControl[] rms = universe.getResourceManagers();
+		IResourceManagerControl[] rms = universe.getResourceManagerControls();
 		new Label(comp, SWT.NONE).setText(Messages.ApplicationTab_RM_Selection_Label);
 
 		resourceManagerCombo = new Combo(comp, SWT.READ_ONLY);
@@ -381,9 +381,10 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 		IPUniverse universe = modelManager.getUniverse();
 		if (universe != null) {
-			IResourceManagerControl[] rms = universe.getResourceManagers();
-			if (rms.length != 1)
+			IResourceManagerControl[] rms = universe.getResourceManagerControls();
+			if (rms.length != 1) {
 				return null;
+			}
 			return rms[0];
 		}
 		return null;

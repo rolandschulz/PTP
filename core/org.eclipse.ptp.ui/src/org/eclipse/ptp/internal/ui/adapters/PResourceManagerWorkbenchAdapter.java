@@ -160,7 +160,7 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 				return label;
 			}
 		}
-		final IResourceManagerControl resourceManager = (IResourceManagerControl) object;
+		final IResourceManagerControl resourceManager = ((IPResourceManager) object).getResourceManager();
 		final String type = resourceManager.getConfiguration().getType();
 		if (type == null) {
 			return resourceManager.getName();

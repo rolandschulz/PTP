@@ -42,6 +42,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttribute;
+import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
@@ -50,6 +51,7 @@ import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
 import org.eclipse.ptp.core.messages.Messages;
@@ -218,7 +220,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			RangeSet jobIds = mgrEntry.getKey();
 
 			for (String elementId : jobIds) {
-				IPJob job = getJobById(elementId);
+				IPJob job = getPResourceManager().getJobById(elementId);
 				if (job != null) {
 					changedJobs.add(job);
 				} else {
@@ -226,7 +228,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				}
 			}
 
-			doUpdateJobs(changedJobs, attrs);
+			getPResourceManager().addJobAttributes(changedJobs, attrs.getAttributes());
 			changedJobs.clear();
 		}
 	}
@@ -247,7 +249,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			RangeSet machineIds = entry.getKey();
 
 			for (String elementId : machineIds) {
-				IPMachine machine = getMachineById(elementId);
+				IPMachine machine = getPResourceManager().getMachineById(elementId);
 				if (machine != null) {
 					machines.add(machine);
 				} else {
@@ -255,7 +257,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				}
 			}
 
-			doUpdateMachines(machines, attrs);
+			getPResourceManager().addMachineAttributes(machines, attrs.getAttributes());
 			machines.clear();
 		}
 	}
@@ -295,7 +297,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * .ptp.rtsystem.events.IRuntimeNewJobEvent)
 	 */
 	public void handleEvent(IRuntimeNewJobEvent e) {
-		IPQueue queue = getQueueById(e.getParentId());
+		IPQueue queue = getPResourceManager().getQueueById(e.getParentId());
 
 		ElementAttributeManager mgr = e.getElementAttributeManager();
 		Collection<IPJob> newJobs = new ArrayList<IPJob>();
@@ -306,9 +308,9 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			RangeSet jobIds = entry.getKey();
 
 			for (String elementId : jobIds) {
-				IPJob job = getJobById(elementId);
+				IPJob job = getPResourceManager().getJobById(elementId);
 				if (job == null) {
-					job = doCreateJob(elementId, jobAttrs);
+					job = getPResourceManager().newJob(elementId, jobAttrs);
 					newJobs.add(job);
 
 					StringAttribute jobSubAttr = jobAttrs.getAttribute(JobAttributes.getSubIdAttributeDefinition());
@@ -332,7 +334,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			}
 
 		}
-		addJobs(queue, newJobs);
+		getPResourceManager().addJobs(queue, newJobs);
 	}
 
 	/*
@@ -351,14 +353,14 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			List<IPMachine> newMachines = new ArrayList<IPMachine>(machineIds.size());
 
 			for (String elementId : machineIds) {
-				IPMachine machine = getMachineById(elementId);
+				IPMachine machine = getPResourceManager().getMachineById(elementId);
 				if (machine == null) {
-					machine = doCreateMachine(elementId, attrs);
+					machine = getPResourceManager().newMachine(elementId, attrs);
 					newMachines.add(machine);
 				}
 			}
 
-			addMachines(newMachines);
+			getPResourceManager().addMachines(newMachines);
 		}
 	}
 
@@ -370,7 +372,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * .ptp.rtsystem.events.IRuntimeNewNodeEvent)
 	 */
 	public void handleEvent(IRuntimeNewNodeEvent e) {
-		IPMachine machine = getMachineById(e.getParentId());
+		IPMachine machine = getPResourceManager().getMachineById(e.getParentId());
 
 		if (machine != null) {
 			ElementAttributeManager mgr = e.getElementAttributeManager();
@@ -381,15 +383,15 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				RangeSet nodeIds = entry.getKey();
 
 				for (String elementId : nodeIds) {
-					IPNode node = getNodeById(elementId);
+					IPNode node = getPResourceManager().getNodeById(elementId);
 					if (node == null) {
-						node = doCreateNode(machine, elementId, attrs);
+						node = getPResourceManager().newNode(machine, elementId, attrs);
 						newNodes.add(node);
 					}
 				}
 
 			}
-			addNodes(machine, newNodes);
+			getPResourceManager().addNodes(machine, newNodes);
 		} else {
 			PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_1 + e.getParentId());
 		}
@@ -404,7 +406,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 */
 	public void handleEvent(IRuntimeNewProcessEvent e) {
 		final String jobId = e.getParentId();
-		final IPJob job = getJobById(jobId);
+		final IPJob job = getPResourceManager().getJobById(jobId);
 
 		if (job != null) {
 			ElementAttributeManager mgr = e.getElementAttributeManager();
@@ -414,7 +416,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				RangeSet processJobRanks = entry.getKey();
 				BitSet newProcessJobRanks = getProcessJobRanks(processJobRanks);
 
-				addProcessesByJobRanks(job, newProcessJobRanks, attrs);
+				getPResourceManager().addProcessesByJobRanks(job, newProcessJobRanks, attrs);
 			}
 		} else {
 			PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_2 + e.getParentId());
@@ -437,14 +439,14 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			List<IPQueue> newQueues = new ArrayList<IPQueue>(queueIds.size());
 
 			for (String elementId : queueIds) {
-				IPQueue queue = getQueueById(elementId);
+				IPQueue queue = getPResourceManager().getQueueById(elementId);
 				if (queue == null) {
-					queue = doCreateQueue(elementId, attrs);
+					queue = getPResourceManager().newQueue(elementId, attrs);
 					newQueues.add(queue);
 				}
 			}
 
-			addQueues(newQueues);
+			getPResourceManager().addQueues(newQueues);
 		}
 	}
 
@@ -465,7 +467,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			List<IPNode> changedNodes;
 
 			for (String elementId : nodeIds) {
-				IPNode node = getNodeById(elementId);
+				IPNode node = getPResourceManager().getNodeById(elementId);
 				if (node != null) {
 					IPMachine machine = node.getMachine();
 					changedNodes = map.get(machine);
@@ -480,7 +482,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			}
 
 			for (Map.Entry<IPMachine, List<IPNode>> entry : map.entrySet()) {
-				doUpdateNodes(entry.getKey(), entry.getValue(), attrs);
+				entry.getKey().addNodeAttributes(entry.getValue(), attrs.getAttributes());
 			}
 
 			map.clear();
@@ -497,7 +499,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	public void handleEvent(IRuntimeProcessChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
 		String jobId = e.getJobId();
-		IPJob job = getJobById(jobId);
+		IPJob job = getPResourceManager().getJobById(jobId);
 
 		for (Map.Entry<RangeSet, AttributeManager> mgrEntry : eMgr.getEntrySet()) {
 			AttributeManager attrs = mgrEntry.getValue();
@@ -506,7 +508,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			// convert the RangeSet to a BitSet
 			BitSet changedProcessesJobRanks = getProcessJobRanks(processJobRanks);
 
-			doUpdateProcesses(job, changedProcessesJobRanks, attrs);
+			updateProcessesByJobRanks(job, changedProcessesJobRanks, attrs);
 
 		}
 	}
@@ -527,7 +529,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			RangeSet queueIds = entry.getKey();
 
 			for (String elementId : queueIds) {
-				IPQueue queue = getQueueById(elementId);
+				IPQueue queue = getPResourceManager().getQueueById(elementId);
 				if (queue != null) {
 					queues.add(queue);
 				} else {
@@ -535,7 +537,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				}
 			}
 
-			doUpdateQueues(queues, attrs);
+			getPResourceManager().addQueueAttributes(queues, attrs.getAttributes());
 			queues.clear();
 		}
 	}
@@ -562,13 +564,13 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		Set<IPJob> removedJobs = new HashSet<IPJob>();
 
 		for (String elementId : e.getElementIds()) {
-			IPJob job = getJobById(elementId);
+			IPJob job = getPResourceManager().getJobById(elementId);
 			if (job != null) {
 				removedJobs.add(job);
 			}
 		}
 
-		removeJobs(removedJobs);
+		getPResourceManager().removeJobs(removedJobs);
 	}
 
 	/*
@@ -582,7 +584,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		Map<IPResourceManager, List<IPMachine>> map = new HashMap<IPResourceManager, List<IPMachine>>();
 
 		for (String elementId : e.getElementIds()) {
-			IPMachine machine = getMachineById(elementId);
+			IPMachine machine = getPResourceManager().getMachineById(elementId);
 			if (machine != null) {
 				IPResourceManager rm = (IPResourceManager) machine.getParent();
 				List<IPMachine> machines = map.get(rm);
@@ -595,7 +597,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		}
 
 		for (Map.Entry<IPResourceManager, List<IPMachine>> entry : map.entrySet()) {
-			removeMachines(entry.getKey(), entry.getValue());
+			getPResourceManager().removeMachines(entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -610,7 +612,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		Map<IPMachine, List<IPNode>> map = new HashMap<IPMachine, List<IPNode>>();
 
 		for (String elementId : e.getElementIds()) {
-			IPNode node = getNodeById(elementId);
+			IPNode node = getPResourceManager().getNodeById(elementId);
 			if (node != null) {
 				IPMachine machine = node.getMachine();
 				List<IPNode> nodes = map.get(machine);
@@ -623,7 +625,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		}
 
 		for (Map.Entry<IPMachine, List<IPNode>> entry : map.entrySet()) {
-			removeNodes(entry.getKey(), entry.getValue());
+			getPResourceManager().removeNodes(entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -638,7 +640,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		final RangeSet jobRanks = e.getProcessJobRanks();
 		final BitSet removedProcessJobRanks = getProcessJobRanks(jobRanks);
 
-		IPJob job = getJobById(e.getJobId());
+		IPJob job = getPResourceManager().getJobById(e.getJobId());
 
 		job.removeProcessesByJobRanks(removedProcessJobRanks);
 	}
@@ -654,7 +656,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		Map<IPResourceManager, List<IPQueue>> map = new HashMap<IPResourceManager, List<IPQueue>>();
 
 		for (String elementId : e.getElementIds()) {
-			IPQueue queue = getQueueById(elementId);
+			IPQueue queue = getPResourceManager().getQueueById(elementId);
 			if (queue != null) {
 				IPResourceManager rm = (IPResourceManager) queue.getParent();
 				List<IPQueue> queues = map.get(rm);
@@ -667,7 +669,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		}
 
 		for (Map.Entry<IPResourceManager, List<IPQueue>> entry : map.entrySet()) {
-			removeQueues(entry.getKey(), entry.getValue());
+			getPResourceManager().removeQueues(entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -679,8 +681,8 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			RangeSet rmIds = mgrEntry.getKey();
 
 			for (String elementId : rmIds) {
-				if (getID().equals(elementId)) {
-					doUpdateRM(attrs);
+				if (getPResourceManager().getID().equals(elementId)) {
+					getPResourceManager().addAttributes(attrs.getAttributes());
 				}
 			}
 		}
@@ -758,7 +760,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * .ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent)
 	 */
 	public void handleEvent(IRuntimeTerminateJobErrorEvent e) {
-		IPJob job = this.getJobById(e.getJobID());
+		IPJob job = getPResourceManager().getJobById(e.getJobID());
 		String name = e.getJobID();
 		if (job != null) {
 			name = job.getName();
@@ -805,44 +807,6 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	}
 
 	/**
-	 * Template pattern method to actually create the job.
-	 * 
-	 * @param queue
-	 * @param jobId
-	 * @return
-	 * @since 5.0
-	 */
-	protected abstract IPJob doCreateJob(String jobId, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually create the machine.
-	 * 
-	 * @param machineId
-	 * @return
-	 * @since 5.0
-	 */
-	protected abstract IPMachine doCreateMachine(String machineId, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually create the node.
-	 * 
-	 * @param machine
-	 * @param nodeId
-	 * @return
-	 * @since 5.0
-	 */
-	protected abstract IPNode doCreateNode(IPMachine machine, String nodeId, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually create the queue.
-	 * 
-	 * @param queueId
-	 * @return
-	 * @since 5.0
-	 */
-	protected abstract IPQueue doCreateQueue(String queueId, AttributeManager attrs);
-
-	/**
 	 * create a new runtime system
 	 * 
 	 * @return the new runtime system
@@ -854,48 +818,12 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDisableEvents()
-	 */
-	@Override
-	protected void doDisableEvents() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDispose()
 	 */
 	@Override
 	protected void doDispose() {
 		// TODO Auto-generated method stub
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doEnableEvents()
-	 */
-	@Override
-	protected void doEnableEvents() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected List<IPJob> doRemoveTerminatedJobs() {
-		List<IPJob> terminatedJobs = new ArrayList<IPJob>();
-
-		for (IPJob job : getJobs()) {
-			if (job.getState() == JobAttributes.State.COMPLETED) {
-				terminatedJobs.add(job);
-			}
-		}
-		removeJobs(terminatedJobs);
-
-		return terminatedJobs;
 	}
 
 	/*
@@ -1024,72 +952,6 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	}
 
 	/**
-	 * Template pattern method to actually update the jobs.
-	 * 
-	 * @param jobs
-	 * @param attrs
-	 * @return changes were made
-	 * @since 5.0
-	 */
-	protected abstract boolean doUpdateJobs(Collection<IPJob> jobs, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually update the machines.
-	 * 
-	 * @param machine
-	 * @param attrs
-	 * @return changes were made
-	 */
-	protected abstract boolean doUpdateMachines(Collection<IPMachine> machines, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to update a collection of nodes.
-	 * 
-	 * @param machine
-	 *            parent machine
-	 * @param nodes
-	 *            collection of nodes to update
-	 * @param attrs
-	 *            new/changed attibutes for each node in the collection
-	 * @return changes were made
-	 * @since 5.0
-	 */
-	protected abstract boolean doUpdateNodes(IPMachine machine, Collection<IPNode> nodes, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually update the processes.
-	 * 
-	 * @param job
-	 *            parent job
-	 * @param processJobRanks
-	 *            collection of process job ranks representing processes to
-	 *            update
-	 * @param attrs
-	 *            new/changed attributes for each node in the collection
-	 * @return changes were made
-	 * @since 5.0
-	 */
-	protected abstract boolean doUpdateProcesses(IPJob job, BitSet processJobRanks, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually update the queues.
-	 * 
-	 * @param queue
-	 * @param attrs
-	 * @return changes were made
-	 */
-	protected abstract boolean doUpdateQueues(Collection<IPQueue> queues, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually update the queues.
-	 * 
-	 * @param queue
-	 * @param attrs
-	 * @return changes were made
-	 */
-	protected abstract boolean doUpdateRM(AttributeManager attrs);
-
-	/**
 	 * @param sJobRank
 	 * @return
 	 * @since 4.0
@@ -1129,4 +991,50 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		return runtimeSystem;
 	}
 
+	/**
+	 * Update attributes on a collection of processes. If the nodeId attribute
+	 * is specified then the processes will be moved to the new node.
+	 * 
+	 * @param job
+	 *            parent of processes
+	 * @param processJobRanks
+	 *            set of job ranks for processes
+	 * @param attrs
+	 *            attributes to update
+	 * @return true if updated
+	 * @since 5.0
+	 */
+	private boolean updateProcessesByJobRanks(IPJob job, BitSet processJobRanks, AttributeManager attrs) {
+		final StringAttributeDefinition nodeIdAttributeDefinition = ProcessAttributes.getNodeIdAttributeDefinition();
+
+		StringAttribute newNodeId = attrs.getAttribute(nodeIdAttributeDefinition);
+
+		// if we are update a node attribute we must move processes from one
+		// node
+		// to another
+		if (newNodeId != null) {
+
+			IPNode newNode = getPResourceManager().getNodeById(newNodeId.getValue());
+			// add the job and the process job ranks to the new node
+			newNode.addJobProcessRanks(job, processJobRanks);
+
+			// Remove the process job ranks from the nodes that no longer
+			// contain these processes
+			Set<StringAttribute> oldNodeIds = job.getProcessAttributes(nodeIdAttributeDefinition, processJobRanks);
+			oldNodeIds.remove(newNodeId);
+			for (StringAttribute oldNodeId : oldNodeIds) {
+				IPNode oldNode = getPResourceManager().getNodeById(oldNodeId.getValue());
+				if (oldNode != null) {
+					oldNode.removeJobProcessRanks(job, processJobRanks);
+				}
+			}
+		}
+
+		/*
+		 * Update attributes on the job (where they live for the processes)
+		 */
+		job.addProcessAttributes(processJobRanks, attrs);
+
+		return true;
+	}
 }
