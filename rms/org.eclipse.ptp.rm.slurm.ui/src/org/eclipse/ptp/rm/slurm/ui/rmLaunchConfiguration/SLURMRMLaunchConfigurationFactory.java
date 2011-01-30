@@ -14,10 +14,10 @@ package org.eclipse.ptp.rm.slurm.ui.rmLaunchConfiguration;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class SLURMRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory {
 

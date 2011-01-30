@@ -20,9 +20,9 @@ package org.eclipse.ptp.core.elements;
 
 import java.util.Collection;
 
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public interface IPQueue extends IPElement {
 	/**

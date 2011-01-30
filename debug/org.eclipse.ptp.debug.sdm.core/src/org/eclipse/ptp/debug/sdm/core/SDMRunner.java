@@ -11,8 +11,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl.JobControlOperation;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.sdm.core.messages.Messages;
@@ -25,6 +23,8 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation;
 
 public class SDMRunner extends Job {
 	public enum SDMMasterState {
@@ -39,6 +39,9 @@ public class SDMRunner extends Job {
 	private IResourceManagerControl rmControl = null;
 	private IRemoteProcess sdmProcess;
 
+	/**
+	 * @since 5.0
+	 */
 	public SDMRunner(IResourceManagerControl rmControl) {
 		super(Messages.SDMRunner_0);
 		this.setPriority(Job.LONG);

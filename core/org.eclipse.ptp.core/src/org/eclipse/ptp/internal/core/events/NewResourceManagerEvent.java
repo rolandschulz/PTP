@@ -20,8 +20,8 @@
 package org.eclipse.ptp.internal.core.events;
 
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * @author rsqrd

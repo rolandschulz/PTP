@@ -21,7 +21,6 @@
  */
 package org.eclipse.ptp.rmsystem;
 
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -45,6 +44,7 @@ public interface IResourceManagerFactory {
 	 * @param configuration
 	 *            configuration to use when creating resource manager
 	 * @return resource manager control
+	 * @since 5.0
 	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration configuration);
 
@@ -85,6 +85,7 @@ public interface IResourceManagerFactory {
 	 *            working copy
 	 * @param resourceManager
 	 *            resource manager
+	 * @since 5.0
 	 */
 	public void saveConfiguration(IResourceManagerConfiguration configuration, IResourceManagerControl resourceManager);
 }

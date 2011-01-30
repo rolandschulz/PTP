@@ -12,11 +12,11 @@ package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider implements IMPICH2ResourceManagerConfiguration {

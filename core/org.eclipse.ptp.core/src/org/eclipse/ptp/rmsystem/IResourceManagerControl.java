@@ -14,7 +14,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.ptp.core.elementcontrols;
+package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -24,8 +24,10 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
+/**
+ * @since 5.0
+ */
 public interface IResourceManagerControl extends IAdaptable {
 	/**
 	 * @since 5.0

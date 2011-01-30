@@ -14,7 +14,7 @@ package org.eclipse.ptp.core.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * This event is generated when the attributes or configuration of one or more

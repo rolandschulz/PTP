@@ -15,13 +15,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.generic.core.messages.Messages;
 import org.eclipse.ptp.rm.generic.core.rmsystem.EffectiveGenericRMConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 

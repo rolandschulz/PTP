@@ -12,11 +12,11 @@ package org.eclipse.ptp.rm.generic.core.rmsystem;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
 import org.eclipse.ptp.rm.generic.core.GenericRMCorePlugin;
 import org.eclipse.ptp.rm.generic.core.GenericRMPreferenceManager;
 import org.eclipse.ptp.rm.generic.core.messages.Messages;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 public class GenericRMServiceProvider extends AbstractToolRMServiceProvider {
