@@ -41,7 +41,6 @@ import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
@@ -84,6 +83,7 @@ import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.ResourceManagerErrorEvent;
 import org.eclipse.ptp.internal.core.elements.events.ResourceManagerSubmitJobErrorEvent;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * @author rsqrd

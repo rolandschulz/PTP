@@ -25,11 +25,11 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * A Job can be a parallel or sequential job, consisting of one or more

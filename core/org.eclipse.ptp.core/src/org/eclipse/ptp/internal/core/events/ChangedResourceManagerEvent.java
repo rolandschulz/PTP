@@ -22,8 +22,8 @@ package org.eclipse.ptp.internal.core.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * @author rsqrd

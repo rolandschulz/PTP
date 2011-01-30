@@ -55,7 +55,6 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
@@ -83,6 +82,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**

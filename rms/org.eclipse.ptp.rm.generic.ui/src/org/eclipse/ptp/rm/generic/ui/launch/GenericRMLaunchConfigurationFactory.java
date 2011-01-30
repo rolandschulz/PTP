@@ -12,10 +12,10 @@ package org.eclipse.ptp.rm.generic.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.generic.core.rmsystem.GenericResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class GenericRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory {
 

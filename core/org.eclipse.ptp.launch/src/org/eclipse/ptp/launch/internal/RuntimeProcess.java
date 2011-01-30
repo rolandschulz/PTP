@@ -14,8 +14,6 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl.JobControlOperation;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
@@ -24,6 +22,8 @@ import org.eclipse.ptp.core.elements.listeners.IJobListener;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation;
 
 public class RuntimeProcess implements IProcess, IJobListener {
 	private IPLaunch launch = null;

@@ -39,7 +39,6 @@ import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.AttributeIndexSet;
@@ -57,6 +56,7 @@ import org.eclipse.ptp.internal.core.elements.events.ChangedProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.JobChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveProcessEvent;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class PJob extends Parent implements IPJob {
 

@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.core.elements;
 
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * A Universe represents a user's view of the world. It is comprised of a set of

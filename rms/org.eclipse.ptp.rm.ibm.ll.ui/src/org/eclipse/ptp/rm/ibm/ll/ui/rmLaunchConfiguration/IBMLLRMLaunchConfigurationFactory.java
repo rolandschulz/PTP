@@ -24,10 +24,10 @@ package org.eclipse.ptp.rm.ibm.ll.ui.rmLaunchConfiguration;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class IBMLLRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory {
 

@@ -24,10 +24,10 @@ import java.util.Collection;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 
 /**

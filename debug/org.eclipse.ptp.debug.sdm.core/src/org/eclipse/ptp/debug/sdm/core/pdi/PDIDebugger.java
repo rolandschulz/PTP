@@ -30,7 +30,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.TaskSet;
@@ -60,6 +59,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * @author clement

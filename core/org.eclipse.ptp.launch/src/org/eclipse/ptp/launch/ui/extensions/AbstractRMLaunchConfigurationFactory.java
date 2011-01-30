@@ -21,9 +21,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * Abstract class that is the extension point for contributing Dynamic

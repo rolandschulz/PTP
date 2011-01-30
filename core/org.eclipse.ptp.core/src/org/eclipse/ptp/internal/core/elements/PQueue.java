@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -35,6 +34,7 @@ import org.eclipse.ptp.core.elements.attributes.QueueAttributes.State;
 import org.eclipse.ptp.core.elements.events.IQueueChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 import org.eclipse.ptp.internal.core.elements.events.QueueChangeEvent;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class PQueue extends Parent implements IPQueue {
 	private final ListenerList fElementListeners = new ListenerList();

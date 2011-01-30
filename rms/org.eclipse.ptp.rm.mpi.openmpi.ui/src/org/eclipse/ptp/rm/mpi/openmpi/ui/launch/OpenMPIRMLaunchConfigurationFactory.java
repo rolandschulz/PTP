@@ -12,10 +12,10 @@ package org.eclipse.ptp.rm.mpi.openmpi.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * 

@@ -28,7 +28,6 @@ import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
@@ -45,6 +44,7 @@ import org.eclipse.ptp.internal.core.elements.events.ChangedNodeEvent;
 import org.eclipse.ptp.internal.core.elements.events.MachineChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewNodeEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveNodeEvent;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class PMachine extends Parent implements IPMachine {
 	private final ListenerList elementListeners = new ListenerList();

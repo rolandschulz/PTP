@@ -19,9 +19,9 @@
 package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 public interface IModelManager extends IModelPresentation {
@@ -36,6 +36,7 @@ public interface IModelManager extends IModelPresentation {
 	 * Add a resource manager to the model.
 	 * 
 	 * @param addedManager
+	 * @since 5.0
 	 */
 	public void addResourceManager(IResourceManagerControl addedManager);
 
@@ -43,6 +44,7 @@ public interface IModelManager extends IModelPresentation {
 	 * Add resource managers to the model.
 	 * 
 	 * @param addedManagers
+	 * @since 5.0
 	 */
 	public void addResourceManagers(IResourceManagerControl[] addedManagers);
 
@@ -75,6 +77,7 @@ public interface IModelManager extends IModelPresentation {
 	 * Remove a resource manager from the model.
 	 * 
 	 * @param removedManager
+	 * @since 5.0
 	 */
 	public void removeResourceManager(IResourceManagerControl removedManager);
 

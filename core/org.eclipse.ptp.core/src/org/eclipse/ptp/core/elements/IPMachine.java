@@ -21,10 +21,10 @@ package org.eclipse.ptp.core.elements;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * Interface class for a model of a machine. Machines are comprised of nodes

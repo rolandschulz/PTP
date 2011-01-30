@@ -14,10 +14,10 @@ package org.eclipse.ptp.rm.ui.launch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 

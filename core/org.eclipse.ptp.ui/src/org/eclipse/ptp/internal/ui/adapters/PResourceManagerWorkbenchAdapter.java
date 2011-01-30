@@ -20,12 +20,12 @@ package org.eclipse.ptp.internal.ui.adapters;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.messages.Messages;
