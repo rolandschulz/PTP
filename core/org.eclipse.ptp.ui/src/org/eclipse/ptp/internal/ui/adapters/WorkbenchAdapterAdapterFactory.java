@@ -28,7 +28,6 @@ import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.rm.IResourceManager;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.IWorkbenchAdapter2;
 
@@ -40,7 +39,6 @@ public class WorkbenchAdapterAdapterFactory implements IAdapterFactory {
 	private static final PQueueWorkbenchAdapter QUEUE_WORKBENCH_ADAPTER = new PQueueWorkbenchAdapter();
 	private static final PNodeWorkbenchAdapter NODE_WORKBENCH_ADAPTER = new PNodeWorkbenchAdapter();
 	private static final PJobWorkbenchAdapter JOB_WORKBENCH_ADAPTER = new PJobWorkbenchAdapter();
-	private static final ResourceManagerWorkbenchAdapter RM_WORKBENCH_ADAPTER = new ResourceManagerWorkbenchAdapter();
 
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
@@ -62,9 +60,6 @@ public class WorkbenchAdapterAdapterFactory implements IAdapterFactory {
 			}
 			if (adaptableObject instanceof IPJob) {
 				return JOB_WORKBENCH_ADAPTER;
-			}
-			if (adaptableObject instanceof IResourceManager) {
-				return RM_WORKBENCH_ADAPTER;
 			}
 		}
 		return null;

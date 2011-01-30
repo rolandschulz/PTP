@@ -208,16 +208,6 @@
        </adapter>
     </factory>
     <factory
-          adaptableType="org.eclipse.ptp.core.rm.IResourceManager"
-          class="org.eclipse.ptp.internal.ui.adapters.WorkbenchAdapterAdapterFactory">
-       <adapter
-             type="org.eclipse.ui.model.IWorkbenchAdapter">
-       </adapter>
-       <adapter
-             type="org.eclipse.ui.model.IWorkbenchAdapter2">
-       </adapter>
-    </factory>
-    <factory
           adaptableType="org.eclipse.ptp.core.elements.IPElement"
           class="org.eclipse.ptp.internal.ui.adapters.PropertyAdapterFactory">
        <adapter
