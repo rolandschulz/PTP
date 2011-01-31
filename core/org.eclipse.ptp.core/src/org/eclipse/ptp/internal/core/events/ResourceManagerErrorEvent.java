@@ -14,46 +14,38 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-/**
- * 
- */
-package org.eclipse.ptp.internal.core.elements.events;
+package org.eclipse.ptp.internal.core.events;
 
-import java.util.Collection;
+import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
+public class ResourceManagerErrorEvent implements IResourceManagerErrorEvent {
 
-/**
- * @author grw
- * 
- */
-public class ChangedJobEvent implements IChangedJobEvent {
+	private final IResourceManagerControl rm;
+	private final String message;
 
-	private final IPResourceManager rm;
-	private final Collection<IPJob> jobs;
-
-	public ChangedJobEvent(IPResourceManager rm, Collection<IPJob> jobs) {
+	public ResourceManagerErrorEvent(final IResourceManagerControl rm, final String message) {
 		this.rm = rm;
-		this.jobs = jobs;
+		this.message = message;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.events.IChangedJobEvent#getJobs()
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent#getMessage()
 	 */
-	public Collection<IPJob> getJobs() {
-		return jobs;
+	public String getMessage() {
+		return message;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.events.IChangedJobEvent#getSource()
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent#getSource()
 	 */
-	public IPResourceManager getSource() {
+	public IResourceManagerControl getSource() {
 		return rm;
 	}
 

@@ -33,7 +33,6 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
@@ -711,12 +710,14 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(org.eclipse.ptp.
-	 * core.elements.IPJob)
+	 * org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(java.lang.String)
 	 */
-	public void terminateJob(IPJob ipJob) throws CoreException {
-		DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: terminate job #{1}", rmConfiguration.getName(), ipJob.getID()); //$NON-NLS-1$
-		Job job = jobs.get(ipJob.getID());
+	/**
+	 * @since 3.0
+	 */
+	public void terminateJob(String jobId) throws CoreException {
+		DebugUtil.trace(DebugUtil.JOB_TRACING, "RTS {0}: terminate job #{1}", rmConfiguration.getName(), jobId); //$NON-NLS-1$
+		Job job = jobs.get(jobId);
 		pendingJobQueue.remove(job);
 		job.cancel();
 	}

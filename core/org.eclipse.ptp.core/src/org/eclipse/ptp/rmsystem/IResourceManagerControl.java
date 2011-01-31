@@ -22,8 +22,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.core.listeners.IJobListener;
 
 /**
  * @since 5.0
@@ -56,10 +56,17 @@ public interface IResourceManagerControl extends IAdaptable {
 	};
 
 	/**
+	 * Add a listener for job events
+	 * 
+	 * @param listener
+	 */
+	public void addJobListener(IJobListener listener);
+
+	/**
 	 * Perform control operation on job.
 	 * 
-	 * @param job
-	 *            job object representing the job to be canceled.
+	 * @param jobId
+	 *            job ID representing the job to be canceled.
 	 * @param operation
 	 *            operation to perform on the job
 	 * @param monitor
@@ -67,7 +74,7 @@ public interface IResourceManagerControl extends IAdaptable {
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	public void control(IPJob job, JobControlOperation operation, IProgressMonitor monitor) throws CoreException;
+	public void control(String jobId, JobControlOperation operation, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Safely dispose of this Resource Manager.
@@ -100,6 +107,15 @@ public interface IResourceManagerControl extends IAdaptable {
 	 * @since 5.0
 	 */
 	public String getDescription();
+
+	/**
+	 * Get the status of the job
+	 * 
+	 * @param jobId
+	 *            ID of job used to obtain status
+	 * @return status of the job
+	 */
+	public IJobStatus getJobStatus(String jobId);
 
 	/**
 	 * Get the name of this RM
@@ -136,6 +152,13 @@ public interface IResourceManagerControl extends IAdaptable {
 	public String getUniqueName();
 
 	/**
+	 * Remove a listener for job events
+	 * 
+	 * @param listener
+	 */
+	public void removeJobListener(IJobListener listener);
+
+	/**
 	 * Set the configuration for this resource manager. This will replace the
 	 * existing configuration with a new configuration. The method is
 	 * responsible for dealing with any saved state that needs to be cleaned up.
@@ -144,6 +167,15 @@ public interface IResourceManagerControl extends IAdaptable {
 	 *            the new configuration
 	 */
 	public void setConfiguration(IResourceManagerConfiguration config);
+
+	/**
+	 * Set the state of this RM
+	 * 
+	 * @param state
+	 *            value representing the state of the RM
+	 * @since 5.0
+	 */
+	public void setState(ResourceManagerAttributes.State state);
 
 	/**
 	 * Start up the resource manager. This could potentially take a long time
@@ -187,11 +219,11 @@ public interface IResourceManagerControl extends IAdaptable {
 	 *            attribute manager containing the job launch attributes
 	 * @param monitor
 	 *            progress monitor for monitoring job submission.
-	 * @return a job object representing the submitted job
+	 * @return a unique job ID representing the submitted job
 	 * @throws CoreException
 	 *             if the job submission fails or was canceled
 	 * @since 5.0
 	 */
-	public IPJob submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+	public String submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException;
 }

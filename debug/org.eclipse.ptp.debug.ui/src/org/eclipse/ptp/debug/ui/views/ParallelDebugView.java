@@ -92,17 +92,17 @@ public class ParallelDebugView extends ParallelJobsView {
 	protected ParallelAction unregisterAction = null;
 	protected AbstractPDebugViewEventHandler fEventHandler = null;
 	protected Viewer launchViewer = null;
-	
+
 	protected ISelectionChangedListener debugViewSelectChangedListener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			ISelection selection = event.getSelection();
 			if (!selection.isEmpty()) {
 				if (selection instanceof IStructuredSelection) {
-					Object element = ((IStructuredSelection)selection).getFirstElement();
+					Object element = ((IStructuredSelection) selection).getFirstElement();
 					if (element instanceof IPDebugElement) {
 						if (canvas != null && !canvas.isDisposed()) {
 							if (getCurrentSet() != null) {
-								int index = getCurrentSet().findIndexByName(String.valueOf(((IPDebugElement)element).getID()));
+								int index = getCurrentSet().findIndexByName(String.valueOf(((IPDebugElement) element).getID()));
 								if (index > -1) {
 									canvas.unselectAllElements();
 									canvas.selectElement(index);
@@ -116,31 +116,29 @@ public class ParallelDebugView extends ParallelJobsView {
 			}
 		}
 	};
+
 	/*
-	private MouseAdapter debugViewMouseAdapter = new MouseAdapter() {
-		public void mouseUp(MouseEvent event) {
-			Object test = event.getSource();
-			if (test instanceof Tree) {
-				TreeItem[] items = ((Tree)test).getSelection();
-				Object[] targets = new Object[items.length];
-				for (int i=0; i<items.length; i++) {
-					targets[i] = items[i].getData();
-				}
-				selectElements(targets);
-			}
-		}
-	};
-	*/
+	 * private MouseAdapter debugViewMouseAdapter = new MouseAdapter() { public
+	 * void mouseUp(MouseEvent event) { Object test = event.getSource(); if
+	 * (test instanceof Tree) { TreeItem[] items = ((Tree)test).getSelection();
+	 * Object[] targets = new Object[items.length]; for (int i=0;
+	 * i<items.length; i++) { targets[i] = items[i].getData(); }
+	 * selectElements(targets); } } };
+	 */
 	public ParallelDebugView(IElementManager manager) {
 		super(manager);
 	}
+
 	public ParallelDebugView() {
 		this(PTPDebugUIPlugin.getUIDebugManager());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
+	@Override
 	public void dispose() {
 		Viewer viewer = getDebugViewer();
 		if (viewer != null)
@@ -149,7 +147,7 @@ public class ParallelDebugView extends ParallelJobsView {
 			getEventHandler().dispose();
 		super.dispose();
 	}
-	
+
 	/**
 	 * @return
 	 */
@@ -169,46 +167,36 @@ public class ParallelDebugView extends ParallelJobsView {
 				}
 			}
 			if (part != null && part instanceof AbstractDebugView) {
-				launchViewer = ((AbstractDebugView)part).getViewer();
+				launchViewer = ((AbstractDebugView) part).getViewer();
 				if (launchViewer != null)
 					launchViewer.addSelectionChangedListener(debugViewSelectChangedListener);
-			}			
+			}
 		}
 		return launchViewer;
 	}
-	
+
 	/*
-	 * FIXME does not work if create a new set.  Currently we can task id to identify icon, but viewer is using order 
-	private void selectElements(final Object[] objects) {
-        SafeRunnable.run(new SafeRunnable() {
-            public void run() {
-				if (!canvas.isDisposed()) {
-					canvas.unselectAllElements();
-					for (int i=0; i<objects.length; i++) {
-						Object obj = objects[i];
-						int id = ((UIDebugManager) manager).getSelectedRegisteredTasks(obj);
-						if (id > -1) {
-							if (!canvas.isSelected(id))
-								canvas.selectElement(id);
-						}
-					}
-					canvas.redraw();
-					canvas.setCurrentSelection(false);
-				}
-			}
-		});
-	}
-	*/
-		
+	 * FIXME does not work if create a new set. Currently we can task id to
+	 * identify icon, but viewer is using order private void
+	 * selectElements(final Object[] objects) { SafeRunnable.run(new
+	 * SafeRunnable() { public void run() { if (!canvas.isDisposed()) {
+	 * canvas.unselectAllElements(); for (int i=0; i<objects.length; i++) {
+	 * Object obj = objects[i]; int id = ((UIDebugManager)
+	 * manager).getSelectedRegisteredTasks(obj); if (id > -1) { if
+	 * (!canvas.isSelected(id)) canvas.selectElement(id); } } canvas.redraw();
+	 * canvas.setCurrentSelection(false); } } }); }
+	 */
+
 	/**
 	 * Sets the event handler for this view
 	 * 
-	 * @param eventHandler event handler
+	 * @param eventHandler
+	 *            event handler
 	 */
 	protected void setEventHandler(AbstractPDebugViewEventHandler eventHandler) {
 		this.fEventHandler = eventHandler;
 	}
-	
+
 	/**
 	 * Returns the event handler for this view
 	 * 
@@ -216,19 +204,29 @@ public class ParallelDebugView extends ParallelJobsView {
 	 */
 	protected AbstractPDebugViewEventHandler getEventHandler() {
 		return this.fEventHandler;
-	}	
-		
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.ParallelJobView#createView(org.eclipse.swt.widgets.Composite)
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.views.ParallelJobView#createView(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
+	@Override
 	public void createView(Composite parent) {
 		super.createView(parent);
 		setEventHandler(new ParallelDebugViewEventHandler(this));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#fillContextMenu(org.eclipse.jface.action.IMenuManager)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.views.AbstractParallelSetView#fillContextMenu(org.
+	 * eclipse.jface.action.IMenuManager)
 	 */
+	@Override
 	protected void fillContextMenu(IMenuManager manager) {
 		super.fillContextMenu(manager);
 		manager.add(new Separator(IPTPDebugUIConstants.THREAD_GROUP));
@@ -246,10 +244,15 @@ public class ParallelDebugView extends ParallelJobsView {
 		manager.appendToGroup(IPTPDebugUIConstants.STEP_OVER_GROUP, stepOverAction);
 		manager.appendToGroup(IPTPDebugUIConstants.EMPTY_STEP_GROUP, stepReturnAction);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActionGroup(org.eclipse.jface.action.IToolBarManager)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActionGroup
+	 * (org.eclipse.jface.action.IToolBarManager)
 	 */
+	@Override
 	protected void createToolBarActionGroup(IToolBarManager toolBarMgr) {
 		toolBarMgr.add(new Separator(IPTPDebugUIConstants.THREAD_GROUP));
 		toolBarMgr.add(new Separator(IPTPDebugUIConstants.STEP_GROUP));
@@ -260,10 +263,15 @@ public class ParallelDebugView extends ParallelJobsView {
 		toolBarMgr.add(new Separator(IPTPDebugUIConstants.REG_GROUP));
 		super.createToolBarActionGroup(toolBarMgr);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions(org.eclipse.jface.action.IToolBarManager)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions
+	 * (org.eclipse.jface.action.IToolBarManager)
 	 */
+	@Override
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		resumeAction = new ResumeAction(this);
 		suspendAction = new SuspendAction(this);
@@ -273,7 +281,7 @@ public class ParallelDebugView extends ParallelJobsView {
 		stepReturnAction = new StepReturnAction(this);
 		registerAction = new RegisterAction(this);
 		unregisterAction = new UnregisterAction(this);
-				
+
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.THREAD_GROUP, resumeAction);
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.THREAD_GROUP, suspendAction);
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.THREAD_GROUP, terminateAction);
@@ -282,12 +290,13 @@ public class ParallelDebugView extends ParallelJobsView {
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.STEP_RETURN_GROUP, stepReturnAction);
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.REG_GROUP, registerAction);
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.REG_GROUP, unregisterAction);
-		
+
 		super.buildInToolBarActions(toolBarMgr);
-		//createOrientationActions();
+		// createOrientationActions();
 	}
-	
-	/** Create orientation actions
+
+	/**
+	 * Create orientation actions
 	 * 
 	 */
 	protected void createOrientationActions() {
@@ -295,23 +304,32 @@ public class ParallelDebugView extends ParallelJobsView {
 		IMenuManager viewMenu = actionBars.getMenuManager();
 		viewMenu.add(new Separator());
 	}
-	
+
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * IIconCanvasActionListener
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int,
+	 * int)
 	 */
+	@Override
 	public void handleAction(int type, int index) {
 		IElement element = canvas.getElement(index);
 		if (type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION) {
 			doubleClick(element);
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.eclipse.ptp.ui.model.IElement)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.
+	 * eclipse.ptp.ui.model.IElement)
 	 */
+	@Override
 	public void doubleClick(IElement element) {
 		try {
 			registerElement(element);
@@ -319,24 +337,32 @@ public class ParallelDebugView extends ParallelJobsView {
 			PTPDebugUIPlugin.errorDialog(getViewSite().getShell(), Messages.ParallelDebugView_0, e.getStatus());
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java.lang.Object)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java
+	 * .lang.Object)
 	 */
+	@Override
 	public String[] getToolTipText(Object obj) {
 		if (obj == null)
-			return new String[] {"", ""}; //$NON-NLS-1$ //$NON-NLS-2$
+			return new String[] { "", "" }; //$NON-NLS-1$ //$NON-NLS-2$
 		String[] header = super.getToolTipText(obj);
-		// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
-		PProcessUI proc = (PProcessUI)obj;
+		// FIXME PProcessUI goes away when we address UI scalability. See Bug
+		// 311057
+		PProcessUI proc = (PProcessUI) obj;
 		String variableText = ((UIDebugManager) manager).getValueText(proc.getJobRank(), this);
 		if (variableText != null && variableText.length() > 0) {
 			return new String[] { header[0], variableText };
 		}
 		return header;
 	}
-	
-	/** Register element
+
+	/**
+	 * Register element
+	 * 
 	 * @param element
 	 * @throws CoreException
 	 */
@@ -346,8 +372,10 @@ public class ParallelDebugView extends ParallelJobsView {
 		else
 			((UIDebugManager) manager).registerElements(new IElement[] { element });
 	}
-	
-	/** Register selected elements
+
+	/**
+	 * Register selected elements
+	 * 
 	 * @throws CoreException
 	 */
 	public void registerSelectedElements() throws CoreException {
@@ -355,8 +383,10 @@ public class ParallelDebugView extends ParallelJobsView {
 			((UIDebugManager) manager).registerElements(canvas.getSelectedElements());
 		}
 	}
-	
-	/** Unregister selected elements
+
+	/**
+	 * Unregister selected elements
+	 * 
 	 * @throws CoreException
 	 */
 	public void unregisterSelectedElements() throws CoreException {
@@ -364,10 +394,14 @@ public class ParallelDebugView extends ParallelJobsView {
 			((UIDebugManager) manager).unregisterElements(canvas.getSelectedElements());
 		}
 	}
+
 	// Update button
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#updateAction()
 	 */
+	@Override
 	public void updateAction() {
 		super.updateAction();
 		IPJob job = ((UIDebugManager) manager).findJobById(getCurrentID());
@@ -380,7 +414,7 @@ public class ParallelDebugView extends ParallelJobsView {
 		if (isRunning && isDebugMode) {
 			IElementHandler elementHandler = getCurrentElementHandler();
 			if (elementHandler != null) {
-				updateDebugButtons(job);
+				updateDebugButtons(getCurrentID());
 			}
 		} else {
 			resumeAction.setEnabled(false);
@@ -390,11 +424,14 @@ public class ParallelDebugView extends ParallelJobsView {
 			suspendAction.setEnabled(false);
 		}
 	}
+
 	/**
 	 * Update debug button
+	 * 
+	 * @since 4.0
 	 */
-	public void updateDebugButtons(IPJob job) {
-		IPSession session = ((UIDebugManager) manager).getDebugSession(job);
+	private void updateDebugButtons(String jobId) {
+		IPSession session = ((UIDebugManager) manager).getDebugSession(jobId);
 		if (session == null)
 			return;
 		IElementSet set = getCurrentSet();
@@ -415,8 +452,7 @@ public class ParallelDebugView extends ParallelJobsView {
 			totalTerminatedSize = terminatedTasks.cardinality();
 			totalSuspendedSize = suspendedTasks.isEmpty() ? 0 : suspendedTasks.cardinality();
 			totalStepReturnSize = stepReturnTasks.isEmpty() ? 0 : stepReturnTasks.cardinality();
-		}
-		else {
+		} else {
 			try {
 				TaskSet setTasks = ((UIDebugManager) manager).getTasks(set.getID());
 				if (setTasks == null)
@@ -435,7 +471,9 @@ public class ParallelDebugView extends ParallelJobsView {
 				PTPDebugUIPlugin.log(e);
 			}
 		}
-//System.err.println("Set size: " + setSize + ", T: " + totalTerminatedSize + ", S: "+ totalSuspendedSize + ", Return: " + totalStepReturnSize);
+		// System.err.println("Set size: " + setSize + ", T: " +
+		// totalTerminatedSize + ", S: "+ totalSuspendedSize + ", Return: " +
+		// totalStepReturnSize);
 		boolean enabledTerminatedButton = (setSize != totalTerminatedSize);
 		terminateAction.setEnabled(enabledTerminatedButton);
 		if (enabledTerminatedButton) {// not all processes terminated
@@ -453,194 +491,184 @@ public class ParallelDebugView extends ParallelJobsView {
 			suspendAction.setEnabled(false);
 		}
 	}
-    /* (non-Javadoc)
-     * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-     */
-    public void selectionChanged(SelectionChangedEvent event) {
-    	super.selectionChanged(event);
-    	ISelection selection = event.getSelection();
-    	if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-    		IStructuredSelection structSelection = (IStructuredSelection)selection;
-    		if (structSelection.size() == 1 && structSelection.getFirstElement() instanceof IElement) {
-	    		IElement element = (IElement)structSelection.getFirstElement();
-	    		if (element.isRegistered()) {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#selectionChanged
+	 * (org.eclipse.jface.viewers.SelectionChangedEvent)
+	 */
+	@Override
+	public void selectionChanged(SelectionChangedEvent event) {
+		super.selectionChanged(event);
+		ISelection selection = event.getSelection();
+		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
+			IStructuredSelection structSelection = (IStructuredSelection) selection;
+			if (structSelection.size() == 1 && structSelection.getFirstElement() instanceof IElement) {
+				IElement element = (IElement) structSelection.getFirstElement();
+				if (element.isRegistered()) {
 					try {
-		    			focusOnDebugTarget(getJobManager().getJob(), Integer.parseInt(element.getName()));
+						focusOnDebugTarget(getJobManager().getJob().getID(), Integer.parseInt(element.getName()));
 					} catch (NumberFormatException e) {
 						// The element name had better be the process number
 					}
-	    		}
-    		}
-    	}
-    }
-    
-    /*
-	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
-		super.drawSpecial(obj, gc, x_loc, y_loc, width, height);
-		if (cur_element_set != null && obj instanceof DebugElement) {
-			DebugElement element =  (DebugElement)obj;
-			switch(element.getType()) {
-			case DebugElement.VALUE_DIFF:
-				gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLUE));
-				gc.drawLine(x_loc, y_loc, x_loc+width, y_loc+height);
-				gc.drawLine(x_loc, y_loc+height, x_loc+width, y_loc);
-				break;
+				}
 			}
 		}
 	}
-	*/
-	
+
+	/*
+	 * public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int
+	 * width, int height) { super.drawSpecial(obj, gc, x_loc, y_loc, width,
+	 * height); if (cur_element_set != null && obj instanceof DebugElement) {
+	 * DebugElement element = (DebugElement)obj; switch(element.getType()) {
+	 * case DebugElement.VALUE_DIFF:
+	 * gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLUE));
+	 * gc.drawLine(x_loc, y_loc, x_loc+width, y_loc+height); gc.drawLine(x_loc,
+	 * y_loc+height, x_loc+width, y_loc); break; } } }
+	 */
+
 	/******************************************************
-	 * focus on debug target on debug view 
+	 * focus on debug target on debug view
 	 ******************************************************/
-	private IDebugElement getDebugElement(IPJob job, int task_id) {
-		IPSession session = ((UIDebugManager)manager).getDebugSession(job);
+	private IDebugElement getDebugElement(String jobId, int task_id) {
+		IPSession session = ((UIDebugManager) manager).getDebugSession(jobId);
 		if (session != null) {
 			return session.getLaunch().getDebugTarget(task_id);
-			/*
-			IPDebugTarget debugTarget = session.getLaunch().getDebugTarget(task_id);
-			if (debugTarget != null) {
-				try {
-					IThread[] threads = debugTarget.getThreads();
-					for (int i=0; i<threads.length; i++) {
-						IStackFrame frame = threads[i].getTopStackFrame();
-						if (frame != null)
-							return frame;
-					}
-					if (threads.length > 0) {
-						return threads[0];
-					}
-				}
-				catch (DebugException e) {
-					return debugTarget;
-				}
-				return debugTarget;
-			}
-			*/
 		}
 		return null;
 	}
-	public void focusOnDebugTarget(final IPJob job, final int task_id) {
+
+	/**
+	 * @since 4.0
+	 */
+	public void focusOnDebugTarget(final String jobId, final int task_id) {
 		WorkbenchJob wjob = new WorkbenchJob(Messages.ParallelDebugView_3) {
+			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				Viewer viewer = getDebugViewer();
 				if (viewer != null) {
 					ISelection selection = viewer.getSelection();
-					//ISelection selection = getViewSite().getPage().getSelection(IDebugUIConstants.ID_DEBUG_VIEW);
+					// ISelection selection =
+					// getViewSite().getPage().getSelection(IDebugUIConstants.ID_DEBUG_VIEW);
 					if (selection instanceof IStructuredSelection) {
-						Object element = ((IStructuredSelection)selection).getFirstElement();
+						Object element = ((IStructuredSelection) selection).getFirstElement();
 						if (element instanceof IPDebugElement) {
-							if (((IPDebugElement)element).getID() != task_id) {
-								//FIXME: only work if all elements are collapse
-								//((TreeViewer)viewer).collapseAll();
+							if (((IPDebugElement) element).getID() != task_id) {
+								// FIXME: only work if all elements are collapse
+								// ((TreeViewer)viewer).collapseAll();
 
-								IDebugElement focusElement = getDebugElement(job, task_id); 
+								IDebugElement focusElement = getDebugElement(jobId, task_id);
 								if (focusElement == null) {
-									//do nothing if cannot find debug target
+									// do nothing if cannot find debug target
 									return Status.CANCEL_STATUS;
 								}
-								selectOnViewer(viewer, (IPDebugElement)focusElement);
+								selectOnViewer(viewer, focusElement);
 								// set focus element to selected element
 								element = focusElement;
 							}
-						}
-						else {
-							IDebugElement focusElement = getDebugElement(job, task_id); 
+						} else {
+							IDebugElement focusElement = getDebugElement(jobId, task_id);
 							if (focusElement == null) {
-								//do nothing if cannot find debug target
+								// do nothing if cannot find debug target
 								return Status.CANCEL_STATUS;
 							}
-							selectOnViewer(viewer, (IDebugElement)focusElement);
+							selectOnViewer(viewer, focusElement);
 							// set focus element to selected element
 							element = focusElement;
 						}
-						
+
 						if (element instanceof IStackFrame) {
-							//do nothing if selected element is stack frame
+							// do nothing if selected element is stack frame
 							return Status.CANCEL_STATUS;
 						}
 						if (element instanceof IThread) {
-							//expand thread this thread
-							expandOnViewer(viewer, (IThread)element);
+							// expand thread this thread
+							expandOnViewer(viewer, (IThread) element);
 							return Status.OK_STATUS;
 						}
 						if (element instanceof IDebugTarget) {
-							//expand debug target this thread
-							expandOnViewer(viewer, (IDebugTarget)element);
+							// expand debug target this thread
+							expandOnViewer(viewer, (IDebugTarget) element);
 							return Status.OK_STATUS;
 						}
-						//if (!((TreeViewer)viewer).getExpandedState(element)) {
-							//((TreeViewer)viewer).setExpandedState(element, true);
-						//}
 					}
-					//viewer.setSelection(new StructuredSelection(focusElement), true);
-					//viewer.setSelection(new StructuredSelection(focusElement.getDebugTarget()), true);
-					//((TreeViewer)viewer).expandAll();
 				}
 				return Status.CANCEL_STATUS;
 			}
-        };
-        //set job priority very low to make sure it is executed at last
-        wjob.setPriority(Job.DECORATE);
-        wjob.schedule(500);
+		};
+		// set job priority very low to make sure it is executed at last
+		wjob.setPriority(Job.DECORATE);
+		wjob.schedule(500);
 	}
+
 	private void expandOnViewer(final Viewer viewer, final IDebugElement element) {
 		WorkbenchJob wjob = new WorkbenchJob(Messages.ParallelDebugView_4) {
+			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				((TreeViewer)viewer).setExpandedState(element, true);
+				((TreeViewer) viewer).setExpandedState(element, true);
 				try {
 					if (element instanceof IThread) {
-						selectOnViewer(viewer, ((IThread)element).getTopStackFrame());
+						selectOnViewer(viewer, ((IThread) element).getTopStackFrame());
 						return Status.OK_STATUS;
 					}
 					if (element instanceof IDebugTarget) {
-						IThread[] threads = ((IPDebugTarget)element).getThreads();
+						IThread[] threads = ((IPDebugTarget) element).getThreads();
 						if (threads.length > 0) {
 							expandOnViewer(viewer, threads[0]);
 							return Status.OK_STATUS;
 						}
 						return Status.CANCEL_STATUS;
 					}
-				}
-				catch (DebugException e) {
+				} catch (DebugException e) {
 					return Status.CANCEL_STATUS;
 				}
 				return Status.OK_STATUS;
 			}
-        };
-        //set job priority very low to make sure it is executed at last
-        wjob.setPriority(Job.DECORATE);
-        wjob.schedule();
+		};
+		// set job priority very low to make sure it is executed at last
+		wjob.setPriority(Job.DECORATE);
+		wjob.schedule();
 	}
+
 	private void selectOnViewer(final Viewer viewer, final IDebugElement element) {
 		if (element != null) {
 			WorkbenchJob wjob = new WorkbenchJob(Messages.ParallelDebugView_5) {
+				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
-					/* FIXME 
-					 * In Debug View, there is a Selection Policy.  If current selected element is stack frame and its status is suspended, then it cannot allow to change selection to others.
-					 * Now I used internal class to avoid policy checking
+					/*
+					 * FIXME In Debug View, there is a Selection Policy. If
+					 * current selected element is stack frame and its status is
+					 * suspended, then it cannot allow to change selection to
+					 * others. Now I used internal class to avoid policy
+					 * checking
 					 */
 					if (viewer instanceof InternalTreeModelViewer) {
 						((InternalTreeModelViewer) viewer).setSelection(new StructuredSelection(element), true, true);
-					} 
-					else {
+					} else {
 						viewer.setSelection(new StructuredSelection(element), true);
 					}
 					return Status.OK_STATUS;
 				}
-	        };
-	        //set job priority very low to make sure it is executed at last
-	        wjob.setPriority(Job.DECORATE);
-	        wjob.schedule();
+			};
+			// set job priority very low to make sure it is executed at last
+			wjob.setPriority(Job.DECORATE);
+			wjob.schedule();
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.ParallelJobsView#changeJobRefresh(org.eclipse.ptp.core.elements.IPJob, boolean)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.views.ParallelJobsView#changeJobRefresh(org.eclipse
+	 * .ptp.core.elements.IPJob, boolean)
 	 */
+	@Override
 	public void changeJobRefresh(IPJob job, boolean force) {
 		if (job != null && job.getState() == JobAttributes.State.COMPLETED) {
-			IPSession session = ((UIDebugManager) manager).getDebugSession(job);
+			IPSession session = ((UIDebugManager) manager).getDebugSession(job.getID());
 			if (session != null) {
 				TaskSet tasks = session.getTasks();
 				if (!session.getPDISession().getTaskManager().isAllTerminated(tasks)) {

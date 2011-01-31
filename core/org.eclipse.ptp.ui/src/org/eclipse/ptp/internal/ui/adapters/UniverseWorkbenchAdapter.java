@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.rm.RMModelManager;
 import org.eclipse.ui.model.WorkbenchAdapter;
 
 public class UniverseWorkbenchAdapter extends WorkbenchAdapter {
@@ -38,7 +37,6 @@ public class UniverseWorkbenchAdapter extends WorkbenchAdapter {
 		IPUniverse universe = (IPUniverse) object;
 		List<Object> children = new ArrayList<Object>();
 		children.addAll(Arrays.asList(universe.getResourceManagers()));
-		children.addAll(Arrays.asList(RMModelManager.getInstance().getResourceManagers()));
 		return children.toArray();
 	}
 

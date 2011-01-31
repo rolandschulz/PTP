@@ -14,34 +14,25 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.ptp.core.elements.events;
+package org.eclipse.ptp.core.events;
 
-import java.util.Collection;
-
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
- * This event is generated when the attributes on one or more jobs have changed.
- * It is a bulk event that is sent to child listeners on the source queue.
+ * This event is sent when a resource manager state changes. It is sent to
+ * listeners on the resource manager.
  * 
- * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+ * @see org.eclipse.ptp.core.listeners.IResourceManagerListener
+ * @since 5.0
  */
-public interface IChangedJobEvent {
+public interface IResourceManagerChangedEvent {
 
 	/**
-	 * Get the jobs that have changed
-	 * 
-	 * @return the changed jobs
-	 */
-	public Collection<IPJob> getJobs();
-
-	/**
-	 * Get the source event
+	 * Get the event source.
 	 * 
 	 * @return the source of the event
 	 * @since 5.0
 	 */
-	public IPResourceManager getSource();
+	public IResourceManagerControl getSource();
 
 }

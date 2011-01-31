@@ -45,7 +45,7 @@ public class StopResourceManagersObjectActionDelegate extends AbstractResourceMa
 			/*
 			 * Only ask if we are really shutting down the RM
 			 */
-			ResourceManagerAttributes.State state = rmManager.getState();
+			ResourceManagerAttributes.State state = rmManager.getResourceManager().getState();
 			if (state == ResourceManagerAttributes.State.STARTED) {
 				boolean shutdown = MessageDialog.openConfirm(getTargetShell(), Messages.StopResourceManagersObjectActionDelegate_0,
 						NLS.bind(Messages.StopResourceManagersObjectActionDelegate_1, rmManager.getName()));
@@ -69,7 +69,7 @@ public class StopResourceManagersObjectActionDelegate extends AbstractResourceMa
 
 	@Override
 	protected boolean isEnabledFor(IPResourceManager rmManager) {
-		ResourceManagerAttributes.State state = rmManager.getState();
+		ResourceManagerAttributes.State state = rmManager.getResourceManager().getState();
 		if (state == ResourceManagerAttributes.State.STARTING || state == ResourceManagerAttributes.State.STARTED
 				|| state == ResourceManagerAttributes.State.ERROR) {
 			return true;

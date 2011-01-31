@@ -72,7 +72,8 @@ public class PVariableManager {
 
 	public void updateVariableStatus(PVariableInfo info, boolean enabled) throws CoreException {
 		info.setEnabled(enabled);
-		getSession(info.getJob()).getPDISession().getExpressionManager().updateStatusMultiExpressions(info.getName(), enabled);
+		getSession(info.getJob().getID()).getPDISession().getExpressionManager()
+				.updateStatusMultiExpressions(info.getName(), enabled);
 	}
 
 	public void updateVariableStatus(IPJob job, String varname, boolean enabled) throws CoreException {
@@ -94,7 +95,7 @@ public class PVariableManager {
 			infoList = new ArrayList<PVariableInfo>();
 			jobVariableMap.put(job.getID(), infoList);
 		}
-		IPSession session = getSession(job);
+		IPSession session = getSession(job.getID());
 		session.getPDISession().getExpressionManager().createMutliExpressions(session.getTasks(), varname, enabled);
 		infoList.add(new PVariableInfo(job, varname, enabled));
 	}
@@ -114,7 +115,7 @@ public class PVariableManager {
 					Messages.PVariableManager_0, varname), null));
 
 		jobVariableMap.get(job.getID()).remove(info);
-		getSession(job).getPDISession().getExpressionManager().removeMutliExpressions(varname);
+		getSession(job.getID()).getPDISession().getExpressionManager().removeMutliExpressions(varname);
 	}
 
 	public void updateVariable(IPJob job, String varname, String newvarname, boolean enabled) throws CoreException {
@@ -128,7 +129,7 @@ public class PVariableManager {
 
 	public void updateValues(IPJob job) {
 		try {
-			updateValues(job, getSession(job).getTasks());
+			updateValues(job, getSession(job.getID()).getTasks());
 		} catch (CoreException ce) {
 			ce.printStackTrace();
 		}
@@ -141,7 +142,7 @@ public class PVariableManager {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				try {
-					IPDISession session = getSession(job).getPDISession();
+					IPDISession session = getSession(job.getID()).getPDISession();
 					TaskSet targetTasks = session.getTaskManager().getSuspendedTasks(tasks);
 					if (targetTasks.isEmpty())
 						monitor.done();
@@ -165,7 +166,7 @@ public class PVariableManager {
 
 	public String getValue(final IPJob job, final int task, final IToolTipProvider provider) {
 		try {
-			IPSession session = getSession(job);
+			IPSession session = getSession(job.getID());
 			IPDIExpression[] expressions = session.getPDISession().getExpressionManager().getMultiExpressions(task);
 			if (expressions == null || expressions.length == 0)
 				return ""; //$NON-NLS-1$
@@ -186,7 +187,7 @@ public class PVariableManager {
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 								try {
-									IPSession session = getSession(job);
+									IPSession session = getSession(job.getID());
 									session.getPDISession().getExpressionManager()
 											.updateMultiExpressions(session.getTasks(task), monitor);
 								} catch (CoreException ce) {
@@ -218,13 +219,13 @@ public class PVariableManager {
 	}
 
 	/**
-	 * @since 3.0
+	 * @since 4.0
 	 */
-	public void resetValues(final IPJob job) {
+	public void resetValues(final String jobId) {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				try {
-					IPSession session = getSession(job);
+					IPSession session = getSession(jobId);
 					session.getPDISession().getExpressionManager().cleanMultiExpressions(session.getTasks(), monitor);
 				} catch (CoreException ce) {
 					throw new InterruptedException(ce.getMessage());
@@ -237,13 +238,13 @@ public class PVariableManager {
 	}
 
 	/**
-	 * @since 3.0
+	 * @since 4.0
 	 */
-	public void resetValue(final IPJob job, final TaskSet tasks) {
+	public void resetValue(final String jobId, final TaskSet tasks) {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				try {
-					IPSession session = getSession(job);
+					IPSession session = getSession(jobId);
 					session.getPDISession().getExpressionManager().cleanMultiExpressions(tasks, monitor);
 				} catch (CoreException ce) {
 					throw new InterruptedException(ce.getMessage());
@@ -267,8 +268,8 @@ public class PVariableManager {
 		return null;
 	}
 
-	private IPSession getSession(IPJob job) throws CoreException {
-		IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job);
+	private IPSession getSession(String jobId) throws CoreException {
+		IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(jobId);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR,
 					Messages.PVariableManager_3, null));

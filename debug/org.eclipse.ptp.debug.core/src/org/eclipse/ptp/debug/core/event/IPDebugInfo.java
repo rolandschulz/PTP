@@ -18,14 +18,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.event;
 
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.TaskSet;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
 /**
  * @author Clement
  */
 public interface IPDebugInfo {
-	public IPJob getJob();
+	/**
+	 * @since 4.0
+	 */
+	public TaskSet getAllRegisteredTasks();
 
 	/**
 	 * @since 4.0
@@ -35,10 +38,10 @@ public interface IPDebugInfo {
 	/**
 	 * @since 4.0
 	 */
-	public TaskSet getAllRegisteredTasks();
+	public TaskSet getAllUnregisteredTasks();
 
 	/**
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public TaskSet getAllUnregisteredTasks();
+	public IPLaunch getLaunch();
 }

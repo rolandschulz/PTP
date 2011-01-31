@@ -132,7 +132,7 @@ public class TerminateJobFromListAction extends Action {
 
 					IResourceManagerControl rm = job.getResourceManager();
 					if (job.getState() != JobAttributes.State.COMPLETED) {
-						rm.control(job, JobControlOperation.TERMINATE, null);
+						rm.control(job.getID(), JobControlOperation.TERMINATE, null);
 					}
 					// TODO: Look for job change event to wait for jobs to be
 					// finished.

@@ -36,7 +36,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.event.PDebugEvent;
@@ -145,21 +144,13 @@ public class PDebugModel {
 	 * @param condition
 	 * @param register
 	 * @param setId
-	 * @param job
+	 * @param jobId
 	 * @return
 	 * @throws CoreException
+	 * @since 5.0
 	 */
 	public static IPLineBreakpoint createLineBreakpoint(String sourceHandle, IResource resource, int lineNumber, boolean enabled,
-			int ignoreCount, String condition, boolean register, String setId, IPJob job) throws CoreException {
-		String jobId = IPBreakpoint.GLOBAL;
-		String jobName = IPBreakpoint.GLOBAL;
-		if (job != null && job.getState() != JobAttributes.State.COMPLETED) {
-			IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job);
-			if (session != null) {
-				jobId = job.getID();
-				jobName = job.getName();
-			}
-		}
+			int ignoreCount, String condition, boolean register, String setId, String jobId, String jobName) throws CoreException {
 		HashMap<String, Object> attributes = new HashMap<String, Object>(10);
 		attributes.put(IBreakpoint.ID, getPluginIdentifier());
 		attributes.put(IMarker.LINE_NUMBER, new Integer(lineNumber));
@@ -460,7 +451,7 @@ public class PDebugModel {
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				boolean allowTerminate = true;
 				boolean allowDisconnect = false;
-				IPSession session = getSession(launch.getPJob());
+				IPSession session = getSession(launch.getJobId());
 				if (session == null)
 					return Status.CANCEL_STATUS;
 				for (IPDITarget pdiTarget : pdiTargets) {
@@ -474,7 +465,7 @@ public class PDebugModel {
 					}
 					launch.addDebugTarget(target);
 				}
-				fireRegisterEvent(launch.getPJob(), tasks, refresh);
+				fireRegisterEvent(launch, tasks, refresh);
 				return Status.OK_STATUS;
 			}
 		};
@@ -498,7 +489,7 @@ public class PDebugModel {
 		session.getSetManager().addTasks(setId, tasks);
 		tasks.andNot(curSetTasks);
 		try {
-			IPBreakpoint[] breakpoints = findBreakpoints(session.getJob().getID(), setId);
+			IPBreakpoint[] breakpoints = findBreakpoints(session.getLaunch().getJobId(), setId);
 			session.getBreakpointManager().addSetBreakpoints(tasks, breakpoints);
 		} catch (CoreException e) {
 			PTPDebugCorePlugin.log(e);
@@ -523,7 +514,7 @@ public class PDebugModel {
 		long timeout = PTPDebugCorePlugin.getDefault().getCommandTimeout();
 		IPDISession pdiSession = debugger.createDebugSession(timeout, launch, monitor);
 		IPSession session = new PSession(pdiSession, launch, project);
-		sessionMgr.addSession(launch.getPJob(), session);
+		sessionMgr.addSession(launch.getJobId(), session);
 		return session;
 	}
 
@@ -548,7 +539,7 @@ public class PDebugModel {
 	 */
 	public void deleteSet(IPSession session, String setId) {
 		try {
-			PDebugModel.deleteBreakpoint(session.getJob().getID(), setId);
+			PDebugModel.deleteBreakpoint(session.getLaunch().getJobId(), setId);
 		} catch (CoreException e) {
 			PTPDebugCorePlugin.log(e);
 		}
@@ -561,9 +552,10 @@ public class PDebugModel {
 	 * 
 	 * @param job
 	 * @return
+	 * @since 5.0
 	 */
-	public IPSession getSession(IPJob job) {
-		return sessionMgr.getSession(job);
+	public IPSession getSession(String jobId) {
+		return sessionMgr.getSession(jobId);
 	}
 
 	/**
@@ -601,7 +593,7 @@ public class PDebugModel {
 						launch.removeDebugTarget(target);
 					}
 				}
-				fireUnregisterEvent(launch.getPJob(), tasks, refresh);
+				fireUnregisterEvent(launch, tasks, refresh);
 				return Status.OK_STATUS;
 			}
 		};
@@ -626,7 +618,7 @@ public class PDebugModel {
 		session.getSetManager().removeTasks(setId, tasks);
 		tasks.and(curSetTasks);
 		try {
-			IPBreakpoint[] breakpoints = findBreakpoints(session.getJob().getID(), setId);
+			IPBreakpoint[] breakpoints = findBreakpoints(session.getLaunch().getJobId(), setId);
 			session.getBreakpointManager().deleteSetBreakpoints(tasks, breakpoints);
 		} catch (CoreException e) {
 			PTPDebugCorePlugin.log(e);
@@ -646,12 +638,13 @@ public class PDebugModel {
 	/**
 	 * Shutdown the debug session for the given job.
 	 * 
-	 * @param job
-	 *            job for the debug session
+	 * @param jobId
+	 *            job ID for the debug session
+	 * @since 5.0
 	 */
-	public void shutdownSession(IPJob job) {
-		if (job != null) {
-			shutdownSession(getSession(job));
+	public void shutdownSession(String jobId) {
+		if (jobId != null) {
+			shutdownSession(getSession(jobId));
 		}
 	}
 
@@ -663,11 +656,11 @@ public class PDebugModel {
 	 * @param refresh
 	 * @since 4.0
 	 */
-	private void fireRegisterEvent(IPJob job, TaskSet tasks, boolean refresh) {
+	private void fireRegisterEvent(IPLaunch launch, TaskSet tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
-			IPSession session = getSession(job);
+			IPSession session = getSession(launch.getJobId());
 			if (session != null) {
-				IPDebugInfo info = new PDebugRegisterInfo(job, tasks, null, null, refresh);
+				IPDebugInfo info = new PDebugRegisterInfo(launch, tasks, null, null, refresh);
 				PTPDebugCorePlugin.getDefault().fireDebugEvent(
 						new PDebugEvent(session, IPDebugEvent.CREATE, IPDebugEvent.REGISTER, info));
 			}
@@ -682,11 +675,11 @@ public class PDebugModel {
 	 * @param refresh
 	 * @since 4.0
 	 */
-	private void fireUnregisterEvent(IPJob job, TaskSet tasks, boolean refresh) {
+	private void fireUnregisterEvent(IPLaunch launch, TaskSet tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
-			IPSession session = getSession(job);
+			IPSession session = getSession(launch.getJobId());
 			if (session != null) {
-				IPDebugInfo info = new PDebugRegisterInfo(job, tasks, null, null, refresh);
+				IPDebugInfo info = new PDebugRegisterInfo(launch, tasks, null, null, refresh);
 				PTPDebugCorePlugin.getDefault().fireDebugEvent(
 						new PDebugEvent(session, IPDebugEvent.TERMINATE, IPDebugEvent.REGISTER, info));
 			}
@@ -701,7 +694,7 @@ public class PDebugModel {
 	private void shutdownSession(IPSession session) {
 		if (session != null) {
 			try {
-				deleteBreakpoint(session.getJob().getID());
+				deleteBreakpoint(session.getLaunch().getJobId());
 			} catch (CoreException e) {
 				PTPDebugCorePlugin.log(e);
 			}

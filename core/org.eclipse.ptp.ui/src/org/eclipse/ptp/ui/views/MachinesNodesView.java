@@ -36,7 +36,6 @@ import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
@@ -50,11 +49,13 @@ import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
-import org.eclipse.ptp.core.events.INewResourceManagerEvent;
-import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.core.events.IJobChangedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
+import org.eclipse.ptp.core.listeners.IJobListener;
+import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.utils.core.BitSetIterable;
@@ -83,6 +84,55 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * 
  */
 public class MachinesNodesView extends ViewPart {
+
+	private final class JobListener implements IJobListener {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse
+		 * .ptp.core.events.IJobChangeEvent)
+		 */
+		public void handleEvent(IJobChangedEvent e) {
+			boolean needRefresh = false;
+			IPResourceManager rm = (IPResourceManager) e.getSource().getAdapter(IPResourceManager.class);
+			if (rm != null) {
+				IPJob job = rm.getJobById(e.getJobId());
+				if (job != null) {
+					if ((job.getState() == JobAttributes.State.STARTING) || job.getState() == JobAttributes.State.RUNNING) {
+						/*
+						 * Add job to the graphical representation of its node
+						 */
+						final BitSet procJobRanks = job.getProcessJobRanks();
+						for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+							final String nodeId = job.getProcessNodeId(procJobRank);
+							if (nodeId != null) {
+								nodesHashMap.get(nodeId).addJob(job.getID());
+								needRefresh = true;
+							}
+						}
+					} else {
+						/*
+						 * remove job from the graphical representation of its
+						 * node
+						 */
+						final BitSet procJobRanks = job.getProcessJobRanks();
+						for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+							final String nodeId = job.getProcessNodeId(procJobRank);
+							if (nodeId != null) {
+								nodesHashMap.get(nodeId).removeJob(job.getID());
+								needRefresh = true;
+							}
+						}
+					}
+					if (needRefresh) {
+						refreshView();
+					}
+				}
+			}
+		}
+	}
 
 	private final class MachineChildListener implements IMachineChildListener {
 		/*
@@ -621,91 +671,6 @@ public class MachinesNodesView extends ViewPart {
 		}
 	}
 
-	private final class MMChildListener implements IModelManagerChildListener {
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
-		 */
-		public void handleEvent(IChangedResourceManagerEvent e) {
-			boolean needRefresh = false;
-			for (IResourceManagerControl rmc : e.getResourceManagers()) {
-				IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
-				if ((rm.getState() == ResourceManagerAttributes.State.STOPPED)
-						|| (rm.getState() == ResourceManagerAttributes.State.ERROR)) {
-					/*
-					 * refresh the view, removing the resource manager machines,
-					 * but not removing machine listeners.
-					 */
-					for (IPMachine machine : rm.getMachines()) {
-						String machineID = machine.getID();
-						for (MachineGraphicalRepresentation machinegr : machinesGraphicalRepresentations)
-							if (machinegr.getMachineID().equals(machineID)) {
-								machinegr.setHalted(true);
-								needRefresh = true;
-								break;
-							}
-
-					}
-				}
-				/*
-				 * otherwise, reactivate machines of the started / starting
-				 * resource manager
-				 */
-				else {
-					for (IPMachine machine : rm.getMachines()) {
-						String machineID = machine.getID();
-						for (MachineGraphicalRepresentation machinegr : machinesGraphicalRepresentations)
-							if (machinegr.getMachineID().equals(machineID)) {
-								machinegr.setHalted(false);
-								needRefresh = true;
-								break;
-							}
-					}
-				}
-			}
-			if (needRefresh)
-				refreshView();
-
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.INewResourceManagerEvent)
-		 */
-		public void handleEvent(INewResourceManagerEvent e) {
-			/*
-			 * Add resource manager child listener so we get notified when new
-			 * machines are added to the model.
-			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
-			rm.addChildListener(resourceManagerListener);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
-		 */
-		public void handleEvent(IRemoveResourceManagerEvent e) {
-			/*
-			 * Removed resource manager child listener when resource manager is
-			 * removed.
-			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
-			rm.removeChildListener(resourceManagerListener);
-
-		}
-	}
-
 	private class NodeGraphicalRepresentation {
 		private Rectangle rectangle = null;
 		private String nodeName = ""; //$NON-NLS-1$
@@ -846,47 +811,6 @@ public class MachinesNodesView extends ViewPart {
 	}
 
 	private final class RMChildListener implements IResourceManagerChildListener {
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
-		 */
-		public void handleEvent(IChangedJobEvent e) {
-			boolean needRefresh = false;
-			for (IPJob job : e.getJobs()) {
-				if ((job.getState() == JobAttributes.State.STARTING) || job.getState() == JobAttributes.State.RUNNING) {
-					/*
-					 * Add job to the graphical representation of its node
-					 */
-					final BitSet procJobRanks = job.getProcessJobRanks();
-					for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
-						final String nodeId = job.getProcessNodeId(procJobRank);
-						if (nodeId != null) {
-							nodesHashMap.get(nodeId).addJob(job.getID());
-							needRefresh = true;
-						}
-					}
-				} else {
-					/*
-					 * remove job from the graphical representation of its node
-					 */
-					final BitSet procJobRanks = job.getProcessJobRanks();
-					for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
-						final String nodeId = job.getProcessNodeId(procJobRank);
-						if (nodeId != null) {
-							nodesHashMap.get(nodeId).removeJob(job.getID());
-							needRefresh = true;
-						}
-					}
-				}
-				if (needRefresh) {
-					refreshView();
-				}
-			}
-		}
 
 		/*
 		 * (non-Javadoc)
@@ -1044,10 +968,104 @@ public class MachinesNodesView extends ViewPart {
 		 */
 		public void handleEvent(IRemoveQueueEvent e) {
 		}
+	};
+
+	private final class RMListener implements IResourceManagerListener {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerAddedEvent)
+		 */
+		public void handleEvent(IResourceManagerAddedEvent e) {
+			/*
+			 * Add resource manager child listener so we get notified when new
+			 * machines are added to the model.
+			 */
+			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			rm.addChildListener(resourceManagerChildListener);
+			e.getResourceManager().addJobListener(jobListener);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerChangedEvent)
+		 */
+		public void handleEvent(IResourceManagerChangedEvent e) {
+			boolean needRefresh = false;
+			IPResourceManager rm = (IPResourceManager) e.getSource().getAdapter(IPResourceManager.class);
+			if (rm != null) {
+				if ((e.getSource().getState() == ResourceManagerAttributes.State.STOPPED)
+						|| (e.getSource().getState() == ResourceManagerAttributes.State.ERROR)) {
+					/*
+					 * refresh the view, removing the resource manager machines,
+					 * but not removing machine listeners.
+					 */
+					for (IPMachine machine : rm.getMachines()) {
+						String machineID = machine.getID();
+						for (MachineGraphicalRepresentation machinegr : machinesGraphicalRepresentations)
+							if (machinegr.getMachineID().equals(machineID)) {
+								machinegr.setHalted(true);
+								needRefresh = true;
+								break;
+							}
+
+					}
+				} else {
+					/*
+					 * otherwise, reactivate machines of the started / starting
+					 * resource manager
+					 */
+					for (IPMachine machine : rm.getMachines()) {
+						String machineID = machine.getID();
+						for (MachineGraphicalRepresentation machinegr : machinesGraphicalRepresentations)
+							if (machinegr.getMachineID().equals(machineID)) {
+								machinegr.setHalted(false);
+								needRefresh = true;
+								break;
+							}
+					}
+				}
+				if (needRefresh) {
+					refreshView();
+				}
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerErrorEvent)
+		 */
+		public void handleEvent(IResourceManagerErrorEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerRemovedEvent)
+		 */
+		public void handleEvent(IResourceManagerRemovedEvent e) {
+			/*
+			 * Removed resource manager child listener when resource manager is
+			 * removed.
+			 */
+			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			rm.removeChildListener(resourceManagerChildListener);
+			e.getResourceManager().removeJobListener(jobListener);
+		}
 	}
 
-	private final IModelManagerChildListener modelManagerListener = new MMChildListener();
-	private final IResourceManagerChildListener resourceManagerListener = new RMChildListener();
+	private final IResourceManagerChildListener resourceManagerChildListener = new RMChildListener();
+	private final IResourceManagerListener resourceManagerListener = new RMListener();
+	private final IJobListener jobListener = new JobListener();
 	private final IMachineChildListener machineListener = new MachineChildListener();
 	private final ArrayList<MachineGraphicalRepresentation> machinesGraphicalRepresentations = new ArrayList<MachineGraphicalRepresentation>();
 	private final Hashtable<String, NodeGraphicalRepresentation> nodesHashMap = new Hashtable<String, NodeGraphicalRepresentation>();
@@ -1087,7 +1105,8 @@ public class MachinesNodesView extends ViewPart {
 			 * problem?
 			 */
 			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
-				rm.addChildListener(resourceManagerListener);
+				rm.addChildListener(resourceManagerChildListener);
+				rm.getResourceManager().addJobListener(jobListener);
 				/*
 				 * We need to get the current state of the nodes on this
 				 * resource manager, browsing through the machines and adding
@@ -1106,7 +1125,7 @@ public class MachinesNodesView extends ViewPart {
 					}
 				}
 			}
-			mm.addListener(modelManagerListener);
+			mm.addListener(resourceManagerListener);
 		}
 
 		refreshView();

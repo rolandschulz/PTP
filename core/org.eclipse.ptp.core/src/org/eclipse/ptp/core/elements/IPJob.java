@@ -28,7 +28,6 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
-import org.eclipse.ptp.core.elements.listeners.IJobListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
@@ -48,13 +47,6 @@ public interface IPJob extends IPElement {
 	 * @param listener
 	 */
 	public void addChildListener(IJobChildListener listener);
-
-	/**
-	 * Add a listener for events related to this job.
-	 * 
-	 * @param listener
-	 */
-	public void addElementListener(IJobListener listener);
 
 	/**
 	 * Add attributes to a collection of processes.
@@ -251,13 +243,6 @@ public interface IPJob extends IPElement {
 	 * @param listener
 	 */
 	public void removeChildListener(IJobChildListener listener);
-
-	/**
-	 * Remove a listener for events relating to this job.
-	 * 
-	 * @param listener
-	 */
-	public void removeElementListener(IJobListener listener);
 
 	/**
 	 * Remove processes from the job

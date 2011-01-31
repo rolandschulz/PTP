@@ -24,7 +24,6 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.INewJobEvent;
@@ -34,12 +33,13 @@ import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
-import org.eclipse.ptp.core.events.INewResourceManagerEvent;
-import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
+import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
+import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 
-public class ConsoleManager implements IModelManagerChildListener, IResourceManagerChildListener {
+public class ConsoleManager implements IResourceManagerListener, IResourceManagerChildListener {
 
 	private IModelManager imm = null;
 	private final Map<IPJob, JobConsole> consoles = new HashMap<IPJob, JobConsole>();
@@ -50,17 +50,6 @@ public class ConsoleManager implements IModelManagerChildListener, IResourceMana
 		for (IPResourceManager rm : imm.getUniverse().getResourceManagers()) {
 			rm.addChildListener(this);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
-	 * (org.eclipse.ptp.core.elements.events.IChangedJobEvent)
-	 */
-	public void handleEvent(IChangedJobEvent e) {
-		// OK to ignore
 	}
 
 	/*
@@ -82,17 +71,6 @@ public class ConsoleManager implements IModelManagerChildListener, IResourceMana
 	 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedQueueEvent)
 	 */
 	public void handleEvent(IChangedQueueEvent e) {
-		// Nothing to do
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-	 * (org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
-	 */
-	public void handleEvent(IChangedResourceManagerEvent e) {
 		// Nothing to do
 	}
 
@@ -145,18 +123,6 @@ public class ConsoleManager implements IModelManagerChildListener, IResourceMana
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-	 * (org.eclipse.ptp.core.events.INewResourceManagerEvent)
-	 */
-	public void handleEvent(INewResourceManagerEvent e) {
-		IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
-		rm.addChildListener(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
 	 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
 	 * (org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
 	 */
@@ -192,10 +158,44 @@ public class ConsoleManager implements IModelManagerChildListener, IResourceMana
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-	 * (org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
+	 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent(org
+	 * .eclipse.ptp.core.events.IResourceManagerAddedEvent)
 	 */
-	public void handleEvent(IRemoveResourceManagerEvent e) {
+	public void handleEvent(IResourceManagerAddedEvent e) {
+		IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+		rm.addChildListener(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent(org
+	 * .eclipse.ptp.core.events.IResourceManagerChangedEvent)
+	 */
+	public void handleEvent(IResourceManagerChangedEvent e) {
+		// Nothing to do
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent(org
+	 * .eclipse.ptp.core.events.IResourceManagerErrorEvent)
+	 */
+	public void handleEvent(IResourceManagerErrorEvent e) {
+		// Nothing to do
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent(org
+	 * .eclipse.ptp.core.events.IResourceManagerRemovedEvent)
+	 */
+	public void handleEvent(IResourceManagerRemovedEvent e) {
 		IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
 		rm.removeChildListener(this);
 	}

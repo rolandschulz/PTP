@@ -11,31 +11,20 @@
 
 package org.eclipse.ptp.core.events;
 
-import java.util.Collection;
-
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
- * This event is generated when the attributes or configuration of one or more
- * resource managers have changed. It is a bulk event that is sent to child
- * listeners on the model manager.
- * 
- * @see org.eclipse.ptp.core.elements.listeners.IModelManagerChildListener
+ * @since 5.0
  */
-public interface IChangedResourceManagerEvent {
+public interface IResourceManagerAddedEvent {
 	/**
-	 * Get the resource managers that have changed
-	 * 
-	 * @return resource managers that have changed
+	 * @return
 	 */
-	public Collection<IResourceManagerControl> getResourceManagers();
+	public IResourceManagerControl getResourceManager();
 
 	/**
-	 * Get the source of the event
-	 * 
-	 * @return source of the event
+	 * @return
 	 */
 	public IModelManager getSource();
-
 }

@@ -24,7 +24,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
@@ -47,19 +46,24 @@ public class PLocationView extends AbstractDebugView implements IDebugContextLis
 	private AbstractPDebugViewEventHandler eventHandler;
 	private UIDebugManager uiManager = null;
 	private TableViewer viewer = null;
-	
-	public static final String COLUMN_FUNCTION	= Messages.PLocationView_0;
-	public static final String COLUMN_FILE		= Messages.PLocationView_1;
-	public static final String COLUMN_LINE		= Messages.PLocationView_2;
-	public static final String COLUMN_PROCESSES	= Messages.PLocationView_3;
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractDebugView#createViewer(org.eclipse.swt.widgets.Composite)
+
+	public static final String COLUMN_FUNCTION = Messages.PLocationView_0;
+	public static final String COLUMN_FILE = Messages.PLocationView_1;
+	public static final String COLUMN_LINE = Messages.PLocationView_2;
+	public static final String COLUMN_PROCESSES = Messages.PLocationView_3;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.AbstractDebugView#createViewer(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
+	@Override
 	protected Viewer createViewer(Composite parent) {
 		uiManager = PTPDebugUIPlugin.getUIDebugManager();
 		DebugUITools.getDebugContextManager().addDebugContextListener(this);
-		
+
 		// add table viewer
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION);
 		Table table = viewer.getTable();
@@ -71,7 +75,7 @@ public class PLocationView extends AbstractDebugView implements IDebugContextLis
 		for (int i = 0; i < 4; i++) {
 			new TableColumn(table, SWT.NULL).setResizable(true);
 		}
-		
+
 		TableColumn[] columns = table.getColumns();
 		columns[0].setText(COLUMN_FILE);
 		columns[1].setText(COLUMN_FUNCTION);
@@ -79,10 +83,11 @@ public class PLocationView extends AbstractDebugView implements IDebugContextLis
 		columns[3].setText(COLUMN_PROCESSES);
 
 		for (int i = 0; i < 4; i++) {
-			final int j = i;  // Need finalness for closure
+			final int j = i; // Need finalness for closure
 			columns[j].addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent event) {
-					((PLocationViewerSorter)viewer.getSorter()).setColumn(j);
+					((PLocationViewerSorter) viewer.getSorter()).setColumn(j);
 					refresh();
 				}
 			});
@@ -93,32 +98,35 @@ public class PLocationView extends AbstractDebugView implements IDebugContextLis
 		columns[1].setWidth(pc.convertWidthInCharsToPixels(30));
 		columns[2].setWidth(pc.convertWidthInCharsToPixels(10));
 		columns[3].setWidth(pc.convertWidthInCharsToPixels(10));
-		
-		viewer.setColumnProperties(new String[]{ COLUMN_FUNCTION, COLUMN_FILE, COLUMN_LINE, COLUMN_PROCESSES });
-		
+
+		viewer.setColumnProperties(new String[] { COLUMN_FUNCTION, COLUMN_FILE, COLUMN_LINE, COLUMN_PROCESSES });
+
 		PLocationContentProvider contentProvider = new PLocationContentProvider();
 		PLocationLabelProvider labelProvider = new PLocationLabelProvider();
-		
+
 		viewer.setContentProvider(contentProvider);
 		viewer.setLabelProvider(labelProvider);
 		viewer.setSorter(new PLocationViewerSorter());
 		viewer.setUseHashlookup(true);
-		
-		//initialize the viewer given the current debug context, if any
+
+		// initialize the viewer given the current debug context, if any
 		updateContext(DebugUITools.getDebugContext());
-		
+
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-		    public void selectionChanged(SelectionChangedEvent event) {
-		    	updateActionsEnable();
-		    }
+			public void selectionChanged(SelectionChangedEvent event) {
+				updateActionsEnable();
+			}
 		});
 		setEventHandler(new PLocationViewEventHandler(this));
 		return viewer;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.AbstractDebugView#dispose()
 	 */
+	@Override
 	public void dispose() {
 		super.dispose();
 		DebugUITools.getDebugContextManager().removeDebugContextListener(this);
@@ -127,13 +135,17 @@ public class PLocationView extends AbstractDebugView implements IDebugContextLis
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.contexts.IDebugContextListener#debugContextChanged(org.eclipse.debug.ui.contexts.DebugContextEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.contexts.IDebugContextListener#debugContextChanged
+	 * (org.eclipse.debug.ui.contexts.DebugContextEvent)
 	 */
 	public void debugContextChanged(DebugContextEvent event) {
 		updateContext(event.getContext());
 	}
-	
+
 	private void updateContext(Object context) {
 		if (context instanceof IStructuredSelection) {
 			Object selection = ((IStructuredSelection) context).getFirstElement();
@@ -141,77 +153,94 @@ public class PLocationView extends AbstractDebugView implements IDebugContextLis
 				setViewerContent(((IPDebugElement) selection).getSession());
 			else if (selection instanceof IPLaunch) {
 				IPLaunch launch = (IPLaunch) selection;
-				IPJob job = launch.getPJob();
-				if (job != null) {
-					IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job);
+				String jobId = launch.getJobId();
+				if (jobId != null) {
+					IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(jobId);
 					setViewerContent(session);
 				}
 			}
 		}
 	}
-	
+
 	public void setViewerContent(IPSession session) {
 		if (viewer != null && viewer.getInput() != session)
 			viewer.setInput(session);
 	}
-	
+
 	public UIDebugManager getUIManager() {
 		return uiManager;
 	}
-	
+
 	public void refresh() {
 		viewer.refresh();
 		updateActionsEnable();
 	}
-	
+
 	public ISelection getSelection() {
 		return viewer.getSelection();
 	}
-	
+
 	protected void setEventHandler(AbstractPDebugViewEventHandler eventHandler) {
 		this.eventHandler = eventHandler;
 	}
-	
+
 	protected AbstractPDebugViewEventHandler getEventHandler() {
 		return this.eventHandler;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.AbstractDebugView#createActions()
 	 */
+	@Override
 	protected void createActions() {
 		setAction(CreateLocationSetAction.ID, new CreateLocationSetAction(this));
 		setAction(DOUBLE_CLICK_ACTION, getAction(CreateLocationSetAction.ID));
 		updateActionsEnable();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractDebugView#configureToolBar(org.eclipse.jface.action.IToolBarManager)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.AbstractDebugView#configureToolBar(org.eclipse.jface
+	 * .action.IToolBarManager)
 	 */
+	@Override
 	protected void configureToolBar(IToolBarManager toolBarMgr) {
 		toolBarMgr.add(getAction(CreateLocationSetAction.ID));
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.AbstractDebugView#getHelpContextId()
 	 */
+	@Override
 	protected String getHelpContextId() {
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractDebugView#fillContextMenu(org.eclipse.jface.action.IMenuManager)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.AbstractDebugView#fillContextMenu(org.eclipse.jface
+	 * .action.IMenuManager)
 	 */
+	@Override
 	protected void fillContextMenu(IMenuManager menu) {
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(getAction(CreateLocationSetAction.ID));
 		updateObjects();
 	}
-	
+
 	private boolean isCurrentJobAvailable() {
 		String cur_jid = uiManager.getCurrentJobId();
 		return (cur_jid != null && cur_jid.length() > 0);
 	}
-	
+
 	public void updateActionsEnable() {
 		getAction(CreateLocationSetAction.ID).setEnabled(!viewer.getSelection().isEmpty() && isCurrentJobAvailable());
 	}

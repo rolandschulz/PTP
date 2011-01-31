@@ -18,30 +18,31 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.event;
 
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.TaskSet;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
 /**
  * @author Clement
+ * @since 5.0
  */
 public class PDebugInfo implements IPDebugInfo {
 	private TaskSet allTasks = null;
 	private TaskSet allRegTasks = null;
 	private TaskSet allUnregTasks = null;
-	private IPJob job = null;
+	private IPLaunch launch = null;
 
 	public PDebugInfo(IPDebugInfo info) {
-		this.job = info.getJob();
+		this.launch = info.getLaunch();
 		this.allTasks = info.getAllTasks();
 		this.allRegTasks = info.getAllRegisteredTasks();
 		this.allUnregTasks = info.getAllUnregisteredTasks();
 	}
 
 	/**
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public PDebugInfo(IPJob job, TaskSet allTasks, TaskSet allRegTasks, TaskSet allUnregTasks) {
-		this.job = job;
+	public PDebugInfo(IPLaunch launch, TaskSet allTasks, TaskSet allRegTasks, TaskSet allUnregTasks) {
+		this.launch = launch;
 		this.allTasks = allTasks;
 		this.allRegTasks = allRegTasks;
 		this.allUnregTasks = allUnregTasks;
@@ -87,9 +88,12 @@ public class PDebugInfo implements IPDebugInfo {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.core.event.IPDebugInfo#getJob()
+	 * @see org.eclipse.ptp.debug.core.event.IPDebugInfo#getLaunch()
 	 */
-	public IPJob getJob() {
-		return job;
+	/**
+	 * @since 5.0
+	 */
+	public IPLaunch getLaunch() {
+		return launch;
 	}
 }

@@ -15,12 +15,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.IPLocationSetManager;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.PDebugInfo;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPLocationSet;
 import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
@@ -49,8 +49,8 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIListStackFramesRequest;
 
 public class PLocationSetManager implements IPLocationSetManager, IPDIEventListener {
 	public static class PDebugLocationInfo extends PDebugInfo {
-		public PDebugLocationInfo(IPJob job, TaskSet allTasks, TaskSet allRegTasks, TaskSet allUnregTasks) {
-			super(job, allTasks, allRegTasks, allUnregTasks);
+		public PDebugLocationInfo(IPLaunch launch, TaskSet allTasks, TaskSet allRegTasks, TaskSet allUnregTasks) {
+			super(launch, allTasks, allRegTasks, allUnregTasks);
 		}
 	}
 
@@ -178,8 +178,8 @@ public class PLocationSetManager implements IPLocationSetManager, IPDIEventListe
 				iter.remove();
 		}
 
-		session.fireDebugEvent(IPDebugEvent.CHANGE, IPDebugEvent.CONTENT, new PDebugLocationInfo(session.getJob(),
-				event.getTasks(), event.getTasks(), event.getTasks()));
+		session.fireDebugEvent(IPDebugEvent.CHANGE, IPDebugEvent.CONTENT,
+				new PDebugLocationInfo(session.getLaunch(), event.getTasks(), event.getTasks(), event.getTasks()));
 	}
 
 	private void handleSuspendedEvent(IPDISuspendedEvent event) {
@@ -249,7 +249,7 @@ public class PLocationSetManager implements IPLocationSetManager, IPDIEventListe
 			else
 				setsByLocation.put(locator, new PLocationSet(tasks, locator));
 		}
-		session.fireDebugEvent(IPDebugEvent.CHANGE, IPDebugEvent.CONTENT, new PDebugLocationInfo(session.getJob(),
-				event.getTasks(), event.getTasks(), event.getTasks()));
+		session.fireDebugEvent(IPDebugEvent.CHANGE, IPDebugEvent.CONTENT,
+				new PDebugLocationInfo(session.getLaunch(), event.getTasks(), event.getTasks(), event.getTasks()));
 	}
 }

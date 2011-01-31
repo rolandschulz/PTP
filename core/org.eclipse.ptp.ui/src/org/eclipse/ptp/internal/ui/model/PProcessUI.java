@@ -176,7 +176,7 @@ public class PProcessUI implements IPElement {
 	 * @see org.eclipse.ptp.core.elements.IPElement#getID()
 	 */
 	public String getID() {
-		return getID(job, jobRank);
+		return job.getProcessName(jobRank);
 	}
 
 	/**

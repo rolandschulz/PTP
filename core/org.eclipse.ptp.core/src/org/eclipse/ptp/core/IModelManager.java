@@ -19,18 +19,19 @@
 package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
+import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 public interface IModelManager extends IModelPresentation {
 	/**
-	 * Add a listener for model manager children events.
+	 * Add a listener for resource manager events.
 	 * 
 	 * @param listener
+	 * @since 5.0
 	 */
-	public void addListener(IModelManagerChildListener listener);
+	public void addListener(IResourceManagerListener listener);
 
 	/**
 	 * Add a resource manager to the model.
@@ -58,6 +59,14 @@ public interface IModelManager extends IModelPresentation {
 	public IResourceManagerControl getResourceManagerFromUniqueName(String rmUniqueName);
 
 	/**
+	 * Get resource managers from the model.
+	 * 
+	 * @return all resource managers know by the model
+	 * @since 5.0
+	 */
+	public IResourceManagerControl[] getResourceManagers();
+
+	/**
 	 * Loads saved resource managers. Loading of resource manager configuration
 	 * is now handled by the {@link ServiceModelManager}. This method now just
 	 * starts any resource managers that require autostart.
@@ -67,11 +76,12 @@ public interface IModelManager extends IModelPresentation {
 	public void loadResourceManagers() throws CoreException;
 
 	/**
-	 * Remove listener for model manager child events.
+	 * Remove listener for resource manager events.
 	 * 
 	 * @param listener
+	 * @since 5.0
 	 */
-	public void removeListener(IModelManagerChildListener listener);
+	public void removeListener(IResourceManagerListener listener);
 
 	/**
 	 * Remove a resource manager from the model.

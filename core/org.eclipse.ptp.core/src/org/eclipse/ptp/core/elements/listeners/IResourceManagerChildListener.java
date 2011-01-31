@@ -21,7 +21,6 @@
  */
 package org.eclipse.ptp.core.elements.listeners;
 
-import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.INewJobEvent;
@@ -36,12 +35,6 @@ import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
  * 
  */
 public interface IResourceManagerChildListener {
-
-	/**
-	 * @param e
-	 * @since 5.0
-	 */
-	public void handleEvent(IChangedJobEvent e);
 
 	/**
 	 * @param e

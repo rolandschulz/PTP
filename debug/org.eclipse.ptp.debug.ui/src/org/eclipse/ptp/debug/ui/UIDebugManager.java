@@ -82,7 +82,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 
 		@Override
 		public boolean shouldRun() {
-			session = getDebugSession(job);
+			session = getDebugSession(job.getID());
 			if (session == null)
 				return false;
 			if (!session.isReady())
@@ -110,7 +110,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				prefAutoUpdateVarOnChange = new Boolean(value).booleanValue();
 			} else if (preferenceType.equals(IPDebugConstants.PREF_DEBUG_COMM_TIMEOUT)) {
 				for (IPJob job : getJobs()) {
-					IPSession session = getDebugSession(job);
+					IPSession session = getDebugSession(job.getID());
 					if (session != null) {
 						session.getPDISession().setRequestTimeout(new Integer(value).longValue());
 					}
@@ -198,7 +198,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 */
 	@Override
 	public synchronized void fireSetEvent(int eventType, IElement[] elements, IElementSet cur_set, IElementSet pre_set) {
-		IPSession session = getDebugSession(getJob());
+		IPSession session = getDebugSession(getJob().getID());
 		if (session != null) {
 			switch (eventType) {
 			case CREATE_SET_TYPE:
@@ -244,33 +244,21 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 */
 	public IPSession getCurrentSession() {
 		if (currentSession == null)
-			currentSession = getDebugSession(getJob());
+			currentSession = getDebugSession(getJob().getID());
 		return currentSession;
 	}
 
 	/**
 	 * Get debug session
 	 * 
-	 * @param job
-	 * @return
-	 */
-	public IPSession getDebugSession(IPJob job) {
-		if (job == null)
-			return null;
-		return debugModel.getSession(job);
-	}
-
-	/**
-	 * Get debug session
-	 * 
-	 * @param job_id
+	 * @param jobId
 	 *            Job ID
 	 * @return
 	 */
-	public IPSession getDebugSession(String job_id) {
-		if (isNoJob(job_id))
+	public IPSession getDebugSession(String jobId) {
+		if (isNoJob(jobId))
 			return null;
-		return getDebugSession(findJobById(job_id));
+		return debugModel.getSession(jobId);
 	}
 
 	/**
@@ -490,7 +478,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	@Override
 	public void removeJob(IPJob job) {
 		if (job.isDebug()) {
-			debugModel.shutdownSession(job);
+			debugModel.shutdownSession(job.getID());
 		}
 		super.removeJob(job);
 	}
@@ -510,8 +498,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param set_id
 	 *            set ID
 	 */
-	public void resume(final String job_id, final String set_id) throws CoreException {
-		IPSession session = getDebugSession(job_id);
+	public void resume(final String jobId, final String set_id) throws CoreException {
+		IPSession session = getDebugSession(jobId);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR,
 					Messages.UIDebugManager_5, null));
@@ -532,7 +520,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 */
 	@Override
 	public void setJob(IPJob job) {
-		currentSession = getDebugSession(job);
+		currentSession = getDebugSession(job.getID());
 		super.setJob(job);
 	}
 
@@ -673,10 +661,10 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param job_id
 	 * @param set_id
 	 */
-	public void terminate(final String job_id, final String set_id) throws CoreException {
-		IPJob job = findJobById(job_id);
+	public void terminate(final String jobId, final String set_id) throws CoreException {
+		IPJob job = findJobById(jobId);
 		if (isDebugMode(job)) {
-			IPSession session = getDebugSession(job);
+			IPSession session = getDebugSession(jobId);
 			if (session == null)
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR,
 						Messages.UIDebugManager_10, null));

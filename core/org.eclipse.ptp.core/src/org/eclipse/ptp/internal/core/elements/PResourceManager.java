@@ -37,8 +37,6 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
-import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -51,8 +49,6 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
-import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
@@ -64,13 +60,9 @@ import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
-import org.eclipse.ptp.internal.core.elements.events.ChangedJobEvent;
+import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.internal.core.elements.events.ChangedMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.ChangedQueueEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewJobEvent;
@@ -79,9 +71,6 @@ import org.eclipse.ptp.internal.core.elements.events.NewQueueEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveJobEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveQueueEvent;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangeEvent;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerErrorEvent;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerSubmitJobErrorEvent;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
@@ -161,12 +150,17 @@ public class PResourceManager extends Parent implements IPResourceManager {
 		listeners.add(listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IPResourceManager#addJobAttributes(java
+	 * .util.Collection, org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
+	 */
 	public void addJobAttributes(Collection<IPJob> jobs, IAttribute<?, ?, ?>[] attrs) {
 		for (IPJob job : jobs) {
 			job.addAttributes(attrs);
 		}
-
-		fireChangedJobs(jobs);
 	}
 
 	/*
@@ -335,47 +329,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 		childListeners.clear();
 	}
 
-	/**
-	 * Propagate IResourceManagerErrorEvent to listener
-	 * 
-	 * @param message
-	 */
-	public void fireError(String message) {
-		IResourceManagerErrorEvent e = new ResourceManagerErrorEvent(this, message);
-
-		for (Object listener : listeners.getListeners()) {
-			((IResourceManagerListener) listener).handleEvent(e);
-		}
-	}
-
-	/**
-	 * Fire an event to notify that some attributes have changed
-	 * 
-	 * @param attrs
-	 *            attributes that have changed
-	 */
-	public void fireResourceManagerChanged(AttributeManager attrs) {
-		IResourceManagerChangeEvent e = new ResourceManagerChangeEvent(this, attrs);
-
-		for (Object listener : listeners.getListeners()) {
-			((IResourceManagerListener) listener).handleEvent(e);
-		}
-	}
-
-	/**
-	 * Propagate IResourceManagerSubmitJobErrorEvent to listeners
-	 * 
-	 * @param id
-	 *            job submission id
-	 */
-	public void fireSubmitJobError(String id, String message) {
-		IResourceManagerSubmitJobErrorEvent e = new ResourceManagerSubmitJobErrorEvent(this, id, message);
-
-		for (Object listener : listeners.getListeners()) {
-			((IResourceManagerListener) listener).handleEvent(e);
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -522,16 +475,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 */
 	public IResourceManagerControl getResourceManager() {
 		return fResourceManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getState()
-	 */
-	public synchronized ResourceManagerAttributes.State getState() {
-		EnumeratedAttribute<State> stateAttr = getStateAttribute();
-		return stateAttr.getValue();
 	}
 
 	/*
@@ -698,24 +641,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 * @param state
 	 */
 	public synchronized void setState(ResourceManagerAttributes.State state) {
-		EnumeratedAttribute<State> stateAttr = getStateAttribute();
-		if (stateAttr.getValue() != state) {
-			stateAttr.setValue(state);
-			AttributeManager attrs = new AttributeManager();
-			attrs.addAttribute(stateAttr);
-			fireResourceManagerChanged(attrs);
-		}
-	}
-
-	/**
-	 * Helper method to get the state attribute for this RM
-	 * 
-	 * @return state attribute
-	 */
-	private EnumeratedAttribute<State> getStateAttribute() {
-		EnumeratedAttributeDefinition<State> stateAttrDef = ResourceManagerAttributes.getStateAttributeDefinition();
-		EnumeratedAttribute<State> stateAttr = getAttribute(stateAttrDef);
-		return stateAttr;
+		fResourceManager.setState(state);
 	}
 
 	/*
@@ -734,22 +660,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 		StringAttribute nameAttr = attrs.getAttribute(ElementAttributes.getNameAttributeDefinition());
 		if (nameAttr != null) {
 			fResourceManager.getConfiguration().setName(nameAttr.getValue());
-		}
-		fireResourceManagerChanged(attrs);
-	}
-
-	/**
-	 * Send IChangedJobEvent to registered listeners
-	 * 
-	 * @param jobs
-	 *            jobs that have changed
-	 * @since 5.0
-	 */
-	protected void fireChangedJobs(Collection<IPJob> jobs) {
-		IChangedJobEvent e = new ChangedJobEvent(this, jobs);
-
-		for (Object listener : childListeners.getListeners()) {
-			((IResourceManagerChildListener) listener).handleEvent(e);
 		}
 	}
 

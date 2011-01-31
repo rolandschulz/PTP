@@ -101,7 +101,7 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	public Object[] getChildren(Object parentElement) {
 		IPResourceManager rm = getResourceManager(parentElement);
 		if (rm != null) {
-			if (rm.getState() != ResourceManagerAttributes.State.STARTED) {
+			if (rm.getResourceManager().getState() != ResourceManagerAttributes.State.STARTED) {
 				return new Object[0];
 			}
 			IPMachine[] machines = rm.getMachines();
@@ -141,7 +141,7 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 				return new ImageImageDescriptor(image);
 			}
 		}
-		final ResourceManagerAttributes.State state = ((IPResourceManager) object).getState();
+		final ResourceManagerAttributes.State state = ((IPResourceManager) object).getResourceManager().getState();
 		return new ImageImageDescriptor(ParallelImages.rmImages[state.ordinal()]);
 	}
 
@@ -175,8 +175,7 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	 */
 	@Override
 	public Object getParent(Object object) {
-		IResourceManagerControl rmc = (IResourceManagerControl) getResourceManager(object);
-		IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+		IPResourceManager rm = getResourceManager(object);
 		if (rm != null) {
 			return rm.getParent();
 		}

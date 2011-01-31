@@ -17,43 +17,41 @@
 /**
  * 
  */
-package org.eclipse.ptp.internal.core.elements.events;
+package org.eclipse.ptp.internal.core.events;
 
-import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
+import org.eclipse.ptp.core.events.IJobChangedEvent;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * @author grw
  * 
  */
-public class JobChangeEvent implements IJobChangeEvent {
+public class JobChangeEvent implements IJobChangedEvent {
 
-	private final IPJob job;
-	private final AttributeManager attributes;
+	private final IResourceManagerControl fResourceManager;
+	private final String fJobId;
 
-	public JobChangeEvent(IPJob job, AttributeManager attrs) {
-		this.job = job;
-		this.attributes = attrs;
+	public JobChangeEvent(IResourceManagerControl rm, String jobId) {
+		fResourceManager = rm;
+		fJobId = jobId;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.events.IJobChangedEvent#getAttributes()
+	 * @see org.eclipse.ptp.core.events.IJobChangedEvent#getJobId()
 	 */
-	public AttributeManager getAttributes() {
-		return attributes;
+	public String getJobId() {
+		return fJobId;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.events.IJobChangedEvent#getSource()
+	 * @see org.eclipse.ptp.core.events.IJobChangedEvent#getSource()
 	 */
-	public IPJob getSource() {
-		return job;
+	public IResourceManagerControl getSource() {
+		return fResourceManager;
 	}
 
 }

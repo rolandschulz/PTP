@@ -22,7 +22,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
@@ -99,11 +98,6 @@ public interface IPSession extends IAdaptable {
 	 * @since 4.0
 	 */
 	public IPDebugInfo getDebugInfo(TaskSet tasks);
-
-	/**
-	 * @return
-	 */
-	public IPJob getJob();
 
 	/**
 	 * @return

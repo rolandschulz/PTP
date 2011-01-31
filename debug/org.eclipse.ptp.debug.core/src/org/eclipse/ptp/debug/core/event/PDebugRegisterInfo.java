@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.event;
 
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.TaskSet;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
 /**
  * @author Clement
@@ -28,10 +28,11 @@ public class PDebugRegisterInfo extends PDebugInfo implements IPDebugRegisterInf
 	private final boolean refresh;
 
 	/**
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public PDebugRegisterInfo(IPJob job, TaskSet allProcesses, TaskSet allRegProcesses, TaskSet allUnregProcesses, boolean refresh) {
-		super(job, allProcesses, allRegProcesses, allUnregProcesses);
+	public PDebugRegisterInfo(IPLaunch launch, TaskSet allProcesses, TaskSet allRegProcesses, TaskSet allUnregProcesses,
+			boolean refresh) {
+		super(launch, allProcesses, allRegProcesses, allUnregProcesses);
 		this.refresh = refresh;
 	}
 

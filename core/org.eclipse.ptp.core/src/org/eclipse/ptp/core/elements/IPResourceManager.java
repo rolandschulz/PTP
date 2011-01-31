@@ -24,9 +24,7 @@ import java.util.Collection;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 
@@ -44,14 +42,6 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	 *            listener to add to the list of listeners
 	 */
 	public void addChildListener(IResourceManagerChildListener listener);
-
-	/**
-	 * Add a listener for events related to this resource manager.
-	 * 
-	 * @param listener
-	 *            listener to add to the list of listeners
-	 */
-	public void addElementListener(IResourceManagerListener listener);
 
 	/**
 	 * Update attributes on a collection of machines.
@@ -216,27 +206,12 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	public IResourceManagerControl getResourceManager();
 
 	/**
-	 * Get the state of this RM
-	 * 
-	 * @return state value representing the state of the RM
-	 */
-	public ResourceManagerAttributes.State getState();
-
-	/**
 	 * Remove listener for child events
 	 * 
 	 * @param listener
 	 *            listener to remove
 	 */
 	public void removeChildListener(IResourceManagerChildListener listener);
-
-	/**
-	 * Remove listener for events relating to this resource manager
-	 * 
-	 * @param listener
-	 *            listener to remove
-	 */
-	public void removeElementListener(IResourceManagerListener listener);
 
 	/**
 	 * @param job
