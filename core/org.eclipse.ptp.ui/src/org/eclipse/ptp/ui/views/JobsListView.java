@@ -38,7 +38,6 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.INewJobEvent;
@@ -48,10 +47,13 @@ import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
-import org.eclipse.ptp.core.events.INewResourceManagerEvent;
-import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
+import org.eclipse.ptp.core.events.IJobChangedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
+import org.eclipse.ptp.core.listeners.IJobListener;
+import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.internal.ui.actions.TerminateJobFromListAction;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.IRMSelectionListener;
@@ -65,62 +67,20 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.part.ViewPart;
 
 public class JobsListView extends ViewPart {
-	private final class MMChildListener implements IModelManagerChildListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
-		 */
-		public void handleEvent(IChangedResourceManagerEvent e) {
-			// Don't need to do anything
-		}
+	private final class JobListener implements IJobListener {
 
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.INewResourceManagerEvent)
+		 * org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse
+		 * .ptp.core.events.IJobChangeEvent)
 		 */
-		public void handleEvent(INewResourceManagerEvent e) {
-			/*
-			 * Add resource manager child listener so we get notified when new
-			 * machines are added to the model.
-			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
-			rm.addChildListener(resourceManagerListener);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
-		 */
-		// Update the button here.
-		public void handleEvent(IRemoveResourceManagerEvent e) {
-			/*
-			 * Removed resource manager child listener when resource manager is
-			 * removed.
-			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
-			rm.removeChildListener(resourceManagerListener);
-		}
-	}
-
-	private final class RMChildListener implements IResourceManagerChildListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
-		 */
-		public void handleEvent(IChangedJobEvent e) {
-			update(e.getJobs().toArray(new IPJob[0]));
+		public void handleEvent(IJobChangedEvent e) {
+			IPResourceManager rm = (IPResourceManager) e.getSource().getAdapter(IPResourceManager.class);
+			if (rm != null) {
+				update(rm.getJobs());
+			}
 
 			// Refresh the terminate job button
 			// TODO: scalability bottleneck
@@ -132,6 +92,64 @@ public class JobsListView extends ViewPart {
 
 		}
 
+	}
+
+	private final class ResourceManagerListener implements IResourceManagerListener {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerAddedEvent)
+		 */
+		public void handleEvent(IResourceManagerAddedEvent e) {
+			/*
+			 * Add resource manager child listener so we get notified when new
+			 * machines are added to the model.
+			 */
+			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			rm.addChildListener(resourceManagerChildListener);
+			rm.getResourceManager().addJobListener(jobListener);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerChangedEvent)
+		 */
+		public void handleEvent(IResourceManagerChangedEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerErrorEvent)
+		 */
+		public void handleEvent(IResourceManagerErrorEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerRemovedEvent)
+		 */
+		// Update the button here.
+		public void handleEvent(IResourceManagerRemovedEvent e) {
+			/*
+			 * Removed resource manager child listener when resource manager is
+			 * removed.
+			 */
+			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			rm.removeChildListener(resourceManagerChildListener);
+			rm.getResourceManager().removeJobListener(jobListener);
+		}
+	}
+
+	private final class RMChildListener implements IResourceManagerChildListener {
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -240,8 +258,9 @@ public class JobsListView extends ViewPart {
 	/*
 	 * Model listeners
 	 */
-	private final IModelManagerChildListener modelManagerListener = new MMChildListener();
-	private final IResourceManagerChildListener resourceManagerListener = new RMChildListener();
+	private final IResourceManagerListener resourceManagerListener = new ResourceManagerListener();
+	private final IResourceManagerChildListener resourceManagerChildListener = new RMChildListener();
+	private final IJobListener jobListener = new JobListener();
 
 	private final Set<IAttributeDefinition<?, ?, ?>> colDefs = Collections
 			.synchronizedSet(new HashSet<IAttributeDefinition<?, ?, ?>>());
@@ -325,9 +344,10 @@ public class JobsListView extends ViewPart {
 		 * if a new event arrives while we're doing this, but is it a problem?
 		 */
 		for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
-			rm.addChildListener(resourceManagerListener);
+			rm.addChildListener(resourceManagerChildListener);
+			rm.getResourceManager().addJobListener(jobListener);
 		}
-		mm.addListener(modelManagerListener);
+		mm.addListener(resourceManagerListener);
 
 		/*
 		 * Link this view to the ResourceManagerView

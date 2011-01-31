@@ -35,7 +35,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
@@ -147,10 +146,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	 * @param job
 	 *            job to terminate
 	 */
-	private void terminateJob(final IPJob job) {
+	private void terminateJob(final IResourceManagerControl rm, final String jobId) {
 		try {
-			IResourceManagerControl rm = job.getResourceManager();
-			rm.control(job, JobControlOperation.TERMINATE, null);
+			rm.control(jobId, JobControlOperation.TERMINATE, null);
 		} catch (CoreException e1) {
 			// Ignore, but log
 			PTPLaunchPlugin.log(e1);
@@ -180,16 +178,23 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate
-	 * #doCompleteJobLaunch(org.eclipse.ptp.core.elements.IPJob)
+	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
+	 * doCompleteJobLaunch(org.eclipse.debug.core.ILaunchConfiguration,
+	 * java.lang.String, org.eclipse.ptp.debug.core.launch.IPLaunch,
+	 * org.eclipse.ptp.core.attributes.AttributeManager,
+	 * org.eclipse.ptp.debug.core.IPDebugger,
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl, java.lang.String)
+	 */
+	/**
+	 * @since 5.0
 	 */
 	@Override
 	protected void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, final IPLaunch launch,
-			AttributeManager mgr, final IPDebugger debugger, final IPJob job) {
-		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), job.getID());
+			AttributeManager mgr, final IPDebugger debugger, final IResourceManagerControl rm, final String jobId) {
+		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), jobId);
 		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-			launch.setPJob(job);
+			launch.setResourceManager(rm);
+			launch.setJobId(jobId);
 			try {
 				setDefaultSourceLocator(launch, configuration);
 				final IProject project = verifyProject(configuration);
@@ -204,19 +209,21 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch,
 											project, subMon.newChild(2));
 
-									String app = job.getAttribute(JobAttributes.getExecutableNameAttributeDefinition())
+									AttributeManager jobAttrs = rm.getJobStatus(jobId).getAttributes();
+
+									String app = jobAttrs.getAttribute(JobAttributes.getExecutableNameAttributeDefinition())
 											.getValueAsString();
-									String path = job.getAttribute(JobAttributes.getExecutablePathAttributeDefinition())
+									String path = jobAttrs.getAttribute(JobAttributes.getExecutablePathAttributeDefinition())
 											.getValueAsString();
-									String cwd = job.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition())
+									String cwd = jobAttrs.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition())
 											.getValueAsString();
-									List<String> args = job.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition())
-											.getValue();
+									List<String> args = jobAttrs.getAttribute(
+											JobAttributes.getProgramArgumentsAttributeDefinition()).getValue();
 
 									session.connectToDebugger(subMon.newChild(8), app, path, cwd,
 											args.toArray(new String[args.size()]));
 								} catch (CoreException e) {
-									PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
+									PTPDebugCorePlugin.getDebugModel().shutdownSession(jobId);
 									throw new InvocationTargetException(e, e.getLocalizedMessage());
 								} finally {
 									monitor.done();
@@ -226,11 +233,11 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 						try {
 							new ProgressMonitorDialog(PTPLaunchPlugin.getActiveWorkbenchShell()).run(true, true, runnable);
 						} catch (InterruptedException e) {
-							terminateJob(job);
+							terminateJob(rm, jobId);
 						} catch (InvocationTargetException e) {
 							PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, e.getTargetException());
 							PTPLaunchPlugin.log(e.getCause());
-							terminateJob(job);
+							terminateJob(rm, jobId);
 						}
 					}
 				});
@@ -243,12 +250,12 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					public void run() {
 						PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_1, e.getStatus());
 						PTPLaunchPlugin.log(e);
-						terminateJob(job);
+						terminateJob(rm, jobId);
 					}
 				});
 			}
 		} else {
-			new RuntimeProcess(launch, job, null);
+			new RuntimeProcess(launch, rm, jobId, null);
 		}
 	}
 

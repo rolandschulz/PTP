@@ -497,7 +497,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public void terminateJob() throws CoreException {
 		IPJob job = getJob();
 		if (job != null) {
-			job.getResourceManager().control(job, JobControlOperation.TERMINATE, null);
+			job.getResourceManager().control(job.getID(), JobControlOperation.TERMINATE, null);
 		}
 	}
 

@@ -53,15 +53,13 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
-import org.eclipse.ptp.core.elements.listeners.IJobListener;
+import org.eclipse.ptp.core.events.IJobChangedEvent;
+import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -106,24 +104,26 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * also been reached.
 	 */
 	private class JobSubmission extends Job {
+		private final IResourceManagerControl fResourceManager;
 		private final ILaunchConfiguration fConfiguration;
 		private final String fMode;
 		private final IPLaunch fLaunch;
 		private final AttributeManager fAttrMgr;
 		private final IPDebugger fDebugger;
-		private final IPJob fJob;
+		private final String fJobId;
 		private final ReentrantLock fSubLock = new ReentrantLock();
 		private final Condition fSubCondition = fSubLock.newCondition();
 
-		public JobSubmission(String name, ILaunchConfiguration conf, String mode, IPLaunch launch, AttributeManager attrMgr,
-				IPDebugger debugger, IPJob job) {
-			super(name);
+		public JobSubmission(IResourceManagerControl rm, ILaunchConfiguration conf, String mode, IPLaunch launch,
+				AttributeManager attrMgr, IPDebugger debugger, String jobId) {
+			super(jobId);
+			fResourceManager = rm;
 			fConfiguration = conf;
 			fMode = mode;
 			fLaunch = launch;
 			fAttrMgr = attrMgr;
 			fDebugger = debugger;
-			fJob = job;
+			fJobId = jobId;
 		}
 
 		public void statusChanged() {
@@ -145,7 +145,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		protected IStatus run(IProgressMonitor monitor) {
 			fSubLock.lock();
 			try {
-				while (fJob.getState() == JobAttributes.State.STARTING) {
+				while (fResourceManager.getJobStatus(fJobId).getState() == JobAttributes.State.STARTING) {
 					try {
 						fSubCondition.await(100, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
@@ -156,11 +156,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				fSubLock.unlock();
 			}
 
-			doCompleteJobLaunch(fConfiguration, fMode, fLaunch, fAttrMgr, fDebugger, fJob);
+			doCompleteJobLaunch(fConfiguration, fMode, fLaunch, fAttrMgr, fDebugger, fResourceManager, fJobId);
 
 			fSubLock.lock();
 			try {
-				while (fJob.getState() != JobAttributes.State.COMPLETED) {
+				while (fResourceManager.getJobStatus(fJobId).getState() != JobAttributes.State.COMPLETED) {
 					try {
 						fSubCondition.await(100, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
@@ -188,15 +188,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			doCleanupLaunch(fConfiguration, fMode, fLaunch);
 
 			/*
-			 * Remove listener for job status changes
-			 */
-			fJob.removeElementListener(jobListener);
-
-			/*
 			 * Remove job submission
 			 */
 			synchronized (jobSubmissions) {
-				jobSubmissions.remove(fJob);
+				jobSubmissions.remove(fJobId);
+				if (jobSubmissions.size() == 0) {
+					fResourceManager.removeJobListener(fJobListener);
+				}
 			}
 			return Status.OK_STATUS;
 		}
@@ -207,21 +205,16 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 * (non-Javadoc)
 		 * 
 		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IJobListener#handleEvent(
-		 * org.eclipse.ptp.core.elements.events.IJobChangeEvent)
+		 * org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse
+		 * .ptp.core.events.IJobChangeEvent)
 		 */
-		public void handleEvent(IJobChangeEvent e) {
-			IPJob job = e.getSource();
-			AttributeManager attrMgr = e.getAttributes();
-			EnumeratedAttribute<JobAttributes.State> stateAttr = attrMgr.getAttribute(JobAttributes.getStateAttributeDefinition());
-			if (stateAttr != null) {
-				JobSubmission jobSub;
-				synchronized (jobSubmissions) {
-					jobSub = jobSubmissions.get(job);
-				}
-				if (jobSub != null) {
-					jobSub.statusChanged();
-				}
+		public void handleEvent(IJobChangedEvent e) {
+			JobSubmission jobSub;
+			synchronized (jobSubmissions) {
+				jobSub = jobSubmissions.get(e.getJobId());
+			}
+			if (jobSub != null) {
+				jobSub.statusChanged();
 			}
 		}
 	}
@@ -368,11 +361,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	/*
 	 * Model listeners
 	 */
-	private final IJobListener jobListener = new JobListener();
+	private final IJobListener fJobListener = new JobListener();
 	/*
 	 * HashMap used to keep track of job submissions
 	 */
-	protected Map<IPJob, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<IPJob, JobSubmission>());
+	protected Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
 	/*
 	 * Data synchronization rules
 	 */
@@ -598,10 +591,12 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @param launch
 	 * @param mgr
 	 * @param debugger
-	 * @param job
+	 * @param rm
+	 * @param jobId
+	 * @since 5.0
 	 */
 	protected abstract void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch,
-			AttributeManager mgr, IPDebugger debugger, IPJob job);
+			AttributeManager mgr, IPDebugger debugger, IResourceManagerControl rm, String jobId);
 
 	/**
 	 * @param configuration
@@ -955,13 +950,12 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
 			}
-
-			IPJob job = rm.submitJob(configuration, attrMgr, progress.newChild(5));
-			JobSubmission jobSub = new JobSubmission(job.getName(), configuration, mode, launch, attrMgr, debugger, job);
+			rm.addJobListener(fJobListener);
+			String jobId = rm.submitJob(configuration, attrMgr, progress.newChild(5));
+			JobSubmission jobSub = new JobSubmission(rm, configuration, mode, launch, attrMgr, debugger, jobId);
 			synchronized (jobSubmissions) {
-				jobSubmissions.put(job, jobSub);
+				jobSubmissions.put(jobId, jobSub);
 			}
-			job.addElementListener(jobListener);
 			jobSub.schedule();
 		} finally {
 			if (monitor != null) {

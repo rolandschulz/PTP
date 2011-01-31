@@ -75,7 +75,7 @@ public class StartResourceManagersObjectActionDelegate extends AbstractResourceM
 	 */
 	@Override
 	protected boolean isEnabledFor(IPResourceManager rmManager) {
-		if (rmManager.getState() == ResourceManagerAttributes.State.STOPPED) {
+		if (rmManager.getResourceManager().getState() == ResourceManagerAttributes.State.STOPPED) {
 			return true;
 		}
 		return false;

@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.messages.Messages;
-import org.eclipse.ptp.core.rm.RMModelManager;
 import org.eclipse.ptp.core.util.DebugUtil;
 import org.eclipse.ptp.internal.core.ModelManager;
 import org.osgi.framework.Bundle;
@@ -231,7 +230,6 @@ public class PTPCorePlugin extends Plugin {
 		});
 		modelManager = new ModelManager();
 		modelManager.start();
-		RMModelManager.getInstance().start();
 	}
 
 	/**
@@ -241,7 +239,6 @@ public class PTPCorePlugin extends Plugin {
 	public void stop(BundleContext context) throws Exception {
 		try {
 			modelManager.shutdown();
-			RMModelManager.getInstance().stop();
 			Preferences.savePreferences(getUniqueIdentifier());
 			ResourcesPlugin.getWorkspace().removeSaveParticipant(getUniqueIdentifier());
 		} finally {

@@ -21,7 +21,6 @@ package org.eclipse.ptp.rtsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.elements.IPJob;
 
 /**
  * A Control System is a portion of a runtime system that handles controlling
@@ -53,12 +52,13 @@ public interface IControlSystem {
 	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException;
 
 	/**
-	 * Terminates a running job. The {@link IPJob} contains the job identifier
-	 * used to locate the job by the control system.
+	 * Terminates a running job. The job identifier is used to locate the job by
+	 * the control system.
 	 * 
-	 * @param job
-	 *            the job to terminate
+	 * @param jobId
+	 *            ID of the job to terminate
 	 * @throws CoreException
+	 * @since 5.0
 	 */
-	public void terminateJob(IPJob job) throws CoreException;
+	public void terminateJob(String jobId) throws CoreException;
 }

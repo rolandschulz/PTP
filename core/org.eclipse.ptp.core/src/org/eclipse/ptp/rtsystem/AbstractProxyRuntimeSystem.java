@@ -40,7 +40,6 @@ import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
@@ -329,8 +328,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			try {
 				int numDefs = Integer.parseInt(attrs[0]);
 
-				ArrayList<IAttributeDefinition<?, ?, ?>> attrDefs =
-						new ArrayList<IAttributeDefinition<?, ?, ?>>(numDefs);
+				ArrayList<IAttributeDefinition<?, ?, ?>> attrDefs = new ArrayList<IAttributeDefinition<?, ?, ?>>(numDefs);
 
 				int pos = 1;
 
@@ -338,8 +336,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					int numArgs = Integer.parseInt(attrs[pos]);
 
 					if (numArgs >= ATTR_MIN_LEN && pos + numArgs < attrs.length) {
-						IAttributeDefinition<?, ?, ?> attrDef =
-								parseAttributeDefinition(attrs, pos + 1, pos + numArgs);
+						IAttributeDefinition<?, ?, ?> attrDef = parseAttributeDefinition(attrs, pos + 1, pos + numArgs);
 						if (attrDef != null) {
 							attrDefs.add(attrDef);
 						}
@@ -726,8 +723,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			return;
 		}
 
-		fireRuntimeRemoveProcessEvent(new RuntimeRemoveProcessEvent(
-					getJobId(attrs, 0), new RangeSet(attrs[1])));
+		fireRuntimeRemoveProcessEvent(new RuntimeRemoveProcessEvent(getJobId(attrs, 0), new RangeSet(attrs[1])));
 	}
 
 	/*
@@ -835,8 +831,8 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			if (codeAttr == null || msgAttr == null || jobSubIdAttr == null) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_7));
 			} else {
-				fireRuntimeSubmitJobErrorEvent(new RuntimeSubmitJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(), jobSubIdAttr
-						.getValue()));
+				fireRuntimeSubmitJobErrorEvent(new RuntimeSubmitJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(),
+						jobSubIdAttr.getValue()));
 			}
 		} else {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_8));
@@ -1068,17 +1064,19 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(org.eclipse.ptp.
-	 * core.elements.IPJob)
+	 * org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(java.lang.String)
 	 */
-	public void terminateJob(IPJob job) throws CoreException {
-		if (job == null) {
+	/**
+	 * @since 5.0
+	 */
+	public void terminateJob(String jobId) throws CoreException {
+		if (jobId == null) {
 			PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_12);
 			return;
 		}
 
 		try {
-			proxy.terminateJob(job.getID());
+			proxy.terminateJob(jobId);
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
 					Messages.AbstractProxyRuntimeSystem_11, null));

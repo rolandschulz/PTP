@@ -32,22 +32,21 @@ import org.eclipse.ptp.debug.core.IPSession;
  * 
  */
 public class PSessionManager implements IDebugEventSetListener {
-	private final Map<IPJob, IPSession> sessionMap;
+	private final Map<String, IPSession> sessionMap = new Hashtable<String, IPSession>();
 
 	public PSessionManager() {
-		sessionMap = new Hashtable<IPJob, IPSession>();
 		DebugPlugin.getDefault().addDebugEventListener(this);
 	}
 
-	public void addSession(IPJob job, IPSession session) {
+	public void addSession(String jobId, IPSession session) {
 		synchronized (sessionMap) {
-			sessionMap.put(job, session);
+			sessionMap.put(jobId, session);
 		}
 	}
 
-	public IPSession getSession(IPJob job) {
+	public IPSession getSession(String jobId) {
 		synchronized (sessionMap) {
-			return sessionMap.get(job);
+			return sessionMap.get(jobId);
 		}
 	}
 
@@ -57,8 +56,12 @@ public class PSessionManager implements IDebugEventSetListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse.debug.core.DebugEvent[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse
+	 * .debug.core.DebugEvent[])
 	 */
 	public void handleDebugEvents(DebugEvent[] events) {
 	}

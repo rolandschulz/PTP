@@ -34,6 +34,7 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.debug.core.IPBreakpointManager;
@@ -275,17 +276,8 @@ public class PSession implements IPSession, IPDIEventListener {
 	 */
 	public IPDebugInfo getDebugInfo(TaskSet eTasks) {
 		IPDITaskManager taskMgr = getPDISession().getTaskManager();
-		return new PDebugInfo(getJob(), eTasks, taskMgr.getRegisteredTasks(eTasks.copy()), taskMgr.getUnregisteredTasks(eTasks
+		return new PDebugInfo(getLaunch(), eTasks, taskMgr.getRegisteredTasks(eTasks.copy()), taskMgr.getUnregisteredTasks(eTasks
 				.copy()));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.IPSession#getJob()
-	 */
-	public IPJob getJob() {
-		return getLaunch().getPJob();
 	}
 
 	/*
@@ -491,13 +483,18 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @param state
 	 */
 	private void changeProcessState(TaskSet tasks, State state) {
-		IPJob job = getJob();
-		BitSet processIndices = new BitSet();
-		for (int task : tasks.toArray()) {
-			processIndices.set(task);
+		IPResourceManager rm = (IPResourceManager) getLaunch().getResourceManager().getAdapter(IPResourceManager.class);
+		if (rm != null) {
+			IPJob job = rm.getJobById(getLaunch().getJobId());
+			if (job != null) {
+				BitSet processIndices = new BitSet();
+				for (int task : tasks.toArray()) {
+					processIndices.set(task);
+				}
+				EnumeratedAttribute<State> attr = ProcessAttributes.getStateAttributeDefinition().create(state);
+				job.addProcessAttributes(processIndices, new AttributeManager(attr));
+			}
 		}
-		EnumeratedAttribute<State> attr = ProcessAttributes.getStateAttributeDefinition().create(state);
-		job.addProcessAttributes(processIndices, new AttributeManager(attr));
 	}
 
 	/**
@@ -735,12 +732,17 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @param output
 	 */
 	private void setProcessOutput(TaskSet tasks, String output) {
-		IPJob job = getJob();
-		BitSet processIndices = new BitSet();
-		for (int task : tasks.toArray()) {
-			processIndices.set(task);
+		IPResourceManager rm = (IPResourceManager) getLaunch().getResourceManager().getAdapter(IPResourceManager.class);
+		if (rm != null) {
+			IPJob job = rm.getJobById(getLaunch().getJobId());
+			if (job != null) {
+				BitSet processIndices = new BitSet();
+				for (int task : tasks.toArray()) {
+					processIndices.set(task);
+				}
+				StringAttribute attr = ProcessAttributes.getStdoutAttributeDefinition().create(output);
+				job.addProcessAttributes(processIndices, new AttributeManager(attr));
+			}
 		}
-		StringAttribute attr = ProcessAttributes.getStdoutAttributeDefinition().create(output);
-		job.addProcessAttributes(processIndices, new AttributeManager(attr));
 	}
 }

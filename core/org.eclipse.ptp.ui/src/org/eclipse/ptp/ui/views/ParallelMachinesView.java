@@ -56,7 +56,6 @@ import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
-import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
@@ -74,10 +73,11 @@ import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.INodeChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
-import org.eclipse.ptp.core.events.INewResourceManagerEvent;
-import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
+import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
+import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.ui.IElementManager;
@@ -197,51 +197,6 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		}
 	}
 
-	private final class MMChildListener implements IModelManagerChildListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
-		 */
-		public void handleEvent(IChangedResourceManagerEvent e) {
-			// Don't need to do anything
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.INewResourceManagerEvent)
-		 */
-		public void handleEvent(INewResourceManagerEvent e) {
-			/*
-			 * Add resource manager child listener so we get notified when new
-			 * machines are added to the model.
-			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
-			rm.addChildListener(resourceManagerListener);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
-		 */
-		public void handleEvent(IRemoveResourceManagerEvent e) {
-			/*
-			 * Removed resource manager child listener when resource manager is
-			 * removed.
-			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
-			rm.removeChildListener(resourceManagerListener);
-		}
-	}
-
 	private final class NodeChildListener implements INodeChildListener {
 		/*
 		 * (non-Javadoc)
@@ -315,16 +270,6 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	}
 
 	private final class RMChildListener implements IResourceManagerChildListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
-		 */
-		public void handleEvent(IChangedJobEvent e) {
-		}
-
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -452,6 +397,58 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		}
 	}
 
+	private final class RMListener implements IResourceManagerListener {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerAddedEvent)
+		 */
+		public void handleEvent(IResourceManagerAddedEvent e) {
+			/*
+			 * Add resource manager child listener so we get notified when new
+			 * machines are added to the model.
+			 */
+			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			rm.addChildListener(resourceManagerChildListener);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerChangedEvent)
+		 */
+		public void handleEvent(IResourceManagerChangedEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerErrorEvent)
+		 */
+		public void handleEvent(IResourceManagerErrorEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerRemovedEvent)
+		 */
+		public void handleEvent(IResourceManagerRemovedEvent e) {
+			/*
+			 * Removed resource manager child listener when resource manager is
+			 * removed.
+			 */
+			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			rm.removeChildListener(resourceManagerChildListener);
+		}
+	}
+
 	// view flag
 	public static final String BOTH_VIEW = "0"; //$NON-NLS-1$
 
@@ -461,9 +458,9 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 
 	private final ListenerList listeners = new ListenerList();
 
-	private final IModelManagerChildListener modelManagerListener = new MMChildListener();
+	private final IResourceManagerListener resourceManagerListener = new RMListener();
 
-	private final IResourceManagerChildListener resourceManagerListener = new RMChildListener();
+	private final IResourceManagerChildListener resourceManagerChildListener = new RMChildListener();
 
 	private final IMachineChildListener machineListener = new MachineChildListener();
 
@@ -1203,10 +1200,10 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			 * problem?
 			 */
 			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
-				rm.addChildListener(resourceManagerListener);
+				rm.addChildListener(resourceManagerChildListener);
 			}
 
-			mm.addListener(modelManagerListener);
+			mm.addListener(resourceManagerListener);
 		}
 	}
 

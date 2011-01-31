@@ -14,31 +14,30 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.ptp.core.elements.events;
+package org.eclipse.ptp.core.events;
 
-import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
- * This event is sent when the attributes on a job change. It is sent to element
- * listeners on the job.
+ * This event is sent when the status of a job changes.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IJobListener
+ * @since 5.0
  */
-public interface IJobChangeEvent {
+public interface IJobChangedEvent {
 
 	/**
-	 * Get the attributes that have changed
+	 * Get the resource manager controlling the job that changed.
 	 * 
-	 * @return changed attributes
+	 * @return resource manager
 	 */
-	public AttributeManager getAttributes();
+	public IResourceManagerControl getSource();
 
 	/**
-	 * Get the source of the event
+	 * Get the ID of the job that changed.
 	 * 
-	 * @return the source of the event
+	 * @return job ID
 	 */
-	public IPJob getSource();
+	public String getJobId();
 
 }

@@ -32,10 +32,12 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
@@ -188,6 +190,15 @@ public class ToggleBreakpointsTarget implements IToggleBreakpointsTargetExtensio
 							errorMessage = Messages.ToggleBreakpointAdapter_Invalid_line_1;
 						} else {
 							IPJob job = uiDebugManager.getJob();
+							String jobId = IPBreakpoint.GLOBAL;
+							String jobName = IPBreakpoint.GLOBAL;
+							if (job != null && job.getState() != JobAttributes.State.COMPLETED) {
+								IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(jobId);
+								if (session != null) {
+									jobId = job.getID();
+									jobName = job.getName();
+								}
+							}
 							String sid = uiDebugManager.getCurrentSetId();
 							sid = (sid == null || sid.length() == 0) ? IElementHandler.SET_ROOT_ID : sid;
 							String sourceHandle = getSourceHandle(input);
@@ -202,17 +213,18 @@ public class ToggleBreakpointsTarget implements IToggleBreakpointsTargetExtensio
 									if (breakpoint.isGlobal() && job == null) {
 										DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
 									} else {
-										IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job);
+										IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job.getID());
 										if (session != null) {
 											session.getBreakpointManager().deleteBreakpoint(breakpoint);
 										}
 									}
 								} else {// create a new breakpoint
 									PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0,
-											"", true, sid, job); //$NON-NLS-1$
+											"", true, sid, jobId, jobName); //$NON-NLS-1$
 								}
 							} else {// no breakpoint found and create a new one
-								PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, job); //$NON-NLS-1$
+								PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0,
+										"", true, sid, jobId, jobName); //$NON-NLS-1$
 							}
 							return;
 						}

@@ -219,17 +219,21 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			AttributeManager attrs = mgrEntry.getValue();
 			RangeSet jobIds = mgrEntry.getKey();
 
-			for (String elementId : jobIds) {
-				IPJob job = getPResourceManager().getJobById(elementId);
+			for (String jobId : jobIds) {
+				IPJob job = getPResourceManager().getJobById(jobId);
 				if (job != null) {
 					changedJobs.add(job);
 				} else {
-					PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_7 + elementId);
+					PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_7 + jobId);
 				}
 			}
 
 			getPResourceManager().addJobAttributes(changedJobs, attrs.getAttributes());
 			changedJobs.clear();
+
+			for (String jobId : jobIds) {
+				fireJobChanged(jobId);
+			}
 		}
 	}
 
@@ -683,6 +687,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			for (String elementId : rmIds) {
 				if (getPResourceManager().getID().equals(elementId)) {
 					getPResourceManager().addAttributes(attrs.getAttributes());
+					fireResourceManagerChanged();
 				}
 			}
 		}
@@ -749,7 +754,6 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				sub.setError(e.getErrorMessage());
 			}
 		}
-		fireSubmitJobError(e.getJobSubID(), e.getErrorMessage());
 	}
 
 	/*
@@ -881,7 +885,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected IPJob doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+	protected String doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
@@ -924,20 +928,20 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			monitor.done();
 		}
 
-		return job;
+		return job.getID();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doControlJob(org.eclipse
-	 * .ptp.core.elements.IPJob,
-	 * org.eclipse.ptp.core.elementcontrols.IResourceManagerControl
-	 * .JobControlOperation, org.eclipse.core.runtime.IProgressMonitor)
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doControlJob(java.lang
+	 * .String,
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected void doControlJob(IPJob job, JobControlOperation operation, IProgressMonitor monitor) throws CoreException {
+	protected void doControlJob(String jobId, JobControlOperation operation, IProgressMonitor monitor) throws CoreException {
 		switch (operation) {
 		case SUSPEND:
 		case RESUME:
@@ -946,7 +950,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(),
 					Messages.AbstractRuntimeResourceManager_operationNotSupported));
 		case TERMINATE:
-			runtimeSystem.terminateJob(job);
+			runtimeSystem.terminateJob(jobId);
 			break;
 		}
 	}

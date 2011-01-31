@@ -8,26 +8,27 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.core.rm;
+package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 
 /**
  * @since 5.0
  */
-public interface IRMChangeListener {
-	/**
-	 * Accept notification when one or more jobs change status
-	 * 
-	 * @param event
-	 *            the event details
-	 */
-	public void jobStatusChange(IRMJobChangeEvent event);
+public interface IJobStatus {
 
 	/**
-	 * Accept notification of resource manager status change
+	 * Get job attributes
 	 * 
-	 * @param event
-	 *            the event details
+	 * @return attributes about this job
 	 */
-	public void sessionStatusChange(IRMSessionChangeEvent event);
+	public AttributeManager getAttributes();
+
+	/**
+	 * Get job status
+	 * 
+	 * @return state of the job
+	 */
+	public JobAttributes.State getState();
 }

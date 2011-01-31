@@ -23,8 +23,10 @@ package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
@@ -38,26 +40,33 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
 import org.eclipse.ptp.core.elements.attributes.FilterAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.core.events.IJobChangedEvent;
+import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.core.messages.Messages;
+import org.eclipse.ptp.internal.core.ModelManager;
 import org.eclipse.ptp.internal.core.elements.PResourceManager;
+import org.eclipse.ptp.internal.core.events.JobChangeEvent;
 
 /**
  * @author rsqrd
+ * @since 5.0
  * 
  */
 public abstract class AbstractResourceManager implements IResourceManagerControl {
-
 	private final PResourceManager fPResourceManager;
-	private final AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
 	private final IPUniverse fUniverse;
+	private final AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
+	private final ListenerList fJobListeners = new ListenerList();
 
 	private IResourceManagerConfiguration fConfig;
+	private ResourceManagerAttributes.State fState;
 
 	/**
 	 * @since 5.0
@@ -65,24 +74,38 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	public AbstractResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
 		fConfig = config;
 		fUniverse = universe;
-		fPResourceManager = new PResourceManager(fUniverse, this);
+		fPResourceManager = new PResourceManager(universe, this);
+		universe.addResourceManager(fPResourceManager);
+		fState = ResourceManagerAttributes.State.STOPPED;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#control(
-	 * org.eclipse.ptp.core.elements.IPJob,
-	 * org.eclipse.ptp.core.elementcontrols.
-	 * IResourceManagerControl.JobControlOperation,
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#addJobListener(org.eclipse
+	 * .ptp.core.listeners.IJobListener)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public void addJobListener(IJobListener listener) {
+		fJobListeners.add(listener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#control(java.lang.String
+	 * , org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	/**
 	 * @since 5.0
 	 */
-	public void control(IPJob job, JobControlOperation operation, IProgressMonitor monitor) throws CoreException {
-		doControlJob(job, operation, monitor);
+	public void control(String jobId, JobControlOperation operation, IProgressMonitor monitor) throws CoreException {
+		doControlJob(jobId, operation, monitor);
 	}
 
 	/*
@@ -97,6 +120,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 		} catch (CoreException e) {
 		}
 		doDispose();
+		fUniverse.removeResourceManager(fPResourceManager);
 	}
 
 	/*
@@ -170,6 +194,32 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
+	 * .String)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IJobStatus getJobStatus(String jobId) {
+		final IPJob job = fPResourceManager.getJobById(jobId);
+		if (job != null) {
+			return new IJobStatus() {
+				public AttributeManager getAttributes() {
+					return new AttributeManager(job.getAttributes());
+				}
+
+				public State getState() {
+					return job.getState();
+				}
+			};
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#getName()
 	 */
 	public String getName() {
@@ -193,7 +243,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#getState()
 	 */
 	public synchronized ResourceManagerAttributes.State getState() {
-		return fPResourceManager.getState();
+		return fState;
 	}
 
 	/*
@@ -205,6 +255,20 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 */
 	public String getUniqueName() {
 		return getConfiguration().getUniqueName();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#removeJobListener(org
+	 * .eclipse.ptp.core.listeners.IJobListener)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public void removeJobListener(IJobListener listener) {
+		fJobListeners.remove(listener);
 	}
 
 	/*
@@ -243,7 +307,22 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 			}
 		}
 
-		fPResourceManager.fireResourceManagerChanged(attrs);
+		fireResourceManagerChanged();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#setState(org.eclipse
+	 * .ptp.core.elements.attributes.ResourceManagerAttributes.State)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public synchronized void setState(ResourceManagerAttributes.State state) {
+		fState = state;
+		fireResourceManagerChanged();
 	}
 
 	/*
@@ -306,7 +385,10 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * org.eclipse.ptp.core.attributes.AttributeManager,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IPJob submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+	/**
+	 * @since 5.0
+	 */
+	public String submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException {
 		return doSubmitJob(configuration, attrMgr, monitor);
 	}
@@ -346,8 +428,8 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	/**
 	 * Control a job.
 	 * 
-	 * @param job
-	 *            job to terminate
+	 * @param jobId
+	 *            ID of job to control
 	 * @param operation
 	 *            operation to perform on job
 	 * @param monitor
@@ -355,7 +437,8 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected abstract void doControlJob(IPJob job, JobControlOperation operation, IProgressMonitor monitor) throws CoreException;
+	protected abstract void doControlJob(String jobId, JobControlOperation operation, IProgressMonitor monitor)
+			throws CoreException;
 
 	/**
 	 * Perform any activities prior to disposing of the resource manager.
@@ -378,15 +461,20 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Submit a job to the resource manager. Returns a job that represents the
-	 * submitted job, or null if the progress monitor was canceled.
+	 * Submit a job to the resource manager. Returns a job ID that represents
+	 * the submitted job. Throws a core exception if there was an error
+	 * submitting the job or if the progress monitor was canceled.
 	 * 
+	 * @param configuration
+	 *            launch configuration
 	 * @param attrMgr
+	 *            attribute manager containing launch attributes
 	 * @param monitor
+	 *            progress monitor
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected abstract IPJob doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+	protected abstract String doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException;
 
 	/**
@@ -395,7 +483,35 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * @param message
 	 */
 	protected void fireError(String message) {
-		fPResourceManager.fireError(message);
+		ModelManager mm = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
+		mm.fireResourceManagerError(this, message);
+	}
+
+	/**
+	 * Notify listeners when a job has changed.
+	 * 
+	 * @param jobId
+	 *            ID of job that has changed
+	 * @since 5.0
+	 */
+	protected void fireJobChanged(String jobId) {
+		IJobChangedEvent e = new JobChangeEvent(this, jobId);
+
+		for (Object listener : fJobListeners.getListeners()) {
+			((IJobListener) listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * Fire an event to notify that some attributes have changed
+	 * 
+	 * @param attrs
+	 *            attributes that have changed
+	 * @since 5.0
+	 */
+	protected void fireResourceManagerChanged() {
+		ModelManager mm = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
+		mm.fireResourceManagerChanged(this);
 	}
 
 	/**
@@ -403,16 +519,5 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 */
 	protected IPResourceManager getPResourceManager() {
 		return fPResourceManager;
-	}
-
-	protected void setState(ResourceManagerAttributes.State state) {
-		fPResourceManager.setState(state);
-	}
-
-	/**
-	 * @since 5.0
-	 */
-	protected void fireSubmitJobError(String id, String message) {
-		fPResourceManager.fireSubmitJobError(id, message);
 	}
 }

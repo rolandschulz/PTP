@@ -52,7 +52,6 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
@@ -66,10 +65,13 @@ import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
-import org.eclipse.ptp.core.events.INewResourceManagerEvent;
-import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
+import org.eclipse.ptp.core.events.IJobChangedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
+import org.eclipse.ptp.core.listeners.IJobListener;
+import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.internal.ui.actions.JobFocusAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
 import org.eclipse.ptp.internal.ui.actions.TerminateJobAction;
@@ -177,63 +179,21 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		}
 	}
 
-	private final class MMChildListener implements IModelManagerChildListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
-		 */
-		public void handleEvent(IChangedResourceManagerEvent e) {
-			// Don't need to do anything
-		}
+	private final class JobListener implements IJobListener {
 
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.INewResourceManagerEvent)
+		 * org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse
+		 * .ptp.core.events.IJobChangeEvent)
 		 */
-		public void handleEvent(INewResourceManagerEvent e) {
-			/*
-			 * Add resource manager child listener so we get notified when new
-			 * machines are added to the model.
-			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
-			rm.addChildListener(resourceManagerListener);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
-		 */
-		public void handleEvent(IRemoveResourceManagerEvent e) {
-			/*
-			 * Removed resource manager child listener when resource manager is
-			 * removed.
-			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
-			rm.removeChildListener(resourceManagerListener);
+		public void handleEvent(IJobChangedEvent e) {
+			refreshJobView();
 		}
 	}
 
 	private final class RMChildListener implements IResourceManagerChildListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
-		 */
-		public void handleEvent(IChangedJobEvent e) {
-			refreshJobView();
-		}
-
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -341,6 +301,60 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		 * IResourceManagerRemoveQueueEvent)
 		 */
 		public void handleEvent(IRemoveQueueEvent e) {
+		}
+	};
+
+	private final class RMListener implements IResourceManagerListener {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerAddedEvent)
+		 */
+		public void handleEvent(IResourceManagerAddedEvent e) {
+			/*
+			 * Add resource manager child listener so we get notified when new
+			 * machines are added to the model.
+			 */
+			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			rm.addChildListener(resourceManagerChildListener);
+			rm.getResourceManager().addJobListener(jobListener);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerChangedEvent)
+		 */
+		public void handleEvent(IResourceManagerChangedEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerErrorEvent)
+		 */
+		public void handleEvent(IResourceManagerErrorEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IResourceManagerRemovedEvent)
+		 */
+		public void handleEvent(IResourceManagerRemovedEvent e) {
+			/*
+			 * Removed resource manager child listener when resource manager is
+			 * removed.
+			 */
+			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			rm.removeChildListener(resourceManagerChildListener);
+			rm.getResourceManager().removeJobListener(jobListener);
 		}
 	}
 
@@ -455,9 +469,10 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * Model listeners
 	 */
-	private final IModelManagerChildListener modelManagerListener = new MMChildListener();
-	private final IResourceManagerChildListener resourceManagerListener = new RMChildListener();
+	private final IResourceManagerChildListener resourceManagerChildListener = new RMChildListener();
+	private final IResourceManagerListener resourceManagerListener = new RMListener();
 	private final IJobChildListener jobChildListener = new JobChildListener();
+	private final IJobListener jobListener = new JobListener();
 
 	/*
 	 * Debug flag
@@ -551,9 +566,10 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 				for (IPJob job : rm.getJobs()) {
 					job.removeChildListener(jobChildListener);
 				}
-				rm.removeChildListener(resourceManagerListener);
+				rm.removeChildListener(resourceManagerChildListener);
+				rm.getResourceManager().removeJobListener(jobListener);
 			}
-			mm.removeListener(modelManagerListener);
+			mm.removeListener(resourceManagerListener);
 		}
 		elementViewComposite.dispose();
 		super.dispose();
@@ -960,9 +976,10 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 			 * problem?
 			 */
 			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
-				rm.addChildListener(resourceManagerListener);
+				rm.addChildListener(resourceManagerChildListener);
+				rm.getResourceManager().addJobListener(jobListener);
 			}
-			mm.addListener(modelManagerListener);
+			mm.addListener(resourceManagerListener);
 		}
 	}
 

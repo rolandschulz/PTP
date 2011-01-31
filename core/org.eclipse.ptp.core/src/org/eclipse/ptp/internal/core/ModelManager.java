@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -36,16 +36,17 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
-import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
-import org.eclipse.ptp.core.events.INewResourceManagerEvent;
-import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
+import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
+import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
-import org.eclipse.ptp.internal.core.events.ChangedResourceManagerEvent;
 import org.eclipse.ptp.internal.core.events.NewResourceManagerEvent;
 import org.eclipse.ptp.internal.core.events.RemoveResourceManagerEvent;
+import org.eclipse.ptp.internal.core.events.ResourceManagerChangeEvent;
+import org.eclipse.ptp.internal.core.events.ResourceManagerErrorEvent;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.IService;
@@ -142,7 +143,7 @@ public class ModelManager implements IModelManager {
 					IResourceManagerControl rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
 							.getUniqueName());
 					if (rm != null) {
-						updateResourceManager(rm);
+						fireResourceManagerChanged(rm);
 					}
 				}
 				break;
@@ -152,10 +153,11 @@ public class ModelManager implements IModelManager {
 	};
 
 	private final ListenerList resourceManagerListeners = new ListenerList();
-	protected final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
-	protected IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
 
-	protected IPUniverse universe = new PUniverse();
+	protected final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
+	protected final Map<String, IResourceManagerControl> resourceManagers = new HashMap<String, IResourceManagerControl>();
+	protected final IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
+	protected final IPUniverse universe = new PUniverse();
 
 	public ModelManager() {
 		fServiceManager.addEventListener(fServiceEventListener, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED
@@ -168,9 +170,9 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.core.IModelManager#addListener(org.eclipse.ptp.core.listeners
-	 * .IModelManagerChildListener)
+	 * .IResourceManagerListener)
 	 */
-	public void addListener(IModelManagerChildListener listener) {
+	public void addListener(IResourceManagerListener listener) {
 		resourceManagerListeners.add(listener);
 	}
 
@@ -182,8 +184,8 @@ public class ModelManager implements IModelManager {
 	 * .core.elementcontrols.IResourceManagerControl)
 	 */
 	public void addResourceManager(IResourceManagerControl rm) {
-		synchronized (universe) {
-			universe.addResourceManager(rm);
+		synchronized (resourceManagers) {
+			resourceManagers.put(rm.getUniqueName(), rm);
 		}
 		fireNewResourceManager(rm);
 	}
@@ -201,6 +203,37 @@ public class ModelManager implements IModelManager {
 		}
 	}
 
+	/**
+	 * Fire an event to notify that a resource manager has changed
+	 * 
+	 * @param rm
+	 *            rm that has changed
+	 * @since 5.0
+	 */
+	public void fireResourceManagerChanged(IResourceManagerControl rm) {
+		IResourceManagerChangedEvent e = new ResourceManagerChangeEvent(rm);
+
+		for (Object listener : resourceManagerListeners.getListeners()) {
+			((IResourceManagerListener) listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * Fire an event to notify that a resource manager error has occurred
+	 * 
+	 * @param rm
+	 *            rm that caused the error
+	 * @param message
+	 *            error message
+	 */
+	public void fireResourceManagerError(IResourceManagerControl rm, String message) {
+		IResourceManagerErrorEvent e = new ResourceManagerErrorEvent(rm, message);
+
+		for (Object listener : resourceManagerListeners.getListeners()) {
+			((IResourceManagerListener) listener).handleEvent(e);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -209,17 +242,20 @@ public class ModelManager implements IModelManager {
 	 * .lang.String)
 	 */
 	public IResourceManagerControl getResourceManagerFromUniqueName(String rmUniqueName) {
-		IResourceManagerControl[] rms;
-		synchronized (universe) {
-			rms = universe.getResourceManagerControls();
+		synchronized (resourceManagers) {
+			return resourceManagers.get(rmUniqueName);
 		}
+	}
 
-		for (IResourceManagerControl rm : rms) {
-			if (rm.getUniqueName().equals(rmUniqueName)) {
-				return rm;
-			}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.IModelManager#getResourceManagers()
+	 */
+	public IResourceManagerControl[] getResourceManagers() {
+		synchronized (resourceManagers) {
+			return resourceManagers.values().toArray(new IResourceManagerControl[0]);
 		}
-		return null;
 	}
 
 	/*
@@ -256,9 +292,11 @@ public class ModelManager implements IModelManager {
 		 */
 		fServiceManager.getActiveConfiguration();
 
-		for (IResourceManagerControl rm : getUniverse().getResourceManagerControls()) {
-			if (rm.getConfiguration().getAutoStart()) {
-				rmsNeedStarting.add(rm);
+		synchronized (resourceManagers) {
+			for (IResourceManagerControl rm : resourceManagers.values()) {
+				if (rm.getConfiguration().getAutoStart()) {
+					rmsNeedStarting.add(rm);
+				}
 			}
 		}
 
@@ -272,9 +310,9 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.core.IModelManager#removeListener(org.eclipse.ptp.core
-	 * .listeners.IModelManagerChildListener)
+	 * .listeners.IResourceManagerListener)
 	 */
-	public void removeListener(IModelManagerChildListener listener) {
+	public void removeListener(IResourceManagerListener listener) {
 		resourceManagerListeners.remove(listener);
 	}
 
@@ -345,33 +383,17 @@ public class ModelManager implements IModelManager {
 	 * @see org.eclipse.ptp.core.IModelManager#stopResourceManagers()
 	 */
 	public void stopResourceManagers() throws CoreException {
-		IResourceManagerControl[] resourceManagers;
-		synchronized (universe) {
-			resourceManagers = universe.getResourceManagerControls();
-		}
-		for (int i = 0; i < resourceManagers.length; ++i) {
-			resourceManagers[i].stop();
+		for (IResourceManagerControl resourceManager : getResourceManagers()) {
+			resourceManager.stop();
 		}
 	}
 
 	private void doRemoveResourceManager(IResourceManagerControl rm) {
-		synchronized (universe) {
-			universe.removeResourceManager(rm);
+		synchronized (resourceManagers) {
+			resourceManagers.remove(rm.getUniqueName());
 		}
 		fireRemoveResourceManager(rm);
-	}
-
-	/**
-	 * Fire a changed resource manager event.
-	 * 
-	 * @param rms
-	 *            collection of resource managers
-	 */
-	private void fireChangedResourceManager(final Collection<IResourceManagerControl> rms) {
-		IChangedResourceManagerEvent event = new ChangedResourceManagerEvent(this, rms);
-		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerChildListener) listener).handleEvent(event);
-		}
+		rm.dispose();
 	}
 
 	/**
@@ -380,9 +402,9 @@ public class ModelManager implements IModelManager {
 	 * @param rm
 	 */
 	private void fireNewResourceManager(final IResourceManagerControl rm) {
-		INewResourceManagerEvent event = new NewResourceManagerEvent(this, rm);
+		IResourceManagerAddedEvent event = new NewResourceManagerEvent(this, rm);
 		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerChildListener) listener).handleEvent(event);
+			((IResourceManagerListener) listener).handleEvent(event);
 		}
 	}
 
@@ -392,9 +414,9 @@ public class ModelManager implements IModelManager {
 	 * @param rm
 	 */
 	private void fireRemoveResourceManager(final IResourceManagerControl rm) {
-		IRemoveResourceManagerEvent event = new RemoveResourceManagerEvent(this, rm);
+		IResourceManagerRemovedEvent event = new RemoveResourceManagerEvent(this, rm);
 		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerChildListener) listener).handleEvent(event);
+			((IResourceManagerListener) listener).handleEvent(event);
 		}
 	}
 
@@ -419,12 +441,8 @@ public class ModelManager implements IModelManager {
 	 * shuts down all of the resource managers.
 	 */
 	private void shutdownResourceManagers() {
-		IResourceManagerControl[] resourceManagers;
-		synchronized (universe) {
-			resourceManagers = universe.getResourceManagerControls();
-		}
-		for (int i = 0; i < resourceManagers.length; ++i) {
-			resourceManagers[i].dispose();
+		for (IResourceManagerControl resourceManager : getResourceManagers()) {
+			resourceManager.dispose();
 		}
 	}
 
@@ -440,9 +458,4 @@ public class ModelManager implements IModelManager {
 			job.schedule();
 		}
 	}
-
-	private void updateResourceManager(IResourceManagerControl rm) {
-		fireChangedResourceManager(Arrays.asList(rm));
-	}
-
 }

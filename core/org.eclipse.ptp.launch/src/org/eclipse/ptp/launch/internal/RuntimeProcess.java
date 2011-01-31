@@ -13,31 +13,32 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
-import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
-import org.eclipse.ptp.core.elements.listeners.IJobListener;
+import org.eclipse.ptp.core.events.IJobChangedEvent;
+import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation;
 
 public class RuntimeProcess implements IProcess, IJobListener {
-	private IPLaunch launch = null;
-	private IPJob job = null;
+	private IPLaunch fLaunch = null;
+	private final IResourceManagerControl fResourceManager;
+	private String fJobId = null;
 	private Map<String, String> fAttributes;
 	private int fExitValue = -1;
 	private boolean fTerminated = false;
 
-	public RuntimeProcess(IPLaunch launch, IPJob job, Map<String, String> attributes) {
-		this.launch = launch;
-		this.job = job;
-		job.addElementListener(this);
+	public RuntimeProcess(IPLaunch launch, IResourceManagerControl rm, String jobId, Map<String, String> attributes) {
+		fLaunch = launch;
+		fResourceManager = rm;
+		fJobId = jobId;
+		rm.addJobListener(this);
 		initializeAttributes(attributes);
-		fTerminated = job.getState() == JobAttributes.State.COMPLETED;
+		fTerminated = rm.getJobStatus(jobId).getState() == JobAttributes.State.COMPLETED;
 		launch.addProcess(this);
 		fireCreationEvent();
 	}
@@ -56,11 +57,11 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	 * IProcess interface
 	 **************************************************************************************************************************************************************************************************/
 	public String getLabel() {
-		return job.getName();
+		return fJobId;
 	}
 
 	public ILaunch getLaunch() {
-		return launch;
+		return fLaunch;
 	}
 
 	public IStreamsProxy getStreamsProxy() {
@@ -98,7 +99,6 @@ public class RuntimeProcess implements IProcess, IJobListener {
 			fTerminated = true;
 		}
 		fExitValue = 0;
-		job.removeElementListener(this);
 		fireTerminateEvent();
 	}
 
@@ -116,8 +116,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	public void terminate() throws DebugException {
 		if (!isTerminated()) {
 			try {
-				IResourceManagerControl rm = job.getResourceManager();
-				rm.control(job, JobControlOperation.TERMINATE, null);
+				fResourceManager.control(fJobId, JobControlOperation.TERMINATE, null);
 			} catch (CoreException e) {
 				throw new DebugException(e.getStatus());
 			}
@@ -139,16 +138,21 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	}
 
 	/***************************************************************************************************************************************************************************************************
-	 * IJobListener interface
+	 * IResourceManagerListener interface
 	 **************************************************************************************************************************************************************************************************/
 
-	public void handleEvent(IJobChangeEvent e) {
-		EnumeratedAttribute<JobAttributes.State> attr = e.getAttributes().getAttribute(JobAttributes.getStateAttributeDefinition());
-		if (attr != null) {
-			JobAttributes.State state = attr.getValue();
-			if (state == State.COMPLETED) {
-				terminated();
-			}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp
+	 * .core.events.IJobChangeEvent)
+	 */
+	public void handleEvent(IJobChangedEvent e) {
+		IResourceManagerControl rm = e.getSource();
+		IJobStatus status = rm.getJobStatus(e.getJobId());
+		if (status.getState() == State.COMPLETED) {
+			terminated();
 		}
 	}
 

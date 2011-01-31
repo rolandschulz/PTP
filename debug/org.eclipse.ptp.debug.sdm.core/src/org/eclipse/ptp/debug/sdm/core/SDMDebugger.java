@@ -141,13 +141,12 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	public synchronized IPDISession createDebugSession(long timeout, final IPLaunch launch, IProgressMonitor monitor)
 			throws CoreException {
-		IPJob job = launch.getPJob();
-		int job_size = getJobSize(job);
+		int jobSize = getJobSize(launch);
 
 		IPDISession session;
 		try {
 			session = new Session(fManagerFactory, fRequestFactory, fEventFactory, fModelFactory, launch.getLaunchConfiguration(),
-					timeout, fPdiDebugger, job.getID(), job_size);
+					timeout, fPdiDebugger, launch.getJobId(), jobSize);
 		} catch (PDIException e) {
 			throw newCoreException(e.getLocalizedMessage());
 		}
@@ -163,7 +162,7 @@ public class SDMDebugger implements IPDebugger {
 			 * servers have started and until the sessions are listening on the
 			 * debugger socket.
 			 */
-			fSdmRunner.setJob(launch.getPJob());
+			fSdmRunner.setJob(launch.getJobId());
 			fSdmRunner.schedule();
 		}
 
@@ -338,14 +337,24 @@ public class SDMDebugger implements IPDebugger {
 	 * Work out the expected number of processes in the job. If it hasn't been
 	 * specified, assume one.
 	 * 
-	 * @param job
+	 * @param launch
 	 *            job that was launched
 	 * @return number of processes
 	 */
-	private int getJobSize(IPJob job) {
-		int nprocs = job.getProcessJobRanks().cardinality();
-		if (nprocs == 0) {
-			nprocs = 1;
+	private int getJobSize(IPLaunch launch) {
+		int nprocs = 1;
+		IResourceManagerControl rmc = launch.getResourceManager();
+		if (rmc != null) {
+			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+			if (rm != null) {
+				IPJob job = rm.getJobById(launch.getJobId());
+				if (job != null) {
+					nprocs = job.getProcessJobRanks().cardinality();
+					if (nprocs == 0) {
+						nprocs = 1;
+					}
+				}
+			}
 		}
 		return nprocs;
 	}
@@ -451,41 +460,44 @@ public class SDMDebugger implements IPDebugger {
 			}
 			progress.subTask(Messages.SDMDebugger_6);
 			PrintWriter pw = new PrintWriter(os);
-			final IPJob pJob = launch.getPJob();
-			BitSet processJobRanks = pJob.getProcessJobRanks();
-			pw.format("%d\n", processJobRanks.cardinality()); //$NON-NLS-1$
-			int base = 50000;
-			int range = 10000;
-			Random random = new Random();
-			for (Integer processIndex : new BitSetIterable(processJobRanks)) {
-				String nodeId = pJob.getProcessNodeId(processIndex);
-				if (nodeId == null) {
-					progress.subTask(Messages.SDMDebugger_10);
-					while (nodeId == null && !progress.isCanceled()) {
-						try {
-							wait(1000);
-						} catch (InterruptedException e) {
-							// ignore
+			final String jobId = launch.getJobId();
+			final IPResourceManager rm = (IPResourceManager) launch.getResourceManager().getAdapter(IPResourceManager.class);
+			if (rm != null) {
+				final IPJob pJob = rm.getJobById(jobId);
+				BitSet processJobRanks = pJob.getProcessJobRanks();
+				pw.format("%d\n", processJobRanks.cardinality()); //$NON-NLS-1$
+				int base = 50000;
+				int range = 10000;
+				Random random = new Random();
+				for (Integer processIndex : new BitSetIterable(processJobRanks)) {
+					String nodeId = pJob.getProcessNodeId(processIndex);
+					if (nodeId == null) {
+						progress.subTask(Messages.SDMDebugger_10);
+						while (nodeId == null && !progress.isCanceled()) {
+							try {
+								wait(1000);
+							} catch (InterruptedException e) {
+								// ignore
+							}
+							nodeId = pJob.getProcessNodeId(processIndex);
+							progress.worked(1);
 						}
-						nodeId = pJob.getProcessNodeId(processIndex);
-						progress.worked(1);
 					}
+					if (progress.isCanceled()) {
+						throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
+					}
+					IPNode node = rm.getNodeById(nodeId);
+					if (node == null) {
+						throw newCoreException(Messages.SDMDebugger_15);
+					}
+					String nodeName = node.getName();
+					int portNumber = base + random.nextInt(range);
+					pw.format("%s %s %d\n", processIndex, nodeName, portNumber); //$NON-NLS-1$
+					progress.setWorkRemaining(60);
+					progress.worked(10);
 				}
-				if (progress.isCanceled()) {
-					throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
-				}
-				IPResourceManager rm = (IPResourceManager) pJob.getParent();
-				IPNode node = rm.getNodeById(nodeId);
-				if (node == null) {
-					throw newCoreException(Messages.SDMDebugger_15);
-				}
-				String nodeName = node.getName();
-				int portNumber = base + random.nextInt(range);
-				pw.format("%s %s %d\n", processIndex, nodeName, portNumber); //$NON-NLS-1$
-				progress.setWorkRemaining(60);
-				progress.worked(10);
+				pw.close();
 			}
-			pw.close();
 			try {
 				os.close();
 			} catch (IOException e) {

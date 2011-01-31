@@ -3,10 +3,12 @@ package org.eclipse.ptp.core.events;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
-public interface IRemoveResourceManagerEvent {
+/**
+ * @since 5.0
+ */
+public interface IResourceManagerRemovedEvent {
 	/**
 	 * @return
-	 * @since 5.0
 	 */
 	public IResourceManagerControl getResourceManager();
 

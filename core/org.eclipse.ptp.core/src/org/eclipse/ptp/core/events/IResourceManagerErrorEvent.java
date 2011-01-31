@@ -14,39 +14,22 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.ptp.internal.core.elements.events;
+package org.eclipse.ptp.core.events;
 
-import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
-public class ResourceManagerErrorEvent implements IResourceManagerErrorEvent {
-
-	private final IPResourceManager rm;
-	private final String message;
-
-	public ResourceManagerErrorEvent(final IPResourceManager rm, final String message) {
-		this.rm = rm;
-		this.message = message;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent#getMessage()
+/**
+ * @since 5.0
+ */
+public interface IResourceManagerErrorEvent {
+	/**
+	 * @return
 	 */
-	public String getMessage() {
-		return message;
-	}
+	public String getMessage();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent#getSource()
+	/**
+	 * @return
+	 * @since 5.0
 	 */
-	public IPResourceManager getSource() {
-		return rm;
-	}
-
+	public IResourceManagerControl getSource();
 }

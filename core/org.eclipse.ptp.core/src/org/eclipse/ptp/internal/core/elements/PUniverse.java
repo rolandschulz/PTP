@@ -28,7 +28,6 @@ import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class PUniverse extends Parent implements IPUniverse {
 	private static final int RMID_SHIFT = 24;
@@ -39,8 +38,6 @@ public class PUniverse extends Parent implements IPUniverse {
 	}
 
 	private int nextResourceManagerId = 1;
-	private final List<IResourceManagerControl> resourceManagersControls = Collections
-			.synchronizedList(new LinkedList<IResourceManagerControl>());
 	private final List<IPResourceManager> resourceManagers = Collections.synchronizedList(new LinkedList<IPResourceManager>());
 	protected String NAME_TAG = "universe "; //$NON-NLS-1$
 
@@ -54,23 +51,22 @@ public class PUniverse extends Parent implements IPUniverse {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPUniverseControl#addResourceManager
-	 * (org.eclipse.ptp.core.elementcontrols.IResourceManagerControl)
+	 * org.eclipse.ptp.core.elements.IPUniverse#addResourceManager(org.eclipse
+	 * .ptp.core.elements.IPResourceManager)
 	 */
-	public void addResourceManager(IResourceManagerControl addedManager) {
-		resourceManagersControls.add(addedManager);
-		resourceManagers.add((IPResourceManager) addedManager.getAdapter(IPResourceManager.class));
+	public void addResourceManager(IPResourceManager addedManager) {
+		resourceManagers.add(addedManager);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPUniverseControl#addResourceManagers
-	 * (org.eclipse.ptp.core.elementcontrols.IResourceManagerControl[])
+	 * org.eclipse.ptp.core.elements.IPUniverse#addResourceManagers(org.eclipse
+	 * .ptp.core.elements.IPResourceManager[])
 	 */
-	public void addResourceManagers(IResourceManagerControl[] addedManagers) {
-		for (IResourceManagerControl rm : addedManagers) {
+	public void addResourceManagers(IPResourceManager[] addedManagers) {
+		for (IPResourceManager rm : addedManagers) {
 			addResourceManager(rm);
 		}
 	}
@@ -99,16 +95,6 @@ public class PUniverse extends Parent implements IPUniverse {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#
-	 * getResourceManagerControls()
-	 */
-	public IResourceManagerControl[] getResourceManagerControls() {
-		return resourceManagersControls.toArray(new IResourceManagerControl[0]);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.core.elements.IPUniverse#getResourceManagers()
 	 */
 	public IPResourceManager[] getResourceManagers() {
@@ -122,8 +108,7 @@ public class PUniverse extends Parent implements IPUniverse {
 	 * org.eclipse.ptp.core.elementcontrols.IPUniverseControl#removeResourceManager
 	 * (org.eclipse.ptp.core.elements.IResourceManagerControl)
 	 */
-	public void removeResourceManager(IResourceManagerControl removedManager) {
-		resourceManagersControls.remove(removedManager);
-		resourceManagers.remove(removedManager.getAdapter(IPResourceManager.class));
+	public void removeResourceManager(IPResourceManager removedManager) {
+		resourceManagers.remove(removedManager);
 	}
 }
