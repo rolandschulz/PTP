@@ -21,6 +21,9 @@
  */
 package org.eclipse.ptp.rmsystem;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -33,14 +36,12 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
 import org.eclipse.ptp.core.elements.attributes.FilterAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
@@ -64,6 +65,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	private final IPUniverse fUniverse;
 	private final AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
 	private final ListenerList fJobListeners = new ListenerList();
+	private final Map<String, IJobStatus> fJobStatus = new HashMap<String, IJobStatus>();
 
 	private IResourceManagerConfiguration fConfig;
 	private ResourceManagerAttributes.State fState;
@@ -201,19 +203,9 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * @since 5.0
 	 */
 	public IJobStatus getJobStatus(String jobId) {
-		final IPJob job = fPResourceManager.getJobById(jobId);
-		if (job != null) {
-			return new IJobStatus() {
-				public AttributeManager getAttributes() {
-					return new AttributeManager(job.getAttributes());
-				}
-
-				public State getState() {
-					return job.getState();
-				}
-			};
+		synchronized (fJobStatus) {
+			return fJobStatus.get(jobId);
 		}
-		return null;
 	}
 
 	/*
@@ -280,7 +272,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 */
 	public void setConfiguration(IResourceManagerConfiguration config) {
 		synchronized (this) {
-			this.fConfig = config;
+			fConfig = config;
 		}
 
 		/*
@@ -390,7 +382,11 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 */
 	public String submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException {
-		return doSubmitJob(configuration, attrMgr, monitor);
+		IJobStatus status = doSubmitJob(configuration, attrMgr, monitor);
+		synchronized (fJobStatus) {
+			fJobStatus.put(status.getJobId(), status);
+		}
+		return status.getJobId();
 	}
 
 	/**
@@ -474,7 +470,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected abstract String doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+	protected abstract IJobStatus doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException;
 
 	/**
