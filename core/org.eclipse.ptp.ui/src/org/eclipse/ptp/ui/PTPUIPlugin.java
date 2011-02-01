@@ -32,7 +32,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
-import org.eclipse.ptp.ui.consoles.ConsoleManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.managers.MachineManager;
 import org.eclipse.ptp.ui.managers.RMManager;
@@ -145,21 +144,11 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations = new HashMap<String, IRuntimeModelPresentation>();
 	private IMachineManager machineManager = null;
 	private IJobManager jobManager = null;
-	private ConsoleManager consoleManager = null;
 	private RMManager rmManager = null;
 
 	public PTPUIPlugin() {
 		super();
 		plugin = this;
-	}
-
-	/**
-	 * Get the console manager instance
-	 * 
-	 * @return console manager
-	 */
-	public ConsoleManager getConsoleManager() {
-		return consoleManager;
 	}
 
 	/**
@@ -243,7 +232,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		retrieveRuntimeModelPresentations();
 		machineManager = new MachineManager();
 		jobManager = new JobManager();
-		consoleManager = new ConsoleManager();
 		rmManager = new RMManager();
 	}
 
@@ -259,11 +247,9 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		super.stop(context);
 		machineManager.shutdown();
 		jobManager.shutdown();
-		consoleManager.shutdown();
 		rmManager.shutdown();
 		machineManager = null;
 		jobManager = null;
-		consoleManager = null;
 		rmManager = null;
 		plugin = null;
 	}
