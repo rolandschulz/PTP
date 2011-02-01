@@ -43,9 +43,9 @@ import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
-import org.eclipse.ptp.internal.core.events.NewResourceManagerEvent;
-import org.eclipse.ptp.internal.core.events.RemoveResourceManagerEvent;
-import org.eclipse.ptp.internal.core.events.ResourceManagerChangeEvent;
+import org.eclipse.ptp.internal.core.events.ResourceManagerAddedEvent;
+import org.eclipse.ptp.internal.core.events.ResourceManagerRemovedEvent;
+import org.eclipse.ptp.internal.core.events.ResourceManagerChangedEvent;
 import org.eclipse.ptp.internal.core.events.ResourceManagerErrorEvent;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
@@ -211,7 +211,7 @@ public class ModelManager implements IModelManager {
 	 * @since 5.0
 	 */
 	public void fireResourceManagerChanged(IResourceManagerControl rm) {
-		IResourceManagerChangedEvent e = new ResourceManagerChangeEvent(rm);
+		IResourceManagerChangedEvent e = new ResourceManagerChangedEvent(rm);
 
 		for (Object listener : resourceManagerListeners.getListeners()) {
 			((IResourceManagerListener) listener).handleEvent(e);
@@ -402,7 +402,7 @@ public class ModelManager implements IModelManager {
 	 * @param rm
 	 */
 	private void fireNewResourceManager(final IResourceManagerControl rm) {
-		IResourceManagerAddedEvent event = new NewResourceManagerEvent(this, rm);
+		IResourceManagerAddedEvent event = new ResourceManagerAddedEvent(this, rm);
 		for (Object listener : resourceManagerListeners.getListeners()) {
 			((IResourceManagerListener) listener).handleEvent(event);
 		}
@@ -414,7 +414,7 @@ public class ModelManager implements IModelManager {
 	 * @param rm
 	 */
 	private void fireRemoveResourceManager(final IResourceManagerControl rm) {
-		IResourceManagerRemovedEvent event = new RemoveResourceManagerEvent(this, rm);
+		IResourceManagerRemovedEvent event = new ResourceManagerRemovedEvent(this, rm);
 		for (Object listener : resourceManagerListeners.getListeners()) {
 			((IResourceManagerListener) listener).handleEvent(event);
 		}

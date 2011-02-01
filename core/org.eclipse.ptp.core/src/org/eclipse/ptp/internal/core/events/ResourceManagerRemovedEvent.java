@@ -20,19 +20,19 @@
 package org.eclipse.ptp.internal.core.events;
 
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
+import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * @author rsqrd
  * 
  */
-public class NewResourceManagerEvent implements IResourceManagerAddedEvent {
+public class ResourceManagerRemovedEvent implements IResourceManagerRemovedEvent {
 
 	private final IModelManager mm;
 	private final IResourceManagerControl rm;
 
-	public NewResourceManagerEvent(IModelManager mm, IResourceManagerControl rm) {
+	public ResourceManagerRemovedEvent(IModelManager mm, IResourceManagerControl rm) {
 		this.mm = mm;
 		this.rm = rm;
 	}
@@ -41,7 +41,8 @@ public class NewResourceManagerEvent implements IResourceManagerAddedEvent {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.events.IResourceManagerAddedEvent#getResourceManager()
+	 * org.eclipse.ptp.core.events.IResourceManagerRemovedEvent#getResourceManager
+	 * ()
 	 */
 	public IResourceManagerControl getResourceManager() {
 		return rm;
@@ -50,7 +51,7 @@ public class NewResourceManagerEvent implements IResourceManagerAddedEvent {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.events.IResourceManagerAddedEvent#getSource()
+	 * @see org.eclipse.ptp.core.events.IResourceManagerRemovedEvent#getSource()
 	 */
 	public IModelManager getSource() {
 		return mm;

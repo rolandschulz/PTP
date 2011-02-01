@@ -52,7 +52,7 @@ import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.ModelManager;
 import org.eclipse.ptp.internal.core.elements.PResourceManager;
-import org.eclipse.ptp.internal.core.events.JobChangeEvent;
+import org.eclipse.ptp.internal.core.events.JobChangedEvent;
 
 /**
  * @author rsqrd
@@ -495,7 +495,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * @since 5.0
 	 */
 	protected void fireJobChanged(String jobId) {
-		IJobChangedEvent e = new JobChangeEvent(this, jobId);
+		IJobChangedEvent e = new JobChangedEvent(this, jobId);
 
 		for (Object listener : fJobListeners.getListeners()) {
 			((IJobListener) listener).handleEvent(e);
