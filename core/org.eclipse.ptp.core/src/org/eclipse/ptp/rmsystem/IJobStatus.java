@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 
@@ -19,6 +21,13 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 public interface IJobStatus {
 
 	/**
+	 * Get the job ID of the job this status is for
+	 * 
+	 * @return job ID
+	 */
+	public String getJobId();
+
+	/**
 	 * Get job attributes
 	 * 
 	 * @return attributes about this job
@@ -26,9 +35,21 @@ public interface IJobStatus {
 	public AttributeManager getAttributes();
 
 	/**
+	 * Get the launch configuration used to launch this job
+	 * 
+	 * @return
+	 */
+	public ILaunchConfiguration getLaunchConfiguration();
+
+	/**
 	 * Get job status
 	 * 
 	 * @return state of the job
 	 */
 	public JobAttributes.State getState();
+
+	/**
+	 * @return
+	 */
+	public IStreamsProxy getStreamsProxy();
 }

@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -31,10 +32,14 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.IStreamListener;
+import org.eclipse.debug.core.model.IStreamMonitor;
+import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.AbstractJobSubmission;
 import org.eclipse.ptp.core.AbstractJobSubmission.JobSubStatus;
@@ -54,6 +59,10 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
+import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
+import org.eclipse.ptp.core.elements.events.INewProcessEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
+import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
@@ -83,6 +92,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
+import org.eclipse.ptp.utils.core.BitSetIterable;
 import org.eclipse.ptp.utils.core.RangeSet;
 import org.eclipse.ui.statushandlers.StatusManager;
 
@@ -92,38 +102,86 @@ import org.eclipse.ui.statushandlers.StatusManager;
  */
 public abstract class AbstractRuntimeResourceManager extends AbstractResourceManager implements IRuntimeEventListener {
 
-	private class JobSubmission extends AbstractJobSubmission {
-		private ILaunchConfiguration configuration;
-		private IPJob job = null;
-		private String reason;
+	private class JobStatus implements IJobStatus {
+		private final IPJob fJob;
+		private final ILaunchConfiguration fConfig;
+		private final IStreamsProxy fProxy;
 
-		public JobSubmission(int count) {
-			super(count);
+		public JobStatus(IPJob job, ILaunchConfiguration config) {
+			fJob = job;
+			fConfig = config;
+			fProxy = new StreamsProxy(fJob);
 		}
 
-		public JobSubmission(String id) {
-			super(id);
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getAttributes()
+		 */
+		public AttributeManager getAttributes() {
+			return new AttributeManager(fJob.getAttributes());
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getJobId()
+		 */
+		public String getJobId() {
+			return fJob.getID();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getLaunchConfiguration()
+		 */
+		public ILaunchConfiguration getLaunchConfiguration() {
+			return fConfig;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getState()
+		 */
+		public JobAttributes.State getState() {
+			return fJob.getState();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getStreamsProxy()
+		 */
+		public IStreamsProxy getStreamsProxy() {
+			return fProxy;
+		}
+
+	}
+
+	private class JobSubmission extends AbstractJobSubmission {
+		private final ILaunchConfiguration fConfiguration;
+		private IJobStatus fJobStatus = null;
+		private String fReason;
+
+		public JobSubmission(int count, ILaunchConfiguration configuration) {
+			super(count);
+			fConfiguration = configuration;
 		}
 
 		/**
 		 * @return the reason for the error
 		 */
 		public String getErrorReason() {
-			return reason;
+			return fReason;
 		}
 
 		/**
-		 * @return the job
+		 * @return the job status
 		 */
-		public IPJob getJob() {
-			return job;
-		}
-
-		/**
-		 * @return the configuration
-		 */
-		public ILaunchConfiguration getLaunchConfiguration() {
-			return configuration;
+		public IJobStatus getJobStatus() {
+			return fJobStatus;
 		}
 
 		/**
@@ -131,20 +189,158 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		 *            the job to set
 		 */
 		public void setJob(IPJob job) {
-			this.job = job;
+			fJobStatus = new JobStatus(job, fConfiguration);
+		}
+	}
+
+	private class StreamMonitor implements IStreamMonitor, IJobChildListener {
+		private final ListenerList fListeners = new ListenerList();
+		private final StringBuffer fContents = new StringBuffer();
+		private final IPJob fJob;
+		private final StringAttributeDefinition fAttrDef;
+		private final boolean fPrefix;
+
+		public StreamMonitor(IPJob job, StringAttributeDefinition attrDef, boolean prefix) {
+			fJob = job;
+			fAttrDef = attrDef;
+			fPrefix = prefix;
+			job.addChildListener(this);
 		}
 
-		/**
-		 * @param configuaration
-		 *            the configuration to set
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.debug.core.model.IStreamMonitor#addListener(org.eclipse
+		 * .debug.core.IStreamListener)
 		 */
-		public void setLaunchConfiguration(ILaunchConfiguration configuration) {
-			this.configuration = configuration;
+		public synchronized void addListener(IStreamListener listener) {
+			fListeners.add(listener);
 		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.debug.core.model.IStreamMonitor#getContents()
+		 */
+		public synchronized String getContents() {
+			return fContents.toString();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
+		 */
+		public void handleEvent(IChangedProcessEvent e) {
+			final boolean hasOutput = e.getAttributes().getAttribute(fAttrDef) != null;
+			if (hasOutput) {
+				final BitSet indices = e.getProcesses();
+				for (Integer index : new BitSetIterable(indices)) {
+					StringAttribute stdout = fJob.getProcessAttribute(fAttrDef, index);
+					if (stdout != null) {
+						String text = ""; //$NON-NLS-1$
+						if (fPrefix) {
+							text = "[" + index + "] "; //$NON-NLS-1$ //$NON-NLS-2$
+						}
+						text += stdout.getValueAsString() + "\n"; //$NON-NLS-1$
+						fContents.append(text);
+						fireStreamAppended(text);
+					}
+				}
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.INewProcessEvent)
+		 */
+		public void handleEvent(INewProcessEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
+		 */
+		public void handleEvent(IRemoveProcessEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.debug.core.model.IStreamMonitor#removeListener(org.eclipse
+		 * .debug.core.IStreamListener)
+		 */
+		public synchronized void removeListener(IStreamListener listener) {
+			fListeners.remove(listener);
+		}
+
+		private void fireStreamAppended(String text) {
+			for (Object listener : fListeners.getListeners()) {
+				((IStreamListener) listener).streamAppended(text, this);
+			}
+		}
+
+	}
+
+	private class StreamsProxy implements IStreamsProxy {
+		private final IStreamMonitor fErrorStreamMonitor;
+		private final IStreamMonitor fOutputStreamMonitor;
+
+		/*
+		 * TODO: obtain prefix flag from launch configuration
+		 */
+		private final boolean fPrefix = false;
+
+		public StreamsProxy(IPJob job) {
+			fErrorStreamMonitor = new StreamMonitor(job, ProcessAttributes.getStderrAttributeDefinition(), fPrefix);
+			fOutputStreamMonitor = new StreamMonitor(job, ProcessAttributes.getStdoutAttributeDefinition(), fPrefix);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.debug.core.model.IStreamsProxy#getErrorStreamMonitor()
+		 */
+		public IStreamMonitor getErrorStreamMonitor() {
+			return fErrorStreamMonitor;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.debug.core.model.IStreamsProxy#getOutputStreamMonitor()
+		 */
+		public IStreamMonitor getOutputStreamMonitor() {
+			return fOutputStreamMonitor;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.debug.core.model.IStreamsProxy#write(java.lang.String)
+		 */
+		public void write(String input) throws IOException {
+			// Not supported yet
+		}
+
 	}
 
 	private final Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
 	private IRuntimeSystem runtimeSystem;
+
 	private volatile int jobSubIdCounter = 0;
 
 	/**
@@ -330,7 +526,6 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 						}
 						if (sub != null) {
 							sub.setJob(job);
-							job.setLaunchConfiguration(sub.getLaunchConfiguration());
 							sub.setStatus(JobSubStatus.SUBMITTED);
 						}
 					}
@@ -773,229 +968,6 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	}
 
 	/**
-	 * 
-	 */
-	protected abstract void doAfterCloseConnection();
-
-	/**
-	 * 
-	 */
-	protected abstract void doAfterOpenConnection();
-
-	/**
-	 * 
-	 */
-	protected abstract void doBeforeCloseConnection();
-
-	/**
-	 * 
-	 */
-	protected abstract void doBeforeOpenConnection();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doCleanUp()
-	 */
-	@Override
-	protected void doCleanUp() {
-		/*
-		 * Cancel any pending job submissions.
-		 */
-		synchronized (jobSubmissions) {
-			for (JobSubmission sub : jobSubmissions.values()) {
-				sub.setStatus(JobSubStatus.CANCELLED);
-			}
-			jobSubmissions.clear();
-		}
-	}
-
-	/**
-	 * create a new runtime system
-	 * 
-	 * @return the new runtime system
-	 * @throws CoreException
-	 *             TODO
-	 */
-	protected abstract IRuntimeSystem doCreateRuntimeSystem() throws CoreException;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDispose()
-	 */
-	@Override
-	protected void doDispose() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doShutdown()
-	 */
-	@Override
-	protected void doShutdown() throws CoreException {
-		doBeforeCloseConnection();
-
-		runtimeSystem.shutdown();
-
-		doAfterCloseConnection();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse
-	 * .core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected void doStartup(IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 100);
-		monitor.subTask(Messages.AbstractRuntimeResourceManager_11);
-
-		runtimeSystem = doCreateRuntimeSystem();
-
-		if (monitor.isCanceled()) {
-			return;
-		}
-
-		monitor.worked(10);
-		monitor.subTask(Messages.AbstractRuntimeResourceManager_5);
-
-		runtimeSystem.addRuntimeEventListener(this);
-
-		try {
-			runtimeSystem.startup(subMon.newChild(90));
-		} catch (CoreException e) {
-			runtimeSystem.removeRuntimeEventListener(this);
-			throw e;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(org.eclipse
-	 * .debug.core.ILaunchConfiguration,
-	 * org.eclipse.ptp.core.attributes.AttributeManager,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected String doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException {
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-
-		IPJob job = null;
-
-		try {
-			JobSubmission sub = new JobSubmission(jobSubIdCounter++);
-			sub.setLaunchConfiguration(configuration);
-			synchronized (jobSubmissions) {
-				jobSubmissions.put(sub.getId(), sub);
-			}
-
-			runtimeSystem.submitJob(sub.getId(), attrMgr);
-
-			JobSubStatus state = sub.waitFor(monitor);
-
-			switch (state) {
-			case CANCELLED:
-				/*
-				 * Once a job has been sent to the RM, it can't be canceled, so
-				 * this will just cause the submitJob command to throw an
-				 * exception. The job will still eventually get created.
-				 */
-				synchronized (jobSubmissions) {
-					jobSubmissions.remove(sub.getId());
-				}
-				throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(),
-						Messages.AbstractRuntimeResourceManager_cancelled));
-
-			case SUBMITTED:
-				job = sub.getJob();
-				break;
-
-			case ERROR:
-				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), sub.getErrorReason()));
-			}
-		} finally {
-			monitor.done();
-		}
-
-		return job.getID();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doControlJob(java.lang
-	 * .String,
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected void doControlJob(String jobId, JobControlOperation operation, IProgressMonitor monitor) throws CoreException {
-		switch (operation) {
-		case SUSPEND:
-		case RESUME:
-		case HOLD:
-		case RELEASE:
-			throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(),
-					Messages.AbstractRuntimeResourceManager_operationNotSupported));
-		case TERMINATE:
-			runtimeSystem.terminateJob(jobId);
-			break;
-		}
-	}
-
-	/**
-	 * @param sJobRank
-	 * @return
-	 * @since 4.0
-	 */
-	protected Integer getProcessJobRank(String sJobRank) {
-		Integer procId;
-		try {
-			procId = Integer.valueOf(sJobRank);
-		} catch (NumberFormatException e) {
-			return null;
-		}
-		return procId;
-	}
-
-	/**
-	 * @param processJobRanks
-	 * @return
-	 * @since 4.0
-	 */
-	protected BitSet getProcessJobRanks(RangeSet processJobRanks) {
-		final BitSet bitSet = new BitSet(processJobRanks.size());
-		for (String sRank : processJobRanks) {
-			Integer rank = getProcessJobRank(sRank);
-			if (rank != null) {
-				bitSet.set(rank);
-			} else {
-				PTPCorePlugin.log(NLS.bind(Messages.AbstractRuntimeResourceManager_12, sRank));
-			}
-		}
-		return bitSet;
-	}
-
-	/**
-	 * @return the runtimeSystem
-	 */
-	protected IRuntimeSystem getRuntimeSystem() {
-		return runtimeSystem;
-	}
-
-	/**
 	 * Update attributes on a collection of processes. If the nodeId attribute
 	 * is specified then the processes will be moved to the new node.
 	 * 
@@ -1040,5 +1012,227 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		job.addProcessAttributes(processJobRanks, attrs);
 
 		return true;
+	}
+
+	/**
+	 * 
+	 */
+	protected abstract void doAfterCloseConnection();
+
+	/**
+	 * 
+	 */
+	protected abstract void doAfterOpenConnection();
+
+	/**
+	 * 
+	 */
+	protected abstract void doBeforeCloseConnection();
+
+	/**
+	 * 
+	 */
+	protected abstract void doBeforeOpenConnection();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doCleanUp()
+	 */
+	@Override
+	protected void doCleanUp() {
+		/*
+		 * Cancel any pending job submissions.
+		 */
+		synchronized (jobSubmissions) {
+			for (JobSubmission sub : jobSubmissions.values()) {
+				sub.setStatus(JobSubStatus.CANCELLED);
+			}
+			jobSubmissions.clear();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doControlJob(java.lang
+	 * .String,
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected void doControlJob(String jobId, JobControlOperation operation, IProgressMonitor monitor) throws CoreException {
+		switch (operation) {
+		case SUSPEND:
+		case RESUME:
+		case HOLD:
+		case RELEASE:
+			throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(),
+					Messages.AbstractRuntimeResourceManager_operationNotSupported));
+		case TERMINATE:
+			runtimeSystem.terminateJob(jobId);
+			break;
+		}
+	}
+
+	/**
+	 * create a new runtime system
+	 * 
+	 * @return the new runtime system
+	 * @throws CoreException
+	 *             TODO
+	 */
+	protected abstract IRuntimeSystem doCreateRuntimeSystem() throws CoreException;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDispose()
+	 */
+	@Override
+	protected void doDispose() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doShutdown()
+	 */
+	@Override
+	protected void doShutdown() throws CoreException {
+		doBeforeCloseConnection();
+
+		runtimeSystem.shutdown();
+
+		doAfterCloseConnection();
+	};
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse
+	 * .core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		monitor.subTask(Messages.AbstractRuntimeResourceManager_11);
+
+		runtimeSystem = doCreateRuntimeSystem();
+
+		if (monitor.isCanceled()) {
+			return;
+		}
+
+		monitor.worked(10);
+		monitor.subTask(Messages.AbstractRuntimeResourceManager_5);
+
+		runtimeSystem.addRuntimeEventListener(this);
+
+		try {
+			runtimeSystem.startup(subMon.newChild(90));
+		} catch (CoreException e) {
+			runtimeSystem.removeRuntimeEventListener(this);
+			throw e;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(org.eclipse
+	 * .debug.core.ILaunchConfiguration,
+	 * org.eclipse.ptp.core.attributes.AttributeManager,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+			throws CoreException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+
+		IJobStatus jobStatus = null;
+
+		try {
+			JobSubmission sub = new JobSubmission(jobSubIdCounter++, configuration);
+			synchronized (jobSubmissions) {
+				jobSubmissions.put(sub.getId(), sub);
+			}
+
+			runtimeSystem.submitJob(sub.getId(), attrMgr);
+
+			JobSubStatus state = sub.waitFor(monitor);
+
+			switch (state) {
+			case CANCELLED:
+				/*
+				 * Once a job has been sent to the RM, it can't be canceled, so
+				 * this will just cause the submitJob command to throw an
+				 * exception. The job will still eventually get created.
+				 */
+				synchronized (jobSubmissions) {
+					jobSubmissions.remove(sub.getId());
+				}
+				throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(),
+						Messages.AbstractRuntimeResourceManager_cancelled));
+
+			case SUBMITTED:
+				jobStatus = sub.getJobStatus();
+				break;
+
+			case ERROR:
+				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), sub.getErrorReason()));
+			}
+		} finally {
+			monitor.done();
+		}
+
+		return jobStatus;
+	}
+
+	/**
+	 * @param sJobRank
+	 * @return
+	 * @since 4.0
+	 */
+	protected Integer getProcessJobRank(String sJobRank) {
+		Integer procId;
+		try {
+			procId = Integer.valueOf(sJobRank);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+		return procId;
+	}
+
+	/**
+	 * @param processJobRanks
+	 * @return
+	 * @since 4.0
+	 */
+	protected BitSet getProcessJobRanks(RangeSet processJobRanks) {
+		final BitSet bitSet = new BitSet(processJobRanks.size());
+		for (String sRank : processJobRanks) {
+			Integer rank = getProcessJobRank(sRank);
+			if (rank != null) {
+				bitSet.set(rank);
+			} else {
+				PTPCorePlugin.log(NLS.bind(Messages.AbstractRuntimeResourceManager_12, sRank));
+			}
+		}
+		return bitSet;
+	}
+
+	/**
+	 * @return the runtimeSystem
+	 */
+	protected IRuntimeSystem getRuntimeSystem() {
+		return runtimeSystem;
 	}
 }
