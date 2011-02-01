@@ -12,19 +12,13 @@
  * 
  */
 
-package org.eclipse.ptp.ui.consoles;
+package org.eclipse.ptp.launch.internal.ui.console;
 
-import java.util.BitSet;
-
-import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
-import org.eclipse.ptp.core.elements.events.INewProcessEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
-import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
-import org.eclipse.ptp.utils.core.BitSetIterable;
+import org.eclipse.debug.core.IStreamListener;
+import org.eclipse.debug.core.model.IStreamMonitor;
+import org.eclipse.debug.core.model.IStreamsProxy;
+import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.console.ConsolePlugin;
@@ -33,7 +27,7 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-public class JobConsole implements IJobChildListener {
+public class JobConsole {
 	/**
 	 * search for console name first, if non-existed, create a new one
 	 * 
@@ -88,11 +82,10 @@ public class JobConsole implements IJobChildListener {
 	private MessageConsole myConsole; // MessageConsole associated with this job
 	private MessageConsoleStream outputStream; // Output stream for the console
 	private MessageConsoleStream errorStream; // Error stream for the console
-	// TODO get this flag from preferences
-	private final boolean prefix = false; // Flag indicating if output should be
-											// prefixed with process index
 
-	public JobConsole(IPJob job) {
+	// TODO get this flag from preferences
+
+	public JobConsole(IResourceManagerControl rm, String jobId) {
 		ConsolePlugin plugin = ConsolePlugin.getDefault();
 		IConsoleManager conMan = plugin.getConsoleManager();
 		boolean haveConsole = false;
@@ -104,7 +97,7 @@ public class JobConsole implements IJobChildListener {
 		// check if this id is already associated with a console
 		// if it is, no new console will be created
 		IConsole[] existing = conMan.getConsoles();
-		String id = getUniqueName(job);
+		String id = getUniqueName(rm, jobId);
 		for (int i = 0; i < existing.length; i++) {
 			if (id.equals(existing[i].getName())) {
 				myConsole = (MessageConsole) existing[i];
@@ -119,89 +112,20 @@ public class JobConsole implements IJobChildListener {
 			errorStream.setColor(red);
 			conMan.addConsoles(new IConsole[] { myConsole });
 		}
-	}
-
-	/**
-	 * Send output from a process to the console. If the prefix flag is true,
-	 * each line of the output will be prefixed by the process index.
-	 * 
-	 * @param index
-	 *            prefix added to each line of output
-	 * @param msg
-	 *            output from process
-	 */
-	synchronized public void cout(String index, String msg, MessageConsoleStream stream) {
-		String output = ""; //$NON-NLS-1$
-
-		if (prefix) {
-			String[] lines = msg.split("\n"); //$NON-NLS-1$
-			for (int i = 0; i < lines.length; i++) {
-				output += "[" + index + "] " + lines[i] + "\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		IJobStatus status = rm.getJobStatus(jobId);
+		IStreamsProxy proxy = status.getStreamsProxy();
+		outputStream.print(proxy.getOutputStreamMonitor().getContents());
+		errorStream.print(proxy.getErrorStreamMonitor().getContents());
+		proxy.getOutputStreamMonitor().addListener(new IStreamListener() {
+			public void streamAppended(String text, IStreamMonitor monitor) {
+				outputStream.print(text);
 			}
-		} else {
-			output = msg;
-		}
-
-		stream.print(output);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
-	 * (org.eclipse.ptp.core.elements.events.INewProcessEvent)
-	 */
-	public void handleEvent(INewProcessEvent e) {
-		// no-op
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
-	 * (org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
-	 */
-	public void handleEvent(IChangedProcessEvent e) {
-		final IPJob job = e.getJob();
-
-		final StringAttributeDefinition stdoutAttributeDefinition = ProcessAttributes.getStdoutAttributeDefinition();
-		final boolean hasStdOut = e.getAttributes().getAttribute(stdoutAttributeDefinition) != null;
-
-		final StringAttributeDefinition stderrAttributeDefinition = ProcessAttributes.getStderrAttributeDefinition();
-		final boolean hasStdErr = e.getAttributes().getAttribute(stderrAttributeDefinition) != null;
-
-		if (!hasStdErr && !hasStdOut) {
-			return;
-		}
-
-		final BitSet indices = e.getProcesses();
-		for (Integer index : new BitSetIterable(indices)) {
-			if (hasStdOut) {
-				StringAttribute stdout = job.getProcessAttribute(stdoutAttributeDefinition, index);
-				if (stdout != null) {
-					cout(index.toString(), stdout.getValueAsString(), outputStream);
-				}
+		});
+		proxy.getErrorStreamMonitor().addListener(new IStreamListener() {
+			public void streamAppended(String text, IStreamMonitor monitor) {
+				errorStream.print(text);
 			}
-			if (hasStdErr) {
-				StringAttribute stderr = job.getProcessAttribute(stderrAttributeDefinition, index);
-				if (stderr != null) {
-					cout(index.toString(), stderr.getValueAsString(), errorStream);
-				}
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
-	 * (org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
-	 */
-	public void handleEvent(IRemoveProcessEvent e) {
-		// no-op
+		});
 	}
 
 	/**
@@ -224,9 +148,8 @@ public class JobConsole implements IJobChildListener {
 	 * @param job
 	 * @return unique name for the job
 	 */
-	private String getUniqueName(IPJob job) {
-		String rmName = job.getResourceManager().getName();
-		String jobName = job.getName();
-		return rmName + ":" + jobName; //$NON-NLS-1$
+	private String getUniqueName(IResourceManagerControl rm, String jobId) {
+		String rmName = rm.getName();
+		return rmName + ":" + jobId; //$NON-NLS-1$
 	}
 }

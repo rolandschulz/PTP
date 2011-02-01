@@ -104,26 +104,17 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * also been reached.
 	 */
 	private class JobSubmission extends Job {
-		private final IResourceManagerControl fResourceManager;
-		private final ILaunchConfiguration fConfiguration;
-		private final String fMode;
 		private final IPLaunch fLaunch;
 		private final AttributeManager fAttrMgr;
 		private final IPDebugger fDebugger;
-		private final String fJobId;
 		private final ReentrantLock fSubLock = new ReentrantLock();
 		private final Condition fSubCondition = fSubLock.newCondition();
 
-		public JobSubmission(IResourceManagerControl rm, ILaunchConfiguration conf, String mode, IPLaunch launch,
-				AttributeManager attrMgr, IPDebugger debugger, String jobId) {
-			super(jobId);
-			fResourceManager = rm;
-			fConfiguration = conf;
-			fMode = mode;
+		public JobSubmission(IPLaunch launch, AttributeManager attrMgr, IPDebugger debugger) {
+			super(launch.getJobId());
 			fLaunch = launch;
 			fAttrMgr = attrMgr;
 			fDebugger = debugger;
-			fJobId = jobId;
 		}
 
 		public void statusChanged() {
@@ -143,9 +134,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 */
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
+			IResourceManagerControl rm = fLaunch.getResourceManager();
+			String jobId = fLaunch.getJobId();
 			fSubLock.lock();
 			try {
-				while (fResourceManager.getJobStatus(fJobId).getState() == JobAttributes.State.STARTING) {
+				while (rm.getJobStatus(jobId).getState() == JobAttributes.State.STARTING) {
 					try {
 						fSubCondition.await(100, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
@@ -156,11 +149,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				fSubLock.unlock();
 			}
 
-			doCompleteJobLaunch(fConfiguration, fMode, fLaunch, fAttrMgr, fDebugger, fResourceManager, fJobId);
+			doCompleteJobLaunch(fLaunch, fAttrMgr, fDebugger);
 
 			fSubLock.lock();
 			try {
-				while (fResourceManager.getJobStatus(fJobId).getState() != JobAttributes.State.COMPLETED) {
+				while (rm.getJobStatus(jobId).getState() != JobAttributes.State.COMPLETED) {
 					try {
 						fSubCondition.await(100, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
@@ -177,7 +170,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			// If needed, copy data back.
 			try {
 				// Get the list of paths to be copied back.
-				doPostLaunchSynchronization(fConfiguration);
+				doPostLaunchSynchronization(fLaunch.getLaunchConfiguration());
 			} catch (CoreException e) {
 				PTPLaunchPlugin.log(e);
 			}
@@ -185,15 +178,15 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			/*
 			 * Clean up any launch activities.
 			 */
-			doCleanupLaunch(fConfiguration, fMode, fLaunch);
+			doCleanupLaunch(fLaunch);
 
 			/*
 			 * Remove job submission
 			 */
 			synchronized (jobSubmissions) {
-				jobSubmissions.remove(fJobId);
+				jobSubmissions.remove(jobId);
 				if (jobSubmissions.size() == 0) {
-					fResourceManager.removeJobListener(fJobListener);
+					rm.removeJobListener(fJobListener);
 				}
 			}
 			return Status.OK_STATUS;
@@ -579,8 +572,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @param config
 	 * @param mode
 	 * @param launch
+	 * @since 5.0
 	 */
-	protected abstract void doCleanupLaunch(ILaunchConfiguration config, String mode, IPLaunch launch);
+	protected abstract void doCleanupLaunch(IPLaunch launch);
 
 	/**
 	 * This method is called when the job state changes to RUNNING. This allows
@@ -595,8 +589,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @param jobId
 	 * @since 5.0
 	 */
-	protected abstract void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch,
-			AttributeManager mgr, IPDebugger debugger, IResourceManagerControl rm, String jobId);
+	protected abstract void doCompleteJobLaunch(IPLaunch launch, AttributeManager mgr, IPDebugger debugger);
 
 	/**
 	 * @param configuration
@@ -952,7 +945,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			}
 			rm.addJobListener(fJobListener);
 			String jobId = rm.submitJob(configuration, attrMgr, progress.newChild(5));
-			JobSubmission jobSub = new JobSubmission(rm, configuration, mode, launch, attrMgr, debugger, jobId);
+			launch.setJobId(jobId);
+			launch.setResourceManager(rm);
+			JobSubmission jobSub = new JobSubmission(launch, attrMgr, debugger);
 			synchronized (jobSubmissions) {
 				jobSubmissions.put(jobId, jobSub);
 			}

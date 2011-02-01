@@ -159,14 +159,13 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
-	 * doCleanupLaunch(org.eclipse.debug.core.ILaunchConfiguration,
-	 * java.lang.String, org.eclipse.ptp.debug.core.launch.IPLaunch)
+	 * doCleanupLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch)
 	 */
 	@Override
-	protected void doCleanupLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch) {
-		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+	protected void doCleanupLaunch(IPLaunch launch) {
+		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
 			try {
-				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
+				IPDebugConfiguration debugConfig = getDebugConfig(launch.getLaunchConfiguration());
 				IPDebugger debugger = debugConfig.getDebugger();
 				debugger.cleanup(launch);
 			} catch (CoreException e) {
@@ -179,22 +178,20 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
-	 * doCompleteJobLaunch(org.eclipse.debug.core.ILaunchConfiguration,
-	 * java.lang.String, org.eclipse.ptp.debug.core.launch.IPLaunch,
+	 * doCompleteJobLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch,
 	 * org.eclipse.ptp.core.attributes.AttributeManager,
-	 * org.eclipse.ptp.debug.core.IPDebugger,
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl, java.lang.String)
+	 * org.eclipse.ptp.debug.core.IPDebugger)
 	 */
 	/**
 	 * @since 5.0
 	 */
 	@Override
-	protected void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, final IPLaunch launch,
-			AttributeManager mgr, final IPDebugger debugger, final IResourceManagerControl rm, final String jobId) {
+	protected void doCompleteJobLaunch(final IPLaunch launch, AttributeManager mgr, final IPDebugger debugger) {
+		final String jobId = launch.getJobId();
+		final IResourceManagerControl rm = launch.getResourceManager();
+		ILaunchConfiguration configuration = launch.getLaunchConfiguration();
 		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), jobId);
-		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-			launch.setResourceManager(rm);
-			launch.setJobId(jobId);
+		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
 			try {
 				setDefaultSourceLocator(launch, configuration);
 				final IProject project = verifyProject(configuration);
