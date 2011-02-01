@@ -21,7 +21,6 @@ package org.eclipse.ptp.core.elements;
 import java.util.BitSet;
 import java.util.Set;
 
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
@@ -65,13 +64,6 @@ public interface IPJob extends IPElement {
 	 * @since 5.0
 	 */
 	public void addProcessesByJobRanks(BitSet jobRanks, AttributeManager attrs);
-
-	/**
-	 * Get the launch configuration that was used to launch this job
-	 * 
-	 * @return launch configuration
-	 */
-	public ILaunchConfiguration getLaunchConfiguration();
 
 	/**
 	 * Retrieve the attribute associated with the given attribute definition for
@@ -256,12 +248,4 @@ public interface IPJob extends IPElement {
 	 * Sets this job to be a debug job
 	 */
 	public void setDebug();
-
-	/**
-	 * Set the launch configuration that was used to launch this job.
-	 * 
-	 * @param configuration
-	 * @since 5.0
-	 */
-	public void setLaunchConfiguration(ILaunchConfiguration configuration);
 }

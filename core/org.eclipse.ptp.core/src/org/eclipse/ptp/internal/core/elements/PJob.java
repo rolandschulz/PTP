@@ -28,7 +28,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
@@ -62,8 +61,6 @@ public class PJob extends Parent implements IPJob {
 	private final ProcessOutput processOutput;
 	private final IResourceManagerControl fResourceManager;
 	private final Map<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>> processAttributesMap = new HashMap<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>>();
-
-	private ILaunchConfiguration configuration;
 
 	public PJob(String id, IResourceManagerControl rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
 		super(id, parent, attrs);
@@ -170,15 +167,6 @@ public class PJob extends Parent implements IPJob {
 		} // end synchronized (this)
 
 		fireNewProcesses(newProcessJobRanks);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.elements.IPJob#getLaunchConfiguration()
-	 */
-	public synchronized ILaunchConfiguration getLaunchConfiguration() {
-		return configuration;
 	}
 
 	/*
@@ -453,17 +441,6 @@ public class PJob extends Parent implements IPJob {
 	public void setDebug() {
 		BooleanAttribute debug = getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 		debug.setValue(true);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPJobControl#setLaunchConfiguration
-	 * (org.eclipse.debug.core.ILaunchConfiguration)
-	 */
-	public synchronized void setLaunchConfiguration(ILaunchConfiguration configuration) {
-		this.configuration = configuration;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
