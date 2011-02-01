@@ -26,12 +26,12 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  * @author grw
  * 
  */
-public class JobChangeEvent implements IJobChangedEvent {
+public class JobChangedEvent implements IJobChangedEvent {
 
 	private final IResourceManagerControl fResourceManager;
 	private final String fJobId;
 
-	public JobChangeEvent(IResourceManagerControl rm, String jobId) {
+	public JobChangedEvent(IResourceManagerControl rm, String jobId) {
 		fResourceManager = rm;
 		fJobId = jobId;
 	}
