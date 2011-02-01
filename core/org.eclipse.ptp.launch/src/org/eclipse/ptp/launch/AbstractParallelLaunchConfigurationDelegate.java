@@ -977,6 +977,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected void verifyDebuggerPath(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		String dbgPath = getDebuggerExePath(configuration);
+		if (dbgPath == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.AbstractParallelLaunchConfigurationDelegate_debuggerPathNotSpecified));
+		}
 		try {
 			verifyResource(dbgPath, configuration, monitor);
 			if (monitor.isCanceled()) {
