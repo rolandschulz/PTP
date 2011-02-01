@@ -201,7 +201,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		}
 
 		setState(ResourceManagerAttributes.State.ERROR);
-		fireError(Messages.AbstractRuntimeResourceManager_6);
+		fireResourceManagerError(Messages.AbstractRuntimeResourceManager_6);
 	}
 
 	/*
@@ -707,7 +707,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			runtimeSystem.startEvents();
 		} catch (CoreException ex) {
 			state = State.ERROR;
-			fireError(ex.getMessage());
+			fireResourceManagerError(ex.getMessage());
 		}
 
 		setState(state);
@@ -734,7 +734,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 */
 	public void handleEvent(IRuntimeStartupErrorEvent e) {
 		setState(ResourceManagerAttributes.State.ERROR);
-		fireError(e.getErrorMessage());
+		fireResourceManagerError(e.getErrorMessage());
 	}
 
 	/*
@@ -769,7 +769,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		if (job != null) {
 			name = job.getName();
 		}
-		fireError(NLS.bind(Messages.AbstractRuntimeResourceManager_4, new Object[] { name, e.getErrorMessage() }));
+		fireResourceManagerError(NLS.bind(Messages.AbstractRuntimeResourceManager_4, new Object[] { name, e.getErrorMessage() }));
 	}
 
 	/**

@@ -478,16 +478,6 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 			throws CoreException;
 
 	/**
-	 * Propagate IResourceManagerErrorEvent to listener
-	 * 
-	 * @param message
-	 */
-	protected void fireError(String message) {
-		ModelManager mm = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
-		mm.fireResourceManagerError(this, message);
-	}
-
-	/**
 	 * Notify listeners when a job has changed.
 	 * 
 	 * @param jobId
@@ -512,6 +502,17 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	protected void fireResourceManagerChanged() {
 		ModelManager mm = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
 		mm.fireResourceManagerChanged(this);
+	}
+
+	/**
+	 * Propagate IResourceManagerErrorEvent to listener
+	 * 
+	 * @param message
+	 * @since 5.0
+	 */
+	protected void fireResourceManagerError(String message) {
+		ModelManager mm = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
+		mm.fireResourceManagerError(this, message);
 	}
 
 	/**
