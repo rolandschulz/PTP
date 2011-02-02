@@ -40,7 +40,6 @@ public class RuntimeProcess implements IProcess, IJobListener {
 		initializeAttributes(attributes);
 		fTerminated = rm.getJobStatus(jobId).getState() == JobAttributes.State.COMPLETED;
 		launch.addProcess(this);
-		// fireCreationEvent();
 	}
 
 	private void initializeAttributes(Map<String, String> attributes) {
@@ -163,10 +162,6 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	/***************************************************************************************************************************************************************************************************
 	 * Debug Event
 	 **************************************************************************************************************************************************************************************************/
-	protected void fireCreationEvent() {
-		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
-	}
-
 	protected void fireEvent(DebugEvent event) {
 		DebugPlugin manager = DebugPlugin.getDefault();
 		if (manager != null) {
