@@ -29,25 +29,6 @@
       </builder>
    </extension>
    <extension
-         id="RemoteGCCStandardMakePerProjectProfile"
-         name="Remote GCC Standard Make Per Project Profile"
-         point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
-      <scannerInfoCollector
-            class="org.eclipse.ptp.rdt.sync.core.make.ProjectDescriptionCollector"
-            scope="project"/>
-      <buildOutputProvider>
-         <open/>
-         <scannerInfoConsoleParser class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser"/>
-      </buildOutputProvider>
-      <scannerInfoProvider providerId="specsFile">
-         <run
-               command="gcc"
-               arguments="-E -P -v -dD ${specs_file_path}"
-               class="org.eclipse.ptp.rdt.sync.core.make.RemoteSpecsRunSIProvider"/>
-         <scannerInfoConsoleParser class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
-      </scannerInfoProvider>
-   </extension>
-   <extension
          id="remoteSyncNature"
          name="%RemoteSyncNature.name"
          point="org.eclipse.core.resources.natures">
