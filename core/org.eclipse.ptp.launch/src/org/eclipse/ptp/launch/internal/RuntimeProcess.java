@@ -40,7 +40,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 		initializeAttributes(attributes);
 		fTerminated = rm.getJobStatus(jobId).getState() == JobAttributes.State.COMPLETED;
 		launch.addProcess(this);
-		fireCreationEvent();
+		// fireCreationEvent();
 	}
 
 	private void initializeAttributes(Map<String, String> attributes) {
@@ -57,7 +57,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	 * IProcess interface
 	 **************************************************************************************************************************************************************************************************/
 	public String getLabel() {
-		return fJobId;
+		return fResourceManager.getName() + ": job_" + fJobId; //$NON-NLS-1$
 	}
 
 	public ILaunch getLaunch() {
@@ -65,6 +65,10 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	}
 
 	public IStreamsProxy getStreamsProxy() {
+		IJobStatus status = fResourceManager.getJobStatus(fJobId);
+		if (status != null) {
+			return status.getStreamsProxy();
+		}
 		return null;
 	}
 

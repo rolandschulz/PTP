@@ -163,8 +163,9 @@ public class PSession implements IPSession, IPDIEventListener {
 					tasks.clear(task_id);
 				}
 			}
-			if (register)
+			if (register) {
 				getPDISession().getTaskManager().setRegisterTasks(true, tasks);
+			}
 			PTPDebugCorePlugin.getDebugModel().addNewDebugTargets(getLaunch(), tasks, targets.toArray(new IPDITarget[0]), refresh,
 					false);
 		}
