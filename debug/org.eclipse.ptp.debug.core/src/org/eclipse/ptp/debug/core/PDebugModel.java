@@ -455,7 +455,8 @@ public class PDebugModel {
 				if (session == null)
 					return Status.CANCEL_STATUS;
 				for (IPDITarget pdiTarget : pdiTargets) {
-					IPDebugTarget target = new PDebugTarget(session, pdiTarget, allowTerminate, allowDisconnect);
+					IPDebugTarget target = new PDebugTarget(session, launch.getProcesses()[0], pdiTarget, allowTerminate,
+							allowDisconnect);
 					if (resumeTarget) {
 						try {
 							session.getPDISession().resume(target.getTasks(), false);

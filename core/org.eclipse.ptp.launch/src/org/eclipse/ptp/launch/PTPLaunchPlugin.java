@@ -45,7 +45,6 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.launch.internal.ui.console.ConsoleManager;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -326,7 +325,6 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		retrieveRMLaunchConfigurationFactories();
-		ConsoleManager.getInstance().start();
 	}
 
 	/**
@@ -335,7 +333,6 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		ConsoleManager.getInstance().stop();
 		rmLaunchConfigurationFactories.clear();
 		plugin = null;
 		resourceBundle = null;

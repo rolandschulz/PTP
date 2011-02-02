@@ -191,6 +191,14 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		final IResourceManagerControl rm = launch.getResourceManager();
 		ILaunchConfiguration configuration = launch.getLaunchConfiguration();
 		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), jobId);
+
+		/*
+		 * Create process that is used by the DebugPlugin for handling console
+		 * output. This process gets added to the debug session so that it is
+		 * also displayed in the Debug View as the system process.
+		 */
+		new RuntimeProcess(launch, rm, jobId, null);
+
 		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
 			try {
 				setDefaultSourceLocator(launch, configuration);
@@ -251,8 +259,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					}
 				});
 			}
-		} else {
-			new RuntimeProcess(launch, rm, jobId, null);
 		}
 	}
 

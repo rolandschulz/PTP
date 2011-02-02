@@ -118,10 +118,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	private final String PROCESS_NAME = Messages.PDebugTarget_0;
 	private ArrayList<IThread> fThreads;
 	private final IPDITarget pdiTarget;
+	private final IProcess fProcess;
 	private Boolean fIsLittleEndian = null;
 
-	public PDebugTarget(IPSession session, IPDITarget pdiTarget, boolean allowTerminate, boolean allowDisconnect) {
+	public PDebugTarget(IPSession session, IProcess process, IPDITarget pdiTarget, boolean allowTerminate, boolean allowDisconnect) {
 		super(session, pdiTarget.getTasks());
+		fProcess = process;
 		this.pdiTarget = pdiTarget;
 		initializePreferences();
 		setThreadList(new ArrayList<IThread>(5));
@@ -441,7 +443,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * @see org.eclipse.debug.core.model.IDebugTarget#getProcess()
 	 */
 	public IProcess getProcess() {
-		return null;
+		return fProcess;
 	}
 
 	/*
