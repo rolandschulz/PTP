@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.cdt.core.CCProjectNature;
@@ -24,21 +24,20 @@ import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * 
@@ -55,24 +54,18 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	public static final String CONNECTION_PROPERTY = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage.connection"; //$NON-NLS-1$
 	public static final String PATH_PROPERTY = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage.path"; //$NON-NLS-1$
 
-	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
-
 	private boolean fbVisited;
 	private String fTitle;
 	private String fDescription;
 	private ImageDescriptor fImageDescriptor;
 	private Image fImage;
-	private IRemoteConnection fSelectedConnection;
 	private ISynchronizeParticipantDescriptor fSelectedProvider;
 
 	private Control pageControl;
-	private Button fBrowseButton;
-	private Button fNewConnectionButton;
 	private Combo fProviderCombo;
-	private Combo fConnectionCombo;
-	private Text fLocationText;
-
-	private final Map<Integer, ISynchronizeParticipantDescriptor> fComboIndexToDescriptorMap = new HashMap<Integer, ISynchronizeParticipantDescriptor>();
+	private Composite fProviderArea;
+	private StackLayout fProviderStack;
+	private final List<Composite> fProviderControls = new ArrayList<Composite>();
 
 	public NewRemoteSyncProjectWizardPage(String pageID) {
 		super(pageID);
@@ -134,7 +127,6 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	public void createControl(final Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		pageControl = comp;
-
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
 		comp.setLayout(layout);
@@ -159,13 +151,20 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 			}
 		});
 
+		fProviderArea = new Group(comp, SWT.SHADOW_ETCHED_IN);
+		fProviderStack = new StackLayout();
+		fProviderArea.setLayout(fProviderStack);
+		GridData providerAreaData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		providerAreaData.horizontalSpan = 3;
+		fProviderArea.setLayoutData(providerAreaData);
+
 		// populate the combo with a list of providers
 		ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
 
 		fProviderCombo.add("Select synchronize provider...", 0); //$NON-NLS-1$
 		for (int k = 0; k < providers.length; k++) {
 			fProviderCombo.add(providers[k].getName(), k + 1);
-			fComboIndexToDescriptorMap.put(k, providers[k]);
+			addProviderControl(providers[k]);
 		}
 
 		fProviderCombo.select(0);
@@ -305,12 +304,24 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 * Handle synchronize provider selected.
 	 */
 	private void handleProviderSelected() {
-		ISynchronizeParticipantDescriptor desc = fComboIndexToDescriptorMap.get(fProviderCombo.getSelectionIndex());
-		if (desc != null) {
-			ISynchronizeParticipant part = desc.getParticipant();
-			if (part != null) {
-
-			}
+		int index = fProviderCombo.getSelectionIndex() - 1;
+		if (index >= 0) {
+			fProviderStack.topControl = fProviderControls.get(index);
+		} else {
+			fProviderStack.topControl = null;
 		}
+		fProviderArea.layout();
+	}
+
+	private void addProviderControl(ISynchronizeParticipantDescriptor desc) {
+		Composite comp = null;
+		ISynchronizeParticipant part = desc.getParticipant();
+		if (part != null) {
+			comp = new Composite(fProviderArea, SWT.NONE);
+			comp.setLayout(new GridLayout(1, false));
+			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			part.createConfigurationArea(comp);
+		}
+		fProviderControls.add(comp);
 	}
 }
