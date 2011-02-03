@@ -23,13 +23,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
+import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
-import org.eclipse.ptp.rdt.sync.ui.serviceproviders.RemoteBuildServiceProvider;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 /**
@@ -47,31 +44,23 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		monitor.beginTask("configure model services", 100); //$NON-NLS-1$
 
-		IWizard wizard = MBSCustomPageManager.getPageData(NewRemoteSyncProjectWizardPage.REMOTE_SYNC_WIZARD_PAGE_ID).getWizardPage()
-				.getWizard();
+		IWizard wizard = MBSCustomPageManager.getPageData(NewRemoteSyncProjectWizardPage.REMOTE_SYNC_WIZARD_PAGE_ID)
+				.getWizardPage().getWizard();
 		IProject project = ((ICDTCommonProjectWizard) wizard).getLastProject();
 
-		IRemoteServices remoteServices = (IRemoteServices) getMBSProperty(NewRemoteSyncProjectWizardPage.SERVICE_PROVIDER_PROPERTY);
-		IRemoteConnection remoteConnection = (IRemoteConnection) getMBSProperty(NewRemoteSyncProjectWizardPage.CONNECTION_PROPERTY);
-		String path = (String) getMBSProperty(NewRemoteSyncProjectWizardPage.PATH_PROPERTY);
+		ISynchronizeParticipant participant = (ISynchronizeParticipant) getMBSProperty(NewRemoteSyncProjectWizardPage.SERVICE_PROVIDER_PROPERTY);
+		if (participant != null) {
+			ServiceModelManager smm = ServiceModelManager.getInstance();
+			IServiceConfiguration config = smm.newServiceConfiguration(getConfigName(project.getName()));
+			IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
+			config.setServiceProvider(syncService, participant.getProvider(project));
+			smm.addConfiguration(project, config);
 
-		ServiceModelManager smm = ServiceModelManager.getInstance();
-		IServiceConfiguration config = smm.newServiceConfiguration(getConfigName(remoteConnection.getName()));
-		IService buildService = smm.getService(IRemoteSyncServiceConstants.SERVICE_BUILD);
-		IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
-		RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
-		if (rbsp != null) {
-			rbsp.setRemoteToolsProviderID(remoteServices.getId());
-			rbsp.setRemoteToolsConnection(remoteConnection);
-			rbsp.setConfigLocation(path);
-			config.setServiceProvider(buildService, rbsp);
-		}
-		smm.addConfiguration(project, config);
-
-		try {
-			smm.saveModelConfiguration();
-		} catch (IOException e) {
-			RDTSyncUIPlugin.log(e.toString(), e);
+			try {
+				smm.saveModelConfiguration();
+			} catch (IOException e) {
+				RDTSyncUIPlugin.log(e.toString(), e);
+			}
 		}
 
 		monitor.done();
