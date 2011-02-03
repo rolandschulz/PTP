@@ -12,13 +12,16 @@
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage;
+import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
@@ -51,8 +54,6 @@ import org.eclipse.swt.widgets.Label;
 public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	public static final String REMOTE_SYNC_WIZARD_PAGE_ID = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage"; //$NON-NLS-1$
 	public static final String SERVICE_PROVIDER_PROPERTY = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage.serviceProvider"; //$NON-NLS-1$
-	public static final String CONNECTION_PROPERTY = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage.connection"; //$NON-NLS-1$
-	public static final String PATH_PROPERTY = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage.path"; //$NON-NLS-1$
 
 	private boolean fbVisited;
 	private String fTitle;
@@ -66,6 +67,7 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	private Composite fProviderArea;
 	private StackLayout fProviderStack;
 	private final List<Composite> fProviderControls = new ArrayList<Composite>();
+	private final Map<Integer, ISynchronizeParticipantDescriptor> fComboIndexToDescriptorMap = new HashMap<Integer, ISynchronizeParticipantDescriptor>();
 
 	public NewRemoteSyncProjectWizardPage(String pageID) {
 		super(pageID);
@@ -105,7 +107,7 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 */
 	@Override
 	protected boolean isCustomPageComplete() {
-		return fbVisited;// && fModelWidget.isConfigured();
+		return fbVisited;
 	}
 
 	/*
@@ -164,6 +166,7 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 		fProviderCombo.add("Select synchronize provider...", 0); //$NON-NLS-1$
 		for (int k = 0; k < providers.length; k++) {
 			fProviderCombo.add(providers[k].getName(), k + 1);
+			fComboIndexToDescriptorMap.put(k, providers[k]);
 			addProviderControl(providers[k]);
 		}
 
@@ -206,7 +209,6 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 * @see org.eclipse.jface.dialogs.IDialogPage#getErrorMessage()
 	 */
 	public String getErrorMessage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -307,10 +309,14 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 		int index = fProviderCombo.getSelectionIndex() - 1;
 		if (index >= 0) {
 			fProviderStack.topControl = fProviderControls.get(index);
+			fSelectedProvider = fComboIndexToDescriptorMap.get(index);
 		} else {
 			fProviderStack.topControl = null;
+			fSelectedProvider = null;
 		}
 		fProviderArea.layout();
+		MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY,
+				fSelectedProvider.getParticipant());
 	}
 
 	private void addProviderControl(ISynchronizeParticipantDescriptor desc) {
@@ -320,7 +326,7 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 			comp = new Composite(fProviderArea, SWT.NONE);
 			comp.setLayout(new GridLayout(1, false));
 			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			part.createConfigurationArea(comp);
+			part.createConfigurationArea(comp, getWizard().getContainer());
 		}
 		fProviderControls.add(comp);
 	}

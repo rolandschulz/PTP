@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -22,6 +25,24 @@ public interface ISynchronizeParticipant {
 	 * Create a control to configure a synchronize provider
 	 * 
 	 * @param parent
+	 *            parent composite that contains the configuration area
 	 */
-	public void createConfigurationArea(final Composite parent);
+	public void createConfigurationArea(Composite parent, IRunnableContext context);
+
+	/**
+	 * Get the configured sync service provider for the supplied project. Only
+	 * valid if {@link isConfigComplete()} is true.
+	 * 
+	 * @param project
+	 *            project that will be synchronized by this provider
+	 * @return configured sync service provider
+	 */
+	public ISyncServiceProvider getProvider(IProject project);
+
+	/**
+	 * Check if the configuration is complete
+	 * 
+	 * @return true if the configuration is complete
+	 */
+	public boolean isConfigComplete();
 }
