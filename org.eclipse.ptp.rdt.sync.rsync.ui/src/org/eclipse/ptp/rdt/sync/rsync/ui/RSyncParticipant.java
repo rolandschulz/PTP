@@ -1,23 +1,26 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Mike Kucera (IBM Corporation) - initial API and implementation
+ *    IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.rsync.ui;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
+import org.eclipse.ptp.rdt.sync.rsync.core.RSyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -27,6 +30,8 @@ import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.services.core.IService;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -47,7 +52,7 @@ import org.eclipse.swt.widgets.Text;
  * buttons. Also has a text field to allow the name of the configuration to be
  * changed.
  */
-public class RsyncParticipant implements ISynchronizeParticipant {
+public class RSyncParticipant implements ISynchronizeParticipant {
 	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
 
 	// private IServiceConfiguration fConfig;
@@ -68,80 +73,16 @@ public class RsyncParticipant implements ISynchronizeParticipant {
 	private Combo fConnectionCombo;
 	private Text fLocationText;
 
-	/**
-	 * Attempt to open a connection.
-	 */
-	private void checkConnection() {
-		IRemoteUIConnectionManager mgr = getUIConnectionManager();
-		if (mgr != null) {
-			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), null, fSelectedConnection);
-		}
-	}
-
-	/**
-	 * @return
-	 */
-	private IRemoteUIConnectionManager getUIConnectionManager() {
-		IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedProvider)
-				.getUIConnectionManager();
-		return connectionManager;
-	}
-
-	/**
-	 * Handle new connection selected
-	 */
-	private void handleConnectionSelected() {
-		int selectionIndex = fConnectionCombo.getSelectionIndex();
-		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
-		fLocationText.setText(getDefaultPathDisplayString());
-	}
-
-	/**
-	 * Handle new remote services selected
-	 */
-	private void handleServicesSelected() {
-		int selectionIndex = fProviderCombo.getSelectionIndex();
-		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
-		populateConnectionCombo(fConnectionCombo);
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
-		handleConnectionSelected();
-	}
-
-	/**
-	 * @param connectionCombo
-	 */
-	private void populateConnectionCombo(final Combo connectionCombo) {
-		connectionCombo.removeAll();
-
-		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
-
-		for (int k = 0; k < connections.length; k++) {
-			connectionCombo.add(connections[k].getName(), k);
-			fComboIndexToRemoteConnectionMap.put(k, connections[k]);
-		}
-
-		connectionCombo.select(0);
-		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(0);
-	}
-
-	/**
-	 * @param button
-	 */
-	private void updateNewConnectionButtonEnabled(Button button) {
-		IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
-		button.setEnabled(connectionManager != null);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#createConfigurationArea
-	 * (org.eclipse.swt.widgets.Composite)
+	 * (org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.jface.operation.IRunnableContext)
 	 */
 	@Override
-	public void createConfigurationArea(Composite parent) {
+	public void createConfigurationArea(Composite parent, IRunnableContext context) {
 		final Composite configArea = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -169,7 +110,7 @@ public class RsyncParticipant implements ISynchronizeParticipant {
 		// IRemoteServices providerSelected = fProvider.getRemoteServices();
 
 		// populate the combo with a list of providers
-		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(null);
+		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(context);
 		int toSelect = 0;
 
 		for (int k = 0; k < providers.length; k++) {
@@ -266,35 +207,45 @@ public class RsyncParticipant implements ISynchronizeParticipant {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 * @see
+	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getProvider(org.eclipse
+	 * .core.resources.IProject)
 	 */
-	// @Override
-	// protected void okPressed() {
-	// RemoteBuildServiceProvider rbsp;
-	// ServiceModelManager smm = ServiceModelManager.getInstance();
-	// IService buildService =
-	// smm.getService(IRemoteSyncServiceConstants.SERVICE_BUILD);
-	// if (fConfig == null) {
-	// fConfig =
-	// smm.newServiceConfiguration(getConfigName(fNameText.getText()));
-	// IServiceProviderDescriptor descriptor =
-	// buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
-	// rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
-	// fConfig.setServiceProvider(buildService, rbsp);
-	// } else {
-	// if (!fConfig.getName().equals(fNameText.getText())) {
-	// fConfig.setName(getConfigName(fNameText.getText()));
-	// }
-	// rbsp = (RemoteBuildServiceProvider)
-	// fConfig.getServiceProvider(buildService);
-	// }
-	// if (rbsp != null) {
-	// rbsp.setRemoteToolsProviderID(fSelectedProvider.getId());
-	// rbsp.setRemoteToolsConnection(fSelectedConnection);
-	// rbsp.setConfigLocation(fLocationText.getText());
-	// }
-	// super.okPressed();
-	// }
+	@Override
+	public ISyncServiceProvider getProvider(IProject project) {
+		ServiceModelManager smm = ServiceModelManager.getInstance();
+		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
+		RSyncServiceProvider provider = (RSyncServiceProvider) smm.getServiceProvider(syncService
+				.getProviderDescriptor(RSyncServiceProvider.ID));
+		provider.setLocation(fLocationText.getText());
+		provider.setRemoteConnection(fSelectedConnection);
+		provider.setRemoteServices(fSelectedProvider);
+		provider.setProject(project);
+		return provider;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#isConfigComplete()
+	 */
+	@Override
+	public boolean isConfigComplete() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * Attempt to open a connection.
+	 */
+	private void checkConnection() {
+		IRemoteUIConnectionManager mgr = getUIConnectionManager();
+		if (mgr != null) {
+			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), null, fSelectedConnection);
+		}
+	}
+
 	/**
 	 * Return the path we are going to display. If it is a file URI then remove
 	 * the file prefix.
@@ -328,26 +279,58 @@ public class RsyncParticipant implements ISynchronizeParticipant {
 	}
 
 	/**
-	 * Creates a name for the service configuration based on the remote
-	 * connection name. If multiple names exist, appends a qualifier to the
-	 * name.
-	 * 
-	 * @return new name guaranteed to be unique
+	 * @return
 	 */
-	private String getConfigName(String candidateName) {
-		// Set<IServiceConfiguration> configs =
-		// ServiceModelManager.getInstance().getConfigurations();
-		Set<String> existingNames = new HashSet<String>();
-		// for (IServiceConfiguration config : configs) {
-		// existingNames.add(config.getName());
-		// }
+	private IRemoteUIConnectionManager getUIConnectionManager() {
+		IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedProvider)
+				.getUIConnectionManager();
+		return connectionManager;
+	}
 
-		int i = 2;
-		String newConfigName = candidateName;
-		while (existingNames.contains(newConfigName)) {
-			newConfigName = candidateName + " (" + (i++) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+	/**
+	 * Handle new connection selected
+	 */
+	private void handleConnectionSelected() {
+		int selectionIndex = fConnectionCombo.getSelectionIndex();
+		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
+		updateNewConnectionButtonEnabled(fNewConnectionButton);
+		fLocationText.setText(getDefaultPathDisplayString());
+	}
+
+	/**
+	 * Handle new remote services selected
+	 */
+	private void handleServicesSelected() {
+		int selectionIndex = fProviderCombo.getSelectionIndex();
+		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
+		populateConnectionCombo(fConnectionCombo);
+		updateNewConnectionButtonEnabled(fNewConnectionButton);
+		handleConnectionSelected();
+	}
+
+	/**
+	 * @param connectionCombo
+	 */
+	private void populateConnectionCombo(final Combo connectionCombo) {
+		connectionCombo.removeAll();
+
+		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
+
+		for (int k = 0; k < connections.length; k++) {
+			connectionCombo.add(connections[k].getName(), k);
+			fComboIndexToRemoteConnectionMap.put(k, connections[k]);
 		}
 
-		return newConfigName;
+		connectionCombo.select(0);
+		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(0);
 	}
+
+	/**
+	 * @param button
+	 */
+	private void updateNewConnectionButtonEnabled(Button button) {
+		IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
+		button.setEnabled(connectionManager != null);
+	}
+
 }

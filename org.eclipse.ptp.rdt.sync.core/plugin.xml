@@ -38,4 +38,11 @@
          </run>
       </runtime>
    </extension>
+   <extension
+         point="org.eclipse.ptp.services.core.services">
+      <service
+            id="org.eclipse.ptp.rdt.sync.core.SyncService"
+            name="%SyncService.name">
+      </service>
+   </extension>
 </plugin>
