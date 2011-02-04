@@ -27,8 +27,12 @@ public interface ISyncServiceProvider extends IServiceProvider {
 	 *            resources requiring synchronization
 	 * @param monitor
 	 *            progress monitor for monitoring or canceling synch
+	 * @param force
+	 *            if true, the synchronization will be guaranteed to happen,
+	 *            otherwise the synchronization may be postponed to a future
+	 *            call
 	 * @throws CoreException
 	 *             if synchronization fails
 	 */
-	public void ensureSync(IResourceDelta delta, IProgressMonitor monitor) throws CoreException;
+	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, boolean force) throws CoreException;
 }
