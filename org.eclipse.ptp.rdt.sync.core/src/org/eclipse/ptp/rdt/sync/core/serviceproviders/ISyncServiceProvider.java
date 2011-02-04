@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core.serviceproviders;
 
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.services.core.IServiceProvider;
 
@@ -21,9 +23,12 @@ public interface ISyncServiceProvider extends IServiceProvider {
 	/**
 	 * Performs synchronization.
 	 * 
+	 * @param delta
+	 *            resources requiring synchronization
 	 * @param monitor
 	 *            progress monitor for monitoring or canceling synch
-	 * @return true if synchronization succeeded, false otherwise
+	 * @throws CoreException
+	 *             if synchronization fails
 	 */
-	public boolean ensureSync(IProgressMonitor monitor);
+	public void ensureSync(IResourceDelta delta, IProgressMonitor monitor) throws CoreException;
 }
