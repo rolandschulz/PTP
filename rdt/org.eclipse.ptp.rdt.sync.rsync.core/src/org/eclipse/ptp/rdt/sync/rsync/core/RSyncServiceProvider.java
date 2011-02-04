@@ -41,10 +41,10 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#
-	 * ensureSync(org.eclipse.core.runtime.IProgressMonitor)
+	 * synchronize(org.eclipse.core.resources.IResourceDelta,
+	 * org.eclipse.core.runtime.IProgressMonitor, boolean)
 	 */
-	@Override
-	public void ensureSync(IResourceDelta delta, IProgressMonitor monitor) throws CoreException {
+	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, boolean force) throws CoreException {
 		switch (delta.getKind()) {
 		case IResourceDelta.ADDED:
 			System.out.println("ensureSync kind=ADDED");
@@ -62,10 +62,10 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			IResource resource = child.getResource();
 			if (resource instanceof IProject) {
 				System.out.println("ensureSync project=" + child.getResource().getName());
-				ensureSync(child, monitor);
+				synchronize(child, monitor, force);
 			} else if (resource instanceof IFolder) {
 				System.out.println("ensureSync folder=" + child.getResource().getName());
-				ensureSync(child, monitor);
+				synchronize(child, monitor, force);
 			} else if (resource instanceof IFile) {
 				System.out.println("ensureSync file=" + child.getResource().getName());
 			}
@@ -135,7 +135,6 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 * 
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#isConfigured()
 	 */
-	@Override
 	public boolean isConfigured() {
 		return getLocation() != null && getRemoteConnection() != null && getProject() != null;
 	}
