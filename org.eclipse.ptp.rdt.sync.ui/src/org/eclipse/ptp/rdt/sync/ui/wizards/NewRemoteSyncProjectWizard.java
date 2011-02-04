@@ -55,7 +55,7 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 		try {
 			CProjectNature.addCNature(prj, new NullProgressMonitor());
 			CCProjectNature.addCCNature(prj, new NullProgressMonitor());
-			RemoteSyncNature.addRemoteNature(prj, new NullProgressMonitor());
+			RemoteSyncNature.addNature(prj, new NullProgressMonitor());
 		} catch (CoreException e) {
 		}
 		return prj;
@@ -68,7 +68,7 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	 */
 	@Override
 	public String[] getNatures() {
-		return new String[] { CProjectNature.C_NATURE_ID, CCProjectNature.CC_NATURE_ID, RemoteSyncNature.REMOTE_NATURE_ID };
+		return new String[] { CProjectNature.C_NATURE_ID, CCProjectNature.CC_NATURE_ID, RemoteSyncNature.NATURE_ID };
 	}
 
 	/*

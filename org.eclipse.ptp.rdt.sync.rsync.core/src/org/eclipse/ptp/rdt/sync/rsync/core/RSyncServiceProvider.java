@@ -10,8 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.rsync.core;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -23,11 +28,12 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	public static final String ID = "org.eclipse.ptp.rdt.sync.rsync.core.RSyncServiceProvider"; //$NON-NLS-1$
 
 	private static final String RSYNC_LOCATION = "location"; //$NON-NLS-1$
+
 	private static final String RSYNC_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String RSYNC_SERVICES_ID = "servicesId"; //$NON-NLS-1$
 	private static final String RSYNC_PROJECT_NAME = "projectName"; //$NON-NLS-1$
-
 	private IProject fProject = null;
+
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
 
@@ -38,8 +44,32 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 * ensureSync(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public boolean ensureSync(IProgressMonitor monitor) {
-		return false;
+	public void ensureSync(IResourceDelta delta, IProgressMonitor monitor) throws CoreException {
+		switch (delta.getKind()) {
+		case IResourceDelta.ADDED:
+			System.out.println("ensureSync kind=ADDED");
+			break;
+		case IResourceDelta.REMOVED:
+			System.out.println("ensureSync kind=REMOVED");
+			break;
+		case IResourceDelta.CHANGED:
+			System.out.println("ensureSync kind=CHANGED");
+			break;
+		default:
+			System.out.println("ensureSync kind=OTHER");
+		}
+		for (IResourceDelta child : delta.getAffectedChildren()) {
+			IResource resource = child.getResource();
+			if (resource instanceof IProject) {
+				System.out.println("ensureSync project=" + child.getResource().getName());
+				ensureSync(child, monitor);
+			} else if (resource instanceof IFolder) {
+				System.out.println("ensureSync folder=" + child.getResource().getName());
+				ensureSync(child, monitor);
+			} else if (resource instanceof IFile) {
+				System.out.println("ensureSync file=" + child.getResource().getName());
+			}
+		}
 	}
 
 	/**
@@ -107,7 +137,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 */
 	@Override
 	public boolean isConfigured() {
-		return getLocation() != null && getRemoteConnection() != null;
+		return getLocation() != null && getRemoteConnection() != null && getProject() != null;
 	}
 
 	/**
@@ -152,4 +182,5 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	public void setRemoteServices(IRemoteServices services) {
 		putString(RSYNC_SERVICES_ID, services.getId());
 	}
+
 }
