@@ -110,6 +110,8 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.ui,org.eclipse.ptp.rdt.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.core,org.eclipse.ptp.rdt.sync.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.ui,org.eclipse.ptp.rdt.sync.ui"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.rsync.core,org.eclipse.ptp.rdt.sync.rsync.core"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.rsync.ui,org.eclipse.ptp.rdt.sync.rsync.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.core,org.eclipse.ptp.rm.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.generic.core,org.eclipse.ptp.rm.generic.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.generic.ui,org.eclipse.ptp.rm.generic.ui"/>
