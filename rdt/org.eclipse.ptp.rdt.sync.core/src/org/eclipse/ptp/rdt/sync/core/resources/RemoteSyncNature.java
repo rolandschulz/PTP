@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,18 +19,36 @@ import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 
 /**
  * Project nature for remote projects.
- * 
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
- * of a work in progress. There is no guarantee that this API will work or that
- * it will remain the same. Please do not use this API without consulting with
- * the RDT team.
- * 
- * @author crecoskie
- * 
  */
 public class RemoteSyncNature implements IProjectNature {
 
-	public static final String REMOTE_NATURE_ID = "org.eclipse.ptp.rdt.sync.core.remoteSyncNature"; //$NON-NLS-1$
+	public static final String NATURE_ID = "org.eclipse.ptp.rdt.sync.core.remoteSyncNature"; //$NON-NLS-1$
+
+	/**
+	 * Add the nature to a project
+	 * 
+	 * @param prj
+	 * @param monitor
+	 * @throws CoreException
+	 */
+	public static void addNature(IProject prj, IProgressMonitor monitor) throws CoreException {
+		CProjectNature.addNature(prj, RemoteSyncNature.NATURE_ID, monitor);
+	}
+
+	/**
+	 * Returns true if the given project has the remote nature.
+	 * 
+	 * @throws NullPointerException
+	 *             if project is null
+	 */
+	public static boolean hasNature(IProject project) {
+		try {
+			return project.hasNature(NATURE_ID);
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(e);
+			return false;
+		}
+	}
 
 	private IProject fProject;
 
@@ -72,25 +90,6 @@ public class RemoteSyncNature implements IProjectNature {
 	 */
 	public void setProject(IProject project) {
 		fProject = project;
-	}
-
-	public static void addRemoteNature(IProject prj, IProgressMonitor monitor) throws CoreException {
-		CProjectNature.addNature(prj, RemoteSyncNature.REMOTE_NATURE_ID, monitor);
-	}
-
-	/**
-	 * Returns true if the given project has the remote nature.
-	 * 
-	 * @throws NullPointerException
-	 *             if project is null
-	 */
-	public static boolean hasRemoteNature(IProject project) {
-		try {
-			return project.hasNature(REMOTE_NATURE_ID);
-		} catch (CoreException e) {
-			RDTSyncCorePlugin.log(e);
-			return false;
-		}
 	}
 
 }

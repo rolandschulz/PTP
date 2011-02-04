@@ -30,8 +30,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTHelpContextIds;
-import org.eclipse.ptp.rdt.sync.core.make.RemoteMakeBuilder;
-import org.eclipse.ptp.rdt.sync.core.resources.RemoteMakeNature;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
@@ -170,8 +168,7 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 	protected void convertProject(IProject project, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.WizardProjectConversion_monitor_convertingToRemoteProject, 3);
 		try {
-			RemoteSyncNature.addRemoteNature(project, new SubProgressMonitor(monitor, 1));
-			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.BUILDER_ID, monitor);
+			RemoteSyncNature.addNature(project, new SubProgressMonitor(monitor, 1));
 			configureServicesForRemoteProject(project);
 		} finally {
 			monitor.done();

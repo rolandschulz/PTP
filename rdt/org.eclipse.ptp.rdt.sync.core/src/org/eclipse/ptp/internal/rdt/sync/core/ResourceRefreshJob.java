@@ -8,7 +8,7 @@
  * Contributors:
  * IBM - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.rdt.sync.core.make;
+package org.eclipse.ptp.internal.rdt.sync.core;
 
 import java.util.List;
 
