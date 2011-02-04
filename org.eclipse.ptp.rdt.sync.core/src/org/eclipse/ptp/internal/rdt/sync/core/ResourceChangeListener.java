@@ -64,7 +64,7 @@ public class ResourceChangeListener {
 		protected IStatus run(IProgressMonitor monitor) {
 			monitor.beginTask(Messages.ResourceChangeListener_jobName, 1);
 			try {
-				fSyncProvider.ensureSync(fDelta, monitor);
+				fSyncProvider.synchronize(fDelta, monitor, false);
 			} catch (CoreException e) {
 				System.out.println("sync failed: " + e.getLocalizedMessage()); //$NON-NLS-1$
 			} finally {
