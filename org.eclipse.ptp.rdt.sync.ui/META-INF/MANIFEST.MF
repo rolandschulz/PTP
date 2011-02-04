@@ -32,7 +32,6 @@ Export-Package: org.eclipse.ptp.rdt.sync.ui,
  org.eclipse.ptp.rdt.sync.ui.messages,
  org.eclipse.ptp.rdt.sync.ui.preferences,
  org.eclipse.ptp.rdt.sync.ui.properties,
- org.eclipse.ptp.rdt.sync.ui.serviceproviders,
  org.eclipse.ptp.rdt.sync.ui.wizards
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin

@@ -21,6 +21,7 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.rsync.core.RSyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.rsync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -59,7 +60,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	private IRemoteConnection fSelectedConnection;
 	private IRemoteServices fSelectedProvider;
 	// private final IRunnableContext fContext;
-	private final String fProjectName = "";
+	private final String fProjectName = ""; //$NON-NLS-1$
 
 	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
 	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
@@ -81,7 +82,6 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	 * (org.eclipse.swt.widgets.Composite,
 	 * org.eclipse.jface.operation.IRunnableContext)
 	 */
-	@Override
 	public void createConfigurationArea(Composite parent, IRunnableContext context) {
 		final Composite configArea = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -92,7 +92,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 
 		// Label for "Provider:"
 		Label providerLabel = new Label(configArea, SWT.LEFT);
-		providerLabel.setText("Remote Provider:"); //$NON-NLS-1$
+		providerLabel.setText(Messages.RSyncParticipant_remoteProvider);
 
 		// combo for providers
 		fProviderCombo = new Combo(configArea, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -126,7 +126,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 		// connection combo
 		// Label for "Connection:"
 		Label connectionLabel = new Label(configArea, SWT.LEFT);
-		connectionLabel.setText("Connection:"); //$NON-NLS-1$
+		connectionLabel.setText(Messages.RSyncParticipant_connection);
 
 		// combo for providers
 		fConnectionCombo = new Combo(configArea, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -144,7 +144,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 
 		// new connection button
 		fNewConnectionButton = new Button(configArea, SWT.PUSH);
-		fNewConnectionButton.setText("New..."); //$NON-NLS-1$
+		fNewConnectionButton.setText(Messages.RSyncParticipant_new);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -159,7 +159,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 		});
 
 		Label locationLabel = new Label(configArea, SWT.LEFT);
-		locationLabel.setText("Location:"); //$NON-NLS-1$
+		locationLabel.setText(Messages.RSyncParticipant_location);
 
 		fLocationText = new Text(configArea, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -168,7 +168,6 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 		gd.widthHint = 250;
 		fLocationText.setLayoutData(gd);
 		fLocationText.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,
 				// PATH_PROPERTY, fLocationText.getText());
@@ -177,7 +176,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 
 		// new connection button
 		fBrowseButton = new Button(configArea, SWT.PUSH);
-		fBrowseButton.setText("Browse..."); //$NON-NLS-1$
+		fBrowseButton.setText(Messages.RSyncParticipant_browse);
 		fBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -211,7 +210,6 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getProvider(org.eclipse
 	 * .core.resources.IProject)
 	 */
-	@Override
 	public ISyncServiceProvider getProvider(IProject project) {
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
@@ -230,7 +228,6 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	 * @see
 	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#isConfigComplete()
 	 */
-	@Override
 	public boolean isConfigComplete() {
 		// TODO Auto-generated method stub
 		return false;
