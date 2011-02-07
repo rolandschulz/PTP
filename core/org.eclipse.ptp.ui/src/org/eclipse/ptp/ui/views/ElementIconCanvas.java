@@ -42,24 +42,43 @@ import org.eclipse.swt.widgets.Event;
  */
 public class ElementIconCanvas extends IconCanvas implements ISelectionProvider {
 	private IElementSet cur_element_set = null;
-	private ListenerList listeners = new ListenerList();
-	private ISelection selection = null; 
+	private final ListenerList listeners = new ListenerList();
+	private ISelection selection = null;
 
-	/** Constructor
-	 * @param view 
+	/**
+	 * Constructor
+	 * 
+	 * @param view
 	 * @param parent
-	 * @param style view style
+	 * @param style
+	 *            view style
 	 */
 	public ElementIconCanvas(AbstractParallelElementView view, Composite parent, int style) {
 		super(parent, style);
 		IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
 		setIconSpace(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X), store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
 		setIconSize(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH), store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
-		setTooltip(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME), store.getLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT), store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP));
+		setTooltip(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME), store.getLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT),
+				store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP));
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener
+	 * (org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+		listeners.add(listener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.swt.widgets.Widget#dispose()
 	 */
+	@Override
 	public void dispose() {
 		listeners.clear();
 		selection = null;
@@ -67,43 +86,37 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 		super.dispose();
 	}
 
-    public void addSelectionChangedListener(ISelectionChangedListener listener) {
-   		listeners.add(listener);
-    }
-    public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-   		listeners.remove(listener);
-    }	
-	/** Change set
-	 * @param e_set
-	 */
-	public void setElementSet(IElementSet e_set) {
-		this.cur_element_set = e_set;
-		this.selection = null;
-		getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				setTotal(cur_element_set == null ? 0 : cur_element_set.size());
-			}
-		});
-	}
-	/** Get current set
+	/**
+	 * Get current set
+	 * 
 	 * @return current set
 	 */
 	public IElementSet getCurrentElementSet() {
 		return cur_element_set;
 	}
-	/** Get element
-	 * @param index Element index
+
+	/**
+	 * Get element
+	 * 
+	 * @param index
+	 *            Element index
 	 * @return element
 	 */
 	public IElement getElement(int index) {
 		if (cur_element_set == null)
 			return null;
 		IElement element = cur_element_set.getElement(index);
-		element.setSelected(selectedElements.get(index));
+		if (element != null) {
+			element.setSelected(selectedElements.get(index));
+		}
 		return element;
 	}
-	/** Get elements
-	 * @param indexes Element indexes
+
+	/**
+	 * Get elements
+	 * 
+	 * @param indexes
+	 *            Element indexes
 	 * @return elements
 	 */
 	public IElement[] getElements(int[] indexes) {
@@ -115,9 +128,12 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 			element.setSelected(selectedElements.get(index));
 			elements.add(element);
 		}
-		return (IElement[]) elements.toArray(new IElement[0]);
+		return elements.toArray(new IElement[0]);
 	}
-	/** Get selected elements
+
+	/**
+	 * Get selected elements
+	 * 
 	 * @return selected elements
 	 */
 	public IElement[] getSelectedElements() {
@@ -129,43 +145,77 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 		}
 		return elements;
 	}
-	
-    public ISelection getSelection() {
-    	if (selection == null) {
-    		return StructuredSelection.EMPTY;
-    	}
-    	return selection;
-    }
-    public void setSelection(ISelection selection) {
-    	this.selection = selection;
-        final SelectionChangedEvent e = new SelectionChangedEvent(ElementIconCanvas.this, selection);
-        Object[] array = listeners.getListeners();
-        for (int i = 0; i < array.length; i++) {
-            final ISelectionChangedListener l = (ISelectionChangedListener) array[i];
-            SafeRunnable.run(new SafeRunnable() {
-                public void run() {
-                    l.selectionChanged(e);
-                }
-            });
-        }
-    }
-    public void setCurrentSelection(boolean sendEvent, IElement[] elements) {
-    	selection = new StructuredSelection(elements);
-    	if (sendEvent) {
-    		setSelection(selection);
-    	}
-    }
-    public void setCurrentSelection(boolean sendEvent) {
-    	setCurrentSelection(sendEvent, getSelectedElements());
-    }
-	protected void handleMouseUp(Event event) {
-		super.handleMouseUp(event);
-		setSelection(new StructuredSelection(getSelectedElements()));
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+	 */
+	public ISelection getSelection() {
+		if (selection == null) {
+			return StructuredSelection.EMPTY;
+		}
+		return selection;
 	}
-	protected void doSelectionAll() {
-		super.doSelectionAll();
-		setSelection(new StructuredSelection(getSelectedElements()));
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener
+	 * (org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+		listeners.remove(listener);
 	}
+
+	/**
+	 * @param sendEvent
+	 */
+	public void setCurrentSelection(boolean sendEvent) {
+		setCurrentSelection(sendEvent, getSelectedElements());
+	}
+
+	/**
+	 * Change set
+	 * 
+	 * @param e_set
+	 */
+	public void setElementSet(IElementSet e_set) {
+		this.cur_element_set = e_set;
+		this.selection = null;
+		getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				setTotal(cur_element_set == null ? 0 : cur_element_set.size());
+			}
+		});
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse
+	 * .jface.viewers.ISelection)
+	 */
+	public void setSelection(ISelection selection) {
+		this.selection = selection;
+		final SelectionChangedEvent e = new SelectionChangedEvent(ElementIconCanvas.this, selection);
+		Object[] array = listeners.getListeners();
+		for (int i = 0; i < array.length; i++) {
+			final ISelectionChangedListener l = (ISelectionChangedListener) array[i];
+			SafeRunnable.run(new SafeRunnable() {
+				public void run() {
+					l.selectionChanged(e);
+				}
+			});
+		}
+	}
+
+	/**
+	 * @param obj
+	 * @param content
+	 */
 	public void updateToolTipText(Object obj, final String content) {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
@@ -175,5 +225,36 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 				}
 			}
 		});
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.views.IconCanvas#doSelectionAll()
+	 */
+	@Override
+	protected void doSelectionAll() {
+		super.doSelectionAll();
+		setSelection(new StructuredSelection(getSelectedElements()));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.views.IconCanvas#handleMouseUp(org.eclipse.swt.widgets
+	 * .Event)
+	 */
+	@Override
+	protected void handleMouseUp(Event event) {
+		super.handleMouseUp(event);
+		setSelection(new StructuredSelection(getSelectedElements()));
+	}
+
+	protected void setCurrentSelection(boolean sendEvent, IElement[] elements) {
+		selection = new StructuredSelection(elements);
+		if (sendEvent) {
+			setSelection(selection);
+		}
 	}
 }
