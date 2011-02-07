@@ -6,7 +6,7 @@
        		<link label="Parallel Language Development Tools" 
        		url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.eclipse.ptp.pldt.help/html/whatsnew.html" 
        		id="orgeclipseptppldtwelcome-introLink" style-id="content-link">
-          		<text>Find out the new features in PLDT 3.0.</text>
+          		<text>Find out the new features in PLDT to help with coding and analysis of Parallel Applications.</text>
        		</link>
        	</group>
   	</extensionContent>
