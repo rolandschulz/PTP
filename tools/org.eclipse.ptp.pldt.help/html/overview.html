@@ -8,7 +8,7 @@ PTP Parallel Language Development Tools
 	</head>
 <body>
 <h1 id="top"> <img src="images/analyze.gif"> PTP Parallel Language Development Tools </h1>
-<p>Release 4.0
+<p>Release 5.0
 <p>The PTP Parallel Language Development Tools (PLDT) provide
 tools to aid in MPI, OpenMP, UPC Programming and other parallel languages and tools.
 PLDT is part of the <a href="PLUGINS_ROOT/org.eclipse.ptp.help/html/toc.html">Parallel Tools Platform</a>.
@@ -20,12 +20,14 @@ PLDT is part of the <a href="PLUGINS_ROOT/org.eclipse.ptp.help/html/toc.html">Pa
 <li>OpenMP
 <li>LAPI
 <li>UPC
+<li> ... and others as provided by optional extensions.
 </ul>
 <li>"Artifact View" indicates locations of Artifacts found
 in source code
 <li>Navigation to source code location of artifacts
 <li>Content assist via Cntl-Space completes API names
-while typing, and fills in arguments too.
+while typing, and instructs the user on argument types too. 
+<li>Code templates provide convenient code snippets and idioms.
 <li>Hover help shows API names, arguments, and descriptions.
 <li>Reference information about APIs via F1 (Cntl-F1 on Linux; Help key on Mac)
 <li>MPI Barrier Analysis detects potential deadlocks in MPI applications,
@@ -47,16 +49,16 @@ and set up the projects to save time.
 <br>&nbsp;
 
 </ul>
-See also <a href="whatsnew.html">New and Noteworthy </a> - what's new in PLDT 4.0
+See also <a href="whatsnew.html">New and Noteworthy </a> - what's new in this release of PLDT.
 <h2>
 Pre-requisites:
 </h2>
-<p>PLDT 4.0 requires the base Eclipse platform, the CDT, and MPI and/or OpenMP.
+<p>PLDT requires the base Eclipse platform, the CDT, and (usually) header files for the API set you wish to use (MPI, OpenMP, etc.) 
 <ul>
-<li><b>Eclipse</b> platform: Version  3.6 (Helios)  
+<li><b>Eclipse</b> platform: Version  3.7 (Indigo)  
 <li><b>CDT:</b>
-Version 7.0 or later for C/C++ files.  (Wherever CDT is mentioned, Photran projects and files,
-for C/C++, if based on Eclipse 3.6/CDT 7.0 or later, should also work, but not much testing has yet been done.)
+Version 8.0 or later for C/C++ files.  (Wherever CDT is mentioned, Photran projects and files,
+for C/C++, if based on Eclipse 3.7/CDT 8.0 or later, should also work, but not much testing has yet been done.)
 
 <li><b>MPI:</b>
 Get MPI and its header file, a version that runs on
@@ -81,8 +83,8 @@ Just the header files are required (in some cases these are now optional) in ord
 be located.
 <p>To run the core part of PTP (Parallel Tools Platform, <a href="http://eclipse.org/ptp">http://eclipse.org/ptp</a>,
 to run and debug parallel programs on the local machine), you need whatever runtime it requires.  Currently 
-(4.0, June 2010) this includes OpenMPI, which is available for Linux and Mac Only, but via PTP Remote Tools and/or RDT (Remote Development Tools),
-other  systems can be accessed remotely, and don't need to be installed on the same machine where Eclipse is installed.
+this includes OpenMPI, which is available for Linux and Mac Only, but via PTP Remote Tools and/or RDT (Remote Development Tools),
+other systems can be accessed remotely, and don't need to be installed on the same machine where Eclipse is installed.
 <p>For PLDT, a runtime system is not required, and PLDT will work (e.g. for development and analysis only) on Windows as well.
 
 <h2>Miscellaneous Topics</h2>
