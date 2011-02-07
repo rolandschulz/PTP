@@ -98,19 +98,13 @@ public class RemoteScript implements IRemoteScript {
 
 		StringBuffer sb = new StringBuffer();
 
-		if (environment.size() > 0) {
-			sb.append("export "); //$NON-NLS-1$
-		}
 		for (String env : environment) {
-			sb.append("\"" + env + "\" "); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("export \"" + env + "\"; "); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		if (environment.size() > 0) {
-			sb.append("; "); //$NON-NLS-1$
-		}
+
 		for (int i = 0; i < script.length; i++) {
 			sb.append(script[i] + "; "); //$NON-NLS-1$
 		}
-
 		return sb.toString();
 	}
 
