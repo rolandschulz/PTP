@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ptp.package"
+      label="%featureName"
+      version="5.0.0.qualifier"
+      provider-name="%providerName"
+      image="eclipse_update_120.jpg">
+
+   <description url="http://eclipse.org/ptp">
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
+   </url>
+
+   <includes
+         id="org.eclipse.ptp.core"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.debug.sdm"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.etfw"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.external"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.pldt"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.remote"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.remote.remotetools"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.remotetools"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.ibm.ll"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.ibm.pe"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.mpich2"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.openmpi"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.pbs"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.slurm"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.services"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.utils"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.pldt.lapi"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ptp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

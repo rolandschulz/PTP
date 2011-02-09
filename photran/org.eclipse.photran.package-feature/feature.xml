@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.photran.package"
+      label="%featureName"
+      version="5.0.0.qualifier"
+      provider-name="%providerName"
+      image="eclipse_update_120.jpg">
+
+   <description url="http://eclipse.org/ptp">
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
+   </url>
+
+   <includes
+         id="org.eclipse.photran"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.photran.intel"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.photran.xlf"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.rephraserengine"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ptp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
