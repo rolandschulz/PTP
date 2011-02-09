@@ -19,7 +19,7 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/helios"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
    </url>
 
    <requires>

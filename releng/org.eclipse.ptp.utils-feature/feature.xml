@@ -19,7 +19,7 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/helios"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
    </url>
 
    <requires>
@@ -40,15 +40,15 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-    
-    <plugin
+
+   <plugin
          id="org.eclipse.ptp.utils.file.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-    
-    <plugin
+
+   <plugin
          id="org.eclipse.ptp.utils.extensionpoints.core"
          download-size="0"
          install-size="0"
