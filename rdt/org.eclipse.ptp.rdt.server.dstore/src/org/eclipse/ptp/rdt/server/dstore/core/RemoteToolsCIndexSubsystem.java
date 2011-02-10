@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -346,7 +346,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 */
 	public ICElement[] findTypeHierarchyInput(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength) {
 		String path = EFSExtensionManager.getDefault().getPathFromURI(unit.getLocationURI());
-		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT2, new Object[] { scope, getHostName(), unit,
+		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT2, new Object[] { scope, getHostName(), unit, path,
 				new Integer(selectionStart), new Integer(selectionLength) }, null);
 		if (result == null) {
 			return new ICElement[] { null, null };
