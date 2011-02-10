@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -306,11 +306,6 @@ public class OpenIncludeAction extends
 	 */
 	private URI replacePath(URI u, String path) {
 		try {
-			if (u.getHost() != null)
-				return new URI(u.getScheme(), u.getUserInfo(), u.getHost(), u.getPort(),
-				               path, // replaced! 
-				               u.getQuery(),u.getFragment());
-			
 			//Bug 332798: handle remote tools connection
 			return new URI(u.getScheme(), u.getAuthority(),
 							path, //replaced!
