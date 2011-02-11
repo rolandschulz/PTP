@@ -12,8 +12,8 @@ package org.eclipse.ptp.pldt.lapi.prefs;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.pldt.lapi.LapiIDs;
-import org.eclipse.ptp.pldt.lapi.LapiPlugin;
+import org.eclipse.ptp.pldt.lapi.IDs;
+import org.eclipse.ptp.pldt.lapi.Activator;
 
 /**
  * Class used to initialize default preference values.
@@ -26,8 +26,8 @@ public class LAPIPreferenceInitializer extends AbstractPreferenceInitializer {
 	 * Initialize default LAPI preferences
 	 */
 	public void initializeDefaultPreferences() {
-		IPreferenceStore store = LapiPlugin.getDefault().getPreferenceStore();
-		store.setDefault(LapiIDs.LAPI_RECOGNIZE_APIS_BY_PREFIX_ALONE, true);
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		store.setDefault(IDs.RECOGNIZE_APIS_BY_PREFIX_ALONE, true);
 	}
 
 }

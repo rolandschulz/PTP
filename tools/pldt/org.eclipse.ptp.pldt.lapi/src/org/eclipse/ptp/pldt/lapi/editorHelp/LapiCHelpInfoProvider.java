@@ -14,7 +14,7 @@ import org.eclipse.ptp.pldt.common.editorHelp.CHelpProviderImpl;
 
 /**
  * 
- * This class implements ICHelpProvider and provides LAPI information <br>
+ * This class implements ICHelpProvider and provides API-specific information <br>
  * (F1, hover, content assist, etc.)
  * 
  */
@@ -23,11 +23,11 @@ public class LapiCHelpInfoProvider extends CHelpProviderImpl {
 
 	public LapiCHelpInfoProvider() {
 		// for debug use only, to see where it's called..
-		//System.out.println("LapiCHelpInfoProvider ctor()...");
+		// System.out.println("LapiCHelpInfoProvider ctor()...");
 	}
 
 	public void initialize() {
 		helpBook = new LapiCHelpBook();
-		//System.out.println("LapiCHelpInfoProvider initialize()...");
+		// System.out.println("LapiCHelpInfoProvider initialize()...");
 	}
 }
