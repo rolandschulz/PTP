@@ -20,9 +20,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
 import org.eclipse.ptp.pldt.common.util.ViewActivator;
+import org.eclipse.ptp.pldt.lapi.Activator;
+import org.eclipse.ptp.pldt.lapi.IDs;
 import org.eclipse.ptp.pldt.lapi.LAPIArtifactMarkingVisitor;
-import org.eclipse.ptp.pldt.lapi.LapiIDs;
-import org.eclipse.ptp.pldt.lapi.LapiPlugin;
 import org.eclipse.ptp.pldt.lapi.analysis.LapiCASTVisitor;
 
 /**
@@ -35,7 +35,7 @@ public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase {
 	 * Constructor for the "Run Analysis" action
 	 */
 	public RunAnalyseLAPIcommandHandler() {
-		super("LAPI", new LAPIArtifactMarkingVisitor(LapiIDs.MARKER_ID), LapiIDs.MARKER_ID); //$NON-NLS-1$
+		super(IDs.API_NAME, new LAPIArtifactMarkingVisitor(IDs.MARKER_ID), IDs.MARKER_ID); //$NON-NLS-1$
 	}
 
 	/**
@@ -52,15 +52,16 @@ public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
 		ILanguage lang;
-		boolean allowPrefixOnlyMatch=LapiPlugin.getDefault().getPreferenceStore().getBoolean(LapiIDs.LAPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
-		System.out.println("RALCH:LAPI allowPrefixOnlyMatch="+allowPrefixOnlyMatch);
+		boolean allowPrefixOnlyMatch = Activator.getDefault().getPreferenceStore().getBoolean(IDs.RECOGNIZE_APIS_BY_PREFIX_ALONE);
+		if (traceOn)
+			System.out.println("RALCH:LAPI allowPrefixOnlyMatch=" + allowPrefixOnlyMatch);
 		try {
 			lang = tu.getLanguage();
 
 			IASTTranslationUnit atu = tu.getAST();
 			if (lang.getId().equals(GCCLanguage.ID)) {// cdt40
 				atu.accept(new LapiCASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
-				//atu.accept(new LapiCASTVisitor(includes, fileName, msr));
+				// atu.accept(new LapiCASTVisitor(includes, fileName, msr));
 			}
 
 		} catch (CoreException e) {
@@ -72,20 +73,12 @@ public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase {
 
 	@Override
 	protected List<String> getIncludePath() {
-		return LapiPlugin.getDefault().getLapiIncludeDirs();
+		return Activator.getDefault().getLapiIncludeDirs();
 	}
 
 	@Override
 	protected void activateArtifactView() {
-		ViewActivator.activateView(LapiIDs.LAPI_VIEW_ID);
-	}
-
-	/**
-	 * LAPI doesn't have a problems view (only OpenMP analysis does)
-	 */
-	@Override
-	protected void activateProblemsView() {
-
+		ViewActivator.activateView(IDs.VIEW_ID);
 	}
 
 }

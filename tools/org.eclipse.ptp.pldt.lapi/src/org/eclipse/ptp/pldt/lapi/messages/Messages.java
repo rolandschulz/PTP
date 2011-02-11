@@ -19,11 +19,11 @@ public class Messages extends NLS {
 	public static String LapiArtifactView_lapi_artifacts_plural;
 	public static String LapiCASTVisitor_lapi_call;
 	public static String LapiCASTVisitor_lapi_constant;
-	public static String LapiIDs_lapi_includes_pref_page_title;
+	public static String Lapi_includes_pref_page_title;
 	public static String LAPIPreferencePage_includes_preference_browse_dialog_title;
 	public static String LAPIPreferencePage_includes_preference_label;
 	public static String LAPIPreferencePage_recognizeAPISByPrefixAlone;
-	
+
 	public static String LapiCHelpBook_LAPI_Addr_get;
 	public static String LapiCHelpBook_LAPI_Addr_set;
 	public static String LapiCHelpBook_LAPI_Address;

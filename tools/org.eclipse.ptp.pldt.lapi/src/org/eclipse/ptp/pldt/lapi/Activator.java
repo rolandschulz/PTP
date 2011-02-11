@@ -20,19 +20,19 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
- * The main plugin class to be used in the desktop.
+ * The main plugin class to be used in this project.
  * 
- * @since 4.0
+ * @since 5.0
  */
-public class LapiPlugin extends AbstractUIPlugin {
+public class Activator extends AbstractUIPlugin {
 
-	// The shared instance.
-	private static LapiPlugin plugin;
+	/** The shared instance */
+	private static Activator plugin;
 
 	/**
 	 * The constructor.
 	 */
-	public LapiPlugin() {
+	public Activator() {
 		plugin = this;
 	}
 
@@ -56,7 +56,7 @@ public class LapiPlugin extends AbstractUIPlugin {
 	/**
 	 * Returns the shared instance.
 	 */
-	public static LapiPlugin getDefault() {
+	public static Activator getDefault() {
 		return plugin;
 	}
 
@@ -78,7 +78,7 @@ public class LapiPlugin extends AbstractUIPlugin {
 	 * @return
 	 */
 	public List<String> getLapiIncludeDirs() {
-		String stringList = getPreferenceStore().getString(LapiIDs.LAPI_INCLUDES);
+		String stringList = getPreferenceStore().getString(IDs.PREF_INCLUDES);
 		StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
 		List<String> dirs = new ArrayList<String>();
 		while (st.hasMoreElements()) {
