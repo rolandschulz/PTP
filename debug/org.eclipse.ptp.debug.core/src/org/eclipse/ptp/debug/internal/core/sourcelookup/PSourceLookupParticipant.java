@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.sourcelookup;
 
+import java.io.File;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.ListenerList;
@@ -25,6 +27,7 @@ import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
+import org.eclipse.ptp.debug.core.sourcelookup.AbsolutePathSourceContainer;
 import org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener;
 
 /**
@@ -32,7 +35,8 @@ import org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener;
  * 
  */
 public class PSourceLookupParticipant extends AbstractSourceLookupParticipant {
-	private static class NoSourceElement {}
+	private static class NoSourceElement {
+	}
 
 	private static final NoSourceElement gfNoSource = new NoSourceElement();
 	private final ListenerList fListeners = new ListenerList(1);
@@ -45,40 +49,59 @@ public class PSourceLookupParticipant extends AbstractSourceLookupParticipant {
 	public void addSourceLookupChangeListener(ISourceLookupChangeListener listener) {
 		fListeners.add(listener);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant#dispose()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant#dispose
+	 * ()
 	 */
 	@Override
 	public void dispose() {
 		fListeners.clear();
 		super.dispose();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant#findSourceElements(java.lang.Object)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant#
+	 * findSourceElements(java.lang.Object)
 	 */
 	@Override
 	public Object[] findSourceElements(Object object) throws CoreException {
-		// Workaround for cases when the stack frame doesn't contain the source file name
+		// Workaround for cases when the stack frame doesn't contain the source
+		// file name
+		String name = null;
 		if (object instanceof IAdaptable) {
 			IPStackFrame frame = (IPStackFrame) ((IAdaptable) object).getAdapter(IPStackFrame.class);
 			if (frame != null) {
-				String name = frame.getFile().trim();
+				name = frame.getFile().trim();
 				if (name == null || name.length() == 0) {
 					return new Object[] { gfNoSource };
 				}
 			}
+		} else if (object instanceof String) {
+			name = (String) object;
 		}
 		Object[] foundElements = super.findSourceElements(object);
 		if (foundElements.length == 0 && (object instanceof IDebugElement)) {
-			foundElements = new Object[] { new PSourceNotFoundElement((IDebugElement)object) };
+			if (new File(name).exists()) {
+				foundElements = new AbsolutePathSourceContainer().findSourceElements(name);
+			} else {
+				foundElements = new Object[] { new PSourceNotFoundElement((IDebugElement) object) };
+			}
 		}
 		return foundElements;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant#getSourceName(java.lang.Object)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant#getSourceName
+	 * (java.lang.Object)
 	 */
 	public String getSourceName(Object object) throws CoreException {
 		if (object instanceof String) {
@@ -93,7 +116,7 @@ public class PSourceLookupParticipant extends AbstractSourceLookupParticipant {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Remove a listener for source lookup changes.
 	 * 
@@ -102,10 +125,15 @@ public class PSourceLookupParticipant extends AbstractSourceLookupParticipant {
 	public void removeSourceLookupChangeListener(ISourceLookupChangeListener listener) {
 		fListeners.remove(listener);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant#sourceContainersChanged(org.eclipse.debug.core.sourcelookup.ISourceLookupDirector)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant#
+	 * sourceContainersChanged
+	 * (org.eclipse.debug.core.sourcelookup.ISourceLookupDirector)
 	 */
+	@Override
 	public void sourceContainersChanged(ISourceLookupDirector director) {
 		Object[] listeners = fListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
