@@ -2882,6 +2882,8 @@ int server(char *name, char *host, int port, char *user_libpath)
     "/opt/ibmll/LoadL/so/lib/",
     "/opt/ibmll/LoadL/scheduler/full/lib",
     "/opt/ibmll/LoadL/scheduler/so/lib/",
+    "/opt/ibmll/LoadL/scheduler/full/lib64",
+    "/opt/ibmll/LoadL/scheduler/so/lib64/",
     (char *) -1
   };
   char *libname = "libllapi.so";
@@ -2897,6 +2899,7 @@ int server(char *name, char *host, int port, char *user_libpath)
     "/opt/ibmll/LoadL/scheduler/so/lib/",
     "/opt/ibmll/LoadL/scheduler/lib/",
     (char *) -1
+
   };
   char *libname = "libllapi.a";
 #endif
