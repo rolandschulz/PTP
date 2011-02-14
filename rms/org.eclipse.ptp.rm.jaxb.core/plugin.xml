@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.rm.jaxb.core.rm.JAXBServiceProvider"
+            id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"
+            name="JAXB"
+            serviceId="org.eclipse.ptp.core.LaunchService">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.rm.jaxb.core.JAXBPreferenceManager">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.core.variables.dynamicVariables">
+      <variable
+            description="Dynamic resource manager configuration variable"
+            name="rm"
+            resolver="org.eclipse.ptp.rm.jaxb.core.variables.RMVariableResolver"
+            supportsArgument="true">
+      </variable>
+   </extension>
+
+</plugin>
