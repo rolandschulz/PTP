@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,7 +52,7 @@ public class ScannerInfoUtility {
 			IScannerInfoCollector collector) {
 		ICfgScannerConfigBuilderInfo2Set container = CfgScannerConfigProfileManager.getCfgScannerConfigBuildInfo(cfg);
 		Map<CfgInfoContext, IScannerConfigBuilderInfo2>  map = container.getInfoMap();
-		List<IScannerInfoConsoleParser> clParserList = null;
+		List<IScannerInfoConsoleParser> clParserList = new ArrayList<IScannerInfoConsoleParser>();
 		Map<String, Set<CfgInfoContext>> profileIDToConfigContextMap = new HashMap<String, Set<CfgInfoContext>>();
 		if (container.isPerRcTypeDiscovery()) {
 			IResourceInfo[] rcInfos = cfg.getResourceInfos();
