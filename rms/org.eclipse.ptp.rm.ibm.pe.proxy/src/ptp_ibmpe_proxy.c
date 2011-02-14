@@ -391,20 +391,30 @@ static struct option longopts[] = {
     {   "runMiniproxy", no_argument, NULL, 'M'},
     {   NULL, 0, NULL, 0}
 };
-static char *libpath[] = {NULL,
-		"/opt/ibmll/LoadL/full/lib/",
-		"/opt/ibmll/LoadL/scheduler/full/lib",
-		"/opt/ibmll/LoadL/so/lib/", 
-		(char *) -1
-};
+static char *libpath[] = {
+        NULL,
+        "/opt/ibmll/LoadL/full/lib/",
+        "/opt/ibmll/LoadL/so/lib/",
+        "/opt/ibmll/LoadL/scheduler/full/lib",
+        "/opt/ibmll/LoadL/scheduler/so/lib/",
+        "/opt/ibmll/LoadL/scheduler/full/lib64",
+        "/opt/ibmll/LoadL/scheduler/so/lib64/",
+        (char *) -1
+    };
 static char *libname = "libllapi.so";
 #else
-static char *libpath[] = { NULL,
-		"/usr/lpp/LoadL/full/lib",
-		"/usr/lpp/LoadL/so/lib",
-		"/opt/ibmll/LoadL/full/lib/",
-        	"/opt/ibmll/LoadL/so/lib/",
-		(char *) -1 };
+static char *libpath[] = {
+        NULL,
+        "/usr/lpp/LoadL/full/lib",
+        "/usr/lpp/LoadL/so/lib",
+        "/usr/lpp/LoadL/scheduler/so/lib",
+        "/usr/lpp/LoadL/scheduler/full/lib",
+        "/opt/ibmll/LoadL/full/lib/",
+        "/opt/ibmll/LoadL/so/lib/",
+        "/opt/ibmll/LoadL/scheduler/so/lib/",
+        "/opt/ibmll/LoadL/scheduler/lib/",
+        (char *) -1
+};
 static char *libname = "libllapi.a";
 #endif
 
