@@ -105,7 +105,6 @@ public class FileTools implements IRemoteFileTools {
 		}
 
 		private Future<T> asyncCmdInThread(String jobName) throws SftpException, IOException, RemoteConnectionException {
-			getProgressMonitor().subTask(jobName);
 			setChannel(getSFTPChannel());
 			return fPool.submit(this);
 		}
