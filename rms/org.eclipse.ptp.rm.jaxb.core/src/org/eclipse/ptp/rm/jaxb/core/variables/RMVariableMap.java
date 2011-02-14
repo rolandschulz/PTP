@@ -1,5 +1,6 @@
 package org.eclipse.ptp.rm.jaxb.core.variables;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,8 +17,8 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 	private final Map<String, Object> discovered;
 
 	private RMVariableMap() {
-		variables = new TreeMap<String, Object>();
-		discovered = new TreeMap<String, Object>();
+		variables = Collections.synchronizedMap(new TreeMap<String, Object>());
+		discovered = Collections.synchronizedMap(new TreeMap<String, Object>());
 	}
 
 	public Map<String, Object> getDiscovered() {
