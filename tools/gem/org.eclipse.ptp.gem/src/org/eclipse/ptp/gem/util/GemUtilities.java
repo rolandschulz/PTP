@@ -410,7 +410,11 @@ public class GemUtilities {
 		// Run isp -v to get version number
 		exePath += (exePath == "") ? "" : "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		exePath += "isp -v"; //$NON-NLS-1$
-		runCommand(exePath, false);
+
+		// Abort if ISP is not installed
+		if (runCommand(exePath, false) == -1) {
+			return null;
+		}
 
 		// Parse first line of STDOUT from GEM Console
 		final Scanner scanner = new Scanner(consoleStdOutMessage);
@@ -422,7 +426,7 @@ public class GemUtilities {
 			return versionMatcher.group(1);
 		}
 
-		return ""; //$NON-NLS-1$
+		return null;
 	}
 
 	/**
@@ -570,6 +574,9 @@ public class GemUtilities {
 	 */
 	private static boolean hasCorrectIspVersion() {
 		final String ispVersion = getIspVersion();
+		if (ispVersion == null) {
+			return false;
+		}
 		final StringTokenizer st = new StringTokenizer(ispVersion, ".", false); //$NON-NLS-1$
 		st.nextToken();
 		final int majorVersionNum = Integer.parseInt(st.nextToken());
@@ -635,6 +642,13 @@ public class GemUtilities {
 			@Override
 			public void run() {
 				taskStatus = TaskStatus.ACTIVE;
+
+				// Check that ISP itself is installed on the target machine
+				if (getIspVersion() == null) {
+					cancelAnalysis();
+					return;
+				}
+
 				// Check for correct version of ISP on the target machine
 				if (!hasCorrectIspVersion() && taskStatus == TaskStatus.ACTIVE) {
 					cancelAnalysis();
@@ -902,11 +916,12 @@ public class GemUtilities {
 
 			return consoleStdErrMessage.contains("ld returned 1 exit status") ? -1 : 1; //$NON-NLS-1$
 
-		} catch (final Exception e) {
+		} catch (final IOException e) { // thrown when ISP is not installed
 			final StringTokenizer st = new StringTokenizer(command);
 			String commandName = st.nextToken();
 			commandName = new Path(commandName).lastSegment().toString();
-			showErrorDialog(Messages.GemUtilities_8 + commandName + Messages.GemUtilities_13);
+			showErrorDialog(Messages.GemUtilities_8 + "\"" + commandName + "\"" + "\n" + Messages.GemUtilities_13); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		} catch (final Exception e) {
 			logExceptionDetail(e);
 		}
 		return -1;
