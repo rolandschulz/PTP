@@ -13,6 +13,7 @@ package org.eclipse.ptp.rdt.sync.core.serviceproviders;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**
@@ -35,4 +36,6 @@ public interface ISyncServiceProvider extends IServiceProvider {
 	 *             if synchronization fails
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, boolean force) throws CoreException;
+
+	public IRemoteConnection getRemoteConnection();
 }
