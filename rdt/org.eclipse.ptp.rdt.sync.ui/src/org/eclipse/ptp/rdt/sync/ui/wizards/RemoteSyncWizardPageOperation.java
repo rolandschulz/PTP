@@ -12,6 +12,7 @@
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
 import java.io.IOException;
+import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,8 +26,11 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
+import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 /**
@@ -54,6 +58,17 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			IServiceConfiguration config = smm.newServiceConfiguration(getConfigName(project.getName()));
 			IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
 			config.setServiceProvider(syncService, participant.getProvider(project));
+			
+			IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
+			IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
+			RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
+			if (rbsp != null) {
+				IRemoteConnection remoteConnection = participant.getProvider(project).getRemoteConnection();
+				rbsp.setRemoteToolsProviderID(remoteConnection.getRemoteServices().getId());
+				rbsp.setRemoteToolsConnection(remoteConnection);
+				config.setServiceProvider(buildService, rbsp);
+			}
+			
 			smm.addConfiguration(project, config);
 
 			try {

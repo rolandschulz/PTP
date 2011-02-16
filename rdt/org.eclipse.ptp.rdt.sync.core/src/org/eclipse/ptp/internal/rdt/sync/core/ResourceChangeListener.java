@@ -67,6 +67,7 @@ public class ResourceChangeListener {
 				fSyncProvider.synchronize(fDelta, monitor, false);
 			} catch (CoreException e) {
 				System.out.println("sync failed: " + e.getLocalizedMessage()); //$NON-NLS-1$
+				e.printStackTrace();
 			} finally {
 				monitor.done();
 			}
