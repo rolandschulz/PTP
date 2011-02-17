@@ -36,48 +36,22 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
-public class LegendDialog extends Dialog 
-{
-	private String rmStateText[] = {
-		Messages.LegendDialog_Starting,
-		Messages.LegendDialog_Started,
-		Messages.LegendDialog_Stopping,
-		Messages.LegendDialog_Stopped,
-		Messages.LegendDialog_Suspended,
-		Messages.LegendDialog_ErrorRM
-	};
-	
-	private String machineStateText[] = {
-		Messages.LegendDialog_UpM,
-		Messages.LegendDialog_DownM,
-		Messages.LegendDialog_AlertM,
-		Messages.LegendDialog_ErrorM,
-		Messages.LegendDialog_UnknownM
-	};
+public class LegendDialog extends Dialog {
+	private final String rmStateText[] = { Messages.LegendDialog_Starting, Messages.LegendDialog_Started,
+			Messages.LegendDialog_Stopped, Messages.LegendDialog_ErrorRM };
 
-	private String jobStateText[] = {
-		Messages.LegendDialog_StartedJ,
-		Messages.LegendDialog_RunningJ,
-		Messages.LegendDialog_SuspendedJ,
-		Messages.LegendDialog_CompletedJ,
-	};
-	
-	private String nodeStateText[] = {
-		Messages.LegendDialog_Up,
-		Messages.LegendDialog_Down,
-		Messages.LegendDialog_Error,
-		Messages.LegendDialog_Unknown,
-		Messages.LegendDialog_ProcessRunning,
-		Messages.LegendDialog_ProcessTerminated,
-	};
-	
-	private String processStateText[] = {
-		Messages.LegendDialog_StartedP,
-		Messages.LegendDialog_RunningP,
-		Messages.LegendDialog_SuspendedP,
-		Messages.LegendDialog_CompletedP,
-	};
-	
+	private final String machineStateText[] = { Messages.LegendDialog_UpM, Messages.LegendDialog_DownM,
+			Messages.LegendDialog_AlertM, Messages.LegendDialog_ErrorM, Messages.LegendDialog_UnknownM };
+
+	private final String jobStateText[] = { Messages.LegendDialog_StartedJ, Messages.LegendDialog_RunningJ,
+			Messages.LegendDialog_SuspendedJ, Messages.LegendDialog_CompletedJ, };
+
+	private final String nodeStateText[] = { Messages.LegendDialog_Up, Messages.LegendDialog_Down, Messages.LegendDialog_Error,
+			Messages.LegendDialog_Unknown, Messages.LegendDialog_ProcessRunning, Messages.LegendDialog_ProcessTerminated, };
+
+	private final String processStateText[] = { Messages.LegendDialog_StartedP, Messages.LegendDialog_RunningP,
+			Messages.LegendDialog_SuspendedP, Messages.LegendDialog_CompletedP, };
+
 	/**
 	 * @param parent
 	 */
@@ -85,12 +59,12 @@ public class LegendDialog extends Dialog
 		/* we DON'T want this to be modal */
 		this(parent, SWT.DIALOG_TRIM | SWT.NONE);
 	}
-	
+
 	public LegendDialog(Shell parent, int style) {
 		super(parent, style);
 		setText(Messages.LegendDialog_LegendTitle);
 	}
-	
+
 	public String open() {
 		Shell shell = new Shell(getParent(), getStyle());
 		shell.setText(getText());
@@ -98,19 +72,19 @@ public class LegendDialog extends Dialog
 		shell.pack();
 		shell.open();
 		Display display = getParent().getDisplay();
-		while(!shell.isDisposed()) {
-			if(!display.readAndDispatch()) {
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
 		}
 		return null;
 	}
-	
+
 	private void createContents(final Shell shell) {
 		GridLayout grid = new GridLayout();
 		grid.numColumns = 2;
 		shell.setLayout(grid);
-		
+
 		/* the RM box */
 		Group box = new Group(shell, SWT.BORDER);
 		box.setText(Messages.LegendDialog_ResourceManagerIcons);
@@ -118,7 +92,7 @@ public class LegendDialog extends Dialog
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
 		box.setLayout(fill);
-		
+
 		GridData data = new GridData(GridData.FILL_BOTH);
 		data.horizontalSpan = 2;
 		box.setLayoutData(data);
@@ -137,11 +111,11 @@ public class LegendDialog extends Dialog
 			r.spacing = 10;
 			c.setLayout(r);
 			CLabel b = new CLabel(c, SWT.FLAT);
-			b.setImage(ParallelImages.rmImages[i]);
+			b.setImage(ParallelImages.rmImages.get(rmStateText[i]));
 			CLabel l = new CLabel(c, SWT.LEFT);
 			l.setText(rmStateText[i]);
 		}
-		
+
 		/* the machines box */
 		box = new Group(shell, SWT.BORDER);
 		box.setText(Messages.LegendDialog_MachineIcons);
@@ -170,7 +144,7 @@ public class LegendDialog extends Dialog
 			CLabel l = new CLabel(c, SWT.LEFT);
 			l.setText(machineStateText[i]);
 		}
-		
+
 		/* the node box */
 		box = new Group(shell, SWT.BORDER);
 		box.setText(Messages.LegendDialog_NodeIcons);
@@ -180,8 +154,8 @@ public class LegendDialog extends Dialog
 		box.setLayoutData(data);
 
 		/* layout column first instead of row first */
-		for (int j = 0; j < nodeStateText.length/2; j++) {
-			for (int i = 0 ; i < 2; i++) {
+		for (int j = 0; j < nodeStateText.length / 2; j++) {
+			for (int i = 0; i < 2; i++) {
 				Composite c = new Composite(box, SWT.NONE);
 				RowLayout r = new RowLayout();
 				r.wrap = true;
@@ -194,12 +168,12 @@ public class LegendDialog extends Dialog
 				r.spacing = 10;
 				c.setLayout(r);
 				CLabel b = new CLabel(c, SWT.FLAT);
-				b.setImage(ParallelImages.nodeImages[i*nodeStateText.length/2 + j][0]);
+				b.setImage(ParallelImages.nodeImages[i * nodeStateText.length / 2 + j][0]);
 				CLabel l = new CLabel(c, SWT.LEFT);
-				l.setText(nodeStateText[i*nodeStateText.length/2 + j]);
+				l.setText(nodeStateText[i * nodeStateText.length / 2 + j]);
 			}
 		}
-		
+
 		/* the job box */
 		box = new Group(shell, SWT.BORDER);
 		box.setText(Messages.LegendDialog_JobIcons);
@@ -228,7 +202,7 @@ public class LegendDialog extends Dialog
 			CLabel l = new CLabel(c, SWT.LEFT);
 			l.setText(jobStateText[i]);
 		}
-				
+
 		/* the process box */
 		box = new Group(shell, SWT.BORDER);
 		box.setText(Messages.LegendDialog_ProcessIcons);
@@ -238,7 +212,7 @@ public class LegendDialog extends Dialog
 		box.setLayout(fill);
 		data = new GridData(GridData.FILL_BOTH);
 		box.setLayoutData(data);
-		
+
 		for (int i = 0; i < processStateText.length; i++) {
 			/* one horizontal box */
 			Composite c = new Composite(box, SWT.NONE);
@@ -252,24 +226,25 @@ public class LegendDialog extends Dialog
 			r.marginTop = 0;
 			r.spacing = 10;
 			c.setLayout(r);
-	        CLabel b = new CLabel(c, SWT.FLAT);
+			CLabel b = new CLabel(c, SWT.FLAT);
 			b.setImage(ParallelImages.procImages[i][0]);
 			CLabel l = new CLabel(c, SWT.LEFT);
 			l.setText(processStateText[i]);
 		}
-		
-        Button close = new Button(shell, SWT.PUSH);
-        close.setText(Messages.LegendDialog_Close);
-        data = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
-        data.horizontalSpan = 2;
+
+		Button close = new Button(shell, SWT.PUSH);
+		close.setText(Messages.LegendDialog_Close);
+		data = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
+		data.horizontalSpan = 2;
 		close.setLayoutData(data);
 
-        close.addSelectionListener(new SelectionAdapter() {
-        	public void widgetSelected(SelectionEvent event) {
-        		shell.close();
-        	}
-        });
-                    
-        shell.setDefaultButton(close);
+		close.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				shell.close();
+			}
+		});
+
+		shell.setDefaultButton(close);
 	}
 }

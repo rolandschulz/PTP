@@ -30,6 +30,13 @@ public class Messages extends NLS {
 	public static String PBSProxyRuntimeClient_5;
 	public static String PBSProxyRuntimeClient_6;
 	public static String PBSProxyRuntimeClient_7;
+	public static String PBSAttributeNotFound;
+	public static String PBSBatchScriptTemplate_parseError;
+	public static String PBSBatchScriptTemplateManager_zerostringError;
+	public static String PBSBatchScriptTemplateManager_removeError;
+	public static String PBSBatchScriptTemplateManager_illegalArgument;
+	public static String PBSBatchScriptTemplateManager_storeError;
+
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.pbs.core.messages.messages"; //$NON-NLS-1$
 
 	static {

@@ -110,7 +110,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 	 * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String) null);
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		setLaunchConfiguration(configuration);
 		try {
-			String wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String) null);
+			String wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
 			workingDirText.setText(EMPTY_STRING);
 			if (wd == null) {
 				useDefaultWorkingDirButton.setSelection(true);
@@ -145,7 +145,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 		if (!isDefaultWorkingDirectory()) {
 			wd = getFieldContent(workingDirText.getText());
 		}
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, wd);
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, wd);
 	}
 
 	/*
@@ -229,7 +229,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 	 * Show a dialog that lets the user select a working directory
 	 */
 	protected void handleWorkingDirBrowseButtonSelected() {
-		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(getLaunchConfiguration());
+		IResourceManagerControl rm = getResourceManager(getLaunchConfiguration());
 		if (rm != null) {
 			IResourceManagerConfiguration conf = rm.getConfiguration();
 			IRemoteServices remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),

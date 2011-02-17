@@ -9,7 +9,7 @@
  *                    a placeholder implementation which uses a
  *                    static plugin XML resource to create the definitions
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui.utils;
+package org.eclipse.ptp.rm.pbs.core.templates;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,8 +18,8 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.rm.pbs.ui.PBSUIPlugin;
-import org.eclipse.ptp.rm.pbs.ui.data.PBSXMLJobAttributeData;
+import org.eclipse.ptp.rm.pbs.core.Activator;
+import org.eclipse.ptp.rm.pbs.core.attributes.PBSXMLJobAttributeData;
 import org.osgi.framework.Bundle;
 
 /**
@@ -27,6 +27,7 @@ import org.osgi.framework.Bundle;
  * this plugin to initialize the base template.
  * 
  * @author arossi
+ * @since 5.0
  * 
  */
 public class PBSXMLAttributeToTemplateConverter extends PBSBaseAttributeToTemplateConverter {
@@ -46,9 +47,9 @@ public class PBSXMLAttributeToTemplateConverter extends PBSBaseAttributeToTempla
 			return;
 
 		URL url = null;
-		if (PBSUIPlugin.getDefault() != null) {
-			Bundle bundle = PBSUIPlugin.getDefault().getBundle();
-			url = FileLocator.find(bundle, new Path(resourcePath), null);
+		if (Activator.getDefault() != null) {
+			Bundle bundle = Activator.getDefault().getBundle();
+			url = FileLocator.find(bundle, new Path(DATA).append(resourcePath), null);
 		} else
 			url = new File(resourcePath).toURL();
 		if (url == null)

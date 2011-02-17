@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.ui;
 
-import java.util.Map;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -117,7 +115,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 				}
 			}
 			if (wc != null) {
-				wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_SPECIFIC_ATTRS_MAP, (Map<String, String>) null);
+				wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
 			}
 		} else {
 			if (wc == null) {
@@ -199,7 +197,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, getDebugConfig().getID());
 			ILaunchConfigurationTab dynamicTab = getDynamicTab();
 			if (dynamicTab == null) {
-				config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_SPECIFIC_ATTRS_MAP, (Map<String, String>) null);
+				config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
 			} else {
 				dynamicTab.performApply(config);
 			}

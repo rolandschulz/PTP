@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -46,7 +45,6 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
-import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringSetAttribute;
 import org.eclipse.ptp.core.attributes.StringSetAttributeDefinition;
@@ -61,6 +59,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
+import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManager;
 import org.eclipse.ptp.rm.ibm.pe.ui.messages.Messages;
 import org.eclipse.ptp.rm.ibm.pe.ui.widgets.BooleanRowWidget;
 import org.eclipse.ptp.rm.ibm.pe.ui.widgets.CheckboxRowWidget;
@@ -268,7 +267,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	private final boolean useLoadLeveler = false;
 	private TabFolder tabbedPane;
 	private ILaunchConfigurationWorkingCopy currentLaunchConfig;
-	private IResourceManagerControl currentRM;
+	private PEResourceManager currentRM;
 	private CheckboxRowWidget peAdvancedMode;
 	private FileSelectorRowWidget peEnvScript;
 	private boolean allFieldsValid = true;
@@ -934,18 +933,16 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
 	 * @param id
 	 *            Attribute id for rm attribute this widget represents
 	 * @return TextRowWidget entry widget
 	 */
-	private TextRowWidget createTextWidget(Composite parent, IResourceManagerControl rm, String id) {
+	private TextRowWidget createTextWidget(Composite parent, String id) {
 		TextRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
 		widget = null;
-		attr = rm.getAttributeDefinition(id);
+		attr = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new TextRowWidget(parent, id, attr);
 			widget.addModifyListener(eventMonitor);
@@ -961,22 +958,20 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
 	 * @param id1
 	 *            Attribute id for first rm attribute this widget represents
 	 * @param id2
 	 *            Attribute id for second rm attribute this widget represents
 	 * @return Text entry widget
 	 */
-	private DualFieldRowWidget createDualField(Composite parent, IResourceManagerControl rm, String id1, String id2) {
+	private DualFieldRowWidget createDualField(Composite parent, String id1, String id2) {
 		DualFieldRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr1;
 		IAttributeDefinition<?, ?, ?> attr2;
 
 		widget = null;
-		attr1 = rm.getAttributeDefinition(id1);
-		attr2 = rm.getAttributeDefinition(id2);
+		attr1 = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id1);
+		attr2 = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id2);
 		if ((attr1 != null) && (attr2 != null)) {
 			widget = new DualFieldRowWidget(parent, id1, id2, attr1, attr2);
 			widget.addModifyListener(eventMonitor);
@@ -993,18 +988,17 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
 	 * @param id
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Checkbox button for this attribute
 	 */
-	private CheckboxRowWidget createCheckbox(Composite parent, IResourceManagerControl rm, String id) {
+	private CheckboxRowWidget createCheckbox(Composite parent, String id) {
 		CheckboxRowWidget widget;
 		StringAttributeDefinition attrDef;
 
 		widget = null;
-		attrDef = (StringAttributeDefinition) rm.getAttributeDefinition(id);
+		attrDef = (StringAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
+				.getAttributeDefinition(id);
 		if (attrDef != null) {
 			widget = new CheckboxRowWidget(parent, id, attrDef);
 			activeWidgets.add(widget);
@@ -1018,18 +1012,17 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
 	 * @param id
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Checkbox button for this attribute
 	 */
-	private BooleanRowWidget createBooleanOption(Composite parent, IResourceManagerControl rm, String id) {
+	private BooleanRowWidget createBooleanOption(Composite parent, String id) {
 		BooleanRowWidget widget;
 		StringSetAttributeDefinition attrDef;
 
 		widget = null;
-		attrDef = (StringSetAttributeDefinition) rm.getAttributeDefinition(id);
+		attrDef = (StringSetAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
+				.getAttributeDefinition(id);
 		if (attrDef != null) {
 			widget = new BooleanRowWidget(parent, id, attrDef, -1);
 			widget.addSelectionListener(eventMonitor);
@@ -1049,8 +1042,6 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
 	 * @param id
 	 *            Attribute id for rm attribute this widget represents
 	 * @param selectorID
@@ -1058,12 +1049,12 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            this widget
 	 * @return Text entry field for this attribute
 	 */
-	private FileSelectorRowWidget createFileSelector(Composite parent, IResourceManagerControl rm, String id, int selectorID) {
+	private FileSelectorRowWidget createFileSelector(Composite parent, String id, int selectorID) {
 		FileSelectorRowWidget widget;
 		StringAttributeDefinition attr;
 
 		widget = null;
-		attr = (StringAttributeDefinition) rm.getAttributeDefinition(id);
+		attr = (StringAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new FileSelectorRowWidget(parent, id, selectorID, attr);
 			widget.setData(id);
@@ -1081,18 +1072,16 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
 	 * @param id
 	 *            Attribute id for rm attribute this widget represents
 	 * @return ComboRowWidget used by this attribute
 	 */
-	private ComboRowWidget createCombobox(Composite parent, IResourceManagerControl rm, String id) {
+	private ComboRowWidget createCombobox(Composite parent, String id) {
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
 		widget = null;
-		attr = rm.getAttributeDefinition(id);
+		attr = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new ComboRowWidget(parent, id, attr, true);
 			widget.addSelectionListener(eventMonitor);
@@ -1108,18 +1097,16 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
-	 * @param rm
-	 *            Resource manager used by this launch config
 	 * @param id
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Editable ComboRowWidget used by this attribute
 	 */
-	private ComboRowWidget createEditableCombobox(Composite parent, IResourceManagerControl rm, String id) {
+	private ComboRowWidget createEditableCombobox(Composite parent, String id) {
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
 		widget = null;
-		attr = rm.getAttributeDefinition(id);
+		attr = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new ComboRowWidget(parent, id, attr, false);
 			widget.addSelectionListener(eventMonitor);
@@ -1224,8 +1211,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * mpPriority.
 	 */
 	private void setPriorityDependentsState() {
-		if ((mpPriority.getValue().length() == 0)
-				|| (mpPriority.getValue().equals(getDefaultAttributeValue(currentRM, MP_PRIORITY)))) {
+		if ((mpPriority.getValue().length() == 0) || (mpPriority.getValue().equals(getDefaultAttributeValue(MP_PRIORITY)))) {
 			if (mpPriorityLog != null) {
 				mpPriorityLog.setEnabled(false);
 			}
@@ -1363,10 +1349,8 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	/**
 	 * Create the tasks tab of the attributes pane
 	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
 	 */
-	private void createTasksTab(IResourceManagerControl rm) {
+	private void createTasksTab() {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1374,19 +1358,17 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		tab.setControl(tasksTabPane);
 		tab.setText(Messages.getString("TasksTab.title")); //$NON-NLS-1$
 		tasksTabPane.setLayout(createTabPaneLayout());
-		mpHostFile = createFileSelector(tasksTabPane, rm, MP_HOSTFILE, MP_HOSTFILE_SELECTOR);
-		mpProcs = createTextWidget(tasksTabPane, rm, MP_PROCS);
-		mpNodes = createTextWidget(tasksTabPane, rm, MP_NODES);
-		mpTasksPerNode = createTextWidget(tasksTabPane, rm, MP_TASKS_PER_NODE);
+		mpHostFile = createFileSelector(tasksTabPane, MP_HOSTFILE, MP_HOSTFILE_SELECTOR);
+		mpProcs = createTextWidget(tasksTabPane, MP_PROCS);
+		mpNodes = createTextWidget(tasksTabPane, MP_NODES);
+		mpTasksPerNode = createTextWidget(tasksTabPane, MP_TASKS_PER_NODE);
 	}
 
 	/**
 	 * Create the I/O tab of the attributes pane
 	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
 	 */
-	private void createIOTab(IResourceManagerControl rm) {
+	private void createIOTab() {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1394,19 +1376,17 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		tab.setControl(ioTabPane);
 		tab.setText(Messages.getString("IOTab.title")); //$NON-NLS-1$
 		ioTabPane.setLayout(createTabPaneLayout());
-		mpStdinMode = createEditableCombobox(ioTabPane, rm, MP_STDINMODE);
-		mpStdoutMode = createEditableCombobox(ioTabPane, rm, MP_STDOUTMODE);
-		mpLabelIO = createBooleanOption(ioTabPane, rm, MP_LABELIO);
-		peSplitStdout = createBooleanOption(ioTabPane, rm, PE_SPLIT_STDOUT);
+		mpStdinMode = createEditableCombobox(ioTabPane, MP_STDINMODE);
+		mpStdoutMode = createEditableCombobox(ioTabPane, MP_STDOUTMODE);
+		mpLabelIO = createBooleanOption(ioTabPane, MP_LABELIO);
+		peSplitStdout = createBooleanOption(ioTabPane, PE_SPLIT_STDOUT);
 	}
 
 	/**
 	 * Create the diagnostics tab of the attributes pane
 	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
 	 */
-	private void createDiagnosticTab(IResourceManagerControl rm) {
+	private void createDiagnosticTab() {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1414,21 +1394,19 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		tab.setControl(diagTabPane);
 		tab.setText(Messages.getString("DIAGTab.title")); //$NON-NLS-1$
 		diagTabPane.setLayout(createTabPaneLayout());
-		mpPmdLogDir = createFileSelector(diagTabPane, rm, MP_PMDLOG_DIR, MP_PMDLOG_DIR_SELECTOR);
-		mpInfoLevel = createCombobox(diagTabPane, rm, MP_INFOLEVEL);
-		mpPrintEnv = createEditableCombobox(diagTabPane, rm, MP_PRINTENV);
-		mpPMDLog = createBooleanOption(diagTabPane, rm, MP_PMDLOG);
-		mpPriorityLog = createBooleanOption(diagTabPane, rm, MP_PRIORITY_LOG);
-		mpStatistics = createCombobox(diagTabPane, rm, MP_STATISTICS);
+		mpPmdLogDir = createFileSelector(diagTabPane, MP_PMDLOG_DIR, MP_PMDLOG_DIR_SELECTOR);
+		mpInfoLevel = createCombobox(diagTabPane, MP_INFOLEVEL);
+		mpPrintEnv = createEditableCombobox(diagTabPane, MP_PRINTENV);
+		mpPMDLog = createBooleanOption(diagTabPane, MP_PMDLOG);
+		mpPriorityLog = createBooleanOption(diagTabPane, MP_PRIORITY_LOG);
+		mpStatistics = createCombobox(diagTabPane, MP_STATISTICS);
 	}
 
 	/**
 	 * Create the debug tab of the attributes pane
 	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
 	 */
-	private void createDebugTab(IResourceManagerControl rm) {
+	private void createDebugTab() {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1436,22 +1414,20 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		tab.setControl(debugTabPane);
 		tab.setText(Messages.getString("DEBUGTab.title")); //$NON-NLS-1$
 		debugTabPane.setLayout(createTabPaneLayout());
-		mpEuiDevelop = createCombobox(debugTabPane, rm, MP_EUIDEVELOP);
-		mpCorefileFormat = createEditableCombobox(debugTabPane, rm, MP_COREFILE_FORMAT);
-		mpCoreDir = createFileSelector(debugTabPane, rm, MP_COREDIR, MP_COREDIR_SELECTOR);
-		mpProfDir = createFileSelector(debugTabPane, rm, MP_PROFDIR, MP_PROFDIR_SELECTOR);
-		mpDebugInitialStop = createTextWidget(debugTabPane, rm, MP_DEBUG_INITIAL_STOP);
-		mpDebugNotimeout = createBooleanOption(debugTabPane, rm, MP_DEBUG_NOTIMEOUT);
-		mpCorefileSigterm = createBooleanOption(debugTabPane, rm, MP_COREFILE_SIGTERM);
+		mpEuiDevelop = createCombobox(debugTabPane, MP_EUIDEVELOP);
+		mpCorefileFormat = createEditableCombobox(debugTabPane, MP_COREFILE_FORMAT);
+		mpCoreDir = createFileSelector(debugTabPane, MP_COREDIR, MP_COREDIR_SELECTOR);
+		mpProfDir = createFileSelector(debugTabPane, MP_PROFDIR, MP_PROFDIR_SELECTOR);
+		mpDebugInitialStop = createTextWidget(debugTabPane, MP_DEBUG_INITIAL_STOP);
+		mpDebugNotimeout = createBooleanOption(debugTabPane, MP_DEBUG_NOTIMEOUT);
+		mpCorefileSigterm = createBooleanOption(debugTabPane, MP_COREFILE_SIGTERM);
 	}
 
 	/**
 	 * Create the system resources tab of the attributes pane
 	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
 	 */
-	private void createSystemTab(IResourceManagerControl rm) {
+	private void createSystemTab() {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1459,20 +1435,18 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		tab.setControl(systemTabPane);
 		tab.setText(Messages.getString("SYSTab.title")); //$NON-NLS-1$
 		systemTabPane.setLayout(createTabPaneLayout());
-		mpEuiDevice = createCombobox(systemTabPane, rm, MP_EUIDEVICE);
-		mpEuiLib = createCombobox(systemTabPane, rm, MP_EUILIB);
-		mpInstances = createEditableCombobox(systemTabPane, rm, MP_INSTANCES);
-		mpAdapterUse = createBooleanOption(systemTabPane, rm, MP_ADAPTER_USE);
-		mpCpuUse = createBooleanOption(systemTabPane, rm, MP_CPU_USE);
+		mpEuiDevice = createCombobox(systemTabPane, MP_EUIDEVICE);
+		mpEuiLib = createCombobox(systemTabPane, MP_EUILIB);
+		mpInstances = createEditableCombobox(systemTabPane, MP_INSTANCES);
+		mpAdapterUse = createBooleanOption(systemTabPane, MP_ADAPTER_USE);
+		mpCpuUse = createBooleanOption(systemTabPane, MP_CPU_USE);
 	}
 
 	/**
 	 * Create the node allocation tab of the attributes pane
 	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
 	 */
-	private void createNodeAllocationTab(IResourceManagerControl rm) {
+	private void createNodeAllocationTab() {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1480,14 +1454,14 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		tab.setControl(nodeTabPane);
 		tab.setText(Messages.getString("NODETab.title")); //$NON-NLS-1$
 		nodeTabPane.setLayout(createTabPaneLayout());
-		mpCmdFile = createFileSelector(nodeTabPane, rm, MP_CMDFILE, MP_CMDFILE_SELECTOR);
-		mpRemoteDir = createFileSelector(nodeTabPane, rm, MP_REMOTEDIR, MP_REMOTEDIR_SELECTOR);
-		mpLLFile = createFileSelector(nodeTabPane, rm, MP_LLFILE, MP_LLFILE_SELECTOR);
-		mpRMPool = createTextWidget(nodeTabPane, rm, MP_RMPOOL);
-		mpRetryCount = createTextWidget(nodeTabPane, rm, MP_RETRY_COUNT);
-		mpPgmModel = createCombobox(nodeTabPane, rm, MP_PGMMODEL);
-		mpRetry = createEditableCombobox(nodeTabPane, rm, MP_RETRY);
-		mpNewJob = createBooleanOption(nodeTabPane, rm, MP_NEWJOB);
+		mpCmdFile = createFileSelector(nodeTabPane, MP_CMDFILE, MP_CMDFILE_SELECTOR);
+		mpRemoteDir = createFileSelector(nodeTabPane, MP_REMOTEDIR, MP_REMOTEDIR_SELECTOR);
+		mpLLFile = createFileSelector(nodeTabPane, MP_LLFILE, MP_LLFILE_SELECTOR);
+		mpRMPool = createTextWidget(nodeTabPane, MP_RMPOOL);
+		mpRetryCount = createTextWidget(nodeTabPane, MP_RETRY_COUNT);
+		mpPgmModel = createCombobox(nodeTabPane, MP_PGMMODEL);
+		mpRetry = createEditableCombobox(nodeTabPane, MP_RETRY);
+		mpNewJob = createBooleanOption(nodeTabPane, MP_NEWJOB);
 		if (mpLLFile != null) {
 			mpLLFile.addModifyListener(eventMonitor);
 		}
@@ -1496,11 +1470,8 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	/**
 	 * Create the first performance tab of the attributes pane. Due to the
 	 * number of performance related attributes, there are two performance tabs.
-	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
 	 */
-	private void createPerformanceTab1(IResourceManagerControl rm) {
+	private void createPerformanceTab1() {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1508,26 +1479,24 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		tab.setControl(performanceTab1Pane);
 		tab.setText(Messages.getString("PERFTab1.title")); //$NON-NLS-1$
 		performanceTab1Pane.setLayout(createTabPaneLayout());
-		mpAckThresh = createTextWidget(performanceTab1Pane, rm, MP_ACK_THRESH);
-		mpPollingInterval = createTextWidget(performanceTab1Pane, rm, MP_POLLING_INTERVAL);
-		mpPriority = createTextWidget(performanceTab1Pane, rm, MP_PRIORITY);
-		mpBulkMinMsgSize = createTextWidget(performanceTab1Pane, rm, MP_BULK_MIN_MSG_SIZE);
-		mpUDPPacketSize = createTextWidget(performanceTab1Pane, rm, MP_UDP_PACKET_SIZE);
-		peRDMACount = createDualField(performanceTab1Pane, rm, PE_RDMA_COUNT, PE_RDMA_COUNT_2);
-		mpWaitMode = createCombobox(performanceTab1Pane, rm, MP_WAIT_MODE);
-		mpPriorityNTP = createBooleanOption(performanceTab1Pane, rm, MP_PRIORITY_NTP);
-		mpCCScratchBuf = createBooleanOption(performanceTab1Pane, rm, MP_CC_SCRATCH_BUF);
-		mpCSSInterrupt = createBooleanOption(performanceTab1Pane, rm, MP_CSS_INTERRUPT);
-		mpUseBulkXfer = createBooleanOption(performanceTab1Pane, rm, MP_USE_BULK_XFER);
+		mpAckThresh = createTextWidget(performanceTab1Pane, MP_ACK_THRESH);
+		mpPollingInterval = createTextWidget(performanceTab1Pane, MP_POLLING_INTERVAL);
+		mpPriority = createTextWidget(performanceTab1Pane, MP_PRIORITY);
+		mpBulkMinMsgSize = createTextWidget(performanceTab1Pane, MP_BULK_MIN_MSG_SIZE);
+		mpUDPPacketSize = createTextWidget(performanceTab1Pane, MP_UDP_PACKET_SIZE);
+		peRDMACount = createDualField(performanceTab1Pane, PE_RDMA_COUNT, PE_RDMA_COUNT_2);
+		mpWaitMode = createCombobox(performanceTab1Pane, MP_WAIT_MODE);
+		mpPriorityNTP = createBooleanOption(performanceTab1Pane, MP_PRIORITY_NTP);
+		mpCCScratchBuf = createBooleanOption(performanceTab1Pane, MP_CC_SCRATCH_BUF);
+		mpCSSInterrupt = createBooleanOption(performanceTab1Pane, MP_CSS_INTERRUPT);
+		mpUseBulkXfer = createBooleanOption(performanceTab1Pane, MP_USE_BULK_XFER);
 	}
 
 	/**
 	 * Create the second performance tab for the attributes pane
 	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
 	 */
-	private void createPerformanceTab2(IResourceManagerControl rm) {
+	private void createPerformanceTab2() {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1535,24 +1504,22 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		tab.setControl(performanceTab2Pane);
 		tab.setText(Messages.getString("PERFTab2.title")); //$NON-NLS-1$
 		performanceTab2Pane.setLayout(createTabPaneLayout());
-		peBufferMem = createDualField(performanceTab2Pane, rm, PE_BUFFER_MEM, PE_BUFFER_MEM_MAX);
-		mpMsgEnvelopeBuf = createTextWidget(performanceTab2Pane, rm, MP_MSG_ENVELOPE_BUF);
-		mpEagerLimit = createTextWidget(performanceTab2Pane, rm, MP_EAGER_LIMIT);
-		mpRetransmitInterval = createTextWidget(performanceTab2Pane, rm, MP_RETRANSMIT_INTERVAL);
-		mpRexmitBufCnt = createTextWidget(performanceTab2Pane, rm, MP_REXMIT_BUF_CNT);
-		mpRexmitBufSize = createTextWidget(performanceTab2Pane, rm, MP_REXMIT_BUF_SIZE);
-		mpTaskAffinity = createEditableCombobox(performanceTab2Pane, rm, MP_TASK_AFFINITY);
-		mpSharedMemory = createBooleanOption(performanceTab2Pane, rm, MP_SHARED_MEMORY);
-		mpSingleThread = createBooleanOption(performanceTab2Pane, rm, MP_SINGLE_THREAD);
+		peBufferMem = createDualField(performanceTab2Pane, PE_BUFFER_MEM, PE_BUFFER_MEM_MAX);
+		mpMsgEnvelopeBuf = createTextWidget(performanceTab2Pane, MP_MSG_ENVELOPE_BUF);
+		mpEagerLimit = createTextWidget(performanceTab2Pane, MP_EAGER_LIMIT);
+		mpRetransmitInterval = createTextWidget(performanceTab2Pane, MP_RETRANSMIT_INTERVAL);
+		mpRexmitBufCnt = createTextWidget(performanceTab2Pane, MP_REXMIT_BUF_CNT);
+		mpRexmitBufSize = createTextWidget(performanceTab2Pane, MP_REXMIT_BUF_SIZE);
+		mpTaskAffinity = createEditableCombobox(performanceTab2Pane, MP_TASK_AFFINITY);
+		mpSharedMemory = createBooleanOption(performanceTab2Pane, MP_SHARED_MEMORY);
+		mpSingleThread = createBooleanOption(performanceTab2Pane, MP_SINGLE_THREAD);
 	}
 
 	/**
 	 * Create the miscellaneous tab of the attributes pane
 	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
 	 */
-	private void createMiscellaneousTab(IResourceManagerControl rm) {
+	private void createMiscellaneousTab() {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1560,35 +1527,33 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		tab.setControl(miscTabPane);
 		tab.setText(Messages.getString("MISCTab.title")); //$NON-NLS-1$
 		miscTabPane.setLayout(createTabPaneLayout());
-		mpClockSource = createCombobox(miscTabPane, rm, MP_CLOCK_SOURCE);
-		mpMsgApi = createCombobox(miscTabPane, rm, MP_MSG_API);
-		mpTLPRequired = createCombobox(miscTabPane, rm, MP_TLP_REQUIRED);
-		mpDevType = createCombobox(miscTabPane, rm, MP_DEVTYPE);
-		mpLAPITraceLevel = createCombobox(miscTabPane, rm, MP_LAPI_TRACE_LEVEL);
-		mpEuiLibPath = createFileSelector(miscTabPane, rm, MP_EUILIBPATH, MP_EUILIBPATH_SELECTOR);
-		mpSaveLLFile = createFileSelector(miscTabPane, rm, MP_SAVE_LLFILE, MP_SAVE_LLFILE_SELECTOR);
-		mpSaveHostFile = createFileSelector(miscTabPane, rm, MP_SAVEHOSTFILE, MP_SAVEHOSTFILE_SELECTOR);
-		mpPriorityLogDir = createFileSelector(miscTabPane, rm, MP_PRIORITY_LOG_DIR, MP_PRIORITY_LOG_DIR_SELECTOR);
-		mpPriorityLogName = createTextWidget(miscTabPane, rm, MP_PRIORITY_LOG_NAME);
-		mpCkptDir = createFileSelector(miscTabPane, rm, MP_CKPTDIR, MP_CKPTDIR_SELECTOR);
-		mpCkptFile = createFileSelector(miscTabPane, rm, MP_CKPTFILE, MP_CKPTFILE_SELECTOR);
-		mpIONodeFile = createFileSelector(miscTabPane, rm, MP_IONODEFILE, MP_IONODEFILE_SELECTOR);
-		mpPulse = createTextWidget(miscTabPane, rm, MP_PULSE);
-		mpThreadStackSize = createTextWidget(miscTabPane, rm, MP_THREAD_STACKSIZE);
-		mpTimeout = createTextWidget(miscTabPane, rm, MP_TIMEOUT);
-		mpIOBufferSize = createTextWidget(miscTabPane, rm, MP_IO_BUFFER_SIZE);
-		mpHintsFiltered = createBooleanOption(miscTabPane, rm, MP_HINTS_FILTERED);
-		mpIOErrLog = createBooleanOption(miscTabPane, rm, MP_IO_ERRLOG);
-		mpCkptDirPerTask = createBooleanOption(miscTabPane, rm, MP_CKPTDIR_PERTASK);
+		mpClockSource = createCombobox(miscTabPane, MP_CLOCK_SOURCE);
+		mpMsgApi = createCombobox(miscTabPane, MP_MSG_API);
+		mpTLPRequired = createCombobox(miscTabPane, MP_TLP_REQUIRED);
+		mpDevType = createCombobox(miscTabPane, MP_DEVTYPE);
+		mpLAPITraceLevel = createCombobox(miscTabPane, MP_LAPI_TRACE_LEVEL);
+		mpEuiLibPath = createFileSelector(miscTabPane, MP_EUILIBPATH, MP_EUILIBPATH_SELECTOR);
+		mpSaveLLFile = createFileSelector(miscTabPane, MP_SAVE_LLFILE, MP_SAVE_LLFILE_SELECTOR);
+		mpSaveHostFile = createFileSelector(miscTabPane, MP_SAVEHOSTFILE, MP_SAVEHOSTFILE_SELECTOR);
+		mpPriorityLogDir = createFileSelector(miscTabPane, MP_PRIORITY_LOG_DIR, MP_PRIORITY_LOG_DIR_SELECTOR);
+		mpPriorityLogName = createTextWidget(miscTabPane, MP_PRIORITY_LOG_NAME);
+		mpCkptDir = createFileSelector(miscTabPane, MP_CKPTDIR, MP_CKPTDIR_SELECTOR);
+		mpCkptFile = createFileSelector(miscTabPane, MP_CKPTFILE, MP_CKPTFILE_SELECTOR);
+		mpIONodeFile = createFileSelector(miscTabPane, MP_IONODEFILE, MP_IONODEFILE_SELECTOR);
+		mpPulse = createTextWidget(miscTabPane, MP_PULSE);
+		mpThreadStackSize = createTextWidget(miscTabPane, MP_THREAD_STACKSIZE);
+		mpTimeout = createTextWidget(miscTabPane, MP_TIMEOUT);
+		mpIOBufferSize = createTextWidget(miscTabPane, MP_IO_BUFFER_SIZE);
+		mpHintsFiltered = createBooleanOption(miscTabPane, MP_HINTS_FILTERED);
+		mpIOErrLog = createBooleanOption(miscTabPane, MP_IO_ERRLOG);
+		mpCkptDirPerTask = createBooleanOption(miscTabPane, MP_CKPTDIR_PERTASK);
 	}
 
 	/**
 	 * Create the alternate resource manager tab of the resources pane
 	 * 
-	 * @param rm
-	 *            resource manager associated with this launch configuration
 	 */
-	private void createOtherRMTab(IResourceManagerControl rm) {
+	private void createOtherRMTab() {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1596,17 +1561,15 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		tab.setControl(alternateRMTabPane);
 		tab.setText(Messages.getString("RMTab.title")); //$NON-NLS-1$
 		alternateRMTabPane.setLayout(createTabPaneLayout());
-		mpRMLib = createFileSelector(alternateRMTabPane, rm, MP_RMLIB, MP_RMLIB_SELECTOR);
+		mpRMLib = createFileSelector(alternateRMTabPane, MP_RMLIB, MP_RMLIB_SELECTOR);
 	}
 
 	/**
 	 * Create a pane containing the advanced mode checkbox and PE setup script
 	 * name
 	 * 
-	 * @param rm
-	 *            The resource manager associated with this launch configuration
 	 */
-	private void createModeBox(IResourceManagerControl rm) {
+	private void createModeBox() {
 		GridData gd;
 		GridLayout layout;
 		Composite pane;
@@ -1620,21 +1583,19 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = true;
 		pane.setLayoutData(gd);
-		peAdvancedMode = createCheckbox(pane, rm, PE_ADVANCED_MODE);
+		peAdvancedMode = createCheckbox(pane, PE_ADVANCED_MODE);
 		if (peAdvancedMode != null) {
 			peAdvancedMode.setData(WidgetAttributes.BUTTON_ID, new Integer(PE_ADVANCED_MODE_CHECKBOX));
 			peAdvancedMode.addSelectionListener(eventMonitor);
 		}
-		peEnvScript = createFileSelector(pane, rm, PE_ENV_SCRIPT, PE_ENV_SCRIPT_SELECTOR);
+		peEnvScript = createFileSelector(pane, PE_ENV_SCRIPT, PE_ENV_SCRIPT_SELECTOR);
 	}
 
 	/**
 	 * Create a pane containing the file selectors for stdio redirection
 	 * 
-	 * @param rm
-	 *            The resource manager associated with this launch configuration
 	 */
-	private void createRedirectBox(IResourceManagerControl rm) {
+	private void createRedirectBox() {
 		GridData gd;
 		GridLayout layout;
 		Composite pane;
@@ -1648,9 +1609,9 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = true;
 		pane.setLayoutData(gd);
-		peStdinPath = createFileSelector(pane, rm, PE_STDIN_PATH, PE_STDIN_PATH_SELECTOR);
-		peStdoutPath = createFileSelector(pane, rm, PE_STDOUT_PATH, PE_STDOUT_PATH_SELECTOR);
-		peStderrPath = createFileSelector(pane, rm, PE_STDERR_PATH, PE_STDERR_PATH_SELECTOR);
+		peStdinPath = createFileSelector(pane, PE_STDIN_PATH, PE_STDIN_PATH_SELECTOR);
+		peStdoutPath = createFileSelector(pane, PE_STDOUT_PATH, PE_STDOUT_PATH_SELECTOR);
+		peStderrPath = createFileSelector(pane, PE_STDERR_PATH, PE_STDERR_PATH_SELECTOR);
 	}
 
 	/**
@@ -1667,6 +1628,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) {
 		IPEResourceManagerConfiguration config;
 		IRemoteConnectionManager connMgr;
+		currentRM = (PEResourceManager) rm;
 
 		config = (IPEResourceManagerConfiguration) ((AbstractResourceManager) rm).getConfiguration();
 		if (config != null) {
@@ -1686,105 +1648,21 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		eventMonitor = new EventMonitor();
 		mainPanel = new Composite(parent, SWT.NONE);
 		mainPanel.setLayout(new GridLayout(1, false));
-		createModeBox(rm);
-		createRedirectBox(rm);
+		createModeBox();
+		createRedirectBox();
 		tabbedPane = new TabFolder(mainPanel, SWT.TOP);
-		createTasksTab(rm);
-		createIOTab(rm);
-		createDiagnosticTab(rm);
-		createDebugTab(rm);
-		createSystemTab(rm);
-		createNodeAllocationTab(rm);
-		createPerformanceTab1(rm);
-		createPerformanceTab2(rm);
+		createTasksTab();
+		createIOTab();
+		createDiagnosticTab();
+		createDebugTab();
+		createSystemTab();
+		createNodeAllocationTab();
+		createPerformanceTab1();
+		createPerformanceTab2();
 		if (!useLoadLeveler) {
-			createOtherRMTab(rm);
+			createOtherRMTab();
 		}
-		createMiscellaneousTab(rm);
-		currentRM = rm;
-	}
-
-	/**
-	 * Add an attribute to the set of launch attributes if its value is not
-	 * equal to the default value and the attribute is known to the specified
-	 * resource manager.
-	 * 
-	 * @param rm
-	 *            The resource manager associated with the current launch
-	 *            configuration
-	 * @param config
-	 *            The current launch configuration
-	 * @param attrs
-	 *            The attributes vector containing the set of launch attributes
-	 * @param attrName
-	 *            The name of the attribute to be added to launch attributes
-	 */
-	private void addAttribute(IResourceManagerControl rm, ILaunchConfiguration config, Vector<StringAttribute> attrs,
-			String attrName) {
-		String attrValue;
-		String defaultValue;
-		StringAttribute attr;
-		StringAttributeDefinition attrDef;
-
-		if (rm.getAttributeDefinition(attrName) != null) {
-			try {
-				attrValue = config.getAttribute(attrName, ""); //$NON-NLS-1$
-			} catch (CoreException e) {
-				attrValue = ""; //$NON-NLS-1$
-			}
-			defaultValue = getAttrDefaultValue(rm, attrName);
-			// Don't add attribute if it has default value or if it is blank.
-			// This reduces number of attributes sent in run command.
-			if ((attrValue.length() > 0) && (!attrValue.equals(defaultValue))) {
-				attrDef = new StringAttributeDefinition(attrName, "", "", //$NON-NLS-1$ //$NON-NLS-2$
-						false, ""); //$NON-NLS-1$
-				attr = new StringAttribute(attrDef, attrValue);
-				attrs.add(attr);
-			}
-		}
-	}
-
-	/**
-	 * Get the set of attributes to be used as launch attributes
-	 * 
-	 * @param rm
-	 *            The resource manager associated with the current launch
-	 *            configuration
-	 * @param queue
-	 *            The current queue (not used for PE since there is only a
-	 *            single queue)
-	 * @param configuration
-	 *            The current launch configuration
-	 */
-	@SuppressWarnings("unchecked")
-	public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(IResourceManagerControl rm,
-			IPQueue queue, ILaunchConfiguration configuration, String mode) throws CoreException {
-		Vector<StringAttribute> attrs;
-		StringAttribute attrArray[];
-
-		attrs = new Vector<StringAttribute>();
-		attrArray = new StringAttribute[0];
-		if (configuration.getAttribute(PE_ADVANCED_MODE, "").equals("yes")) { //$NON-NLS-1$ //$NON-NLS-2$
-			addAttribute(rm, configuration, attrs, "PE_ENV_SCRIPT"); //$NON-NLS-1$
-		} else {
-			Map<String, StringAttribute> allAttrs;
-			Set<String> attrNames;
-			Iterator<String> i;
-			String name;
-
-			allAttrs = configuration.getAttributes();
-			attrNames = allAttrs.keySet();
-			i = attrNames.iterator();
-			while (i.hasNext()) {
-				name = i.next();
-				if ((name.startsWith("MP_")) //$NON-NLS-1$
-						|| ((name.startsWith("PE_")) && (!name //$NON-NLS-1$
-								.equals(PE_ENV_SCRIPT)))) {
-					addAttribute(rm, configuration, attrs, name);
-				}
-			}
-		}
-		return attrs.toArray(attrArray);
+		createMiscellaneousTab();
 	}
 
 	/*
@@ -1806,50 +1684,23 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * string attribute where the leading 'MP_' of the attribute name is
 	 * replaced with 'EN_'
 	 * 
-	 * @param rm
-	 *            The resource manager currently associated with the launch
-	 *            configuration
 	 * @param attrName
 	 *            The name of the attribute
 	 * @return The value of the attribute
 	 */
-	private String getAttrLocalDefaultValue(IResourceManagerControl rm, String attrName) {
+	private String getAttrLocalDefaultValue(String attrName) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 		String localDefaultEnv;
 
 		localDefaultEnv = attrName.replaceFirst("^MP_", "EN_"); //$NON-NLS-1$ //$NON-NLS-2$
-		attrDef = rm.getAttributeDefinition(localDefaultEnv);
+		attrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(localDefaultEnv);
 		if (attrDef != null) {
 			try {
 				return attrDef.create().getValueAsString();
 			} catch (IllegalValueException e) {
 			}
 		}
-		attrDef = rm.getAttributeDefinition(attrName);
-		if (attrDef != null) {
-			try {
-				return attrDef.create().getValueAsString();
-			} catch (IllegalValueException e) {
-				return ""; //$NON-NLS-1$
-			}
-		}
-		return ""; //$NON-NLS-1$
-	}
-
-	/**
-	 * Get the default value for an attribute from the resource manager
-	 * 
-	 * @param rm
-	 *            The resource manager currently associated with the launch
-	 *            configuration
-	 * @param attrName
-	 *            The name of the attribute
-	 * @return The value of the attribute
-	 */
-	private String getAttrDefaultValue(IResourceManagerControl rm, String attrName) {
-		IAttributeDefinition<?, ?, ?> attrDef;
-
-		attrDef = rm.getAttributeDefinition(attrName);
+		attrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		if (attrDef != null) {
 			try {
 				return attrDef.create().getValueAsString();
@@ -1867,14 +1718,11 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param config
 	 *            The current launch configuration
-	 * @param rm
-	 *            The resource manager currently associated with the launch
-	 *            configuration
 	 * @param attrName
 	 *            The name of the attribute
 	 * @return The value of the attribute
 	 */
-	private String getAttrInitialValue(ILaunchConfiguration config, IResourceManagerControl rm, String attrName) {
+	private String getAttrInitialValue(ILaunchConfiguration config, String attrName) {
 		String value;
 		IAttributeDefinition<?, ?, ?> rmAttrDef;
 
@@ -1887,7 +1735,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 			// Get the default attribute value, where that default may be the
 			// value
 			// specified by the user as an override to the PE default value.
-			value = getAttrLocalDefaultValue(rm, attrName);
+			value = getAttrLocalDefaultValue(attrName);
 		}
 		// If an attribute is defined as an integer attribute, then determine if
 		// the attribute is evenly divisible by 1G, 1M or 1K, and if so, then
@@ -1899,7 +1747,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		// NumberFormatException, so a try/catch block is required, where the
 		// string
 		// value is returned in thecase of a NumberFormatException
-		rmAttrDef = rm.getAttributeDefinition(attrName);
+		rmAttrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		if (rmAttrDef instanceof IntegerAttributeDefinition || rmAttrDef instanceof BigIntegerAttributeDefinition) {
 			long intVal;
 
@@ -2018,11 +1866,8 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param configuration
 	 *            The current launch configuration
-	 * @param rm
-	 *            The resource manager currently associated with the launch
-	 *            configuration
 	 */
-	private void setInitialValues(ILaunchConfiguration config, IResourceManagerControl rm) {
+	private void setInitialValues(ILaunchConfiguration config) {
 		Object widget;
 		Iterator<Object> i;
 
@@ -2049,22 +1894,22 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 			widget = i.next();
 			if (widget instanceof FileSelectorRowWidget) {
 				setValue((FileSelectorRowWidget) widget,
-						getAttrInitialValue(config, rm, (String) ((FileSelectorRowWidget) widget).getData()));
+						getAttrInitialValue(config, (String) ((FileSelectorRowWidget) widget).getData()));
 			} else if (widget instanceof DualFieldRowWidget) {
 				setValue((DualFieldRowWidget) widget,
-						getAttrInitialValue(config, rm, (String) ((DualFieldRowWidget) widget).getData1()),
-						getAttrInitialValue(config, rm, (String) ((DualFieldRowWidget) widget).getData2()));
+						getAttrInitialValue(config, (String) ((DualFieldRowWidget) widget).getData1()),
+						getAttrInitialValue(config, (String) ((DualFieldRowWidget) widget).getData2()));
 			} else if (widget instanceof TextRowWidget) {
 				setValue((TextRowWidget) widget,
-						getAttrInitialValue(config, rm, ((TextRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)));
+						getAttrInitialValue(config, ((TextRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)));
 			} else if (widget instanceof ComboRowWidget) {
 				setValue((ComboRowWidget) widget,
-						getAttrInitialValue(config, rm, ((ComboRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)));
+						getAttrInitialValue(config, ((ComboRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)));
 			} else if (widget instanceof BooleanRowWidget) {
-				setValue((BooleanRowWidget) widget, getAttrInitialValue(config, rm, ((BooleanRowWidget) widget).getData()));
+				setValue((BooleanRowWidget) widget, getAttrInitialValue(config, ((BooleanRowWidget) widget).getData()));
 			} else if (widget instanceof CheckboxRowWidget) {
 				setValue((CheckboxRowWidget) widget,
-						getAttrInitialValue(config, rm, ((CheckboxRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)), "yes"); //$NON-NLS-1$
+						getAttrInitialValue(config, ((CheckboxRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)), "yes"); //$NON-NLS-1$
 			}
 
 		}
@@ -2084,11 +1929,11 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * point this method is called, all widgets are in enabled state, so it is
 	 * only necessary to disable widgets.
 	 */
-	private void setInitialWidgetState(IResourceManagerControl rm) {
+	private void setInitialWidgetState() {
 		String mpPriorityDefaultValue;
 		boolean enableState;
 
-		mpPriorityDefaultValue = getDefaultAttributeValue(rm, MP_PRIORITY);
+		mpPriorityDefaultValue = getDefaultAttributeValue(MP_PRIORITY);
 		if ((mpPriority != null) && ((mpPriority.getValue().length() == 0) || mpPriority.getValue().equals(mpPriorityDefaultValue))) {
 			enableState = false;
 		} else {
@@ -2128,13 +1973,13 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @return The default attribute value or empty string if value cannot be
 	 *         retrieved
 	 */
-	private String getDefaultAttributeValue(IResourceManagerControl rm, String attributeName) {
+	private String getDefaultAttributeValue(String attributeName) {
 		String defaultValue;
 
 		try {
 			IAttributeDefinition<?, ?, ?> def;
 
-			def = rm.getAttributeDefinition(attributeName);
+			def = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(attributeName);
 			if (def != null) {
 				defaultValue = def.create().getValueAsString();
 			} else {
@@ -2160,8 +2005,9 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
 			currentLaunchConfig = (ILaunchConfigurationWorkingCopy) configuration;
 		}
-		setInitialValues(configuration, rm);
-		setInitialWidgetState(rm);
+		currentRM = (PEResourceManager) rm;
+		setInitialValues(configuration);
+		setInitialWidgetState();
 		return success;
 	}
 
@@ -2233,22 +2079,18 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param config
 	 *            The launch configuration
-	 * @param rm
-	 *            The resource manager currently used by the launch
-	 *            configuration
 	 * @param attr
 	 *            The name of the attribute
 	 * @param control
 	 *            The widget to obtain the value from
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, IResourceManagerControl rm, String attr,
-			TextRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr, TextRowWidget control) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 
 		if (control != null) {
 			String attrValue;
 
-			attrDef = rm.getAttributeDefinition(attr);
+			attrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(attr);
 			try {
 				if ((attrDef instanceof IntegerAttributeDefinition) || (attrDef instanceof BigIntegerAttributeDefinition)) {
 					attrValue = getIntegerValue(control.getValue());
@@ -2349,7 +2191,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param config
 	 */
-	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config, IResourceManagerControl rm) {
+	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config) {
 		Object widget;
 		Iterator<Object> i;
 
@@ -2358,7 +2200,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 			while (i.hasNext()) {
 				widget = i.next();
 				if (widget instanceof TextRowWidget) {
-					setConfigAttr(config, rm, ((TextRowWidget) widget).getData(WidgetAttributes.ATTR_NAME), (TextRowWidget) widget);
+					setConfigAttr(config, ((TextRowWidget) widget).getData(WidgetAttributes.ATTR_NAME), (TextRowWidget) widget);
 				} else if (widget instanceof ComboRowWidget) {
 					setConfigAttr(config, ((ComboRowWidget) widget).getData(WidgetAttributes.ATTR_NAME), (ComboRowWidget) widget);
 				} else if (widget instanceof CheckboxRowWidget) {
@@ -2386,7 +2228,8 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 */
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
 		currentLaunchConfig = configuration;
-		saveConfigurationData(configuration, rm);
+		currentRM = (PEResourceManager) rm;
+		saveConfigurationData(configuration);
 		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	}
 
@@ -2982,7 +2825,8 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		@SuppressWarnings("unused")
 		StringSetAttribute attr;
 
-		attrDef = (StringSetAttributeDefinition) currentRM.getAttributeDefinition(attrName);
+		attrDef = (StringSetAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
+				.getAttributeDefinition(attrName);
 		if (attrDef != null) {
 			try {
 				attr = attrDef.create(widget.getValue());
@@ -3042,7 +2886,8 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		@SuppressWarnings("unused")
 		IntegerAttribute attr;
 
-		attrDef = (IntegerAttributeDefinition) currentRM.getAttributeDefinition(attrName);
+		attrDef = (IntegerAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
+				.getAttributeDefinition(attrName);
 		try {
 			attr = attrDef.create(value);
 		} catch (IllegalValueException e) {
@@ -3107,7 +2952,8 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		@SuppressWarnings("unused")
 		BigIntegerAttribute attr;
 
-		attrDef = (BigIntegerAttributeDefinition) currentRM.getAttributeDefinition(attrName);
+		attrDef = (BigIntegerAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
+				.getAttributeDefinition(attrName);
 		try {
 			attr = attrDef.create(value);
 		} catch (IllegalValueException e) {

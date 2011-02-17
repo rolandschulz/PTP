@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui.data;
+package org.eclipse.ptp.rm.pbs.core.attributes;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,8 +33,7 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
-import org.eclipse.ptp.rm.pbs.ui.IPBSJobAttributeData;
-import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,6 +50,7 @@ import com.ibm.icu.text.DateFormat;
  * solely via the model definition.
  * 
  * @author arossi
+ * @since 5.0
  */
 public class PBSXMLJobAttributeData implements IPBSJobAttributeData, IPBSNonNLSConstants {
 

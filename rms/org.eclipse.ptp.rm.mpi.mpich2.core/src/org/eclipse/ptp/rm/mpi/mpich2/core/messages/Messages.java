@@ -97,12 +97,18 @@ public class Messages extends NLS {
 	public static String MPICH2ProcessMapXml13Parser_Exception_UnknownAttribute;
 	public static String MPICH2ProcessMapXml13Parser_Exception_UnknownElement;
 
+	public static String MPICH2RuntimeSystem_InvalidConfiguration;
 	public static String MPICH2RuntimeSystem_JobName;
+	public static String MPICH2RuntimeSystem_NoDefaultQueue;
 	public static String MPICH2RuntimeSystemJob_Exception_FailedParse;
 	public static String MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch;
 	public static String MPICH2RuntimeSystemJob_ProcessName;
 	public static String MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithExitValue;
 	public static String MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithSignal;
+
+	public static String MPICH2LaunchConfigurationDefaults_Exception_FailedReadFile;
+	public static String MPICH2LaunchConfigurationDefaults_FailedParseInteger;
+	public static String MPICH2LaunchConfigurationDefaults_MissingValue;
 
 	static {
 		// initialize resource bundle

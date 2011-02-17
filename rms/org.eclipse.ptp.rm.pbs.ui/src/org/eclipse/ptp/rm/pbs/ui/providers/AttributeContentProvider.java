@@ -18,8 +18,8 @@ import java.util.Map;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.pbs.ui.data.AttributePlaceholder;
-import org.eclipse.ptp.rm.pbs.ui.data.PBSBatchScriptTemplate;
+import org.eclipse.ptp.rm.pbs.core.attributes.AttributePlaceholder;
+import org.eclipse.ptp.rm.pbs.core.templates.PBSBatchScriptTemplate;
 
 /**
  * Used to populate viewers whose model is the AttributePlaceholder. <br>
@@ -27,7 +27,7 @@ import org.eclipse.ptp.rm.pbs.ui.data.PBSBatchScriptTemplate;
  * Assumes top-level PBSBatchScriptTemplate and also maps whose values are
  * AttributePlaceholders.
  * 
- * @see org.eclipse.ptp.rm.pbs.ui.data.AttributePlaceholder
+ * @see org.eclipse.ptp.rm.pbs.core.attributes.AttributePlaceholder
  * @author arossi
  */
 public class AttributeContentProvider implements IStructuredContentProvider {

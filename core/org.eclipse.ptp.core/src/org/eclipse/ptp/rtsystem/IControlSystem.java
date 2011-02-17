@@ -20,7 +20,8 @@
 package org.eclipse.ptp.rtsystem;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 
 /**
  * A Control System is a portion of a runtime system that handles controlling
@@ -33,10 +34,16 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 public interface IControlSystem {
 
 	/**
+	 * Get the attribute definition manager.
+	 * 
+	 * @return the attribute definition manager
+	 * @since 5.0
+	 */
+	public AttributeDefinitionManager getAttributeDefinitionManager();
+
+	/**
 	 * Submits a job run using the submission ID and the attributes provided by
-	 * the AttributeManager. The AttributeManager contains resource manager
-	 * specific information about how the user wants to run the job, such as the
-	 * program name, number of processes, etc.
+	 * the ILaunchConfiguration.
 	 * 
 	 * The job submission ID can be used to identify the new job that is
 	 * created. The ID will be returned as an attribute on the new job.
@@ -46,10 +53,15 @@ public interface IControlSystem {
 	 * fails.
 	 * 
 	 * @param subId
-	 * @param attrMgr
+	 *            job submission ID
+	 * @param configuration
+	 *            launch configuration
+	 * @param mode
+	 *            launch mode
 	 * @throws CoreException
+	 * @since 5.0
 	 */
-	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException;
+	public void submitJob(String subId, ILaunchConfiguration configuration, String mode) throws CoreException;
 
 	/**
 	 * Terminates a running job. The job identifier is used to locate the job by
@@ -61,4 +73,5 @@ public interface IControlSystem {
 	 * @since 5.0
 	 */
 	public void terminateJob(String jobId) throws CoreException;
+
 }

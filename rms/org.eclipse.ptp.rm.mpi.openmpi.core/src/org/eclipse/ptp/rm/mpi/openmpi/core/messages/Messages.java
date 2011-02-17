@@ -91,7 +91,11 @@ public class Messages extends NLS {
 	public static String OpenMPIProcessMapXml13Parser_Exception_UnknownAttribute;
 	public static String OpenMPIProcessMapXml13Parser_Exception_UnknownElement;
 
+	public static String OpenMPIRuntimeSystem_InvalidConfiguration;
+
 	public static String OpenMPIRuntimeSystem_JobName;
+
+	public static String OpenMPIRuntimeSystem_NoDefaultQueue;
 	public static String OpenMPIRuntimeSystemJob_Exception_FailedParse;
 	public static String OpenMPIRuntimeSystemJob_Exception_HostnamesDoNotMatch;
 	public static String OpenMPIRuntimeSystemJob_Exception_FailedExecute0;
@@ -99,6 +103,10 @@ public class Messages extends NLS {
 	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithExitValue;
 	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithSignal;
 	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailureDetected;
+
+	public static String OpenMPILaunchConfigurationDefaults_Exception_FailedReadFile;
+	public static String OpenMPILaunchConfigurationDefaults_FailedParseInteger;
+	public static String OpenMPILaunchConfigurationDefaults_MissingValue;
 
 	static {
 		// initialize resource bundle

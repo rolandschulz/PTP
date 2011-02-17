@@ -37,6 +37,8 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfigurationDefaults;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.Parameters.Parameter;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManager;

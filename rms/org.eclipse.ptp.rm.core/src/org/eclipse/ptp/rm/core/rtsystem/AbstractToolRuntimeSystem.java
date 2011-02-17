@@ -10,22 +10,29 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.core.rtsystem;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
@@ -36,10 +43,15 @@ import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
+import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
+import org.eclipse.ptp.core.elements.attributes.FilterAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
+import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -61,6 +73,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeEventFactory;
+import org.eclipse.ptp.utils.core.ArgumentParser;
 import org.eclipse.ptp.utils.core.RangeSet;
 
 /**
@@ -103,6 +116,37 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		}
 	}
 
+	/**
+	 * Get environment to append
+	 * 
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 * @since 3.0
+	 */
+	protected static String[] getEnvironment(ILaunchConfiguration configuration) throws CoreException {
+		Map<?, ?> defaultEnv = null;
+		Map<?, ?> configEnv = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, defaultEnv);
+		if (configEnv == null) {
+			return null;
+		}
+		if (!configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true)) {
+			throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getUniqueIdentifier(),
+					Messages.AbstractToolRuntimeSystem_EnvNotSupported));
+		}
+
+		List<String> strings = new ArrayList<String>(configEnv.size());
+		Iterator<?> iter = configEnv.entrySet().iterator();
+		while (iter.hasNext()) {
+			Entry<?, ?> entry = (Entry<?, ?>) iter.next();
+			String key = (String) entry.getKey();
+			String value = (String) entry.getValue();
+			strings.add(key + "=" + value); //$NON-NLS-1$
+
+		}
+		return strings.toArray(new String[strings.size()]);
+	}
+
 	/** Job to monitor remote system and is executed continuously. */
 	private Job continousMonitorJob;
 
@@ -129,7 +173,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	private final IResourceManagerControl fResourceManager;
 
 	/** Attribute definitions for the RTS. */
-	protected AttributeDefinitionManager attrMgr;
+	protected AttributeDefinitionManager attrMgr = new AttributeDefinitionManager();
 
 	protected IRemoteConnection connection = null;
 
@@ -148,11 +192,10 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/**
 	 * @since 3.0
 	 */
-	public AbstractToolRuntimeSystem(IResourceManagerControl rm, IToolRMConfiguration config, AttributeDefinitionManager manager) {
+	public AbstractToolRuntimeSystem(IResourceManagerControl rm, IToolRMConfiguration config) {
 		fResourceManager = rm;
 		this.jobNumber = 0;
 		this.rmConfiguration = config;
-		this.attrMgr = manager;
 	}
 
 	/**
@@ -436,8 +479,6 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		return id;
 	}
 
-	abstract public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) throws CoreException;
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -450,16 +491,25 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		doFilterEvents(element, filterChildren, filterAttributes);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IControlSystem#getAttributeDefinitionManager()
+	 */
+	/**
+	 * @since 3.0
+	 */
+	public AttributeDefinitionManager getAttributeDefinitionManager() {
+		return attrMgr;
+	}
+
 	public IRemoteConnection getConnection() {
 		return connection;
 	}
 
 	public IRemoteServices getRemoteServices() {
 		return remoteServices;
-	}
-
-	public IToolRMConfiguration getRmConfiguration() {
-		return rmConfiguration;
 	}
 
 	/**
@@ -469,7 +519,9 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		return fResourceManager;
 	}
 
-	public abstract AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration();
+	public IToolRMConfiguration getRmConfiguration() {
+		return rmConfiguration;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -566,6 +618,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		synchronized (this) {
 			startupMonitor = subMon;
 		}
+
+		initialize();
 
 		subMon.subTask(Messages.AbstractToolRuntimeSystem_1);
 
@@ -669,15 +723,19 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IControlSystem#submitJob(org.eclipse.ptp.core
-	 * .attributes.AttributeManager)
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(java.lang.String,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException {
+	/**
+	 * @since 3.0
+	 */
+	public void submitJob(String subId, ILaunchConfiguration configuration, String mode) throws CoreException {
 		if (remoteServices == null) {
 			throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID,
 					Messages.AbstractToolRuntimeSystem_Exception_ResourceManagerNotInitialized));
 		}
+
+		AttributeManager attrMgr = new AttributeManager(getAttributes(configuration, mode).toArray(new IAttribute<?, ?, ?>[0]));
 
 		/*
 		 * Add some more attributes to the launch information.
@@ -744,6 +802,24 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	}
 
 	/**
+	 * Initialize the attribute manager. This is called each time the runtime is
+	 * started.
+	 */
+	private void initialize() {
+		attrMgr.clear();
+		attrMgr.setAttributeDefinitions(ElementAttributes.getDefaultAttributeDefinitions());
+		attrMgr.setAttributeDefinitions(ErrorAttributes.getDefaultAttributeDefinitions());
+		attrMgr.setAttributeDefinitions(FilterAttributes.getDefaultAttributeDefinitions());
+		attrMgr.setAttributeDefinitions(JobAttributes.getDefaultAttributeDefinitions());
+		attrMgr.setAttributeDefinitions(MachineAttributes.getDefaultAttributeDefinitions());
+		attrMgr.setAttributeDefinitions(MessageAttributes.getDefaultAttributeDefinitions());
+		attrMgr.setAttributeDefinitions(NodeAttributes.getDefaultAttributeDefinitions());
+		attrMgr.setAttributeDefinitions(ProcessAttributes.getDefaultAttributeDefinitions());
+		attrMgr.setAttributeDefinitions(QueueAttributes.getDefaultAttributeDefinitions());
+		attrMgr.setAttributeDefinitions(ResourceManagerAttributes.getDefaultAttributeDefinitions());
+	}
+
+	/**
 	 * Creates a job that keeps monitoring the remote machine. The default
 	 * implementation runs the continuous monitor command if defined in the RM
 	 * capability.
@@ -777,6 +853,15 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * @return periodic monitor job
 	 */
 	protected abstract Job createPeriodicMonitorJob(IProgressMonitor monitor) throws CoreException;
+
+	/**
+	 * @param jobID
+	 * @param queueID
+	 * @param attrMgr
+	 * @return
+	 * @throws CoreException
+	 */
+	protected abstract Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) throws CoreException;
 
 	/**
 	 * Template method to extend the filterEvents procedure.
@@ -866,4 +951,105 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	protected String generateJobName() {
 		return "job" + jobNumber++; //$NON-NLS-1$
 	}
+
+	/**
+	 * Convert launch configuration attributes to PTP attributes
+	 * 
+	 * @since 3.0
+	 */
+	protected List<IAttribute<?, ?, ?>> getAttributes(ILaunchConfiguration configuration, String mode) throws CoreException {
+		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
+
+		/*
+		 * Collect attributes from Application tab
+		 */
+		String exePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, (String) null);
+		if (exePath != null) {
+			IPath programPath = new Path(exePath);
+			attrs.add(JobAttributes.getExecutableNameAttributeDefinition().create(programPath.lastSegment()));
+
+			String path = programPath.removeLastSegments(1).toString();
+			if (path != null) {
+				attrs.add(JobAttributes.getExecutablePathAttributeDefinition().create(path));
+			}
+		}
+
+		/*
+		 * Collect attributes from Arguments tab
+		 */
+		String wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
+		if (wd != null) {
+			attrs.add(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
+		}
+
+		String[] args = getProgramArguments(configuration, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS);
+		if (args != null) {
+			attrs.add(JobAttributes.getProgramArgumentsAttributeDefinition().create(args));
+		}
+
+		/*
+		 * Collect attributes from Environment tab
+		 */
+		String[] envArr = getEnvironment(configuration);
+		if (envArr != null) {
+			attrs.add(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
+		}
+
+		/*
+		 * Collect attributes from Debugger tab if this is a debug launch
+		 */
+		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+			boolean stopInMainFlag = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
+			attrs.add(JobAttributes.getDebuggerStopInMainFlagAttributeDefinition().create(Boolean.valueOf(stopInMainFlag)));
+
+			attrs.add(JobAttributes.getDebugFlagAttributeDefinition().create(Boolean.TRUE));
+
+			args = getProgramArguments(configuration, IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS);
+			if (args != null) {
+				attrs.add(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(args));
+			}
+
+			String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
+					(String) null);
+			if (dbgExePath != null) {
+				IPath path = new Path(dbgExePath);
+				attrs.add(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
+				attrs.add(JobAttributes.getDebuggerExecutablePathAttributeDefinition()
+						.create(path.removeLastSegments(1).toString()));
+			}
+		}
+
+		/*
+		 * PTP launched this job
+		 */
+		attrs.add(JobAttributes.getLaunchedByPTPFlagAttributeDefinition().create(Boolean.valueOf(true)));
+
+		return attrs;
+	}
+
+	/**
+	 * Convert application arguments to an array of strings.
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 * @return array of strings containing the program arguments
+	 * @throws CoreException
+	 * @since 3.0
+	 */
+	protected String[] getProgramArguments(ILaunchConfiguration configuration, String attrName) throws CoreException {
+		String temp = configuration.getAttribute(attrName, (String) null);
+		if (temp != null && temp.length() > 0) {
+			ArgumentParser ap = new ArgumentParser(temp);
+			List<String> args = ap.getTokenList();
+			if (args != null) {
+				return args.toArray(new String[args.size()]);
+			}
+		}
+		return new String[0];
+	}
+
+	/**
+	 * @return
+	 */
+	protected abstract AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration();
 }

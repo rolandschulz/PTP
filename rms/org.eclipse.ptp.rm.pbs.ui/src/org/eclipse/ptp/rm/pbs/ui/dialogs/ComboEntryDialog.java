@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.pbs.ui.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.ui.utils.WidgetUtils;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;

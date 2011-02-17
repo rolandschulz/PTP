@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - original API
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui;
+package org.eclipse.ptp.rm.pbs.core;
 
 /**
  * Gathers all internal, unmodifiable string constants into a single place for
@@ -116,6 +116,7 @@ public interface IPBSNonNLSConstants {
 
 	/* FIXED PATHS & FILE NAMES */
 	String SRC = "src";//$NON-NLS-1$
+	String DATA = "data";//$NON-NLS-1$
 	String TEMPLATE_SUFFIX = "_template";//$NON-NLS-1$
 	String FULL_TEMPLATE = "full" + TEMPLATE_SUFFIX;//$NON-NLS-1$
 	String MIN_TEMPLATE = "min" + TEMPLATE_SUFFIX;//$NON-NLS-1$

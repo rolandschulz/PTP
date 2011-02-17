@@ -19,7 +19,6 @@
 package org.eclipse.ptp.launch;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -34,9 +33,7 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.IPSession;
@@ -46,7 +43,6 @@ import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -58,6 +54,44 @@ import org.eclipse.ui.WorkbenchException;
  * manager mechanism.
  */
 public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchConfigurationDelegate {
+	private class DebuggerSession implements IRunnableWithProgress {
+		private final String fJobId;
+		private final IPLaunch fLaunch;
+		private final IProject fProject;
+		private final IPDebugger fDebugger;
+
+		public DebuggerSession(String jobId, IPLaunch launch, IProject project, IPDebugger debugger) {
+			fJobId = jobId;
+			fLaunch = launch;
+			fProject = project;
+			fDebugger = debugger;
+		}
+
+		public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+			monitor.beginTask(Messages.ParallelLaunchConfigurationDelegate_5, 10);
+			SubMonitor subMon = SubMonitor.convert(monitor, 10);
+			try {
+				IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(fDebugger, fLaunch, fProject,
+						subMon.newChild(2));
+
+				/*
+				 * NOTE: we assume these have already been verified prior to
+				 * launch
+				 */
+				String app = getProgramName(fLaunch.getLaunchConfiguration());
+				String path = getProgramPath(fLaunch.getLaunchConfiguration());
+				String cwd = getWorkingDirectory(fLaunch.getLaunchConfiguration());
+				String[] args = getProgramArguments(fLaunch.getLaunchConfiguration());
+
+				session.connectToDebugger(subMon.newChild(8), app, path, cwd, args);
+			} catch (CoreException e) {
+				PTPDebugCorePlugin.getDebugModel().shutdownSession(fJobId);
+				throw new InvocationTargetException(e, e.getLocalizedMessage());
+			} finally {
+				monitor.done();
+			}
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -86,7 +120,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			progress.worked(10);
 			progress.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
 
-			AttributeManager attrManager = getAttributeManager(configuration, mode, progress.newChild(10));
+			verifyLaunchAttributes(configuration, mode, progress.newChild(10));
 
 			// All copy pre-"job submission" occurs here
 			copyExecutable(configuration, progress.newChild(10));
@@ -111,18 +145,16 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 
 					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 					debugger = debugConfig.getDebugger();
-					debugger.initialize(configuration, attrManager, progress.newChild(10));
+					debugger.initialize(configuration, progress.newChild(10));
 					if (progress.isCanceled()) {
 						return;
 					}
-					attrManager.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
-					attrManager.addAttribute(JobAttributes.getDebuggerIdAttributeDefinition().create(debugConfig.getID()));
 				}
 
 				progress.worked(10);
 				progress.subTask(Messages.ParallelLaunchConfigurationDelegate_7);
 
-				submitJob(configuration, mode, (IPLaunch) launch, attrManager, debugger, progress.newChild(40));
+				submitJob(configuration, mode, (IPLaunch) launch, debugger, progress.newChild(40));
 
 				progress.worked(10);
 			} catch (CoreException e) {
@@ -148,7 +180,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	 */
 	private void terminateJob(final IResourceManagerControl rm, final String jobId) {
 		try {
-			rm.control(jobId, JobControlOperation.TERMINATE, null);
+			rm.control(jobId, IResourceManagerControl.TERMINATE_OPERATION, null);
 		} catch (CoreException e1) {
 			// Ignore, but log
 			PTPLaunchPlugin.log(e1);
@@ -179,17 +211,17 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	 * 
 	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
 	 * doCompleteJobLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch,
-	 * org.eclipse.ptp.core.attributes.AttributeManager,
 	 * org.eclipse.ptp.debug.core.IPDebugger)
 	 */
-	/**
-	 * @since 5.0
-	 */
 	@Override
-	protected void doCompleteJobLaunch(final IPLaunch launch, AttributeManager mgr, final IPDebugger debugger) {
+	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
 		final String jobId = launch.getJobId();
 		final IResourceManagerControl rm = launch.getResourceManager();
-		ILaunchConfiguration configuration = launch.getLaunchConfiguration();
+		final ILaunchConfiguration configuration = launch.getLaunchConfiguration();
+
+		/*
+		 * Used by org.eclipse.ptp.ui.IJobManager#removeJob
+		 */
 		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), jobId);
 
 		/*
@@ -204,39 +236,11 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				setDefaultSourceLocator(launch, configuration);
 				final IProject project = verifyProject(configuration);
 
+				final DebuggerSession session = new DebuggerSession(jobId, launch, project, debugger);
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
-						IRunnableWithProgress runnable = new IRunnableWithProgress() {
-							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-								monitor.beginTask(Messages.ParallelLaunchConfigurationDelegate_5, 10);
-								SubMonitor subMon = SubMonitor.convert(monitor, 10);
-								try {
-									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch,
-											project, subMon.newChild(2));
-
-									AttributeManager jobAttrs = rm.getJobStatus(jobId).getAttributes();
-
-									String app = jobAttrs.getAttribute(JobAttributes.getExecutableNameAttributeDefinition())
-											.getValueAsString();
-									String path = jobAttrs.getAttribute(JobAttributes.getExecutablePathAttributeDefinition())
-											.getValueAsString();
-									String cwd = jobAttrs.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition())
-											.getValueAsString();
-									List<String> args = jobAttrs.getAttribute(
-											JobAttributes.getProgramArgumentsAttributeDefinition()).getValue();
-
-									session.connectToDebugger(subMon.newChild(8), app, path, cwd,
-											args.toArray(new String[args.size()]));
-								} catch (CoreException e) {
-									PTPDebugCorePlugin.getDebugModel().shutdownSession(jobId);
-									throw new InvocationTargetException(e, e.getLocalizedMessage());
-								} finally {
-									monitor.done();
-								}
-							}
-						};
 						try {
-							new ProgressMonitorDialog(PTPLaunchPlugin.getActiveWorkbenchShell()).run(true, true, runnable);
+							new ProgressMonitorDialog(PTPLaunchPlugin.getActiveWorkbenchShell()).run(true, true, session);
 						} catch (InterruptedException e) {
 							terminateJob(rm, jobId);
 						} catch (InvocationTargetException e) {

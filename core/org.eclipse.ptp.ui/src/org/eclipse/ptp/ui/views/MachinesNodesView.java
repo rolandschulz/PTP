@@ -35,7 +35,6 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
@@ -56,6 +55,7 @@ import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.utils.core.BitSetIterable;
@@ -999,8 +999,8 @@ public class MachinesNodesView extends ViewPart {
 			boolean needRefresh = false;
 			IPResourceManager rm = (IPResourceManager) e.getSource().getAdapter(IPResourceManager.class);
 			if (rm != null) {
-				if ((e.getSource().getState() == ResourceManagerAttributes.State.STOPPED)
-						|| (e.getSource().getState() == ResourceManagerAttributes.State.ERROR)) {
+				if ((e.getSource().getState().equals(IResourceManagerControl.STOPPED_STATE))
+						|| (e.getSource().getState().equals(IResourceManagerControl.ERROR_STATE))) {
 					/*
 					 * refresh the view, removing the resource manager machines,
 					 * but not removing machine listeners.

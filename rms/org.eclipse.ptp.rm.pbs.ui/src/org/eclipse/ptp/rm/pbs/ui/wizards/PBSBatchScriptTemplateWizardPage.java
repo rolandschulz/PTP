@@ -26,11 +26,12 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
+import org.eclipse.ptp.rm.pbs.core.templates.PBSBatchScriptTemplate;
+import org.eclipse.ptp.rm.pbs.core.templates.PBSBatchScriptTemplateManager;
 import org.eclipse.ptp.rm.pbs.ui.PBSUIPlugin;
-import org.eclipse.ptp.rm.pbs.ui.data.PBSBatchScriptTemplate;
 import org.eclipse.ptp.rm.pbs.ui.dialogs.ScrollingEditableMessageDialog;
-import org.eclipse.ptp.rm.pbs.ui.managers.PBSBatchScriptTemplateManager;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 import org.eclipse.ptp.rm.pbs.ui.providers.AttributeContentProvider;
 import org.eclipse.ptp.rm.pbs.ui.providers.AttributeLabelProvider;
@@ -97,7 +98,7 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 		public void widgetSelected(SelectionEvent e) {
 			try {
 				String name = WidgetUtils.getSelected(templates);
-				templateManager.removeTemplate(name);
+				resourceManager.getTemplateManager().removeTemplate(name);
 				updateTemplates(name);
 				updateSettings();
 			} catch (Throwable t) {
@@ -131,15 +132,15 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 						Messages.PBSRMLaunchConfigEditChoose_new_name, oldName, null);
 				if (nameDialog.open() == Window.CANCEL)
 					return;
-				newName = templateManager.validateTemplateNameForEdit(nameDialog.getValue());
+				newName = resourceManager.getTemplateManager().validateTemplateNameForEdit(nameDialog.getValue());
 
-				PBSBatchScriptTemplate template = templateManager.loadTemplate(oldName, null);
+				PBSBatchScriptTemplate template = resourceManager.getTemplateManager().loadTemplate(oldName, null);
 				ScrollingEditableMessageDialog dialog = new ScrollingEditableMessageDialog(getShell(),
 						Messages.PBSRMLaunchConfigEditChoose_message, template.getText());
 				if (dialog.open() == Window.CANCEL)
 					return;
 				String edited = dialog.getValue();
-				templateManager.storeTemplate(edited, newName);
+				resourceManager.getTemplateManager().storeTemplate(edited, newName);
 				updateTemplates(newName);
 				updateSettings();
 			} catch (Throwable t) {
@@ -187,7 +188,7 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					try {
 						monitor.beginTask(Messages.PBSRMLaunchConfigImportJobMessage, 2);
-						templateManager.exportTemplate(dir, original, renamed);
+						resourceManager.getTemplateManager().exportTemplate(dir, original, renamed);
 						monitor.worked(2);
 					} catch (Throwable t) {
 						t.printStackTrace();
@@ -222,7 +223,7 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					try {
 						monitor.beginTask(Messages.PBSRMLaunchConfigImportJobMessage, 2);
-						templateManager.addImportedTemplate(imported);
+						resourceManager.getTemplateManager().addImportedTemplate(imported);
 						monitor.worked(1);
 						updateTemplates(imported.getName());
 						updateSettings();
@@ -243,15 +244,15 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 
 	private ConfigurationChangeListener listener;
 	private TableViewer readOnlyView;
-	private final PBSBatchScriptTemplateManager templateManager;
+	private final PBSResourceManager resourceManager;
 	private Combo templates;
 	private String selected;
 
-	public PBSBatchScriptTemplateWizardPage(PBSBatchScriptTemplateManager templateManager) throws Throwable {
+	public PBSBatchScriptTemplateWizardPage(PBSResourceManager rm) throws Throwable {
 		super(Messages.PBSConfigurationWizardPage_name);
 		setTitle(Messages.PBSConfigurationWizardPage_title);
 		setDescription(Messages.PBSConfigurationWizardPage_description);
-		this.templateManager = templateManager;
+		this.resourceManager = rm;
 		selected = ZEROSTR;
 		setValid(true);
 	}
@@ -261,7 +262,7 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 		GridLayout topLayout = new GridLayout();
 		composite.setLayout(topLayout);
 		createContents(composite);
-		PBSBatchScriptTemplate current = templateManager.getCurrent();
+		PBSBatchScriptTemplate current = resourceManager.getTemplateManager().getCurrent();
 		String last = current == null ? PBSBatchScriptTemplateManager.FULL_TEMPLATE : current.getName();
 		WidgetUtils.select(templates, last);
 		setControl(composite);
@@ -274,7 +275,7 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 	private void createContents(Composite parent) {
 		Group templateContainer = WidgetUtils.createFillingGroup(parent, ZEROSTR, 4, 1, false);
 		listener = new ConfigurationChangeListener();
-		String[] available = templateManager.findAvailableTemplates();
+		String[] available = resourceManager.getTemplateManager().findAvailableTemplates();
 		String initial = available.length == 0 ? null : available[0];
 		templates = WidgetUtils.createItemCombo(templateContainer, Messages.PBSRMLaunchConfigTemplate_title, available, initial,
 				Messages.PBSRMLaunchConfigTemplate_message, true, listener, 2);
@@ -330,7 +331,7 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 		PBSBatchScriptTemplate template = null;
 		selected = WidgetUtils.getSelected(templates);
 		if (!ZEROSTR.equals(selected))
-			template = templateManager.loadTemplate(selected, null);
+			template = resourceManager.getTemplateManager().loadTemplate(selected, null);
 		if (template == null)
 			readOnlyView.setInput(this);
 		else
@@ -345,7 +346,7 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 	 */
 	private void updateTemplates(String current) {
 		listener.disable();
-		templates.setItems(templateManager.findAvailableTemplates());
+		templates.setItems(resourceManager.getTemplateManager().findAvailableTemplates());
 		String next = WidgetUtils.select(templates, current);
 		listener.enable();
 		if (!next.equals(current))

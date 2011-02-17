@@ -18,10 +18,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.launch;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -32,6 +30,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -39,16 +38,14 @@ import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
+import org.eclipse.ptp.rm.pbs.core.ConfigUtils;
+import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.core.attributes.AttributePlaceholder;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
-import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.core.templates.PBSBatchScriptTemplate;
 import org.eclipse.ptp.rm.pbs.ui.PBSUIPlugin;
-import org.eclipse.ptp.rm.pbs.ui.data.AttributePlaceholder;
-import org.eclipse.ptp.rm.pbs.ui.data.PBSBatchScriptTemplate;
 import org.eclipse.ptp.rm.pbs.ui.dialogs.ScrollingEditableMessageDialog;
-import org.eclipse.ptp.rm.pbs.ui.managers.PBSBatchScriptTemplateManager;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
-import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
 import org.eclipse.ptp.rm.pbs.ui.utils.WidgetUtils;
 import org.eclipse.ptp.rm.pbs.ui.wizards.PBSBatchScriptTemplateWizard;
 import org.eclipse.ptp.rm.pbs.ui.wizards.PBSRMLaunchConfigurationDynamicTabWizardPage;
@@ -71,6 +68,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.progress.UIJob;
@@ -148,7 +146,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		protected void copyFromFields() throws ValidationException {
 			if (dynamicControl == null || dynamicControl.isDisposed())
 				return;
-			PBSBatchScriptTemplate template = templateManager.getCurrent();
+			PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
 			if (template == null)
 				return;
 
@@ -193,7 +191,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		protected void copyToFields() {
 			if (dynamicControl == null || dynamicControl.isDisposed())
 				return;
-			PBSBatchScriptTemplate template = templateManager.getCurrent();
+			PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
 			if (template == null)
 				return;
 			AttributePlaceholder ap = null;
@@ -240,7 +238,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
 			if (config == null)
 				return;
-			PBSBatchScriptTemplate template = templateManager.getCurrent();
+			PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
 			if (template != null)
 				template.saveValues(config);
 		}
@@ -259,7 +257,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		protected void loadFromStorage() {
 			ILaunchConfiguration config = getConfiguration();
 			if (config != null) {
-				PBSBatchScriptTemplate template = templateManager.getCurrent();
+				PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
 				if (template == null)
 					return;
 				template.setConfiguration(config);
@@ -354,7 +352,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			PBSBatchScriptTemplate template = templateManager.getCurrent();
+			PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
 			if (template == null)
 				return;
 			AttributePlaceholder ap = null;
@@ -427,11 +425,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		}
 	}
 
-	private Map<Control, AttributePlaceholder> valueWidgets;
+	private final Map<Control, AttributePlaceholder> valueWidgets;
 
 	private PBSRMLaunchDataSource dataSource;
-	private PBSBatchScriptTemplateManager templateManager;
-	private PBSBatchScriptTemplateWizard templateWizard;
 	private ScrolledComposite parent;
 	private Composite dynamicControl;
 	private Composite control;
@@ -441,7 +437,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	private Button editTemplates;
 	private Combo mpiCommand;
 	private Combo templates;
-	private TemplateChangeListener templateChangeListener;
+	private final TemplateChangeListener templateChangeListener;
 	private PBSRMLaunchWidgetListener listener;
 	private DestinationComboListener destComboListener;
 	private PBSResourceManager pbsRM;
@@ -453,15 +449,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 */
 	public PBSRMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
-		try {
-			setResourceManager(rm);
-			templateManager = new PBSBatchScriptTemplateManager(this);
-			templateWizard = new PBSBatchScriptTemplateWizard(templateManager);
-			templateChangeListener = new TemplateChangeListener();
-			valueWidgets = new HashMap<Control, AttributePlaceholder>();
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
+		setResourceManager(rm);
+		templateChangeListener = new TemplateChangeListener();
+		valueWidgets = new HashMap<Control, AttributePlaceholder>();
 	}
 
 	/**
@@ -490,27 +480,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		if (destComboListener == null)
 			destComboListener = new DestinationComboListener(this);
 		return destComboListener;
-	}
-
-	/**
-	 * Sends only the realized script as attribute.<br>
-	 */
-	public IAttribute<?, ?, ?>[] getAttributes(IResourceManagerControl rm, IPQueue queue, ILaunchConfiguration configuration,
-			String mode) throws CoreException {
-		setResourceManager(rm);
-		IPBSResourceManagerConfiguration rmConfig = (IPBSResourceManagerConfiguration) getResourceManager().getConfiguration();
-		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
-		String current = rmConfig.getCurrentTemplateName();
-		PBSBatchScriptTemplate template = templateManager.loadTemplate(current, configuration);
-		try {
-			template.configure();
-			attrs.add(template.createScriptAttribute());
-		} catch (Throwable t) {
-			IStatus status = new Status(Status.ERROR, PBSUIPlugin.getUniqueIdentifier(), GET_ATTRIBUTES, t);
-			throw new CoreException(status);
-		}
-		System.out.println(attrs);
-		return attrs.toArray(new IAttribute<?, ?, ?>[attrs.size()]);
 	}
 
 	/*
@@ -629,10 +598,10 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		if (control.isDisposed())
 			return;
 		dynamicControl = WidgetUtils.createComposite(control, 1);
-		PBSBatchScriptTemplate template = templateManager.getCurrent();
+		PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
 		if (template == null && lconfig != null) {
-			templateManager.loadTemplate(templateManager.getCurrentTemplateName(), lconfig);
-			template = templateManager.getCurrent();
+			pbsRM.getTemplateManager().loadTemplate(pbsRM.getTemplateManager().getCurrentTemplateName(), lconfig);
+			template = pbsRM.getTemplateManager().getCurrent();
 		}
 		if (template != null) {
 			createOptionalGroup(dynamicControl, template);
@@ -685,8 +654,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		Composite composite = WidgetUtils.createComposite(parent, 1);
 		Group selection = WidgetUtils.createFillingGroup(composite, Messages.PBSRMLaunchConfigGroup1_title, 5, 1, false);
 		selection.setForeground(WidgetUtils.DKMG);
-		templates = WidgetUtils.createItemCombo(selection, null, templateManager.findAvailableTemplates(), null, null, true,
-				templateChangeListener, 2);
+		templates = WidgetUtils.createItemCombo(selection, null, pbsRM.getTemplateManager().findAvailableTemplates(), null, null,
+				true, templateChangeListener, 2);
 		((GridData) templates.getLayoutData()).widthHint = 200;
 		editTemplates = WidgetUtils.createButton(selection, Messages.PBSRMLaunchConfigEditTemplates_title, null, SWT.PUSH, 1, true,
 				templateChangeListener);
@@ -695,7 +664,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		Label l = WidgetUtils.createLabel(selection, rmNotRunningWarning(), SWT.LEFT, 1);
 		l.setForeground(WidgetUtils.DKRD);
 
-		WidgetUtils.select(templates, templateManager.getCurrentTemplateName());
+		WidgetUtils.select(templates, pbsRM.getTemplateManager().getCurrentTemplateName());
 	}
 
 	/*
@@ -711,7 +680,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 					templateChangeListener.disable();
 					dataSource.copyToStorage();
 					ILaunchConfiguration c = dataSource.getConfiguration();
-					templateManager.loadTemplate(name, c);
+					pbsRM.getTemplateManager().loadTemplate(name, c);
 					buildDynamicPart(c);
 					dataSource.loadFromStorage();
 					dataSource.copyToFields();
@@ -735,14 +704,31 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				try {
 					try {
-						if (!templateManager.handleBaseTemplates())
-							return Status.OK_STATUS;
+						Shell shell = PBSUIPlugin.getActiveWorkbenchShell();
+						if (getResourceManager() == null
+								|| !getResourceManager().getState().equals(ResourceManagerAttributes.State.STARTED)) {
+							MessageDialog dialog = new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestStartTitle,
+									null, Messages.PBSAttributeTemplateManager_requestStartMessage, MessageDialog.QUESTION,
+									new String[] { Messages.PBSAttributeTemplateManager_requestStartContinue,
+											Messages.PBSAttributeTemplateManager_requestStartCancel }, 1);
+							if (MessageDialog.CANCEL == dialog.open())
+								return Status.OK_STATUS;
+						}
+						if (!pbsRM.getTemplateManager().handleBaseTemplates()) {
+							new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestInitializeTitle, null,
+									Messages.PBSAttributeTemplateManager_requestInitializeMessage, MessageDialog.WARNING,
+									new String[] { Messages.PBSAttributeTemplateManager_requestStartCancel }, 0).open();
+
+						}
+						return Status.OK_STATUS;
 					} catch (Throwable t) {
 						t.printStackTrace();
 					}
 					// String oldTemplate = WidgetUtils.getSelected(templates);
-					if (Window.CANCEL != new WizardDialog(control.getShell(), templateWizard).open())
+					PBSBatchScriptTemplateWizard templateWizard = new PBSBatchScriptTemplateWizard(pbsRM);
+					if (Window.CANCEL != new WizardDialog(control.getShell(), templateWizard).open()) {
 						repopulateTemplates(templateWizard.getSelectedTemplate());
+					}
 				} catch (Throwable t) {
 					t.printStackTrace();
 				}
@@ -760,7 +746,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				templateChangeListener.disable();
-				String[] tempNames = templateManager.findAvailableTemplates();
+				String[] tempNames = pbsRM.getTemplateManager().findAvailableTemplates();
 				templates.setItems(tempNames);
 				int i = 0;
 				for (; i < tempNames.length; i++)
@@ -787,9 +773,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		StringBuffer text = new StringBuffer();
 		if (rm != null) {
 			text.append(Messages.PBSAttributeTemplateManager_rmState);
-			ResourceManagerAttributes.State state = rm.getState();
+			String state = rm.getState();
 			text.append(state);
-			if (!ResourceManagerAttributes.State.STARTED.equals(state))
+			if (!IResourceManagerControl.STARTED_STATE.equals(state))
 				text.append(Messages.PBSAttributeTemplateManager_rmNotStartedMessage);
 		}
 		return text.toString();
@@ -799,6 +785,10 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * For consistency.
 	 */
 	private synchronized void setResourceManager(IResourceManagerControl resourceManager) {
-		pbsRM = (PBSResourceManager) resourceManager;
+		try {
+			pbsRM = (PBSResourceManager) resourceManager;
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 }

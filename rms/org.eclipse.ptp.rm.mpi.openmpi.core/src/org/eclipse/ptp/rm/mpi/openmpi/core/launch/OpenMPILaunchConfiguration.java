@@ -8,22 +8,23 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.mpi.openmpi.ui.launch;
+package org.eclipse.ptp.rm.mpi.openmpi.core.launch;
 
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 
 /**
  * 
  * @author Daniel Felix Ferber
+ * @since 4.0
  * 
  */
 public class OpenMPILaunchConfiguration {
-	public static final String ATTR_BASE = OpenMPIUIPlugin.getUniqueIdentifier() + ".launchAttributes"; //$NON-NLS-1$
+	public static final String ATTR_BASE = OpenMPIPlugin.getUniqueIdentifier() + ".launchAttributes"; //$NON-NLS-1$
 	public static final String ATTR_NUMPROCS = ATTR_BASE + ".numProcs"; //$NON-NLS-1$
 	public static final String ATTR_BYNODE = ATTR_BASE + ".byNode"; //$NON-NLS-1$
 	public static final String ATTR_BYSLOT = ATTR_BASE + ".bySlot"; //$NON-NLS-1$
@@ -41,7 +42,7 @@ public class OpenMPILaunchConfiguration {
 	public static final String ATTR_USEDEFAULTPARAMETERS = ATTR_BASE + ".useDefaultParameters"; //$NON-NLS-1$
 
 	@SuppressWarnings("unchecked")
-	static String calculateArguments(ILaunchConfiguration configuration) throws CoreException {
+	public static String calculateArguments(ILaunchConfiguration configuration) throws CoreException {
 		if (configuration.getAttribute(ATTR_USEDEFAULTARGUMENTS, OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS)) {
 			String launchArgs = "-np " + Integer.toString(configuration.getAttribute(ATTR_NUMPROCS, OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS)); //$NON-NLS-1$
 			if (configuration.getAttribute(ATTR_BYNODE, OpenMPILaunchConfigurationDefaults.ATTR_BYNODE)) {

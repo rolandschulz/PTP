@@ -13,7 +13,7 @@ package org.eclipse.ptp.rm.pbs.ui.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;

@@ -15,12 +15,12 @@ import org.eclipse.osgi.util.NLS;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.mpi.mpich2.ui.messages.messages"; //$NON-NLS-1$
 	public static String MPICH2UIPlugin_Exception_InternalError;
-	
+
 	public static String AdvancedMPICH2RMLaunchConfigurationDynamicTab_Label_Arguments;
 	public static String AdvancedMPICH2RMLaunchConfigurationDynamicTab_Label_DefaultArguments;
 	public static String AdvancedMPICH2RMLaunchConfigurationDynamicTab_Label_DefaultMCAParameters;
@@ -47,10 +47,7 @@ public class Messages extends NLS {
 	public static String BasicMPICH2RMLaunchConfigurationDynamicTab_Validation_EmptyHostList;
 	public static String BasicMPICH2RMLaunchConfigurationDynamicTab_Validation_EmptyPrefix;
 	public static String BasicMPICH2RMLaunchConfigurationDynamicTab_Validation_NoProcess;
-	public static String MPICH2LaunchConfigurationDefaults_Exception_FailedReadFile;
-	public static String MPICH2LaunchConfigurationDefaults_FailedParseInteger;
-	public static String MPICH2LaunchConfigurationDefaults_MissingValue;
-	
+
 	public static String MPICH2PreferencePage_Title;
 
 	public static String MPICH2ConfigurationWizardPage_Description;

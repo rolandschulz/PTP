@@ -44,7 +44,6 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -271,7 +270,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 				(String) null);
 		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
+		if (rm.getState().equals(IResourceManagerControl.STARTED_STATE)) {
 			return rm;
 		}
 		return null;

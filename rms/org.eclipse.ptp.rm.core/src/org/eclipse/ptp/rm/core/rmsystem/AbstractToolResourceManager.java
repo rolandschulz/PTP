@@ -10,10 +10,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.core.rmsystem;
 
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager;
 
 /**
  * @author Daniel Felix Ferber
@@ -25,17 +24,6 @@ public abstract class AbstractToolResourceManager extends AbstractRuntimeResourc
 	 */
 	public AbstractToolResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
 		super(universe, config);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#
-	 * getAttributeDefinitionManager()
-	 */
-	@Override
-	public AttributeDefinitionManager getAttributeDefinitionManager() {
-		return super.getAttributeDefinitionManager();
 	}
 
 	/*

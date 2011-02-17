@@ -24,7 +24,7 @@
 
  *******************************************************************************/
 
-package org.eclipse.ptp.rm.pbs.ui.data;
+package org.eclipse.ptp.rm.pbs.core.templates;
 
 import java.io.BufferedReader;
 import java.io.EOFException;
@@ -53,10 +53,10 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.rm.pbs.ui.IPBSAttributeToTemplateConverter;
-import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
-import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
-import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
+import org.eclipse.ptp.rm.pbs.core.ConfigUtils;
+import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.core.attributes.AttributePlaceholder;
+import org.eclipse.ptp.rm.pbs.core.messages.Messages;
 
 /**
  * Encapsulates the template used to generate a full (realized) PBS script. <br>
@@ -70,6 +70,7 @@ import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
  * @see org.eclipse.ptp.rm.pbs.ui.managers.PBSBatchScriptTemplateManager
  * 
  * @author arossi
+ * @since 5.0
  * 
  */
 public class PBSBatchScriptTemplate implements IPBSNonNLSConstants {
@@ -449,7 +450,7 @@ public class PBSBatchScriptTemplate implements IPBSNonNLSConstants {
 	private String maybeReplaceChdir(String template) throws CoreException {
 		if (configuration == null)
 			return template;
-		String wdir = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, ZEROSTR);
+		String wdir = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, ZEROSTR);
 
 		// do what the launch manager does
 		if (ZEROSTR.equals(wdir)) {

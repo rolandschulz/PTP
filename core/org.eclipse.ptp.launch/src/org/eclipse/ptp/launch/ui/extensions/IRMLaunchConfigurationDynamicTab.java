@@ -19,7 +19,6 @@ package org.eclipse.ptp.launch.ui.extensions;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.widgets.Composite;
@@ -75,26 +74,6 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @since 5.0
 	 */
 	public abstract void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) throws CoreException;
-
-	/**
-	 * Get the set of resource manager attributes to be used as launch
-	 * attributes
-	 * 
-	 * @param rm
-	 *            The resource manager associated with the current launch
-	 *            configuration
-	 * @param queue
-	 *            The current queue
-	 * @param configuration
-	 *            The current launch configuration
-	 * @param mode
-	 *            The current launch mode
-	 * @return array of attributes
-	 * @throws CoreException
-	 * @since 5.0
-	 */
-	public abstract IAttribute<?, ?, ?>[] getAttributes(IResourceManagerControl rm, IPQueue queue,
-			ILaunchConfiguration configuration, String mode) throws CoreException;
 
 	/**
 	 * Returns the top level control for the dynamic portion of the parallel

@@ -26,8 +26,8 @@ import org.eclipse.ptp.rm.slurm.core.SLURMNodeAttributes;
 import org.eclipse.ptp.rm.slurm.core.messages.Messages;
 import org.eclipse.ptp.rm.slurm.core.rtsystem.SLURMProxyRuntimeClient;
 import org.eclipse.ptp.rm.slurm.core.rtsystem.SLURMRuntimeSystem;
-import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 import org.eclipse.swt.widgets.Display;
@@ -105,10 +105,10 @@ public class SLURMResourceManager extends AbstractRuntimeResourceManager {
 			throw new CoreException(new Status(IStatus.ERROR, SLURMCorePlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
 		}
 		SLURMProxyRuntimeClient runtimeProxy = new SLURMProxyRuntimeClient(config, baseId);
-		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
+		slurmRMS = new SLURMRuntimeSystem(runtimeProxy);
+		AttributeDefinitionManager attrDefMgr = slurmRMS.getAttributeDefinitionManager();
 		attrDefMgr.setAttributeDefinitions(SLURMJobAttributes.getDefaultAttributeDefinitions());
 		attrDefMgr.setAttributeDefinitions(SLURMNodeAttributes.getDefaultAttributeDefinitions());
-		slurmRMS = new SLURMRuntimeSystem(runtimeProxy, attrDefMgr);
 		return slurmRMS;
 	}
 

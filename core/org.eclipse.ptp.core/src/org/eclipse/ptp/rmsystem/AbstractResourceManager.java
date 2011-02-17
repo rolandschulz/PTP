@@ -30,23 +30,13 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
-import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
-import org.eclipse.ptp.core.elements.attributes.FilterAttributes;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
-import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
-import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
@@ -63,12 +53,11 @@ import org.eclipse.ptp.internal.core.events.JobChangedEvent;
 public abstract class AbstractResourceManager implements IResourceManagerControl {
 	private final PResourceManager fPResourceManager;
 	private final IPUniverse fUniverse;
-	private final AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
 	private final ListenerList fJobListeners = new ListenerList();
 	private final Map<String, IJobStatus> fJobStatus = new HashMap<String, IJobStatus>();
 
 	private IResourceManagerConfiguration fConfig;
-	private ResourceManagerAttributes.State fState;
+	private String fState;
 
 	/**
 	 * @since 5.0
@@ -78,7 +67,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 		fUniverse = universe;
 		fPResourceManager = new PResourceManager(universe, this);
 		universe.addResourceManager(fPResourceManager);
-		fState = ResourceManagerAttributes.State.STOPPED;
+		fState = STOPPED_STATE;
 	}
 
 	/*
@@ -100,13 +89,12 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#control(java.lang.String
-	 * , org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * , java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	/**
 	 * @since 5.0
 	 */
-	public void control(String jobId, JobControlOperation operation, IProgressMonitor monitor) throws CoreException {
+	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 		doControlJob(jobId, operation, monitor);
 	}
 
@@ -142,25 +130,6 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 			return getConfiguration();
 		}
 		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#
-	 * getAttributeDefinition(java.lang.String)
-	 */
-	public IAttributeDefinition<?, ?, ?> getAttributeDefinition(String attrId) {
-		return attrDefManager.getAttributeDefinition(attrId);
-	}
-
-	/**
-	 * Returns the resource managers attribute definition manager
-	 * 
-	 * @return attribute definition manager for this resource manager
-	 */
-	public AttributeDefinitionManager getAttributeDefinitionManager() {
-		return attrDefManager;
 	}
 
 	/*
@@ -234,7 +203,10 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * @see
 	 * org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#getState()
 	 */
-	public synchronized ResourceManagerAttributes.State getState() {
+	/**
+	 * @since 5.0
+	 */
+	public synchronized String getState() {
 		return fState;
 	}
 
@@ -312,7 +284,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	/**
 	 * @since 5.0
 	 */
-	public synchronized void setState(ResourceManagerAttributes.State state) {
+	public synchronized void setState(String state) {
 		fState = state;
 		fireResourceManagerChanged();
 	}
@@ -327,18 +299,17 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
-		if (getState() == ResourceManagerAttributes.State.STOPPED || getState() == ResourceManagerAttributes.State.ERROR) {
-			setState(ResourceManagerAttributes.State.STARTING);
+		if (getState().equals(STOPPED_STATE) || getState().equals(ERROR_STATE)) {
+			setState(STARTING_STATE);
 			monitor.subTask(Messages.AbstractResourceManager_1 + getName());
 			try {
-				initialize();
 				doStartup(subMon.newChild(100));
 			} catch (CoreException e) {
-				setState(ResourceManagerAttributes.State.ERROR);
+				setState(ERROR_STATE);
 				throw e;
 			}
 			if (monitor.isCanceled()) {
-				setState(ResourceManagerAttributes.State.STOPPED);
+				setState(STOPPED_STATE);
 			}
 		}
 	}
@@ -352,17 +323,14 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * @since 5.0
 	 */
 	public void stop() throws CoreException {
-		switch (getState()) {
-		case ERROR:
-			setState(ResourceManagerAttributes.State.STOPPED);
+		if (getState().equals(ERROR_STATE)) {
+			setState(STOPPED_STATE);
 			cleanUp();
-			break;
-		case STARTING:
-		case STARTED:
+		} else if (getState().equals(STARTING_STATE) || getState().equals(STARTED_STATE)) {
 			try {
 				doShutdown();
 			} finally {
-				setState(ResourceManagerAttributes.State.STOPPED);
+				setState(STOPPED_STATE);
 				cleanUp();
 			}
 		}
@@ -380,31 +348,12 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	/**
 	 * @since 5.0
 	 */
-	public String submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException {
-		IJobStatus status = doSubmitJob(configuration, attrMgr, monitor);
+	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
+		IJobStatus status = doSubmitJob(configuration, mode, monitor);
 		synchronized (fJobStatus) {
 			fJobStatus.put(status.getJobId(), status);
 		}
 		return status.getJobId();
-	}
-
-	/**
-	 * Initialize the resource manager. This is called each time the resource
-	 * manager is started.
-	 */
-	private void initialize() {
-		attrDefManager.clear();
-		attrDefManager.setAttributeDefinitions(ElementAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(ErrorAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(FilterAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(JobAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(MachineAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(MessageAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(NodeAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(ProcessAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(QueueAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(ResourceManagerAttributes.getDefaultAttributeDefinitions());
 	}
 
 	/**
@@ -433,8 +382,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected abstract void doControlJob(String jobId, JobControlOperation operation, IProgressMonitor monitor)
-			throws CoreException;
+	protected abstract void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Perform any activities prior to disposing of the resource manager.
@@ -463,14 +411,14 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * 
 	 * @param configuration
 	 *            launch configuration
-	 * @param attrMgr
-	 *            attribute manager containing launch attributes
+	 * @param mode
+	 *            launch mode
 	 * @param monitor
 	 *            progress monitor
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected abstract IJobStatus doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+	protected abstract IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException;
 
 	/**

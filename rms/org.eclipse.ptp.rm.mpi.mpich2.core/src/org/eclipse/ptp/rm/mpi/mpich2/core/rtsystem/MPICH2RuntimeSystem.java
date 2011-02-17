@@ -11,16 +11,28 @@
 package org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPElement;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
+import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2LaunchAttributes;
+import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
+import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfiguration;
+import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfigurationDefaults;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.EffectiveMPICH2ResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration;
@@ -43,11 +55,17 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/**
 	 * @since 2.0
 	 */
-	public MPICH2RuntimeSystem(IResourceManagerControl rm, IMPICH2ResourceManagerConfiguration config,
-			AttributeDefinitionManager attrDefMgr) {
-		super(rm, config, attrDefMgr);
+	public MPICH2RuntimeSystem(IResourceManagerControl rm, IMPICH2ResourceManagerConfiguration config) {
+		super(rm, config);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * createRuntimeSystemJob(java.lang.String, java.lang.String,
+	 * org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
 	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
 		return new MPICH2RuntimeSystemJob(jobID, queueID, Messages.MPICH2RuntimeSystem_JobName, this, attrMgr);
@@ -65,6 +83,46 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 		return queueID;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#getAttributes
+	 * (org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
+	 */
+	@Override
+	public List<IAttribute<?, ?, ?>> getAttributes(ILaunchConfiguration configuration, String mode) throws CoreException {
+		List<IAttribute<?, ?, ?>> attrs = super.getAttributes(configuration, mode);
+
+		IPResourceManager rm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		if (rm != null) {
+			IPQueue[] queues = rm.getQueues();
+			if (queues.length != 1) {
+				throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getUniqueIdentifier(), Messages.MPICH2RuntimeSystem_NoDefaultQueue));
+			}
+			attrs.add(JobAttributes.getQueueIdAttributeDefinition().create(queues[0].getID()));
+		}
+
+		int numProcs = configuration.getAttribute(MPICH2LaunchConfiguration.ATTR_NUMPROCS,
+				MPICH2LaunchConfigurationDefaults.ATTR_NUMPROCS);
+		try {
+			attrs.add(JobAttributes.getNumberOfProcessesAttributeDefinition().create(Integer.valueOf(numProcs)));
+		} catch (IllegalValueException e) {
+			throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getUniqueIdentifier(), Messages.MPICH2RuntimeSystem_InvalidConfiguration, e));
+		}
+
+		attrs.add(MPICH2LaunchAttributes.getLaunchArgumentsAttributeDefinition().create(
+				MPICH2LaunchConfiguration.calculateArguments(configuration)));
+
+		return attrs;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * retrieveEffectiveToolRmConfiguration()
+	 */
 	@Override
 	public AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration() {
 		return new EffectiveMPICH2ResourceManagerConfiguration(getRmConfiguration());
@@ -74,11 +132,24 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 		nodeNameToIDMap.put(hostname, nodeID);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * createContinuousMonitorJob(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected Job createContinuousMonitorJob(IProgressMonitor monitor) {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#createDiscoverJob
+	 * (org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected Job createDiscoverJob(IProgressMonitor monitor) {
 		if (!rmConfiguration.hasDiscoverCmd()) {
@@ -91,6 +162,12 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 		return job;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * createPeriodicMonitorJob(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected Job createPeriodicMonitorJob(IProgressMonitor monitor) {
 		if (!rmConfiguration.hasPeriodicMonitorCmd()) {

@@ -10,22 +10,14 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.ui.launch;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2LaunchAttributes;
+import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfiguration;
+import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfigurationDefaults;
 import org.eclipse.ptp.rm.mpi.mpich2.ui.MPICH2UIPlugin;
 import org.eclipse.ptp.rm.mpi.mpich2.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
@@ -328,29 +320,6 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConf
 		gd.heightHint = 20;
 		hostListText.setLayoutData(gd);
 		hostListText.addModifyListener(getListener());
-	}
-
-	/**
-	 * @since 2.0
-	 */
-	public IAttribute<?, ?, ?>[] getAttributes(IResourceManagerControl rm, IPQueue queue, ILaunchConfiguration configuration,
-			String mode) throws CoreException {
-
-		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
-
-		int numProcs = configuration.getAttribute(MPICH2LaunchConfiguration.ATTR_NUMPROCS,
-				MPICH2LaunchConfigurationDefaults.ATTR_NUMPROCS);
-		try {
-			attrs.add(JobAttributes.getNumberOfProcessesAttributeDefinition().create(Integer.valueOf(numProcs)));
-		} catch (IllegalValueException e) {
-			throw new CoreException(new Status(IStatus.ERROR, MPICH2UIPlugin.getDefault().getBundle().getSymbolicName(),
-					Messages.BasicMPICH2RMLaunchConfigurationDynamicTab_Exception_InvalidConfiguration, e));
-		}
-
-		attrs.add(MPICH2LaunchAttributes.getLaunchArgumentsAttributeDefinition().create(
-				MPICH2LaunchConfiguration.calculateArguments(configuration)));
-
-		return attrs.toArray(new IAttribute<?, ?, ?>[attrs.size()]);
 	}
 
 	public Control getControl() {

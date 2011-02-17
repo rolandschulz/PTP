@@ -10,12 +10,17 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.generic.core.rtsystem;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPElement;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
@@ -32,13 +37,36 @@ public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 	/** The queue that dispatches jobs */
 	private String fQueueID;
 
-	public GenericRMRuntimeSystem(IResourceManagerControl rm, IToolRMConfiguration config, AttributeDefinitionManager attrDefMgr) {
-		super(rm, config, attrDefMgr);
+	public GenericRMRuntimeSystem(IResourceManagerControl rm, IToolRMConfiguration config) {
+		super(rm, config);
 	}
 
 	@Override
 	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
 		return new GenericRMRuntimeSystemJob(jobID, queueID, Messages.GenericRMRuntimeSystem_JobName, this, attrMgr);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#getAttributes
+	 * (org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
+	 */
+	@Override
+	public List<IAttribute<?, ?, ?>> getAttributes(ILaunchConfiguration configuration, String mode) throws CoreException {
+		List<IAttribute<?, ?, ?>> attrs = super.getAttributes(configuration, mode);
+
+		/*
+		 * Always set the number of processes to 1
+		 */
+		try {
+			attrs.add(JobAttributes.getNumberOfProcessesAttributeDefinition().create(Integer.valueOf(1)));
+		} catch (IllegalValueException e) {
+			// Should never happen
+		}
+
+		return attrs;
 	}
 
 	public String getMachineID() {
@@ -53,21 +81,46 @@ public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 		return fQueueID;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * retrieveEffectiveToolRmConfiguration()
+	 */
 	@Override
 	public AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration() {
 		return new EffectiveGenericRMConfiguration(getRmConfiguration());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * createContinuousMonitorJob(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected Job createContinuousMonitorJob(IProgressMonitor monitor) {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#createDiscoverJob
+	 * (org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected Job createDiscoverJob(IProgressMonitor monitor) {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * createPeriodicMonitorJob(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected Job createPeriodicMonitorJob(IProgressMonitor monitor) {
 		return null;

@@ -7,17 +7,19 @@
  * Contributors: 
  * 	Albert L. Rossi - original API and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui.utils;
+package org.eclipse.ptp.rm.pbs.core.templates;
 
+import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
-import org.eclipse.ptp.rm.pbs.ui.IPBSAttributeToTemplateConverter;
-import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
 
+/**
+ * @since 5.0
+ */
 public class PBSAttributeToTemplateConverterFactory implements IPBSNonNLSConstants {
 
 	public static IPBSAttributeToTemplateConverter getConverter(IPBSResourceManagerConfiguration config) {
 		PBSXMLAttributeToTemplateConverter pbsConverter = new PBSXMLAttributeToTemplateConverter();
-		pbsConverter.setResourcePath(SRC + PATH_SEP + config.getProxyConfiguration());
+		pbsConverter.setResourcePath(config.getProxyConfiguration());
 		return pbsConverter;
 	}
 }

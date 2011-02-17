@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
+import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfigurationDefaults;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.osgi.framework.BundleContext;
 
@@ -49,6 +50,7 @@ public class OpenMPIPlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		OpenMPILaunchConfigurationDefaults.loadDefaults();
 	}
 
 	/*

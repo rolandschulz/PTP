@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui.utils;
+package org.eclipse.ptp.rm.pbs.core.templates;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -16,15 +16,15 @@ import java.util.Properties;
 
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
-import org.eclipse.ptp.rm.pbs.ui.IPBSAttributeToTemplateConverter;
-import org.eclipse.ptp.rm.pbs.ui.IPBSJobAttributeData;
-import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.core.attributes.IPBSJobAttributeData;
 
 /**
  * Provides the method for taking attribute definitions and qsub flags and
  * turning them into the full base template.
  * 
  * @author arossi
+ * @since 5.0
  * 
  */
 public abstract class PBSBaseAttributeToTemplateConverter implements IPBSAttributeToTemplateConverter, IPBSNonNLSConstants {

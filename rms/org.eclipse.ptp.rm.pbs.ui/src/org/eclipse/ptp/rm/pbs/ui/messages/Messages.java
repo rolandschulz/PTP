@@ -25,10 +25,6 @@ public class Messages extends NLS {
 
 	public static String DynamicTabWizardPage_VALUE;
 
-	public static String PBSAttributeNotFound;
-
-	public static String PBSAttributeTemplateManager_removeError;
-	public static String PBSAttributeTemplateManager_storeError;
 	public static String PBSAttributeTemplateManager_rmState;
 	public static String PBSAttributeTemplateManager_rmNotStartedMessage;
 	public static String PBSAttributeTemplateManager_requestStartTitle;
@@ -40,7 +36,6 @@ public class Messages extends NLS {
 
 	public static String PBSBatchScriptDisplay;
 
-	public static String PBSBatchScriptTemplate_parseError;
 	public static String PBSBatchScriptTemplateEditError_message;
 	public static String PBSBatchScriptTemplateEditError_title;
 	public static String PBSBatchScriptTemplateEditPostpend_title;
@@ -61,7 +56,6 @@ public class Messages extends NLS {
 	public static String PBSRMLaunchConfigDeleteError_message;
 	public static String PBSRMLaunchConfigDeleteError_title;
 	public static String PBSRMLaunchConfigEditButton_title;
-	public static String PBSRMLaunchConfigEditChoose_illegalArgument;
 	public static String PBSRMLaunchConfigEditChoose_message;
 	public static String PBSRMLaunchConfigEditChoose_new;
 	public static String PBSRMLaunchConfigEditChoose_new_name;
@@ -88,7 +82,6 @@ public class Messages extends NLS {
 	public static String PBSRMLaunchConfigPreferences_message;
 	public static String PBSRMLaunchConfigTemplate_message;
 	public static String PBSRMLaunchConfigTemplate_title;
-	public static String PBSRMLaunchConfigTemplate_zerostringError;
 	public static String PBSRMLaunchConfigViewScript_title;
 	public static String PBSRMLaunchConfigEditTemplates_title;
 

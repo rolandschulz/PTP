@@ -13,10 +13,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.services.core;bundle-version="1.0.0",
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.core,
- org.eclipse.ptp.rm.core
+ org.eclipse.ptp.rm.core,
+ org.eclipse.ptp.utils.core
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.rm.mpi.openmpi.core,
- org.eclipse.ptp.rm.mpi.openmpi.core.messages,
+ org.eclipse.ptp.rm.mpi.openmpi.core.launch,
  org.eclipse.ptp.rm.mpi.openmpi.core.parameters,
  org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem,
  org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem

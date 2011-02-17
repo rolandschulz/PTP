@@ -32,8 +32,8 @@ import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLCorePlugin;
 import org.eclipse.ptp.rm.ibm.ll.core.rtsystem.IBMLLProxyRuntimeClient;
 import org.eclipse.ptp.rm.ibm.ll.core.rtsystem.IBMLLRuntimeSystem;
-import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 public class IBMLLResourceManager extends AbstractRuntimeResourceManager {
@@ -106,7 +106,6 @@ public class IBMLLResourceManager extends AbstractRuntimeResourceManager {
 		} catch (NumberFormatException e) {
 			throw new CoreException(new Status(IStatus.ERROR, IBMLLCorePlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
 		}
-		IBMLLProxyRuntimeClient runtimeProxy = new IBMLLProxyRuntimeClient(config, baseId);
-		return new IBMLLRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
+		return new IBMLLRuntimeSystem(new IBMLLProxyRuntimeClient(config, baseId));
 	}
 }

@@ -15,7 +15,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.proxy.protocol
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.rm.pbs.core,
- org.eclipse.ptp.rm.pbs.core.messages;x-friends:="org.eclipse.ptp.rm.pbs.ui",
+ org.eclipse.ptp.rm.pbs.core.attributes,
  org.eclipse.ptp.rm.pbs.core.rmsystem,
- org.eclipse.ptp.rm.pbs.core.rtsystem
+ org.eclipse.ptp.rm.pbs.core.rtsystem,
+ org.eclipse.ptp.rm.pbs.core.templates
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: com.ibm.icu.text

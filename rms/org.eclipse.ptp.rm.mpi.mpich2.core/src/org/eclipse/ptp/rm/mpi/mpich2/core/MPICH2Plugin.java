@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
+import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfigurationDefaults;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 import org.osgi.framework.BundleContext;
 
@@ -50,6 +51,7 @@ public class MPICH2Plugin extends Plugin {
 		super.start(context);
 		fPlugin = this;
 		MPICH2Defaults.loadDefaults();
+		MPICH2LaunchConfigurationDefaults.loadDefaults();
 	}
 
 	/*

@@ -98,14 +98,18 @@ public interface IPTPLaunchConfigurationConstants {
 
 	/**
 	 * Launch configuration attribute key. The value is the working directory.
+	 * 
+	 * @since 5.0
 	 */
-	public static final String ATTR_WORK_DIRECTORY = PTP_LAUNCH_ID + ".WORK_DIRECTORY_ATTR"; //$NON-NLS-1$
+	public static final String ATTR_WORKING_DIR = PTP_LAUNCH_ID + ".WORKING_DIR_ATTR"; //$NON-NLS-1$
 
 	/**
-	 * Launch configuration attribute key. The value is the platform string of
-	 * the launch configuration
+	 * Launch configuration attribute key. The value is any debugger specific
+	 * arguments
+	 * 
+	 * @since 5.0
 	 */
-	public static final String ATTR_DEBUGGER_SPECIFIC_ATTRS_MAP = PTP_LAUNCH_ID + ".DEBUGGER_SPECIFIC_ATTRS_MAP"; //$NON-NLS-1$
+	public static final String ATTR_DEBUGGER_ARGS = PTP_LAUNCH_ID + ".DEBUGGER_ARGS"; //$NON-NLS-1$
 
 	/**
 	 * Launch configuration attribute key. The value is a global variables'

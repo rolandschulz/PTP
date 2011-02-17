@@ -15,7 +15,6 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.views.JobsListView;
 import org.eclipse.swt.widgets.Shell;
@@ -132,7 +131,7 @@ public class TerminateJobFromListAction extends Action {
 
 					IResourceManagerControl rm = job.getResourceManager();
 					if (job.getState() != JobAttributes.State.COMPLETED) {
-						rm.control(job.getID(), JobControlOperation.TERMINATE, null);
+						rm.control(job.getID(), IResourceManagerControl.TERMINATE_OPERATION, null);
 					}
 					// TODO: Look for job change event to wait for jobs to be
 					// finished.

@@ -18,38 +18,49 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem;
 
 public abstract class AbstractRemoteProxyRuntimeSystem extends AbstractProxyRuntimeSystem {
-	private AbstractRemoteProxyRuntimeClient proxy;
-	
-	public AbstractRemoteProxyRuntimeSystem(AbstractRemoteProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
-		super(proxy, manager);
-		this.proxy = proxy;
+	private final AbstractRemoteProxyRuntimeClient fRemoteProxy;
+
+	/**
+	 * @since 3.0
+	 */
+	public AbstractRemoteProxyRuntimeSystem(AbstractRemoteProxyRuntimeClient proxy) {
+		super(proxy);
+		fRemoteProxy = proxy;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem#shutdown()
 	 */
+	@Override
 	public void shutdown() throws CoreException {
 		try {
-			proxy.shutdown();
+			fRemoteProxy.shutdown();
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.WARNING, PTPCorePlugin.getUniqueIdentifier(), 
-					IStatus.WARNING, e.getMessage(), null));
+			throw new CoreException(new Status(IStatus.WARNING, PTPCorePlugin.getUniqueIdentifier(), IStatus.WARNING,
+					e.getMessage(), null));
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem#startup(org.eclipse.core.runtime.IProgressMonitor)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem#startup(org.eclipse
+	 * .core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public void startup(IProgressMonitor monitor) throws CoreException {
+		initialize();
 		try {
-			proxy.startup(monitor);
+			fRemoteProxy.startup(monitor);
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.WARNING, PTPCorePlugin.getUniqueIdentifier(), 
-					IStatus.WARNING, e.getMessage(), null));
+			throw new CoreException(new Status(IStatus.WARNING, PTPCorePlugin.getUniqueIdentifier(), IStatus.WARNING,
+					e.getMessage(), null));
 		}
 	}
 }
