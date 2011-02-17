@@ -24,6 +24,7 @@ import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.core.messages.Messages;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
+import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 /**
  * Controls the selection and configuration of batch script templates.
@@ -110,15 +111,8 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 		return FULL_TEMPLATE;
 	}
 
-	public PBSResourceManager getRM() {
-		return resourceManager;
-	}
-
 	public IPBSResourceManagerConfiguration getRMConfig() {
-		PBSResourceManager rm = getRM();
-		if (rm == null)
-			return null;
-		return (IPBSResourceManagerConfiguration) rm.getConfiguration();
+		return (IPBSResourceManagerConfiguration) resourceManager.getConfiguration();
 	}
 
 	/**
@@ -261,10 +255,10 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	}
 
 	private IAttributeDefinition<?, ?, ?>[] getModelAttributeDefinitions() {
-		PBSResourceManager rm = getRM();
-		if (rm == null)
+		IRuntimeSystem rts = resourceManager.getRuntimeSystem();
+		if (rts == null)
 			return null;
-		IAttributeDefinition<?, ?, ?>[] defs = rm.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinitions();
+		IAttributeDefinition<?, ?, ?>[] defs = rts.getAttributeDefinitionManager().getAttributeDefinitions();
 
 		if (defs.length == 0)
 			return null;
