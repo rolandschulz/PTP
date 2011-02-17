@@ -29,7 +29,6 @@ package org.eclipse.ptp.debug.core;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 
@@ -68,13 +67,11 @@ public interface IPDebugger {
 	 * 
 	 * @param configuration
 	 *            debugger launch configuration
-	 * @param attrMgr
-	 *            attribute manager containing attributes for launch
 	 * @param monitor
 	 *            progress monitor
 	 * @throws CoreException
 	 *             if the debugger cannot be initialized
+	 * @since 5.0
 	 */
-	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException;
+	public void initialize(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException;
 }

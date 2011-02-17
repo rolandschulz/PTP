@@ -7,9 +7,10 @@
  * Contributors: 
  * 	Albert L. Rossi - original API
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui;
+package org.eclipse.ptp.rm.pbs.core.templates;
 
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.rm.pbs.core.attributes.IPBSJobAttributeData;
 
 /**
  * Layer between the valid attribute definition access/storage and the creation

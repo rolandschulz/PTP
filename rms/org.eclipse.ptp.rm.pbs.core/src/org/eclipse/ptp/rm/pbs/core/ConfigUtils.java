@@ -10,7 +10,7 @@
  *                  - removed all static final strings into the non-nls
  *                    interface (09/14/2010)
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui.utils;
+package org.eclipse.ptp.rm.pbs.core;
 
 import java.io.EOFException;
 import java.io.File;
@@ -27,15 +27,15 @@ import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.rm.pbs.core.attributes.AttributePlaceholder;
+import org.eclipse.ptp.rm.pbs.core.messages.Messages;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
-import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
-import org.eclipse.ptp.rm.pbs.ui.data.AttributePlaceholder;
-import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 
 /**
  * Various utilities for configuring attributes.
  * 
  * @author arossi
+ * @since 5.0
  */
 public class ConfigUtils implements IPBSNonNLSConstants {
 	public static class PrefixFilter implements FilenameFilter {

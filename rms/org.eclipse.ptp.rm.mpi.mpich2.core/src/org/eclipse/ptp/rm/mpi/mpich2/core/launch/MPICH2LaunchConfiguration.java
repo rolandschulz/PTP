@@ -8,22 +8,23 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.mpi.mpich2.ui.launch;
+package org.eclipse.ptp.rm.mpi.mpich2.core.launch;
 
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.rm.mpi.mpich2.ui.MPICH2UIPlugin;
+import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 
 /**
  * 
  * @author Daniel Felix Ferber
+ * @since 2.0
  * 
  */
 public class MPICH2LaunchConfiguration {
-	public static final String ATTR_BASE = MPICH2UIPlugin.getUniqueIdentifier() + ".launchAttributes"; //$NON-NLS-1$
+	public static final String ATTR_BASE = MPICH2Plugin.getUniqueIdentifier() + ".launchAttributes"; //$NON-NLS-1$
 	public static final String ATTR_NUMPROCS = ATTR_BASE + ".numProcs"; //$NON-NLS-1$
 	public static final String ATTR_NOLOCAL = ATTR_BASE + ".noLocal"; //$NON-NLS-1$
 	public static final String ATTR_PREFIX = ATTR_BASE + ".prefix"; //$NON-NLS-1$
@@ -37,7 +38,7 @@ public class MPICH2LaunchConfiguration {
 	public static final String ATTR_PARAMETERS = ATTR_BASE + ".parameters"; //$NON-NLS-1$
 	public static final String ATTR_USEDEFAULTPARAMETERS = ATTR_BASE + ".useDefaultParameters"; //$NON-NLS-1$
 
-	static String calculateArguments(ILaunchConfiguration configuration) throws CoreException {
+	public static String calculateArguments(ILaunchConfiguration configuration) throws CoreException {
 		if (configuration.getAttribute(ATTR_USEDEFAULTARGUMENTS, MPICH2LaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS)) {
 			String launchArgs = "-np " + Integer.toString(configuration.getAttribute(ATTR_NUMPROCS, MPICH2LaunchConfigurationDefaults.ATTR_NUMPROCS)); //$NON-NLS-1$
 			if (configuration.getAttribute(ATTR_NOLOCAL, MPICH2LaunchConfigurationDefaults.ATTR_NOLOCAL)) {
@@ -72,7 +73,7 @@ public class MPICH2LaunchConfiguration {
 	 * @param s
 	 * @return
 	 */
-	static private String fixString(String s) {
+	private static String fixString(String s) {
 		// TODO is that right and escaped correctly?
 		if (s == null) {
 			return "\"\""; //$NON-NLS-1$

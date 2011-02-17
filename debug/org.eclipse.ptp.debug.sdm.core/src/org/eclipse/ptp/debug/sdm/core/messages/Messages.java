@@ -84,6 +84,8 @@ public class Messages extends NLS {
 
 	public static String SDMDebugger_6;
 
+	public static String SDMDebugger_NoWorkingDir;
+
 	public static String SDMDebugger_Operation_canceled_by_user;
 	public static String SDMEvaluateExpressionRequest_0;
 	public static String SDMEvaluatePartialExpressionRequest_0;

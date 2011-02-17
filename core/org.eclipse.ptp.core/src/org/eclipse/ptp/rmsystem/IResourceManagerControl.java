@@ -20,9 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.listeners.IJobListener;
 
 /**
@@ -30,30 +27,42 @@ import org.eclipse.ptp.core.listeners.IJobListener;
  */
 public interface IResourceManagerControl extends IAdaptable {
 	/**
-	 * @since 5.0
+	 * Control operation to suspend a job
 	 */
-	public enum JobControlOperation {
-		/*
-		 * stop a job
-		 */
-		SUSPEND,
-		/*
-		 * restart a suspended job
-		 */
-		RESUME,
-		/*
-		 * put a job on hold
-		 */
-		HOLD,
-		/*
-		 * release a job from hold
-		 */
-		RELEASE,
-		/*
-		 * kill a job
-		 */
-		TERMINATE
-	};
+	public static final String SUSPEND_OPERATION = "SUSPEND"; //$NON-NLS-1$
+	/**
+	 * Control operation to resume a suspended job
+	 */
+	public static final String RESUME_OPERATION = "RESUME"; //$NON-NLS-1$
+	/**
+	 * Control operation to put a job on hold
+	 */
+	public static final String HOLD_OPERATION = "HOLD"; //$NON-NLS-1$
+	/**
+	 * Control operation to release a job from hold
+	 */
+	public static final String RELEASE_OPERATION = "RELEASE"; //$NON-NLS-1$
+	/**
+	 * Control operation to terminate a job
+	 */
+	public static final String TERMINATE_OPERATION = "TERMINATE"; //$NON-NLS-1$
+
+	/**
+	 * State indicating resource manager is stopped
+	 */
+	public static final String STOPPED_STATE = "STOPPED"; //$NON-NLS-1$
+	/**
+	 * State indicating resource manager is started
+	 */
+	public static final String STARTED_STATE = "STARTED"; //$NON-NLS-1$
+	/**
+	 * State indicating resource manager is in the process of starting
+	 */
+	public static final String STARTING_STATE = "STARTING"; //$NON-NLS-1$
+	/**
+	 * State indicating a resource manager error condition
+	 */
+	public static final String ERROR_STATE = "ERROR"; //$NON-NLS-1$
 
 	/**
 	 * Add a listener for job events
@@ -74,24 +83,12 @@ public interface IResourceManagerControl extends IAdaptable {
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	public void control(String jobId, JobControlOperation operation, IProgressMonitor monitor) throws CoreException;
+	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Safely dispose of this Resource Manager.
 	 */
 	public void dispose();
-
-	/**
-	 * Get the attribute definition corresponding to the attrId. This will only
-	 * check for attribute definitions that the RM knows about.
-	 * 
-	 * @param attrId
-	 *            ID of the attribute definition
-	 * @return the attribute definition corresponding to the attribute
-	 *         definition ID
-	 * @since 5.0
-	 */
-	public IAttributeDefinition<?, ?, ?> getAttributeDefinition(String attrId);
 
 	/**
 	 * Get the configuration associated with this resource manager.
@@ -139,7 +136,7 @@ public interface IResourceManagerControl extends IAdaptable {
 	 * @return state value representing the state of the RM
 	 * @since 5.0
 	 */
-	public ResourceManagerAttributes.State getState();
+	public String getState();
 
 	/**
 	 * Get a unique name that can be used to identify this resource manager
@@ -175,7 +172,7 @@ public interface IResourceManagerControl extends IAdaptable {
 	 *            value representing the state of the RM
 	 * @since 5.0
 	 */
-	public void setState(ResourceManagerAttributes.State state);
+	public void setState(String state);
 
 	/**
 	 * Start up the resource manager. This could potentially take a long time
@@ -207,16 +204,13 @@ public interface IResourceManagerControl extends IAdaptable {
 	public void stop() throws CoreException;
 
 	/**
-	 * Submit a job. The attribute manager must contain the appropriate
+	 * Submit a job. The launch configuration must contain the appropriate
 	 * attributes for a successful job launch (e.g. the queue, etc.).
-	 * 
-	 * The method will return after an INewJobEvent has been received confirming
-	 * that the job has been submitted.
 	 * 
 	 * @param configuration
 	 *            launch configuration used to submit the job
-	 * @param attrMgr
-	 *            attribute manager containing the job launch attributes
+	 * @param mode
+	 *            launch mode {@see ILaunchManager}
 	 * @param monitor
 	 *            progress monitor for monitoring job submission.
 	 * @return a unique job ID representing the submitted job
@@ -224,6 +218,5 @@ public interface IResourceManagerControl extends IAdaptable {
 	 *             if the job submission fails or was canceled
 	 * @since 5.0
 	 */
-	public String submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException;
+	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException;
 }

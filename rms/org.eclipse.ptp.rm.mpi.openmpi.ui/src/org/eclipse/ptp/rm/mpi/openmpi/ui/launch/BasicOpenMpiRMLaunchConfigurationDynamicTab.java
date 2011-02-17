@@ -26,6 +26,8 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPILaunchAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfigurationDefaults;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;

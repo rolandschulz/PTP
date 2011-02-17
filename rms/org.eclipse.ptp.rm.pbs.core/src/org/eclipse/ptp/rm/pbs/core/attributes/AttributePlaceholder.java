@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui.data;
+package org.eclipse.ptp.rm.pbs.core.attributes;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 
@@ -16,6 +16,7 @@ import org.eclipse.ptp.core.attributes.IAttribute;
  * whether the attribute has been selected for inclusion by the user.
  * 
  * @author arossi
+ * @since 5.0
  */
 public class AttributePlaceholder {
 	private IAttribute<?, ?, ?> attribute;

@@ -641,7 +641,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 * @param state
 	 */
 	public synchronized void setState(ResourceManagerAttributes.State state) {
-		fResourceManager.setState(state);
+		fResourceManager.setState(state.name());
 	}
 
 	/*

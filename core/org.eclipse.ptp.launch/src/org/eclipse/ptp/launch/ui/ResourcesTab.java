@@ -29,7 +29,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
@@ -252,7 +251,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
 			return false;
 		}
-		if (resourceManager.getState() != State.STARTED) {
+		if (!resourceManager.getState().equals(IResourceManagerControl.STARTED_STATE)) {
 			setErrorMessage(Messages.ResourcesTab_Resource_Manager_Not_Started);
 			return false;
 		}

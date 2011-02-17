@@ -13,13 +13,13 @@ package org.eclipse.ptp.rm.pbs.ui.providers;
 
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.ptp.rm.pbs.ui.data.AttributePlaceholder;
+import org.eclipse.ptp.rm.pbs.core.attributes.AttributePlaceholder;
 import org.eclipse.swt.graphics.Image;
 
 /**
  * Used to extract labels for viewers whose model is the AttributePlaceholder.
  * 
- * @see org.eclipse.ptp.rm.pbs.ui.data.AttributePlaceholder
+ * @see org.eclipse.ptp.rm.pbs.core.attributes.AttributePlaceholder
  * @author arossi
  */
 public class AttributeLabelProvider implements ITableLabelProvider {

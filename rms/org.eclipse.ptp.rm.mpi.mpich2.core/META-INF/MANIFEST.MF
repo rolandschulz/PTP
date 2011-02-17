@@ -16,6 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.remote.core
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.rm.mpi.mpich2.core,
+ org.eclipse.ptp.rm.mpi.mpich2.core.launch,
  org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem,
  org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem
 Bundle-Vendor: %pluginProvider

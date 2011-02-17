@@ -32,8 +32,8 @@ import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rm.ibm.pe.core.PECorePlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.rtsystem.PEProxyRuntimeClient;
 import org.eclipse.ptp.rm.ibm.pe.core.rtsystem.PERuntimeSystem;
-import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 public class PEResourceManager extends AbstractRuntimeResourceManager {
@@ -107,6 +107,6 @@ public class PEResourceManager extends AbstractRuntimeResourceManager {
 			throw new CoreException(new Status(IStatus.ERROR, PECorePlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
 		}
 		PEProxyRuntimeClient runtimeProxy = new PEProxyRuntimeClient(config, baseId);
-		return new PERuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
+		return new PERuntimeSystem(runtimeProxy);
 	}
 }

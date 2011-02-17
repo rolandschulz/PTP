@@ -23,7 +23,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
@@ -101,7 +100,7 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	public Object[] getChildren(Object parentElement) {
 		IPResourceManager rm = getResourceManager(parentElement);
 		if (rm != null) {
-			if (rm.getResourceManager().getState() != ResourceManagerAttributes.State.STARTED) {
+			if (!rm.getResourceManager().getState().equals(IResourceManagerControl.STARTED_STATE)) {
 				return new Object[0];
 			}
 			IPMachine[] machines = rm.getMachines();
@@ -141,8 +140,8 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 				return new ImageImageDescriptor(image);
 			}
 		}
-		final ResourceManagerAttributes.State state = ((IPResourceManager) object).getResourceManager().getState();
-		return new ImageImageDescriptor(ParallelImages.rmImages[state.ordinal()]);
+		final String state = ((IPResourceManager) object).getResourceManager().getState();
+		return new ImageImageDescriptor(ParallelImages.rmImages.get(state));
 	}
 
 	/*

@@ -58,7 +58,6 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
@@ -165,7 +164,7 @@ public class ResourceManagerView extends ViewPart {
 		 */
 		public void handleEvent(IResourceManagerChangedEvent e) {
 			IResourceManagerControl rm = e.getSource();
-			if (rmManager != null && rm.getState() == ResourceManagerAttributes.State.STOPPED
+			if (rmManager != null && rm.getState().equals(IResourceManagerControl.STOPPED_STATE)
 					&& rm.getUniqueName().equals(rmManager.getSelected())) {
 				rmManager.fireSetDefaultRMEvent(null);
 			}
@@ -546,8 +545,8 @@ public class ResourceManagerView extends ViewPart {
 				if (!selection.isEmpty()) {
 					if (selection.getFirstElement() instanceof IPResourceManager) {
 						final IPResourceManager rm = (IPResourceManager) selection.getFirstElement();
-						if (rm.getResourceManager().getState() == ResourceManagerAttributes.State.STOPPED
-								|| rm.getResourceManager().getState() == ResourceManagerAttributes.State.ERROR) {
+						if (rm.getResourceManager().getState().equals(IResourceManagerControl.STOPPED_STATE)
+								|| rm.getResourceManager().getState().equals(IResourceManagerControl.ERROR_STATE)) {
 							IRunnableWithProgress runnable = new IRunnableWithProgress() {
 								public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 									try {
@@ -576,7 +575,7 @@ public class ResourceManagerView extends ViewPart {
 							return;
 						} else {
 							boolean shutdown = true;
-							if (rm.getResourceManager().getState() == ResourceManagerAttributes.State.STARTED) {
+							if (rm.getResourceManager().getState().equals(IResourceManagerControl.STARTED_STATE)) {
 								shutdown = MessageDialog.openConfirm(viewer.getControl().getShell(),
 										Messages.ResourceManagerView_Shutdown,
 										NLS.bind(Messages.ResourceManagerView_AreYouSure, rm.getName()));
@@ -738,7 +737,7 @@ public class ResourceManagerView extends ViewPart {
 				final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
 				IPResourceManager rm = (IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
 				if (rm != null) {
-					if (rm.getResourceManager().getState() != ResourceManagerAttributes.State.STOPPED) {
+					if (!rm.getResourceManager().getState().equals(IResourceManagerControl.STOPPED_STATE)) {
 						inContextForEditRM = false;
 						inContextForRemoveRM = false;
 					} else {

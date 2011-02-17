@@ -30,7 +30,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.IPDICondition;
@@ -1019,7 +1018,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			throw new PDIException(null, e.getMessage());
 		}
 		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
+		if (rm.getState().equals(IResourceManagerControl.STARTED_STATE)) {
 			return rm;
 		}
 		return null;

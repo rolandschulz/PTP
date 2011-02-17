@@ -25,12 +25,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
@@ -45,7 +53,13 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
 import org.eclipse.ptp.core.elements.attributes.FilterAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
+import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
+import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.internal.rtsystem.events.RuntimeConnectedStateEvent;
@@ -101,6 +115,7 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeShutdownStateEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeStartupErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeTerminateJobErrorEvent;
+import org.eclipse.ptp.utils.core.ArgumentParser;
 import org.eclipse.ptp.utils.core.RangeSet;
 
 import com.ibm.icu.text.DateFormat;
@@ -191,13 +206,48 @@ import com.ibm.icu.util.ULocale;
 public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem implements IProxyRuntimeEventListener {
 
 	private final static int ATTR_MIN_LEN = 5;
+
+	/**
+	 * Get environment to append
+	 * 
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 * @since 5.0
+	 */
+	protected static String[] getEnvironment(ILaunchConfiguration configuration) throws CoreException {
+		Map<?, ?> defaultEnv = null;
+		Map<?, ?> configEnv = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, defaultEnv);
+		if (configEnv == null) {
+			return null;
+		}
+		if (!configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true)) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(),
+					"Replacing environment not supported"));
+		}
+
+		List<String> strings = new ArrayList<String>(configEnv.size());
+		Iterator<?> iter = configEnv.entrySet().iterator();
+		while (iter.hasNext()) {
+			Entry<?, ?> entry = (Entry<?, ?>) iter.next();
+			String key = (String) entry.getKey();
+			String value = (String) entry.getValue();
+			strings.add(key + "=" + value); //$NON-NLS-1$
+
+		}
+		return strings.toArray(new String[strings.size()]);
+	}
+
 	protected IProxyRuntimeClient proxy = null;
-	private final AttributeDefinitionManager attrDefManager;
+	private final AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
+
 	private final Map<String, AttributeManager> jobSubs = Collections.synchronizedMap(new HashMap<String, AttributeManager>());
 
-	public AbstractProxyRuntimeSystem(IProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
+	/**
+	 * @since 5.0
+	 */
+	public AbstractProxyRuntimeSystem(IProxyRuntimeClient proxy) {
 		this.proxy = proxy;
-		this.attrDefManager = manager;
 		proxy.addProxyRuntimeEventListener(this);
 	}
 
@@ -220,98 +270,17 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
-	/**
-	 * Create an attribute manager given an array of key/value strings. Each
-	 * key/value string must be in the form "key=value", where "key" is a string
-	 * containing at least one character, and "value" is a string containing
-	 * zero or more characters. The "key" string cannot contain an '='
-	 * character. There is no white space allowed between the end of the "key"
-	 * string, the '=', and the start of the "value" string, unless that white
-	 * space is part of those strings.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param kvs
-	 * @param start
-	 * @param end
-	 * @return
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IControlSystem#getAttributeDefinitionManager()
 	 */
-	private AttributeManager getAttributeManager(String[] kvs, int start, int end) {
-		AttributeManager mgr = new AttributeManager();
-
-		for (int i = start; i <= end; i++) {
-			String kv = kvs[i];
-			int sep = kv.indexOf('=');
-			if (sep > 0) {
-				try {
-					String id = kv.substring(0, sep);
-					IAttributeDefinition<?, ?, ?> attrDef = attrDefManager.getAttributeDefinition(id);
-					if (attrDef == null) {
-						/*
-						 * Treat this as a string attribute. This allows the
-						 * proxy to send unsolicited attributes when their type
-						 * is not important.
-						 */
-						attrDef = attrDefManager.createStringAttributeDefinition(id, id, id, true, ""); //$NON-NLS-1$
-					}
-					String value = ""; //$NON-NLS-1$
-					if (sep < kv.length() - 1) {
-						value = kv.substring(sep + 1);
-					}
-					IAttribute<?, ?, ?> attr = attrDef.create(value);
-					mgr.addAttribute(attr);
-				} catch (IllegalValueException e1) {
-					PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_14 + ": " + e1.getMessage()); //$NON-NLS-1$
-				}
-			}
-		}
-
-		return mgr;
-	}
-
 	/**
-	 * @param attrs
-	 * @param pos
-	 * @return
+	 * @since 5.0
 	 */
-	private ElementAttributeManager getElementAttributeManager(String[] attrs, int pos) {
-		ElementAttributeManager eMgr = new ElementAttributeManager();
-
-		try {
-			int numRanges = Integer.parseInt(attrs[pos++]);
-
-			for (int i = 0; i < numRanges; i++) {
-				if (pos >= attrs.length) {
-					return null;
-				}
-
-				RangeSet ids = new RangeSet(attrs[pos++]);
-				int numAttrs = Integer.parseInt(attrs[pos++]);
-
-				int start = pos;
-				int end = pos + numAttrs - 1;
-
-				if (end >= attrs.length) {
-					return null;
-				}
-
-				eMgr.setAttributeManager(ids, getAttributeManager(attrs, start, end));
-
-				pos = end + 1;
-			}
-		} catch (NumberFormatException e1) {
-			return null;
-		}
-
-		return eMgr;
-	}
-
-	/**
-	 * @param attrs
-	 * @param pos
-	 * @return
-	 */
-	private String getJobId(String[] attrs, int pos) {
-		String jobId = attrs[pos++];
-		return jobId;
+	public AttributeDefinitionManager getAttributeDefinitionManager() {
+		return attrDefManager;
 	}
 
 	/*
@@ -866,6 +835,205 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown()
+	 */
+	public void shutdown() throws CoreException {
+		try {
+			proxy.shutdown();
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.WARNING, PTPCorePlugin.getUniqueIdentifier(), IStatus.WARNING,
+					e.getMessage(), null));
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#startEvents()
+	 */
+	public void startEvents() throws CoreException {
+		try {
+			proxy.startEvents();
+		} catch (IOException e) {
+			throw new CoreException(
+					new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime
+	 * .IProgressMonitor)
+	 */
+	public void startup(IProgressMonitor monitor) throws CoreException {
+		initialize();
+		try {
+			proxy.startup();
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.WARNING, PTPCorePlugin.getUniqueIdentifier(), IStatus.WARNING,
+					e.getMessage(), null));
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#stopEvents()
+	 */
+	public void stopEvents() throws CoreException {
+		try {
+			proxy.stopEvents();
+		} catch (IOException e) {
+			throw new CoreException(
+					new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(java.lang.String,
+	 * org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public void submitJob(String subId, ILaunchConfiguration configuration, String mode) throws CoreException {
+		try {
+			List<IAttribute<?, ?, ?>> attrs = getAttributes(configuration, mode);
+			AttributeManager attrMgr = new AttributeManager(attrs.toArray(new IAttribute<?, ?, ?>[0]));
+			StringAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(subId);
+			attrMgr.addAttribute(jobSubAttr);
+			jobSubs.put(subId, attrMgr);
+			proxy.submitJob(attrMgr.toStringArray());
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
+					Messages.AbstractProxyRuntimeSystem_11, null));
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(java.lang.String)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public void terminateJob(String jobId) throws CoreException {
+		if (jobId == null) {
+			PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_12);
+			return;
+		}
+
+		try {
+			proxy.terminateJob(jobId);
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
+					Messages.AbstractProxyRuntimeSystem_11, null));
+		}
+	}
+
+	/**
+	 * Create an attribute manager given an array of key/value strings. Each
+	 * key/value string must be in the form "key=value", where "key" is a string
+	 * containing at least one character, and "value" is a string containing
+	 * zero or more characters. The "key" string cannot contain an '='
+	 * character. There is no white space allowed between the end of the "key"
+	 * string, the '=', and the start of the "value" string, unless that white
+	 * space is part of those strings.
+	 * 
+	 * @param kvs
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	private AttributeManager getAttributeManager(String[] kvs, int start, int end) {
+		AttributeManager mgr = new AttributeManager();
+
+		for (int i = start; i <= end; i++) {
+			String kv = kvs[i];
+			int sep = kv.indexOf('=');
+			if (sep > 0) {
+				try {
+					String id = kv.substring(0, sep);
+					IAttributeDefinition<?, ?, ?> attrDef = attrDefManager.getAttributeDefinition(id);
+					if (attrDef == null) {
+						/*
+						 * Treat this as a string attribute. This allows the
+						 * proxy to send unsolicited attributes when their type
+						 * is not important.
+						 */
+						attrDef = attrDefManager.createStringAttributeDefinition(id, id, id, true, ""); //$NON-NLS-1$
+					}
+					String value = ""; //$NON-NLS-1$
+					if (sep < kv.length() - 1) {
+						value = kv.substring(sep + 1);
+					}
+					IAttribute<?, ?, ?> attr = attrDef.create(value);
+					mgr.addAttribute(attr);
+				} catch (IllegalValueException e1) {
+					PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_14 + ": " + e1.getMessage()); //$NON-NLS-1$
+				}
+			}
+		}
+
+		return mgr;
+	}
+
+	/**
+	 * @param attrs
+	 * @param pos
+	 * @return
+	 */
+	private ElementAttributeManager getElementAttributeManager(String[] attrs, int pos) {
+		ElementAttributeManager eMgr = new ElementAttributeManager();
+
+		try {
+			int numRanges = Integer.parseInt(attrs[pos++]);
+
+			for (int i = 0; i < numRanges; i++) {
+				if (pos >= attrs.length) {
+					return null;
+				}
+
+				RangeSet ids = new RangeSet(attrs[pos++]);
+				int numAttrs = Integer.parseInt(attrs[pos++]);
+
+				int start = pos;
+				int end = pos + numAttrs - 1;
+
+				if (end >= attrs.length) {
+					return null;
+				}
+
+				eMgr.setAttributeManager(ids, getAttributeManager(attrs, start, end));
+
+				pos = end + 1;
+			}
+		} catch (NumberFormatException e1) {
+			return null;
+		}
+
+		return eMgr;
+	}
+
+	/**
+	 * @param attrs
+	 * @param pos
+	 * @return
+	 */
+	private String getJobId(String[] attrs, int pos) {
+		String jobId = attrs[pos++];
+		return jobId;
+	}
+
 	/**
 	 * Parse and extract an attribute definition.
 	 * 
@@ -998,91 +1166,6 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		return attrDef;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown()
-	 */
-	public abstract void shutdown() throws CoreException;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#startEvents()
-	 */
-	public void startEvents() throws CoreException {
-		try {
-			proxy.startEvents();
-		} catch (IOException e) {
-			throw new CoreException(
-					new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime
-	 * .IProgressMonitor)
-	 */
-	public abstract void startup(IProgressMonitor monitor) throws CoreException;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#stopEvents()
-	 */
-	public void stopEvents() throws CoreException {
-		try {
-			proxy.stopEvents();
-		} catch (IOException e) {
-			throw new CoreException(
-					new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(java.lang.String,
-	 * org.eclipse.ptp.core.attributes.AttributeManager)
-	 */
-	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException {
-		try {
-			StringAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(subId);
-			attrMgr.addAttribute(jobSubAttr);
-			jobSubs.put(subId, attrMgr);
-			proxy.submitJob(attrMgr.toStringArray());
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
-					Messages.AbstractProxyRuntimeSystem_11, null));
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(java.lang.String)
-	 */
-	/**
-	 * @since 5.0
-	 */
-	public void terminateJob(String jobId) throws CoreException {
-		if (jobId == null) {
-			PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_12);
-			return;
-		}
-
-		try {
-			proxy.terminateJob(jobId);
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
-					Messages.AbstractProxyRuntimeSystem_11, null));
-		}
-	}
-
 	/**
 	 * @param val
 	 * @return
@@ -1127,5 +1210,121 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		} else {
 			return ULocale.US;
 		}
+	}
+
+	/**
+	 * Convert launch configuration attributes to PTP attributes
+	 * 
+	 * @since 5.0
+	 */
+	protected List<IAttribute<?, ?, ?>> getAttributes(ILaunchConfiguration configuration, String mode) throws CoreException {
+		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
+
+		/*
+		 * Collect attributes from Application tab
+		 */
+		String exePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, (String) null);
+		if (exePath != null) {
+			IPath programPath = new Path(exePath);
+			attrs.add(JobAttributes.getExecutableNameAttributeDefinition().create(programPath.lastSegment()));
+
+			String path = programPath.removeLastSegments(1).toString();
+			if (path != null) {
+				attrs.add(JobAttributes.getExecutablePathAttributeDefinition().create(path));
+			}
+		}
+
+		/*
+		 * Collect attributes from Arguments tab
+		 */
+		String wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
+		if (wd != null) {
+			attrs.add(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
+		}
+
+		String[] args = getProgramArguments(configuration, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS);
+		if (args != null) {
+			attrs.add(JobAttributes.getProgramArgumentsAttributeDefinition().create(args));
+		}
+
+		/*
+		 * Collect attributes from Environment tab
+		 */
+		String[] envArr = getEnvironment(configuration);
+		if (envArr != null) {
+			attrs.add(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
+		}
+
+		/*
+		 * Collect attributes from Debugger tab if this is a debug launch
+		 */
+		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+			boolean stopInMainFlag = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
+			attrs.add(JobAttributes.getDebuggerStopInMainFlagAttributeDefinition().create(Boolean.valueOf(stopInMainFlag)));
+
+			attrs.add(JobAttributes.getDebugFlagAttributeDefinition().create(Boolean.TRUE));
+
+			args = getProgramArguments(configuration, IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS);
+			if (args != null) {
+				attrs.add(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(args));
+			}
+
+			String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
+					(String) null);
+			if (dbgExePath != null) {
+				IPath path = new Path(dbgExePath);
+				attrs.add(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
+				attrs.add(JobAttributes.getDebuggerExecutablePathAttributeDefinition()
+						.create(path.removeLastSegments(1).toString()));
+			}
+		}
+
+		/*
+		 * PTP launched this job
+		 */
+		attrs.add(JobAttributes.getLaunchedByPTPFlagAttributeDefinition().create(Boolean.valueOf(true)));
+
+		return attrs;
+	}
+
+	/**
+	 * Convert application arguments to an array of strings.
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 * @return array of strings containing the program arguments
+	 * @throws CoreException
+	 * @since 5.0
+	 */
+	protected String[] getProgramArguments(ILaunchConfiguration configuration, String attrName) throws CoreException {
+		String temp = configuration.getAttribute(attrName, (String) null);
+		if (temp != null && temp.length() > 0) {
+			ArgumentParser ap = new ArgumentParser(temp);
+			List<String> args = ap.getTokenList();
+			if (args != null) {
+				return args.toArray(new String[args.size()]);
+			}
+		}
+		return new String[0];
+	}
+
+	/**
+	 * Initialize the attribute manager. This must be called each time the
+	 * runtime is started.
+	 * 
+	 * @since 5.0
+	 */
+	protected void initialize() {
+		attrDefManager.clear();
+		attrDefManager.setAttributeDefinitions(ElementAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(ErrorAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(FilterAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(JobAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(MachineAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(MessageAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(NodeAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(ProcessAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(QueueAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(ResourceManagerAttributes.getDefaultAttributeDefinitions());
 	}
 }

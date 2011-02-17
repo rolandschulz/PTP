@@ -9,7 +9,7 @@
  *  				- reworked 05/11/2010
  *                  - version 5.0: now writes to the resourceManager config
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui.managers;
+package org.eclipse.ptp.rm.pbs.core.templates;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,38 +18,31 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.rm.pbs.core.ConfigUtils;
+import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.core.messages.Messages;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
-import org.eclipse.ptp.rm.pbs.ui.IPBSAttributeToTemplateConverter;
-import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
-import org.eclipse.ptp.rm.pbs.ui.PBSUIPlugin;
-import org.eclipse.ptp.rm.pbs.ui.data.PBSBatchScriptTemplate;
-import org.eclipse.ptp.rm.pbs.ui.launch.PBSRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
-import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
-import org.eclipse.ptp.rm.pbs.ui.utils.PBSAttributeToTemplateConverterFactory;
-import org.eclipse.swt.widgets.Shell;
 
 /**
  * Controls the selection and configuration of batch script templates.
  * 
- * @see org.eclipse.ptp.rm.pbs.ui.data.PBSBatchScriptTemplate
+ * @see org.eclipse.ptp.rm.pbs.core.templates.PBSBatchScriptTemplate
  * 
  * @author arossi
+ * @since 5.0
  * 
  */
 public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 
 	private PBSBatchScriptTemplate current;
 
-	private final PBSRMLaunchConfigurationDynamicTab launchTab;
+	private final PBSResourceManager resourceManager;
 	private final IPBSAttributeToTemplateConverter converter;
 
-	public PBSBatchScriptTemplateManager(PBSRMLaunchConfigurationDynamicTab launchTab) throws Throwable {
-		this.launchTab = launchTab;
+	public PBSBatchScriptTemplateManager(PBSResourceManager rm) throws Throwable {
+		this.resourceManager = rm;
 		this.converter = PBSAttributeToTemplateConverterFactory.getConverter(getRMConfig());
 		configureConverter();
 	}
@@ -59,7 +52,7 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 		name = validateTemplateNameForEdit(name);
 		String template = ConfigUtils.readFull(imported, PBSBatchScriptTemplate.BUFFER_SIZE);
 		if (ZEROSTR.equals(template))
-			throw new Throwable(Messages.PBSRMLaunchConfigTemplate_zerostringError);
+			throw new Throwable(Messages.PBSBatchScriptTemplateManager_zerostringError);
 		ByteArrayInputStream bais = new ByteArrayInputStream(template.getBytes());
 		new PBSBatchScriptTemplate(converter).load(bais);
 		getRMConfig().addTemplate(name, template);
@@ -71,7 +64,7 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 			String validated = validateTemplateNameForEdit(renamed);
 			String template = getRMConfig().getTemplate(original);
 			if (ZEROSTR.equals(template))
-				throw new Throwable(Messages.PBSRMLaunchConfigTemplate_zerostringError);
+				throw new Throwable(Messages.PBSBatchScriptTemplateManager_zerostringError);
 			File export = new File(dir, validated);
 			fw = new FileWriter(export, false);
 			fw.write(template);
@@ -118,7 +111,7 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	}
 
 	public PBSResourceManager getRM() {
-		return launchTab.getResourceManager();
+		return resourceManager;
 	}
 
 	public IPBSResourceManagerConfiguration getRMConfig() {
@@ -134,21 +127,8 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	 * @throws Throwable
 	 */
 	public boolean handleBaseTemplates() throws Throwable {
-		PBSResourceManager rm = getRM();
 		IPBSResourceManagerConfiguration c = getRMConfig();
-		Shell shell = PBSUIPlugin.getActiveWorkbenchShell();
-		if (rm == null || !rm.getState().equals(ResourceManagerAttributes.State.STARTED)) {
-			MessageDialog dialog = new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestStartTitle, null,
-					Messages.PBSAttributeTemplateManager_requestStartMessage, MessageDialog.QUESTION, new String[] {
-							Messages.PBSAttributeTemplateManager_requestStartContinue,
-							Messages.PBSAttributeTemplateManager_requestStartCancel }, 1);
-			if (MessageDialog.CANCEL == dialog.open())
-				return false;
-		}
 		if (!configureConverter()) {
-			new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestInitializeTitle, null,
-					Messages.PBSAttributeTemplateManager_requestInitializeMessage, MessageDialog.WARNING,
-					new String[] { Messages.PBSAttributeTemplateManager_requestStartCancel }, 0).open();
 			return false;
 		}
 		String fullTemplate = converter.generateFullBatchScriptTemplate();
@@ -156,9 +136,6 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 			if (c != null)
 				fullTemplate = c.getTemplate(FULL_TEMPLATE);
 			if (fullTemplate == null || ZEROSTR.equals(fullTemplate)) {
-				new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestInitializeTitle, null,
-						Messages.PBSAttributeTemplateManager_requestInitializeMessage, MessageDialog.WARNING,
-						new String[] { Messages.PBSAttributeTemplateManager_requestStartCancel }, 0).open();
 				return false;
 			}
 			return true;
@@ -219,7 +196,7 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	 */
 	public void removeTemplate(String name) throws IllegalAccessError {
 		if (name.equals(FULL_TEMPLATE) || name.equals(MIN_TEMPLATE))
-			throw new IllegalAccessError(name + Messages.PBSAttributeTemplateManager_removeError);
+			throw new IllegalAccessError(name + Messages.PBSBatchScriptTemplateManager_removeError);
 		IPBSResourceManagerConfiguration c = getRMConfig();
 		if (c != null)
 			c.removeTemplate(name);
@@ -253,11 +230,11 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	 */
 	public String validateTemplateNameForEdit(String name) throws IllegalArgumentException, IllegalAccessError {
 		if (name.length() == 0)
-			throw new IllegalArgumentException(Messages.PBSRMLaunchConfigEditChoose_illegalArgument);
+			throw new IllegalArgumentException(Messages.PBSBatchScriptTemplateManager_illegalArgument);
 		if (!name.endsWith(TEMPLATE_SUFFIX))
 			name = name + TEMPLATE_SUFFIX;
 		else if (name.equals(FULL_TEMPLATE) || name.equals(MIN_TEMPLATE))
-			throw new IllegalAccessError(name + Messages.PBSAttributeTemplateManager_storeError);
+			throw new IllegalAccessError(name + Messages.PBSBatchScriptTemplateManager_storeError);
 		return name;
 	}
 
@@ -287,7 +264,7 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 		PBSResourceManager rm = getRM();
 		if (rm == null)
 			return null;
-		IAttributeDefinition<?, ?, ?>[] defs = rm.getAttributeDefinitionManager().getAttributeDefinitions();
+		IAttributeDefinition<?, ?, ?>[] defs = rm.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinitions();
 
 		if (defs.length == 0)
 			return null;

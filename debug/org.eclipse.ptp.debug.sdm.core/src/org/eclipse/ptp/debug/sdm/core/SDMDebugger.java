@@ -37,18 +37,14 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.core.attributes.ArrayAttribute;
-import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
@@ -173,11 +169,13 @@ public class SDMDebugger implements IPDebugger {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.ptp.core
-	 * .attributes.AttributeManager)
+	 * org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.debug.core
+	 * .ILaunchConfiguration, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public synchronized void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException {
+	/**
+	 * @since 5.0
+	 */
+	public synchronized void initialize(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 30);
 		try {
 			if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED)) {
@@ -194,14 +192,9 @@ public class SDMDebugger implements IPDebugger {
 				}
 			}
 
-			ArrayAttribute<String> dbgArgsAttr = attrMgr.getAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition());
+			ILaunchConfigurationWorkingCopy workingCopy = configuration.getWorkingCopy();
 
-			if (dbgArgsAttr == null) {
-				dbgArgsAttr = JobAttributes.getDebuggerArgumentsAttributeDefinition().create();
-				attrMgr.addAttribute(dbgArgsAttr);
-			}
-
-			List<String> dbgArgs = dbgArgsAttr.getValue();
+			List<String> dbgArgs = new ArrayList<String>();
 
 			try {
 				fPdiDebugger.initialize(configuration, dbgArgs, progress.newChild(10));
@@ -234,23 +227,16 @@ public class SDMDebugger implements IPDebugger {
 				dbgArgs.add("--debug=" + Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_LEVEL)); //$NON-NLS-1$
 			}
 
-			// remote setting
-			String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, ""); //$NON-NLS-1$
-			IPath path = verifyResource(dbgExePath, configuration, progress.newChild(10));
-			attrMgr.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
-			attrMgr.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(
-					path.removeLastSegments(1).toString()));
-
-			StringAttribute wdAttr = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
-			String dbgWD = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String) null);
-			if (dbgWD != null) {
-				if (wdAttr != null) {
-					wdAttr.setValueAsString(dbgWD);
-				} else {
-					wdAttr = JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD);
-					attrMgr.addAttribute(wdAttr);
-				}
+			String args = workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
+			if (args == null) {
+				args = stringify(dbgArgs);
+			} else {
+				args += " " + stringify(dbgArgs); //$NON-NLS-1$
 			}
+			workingCopy.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, args);
+
+			String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, ""); //$NON-NLS-1$
+			verifyResource(dbgExePath, configuration, progress.newChild(10));
 
 			/*
 			 * Prepare the Master SDM controller thread if required by the RM.
@@ -261,7 +247,7 @@ public class SDMDebugger implements IPDebugger {
 				/*
 				 * Store information to create routing file later.
 				 */
-				prepareRoutingFile(configuration, attrMgr, progress.newChild(10));
+				prepareRoutingFile(configuration, progress.newChild(10));
 
 				/*
 				 * Create SDM master thread
@@ -276,61 +262,16 @@ public class SDMDebugger implements IPDebugger {
 				sdmCommand.add("--master"); //$NON-NLS-1$
 				sdmCommand.addAll(dbgArgs);
 				fSdmRunner.setCommand(sdmCommand);
-				if (wdAttr != null) {
-					fSdmRunner.setWorkDir(wdAttr.getValue());
-				}
+				fSdmRunner.setWorkDir(getWorkingDirectory(configuration));
 			}
+
+			workingCopy.doSave();
+
 		} finally {
 			if (monitor != null) {
 				monitor.done();
 			}
 		}
-	}
-
-	/**
-	 * Verify that the resource "path" actually exists. This just checks that
-	 * the path references something real.
-	 * 
-	 * @param path
-	 *            path to verify
-	 * @param configuration
-	 *            launch configuration
-	 * @return IPath representing the path
-	 * @throws CoreException
-	 *             is thrown if the verification fails or the user cancels the
-	 *             progress monitor
-	 * @since 5.0
-	 */
-	public IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		IResourceManagerControl rm = getResourceManager(configuration);
-		if (rm == null) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_4));
-		}
-		IResourceManagerConfiguration conf = rm.getConfiguration();
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), monitor);
-		if (monitor.isCanceled()) {
-			throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
-		}
-		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_0));
-		}
-		IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-		if (connMgr == null) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_1));
-		}
-		IRemoteConnection conn = connMgr.getConnection(conf.getConnectionName());
-		if (conn == null) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_2));
-		}
-		IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
-		if (fileManager == null) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_3));
-		}
-		if (!fileManager.getResource(path).fetchInfo().exists()) {
-			throw new CoreException(new Status(IStatus.INFO, SDMDebugCorePlugin.PLUGIN_ID, NLS.bind(Messages.SDMDebugger_5,
-					new Object[] { path })));
-		}
-		return new Path(path);
 	}
 
 	/**
@@ -372,10 +313,21 @@ public class SDMDebugger implements IPDebugger {
 		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 				(String) null);
 		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
+		if (rm.getState().equals(IResourceManagerControl.STARTED_STATE)) {
 			return rm;
 		}
 		return null;
+	}
+
+	private String getWorkingDirectory(ILaunchConfiguration configuration) throws CoreException {
+		String wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String) null);
+		if (wd == null || wd.equals("")) { //$NON-NLS-1$
+			wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
+			if (wd == null || wd.equals("")) { //$NON-NLS-1$
+				throw newCoreException(Messages.SDMDebugger_NoWorkingDir);
+			}
+		}
+		return wd;
 	}
 
 	/**
@@ -394,19 +346,15 @@ public class SDMDebugger implements IPDebugger {
 	 * 
 	 * @param configuration
 	 *            launch configuration
-	 * @param attrMgr
-	 *            attribute manager used to construct launch attributes
 	 * @param monitor
 	 *            progress monitor
 	 * @throws CoreException
 	 */
-	private void prepareRoutingFile(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException {
+	private void prepareRoutingFile(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 
 		try {
-			IPath routingFilePath = new Path(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition())
-					.getValue());
+			IPath routingFilePath = new Path(getWorkingDirectory(configuration));
 			routingFilePath = routingFilePath.append("routing_file"); //$NON-NLS-1$
 
 			IResourceManagerControl rm = getResourceManager(configuration);
@@ -435,6 +383,69 @@ public class SDMDebugger implements IPDebugger {
 				monitor.done();
 			}
 		}
+	}
+
+	/**
+	 * Create a string containing each element of the list separated by a space
+	 * 
+	 * @param list
+	 * @return
+	 */
+	private String stringify(List<String> list) {
+		String result = ""; //$NON-NLS-1$
+		for (int i = 0; i < list.size(); i++) {
+			if (i > 0) {
+				result += " "; //$NON-NLS-1$
+			}
+			result += list.get(i);
+		}
+		return result;
+	}
+
+	/**
+	 * Verify that the resource "path" actually exists. This just checks that
+	 * the path references something real.
+	 * 
+	 * @param path
+	 *            path to verify
+	 * @param configuration
+	 *            launch configuration
+	 * @return IPath representing the path
+	 * @throws CoreException
+	 *             is thrown if the verification fails or the user cancels the
+	 *             progress monitor
+	 * @since 5.0
+	 */
+	private IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+		IResourceManagerControl rm = getResourceManager(configuration);
+		if (rm == null) {
+			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_4));
+		}
+		IResourceManagerConfiguration conf = rm.getConfiguration();
+		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), monitor);
+		if (monitor.isCanceled()) {
+			throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
+		}
+		if (remoteServices == null) {
+			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_0));
+		}
+		IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
+		if (connMgr == null) {
+			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_1));
+		}
+		IRemoteConnection conn = connMgr.getConnection(conf.getConnectionName());
+		if (conn == null) {
+			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_2));
+		}
+		IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
+		if (fileManager == null) {
+			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_3));
+		}
+		if (!fileManager.getResource(path).fetchInfo().exists()) {
+			throw new CoreException(new Status(IStatus.INFO, SDMDebugCorePlugin.PLUGIN_ID, NLS.bind(Messages.SDMDebugger_5,
+					new Object[] { path })));
+		}
+		return new Path(path);
 	}
 
 	/**

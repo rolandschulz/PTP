@@ -23,7 +23,6 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation;
 
 public class SDMRunner extends Job {
 	public enum SDMMasterState {
@@ -201,7 +200,7 @@ public class SDMRunner extends Job {
 			}
 			try {
 				DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_21, jobId);
-				rmControl.control(jobId, JobControlOperation.TERMINATE, null);
+				rmControl.control(jobId, IResourceManagerControl.TERMINATE_OPERATION, null);
 			} catch (CoreException e1) {
 				PTPDebugCorePlugin.log(e1);
 			}

@@ -38,7 +38,6 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation;
 import org.eclipse.ptp.ui.IJobManager;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -497,7 +496,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public void terminateJob() throws CoreException {
 		IPJob job = getJob();
 		if (job != null) {
-			job.getResourceManager().control(job.getID(), JobControlOperation.TERMINATE, null);
+			job.getResourceManager().control(job.getID(), IResourceManagerControl.TERMINATE_OPERATION, null);
 		}
 	}
 

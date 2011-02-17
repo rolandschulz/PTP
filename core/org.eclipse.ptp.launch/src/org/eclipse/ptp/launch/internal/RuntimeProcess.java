@@ -22,7 +22,6 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation;
 
 public class RuntimeProcess implements IProcess, IJobListener {
 	private IPLaunch fLaunch = null;
@@ -119,7 +118,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	public void terminate() throws DebugException {
 		if (!isTerminated()) {
 			try {
-				fResourceManager.control(fJobId, JobControlOperation.TERMINATE, null);
+				fResourceManager.control(fJobId, IResourceManagerControl.TERMINATE_OPERATION, null);
 			} catch (CoreException e) {
 				throw new DebugException(e.getStatus());
 			}

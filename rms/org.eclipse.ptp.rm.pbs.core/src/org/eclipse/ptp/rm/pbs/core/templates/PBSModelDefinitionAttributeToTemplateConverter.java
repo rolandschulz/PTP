@@ -7,9 +7,9 @@
  * Contributors: 
  * 	Albert L. Rossi - design; to be implemented in near future.
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui.utils;
+package org.eclipse.ptp.rm.pbs.core.templates;
 
-import org.eclipse.ptp.rm.pbs.ui.IPBSJobAttributeData;
+import org.eclipse.ptp.rm.pbs.core.attributes.IPBSJobAttributeData;
 
 /**
  * Not yet implemented. When protocol changes are complete, will read full
@@ -17,6 +17,7 @@ import org.eclipse.ptp.rm.pbs.ui.IPBSJobAttributeData;
  * events sent by the proxy.
  * 
  * @author arossi
+ * @since 5.0
  * 
  */
 public class PBSModelDefinitionAttributeToTemplateConverter extends PBSBaseAttributeToTemplateConverter {

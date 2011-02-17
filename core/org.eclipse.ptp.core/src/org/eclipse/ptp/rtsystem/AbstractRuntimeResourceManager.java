@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.rmsystem;
+package org.eclipse.ptp.rtsystem;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,15 +57,14 @@ import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.messages.Messages;
-import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
-import org.eclipse.ptp.rtsystem.IRuntimeSystem;
+import org.eclipse.ptp.rmsystem.AbstractResourceManager;
+import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
@@ -98,6 +97,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * @author greg
+ * @since 5.0
  * 
  */
 public abstract class AbstractRuntimeResourceManager extends AbstractResourceManager implements IRuntimeEventListener {
@@ -362,7 +362,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 */
 	public void handleEvent(IRuntimeAttributeDefinitionEvent e) {
 		for (IAttributeDefinition<?, ?, ?> attr : e.getDefinitions()) {
-			getAttributeDefinitionManager().setAttributeDefinition(attr);
+			runtimeSystem.getAttributeDefinitionManager().setAttributeDefinition(attr);
 		}
 	}
 
@@ -396,7 +396,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			jobSubmissions.clear();
 		}
 
-		setState(ResourceManagerAttributes.State.ERROR);
+		setState(ERROR_STATE);
 		fireResourceManagerError(Messages.AbstractRuntimeResourceManager_6);
 	}
 
@@ -896,12 +896,12 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * .ptp.rtsystem.events.IRuntimeRunningStateEvent)
 	 */
 	public void handleEvent(IRuntimeRunningStateEvent e) {
-		ResourceManagerAttributes.State state = State.STARTED;
+		String state = STARTED_STATE;
 
 		try {
 			runtimeSystem.startEvents();
 		} catch (CoreException ex) {
-			state = State.ERROR;
+			state = ERROR_STATE;
 			fireResourceManagerError(ex.getMessage());
 		}
 
@@ -916,7 +916,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * .ptp.rtsystem.events.IRuntimeShutdownStateEvent)
 	 */
 	public void handleEvent(IRuntimeShutdownStateEvent e) {
-		setState(ResourceManagerAttributes.State.STOPPED);
+		setState(STOPPED_STATE);
 		cleanUp();
 	}
 
@@ -928,7 +928,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * .ptp.rtsystem.events.IRuntimeStartupErrorEvent)
 	 */
 	public void handleEvent(IRuntimeStartupErrorEvent e) {
-		setState(ResourceManagerAttributes.State.ERROR);
+		setState(ERROR_STATE);
 		fireResourceManagerError(e.getErrorMessage());
 	}
 
@@ -1057,22 +1057,15 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doControlJob(java.lang
-	 * .String,
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl.JobControlOperation,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * .String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected void doControlJob(String jobId, JobControlOperation operation, IProgressMonitor monitor) throws CoreException {
-		switch (operation) {
-		case SUSPEND:
-		case RESUME:
-		case HOLD:
-		case RELEASE:
+	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
+		if (operation.equals(TERMINATE_OPERATION)) {
+			runtimeSystem.terminateJob(jobId);
+		} else {
 			throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(),
 					Messages.AbstractRuntimeResourceManager_operationNotSupported));
-		case TERMINATE:
-			runtimeSystem.terminateJob(jobId);
-			break;
 		}
 	}
 
@@ -1151,7 +1144,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
@@ -1165,7 +1158,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				jobSubmissions.put(sub.getId(), sub);
 			}
 
-			runtimeSystem.submitJob(sub.getId(), attrMgr);
+			runtimeSystem.submitJob(sub.getId(), configuration, mode);
 
 			JobSubStatus state = sub.waitFor(monitor);
 
@@ -1231,8 +1224,9 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 
 	/**
 	 * @return the runtimeSystem
+	 * @since 5.0
 	 */
-	protected IRuntimeSystem getRuntimeSystem() {
+	public IRuntimeSystem getRuntimeSystem() {
 		return runtimeSystem;
 	}
 }

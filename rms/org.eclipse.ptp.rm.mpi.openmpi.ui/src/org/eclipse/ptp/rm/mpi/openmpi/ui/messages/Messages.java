@@ -15,7 +15,7 @@ import org.eclipse.osgi.util.NLS;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.mpi.openmpi.ui.messages.messages"; //$NON-NLS-1$
@@ -49,10 +49,6 @@ public class Messages extends NLS {
 	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyHostList;
 	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyPrefix;
 	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_NoProcess;
-
-	public static String OpenMPILaunchConfigurationDefaults_Exception_FailedReadFile;
-	public static String OpenMPILaunchConfigurationDefaults_FailedParseInteger;
-	public static String OpenMPILaunchConfigurationDefaults_MissingValue;
 
 	public static String OpenMPI12PreferencePage_Title;
 	public static String OpenMPI13PreferencePage_Title;

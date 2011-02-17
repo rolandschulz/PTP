@@ -11,14 +11,12 @@
 package org.eclipse.ptp.rm.ui.launch;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
@@ -98,31 +96,6 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 			simpleTabItem.setImage(tabControl.getImage());
 			simpleTabItem.setControl(tabControl.getControl());
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #getAttributes(org.eclipse.ptp.core.elements.IPResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue,
-	 * org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
-	 */
-	/**
-	 * @since 2.0
-	 */
-	public IAttribute<?, ?, ?>[] getAttributes(IResourceManagerControl rm, IPQueue queue, ILaunchConfiguration configuration,
-			String mode) throws CoreException {
-		List<IAttribute<?, ?, ?>> attributes = new ArrayList<IAttribute<?, ?, ?>>();
-		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			IAttribute<?, ?, ?> attributeArray[] = tabControl.getAttributes(rm, queue, configuration, mode);
-			if (attributeArray != null) {
-				List<IAttribute<?, ?, ?>> attributesList = Arrays.asList(attributeArray);
-				attributes.addAll(attributesList);
-			}
-		}
-		return attributes.toArray(new IAttribute<?, ?, ?>[attributes.size()]);
 	}
 
 	/*

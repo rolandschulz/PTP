@@ -11,9 +11,7 @@
 package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.rm.core.AbstractToolsAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManager;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem.MPICH2RuntimeSystem;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
@@ -25,8 +23,6 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
  * 
  */
 public class MPICH2ResourceManager extends AbstractToolResourceManager {
-
-	private MPICH2RuntimeSystem rts = null;
 
 	/**
 	 * @since 2.0
@@ -45,9 +41,6 @@ public class MPICH2ResourceManager extends AbstractToolResourceManager {
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
 		IMPICH2ResourceManagerConfiguration config = (IMPICH2ResourceManagerConfiguration) getConfiguration();
-		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
-		attrDefMgr.setAttributeDefinitions(AbstractToolsAttributes.getDefaultAttributeDefinitions());
-		rts = new MPICH2RuntimeSystem(this, config, attrDefMgr);
-		return rts;
+		return new MPICH2RuntimeSystem(this, config);
 	}
 }

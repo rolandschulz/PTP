@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.generic.core.rmsystem;
 
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.rm.core.AbstractToolsAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManager;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.generic.core.rtsystem.GenericRMRuntimeSystem;
@@ -25,8 +23,6 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
  * 
  */
 public class GenericResourceManager extends AbstractToolResourceManager {
-
-	private GenericRMRuntimeSystem rts = null;
 
 	public GenericResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
 		super(universe, config);
@@ -42,9 +38,6 @@ public class GenericResourceManager extends AbstractToolResourceManager {
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
 		IToolRMConfiguration config = (IToolRMConfiguration) getConfiguration();
-		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
-		attrDefMgr.setAttributeDefinitions(AbstractToolsAttributes.getDefaultAttributeDefinitions());
-		rts = new GenericRMRuntimeSystem(this, config, attrDefMgr);
-		return rts;
+		return new GenericRMRuntimeSystem(this, config);
 	}
 }

@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - original API
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui;
+package org.eclipse.ptp.rm.pbs.core.attributes;
 
 import java.io.InputStream;
 import java.io.OutputStream;

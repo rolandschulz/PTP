@@ -17,6 +17,7 @@ package org.eclipse.ptp.rm.pbs.ui;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
+import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;

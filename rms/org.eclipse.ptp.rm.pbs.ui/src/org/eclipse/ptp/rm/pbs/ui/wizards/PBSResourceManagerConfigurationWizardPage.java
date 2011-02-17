@@ -19,8 +19,8 @@ import java.util.Properties;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
-import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.ui.PBSUIPlugin;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 import org.eclipse.ptp.rm.pbs.ui.utils.WidgetUtils;

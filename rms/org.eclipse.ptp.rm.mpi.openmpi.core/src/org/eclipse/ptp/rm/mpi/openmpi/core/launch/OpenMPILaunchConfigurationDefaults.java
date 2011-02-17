@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.mpi.openmpi.ui.launch;
+package org.eclipse.ptp.rm.mpi.openmpi.core.launch;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,13 +21,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
-import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
+import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.osgi.framework.Bundle;
 
 /**
  * 
  * @author Daniel Felix Ferber
+ * @since 4.0
  * 
  */
 public class OpenMPILaunchConfigurationDefaults {
@@ -51,7 +52,7 @@ public class OpenMPILaunchConfigurationDefaults {
 
 	public static void loadDefaults() throws CoreException {
 		Path defaultsPropertiesPath = new Path(defaultsResourcePath);
-		Bundle bundle = OpenMPIUIPlugin.getDefault().getBundle();
+		Bundle bundle = OpenMPIPlugin.getDefault().getBundle();
 		Properties properties = read(defaultsPropertiesPath, bundle);
 
 		ATTR_NUMPROCS = getInteger(bundle, properties, "NUMPROCS"); //$NON-NLS-1$
@@ -80,7 +81,7 @@ public class OpenMPILaunchConfigurationDefaults {
 			inStream = FileLocator.openStream(bundle, defaultsPropertiesPath, false);
 			properties.load(inStream);
 		} catch (IOException e) {
-			throw OpenMPIUIPlugin.coreErrorException(Messages.OpenMPILaunchConfigurationDefaults_Exception_FailedReadFile, e);
+			throw OpenMPIPlugin.coreErrorException(Messages.OpenMPILaunchConfigurationDefaults_Exception_FailedReadFile, e);
 		}
 		return properties;
 	}

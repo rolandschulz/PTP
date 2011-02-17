@@ -18,11 +18,13 @@ import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rm.pbs.core.Activator;
 import org.eclipse.ptp.rm.pbs.core.rtsystem.PBSProxyRuntimeClient;
 import org.eclipse.ptp.rm.pbs.core.rtsystem.PBSRuntimeSystem;
-import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
+import org.eclipse.ptp.rm.pbs.core.templates.PBSBatchScriptTemplateManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 public class PBSResourceManager extends AbstractRuntimeResourceManager {
+	private PBSBatchScriptTemplateManager fTemplateManager = null;
 
 	/**
 	 * @since 5.0
@@ -93,6 +95,20 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 			throw new CoreException(new Status(IStatus.ERROR, Activator.getUniqueIdentifier(), e.getLocalizedMessage()));
 		}
 		PBSProxyRuntimeClient runtimeProxy = new PBSProxyRuntimeClient(config, baseId);
-		return new PBSRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
+		return new PBSRuntimeSystem(this, runtimeProxy);
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public PBSBatchScriptTemplateManager getTemplateManager() {
+		if (fTemplateManager == null) {
+			try {
+				fTemplateManager = new PBSBatchScriptTemplateManager(this);
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+		return fTemplateManager;
 	}
 }

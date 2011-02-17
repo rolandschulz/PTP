@@ -11,16 +11,28 @@
 package org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPElement;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPILaunchAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
+import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfiguration;
+import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfigurationDefaults;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.EffectiveOpenMPIResourceManagerConfiguration;
@@ -41,20 +53,63 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	/** The queue that dispatches jobs to mpi. */
 	private String queueID;
+
 	/** Mapping of discovered hosts and their ID for IPNode elements. */
 	private final Map<String, String> nodeToIDMap = new HashMap<String, String>();
 
 	/**
 	 * @since 4.0
 	 */
-	public OpenMPIRuntimeSystem(IResourceManagerControl rm, IOpenMPIResourceManagerConfiguration config,
-			AttributeDefinitionManager attrDefMgr) {
-		super(rm, config, attrDefMgr);
+	public OpenMPIRuntimeSystem(IResourceManagerControl rm, IOpenMPIResourceManagerConfiguration config) {
+		super(rm, config);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * createRuntimeSystemJob(java.lang.String, java.lang.String,
+	 * org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
 	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
 		return new OpenMPIRuntimeSystemJob(jobID, queueID, Messages.OpenMPIRuntimeSystem_JobName, this, attrMgr);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#getAttributes
+	 * (org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
+	 */
+	@Override
+	public List<IAttribute<?, ?, ?>> getAttributes(ILaunchConfiguration configuration, String mode) throws CoreException {
+		List<IAttribute<?, ?, ?>> attrs = super.getAttributes(configuration, mode);
+
+		IPResourceManager rm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		if (rm != null) {
+			IPQueue[] queues = rm.getQueues();
+			if (queues.length != 1) {
+				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(),
+						Messages.OpenMPIRuntimeSystem_NoDefaultQueue));
+			}
+			attrs.add(JobAttributes.getQueueIdAttributeDefinition().create(queues[0].getID()));
+		}
+
+		int numProcs = configuration.getAttribute(OpenMPILaunchConfiguration.ATTR_NUMPROCS,
+				OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS);
+		try {
+			attrs.add(JobAttributes.getNumberOfProcessesAttributeDefinition().create(Integer.valueOf(numProcs)));
+		} catch (IllegalValueException e) {
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(),
+					Messages.OpenMPIRuntimeSystem_InvalidConfiguration, e));
+		}
+
+		attrs.add(OpenMPILaunchAttributes.getLaunchArgumentsAttributeDefinition().create(
+				OpenMPILaunchConfiguration.calculateArguments(configuration)));
+
+		return attrs;
 	}
 
 	public String getMachineID() {

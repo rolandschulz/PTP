@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.rm.core.AbstractToolsAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIRuntimeSystem;
@@ -25,9 +23,6 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
  * 
  */
 public class OpenMPIResourceManager extends AbstractToolResourceManager {
-
-	private OpenMPIRuntimeSystem rts = null;
-
 	/**
 	 * @since 4.0
 	 */
@@ -45,10 +40,7 @@ public class OpenMPIResourceManager extends AbstractToolResourceManager {
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
 		IOpenMPIResourceManagerConfiguration config = (IOpenMPIResourceManagerConfiguration) getConfiguration();
-		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
-		attrDefMgr.setAttributeDefinitions(AbstractToolsAttributes.getDefaultAttributeDefinitions());
-		rts = new OpenMPIRuntimeSystem(this, config, attrDefMgr);
-		return rts;
+		return new OpenMPIRuntimeSystem(this, config);
 	}
 
 	/**
@@ -57,10 +49,12 @@ public class OpenMPIResourceManager extends AbstractToolResourceManager {
 	 * @return OmpiInfo
 	 */
 	public OmpiInfo getOmpiInfo() {
-		if (rts == null)
+		IRuntimeSystem rts = getRuntimeSystem();
+		if (rts == null || !(rts instanceof OpenMPIRuntimeSystem)) {
 			return null;
+		}
 		try {
-			return rts.getOmpiInfo().clone();
+			return ((OpenMPIRuntimeSystem) rts).getOmpiInfo().clone();
 		} catch (CloneNotSupportedException e) {
 			return null;
 		}

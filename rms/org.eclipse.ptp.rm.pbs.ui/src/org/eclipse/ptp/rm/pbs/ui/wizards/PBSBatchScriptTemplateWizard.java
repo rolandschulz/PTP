@@ -11,14 +11,14 @@
 package org.eclipse.ptp.rm.pbs.ui.wizards;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ptp.rm.pbs.ui.managers.PBSBatchScriptTemplateManager;
+import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
 
 public class PBSBatchScriptTemplateWizard extends Wizard {
 
 	private final PBSBatchScriptTemplateWizardPage page;
 	private boolean added;
 
-	public PBSBatchScriptTemplateWizard(PBSBatchScriptTemplateManager manager) throws Throwable {
+	public PBSBatchScriptTemplateWizard(PBSResourceManager manager) throws Throwable {
 		page = new PBSBatchScriptTemplateWizardPage(manager);
 		added = false;
 	}
