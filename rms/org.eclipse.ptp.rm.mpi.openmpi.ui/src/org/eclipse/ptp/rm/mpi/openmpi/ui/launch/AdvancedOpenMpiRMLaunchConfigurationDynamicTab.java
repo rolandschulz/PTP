@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.viewers.CellEditor;
@@ -34,7 +33,6 @@ import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfiguration;
@@ -90,7 +88,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 		info = ((OpenMPIResourceManager) rm).getOmpiInfo();
 	}
 
-	class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener implements ICheckStateListener {
+	private class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener implements ICheckStateListener {
 		public WidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
 			super(dynamicTab);
 		}
@@ -115,7 +113,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 		}
 	}
 
-	class DataSource extends RMLaunchConfigurationDynamicTabDataSource {
+	private class DataSource extends RMLaunchConfigurationDynamicTabDataSource {
 		private boolean useDefArgs;
 		private String args;
 		private boolean useDefParams;
@@ -207,6 +205,10 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 					}
 				}
 			}
+		}
+
+		protected boolean getUseDefArgs() {
+			return useDefArgs;
 		}
 	}
 
@@ -436,14 +438,6 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 
 	}
 
-	/**
-	 * @since 2.0
-	 */
-	public IAttribute<?, ?, ?>[] getAttributes(IResourceManagerControl rm, IPQueue queue, ILaunchConfiguration configuration,
-			String mode) throws CoreException {
-		return null;
-	}
-
 	public Control getControl() {
 		return control;
 	}
@@ -465,7 +459,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 	public void updateControls() {
 		argsText.setEnabled(!useArgsDefaultsButton.getSelection());
 		paramsTable.setEnabled(!useParamsDefaultsButton.getSelection());
-		if (getLocalDataSource().useDefArgs) {
+		if (getLocalDataSource().getUseDefArgs()) {
 			String launchArgs = ""; //$NON-NLS-1$
 			try {
 				launchArgs = OpenMPILaunchConfiguration.calculateArguments(getLocalDataSource().getConfiguration());
