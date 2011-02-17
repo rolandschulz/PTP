@@ -6,7 +6,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -52,7 +51,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	}
 
 	@Override
-	protected void doControlJob(String jobId, JobControlOperation operation, IProgressMonitor monitor) throws CoreException {
+	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 		// TODO Auto-generated method stub
 
 	}
@@ -79,9 +78,9 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	}
 
 	@Override
-	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
-		setPropertyValuesFromTab(configuration);
+		// TODO Auto-generated method stub
 		return null;
 	}
 
