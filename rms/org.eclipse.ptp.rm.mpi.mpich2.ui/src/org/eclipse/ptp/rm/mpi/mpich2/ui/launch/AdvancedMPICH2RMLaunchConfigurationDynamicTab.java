@@ -96,6 +96,10 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 				throw new ValidationException(Messages.AdvancedMPICH2RMLaunchConfigurationDynamicTab_Validation_EmptyArguments);
 			}
 		}
+
+		protected boolean getUseDefArgs() {
+			return useDefArgs;
+		}
 	}
 
 	private class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener implements ICheckStateListener {
@@ -109,6 +113,9 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 
 		@Override
 		protected void doWidgetSelected(SelectionEvent e) {
+			if (e.getSource() == useArgsDefaultsButton) {
+				updateControls();
+			}
 			super.doWidgetSelected(e);
 		}
 	}
@@ -237,6 +244,19 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	@Override
 	public void updateControls() {
 		argsText.setEnabled(!useArgsDefaultsButton.getSelection());
+		if (getLocalDataSource().getUseDefArgs()) {
+			String launchArgs = ""; //$NON-NLS-1$
+			try {
+				launchArgs = MPICH2LaunchConfiguration.calculateArguments(getLocalDataSource().getConfiguration());
+			} catch (CoreException e) {
+				// ignore
+			}
+			argsText.setText(launchArgs);
+		}
+	}
+
+	private DataSource getLocalDataSource() {
+		return (DataSource) super.getDataSource();
 	}
 
 	/*

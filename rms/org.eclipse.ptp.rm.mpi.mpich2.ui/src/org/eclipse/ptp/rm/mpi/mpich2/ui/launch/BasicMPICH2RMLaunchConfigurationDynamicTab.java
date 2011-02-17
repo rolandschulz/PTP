@@ -76,7 +76,7 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConf
 			for (int i = 0; i < values.length; i++) {
 				if (!values[i].equals("")) { //$NON-NLS-1$
 					if (i > 0) {
-						result += "\r"; //$NON-NLS-1$
+						result += "\n"; //$NON-NLS-1$
 					}
 					result += values[i];
 				}

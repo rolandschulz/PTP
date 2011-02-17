@@ -51,7 +51,7 @@ public class MPICH2LaunchConfiguration {
 				launchArgs += " -hostfile " + fixString(configuration.getAttribute(ATTR_HOSTFILE, MPICH2LaunchConfigurationDefaults.ATTR_HOSTFILE)); //$NON-NLS-1$
 			}
 			if (configuration.getAttribute(ATTR_USEHOSTLIST, MPICH2LaunchConfigurationDefaults.ATTR_USEHOSTLIST)) {
-				launchArgs += " -host " + fixString(configuration.getAttribute(ATTR_HOSTLIST, MPICH2LaunchConfigurationDefaults.ATTR_HOSTLIST)); //$NON-NLS-1$
+				launchArgs += " -host " + textToHostList(fixString(configuration.getAttribute(ATTR_HOSTLIST, MPICH2LaunchConfigurationDefaults.ATTR_HOSTLIST))); //$NON-NLS-1$
 			}
 
 			if (!configuration.getAttribute(ATTR_USEDEFAULTPARAMETERS, MPICH2LaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS)) {
@@ -79,5 +79,28 @@ public class MPICH2LaunchConfiguration {
 			return "\"\""; //$NON-NLS-1$
 		}
 		return "\"" + s + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * Convert a one-host-per-line string into a comma separated list
+	 * 
+	 * @param text
+	 * @return
+	 */
+	private static String textToHostList(String text) {
+		if (text == null) {
+			return ""; //$NON-NLS-1$
+		}
+		String result = ""; //$NON-NLS-1$
+		String[] values = text.split("\n"); //$NON-NLS-1$
+		for (int i = 0; i < values.length; i++) {
+			if (!values[i].equals("")) { //$NON-NLS-1$
+				if (i > 0) {
+					result += ","; //$NON-NLS-1$
+				}
+				result += values[i];
+			}
+		}
+		return result;
 	}
 }
