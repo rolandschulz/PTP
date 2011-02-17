@@ -36,7 +36,6 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.pbs.core.ConfigUtils;
 import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
@@ -706,7 +705,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 					try {
 						Shell shell = PBSUIPlugin.getActiveWorkbenchShell();
 						if (getResourceManager() == null
-								|| !getResourceManager().getState().equals(ResourceManagerAttributes.State.STARTED)) {
+								|| !getResourceManager().getState().equals(IResourceManagerControl.STARTED_STATE)) {
 							MessageDialog dialog = new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestStartTitle,
 									null, Messages.PBSAttributeTemplateManager_requestStartMessage, MessageDialog.QUESTION,
 									new String[] { Messages.PBSAttributeTemplateManager_requestStartContinue,
