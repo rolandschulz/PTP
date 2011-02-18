@@ -831,11 +831,18 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			IntegerAttribute codeAttr = mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
 			StringAttribute msgAttr = mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
 			StringAttribute jobIdAttr = mgr.getAttribute(JobAttributes.getJobIdAttributeDefinition());
-			if (codeAttr == null || msgAttr == null || jobIdAttr == null) {
+			if (jobIdAttr == null) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_9));
 			} else {
-				fireRuntimeTerminateJobErrorEvent(new RuntimeTerminateJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(),
-						jobIdAttr.getValue()));
+				int code = 0;
+				if (codeAttr != null) {
+					code = codeAttr.getValue();
+				}
+				String msg = Messages.AbstractProxyRuntimeSystem_NoErrorMsgSupplied;
+				if (msgAttr != null) {
+					msg = msgAttr.getValue();
+				}
+				fireRuntimeTerminateJobErrorEvent(new RuntimeTerminateJobErrorEvent(code, msg, jobIdAttr.getValue()));
 			}
 		} else {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_10));
