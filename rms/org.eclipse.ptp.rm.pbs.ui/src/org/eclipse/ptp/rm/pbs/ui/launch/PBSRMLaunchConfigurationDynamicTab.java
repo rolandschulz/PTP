@@ -717,17 +717,14 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 							new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestInitializeTitle, null,
 									Messages.PBSAttributeTemplateManager_requestInitializeMessage, MessageDialog.WARNING,
 									new String[] { Messages.PBSAttributeTemplateManager_requestStartCancel }, 0).open();
-
+							return Status.OK_STATUS;
 						}
-						return Status.OK_STATUS;
 					} catch (Throwable t) {
 						t.printStackTrace();
 					}
-					// String oldTemplate = WidgetUtils.getSelected(templates);
 					PBSBatchScriptTemplateWizard templateWizard = new PBSBatchScriptTemplateWizard(pbsRM);
-					if (Window.CANCEL != new WizardDialog(control.getShell(), templateWizard).open()) {
+					if (Window.CANCEL != new WizardDialog(control.getShell(), templateWizard).open())
 						repopulateTemplates(templateWizard.getSelectedTemplate());
-					}
 				} catch (Throwable t) {
 					t.printStackTrace();
 				}
