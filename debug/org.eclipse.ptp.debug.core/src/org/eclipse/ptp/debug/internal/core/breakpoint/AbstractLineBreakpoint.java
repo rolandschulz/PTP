@@ -36,8 +36,8 @@ public abstract class AbstractLineBreakpoint extends PBreakpoint implements IPLi
 		super();
 	}
 
-	public AbstractLineBreakpoint(IResource resource, String markerType, Map<?, ?> attributes, final String jobId,
-			final String setId, boolean add) throws CoreException {
+	public AbstractLineBreakpoint(IResource resource, String markerType, Map<String, ? extends Object> attributes,
+			final String jobId, final String setId, boolean add) throws CoreException {
 		super(resource, markerType, attributes, jobId, setId, add);
 	}
 

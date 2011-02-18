@@ -49,8 +49,8 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	public PBreakpoint() {
 	}
 
-	public PBreakpoint(final IResource resource, final String markerType, final Map<?, ?> attributes, final String jobId,
-			final String setId, final boolean add) throws CoreException {
+	public PBreakpoint(final IResource resource, final String markerType, final Map<String, ? extends Object> attributes,
+			final String jobId, final String setId, final boolean add) throws CoreException {
 		this();
 		fJobId = jobId;
 		fSetId = setId;

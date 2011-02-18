@@ -40,7 +40,7 @@ public class PAddressBreakpoint extends AbstractLineBreakpoint implements IPAddr
 	public PAddressBreakpoint() {
 	}
 
-	public PAddressBreakpoint(IResource resource, Map<?, ?> attributes, String jobId, String setId, boolean add)
+	public PAddressBreakpoint(IResource resource, Map<String, ? extends Object> attributes, String jobId, String setId, boolean add)
 			throws CoreException {
 		super(resource, getMarkerType(), attributes, jobId, setId, add);
 	}

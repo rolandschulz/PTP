@@ -42,7 +42,8 @@ public class PLineBreakpoint extends AbstractLineBreakpoint {
 	public PLineBreakpoint() {
 	}
 
-	public PLineBreakpoint(IResource resource, Map<?, ?> attributes, String jobId, String setId, boolean add) throws CoreException {
+	public PLineBreakpoint(IResource resource, Map<String, ? extends Object> attributes, String jobId, String setId, boolean add)
+			throws CoreException {
 		super(resource, getMarkerType(), attributes, jobId, setId, add);
 	}
 

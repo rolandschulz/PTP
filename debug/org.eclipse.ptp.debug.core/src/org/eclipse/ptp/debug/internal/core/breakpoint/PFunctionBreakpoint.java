@@ -43,8 +43,8 @@ public class PFunctionBreakpoint extends AbstractLineBreakpoint implements IPFun
 	public PFunctionBreakpoint() {
 	}
 
-	public PFunctionBreakpoint(IResource resource, Map<?, ?> attributes, final String jobId, final String setId, boolean add)
-			throws CoreException {
+	public PFunctionBreakpoint(IResource resource, Map<String, ? extends Object> attributes, final String jobId,
+			final String setId, boolean add) throws CoreException {
 		super(resource, getMarkerType(), attributes, jobId, setId, add);
 	}
 
