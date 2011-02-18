@@ -44,8 +44,8 @@ public class PWatchpoint extends PBreakpoint implements IPWatchpoint {
 	public PWatchpoint() {
 	}
 
-	public PWatchpoint(IResource resource, Map<?, ?> attributes, final String jobId, final String setId, boolean add)
-			throws CoreException {
+	public PWatchpoint(IResource resource, Map<String, ? extends Object> attributes, final String jobId, final String setId,
+			boolean add) throws CoreException {
 		super(resource, getMarkerType(), attributes, jobId, setId, add);
 	}
 
