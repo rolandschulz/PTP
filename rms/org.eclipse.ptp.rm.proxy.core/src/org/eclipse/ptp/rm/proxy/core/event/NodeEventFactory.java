@@ -29,7 +29,7 @@ public class NodeEventFactory implements IEventFactory {
 	 * .lang.String[])
 	 */
 	public IProxyEvent createChangeEvent(String[] args) {
-		return fEventFactory.newProxyRuntimeJobChangeEvent(-1, args);
+		return fEventFactory.newProxyRuntimeNodeChangeEvent(-1, args);
 	}
 
 	/*
