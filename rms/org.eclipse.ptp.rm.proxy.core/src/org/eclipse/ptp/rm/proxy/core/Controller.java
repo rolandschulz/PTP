@@ -46,22 +46,6 @@ import org.eclipse.ptp.utils.core.RangeSet;
 
 /**
  * @author rschulz
- *
- */
-/**
- * @author rschulz
- *
- */
-/**
- * @author rschulz
- *
- */
-/**
- * @author rschulz
- *
- */
-/**
- * @author rschulz
  * 
  */
 public class Controller {
