@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
@@ -55,6 +56,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	private final IPUniverse fUniverse;
 	private final ListenerList fJobListeners = new ListenerList();
 	private final Map<String, IJobStatus> fJobStatus = new HashMap<String, IJobStatus>();
+	private final IModelManager fModelManager = PTPCorePlugin.getDefault().getModelManager();
 
 	private IResourceManagerConfiguration fConfig;
 	private String fState;
@@ -444,8 +446,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * @since 5.0
 	 */
 	protected void fireResourceManagerChanged() {
-		ModelManager mm = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
-		mm.fireResourceManagerChanged(this);
+		((ModelManager) fModelManager).fireResourceManagerChanged(this);
 	}
 
 	/**
@@ -455,8 +456,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 * @since 5.0
 	 */
 	protected void fireResourceManagerError(String message) {
-		ModelManager mm = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
-		mm.fireResourceManagerError(this, message);
+		((ModelManager) fModelManager).fireResourceManagerError(this, message);
 	}
 
 	/**
