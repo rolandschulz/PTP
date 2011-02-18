@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
@@ -38,6 +39,8 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
@@ -175,7 +178,31 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 */
 	public IJobStatus getJobStatus(String jobId) {
 		synchronized (fJobStatus) {
-			return fJobStatus.get(jobId);
+			IJobStatus status = fJobStatus.get(jobId);
+			if (status == null) {
+				status = new IJobStatus() {
+					public String getJobId() {
+						return null;
+					}
+
+					public AttributeManager getAttributes() {
+						return null;
+					}
+
+					public ILaunchConfiguration getLaunchConfiguration() {
+						return null;
+					}
+
+					public State getState() {
+						return JobAttributes.State.COMPLETED;
+					}
+
+					public IStreamsProxy getStreamsProxy() {
+						return null;
+					}
+				};
+			}
+			return status;
 		}
 	}
 
@@ -417,6 +444,7 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 *            launch mode
 	 * @param monitor
 	 *            progress monitor
+	 * @return job status representing the status of the submitted job
 	 * @throws CoreException
 	 * @since 5.0
 	 */
