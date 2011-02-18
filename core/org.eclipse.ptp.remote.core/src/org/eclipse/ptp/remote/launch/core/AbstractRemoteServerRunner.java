@@ -47,6 +47,13 @@ import org.osgi.framework.Bundle;
  * @since 4.0
  */
 public abstract class AbstractRemoteServerRunner extends Job {
+	private static String LAUNCH_COMMAND_VAR = "launch_command"; //$NON-NLS-1$
+	private static String PAYLOAD_VAR = "payload"; //$NON-NLS-1$
+	private static String WORKING_DIR_VAR = "working_dir"; //$NON-NLS-1$
+	private static String VERIFY_COMMAND_VAR = "verify_command"; //$NON-NLS-1$
+	private static String VERIFY_FAIL_MESSAGE_VAR = "verify_fail_message"; //$NON-NLS-1$
+	private static String VERIFY_PATTERN_VAR = "verify_pattern"; //$NON-NLS-1$
+
 	public enum ServerState {
 		/**
 		 * @since 5.0
@@ -57,18 +64,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	private final boolean DEBUG = true;
 
 	private final Map<String, String> fEnv = new HashMap<String, String>();
-	private IRemoteConnection fRemoteConnection;
-	private Bundle fBundle;
+	private final Map<String, String> fVars = new HashMap<String, String>();
 	private final String fServerName;
 
-	private String fLaunchCommand;
-	private String fWorkDir = null;
 	private ServerState fServerState = ServerState.STOPPED;
 	private IRemoteProcess fRemoteProcess;
-
-	private String fVerifyCommand;
-	private String fVerifyPattern;
-	private String fVerifyFailMessage;
+	private IRemoteConnection fRemoteConnection;
+	private Bundle fBundle;
 
 	public AbstractRemoteServerRunner(String name) {
 		super(name);
@@ -87,7 +89,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @return launch command
 	 */
 	public String getLaunchCommand() {
-		return fLaunchCommand;
+		return fVars.get(LAUNCH_COMMAND_VAR);
 	}
 
 	/**
@@ -97,7 +99,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @return
 	 */
 	public String getPayload() {
-		return RemoteVariableManager.getInstance().getVariable("payload"); //$NON-NLS-1$
+		return fVars.get(PAYLOAD_VAR);
 	}
 
 	/**
@@ -119,14 +121,14 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Get the value of a variable that will be expended in the launch command
+	 * Get the value of a variable that will be expanded in the launch command
 	 * 
 	 * @param name
 	 *            variable name
 	 * @returns variable value
 	 */
 	public String getVariable(String name) {
-		return RemoteVariableManager.getInstance().getVariable(name);
+		return fVars.get(name);
 	}
 
 	/**
@@ -135,7 +137,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @return the verify command
 	 */
 	public String getVerifyCommand() {
-		return fVerifyCommand;
+		return fVars.get(VERIFY_COMMAND_VAR);
 	}
 
 	/**
@@ -144,7 +146,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @return the verify fail message
 	 */
 	public String getVerifyFailMessage() {
-		return fVerifyFailMessage;
+		return fVars.get(VERIFY_FAIL_MESSAGE_VAR);
 	}
 
 	/**
@@ -153,7 +155,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @return the verify pattern
 	 */
 	public String getVerifyPattern() {
-		return fVerifyPattern;
+		return fVars.get(VERIFY_PATTERN_VAR);
 	}
 
 	/**
@@ -162,7 +164,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @return working directory
 	 */
 	public String getWorkingDir() {
-		return fWorkDir;
+		return fVars.get(WORKING_DIR_VAR);
 	}
 
 	/**
@@ -199,7 +201,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            launch command
 	 */
 	public void setLaunchCommand(String command) {
-		fLaunchCommand = command;
+		fVars.put(LAUNCH_COMMAND_VAR, command);
 	}
 
 	/**
@@ -209,7 +211,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            payload name
 	 */
 	public void setPayload(String file) {
-		RemoteVariableManager.getInstance().setVariable("payload", file); //$NON-NLS-1$
+		fVars.put(PAYLOAD_VAR, file);
 	}
 
 	/**
@@ -232,7 +234,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            variable value
 	 */
 	public void setVariable(String name, String value) {
-		RemoteVariableManager.getInstance().setVariable(name, value);
+		fVars.put(name, value);
 	}
 
 	/**
@@ -242,7 +244,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            the new verify command
 	 */
 	public void setVerifyCommand(String fVerifyCommand) {
-		this.fVerifyCommand = fVerifyCommand;
+		fVars.put(VERIFY_COMMAND_VAR, fVerifyCommand);
 	}
 
 	/**
@@ -252,7 +254,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            the new verify fail message
 	 */
 	public void setVerifyFailMessage(String fVerifyFailMessage) {
-		this.fVerifyFailMessage = fVerifyFailMessage;
+		fVars.put(VERIFY_FAIL_MESSAGE_VAR, fVerifyFailMessage);
 	}
 
 	/**
@@ -262,7 +264,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            the new verify pattern
 	 */
 	public void setVerifyPattern(String fVerifyPattern) {
-		this.fVerifyPattern = fVerifyPattern;
+		fVars.put(VERIFY_PATTERN_VAR, fVerifyPattern);
 	}
 
 	/**
@@ -273,7 +275,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            working directory
 	 */
 	public void setWorkDir(String workDir) {
-		fWorkDir = workDir;
+		fVars.put(WORKING_DIR_VAR, workDir);
 	}
 
 	/**
@@ -462,7 +464,9 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 * Now launch the server.
 			 */
 			subMon.subTask(Messages.AbstractRemoteServerRunner_5);
-			String launchCmd = RemoteVariableManager.getInstance().performStringSubstitution(getLaunchCommand());
+			RemoteVariableManager varMgr = RemoteVariableManager.getInstance();
+			varMgr.setVars(fVars);
+			String launchCmd = varMgr.performStringSubstitution(getLaunchCommand());
 			List<String> launchArgs = Arrays.asList(launchCmd.split(" ")); //$NON-NLS-1$
 			IRemoteProcessBuilder builder = conn.getRemoteServices().getProcessBuilder(conn, launchArgs);
 			builder.directory(directory);
@@ -563,7 +567,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		assert fLaunchCommand != null;
+		assert getLaunchCommand() != null;
 		assert fRemoteProcess == null;
 
 		final SubMonitor subMon = SubMonitor.convert(monitor, 100);

@@ -6,7 +6,7 @@
         <remoteServer
               class="org.eclipse.ptp.rm.pbs.core.server.PBSProxyServerRunner"
               id="org.eclipse.ptp.rm.pbs.PBSProxyServer"
-              launchCommand="java -Xms64m -Xmx128m -Xss2m ${javaargs} -jar ${payload} ${args}"
+              launchCommand="java -Xms64m -Xmx128m -Xss2m ${javaargs} -jar ${payload} ${payload_args}"
               name="%PBSProxyServer.name"
               payload="pbs_proxy.jar"
               verifyCommand="java -version"
