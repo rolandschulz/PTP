@@ -422,8 +422,13 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 				script = normalize(value);
 		}
 
-		if (jobSubId == null || script == null) {
+		if (jobSubId == null) {
 			System.err.println("missing arguments!");//$NON-NLS-1$
+			return;
+		}
+
+		if (script == null) {
+			sendSubmitJobError(transID, jobSubId, "No script supplied");
 			return;
 		}
 
@@ -437,7 +442,7 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 			out.write(script);
 			out.close();
 		} catch (IOException e1) {
-			e1.printStackTrace(); /* TODO: should send error message */
+			sendSubmitJobError(transID, jobSubId, e1.getLocalizedMessage());
 			return;
 		}
 
@@ -461,31 +466,19 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 						jobIdBindings.put(batchId, jobSubId);
 					sendEvent(getEventFactory().newOKEvent(transID));
 				} else {
-					// if error get error messaes from stderr
-					String errArgs[] = { "jobSubId=" + jobSubId, //$NON-NLS-1$
-							"errorCode=" + 0, //$NON-NLS-1$
-							// p.exitValue()
-							"errorMsg=" + err.toString() }; //$NON-NLS-1$
-					sendEvent(getEventFactory().newProxyRuntimeSubmitJobErrorEvent(transID, errArgs)); // TODO:
+					sendSubmitJobError(transID, jobSubId, out.toString());
 					/*
 					 * document in wiki - following here
 					 * proxy_event:proxy_submitjob_error_event
 					 */
-					System.err.println("submitJob: err: " + err.toString()); //$NON-NLS-1$
+					System.out.println("submitJob: err: " + out.toString()); //$NON-NLS-1$
 				}
 			} catch (Throwable e1) { // sendEvent, readLine
 				e1.printStackTrace();
 			}
 
 		} catch (IOException e) { // exec
-			String errArgs[] = { "jobSubId=" + jobSubId, "errorCode=" + 0, "errorMsg=" + e.getMessage() }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			try {
-				System.err.println("SubmitJobError: " + e.getMessage()); //$NON-NLS-1$
-				sendEvent(getEventFactory().newProxyRuntimeSubmitJobErrorEvent(transID, errArgs));
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			// e.printStackTrace();
+			sendSubmitJobError(transID, jobSubId, e.getLocalizedMessage());
 		} catch (InterruptedException e) { // waitFor
 			e.printStackTrace();
 		}
@@ -513,10 +506,14 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 		//
 		int id = Integer.parseInt(arguments[0].split("=")[1]); //$NON-NLS-1$
 		IElement job = jobController.currentElements.getElementByElementID(id);
-		System.err.println(Messages.getString("PBSProxyRuntimeServer.25") + id + "," + job.getKey()); //$NON-NLS-1$ //$NON-NLS-2$
+		if (job == null) {
+			sendTerminateJobError(transID, id, "Unable to terminate job: not found");
+			return;
+		}
+		System.out.println(Messages.getString("PBSProxyRuntimeServer.25") + id + "," + job.getKey()); //$NON-NLS-1$ //$NON-NLS-2$
 		String args[] = { "qdel", job.getKey() }; //$NON-NLS-1$
 		try {
-			Process p = new ProcessBuilder(args).redirectErrorStream(false).start();
+			Process p = new ProcessBuilder(args).redirectErrorStream(true).start();
 
 			p.waitFor();
 			if (p.exitValue() == 0)
@@ -527,10 +524,9 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 				while ((line = err.readLine()) != null)
 					errMsg += line;
 				err.close();
-				String errArgs[] = { "jobSubId=" + id, "errorCode=" + 0, "errorMsg=" + errMsg }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				sendEvent(getEventFactory().newProxyRuntimeTerminateJobErrorEvent(transID, errArgs));
+				sendTerminateJobError(transID, id, errMsg);
+				System.out.println("qdel finished with exit status " + p.exitValue()); //$NON-NLS-1$
 			}
-			System.err.println(p.exitValue());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -661,4 +657,25 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 		};
 	}
 
+	private void sendSubmitJobError(int transId, String jobSubId, String errorMsg) {
+		String errArgs[] = { "jobSubId=" + jobSubId, "errorCode=" + 0, "errorMsg=" + errorMsg }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		try {
+			System.out.println("SubmitJobError: " + errorMsg); //$NON-NLS-1$
+			sendEvent(getEventFactory().newProxyRuntimeSubmitJobErrorEvent(transId, errArgs));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+	}
+
+	private void sendTerminateJobError(int transId, int id, String errorMsg) {
+		String errArgs[] = { "jobId=" + id, "errorCode=" + 0, "errorMsg=" + errorMsg }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		try {
+			System.out.println("SubmitJobError: " + errorMsg); //$NON-NLS-1$
+			sendEvent(getEventFactory().newProxyRuntimeTerminateJobErrorEvent(transId, errArgs));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+	}
 }
