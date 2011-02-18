@@ -128,6 +128,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			super(launch.getJobId());
 			fLaunch = launch;
 			fDebugger = debugger;
+			setSystem(true);
 		}
 
 		public void statusChanged() {
