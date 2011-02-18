@@ -525,7 +525,9 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			}
 
 		}
-		getPResourceManager().addJobs(queue, newJobs);
+		if (newJobs.size() > 0) {
+			getPResourceManager().addJobs(queue, newJobs);
+		}
 	}
 
 	/*
@@ -551,7 +553,9 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				}
 			}
 
-			getPResourceManager().addMachines(newMachines);
+			if (newMachines.size() > 0) {
+				getPResourceManager().addMachines(newMachines);
+			}
 		}
 	}
 
@@ -582,7 +586,9 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				}
 
 			}
-			getPResourceManager().addNodes(machine, newNodes);
+			if (newNodes.size() > 0) {
+				getPResourceManager().addNodes(machine, newNodes);
+			}
 		} else {
 			PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_1 + e.getParentId());
 		}
@@ -637,7 +643,9 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				}
 			}
 
-			getPResourceManager().addQueues(newQueues);
+			if (newQueues.size() > 0) {
+				getPResourceManager().addQueues(newQueues);
+			}
 		}
 	}
 
