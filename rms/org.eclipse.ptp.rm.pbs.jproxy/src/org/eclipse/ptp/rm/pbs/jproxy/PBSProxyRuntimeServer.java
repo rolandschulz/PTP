@@ -152,7 +152,7 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 		// Attribute Defintions
 		InputStream AttrDefFile = getClass().getClassLoader().getResourceAsStream("PBSAttributes/Definitions.txt"); //$NON-NLS-1$
 		if (AttrDefFile == null) {
-			System.err.println("Unable to locate PBSAttributes/Definitions.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/Definitions.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 		List<IAttributeDefinition<?, ?, ?>> AttributeDefinitions = AttributeDefinitionReader.parse(AttrDefFile);
@@ -168,15 +168,15 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 		InputStream jobParserRequiredKeyStream = getClass().getClassLoader().getResourceAsStream(
 				"PBSAttributes/RequiredPBSKeys-job.txt"); //$NON-NLS-1$
 		if (nodeParserRequiredKeyStream == null) {
-			System.err.println("Unable to locate PBSAttributes/RequiredPBSKeys-node.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/RequiredPBSKeys-node.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 		if (queueParserRequiredKeyStream == null) {
-			System.err.println("Unable to locate PBSAttributes/RequiredPBSKeys-queue.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/RequiredPBSKeys-queue.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 		if (jobParserRequiredKeyStream == null) {
-			System.err.println("Unable to locate PBSAttributes/RequiredPBSKeys-job.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/RequiredPBSKeys-job.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 
@@ -192,15 +192,15 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 		InputStream jobParserKeyMapStream = getClass().getClassLoader().getResourceAsStream(
 				"PBSAttributes/Parser2PBS-KeyMap-job.txt"); //$NON-NLS-1$
 		if (nodeParserKeyMapStream == null) {
-			System.err.println("Unable to locate PBSAttributes/Parser2PBS-KeyMap-node.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/Parser2PBS-KeyMap-node.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 		if (queueParserKeyMapStream == null) {
-			System.err.println("Unable to locate PBSAttributes/Parser2PBS-KeyMap-queue.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/Parser2PBS-KeyMap-queue.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 		if (jobParserKeyMapStream == null) {
-			System.err.println("Unable to locate PBSAttributes/Parser2PBS-KeyMap-job.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/Parser2PBS-KeyMap-job.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 
@@ -216,15 +216,15 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 		InputStream jobParserValueMapStream = getClass().getClassLoader().getResourceAsStream(
 				"PBSAttributes/Parser2PBS-ValueMap-job.txt"); //$NON-NLS-1$
 		if (nodeParserValueMapStream == null) {
-			System.err.println("Unable to locate PBSAttributes/Parser2PBS-ValueMap-node.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/Parser2PBS-ValueMap-node.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 		if (queueParserValueMapStream == null) {
-			System.err.println("Unable to locate PBSAttributes/Parser2PBS-ValueMap-queue.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/Parser2PBS-ValueMap-queue.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 		if (jobParserValueMapStream == null) {
-			System.err.println("Unable to locate PBSAttributes/Parser2PBS-ValueMap-job.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/Parser2PBS-ValueMap-job.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 
@@ -236,7 +236,7 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 		InputStream ProtocolKeyMapStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/PBS2Protocol-KeyMap.txt"); //$NON-NLS-1$
 		List<List<Object>> ProtocolKeyMap = AttributeKeyMapReader.parse(ProtocolKeyMapStream);
 		if (ProtocolKeyMap == null) {
-			System.err.println("Unable to locate PBSAttributes/PBS2Protocol-KeyMap.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/PBS2Protocol-KeyMap.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 		nodeController.setProtocolKeyMap(ProtocolKeyMap);
@@ -248,7 +248,7 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 				"PBSAttributes/PBS2Protocol-ValueMap.txt"); //$NON-NLS-1$
 		List<List<Object>> ProtocolValueMap = AttributeValueMapReader.parse(ProtocolValueMapStream);
 		if (ProtocolValueMap == null) {
-			System.err.println("Unable to locate PBSAttributes/PBS2Protocol-ValueMap.txt"); //$NON-NLS-1$
+			System.out.println("Unable to locate PBSAttributes/PBS2Protocol-ValueMap.txt"); //$NON-NLS-1$
 			throw new Exception();
 		}
 		nodeController.setProtocolValueMap(ProtocolValueMap);
@@ -284,7 +284,7 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 	@Override
 	protected Thread startEventThread(final int transID) {
 		int machineID = ElementIDGenerator.getInstance().getUniqueID();
-		System.err.println(Messages.getString("PBSProxyRuntimeServer.2")); //$NON-NLS-1$
+		System.out.println(Messages.getString("PBSProxyRuntimeServer.2")); //$NON-NLS-1$
 
 		// System.err.println(base_ID);
 		// System.err.println(getElementID());
@@ -349,11 +349,11 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 							for (IProxyEvent e : events) {
 								e.setTransactionID(transID);
 								sendEvent(e);
-								System.err.println(e.toString());
+								System.out.println(e.toString());
 							}
 						} catch (IOException e1) {
 							e1.printStackTrace();
-							System.err.println(Messages.getString("PBSProxyRuntimeServer.6")); //$NON-NLS-1$
+							System.out.println(Messages.getString("PBSProxyRuntimeServer.6")); //$NON-NLS-1$
 							state = ServerState.SHUTDOWN;
 							stateMachineThread.interrupt();
 						}
@@ -367,7 +367,7 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 						e.printStackTrace();
 					}
 				}
-				System.err.println(Messages.getString("PBSProxyRuntimeServer.0")); //$NON-NLS-1$
+				System.out.println(Messages.getString("PBSProxyRuntimeServer.0")); //$NON-NLS-1$
 			}
 
 			// private String escape(String input, String what, String with)
@@ -423,12 +423,12 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 		}
 
 		if (jobSubId == null) {
-			System.err.println("missing arguments!");//$NON-NLS-1$
+			System.out.println("missing arguments!");//$NON-NLS-1$
 			return;
 		}
 
 		if (script == null) {
-			sendSubmitJobError(transID, jobSubId, "No script supplied");
+			sendSubmitJobError(transID, jobSubId, "No script supplied");//$NON-NLS-1$
 			return;
 		}
 
@@ -507,7 +507,7 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 		int id = Integer.parseInt(arguments[0].split("=")[1]); //$NON-NLS-1$
 		IElement job = jobController.currentElements.getElementByElementID(id);
 		if (job == null) {
-			sendTerminateJobError(transID, id, "Unable to terminate job: not found");
+			sendTerminateJobError(transID, id, "job not found on server");//$NON-NLS-1$
 			return;
 		}
 		System.out.println(Messages.getString("PBSProxyRuntimeServer.25") + id + "," + job.getKey()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -558,13 +558,13 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 		Map<String, Object> params = parseArguments(args);
 		String host = (String) params.get("host"); //$NON-NLS-1$
 		if (host == null) {
-			System.err.println(Messages.getString("PBSProxyRuntimeServer.1")); //$NON-NLS-1$
+			System.out.println(Messages.getString("PBSProxyRuntimeServer.1")); //$NON-NLS-1$
 			System.exit(1);
 		}
 		int port = 0;
 		Integer portVal = ((Integer) params.get("port")); //$NON-NLS-1$
 		if (portVal == null) {
-			System.err.println(Messages.getString("PBSProxyRuntimeServer.3")); //$NON-NLS-1$
+			System.out.println(Messages.getString("PBSProxyRuntimeServer.3")); //$NON-NLS-1$
 			System.exit(1);
 			return; // just to avoid warnings
 		}
@@ -577,7 +577,7 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 			System.out.println(PBSProxyRuntimeServer.class.getSimpleName() + Messages.getString("PBSProxyRuntimeServer.4")); //$NON-NLS-1$
 			server.start();
 		} catch (IOException e) {
-			System.err.println(Messages.getString("PBSProxyRuntimeServer.5") + e.getMessage()); //$NON-NLS-1$
+			System.out.println(Messages.getString("PBSProxyRuntimeServer.5") + e.getMessage()); //$NON-NLS-1$
 			System.exit(1);
 		}
 		System.out.println("PBSProxyRuntimeServer exited"); //$NON-NLS-1$
@@ -599,7 +599,7 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 					int port = new Integer(args[i].substring(7));
 					argsMap.put("port", port); //$NON-NLS-1$
 				} catch (NumberFormatException e) {
-					System.err.println(org.eclipse.ptp.rm.pbs.jproxy.Messages.getString("AbstractProxyRuntimeServer_0") //$NON-NLS-1$
+					System.out.println(org.eclipse.ptp.rm.pbs.jproxy.Messages.getString("AbstractProxyRuntimeServer_0") //$NON-NLS-1$
 							+ args[i + 1].substring(7));
 				}
 			else if (args[i].startsWith("--host")) { //$NON-NLS-1$
