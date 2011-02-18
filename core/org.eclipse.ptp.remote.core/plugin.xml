@@ -21,9 +21,9 @@
             readOnly="false">
       </variable>
       <variable
-            description="args"
+            description="payload_args"
             initialValue="&quot;&quot;"
-            name="args"
+            name="payload_args"
             readOnly="false">
       </variable>
    </extension>

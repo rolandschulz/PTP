@@ -7,6 +7,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.core;
 
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.IValueVariable;
@@ -17,7 +19,6 @@ import org.eclipse.core.variables.VariablesPlugin;
  */
 public class RemoteVariableManager {
 	private static RemoteVariableManager fInstance = null;
-	private final IStringVariableManager fVarMgr;
 
 	public static RemoteVariableManager getInstance() {
 		if (fInstance == null) {
@@ -26,30 +27,46 @@ public class RemoteVariableManager {
 		return fInstance;
 	}
 
+	private final IStringVariableManager fVarMgr;
+
 	public RemoteVariableManager() {
 		fVarMgr = VariablesPlugin.getDefault().getStringVariableManager();
 	}
 
-	public void setVariable(String name, String value) {
-		IValueVariable var = fVarMgr.getValueVariable(name);
-		if (var != null) {
-			var.setValue(value);
-		}
-	}
-
-	public String getVariable(String name) {
-		IValueVariable var = fVarMgr.getValueVariable(name);
-		if (var != null) {
-			return var.getValue();
-		}
-		return null;
-	}
-
+	/**
+	 * Perform a string substitution on the expression using the variables known
+	 * by the platform.
+	 * 
+	 * @param expression
+	 *            expression to substitute
+	 * @return
+	 */
 	public String performStringSubstitution(String expression) {
 		try {
 			return fVarMgr.performStringSubstitution(expression, false);
 		} catch (CoreException e) {
 			return expression;
+		}
+	}
+
+	/**
+	 * Initialize variables with values from the map. Variable values should be
+	 * stored externally as platform variables are shared across all plugins.
+	 * This method should be called prior to calling
+	 * {@link performStringSubstitution}
+	 * 
+	 * @param vars
+	 * @since 5.0
+	 */
+	public void setVars(Map<String, String> vars) {
+		for (String name : vars.keySet()) {
+			String value = vars.get(name);
+			IValueVariable var = fVarMgr.getValueVariable(name);
+			if (var == null) {
+				var = fVarMgr.newValueVariable(name, name, false, value);
+			} else {
+				var.setValue(value);
+			}
 		}
 	}
 }
