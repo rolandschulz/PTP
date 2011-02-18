@@ -163,18 +163,10 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	private class JobSubmission extends AbstractJobSubmission {
 		private final ILaunchConfiguration fConfiguration;
 		private IJobStatus fJobStatus = null;
-		private String fReason;
 
 		public JobSubmission(int count, ILaunchConfiguration configuration) {
 			super(count);
 			fConfiguration = configuration;
-		}
-
-		/**
-		 * @return the reason for the error
-		 */
-		public String getErrorReason() {
-			return fReason;
 		}
 
 		/**
@@ -1180,7 +1172,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 				break;
 
 			case ERROR:
-				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), sub.getErrorReason()));
+				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), sub.getError()));
 			}
 		} finally {
 			monitor.done();

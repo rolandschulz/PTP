@@ -44,6 +44,10 @@ public class Messages extends NLS {
 	public static String AbstractProxyRuntimeSystem_7;
 	public static String AbstractProxyRuntimeSystem_8;
 	public static String AbstractProxyRuntimeSystem_9;
+
+	public static String AbstractProxyRuntimeSystem_NoErrorMsgSupplied;
+
+	public static String AbstractProxyRuntimeSystem_ReplacingEnvNotSupported;
 	public static String AbstractResourceManager_1;
 	public static String AbstractRuntimeResourceManager_1;
 	public static String AbstractRuntimeResourceManager_11;

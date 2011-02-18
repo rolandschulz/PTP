@@ -223,7 +223,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 		if (!configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true)) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(),
-					"Replacing environment not supported"));
+					Messages.AbstractProxyRuntimeSystem_ReplacingEnvNotSupported));
 		}
 
 		List<String> strings = new ArrayList<String>(configEnv.size());
@@ -797,11 +797,18 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			IntegerAttribute codeAttr = mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
 			StringAttribute msgAttr = mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
 			StringAttribute jobSubIdAttr = mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
-			if (codeAttr == null || msgAttr == null || jobSubIdAttr == null) {
+			if (jobSubIdAttr == null) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_7));
 			} else {
-				fireRuntimeSubmitJobErrorEvent(new RuntimeSubmitJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(),
-						jobSubIdAttr.getValue()));
+				int code = 0;
+				if (codeAttr != null) {
+					code = codeAttr.getValue();
+				}
+				String msg = Messages.AbstractProxyRuntimeSystem_NoErrorMsgSupplied;
+				if (msgAttr != null) {
+					msg = msgAttr.getValue();
+				}
+				fireRuntimeSubmitJobErrorEvent(new RuntimeSubmitJobErrorEvent(code, msg, jobSubIdAttr.getValue()));
 			}
 		} else {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_8));
