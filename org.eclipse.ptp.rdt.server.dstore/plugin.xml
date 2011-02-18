@@ -11,8 +11,7 @@
               payload="rdt-server.jar"
               verifyCommand="java -version"
               verifyFailMessage="Invalid java version or java not installed"
-              verifyPattern="^(java version )(.)(1\.[5-9]|[2-9]\.).*$"
-              verifyReqVersion="Java 1.5">
+              verifyPattern="^(java version )(.)(1\.[5-9]|[2-9]\.).*$">
         </remoteServer>
      </extension>
         <extension
