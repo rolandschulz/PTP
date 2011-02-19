@@ -154,7 +154,7 @@ public class PQueue extends Parent implements IPQueue {
 	public void removeJobs(Collection<IPJob> jobs) {
 		synchronized (fJobs) {
 			for (IPJob job : jobs) {
-				fJobs.remove(job);
+				fJobs.remove(job.getID());
 			}
 		}
 	}
