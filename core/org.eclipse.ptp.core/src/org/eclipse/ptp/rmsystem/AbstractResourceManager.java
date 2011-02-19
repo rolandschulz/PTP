@@ -391,6 +391,9 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 	 */
 	protected void cleanUp() {
 		doCleanUp();
+		synchronized (fJobStatus) {
+			fJobStatus.clear();
+		}
 		fPResourceManager.cleanUp();
 	}
 

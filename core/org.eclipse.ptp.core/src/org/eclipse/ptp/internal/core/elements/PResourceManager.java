@@ -320,6 +320,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 * shuts down and ensures that everything is cleaned up properly.
 	 */
 	public void cleanUp() {
+		removeJobs(Arrays.asList(getJobs()));
 		removeQueues(this, Arrays.asList(getQueues()));
 		removeMachines(this, Arrays.asList(getMachines()));
 	}
