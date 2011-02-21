@@ -168,7 +168,80 @@
 		<argument flag="-optTauSelectFile" separator="=" value="tau_select.txt" localdir="true"/>
 		</allcompilers>
 	</compile>
-	<execute/>	
+	<execute>
+        <global name="TAU Runtime">
+              <!--This is a static value that will always be put in the environment and bypass the UI entirely 
+              <envvar flag="A_VAR" value="1"/>  -->
+
+            <optionpane title="TAU Runtime" virtual="true" displayoptions="false">
+            
+                 <togoption label="Verbose Output" optname="TAU_VERBOSE" envvar="true" defstate="false" tooltip="Enable verbose diagnostic output">
+                      <optvalue type="toggle" seton="1"/>
+                </togoption>
+                
+                <togoption label="Enable Profiling" optname="TAU_PROFILE" envvar="true" defstate="true" tooltip="Generate TAU profile output">
+                      <optvalue type="toggle" seton="1"/>
+                </togoption>
+                
+                <togoption label="Profile Output Directory" optname="TAU_PROFILEDIR" envvar="true" tooltip="Location of profile output.  Current directory by default.  Changing this may disable automatic profile storage.">
+                      <optvalue type="dir" default="."/>
+                </togoption>
+                
+               <togoption label="Callpath Profiling" optname="TAU_CALLPATH" envvar="true" defstate="false" tooltip="Generate TAU callpath profiles">
+                      <optvalue type="toggle" seton="1"/>
+                </togoption>
+                
+                <togoption label="Set Callpath Depth" optname="TAU_CALLPATH_DEPTH" envvar="true" defstate="false" tooltip="Sets depth of callpaths">
+                      <optvalue type="number" min="0" defnum="2"/>
+                </togoption>
+                
+                <togoption label="Overhead Compensation" optname="TAU_COMPENSATE" envvar="true" defstate="false" tooltip="Adjust recorded time values to allow for instrumentation overhead">
+                      <optvalue type="toggle" seton="1"/>
+                </togoption>
+                
+				<togoption label="Track Message" optname="TAU_TRACK_MESSAGE" envvar="true" defstate="false" tooltip="Track individual MPI message statistics">
+                      <optvalue type="toggle" seton="1"/>
+                </togoption>
+                
+                <togoption label="Communication Matrix" optname="TAU_COMM_MATRIX" envvar="true" defstate="false" tooltip="Generate MPI communication matrix">
+                      <optvalue type="toggle" seton="1"/>
+                </togoption>
+                
+                <togoption label="Enable Throttling" optname="TAU_THROTTLE" envvar="true" defstate="true" tooltip="Throttle out lightweight routines">
+                      <optvalue type="toggle" seton="1"/>
+                </togoption>
+                
+                <togoption label="Throttle Percall" optname="TAU_THROTTLE_PERCALL" envvar="true" defstate="true" tooltip="Runtime throttling per call threshold (e.g. less than 10 microseconds per call)">
+                      <optvalue type="number" min="0" defnum="10"/>
+                </togoption>
+                
+                <togoption label="Throttle Numcalls" optname="TAU_THROTTLE_NUMCALLS" envvar="true" defstate="true" tooltip="Runtime throttling number of calls threshold (e.g. at least 100000 calls)">
+                      <optvalue type="number" min="0" defnum="100000"/>
+                </togoption>				
+                
+                <togoption label="Enable Tracing" optname="TAU_TRACE" envvar="true" defstate="false" tooltip="Generate TAU trace output">
+                      <optvalue type="toggle" seton="1"/>
+                </togoption>
+                
+                <togoption label="Trace Output Directory" optname="TAU_TRACEDIR" envvar="true" tooltip="Location of trace output.  Current directory by default.">
+                      <optvalue type="dir" default="."/>
+                </togoption>
+                
+                <togoption label="Synchronize Clocks" optname="TAU_SYNCHRONIZE_CLOCKS" envvar="true" defstate="true" tooltip="Synchronize different MPI process clocks for tracing">
+                      <optvalue type="toggle" seton="1"/>
+                </togoption>
+                
+                <togoption label="Track Heap" optname="TAU_TRACK_HEAP" envvar="true" defstate="false" tooltip="Track memory heap usage at function entry/exit with a context event">
+                      <optvalue type="toggle" seton="1"/>
+                </togoption>
+                
+                <togoption label="Track Headroom" optname="TAU_TRACK_HEADROOM" envvar="true" defstate="false" tooltip="Track memory headroom availability at function entry/exit with a context event">
+                      <optvalue type="toggle" seton="1"/>
+                </togoption>
+                
+          </optionpane>
+      </global>
+	</execute>	
 	<analyze>
 		<utility command="process-TAU-data" group="internal"/>
 	</analyze>

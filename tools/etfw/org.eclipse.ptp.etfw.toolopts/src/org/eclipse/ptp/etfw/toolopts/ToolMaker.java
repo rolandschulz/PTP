@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.xml.sax.SAXException;
@@ -194,16 +195,17 @@ public class ToolMaker {
 	 * @param checkListener  The listener that defines behavior for this tool's check boxe and value field, if any
 	 */
 	protected static void displayToolOption(Composite comp, ToolOption toolOpt, SelectionListener browseListener, ToolPaneListener checkListener){
+		
+		initializeCheckLabel(comp,toolOpt);
+		
 		//If this option is a boolean or a toggle we don't need any widgets but the checkbox
 		if (toolOpt.type == ToolOption.BOOL || toolOpt.type == ToolOption.TOGGLE) {
-			initializeCheckLabel(comp,toolOpt);
+			
 			new Label(comp, SWT.NULL);
 			new Label(comp, SWT.NULL);
 		} 
 		//If this option is text only we just need the argbox
 		else if (toolOpt.type == ToolOption.TEXT) {
-			initializeCheckLabel(comp,toolOpt);
-
 			toolOpt.argbox = new Text(comp, SWT.BORDER | SWT.SINGLE);
 			toolOpt.argbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			toolOpt.argbox.setToolTipText(toolOpt.valueToolTip);
@@ -213,9 +215,7 @@ public class ToolMaker {
 			new Label(comp, SWT.NULL);
 		} 
 		//This is a widget with a browse button, so build it accordingly
-		else {
-			initializeCheckLabel(comp,toolOpt);
-
+		else if(toolOpt.type == ToolOption.DIR||toolOpt.type == ToolOption.FILE){
 			toolOpt.argbox = new Text(comp, SWT.BORDER | SWT.SINGLE);
 			toolOpt.argbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			toolOpt.argbox.setToolTipText(toolOpt.valueToolTip);
@@ -226,6 +226,22 @@ public class ToolMaker {
 			if(browseListener!=null)
 				toolOpt.browser.addSelectionListener(browseListener);
 		}
+		else if(toolOpt.type == ToolOption.COMBO){
+			
+		}
+		else if(toolOpt.type == ToolOption.NUMBER){
+			toolOpt.numopt = new Spinner(comp,SWT.NULL);
+			toolOpt.numopt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			toolOpt.numopt.setToolTipText(toolOpt.valueToolTip);
+			toolOpt.numopt.setMaximum(toolOpt.maxNum);
+			toolOpt.numopt.setMinimum(toolOpt.minNum);
+			if(checkListener!=null)
+				toolOpt.numopt.addModifyListener((ModifyListener)checkListener);
+
+			new Label(comp, SWT.NULL);
+		}
+		
+		
 		if(checkListener!=null&&toolOpt.unitCheck!=null)
 			toolOpt.unitCheck.addSelectionListener(checkListener);
 	}

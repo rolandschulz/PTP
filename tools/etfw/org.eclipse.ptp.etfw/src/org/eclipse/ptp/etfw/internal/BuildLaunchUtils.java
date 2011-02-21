@@ -31,6 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
@@ -262,9 +266,11 @@ public class BuildLaunchUtils {
 		dialog.setText(toolText);
 		dialog.setMessage(toolMessage);
 		if (archpath != null) {
-			File path = new File(archpath);
-			if (path.exists()) {
-				dialog.setFilterPath(path.isFile() ? archpath : path.getParent());
+			//File path = new File(archpath);
+			IFileStore path = EFS.getLocalFileSystem().getStore(new Path(archpath));
+			IFileInfo finf=path.fetchInfo();
+			if (finf.exists()) {
+				dialog.setFilterPath(!finf.isDirectory() ? archpath : path.getParent().toURI().getPath());
 			}
 		}
 		return dialog.open();

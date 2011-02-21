@@ -407,7 +407,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 		if (panes != null)
 			for (int i = 0; i < panes.length; i++) {
-				if (panes[i].virtual)
+				if (panes[i].virtual||panes[i].embedded)
 					continue;
 				optionTab = new TabItem(tabParent, SWT.NULL);
 				optionTab.setText(panes[i].toolName);

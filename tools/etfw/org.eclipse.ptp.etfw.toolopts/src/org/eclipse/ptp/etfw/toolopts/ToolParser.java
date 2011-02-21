@@ -82,6 +82,9 @@ public class ToolParser extends DefaultHandler{
 	private static final String NAME = "optname";
 	private static final String VALUE = "optvalue";
 	private static final String DEFAULT = "default";
+	private static final String DEFAULTNUM = "defnum";
+	private static final String MINIMUM = "minimum";
+	private static final String MAXIMUM = "maximum";
 	private static final String DEFSTATE = "defstate";
 	
 	private static final String SETON="seton";
@@ -215,6 +218,15 @@ public class ToolParser extends DefaultHandler{
 		}
 		else
 			return null;
+	}
+	
+	private static int getIntAttribute(String name, int defValue, Attributes atts){
+		String str = getAttribute(name,atts);
+		if(str == null)
+			return defValue;
+		int ret = Integer.parseInt(str);
+		return ret;
+		
 	}
 	
 	private static boolean getBooleanAttribute(String name, boolean defValue, Attributes atts)
@@ -412,11 +424,13 @@ public class ToolParser extends DefaultHandler{
 		else if(name.equals(OPTIONPANE))
 		{
 			boolean virtual=getBooleanAttribute("virtual",false,atts);
+			boolean embedded = getBooleanAttribute("embedded",false,atts);
 			//TODO: Make -absolutely- certain that nothing ever tries to create a UI instance of a virtual pane!
 			
 			toolOptions=new ArrayList<ToolOption>();
 			currentPane=new ToolPane(virtual);
 			currentPane.setName(getAttribute("title",atts));
+			currentPane.embedded=embedded;
 			int optdex = atts.getIndex(PREPENDWITH);
 			if(optdex>=0)
 			{
@@ -474,6 +488,9 @@ public class ToolParser extends DefaultHandler{
 			{
 				//actOpt.useEquals=getBooleanAttribute("equals",true,atts);
 				actOpt.defText=getAttribute(DEFAULT,atts);
+				actOpt.defNum=getIntAttribute(DEFAULTNUM,0,atts);
+				actOpt.minNum=getIntAttribute(MINIMUM,0,atts);
+				actOpt.maxNum=getIntAttribute(MAXIMUM,Integer.MAX_VALUE,atts);
 				String type=getAttribute("type",atts);
 				actOpt.valueToolTip=getAttribute("TIP",atts);
 				if(type!=null)

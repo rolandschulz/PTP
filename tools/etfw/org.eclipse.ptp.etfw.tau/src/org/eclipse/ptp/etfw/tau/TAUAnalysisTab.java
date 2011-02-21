@@ -275,7 +275,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 
 	//TODO:  This isn't generic.  We need to get this pane explicitly
 	protected final ToolPane tauOpts = Activator.getTool("TAU").getFirstBuilder(null).getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0]; //$NON-NLS-1$
-
+	protected final ToolPane tauEnv = Activator.getTool("TAU").getNthRunner(null,2).global.toolPanes[0];
 	//	protected ToolPane custOpts=null;
 
 	//	private static File tauToolXML= null;
@@ -321,6 +321,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 					compOpt.setSelected(true);
 				}
 				tauOpts.OptUpdate();
+				tauEnv.OptUpdate();
 			}
 			//			else
 			//			if(source==buildonlyCheck){
@@ -658,6 +659,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 				//compOpt.setSelected(false);
 
 				tauOpts.OptUpdate();
+				tauEnv.OptUpdate();
 			}
 
 
@@ -670,6 +672,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			compOpt.setSelected(true);
 
 			tauOpts.OptUpdate();
+			tauEnv.OptUpdate();
 		}
 
 
@@ -844,6 +847,41 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		scrollAna.setExpandHorizontal(true);
 		scrollAna.setExpandVertical(true);
 
+		
+		/*
+		 * 
+		 * TAU Compiler:  TAU Compiler options
+		 * 
+		 * */
+
+		//		tauOpts.encloseOpts="\'";
+		//		tauOpts.prependOpts="-tau_options=";
+		//		tauOpts.separateOpts=" ";
+
+		TabItem envTab = new TabItem(tabParent, SWT.NULL);
+		envTab.setText(tauEnv.toolName.trim());
+
+		ScrolledComposite scrollEnv = new ScrolledComposite(tabParent,
+				SWT.V_SCROLL);
+
+		Composite envComp = new Composite(scrollEnv, SWT.NONE);
+
+		envTab.setControl(scrollEnv);
+
+		/*
+		 * The actual controls of optComp
+		 * */
+
+		tauEnv.makeToolPane(envComp, new TauPaneListener(tauEnv));
+
+		envComp.pack();
+		int envCompHeight=envComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+		scrollEnv.setContent(envComp);
+		scrollEnv.setMinSize(400, envCompHeight);
+		scrollEnv.setExpandHorizontal(true);
+		scrollEnv.setExpandVertical(true);
+		
+		
 		/*
 		 * 
 		 * TAU Compiler:  TAU Compiler options
@@ -1022,6 +1060,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		""); //$NON-NLS-1$
 
 		tauOpts.setDefaults(configuration);
+		tauEnv.setDefaults(configuration);
 	}
 
 	ToolOption pdtOpt = null;//tauOpts.getOption("-optPDTInst");
@@ -1063,6 +1102,9 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			tauOpts.OptUpdate();
 
 			tauOpts.initializePane(configuration);
+			
+			tauEnv.OptUpdate();
+			tauEnv.initializePane(configuration);
 
 			int pcr=configuration.getAttribute(
 					ITAULaunchConfigurationConstants.PAPISELECT, 0);
@@ -1194,9 +1236,14 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAUINC,runTauinc.getSelection());
 
 		tauOpts.performApply(configuration);
+		
 
 		configuration.setAttribute(tauOpts.configID, tauOpts.getOptionString());
 		configuration.setAttribute(tauOpts.configVarID, tauOpts.getVarMap());
+		
+		tauEnv.performApply(configuration);
+		configuration.setAttribute(tauEnv.configID, tauEnv.getOptionString());
+		configuration.setAttribute(tauEnv.configVarID, tauEnv.getVarMap());
 
 		//		configuration.setAttribute(IToolLaunchConfigurationConstants.BUILDONLY,
 		//		buildonlyCheck.getSelection());
@@ -1305,7 +1352,9 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			//configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT_COMMAND,selcommand);
 			configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT,selected);
 		}
-		String tauMakeName=makecombo.getItem(makecombo.getSelectionIndex());
+		int seldex=makecombo.getSelectionIndex();
+		if(seldex<0)return;
+		String tauMakeName=makecombo.getItem(seldex);
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKENAME, tauMakeName);
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE,"-tau_makefile="+tlpath+File.separator+makecombo.getItem(makecombo.getSelectionIndex())); //$NON-NLS-1$
 

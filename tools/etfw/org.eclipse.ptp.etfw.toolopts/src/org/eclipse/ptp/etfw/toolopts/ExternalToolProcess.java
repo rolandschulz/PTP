@@ -112,6 +112,26 @@ public class ExternalToolProcess {
 		return null;
 	}
 	
+	/**
+	 * Returns the nth ExecTool defined in this process.
+	 * @param configuration
+	 * @param n
+	 * @return
+	 */
+	public ExecTool getNthRunner(ILaunchConfiguration configuration, int n){
+		if(n<1)n=1;
+		int count = 0;
+		for(int i=0;i<externalTools.size();i++){
+			ExternalTool pt = externalTools.get(i);
+			if(pt instanceof ExecTool &&(configuration==null||pt.canRun(configuration))){
+				count++;
+				if(count==n)
+					return (ExecTool) externalTools.get(i);
+			}
+		}
+		return null;
+	}
+	
 	public PostProcTool getFirstAnalyzer(ILaunchConfiguration configuration){
 		for(int i=0;i<externalTools.size();i++){
 			ExternalTool pt = externalTools.get(i);
