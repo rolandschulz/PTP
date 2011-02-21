@@ -20,6 +20,7 @@ package org.eclipse.ptp.etfw.toolopts;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -84,6 +85,21 @@ public class ToolOption {
 	protected String defText;
 	
 	/**
+	 * The default numerical value for numerical arguments, if any
+	 */
+	protected int defNum;
+	
+	/**
+	 * The minimum numerical value for numerical arguments, if any
+	 */
+	protected int minNum;
+	
+	/**
+	 * The maximum numerical value for numerical arguments, if any
+	 */
+	protected int maxNum;
+	
+	/**
 	 * Text for the option button
 	 */
 	protected String optLabel;
@@ -116,6 +132,8 @@ public class ToolOption {
 	public boolean visible=true;
 	
 	protected Combo combopt;
+	
+	protected Spinner numopt;
 	
 	/**
 	 * If true this option is for an argument, if false it is for an environment variable
@@ -224,6 +242,10 @@ public class ToolOption {
 		if(argbox!=null){
 			argbox.setEnabled(set);
 		}
+		
+		if(numopt!=null){
+			numopt.setEnabled(set);
+		}
 	}
 	public void setArg(String arg){
 		if(argbox!=null){
@@ -231,6 +253,43 @@ public class ToolOption {
 			argbox.setText(arg);
 			argbox.setEnabled(isOn);
 		}
+		else if(numopt!=null){
+			int argnum=Integer.parseInt(arg);
+			setArg(argnum);
+		}
+	}
+	public void setArg(int arg){
+		if(numopt!=null){
+			boolean isOn=numopt.getEnabled();
+			numopt.setSelection(arg);
+			numopt.setEnabled(isOn);
+		}
+		else if(argbox!=null){
+			setArg(""+arg);
+		}
+	}
+	public String getArg(){
+		if(argbox!=null)
+			return argbox.getText();
+		else if (numopt!=null)
+			return numopt.getText();
+		return null;
 	}
 
+	/**
+	 * Enable or disable (true or false) whichever widget this option uses to take its argument value
+	 * @param bool
+	 */
+	public void setWidgetsEnabled(boolean bool){
+		if(numopt!=null){
+			numopt.setEnabled(bool);
+		}
+		if(argbox!=null){
+			argbox.setEnabled(bool);
+		}
+		if(browser!=null){
+			browser.setEnabled(bool);
+		}
+	}
+	
 }

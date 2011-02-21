@@ -192,7 +192,7 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 				e.printStackTrace();
 			}
 			if (path.fetchInfo().exists())
-				dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toString()); //TODO: This may be bad
+				dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toURI().getPath()); //TODO: This may be bad
 		}
 
 		// String tlpath = correctPath+File.separator+"lib";

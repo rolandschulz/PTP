@@ -130,6 +130,11 @@ public class ToolPane implements IAppInput {
 	 * The type of tool the parameter defined by this pane goes to
 	 */
 	public int paneType = -1;
+	
+	/**
+	 * Control the pane normally but don't the user must set it to be displayed manually in a plugin
+	 */
+	public boolean embedded = false;
 
 	@SuppressWarnings("unchecked")
 	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {
@@ -184,7 +189,7 @@ public class ToolPane implements IAppInput {
 	 */
 	public boolean updateOptField(Object source) {
 		for (int i = 0; i < options.length; i++) {
-			if (source.equals(options[i].argbox)) {
+			if (source.equals(options[i].argbox)||source.equals(options[i].numopt)) {
 				OptArgUpdate(options[i]);
 				updateOptDisplay();
 				return true;
@@ -206,9 +211,9 @@ public class ToolPane implements IAppInput {
 		for (int i = 0; i < options.length; i++) {
 			if (options[i].unitCheck == null || options[i].unitCheck.getSelection()) {
 				
-				String text="";
-				if(options[i].argbox!=null){
-					text = options[i].argbox.getText();
+				String text=options[i].getArg();
+				if(options[i].getArg()==null){
+					text = "";
 				}
 				
 				boolean useField=!options[i].fieldrequired||text.trim().length()>0;
@@ -218,7 +223,7 @@ public class ToolPane implements IAppInput {
 						optString.append(options[i].optionLine).append(this.separateOpts);
 				}
 				else{
-					if(options[i].argbox!=null)
+					if(options[i].getArg()!=null)
 					{
 						
 						if(useField){
@@ -231,17 +236,9 @@ public class ToolPane implements IAppInput {
 						}
 					}
 				}
-				if (options[i].argbox != null) {
-					options[i].argbox.setEnabled(true);
-					if (options[i].browser != null)
-						options[i].browser.setEnabled(true);
-				}
+				options[i].setWidgetsEnabled(true);
 			} else {
-				if (options[i].argbox != null) {
-					options[i].argbox.setEnabled(false);
-					if (options[i].browser != null)
-						options[i].browser.setEnabled(false);
-				}
+				options[i].setWidgetsEnabled(false);
 				if(options[i].type==ToolOption.TOGGLE){
 					if(options[i].setOff!=null)
 					{
@@ -263,13 +260,20 @@ public class ToolPane implements IAppInput {
 	 *            The ToolOption being updated
 	 */
 	protected void OptArgUpdate(ToolOption opt) {
-		if (opt.type > 0) {
+		String val = opt.getArg();
+		if(val==null)
+			val="";
+//		if (opt.type ==1||opt.type ==2||opt.type ==3) {
+//			val = opt.argbox.getText();
+//		}else if (opt.type==4){
+//			val=opt.numopt.getText();
+//		}
 			opt.optionLine = new StringBuffer(opt.optName).append(
 					this.separateNameValue).append(this.encloseValues).append(
-							opt.argbox.getText()).append(this.encloseValues);
+							val).append(this.encloseValues);
 
 			OptUpdate();
-		}
+		
 	}
 
 	/**
@@ -282,11 +286,18 @@ public class ToolPane implements IAppInput {
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		for (int i = 0; i < options.length; i++) {
 			if (options[i].visible && !options[i].required)
+			{
 				configuration.setAttribute(options[i].confDefString,
 						options[i].defState);
+			}
 			if (options[i].usesTextBox())
+			{
 				configuration.setAttribute(options[i].confArgString,
 						options[i].defText);
+			}
+			if(options[i].numopt!=null){
+				configuration.setAttribute(options[i].confArgString, options[i].defNum);
+			}
 		}
 	}
 
@@ -315,6 +326,11 @@ public class ToolPane implements IAppInput {
 				if (arg != null)
 					options[i].argbox.setText(arg);
 			}
+			
+			if(options[i].numopt!=null){
+				options[i].numopt.setSelection(configuration.getAttribute(options[i].confArgString, options[i].defNum));
+			}
+			
 		}
 		updateOptDisplay();
 	}
@@ -347,6 +363,10 @@ public class ToolPane implements IAppInput {
 			if (options[i].usesTextBox())
 			{
 				configuration.setAttribute(options[i].confArgString,options[i].argbox.getText());
+			}
+			
+			if(options[i].numopt!=null){
+				configuration.setAttribute(options[i].confArgString,options[i].numopt.getSelection());
 			}
 			//			if(options[i].type==ToolOption.TOGGLE){
 			//				String argVal=null;
