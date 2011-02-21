@@ -17,9 +17,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
-import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFileJob;
-import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
@@ -31,7 +29,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	public JAXBResourceManager(IPUniverse universe, JAXBServiceProvider jaxbServiceProvider) {
 		super(universe, jaxbServiceProvider);
 		config = jaxbServiceProvider;
-		initialize();
+		setRuntimeProperties();
 	}
 
 	public ResourceManagerData getData() {
@@ -40,6 +38,10 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	public IJAXBResourceManagerConfiguration getJAXBRMConfiguration() {
 		return config;
+	}
+
+	public void setData(ResourceManagerData rmdata) {
+		this.rmdata = rmdata;
 	}
 
 	@Override
@@ -128,16 +130,6 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	 */
 	private void handleScript(Control control, Map<String, Object> env) {
 
-	}
-
-	private void initialize() throws RuntimeException {
-		try {
-			rmdata = JAXBUtils.initializeRMData(config.getRMInstanceXMLLocation());
-			setRuntimeProperties();
-
-		} catch (Throwable t) {
-			throw new RuntimeException(Messages.JAXBResourceManager_initError, t);
-		}
 	}
 
 	private void maybeDiscoverAttributes() {

@@ -35,6 +35,15 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	public void addMonitorInvocationOptions(String optionString);
 
 	/**
+	 * Get the connection name. If there are separate connections for control
+	 * and monitoring, the type distinguishes them.
+	 * 
+	 * @param type
+	 * @return connection name
+	 */
+	public String getConnectionName(String type);
+
+	/**
 	 * Get the invocation options as a list of strings. Returns an empty list if
 	 * there are no options
 	 * 
@@ -91,6 +100,15 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	 * @return path
 	 */
 	public String getMonitorPath();
+
+	/**
+	 * Set the connection name. If there are separate connections for control
+	 * and monitoring, the type distinguishes them.
+	 * 
+	 * @param name
+	 * @param type
+	 */
+	public void setConnectionName(String name, String type);
 
 	/**
 	 * Set the invocation options. The contents of optionString are split into

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource-manager-data name="rm-pbs-torque_2.3.7">
+   <site>
+      <control-connection>ssh://abe.ncsa.uiuc.edu/usr/local/bin/qsub</control-connection>
+   </site>
 	<control>
 		<!-- all attribute names, managed-file names and parser ids are added at initialization -->
 		<!-- these included from runtime configuration information -->

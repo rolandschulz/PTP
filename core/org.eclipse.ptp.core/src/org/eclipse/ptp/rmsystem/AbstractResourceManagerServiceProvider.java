@@ -60,15 +60,12 @@ public abstract class AbstractResourceManagerServiceProvider extends ServiceProv
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) {
+		if (obj == null)
 			return false;
-		}
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (!(obj instanceof AbstractResourceManagerServiceProvider)) {
+		if (!(obj instanceof AbstractResourceManagerServiceProvider))
 			return false;
-		}
 		return getUniqueName().equals(((AbstractResourceManagerServiceProvider) obj).getUniqueName());
 	}
 

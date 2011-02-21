@@ -62,6 +62,10 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 		}
 	}
 
+	public String getConnectionName(String type) {
+		return getString(type, ZEROSTR);
+	}
+
 	/**
 	 * Get the invocation options as a list of strings. Returns an empty list if
 	 * there are no options
@@ -127,6 +131,10 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 */
 	public String getMonitorPath() {
 		return getString(TAG_MONITOR_PATH, ZEROSTR);
+	}
+
+	public void setConnectionName(String name, String type) {
+		putString(type, name);
 	}
 
 	/**

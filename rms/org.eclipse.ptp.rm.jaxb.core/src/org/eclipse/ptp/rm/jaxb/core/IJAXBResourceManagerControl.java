@@ -17,4 +17,6 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 
 	IJAXBResourceManagerConfiguration getJAXBRMConfiguration();
 
+	void setData(ResourceManagerData data);
+
 }
