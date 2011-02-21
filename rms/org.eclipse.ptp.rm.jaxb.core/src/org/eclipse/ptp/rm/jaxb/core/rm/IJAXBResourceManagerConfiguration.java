@@ -1,8 +1,44 @@
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
+import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.rmsystem.IControlMonitorRMConfiguration;
 
 public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConfiguration {
+
+	/**
+	 * @since 5.0
+	 */
+	public String getDefaultControlHost();
+
+	/**
+	 * @since 5.0
+	 */
+	public String getDefaultControlPath();
+
+	/**
+	 * @since 5.0
+	 */
+	public String getDefaultControlPort();
+
+	/**
+	 * @since 5.0
+	 */
+	public String getDefaultMonitorHost();
+
+	/**
+	 * @since 5.0
+	 */
+	public String getDefaultMonitorPath();
+
+	/**
+	 * @since 5.0
+	 */
+	public String getDefaultMonitorPort();
+
+	/**
+	 * @since 5.0
+	 */
+	public ResourceManagerData getResourceManagerData();
 
 	/**
 	 * @since 5.0
@@ -32,6 +68,11 @@ public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConf
 	/**
 	 * @since 5.0
 	 */
+	public void setResourceManagerData(ResourceManagerData data);
+
+	/**
+	 * @since 5.0
+	 */
 	public void setRMInstanceXMLLocation(String location);
 
 	/**
@@ -43,5 +84,4 @@ public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConf
 	 * @since 5.0
 	 */
 	public void setValidAttributeSet(String serialized);
-
 }

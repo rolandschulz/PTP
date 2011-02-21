@@ -103,7 +103,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
-			validateProxyPath();
+			validateTargetPath();
 			updatePage();
 			return Status.OK_STATUS;
 		}
@@ -156,7 +156,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 			else if (source == optionsButton) {
 				targetArgs = createOptionsDialog(getShell(), targetArgs);
 				updatePage();
-			} else {
+			} else if (connectionSharingEnabled && source == shareConnectionButton)
+				updateSettings();
+			else {
 				updateSettings();
 				updatePage();
 			}
@@ -169,11 +171,11 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	protected String targetPath = ZEROSTR;
 	protected String targetArgs = ZEROSTR;
 	protected String localAddr = ZEROSTR;
-	protected IRemoteServices remoteServices = null;
-	protected IRemoteServices[] fAllRemoteServices = null;
-	protected IRemoteConnectionManager connectionManager = null;
-	protected IRemoteUIConnectionManager uiConnectionManager = null;
-	protected IRemoteConnection connection = null;
+	protected IRemoteServices remoteServices;
+	protected IRemoteServices[] fAllRemoteServices;
+	protected IRemoteConnectionManager connectionManager;
+	protected IRemoteUIConnectionManager uiConnectionManager;
+	protected IRemoteConnection connection;
 	protected boolean loading = true;
 	protected boolean isValid;
 	protected boolean muxPortFwd = false;
@@ -183,13 +185,14 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 
 	protected final Job validateJob = new ValidateJob();
 	protected final WidgetListener listener = new WidgetListener();
-	protected Text targetPathText = null;
-	protected Button optionsButton = null;
-	protected Button browseButton = null;
-	protected Button noneButton = null;
-	protected Button portForwardingButton = null;
+	protected Text targetPathText;
+	protected Button optionsButton;
+	protected Button browseButton;
+	protected Button noneButton;
+	protected Button portForwardingButton;
 	protected Button manualButton = null;
 	protected Button newConnectionButton;
+	protected Button shareConnectionButton;
 	protected Combo remoteCombo;
 	protected Combo connectionCombo;
 	protected Combo localAddrCombo;
@@ -198,6 +201,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	protected boolean targetOptionsEnabled = true;
 	protected boolean multiplexingEnabled = true;
 	protected boolean fManualLaunchEnabled = true;
+	protected boolean connectionSharingEnabled = true;
 
 	public AbstractControlMonitorRMConfigurationWizardPage(IRMConfigurationWizard wizard, String title) {
 		super(wizard, title);
@@ -282,8 +286,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		if (remoteServices != null)
 			config.setRemoteServicesId(remoteServices.getId());
 		if (connection != null)
-			config.setConnectionName(connection.getName());
-
+			setConnectionName(connection.getName());
+		else
+			setConnectionName(null);
 		setConnectionOptions();
 		return true;
 	}
@@ -307,9 +312,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 * 
 	 * @since 2.0
 	 */
-	protected void addCustomWidgets(Composite remoteComp) {
-		// NO-OP
-	}
+	protected abstract void addCustomWidgets(Composite remoteComp);
 
 	/**
 	 * Convenience method for creating a button widget.
@@ -599,6 +602,8 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 
 	protected abstract void loadConnectionOptions();
 
+	protected abstract void setConnectionName(String name);
+
 	protected abstract void setConnectionOptions();
 
 	/**
@@ -650,6 +655,13 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 				manualLaunch = manualButton.getSelection();
 		}
 
+		if (shareConnectionButton != null) {
+			boolean selected = shareConnectionButton.getSelection();
+			remoteCombo.setEnabled(!selected);
+			connectionCombo.setEnabled(!selected);
+			newConnectionButton.setEnabled(!selected);
+		}
+
 		/*
 		 * If no localAddr has been specified in the configuration, select a
 		 * default one.
@@ -689,7 +701,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 * @return true if valid
 	 * @since 1.1
 	 */
-	protected boolean validateProxyPath() {
+	protected boolean validateTargetPath() {
 		if (!targetPathEnabled)
 			return true;
 		targetPathIsValid = false;
@@ -767,19 +779,27 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 */
 	private void createContents(Composite parent) {
 		/*
-		 * Composite for remote information
+		 * connection sharing
 		 */
-		Composite remoteComp = new Composite(parent, SWT.NONE);
-		GridLayout remoteLayout = new GridLayout();
-		remoteLayout.numColumns = 4;
-		remoteLayout.marginWidth = 0;
-		remoteComp.setLayout(remoteLayout);
+		if (connectionSharingEnabled) {
+			shareConnectionButton = createCheckButton(parent, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3b);
+			shareConnectionButton.addSelectionListener(listener);
+		}
+
+		/*
+		 * group for connection information
+		 */
+		Composite remoteComp = new Group(parent, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 4;
+		layout.marginWidth = 0;
+		remoteComp.setLayout(layout);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 4;
 		remoteComp.setLayoutData(gd);
 
 		/*
-		 * Remote provider
+		 * connection provider
 		 */
 		Label label = new Label(remoteComp, SWT.NONE);
 		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_4);
@@ -793,7 +813,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		remoteCombo.setLayoutData(gd);
 
 		/*
-		 * Proxy location
+		 * connection location
 		 */
 		label = new Label(remoteComp, SWT.NONE);
 		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_5);
@@ -811,15 +831,27 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 
 		if (targetPathEnabled) {
 			/*
-			 * Proxy path
+			 * group for service executable information
 			 */
-			label = new Label(remoteComp, SWT.NONE);
+			Composite serviceComp = new Group(parent, SWT.NONE);
+			layout = new GridLayout();
+			layout.numColumns = 4;
+			layout.marginWidth = 0;
+			serviceComp.setLayout(layout);
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 4;
+			serviceComp.setLayoutData(gd);
+
+			/*
+			 * Service path
+			 */
+			label = new Label(serviceComp, SWT.NONE);
 			label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_7);
 			gd = new GridData();
 			gd.horizontalSpan = 1;
 			label.setLayoutData(gd);
 
-			targetPathText = new Text(remoteComp, SWT.SINGLE | SWT.BORDER);
+			targetPathText = new Text(serviceComp, SWT.SINGLE | SWT.BORDER);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.horizontalSpan = 1;
 			gd.grabExcessHorizontalSpace = true;
@@ -827,26 +859,25 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 			targetPathText.setLayoutData(gd);
 			targetPathText.addModifyListener(listener);
 
-			browseButton = SWTUtil.createPushButton(remoteComp,
+			browseButton = SWTUtil.createPushButton(serviceComp,
 					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_8, null);
 			browseButton.addSelectionListener(listener);
 
-		}
+			if (targetOptionsEnabled) {
+				/*
+				 * options
+				 */
+				optionsButton = SWTUtil.createPushButton(serviceComp,
+						Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_9, null);
+				optionsButton.addSelectionListener(listener);
 
-		if (targetOptionsEnabled) {
-			/*
-			 * Proxy options
-			 */
-			optionsButton = SWTUtil.createPushButton(remoteComp,
-					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_9, null);
-			optionsButton.addSelectionListener(listener);
-
+			}
 		}
 
 		/*
 		 * customizable
 		 */
-		addCustomWidgets(remoteComp);
+		addCustomWidgets(parent);
 
 		/*
 		 * Multiplexing options

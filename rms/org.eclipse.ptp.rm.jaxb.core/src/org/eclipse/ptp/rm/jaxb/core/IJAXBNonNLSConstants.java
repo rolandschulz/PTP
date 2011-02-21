@@ -16,6 +16,7 @@ public interface IJAXBNonNLSConstants {
 	String QT = "\"";//$NON-NLS-1$
 	String QM = "?";//$NON-NLS-1$
 	String PD = "#";//$NON-NLS-1$
+	String PDRX = "[#]";//$NON-NLS-1$
 	String CM = ",";//$NON-NLS-1$
 	String CO = ":";//$NON-NLS-1$
 	String SC = ";";//$NON-NLS-1$
@@ -44,6 +45,8 @@ public interface IJAXBNonNLSConstants {
 	String YES = "yes";//$NON-NLS-1$
 	String NO = "no";//$NON-NLS-1$
 
+	String GET = "get";//$NON-NLS-1$
+
 	String XMLSchema = "http://www.w3.org/2001/XMLSchema"; //$NON-NLS-1$
 	String DATA = "data/"; //$NON-NLS-1$
 	String RM_XSD = DATA + "resource_manager_type.xsd";//$NON-NLS-1$
@@ -54,18 +57,8 @@ public interface IJAXBNonNLSConstants {
 	String SELECTED_ATTRIBUTES = "selected_attributes";//$NON-NLS-1$
 	String VALID_ATTRIBUTES = "valid_attributes"; //$NON-NLS-1$
 
-	String ATTR_ID = "[id]";//$NON-NLS-1$
-	String ATTR_TYPE = "[type]";//$NON-NLS-1$
-	String ATTR_DEFAULT = "[default]";//$NON-NLS-1$
-	String ATTR_BASIC = "[basic]";//$NON-NLS-1$
-	String ATTR_MAX = "[max]";//$NON-NLS-1$
-	String ATTR_MIN = "[min]";//$NON-NLS-1$
-	String ATTR_CHOICE = "[choice]";//$NON-NLS-1$
-	String ATTR_TOOLTIP = "[tooltip]";//$NON-NLS-1$
-	String ATTR_DESCRIPTION = "[description]";//$NON-NLS-1$
-	String ATTR_VALIDATOR = "[validator]";//$NON-NLS-1$
-	String ATTR_VALUE = "[value]";//$NON-NLS-1$
-
+	String CONTROL_CONNECTION_NAME = "controlConnectionName";//$NON-NLS-1$
+	String MONITOR_CONNECTION_NAME = "monitorConnectionName";//$NON-NLS-1$
 	String LOCALHOST = "localhost";//$NON-NLS-1$
 	String TAG_CONTROL_PATH = "controlPath"; //$NON-NLS-1$
 	String TAG_MONITOR_PATH = "monitorPath"; //$NON-NLS-1$

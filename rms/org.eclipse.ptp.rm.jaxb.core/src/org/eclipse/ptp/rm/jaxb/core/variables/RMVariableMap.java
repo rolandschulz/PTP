@@ -47,6 +47,14 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 		System.out.println(buffer);
 	}
 
+	/**
+	 * Performs the substitution on the string. rm: prefix points to the
+	 * RMVariableResolver.
+	 * 
+	 * @param expression
+	 * @return
+	 * @throws CoreException
+	 */
 	public static String dereference(String expression) throws CoreException {
 		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
 	}

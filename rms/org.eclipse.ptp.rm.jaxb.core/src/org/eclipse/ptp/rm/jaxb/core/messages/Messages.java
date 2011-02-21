@@ -18,9 +18,7 @@ public class Messages extends NLS {
 	public static String JAXBServiceProvider_defaultDescription;
 	public static String JAXBServiceProvider_defaultName;
 	public static String JAXBResourceManager_initError;
-	public static String PropertyResolutionException0;
-	public static String PropertyResolutionException1;
-	public static String PropertyResolutionException2;
+	public static String RMVariableResolver_derefError;
 
 	static {
 		// initialize resource bundle

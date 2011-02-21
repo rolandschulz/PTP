@@ -26,12 +26,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
@@ -74,6 +79,7 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 		targetOptionsEnabled = false;
 		multiplexingEnabled = false;
 		fManualLaunchEnabled = false;
+		connectionSharingEnabled = false;
 	}
 
 	@Override
@@ -92,10 +98,38 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 			}
 
 			public void widgetSelected(SelectionEvent e) {
-				jaxbConfig.setRMInstanceXMLLocation(rmXmlNames.getProperty(rmTypes.getText()));
-				updatePage();
+				String text = rmTypes.getText();
+				if (text != null && text.length() > 0) {
+					String location = rmXmlNames.getProperty(text);
+					jaxbConfig.setRMInstanceXMLLocation(location);
+					try {
+						ResourceManagerData data = JAXBUtils.initializeRMData(location);
+						if (data != null)
+							jaxbConfig.setResourceManagerData(data);
+					} catch (Throwable t) {
+						t.printStackTrace();
+					}
+					updateSettings();
+				}
 			}
 		});
+	}
+
+	/**
+	 * Handle creation of a new connection by pressing the 'New...' button.
+	 * Calls handleRemoteServicesSelected() to update the connection combo with
+	 * the new connection.
+	 * 
+	 * TODO should probably select the new connection
+	 */
+	@Override
+	protected void handleNewRemoteConnectionSelected() {
+		if (uiConnectionManager != null) {
+			Map<String, String> defaults = new HashMap<String, String>();
+			defaults.put(ConfigFactory.ATTR_CONNECTION_ADDRESS, jaxbConfig.getDefaultControlHost());
+			defaults.put(ConfigFactory.ATTR_CONNECTION_PORT, jaxbConfig.getDefaultControlPort());
+			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell(), defaults));
+		}
 	}
 
 	@Override
@@ -128,9 +162,21 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 	}
 
 	@Override
+	protected void setConnectionName(String name) {
+		if (name != null)
+			jaxbConfig.setConnectionName(name, CONTROL_CONNECTION_NAME);
+	}
+
+	@Override
 	protected void setConnectionOptions() {
 		config.setControlPath(targetPath);
 		config.setControlInvocationOptions(targetArgs);
+	}
+
+	@Override
+	protected void updateSettings() {
+		super.updateSettings();
+		handleActivate();
 	}
 
 	private void getAvailableConfigurations() throws IOException {
@@ -155,6 +201,46 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 			} catch (IOException e) {
 			}
 		}
+	}
+
+	private void handleActivate() {
+		boolean deactivate = rmTypes.getText().length() == 0;
+		if (targetPathText != null) {
+			if (deactivate)
+				targetPathText.setText(ZEROSTR);
+			else
+				targetPathText.setText(jaxbConfig.getDefaultControlPath());
+			targetPathText.setEnabled(!deactivate);
+		}
+		if (remoteCombo != null) {
+			if (deactivate)
+				remoteCombo.setText(ZEROSTR);
+			remoteCombo.setEnabled(!deactivate);
+		}
+		if (localAddrCombo != null) {
+			if (deactivate)
+				localAddrCombo.setText(ZEROSTR);
+			localAddrCombo.setEnabled(!deactivate);
+		}
+		if (connectionCombo != null) {
+			if (deactivate)
+				connectionCombo.setText(ZEROSTR);
+			connectionCombo.setEnabled(!deactivate);
+		}
+		if (null != optionsButton)
+			optionsButton.setEnabled(!deactivate);
+		if (null != browseButton)
+			browseButton.setEnabled(!deactivate);
+		if (null != noneButton)
+			noneButton.setEnabled(!deactivate);
+		if (null != portForwardingButton)
+			portForwardingButton.setEnabled(!deactivate);
+		if (null != manualButton)
+			manualButton.setEnabled(!deactivate);
+		if (null != newConnectionButton)
+			newConnectionButton.setEnabled(!deactivate);
+		if (null != shareConnectionButton)
+			shareConnectionButton.setEnabled(!deactivate);
 	}
 
 	private void setAvailableConfigurations() {

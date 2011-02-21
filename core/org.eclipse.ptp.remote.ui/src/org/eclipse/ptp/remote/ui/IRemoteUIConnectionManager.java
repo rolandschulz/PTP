@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui;
 
+import java.util.Map;
+
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.swt.widgets.Shell;
@@ -24,6 +26,8 @@ public interface IRemoteUIConnectionManager {
 	 * @return newly created remote connection
 	 */
 	public IRemoteConnection newConnection(Shell shell);
+
+	public IRemoteConnection newConnection(Shell shell, Map<String, String> defaultAttr);
 
 	/**
 	 * Attempt to open a connection using a progress monitor. Can be called on

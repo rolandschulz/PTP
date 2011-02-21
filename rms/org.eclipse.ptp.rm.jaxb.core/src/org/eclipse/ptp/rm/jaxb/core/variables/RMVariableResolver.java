@@ -8,15 +8,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.variables.IDynamicVariable;
 import org.eclipse.core.variables.IDynamicVariableResolver;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
-public class RMVariableResolver implements IDynamicVariableResolver {
+public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
 
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
 		Map<String, Object> variables = RMVariableMap.getInstance().getVariables();
-		String[] parts = argument.split("[#]");
-		System.out.println("LOOKING FOR " + parts[0] + ": ");
-		System.out.println("MAP HAS KEYS: " + variables.keySet());
+		String[] parts = argument.split(PDRX);
 		Object value = variables.get(parts[0]);
 		if (value != null)
 			if (parts.length == 2)
@@ -25,7 +25,7 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 				} catch (Throwable t) {
 					t.printStackTrace();
 					Status status = new Status(Status.ERROR, JAXBCorePlugin.getUniqueIdentifier(),
-							"RMVariable dereferencing error", t);
+							Messages.RMVariableResolver_derefError, t);
 					throw new CoreException(status);
 				}
 			else
@@ -33,14 +33,9 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 		return null;
 	}
 
-	/*
-	 * We should provide an interface to make sure these are all contained on
-	 * this classloader ...
-	 */
 	private String invokeGetter(Object value, String string) throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-		String name = "get" + string.substring(0, 1).toUpperCase() + string.substring(1);
-		System.out.println("APPLYING " + name + " to " + value);
+		String name = GET + string.substring(0, 1).toUpperCase() + string.substring(1);
 		Method getter = value.getClass().getDeclaredMethod(name, (Class[]) null);
 		Object result = getter.invoke(value, (Object[]) null);
 		if (result == null)

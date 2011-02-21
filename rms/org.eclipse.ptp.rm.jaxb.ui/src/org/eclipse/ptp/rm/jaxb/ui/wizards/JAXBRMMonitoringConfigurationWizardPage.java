@@ -25,6 +25,7 @@ package org.eclipse.ptp.rm.jaxb.ui.wizards;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
+import org.eclipse.swt.widgets.Composite;
 
 /**
  * Generic Wizard for the JAXB Resource Manager.
@@ -47,6 +48,11 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractContr
 	}
 
 	@Override
+	protected void addCustomWidgets(Composite parent) {
+		// NOP
+	}
+
+	@Override
 	protected void loadConnectionOptions() {
 		targetPath = config.getMonitorPath();
 		targetArgs = config.getMonitorInvocationOptionsStr();
@@ -54,6 +60,13 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractContr
 		int options = config.getMonitorOptions();
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
+	}
+
+	@Override
+	protected void setConnectionName(String name) {
+		String connectionName = name == null ? config.getConnectionName(CONTROL_CONNECTION_NAME) : name;
+		if (connectionName != null)
+			config.setConnectionName(connectionName, MONITOR_CONNECTION_NAME);
 	}
 
 	@Override

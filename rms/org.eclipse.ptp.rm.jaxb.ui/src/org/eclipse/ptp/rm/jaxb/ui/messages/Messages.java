@@ -25,6 +25,7 @@ public class Messages extends NLS {
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_1;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_2;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_3;
+	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_3b;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_4;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_5;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_6;
