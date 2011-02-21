@@ -11,7 +11,6 @@
 package org.eclipse.ptp.remote.internal.ui;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -40,7 +39,14 @@ public class LocalUIConnectionManager implements IRemoteUIConnectionManager {
 		return null;
 	}
 
-	public IRemoteConnection newConnection(Shell shell, Map<String, String> defaultAttr) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#newConnection(org
+	 * .eclipse.swt.widgets.Shell, java.lang.String[], java.lang.String[])
+	 */
+	public IRemoteConnection newConnection(Shell shell, String[] attrHints, String[] attrHintValues) {
 		return newConnection(shell);
 	}
 
@@ -65,10 +71,11 @@ public class LocalUIConnectionManager implements IRemoteUIConnectionManager {
 				}
 			};
 			try {
-				if (context != null)
+				if (context != null) {
 					context.run(true, true, op);
-				else
+				} else {
 					new ProgressMonitorDialog(shell).run(true, true, op);
+				}
 			} catch (InvocationTargetException e) {
 				ErrorDialog.openError(shell, Messages.LocalUIConnectionManager_0, Messages.LocalUIConnectionManager_1, new Status(
 						IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), e.getMessage()));
