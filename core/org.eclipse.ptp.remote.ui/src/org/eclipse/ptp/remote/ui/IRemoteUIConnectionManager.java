@@ -10,13 +10,28 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui;
 
-import java.util.Map;
-
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.swt.widgets.Shell;
 
 public interface IRemoteUIConnectionManager {
+	/**
+	 * @since 5.0
+	 */
+	public static String CONNECTION_ADDRESS_HINT = "CONNECTION_ADDRESS_HINT"; //$NON-NLS-1$
+	/**
+	 * @since 5.0
+	 */
+	public static String CONNECTION_PORT_HINT = "CONNECTION_PORT_HINT"; //$NON-NLS-1$
+	/**
+	 * @since 5.0
+	 */
+	public static String CONNECTION_TIMEOUT_HINT = "CONNECTION_TIMEOUT_HINT"; //$NON-NLS-1$
+	/**
+	 * @since 5.0
+	 */
+	public static String LOGIN_USERNAME_HINT = "LOGIN_USERNAME_HINT"; //$NON-NLS-1$
+
 	/**
 	 * Create a new connection. The implementation can chose to do this in any
 	 * way, but typically will use a dialog or wizard.
@@ -27,7 +42,23 @@ public interface IRemoteUIConnectionManager {
 	 */
 	public IRemoteConnection newConnection(Shell shell);
 
-	public IRemoteConnection newConnection(Shell shell, Map<String, String> defaultAttr);
+	/**
+	 * Create a new connection using the remote service provider new connection
+	 * dialog. If attrHints and attrHintValues are provided then the dialog will
+	 * attempt to use these values as the default values for the appropriate
+	 * dialog fields.
+	 * 
+	 * @param shell
+	 *            shell used to display dialog
+	 * @param attrHints
+	 *            array containing attribute hints
+	 * @param attrHintValues
+	 *            array containing default values for each attribute specified
+	 *            in attrHints
+	 * @return
+	 * @since 5.0
+	 */
+	public IRemoteConnection newConnection(Shell shell, String[] attrHints, String[] attrHintValues);
 
 	/**
 	 * Attempt to open a connection using a progress monitor. Can be called on

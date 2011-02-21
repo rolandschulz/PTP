@@ -13,7 +13,6 @@ package org.eclipse.ptp.remote.rse.ui;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -47,8 +46,9 @@ public class RSEUIConnectionManager implements IRemoteUIConnectionManager {
 	public IRemoteConnection newConnection(Shell shell) {
 		IRemoteConnection[] oldConns = manager.getConnections();
 
-		if (action == null)
+		if (action == null) {
 			action = new SystemNewConnectionAction(shell, false, false, null);
+		}
 
 		try {
 			action.run();
@@ -64,8 +64,9 @@ public class RSEUIConnectionManager implements IRemoteUIConnectionManager {
 		 */
 		IRemoteConnection[] newConns = manager.getConnections();
 
-		if (newConns.length <= oldConns.length)
+		if (newConns.length <= oldConns.length) {
 			return null;
+		}
 
 		Arrays.sort(oldConns, new Comparator<IRemoteConnection>() {
 			public int compare(IRemoteConnection c1, IRemoteConnection c2) {
@@ -77,14 +78,23 @@ public class RSEUIConnectionManager implements IRemoteUIConnectionManager {
 				return c1.getName().compareToIgnoreCase(c2.getName());
 			}
 		});
-		for (int i = 0; i < oldConns.length; i++)
-			if (!oldConns[i].equals(newConns[i]))
+		for (int i = 0; i < oldConns.length; i++) {
+			if (!oldConns[i].equals(newConns[i])) {
 				return newConns[i];
+			}
+		}
 
 		return newConns[newConns.length - 1];
 	}
 
-	public IRemoteConnection newConnection(Shell shell, Map<String, String> defaultAttr) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#newConnection(org
+	 * .eclipse.swt.widgets.Shell, java.lang.String[], java.lang.String[])
+	 */
+	public IRemoteConnection newConnection(Shell shell, String[] attrHints, String[] attrHintValues) {
 		return newConnection(shell);
 	}
 
@@ -109,10 +119,11 @@ public class RSEUIConnectionManager implements IRemoteUIConnectionManager {
 				}
 			};
 			try {
-				if (context != null)
+				if (context != null) {
 					context.run(true, true, op);
-				else
+				} else {
 					new ProgressMonitorDialog(shell).run(true, true, op);
+				}
 			} catch (InvocationTargetException e) {
 				ErrorDialog.openError(shell, Messages.RSEUIConnectionManager_0, Messages.RSEUIConnectionManager_1, new Status(
 						IStatus.ERROR, RSEAdapterUIPlugin.PLUGIN_ID, e.getMessage()));

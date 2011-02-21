@@ -26,13 +26,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
+import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
@@ -104,8 +102,9 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 					jaxbConfig.setRMInstanceXMLLocation(location);
 					try {
 						ResourceManagerData data = JAXBUtils.initializeRMData(location);
-						if (data != null)
+						if (data != null) {
 							jaxbConfig.setResourceManagerData(data);
+						}
 					} catch (Throwable t) {
 						t.printStackTrace();
 					}
@@ -125,10 +124,10 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 	@Override
 	protected void handleNewRemoteConnectionSelected() {
 		if (uiConnectionManager != null) {
-			Map<String, String> defaults = new HashMap<String, String>();
-			defaults.put(ConfigFactory.ATTR_CONNECTION_ADDRESS, jaxbConfig.getDefaultControlHost());
-			defaults.put(ConfigFactory.ATTR_CONNECTION_PORT, jaxbConfig.getDefaultControlPort());
-			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell(), defaults));
+			String[] attrHints = new String[] { IRemoteUIConnectionManager.CONNECTION_ADDRESS_HINT,
+					IRemoteUIConnectionManager.CONNECTION_PORT_HINT };
+			String[] attrValues = new String[] { jaxbConfig.getDefaultControlHost(), jaxbConfig.getDefaultControlPort() };
+			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell(), attrHints, attrValues));
 		}
 	}
 
@@ -137,7 +136,7 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 		super.initContents();
 		jaxbConfig = (IJAXBResourceManagerConfiguration) config;
 		String rmConfigPath = jaxbConfig.getRMInstanceXMLLocation();
-		if (rmConfigPath != null && rmConfigPath.length() != 0)
+		if (rmConfigPath != null && rmConfigPath.length() != 0) {
 			for (int i = 0; i < types.length; i++) {
 				String path = rmXmlNames.getProperty(types[i]);
 				if (rmConfigPath.equals(path)) {
@@ -145,13 +144,15 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 					break;
 				}
 			}
+		}
 	}
 
 	@Override
 	protected boolean isValidSetting() {
 		String choice = rmTypes.getText();
-		if (choice == null || choice.length() == 0)
+		if (choice == null || choice.length() == 0) {
 			return false;
+		}
 		return super.isValidSetting();
 	}
 
@@ -163,8 +164,9 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 
 	@Override
 	protected void setConnectionName(String name) {
-		if (name != null)
+		if (name != null) {
 			jaxbConfig.setConnectionName(name, CONTROL_CONNECTION_NAME);
+		}
 	}
 
 	@Override
@@ -185,19 +187,22 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 		if (JAXBCorePlugin.getDefault() != null) {
 			Bundle bundle = JAXBCorePlugin.getDefault().getBundle();
 			url = FileLocator.find(bundle, new Path(DATA + RM_CONFIG_PROPS), null);
-		} else
+		} else {
 			url = new File(RM_CONFIG_PROPS).toURL();
+		}
 
-		if (url == null)
+		if (url == null) {
 			return;
+		}
 		InputStream s = null;
 		try {
 			s = url.openStream();
 			rmXmlNames.load(s);
 		} finally {
 			try {
-				if (s != null)
+				if (s != null) {
 					s.close();
+				}
 			} catch (IOException e) {
 			}
 		}
@@ -206,41 +211,52 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 	private void handleActivate() {
 		boolean deactivate = rmTypes.getText().length() == 0;
 		if (targetPathText != null) {
-			if (deactivate)
+			if (deactivate) {
 				targetPathText.setText(ZEROSTR);
-			else
+			} else {
 				targetPathText.setText(jaxbConfig.getDefaultControlPath());
+			}
 			targetPathText.setEnabled(!deactivate);
 		}
 		if (remoteCombo != null) {
-			if (deactivate)
+			if (deactivate) {
 				remoteCombo.setText(ZEROSTR);
+			}
 			remoteCombo.setEnabled(!deactivate);
 		}
 		if (localAddrCombo != null) {
-			if (deactivate)
+			if (deactivate) {
 				localAddrCombo.setText(ZEROSTR);
+			}
 			localAddrCombo.setEnabled(!deactivate);
 		}
 		if (connectionCombo != null) {
-			if (deactivate)
+			if (deactivate) {
 				connectionCombo.setText(ZEROSTR);
+			}
 			connectionCombo.setEnabled(!deactivate);
 		}
-		if (null != optionsButton)
+		if (null != optionsButton) {
 			optionsButton.setEnabled(!deactivate);
-		if (null != browseButton)
+		}
+		if (null != browseButton) {
 			browseButton.setEnabled(!deactivate);
-		if (null != noneButton)
+		}
+		if (null != noneButton) {
 			noneButton.setEnabled(!deactivate);
-		if (null != portForwardingButton)
+		}
+		if (null != portForwardingButton) {
 			portForwardingButton.setEnabled(!deactivate);
-		if (null != manualButton)
+		}
+		if (null != manualButton) {
 			manualButton.setEnabled(!deactivate);
-		if (null != newConnectionButton)
+		}
+		if (null != newConnectionButton) {
 			newConnectionButton.setEnabled(!deactivate);
-		if (null != shareConnectionButton)
+		}
+		if (null != shareConnectionButton) {
 			shareConnectionButton.setEnabled(!deactivate);
+		}
 	}
 
 	private void setAvailableConfigurations() {
