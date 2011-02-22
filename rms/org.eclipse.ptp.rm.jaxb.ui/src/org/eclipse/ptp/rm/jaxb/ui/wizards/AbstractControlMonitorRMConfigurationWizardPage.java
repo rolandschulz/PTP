@@ -40,9 +40,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.FieldEditor;
@@ -62,6 +60,7 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.rmsystem.IControlMonitorRMConfiguration;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;
 import org.eclipse.ptp.rm.ui.RMUIPlugin;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
@@ -71,7 +70,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -79,7 +77,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.progress.UIJob;
 
@@ -154,7 +151,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 			if (source == browseButton)
 				handlePathBrowseButtonSelected();
 			else if (source == optionsButton) {
-				targetArgs = createOptionsDialog(getShell(), targetArgs);
+				targetArgs = WidgetUtils.createOptionsDialog(getShell(), targetArgs);
 				updatePage();
 			} else if (connectionSharingEnabled && source == shareConnectionButton)
 				updateSettings();
@@ -305,97 +302,6 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 			updatePage();
 		}
 		super.setVisible(visible);
-	}
-
-	/**
-	 * specialized implementation override this.
-	 * 
-	 * @since 2.0
-	 */
-	protected abstract void addCustomWidgets(Composite remoteComp);
-
-	/**
-	 * Convenience method for creating a button widget.
-	 * 
-	 * @param parent
-	 * @param label
-	 * @param type
-	 * @return the button widget
-	 */
-	protected Button createButton(Composite parent, String label, int type) {
-		Button button = new Button(parent, type);
-		button.setText(label);
-		GridData data = new GridData();
-		button.setLayoutData(data);
-		return button;
-	}
-
-	/**
-	 * Convenience method for creating a check button widget.
-	 * 
-	 * @param parent
-	 * @param label
-	 * @return the check button widget
-	 */
-	protected Button createCheckButton(Composite parent, String label) {
-		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
-	}
-
-	/**
-	 * Convenience method for creating a grid layout.
-	 * 
-	 * @param columns
-	 * @param isEqual
-	 * @param mh
-	 * @param mw
-	 * @return the new grid layout
-	 */
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
-		gridLayout.marginHeight = mh;
-		gridLayout.marginWidth = mw;
-		return gridLayout;
-	}
-
-	/**
-	 * Creates the dialog when the target "Options..." button is selected.
-	 * Override if you want to provide your own dialog.
-	 * 
-	 * @param parent
-	 *            the parent composite to contain the dialog area
-	 * @return the target options string
-	 */
-	protected String createOptionsDialog(Shell shell, String initialOptions) {
-		InputDialog dialog = new InputDialog(shell, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_14,
-				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_15, initialOptions, null);
-		if (dialog.open() == Dialog.OK)
-			return dialog.getValue();
-		return initialOptions;
-	}
-
-	/**
-	 * Creates an new radio button instance and sets the default layout data.
-	 * 
-	 * @param group
-	 *            the composite in which to create the radio button
-	 * @param label
-	 *            the string to set into the radio button
-	 * @param value
-	 *            the string to identify radio button
-	 * @return the new radio button
-	 */
-	protected Button createRadioButton(Composite parent, String label, String value, SelectionListener listener) {
-		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT);
-		button.setData((null == value) ? label : value);
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		data.horizontalAlignment = GridData.FILL;
-		data.verticalAlignment = GridData.BEGINNING;
-		button.setLayoutData(data);
-		if (null != listener)
-			button.addSelectionListener(listener);
-		return button;
 	}
 
 	/**
@@ -607,21 +513,6 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	protected abstract void setConnectionOptions();
 
 	/**
-	 * @param style
-	 * @param space
-	 * @return
-	 */
-	protected GridData spanGridData(int style, int space) {
-		GridData gd = null;
-		if (style == -1)
-			gd = new GridData();
-		else
-			gd = new GridData(style);
-		gd.horizontalSpan = space;
-		return gd;
-	}
-
-	/**
 	 * Call to update page status and store any changed settings
 	 */
 	protected void updatePage() {
@@ -782,7 +673,8 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		 * connection sharing
 		 */
 		if (connectionSharingEnabled) {
-			shareConnectionButton = createCheckButton(parent, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3b);
+			shareConnectionButton = WidgetUtils.createCheckButton(parent,
+					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3b);
 			shareConnectionButton.addSelectionListener(listener);
 		}
 
@@ -875,21 +767,16 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		}
 
 		/*
-		 * customizable
-		 */
-		addCustomWidgets(parent);
-
-		/*
 		 * Multiplexing options
 		 */
 		if (multiplexingEnabled) {
 			Group mxGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-			mxGroup.setLayout(createGridLayout(1, true, 10, 10));
-			mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
+			mxGroup.setLayout(WidgetUtils.createGridLayout(1, true, 10, 10));
+			mxGroup.setLayoutData(WidgetUtils.spanGridData(GridData.FILL_HORIZONTAL, 2));
 			mxGroup.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_10);
 
-			noneButton = createRadioButton(mxGroup, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_11,
-					"mxGroup", listener); //$NON-NLS-1$
+			noneButton = WidgetUtils.createRadioButton(mxGroup,
+					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_11, "mxGroup", listener); //$NON-NLS-1$
 			noneButton.addSelectionListener(listener);
 
 			/*
@@ -915,7 +802,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 			gd.horizontalSpan = 1;
 			localAddrCombo.setLayoutData(gd);
 
-			portForwardingButton = createRadioButton(mxGroup,
+			portForwardingButton = WidgetUtils.createRadioButton(mxGroup,
 					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_13, "mxGroup", listener); //$NON-NLS-1$
 			portForwardingButton.addSelectionListener(listener);
 		}
@@ -924,7 +811,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		 * Manual launch
 		 */
 		if (fManualLaunchEnabled) {
-			manualButton = createCheckButton(parent, "Launch server manually"); //$NON-NLS-1$
+			manualButton = WidgetUtils.createCheckButton(parent, "Launch server manually"); //$NON-NLS-1$
 			manualButton.addSelectionListener(listener);
 		}
 

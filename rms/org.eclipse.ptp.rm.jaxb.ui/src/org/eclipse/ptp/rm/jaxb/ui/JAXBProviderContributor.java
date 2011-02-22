@@ -10,9 +10,13 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMConfigurationSelectionWizardPage;
 import org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMControlConfigurationWizardPage;
 import org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMMonitoringConfigurationWizardPage;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -60,10 +64,10 @@ public class JAXBProviderContributor implements IServiceProviderContributor {
 	 * org.eclipse.ptp.services.core.IServiceProvider)
 	 */
 	public WizardPage[] getWizardPages(IWizard wizard, IServiceProvider provider) {
-		WizardPage wizardPages[];
-		wizardPages = new WizardPage[2];
-		wizardPages[0] = new JAXBRMControlConfigurationWizardPage((IRMConfigurationWizard) wizard);
-		wizardPages[1] = new JAXBRMMonitoringConfigurationWizardPage((IRMConfigurationWizard) wizard);
-		return wizardPages;
+		List<WizardPage> pages = new ArrayList<WizardPage>();
+		pages.add(new JAXBRMConfigurationSelectionWizardPage((IRMConfigurationWizard) wizard));
+		pages.add(new JAXBRMControlConfigurationWizardPage((IRMConfigurationWizard) wizard));
+		pages.add(new JAXBRMMonitoringConfigurationWizardPage((IRMConfigurationWizard) wizard));
+		return pages.toArray(new WizardPage[0]);
 	}
 }

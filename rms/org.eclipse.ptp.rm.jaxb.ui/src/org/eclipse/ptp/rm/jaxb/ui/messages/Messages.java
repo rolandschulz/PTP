@@ -15,11 +15,20 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.jaxb.ui.messages.messages"; //$NON-NLS-1$
 	public static String JAXBUIPlugin_Exception_InternalError;
+	public static String JAXBConnectionWizardPage_Description;
 	public static String JAXBConfigurationWizardPage_Description;
+	public static String JAXBRMConfigurationSelectionWizardPage_Title;
 	public static String JAXBRMControlConfigurationWizardPage_Title;
 	public static String JAXBRMMonitoringConfigurationWizardPage_Title;
 	public static String JAXBRMSchemaComboGroupTitle;
 	public static String JAXBRMSchemaComboTitle;
+
+	public static String JAXBRMConfigurationSelectionWizardPage_0;
+	public static String JAXBRMConfigurationSelectionWizardPage_1;
+	public static String JAXBRMConfigurationSelectionWizardPage_2;
+	public static String JAXBRMConfigurationSelectionWizardPage_3;
+	public static String JAXBRMConfigurationSelectionWizardPage_Project_Selection_Title;
+	public static String JAXBRMConfigurationSelectionWizardPage_Project_Selection_Message;
 
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_0;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_1;
@@ -48,6 +57,8 @@ public class Messages extends NLS {
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_4;
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_5;
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_6;
+
+	public static String WidgetUtils_openIDEEditor;
 
 	static {
 		// initialize resource bundle

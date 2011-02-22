@@ -48,8 +48,9 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 		if (!optionString.equals(ZEROSTR)) {
 			String[] options = optionString.split(SP);
 
-			for (String option : options)
+			for (String option : options) {
 				controlInvocationOptions.add(option);
+			}
 		}
 	}
 
@@ -57,8 +58,9 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 		if (!optionString.equals(ZEROSTR)) {
 			String[] options = optionString.split(SP);
 
-			for (String option : options)
+			for (String option : options) {
 				monitorInvocationOptions.add(option);
+			}
 		}
 	}
 
@@ -84,6 +86,23 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 */
 	public String getControlInvocationOptionsStr() {
 		return convertInvocationOptionsStr(getControlInvocationOptions());
+	}
+
+	/**
+	 * Get the remote configuration options.
+	 * 
+	 * @return remote configuration options
+	 */
+	public int getControlOptions() {
+		try {
+			String options = getString(TAG_CONTROL_OPTIONS, null);
+			if (options != null) {
+				return Integer.valueOf(options).intValue();
+			}
+			return 0;
+		} catch (NumberFormatException e) {
+			return 0;
+		}
 	}
 
 	public String getControlPath() {
@@ -115,9 +134,10 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 */
 	public int getMonitorOptions() {
 		try {
-			String options = getString(TAG_OPTIONS, null);
-			if (options != null)
+			String options = getString(TAG_MONITOR_OPTIONS, null);
+			if (options != null) {
 				return Integer.valueOf(options).intValue();
+			}
 			return 0;
 		} catch (NumberFormatException e) {
 			return 0;
@@ -151,6 +171,15 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	}
 
 	/**
+	 * Set the remote configuration options
+	 * 
+	 * @param options
+	 */
+	public void setControlOptions(int options) {
+		putString(TAG_CONTROL_OPTIONS, String.valueOf(options));
+	}
+
+	/**
 	 * Set the control path
 	 * 
 	 * @param path
@@ -181,7 +210,7 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 * @param options
 	 */
 	public void setMonitorOptions(int options) {
-		putString(TAG_OPTIONS, String.valueOf(options));
+		putString(TAG_MONITOR_OPTIONS, String.valueOf(options));
 	}
 
 	/**
@@ -212,8 +241,9 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	private static String convertInvocationOptionsStr(List<String> options) {
 		String opts = ZEROSTR;
 		for (int i = 0; i < options.size(); i++) {
-			if (i > 0)
+			if (i > 0) {
 				opts += SP;
+			}
 			opts += options.get(i);
 		}
 		return opts;

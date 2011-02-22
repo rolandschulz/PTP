@@ -10,14 +10,29 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URL;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
+import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
@@ -36,6 +51,10 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * A set of convenience wrappers around JFace and SWT widget construction
@@ -56,8 +75,9 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 
 		TableColumn c = new TableColumn(t, style);
 		c.setText(columnName);
-		if (l != null)
+		if (l != null) {
 			c.addSelectionListener(l);
+		}
 		return c;
 	}
 
@@ -85,20 +105,50 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 
 		Button button = new Button(parent, style);
 		button.setText(buttonText);
-		if (image != null)
+		if (image != null) {
 			button.setImage(image);
+		}
 
-		if (l != null)
+		if (l != null) {
 			button.addSelectionListener(l);
+		}
 
 		GridData data = new GridData();
-		if (fill)
+		if (fill) {
 			data.horizontalAlignment = SWT.FILL;
+		}
 		data.grabExcessHorizontalSpace = false;
 		data.horizontalSpan = colSpan;
 		button.setLayoutData(data);
 
 		return button;
+	}
+
+	/**
+	 * Convenience method for creating a button widget.
+	 * 
+	 * @param parent
+	 * @param label
+	 * @param type
+	 * @return the button widget
+	 */
+	public static Button createButton(Composite parent, String label, int type) {
+		Button button = new Button(parent, type);
+		button.setText(label);
+		GridData data = new GridData();
+		button.setLayoutData(data);
+		return button;
+	}
+
+	/**
+	 * Convenience method for creating a check button widget.
+	 * 
+	 * @param parent
+	 * @param label
+	 * @return the check button widget
+	 */
+	public static Button createCheckButton(Composite parent, String label) {
+		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
 	}
 
 	public static Composite createComposite(Composite parent, int columns) {
@@ -116,16 +166,18 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 		data.verticalAlignment = GridData.FILL;
 		data.grabExcessHorizontalSpace = true;
 		data.grabExcessVerticalSpace = verticalFill;
-		if (colSpan != -1)
+		if (colSpan != -1) {
 			data.horizontalSpan = colSpan;
+		}
 
 		GridLayout layout = new GridLayout();
 		layout.numColumns = columns;
 		layout.verticalSpacing = 9;
 
 		Group group = new Group(parent, SWT.NO_TRIM | SWT.SHADOW_NONE);
-		if (text != null)
+		if (text != null) {
 			group.setText(text);
+		}
 		group.setLayout(layout);
 		group.setLayoutData(data);
 		return group;
@@ -147,10 +199,29 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 		t.setLayoutData(data);
 
 		TableLayout layout = new TableLayout();
-		for (int i = 0; i < numColumns; i++)
+		for (int i = 0; i < numColumns; i++) {
 			layout.addColumnData(new ColumnPixelData(suggestedWidth / numColumns));
+		}
 		t.setLayout(layout);
 		return t;
+	}
+
+	/**
+	 * Convenience method for creating a grid layout.
+	 * 
+	 * @param columns
+	 * @param isEqual
+	 * @param mh
+	 * @param mw
+	 * @return the new grid layout
+	 */
+	public static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
 	}
 
 	public static Combo createItemCombo(Composite container, String labelString, String[] items, String initial, String tooltip,
@@ -158,25 +229,30 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 		if (labelString != null) {
 			Label label = new Label(container, SWT.NONE);
 			label.setText(labelString);
-			if (tooltip != null)
+			if (tooltip != null) {
 				label.setToolTipText(tooltip);
+			}
 		}
 
 		GridData data = new GridData();
-		if (fill)
+		if (fill) {
 			data.horizontalAlignment = SWT.FILL;
+		}
 		data.grabExcessHorizontalSpace = false;
-		if (colSpan != -1)
+		if (colSpan != -1) {
 			data.horizontalSpan = colSpan;
+		}
 		data.widthHint = 100;
 
 		Combo combo = new Combo(container, SWT.BORDER);
 		combo.setItems(items);
 		combo.setLayoutData(data);
-		if (initial != null)
+		if (initial != null) {
 			combo.setText(initial);
-		if (listener != null)
+		}
+		if (listener != null) {
 			combo.addModifyListener(listener);
+		}
 		return combo;
 	}
 
@@ -185,11 +261,53 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 		data.horizontalSpan = colSpan;
 
 		Label label = new Label(container, style);
-		if (text == null)
+		if (text == null) {
 			text = ZEROSTR;
+		}
 		label.setText(text.trim());
 		label.setLayoutData(data);
 		return label;
+	}
+
+	/**
+	 * Creates the dialog when the target "Options..." button is selected.
+	 * Override if you want to provide your own dialog.
+	 * 
+	 * @param parent
+	 *            the parent composite to contain the dialog area
+	 * @return the target options string
+	 */
+	public static String createOptionsDialog(Shell shell, String initialOptions) {
+		InputDialog dialog = new InputDialog(shell, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_14,
+				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_15, initialOptions, null);
+		if (dialog.open() == Dialog.OK) {
+			return dialog.getValue();
+		}
+		return initialOptions;
+	}
+
+	/**
+	 * Creates an new radio button instance and sets the default layout data.
+	 * 
+	 * @param group
+	 *            the composite in which to create the radio button
+	 * @param label
+	 *            the string to set into the radio button
+	 * @param value
+	 *            the string to identify radio button
+	 * @return the new radio button
+	 */
+	public static Button createRadioButton(Composite parent, String label, String value, SelectionListener listener) {
+		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT);
+		button.setData((null == value) ? label : value);
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.horizontalAlignment = GridData.FILL;
+		data.verticalAlignment = GridData.BEGINNING;
+		button.setLayoutData(data);
+		if (null != listener) {
+			button.addSelectionListener(listener);
+		}
+		return button;
 	}
 
 	public static Spinner createSpinner(Composite container, String labelString, int min, int max, int initial, int colSpan,
@@ -202,8 +320,9 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 		}
 
 		GridData data = new GridData();
-		if (fill)
+		if (fill) {
 			data.horizontalAlignment = SWT.FILL;
+		}
 		data.grabExcessHorizontalSpace = false;
 		data.horizontalSpan = colSpan;
 
@@ -212,25 +331,30 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 		s.setMinimum(min);
 		s.setSelection(initial);
 		s.setLayoutData(data);
-		if (listener != null)
+		if (listener != null) {
 			s.addModifyListener(listener);
+		}
 		return s;
 	}
 
 	public static Text createText(Composite container, String initialValue, boolean fill, ModifyListener listener, Color color) {
 
 		GridData data = new GridData();
-		if (fill)
+		if (fill) {
 			data.horizontalAlignment = SWT.FILL;
+		}
 		data.grabExcessHorizontalSpace = true;
 		Text text = new Text(container, SWT.BORDER);
-		if (color != null)
+		if (color != null) {
 			text.setBackground(color);
+		}
 		text.setLayoutData(data);
-		if (initialValue != null)
+		if (initialValue != null) {
 			text.setText(initialValue);
-		if (listener != null)
+		}
+		if (listener != null) {
 			text.addModifyListener(listener);
+		}
 		return text;
 	}
 
@@ -245,8 +369,9 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 				t.printStackTrace(pw);
 				append = sw.toString();
 			}
-		} else if (t != null)
+		} else if (t != null) {
 			append = t.getMessage();
+		}
 		MessageDialog.openError(s, title, message + lineSep + lineSep + append);
 	}
 
@@ -259,10 +384,12 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 	 * @param text
 	 */
 	public static String fitToLineLength(int length, String text) {
-		if (text == null)
+		if (text == null) {
 			return null;
-		if (length < 1)
+		}
+		if (length < 1) {
 			length = Integer.MAX_VALUE;
+		}
 		StringBuffer newLine = new StringBuffer();
 		int strln = text.length();
 		int current = 0;
@@ -293,28 +420,84 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 	}
 
 	public static String getSelected(Combo combo) {
-		if (combo.getItemCount() == 0)
+		if (combo.getItemCount() == 0) {
 			return combo.getText();
+		}
 		int i = combo.getSelectionIndex();
-		if (i < 0)
+		if (i < 0) {
 			return combo.getText();
+		}
 		return combo.getItem(i);
+	}
+
+	public static void hideIDEEditor() {
+		new UIJob(Messages.WidgetUtils_openIDEEditor) {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				try {
+					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+					page.setEditorAreaVisible(false);
+				} catch (Throwable e) {
+					return new Status(Status.ERROR, JAXBUIPlugin.PLUGIN_ID, Status.ERROR, e.getMessage(), e);
+				}
+				return Status.OK_STATUS;
+			}
+		}.schedule();
+	}
+
+	public static void openIDEEditor(final String file) throws IOException {
+		final URL fUrl = FileLocator.toFileURL(JAXBUtils.getURL(file));
+		new UIJob(Messages.WidgetUtils_openIDEEditor) {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				try {
+					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+					URI uri = fUrl.toURI();
+					File fileToOpen = new File(uri);
+					if (fileToOpen.exists() && fileToOpen.isFile()) {
+						IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
+						IDE.openEditorOnFileStore(page, fileStore);
+					}
+				} catch (Throwable e) {
+					return new Status(Status.ERROR, JAXBUIPlugin.PLUGIN_ID, Status.ERROR, e.getMessage(), e);
+				}
+				return Status.OK_STATUS;
+			}
+		}.schedule();
 	}
 
 	public static String select(Combo combo, String name) {
 		String[] items = combo.getItems();
-		if (items.length == 0)
+		if (items.length == 0) {
 			return ZEROSTR;
+		}
 		int i = 0;
-		for (; i < items.length; i++)
+		for (; i < items.length; i++) {
 			if (items[i].equals(name)) {
 				combo.select(i);
 				break;
 			}
+		}
 		if (i == items.length) {
 			i = 0;
 			combo.select(i);
 		}
 		return combo.getItem(i);
+	}
+
+	/**
+	 * @param style
+	 * @param space
+	 * @return
+	 */
+	public static GridData spanGridData(int style, int space) {
+		GridData gd = null;
+		if (style == -1) {
+			gd = new GridData();
+		} else {
+			gd = new GridData(style);
+		}
+		gd.horizontalSpan = space;
+		return gd;
 	}
 }

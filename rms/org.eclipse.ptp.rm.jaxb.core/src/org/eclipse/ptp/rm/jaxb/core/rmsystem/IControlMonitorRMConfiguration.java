@@ -59,6 +59,13 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	public String getControlInvocationOptionsStr();
 
 	/**
+	 * Get the remote configuration options.
+	 * 
+	 * @return remote configuration options
+	 */
+	public int getControlOptions();
+
+	/**
 	 * Get the proxy server path. This may be a path on a remote system.
 	 * 
 	 * @return path
@@ -118,6 +125,13 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	 *            string containing the space separated invocation options
 	 */
 	public void setControlInvocationOptions(String optionString);
+
+	/**
+	 * Set the remote configuration options
+	 * 
+	 * @param options
+	 */
+	public void setControlOptions(int options);
 
 	/**
 	 * Set the proxy server path

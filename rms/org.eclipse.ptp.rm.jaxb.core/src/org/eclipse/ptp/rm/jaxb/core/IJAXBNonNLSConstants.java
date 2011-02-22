@@ -47,6 +47,8 @@ public interface IJAXBNonNLSConstants {
 
 	String GET = "get";//$NON-NLS-1$
 
+	String JAVA_USER_HOME = "user.home";//$NON-NLS-1$
+
 	String XMLSchema = "http://www.w3.org/2001/XMLSchema"; //$NON-NLS-1$
 	String DATA = "data/"; //$NON-NLS-1$
 	String RM_XSD = DATA + "resource_manager_type.xsd";//$NON-NLS-1$
@@ -62,7 +64,8 @@ public interface IJAXBNonNLSConstants {
 	String LOCALHOST = "localhost";//$NON-NLS-1$
 	String TAG_CONTROL_PATH = "controlPath"; //$NON-NLS-1$
 	String TAG_MONITOR_PATH = "monitorPath"; //$NON-NLS-1$
-	String TAG_OPTIONS = "options"; //$NON-NLS-1$
+	String TAG_CONTROL_OPTIONS = "controlOptions"; //$NON-NLS-1$
+	String TAG_MONITOR_OPTIONS = "monitorOptions"; //$NON-NLS-1$
 	String TAG_CONTROL_INVOCATION_OPTIONS = "controlInvocationOptions"; //$NON-NLS-1$
 	String TAG_MONITOR_INVOCATION_OPTIONS = "monitorInvocationOptions"; //$NON-NLS-1$
 	String TAG_LOCAL_ADDRESS = "localAddress"; //$NON-NLS-1$

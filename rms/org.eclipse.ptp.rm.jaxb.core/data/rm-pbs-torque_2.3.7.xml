@@ -17,6 +17,7 @@
 		<property name="executablePath"/>
 		<property name="progArgs"/>
 		<property name="directory"/>
+		
 		<managed-files>
 			<file-staging-location>${rm:remote.home}/.eclipse</file-staging-location>
 			<managed-file name="pbs_script" uniqueIdSuffix="true" deleteAfterUse="true">

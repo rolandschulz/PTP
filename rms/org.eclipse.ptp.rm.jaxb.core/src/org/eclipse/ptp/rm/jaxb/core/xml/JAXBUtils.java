@@ -1,5 +1,7 @@
 package org.eclipse.ptp.rm.jaxb.core.xml;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -36,12 +38,23 @@ public class JAXBUtils implements IJAXBNonNLSConstants {
 	private JAXBUtils() {
 	}
 
+	public static URL getURL(String xml) throws IOException {
+		URL instance = JAXBCorePlugin.getResource(xml);
+		if (instance == null) {
+			File f = new File(xml);
+			if (f.exists() && f.isFile()) {
+				instance = f.toURL();
+			} else {
+				throw new FileNotFoundException(xml);
+			}
+		}
+		return instance;
+	}
+
 	public static ResourceManagerData initializeRMData(String xml) throws IOException, SAXException, URISyntaxException,
 			JAXBException {
 		ResourceManagerData rmdata = null;
-		URL xsd = JAXBCorePlugin.getResource(RM_XSD);
-		URL instance = JAXBCorePlugin.getResource(xml);
-		validate(xsd, instance);
+		URL instance = getURL(xml);
 		rmdata = unmarshalResourceManagerData(instance);
 		if (rmdata != null) {
 			Control control = rmdata.getControl();
@@ -51,13 +64,23 @@ public class JAXBUtils implements IJAXBNonNLSConstants {
 	}
 
 	public static void serializeScript(Map<String, Object> env, Control control) {
+	}
 
+	public static void validate(String xml) throws SAXException, IOException, URISyntaxException {
+		URL instance = getURL(xml);
+		URL xsd = JAXBCorePlugin.getResource(RM_XSD);
+		SchemaFactory factory = SchemaFactory.newInstance(XMLSchema);
+		Schema schema = factory.newSchema(xsd);
+		Validator validator = schema.newValidator();
+		Source source = new StreamSource(instance.openStream());
+		validator.validate(source);
 	}
 
 	private static void addAttributes(Map<String, Object> env, Control control) {
 		AttributeDefinitions adefs = control.getAttributeDefinitions();
-		if (adefs == null)
+		if (adefs == null) {
 			return;
+		}
 		List<JobAttribute> jobAttributes = adefs.getJobAttribute();
 		for (JobAttribute jobAttribute : jobAttributes) {
 			String name = jobAttribute.getName();
@@ -67,35 +90,42 @@ public class JAXBUtils implements IJAXBNonNLSConstants {
 
 	private static void addCommands(Map<String, Object> env, Control control) {
 		Commands comms = control.getCommands();
-		if (comms == null)
+		if (comms == null) {
 			return;
+		}
 		List<Command> commands = comms.getCommand();
-		for (Command command : commands)
+		for (Command command : commands) {
 			env.put(command.getName(), command);
+		}
 	}
 
 	private static void addFiles(Map<String, Object> env, Control control) {
 		ManagedFiles mf = control.getManagedFiles();
-		if (mf == null)
+		if (mf == null) {
 			return;
+		}
 		List<ManagedFile> files = mf.getManagedFile();
-		for (ManagedFile file : files)
+		for (ManagedFile file : files) {
 			env.put(file.getName(), file);
+		}
 	}
 
 	private static void addParsers(Map<String, Object> env, Control control) {
 		Parsers prsrs = control.getParsers();
-		if (prsrs == null)
+		if (prsrs == null) {
 			return;
+		}
 		List<StreamParser> parsers = prsrs.getStreamParser();
-		for (StreamParser parser : parsers)
+		for (StreamParser parser : parsers) {
 			env.put(parser.getName(), parser);
+		}
 	}
 
 	private static void addProperties(Map<String, Object> env, Control control) {
 		List<Property> properties = control.getProperty();
-		for (Property property : properties)
+		for (Property property : properties) {
 			env.put(property.getName(), null);
+		}
 	}
 
 	private static void initialize(Control control) {
@@ -112,13 +142,5 @@ public class JAXBUtils implements IJAXBNonNLSConstants {
 		Unmarshaller u = jc.createUnmarshaller();
 		ResourceManagerData rmdata = (ResourceManagerData) u.unmarshal(xml.openStream());
 		return rmdata;
-	}
-
-	private static void validate(URL xsd, URL xml) throws SAXException, IOException, URISyntaxException {
-		SchemaFactory factory = SchemaFactory.newInstance(XMLSchema);
-		Schema schema = factory.newSchema(xsd);
-		Validator validator = schema.newValidator();
-		Source source = new StreamSource(xml.openStream());
-		validator.validate(source);
 	}
 }
