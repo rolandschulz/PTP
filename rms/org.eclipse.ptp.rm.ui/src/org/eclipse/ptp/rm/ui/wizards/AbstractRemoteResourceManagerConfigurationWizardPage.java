@@ -521,8 +521,9 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @return cleaned up text.
 	 */
 	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
 			return null;
+		}
 
 		return text;
 	}
@@ -586,7 +587,12 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		IRemoteServices services = getRemoteServices(servicesId);
 		if (currentSelection >= 0 && services != null) {
 			String connectionName = connectionCombo.getItem(currentSelection);
-			getDataSource().setConnectionName(connectionName);
+			final IRemoteConnection connection = getRemoteConnection(services, connectionName);
+			if (connection != null) {
+				boolean portFwd = connection.supportsTCPPortForwarding();
+				portForwardingButton.setEnabled(portFwd);
+				portForwardingButton.setSelection(portFwd);
+			}
 		}
 		getWidgetListener().setEnabled(enabled);
 	}
@@ -763,10 +769,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 */
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
-		if (style == -1)
+		if (style == -1) {
 			gd = new GridData();
-		else
+		} else {
 			gd = new GridData(style);
+		}
 		gd.horizontalSpan = space;
 		return gd;
 	}
