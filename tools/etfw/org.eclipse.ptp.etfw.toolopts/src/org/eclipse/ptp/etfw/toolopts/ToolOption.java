@@ -39,6 +39,11 @@ public class ToolOption {
 	public static final int TOGGLE = 7;
 	
 	/**
+	 * List of items availabel in the combo widget
+	 */
+	protected String[] items;
+	
+	/**
 	 * The check button to activate/deactivate this option if it is optional
 	 */
 	protected Button unitCheck;
@@ -246,6 +251,11 @@ public class ToolOption {
 		if(numopt!=null){
 			numopt.setEnabled(set);
 		}
+		
+		if(combopt!=null){
+			combopt.setEnabled(set);
+		}
+		
 	}
 	public void setArg(String arg){
 		if(argbox!=null){
@@ -257,6 +267,9 @@ public class ToolOption {
 			int argnum=Integer.parseInt(arg);
 			setArg(argnum);
 		}
+		else if(combopt!=null){
+			combopt.select(Integer.parseInt(arg));
+		}
 	}
 	public void setArg(int arg){
 		if(numopt!=null){
@@ -267,12 +280,20 @@ public class ToolOption {
 		else if(argbox!=null){
 			setArg(""+arg);
 		}
+		else if(combopt!=null){
+			combopt.select(arg);
+		}
 	}
 	public String getArg(){
-		if(argbox!=null)
+		if(argbox!=null){
 			return argbox.getText();
-		else if (numopt!=null)
+		}
+		else if (numopt!=null){
 			return numopt.getText();
+		}
+		else if(combopt!=null){
+			return combopt.getItem(combopt.getSelectionIndex());
+		}
 		return null;
 	}
 
@@ -283,6 +304,9 @@ public class ToolOption {
 	public void setWidgetsEnabled(boolean bool){
 		if(numopt!=null){
 			numopt.setEnabled(bool);
+		}
+		if(combopt!=null){
+			combopt.setEnabled(bool);
 		}
 		if(argbox!=null){
 			argbox.setEnabled(bool);
