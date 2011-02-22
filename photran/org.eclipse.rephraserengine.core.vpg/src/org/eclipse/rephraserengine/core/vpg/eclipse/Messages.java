@@ -29,7 +29,11 @@ public class Messages extends NLS
 
     public static String EclipseVPG_SearchingForWorkspaceModifications;
 
+    /** @since 3.0 */
+    public static String EclipseVPG_WritingDatabaseToDisk;
+
     public static String EclipseVPG_XofY;
+
     static
     {
         // initialize resource bundle

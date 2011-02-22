@@ -33,8 +33,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.MultiRule;
-import org.eclipse.rephraserengine.core.vpg.VPG;
 import org.eclipse.rephraserengine.core.vpg.IVPGNode;
+import org.eclipse.rephraserengine.core.vpg.VPG;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchListener;
+import org.eclipse.ui.internal.Workbench;
 
 /**
  * A virtual program graph for use in an Eclipse environment.
@@ -46,6 +49,7 @@ import org.eclipse.rephraserengine.core.vpg.IVPGNode;
  * 
  * @since 1.0
  */
+@SuppressWarnings("restriction")
 public abstract class EclipseVPG<A, T, R extends IVPGNode<T>>
               extends VPG<A, T, R>
 {
@@ -75,6 +79,8 @@ public abstract class EclipseVPG<A, T, R extends IVPGNode<T>>
      */
     public void start()
     {
+        ensureVPGClosedOnWorkbenchShutdown();
+        
         getLog().readLogFromFile();
         
         // Now listen for changes to workspace resources
@@ -87,6 +93,51 @@ public abstract class EclipseVPG<A, T, R extends IVPGNode<T>>
         // Platform.getContentTypeManager().addContentTypeChangeListener(this);
 
         queueJobToEnsureVPGIsUpToDate();
+    }
+
+    /** Ensures that the database is closed and flushed when the workbench shuts down */
+    private void ensureVPGClosedOnWorkbenchShutdown()
+    {
+        Workbench.getInstance().addWorkbenchListener(new IWorkbenchListener()
+        {
+            public boolean preShutdown(IWorkbench workbench, boolean forced)
+            {
+                FlushDatabaseJob job = new FlushDatabaseJob();
+                job.setRule(
+                    MultiRule.combine(
+                        VPGSchedulingRule.getInstance(),
+                        ResourcesPlugin.getWorkspace().getRoot()));
+                job.schedule();
+                return true;
+            }
+
+            public void postShutdown(IWorkbench workbench)
+            {
+            }
+        });
+    }
+
+    private final class FlushDatabaseJob extends WorkspaceJob
+    {
+        private FlushDatabaseJob()
+        {
+            super(Messages.bind(Messages.EclipseVPG_WritingDatabaseToDisk, syncMessage));
+        }
+
+        @Override
+        public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
+        {
+            try
+            {
+                flushDatabase();
+                getLog().writeToFile();
+                return Status.OK_STATUS;
+            }
+            catch (Throwable e)
+            {
+                return new Status(IStatus.ERROR, null, e.getMessage(), e);
+            }
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
