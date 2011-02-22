@@ -160,7 +160,7 @@ public abstract class RenameTestCase extends PhotranWorkspaceTestCase
 
     private IRenameRefactoring createRefactoring(final String filename, final LineCol lineCol, final Set<String> allFiles) throws Exception
     {
-    	PhotranVPG.getDatabase().clearDatabase();
+    	PhotranVPG.getInstance().clearDatabase();
 
         final IFile thisFile = importFile(Activator.getDefault(), DIR, filename);
         for (String f : allFiles)

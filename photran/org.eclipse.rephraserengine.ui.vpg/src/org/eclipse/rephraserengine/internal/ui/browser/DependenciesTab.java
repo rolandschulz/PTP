@@ -126,10 +126,10 @@ class DependenciesTab
 
         fileNameTextBox.setText(filename);
 
-        for (String dependentFile : (Iterable<String>)vpg.db.getIncomingDependenciesTo(filename))
+        for (String dependentFile : (Iterable<String>)vpg.getIncomingDependenciesTo(filename))
             incomingDependenciesList.add(dependentFile);
 
-        for (String dependentFile : (Iterable<String>)vpg.db.getOutgoingDependenciesFrom(filename))
+        for (String dependentFile : (Iterable<String>)vpg.getOutgoingDependenciesFrom(filename))
             outgoingDependenciesList.add(dependentFile);
     }
 }

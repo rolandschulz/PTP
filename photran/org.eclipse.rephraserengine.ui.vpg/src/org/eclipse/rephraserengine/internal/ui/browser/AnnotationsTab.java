@@ -19,7 +19,7 @@ import java.util.Set;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.rephraserengine.core.util.Pair;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CaretEvent;
@@ -53,8 +53,8 @@ class AnnotationsTab
     private Composite composite ;
     private Label label;
     private String filename;
-    private List<Pair< ? extends TokenRef, Integer>> annotationsInFile;
-    private Set<Pair< ? extends TokenRef, Integer>> annotationsToShow;
+    private List<Pair<? extends IVPGNode, Integer>> annotationsInFile;
+    private Set<Pair<? extends IVPGNode, Integer>> annotationsToShow;
     private HashMap<Integer, TabItem> hashMap;   //to decide which tab to display the annotation in depending upon the type
     
     public AnnotationsTab(TabItem annotations, TabFolder tabFolder, EclipseVPG vpg)
@@ -147,15 +147,15 @@ class AnnotationsTab
         else
             styledText.setText(vpg.getSourceCodeFromAST(ast));
 
-        annotationsInFile = new ArrayList<Pair< ? extends TokenRef, Integer>>();
+        annotationsInFile = new ArrayList<Pair<? extends IVPGNode, Integer>>();
        
-        for (Pair< ? extends TokenRef, Integer> pair :
-                (Iterable<Pair< ? extends TokenRef, Integer>>)vpg.db.getAllAnnotationsFor(filename))
+        for (Pair<? extends IVPGNode, Integer> pair :
+                (Iterable<Pair<? extends IVPGNode, Integer>>)vpg.getAllAnnotationsFor(filename))
         {
             annotationsInFile.add(pair);
         }
 
-        for (Pair< ? extends TokenRef, Integer> pair : annotationsInFile)
+        for (Pair<? extends IVPGNode, Integer> pair : annotationsInFile)
         {
             createNewTab(pair.snd, vpg.describeAnnotationType(pair.snd));
         }
@@ -163,15 +163,15 @@ class AnnotationsTab
 
     private final class ShowEdgeCaretListener implements CaretListener
     {
-        private Set<Pair< ? extends TokenRef, Integer>> collectSelectedAnnotations(int caretOffset)
+        private Set<Pair<? extends IVPGNode, Integer>> collectSelectedAnnotations(int caretOffset)
         {
             // if the care offset happens to be within the edge 
             //then add the edge to the edgesToShow list
-            HashSet<Pair< ? extends TokenRef, Integer>> AnnotationsToShow = new HashSet<Pair< ? extends TokenRef, Integer>>();
+            HashSet<Pair<? extends IVPGNode, Integer>> AnnotationsToShow = new HashSet<Pair<? extends IVPGNode, Integer>>();
           
-            for (Pair< ? extends TokenRef, Integer> pair : annotationsInFile)
+            for (Pair<? extends IVPGNode, Integer> pair : annotationsInFile)
             {
-                TokenRef tokenRef = pair.fst;
+                IVPGNode tokenRef = pair.fst;
 
                 if (tokenRef.getOffset() <= caretOffset && tokenRef.getEndOffset() >= caretOffset)
                     AnnotationsToShow.add(pair);
@@ -188,7 +188,6 @@ class AnnotationsTab
             styledText.redraw();
         }
 
-        @SuppressWarnings("unchecked")
         private void displayAnnotations()
         {
             Text blankText = new Text(annotationsTabFolder, SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI
@@ -200,14 +199,14 @@ class AnnotationsTab
                 hashMap.get(type).setControl(blankText);
             }
             
-            for (Pair< ? extends TokenRef, Integer> pair : annotationsToShow)
+            for (Pair<? extends IVPGNode, Integer> pair : annotationsToShow)
             {
-                TokenRef tokenRef = pair.fst;
+                IVPGNode tokenRef = pair.fst;
                 int annotationType = pair.snd;
                 Text textField = new Text(annotationsTabFolder, SWT.V_SCROLL | SWT.H_SCROLL
                                           | SWT.MULTI | SWT.READ_ONLY);
                 textField.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-                String text = vpg.db.getAnnotation(tokenRef, annotationType).toString();
+                String text = tokenRef.getAnnotation(annotationType).toString();
                 textField.setText(text);
                 hashMap.get(annotationType).setControl(textField);
             }
@@ -241,9 +240,9 @@ class AnnotationsTab
 
         public void paintControl(PaintEvent e)
         {
-            for (Pair< ? extends TokenRef, Integer> pair : annotationsInFile)
+            for (Pair<? extends IVPGNode, Integer> pair : annotationsInFile)
             {
-                TokenRef tokenRef = pair.fst;
+                IVPGNode tokenRef = pair.fst;
                 if (tokenRef.getFilename().equals(filename))
                     drawRectangle(e, tokenRef.getOffset(), tokenRef.getEndOffset());
             }

@@ -33,10 +33,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.MultiRule;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
 import org.eclipse.rephraserengine.core.vpg.VPG;
-import org.eclipse.rephraserengine.core.vpg.VPGDB;
-
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 
 /**
  * A virtual program graph for use in an Eclipse environment.
@@ -48,20 +46,26 @@ import org.eclipse.rephraserengine.core.vpg.VPGDB;
  * 
  * @since 1.0
  */
-public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>, L extends EclipseVPGLog<T, R>>
-              extends VPG<A, T, R, D, L>
+public abstract class EclipseVPG<A, T, R extends IVPGNode<T>>
+              extends VPG<A, T, R>
 {
     private String syncMessage;
 
-    public EclipseVPG(L log, D database, String syncMessage, int transientASTCacheSize)
+    /**
+     * @since 3.0
+     */
+    public EclipseVPG(IEclipseVPGComponentFactory<A, T, R> locator, String syncMessage, int transientASTCacheSize)
     {
-        super(log, database, transientASTCacheSize);
+        super(locator, transientASTCacheSize);
         this.syncMessage = syncMessage;
     }
 
-    public EclipseVPG(L log, D database, String syncMessage)
+    /**
+     * @since 3.0
+     */
+    public EclipseVPG(IEclipseVPGComponentFactory<A, T, R> locator, String syncMessage)
     {
-        super(log, database);
+        super(locator);
         this.syncMessage = syncMessage;
     }
 
@@ -71,7 +75,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
      */
     public void start()
     {
-        log.readLogFromFile();
+        getLog().readLogFromFile();
         
         // Now listen for changes to workspace resources
         ResourcesPlugin.getWorkspace().addResourceChangeListener(new VPGResourceChangeListener(), IResourceChangeEvent.POST_CHANGE);
@@ -126,28 +130,21 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
     {
         try
         {
+            long start = System.currentTimeMillis();
+            
             WorkspaceSyncResourceVisitor visitor = new WorkspaceSyncResourceVisitor();
             collectFilesToIndex(visitor, monitor);
             visitor.calculateDependencies(monitor);
             visitor.index(monitor);
-            flushDatabaseNoFail();
+
+            long end = System.currentTimeMillis();
+            debug("Total time in #ensureVPGIsUpToDate: " + (end-start) + " ms", null); //$NON-NLS-1$ //$NON-NLS-2$
+
             return Status.OK_STATUS;
         }
         catch (CoreException e)
         {
             return e.getStatus();
-        }
-    }
-    
-    private void flushDatabaseNoFail()
-    {
-        try
-        {
-            db.flush();
-        }
-        catch (Throwable e)
-        {
-            // Ignore errors
         }
     }
 
@@ -158,6 +155,11 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
         workspaceRoot.accept(visitor); // Collect list of files to index
     }
 
+    private EclipseVPGWriter<A, T, R> getBuilder()
+    {
+        return (EclipseVPGWriter<A, T, R>)getBuilder();
+    }
+    
     private final class WorkspaceSyncResourceVisitor implements IResourceVisitor
     {
         private final ArrayList<String> files;
@@ -180,7 +182,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
             }
             catch (Exception e)
             {
-                log.logError(e);
+                getLog().logError(e);
             }
             return !(resource instanceof IFile);
         }
@@ -204,7 +206,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
 
         public void index(IProgressMonitor monitor)
         {
-            List<String> queue = sortFilesAccordingToDependencies(files, monitor);
+            List<String> queue = sortFilesAccordingToDependencies(files); //, monitor);
 
             int completed = 0, total = countFilesInQueue(queue);
             for (String filename : queue)
@@ -231,7 +233,8 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
         return total;
     }
 
-    protected boolean shouldListFileInIndexerProgressMessages(String filename) {
+    protected boolean shouldListFileInIndexerProgressMessages(String filename)
+    {
         return !isVirtualFile(filename);
     }
 
@@ -271,13 +274,18 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
             try
             {
                 monitor.beginTask(Messages.EclipseVPG_Indexing, IProgressMonitor.UNKNOWN);
+                
+                long start = System.currentTimeMillis();
+                
                 // Re-index or delete entries for files when they are added/changed or deleted, respectively
                 VPGResourceDeltaVisitor visitor = new VPGResourceDeltaVisitor();
                 monitor.subTask(Messages.EclipseVPG_SearchingForWorkspaceModifications);
                 delta.accept(visitor); // Collect files to index
                 visitor.calculateDependencies(monitor);
                 visitor.index(monitor);
-                flushDatabaseNoFail();
+                
+                long end = System.currentTimeMillis();
+                debug("Total time indexing resource delta: " + (end-start) + " ms", null); //$NON-NLS-1$ //$NON-NLS-2$
                 return Status.OK_STATUS;
             }
             catch (CoreException e)
@@ -338,14 +346,13 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
 
                 case IResourceDelta.REMOVED:
                     debug("Resource Delta: Remove", filename); //$NON-NLS-1$
-                    log.clearEntriesFor(filename);
-                    db.deleteAllEntriesFor(filename);
+                    deleteAllEntriesFor(filename);
                     break;
                 }
             }
             catch (Exception e)
             {
-                log.logError(e);
+                getLog().logError(e);
             }
             return true;
         }
@@ -372,7 +379,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
 
         public void index(IProgressMonitor monitor)
         {
-            List<String> queue = sortFilesAccordingToDependencies(files, monitor);
+            List<String> queue = sortFilesAccordingToDependencies(files); //, monitor);
             int completed = 0, total = countFilesInQueue(queue);
             for (String filename : queue)
             {
@@ -398,7 +405,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
      * @param monitor */
     protected void calculateDependenciesIfNotUpToDate(String filename)
     {
-        if (db.isOutOfDate(filename))
+        if (isOutOfDate(filename))
         {
             debug(Messages.EclipseVPG_Indexing, filename);
             forceRecomputationOfDependencies(filename);
@@ -414,7 +421,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
      * @param monitor */
     protected void indexIfNotUpToDate(String filename)
     {
-        if (db.isOutOfDate(filename))
+        if (isOutOfDate(filename))
         {
             debug(Messages.EclipseVPG_Indexing, filename);
             forceRecomputationOfEdgesAndAnnotations(filename);
@@ -426,51 +433,27 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Abstract Methods (Resource Filtering)
-    ///////////////////////////////////////////////////////////////////////////
-
-    /** @return true iff the given file should be parsed */
-    @Override protected boolean shouldProcessFile(String filename)
-    {
-        IFile file = getIFileForFilename(filename);
-        return file == null ? false : shouldProcessFile(file);
-    }
-
-    /** @return true if the given project should be indexed */
-    protected abstract boolean shouldProcessProject(IProject project);
-
-    /** @return true iff the given file should be indexed */
-    protected abstract boolean shouldProcessFile(IFile file);
-
-    ///////////////////////////////////////////////////////////////////////////
     // Utility Methods (IFile<->Filename Mapping)
     ///////////////////////////////////////////////////////////////////////////
 
     public static IFile getIFileForFilename(String filename)
     {
-        IResource resource = getIResourceForFilename(filename);
-        if (resource instanceof IFile)
-            return (IFile)resource;
-        else
-            return null;
+        return ResourceUtil.getIFileForFilename(filename);
     }
 
     public static String getFilenameForIFile(IFile file)
     {
-        return getFilenameForIResource(file);
+        return ResourceUtil.getFilenameForIFile(file);
     }
 
     public static IResource getIResourceForFilename(String filename)
     {
-        return ResourcesPlugin.getWorkspace().getRoot().findMember(filename);
+        return ResourceUtil.getIResourceForFilename(filename);
     }
 
     public static String getFilenameForIResource(IResource resource)
     {
-        if (resource == null)
-            return null;
-        else
-            return resource.getFullPath().toString();
+        return ResourceUtil.getFilenameForIResource(resource);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -530,15 +513,6 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
     // VPG Overrides
     ///////////////////////////////////////////////////////////////////////////
 
-    @Override protected void processingDependent(String filename, String dependentFilename)
-    {
-//        if (progressMonitor != null)
-//            progressMonitor.subTask(filename
-//                                    + " - reindexing dependent file "
-//                                    + dependentFilename);
-        super.processingDependent(filename, dependentFilename);
-    }
-
     /** Forces the database to be updated based on the current in-memory AST for the given file */
     public void commitChangesFromInMemoryASTs(IProgressMonitor pm, int ticks, IFile file)
     {
@@ -558,4 +532,24 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
         
         commitChangesFromInMemoryASTs(pm, ticks, filenames);
     }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // Abstract Methods (Resource Filtering)
+    ///////////////////////////////////////////////////////////////////////////
+
+    /** @return true iff the given file should be parsed 
+     * @since 3.0*/
+    @Override public boolean shouldProcessFile(String filename)
+    {
+        IFile file = EclipseVPG.getIFileForFilename(filename);
+        return file == null ? false : shouldProcessFile(file);
+    }
+
+    /** @return true if the given project should be indexed 
+     * @since 3.0*/
+    public abstract boolean shouldProcessProject(IProject project);
+
+    /** @return true iff the given file should be indexed 
+     * @since 3.0*/
+    public abstract boolean shouldProcessFile(IFile file);
 }

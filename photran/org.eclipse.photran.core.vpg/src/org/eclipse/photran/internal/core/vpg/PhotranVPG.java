@@ -1,18 +1,12 @@
 package org.eclipse.photran.internal.core.vpg;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.FProjectNature;
@@ -36,11 +30,8 @@ import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
-import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
-import org.eclipse.photran.internal.core.util.LRUCache;
-import org.eclipse.rephraserengine.core.vpg.VPGLog;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 
 /**
@@ -48,256 +39,68 @@ import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
  *
  * @author Jeff Overbey
  */
-public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB, PhotranVPGLog>
+//public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB, PhotranVPGLog>
+public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef>
 {
-	// Tested empirically on ibeam-cpp-mod: 5 does better than 3, but 10 does not do better than 5
-    private static final int MODULE_SYMTAB_CACHE_SIZE = 5;
+    private static PhotranVPG instance = null;
 
-	public static final int DEFINED_IN_SCOPE_EDGE_TYPE = 0;
-	//public static final int IMPORTED_INTO_SCOPE_EDGE_TYPE = 1;
-	public static final int BINDING_EDGE_TYPE = 2;
-    public static final int RENAMED_BINDING_EDGE_TYPE = 3;
-    public static final int DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE = 4;
-    public static final int ILLEGAL_SHADOWING_EDGE_TYPE = 5;
-    public static final int CONTROL_FLOW_EDGE_TYPE = 6;
-    private static final String[] edgeTypeDescriptions =
-	{
-	    Messages.PhotranVPG_DefinitionScopeRelationship,
-	    Messages.PhotranVPG_DefinitionScopeRelationshipDueToModuleImport,
-	    Messages.PhotranVPG_NameBinding,
-	    Messages.PhotranVPG_RenamedBinding,
-	    Messages.PhotranVPG_DefinitionIsPrivateInScope,
-	    Messages.PhotranVPG_IllegalShadowing,
-	    Messages.PhotranVPG_ControlFlow
-	};
-
-	public static final int SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE = 0;
-	public static final int SCOPE_IS_INTERNAL_ANNOTATION_TYPE = 1;
-	public static final int SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE = 2;
-	public static final int DEFINITION_ANNOTATION_TYPE = 3;
-    public static final int TYPE_ANNOTATION_TYPE = 4;
-    public static final int MODULE_TOKENREF_ANNOTATION_TYPE = 5;
-    public static final int MODULE_SYMTAB_ENTRY_COUNT_ANNOTATION_TYPE = 6;
-    public static final int MODULE_SYMTAB_ENTRY_ANNOTATION_TYPE = 7;
-    public static final int VARIABLE_ACCESS_ANNOTATION_TYPE = 8;
-	private static final String[] annotationTypeDescriptions =
-	{
-	    Messages.PhotranVPG_DefaultVisibilityForScopeIsPrivate,
-        Messages.PhotranVPG_ScopeIsInternal,
-        Messages.PhotranVPG_ImplicitSpecForScope,
-	    Messages.PhotranVPG_Definition,
-	    Messages.PhotranVPG_Type,
-	    Messages.PhotranVPG_ModuleTokenRef,
-	    Messages.PhotranVPG_ModuleSymbolTableEntryCount,
-	    Messages.PhotranVPG_ModuleSymbolTableEntry,
-	    Messages.PhotranVPG_VariableAccess
-	};
-
-	private static PhotranVPG instance = null;
-	public PhotranVPGDB db = null;
-
-	protected Parser parser = new Parser();
-
-	public static PhotranVPG getInstance()
-	{
-		if (instance == null)
-	    {
+    public static PhotranVPG getInstance()
+    {
+        if (instance == null)
+        {
+            PhotranVPGComponentFactory locator = new PhotranVPGComponentFactory();
+            
             if (/*inTestingMode() ||*/ FortranPreferences.ENABLE_VPG_LOGGING.getValue())
             {
-    		    instance = new PhotranVPGBuilder()
-        		{
-        		    @Override public void debug(String message, String filename)
-        		    {
-        		        System.out.println(message + " - " + lastSegmentOfFilename(filename)); //$NON-NLS-1$
-        		    }
-        		};
+                instance = new PhotranVPG(locator)
+                {
+                    @Override public void debug(String message, String filename)
+                    {
+                        System.out.println(message + " - " + lastSegmentOfFilename(filename)); //$NON-NLS-1$
+                    }
+                };
             }
             else
             {
-                instance = new PhotranVPGBuilder();
+                instance = new PhotranVPG(locator);
             }
-	    }
-		return instance;
-	}
-
-    public static PhotranVPGDB getDatabase()
+        }
+        
+        return instance;
+    }
+    
+    public static PhotranVPGWriter getProvider()
     {
-        return getInstance().db;
+        return getInstance().getVPGWriter();
     }
 
-    @Override public void debug(String message, String filename)
+    //protected PhotranVPG(PhotranVPGNodeFactory locator, PhotranVPGDB db)
+    protected PhotranVPG(PhotranVPGComponentFactory locator)
     {
-    }
-
-    @Override protected void debug(long parseTimeMillisec,
-                                   long computeEdgesAndAnnotationsMillisec,
-                                   String filename)
-    {
-//        printDebug("- "
-//                   + parseTimeMillisec
-//                   + "/"
-//                   + computeEdgesAndAnnotationsMillisec
-//                   + " ms parsing/analysis", filename);
-
-//        // Print a stack trace, filtered to elements in VPG and Photran
-//        try
-//        {
-//            throw new Exception();
-//        }
-//        catch (Exception e)
-//        {
-//            StackTraceElement[] st = e.getStackTrace();
-//            String lastLine = "";
-//            for (int i = 1; i < st.length; i++)
-//            {
-//                String result = st[i].toString();
-//                if (result.equals(lastLine))
-//                    continue;
-//                else if (result.startsWith("bz.over.vpg") || result.startsWith("org.eclipse.photran"))
-//                {
-//                    System.out.println("      " + result);
-//                    lastLine = result;
-//                }
-//                else break;
-//            }
-//        }
+        super(locator, Messages.PhotranVPG_PhotranIndexer, 2);
     }
 
     @Override public void start()
-	{
-		if (!FortranCorePlugin.inTestingMode()) super.start();
-	}
-
-	protected PhotranVPG()
-	{
-        super(new PhotranVPGLog(), new PhotranVPGDB(), Messages.PhotranVPG_PhotranIndexer, 2);
-        db = super.db;
-    }
-
-    @Override
-	public String describeEdgeType(int edgeType)
-	{
-		return edgeTypeDescriptions[edgeType];
-	}
-
-	@Override
-	public String describeAnnotationType(int annotationType)
-	{
-		return annotationTypeDescriptions[annotationType];
-	}
-
-	protected String describeToken(String filename, int offset, int length)
-	{
-		try
-		{
-			if (offset == -1 && length == 0) return Messages.PhotranVPG_GlobalScope;
-
-			Token token = acquireTransientAST(filename).findTokenByStreamOffsetLength(offset, length);
-			if (token == null)
-				return db.describeToken(filename, offset, length);
-			else
-				return token.getText() + " " + Messages.bind(Messages.PhotranVPG_OffsetN, offset); //$NON-NLS-1$
-		}
-		catch (Exception e)
-		{
-			return db.describeToken(filename, offset, length);
-		}
-	}
-
-	@Override
-	public Token findToken(PhotranTokenRef tokenRef)
-	{
-		IFortranAST ast = acquireTransientAST(tokenRef.getFilename());
-		if (ast == null)
-			return null;
-		else
-			return ast.findTokenByStreamOffsetLength(tokenRef.getOffset(), tokenRef.getLength());
-	}
-
-    @Override
-    public boolean shouldProcessFile(IFile file)
     {
-        return FortranCorePlugin.hasFortranContentType(file.getName()); 
+        if (!FortranCorePlugin.inTestingMode()) super.start();
     }
-
-    @Override
-    public boolean shouldProcessProject(IProject project)
+    
+    public static String canonicalizeIdentifier(String identifier)
     {
-        try
-        {
-            if (!project.isAccessible()) return false;
-            if (!project.hasNature(FProjectNature.F_NATURE_ID)) return false;
-            return FortranCorePlugin.inTestingMode() || new SearchPathProperties().getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true"); //$NON-NLS-1$
-        }
-        catch (CoreException e)
-        {
-            throw new Error(e);
-        }
+        return identifier.trim().toLowerCase().replaceAll("[ \t\r\n]", ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    public String describeWhyCannotProcessProject(IProject project)
-    {
-        try
-        {
-            if (!project.isAccessible())
-                return Messages.bind(Messages.PhotranVPG_ProjectIsNotAccessible, project.getName());
-            else if (!project.hasNature(FProjectNature.F_NATURE_ID))
-                return Messages.bind(Messages.PhotranVPG_ProjectIsNotAFortranProject, project.getName());
-            else if (!new SearchPathProperties().getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true")) //$NON-NLS-1$
-                return Messages.bind(Messages.PhotranVPG_AnalysisRefactoringNotEnabled, project.getName());
-            else
-                return null;
-        }
-        catch (CoreException e)
-        {
-            throw new Error(e);
-        }
-    }
 
-    public String describeWhyCannotProcessFile(IFile file)
-    {
-        if (file.getProject() == null)
-            return Messages.bind(Messages.PhotranVPG_FileIsNotInAFortranProject, file.getName());
-        else if (!shouldProcessProject(file.getProject()))
-            return describeWhyCannotProcessProject(file.getProject());
-        else if (!shouldProcessFile(file))
-            return Messages.bind(
-                Messages.PhotranVPG_NotAFortranSourceFile,
-                file.getName(),
-                file.getFileExtension());
-        else
-            return null;
-    }
 
-	@Override
-	protected PhotranTokenRef getTokenRef(Token forToken)
-	{
-		return forToken.getTokenRef();
-	}
 
-	public static String canonicalizeIdentifier(String identifier)
-	{
-		return identifier.trim().toLowerCase().replaceAll("[ \t\r\n]", ""); //$NON-NLS-1$ //$NON-NLS-2$
-	}
 
-    private List<IFile> getOutgoingDependenciesFrom(String targetFilename)
-    {
-        List<IFile> files = new LinkedList<IFile>();
-        for (String filename : db.getOutgoingDependenciesFrom(targetFilename))
-        {
-            IFile file = getIFileForFilename(filename);
-            if (file != null) files.add(file);
-        }
-        return files;
-    }
 
-    private List<IFile> getIncomingDependenciesTo(String targetFilename)
-    {
-        List<IFile> files = new LinkedList<IFile>();
-        for (String filename : db.getIncomingDependenciesTo(targetFilename))
-            files.add(getIFileForFilename(filename));
-        return files;
-    }
+
+
+
+
+
+
 
     public ArrayList<Definition> findAllExternalSubprogramsNamed(String name)
     {
@@ -310,9 +113,9 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     private ArrayList<Definition> findSubprograms(String name, IFile file)
     {
         ArrayList<Definition> result = new ArrayList<Definition>();
-        String cname = PhotranVPG.canonicalizeIdentifier(name);
+        String cname = canonicalizeIdentifier(name);
 
-        IFortranAST ast = acquireTransientAST(file);
+        IFortranAST ast = PhotranVPG.getInstance().acquireTransientAST(file);
         if (ast != null)
         {
             ASTExecutableProgramNode node = ast.getRoot();
@@ -407,9 +210,9 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     {
         ArrayList<Definition> result = new ArrayList<Definition>();
 
-        IFortranAST ast = acquireTransientAST(file);
+        IFortranAST ast = PhotranVPG.getInstance().acquireTransientAST(file);
         if (ast != null)
-            ast.accept(new InterfaceVisitor(result, PhotranVPG.canonicalizeIdentifier(name)));
+            ast.accept(new InterfaceVisitor(result, canonicalizeIdentifier(name)));
 
         return result;
     }
@@ -427,12 +230,12 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 
         @Override public void visitASTFunctionStmtNode(ASTFunctionStmtNode node)
         {
-            addIfDefinedInInterface(PhotranVPG.this.attemptToMatch(canonicalizedName, node));
+            addIfDefinedInInterface(attemptToMatch(canonicalizedName, node));
         }
 
         @Override public void visitASTSubroutineStmtNode(ASTSubroutineStmtNode node)
         {
-            addIfDefinedInInterface(PhotranVPG.this.attemptToMatch(canonicalizedName, node));
+            addIfDefinedInInterface(attemptToMatch(canonicalizedName, node));
         }
 
         private void addIfDefinedInInterface(PhotranTokenRef tr)
@@ -455,9 +258,9 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     {
         ArrayList<Definition> result = new ArrayList<Definition>();
 
-        IFortranAST ast = acquireTransientAST(file);
+        IFortranAST ast = PhotranVPG.getInstance().acquireTransientAST(file);
         if (ast != null)
-            ast.accept(new ExternalStmtVisitor(result, PhotranVPG.canonicalizeIdentifier(name)));
+            ast.accept(new ExternalStmtVisitor(result, canonicalizeIdentifier(name)));
 
         return result;
     }
@@ -488,7 +291,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 
             IASTListNode<ASTExternalNameListNode> list = node.getExternalNameList();
             for (int i = 0; i < list.size(); i++)
-                add(PhotranVPG.this.attemptToMatch(canonicalizedName, list.get(i).getExternalName()));
+                add(attemptToMatch(canonicalizedName, list.get(i).getExternalName()));
         }
 
         private void add(PhotranTokenRef tr)
@@ -499,24 +302,43 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         }
     }
 
+    private List<IFile> getOutgoingIFileDependenciesFrom(String targetFilename)
+    {
+        List<IFile> files = new LinkedList<IFile>();
+        for (String filename : super.getOutgoingDependenciesFrom(targetFilename))
+        {
+            IFile file = getIFileForFilename(filename);
+            if (file != null) files.add(file);
+        }
+        return files;
+    }
+
+    private List<IFile> getIncomingIFileDependenciesTo(String targetFilename)
+    {
+        List<IFile> files = new LinkedList<IFile>();
+        for (String filename : super.getIncomingDependenciesTo(targetFilename))
+            files.add(getIFileForFilename(filename));
+        return files;
+    }
+
     public List<IFile> findFilesThatExportSubprogram(String subprogramName)
     {
-        return getOutgoingDependenciesFrom("subprogram:" + canonicalizeIdentifier(subprogramName)); //$NON-NLS-1$
+        return getOutgoingIFileDependenciesFrom("subprogram:" + canonicalizeIdentifier(subprogramName)); //$NON-NLS-1$
     }
 
     public List<IFile> findFilesThatImportSubprogram(String subprogramName)
     {
-        return getIncomingDependenciesTo("subprogram:" + canonicalizeIdentifier(subprogramName)); //$NON-NLS-1$
+        return getIncomingIFileDependenciesTo("subprogram:" + canonicalizeIdentifier(subprogramName)); //$NON-NLS-1$
     }
 
     public List<IFile> findFilesThatExportModule(String moduleName)
     {
-        return getOutgoingDependenciesFrom("module:" + canonicalizeIdentifier(moduleName)); //$NON-NLS-1$
+        return getOutgoingIFileDependenciesFrom("module:" + canonicalizeIdentifier(moduleName)); //$NON-NLS-1$
     }
 
     public List<IFile> findFilesThatImportModule(String moduleName)
     {
-        return getIncomingDependenciesTo("module:" + canonicalizeIdentifier(moduleName)); //$NON-NLS-1$
+        return getIncomingIFileDependenciesTo("module:" + canonicalizeIdentifier(moduleName)); //$NON-NLS-1$
     }
 
     public List<IFile> findFilesThatUseCommonBlock(String commonBlockName)
@@ -524,7 +346,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         // The unnamed common block is stored with the empty name as its name
         if (commonBlockName == null) commonBlockName = ""; //$NON-NLS-1$
 
-        return getIncomingDependenciesTo("common:" + canonicalizeIdentifier(commonBlockName)); //$NON-NLS-1$
+        return getIncomingIFileDependenciesTo("common:" + canonicalizeIdentifier(commonBlockName)); //$NON-NLS-1$
     }
 
     public Iterable<String> listAllModules()
@@ -558,10 +380,10 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
          */
 
         TreeSet<String> result = new TreeSet<String>();
-        for (String name : db.listAllDependentFilenames())
+        for (String name : listAllDependentFilenames())
             if (name.startsWith(prefix))
                 result.add(name.substring(prefix.length()));
-        for (String name : db.listAllFilenamesWithDependents())
+        for (String name : listAllFilenamesWithDependents())
             if (name.startsWith(prefix))
                 result.add(name.substring(prefix.length()));
         return result;
@@ -580,192 +402,64 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
          */
 
         TreeSet<String> result = new TreeSet<String>();
-        for (String name : db.listAllFilenamesWithDependents())
+        for (String name : listAllFilenamesWithDependents())
             if (name.startsWith(prefix))
                 result.add(name.substring(prefix.length()));
         return result;
     }
 
-	public Definition getDefinitionFor(PhotranTokenRef tokenRef)
-	{
-		return (Definition)db.getAnnotation(tokenRef, DEFINITION_ANNOTATION_TYPE);
-	}
+    public Definition getDefinitionFor(PhotranTokenRef tokenRef)
+    {
+        return tokenRef.getAnnotation(AnnotationType.DEFINITION_ANNOTATION_TYPE);
+    }
 
-	public Type getTypeFor(PhotranTokenRef tokenRef)
-	{
-		return (Type)db.getAnnotation(tokenRef, TYPE_ANNOTATION_TYPE);
-	}
+    public Type getTypeFor(PhotranTokenRef tokenRef)
+    {
+        return tokenRef.getAnnotation(AnnotationType.TYPE_ANNOTATION_TYPE);
+    }
 
-	public Visibility getVisibilityFor(Definition def, ScopingNode visibilityInScope)
-	{
-	    PhotranTokenRef targetScope = visibilityInScope.getRepresentativeToken();
+    public Visibility getVisibilityFor(Definition def, ScopingNode visibilityInScope)
+    {
+        PhotranTokenRef targetScope = visibilityInScope.getRepresentativeToken();
 
-	    for (PhotranTokenRef privateScope : db.getOutgoingEdgeTargets(def.getTokenRef(), DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE))
-	        if (privateScope.equals(targetScope))
-	            return Visibility.PRIVATE;
+        for (PhotranTokenRef privateScope : def.getTokenRef().followOutgoing(EdgeType.DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE))
+            if (privateScope.equals(targetScope))
+                return Visibility.PRIVATE;
 
-	    return Visibility.PUBLIC;
-	}
+        return Visibility.PUBLIC;
+    }
 
     public PhotranTokenRef getModuleTokenRef(String moduleName)
     {
         String filename = "module:" + canonicalizeIdentifier(moduleName); //$NON-NLS-1$
-        PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
+        PhotranTokenRef tokenRef = getVPGNode(filename, 0, 0);
         //System.err.println("getModuleTokenRef(" + moduleName + ") returning " + db.getAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE));
-        return (PhotranTokenRef)db.getAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE);
+        return tokenRef.getAnnotation(AnnotationType.MODULE_TOKENREF_ANNOTATION_TYPE);
     }
-
-    protected LRUCache<String, List<Definition>> moduleSymTabCache = new LRUCache<String, List<Definition>>(MODULE_SYMTAB_CACHE_SIZE);
-    protected long moduleSymTabCacheHits = 0L, moduleSymTabCacheMisses = 0L;
 
     public List<Definition> getModuleSymbolTable(String moduleName)
     {
-        if (moduleSymTabCache.contains(moduleName))
-        {
-            moduleSymTabCacheHits++;
-            return moduleSymTabCache.get(moduleName);
-        }
-        moduleSymTabCacheMisses++;
-
-        int entries = countModuleSymbolTableEntries(moduleName);
-
-        if (entries == 0) return new LinkedList<Definition>();
-
-        String filename = "module:" + canonicalizeIdentifier(moduleName); //$NON-NLS-1$
-        ArrayList<Definition> result = new ArrayList<Definition>(entries);
-        for (int i = 0; i < entries; i++)
-        {
-            PhotranTokenRef tokenRef = createTokenRef(filename, i, 0);
-            Object entry = db.getAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_ANNOTATION_TYPE);
-            if (entry != null && entry instanceof Definition)
-                result.add((Definition)entry);
-        }
-
-        moduleSymTabCache.cache(moduleName, result);
-
-        return result;
+        return getProvider().getModuleSymbolTable(moduleName);
     }
 
-    protected int countModuleSymbolTableEntries(String canonicalizedModuleName)
+
+
+
+
+    @Override
+    public String describeEdgeType(int edgeType)
     {
-        String filename = "module:" + canonicalizedModuleName; //$NON-NLS-1$
-        PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
-        Object result = db.getAnnotation(tokenRef, MODULE_SYMTAB_ENTRY_COUNT_ANNOTATION_TYPE);
-        return result == null || !(result instanceof Integer) ? 0 : ((Integer)result).intValue();
+        return getProvider().describeEdgeType(edgeType);
     }
 
-    public void printModuleSymTabCacheStatisticsOn(PrintStream out)
+    @Override
+    public String describeAnnotationType(int annotationType)
     {
-        out.println("Module Symbol Table Cache Statistics:"); //$NON-NLS-1$
-
-        long edgeTotal = moduleSymTabCacheHits + moduleSymTabCacheMisses;
-        float edgeHitRatio = edgeTotal == 0 ? 0 : ((float)moduleSymTabCacheHits) / edgeTotal * 100;
-        out.println("    Hit Ratio:        " + moduleSymTabCacheHits + "/" + edgeTotal + " (" + (long)Math.round(edgeHitRatio) + "%)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        return getProvider().describeAnnotationType(annotationType);
     }
 
-    public void resetStatistics()
-    {
-        moduleSymTabCacheHits = moduleSymTabCacheMisses = 0L;
-    }
 
-    ////////////////////////////////////////////////////////////////////////////////
-    // VPG Error/Warning Log View/Listener Support
-    ////////////////////////////////////////////////////////////////////////////////
 
-    private List<IMarker> errorLogMarkers = null;
-
-    /**
-     * It is the caller's responsibility to make sure this task is executed in the
-     * with the correct scheduling rule.  (The VPG Problems view locks the entire
-     * workspace; the CVS plug-in was having problems when marker attributes were
-     * being set on resources that were not locked by the scheduling rule.)
-     */
-    public List<IMarker> recomputeErrorLogMarkers()
-    {
-        deleteExistingErrorMarkers();
-        populateErrorLogMarkers();
-        return errorLogMarkers;
-    }
-
-    private void deleteExistingErrorMarkers()
-    {
-        if (errorLogMarkers != null)
-        {
-            for (IMarker marker : errorLogMarkers)
-            {
-                try
-                {
-                    marker.delete();
-                }
-                catch (CoreException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-
-            errorLogMarkers = null;
-        }
-    }
-
-    private void populateErrorLogMarkers()
-    {
-        List<VPGLog<Token, PhotranTokenRef>.Entry> errorLog = log.getEntries();
-        errorLogMarkers = new ArrayList<IMarker>(errorLog.size());
-        for (int i = 0; i < errorLog.size(); i++)
-        {
-            try
-            {
-                VPGLog<Token, PhotranTokenRef>.Entry entry = errorLog.get(i);
-                errorLogMarkers.add(createMarkerFrom(entry));
-            }
-            catch (CoreException e)
-            {
-                // Ignore
-            }
-        }
-    }
-
-    private IMarker createMarkerFrom(VPGLog<Token, PhotranTokenRef>.Entry entry) throws CoreException
-    {
-        IMarker marker = createMarkerOnResource(entry);
-        if (marker != null) setMarkerAttributes(marker, entry);
-        return marker;
-    }
-
-    private IMarker createMarkerOnResource(VPGLog<Token, PhotranTokenRef>.Entry entry) throws CoreException
-    {
-        PhotranTokenRef tr = entry.getTokenRef();
-        IFile file = tr == null ? null : tr.getFile();
-        IResource res = file == null ? ResourcesPlugin.getWorkspace().getRoot() : file;
-        return res.createMarker(determineMarkerType(entry));
-    }
-
-    private String determineMarkerType(VPGLog<Token, PhotranTokenRef>.Entry entry)
-    {
-        if (entry.isWarning())
-            return "org.eclipse.photran.core.vpg.warningMarker"; //$NON-NLS-1$
-        else // (entry.isError())
-            return "org.eclipse.photran.core.vpg.errorMarker"; //$NON-NLS-1$
-    }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void setMarkerAttributes(IMarker marker, VPGLog<Token, PhotranTokenRef>.Entry entry) throws CoreException
-    {
-        Map attribs = new HashMap(5);
-
-        PhotranTokenRef tr = entry.getTokenRef();
-        if (tr != null)
-        {
-            attribs.put(IMarker.CHAR_START, tr.getOffset());
-            attribs.put(IMarker.CHAR_END, tr.getEndOffset());
-        }
-
-        attribs.put(IMarker.MESSAGE, entry.getMessage());
-        attribs.put(IMarker.USER_EDITABLE, false);
-        attribs.put(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-
-        marker.setAttributes(attribs);
-    }
     
     public boolean doesProjectHaveRefactoringEnabled(IFile file)
     {
@@ -777,8 +471,95 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         return vpgEnabledProperty != null && vpgEnabledProperty.equals("true"); //$NON-NLS-1$
     }
 
-    private boolean isDefinitionCachingEnabled = false;
-    public void enableDefinitionCaching() { isDefinitionCachingEnabled = true; }
-    public void disableDefinitionCaching() { isDefinitionCachingEnabled = false; }
-    public boolean isDefinitionCachingEnabled() { return isDefinitionCachingEnabled; }
+
+
+
+
+
+
+
+
+
+    @Override public String getSourceCodeFromAST(IFortranAST ast)
+    {
+        return ast.getRoot().toString();
+    }
+
+
+
+
+
+
+
+
+    @Override
+    public boolean shouldProcessFile(IFile file)
+    {
+        return FortranCorePlugin.hasFortranContentType(file.getName()); 
+    }
+
+    @Override
+    public boolean shouldProcessProject(IProject project)
+    {
+        try
+        {
+            if (!project.isAccessible()) return false;
+            if (!project.hasNature(FProjectNature.F_NATURE_ID)) return false;
+            return FortranCorePlugin.inTestingMode() || new SearchPathProperties().getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true"); //$NON-NLS-1$
+        }
+        catch (CoreException e)
+        {
+            throw new Error(e);
+        }
+    }
+
+    public String describeWhyCannotProcessProject(IProject project)
+    {
+        try
+        {
+            if (!project.isAccessible())
+                return Messages.bind(Messages.PhotranVPG_ProjectIsNotAccessible, project.getName());
+            else if (!project.hasNature(FProjectNature.F_NATURE_ID))
+                return Messages.bind(Messages.PhotranVPG_ProjectIsNotAFortranProject, project.getName());
+            else if (!new SearchPathProperties().getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true")) //$NON-NLS-1$
+                return Messages.bind(Messages.PhotranVPG_AnalysisRefactoringNotEnabled, project.getName());
+            else
+                return null;
+        }
+        catch (CoreException e)
+        {
+            throw new Error(e);
+        }
+    }
+
+    public String describeWhyCannotProcessFile(IFile file)
+    {
+        if (file.getProject() == null)
+            return Messages.bind(Messages.PhotranVPG_FileIsNotInAFortranProject, file.getName());
+        else if (!shouldProcessProject(file.getProject()))
+            return describeWhyCannotProcessProject(file.getProject());
+        else if (!shouldProcessFile(file))
+            return Messages.bind(
+                Messages.PhotranVPG_NotAFortranSourceFile,
+                file.getName(),
+                file.getFileExtension());
+        else
+            return null;
+    }
+
+    @Override
+    public boolean isVirtualFile(String filename)
+    {
+        return filename.startsWith("module:") || filename.startsWith("common:") || filename.startsWith("subprogram:"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    }
+
+
+
+
+
+    @Override
+    public IFortranAST parse(final String filename)
+    {
+        return ((PhotranVPGWriter)getVPGWriter()).parse(filename);
+    }
 }

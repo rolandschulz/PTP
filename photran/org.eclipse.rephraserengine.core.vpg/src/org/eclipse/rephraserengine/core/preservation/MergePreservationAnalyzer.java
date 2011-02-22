@@ -12,20 +12,20 @@ package org.eclipse.rephraserengine.core.preservation;
 
 import java.util.Collection;
 
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 
 /**
  * 
  * @author Jeff Overbey
  */
-final class MergePreservationAnalyzer extends PreservationAnalyzer
+final class MergePreservationAnalyzer<A, T, R extends IVPGNode<T>> extends PreservationAnalyzer<A, T, R>
 {
     public MergePreservationAnalyzer(
-        Collection<VPGEdge<?,?,?>> initialEdges,
-        Collection<VPGEdge<?,?,?>> finalEdges,
+        Collection<VPGEdge<A,T,R>> initialEdges,
+        Collection<VPGEdge<A,T,R>> finalEdges,
         PreservationRuleset ruleset)
     {
         super(initialEdges, finalEdges, ruleset);
     }
-
 }

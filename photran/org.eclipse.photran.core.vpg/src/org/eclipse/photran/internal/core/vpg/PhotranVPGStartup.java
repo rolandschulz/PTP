@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.vpg;
 
-import java.io.IOException;
-
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -75,7 +73,7 @@ public class PhotranVPGStartup implements IStartup
         {
             try
             {
-                PhotranVPG.getDatabase().flush();
+                PhotranVPG.getInstance().flushDatabase();
             }
             catch (Throwable e)
             {

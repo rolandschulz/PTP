@@ -18,9 +18,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.VPG;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
@@ -32,32 +31,32 @@ import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
  * 
  * @since 3.0
  */
-final class Model
+final class Model<A, T, R extends IVPGNode<T>>
 {
     private String name;
-    private EclipseVPG<?,?,?,?,?> vpg;
+    private EclipseVPG<A,T,R> vpg;
     private List<String> files;
     private Set<String> filesWithNoEdges;
-    private Collection<VPGEdge<?,?,?>> edges;
+    private Collection<VPGEdge<A,T,R>> edges;
 
-    public Model(String name, IProgressMonitor pm, int ticks, EclipseVPG<?,?,?,?,?> vpg, String... filenames)
+    public Model(String name, IProgressMonitor pm, int ticks, EclipseVPG<A,T,R> vpg, String... filenames)
     {
         this(name, pm, ticks, vpg, Arrays.asList(filenames));
     }
 
-    public Model(String name, IProgressMonitor pm, int ticks, EclipseVPG<?,?,?,?,?> vpg, List<String> filenames)
+    public Model(String name, IProgressMonitor pm, int ticks, EclipseVPG<A,T,R> vpg, List<String> filenames)
     {
         this.name = name;
         this.vpg = vpg;
 
         pm.subTask(Messages.Model_PreparingToCompute + name);
-        this.files = vpg.sortFilesAccordingToDependencies(new ArrayList<String>(filenames), new NullProgressMonitor());
+        this.files = vpg.sortFilesAccordingToDependencies(new ArrayList<String>(filenames)); //, new NullProgressMonitor());
 
         this.filesWithNoEdges = new TreeSet<String>();
 
         pm = new SubProgressMonitor(pm, ticks, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
         pm.beginTask(Messages.bind(Messages.Model_Computing, name), files.size());
-        this.edges = new ArrayList<VPGEdge<?,?,?>>();
+        this.edges = new ArrayList<VPGEdge<A,T,R>>();
         for (String thisFile : files)
         {
             pm.subTask(VPG.lastSegmentOfFilename(thisFile));
@@ -71,7 +70,7 @@ final class Model
     {
         int count = 0;
 
-        for (VPGEdge<?,?,?> edge : vpg.db.getAllEdgesFor(filename))
+        for (VPGEdge<A,T,R> edge : vpg.getAllEdgesFor(filename))
         {
             edges.add(edge);
             count++;
@@ -92,11 +91,11 @@ final class Model
         pm.beginTask(Messages.bind(Messages.Model_Normalizing, name), edges.size());
 
         // Use a set to eliminate duplicates
-        Set<VPGEdge<?,?,?>> newEdges = createNewEdgeSet();;
+        Set<VPGEdge<A,T,R>> newEdges = createNewEdgeSet();
         
-        for (VPGEdge<?,?,?> e : edges)
+        for (VPGEdge<A,T,R> e : edges)
         {
-            newEdges.add(e.projectInitial(replacements));
+            newEdges.add(e.projectInitial(replacements, vpg));
             pm.worked(1);
         }
         
@@ -111,11 +110,11 @@ final class Model
         pm.beginTask(Messages.bind(Messages.Model_Normalizing, name), edges.size());
 
         // Use a set to eliminate duplicates
-        Set<VPGEdge<?,?,?>> newEdges = createNewEdgeSet();
+        Set<VPGEdge<A,T,R>> newEdges = createNewEdgeSet();
         
-        for (VPGEdge<?,?,?> e : edges)
+        for (VPGEdge<A,T,R> e : edges)
         {
-            newEdges.add(e.projectFinal(replacements));
+            newEdges.add(e.projectFinal(replacements, vpg));
             pm.worked(1);
         }
         
@@ -124,12 +123,12 @@ final class Model
         pm.done();
     }
 
-    protected Set<VPGEdge<?,?,?>> createNewEdgeSet()
+    protected Set<VPGEdge<A,T,R>> createNewEdgeSet()
     {
-        return new TreeSet<VPGEdge<?,?,?>>();
+        return new TreeSet<VPGEdge<A,T,R>>();
     }
 
-    ModelDiff checkPreservation(Model that, PreservationRuleset ruleset, IProgressMonitor pm)
+    ModelDiff checkPreservation(Model<A,T,R> that, PreservationRuleset ruleset, IProgressMonitor pm)
     {
         pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
         pm.beginTask(
@@ -139,7 +138,7 @@ final class Model
         ModelDiff diff = new ModelDiff();
 
         int type = 0;
-        PreservationAnalyzer analyzer = new MergePreservationAnalyzer(this.edges, that.edges, ruleset);
+        PreservationAnalyzer<A,T,R> analyzer = new MergePreservationAnalyzer<A,T,R>(this.edges, that.edges, ruleset);
         while (analyzer.hasEdgesRemaining())
         {
             int edgesRemainingBefore = analyzer.countEdgesRemaining();
@@ -255,7 +254,7 @@ final class Model
         return sb.toString();
     }
 
-    private String extractText(String fileContents, TokenRef<?> tokenRef)
+    private String extractText(String fileContents, IVPGNode<?> tokenRef)
     {
         String result = fileContents.substring(tokenRef.getOffset(), tokenRef.getEndOffset());
         result = result.replace("\t", "\\t"); //$NON-NLS-1$ //$NON-NLS-2$

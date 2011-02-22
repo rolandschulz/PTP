@@ -75,7 +75,7 @@ class SpecificationCollector extends VisibilityCollector
             {
                 Definition def = vpg.getDefinitionFor(tr);
                 def.setIntent(node.getIntentSpec());
-                vpg.setDefinitionFor(tr, def);
+                vpgProvider.setDefinitionFor(tr, def);
             }
         }
     }
@@ -103,7 +103,7 @@ class SpecificationCollector extends VisibilityCollector
             {
                 Definition def = vpg.getDefinitionFor(tr);
                 def.setOptional();
-                vpg.setDefinitionFor(tr, def);
+                vpgProvider.setDefinitionFor(tr, def);
             }
         }
     }
@@ -141,7 +141,7 @@ class SpecificationCollector extends VisibilityCollector
                 {
                     Definition def = vpg.getDefinitionFor(tr);
                     def.setSave();
-                    vpg.setDefinitionFor(tr, def);
+                    vpgProvider.setDefinitionFor(tr, def);
                 }
             }
             else if (entity.getCommonBlockName() != null)
@@ -152,7 +152,7 @@ class SpecificationCollector extends VisibilityCollector
                 {
                     Definition def = vpg.getDefinitionFor(tr);
                     def.setSave();
-                    vpg.setDefinitionFor(tr, def);
+                    vpgProvider.setDefinitionFor(tr, def);
                 }
             }
         }
@@ -183,7 +183,7 @@ class SpecificationCollector extends VisibilityCollector
 	            {
 	            	Definition def = vpg.getDefinitionFor(tr);
 	            	def.setArraySpec(decls.get(i).getArraySpec());
-	            	vpg.setDefinitionFor(tr, def);
+	            	vpgProvider.setDefinitionFor(tr, def);
 	            }
             }
             catch (Exception e)
@@ -218,7 +218,7 @@ class SpecificationCollector extends VisibilityCollector
             {
                 Definition def = vpg.getDefinitionFor(tr);
                 def.setAllocatable();
-                vpg.setDefinitionFor(tr, def);
+                vpgProvider.setDefinitionFor(tr, def);
             }
         }
     }
@@ -250,7 +250,7 @@ class SpecificationCollector extends VisibilityCollector
             {
                 Definition def = vpg.getDefinitionFor(tr);
                 def.setPointer();
-                vpg.setDefinitionFor(tr, def);
+                vpgProvider.setDefinitionFor(tr, def);
             }
         }
     }
@@ -284,7 +284,7 @@ class SpecificationCollector extends VisibilityCollector
             {
                 Definition def = vpg.getDefinitionFor(tr);
                 def.setTarget();
-                vpg.setDefinitionFor(tr, def);
+                vpgProvider.setDefinitionFor(tr, def);
             }
         }
     }
@@ -315,7 +315,7 @@ class SpecificationCollector extends VisibilityCollector
                 {
                     Definition def = vpg.getDefinitionFor(tr);
                     def.setParameter();
-                    vpg.setDefinitionFor(tr, def);
+                    vpgProvider.setDefinitionFor(tr, def);
                 }
             }
             catch (Exception e)

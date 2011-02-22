@@ -4,15 +4,24 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
-import org.eclipse.rephraserengine.core.vpg.VPGDB;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
-import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPGLog;
 
 /**
+ * A refactoring which requires the user to make a selection in a text editor in order to invoke the
+ * refactoring.
+ * <p>
+ * Contrast with {@link VPGResourceRefactoring}.
+ * 
+ * @author Jeff Overbey
+ * 
+ * @param <A> AST type
+ * @param <T> node/token type (i.e., the type returned by {@link IVPGNode#getASTNode()})
+ * @param <V> VPG
+ * 
  * @since 2.0
  */
-public abstract class VPGEditorRefactoring<A, T, V extends EclipseVPG<A, T, ? extends TokenRef<T>, ? extends VPGDB<A, T, ?, ?>, ? extends EclipseVPGLog<T, ?>>>
+public abstract class VPGEditorRefactoring<A, T, V extends EclipseVPG<A, T, ? extends IVPGNode<T>>>
     extends VPGRefactoring<A, T, V>
     implements IEditorRefactoring
 {

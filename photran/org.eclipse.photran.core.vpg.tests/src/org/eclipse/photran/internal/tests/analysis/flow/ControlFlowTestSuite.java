@@ -21,6 +21,7 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.IActionStmt;
 import org.eclipse.photran.internal.core.parser.IExecutableConstruct;
+import org.eclipse.photran.internal.core.vpg.EdgeType;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
@@ -106,11 +107,11 @@ public class ControlFlowTestSuite extends GeneralTestSuiteFromMarkers
             assertEquals(expected.replace("\r", ""), actual.replace("\r", ""));
         }
         
-        private static final class PhotranVPGFlowGraph extends VPGFlowGraph<PhotranTokenRef, IExecutableConstruct>
+        private static final class PhotranVPGFlowGraph extends VPGFlowGraph<PhotranTokenRef, Token, IExecutableConstruct>
         {
             private PhotranVPGFlowGraph(PhotranTokenRef entryNodeRef, PhotranTokenRef exitNodeRef)
             {
-                super(PhotranVPG.getInstance(), entryNodeRef, exitNodeRef, PhotranVPG.CONTROL_FLOW_EDGE_TYPE);
+                super(PhotranVPG.getInstance(), entryNodeRef, exitNodeRef, EdgeType.CONTROL_FLOW_EDGE_TYPE);
             }
 
             @Override protected IExecutableConstruct map(PhotranTokenRef tokenRef)

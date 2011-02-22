@@ -71,7 +71,7 @@ public abstract class VisibilityCollector extends BindingCollector
                     {
                         Definition def = vpg.getDefinitionFor(tr);
                         def.setVisibility(node.getAccessSpec(), enclosingScope);
-                        vpg.setDefinitionFor(tr, def);
+                        vpgProvider.setDefinitionFor(tr, def);
                     }
                 }
                 catch (Exception e)

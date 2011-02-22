@@ -122,7 +122,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
         tableViewer.setContentProvider(new VPGProblemContentProvider());
         tableViewer.setLabelProvider(new VPGProblemLabelProvider());
 
-        PhotranVPG.getInstance().log.addLogListener(this);
+        PhotranVPG.getInstance().getLog().addLogListener(this);
 
         createToolbarButtons();
         initEvents();
@@ -176,7 +176,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
                 {
                     if (!disposed)
                     {
-                        final List<IMarker> markers = PhotranVPG.getInstance().recomputeErrorLogMarkers();
+                        final List<IMarker> markers = PhotranVPG.getProvider().recomputeErrorLogMarkers();
                         
                         Table t = tableViewer.getTable();
                         

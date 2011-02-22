@@ -8,12 +8,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGWriter;
 
 /**
  * Performs name-binding analysis on a Fortran file, storing the results in the VPG.
  * <p>
- * This class should only be invoked by {@link PhotranVPGBuilder}; clients should use
+ * This class should only be invoked by {@link PhotranVPGWriter}; clients should use
  * {@link Token#resolveBinding()} and related methods to look up binding information.
  * 
  * @author Jeff Overbey
@@ -32,7 +32,7 @@ public class Binder
     {
         // Name-binding analysis                    Logging/timing
         // =======================================  ===========================================================
-        PhotranVPG vpg = PhotranVPG.getInstance();  String filename = file.getName();
+        PhotranVPGWriter vpg = PhotranVPG.getProvider();  String filename = file.getName();
                                                     StringBuilder sb = new StringBuilder("  - Binder#bind: "); //$NON-NLS-1$
         
                                                     long start = System.currentTimeMillis();
@@ -49,7 +49,7 @@ public class Binder
         
                                                     start = System.currentTimeMillis();
         ast.accept(new SubprogramTypeCollector());  logTime(start, SubprogramTypeCollector.class, filename);
-                                                    
+
                                                     start = System.currentTimeMillis();
         ast.accept(new ModuleLoader(file));         logTime(start, ModuleLoader.class, filename);
         // TODO: Type check here so derived type components can be resolved
@@ -57,8 +57,25 @@ public class Binder
         vpg.enableDefinitionCaching();
         ast.accept(new ReferenceCollector());
         vpg.disableDefinitionCaching();             logTime(start, ReferenceCollector.class, filename);
-                                                    vpg.debug(sb.toString(), ""); //$NON-NLS-1$
+                                                    PhotranVPG.getInstance().debug(sb.toString(), ""); //$NON-NLS-1$
     }
+
+//    public static void bindLazy(IFortranAST ast, IFile file)
+//    {
+//        // Name-binding analysis                    Logging/timing
+//        // =======================================  ===========================================================
+//        PhotranVPGContentProvider vpg = PhotranVPG.getProvider();  String filename = file.getName();
+//                                                    StringBuilder sb = new StringBuilder("  - Binder#bindLazy: "); //$NON-NLS-1$
+//        
+//                                                    long start = System.currentTimeMillis();
+//        ast.accept(new ModuleLoader(file));         logTime(start, ModuleLoader.class, filename);
+//        // TODO: Type check here so derived type components can be resolved
+//                                                    start = System.currentTimeMillis();
+//        vpg.enableDefinitionCaching();
+//        ast.accept(new ReferenceCollector());
+//        vpg.disableDefinitionCaching();             logTime(start, ReferenceCollector.class, filename);
+//                                                    PhotranVPG.getInstance().debug(sb.toString(), ""); //$NON-NLS-1$
+//    }
 
     private static void logTime(long start, Class<?> clazz, String filename)
     {

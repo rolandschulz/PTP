@@ -15,14 +15,13 @@ import org.eclipse.core.resources.WorkspaceJob;
 /**
  * A {@link WorkspaceJob} which accesses a VPG.
  * <p>
- * The job will be scheduled such that only one
- * VPG-accessing job is running at any point in time
+ * The job will be scheduled such that only one VPG-accessing job is running at any point in time
  * (using a {@link VPGSchedulingRule}).
  * <p>
  * <a href="../../../../overview-summary.html#Eclipse">More Information</a>
  * <p>
  * This class is intended to be subclassed directly.
- *
+ * 
  * @author Jeff Overbey
  * @see org.eclipse.core.resources.WorkspaceJob
  * 

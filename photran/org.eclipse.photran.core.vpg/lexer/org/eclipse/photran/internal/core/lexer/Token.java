@@ -17,17 +17,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.binding.VariableAccess;
 import org.eclipse.photran.internal.core.parser.ASTNodeUtil;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IASTVisitor;
+import org.eclipse.photran.internal.core.vpg.AnnotationType;
+import org.eclipse.photran.internal.core.vpg.EdgeType;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.util.OffsetLength;
-import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 
 /**
  * Tokens are returned by the lexical analyzer and serve as leaf nodes in the AST.
@@ -586,9 +586,9 @@ public class Token implements IToken, IASTNode
 			return result;
 		}
 		
-		for (VPGEdge<IFortranAST, Token, PhotranTokenRef> edge : PhotranVPG.getDatabase().getOutgoingEdgesFrom(getTokenRef(), PhotranVPG.BINDING_EDGE_TYPE))
+		for (PhotranTokenRef tokenRef : getTokenRef().followOutgoing(EdgeType.BINDING_EDGE_TYPE))
 		{
-    		def = PhotranVPG.getInstance().getDefinitionFor(edge.getSink());
+    		def = PhotranVPG.getInstance().getDefinitionFor(tokenRef);
     		if (def != null) result.add(def);
 		}
 		
@@ -609,9 +609,8 @@ public class Token implements IToken, IASTNode
         if (varAccessType == null)
         {
             varAccessType = (VariableAccess)
-                PhotranVPG.getDatabase().getAnnotation(
-                    getTokenRef(),
-                    PhotranVPG.VARIABLE_ACCESS_ANNOTATION_TYPE);
+                getTokenRef().getAnnotation(
+                    AnnotationType.VARIABLE_ACCESS_ANNOTATION_TYPE);
             if (varAccessType == null)
                 varAccessType = VariableAccess.NONE;
         }

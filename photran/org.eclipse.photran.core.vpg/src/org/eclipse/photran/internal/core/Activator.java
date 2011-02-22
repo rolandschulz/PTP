@@ -49,8 +49,8 @@ public class Activator extends Plugin {
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override public void stop(BundleContext context) throws Exception {
-        PhotranVPG.getInstance().log.writeToFile();
-	    PhotranVPG.getDatabase().close();
+        PhotranVPG.getInstance().getLog().writeToFile();
+        PhotranVPG.getInstance().close();
 		plugin = null;
 		super.stop(context);
 	}

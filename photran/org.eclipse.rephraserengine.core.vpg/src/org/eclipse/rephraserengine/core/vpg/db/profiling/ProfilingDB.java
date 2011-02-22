@@ -17,15 +17,14 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import org.eclipse.rephraserengine.core.util.Pair;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
-import org.eclipse.rephraserengine.core.vpg.VPG;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.VPGDB;
 import org.eclipse.rephraserengine.core.vpg.VPGDependency;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
-import org.eclipse.rephraserengine.core.vpg.VPGLog;
 
 /**
- * Collects information about the frequency and duration of VPG database method invocations.
+ * VPG database decorator which collects information about the frequency and duration of VPG
+ * database method invocations.
  * <p>
  * The collected information is displayed when the &quot;Print Database Statistic&quot; action is
  * invoked (from the Refactor &gt; (Debugging) menu).
@@ -34,7 +33,7 @@ import org.eclipse.rephraserengine.core.vpg.VPGLog;
  * each method call, and the longest amount of time spent in each method call.
  * 
  * @author Esfar Huq
- *
+ * 
  * @param <A> AST type
  * @param <T> token type
  * @param <R> TokenRef type
@@ -43,10 +42,10 @@ import org.eclipse.rephraserengine.core.vpg.VPGLog;
  * 
  * @since 3.0
  */
-public final class ProfilingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>, L extends VPGLog<T, R>>
-     extends VPGDB<A, T, R, L>
+public class ProfilingDB<A, T, R extends IVPGNode<T>>
+     extends VPGDB<A, T, R>
 {
-    private D db;
+    private VPGDB<A, T, R> db;
     
     /** Maps a method name to the number of calls made to the method */
     private HashMap<String, Integer> methodCalls;
@@ -57,26 +56,15 @@ public final class ProfilingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T
     /** Maps a method name to the elapsed time of the longest call for that method (in milliseconds) */
     private HashMap<String, Long> methodLongestCall;
     
-    public ProfilingDB(D diskDatabase)
+    public ProfilingDB(VPGDB<A, T, R> diskDatabase)
     {
+        super(diskDatabase);
+        
         db = diskDatabase;
         
         methodCalls = new HashMap<String, Integer>();
         methodTimes = new HashMap<String, Long>();
         methodLongestCall = new HashMap<String, Long>();
-    }
-
-    @Override public void setVPG(VPG<A, T, R, ? extends VPGDB<A, T, R, L>, L> vpg)
-    {
-        super.setVPG(vpg);
-
-        long startTime = System.currentTimeMillis();
-
-        db.setVPG(vpg);
-
-        long endTime = System.currentTimeMillis();
-
-        update("setVPG", endTime - startTime); //$NON-NLS-1$
     }
 
     /**

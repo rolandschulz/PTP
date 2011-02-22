@@ -35,7 +35,7 @@ import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGWriter;
 
 public abstract class DefinitionMap<T>
 {
@@ -48,7 +48,7 @@ public abstract class DefinitionMap<T>
 
     public DefinitionMap(ASTExecutableProgramNode ast)
     {
-        if (PhotranVPGBuilder.isEmpty(ast)) return;
+        if (PhotranVPGWriter.isEmpty(ast)) return;
         
         try
         {

@@ -27,6 +27,6 @@ public class DisplayVPGErrorLogAction extends VPGOutputWindowAction
     @Override
     protected void writeOutput(EclipseVPG vpg, PrintStream ps)
     {
-        vpg.log.printOn(ps);
+        vpg.getLog().printOn(ps);
     }
 }

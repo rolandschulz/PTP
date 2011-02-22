@@ -8,57 +8,34 @@ import java.io.Serializable;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.internal.core.Activator;
-import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.preferences.FortranPreferences;
+import org.eclipse.rephraserengine.core.vpg.VPGLog;
 import org.eclipse.rephraserengine.core.vpg.db.caching.CachingDB;
 import org.eclipse.rephraserengine.core.vpg.db.cdt.CDTDB;
-import org.eclipse.rephraserengine.core.vpg.db.profiling.ProfilingDB;
 
-
-public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef, ProfilingDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB.PhotranCDTDB, PhotranVPGLog>, PhotranVPGLog>
+/**
+ * Photran VPG database based on CDT's B-tree infrastructure and a caching decorator.
+ * 
+ * @author Jeff Overbey
+ */
+public class PhotranVPGDB1 extends CachingDB<IFortranAST, Token, PhotranTokenRef>
 {
-    public PhotranVPGDB()
+    public PhotranVPGDB1(PhotranVPGComponentFactory locator, File file, VPGLog<Token,PhotranTokenRef> log)
     {
-        super(new ProfilingDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB.PhotranCDTDB, PhotranVPGLog>(new PhotranCDTDB()), 500, 10000);
+        super(new PhotranCDTDB(locator, file, log), 500, 10000);
     }
 
-    static class PhotranCDTDB extends CDTDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGLog>
+    static class PhotranCDTDB extends CDTDB<IFortranAST, Token, PhotranTokenRef>
     {
-        public PhotranCDTDB()
+        private PhotranCDTDB(PhotranVPGComponentFactory locator, File file, VPGLog<Token,PhotranTokenRef> log)
         {
-            this(FortranCorePlugin.inTestingMode()
-                 ? createTempFile()
-                 : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "photran70vpg"); //$NON-NLS-1$
-        }
-
-        private PhotranCDTDB(String filename)
-        {
-            super(filename);
-
-            if (FortranPreferences.ENABLE_VPG_LOGGING.getValue())
-                System.out.println("Using Photran VPG database " + filename); //$NON-NLS-1$
-        }
-
-        private static String createTempFile()
-        {
-            try
-            {
-                File f = File.createTempFile("vpg", null); //$NON-NLS-1$
-                f.deleteOnExit();
-                return f.getAbsolutePath();
-            }
-            catch (IOException e)
-            {
-                throw new Error(e);
-            }
+            super(file, locator, log);
         }
 
         @Override
         protected long getModificationStamp(String filename)
         {
-            if (getVPG().isVirtualFile(filename)) return Long.MIN_VALUE;
+            if (PhotranVPG.getInstance().isVirtualFile(filename)) return Long.MIN_VALUE;
 
             IFile ifile = PhotranVPG.getIFileForFilename(filename);
             return ifile == null ? Integer.MIN_VALUE : ifile.getLocalTimeStamp();
@@ -115,7 +92,7 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
         // corresponding "real" file (whatever.f90) is parsed.
         // We should not delete them here, because populateVPG()
         // will not reconstruct them.
-        if (!getVPG().isVirtualFile(filename))
+        if (!PhotranVPG.getInstance().isVirtualFile(filename))
             super.deleteAllEdgesAndAnnotationsFor(filename);
     }
 
@@ -123,13 +100,13 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
 
     @Override public void enterHypotheticalMode() throws IOException
     {
-        ((PhotranVPG)getVPG()).moduleSymTabCache.clear();
+        PhotranVPG.getProvider().moduleSymTabCache.clear();
         super.enterHypotheticalMode();
     }
 
     @Override public void leaveHypotheticalMode() throws IOException
     {
-        ((PhotranVPG)getVPG()).moduleSymTabCache.clear();
+        PhotranVPG.getProvider().moduleSymTabCache.clear();
         super.leaveHypotheticalMode();
     }
 }

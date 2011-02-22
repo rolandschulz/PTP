@@ -10,30 +10,36 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.vpg;
 
+import java.io.Serializable;
+
 /**
- * A dependency in a VPG.
+ * A dependency in a VPG between two files.
  * <a href="../../../overview-summary.html#DEA">More Information</a>
  *
  * @author Jeff Overbey
+ * 
+ * @param <A> AST type
+ * @param <T> token type
+ * @param <R> {@link IVPGNode}/{@link NodeRef} type
  *
  * @since 1.0
  */
-public class VPGDependency<A, T, R extends TokenRef<T>>
+public class VPGDependency<A, T, R extends IVPGNode<T>> implements Serializable
 {
-	//private VPG<A, T, R, ?, ?> vpg;
-	private String dependentFile;
+    private static final long serialVersionUID = 1L;
+
+    private String dependentFile;
 	private String dependsOnFile;
 
     /**
      * Constructor. Creates a dependency between two files in the given VPG.
      * <p>
      * The dependency is <i>not</i> added to the VPG database automatically.
+     * 
+     * @since 3.0
      */
-	public VPGDependency(VPG<A, T, R, ?, ?> vpg,
-	                        String dependencyFrom,
-	                        String dependsOn)
+	public VPGDependency(String dependencyFrom, String dependsOn)
 	{
-		//this.vpg = vpg;
 		this.dependentFile = dependencyFrom;
 		this.dependsOnFile = dependsOn;
 	}

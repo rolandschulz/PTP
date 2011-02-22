@@ -102,7 +102,7 @@ public abstract class PhotranWorkspaceTestCase extends PhotranTestCase {
 			
 	        try {
 	            PhotranVPG.getInstance().releaseAllASTs();
-	            PhotranVPG.getDatabase().clearDatabase();
+	            PhotranVPG.getInstance().clearDatabase();
 	            
 	            cproject = CProjectHelper.createCCProject("PhotranTestProject" + (++n), "bin", IPDOMManager.ID_NO_INDEXER); //$NON-NLS-1$ //$NON-NLS-2$
 	            CProjectHelper.addNatureToProject(cproject.getProject(), FProjectNature.F_NATURE_ID, null);
@@ -168,7 +168,7 @@ public abstract class PhotranWorkspaceTestCase extends PhotranTestCase {
             project.close(new NullProgressMonitor());
             // To speed things up a bit and conserve memory...
             PhotranVPG.getInstance().releaseAllASTs();
-            PhotranVPG.getDatabase().clearDatabase();
+            PhotranVPG.getInstance().clearDatabase();
         }
         project = null;
 	}

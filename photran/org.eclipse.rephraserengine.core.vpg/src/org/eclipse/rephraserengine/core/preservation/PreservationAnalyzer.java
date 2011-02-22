@@ -18,6 +18,7 @@ import java.util.ListIterator;
 import org.eclipse.rephraserengine.core.preservation.ModelDiff.EdgeAdded;
 import org.eclipse.rephraserengine.core.preservation.ModelDiff.EdgeDeleted;
 import org.eclipse.rephraserengine.core.preservation.ModelDiff.EdgeSinkChanged;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge.Classification;
 
@@ -34,7 +35,7 @@ import org.eclipse.rephraserengine.core.vpg.VPGEdge.Classification;
  * 
  * @author Jeff Overbey
  */
-abstract class PreservationAnalyzer extends PreservationRuleset.Processor
+abstract class PreservationAnalyzer<A, T, R extends IVPGNode<T>> extends PreservationRuleset.Processor
 {
     @SuppressWarnings("serial")
     private static abstract class UnexpectedEdgeException extends Error
@@ -46,9 +47,10 @@ abstract class PreservationAnalyzer extends PreservationRuleset.Processor
             this.edge = edge;
         }
         
-        public VPGEdge<?,?,?> getEdge()
+        @SuppressWarnings("unchecked")
+        public <A, T, R extends IVPGNode<T>> VPGEdge<A,T,R> getEdge()
         {
-            return edge;
+            return (VPGEdge<A,T,R>)edge;
         }
     }
     
@@ -64,21 +66,21 @@ abstract class PreservationAnalyzer extends PreservationRuleset.Processor
         public UnexpectedFinalEdge(VPGEdge<?,?,?> edge) { super(edge); }
     }
     
-    private final Iterable<VPGEdge<?,?,?>> initialEdges;
-    private final Iterable<VPGEdge<?,?,?>> finalEdges;
+    private final Iterable<VPGEdge<A,T,R>> initialEdges;
+    private final Iterable<VPGEdge<A,T,R>> finalEdges;
     private final PreservationRuleset ruleset;
     
-    private final Iterator<VPGEdge<?,?,?>> initialIterator;
-    private final Iterator<VPGEdge<?,?,?>> finalIterator;
-    private VPGEdge<?,?,?> initialEdge;
-    private VPGEdge<?,?,?> finalEdge;
+    private final Iterator<VPGEdge<A,T,R>> initialIterator;
+    private final Iterator<VPGEdge<A,T,R>> finalIterator;
+    private VPGEdge<A,T,R> initialEdge;
+    private VPGEdge<A,T,R> finalEdge;
     
     private int targetType;
     private Classification targetClassification;
     
     public PreservationAnalyzer(
-        Collection<VPGEdge<?,?,?>> initialEdges,
-        Collection<VPGEdge<?,?,?>> finalEdges,
+        Collection<VPGEdge<A,T,R>> initialEdges,
+        Collection<VPGEdge<A,T,R>> finalEdges,
         PreservationRuleset ruleset)
     {
         this.initialEdges = initialEdges;
@@ -103,8 +105,8 @@ abstract class PreservationAnalyzer extends PreservationRuleset.Processor
             }
             catch (UnexpectedInitialEdge exception)
             {
-                VPGEdge<?,?,?> entry = exception.getEdge();
-                VPGEdge<?,?,?> otherEntry = findEdgeWithNewSink(entry);
+                VPGEdge<A,T,R> entry = exception.getEdge();
+                VPGEdge<A,T,R> otherEntry = findEdgeWithNewSink(entry);
                 if (otherEntry != null)
                 {
                     //that.edges.remove(otherEntry);
@@ -122,17 +124,17 @@ abstract class PreservationAnalyzer extends PreservationRuleset.Processor
             }
             catch (UnexpectedFinalEdge exception)
             {
-                VPGEdge<?,?,?> edge = exception.getEdge();
+                VPGEdge<A,T,R> edge = exception.getEdge();
                 diff.add(new EdgeAdded(edge));
             }
         }
     }
     
-    private VPGEdge<?,?,?> finalEdge(){ return getEdge(finalEdge); }
+    private VPGEdge<A,T,R> finalEdge(){ return getEdge(finalEdge); }
 
-    private VPGEdge<?,?,?> initialEdge() { return getEdge(initialEdge); }
+    private VPGEdge<A,T,R> initialEdge() { return getEdge(initialEdge); }
     
-    private VPGEdge<?,?,?> getEdge(VPGEdge<?,?,?> edge)
+    private VPGEdge<A,T,R> getEdge(VPGEdge<A,T,R> edge)
     {
         if (edge == null) return null;
         if (edge.getType() < targetType) throw new IllegalStateException("INTERNAL ERROR: Type " + targetType + " processing terminated prematurely"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -149,8 +151,8 @@ abstract class PreservationAnalyzer extends PreservationRuleset.Processor
 
     @Override void handlePreserveAll()
     {
-        VPGEdge<?,?,?> finalEdge = finalEdge();
-        VPGEdge<?,?,?> initialEdge = initialEdge();
+        VPGEdge<A,T,R> finalEdge = finalEdge();
+        VPGEdge<A,T,R> initialEdge = initialEdge();
         
         if (finalEdge != null && initialEdge == null)
         {
@@ -185,8 +187,8 @@ abstract class PreservationAnalyzer extends PreservationRuleset.Processor
     
     @Override void handlePreserveSubset()
     {
-        VPGEdge<?,?,?> finalEdge = finalEdge();
-        VPGEdge<?,?,?> initialEdge = initialEdge();
+        VPGEdge<A,T,R> finalEdge = finalEdge();
+        VPGEdge<A,T,R> initialEdge = initialEdge();
         
         if (finalEdge != null && initialEdge == null)
         {
@@ -234,9 +236,9 @@ abstract class PreservationAnalyzer extends PreservationRuleset.Processor
             throw new IllegalStateException("INTERNAL ERROR: Type " + type + " processing incomplete - final edge "+ finalEdge);  //$NON-NLS-1$//$NON-NLS-2$
     }
     
-    private VPGEdge<?,?,?> findEdgeWithNewSink(VPGEdge<?,?,?> initialEdge)
+    private VPGEdge<A,T,R> findEdgeWithNewSink(VPGEdge<A,T,R> initialEdge)
     {
-        for (VPGEdge<?,?,?> finalEdge : finalEdges)
+        for (VPGEdge<A,T,R> finalEdge : finalEdges)
         {
             if (finalEdge.getSource() != null
                 && finalEdge.getSource().equals(initialEdge.getSource())

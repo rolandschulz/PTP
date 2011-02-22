@@ -15,14 +15,13 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 /**
  * An {@link ISchedulingRule} for jobs which access a VPG.
  * <p>
- * Only one job with a <code>VPGSchedulingRule</code>
- * is allowed to run at any single point in time.
+ * Only one job with a {@link VPGSchedulingRule} is allowed to run at any single point in time.
  * <p>
- * This class is a Singleton; the singleton instance is
- * accessed via the {@link #getInstance()} method.
+ * This class is a Singleton; the singleton instance is accessed via the {@link #getInstance()}
+ * method.
  * <p>
  * <a href="../../../../overview-summary.html#Eclipse">More Information</a>
- *
+ * 
  * @author Jeff Overbey
  * 
  * @since 1.0

@@ -1,5 +1,6 @@
 package org.eclipse.rephraserengine.core.util;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -9,6 +10,8 @@ import java.util.Set;
  * This is essentially a table -- a big block of cells indexed by row and column.
  * 
  * @author Jeff Overbey
+ * @author Esfar Huq
+ * @author Rui Wang -- added method clone()
  * 
  * @param <RowType>
  * @param <ColType>
@@ -16,7 +19,8 @@ import java.util.Set;
  * 
  * @since 2.0
  */
-public final class TwoKeyHashMap<RowType, ColType, CellType> implements Iterable<CellType>
+@SuppressWarnings("serial")
+public final class TwoKeyHashMap<RowType, ColType, CellType> implements Iterable<CellType>, Serializable
 {
     protected HashMap<RowType, HashMap<ColType, CellType>> table = new HashMap<RowType, HashMap<ColType, CellType>>();
 
@@ -239,5 +243,22 @@ public final class TwoKeyHashMap<RowType, ColType, CellType> implements Iterable
     public Iterator<CellType> iterator()
     {
         return new ValueIterator();
+    }
+    
+    @Override
+    public Object clone()
+    {
+        TwoKeyHashMap<RowType, ColType, CellType> toReturn = new TwoKeyHashMap<RowType, ColType, CellType>();
+        
+        for (RowType r : table.keySet())
+        {
+            for (ColType c : table.get(r).keySet())
+            {
+                CellType t = table.get(r).get(c);
+                toReturn.put(r, c, t);
+            }
+        }
+        
+        return toReturn;
     }
 }

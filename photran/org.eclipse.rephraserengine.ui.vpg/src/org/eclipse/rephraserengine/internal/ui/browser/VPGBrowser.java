@@ -249,7 +249,7 @@ public class VPGBrowser
         fileNameArray = new ArrayList<String>();
         int i = 0;
         //this loops gets all the files from the workspace
-        for (String filename : (Iterable<String>)vpg.db.listAllFilenames())
+        for (String filename : (Iterable<String>)vpg.listAllFilenames())
         {
             fileList.add(filename);
             fileNameArray.add(filename);

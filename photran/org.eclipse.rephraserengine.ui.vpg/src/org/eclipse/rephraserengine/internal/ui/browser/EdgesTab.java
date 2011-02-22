@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 import org.eclipse.swt.SWT;
@@ -336,8 +336,8 @@ class EdgesTab
                     Color defaultColor = e.gc.getForeground();
                    //depending upon the type of edge the color of the edges and lines is decided.
                     e.gc.setForeground(setColor(edge.getType()));
-                    TokenRef source = edge.getSource();
-                    TokenRef sink = edge.getSink();
+                    IVPGNode source = edge.getSource();
+                    IVPGNode sink = edge.getSink();
                     
                     
                     if (source.getFilename().equals(filename) && sink.getFilename().equals(filename))
@@ -405,13 +405,12 @@ class EdgesTab
  
         edgesInFile = new ArrayList<VPGEdge< ? , ? , ? >>();
         
-        for (VPGEdge< ? , ? , ? > edge : (Iterable<VPGEdge< ? , ? , ? >>)vpg.db
-            .getAllEdgesFor(filename))
+        for (VPGEdge< ? , ? , ? > edge : (Iterable<VPGEdge< ? , ? , ? >>)vpg.getAllEdgesFor(filename))
             edgesInFile.add(edge);
         
         edgeTypes = new HashSet<Integer>();
         
-        for (VPGEdge<?,?,?> edge : (Iterable<VPGEdge<?,?,? >>)vpg.db.getAllEdgesFor(filename))
+        for (VPGEdge<?,?,?> edge : (Iterable<VPGEdge<?,?,? >>)vpg.getAllEdgesFor(filename))
             edgeTypes.add(edge.getType());
         
         edgeButton.setEnabled(edgeTypes.size() != 0);

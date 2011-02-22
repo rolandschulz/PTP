@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.VPG;
 
 /**
@@ -136,8 +136,8 @@ public final class ReplacementList implements Iterable<Replacement>
         return result;
     }
 
-    /** @return the initial model projection of the given {@link TokenRef} */
-    public <T, R extends TokenRef<T>> R projectInitial(R tokenRef, VPG<?,T,R,?,?> vpg)
+    /** @return the initial model projection of the given {@link IVPGNode} */
+    public <T, R extends IVPGNode<T>> R projectInitial(R tokenRef, VPG<?,T,R> vpg)
     {
         for (Replacement replacement : list)
             if (replacement.origIntervalContains(tokenRef))
@@ -146,14 +146,14 @@ public final class ReplacementList implements Iterable<Replacement>
         String filename = tokenRef.getFilename();
         int newOffset = offset(filename, tokenRef.getOffset());
         int newEndOffset = offset(filename, tokenRef.getEndOffset()-1)+1;
-        return vpg.createTokenRef(
+        return vpg.getVPGNode(
             filename,
             newOffset,
             newEndOffset - newOffset);
     }
 
-    /** @return the final model projection of the given {@link TokenRef} */
-    public <T, R extends TokenRef<T>> R projectFinal(R tokenRef, VPG<?,T,R,?,?> vpg)
+    /** @return the final model projection of the given {@link IVPGNode} */
+    public <T, R extends IVPGNode<T>> R projectFinal(R tokenRef, VPG<?,T,R> vpg)
     {
         for (Replacement replacement : list)
             if (replacement.newIntervalContains(tokenRef, this))

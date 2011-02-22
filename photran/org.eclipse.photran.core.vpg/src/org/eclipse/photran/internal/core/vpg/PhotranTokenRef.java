@@ -13,18 +13,23 @@ package org.eclipse.photran.internal.core.vpg;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.rephraserengine.core.util.OffsetLength;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.NodeRef;
+import org.eclipse.rephraserengine.core.vpg.VPG;
 
 /**
  * A reference to a token in a Fortran AST (used by the VPG).
  * 
  * @author Jeff Overbey
+ * 
+ * @see PhotranVPG
  */
-public class PhotranTokenRef extends TokenRef<Token> implements IPhotranSerializable //, Comparable<PhotranTokenRef>
+public class PhotranTokenRef extends NodeRef<Token> implements IPhotranSerializable //, Comparable<PhotranTokenRef>
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -55,12 +60,21 @@ public class PhotranTokenRef extends TokenRef<Token> implements IPhotranSerializ
 	{
 		return PhotranVPG.getIFileForFilename(getFilename());
 	}
+    
+    @Override public Token getASTNode()
+    {
+        return findToken();
+    }
 	
 	public Token findToken()
 	{
 		try
 		{
-			return PhotranVPG.getInstance().findToken(this);
+	        IFortranAST ast = PhotranVPG.getInstance().acquireTransientAST(getFilename());
+	        if (ast == null)
+	            return null;
+	        else
+	            return ast.findTokenByStreamOffsetLength(getOffset(), getLength());
 		}
 		catch (Exception e)
 		{
@@ -70,7 +84,7 @@ public class PhotranTokenRef extends TokenRef<Token> implements IPhotranSerializ
 	
 	public Token findTokenOrReturnNull()
 	{
-		return PhotranVPG.getInstance().findToken(this);
+		return findToken();
 	}
 	
 	public String getText()
@@ -86,7 +100,66 @@ public class PhotranTokenRef extends TokenRef<Token> implements IPhotranSerializ
         if (result == 0) result = Integer.valueOf(this.getLength()).compareTo(that.getLength());
         return result;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // AST Mapping
+    ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Returns a list of the tokens pointed at by an edge extending from the given token.
+     * <p>
+     * To only return edges of a particular type, set the <code>edgeType</code>
+     * parameter to that type.
+     *
+     * @param edgeType the type of edge (an arbitrary non-negative integer), or
+     *                 {@link VPG#ALL_EDGES} to process all edges, regardless
+     *                 of type
+     * @since 3.0
+     */
+    @SuppressWarnings("unchecked")
+    @Override public Iterable<PhotranTokenRef> followOutgoing(int edgeType)
+    {
+        return super.followOutgoing(edgeType);
+    }
+
+    public Iterable<PhotranTokenRef> followOutgoing(EdgeType edgeType)
+    {
+        return super.followOutgoing(edgeType.ordinal());
+    }
+
+    /**
+     * Returns a list of the tokens which have an edges pointing at the given token.
+     * <p>
+     * To only return edges of a particular type, set the <code>edgeType</code>
+     * parameter to that type.
+     *
+     * @param edgeType the type of edge (an arbitrary non-negative integer), or
+     *                 {@link VPG#ALL_EDGES} to process all edges, regardless
+     *                 of type
+     * @since 3.0
+     */
+    @SuppressWarnings("unchecked")
+    @Override public Iterable<PhotranTokenRef> followIncoming(int edgeType)
+    {
+        return super.followIncoming(edgeType);
+    }
+
+    public Iterable<PhotranTokenRef> followIncoming(EdgeType edgeType)
+    {
+        return super.followIncoming(edgeType.ordinal());
+    }
     
+    public <R extends Serializable> R getAnnotation(AnnotationType annotationType)
+    {
+        return super.getAnnotation(annotationType.ordinal());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override protected PhotranVPG getVPG()
+    {
+        return PhotranVPG.getInstance();
+    }
+
     ////////////////////////////////////////////////////////////////////////////////
     // IPhotranSerializable Implementation
     ////////////////////////////////////////////////////////////////////////////////

@@ -56,7 +56,6 @@ import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IInterfaceSpecification;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
 
 /**
  * Phase 3 of name-binding analysis.
@@ -75,7 +74,7 @@ class DefinitionCollector extends BindingCollector
 
     public DefinitionCollector(IFile file)
     {
-    	this.vpg = (PhotranVPGBuilder)PhotranVPG.getInstance();
+    	this.vpgProvider = PhotranVPG.getProvider();
     	
         this.file = file;
     }
@@ -250,7 +249,7 @@ class DefinitionCollector extends BindingCollector
             {
                 Token commonBlockName = list.get(i).getName().getCommonBlockName();
                 addDefinition(commonBlockName, Definition.Classification.COMMON_BLOCK);
-                vpg.markFileAsUsingCommonBlock(file, commonBlockName.getText());
+                vpgProvider.markFileAsUsingCommonBlock(file, commonBlockName.getText());
             }
         }
     }

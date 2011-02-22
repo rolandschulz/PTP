@@ -18,7 +18,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.rephraserengine.core.preservation.ModelDiff.ModelDiffProcessor;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 
@@ -140,7 +140,7 @@ final class ModelDiff
 
         public IRegion getNewSinkRegion()
         {
-            TokenRef<?> newSink = newEdge.getSink();
+            IVPGNode<?> newSink = newEdge.getSink();
             return new Region(newSink.getOffset(), newSink.getLength());
         }
 

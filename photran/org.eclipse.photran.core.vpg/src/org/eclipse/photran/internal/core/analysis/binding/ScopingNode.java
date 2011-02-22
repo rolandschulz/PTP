@@ -80,9 +80,11 @@ import org.eclipse.photran.internal.core.parser.IInterfaceSpecification;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
 import org.eclipse.photran.internal.core.parser.IModuleBodyConstruct;
 import org.eclipse.photran.internal.core.util.Notification;
+import org.eclipse.photran.internal.core.vpg.AnnotationType;
+import org.eclipse.photran.internal.core.vpg.EdgeType;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGWriter;
 
 /**
  * An AST node representing a scope.
@@ -532,7 +534,7 @@ public abstract class ScopingNode extends ASTNode
 
     public ImplicitSpec getImplicitSpec()
     {
-    	return (ImplicitSpec)PhotranVPG.getDatabase().getAnnotation(getRepresentativeToken(), PhotranVPG.SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE);
+    	return getRepresentativeToken().getAnnotation(AnnotationType.SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE);
     }
 
     public boolean isImplicitNone()
@@ -542,7 +544,7 @@ public abstract class ScopingNode extends ASTNode
 
     public boolean isDefaultVisibilityPrivate()
     {
-		return PhotranVPG.getDatabase().getAnnotation(getRepresentativeToken(), PhotranVPG.SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE) != null;
+		return getRepresentativeToken().getAnnotation(AnnotationType.SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE) != null;
     }
 
     public boolean isParentScopeOf(ScopingNode scope)
@@ -685,7 +687,7 @@ public abstract class ScopingNode extends ASTNode
 	    if (tr.getOffset() < 0)
 	        return vpg.acquireTransientAST(tr.getFilename()).getRoot();
 	    else
-	        return vpg.findToken(tr).findNearestAncestor(ScopingNode.class);
+	        return tr.findToken().findNearestAncestor(ScopingNode.class);
 	}
 
 	private HashMap<String, List<PhotranTokenRef>> definitionCache = new HashMap<String, List<PhotranTokenRef>>();
@@ -693,7 +695,7 @@ public abstract class ScopingNode extends ASTNode
     public List<PhotranTokenRef> manuallyResolve(Token identifier)
     {
         String canonicalizedIdentifier = null;
-        if (PhotranVPG.getInstance().isDefinitionCachingEnabled())
+        if (PhotranVPG.getProvider().isDefinitionCachingEnabled())
         {
             canonicalizedIdentifier = PhotranVPG.canonicalizeIdentifier(identifier.getText());
             if (definitionCache.containsKey(canonicalizedIdentifier))
@@ -710,7 +712,7 @@ public abstract class ScopingNode extends ASTNode
 			}
     	});
 
-        if (PhotranVPG.getInstance().isDefinitionCachingEnabled())
+        if (PhotranVPG.getProvider().isDefinitionCachingEnabled())
             definitionCache.put(canonicalizedIdentifier, bindings);
 
     	return bindings;
@@ -792,14 +794,14 @@ public abstract class ScopingNode extends ASTNode
     	Definition def = Intrinsic.resolve(identifier);
 		if (def == null) return false;
 
-		((PhotranVPGBuilder)PhotranVPG.getInstance()).setDefinitionFor(identifier.getTokenRef(), def);
+		PhotranVPG.getProvider().setDefinitionFor(identifier.getTokenRef(), def);
         bindings.foundDefinition(def.getTokenRef(), getGlobalScope());
 		return true;
 	}
 
 	private void attemptToDeclareImplicit(Token identifier, BindingResolutionCallback bindings)
 	{
-		PhotranVPGBuilder vpg = (PhotranVPGBuilder)PhotranVPG.getInstance();
+		PhotranVPGWriter vpg = PhotranVPG.getProvider();
 		ImplicitSpec implicitSpec = getImplicitSpec();
 
 		if (implicitSpec == null) return; // Implicit None
@@ -858,7 +860,7 @@ public abstract class ScopingNode extends ASTNode
 		PhotranVPG vpg = PhotranVPG.getInstance();
 		List<Definition> result = new LinkedList<Definition>();
 
-    	for (PhotranTokenRef t : vpg.db.getIncomingEdgeSources(this.getRepresentativeToken(), PhotranVPG.DEFINED_IN_SCOPE_EDGE_TYPE))
+    	for (PhotranTokenRef t : this.getRepresentativeToken().followIncoming(EdgeType.DEFINED_IN_SCOPE_EDGE_TYPE))
     		result.add(vpg.getDefinitionFor(t));
 
 //    	for (PhotranTokenRef t : vpg.db.getIncomingEdgeSources(this.getRepresentativeToken(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
@@ -965,7 +967,7 @@ public abstract class ScopingNode extends ASTNode
 
     public String getName()
     {
-        return getName(PhotranVPG.getDatabase().isInHypotheticalMode());
+        return getName(PhotranVPG.getInstance().isInHypotheticalMode());
     }
 
     public String getName(boolean force)
@@ -976,7 +978,7 @@ public abstract class ScopingNode extends ASTNode
 
     public Token getNameToken()
     {
-        return getNameToken(PhotranVPG.getDatabase().isInHypotheticalMode());
+        return getNameToken(PhotranVPG.getInstance().isInHypotheticalMode());
     }
 
     public Token getNameToken(boolean force)

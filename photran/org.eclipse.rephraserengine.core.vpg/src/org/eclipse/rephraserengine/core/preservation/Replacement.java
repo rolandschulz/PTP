@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.preservation;
 
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 
 /**
  * A replacement [ i, j ) <small>//</small> [ i, k ), i.e., an object representing
@@ -108,14 +108,14 @@ public final class Replacement
             || this.getOffset() >= that.getOrigEndOffset();
     }
     
-    boolean origIntervalContains(TokenRef<?> tokenRef)
+    boolean origIntervalContains(IVPGNode<?> tokenRef)
     {
         return filename.equals(tokenRef.getFilename())
             && this.offset <= tokenRef.getOffset()
             && tokenRef.getEndOffset() <= this.getOrigEndOffset();
     }
     
-    boolean newIntervalContains(TokenRef<?> tokenRef, ReplacementList list)
+    boolean newIntervalContains(IVPGNode<?> tokenRef, ReplacementList list)
     {
         if (!filename.equals(tokenRef.getFilename())) return false;
         

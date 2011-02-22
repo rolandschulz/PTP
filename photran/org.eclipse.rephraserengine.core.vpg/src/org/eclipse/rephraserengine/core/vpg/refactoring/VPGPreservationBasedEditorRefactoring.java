@@ -7,15 +7,13 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.rephraserengine.core.preservation.PreservationAnalysis;
 import org.eclipse.rephraserengine.core.preservation.PreservationRuleset;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
-import org.eclipse.rephraserengine.core.vpg.VPGDB;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
-import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPGLog;
 
 /**
  * @since 2.0
  */
-public abstract class VPGPreservationBasedEditorRefactoring<A, T, V extends EclipseVPG<A, T, ? extends TokenRef<T>, ? extends VPGDB<A, T, ?, ?>, ? extends EclipseVPGLog<T, ?>>>
+public abstract class VPGPreservationBasedEditorRefactoring<A, T, V extends EclipseVPG<A, T, ? extends IVPGNode<T>>>
     extends VPGEditorRefactoring<A, T, V>
 {
     protected PreservationAnalysis preservation = null;

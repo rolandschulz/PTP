@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.analysis.loops.ASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.parser.ASTContinueStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTLblRefNode;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
@@ -72,7 +73,7 @@ public class RemoveUnreferencedLabelsRefactoring extends FortranEditorRefactorin
     {
         ScopingNode scope = this.astOfFileInEditor.getRoot(); 
       
-        scope.accept(new ASTVisitor()
+        scope.accept(new ASTVisitorWithLoops()
         {            
             // Visit IActionStmt Nodes
             @Override public void visitIActionStmt (IActionStmt node)
@@ -110,10 +111,10 @@ public class RemoveUnreferencedLabelsRefactoring extends FortranEditorRefactorin
     private void collectAllLabels(ScopingNode scope)
     {
         // Visit the AST 
-        scope.accept(new ASTVisitor()
+        scope.accept(new ASTVisitorWithLoops()
         {            
             // Visit IActionStmt Nodes
-            @Override public void  visitIActionStmt (IActionStmt node)
+            @Override public void visitIActionStmt (IActionStmt node)
             {
                 // get the statements labeled
                 if (node.getLabel()!=null) 
@@ -129,7 +130,7 @@ public class RemoveUnreferencedLabelsRefactoring extends FortranEditorRefactorin
     private void collectAllReferences(ScopingNode scope)
     {
         // Visit the AST 
-        scope.accept(new ASTVisitor()
+        scope.accept(new ASTVisitorWithLoops()
         {    
             //ASTLblRefNode
             @Override public void visitASTLblRefNode(ASTLblRefNode node)

@@ -25,8 +25,9 @@ import java.util.LinkedList;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.rephraserengine.core.util.Pair;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
-import org.eclipse.rephraserengine.core.vpg.VPG;
+import org.eclipse.rephraserengine.core.vpg.IVPGComponentFactory;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
+import org.eclipse.rephraserengine.core.vpg.NodeRef;
 import org.eclipse.rephraserengine.core.vpg.VPGDB;
 import org.eclipse.rephraserengine.core.vpg.VPGDependency;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
@@ -34,64 +35,58 @@ import org.eclipse.rephraserengine.core.vpg.VPGLog;
 import org.eclipse.rephraserengine.internal.core.vpg.db.cdt.InternalCDTDB;
 import org.eclipse.rephraserengine.internal.core.vpg.db.cdt.InternalCDTDB.IntVector;
 
-
 /**
- * Base class for a typical Virtual Program Graph with a database maintained on disk using the
- * Eclipse C/C++ Development Tool's internal indexer database.
+ * Base class for a VPG database maintained on disk using the B-tree infrastructure from the Eclipse
+ * C/C++ Development Tool's indexer database.
  * <p>
- * This class is intended to be subclassed directly, although Eclipse-based VPGs will subclass
- * <code>EclipseVPG</code> instead.
- * Subclasses must implement the language-specific (parser/AST) methods.
+ * This class is intended to be subclassed directly.
  * <p>
  * N.B. You <i>must</i> call {@link #close()} to flush the database to disk.
- * <p>
- * N.B. See several important notes in the JavaDoc for {@link VPG}.
- *
+ * 
  * @author Jeff Overbey
- *
+ * 
  * @param <A> AST type
  * @param <T> token type
- * @param <R> TokenRef type
- * @param <L> log type
+ * @param <R> {@link IVPGNode}/{@link NodeRef} type
  * 
  * @since 1.0
  */
-public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
-              extends VPGDB<A, T, R, L>
+public abstract class CDTDB<A, T, R extends IVPGNode<T>>
+              extends VPGDB<A, T, R>
 {
     private InternalCDTDB db;
     private File lock;
+    
+    private final VPGLog<T, R> log;
 
-    public CDTDB(String filename)
+    /**
+     * @since 3.0
+     */
+    public CDTDB(String filename, IVPGComponentFactory<A, T, R> locator, VPGLog<T, R> log)
     {
-        this(new File(filename));
+        this(new File(filename), locator, log);
     }
 
-    public CDTDB(File file)
+    /**
+     * @since 3.0
+     */
+    public CDTDB(File file, IVPGComponentFactory<A, T, R> locator, VPGLog<T, R> log)
     {
-        super();
+        super(locator);
 
         Assert.isNotNull(file);
 
         try
         {
-            lock = new File(file.getPath() + ".lock"); //$NON-NLS-1$
-            db = new InternalCDTDB(file);
+            this.log = log;
+            this.db = new InternalCDTDB(file);
+            this.lock = new File(file.getPath() + ".lock"); //$NON-NLS-1$
+            clearDBIfPossiblyCorrupted();
         }
         catch (CoreException e)
         {
             throw new Error("Unable to create VPG database " + file.getName(), e); //$NON-NLS-1$
         }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    // VPG DATABASE METHODS
-    ////////////////////////////////////////////////////////////////////////////
-
-    @Override public void setVPG(VPG<A, T, R, ? extends VPGDB<A, T, R, L>, L> vpg)
-    {
-        super.setVPG(vpg);
-        clearDBIfPossiblyCorrupted();
     }
 
     /**
@@ -124,6 +119,10 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // VPG DATABASE METHODS
+    ////////////////////////////////////////////////////////////////////////////
+
     @Override public void flush()
     {
         try
@@ -151,7 +150,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
 
     @Override public void clearDatabase()
     {
-        getVPG().log.clear();
+        log.clear();
 
         try
         {
@@ -159,7 +158,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -224,7 +223,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -263,7 +262,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -277,7 +276,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -289,7 +288,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -301,7 +300,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -319,7 +318,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -331,7 +330,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
             return Collections.<String>emptyList();
         }
     }
@@ -344,7 +343,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
             return Collections.<String>emptyList();
         }
     }
@@ -357,7 +356,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
             return Collections.<String>emptyList();
         }
     }
@@ -372,7 +371,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -388,7 +387,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -421,7 +420,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
                             }
                             catch (CoreException e)
                             {
-                                getVPG().log.logError(e);
+                                log.logError(e);
                                 throw new Error(e);
                             }
                         }
@@ -436,7 +435,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
             return new LinkedList<String>();
         }
     }
@@ -469,7 +468,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
                             }
                             catch (CoreException e)
                             {
-                                getVPG().log.logError(e);
+                                log.logError(e);
                                 throw new Error(e);
                             }
                         }
@@ -485,7 +484,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
             return new LinkedList<String>();
         }
     }
@@ -502,7 +501,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -518,7 +517,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -550,15 +549,15 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
                                 IntVector records = (nextRecord < inRecords.size() ? inRecords : outRecords);
                                 int recordNum     = (nextRecord < inRecords.size() ? nextRecord : nextRecord-inRecords.size());
 
-                                R fromRef = getVPG().createTokenRef(db.files.getFilename(db.edges.getFromFileRecordPtr(records.get(recordNum))).getString(), db.edges.getFromOffset(records.get(recordNum)), db.edges.getFromLength(records.get(recordNum)));
-                                R toRef = getVPG().createTokenRef(db.files.getFilename(db.edges.getToFileRecordPtr(records.get(recordNum))).getString(), db.edges.getToOffset(records.get(recordNum)), db.edges.getToLength(records.get(recordNum)));
-                                VPGEdge<A, T, R> result = getVPG().createEdge(fromRef, toRef, db.edges.getEdgeType(records.get(recordNum)));
+                                R fromRef = factory.getVPGNode(db.files.getFilename(db.edges.getFromFileRecordPtr(records.get(recordNum))).getString(), db.edges.getFromOffset(records.get(recordNum)), db.edges.getFromLength(records.get(recordNum)));
+                                R toRef = factory.getVPGNode(db.files.getFilename(db.edges.getToFileRecordPtr(records.get(recordNum))).getString(), db.edges.getToOffset(records.get(recordNum)), db.edges.getToLength(records.get(recordNum)));
+                                VPGEdge<A, T, R> result = new VPGEdge<A,T,R>(fromRef, toRef, db.edges.getEdgeType(records.get(recordNum)));
                                 nextRecord++;
                                 return result;
                             }
                             catch (CoreException e)
                             {
-                                getVPG().log.logError(e);
+                                log.logError(e);
                                 throw new Error(e);
                             }
                         }
@@ -573,7 +572,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
             return new LinkedList<VPGEdge<A, T, R>>();
         }
     }
@@ -605,13 +604,13 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
                         {
                             try
                             {
-                                R fromRef = getVPG().createTokenRef(db.files.getFilename(db.edges.getFromFileRecordPtr(records.get(nextRecord))).getString(), db.edges.getFromOffset(records.get(nextRecord)), db.edges.getFromLength(records.get(nextRecord)));
-                                R toRef = getVPG().createTokenRef(db.files.getFilename(db.edges.getToFileRecordPtr(records.get(nextRecord))).getString(), db.edges.getToOffset(records.get(nextRecord)), db.edges.getToLength(records.get(nextRecord)));
-                                return getVPG().createEdge(fromRef, toRef, db.edges.getEdgeType(records.get(nextRecord++)));
+                                R fromRef = factory.getVPGNode(db.files.getFilename(db.edges.getFromFileRecordPtr(records.get(nextRecord))).getString(), db.edges.getFromOffset(records.get(nextRecord)), db.edges.getFromLength(records.get(nextRecord)));
+                                R toRef = factory.getVPGNode(db.files.getFilename(db.edges.getToFileRecordPtr(records.get(nextRecord))).getString(), db.edges.getToOffset(records.get(nextRecord)), db.edges.getToLength(records.get(nextRecord)));
+                                return new VPGEdge<A,T,R>(fromRef, toRef, db.edges.getEdgeType(records.get(nextRecord++)));
                             }
                             catch (CoreException e)
                             {
-                                getVPG().log.logError(e);
+                                log.logError(e);
                                 throw new Error(e);
                             }
                         }
@@ -626,7 +625,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
             return new LinkedList<VPGEdge<A, T, R>>();
         }
     }
@@ -658,13 +657,13 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
                         {
                             try
                             {
-                                R fromRef = getVPG().createTokenRef(db.files.getFilename(db.edges.getFromFileRecordPtr(records.get(nextRecord))).getString(), db.edges.getFromOffset(records.get(nextRecord)), db.edges.getFromLength(records.get(nextRecord)));
-                                R toRef = getVPG().createTokenRef(db.files.getFilename(db.edges.getToFileRecordPtr(records.get(nextRecord))).getString(), db.edges.getToOffset(records.get(nextRecord)), db.edges.getToLength(records.get(nextRecord)));
-                                return getVPG().createEdge(fromRef, toRef, db.edges.getEdgeType(records.get(nextRecord++)));
+                                R fromRef = factory.getVPGNode(db.files.getFilename(db.edges.getFromFileRecordPtr(records.get(nextRecord))).getString(), db.edges.getFromOffset(records.get(nextRecord)), db.edges.getFromLength(records.get(nextRecord)));
+                                R toRef = factory.getVPGNode(db.files.getFilename(db.edges.getToFileRecordPtr(records.get(nextRecord))).getString(), db.edges.getToOffset(records.get(nextRecord)), db.edges.getToLength(records.get(nextRecord)));
+                                return new VPGEdge<A,T,R>(fromRef, toRef, db.edges.getEdgeType(records.get(nextRecord++)));
                             }
                             catch (CoreException e)
                             {
-                                getVPG().log.logError(e);
+                                log.logError(e);
                                 throw new Error(e);
                             }
                         }
@@ -680,7 +679,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
             return new LinkedList<VPGEdge<A, T, R>>();
         }
     }
@@ -695,7 +694,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (Exception e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -708,7 +707,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
         }
     }
 
@@ -724,7 +723,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (Exception e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
             return null;
         }
     }
@@ -753,7 +752,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
                         {
                             try
                             {
-                                R tokenRef = getVPG().createTokenRef(
+                                R tokenRef = factory.getVPGNode(
                                     db.files.getFilename(db.annotations.getFileRecordPtr(records.get(nextRecord))).getString(),
                                     db.annotations.getOffset(records.get(nextRecord)),
                                     db.annotations.getLength(records.get(nextRecord)));
@@ -763,7 +762,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
                             }
                             catch (CoreException e)
                             {
-                                getVPG().log.logError(e);
+                                log.logError(e);
                                 throw new Error(e);
                             }
                         }
@@ -778,7 +777,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            getVPG().log.logError(e);
+            log.logError(e);
             return new LinkedList<Pair<R, Integer>>();
         }
     }
@@ -839,7 +838,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
             }
             catch (Exception e)
             {
-                getVPG().log.logError(e);
+                log.logError(e);
             }
         }
         catch (Exception e)

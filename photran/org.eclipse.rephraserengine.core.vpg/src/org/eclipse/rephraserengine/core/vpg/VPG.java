@@ -10,89 +10,111 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.vpg;
 
-import java.lang.ref.WeakReference;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.rephraserengine.core.util.Pair;
+import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 
 /**
- * Base class for a Virtual Program Graph.  <a href="../../../overview-summary.html#VPG">More Information</a>
+ * Base class for a Virtual Program Graph. <a href="../../../overview-summary.html#VPG">More
+ * Information</a>
  * <p>
- * Usually, this class should not be subclassed directly; instead, subclass one of the <code>StandardVPG</code>
- * classes or the <code>EclipseVPG</code> class.
+ * This class may be subclassed directly, although in an Eclipse environment, clients will usually
+ * subclass {@link EclipseVPG} instead.
  * <p>
- * N.B. Transient ASTS <b>require</b> the AST to have bi-directional pointers.  Otherwise, the portion of the tree
- * above the acquired token can be garbage collected!
- * <p>
- * N.B. If a VPG inherits subclasses {@link VPGEdge} to create custom edge types, it <i>must</i>
- * override {@link StandardVPG#createEdge(TokenRef, TokenRef, int)}.  This method is called when edges are created
- * based on data in the database.  By default, its creates edges of type {@link VPGEdge}; subclasses must override
- * it to create edges of the proper subclass(es).  Otherwise, an edge may have a subclass type originally but later
- * have the {@link VPGEdge} type when it is reconstructed from the database.
- * <p>
- * Similarly, if a VPG subclasses {@link TokenRef}, it must override {@link #createEdge(TokenRef, TokenRef, int)}.
- *
+ * <i>Requirements/assumptions:</i>
+ * <ul>
+ * <li>Transient ASTs <b>require</b> the AST to have bi-directional pointers. Otherwise, the portion
+ * of the tree above the acquired token can be garbage collected!
+ * </ul>
+ * 
  * @author Jeff Overbey
- *
+ * 
  * @param <A> AST type
  * @param <T> token type
- * @param <R> TokenRef type
- * @param <D> database type
- * @param <L> error/warning log type
+ * @param <R> {@link IVPGNode}/{@link NodeRef} type
  * 
  * @since 1.0
  */
-public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>, L extends VPGLog<T, R>>
+public abstract class VPG<A, T, R extends IVPGNode<T>>
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // Fields
-    ///////////////////////////////////////////////////////////////////////////
-
-	/** Cache of ASTs acquired using {@link #acquirePermanentAST(String)} or converted
-	 *  using {@link #makeTransientASTPermanent(String)}. */
-	protected HashMap<String, A> permanentASTs;
-
-	/** Cache of ASTs acquired using {@link #acquireTransientAST(String)}. */
-	protected HashMap<String, WeakReference<A>> transientASTs;
-
-	/** Small queue of <i>recent</i> ASTs acquired using {@link #acquireTransientAST(String)}. */
-	protected Object[] transientASTCache;
-	private int transientASTCacheIndex = 0;
-
-	/** The VPG database, which persists edges and annotations. */
-	public final D db;
+    /** The VPG component factory, which creates the database, log, etc. for this VPG. */
+    private final IVPGComponentFactory<A, T, R> factory;
+    
+    /** The VPG writer, which populates the dependencies, edges, and annotations in this VPG. */
+    private final VPGWriter<A, T, R> vpgWriter;
+    
+    /** The AST cache, which provides access to ASTs and determines which files' ASTs are in memory. */
+    private final ASTRepository<A> astCache;
+    
+    /** The VPG database, which stores and persists the VPG's dependencies, edges, and annotations. */
+    private final DemandDB<A, T, R> db;
 
 	/** The VPG error/warning log. */
-	public final VPGLog<T, R> log;
+	private final VPGLog<T, R> log;
 
     ///////////////////////////////////////////////////////////////////////////
     // Constructor
     ///////////////////////////////////////////////////////////////////////////
 
-    protected VPG(L log, D database)
+	/** @since 3.0 */
+    protected VPG(IVPGComponentFactory<A, T, R> factory)
     {
-        this(log, database, 5);
+        this(factory, 5);
     }
 
-	protected VPG(L log, D database, int transientASTCacheSize)
+    /** @since 3.0 */
+	protected VPG(IVPGComponentFactory<A, T, R> factory, int transientASTCacheSize)
 	{
-	    assert transientASTCacheSize > 0;
+        assert transientASTCacheSize > 0;
 
-		this.transientASTs = new HashMap<String, WeakReference<A>>();
-		this.permanentASTs = new HashMap<String, A>();
-		this.transientASTCache = new Object[transientASTCacheSize];
-        this.log = log;
-        this.log.setVPG(this);
-		this.db = database;
-		this.db.setVPG(this); // CDTDB requires the log to be set before this call
+        this.factory = factory;
+        this.log = factory.createLog();
+        this.db = new DemandDB<A,T,R>(factory.createDatabase(log));
+        this.vpgWriter = factory.createVPGWriter(db, log);
+        db.setContentProvider(vpgWriter);
+
+        this.astCache = new ASTRepository<A>(transientASTCacheSize);
 	}
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // ACCESSORS
+    ////////////////////////////////////////////////////////////////////////////
+
+    /** @since 3.0 */
+    @SuppressWarnings("unchecked")
+    public <W extends VPGWriter<A, T, R>> W getVPGWriter()
+    {
+        return (W)vpgWriter;
+    }
+    
+    /** @since 3.0 */
+    public VPGLog<T, R> getLog()
+    {
+        return log;
+    }
+    
+    /*package*/ VPGDB<A, T, R> getDB()
+    {
+        return db;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // CALLBACK: AST CONSTRUCTION
+    ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Parses the given file.
+     * @param filename (non-null)
+     * @return an AST for the given file, or <code>null</code> if an error was encountered
+     */
+    protected abstract A parse(String filename);
 
 	////////////////////////////////////////////////////////////////////////////
 	// API: AST ACQUISITION/RELEASE
@@ -101,204 +123,17 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 	/** @return an AST for the given file which will be garbage collected after
 	 *  no pointers to any of its nodes remain.
 	 */
-	public A acquireTransientAST(String filename)
+	public final A acquireTransientAST(String filename)
 	{
-		return acquireTransientAST(filename, false);
-	}
-
-	private A acquireTransientAST(String filename, boolean forceRecomputationOfEdgesAndAnnotations)
-	{
-		if (isVirtualFile(filename) || !shouldProcessFile(filename)) return null;
-
-		A ast = null;
-
-		if (!forceRecomputationOfEdgesAndAnnotations)
-		{
-			if (permanentASTs.containsKey(filename))
-				ast = permanentASTs.get(filename);
-			else if (transientASTs.containsKey(filename))
-				ast = transientASTs.get(filename).get();
-
-			if (ast != null) return ast;
-		}
-
-	    boolean shouldComputeEdgesAndAnnotations =
-	        forceRecomputationOfEdgesAndAnnotations || db.isOutOfDate(filename);
-	    
-        if (shouldComputeEdgesAndAnnotations)
-	        log.clearEntriesFor(filename);
-
-		long start = System.currentTimeMillis();
-		ast = parse(filename);
-		long parseTime = System.currentTimeMillis() - start;
-
-		if (ast != null)
-		{
-			WeakReference<A> astRef = new WeakReference<A>(ast);
-			transientASTs.put(filename, astRef);
-			//astFilenames.put(astRef, filename);
-
-			transientASTCache[transientASTCacheIndex] = ast;
-			transientASTCacheIndex = (transientASTCacheIndex+1) % transientASTCache.length;
-		}
-
-		long computeTime = -1L;
-		if (shouldComputeEdgesAndAnnotations)
-            computeTime = computeEdgesAndAnnotations(filename, ast);
-
-		debug(parseTime, computeTime, filename);
-
-		return ast;
+		return astCache.acquireTransientAST(filename, false, this);
 	}
 
 	/** @return an AST for the given file.  The AST will remain in memory until it is
 	 *  explicitly released using {@link #releaseAST(String)} or {@link #releaseAllASTs()}.
 	 */
-	public A acquirePermanentAST(String filename)
+	public final A acquirePermanentAST(String filename)
 	{
-	    A ast = acquireTransientAST(filename);
-		return makeTransientASTPermanent(filename, ast);
-	}
-//
-//	private long computeEdgesAndAnnotations(String filename, A ast)
-//	{
-//		// We must store the old list of dependents since deleteAllEntriesFor()
-//		// will delete all of the dependencies to this file
-//		ArrayList<String> dependents = new ArrayList<String>();
-//		dependents.add(filename);
-//        enqueueNewDependents(filename, dependents);
-//
-//        long start = System.currentTimeMillis();
-//		db.deleteAllEdgesAndAnnotationsFor(filename);
-//		populateVPG(filename, ast);
-//		db.updateModificationStamp(filename);
-//		long computeTime = System.currentTimeMillis()-start;
-//
-//        // This was done above, populateVPG may have added new dependents
-//        enqueueNewDependents(filename, dependents);
-//
-//        // Traverse the dependency tree in breadth-first order so each file
-//        // will only need to be processed once (assuming there are no cycles)
-//        for (int i = 1; i < dependents.size(); i++) // 1: Skip current file
-//        {
-//            String dependentFilename = dependents.get(i);
-//            processingDependent(filename, dependentFilename);
-//            // Call acquireTransientAST, forcing recomputation of edges and annotations and processing dependents
-//            acquireTransientAST(dependentFilename, true);
-//
-//            enqueueNewDependents(dependentFilename, dependents);
-////                for (String f : findAllFilesDependentUpon(dependentFilename))
-////                    if (dependents.indexOf(f) < i && !f.equals(filename))
-////                        dependents.add(f);
-//        }
-//
-//		return computeTime;
-//	}
-
-    protected long computeEdgesAndAnnotations(String filename, A ast)
-    {
-        long start = System.currentTimeMillis();
-        // Log cleared prior to parse -- log.clearEntriesFor(filename);
-        db.deleteAllEdgesAndAnnotationsFor(filename);
-        populateVPG(filename, ast);
-        db.updateModificationStamp(filename);
-        return System.currentTimeMillis()-start;
-    }
-
-    public List<String> sortFilesAccordingToDependencies(final List<String> files, final IProgressMonitor monitor)
-    {
-        // Enqueue the reflexive transitive closure of the dependencies
-        for (int i = 0; i < files.size(); i++)
-        {
-            if (monitor.isCanceled()) throw new OperationCanceledException();
-            monitor.subTask(Messages.bind(Messages.VPG_SortingFilesEnqueuingDependents, i, files.size()));
-
-            enqueueNewDependents(files.get(i), files);
-        }
-
-        // Topological Sort -- from Cormen et al. pp. 550, 541
-        class DFS
-        {
-            final Integer WHITE = 0, GRAY = 1, BLACK = 2;
-
-            final int numFiles = files.size();
-            ArrayList<String> result = new ArrayList<String>(numFiles);
-            HashMap<String, Integer> color = new HashMap<String, Integer>();
-            int time;
-
-            DFS()
-            {
-                for (String filename : files)
-                    color.put(filename, WHITE);
-
-                time = 0;
-
-                for (String filename : files)
-                    if (color.get(filename) == WHITE)
-                        dfsVisit(filename);
-            }
-
-            private void dfsVisit(String u)
-            {
-                if (monitor.isCanceled()) throw new OperationCanceledException();
-                monitor.subTask(Messages.bind(Messages.VPG_SortingFilesSortingDependents,
-                                              new Object[] { u, time, files.size() }));
-
-                color.put(u, GRAY);
-                time++;
-
-                for (String v : db.getIncomingDependenciesTo(u))
-                    if (color.get(v) == WHITE)
-                        dfsVisit(v);
-
-                color.put(u, BLACK);
-                result.add(0, u);
-            }
-        }
-
-        return new DFS().result;
-    }
-
-    protected void processingDependent(String filename, String dependentFilename)
-    {
-        debug(Messages.VPG_ProcessingDependentFile + dependentFilename, filename);
-    }
-
-    protected void enqueueNewDependents(String filename,
-                                        List<String> dependents)
-    {
-        for (String f : findAllFilesDependentUpon(filename))
-            if (!dependents.contains(f))
-                dependents.add(f);
-    }
-
-    /** Recomputes the edges and annotations for the given file, regardless
-     *  of whether or not the VPG database entries for that file are
-     *  out of date.
-     */
-    public void forceRecomputationOfDependencies(String filename)
-    {
-        calculateDependencies(filename);
-    }
-
-    /** Recomputes the edges and annotations for the given file, regardless
-     *  of whether or not the VPG database entries for that file are
-     *  out of date.
-     */
-    public void forceRecomputationOfEdgesAndAnnotations(String filename)
-    {
-    	releaseAST(filename);
-        acquireTransientAST(filename, true);
-    }
-
-	private Set<String> findAllFilesDependentUpon(String filename)
-	{
-        Set<String> dependents = new HashSet<String>();
-
-		for (String dependentFilename : db.getIncomingDependenciesTo(filename))
-			dependents.add(dependentFilename);
-
-		return dependents;
+	    return astCache.acquirePermanentAST(filename, this);
 	}
 
     /**
@@ -308,28 +143,25 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
      * 
      * @since 2.0
      */
-    public A makeTransientASTPermanent(String filename)
+    public final A makeTransientASTPermanent(String filename)
     {
-        return makeTransientASTPermanent(filename, acquireTransientAST(filename));
+        return astCache.makeTransientASTPermanent(filename, this);
     }
 
 	/** Changes the AST for the given file from a transient AST to a permanent
 	 *  AST.  The AST will remain in memory until it is explicitly released
 	 *  using {@link #releaseAST(String)} or {@link #releaseAllASTs()}.
 	 */
-	public A makeTransientASTPermanent(String filename, A ast)
+	public final A makeTransientASTPermanent(String filename, A ast)
 	{
-        transientASTs.remove(filename);
-		permanentASTs.put(filename, ast);
-		return ast;
+        return astCache.makeTransientASTPermanent(filename, ast);
 	}
 
 	/** Releases the AST for the given file, regardless of whether it was
 	 *  acquired as a permanent or transient AST. */
-	public void releaseAST(String filename)
+	public final void releaseAST(String filename)
 	{
-		transientASTs.remove(filename);
-		permanentASTs.remove(filename);
+	    astCache.releaseAST(filename);
 	}
 
     /**
@@ -340,10 +172,9 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
      * @see #acquirePermanentAST(String)
      * @see #makeTransientASTPermanent(String)
      */
-	public void releaseAllASTs()
+	public final void releaseAllASTs()
 	{
-		transientASTs.clear();
-		permanentASTs.clear();
+		astCache.releaseAllASTs();
 	}
 
 	/**
@@ -359,136 +190,133 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 	 * 
 	 * @since 2.0
 	 */
-	public String getFilenameCorrespondingTo(A ast)
+	public final String getFilenameCorrespondingTo(A ast)
 	{
-        for (String filename : transientASTs.keySet())
-            if (transientASTs.get(filename).get() == ast)
-                return filename;
-        
-        for (String filename : permanentASTs.keySet())
-            if (permanentASTs.get(filename) == ast)
-                return filename;
-        
-        return null;
+        return astCache.getFilenameCorrespondingTo(ast);
 	}
-	
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // API: VPG NODE ACCESS
+    ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return a TokenRef referring to the token with the given position in the given file.
+     * 
+     * @since 3.0
+     */
+    public final R getVPGNode(String filename, int offset, int length)
+    {
+        return factory.getVPGNode(filename, offset, length);
+    }
+
 	////////////////////////////////////////////////////////////////////////////
 	// API: DEPENDENCIES
 	////////////////////////////////////////////////////////////////////////////
 
-//	public boolean checkForCircularDependencies(String filename)
-//	{
-//		// TODO
-//		throw new UnsupportedOperationException();
-//	}
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Abstract Methods (Resource Filtering)
-    ///////////////////////////////////////////////////////////////////////////
-
-	/** @return true iff the given file should be parsed */
-	protected abstract boolean shouldProcessFile(String filename);
-
-	////////////////////////////////////////////////////////////////////////////
-	// CREATION METHODS
-	////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 *  Creates a TokenRef referring to the token with the given position in the
-	 *  given file.
-	 *  <p>
-	 *  Subclasses should override this method if they subclass {@link TokenRef}.
-	 */
-	public abstract R createTokenRef(String filename, int offset, int length);
+    /**
+     * @return the name of every file on which at least one other file is dependent.
+     * @since 3.0
+     */
+    public Iterable<String> listAllFilenamesWithDependents()
+    {
+        return db.listAllFilenamesWithDependents();
+    }
 
     /**
-     *  Creates an edge of the given type with the given tokens as endpoints.
-     *  <p>
-     *  Subclasses should override this method if they subclass {@link VPGEdge}.
+     * @return the name of every file which depends on at least one other file.
+     * @since 3.0
      */
-	public VPGEdge<A, T, R> createEdge(R fromRef, R toRef, int type)
-	{
-		return new VPGEdge<A, T, R>(this, fromRef, toRef, type);
-	}
+    public Iterable<String> listAllDependentFilenames()
+    {
+        return db.listAllDependentFilenames();
+    }
 
     /**
-     *  Creates an edge of the given type with the given tokens as endpoints.
+     * @return all of the files on which the given file depends
+     * @since 3.0
      */
-	public final VPGEdge<A, T, R> createEdge(T from, T to, int type)
-	{
-		return createEdge(getTokenRef(from), getTokenRef(to), type);
-	}
+    public Iterable<String> getOutgoingDependenciesFrom(String filename)
+    {
+        return db.getOutgoingDependenciesFrom(filename);
+    }
 
+    /**
+     * @return all of the files dependent on the given file
+     * @since 3.0
+     */
+    public Iterable<String> getIncomingDependenciesTo(String filename)
+    {
+        return db.getIncomingDependenciesTo(filename);
+    }
+    
+    /** @since 3.0 */
+    public List<String> sortFilesAccordingToDependencies(List<String> files)
+    {
+        return db.sortFilesAccordingToDependencies(files);
+    }
+
+//  public boolean checkForCircularDependencies(String filename)
+//  {
+//      throw new UnsupportedOperationException();
+//  }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // API: EDGES
+    ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Returns a list of all of the edges with at least one endpoint in the given file.
+     * <p>
+     * Due to implementation details, some edges may be listed more than once.
+     * 
+     * @since 3.0
+     */
+    public Iterable<? extends VPGEdge<A, T, R>> getAllEdgesFor(String filename)
+    {
+        return db.getAllEdgesFor(filename);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // API: ANNOTATIONS
+    ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Returns a list of all of the annotations in the given file.
+     * <p>
+     * The first entry of each pair is a {@link IVPGNode}, and the second is an annotation type.
+     * The annotation can be retrieved using {@link VPGDB#getAnnotation(VPGNode, int)}.
+     * <p>
+     * Due to implementation details, some annotations may be listed more than once.
+     * 
+     * @since 3.0
+     */
+    public Iterable<Pair<R, Integer>> getAllAnnotationsFor(String filename)
+    {
+        return db.getAllAnnotationsFor(filename);
+    }
+    
 	////////////////////////////////////////////////////////////////////////////
 	// PARSER/AST METHODS
 	////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Calculates dependencies for the given file.
-     * @param filename (non-null)
-     */
-    abstract protected void calculateDependencies(String filename);
-
-    /**
-     * Returns <code>true</code> iff the given filename refers to a virtual file, i.e., a symbolic
-     * name that does not represent an actual file on disk.
-     * @param filename (non-null)
-     * @return <code>true</code> iff the given filename refers to a virtual file
-     */
-    public boolean isVirtualFile(String filename)
-    {
-        return false;
-    }
-
-	/**
-	 * Parses the given file.
-	 * @param filename (non-null)
-	 * @return an AST for the given file, or <code>null</code> if an error was
-	 *         encountered
-	 */
-	abstract protected A parse(String filename);
-
-	/**
-	 * Computes dependencies, edges, and annotations for the given file, adding them
-	 * to the VPG database.
-	 * <p>
-	 * If the parser was unable to parse the given file, the AST will be <code>null</code>.
-	 *
-	 * @param filename the name of the parsed file (not null)
-	 * @param ast the AST for the given file, as returned from the parser (possibly null)
-	 */
-	abstract protected void populateVPG(String filename, A ast);
-
-	/** @return a TokenRef for the given token */
-	abstract protected R getTokenRef(T forToken);
-
-	/** Dereferences the given TokenRef, returning a pointer to that token in an
-	 *  AST, or <code>null</code> if it could not be found. */
-	abstract public T findToken(R tokenRef);
 
     /** Forces the database to be updated based on the current in-memory AST for the given file. */
     public void commitChangesFromInMemoryASTs(IProgressMonitor pm, int ticks, String... filenames)
     {
         List<String> files = new ArrayList<String>(Arrays.asList(filenames));
-        files = sortFilesAccordingToDependencies(files, pm);
+        files = sortFilesAccordingToDependencies(files); //, pm);
 
         pm = new SubProgressMonitor(pm, ticks, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
         pm.beginTask(Messages.VPG_PostTransformAnalysis, files.size());
         for (String thisFile : files)
         {
-            pm.subTask(lastSegmentOfFilename(thisFile));
-            doCommitChangeFromAST(thisFile);
+            if (!isVirtualFile(thisFile))
+            {
+                pm.subTask(lastSegmentOfFilename(thisFile));
+                vpgWriter.computeEdgesAndAnnotationsFromModifiedAST(thisFile, acquireTransientAST(thisFile));
+            }
             pm.worked(1);
         }
         pm.done();
-    }
-
-    protected void doCommitChangeFromAST(String filename)
-    {
-        if (!isVirtualFile(filename))
-        {
-            computeEdgesAndAnnotations(filename, acquireTransientAST(filename));
-        }
     }
 
     public static String lastSegmentOfFilename(String filename)
@@ -520,23 +348,143 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
         return null;
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    // UTILITY METHODS - LOGGING
-    ////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    // Files & Resource Filtering
+    ///////////////////////////////////////////////////////////////////////////
 
-    protected void debug(String message, String filename)
+    /**
+     * @return all filenames present in the VPG database.
+     * @since 3.0
+     */
+    public Iterable<String> listAllFilenames()
     {
+        return db.listAllFilenames();
     }
 
-    protected void debug(long parseTimeMillisec,
-                         long computeEdgesAndAnnotationsMillisec,
-                         String filename)
+    /** @since 3.0 */
+    public boolean isOutOfDate(String filename)
     {
+        return db.isOutOfDate(filename);
+    }
+
+    /**
+     * Returns <code>true</code> iff the given filename refers to a virtual file, i.e., a symbolic
+     * name that does not represent an actual file on disk.
+     * @param filename (non-null)
+     * @return <code>true</code> iff the given filename refers to a virtual file
+     */
+    public boolean isVirtualFile(String filename)
+    {
+        return false;
+    }
+
+    /**
+     * @return true iff the given file should be parsed
+     * @since 3.0
+     */
+    public boolean shouldProcessFile(String filename)
+    {
+        return !isVirtualFile(filename);
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // HYPOTHETICAL UPDATING
+    ////////////////////////////////////////////////////////////////////////////
+    
+    /** @since 3.0 */
+    public void enterHypotheticalMode() throws IOException
+    {
+        db.enterHypotheticalMode();
+    }
+    
+    /** @since 3.0 */
+    public void leaveHypotheticalMode() throws IOException
+    {
+        db.leaveHypotheticalMode();
+    }
+    
+    /** @since 3.0 */
+    public boolean isInHypotheticalMode()
+    {
+        return db.isInHypotheticalMode();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // API: INDEXING
+    ////////////////////////////////////////////////////////////////////////////
+    
+    /** Recomputes the edges and annotations for the given file, regardless
+     *  of whether or not the VPG database entries for that file are
+     *  out of date.
+     */
+    public final void forceRecomputationOfDependencies(String filename)
+    {
+        vpgWriter.computeDependencies(filename);
+    }
+
+    /** Recomputes the edges and annotations for the given file, regardless
+     *  of whether or not the VPG database entries for that file are
+     *  out of date.
+     */
+    public final void forceRecomputationOfEdgesAndAnnotations(String filename)
+    {
+        releaseAST(filename);
+        astCache.acquireTransientAST(filename, true, this);
+    }
+
+    /**
+     * Callback method invoked by {@link EclipseVPG} when it detects that a file has been deleted
+     * from the filesystem.
+     * <p>
+     * Typically, implementors should respond by deleting all information (dependencies, edges, and
+     * annotations) for the file, since it no longer exists.
+     * 
+     * @param filename path to the deleted file
+     * 
+     * @since 3.0
+     */
+    public void deleteAllEntriesFor(String filename)
+    {
+        log.clearEntriesFor(filename);
+        db.deleteAllEntriesFor(filename);
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // UTILITY METHODS - DATABASE
     ////////////////////////////////////////////////////////////////////////////
+    
+    /** @since 3.0 */
+    public void resetDatabaseStatistics()
+    {
+        db.resetStatistics();
+    }
+    
+    /** @since 3.0 */
+    public void printDatabaseStatisticsOn(PrintStream out)
+    {
+        db.printStatisticsOn(out);
+    }
+    
+    /** @since 3.0 */
+    public void printDatabaseOn(PrintStream out)
+    {
+        db.printOn(out);
+    }
+    
+    /** @since 3.0 */
+    public void clearDatabase()
+    {
+        db.clearDatabase();
+    }
+    
+    /**
+     * Forces any in-memory data to be flushed to disk
+     * @since 3.0
+     */
+    public void flushDatabase()
+    {
+        db.flush();
+    }
 
     /** Called when the database is no longer needed.  Typically ensures that
      * any data in memory is flushed to disk and any locks are released.
@@ -558,5 +506,16 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
     public String describeAnnotationType(int annotationType)
     {
         return Messages.bind(Messages.VPG_AnnotationOfType, annotationType);
+    }
+
+    /**
+     * 
+     * @param message
+     * @param filename (possibly <code>null</code>
+     * 
+     * @since 3.0
+     */
+    public void debug(String message, String filename)
+    {
     }
 }

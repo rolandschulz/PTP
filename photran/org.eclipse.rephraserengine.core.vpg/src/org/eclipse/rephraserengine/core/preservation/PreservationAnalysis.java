@@ -133,11 +133,11 @@ public final class PreservationAnalysis
 
     private void ensureDatabaseIsInHypotheticalMode() throws Error
     {
-        if (!vpg.db.isInHypotheticalMode())
+        if (!vpg.isInHypotheticalMode())
         {
             try
             {
-                vpg.db.enterHypotheticalMode();
+                vpg.enterHypotheticalMode();
             }
             catch (IOException e)
             {
@@ -306,7 +306,7 @@ public final class PreservationAnalysis
         try
         {
             progressMonitor.subTask(Messages.PreservationAnalysis_ExitingHypotheticalMode);
-            vpg.db.leaveHypotheticalMode();
+            vpg.leaveHypotheticalMode();
         }
         catch (IOException e)
         {
@@ -437,7 +437,7 @@ public final class PreservationAnalysis
     }
     
     /** @since 3.0 */
-    public static boolean printModelOn(PrintStream ps, IFile file, EclipseVPG<?,?,?,?,?> vpg) throws UnsupportedEncodingException, IOException, CoreException
+    public static boolean printModelOn(PrintStream ps, IFile file, EclipseVPG<?,?,?> vpg) throws UnsupportedEncodingException, IOException, CoreException
     {
         String filename = EclipseVPG.getFilenameForIFile(file);
         if (filename == null) return false;

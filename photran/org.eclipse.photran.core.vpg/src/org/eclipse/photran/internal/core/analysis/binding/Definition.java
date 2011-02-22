@@ -45,12 +45,12 @@ import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
+import org.eclipse.photran.internal.core.vpg.EdgeType;
 import org.eclipse.photran.internal.core.vpg.IPhotranSerializable;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 
 /**
  * A declaration of a variable, subprogram, main program, interface,
@@ -435,7 +435,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 //        else if (accessSpec.isPrivate())
 //            this.visibility = Visibility.PRIVATE;
 
-        ((PhotranVPGBuilder)PhotranVPG.getInstance()).markDefinitionVisibilityInScope(
+        PhotranVPG.getProvider().markDefinitionVisibilityInScope(
             tokenRef,
             setInScope,
             accessSpec.isPrivate() ? Visibility.PRIVATE : Visibility.PUBLIC);
@@ -608,7 +608,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     {
         result.add(this.getTokenRef());
 
-        for (TokenRef<Token> r : PhotranVPG.getDatabase().getIncomingEdgeSources(tokenRef, PhotranVPG.BINDING_EDGE_TYPE))
+        for (IVPGNode<Token> r : tokenRef.followIncoming(EdgeType.BINDING_EDGE_TYPE))
             result.add((PhotranTokenRef)r);
     }
 

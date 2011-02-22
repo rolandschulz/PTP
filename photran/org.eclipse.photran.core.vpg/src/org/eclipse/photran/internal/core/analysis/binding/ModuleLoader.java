@@ -28,7 +28,6 @@ import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
 
 /**
  * Phase 6 of name-binding analysis.
@@ -57,7 +56,7 @@ public class ModuleLoader extends VisibilityCollector
         Token moduleName = node.getModuleStmt().getModuleName().getModuleName();
         List<Definition> moduleSymtab = node.getAllPublicDefinitions();
         //System.out.println(moduleName.getText() + ": " + moduleSymtab);
-        vpg.setModuleSymbolTable(moduleName, moduleSymtab);
+        vpgProvider.setModuleSymbolTable(moduleName, moduleSymtab);
     }
 
     // # R1107
@@ -93,7 +92,7 @@ public class ModuleLoader extends VisibilityCollector
 
 	public ModuleLoader(IFile fileContainingUseStmt /*, IProgressMonitor progressMonitor*/)
 	{
-		this.vpg = (PhotranVPGBuilder)PhotranVPG.getInstance();
+		this.vpgProvider = PhotranVPG.getProvider();
 
 		this.shouldImportModules = true;
 		this.fileContainingUseStmt = fileContainingUseStmt;
@@ -112,7 +111,7 @@ public class ModuleLoader extends VisibilityCollector
 
         try
         {
-        	vpg.markFileAsImportingModule(fileContainingUseStmt, node.getName().getText());
+        	vpgProvider.markFileAsImportingModule(fileContainingUseStmt, node.getName().getText());
 
 	        if (this.shouldImportModules)
 	        	loadModule(node);
@@ -145,7 +144,7 @@ public class ModuleLoader extends VisibilityCollector
 
     private ASTModuleNode findModuleIn(IFile file) throws Exception
     {
-        ASTExecutableProgramNode fileAST = vpg.acquireTransientAST(file).getRoot();
+        ASTExecutableProgramNode fileAST = PhotranVPG.getInstance().acquireTransientAST(file).getRoot();
         for (IProgramUnit pu : fileAST.getProgramUnitList())
             if (pu instanceof ASTModuleNode && isNamed(moduleName, (ASTModuleNode)pu))
                 return (ASTModuleNode)pu;
@@ -165,7 +164,7 @@ public class ModuleLoader extends VisibilityCollector
         if (files.isEmpty())
         {
             if (!isIntrinsicModule())
-                vpg.log.logError(
+                vpgProvider.logError(
                     Messages.bind(Messages.ModuleLoader_NoFilesExportAModuleNamed, moduleName),
                     useStmt.getName().getTokenRef());
             return;
@@ -174,7 +173,7 @@ public class ModuleLoader extends VisibilityCollector
         files = applyModulePaths(files);
         if (files.isEmpty())
         {
-            vpg.log.logError(
+            vpgProvider.logError(
                 Messages.bind(
                     Messages.ModuleLoader_ModuleNotFoundInModulePathsButFoundElsewhere,
                     moduleName),
@@ -257,7 +256,7 @@ public class ModuleLoader extends VisibilityCollector
         List<Definition> moduleSymtab = vpg.getModuleSymbolTable(moduleName);
         if (moduleSymtab == null) // Just in case
         {
-            vpg.log.logError(Messages.bind(Messages.ModuleLoader_ModuleNotFoundInFile, moduleName, file.getFullPath().toOSString()));
+            vpgProvider.logError(Messages.bind(Messages.ModuleLoader_ModuleNotFoundInFile, moduleName, file.getFullPath().toOSString()));
         }
         else
         {

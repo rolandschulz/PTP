@@ -32,9 +32,12 @@ import java.util.Set;
  * @author Jeff Overbey
  * @author Kurt Hendle
  * 
+ * @param <T> token type
+ * @param <R> {@link IVPGNode}/{@link NodeRef} type
+ * 
  * @since 1.0
  */
-public abstract class VPGLog<T, R extends TokenRef<T>>
+public final class VPGLog<T, R extends IVPGNode<T>>
 {
     public class Entry
 	{
@@ -42,6 +45,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
 		private String message;
 		private R tokenRef;
 
+		/** @since 3.0 */
 		public Entry(boolean isWarningOnly, String message, R tokenRef)
 		{
 			this.isWarning = isWarningOnly;
@@ -71,7 +75,8 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
 			return message;
 		}
 
-		/** @return the token associated with this error message, or <code>null</code> */
+		/** @return the token associated with this error message, or <code>null</code> 
+		 * @since 3.0*/
 		public R getTokenRef()
 		{
 			return tokenRef;
@@ -79,43 +84,26 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
 	}
 
     ///////////////////////////////////////////////////////////////////////////
-    // VPG Access
+    // Fields
     ///////////////////////////////////////////////////////////////////////////
 
-    /** DO NOT ACCESS THIS FIELD DIRECTLY; call {@link #getVPG()} instead. */
-    private VPG<?, T, R, ? extends VPGDB<?, T, R, ?>, ? extends VPGLog<T, R>> vpg = null;
+    /** @since 3.0 */
+    protected final File logFile;
+    
+    /** @since 3.0 */
+    protected IVPGComponentFactory<?, T, R> locator;
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // Constructor
+    ///////////////////////////////////////////////////////////////////////////
 
     /**
-     * <b>FOR INTERNAL USE ONLY. THIS IS NOT AN API METHOD.</b>
-     * <p>
-     * Sets the VPG for which we are storing information.
-     * <p>
-     * This method is called by the VPG class constructor.
-     *
-     * @param vpg the VPG for which we are storing information
+     * @since 3.0
      */
-    public void setVPG(VPG<?, T, R, ? extends VPGDB<?, T, R, ?>, ? extends VPGLog<T, R>> vpg)
+    public VPGLog(File logFile, IVPGComponentFactory<?, T, R> locator)
     {
-        this.vpg = vpg;
-    }
-
-    /**
-     * Returns the VPG for which we are storing information.
-     * <p>
-     * This value is set by the VPG class constructor.  The user will call the
-     * VPGDB constructor <i>before</i> calling the VPG class constructor,
-     * so this field should not be accessed by a VPGDB constructor.
-     *
-     * @return the VPG for which we are storing information
-     */
-    protected VPG<?, T, R, ? extends VPGDB<?, T, R, ?>, ? extends VPGLog<T, R>> getVPG()
-    {
-        if (vpg == null)
-            throw new IllegalStateException("This VPG database has not been " //$NON-NLS-1$
-                + "assigned to a VPG.  Construct a VPGDB object, and then " //$NON-NLS-1$
-                + "pass it to the VPG or EclipseVPG constructor."); //$NON-NLS-1$
-        else
-            return vpg;
+        this.logFile = logFile;
+        this.locator = locator;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -170,7 +158,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
      */
 	public void logWarning(String message, String filename)
 	{
-		log.add(new Entry(true, message, getVPG().createTokenRef(filename, 0, 0)));
+		log.add(new Entry(true, message, locator.getVPGNode(filename, 0, 0)));
 		notifyListeners();
 	}
 
@@ -181,6 +169,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
      * @param tokenRef a specific token with which the warning is associated;
      *                 for example, if an identifier was used without being
      *                 initialized, it could reference that identifier
+     * @since 3.0
      */
 	public void logWarning(String message, R tokenRef)
 	{
@@ -205,7 +194,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
      * @param tokenRef a specific token with which the warning is associated;
      *                 for example, if an identifier was used without being
      *                 initialized, it could reference that identifier
-     * @since 2.0
+     * @since 3.0
      */
 	public void logError(Throwable e, R tokenRef)
 	{
@@ -252,6 +241,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
      * @param tokenRef a specific token with which the error is associated;
      *                 for example, if an identifier was used but not
      *                 declared, it could reference that identifier
+     * @since 3.0
      */
 	public void logError(String message, R tokenRef)
 	{
@@ -347,17 +337,12 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
     private static final String EOL_ESCAPE = "&EOL;"; //$NON-NLS-1$
     
     /**
-     * @since 2.0
-     */
-    protected abstract File getLogFile();
-
-    /**
      * Writes the log to a file.
      * @since 2.0
      */
     public void writeToFile() throws IOException
     {
-        Writer output = new BufferedWriter(new FileWriter(getLogFile()));
+        Writer output = new BufferedWriter(new FileWriter(logFile));
         
         try
         {
@@ -402,7 +387,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
     {
         try
         {
-            FileInputStream fstream = new FileInputStream(getLogFile());
+            FileInputStream fstream = new FileInputStream(logFile);
             BufferedReader bRead = new BufferedReader(new InputStreamReader(fstream));
             
             clear();
@@ -422,7 +407,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
                 else
                 {
                     String[] tokenRefString = line.split("\\,"); //$NON-NLS-1$
-                    tokenRef = vpg.createTokenRef(
+                    tokenRef = locator.getVPGNode(
                         tokenRefString[0],
                         Integer.parseInt(tokenRefString[1]),
                         Integer.parseInt(tokenRefString[2]));

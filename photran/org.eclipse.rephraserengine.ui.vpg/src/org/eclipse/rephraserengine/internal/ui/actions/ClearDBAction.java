@@ -28,7 +28,7 @@ public class ClearDBAction extends VPGWindowActionDelegate
     {
         progressMonitor.beginTask(Messages.ClearDBAction_ClearingAndRebuildingDatabase, IProgressMonitor.UNKNOWN);
 
-        vpg.db.clearDatabase();
+        vpg.clearDatabase();
         vpg.queueJobToEnsureVPGIsUpToDate();
 
         progressMonitor.done();

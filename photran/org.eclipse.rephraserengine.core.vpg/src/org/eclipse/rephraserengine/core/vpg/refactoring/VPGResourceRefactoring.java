@@ -6,15 +6,24 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.rephraserengine.core.refactorings.IResourceRefactoring;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
-import org.eclipse.rephraserengine.core.vpg.VPGDB;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
-import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPGLog;
 
 /**
+ * A refactoring which operates on entire files (or folders) at once, rather than requiring the user
+ * to make a text selection in an editor.
+ * <p>
+ * Contrast with {@link VPGEditorRefactoring}.
+ * 
+ * @author Jeff Overbey
+ * 
+ * @param <A> AST type
+ * @param <T> node/token type (i.e., the type returned by {@link IVPGNode#getASTNode()})
+ * @param <V> VPG
+ * 
  * @since 2.0
  */
-public abstract class VPGResourceRefactoring<A, T, V extends EclipseVPG<A, T, ? extends TokenRef<T>, ? extends VPGDB<A, T, ?, ?>, ? extends EclipseVPGLog<T, ?>>>
+public abstract class VPGResourceRefactoring<A, T, V extends EclipseVPG<A, T, ? extends IVPGNode<T>>>
     extends VPGRefactoring<A, T, V>
     implements IResourceRefactoring
 {

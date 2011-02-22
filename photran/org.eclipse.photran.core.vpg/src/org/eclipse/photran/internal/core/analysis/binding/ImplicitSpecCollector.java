@@ -53,7 +53,7 @@ class ImplicitSpecCollector extends BindingCollector
     	if (node.getImplicitSpecList() != null)
     		implicitSpec = new ImplicitSpec(node.getImplicitSpecList());
     	
-    	try { vpg.setScopeImplicitSpec(node.getImplicitToken().getEnclosingScope(), implicitSpec); }
+    	try { vpgProvider.setScopeImplicitSpec(node.getImplicitToken().getEnclosingScope(), implicitSpec); }
     	catch (Exception e) { throw new Error(e); }
     	
     	super.traverseChildren(node);
@@ -118,7 +118,7 @@ class ImplicitSpecCollector extends BindingCollector
 		else
 			implicitSpec = node.getEnclosingScope().getImplicitSpec();
 		
-		try { vpg.setScopeImplicitSpec(node, implicitSpec); }
+		try { vpgProvider.setScopeImplicitSpec(node, implicitSpec); }
 	    catch (Exception e) { throw new Error(e); }
     }
 }

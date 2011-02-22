@@ -111,10 +111,7 @@ class ReferenceCollector extends BindingCollector
 {
     private void markAccess(Token ident, VariableAccess access)
     {
-        PhotranVPG.getDatabase().setAnnotation(
-            ident.getTokenRef(),
-            PhotranVPG.VARIABLE_ACCESS_ANNOTATION_TYPE,
-            access);
+        vpgProvider.markAccess(ident, access);
     }
 
     // Occurs only in the context of an <SFExprList>, which provides the
@@ -323,7 +320,7 @@ class ReferenceCollector extends BindingCollector
                         {
                             Definition def = vpg.getDefinitionFor(tr);
                             def.setArraySpec(obj.getArraySpec());
-                            vpg.setDefinitionFor(tr, def);
+                            vpgProvider.setDefinitionFor(tr, def);
                         }
                     }
                     catch (Exception e)
@@ -1243,7 +1240,7 @@ class ReferenceCollector extends BindingCollector
         {
             Definition def = PhotranVPG.getInstance().getDefinitionFor(tokenRef);
             def.markAsTypeBoundProcedure(renamed);
-            vpg.setDefinitionFor(tokenRef, def);
+            vpgProvider.setDefinitionFor(tokenRef, def);
         }
     }
 

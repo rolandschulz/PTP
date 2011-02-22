@@ -19,7 +19,7 @@ import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGWriter;
 
 /**
  * Abstract superclass providing utility methods for several visitor classes
@@ -30,31 +30,32 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
  */
 public abstract class BindingCollector extends ASTVisitorWithLoops
 {
-	protected PhotranVPGBuilder vpg = (PhotranVPGBuilder)PhotranVPG.getInstance();
+    protected PhotranVPG vpg = PhotranVPG.getInstance();
+	protected PhotranVPGWriter vpgProvider = PhotranVPG.getProvider();
 
     protected void markSubprogramExport(IFile file, Token subprogramName)
     {
-        vpg.markFileAsExportingSubprogram(file, subprogramName.getText());
+        vpgProvider.markFileAsExportingSubprogram(file, subprogramName.getText());
     }
 
     protected void markSubprogramImport(IFile file, Token subprogramName)
     {
-        vpg.markFileAsImportingSubprogram(file, subprogramName.getText());
+        vpgProvider.markFileAsImportingSubprogram(file, subprogramName.getText());
     }
 
     protected void markModuleExport(IFile file, Token moduleName)
     {
-        vpg.markFileAsExportingModule(file, moduleName.getText());
+        vpgProvider.markFileAsExportingModule(file, moduleName.getText());
     }
 
     protected void setScopeDefaultVisibilityToPrivate(ScopingNode scope)
     {
-        vpg.setDefaultScopeVisibilityToPrivate(scope);
+        vpgProvider.setDefaultScopeVisibilityToPrivate(scope);
     }
 	
     protected void setDefinition(Token ident, Definition def)
     {
-        vpg.setDefinitionFor(ident.getTokenRef(), def);
+        vpgProvider.setDefinitionFor(ident.getTokenRef(), def);
     }
 
 	// addDefinition() and bindRenamedEntity() accept null to support the module loader
@@ -75,9 +76,9 @@ public abstract class BindingCollector extends ASTVisitorWithLoops
     	    
             Visibility visibility = enclosingScope.isDefaultVisibilityPrivate() ? Visibility.PRIVATE : Visibility.PUBLIC;
             Definition definition = new Definition(token.getText(), token.getTokenRef(), classification, /*visibility,*/ type);
-    		vpg.setDefinitionFor(token.getTokenRef(), definition);
-    		vpg.markScope(token.getTokenRef(), enclosingScope);
-    		vpg.markDefinitionVisibilityInScope(token.getTokenRef(), enclosingScope, visibility);
+    		vpgProvider.setDefinitionFor(token.getTokenRef(), definition);
+    		vpgProvider.markScope(token.getTokenRef(), enclosingScope);
+    		vpgProvider.markDefinitionVisibilityInScope(token.getTokenRef(), enclosingScope, visibility);
     		
     		checkForIllegalShadowing(token.getText(), token.getTokenRef(), enclosingScope);
     		
@@ -99,7 +100,7 @@ public abstract class BindingCollector extends ASTVisitorWithLoops
         	    PhotranVPG.canonicalizeIdentifier(name).equals(
         	        PhotranVPG.canonicalizeIdentifier(scopeName)))
         	{
-        	    vpg.markIllegalShadowing(tokenRef, enclosingScope.getNameToken().getTokenRef());
+        	    vpgProvider.markIllegalShadowing(tokenRef, enclosingScope.getNameToken().getTokenRef());
         	}
         }
     }
@@ -124,10 +125,10 @@ public abstract class BindingCollector extends ASTVisitorWithLoops
     {
     	try
     	{
-    		vpg.markScope(definitionToImport.getTokenRef(), importIntoScope);
+    		vpgProvider.markScope(definitionToImport.getTokenRef(), importIntoScope);
     		
     		if (importIntoScope.isDefaultVisibilityPrivate())
-    		    vpg.markDefinitionVisibilityInScope(definitionToImport.getTokenRef(), importIntoScope, Visibility.PRIVATE);
+    		    vpgProvider.markDefinitionVisibilityInScope(definitionToImport.getTokenRef(), importIntoScope, Visibility.PRIVATE);
     		
     		checkForIllegalShadowing(definitionToImport.getCanonicalizedName(), definitionToImport.getTokenRef(), importIntoScope);
     	}
@@ -165,7 +166,7 @@ public abstract class BindingCollector extends ASTVisitorWithLoops
 			{
 	    		Definition d = vpg.getDefinitionFor(def);
 	    		d.markAsSubprogramArgument();
-	    		vpg.setDefinitionFor(def, d);
+	    		vpgProvider.setDefinitionFor(def, d);
 			}
 			
 			return result;
@@ -175,7 +176,7 @@ public abstract class BindingCollector extends ASTVisitorWithLoops
     {
        	try
     	{
-       		vpg.markBinding(identifier.getTokenRef(), toDefinition);
+       		vpgProvider.markBinding(identifier.getTokenRef(), toDefinition);
     	}
     	catch (Exception e)
     	{
@@ -189,7 +190,7 @@ public abstract class BindingCollector extends ASTVisitorWithLoops
     	
        	try
     	{
-       		vpg.markRenamedBinding(identifier.getTokenRef(), toDefinition);
+       		vpgProvider.markRenamedBinding(identifier.getTokenRef(), toDefinition);
     	}
     	catch (Exception e)
     	{

@@ -19,35 +19,27 @@ import java.util.NoSuchElementException;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.rephraserengine.core.util.Pair;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
-import org.eclipse.rephraserengine.core.vpg.VPG;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
+import org.eclipse.rephraserengine.core.vpg.NodeRef;
 import org.eclipse.rephraserengine.core.vpg.VPGDB;
 import org.eclipse.rephraserengine.core.vpg.VPGDependency;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
-import org.eclipse.rephraserengine.core.vpg.VPGLog;
-
+import org.eclipse.rephraserengine.core.vpg.db.cdt.CDTDB;
 
 /**
  * Base class for a typical Virtual Program Graph database the caches the result of another
- * (on-disk) database.
- * <p>
- * This class is intended to be subclassed directly, although Eclipse-based VPGs will subclass
- * <code>EclipseVPG</code> instead.
- * Subclasses must implement the language-specific (parser/AST) methods.
- * <p>
- * N.B. See several important notes in the JavaDoc for {@link VPG}.
+ * (on-disk) database (usually a {@link CDTDB}).
  *
  * @author Jeff Overbey
  *
  * @param <A> AST type
  * @param <T> token type
- * @param <R> TokenRef type
- * @param <D> database type
+ * @param <R> {@link IVPGNode}/{@link NodeRef} type
  * 
  * @since 1.0
  */
-public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>, L extends VPGLog<T, R>>
-     extends VPGDB<A, T, R, L>
+public class CachingDB<A, T, R extends IVPGNode<T>>
+     extends VPGDB<A, T, R>
 {
     private final class CacheKey
     {
@@ -82,7 +74,7 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
         }
     }
 
-    public D db;
+    public VPGDB<A, T, R> db;
 
     private int maxEdgeCacheEntries;
     private int maxAnnotationCacheEntries;
@@ -94,14 +86,14 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
     private long edgeHits = 0, edgeMisses = 0, totalEdgeListBuildTime = 0;
     private long annotationHits = 0, annotationMisses = 0, totalDeserializationTime = 0;
 
-    public CachingDB(D diskDatabase)
+    public CachingDB(VPGDB<A, T, R> diskDatabase)
     {
         this(diskDatabase, Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
-    public CachingDB(D diskDatabase, int maxEdgeCacheEntries, int maxAnnotationCacheEntries)
+    public CachingDB(VPGDB<A, T, R> diskDatabase, int maxEdgeCacheEntries, int maxAnnotationCacheEntries)
     {
-        super();
+        super(diskDatabase);
 
         Assert.isNotNull(diskDatabase);
         Assert.isTrue(diskDatabase != this);
@@ -114,12 +106,6 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
         this.incomingEdgeCache = new HashMap<CacheKey, Iterable<? extends VPGEdge<A, T, R>>>();
         this.outgoingEdgeCache = new HashMap<CacheKey, Iterable<? extends VPGEdge<A, T, R>>>();
         this.annotationCache = new HashMap<CacheKey, Serializable>();
-    }
-
-    @Override public void setVPG(VPG<A, T, R, ? extends VPGDB<A, T, R, L>, L> vpg)
-    {
-        super.setVPG(vpg);
-        db.setVPG(vpg);
     }
 
     ////////////////////////////////////////////////////////////////////////////

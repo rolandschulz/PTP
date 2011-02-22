@@ -20,8 +20,8 @@ import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineParNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
+import org.eclipse.photran.internal.core.vpg.AnnotationType;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
  * Phase 5 of name-binding analysis.
@@ -53,7 +53,7 @@ class SubprogramTypeCollector extends BindingCollector
     {
         Definition def = vpg.getDefinitionFor(tokenRef);
         def.setType(type);
-        vpg.setDefinitionFor(tokenRef, def);
+        vpgProvider.setDefinitionFor(tokenRef, def);
     }
 
     private FunctionType typeOf(ASTSubroutineStmtNode node)
@@ -135,7 +135,7 @@ class SubprogramTypeCollector extends BindingCollector
     {
         List<PhotranTokenRef> bindings = bind(ident);
         if (bindings.size() >= 1)
-            return (Definition)PhotranVPG.getDatabase().getAnnotation(bindings.get(0), PhotranVPG.DEFINITION_ANNOTATION_TYPE);
+            return bindings.get(0).getAnnotation(AnnotationType.DEFINITION_ANNOTATION_TYPE);
         else
             return null;
     }

@@ -56,7 +56,7 @@ import org.eclipse.photran.internal.core.parser.IExecutableConstruct;
 import org.eclipse.photran.internal.core.parser.IObsoleteActionStmt;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
+import org.eclipse.photran.internal.core.vpg.PhotranVPGWriter;
 
 /**
  * Generates a control flow graph of an AST.
@@ -66,7 +66,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
  * is necessary for constructs which behave similarly to a GOTO. The second pass builds the Control
  * Flow Graph.
  * <p>
- * FIXME: Enable in production (see {@link PhotranVPGBuilder#TEMP_____ENABLE_FLOW_ANALYSIS}). This
+ * FIXME: Enable in production (see {@link PhotranVPGWriter#TEMP_____ENABLE_FLOW_ANALYSIS}). This
  * is temporarily disabled for several reasons:
  * <ol>
  * <li>We need to check the impact on performance (indexing time)
@@ -114,8 +114,6 @@ public class ControlFlowAnalysis extends ASTVisitorWithLoops
         ast.accept(new ControlFlowAnalysis(filename, labels, assignedLabels, exitsList));
     }
 
-    private final PhotranVPG vpg = PhotranVPG.getInstance();
-
     private Set<IASTNode> predecessors = Collections.<IASTNode> emptySet();
 
     private HashMap<String, IActionStmt> labels = new HashMap<String, IActionStmt>();
@@ -141,7 +139,7 @@ public class ControlFlowAnalysis extends ASTVisitorWithLoops
         PhotranTokenRef from = pred.findFirstToken().getTokenRef();
         PhotranTokenRef to = toNode.findFirstToken().getTokenRef();
 
-        vpg.db.ensure(vpg.createEdge(from, to, PhotranVPG.CONTROL_FLOW_EDGE_TYPE));
+        PhotranVPG.getProvider().createFlow(from, to);
     }
 
     private void flowTo(IASTNode toNode)
@@ -434,7 +432,8 @@ public class ControlFlowAnalysis extends ASTVisitorWithLoops
         flowTo(node);
 
         Set<IASTNode> predsBeforeStmt = this.predecessors; // == { node }
-        node.getActionStmt().accept(this);
+        if (node.getActionStmt() != null)
+            node.getActionStmt().accept(this);
         Set<IASTNode> predsAfterStmt = this.predecessors;
 
         Set<IASTNode> newPredecessors = new HashSet<IASTNode>();

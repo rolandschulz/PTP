@@ -27,6 +27,6 @@ public class DisplayDBAction extends VPGOutputWindowAction
     @Override
     protected void writeOutput(EclipseVPG vpg, PrintStream ps)
     {
-        vpg.db.printOn(ps);
+        vpg.printDatabaseOn(ps);
     }
 }

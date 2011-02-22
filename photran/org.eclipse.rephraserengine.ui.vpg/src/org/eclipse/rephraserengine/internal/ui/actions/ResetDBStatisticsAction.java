@@ -26,6 +26,6 @@ public class ResetDBStatisticsAction extends VPGWindowActionDelegate
     @Override
     protected void run(EclipseVPG vpg, IProgressMonitor progressMonitor) throws Exception
     {
-        vpg.db.resetStatistics();
+        vpg.resetDatabaseStatistics();
     }
 }

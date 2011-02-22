@@ -20,17 +20,23 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.rephraserengine.core.refactorings.IRefactoring;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
-import org.eclipse.rephraserengine.core.vpg.VPGDB;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 import org.eclipse.rephraserengine.core.vpg.VPGLog;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
-import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPGLog;
 import org.eclipse.text.edits.ReplaceEdit;
 
 /**
+ * A refactoring which accesses a VPG.
+ * 
+ * @author Jeff Overbey
+ * 
+ * @param <A> AST type
+ * @param <T> node/token type (i.e., the type returned by {@link IVPGNode#getASTNode()})
+ * @param <V> VPG
+ * 
  * @since 2.0
  */
-public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends TokenRef<T>, ? extends VPGDB<A, T, ?, ?>, ? extends EclipseVPGLog<T, ?>>>
+public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends IVPGNode<T>>>
     extends Refactoring
     implements IRefactoring
 {
@@ -102,7 +108,7 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
 
     protected void logVPGErrors(RefactoringStatus status, Collection<IFile> files)
     {
-        for (VPGLog<T, ? extends TokenRef<T>>.Entry entry : vpg.log.getEntries())
+        for (VPGLog<T, ? extends IVPGNode<T>>.Entry entry : vpg.getLog().getEntries())
         {
             if (files == null || contains(files, entry.getTokenRef()))
             {
@@ -114,7 +120,7 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
         }
     }
 
-    private boolean contains(Collection<IFile> files, TokenRef<T> tokenRef)
+    private boolean contains(Collection<IFile> files, IVPGNode<T> tokenRef)
     {
         if (files == null || tokenRef == null || tokenRef.getFilename() == null)
             return false;
@@ -231,7 +237,10 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
 
     // REFACTORING STATUS /////////////////////////////////////////////////////
 
-    protected RefactoringStatusContext createContext(TokenRef<T> tokenRef)
+    /**
+     * @since 3.0
+     */
+    protected RefactoringStatusContext createContext(IVPGNode<T> tokenRef)
     {
         if (tokenRef == null) return null;
 

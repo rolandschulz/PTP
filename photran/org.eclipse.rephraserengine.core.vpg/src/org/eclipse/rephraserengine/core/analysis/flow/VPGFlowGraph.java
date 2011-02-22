@@ -14,20 +14,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.rephraserengine.core.util.Worklist;
-import org.eclipse.rephraserengine.core.vpg.TokenRef;
+import org.eclipse.rephraserengine.core.vpg.NodeRef;
 import org.eclipse.rephraserengine.core.vpg.VPG;
+import org.eclipse.rephraserengine.core.vpg.IVPGNode;
 
 /**
  * A control flow graph constructed from edges in a VPG.
  *
  * @author Jeff Overbey
  *
- * @param R TokenRef type
- * @param U Flowgraph node type
+ * @param <R> {@link IVPGNode}/{@link NodeRef} type
+ * @param <T> node/token type
+ * @param <U> flowgraph node type
  *
  * @since 3.0
  */
-public abstract class VPGFlowGraph<R extends TokenRef<?>, U>
+public abstract class VPGFlowGraph<R extends IVPGNode<T>, T, U>
               extends FlowGraph<U>
 {
     private final class NodeFactory
@@ -68,9 +70,9 @@ public abstract class VPGFlowGraph<R extends TokenRef<?>, U>
 
     private final NodeFactory nodeFactory;
 
-    protected final VPG<?, ?, R, ?, ?> vpg;
+    protected final VPG<?,?,R> vpg;
 
-    public VPGFlowGraph(VPG<?, ?, R, ?, ?> vpg, R entryNodeRef, R exitNodeRef, int controlFlowEdgeType)
+    public VPGFlowGraph(VPG<?,?,R> vpg, R entryNodeRef, R exitNodeRef, int controlFlowEdgeType)
     {
         this.vpg = vpg;
         this.nodeFactory = new NodeFactory();
@@ -78,6 +80,11 @@ public abstract class VPGFlowGraph<R extends TokenRef<?>, U>
         this.exitNode = nodeFactory.nodeFor(exitNodeRef);
 
         populate(entryNodeRef, exitNodeRef, controlFlowEdgeType);
+    }
+
+    public VPGFlowGraph(VPG<?,?,R> vpg, R entryNodeRef, R exitNodeRef, Enum<?> controlFlowEdgeType)
+    {
+        this(vpg, entryNodeRef, exitNodeRef, controlFlowEdgeType.ordinal());
     }
 
     private void populate(R entryNodeRef, R exitNodeRef, int controlFlowEdgeType)
@@ -88,7 +95,7 @@ public abstract class VPGFlowGraph<R extends TokenRef<?>, U>
         {
             FlowGraphNode<U> currentNode = nodeFactory.get(currentNodeRef);
 
-            for (R successorNodeRef : vpg.db.getOutgoingEdgeTargets(currentNodeRef, controlFlowEdgeType))
+            for (R successorNodeRef : currentNodeRef.<R>followOutgoing(controlFlowEdgeType))
             {
                 if (nodeFactory.containsKey(successorNodeRef))
                 {

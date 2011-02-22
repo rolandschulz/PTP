@@ -281,7 +281,7 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
 
         private void importFiles(String subdir) throws Exception
         {
-            PhotranVPG.getDatabase().clearDatabase();
+            PhotranVPG.getInstance().clearDatabase();
 
             files = new TreeMap<String, IFile>();
 
