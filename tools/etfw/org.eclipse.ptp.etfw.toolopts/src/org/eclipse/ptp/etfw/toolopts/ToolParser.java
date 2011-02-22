@@ -508,7 +508,12 @@ public class ToolParser extends DefaultHandler{
 					else if(type.equals("number"))
 						actOpt.type=ToolOption.NUMBER;
 					else if(type.equals("combo"))
+					{
 						actOpt.type=ToolOption.COMBO;
+						String items = getAttribute("items",atts);
+						if(items!=null)
+							actOpt.items=parseItems(items);
+					}
 					else if(type.equals("toggle")){
 						actOpt.type=ToolOption.TOGGLE;
 						String hold=getAttribute(SETON,atts);
@@ -525,6 +530,10 @@ public class ToolParser extends DefaultHandler{
 		}
 		tagStack.push(name.toLowerCase());
 		content.push(new StringBuffer());
+	}
+	
+	private static String[] parseItems(String in){
+		return in.split(":::");
 	}
 	
 	private ToolApp finishApp()

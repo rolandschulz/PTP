@@ -189,7 +189,7 @@ public class ToolPane implements IAppInput {
 	 */
 	public boolean updateOptField(Object source) {
 		for (int i = 0; i < options.length; i++) {
-			if (source.equals(options[i].argbox)||source.equals(options[i].numopt)) {
+			if (source.equals(options[i].argbox)||source.equals(options[i].numopt)||source.equals(options[i].combopt)) {
 				OptArgUpdate(options[i]);
 				updateOptDisplay();
 				return true;
@@ -298,6 +298,9 @@ public class ToolPane implements IAppInput {
 			if(options[i].numopt!=null){
 				configuration.setAttribute(options[i].confArgString, options[i].defNum);
 			}
+			if(options[i].combopt!=null){
+				configuration.setAttribute(options[i].confArgString,options[i].items[options[i].defNum]);
+			}
 		}
 	}
 
@@ -329,6 +332,16 @@ public class ToolPane implements IAppInput {
 			
 			if(options[i].numopt!=null){
 				options[i].numopt.setSelection(configuration.getAttribute(options[i].confArgString, options[i].defNum));
+			}
+			
+			if(options[i].combopt!=null){
+				arg = configuration.getAttribute(options[i].confArgString,options[i].defText);
+				if(arg!=null){
+					int dex = options[i].combopt.indexOf(arg);
+					if(dex>-1){
+						options[i].combopt.select(dex);
+					}
+				}
 			}
 			
 		}
@@ -367,6 +380,10 @@ public class ToolPane implements IAppInput {
 			
 			if(options[i].numopt!=null){
 				configuration.setAttribute(options[i].confArgString,options[i].numopt.getSelection());
+			}
+			
+			if(options[i].combopt!=null){
+				configuration.setAttribute(options[i].confArgString,options[i].items[options[i].combopt.getSelectionIndex()]);
 			}
 			//			if(options[i].type==ToolOption.TOGGLE){
 			//				String argVal=null;

@@ -34,6 +34,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
@@ -227,7 +228,14 @@ public class ToolMaker {
 				toolOpt.browser.addSelectionListener(browseListener);
 		}
 		else if(toolOpt.type == ToolOption.COMBO){
-			
+			toolOpt.combopt = new Combo(comp,SWT.NULL);
+			toolOpt.combopt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			toolOpt.combopt.setToolTipText(toolOpt.valueToolTip);
+			toolOpt.combopt.setItems(toolOpt.items);
+			toolOpt.combopt.select(toolOpt.defNum);
+			if(checkListener!=null)
+				toolOpt.combopt.addModifyListener((ModifyListener)checkListener);
+			new Label(comp, SWT.NULL);
 		}
 		else if(toolOpt.type == ToolOption.NUMBER){
 			toolOpt.numopt = new Spinner(comp,SWT.NULL);
