@@ -20,15 +20,17 @@ package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.ptp.ui.ModelessWizardDialog;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.RMServicesConfigurationWizard;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 
 public class AddResourceManagerAction extends Action {
-	
+
 	private final Shell shell;
 
 	public AddResourceManagerAction(Shell shell) {
@@ -39,18 +41,24 @@ public class AddResourceManagerAction extends Action {
 	public void dispose() {
 	}
 
+	@Override
 	public void run() {
 		final RMServicesConfigurationWizard wizard = new RMServicesConfigurationWizard();
-		
-		final WizardDialog dialog = new WizardDialog(shell, wizard);
-		int status = dialog.open();
-		if (status != Dialog.OK) {
-			return;
+
+		final WizardDialog dialog = new ModelessWizardDialog(shell, wizard);
+		dialog.open();
+
+		try {
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			page.setEditorAreaVisible(false);
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
+
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
-	
+
 	}
 
 }

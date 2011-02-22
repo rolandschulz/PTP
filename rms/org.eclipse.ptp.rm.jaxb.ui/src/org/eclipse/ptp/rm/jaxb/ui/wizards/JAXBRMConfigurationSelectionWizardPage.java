@@ -60,9 +60,7 @@ public class JAXBRMConfigurationSelectionWizardPage extends RMConfigurationWizar
 				handlePathBrowseButtonSelected(project.getFullPath().toFile());
 			} else if (source == editButton) {
 				try {
-					// can we turn off modal on the wizard dialog?
 					WidgetUtils.openIDEEditor(choice);
-					// hide the editor page
 				} catch (IOException t) {
 					t.printStackTrace();
 				}
