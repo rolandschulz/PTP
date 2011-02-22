@@ -59,6 +59,7 @@ public class Messages extends NLS {
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_6;
 
 	public static String WidgetUtils_openIDEEditor;
+	public static String WidgetUtils_hideIDEEditor;
 
 	static {
 		// initialize resource bundle

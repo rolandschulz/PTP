@@ -430,21 +430,6 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 		return combo.getItem(i);
 	}
 
-	public static void hideIDEEditor() {
-		new UIJob(Messages.WidgetUtils_openIDEEditor) {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				try {
-					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-					page.setEditorAreaVisible(false);
-				} catch (Throwable e) {
-					return new Status(Status.ERROR, JAXBUIPlugin.PLUGIN_ID, Status.ERROR, e.getMessage(), e);
-				}
-				return Status.OK_STATUS;
-			}
-		}.schedule();
-	}
-
 	public static void openIDEEditor(final String file) throws IOException {
 		final URL fUrl = FileLocator.toFileURL(JAXBUtils.getURL(file));
 		new UIJob(Messages.WidgetUtils_openIDEEditor) {
