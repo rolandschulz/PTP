@@ -64,8 +64,9 @@ public final class RefactorMenu extends CompoundContributionItem
 
     private WorkbenchSelectionInfo selection;
 
+    /** @since 3.0 */
     @Override
-    protected IContributionItem[] getContributionItems()
+    public IContributionItem[] getContributionItems()
     {
         selection = new WorkbenchSelectionInfo();
         LinkedList<IContributionItem> result = loadRefactoringsFromExtensionPoint();
@@ -341,4 +342,16 @@ public final class RefactorMenu extends CompoundContributionItem
             item.setEnabled(false);
         }
     };
+    
+    /** @since 3.0 */
+    public boolean isEmpty()
+    {
+        IContributionItem[] items = getContributionItems();
+        if (items.length == 0)
+            return true;
+        else if (items.length == 1 && items[0] instanceof EmptyMenuContributionItem)
+            return true;
+        else
+            return false;
+    }
 }

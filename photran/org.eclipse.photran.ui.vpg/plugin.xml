@@ -353,7 +353,7 @@
             id="org.eclipse.photran.ui.Reindenter">
 	     <action 
 	           label="%action.label.reindent.0" 
-               menubarPath="org.eclipse.photran.ui.source.menu/indentationActions"
+               menubarPath="org.eclipse.jdt.ui.source.menu/editGroup"
                definitionId="org.eclipse.photran.ui.ReindenterCommand"
 	           class="org.eclipse.photran.internal.ui.actions.ReindentAction"
 	           id="org.eclipse.photran.ui.ReindenterAction">

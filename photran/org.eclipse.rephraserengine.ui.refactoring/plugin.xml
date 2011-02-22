@@ -26,6 +26,18 @@
                   class="org.eclipse.rephraserengine.ui.menus.RefactorMenu"
                   id="org.eclipse.rephraserengine.ui.menus.refactor">
             </dynamic>
+            <visibleWhen checkEnabled="false">
+               <iterate operator="or">
+                 <or>
+                   <adapt type="org.eclipse.core.resources.IResource">
+                     <test property="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"/>
+                   </adapt>
+                   <adapt type="org.eclipse.jface.text.ITextSelection">
+                     <test property="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"/>
+                   </adapt>
+                 </or>
+               </iterate>
+            </visibleWhen>
          </menu>
       </menuContribution>
 
@@ -42,18 +54,34 @@
                   class="org.eclipse.rephraserengine.ui.menus.RefactorMenu"
                   id="org.eclipse.rephraserengine.ui.menus.refactor">
             </dynamic>
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     operator="or">
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                  </adapt>
+            <visibleWhen checkEnabled="false">
+               <iterate operator="or">
+                 <or>
+                   <adapt type="org.eclipse.core.resources.IResource">
+                     <test property="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"/>
+                   </adapt>
+                   <adapt type="org.eclipse.jface.text.ITextSelection">
+                     <test property="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"/>
+                   </adapt>
+                 </or>
                </iterate>
             </visibleWhen>
          </menu>
       </menuContribution>
 
    </extension>
+
+   <!--=================-->
+   <!-- Property Tester -->
+   <!--=================-->
+  <extension
+        point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+           id="org.eclipse.rephraserengine.ui.refactoring.isRefactorablePropertyTester"
+           class="org.eclipse.rephraserengine.internal.ui.menus.RefactorableResourcePropertyTester"
+           namespace="org.eclipse.rephraserengine.ui.refactoring"
+           properties="isRefactorable"
+           type="java.lang.Object"/>
+  </extension>
 
 </plugin>

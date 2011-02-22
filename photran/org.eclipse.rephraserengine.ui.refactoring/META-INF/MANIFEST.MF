@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ltk.ui.refactoring,
  org.eclipse.rephraserengine.core.refactoring,
  org.eclipse.rephraserengine.core,
- org.eclipse.rephraserengine.ui
+ org.eclipse.rephraserengine.ui,
+ org.eclipse.core.expressions
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.eclipse.rephraserengine.ui.menus,

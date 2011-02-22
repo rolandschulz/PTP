@@ -73,7 +73,7 @@
             id="org.eclipse.photran.ui.CommentUncomment">
 	     <action 
 	           label="%action.label.0" 
-               menubarPath="org.eclipse.photran.ui.source.menu/commentActions"
+               menubarPath="org.eclipse.jdt.ui.source.menu/commentGroup"
                definitionId="org.eclipse.photran.ui.CommentCommand"
 	           class="org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate" 
 	           id="org.eclipse.photran.ui.BlockCommentAction">
@@ -160,29 +160,35 @@
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu?after=edit">
          <menu
-               label="Source"
-               id="org.eclipse.photran.ui.source.menu">
-            <separator
-                  name="commentActions">
-            </separator>
-            <!-- SEPARATOR --><separator name="separator1" visible="true" />
+               label="&amp;Source"
+               id="org.eclipse.jdt.ui.source.menu">
+            <visibleWhen checkEnabled="false">
+               <iterate operator="or">
+                   <adapt type="org.eclipse.jface.text.ITextSelection">
+                     <test property="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"/>
+                   </adapt>
+               </iterate>
+            </visibleWhen>
+         <!-- Menu mimicks org.eclipse.jdt.ui's (as does CDT's Refactor menu)
+              http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.jdt.ui/plugin.xml?view=markup -->
+            <separator name="commentGroup" />
+            <separator name="editGroup" />
             <command
                   commandId="org.eclipse.ui.edit.text.shiftRight"
-                  label="Shift Right"
+                  label="&amp;Shift Right"
                   style="push">
             </command>
             <command
                   commandId="org.eclipse.ui.edit.text.shiftLeft"
-                  label="Shift Left"
+                  label="S&amp;hift Left"
                   style="push">
             </command>
-            <separator
-                  name="indentationActions">
-            </separator>
-            <!-- SEPARATOR --><separator name="separator1" visible="true" />
-            <separator
-                  name="additions">
-            </separator>
+            <separator name="importGroup" />
+            <separator name="generateGroup" />
+            <separator name="codeGroup" />
+            <separator name="externalizeGroup" />
+            <separator name="convertGroup" />
+            <separator name="additions" />
          </menu>
       </menuContribution>
    </extension>
