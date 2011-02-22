@@ -8,6 +8,11 @@ public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConf
 	/**
 	 * @since 5.0
 	 */
+	public void addExternalRMInstanceXMLLocation(String location);
+
+	/**
+	 * @since 5.0
+	 */
 	public String getDefaultControlHost();
 
 	/**
@@ -34,6 +39,12 @@ public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConf
 	 * @since 5.0
 	 */
 	public String getDefaultMonitorPort();
+
+	/**
+	 * @since 5.0
+	 */
+
+	public String[] getExternalRMInstanceXMLLocations();
 
 	/**
 	 * @since 5.0

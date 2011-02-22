@@ -35,6 +35,15 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		super(provider);
 	}
 
+	public void addExternalRMInstanceXMLLocation(String location) {
+		StringBuffer list = new StringBuffer(getString(EXTERNAL_RM_XSD_PATHS, ZEROSTR));
+		if (list.length() > 0) {
+			list.append(CM);
+		}
+		list.append(location);
+		putString(EXTERNAL_RM_XSD_PATHS, list.toString());
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -170,6 +179,11 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 			}
 		}
 		return ZEROSTR;
+	}
+
+	public String[] getExternalRMInstanceXMLLocations() {
+		String list = getString(EXTERNAL_RM_XSD_PATHS, ZEROSTR);
+		return list.split(CM);
 	}
 
 	public ResourceManagerData getResourceManagerData() {

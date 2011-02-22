@@ -227,7 +227,7 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 	public static Combo createItemCombo(Composite container, String labelString, String[] items, String initial, String tooltip,
 			boolean fill, ModifyListener listener, int colSpan) {
 		if (labelString != null) {
-			Label label = new Label(container, SWT.NONE);
+			Label label = new Label(container, SWT.RIGHT);
 			label.setText(labelString);
 			if (tooltip != null) {
 				label.setToolTipText(tooltip);
@@ -238,7 +238,7 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 		if (fill) {
 			data.horizontalAlignment = SWT.FILL;
 		}
-		data.grabExcessHorizontalSpace = false;
+		data.grabExcessHorizontalSpace = true;
 		if (colSpan != -1) {
 			data.horizontalSpan = colSpan;
 		}

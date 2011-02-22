@@ -48,7 +48,7 @@ public interface IJAXBNonNLSConstants {
 	String GET = "get";//$NON-NLS-1$
 
 	String JAVA_USER_HOME = "user.home";//$NON-NLS-1$
-
+	String FILE_SCHEME = "file";//$NON-NLS-1$
 	String XMLSchema = "http://www.w3.org/2001/XMLSchema"; //$NON-NLS-1$
 	String DATA = "data/"; //$NON-NLS-1$
 	String RM_XSD = DATA + "resource_manager_type.xsd";//$NON-NLS-1$
@@ -56,6 +56,7 @@ public interface IJAXBNonNLSConstants {
 	String JAXB_CONTEXT = "org.eclipse.ptp.rm.jaxb.core.data";//$NON-NLS-1$
 	String RM_CONFIG_PROPS = "rm_configurations.properties";//$NON-NLS-1$
 	String RM_XSD_PATH = "rm_schema_path";//$NON-NLS-1$
+	String EXTERNAL_RM_XSD_PATHS = "external_rm_schema_paths";//$NON-NLS-1$
 	String SELECTED_ATTRIBUTES = "selected_attributes";//$NON-NLS-1$
 	String VALID_ATTRIBUTES = "valid_attributes"; //$NON-NLS-1$
 

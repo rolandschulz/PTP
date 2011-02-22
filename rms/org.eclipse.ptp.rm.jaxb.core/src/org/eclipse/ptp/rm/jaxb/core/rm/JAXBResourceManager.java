@@ -111,8 +111,9 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 				new NullProgressMonitor());
 		if (remoteServices != null) {
 			IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
-			if (rconnMgr != null)
+			if (rconnMgr != null) {
 				return rconnMgr.getConnection(config.getConnectionName());
+			}
 		}
 		return null;
 	}
@@ -146,14 +147,20 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	}
 
+	/*
+	 * Should get the values, run through them in map: if Attribute, setValue()
+	 * if Property, setValue();
+	 */
 	private void setPropertyValuesFromTab(ILaunchConfiguration configuration) {
 		// TODO Auto-generated method stub
 
 	}
 
 	/*
-	 * parse out the connection <property name="remote.host"/> <property
-	 * name="user.name"/> <property name="remote.home"/>
+	 * need to get the control connection, for remote.host. home is then just
+	 * ~/.eclipsesettings parse out the connection <property
+	 * name="remote.host"/> <property name="user.name"/> <property
+	 * name="remote.home"/>
 	 * 
 	 * then set managed-file source/target from the above
 	 */
