@@ -58,17 +58,17 @@ public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConf
 	/**
 	 * @since 5.0
 	 */
+	public void realizeRMDataFromXML() throws Throwable;
+
+	/**
+	 * @since 5.0
+	 */
 	public void removeSelectedAttributeSet();
 
 	/**
 	 * @since 5.0
 	 */
 	public void removeValidAttributeSet();
-
-	/**
-	 * @since 5.0
-	 */
-	public void setResourceManagerData(ResourceManagerData data);
 
 	/**
 	 * @since 5.0

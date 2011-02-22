@@ -9,6 +9,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.Site;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.rmsystem.AbstractControlMonitorRMServiceProvider;
+import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
@@ -52,8 +53,9 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-		if (adapter == IResourceManagerControl.class)
+		if (adapter == IResourceManagerControl.class) {
 			return new JAXBResourceManager(PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
+		}
 		return null;
 	}
 
@@ -61,14 +63,16 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		if (rmdata != null) {
 			Site site = rmdata.getSite();
 			URI defaultURI = null;
-			if (site != null)
+			if (site != null) {
 				try {
 					defaultURI = new URI(site.getControlConnection());
-					if (defaultURI != null)
+					if (defaultURI != null) {
 						return defaultURI.getHost();
+					}
 				} catch (URISyntaxException t) {
 					t.printStackTrace();
 				}
+			}
 		}
 		return ZEROSTR;
 	}
@@ -77,14 +81,16 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		if (rmdata != null) {
 			Site site = rmdata.getSite();
 			URI defaultURI = null;
-			if (site != null)
+			if (site != null) {
 				try {
 					defaultURI = new URI(site.getControlConnection());
-					if (defaultURI != null)
+					if (defaultURI != null) {
 						return defaultURI.getPath();
+					}
 				} catch (URISyntaxException t) {
 					t.printStackTrace();
 				}
+			}
 		}
 		return ZEROSTR;
 	}
@@ -93,17 +99,19 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		if (rmdata != null) {
 			Site site = rmdata.getSite();
 			URI defaultURI = null;
-			if (site != null)
+			if (site != null) {
 				try {
 					defaultURI = new URI(site.getControlConnection());
 					if (defaultURI != null) {
 						int p = defaultURI.getPort();
-						if (p != -1)
+						if (p != -1) {
 							return ZEROSTR + p;
+						}
 					}
 				} catch (URISyntaxException t) {
 					t.printStackTrace();
 				}
+			}
 		}
 		return ZEROSTR;
 	}
@@ -112,14 +120,16 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		if (rmdata != null) {
 			Site site = rmdata.getSite();
 			URI defaultURI = null;
-			if (site != null)
+			if (site != null) {
 				try {
 					defaultURI = new URI(site.getMonitorServerInstall());
-					if (defaultURI != null)
+					if (defaultURI != null) {
 						return defaultURI.getHost();
+					}
 				} catch (URISyntaxException t) {
 					t.printStackTrace();
 				}
+			}
 		}
 		return ZEROSTR;
 	}
@@ -128,14 +138,17 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		if (rmdata != null) {
 			Site site = rmdata.getSite();
 			URI defaultURI = null;
-			if (site != null)
+			if (site != null) {
 				try {
-					defaultURI = new URI(site.getMonitorServerInstall());
-					if (defaultURI != null)
+					String uri = site.getMonitorServerInstall();
+					if (uri != null && uri.length() > 0) {
+						defaultURI = new URI(site.getMonitorServerInstall());
 						return defaultURI.getPath();
+					}
 				} catch (URISyntaxException t) {
 					t.printStackTrace();
 				}
+			}
 		}
 		return ZEROSTR;
 	}
@@ -144,15 +157,17 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		if (rmdata != null) {
 			Site site = rmdata.getSite();
 			URI defaultURI = null;
-			if (site != null)
+			if (site != null) {
 				try {
 					defaultURI = new URI(site.getMonitorServerInstall());
 					int p = defaultURI.getPort();
-					if (p != -1)
+					if (p != -1) {
 						return ZEROSTR + p;
+					}
 				} catch (URISyntaxException t) {
 					t.printStackTrace();
 				}
+			}
 		}
 		return ZEROSTR;
 	}
@@ -184,6 +199,15 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		return getString(VALID_ATTRIBUTES, null);
 	}
 
+	public void realizeRMDataFromXML() throws Throwable {
+		String location = getRMInstanceXMLLocation();
+		if (ZEROSTR.equals(location)) {
+			rmdata = null;
+		} else {
+			rmdata = JAXBUtils.initializeRMData(location);
+		}
+	}
+
 	public void removeSelectedAttributeSet() {
 		keySet().remove(SELECTED_ATTRIBUTES);
 	}
@@ -195,14 +219,11 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 	public void setDefaultNameAndDesc() {
 		String name = JAXB;
 		String conn = getConnectionName();
-		if (conn != null && !conn.equals(ZEROSTR))
+		if (conn != null && !conn.equals(ZEROSTR)) {
 			name += AMP + conn;
+		}
 		setName(name);
 		setDescription(Messages.JAXBServiceProvider_defaultDescription);
-	}
-
-	public void setResourceManagerData(ResourceManagerData data) {
-		rmdata = data;
 	}
 
 	public void setRMInstanceXMLLocation(String location) {

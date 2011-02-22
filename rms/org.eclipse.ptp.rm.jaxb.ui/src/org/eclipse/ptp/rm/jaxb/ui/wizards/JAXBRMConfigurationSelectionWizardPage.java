@@ -62,7 +62,7 @@ public class JAXBRMConfigurationSelectionWizardPage extends RMConfigurationWizar
 				try {
 					// can we turn off modal on the wizard dialog?
 					WidgetUtils.openIDEEditor(choice);
-					// close the editor page
+					// hide the editor page
 				} catch (IOException t) {
 					t.printStackTrace();
 				}

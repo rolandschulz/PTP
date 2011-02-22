@@ -23,17 +23,20 @@
 package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
+import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
+import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
-import org.eclipse.swt.widgets.Composite;
 
 /**
- * Generic Wizard for the JAXB Resource Manager.
+ * Generic Wizard for the JAXB Resource Manager Monitoring.
  * 
  * @author arossi
  * 
  */
 public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractControlMonitorRMConfigurationWizardPage {
+
+	private IJAXBResourceManagerConfiguration jaxbConfig;
 
 	public JAXBRMMonitoringConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		this(wizard, Messages.JAXBRMMonitoringConfigurationWizardPage_Title);
@@ -44,12 +47,34 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractContr
 		setPageComplete(false);
 		isValid = false;
 		setTitle(Messages.JAXBRMMonitoringConfigurationWizardPage_Title);
-		setDescription(Messages.JAXBConfigurationWizardPage_Description);
+		setDescription(Messages.JAXBConnectionWizardPage_Description);
 	}
 
+	/**
+	 * Handle creation of a new connection by pressing the 'New...' button.
+	 * Calls handleRemoteServicesSelected() to update the connection combo with
+	 * the new connection.
+	 * 
+	 */
 	@Override
-	protected void addCustomWidgets(Composite parent) {
-		// NOP
+	protected void handleNewRemoteConnectionSelected() {
+		if (uiConnectionManager != null) {
+			String[] hints = new String[] { ConfigFactory.ATTR_CONNECTION_ADDRESS, ConfigFactory.ATTR_CONNECTION_PORT };
+			String[] defaults = new String[] { jaxbConfig.getDefaultMonitorHost(), jaxbConfig.getDefaultMonitorPort() };
+			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell(), hints, defaults));
+		}
+	}
+
+	/*
+	 * @see org.eclipse.ptp.rm.jaxb.ui.wizards.
+	 * AbstractControlMonitorRMConfigurationWizardPage#initContents()
+	 */
+	@Override
+	protected void initContents() {
+		super.initContents();
+		jaxbConfig = (IJAXBResourceManagerConfiguration) config;
+		targetPath = jaxbConfig.getDefaultMonitorPath();
+		defaultSetting();
 	}
 
 	@Override
@@ -65,20 +90,31 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractContr
 	@Override
 	protected void setConnectionName(String name) {
 		String connectionName = name == null ? config.getConnectionName(CONTROL_CONNECTION_NAME) : name;
-		if (connectionName != null)
+		if (connectionName != null) {
 			config.setConnectionName(connectionName, MONITOR_CONNECTION_NAME);
+		}
 	}
 
 	@Override
 	protected void setConnectionOptions() {
 		int options = 0;
-		if (muxPortFwd)
+		if (muxPortFwd) {
 			options |= IRemoteProxyOptions.PORT_FORWARDING;
-		if (manualLaunch)
+		}
+		if (manualLaunch) {
 			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
+		}
 		config.setMonitorPath(targetPath);
 		config.setMonitorInvocationOptions(targetArgs);
 		config.setMonitorOptions(options);
 		config.setLocalAddress(localAddr);
+	}
+
+	@Override
+	protected void updateSettings() {
+		if (loading) {
+			shareConnectionButton.setSelection(true);
+		}
+		super.updateSettings();
 	}
 }

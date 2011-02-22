@@ -24,9 +24,11 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 	public void testJAXBRMInstantiation() {
 		ResourceManagerData rmdata = null;
 		try {
+			JAXBUtils.validate(xml);
 			rmdata = JAXBUtils.initializeRMData(xml);
-			if (rmdata != null)
+			if (rmdata != null) {
 				RMVariableMap.getInstance().print();
+			}
 		} catch (Throwable t) {
 			t.printStackTrace();
 			assert (t != null);

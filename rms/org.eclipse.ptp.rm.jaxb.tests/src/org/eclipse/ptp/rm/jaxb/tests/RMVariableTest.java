@@ -22,6 +22,7 @@ public class RMVariableTest extends TestCase implements IJAXBNonNLSConstants {
 
 	public void testJAXBLoadVariables() {
 		try {
+			JAXBUtils.validate(xml);
 			JAXBUtils.initializeRMData(xml);
 			String exp = RMVariableMap.dereference("${rm:stagein#description}");
 			System.out.println(exp);
