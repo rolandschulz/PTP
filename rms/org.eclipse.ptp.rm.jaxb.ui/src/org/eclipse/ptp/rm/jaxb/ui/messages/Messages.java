@@ -20,13 +20,14 @@ public class Messages extends NLS {
 	public static String JAXBRMConfigurationSelectionWizardPage_Title;
 	public static String JAXBRMControlConfigurationWizardPage_Title;
 	public static String JAXBRMMonitoringConfigurationWizardPage_Title;
-	public static String JAXBRMSchemaComboGroupTitle;
-	public static String JAXBRMSchemaComboTitle;
+	public static String JAXBRMConfigurationSelectionComboTitle_0;
+	public static String JAXBRMConfigurationSelectionComboTitle_1;
 
 	public static String JAXBRMConfigurationSelectionWizardPage_0;
 	public static String JAXBRMConfigurationSelectionWizardPage_1;
 	public static String JAXBRMConfigurationSelectionWizardPage_2;
 	public static String JAXBRMConfigurationSelectionWizardPage_3;
+	public static String JAXBRMConfigurationSelectionWizardPage_4;
 	public static String JAXBRMConfigurationSelectionWizardPage_Project_Selection_Title;
 	public static String JAXBRMConfigurationSelectionWizardPage_Project_Selection_Message;
 
