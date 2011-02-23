@@ -4,22 +4,8 @@
       <control-connection>ssh://abe.ncsa.uiuc.edu/usr/local/bin/qsub</control-connection>
    </site>
 	<control>
-		<!-- all attribute names, managed-file names and parser ids are added at initialization -->
-		<!-- these included from runtime configuration information -->
-		<property name="remote.host"/>
-		<property name="user.name"/>
-		<property name="remote.home"/>
-		<!-- from the monitoring part -->
-		<property name="available_queues"/>
-		<!-- from the launch command stdout parser -->
-		<property name="jobId"/>
-		<!-- from the other Run Configuration tabs -->
-		<property name="executablePath"/>
-		<property name="progArgs"/>
-		<property name="directory"/>
-		
 		<managed-files>
-			<file-staging-location>${rm:remote.home}/.eclipse</file-staging-location>
+			<file-staging-location>~/.eclipsesettings</file-staging-location>
 			<managed-file name="pbs_script" uniqueIdSuffix="true" deleteAfterUse="true">
 				<contents>${rm:script}</contents>
 			</managed-file>

@@ -33,10 +33,23 @@
 	<xs:element name="control">
 		<xs:annotation>
 			<xs:documentation>
-				The implementation will construct a map serving as the resource manager "environment"; these are dereferenced in
-				the configuration file via ${name} or ${name#part}; in addition to the properties specified at the top level of the control tree,
-				all attributes and parsers will be mapped for reference. A number of runtime variables such as remote host name, user name, etc.,
-				will also be included. The top level of the tree represents the available commands/methods on all resource managers, places for
+				The implementation will construct a variable map serving as the resource manager "environment"; these are dereferenced in
+				the configuration file via ${rm:name} or ${rm:name#getterName}; in addition to the properties specified at the top level of the control tree,
+				all attributes and parsers will be mapped for reference. The following hard-coded variables are added at runtime:
+				<!-- from runtime configuration information -->
+				control.user.name
+				control.address
+				monitor.user.name
+				monitor.address
+            <!-- from the monitoring part -->
+            available_queues
+            <!-- from the launch command stdout parser -->
+            jobId
+            <!-- from the other Run Configuration tabs -->
+            executablePath
+            progArgs
+            directory
+				The top level of the tree represents the available commands/methods on all resource managers, places for
 				defining stdout or stderr parsers, for defining the structure of a batch script to be used, for defining (job) attributes, and
 				finally for describing how to construct the UI (Launch Configuration Tab).
 			</xs:documentation>
@@ -415,8 +428,8 @@
       <xs:annotation>
          <xs:documentation>
             Value assigned to the name is the token with the given index in the returned list; in the context of this
-            implementation, set refers to the name of an attribute or element of AttributeDefinition.  Set can be used
-            together with a single put without index, designating the variable to which to assign the AttributeDefinition.
+            implementation, set refers to the name of an attribute or element of JobAttribute.  Set can be used
+            together with a single put without index, designating the variable to which to assign the JobAttribute.
          </xs:documentation>
       </xs:annotation>
       <xs:complexType>
