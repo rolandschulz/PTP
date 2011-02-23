@@ -44,6 +44,13 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	public String getConnectionName(String type);
 
 	/**
+	 * get the control connection user name.
+	 * 
+	 * @return name
+	 */
+	public String getControlAddress();
+
+	/**
 	 * Get the invocation options as a list of strings. Returns an empty list if
 	 * there are no options
 	 * 
@@ -66,18 +73,32 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	public int getControlOptions();
 
 	/**
-	 * Get the proxy server path. This may be a path on a remote system.
+	 * Get the server path. This may be a path on a remote system.
 	 * 
 	 * @return path
 	 */
 	public String getControlPath();
 
 	/**
-	 * Get the local address for the proxy to connect to
+	 * get the control connection user name.
+	 * 
+	 * @return name
+	 */
+	public String getControlUserName();
+
+	/**
+	 * Get the local address for the remote service to connect to
 	 * 
 	 * @return local address
 	 */
 	public String getLocalAddress();
+
+	/**
+	 * get the control connection user name.
+	 * 
+	 * @return name
+	 */
+	public String getMonitorAddress();
 
 	/**
 	 * Get the invocation options as a list of strings. Returns an empty list if
@@ -102,11 +123,18 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	public int getMonitorOptions();
 
 	/**
-	 * Get the proxy server path. This may be a path on a remote system.
+	 * Get the server path. This may be a path on a remote system.
 	 * 
 	 * @return path
 	 */
 	public String getMonitorPath();
+
+	/**
+	 * get the monitor connection user name.
+	 * 
+	 * @return name
+	 */
+	public String getMonitorUserName();
 
 	/**
 	 * Set the connection name. If there are separate connections for control
@@ -116,6 +144,13 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	 * @param type
 	 */
 	public void setConnectionName(String name, String type);
+
+	/**
+	 * Set the user name for monitor
+	 * 
+	 * @param name
+	 */
+	public void setControlAddress(String name);
 
 	/**
 	 * Set the invocation options. The contents of optionString are split into
@@ -134,11 +169,18 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	public void setControlOptions(int options);
 
 	/**
-	 * Set the proxy server path
+	 * Set the server path
 	 * 
-	 * @param proxyServerPath
+	 * @param ServerPath
 	 */
 	public void setControlPath(String path);
+
+	/**
+	 * Set the user name for control
+	 * 
+	 * @param name
+	 */
+	public void setControlUserName(String name);
 
 	/**
 	 * Set the local address
@@ -146,6 +188,13 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	 * @param localAddr
 	 */
 	public void setLocalAddress(String localAddr);
+
+	/**
+	 * Set the user name for monitor
+	 * 
+	 * @param name
+	 */
+	public void setMonitorAddress(String name);
 
 	/**
 	 * Set the invocation options. The contents of optionString are split into
@@ -164,11 +213,18 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	public void setMonitorOptions(int options);
 
 	/**
-	 * Set the proxy server path
+	 * Set the server path
 	 * 
-	 * @param proxyServerPath
+	 * @param ServerPath
 	 */
 	public void setMonitorPath(String path);
+
+	/**
+	 * Set the user name for monitor
+	 * 
+	 * @param name
+	 */
+	public void setMonitorUserName(String name);
 
 	/**
 	 * Test if option is set.

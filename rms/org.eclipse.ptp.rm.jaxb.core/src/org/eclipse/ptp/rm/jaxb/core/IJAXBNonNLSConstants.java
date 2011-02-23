@@ -40,13 +40,14 @@ public interface IJAXBNonNLSConstants {
 	String REMOTE_PATH_SEP = "/"; //$NON-NLS-1$
 	String PATH_SEP = System.getProperty("file.separator"); //$NON-NLS-1$
 
+	/* KEY WORDS */
 	String TRUE = "true";//$NON-NLS-1$
 	String FALSE = "false";//$NON-NLS-1$
 	String YES = "yes";//$NON-NLS-1$
 	String NO = "no";//$NON-NLS-1$
-
 	String GET = "get";//$NON-NLS-1$
 
+	/* STANDARD PROPERTIES */
 	String JAVA_USER_HOME = "user.home";//$NON-NLS-1$
 	String FILE_SCHEME = "file";//$NON-NLS-1$
 	String XMLSchema = "http://www.w3.org/2001/XMLSchema"; //$NON-NLS-1$
@@ -61,16 +62,32 @@ public interface IJAXBNonNLSConstants {
 	String SELECTED_ATTRIBUTES = "selected_attributes";//$NON-NLS-1$
 	String VALID_ATTRIBUTES = "valid_attributes"; //$NON-NLS-1$
 
+	String CONTROL_USER_NAME = "controlUserName";//$NON-NLS-1$
+	String MONITOR_USER_NAME = "monitorUserName";//$NON-NLS-1$
 	String CONTROL_CONNECTION_NAME = "controlConnectionName";//$NON-NLS-1$
 	String MONITOR_CONNECTION_NAME = "monitorConnectionName";//$NON-NLS-1$
 	String LOCALHOST = "localhost";//$NON-NLS-1$
-	String TAG_CONTROL_PATH = "controlPath"; //$NON-NLS-1$
-	String TAG_MONITOR_PATH = "monitorPath"; //$NON-NLS-1$
-	String TAG_CONTROL_OPTIONS = "controlOptions"; //$NON-NLS-1$
-	String TAG_MONITOR_OPTIONS = "monitorOptions"; //$NON-NLS-1$
-	String TAG_CONTROL_INVOCATION_OPTIONS = "controlInvocationOptions"; //$NON-NLS-1$
-	String TAG_MONITOR_INVOCATION_OPTIONS = "monitorInvocationOptions"; //$NON-NLS-1$
-	String TAG_LOCAL_ADDRESS = "localAddress"; //$NON-NLS-1$
+	String CONTROL_PATH = "controlPath"; //$NON-NLS-1$
+	String MONITOR_PATH = "monitorPath"; //$NON-NLS-1$
+	String CONTROL_OPTIONS = "controlOptions"; //$NON-NLS-1$
+	String MONITOR_OPTIONS = "monitorOptions"; //$NON-NLS-1$
+	String CONTROL_INVOCATION_OPTIONS = "controlInvocationOptions"; //$NON-NLS-1$
+	String MONITOR_INVOCATION_OPTIONS = "monitorInvocationOptions"; //$NON-NLS-1$
+	String CONTROL_ADDRESS = "controlAddress"; //$NON-NLS-1$
+	String LOCAL_ADDRESS = "localAddress"; //$NON-NLS-1$
+	String MONITOR_ADDRESS = "monitorAddress"; //$NON-NLS-1$
 
+	String CONTROL_USER_VAR = "control.user.name";//$NON-NLS-1$
+	String CONTROL_ADDRESS_VAR = "control.address";//$NON-NLS-1$
+	String MONITOR_USER_VAR = "monitor.user.name";//$NON-NLS-1$
+	String MONITOR_ADDRESS_VAR = "monitor.address";//$NON-NLS-1$
 	String ARPA = ".in-addr.arpa";//$NON-NLS-1$
+
+	String QUEUES = "available_queues";//$NON-NLS-1$
+	String JOB_ID = "jobId";//$NON-NLS-1$
+	String EXEC_PATH = "executablePath";//$NON-NLS-1$
+	String PROG_ARGS = "progArgs";//$NON-NLS-1$
+	String DIRECTORY = "directory";//$NON-NLS-1$
+	String MPI_CMD = "mpiCommand";//$NON-NLS-1$
+	String MPI_ARGS = "mpiArgs";//$NON-NLS-1$
 }
