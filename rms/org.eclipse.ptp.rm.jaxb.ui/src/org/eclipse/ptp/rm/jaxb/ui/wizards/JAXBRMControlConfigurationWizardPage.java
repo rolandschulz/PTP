@@ -47,6 +47,16 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 		connectionSharingEnabled = false;
 	}
 
+	@Override
+	protected void configureInternal() {
+		jaxbConfig = (IJAXBResourceManagerConfiguration) config;
+		try {
+			jaxbConfig.realizeRMDataFromXML();
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
+
 	/**
 	 * Handle creation of a new connection by pressing the 'New...' button.
 	 * Calls handleRemoteServicesSelected() to update the connection combo with
@@ -62,25 +72,6 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 		}
 	}
 
-	/*
-	 * The ResourceManagerData is unmarshaled here. (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.ui.wizards.
-	 * AbstractControlMonitorRMConfigurationWizardPage#initContents()
-	 */
-	@Override
-	protected void initContents() {
-		super.initContents();
-		jaxbConfig = (IJAXBResourceManagerConfiguration) config;
-		try {
-			jaxbConfig.realizeRMDataFromXML();
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
-		targetPath = jaxbConfig.getDefaultControlPath();
-		defaultSetting();
-	}
-
 	@Override
 	protected void loadConnectionOptions() {
 		targetPath = config.getControlPath();
@@ -89,7 +80,9 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 		int options = config.getControlOptions();
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
-
+		if (ZEROSTR.equals(targetPath)) {
+			targetPath = jaxbConfig.getDefaultControlPath();
+		}
 	}
 
 	@Override

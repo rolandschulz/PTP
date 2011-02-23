@@ -50,6 +50,11 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractContr
 		setDescription(Messages.JAXBConnectionWizardPage_Description);
 	}
 
+	@Override
+	protected void configureInternal() {
+		jaxbConfig = (IJAXBResourceManagerConfiguration) config;
+	}
+
 	/**
 	 * Handle creation of a new connection by pressing the 'New...' button.
 	 * Calls handleRemoteServicesSelected() to update the connection combo with
@@ -65,18 +70,6 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractContr
 		}
 	}
 
-	/*
-	 * @see org.eclipse.ptp.rm.jaxb.ui.wizards.
-	 * AbstractControlMonitorRMConfigurationWizardPage#initContents()
-	 */
-	@Override
-	protected void initContents() {
-		super.initContents();
-		jaxbConfig = (IJAXBResourceManagerConfiguration) config;
-		targetPath = jaxbConfig.getDefaultMonitorPath();
-		defaultSetting();
-	}
-
 	@Override
 	protected void loadConnectionOptions() {
 		targetPath = config.getMonitorPath();
@@ -85,6 +78,9 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractContr
 		int options = config.getMonitorOptions();
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
+		if (ZEROSTR.equals(targetPath)) {
+			targetPath = jaxbConfig.getDefaultMonitorPath();
+		}
 	}
 
 	@Override

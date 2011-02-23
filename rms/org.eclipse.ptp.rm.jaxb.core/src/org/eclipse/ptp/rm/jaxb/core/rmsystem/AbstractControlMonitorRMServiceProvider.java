@@ -186,7 +186,6 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 */
 	public void setControlPath(String path) {
 		putString(TAG_CONTROL_PATH, path);
-
 	}
 
 	/**
@@ -231,6 +230,18 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 */
 	public boolean testOption(int option) {
 		return (getMonitorOptions() & option) == option;
+	}
+
+	protected void clearRMData() {
+		controlInvocationOptions.clear();
+		monitorInvocationOptions.clear();
+		putString(TAG_CONTROL_PATH, ZEROSTR);
+		putString(TAG_MONITOR_PATH, ZEROSTR);
+		putString(TAG_CONTROL_OPTIONS, ZEROSTR);
+		putString(TAG_MONITOR_OPTIONS, ZEROSTR);
+		putString(TAG_MONITOR_INVOCATION_OPTIONS, ZEROSTR);
+		putString(TAG_CONTROL_INVOCATION_OPTIONS, ZEROSTR);
+		putString(TAG_LOCAL_ADDRESS, ZEROSTR);
 	}
 
 	/**

@@ -130,6 +130,7 @@ public class JAXBUtils implements IJAXBNonNLSConstants {
 
 	private static void initialize(Control control) {
 		Map<String, Object> env = RMVariableMap.getInstance().getVariables();
+		env.clear();
 		addProperties(env, control);
 		addAttributes(env, control);
 		addCommands(env, control);

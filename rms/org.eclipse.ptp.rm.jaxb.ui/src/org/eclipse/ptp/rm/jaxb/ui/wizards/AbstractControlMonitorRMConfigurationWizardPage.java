@@ -116,13 +116,31 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		 */
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if (!loading && (source == targetPathText)) {
-				/*
-				 * Reschedule the validate job to run in VALIDATE_TIMER ms every
-				 * time the user hits a key.
-				 */
-				validateJob.cancel();
-				validateJob.schedule(VALIDATE_TIMER);
+			if (source == targetPathText) {
+				targetPath = targetPathText.getText();
+				if (!loading) {
+					validateJob.cancel();
+					validateJob.schedule();
+				}
+			} else {
+				if (source == remoteCombo) {
+					/*
+					 * If we're loading saved settings, then we want to select
+					 * the saved connection after the remote services are
+					 * selected. Otherwise just pick the default item.
+					 */
+					if (loading) {
+						handleRemoteServiceSelected(connection);
+					} else {
+						handleRemoteServiceSelected(null);
+					}
+					updateSettings();
+				} else if (source == connectionCombo) {
+					handleConnectionSelected();
+				} else if (source == localAddrCombo) {
+					updateSettings();
+				}
+				updatePage();
 			}
 		}
 
@@ -134,8 +152,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		 * .eclipse.jface.util.PropertyChangeEvent)
 		 */
 		public void propertyChange(PropertyChangeEvent event) {
-			if (event.getProperty().equals(FieldEditor.IS_VALID))
+			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 				updatePage();
+			}
 		}
 
 		/*
@@ -148,15 +167,18 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Object source = e.getSource();
-			if (source == browseButton)
+			if (source == browseButton) {
 				handlePathBrowseButtonSelected();
-			else if (source == optionsButton) {
-				targetArgs = WidgetUtils.createOptionsDialog(getShell(), targetArgs);
-				updatePage();
-			} else if (connectionSharingEnabled && source == shareConnectionButton)
-				updateSettings();
-			else {
-				updateSettings();
+			} else {
+				if (source == optionsButton) {
+					targetArgs = WidgetUtils.createOptionsDialog(getShell(), targetArgs);
+				} else if (connectionSharingEnabled && source == shareConnectionButton) {
+					updateSettings();
+				} else if (source == newConnectionButton) {
+					handleNewRemoteConnectionSelected();
+				} else {
+					updateSettings();
+				}
 				updatePage();
 			}
 		}
@@ -194,7 +216,6 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	protected Combo connectionCombo;
 	protected Combo localAddrCombo;
 
-	protected boolean targetPathEnabled = true;
 	protected boolean targetOptionsEnabled = true;
 	protected boolean multiplexingEnabled = true;
 	protected boolean fManualLaunchEnabled = true;
@@ -231,8 +252,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 * was specified manually.
 	 */
 	public void initializeLocalHostCombo() {
-		if (localAddrCombo == null)
+		if (localAddrCombo == null) {
 			return;
+		}
 		Set<String> addrs = new TreeSet<String>();
 		try {
 			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -241,23 +263,25 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
 				while (alladdr.hasMoreElements()) {
 					InetAddress ip = alladdr.nextElement();
-					if (ip instanceof Inet4Address)
+					if (ip instanceof Inet4Address) {
 						addrs.add(fixHostName(ip.getCanonicalHostName()));
+					}
 				}
 			}
 		} catch (Exception e) {
 			// at least we'll still get localhost
 		}
-		if (addrs.size() == 0)
-			addrs.add("localhost"); //$NON-NLS-1$
+		if (addrs.size() == 0) {
+			addrs.add(LOCALHOST);
+		}
 		localAddrCombo.removeAll();
 		int index = 0;
 		int selection = -1;
 		for (String addr : addrs) {
 			localAddrCombo.add(addr);
-			if ((localAddr.equals("") && addr.equals("localhost")) //$NON-NLS-1$ //$NON-NLS-2$
-					|| addr.equals(localAddr))
+			if ((localAddr.equals(ZEROSTR) && addr.equals(LOCALHOST)) || addr.equals(localAddr)) {
 				selection = index;
+			}
 			index++;
 		}
 		/*
@@ -265,8 +289,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		 * selection
 		 */
 		if (selection < 0) {
-			if (!localAddr.equals("")) //$NON-NLS-1$
+			if (!localAddr.equals(ZEROSTR)) {
 				localAddrCombo.add(localAddr);
+			}
 			selection = localAddrCombo.getItemCount() - 1;
 		}
 		localAddrCombo.select(selection);
@@ -279,13 +304,14 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 * @return
 	 */
 	public boolean performOk() {
-		store();
-		if (remoteServices != null)
+		if (remoteServices != null) {
 			config.setRemoteServicesId(remoteServices.getId());
-		if (connection != null)
+		}
+		if (connection != null) {
 			setConnectionName(connection.getName());
-		else
+		} else {
 			setConnectionName(null);
+		}
 		setConnectionOptions();
 		return true;
 	}
@@ -304,13 +330,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		super.setVisible(visible);
 	}
 
-	/**
-	 * Transfer current settings to text fields
-	 */
-	protected void defaultSetting() {
-		if (targetPathEnabled)
-			targetPathText.setText(targetPath);
-	}
+	protected abstract void configureInternal();
 
 	/**
 	 * Clean up the content of a text field.
@@ -319,8 +339,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 * @return cleaned up text.
 	 */
 	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals(ZEROSTR))
+		if (text.trim().length() == 0 || text.equals(ZEROSTR)) {
 			return null;
+		}
 
 		return text;
 	}
@@ -338,36 +359,37 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 
 		/*
 		 * Disable port forwarding button if it's not supported. If port
-		 * forwarding was selected, switch to 'none' instead.
+		 * forwarding was selected, switch to 'forward' instead.
 		 */
-		if (connection != null)
+		if (connection != null) {
 			portFwdSupported = connection.supportsTCPPortForwarding();
+			portForwardingButton.setSelection(portFwdSupported);
+		}
+
 		/*
 		 * Linux doesn't call modify handler (which calls updateSettings &
 		 * updatePage) so need to call them explicitly here
 		 */
 		updateSettings();
-		updatePage();
+		validateJob.cancel();
+		validateJob.schedule();
 	}
 
 	/**
 	 * Handle creation of a new connection by pressing the 'New...' button.
 	 * Calls handleRemoteServicesSelected() to update the connection combo with
 	 * the new connection.
-	 * 
-	 * TODO should probably select the new connection
 	 */
 	protected void handleNewRemoteConnectionSelected() {
-		if (uiConnectionManager != null)
+		if (uiConnectionManager != null) {
 			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell()));
+		}
 	}
 
 	/**
 	 * Show a dialog that lets the user select a file.
 	 */
 	protected void handlePathBrowseButtonSelected() {
-		if (!targetPathEnabled)
-			return;
 		if (connection != null) {
 			checkConnection();
 			if (connection.isOpen()) {
@@ -379,8 +401,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 						String correctPath = targetPathText.getText();
 						String selectedPath = fileMgr.browseFile(getShell(),
 								Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_16, correctPath, 0);
-						if (selectedPath != null)
+						if (selectedPath != null) {
 							targetPathText.setText(selectedPath.toString());
+						}
 					}
 				}
 			}
@@ -404,8 +427,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 			remoteServices = fAllRemoteServices[selectionIndex];
 			connectionManager = remoteServices.getConnectionManager();
 			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
-			if (remUIServices != null)
+			if (remUIServices != null) {
 				uiConnectionManager = remUIServices.getUIConnectionManager();
+			}
 			IRemoteConnection[] connections = connectionManager.getConnections();
 			Arrays.sort(connections, new Comparator<IRemoteConnection>() {
 				public int compare(IRemoteConnection c1, IRemoteConnection c2) {
@@ -416,8 +440,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 			int selected = 0;
 			for (int i = 0; i < connections.length; i++) {
 				connectionCombo.add(connections[i].getName());
-				if (conn != null && connections[i].equals(conn))
+				if (conn != null && connections[i].equals(conn)) {
 					selected = i;
+				}
 			}
 			if (connections.length > 0) {
 				connectionCombo.select(selected);
@@ -444,11 +469,13 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	protected void initContents() {
 		loading = true;
 		config = (IControlMonitorRMConfiguration) getConfigurationWizard().getConfiguration();
+		configureInternal();
 		loadSaved();
 		updateSettings();
-		defaultSetting();
 		initializeRemoteServicesCombo();
 		initializeLocalHostCombo();
+		validateJob.cancel();
+		validateJob.schedule();
 		loading = false;
 	}
 
@@ -460,14 +487,16 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 */
 	protected void initializeRemoteServicesCombo() {
 		IWizardContainer container = null;
-		if (getControl().isVisible())
+		if (getControl().isVisible()) {
 			container = getWizard().getContainer();
+		}
 		fAllRemoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(container);
 		IRemoteServices defServices;
-		if (remoteServices != null)
+		if (remoteServices != null) {
 			defServices = remoteServices;
-		else
+		} else {
 			defServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+		}
 		int defIndex = 0;
 		Arrays.sort(fAllRemoteServices, new Comparator<IRemoteServices>() {
 			public int compare(IRemoteServices c1, IRemoteServices c2) {
@@ -477,8 +506,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		remoteCombo.removeAll();
 		for (int i = 0; i < fAllRemoteServices.length; i++) {
 			remoteCombo.add(fAllRemoteServices[i].getName());
-			if (fAllRemoteServices[i].equals(defServices))
+			if (fAllRemoteServices[i].equals(defServices)) {
 				defIndex = i;
+			}
 		}
 		if (fAllRemoteServices.length > 0) {
 			remoteCombo.select(defIndex);
@@ -495,7 +525,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 * @return
 	 */
 	protected boolean isValidSetting() {
-		if (targetPathEnabled && targetPathText != null) {
+		if (targetPathText != null) {
 			String name = getFieldContent(targetPathText.getText());
 			if (name == null || !targetPathIsValid) {
 				setErrorMessage(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_17);
@@ -519,10 +549,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		if (!loading) {
 			setErrorMessage(null);
 			setMessage(null);
-
-			if (!isValidSetting())
+			if (!isValidSetting()) {
 				setValid(false);
-			else {
+			} else {
 				performOk();
 				setValid(true);
 			}
@@ -540,10 +569,12 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		 * Get current settings unless we're initializing things
 		 */
 		if (!loading) {
-			if (portForwardingButton != null)
+			if (portForwardingButton != null) {
 				muxPortFwd = portForwardingButton.getSelection();
-			if (manualButton != null)
+			}
+			if (manualButton != null) {
 				manualLaunch = manualButton.getSelection();
+			}
 		}
 
 		if (shareConnectionButton != null) {
@@ -557,32 +588,40 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		 * If no localAddr has been specified in the configuration, select a
 		 * default one.
 		 */
-		if (localAddrCombo != null)
-			if (!loading || localAddr.equals(ZEROSTR))
+		if (localAddrCombo != null) {
+			if (!loading || localAddr.equals(ZEROSTR)) {
 				localAddr = localAddrCombo.getText();
+			}
+		}
 
 		/*
 		 * Fix settings
 		 */
-		if (muxPortFwd && !portFwdSupported)
+		if (muxPortFwd && !portFwdSupported) {
 			muxPortFwd = false;
+		}
 
 		/*
 		 * Update UI to display correct settings
 		 */
-		if (noneButton != null)
+		targetPathText.setText(targetPath);
+
+		if (noneButton != null) {
 			noneButton.setSelection(!muxPortFwd);
+		}
 
 		if (portForwardingButton != null) {
 			portForwardingButton.setSelection(muxPortFwd);
 			portForwardingButton.setEnabled(portFwdSupported);
 		}
 
-		if (localAddrCombo != null)
+		if (localAddrCombo != null) {
 			localAddrCombo.setEnabled(!muxPortFwd);
+		}
 
-		if (manualButton != null)
+		if (manualButton != null) {
 			manualButton.setSelection(manualLaunch);
+		}
 	}
 
 	/**
@@ -593,14 +632,12 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 * @since 1.1
 	 */
 	protected boolean validateTargetPath() {
-		if (!targetPathEnabled)
-			return true;
 		targetPathIsValid = false;
 		final String path = targetPathText.getText();
-		if (path != null)
+		if (path != null) {
 			if (connection != null) {
 				checkConnection();
-				if (connection.isOpen())
+				if (connection.isOpen()) {
 					if (remoteServices != null) {
 						final IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
 						if (fileMgr != null) {
@@ -608,8 +645,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 								public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 									try {
 										IFileStore file = fileMgr.getResource(path);
-										if (!monitor.isCanceled())
+										if (!monitor.isCanceled()) {
 											targetPathIsValid = file.fetchInfo(EFS.NONE, monitor).exists();
+										}
 									} catch (CoreException e) {
 										throw new InvocationTargetException(e);
 									}
@@ -627,7 +665,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 							}
 						}
 					}
+				}
 			}
+		}
 		return targetPathIsValid;
 	}
 
@@ -640,8 +680,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
 						connection.open(monitor);
-						if (monitor.isCanceled())
+						if (monitor.isCanceled()) {
 							throw new InterruptedException(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_0);
+						}
 					} catch (RemoteConnectionException e) {
 						throw new InvocationTargetException(e);
 					}
@@ -703,6 +744,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
 		remoteCombo.setLayoutData(gd);
+		remoteCombo.addModifyListener(listener);
 
 		/*
 		 * connection location
@@ -717,53 +759,51 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		connectionCombo.setLayoutData(gd);
+		connectionCombo.addModifyListener(listener);
 
 		newConnectionButton = SWTUtil.createPushButton(remoteComp,
 				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_6, null);
 
-		if (targetPathEnabled) {
+		/*
+		 * group for service executable information
+		 */
+		Composite serviceComp = new Group(parent, SWT.NONE);
+		layout = new GridLayout();
+		layout.numColumns = 4;
+		layout.marginWidth = 0;
+		serviceComp.setLayout(layout);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 4;
+		serviceComp.setLayoutData(gd);
+
+		/*
+		 * Service path
+		 */
+		label = new Label(serviceComp, SWT.NONE);
+		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_7);
+		gd = new GridData();
+		gd.horizontalSpan = 1;
+		label.setLayoutData(gd);
+
+		targetPathText = new Text(serviceComp, SWT.SINGLE | SWT.BORDER);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 1;
+		gd.grabExcessHorizontalSpace = true;
+		gd.widthHint = 100;
+		targetPathText.setLayoutData(gd);
+		targetPathText.addModifyListener(listener);
+
+		browseButton = SWTUtil.createPushButton(serviceComp, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_8,
+				null);
+		browseButton.addSelectionListener(listener);
+
+		if (targetOptionsEnabled) {
 			/*
-			 * group for service executable information
+			 * options
 			 */
-			Composite serviceComp = new Group(parent, SWT.NONE);
-			layout = new GridLayout();
-			layout.numColumns = 4;
-			layout.marginWidth = 0;
-			serviceComp.setLayout(layout);
-			gd = new GridData(GridData.FILL_HORIZONTAL);
-			gd.horizontalSpan = 4;
-			serviceComp.setLayoutData(gd);
-
-			/*
-			 * Service path
-			 */
-			label = new Label(serviceComp, SWT.NONE);
-			label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_7);
-			gd = new GridData();
-			gd.horizontalSpan = 1;
-			label.setLayoutData(gd);
-
-			targetPathText = new Text(serviceComp, SWT.SINGLE | SWT.BORDER);
-			gd = new GridData(GridData.FILL_HORIZONTAL);
-			gd.horizontalSpan = 1;
-			gd.grabExcessHorizontalSpace = true;
-			gd.widthHint = 100;
-			targetPathText.setLayoutData(gd);
-			targetPathText.addModifyListener(listener);
-
-			browseButton = SWTUtil.createPushButton(serviceComp,
-					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_8, null);
-			browseButton.addSelectionListener(listener);
-
-			if (targetOptionsEnabled) {
-				/*
-				 * options
-				 */
-				optionsButton = SWTUtil.createPushButton(serviceComp,
-						Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_9, null);
-				optionsButton.addSelectionListener(listener);
-
-			}
+			optionsButton = SWTUtil.createPushButton(serviceComp,
+					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_9, null);
+			optionsButton.addSelectionListener(listener);
 		}
 
 		/*
@@ -814,8 +854,6 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 			manualButton = WidgetUtils.createCheckButton(parent, "Launch server manually"); //$NON-NLS-1$
 			manualButton.addSelectionListener(listener);
 		}
-
-		registerListeners();
 	}
 
 	/**
@@ -829,8 +867,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 */
 	private String fixHostName(String hostname) {
 		try {
-			if (hostname.endsWith(".in-addr.arpa")) //$NON-NLS-1$
+			if (hostname.endsWith(ARPA)) {
 				return InetAddress.getLocalHost().getHostAddress();
+			}
 		} catch (UnknownHostException e) {
 			// should not happen
 		}
@@ -844,57 +883,19 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
 			IWizardContainer container = null;
-			if (getControl().isVisible())
+			if (getControl().isVisible()) {
 				container = getWizard().getContainer();
+			}
 			remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(rmID, container);
 			String conn = config.getConnectionName();
-			if (remoteServices != null && conn != null)
+			if (remoteServices != null && conn != null) {
 				connection = remoteServices.getConnectionManager().getConnection(conn);
+			}
+		} else {
+			remoteServices = null;
+			connection = null;
 		}
 		loadConnectionOptions();
-	}
-
-	/**
-	 * @since 1.1
-	 */
-	private void registerListeners() {
-		if (remoteCombo != null)
-			remoteCombo.addModifyListener(new ModifyListener() {
-				public void modifyText(ModifyEvent e) {
-					/*
-					 * If we're loading saved settings, then we want to select
-					 * the saved connection after the remote services are
-					 * selected. Otherwise just pick the default item.
-					 */
-					if (loading)
-						handleRemoteServiceSelected(connection);
-					else
-						handleRemoteServiceSelected(null);
-					updateSettings();
-				}
-			});
-		if (connectionCombo != null)
-			connectionCombo.addModifyListener(new ModifyListener() {
-				public void modifyText(ModifyEvent e) {
-					handleConnectionSelected();
-					updatePage();
-				}
-			});
-		if (newConnectionButton != null)
-			newConnectionButton.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent evt) {
-					handleNewRemoteConnectionSelected();
-					updatePage();
-				}
-			});
-		if (localAddrCombo != null)
-			localAddrCombo.addModifyListener(new ModifyListener() {
-				public void modifyText(ModifyEvent e) {
-					updateSettings();
-					updatePage();
-				}
-			});
 	}
 
 	/**
@@ -906,13 +907,5 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	private void setValid(boolean complete) {
 		isValid = complete;
 		setPageComplete(isValid);
-	}
-
-	/**
-	 * Store text fields
-	 */
-	private void store() {
-		if (targetPathEnabled && targetPathText != null)
-			targetPath = targetPathText.getText();
 	}
 }
