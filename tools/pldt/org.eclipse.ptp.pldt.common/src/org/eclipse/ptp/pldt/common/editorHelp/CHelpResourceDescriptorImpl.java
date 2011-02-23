@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.help.IHelpResource;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
-import org.osgi.framework.Bundle;
 
 public class CHelpResourceDescriptorImpl implements ICHelpResourceDescriptor {
 	ICHelpBook book;
@@ -44,7 +43,8 @@ public class CHelpResourceDescriptorImpl implements ICHelpResourceDescriptor {
 		// href = "/"+pluginId + "/html/" + name + ".html";
 		StringBuffer buf = new StringBuffer();
 
-		// Find where the html dir is located - could vary e.g. if a fragment provides "extra" info
+		// Find where the html dir is located - could vary e.g. if a fragment
+		// provides "extra" info
 		String htmlLocn = findHTMLdir(pluginId);
 
 		buf.append("/").append(pluginId).append("/").append(htmlLocn).append("/").append(name).append(".html"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -71,11 +71,24 @@ public class CHelpResourceDescriptorImpl implements ICHelpResourceDescriptor {
 		};
 	}
 
+	public ICHelpBook getCHelpBook() {
+		return book;
+	}
+
+	public IHelpResource[] getHelpResources() {
+		return resources;
+	}
+
+	@Override
+	public String toString() {
+		return name + " -> " + href; //$NON-NLS-1$
+	}
+
 	/**
 	 * Find the HTML directory that holds the html files that dynamic help will
 	 * use. Normally this is in the 'html' directory but if there is a fragment
-	 * plug-in that e.g. adds "extra" information for the html files (via an Eclipse extension), then we
-	 * want to use that one.
+	 * plug-in that e.g. adds "extra" information for the html files (via an
+	 * Eclipse extension), then we want to use that one.
 	 * 
 	 * @param pluginId
 	 *            the plugin/bundle that we want the HTML directory for
@@ -85,38 +98,31 @@ public class CHelpResourceDescriptorImpl implements ICHelpResourceDescriptor {
 		String result = "html";
 		String pid = CommonPlugin.PLUGIN_ID;
 		String extid = "althelp";
-		if(traceOn)System.out.println("Looking for HTML dir for "+pluginId);
+		if (traceOn) {
+			System.out.println("Looking for HTML dir for " + pluginId);
+		}
 		IExtension[] extensions = Platform.getExtensionRegistry().getExtensionPoint(pid, extid).getExtensions();
 		for (int i = 0; i < extensions.length; i++) {
 			IExtension extn = extensions[i];
 			String extLabel = extn.getLabel();
-			if (traceOn)
+			if (traceOn) {
 				System.out.println("  Found extension for " + extLabel + "  id=" + extn.getUniqueIdentifier()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			String uid = extn.getUniqueIdentifier();
 			if (uid.startsWith(pluginId)) {
 				IConfigurationElement[] configElements = extensions[i].getConfigurationElements();
 				for (int j = 0; j < configElements.length; j++) {
 					IConfigurationElement ice = configElements[j];
 					result = ice.getAttribute("dirname"); //$NON-NLS-1$
-					if(traceOn)System.out.println("    dirname=" + result); //$NON-NLS-1$
-					//we can stop looking now
+					if (traceOn) {
+						System.out.println("    dirname=" + result); //$NON-NLS-1$
+					}
+					// we can stop looking now
 					return result;
 				}
 			}
 		}
 		// Didn't find anything better, so stick with what we had
 		return result;
-	}
-
-	public ICHelpBook getCHelpBook() {
-		return book;
-	}
-
-	public IHelpResource[] getHelpResources() {
-		return resources;
-	}
-
-	public String toString() {
-		return name + " -> " + href; //$NON-NLS-1$
 	}
 }
