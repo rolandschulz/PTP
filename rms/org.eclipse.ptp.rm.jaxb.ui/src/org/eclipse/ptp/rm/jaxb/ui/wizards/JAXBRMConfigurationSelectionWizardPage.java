@@ -281,6 +281,7 @@ public class JAXBRMConfigurationSelectionWizardPage extends RMConfigurationWizar
 	private void initContents() {
 		jaxbConfig = (IJAXBResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
 		setAvailableConfigurations();
+		setValid();
 	}
 
 	private boolean isValidSetting() {

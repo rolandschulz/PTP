@@ -4,7 +4,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.rmsystem.IControlMonitorRMConfiguration;
 
 public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConfiguration {
-
 	/**
 	 * @since 5.0
 	 */

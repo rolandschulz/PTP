@@ -241,7 +241,11 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 	}
 
 	public void setRMInstanceXMLLocation(String location) {
-		putString(RM_XSD_PATH, location);
+		String current = getRMInstanceXMLLocation();
+		if (!current.equals(location)) {
+			putString(RM_XSD_PATH, location);
+			clearRMData();
+		}
 	}
 
 	public void setSelectedAttributeSet(String serialized) {
@@ -250,5 +254,15 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 
 	public void setValidAttributeSet(String serialized) {
 		putString(VALID_ATTRIBUTES, serialized);
+	}
+
+	@Override
+	protected void clearRMData() {
+		rmdata = null;
+		setRemoteServicesId(null);
+		setConnectionName(null);
+		setConnectionName(CONTROL_CONNECTION_NAME, null);
+		setConnectionName(MONITOR_CONNECTION_NAME, null);
+		super.clearRMData();
 	}
 }

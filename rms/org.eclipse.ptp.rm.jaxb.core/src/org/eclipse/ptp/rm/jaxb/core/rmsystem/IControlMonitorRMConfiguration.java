@@ -138,7 +138,7 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	 * 
 	 * @param proxyServerPath
 	 */
-	public void setControlPath(String proxyServerPath);
+	public void setControlPath(String path);
 
 	/**
 	 * Set the local address
@@ -168,7 +168,7 @@ public interface IControlMonitorRMConfiguration extends IResourceManagerConfigur
 	 * 
 	 * @param proxyServerPath
 	 */
-	public void setMonitorPath(String proxyServerPath);
+	public void setMonitorPath(String path);
 
 	/**
 	 * Test if option is set.
