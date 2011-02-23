@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Text;
  * operations (eg. getting from widgets, validating, writing to storage). The
  * class controls the validity state of the dialog page and its error/warning
  * message.
- *
+ * 
  * @author Daniel Felix Ferber
  */
 public abstract class DataSource {
@@ -50,8 +50,7 @@ public abstract class DataSource {
 			canAccept = false;
 		}
 
-		public ValidationException(String message, boolean canAccept,
-				boolean canSave) {
+		public ValidationException(String message, boolean canAccept, boolean canSave) {
 			super(message);
 			this.canAccept = canAccept;
 			this.canSave = canSave;
@@ -66,24 +65,24 @@ public abstract class DataSource {
 		}
 	}
 
-	private ValidationException firstException = null;
-	private boolean canSave = false;
-	private boolean canAccept = false;
+	private ValidationException fFirstException = null;
+	private boolean fCanSave = false;
+	private boolean fCanAccept = false;
 
 	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	/**
 	 * Update the page with the error message and status.
-	 *
+	 * 
 	 * @param e
 	 *            Exception raised while validating the intermediate storage.
 	 */
-	abstract protected void setErrorMessage(ValidationException e);
+	protected abstract void setErrorMessage(ValidationException e);
 
 	/**
 	 * Facility to get string value of a {@link Text} widget, or null if the
 	 * widget is empty.
-	 *
+	 * 
 	 * @param text
 	 *            The widget
 	 * @return The string value of widget or null widget is empty.
@@ -97,7 +96,7 @@ public abstract class DataSource {
 	/**
 	 * Facility to get string value of a {@link Combo} widget, or null if the
 	 * widget is empty.
-	 *
+	 * 
 	 * @param text
 	 *            The widget
 	 * @return The string value of widget or null widget is empty.
@@ -110,7 +109,7 @@ public abstract class DataSource {
 
 	/**
 	 * Facility to set the string value of a {@link Text} widget.
-	 *
+	 * 
 	 * @param t
 	 *            The {@link Text} widget.
 	 * @param s
@@ -127,7 +126,7 @@ public abstract class DataSource {
 
 	/**
 	 * Facility to set the string value of a {@link Text} widget.
-	 *
+	 * 
 	 * @param t
 	 *            The {@link Text} widget.
 	 * @param s
@@ -145,18 +144,18 @@ public abstract class DataSource {
 	/**
 	 * Called to individually validate each value in intermediary storage.
 	 * Should be used to test format and range of values.
-	 *
+	 * 
 	 * @throws ValidationException
 	 *             A value in intermediary storage is invalid. The message of
 	 *             the exception is shown as error message in the preference
 	 *             page.
 	 */
-	abstract protected void validateLocal() throws ValidationException;
+	protected abstract void validateLocal() throws ValidationException;
 
 	/**
 	 * Called to validate the intermediary storage as a whole. Should be used to
 	 * test values make sense with each other.
-	 *
+	 * 
 	 * @throws ValidationException
 	 *             A value in intermediary storage is invalid. The message of
 	 *             the exception is shown as error message in the preference
@@ -169,82 +168,82 @@ public abstract class DataSource {
 	/**
 	 * Called to write the intermediary storage into storage.
 	 */
-	abstract protected void copyToStorage();
+	protected abstract void copyToStorage();
 
 	/**
 	 * Called to read the intermediary storage from storage.
 	 */
-	abstract protected void loadFromStorage();
+	protected abstract void loadFromStorage();
 
 	/**
 	 * Called to assign default values to intermediary storage.
 	 */
-	abstract protected void loadDefault();
+	protected abstract void loadDefault();
 
 	/**
 	 * Copy values from the intermediary storage to the widgets.
 	 */
-	abstract protected void copyToFields();
+	protected abstract void copyToFields();
 
 	/**
 	 * Copy values from the widgets to intermediary storage.
-	 *
+	 * 
 	 * @throws ValidationException
 	 *             A widget cannot be read because it contains an invalid value
 	 *             that cannot be parsed to intermediary storage.
 	 */
-	abstract protected void copyFromFields() throws ValidationException;
+	protected abstract void copyFromFields() throws ValidationException;
 
 	/**
 	 * Update visibility and 'enablebility' of widgets.
 	 */
-	abstract protected void update();
+	protected abstract void update();
 
 	protected void addException(ValidationException e) {
 		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: Add Exception: {0}", e.getMessage()); //$NON-NLS-1$
-		if (firstException == null) {
-			firstException = e;
-			canAccept = e.canAccept();
-			canSave = e.canSave();
+		if (fFirstException == null) {
+			fFirstException = e;
+			fCanAccept = e.canAccept();
+			fCanSave = e.canSave();
 		} else {
-			if (canSave && ! e.canSave()) {
-				firstException = e;
+			if (fCanSave && !e.canSave()) {
+				fFirstException = e;
 			}
-			canAccept = canAccept && e.canAccept();
-			canSave = canSave && e.canSave();
+			fCanAccept = fCanAccept && e.canAccept();
+			fCanSave = fCanSave && e.canSave();
 		}
 	}
 
 	protected void resetExceptions() {
 		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: Reset exceptions"); //$NON-NLS-1$
-		firstException = null;
-		canAccept = true;
-		canSave = true;
+		fFirstException = null;
+		fCanAccept = true;
+		fCanSave = true;
 	}
 
 	public boolean canAccept() {
-		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: canAccept={0}", canAccept); //$NON-NLS-1$
-		return canAccept;
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: fCanAccept={0}", Boolean.toString(fCanAccept)); //$NON-NLS-1$
+		return fCanAccept;
 	}
 
 	public boolean canSave() {
-		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: canSave={0}", canSave); //$NON-NLS-1$
-		return canSave;
+		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: fCanSave={0}", Boolean.toString(fCanSave)); //$NON-NLS-1$
+		return fCanSave;
 	}
 
 	public boolean summarizeExceptions() {
-		if (! canAccept || ! canSave) {
-			setErrorMessage(firstException);
+		if (!fCanAccept || !fCanSave) {
+			setErrorMessage(fFirstException);
 			return false;
 		}
 		return true;
 	}
 
 	public String getErrorMessage() {
-		if (firstException == null)
+		if (fFirstException == null) {
 			return null;
-		else
-			return firstException.getMessage();
+		}
+		return fFirstException.getMessage();
 	}
 
 	/**
@@ -264,7 +263,8 @@ public abstract class DataSource {
 	}
 
 	/**
-	 * Put values from intermediary storage into widgets and update visibility and 'enablebility' of widgets.
+	 * Put values from intermediary storage into widgets and update visibility
+	 * and 'enablebility' of widgets.
 	 */
 	final public void justUpdate() {
 		DebugUtil.trace(DebugUtil.DATASOURCE_TRACING, "DataSource: justUpdate()"); //$NON-NLS-1$
@@ -284,7 +284,7 @@ public abstract class DataSource {
 	/**
 	 * Get values from widgets, validate them and, if validations was
 	 * successful, store them to preferences.
-	 *
+	 * 
 	 * @return true if could store to preferences, false otherwise.
 	 */
 	final public boolean storeAndValidate() {
