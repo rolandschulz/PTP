@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.reindenter;
 
+import static org.eclipse.photran.internal.core.reindenter.Reindenter.defaultIndentation;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -53,8 +55,6 @@ import org.eclipse.photran.internal.core.parser.IActionStmt;
  */
 final class StartOfLine
 {
-    private static final String INDENT = "    "; //$NON-NLS-1$
-
     public static StartOfLine createForLine(int line, IFortranAST ast)
     {
         return StartOfLine.createForLineStartingWith(ast.findFirstTokenOnLine(line));
@@ -356,7 +356,7 @@ final class StartOfLine
      */
     public String getIncreasedIndentation()
     {
-        return getIndentation() + INDENT;
+        return getIndentation() + defaultIndentation();
     }
     
     /**
@@ -365,8 +365,8 @@ final class StartOfLine
     public String getDecreasedIndentation()
     {
         String indentation = getIndentation();
-        if (indentation.endsWith(INDENT))
-            return indentation.substring(0, indentation.length()-INDENT.length());
+        if (indentation.endsWith(defaultIndentation()))
+            return indentation.substring(0, indentation.length()-defaultIndentation().length());
         else if (indentation.endsWith("\t")) //$NON-NLS-1$
             return indentation.substring(0, indentation.length()-1);
         else

@@ -25,6 +25,8 @@ public class Messages extends NLS
 
     public static String EditorPreferencePage_CommentsFieldLabel;
 
+    public static String EditorPreferencePage_ConvertTabsToSpaces;
+
     public static String EditorPreferencePage_CPPDirectivesFieldLabel;
 
     public static String EditorPreferencePage_EnableFolding;
@@ -38,6 +40,8 @@ public class Messages extends NLS
     public static String EditorPreferencePage_KeywordsFieldLabel;
 
     public static String EditorPreferencePage_StringsFieldLabel;
+
+    public static String EditorPreferencePage_TabWidth;
 
     public static String MainFortranPreferencePage_0;
 

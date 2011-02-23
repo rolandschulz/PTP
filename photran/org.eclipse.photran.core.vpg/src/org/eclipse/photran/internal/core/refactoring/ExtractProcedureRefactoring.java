@@ -368,7 +368,8 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
         sb.append(parameterList());
         sb.append("\n"); //$NON-NLS-1$
 
-        sb.append("    implicit none\n"); //$NON-NLS-1$
+        sb.append(Reindenter.defaultIndentation());
+        sb.append("implicit none\n"); //$NON-NLS-1$
 
         sb.append(parameterDeclarations());
 
@@ -457,7 +458,7 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
 
         for (Definition var : localVarsToPassInAsParams)
         {
-            sb.append("    "); //$NON-NLS-1$
+            sb.append(Reindenter.defaultIndentation());
             sb.append(declarationOf(var));
             sb.append("\n"); //$NON-NLS-1$
         }

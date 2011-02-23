@@ -14,6 +14,8 @@ import java.lang.reflect.Field;
 
 import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 /**
  * Provides access to all of the workspace-wide preferences for Photran.
@@ -29,7 +31,7 @@ import org.eclipse.swt.graphics.RGB;
  *
  * TODO: Jeff: Make sure we call <code>FortranPreferences.initializeDefaults(getPluginPreferences());</code>
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "restriction"})
 public final class FortranPreferences
 {
     public static final FortranStringPreference RELEASE_NOTES_SHOWN = new FortranStringPreference("releasenotesversionshown", ""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -49,8 +51,29 @@ public final class FortranPreferences
     public static final FortranStringPreference PREFERRED_MODEL_BUILDER = new FortranStringPreference("modelbuilder", ""); //$NON-NLS-1$ //$NON-NLS-2$
     public static final FortranStringPreference PREFERRED_DOM_PARSER = new FortranStringPreference("domparser", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
-    public static final FortranIntegerPreference FIXED_FORM_COMMENT_COLUMN = new FortranIntegerPreference("fixedformcommentcolum", 72, FortranIntegerPreference.NO_LIMIT, 72); //$NON-NLS-1$
+    public static final FortranIntegerPreference FIXED_FORM_COMMENT_COLUMN = new FortranIntegerPreference("fixedformcommentcolum", 72, 9999, 72); //$NON-NLS-1$
     public static final FortranBooleanPreference CONVERT_TABS_TO_SPACES = new FortranBooleanPreference("converttabs", true); //$NON-NLS-1$
+    public static final FortranIntegerPreference TAB_WIDTH = new FortranIntegerPreference("tabwidth", 0, 16, 0) //$NON-NLS-1$
+    {
+        /**
+         * Determines the tab width to use in the Fortran editor.
+         * <ol>
+         * <li> First, it looks at the custom Fortran editor preference.  If it is
+         *      non-zero, this width is used.
+         * <li> If the custom preference is not set, the workspace-wide text editor
+         *      preference is used instead.
+         * </ol>
+         */
+        @Override public int getValue()
+        {
+            int customValue = super.getValue();
+            if (customValue > 0)
+                return customValue;
+            else
+                return EditorsPlugin.getDefault().getPreferenceStore().getInt(
+                    AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+        }
+    };
     
     private FortranPreferences() {}
 

@@ -22,8 +22,6 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
  */
 public class EditorPreferencePage extends AbstractFortranPreferencePage
 {
-    private final int MAX_FIXED_FILE_FORMAT_OFFSET = 999;
-
     @Override protected void createFieldEditors()
     {
         addField(new BooleanFieldEditor(FortranPreferences.ENABLE_FREE_FORM_FOLDING.getName(),
@@ -37,15 +35,24 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
         */
 
         addField(new BooleanFieldEditor(FortranPreferences.CONVERT_TABS_TO_SPACES.getName(),
-            "Convert tabs to spaces",
+            Messages.EditorPreferencePage_ConvertTabsToSpaces,
             getFieldEditorParent()));
 
-        IntegerFieldEditor intEditor = new IntegerFieldEditor(FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getName(),
-                                                              Messages.EditorPreferencePage_FixedFormLineLength,
-                                                               getFieldEditorParent());
-        intEditor.setValidRange(72, MAX_FIXED_FILE_FORMAT_OFFSET);
-        intEditor.setTextLimit(3);
-        addField(intEditor);
+        IntegerFieldEditor tabWidthEditor = new IntegerFieldEditor(
+            FortranPreferences.TAB_WIDTH.getName(),
+            Messages.EditorPreferencePage_TabWidth,
+            getFieldEditorParent());
+        tabWidthEditor.setValidRange(FortranPreferences.TAB_WIDTH.getLowerLimit(), FortranPreferences.TAB_WIDTH.getUpperLimit());
+        tabWidthEditor.setTextLimit(Integer.toString(FortranPreferences.TAB_WIDTH.getUpperLimit()).length());
+        addField(tabWidthEditor);
+
+        IntegerFieldEditor fixedColEditor = new IntegerFieldEditor(
+            FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getName(),
+            Messages.EditorPreferencePage_FixedFormLineLength,
+            getFieldEditorParent());
+        fixedColEditor.setValidRange(FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getLowerLimit(), FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getUpperLimit());
+        fixedColEditor.setTextLimit(Integer.toString(FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getUpperLimit()).length());
+        addField(fixedColEditor);
         
         //addField(new Separator(getFieldEditorParent()));
         

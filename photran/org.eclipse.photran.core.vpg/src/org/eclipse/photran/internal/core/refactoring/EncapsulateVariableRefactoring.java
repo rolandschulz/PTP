@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
+import static org.eclipse.photran.internal.core.reindenter.Reindenter.defaultIndentation;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -51,7 +53,6 @@ import org.eclipse.photran.internal.core.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.rephraserengine.core.refactorings.UserInputBoolean;
 import org.eclipse.rephraserengine.core.refactorings.UserInputString;
-
 
 /**
  * Refactoring to create getter and setter subprograms for a module variable and replace variable
@@ -561,8 +562,8 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     {
         String type = def.getType().toString();
         String getterFunction = type + " function " + getGetterName() + "()" + EOL + //$NON-NLS-1$ //$NON-NLS-2$
-                                "    implicit none" + EOL + //$NON-NLS-1$
-                                "    " + getGetterName() + " = " + def.getTokenRef().getText() +EOL + //$NON-NLS-1$ //$NON-NLS-2$
+                                defaultIndentation() + "implicit none" + EOL + //$NON-NLS-1$
+                                defaultIndentation() + getGetterName() + " = " + def.getTokenRef().getText() +EOL + //$NON-NLS-1$
                                 "end function" + EOL; //$NON-NLS-1$
         ASTFunctionSubprogramNode newFunNode = (ASTFunctionSubprogramNode)parseLiteralProgramUnit(getterFunction);
         return newFunNode;
@@ -573,9 +574,9 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         String type = def.getType().toString();
         String valueName = "value"; //$NON-NLS-1$
         String setterFunction = "subroutine " + getSetterName() + "(" + valueName + ")" + EOL + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                                "    implicit none" + EOL + //$NON-NLS-1$
-                                "    " + type + ", intent(in) :: " + valueName + EOL + //$NON-NLS-1$ //$NON-NLS-2$
-                                "    " + def.getTokenRef().getText() +" = " + valueName + EOL + //$NON-NLS-1$ //$NON-NLS-2$
+                                defaultIndentation() + "implicit none" + EOL + //$NON-NLS-1$
+                                defaultIndentation() + type + ", intent(in) :: " + valueName + EOL + //$NON-NLS-1$ //$NON-NLS-2$
+                                defaultIndentation() + def.getTokenRef().getText() +" = " + valueName + EOL + //$NON-NLS-1$ //$NON-NLS-2$
                                 "end subroutine" + EOL; //$NON-NLS-1$
         ASTSubroutineSubprogramNode newSubNode = (ASTSubroutineSubprogramNode)parseLiteralProgramUnit(setterFunction);
         return newSubNode;

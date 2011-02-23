@@ -190,7 +190,7 @@ public class MoveCommonToModuleRefactoring extends FortranEditorRefactoring
     {
         String moduleSource =
             "module " + newModuleName + CRLF + //$NON-NLS-1$
-            "    implicit none" + CRLF + //$NON-NLS-1$
+            Reindenter.defaultIndentation() + "implicit none" + CRLF + //$NON-NLS-1$
             "end module " + newModuleName + CRLF; //$NON-NLS-1$
         return (ASTModuleNode)parseLiteralProgramUnit(moduleSource);
     }
