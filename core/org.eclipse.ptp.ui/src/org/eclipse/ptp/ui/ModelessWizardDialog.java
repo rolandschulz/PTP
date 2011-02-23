@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Shell;
  * Same as WizardDialog except it is modeless.
  * 
  * @author arossi
+ * @since 5.0
  * 
  */
 public class ModelessWizardDialog extends WizardDialog {
