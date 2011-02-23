@@ -15,7 +15,7 @@ import org.eclipse.osgi.util.NLS;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.ui.messages.messages"; //$NON-NLS-1$
@@ -42,15 +42,15 @@ public class Messages extends NLS {
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_6;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_7;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_8;
-	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_9;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_10;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_11;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_12;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_13;
-	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_14;
-	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_15;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_16;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_17;
+	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_ProxyOptions;
+
+	public static String DefaultProxyOptions_ExtraCommandLineArgs;
 
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_0;
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_1;
@@ -59,9 +59,9 @@ public class Messages extends NLS {
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_4;
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_5;
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_6;
-	
-	public static String AbstractToolRMConfigurationWizardPage_Exception_ConnectionError;
-	public static String AbstractToolRMConfigurationWizardPage_Exception_ConnectionErrorDescription;
+
+	public static String AbstractRemoteResourceManagerConfigurationWizardPage_AdvancedOptions;
+
 	public static String AbstractToolRMConfigurationWizardPage_Label_CommandGroup;
 	public static String AbstractToolRMConfigurationWizardPage_Label_ContinuousMinitorCommand;
 	public static String AbstractToolRMConfigurationWizardPage_Label_DebugCommand;

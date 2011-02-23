@@ -24,16 +24,31 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.ll.ui.wizards;
 
+import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.ll.ui.messages.Messages;
+import org.eclipse.ptp.rm.ui.wizards.AbstractProxyOptions;
 import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
-public final class IBMLLResourceManagerConfigurationWizardPage extends
-	AbstractRemoteProxyResourceManagerConfigurationWizardPage {
-	
+public final class IBMLLResourceManagerConfigurationWizardPage extends AbstractRemoteProxyResourceManagerConfigurationWizardPage {
+
 	public IBMLLResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.getString("Wizard.ConfigurationTitle")); //$NON-NLS-1$
 		setTitle(Messages.getString("Wizard.ConfigurationTitle")); //$NON-NLS-1$
 		setDescription(Messages.getString("Wizard.Configuration")); //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.ui.wizards.
+	 * AbstractRemoteProxyResourceManagerConfigurationWizardPage
+	 * #createProxyOptions(org.eclipse.jface.wizard.WizardPage,
+	 * org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration)
+	 */
+	@Override
+	protected AbstractProxyOptions createProxyOptions(WizardPage wizardPage, IRemoteResourceManagerConfiguration config) {
+		return null;
 	}
 }

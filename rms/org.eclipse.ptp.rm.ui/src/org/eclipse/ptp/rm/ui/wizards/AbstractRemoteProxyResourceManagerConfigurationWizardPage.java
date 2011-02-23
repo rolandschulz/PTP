@@ -40,15 +40,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.wizard.IWizardContainer;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -63,6 +62,7 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ui.RMUIPlugin;
 import org.eclipse.ptp.rm.ui.messages.Messages;
+import org.eclipse.ptp.ui.preferences.ScrolledPageContent;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
@@ -77,10 +77,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.progress.UIJob;
 
 /**
@@ -103,6 +106,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			validateProxyPath();
+			if (!proxyPathIsValid) {
+				setErrorMessage(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_17);
+			}
 			updatePage();
 			return Status.OK_STATUS;
 		}
@@ -136,8 +142,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		 * .eclipse.jface.util.PropertyChangeEvent)
 		 */
 		public void propertyChange(PropertyChangeEvent event) {
-			if (event.getProperty().equals(FieldEditor.IS_VALID))
+			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 				updatePage();
+			}
 		}
 
 		/*
@@ -150,11 +157,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Object source = e.getSource();
-			if (source == browseButton)
+			if (source == browseButton) {
 				handlePathBrowseButtonSelected();
-			else if (source == optionsButton) {
-				proxyArgs = createOptionsDialog(getShell(), proxyArgs);
-				updatePage();
 			} else {
 				updateSettings();
 				updatePage();
@@ -163,7 +167,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	}
 
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
+
 	public static final int VALIDATE_TIMER = 250;
+
 	/**
 	 * @since 1.1
 	 */
@@ -172,10 +178,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * @since 1.1
 	 */
 	protected String proxyPath = EMPTY_STRING;
-	/**
-	 * @since 1.1
-	 */
-	protected String proxyArgs = EMPTY_STRING;
 	/**
 	 * @since 1.1
 	 */
@@ -224,7 +226,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * @since 1.1
 	 */
 	protected boolean manualLaunch = false;
-
 	/**
 	 * @since 1.1
 	 */
@@ -239,9 +240,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	protected Text proxyPathText = null;
 	/**
-	 * @since 1.1
+	 * @since 2.0
 	 */
-	protected Button optionsButton = null;
+	protected Text optionsText = null;
 	/**
 	 * @since 1.1
 	 */
@@ -274,7 +275,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * @since 1.1
 	 */
 	protected Combo localAddrCombo;
-
 	/**
 	 * @since 1.1
 	 */
@@ -283,16 +283,20 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * @since 1.1
 	 */
 	protected boolean proxyOptionsEnabled = true;
-
 	/**
 	 * @since 2.0
 	 */
 	protected boolean fManualLaunchEnabled = true;
+	/**
+	 * @since 2.0
+	 */
+	protected AbstractProxyOptions fProxyOptions;
 
 	public AbstractRemoteProxyResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard, String title) {
 		super(wizard, title);
 		setPageComplete(false);
 		isValid = false;
+		config = (IRemoteResourceManagerConfiguration) wizard.getConfiguration();
 	}
 
 	/*
@@ -306,57 +310,12 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout topLayout = new GridLayout();
+		topLayout.marginHeight = 0;
+		topLayout.marginWidth = 0;
 		composite.setLayout(topLayout);
-		createContents(composite);
+		Composite pageContent = createContents(composite);
+		pageContent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		setControl(composite);
-	}
-
-	/**
-	 * Initialize the contents of the local address selection combo. Host names
-	 * are obtained by performing a reverse lookup on the IP addresses of each
-	 * network interface. If DNS is configured correctly, this should add the
-	 * fully qualified domain name, otherwise it will probably be the IP
-	 * address. We also add the configuration address to the combo in case it
-	 * was specified manually.
-	 */
-	public void initializeLocalHostCombo() {
-		Set<String> addrs = new TreeSet<String>();
-		try {
-			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
-			while (netInterfaces.hasMoreElements()) {
-				NetworkInterface ni = netInterfaces.nextElement();
-				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
-				while (alladdr.hasMoreElements()) {
-					InetAddress ip = alladdr.nextElement();
-					if (ip instanceof Inet4Address)
-						addrs.add(fixHostName(ip.getCanonicalHostName()));
-				}
-			}
-		} catch (Exception e) {
-			// at least we'll still get localhost
-		}
-		if (addrs.size() == 0)
-			addrs.add("localhost"); //$NON-NLS-1$
-		localAddrCombo.removeAll();
-		int index = 0;
-		int selection = -1;
-		for (String addr : addrs) {
-			localAddrCombo.add(addr);
-			if ((localAddr.equals("") && addr.equals("localhost")) //$NON-NLS-1$ //$NON-NLS-2$
-					|| addr.equals(localAddr))
-				selection = index;
-			index++;
-		}
-		/*
-		 * localAddr is not in the list, so add it and make it the current
-		 * selection
-		 */
-		if (selection < 0) {
-			if (!localAddr.equals("")) //$NON-NLS-1$
-				localAddrCombo.add(localAddr);
-			selection = localAddrCombo.getItemCount() - 1;
-		}
-		localAddrCombo.select(selection);
 	}
 
 	/**
@@ -368,18 +327,22 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	public boolean performOk() {
 		store();
 		int options = 0;
-		if (muxPortFwd)
+		if (muxPortFwd) {
 			options |= IRemoteProxyOptions.PORT_FORWARDING;
-		if (manualLaunch)
+		}
+		if (manualLaunch) {
 			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
-		if (remoteServices != null)
+		}
+		if (remoteServices != null) {
 			config.setRemoteServicesId(remoteServices.getId());
-		if (connection != null)
+		}
+		if (connection != null) {
 			config.setConnectionName(connection.getName());
+		}
 		config.setLocalAddress(localAddr);
 		config.setProxyServerPath(proxyPath);
-		config.setInvocationOptions(proxyArgs);
 		config.setOptions(options);
+		fProxyOptions.save();
 		return true;
 	}
 
@@ -390,9 +353,388 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	@Override
 	public void setVisible(boolean visible) {
-		if (visible)
+		if (visible) {
 			initContents();
+		}
 		super.setVisible(visible);
+	}
+
+	/**
+	 * Attempt to open a connection.
+	 */
+	private void checkConnection() {
+		if (!connection.isOpen()) {
+			IRunnableWithProgress op = new IRunnableWithProgress() {
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					try {
+						connection.open(monitor);
+						if (monitor.isCanceled()) {
+							throw new InterruptedException(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_0);
+						}
+					} catch (RemoteConnectionException e) {
+						throw new InvocationTargetException(e);
+					}
+				}
+
+			};
+			try {
+				new ProgressMonitorDialog(getShell()).run(true, true, op);
+			} catch (InvocationTargetException e) {
+				ErrorDialog.openError(getShell(), Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_1,
+						Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_2, new Status(IStatus.ERROR,
+								RMUIPlugin.PLUGIN_ID, e.getCause().getMessage()));
+			} catch (InterruptedException e) {
+				ErrorDialog.openError(getShell(), Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3,
+						Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_2, new Status(IStatus.ERROR,
+								RMUIPlugin.PLUGIN_ID, e.getMessage()));
+			}
+		}
+	}
+
+	/**
+	 * Create the contents of the wizard page.
+	 * 
+	 * @param parent
+	 */
+	private Composite createContents(Composite parent) {
+		ScrolledPageContent pageContent = new ScrolledPageContent(parent);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 4;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+
+		Composite composite = pageContent.getBody();
+		composite.setLayout(layout);
+
+		/*
+		 * Composite for remote information
+		 */
+		Composite remoteComp = new Composite(composite, SWT.NONE);
+		GridLayout remoteLayout = new GridLayout();
+		remoteLayout.numColumns = 4;
+		remoteLayout.marginWidth = 0;
+		remoteComp.setLayout(remoteLayout);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 4;
+		remoteComp.setLayoutData(gd);
+		pageContent.adaptChild(remoteComp);
+
+		/*
+		 * Remote provider
+		 */
+		Label label = new Label(remoteComp, SWT.NONE);
+		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_4);
+		gd = new GridData();
+		gd.horizontalSpan = 1;
+		label.setLayoutData(gd);
+
+		remoteCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		remoteCombo.setLayoutData(gd);
+
+		/*
+		 * Proxy location
+		 */
+		label = new Label(remoteComp, SWT.NONE);
+		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_5);
+		gd = new GridData();
+		gd.horizontalSpan = 1;
+		label.setLayoutData(gd);
+
+		connectionCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		connectionCombo.setLayoutData(gd);
+
+		newConnectionButton = SWTUtil.createPushButton(remoteComp,
+				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_6, null);
+
+		if (proxyPathEnabled) {
+			/*
+			 * Proxy path
+			 */
+			label = new Label(remoteComp, SWT.NONE);
+			label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_7);
+			gd = new GridData();
+			gd.horizontalSpan = 1;
+			label.setLayoutData(gd);
+
+			proxyPathText = new Text(remoteComp, SWT.SINGLE | SWT.BORDER);
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 2;
+			gd.grabExcessHorizontalSpace = true;
+			gd.widthHint = 100;
+			proxyPathText.setLayoutData(gd);
+			proxyPathText.addModifyListener(listener);
+
+			browseButton = SWTUtil.createPushButton(remoteComp,
+					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_8, null);
+			browseButton.addSelectionListener(listener);
+
+		}
+
+		/*
+		 * customizable
+		 */
+		addCustomWidgets(remoteComp);
+
+		/*
+		 * Proxy options
+		 */
+		if (proxyOptionsEnabled) {
+			ExpandableComposite proxyOptionsArea = new ExpandableComposite(composite, SWT.NONE, ExpandableComposite.TWISTIE
+					| ExpandableComposite.CLIENT_INDENT);
+			proxyOptionsArea.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_ProxyOptions);
+			proxyOptionsArea.addExpansionListener(new ExpansionAdapter() {
+				@Override
+				public void expansionStateChanged(ExpansionEvent e) {
+					ScrolledPageContent parent = getParentScrolledComposite((ExpandableComposite) e.getSource());
+					if (parent != null) {
+						parent.reflow(true);
+					}
+				}
+			});
+			proxyOptionsArea.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 4));
+			pageContent.adaptChild(proxyOptionsArea);
+
+			fProxyOptions = createProxyOptions(this, config);
+			fProxyOptions.setRemoteConnection(connection);
+			Composite optionsComp = fProxyOptions.createContents(proxyOptionsArea);
+			proxyOptionsArea.setClient(optionsComp);
+		}
+
+		/*
+		 * Advanced options
+		 */
+		ExpandableComposite advancedOptionsArea = new ExpandableComposite(composite, SWT.NONE, ExpandableComposite.TWISTIE
+				| ExpandableComposite.CLIENT_INDENT);
+		advancedOptionsArea.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_AdvancedOptions);
+		advancedOptionsArea.addExpansionListener(new ExpansionAdapter() {
+			@Override
+			public void expansionStateChanged(ExpansionEvent e) {
+				ScrolledPageContent parent = getParentScrolledComposite((ExpandableComposite) e.getSource());
+				if (parent != null) {
+					parent.reflow(true);
+				}
+			}
+		});
+		advancedOptionsArea.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 4));
+		pageContent.adaptChild(advancedOptionsArea);
+
+		Composite advancedOptionsComp = new Composite(advancedOptionsArea, SWT.NONE);
+		layout = new GridLayout();
+		advancedOptionsComp.setLayout(layout);
+		advancedOptionsArea.setClient(advancedOptionsComp);
+
+		/*
+		 * Multiplexing options
+		 */
+		Group mxGroup = new Group(advancedOptionsComp, SWT.SHADOW_ETCHED_IN);
+		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
+		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
+		mxGroup.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_10);
+
+		noneButton = createRadioButton(mxGroup, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_11,
+				"mxGroup", listener); //$NON-NLS-1$
+		noneButton.addSelectionListener(listener);
+
+		/*
+		 * Local address
+		 */
+		Composite addrComp = new Composite(mxGroup, SWT.NONE);
+		GridLayout addrLayout = new GridLayout();
+		addrLayout.numColumns = 2;
+		addrLayout.marginWidth = 0;
+		addrLayout.marginLeft = 15;
+		addrComp.setLayout(addrLayout);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		addrComp.setLayoutData(gd);
+
+		label = new Label(addrComp, SWT.NONE);
+		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_12);
+		gd = new GridData();
+		gd.horizontalSpan = 1;
+		label.setLayoutData(gd);
+
+		localAddrCombo = new Combo(addrComp, SWT.DROP_DOWN);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 1;
+		localAddrCombo.setLayoutData(gd);
+
+		portForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_13,
+				"mxGroup", listener); //$NON-NLS-1$
+		portForwardingButton.addSelectionListener(listener);
+
+		/*
+		 * Manual launch
+		 */
+		if (fManualLaunchEnabled) {
+			manualButton = createCheckButton(advancedOptionsComp, "Launch server manually"); //$NON-NLS-1$
+			manualButton.addSelectionListener(listener);
+		}
+
+		registerListeners();
+
+		return pageContent;
+	}
+
+	/**
+	 * In some nameserver configurations, getCanonicalHostName() will return the
+	 * inverse mapping of the IP address (e.g. 1.1.0.192.in-addr.arpa). In this
+	 * case we just use the IP address.
+	 * 
+	 * @param hostname
+	 *            host name to be fixed
+	 * @return fixed host name
+	 */
+	private String fixHostName(String hostname) {
+		try {
+			if (hostname.endsWith(".in-addr.arpa")) { //$NON-NLS-1$
+				return InetAddress.getLocalHost().getHostAddress();
+			}
+		} catch (UnknownHostException e) {
+			// should not happen
+		}
+		return hostname;
+	}
+
+	/**
+	 * Initialize the contents of the local address selection combo. Host names
+	 * are obtained by performing a reverse lookup on the IP addresses of each
+	 * network interface. If DNS is configured correctly, this should add the
+	 * fully qualified domain name, otherwise it will probably be the IP
+	 * address. We also add the configuration address to the combo in case it
+	 * was specified manually.
+	 */
+	private void initializeLocalHostCombo() {
+		Set<String> addrs = new TreeSet<String>();
+		try {
+			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
+			while (netInterfaces.hasMoreElements()) {
+				NetworkInterface ni = netInterfaces.nextElement();
+				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
+				while (alladdr.hasMoreElements()) {
+					InetAddress ip = alladdr.nextElement();
+					if (ip instanceof Inet4Address) {
+						addrs.add(fixHostName(ip.getCanonicalHostName()));
+					}
+				}
+			}
+		} catch (Exception e) {
+			// at least we'll still get localhost
+		}
+		if (addrs.size() == 0) {
+			addrs.add("localhost"); //$NON-NLS-1$
+		}
+		localAddrCombo.removeAll();
+		int index = 0;
+		int selection = -1;
+		for (String addr : addrs) {
+			localAddrCombo.add(addr);
+			if ((localAddr.equals("") && addr.equals("localhost")) //$NON-NLS-1$ //$NON-NLS-2$
+					|| addr.equals(localAddr)) {
+				selection = index;
+			}
+			index++;
+		}
+		/*
+		 * localAddr is not in the list, so add it and make it the current
+		 * selection
+		 */
+		if (selection < 0) {
+			if (!localAddr.equals("")) { //$NON-NLS-1$
+				localAddrCombo.add(localAddr);
+			}
+			selection = localAddrCombo.getItemCount() - 1;
+		}
+		localAddrCombo.select(selection);
+	}
+
+	/**
+	 * Load the initial wizard state from the configuration settings.
+	 */
+	private void loadSaved() {
+		proxyPath = config.getProxyServerPath();
+		localAddr = config.getLocalAddress();
+
+		String rmID = config.getRemoteServicesId();
+		if (rmID != null) {
+			IWizardContainer container = null;
+			if (getControl().isVisible()) {
+				container = getWizard().getContainer();
+			}
+			remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(rmID, container);
+			String conn = config.getConnectionName();
+			if (remoteServices != null && conn != null) {
+				connection = remoteServices.getConnectionManager().getConnection(conn);
+			}
+		}
+
+		int options = config.getOptions();
+
+		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
+		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
+	}
+
+	/**
+	 * @since 1.1
+	 */
+	private void registerListeners() {
+		remoteCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				/*
+				 * If we're loading saved settings, then we want to select the
+				 * saved connection after the remote services are selected.
+				 * Otherwise just pick the default item.
+				 */
+				if (loading) {
+					handleRemoteServiceSelected(connection);
+				} else {
+					handleRemoteServiceSelected(null);
+				}
+				updateSettings();
+			}
+		});
+		connectionCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				handleConnectionSelected();
+				updatePage();
+			}
+		});
+		newConnectionButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent evt) {
+				handleNewRemoteConnectionSelected();
+				updatePage();
+			}
+		});
+		localAddrCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				updateSettings();
+				updatePage();
+			}
+		});
+	}
+
+	/**
+	 * Set the isValid flag and page completion status
+	 * 
+	 * @param complete
+	 *            true if complete
+	 */
+	private void setValid(boolean complete) {
+		isValid = complete;
+		setPageComplete(isValid);
+	}
+
+	/**
+	 * Store text fields
+	 */
+	private void store() {
+		if (proxyPathEnabled && proxyPathText != null) {
+			proxyPath = proxyPathText.getText();
+		}
 	}
 
 	/**
@@ -450,19 +792,17 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	}
 
 	/**
-	 * Creates the dialog when the proxy "Options..." button is selected.
-	 * Override if you want to provide your own dialog.
+	 * Create options that will populate the proxy options area of a wizard
+	 * page. The default is a simple text field. Override to provide different
+	 * options.
 	 * 
-	 * @param parent
-	 *            the parent composite to contain the dialog area
-	 * @return the proxy options string
+	 * @param wizardPage
+	 * @param config
+	 * @return
+	 * @since 2.0
 	 */
-	protected String createOptionsDialog(Shell shell, String initialOptions) {
-		InputDialog dialog = new InputDialog(shell, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_14,
-				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_15, initialOptions, null);
-		if (dialog.open() == Dialog.OK)
-			return dialog.getValue();
-		return initialOptions;
+	protected AbstractProxyOptions createProxyOptions(WizardPage wizardPage, IRemoteResourceManagerConfiguration config) {
+		return new DefaultProxyOptions(wizardPage, config);
 	}
 
 	/**
@@ -483,8 +823,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.BEGINNING;
 		button.setLayoutData(data);
-		if (null != listener)
+		if (null != listener) {
 			button.addSelectionListener(listener);
+		}
 		return button;
 	}
 
@@ -492,8 +833,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * Transfer current settings to text fields
 	 */
 	protected void defaultSetting() {
-		if (proxyPathEnabled)
+		if (proxyPathEnabled) {
 			proxyPathText.setText(proxyPath);
+		}
 	}
 
 	/**
@@ -503,10 +845,25 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * @return cleaned up text.
 	 */
 	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
 			return null;
+		}
 
 		return text;
+	}
+
+	/**
+	 * @since 2.0
+	 */
+	protected ScrolledPageContent getParentScrolledComposite(Control control) {
+		Control parent = control.getParent();
+		while (!(parent instanceof ScrolledPageContent) && parent != null) {
+			parent = parent.getParent();
+		}
+		if (parent instanceof ScrolledPageContent) {
+			return (ScrolledPageContent) parent;
+		}
+		return null;
 	}
 
 	/**
@@ -518,14 +875,18 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		if (currentSelection >= 0 && connectionManager != null) {
 			String connectionName = connectionCombo.getItem(currentSelection);
 			connection = connectionManager.getConnection(connectionName);
+			fProxyOptions.setRemoteConnection(connection);
 		}
 
 		/*
 		 * Disable port forwarding button if it's not supported. If port
 		 * forwarding was selected, switch to 'none' instead.
 		 */
-		if (connection != null)
+		if (connection != null) {
 			portFwdSupported = connection.supportsTCPPortForwarding();
+			portForwardingButton.setEnabled(portFwdSupported);
+			portForwardingButton.setSelection(portFwdSupported);
+		}
 		/*
 		 * Linux doesn't call modify handler (which calls updateSettings &
 		 * updatePage) so need to call them explicitly here
@@ -542,16 +903,18 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * TODO should probably select the new connection
 	 */
 	protected void handleNewRemoteConnectionSelected() {
-		if (uiConnectionManager != null)
+		if (uiConnectionManager != null) {
 			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell()));
+		}
 	}
 
 	/**
 	 * Show a dialog that lets the user select a file.
 	 */
 	protected void handlePathBrowseButtonSelected() {
-		if (!proxyPathEnabled)
+		if (!proxyPathEnabled) {
 			return;
+		}
 		if (connection != null) {
 			checkConnection();
 			if (connection.isOpen()) {
@@ -563,8 +926,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 						String correctPath = proxyPathText.getText();
 						String selectedPath = fileMgr.browseFile(getShell(),
 								Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_16, correctPath, 0);
-						if (selectedPath != null)
+						if (selectedPath != null) {
 							proxyPathText.setText(selectedPath.toString());
+						}
 					}
 				}
 			}
@@ -588,8 +952,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			remoteServices = fAllRemoteServices[selectionIndex];
 			connectionManager = remoteServices.getConnectionManager();
 			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
-			if (remUIServices != null)
+			if (remUIServices != null) {
 				uiConnectionManager = remUIServices.getUIConnectionManager();
+			}
 			IRemoteConnection[] connections = connectionManager.getConnections();
 			Arrays.sort(connections, new Comparator<IRemoteConnection>() {
 				public int compare(IRemoteConnection c1, IRemoteConnection c2) {
@@ -600,8 +965,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			int selected = 0;
 			for (int i = 0; i < connections.length; i++) {
 				connectionCombo.add(connections[i].getName());
-				if (conn != null && connections[i].equals(conn))
+				if (conn != null && connections[i].equals(conn)) {
 					selected = i;
+				}
 			}
 			if (connections.length > 0) {
 				connectionCombo.select(selected);
@@ -627,7 +993,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	protected void initContents() {
 		loading = true;
-		config = (IRemoteResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
 		loadSaved();
 		updateSettings();
 		defaultSetting();
@@ -645,14 +1010,16 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	protected void initializeRemoteServicesCombo() {
 		IWizardContainer container = null;
-		if (getControl().isVisible())
+		if (getControl().isVisible()) {
 			container = getWizard().getContainer();
+		}
 		fAllRemoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(container);
 		IRemoteServices defServices;
-		if (remoteServices != null)
+		if (remoteServices != null) {
 			defServices = remoteServices;
-		else
+		} else {
 			defServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+		}
 		int defIndex = 0;
 		Arrays.sort(fAllRemoteServices, new Comparator<IRemoteServices>() {
 			public int compare(IRemoteServices c1, IRemoteServices c2) {
@@ -662,8 +1029,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		remoteCombo.removeAll();
 		for (int i = 0; i < fAllRemoteServices.length; i++) {
 			remoteCombo.add(fAllRemoteServices[i].getName());
-			if (fAllRemoteServices[i].equals(defServices))
+			if (fAllRemoteServices[i].equals(defServices)) {
 				defIndex = i;
+			}
 		}
 		if (fAllRemoteServices.length > 0) {
 			remoteCombo.select(defIndex);
@@ -683,7 +1051,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		if (proxyPathEnabled && proxyPathText != null) {
 			String name = getFieldContent(proxyPathText.getText());
 			if (name == null || !proxyPathIsValid) {
-				setErrorMessage(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_17);
 				return false;
 			}
 		}
@@ -698,10 +1065,11 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
-		if (style == -1)
+		if (style == -1) {
 			gd = new GridData();
-		else
+		} else {
 			gd = new GridData(style);
+		}
 		gd.horizontalSpan = space;
 		return gd;
 	}
@@ -711,14 +1079,12 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	protected void updatePage() {
 		if (!loading) {
-			setErrorMessage(null);
-			setMessage(null);
-
-			if (!isValidSetting())
+			if (!isValidSetting()) {
 				setValid(false);
-			else {
+			} else {
 				performOk();
 				setValid(true);
+				setErrorMessage(null);
 			}
 		}
 	}
@@ -735,39 +1101,45 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		 */
 		if (!loading) {
 			muxPortFwd = portForwardingButton.getSelection();
-			if (manualButton != null)
+			if (manualButton != null) {
 				manualLaunch = manualButton.getSelection();
+			}
 		}
 
 		/*
 		 * If no localAddr has been specified in the configuration, select a
 		 * default one.
 		 */
-		if (!loading || localAddr.equals("")) //$NON-NLS-1$
+		if (!loading || localAddr.equals("")) { //$NON-NLS-1$
 			localAddr = localAddrCombo.getText();
+		}
 
 		/*
 		 * Fix settings
 		 */
-		if (muxPortFwd && !portFwdSupported)
+		if (muxPortFwd && !portFwdSupported) {
 			muxPortFwd = false;
+		}
 
 		/*
 		 * Update UI to display correct settings
 		 */
-		if (noneButton != null)
+		if (noneButton != null) {
 			noneButton.setSelection(!muxPortFwd);
+		}
 
 		if (portForwardingButton != null) {
 			portForwardingButton.setSelection(muxPortFwd);
 			portForwardingButton.setEnabled(portFwdSupported);
 		}
 
-		if (localAddrCombo != null)
+		if (localAddrCombo != null) {
 			localAddrCombo.setEnabled(!muxPortFwd);
+		}
 
-		if (manualButton != null)
+		if (manualButton != null) {
 			manualButton.setSelection(manualLaunch);
+		}
 	}
 
 	/**
@@ -778,14 +1150,15 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * @since 1.1
 	 */
 	protected boolean validateProxyPath() {
-		if (!proxyPathEnabled)
+		if (!proxyPathEnabled) {
 			return true;
+		}
 		proxyPathIsValid = false;
 		final String path = proxyPathText.getText();
-		if (path != null)
+		if (path != null && !path.equals("")) { //$NON-NLS-1$
 			if (connection != null) {
 				checkConnection();
-				if (connection.isOpen())
+				if (connection.isOpen()) {
 					if (remoteServices != null) {
 						final IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
 						if (fileMgr != null) {
@@ -793,8 +1166,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 								public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 									try {
 										IFileStore file = fileMgr.getResource(path);
-										if (!monitor.isCanceled())
+										if (!monitor.isCanceled()) {
 											proxyPathIsValid = file.fetchInfo(EFS.NONE, monitor).exists();
+										}
 									} catch (CoreException e) {
 										throw new InvocationTargetException(e);
 									}
@@ -812,279 +1186,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 							}
 						}
 					}
-			}
-		return proxyPathIsValid;
-	}
-
-	/**
-	 * Attempt to open a connection.
-	 */
-	private void checkConnection() {
-		if (!connection.isOpen()) {
-			IRunnableWithProgress op = new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					try {
-						connection.open(monitor);
-						if (monitor.isCanceled())
-							throw new InterruptedException(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_0);
-					} catch (RemoteConnectionException e) {
-						throw new InvocationTargetException(e);
-					}
 				}
-
-			};
-			try {
-				new ProgressMonitorDialog(getShell()).run(true, true, op);
-			} catch (InvocationTargetException e) {
-				ErrorDialog.openError(getShell(), Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_1,
-						Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_2, new Status(IStatus.ERROR,
-								RMUIPlugin.PLUGIN_ID, e.getCause().getMessage()));
-			} catch (InterruptedException e) {
-				ErrorDialog.openError(getShell(), Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3,
-						Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_2, new Status(IStatus.ERROR,
-								RMUIPlugin.PLUGIN_ID, e.getMessage()));
 			}
 		}
-	}
-
-	/**
-	 * Create the contents of the wizard page.
-	 * 
-	 * @param parent
-	 * @param colSpan
-	 */
-	private void createContents(Composite parent) {
-		/*
-		 * Composite for remote information
-		 */
-		Composite remoteComp = new Composite(parent, SWT.NONE);
-		GridLayout remoteLayout = new GridLayout();
-		remoteLayout.numColumns = 4;
-		remoteLayout.marginWidth = 0;
-		remoteComp.setLayout(remoteLayout);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 4;
-		remoteComp.setLayoutData(gd);
-
-		/*
-		 * Remote provider
-		 */
-		Label label = new Label(remoteComp, SWT.NONE);
-		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_4);
-		gd = new GridData();
-		gd.horizontalSpan = 1;
-		label.setLayoutData(gd);
-
-		remoteCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 3;
-		remoteCombo.setLayoutData(gd);
-
-		/*
-		 * Proxy location
-		 */
-		label = new Label(remoteComp, SWT.NONE);
-		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_5);
-		gd = new GridData();
-		gd.horizontalSpan = 1;
-		label.setLayoutData(gd);
-
-		connectionCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 2;
-		connectionCombo.setLayoutData(gd);
-
-		newConnectionButton = SWTUtil.createPushButton(remoteComp,
-				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_6, null);
-
-		if (proxyPathEnabled) {
-			/*
-			 * Proxy path
-			 */
-			label = new Label(remoteComp, SWT.NONE);
-			label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_7);
-			gd = new GridData();
-			gd.horizontalSpan = 1;
-			label.setLayoutData(gd);
-
-			proxyPathText = new Text(remoteComp, SWT.SINGLE | SWT.BORDER);
-			gd = new GridData(GridData.FILL_HORIZONTAL);
-			gd.horizontalSpan = 1;
-			gd.grabExcessHorizontalSpace = true;
-			gd.widthHint = 100;
-			proxyPathText.setLayoutData(gd);
-			proxyPathText.addModifyListener(listener);
-
-			browseButton = SWTUtil.createPushButton(remoteComp,
-					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_8, null);
-			browseButton.addSelectionListener(listener);
-
-		}
-
-		if (proxyOptionsEnabled) {
-			/*
-			 * Proxy options
-			 */
-			optionsButton = SWTUtil.createPushButton(remoteComp,
-					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_9, null);
-			optionsButton.addSelectionListener(listener);
-
-		}
-
-		/*
-		 * customizable
-		 */
-		addCustomWidgets(remoteComp);
-
-		/*
-		 * Multiplexing options
-		 */
-		Group mxGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
-		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		mxGroup.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_10);
-
-		noneButton = createRadioButton(mxGroup, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_11,
-				"mxGroup", listener); //$NON-NLS-1$
-		noneButton.addSelectionListener(listener);
-
-		/*
-		 * Local address
-		 */
-		Composite addrComp = new Composite(mxGroup, SWT.NONE);
-		GridLayout addrLayout = new GridLayout();
-		addrLayout.numColumns = 2;
-		addrLayout.marginWidth = 0;
-		addrLayout.marginLeft = 15;
-		addrComp.setLayout(addrLayout);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		addrComp.setLayoutData(gd);
-
-		label = new Label(addrComp, SWT.NONE);
-		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_12);
-		gd = new GridData();
-		gd.horizontalSpan = 1;
-		label.setLayoutData(gd);
-
-		localAddrCombo = new Combo(addrComp, SWT.DROP_DOWN);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 1;
-		localAddrCombo.setLayoutData(gd);
-
-		portForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_13,
-				"mxGroup", listener); //$NON-NLS-1$
-		portForwardingButton.addSelectionListener(listener);
-
-		/*
-		 * Manual launch
-		 */
-		if (fManualLaunchEnabled) {
-			manualButton = createCheckButton(parent, "Launch server manually"); //$NON-NLS-1$
-			manualButton.addSelectionListener(listener);
-		}
-
-		registerListeners();
-	}
-
-	/**
-	 * In some nameserver configurations, getCanonicalHostName() will return the
-	 * inverse mapping of the IP address (e.g. 1.1.0.192.in-addr.arpa). In this
-	 * case we just use the IP address.
-	 * 
-	 * @param hostname
-	 *            host name to be fixed
-	 * @return fixed host name
-	 */
-	private String fixHostName(String hostname) {
-		try {
-			if (hostname.endsWith(".in-addr.arpa")) //$NON-NLS-1$
-				return InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-			// should not happen
-		}
-		return hostname;
-	}
-
-	/**
-	 * Load the initial wizard state from the configuration settings.
-	 */
-	private void loadSaved() {
-		proxyPath = config.getProxyServerPath();
-		proxyArgs = config.getInvocationOptionsStr();
-		localAddr = config.getLocalAddress();
-
-		String rmID = config.getRemoteServicesId();
-		if (rmID != null) {
-			IWizardContainer container = null;
-			if (getControl().isVisible())
-				container = getWizard().getContainer();
-			remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(rmID, container);
-			String conn = config.getConnectionName();
-			if (remoteServices != null && conn != null)
-				connection = remoteServices.getConnectionManager().getConnection(conn);
-		}
-
-		int options = config.getOptions();
-
-		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
-		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
-	}
-
-	/**
-	 * @since 1.1
-	 */
-	private void registerListeners() {
-		remoteCombo.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				/*
-				 * If we're loading saved settings, then we want to select the
-				 * saved connection after the remote services are selected.
-				 * Otherwise just pick the default item.
-				 */
-				if (loading)
-					handleRemoteServiceSelected(connection);
-				else
-					handleRemoteServiceSelected(null);
-				updateSettings();
-			}
-		});
-		connectionCombo.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				handleConnectionSelected();
-				updatePage();
-			}
-		});
-		newConnectionButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent evt) {
-				handleNewRemoteConnectionSelected();
-				updatePage();
-			}
-		});
-		localAddrCombo.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				updateSettings();
-				updatePage();
-			}
-		});
-	}
-
-	/**
-	 * Set the isValid flag and page completion status
-	 * 
-	 * @param complete
-	 *            true if complete
-	 */
-	private void setValid(boolean complete) {
-		isValid = complete;
-		setPageComplete(isValid);
-	}
-
-	/**
-	 * Store text fields
-	 */
-	private void store() {
-		if (proxyPathEnabled && proxyPathText != null)
-			proxyPath = proxyPathText.getText();
+		return proxyPathIsValid;
 	}
 }
