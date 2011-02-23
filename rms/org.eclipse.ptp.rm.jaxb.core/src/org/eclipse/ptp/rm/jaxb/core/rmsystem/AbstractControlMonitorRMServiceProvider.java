@@ -68,6 +68,10 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 		return getString(type, ZEROSTR);
 	}
 
+	public String getControlAddress() {
+		return getString(CONTROL_ADDRESS, ZEROSTR);
+	}
+
 	/**
 	 * Get the invocation options as a list of strings. Returns an empty list if
 	 * there are no options
@@ -75,7 +79,7 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 * @return list of strings containing invocation options
 	 */
 	public List<String> getControlInvocationOptions() {
-		addControlInvocationOptions(getString(TAG_CONTROL_INVOCATION_OPTIONS, ZEROSTR));
+		addControlInvocationOptions(getString(CONTROL_INVOCATION_OPTIONS, ZEROSTR));
 		return controlInvocationOptions;
 	}
 
@@ -95,7 +99,7 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 */
 	public int getControlOptions() {
 		try {
-			String options = getString(TAG_CONTROL_OPTIONS, null);
+			String options = getString(CONTROL_OPTIONS, null);
 			if (options != null) {
 				return Integer.valueOf(options).intValue();
 			}
@@ -106,7 +110,11 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	}
 
 	public String getControlPath() {
-		return getString(TAG_CONTROL_PATH, ZEROSTR);
+		return getString(CONTROL_PATH, ZEROSTR);
+	}
+
+	public String getControlUserName() {
+		return getString(CONTROL_USER_NAME, ZEROSTR);
 	}
 
 	/**
@@ -115,11 +123,15 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 * @return local address
 	 */
 	public String getLocalAddress() {
-		return getString(TAG_LOCAL_ADDRESS, LOCALHOST);
+		return getString(LOCAL_ADDRESS, LOCALHOST);
+	}
+
+	public String getMonitorAddress() {
+		return getString(MONITOR_ADDRESS, ZEROSTR);
 	}
 
 	public List<String> getMonitorInvocationOptions() {
-		addMonitorInvocationOptions(getString(TAG_MONITOR_INVOCATION_OPTIONS, ZEROSTR));
+		addMonitorInvocationOptions(getString(MONITOR_INVOCATION_OPTIONS, ZEROSTR));
 		return monitorInvocationOptions;
 	}
 
@@ -134,7 +146,7 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 */
 	public int getMonitorOptions() {
 		try {
-			String options = getString(TAG_MONITOR_OPTIONS, null);
+			String options = getString(MONITOR_OPTIONS, null);
 			if (options != null) {
 				return Integer.valueOf(options).intValue();
 			}
@@ -150,11 +162,19 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 * @return path
 	 */
 	public String getMonitorPath() {
-		return getString(TAG_MONITOR_PATH, ZEROSTR);
+		return getString(MONITOR_PATH, ZEROSTR);
+	}
+
+	public String getMonitorUserName() {
+		return getString(MONITOR_USER_NAME, ZEROSTR);
 	}
 
 	public void setConnectionName(String name, String type) {
 		putString(type, name);
+	}
+
+	public void setControlAddress(String name) {
+		putString(CONTROL_ADDRESS, name);
 	}
 
 	/**
@@ -167,7 +187,7 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	public void setControlInvocationOptions(String optionString) {
 		controlInvocationOptions.clear();
 		addControlInvocationOptions(optionString);
-		putString(TAG_CONTROL_INVOCATION_OPTIONS, convertInvocationOptionsStr(getControlInvocationOptions()));
+		putString(CONTROL_INVOCATION_OPTIONS, convertInvocationOptionsStr(getControlInvocationOptions()));
 	}
 
 	/**
@@ -176,7 +196,7 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 * @param options
 	 */
 	public void setControlOptions(int options) {
-		putString(TAG_CONTROL_OPTIONS, String.valueOf(options));
+		putString(CONTROL_OPTIONS, String.valueOf(options));
 	}
 
 	/**
@@ -185,7 +205,11 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 * @param path
 	 */
 	public void setControlPath(String path) {
-		putString(TAG_CONTROL_PATH, path);
+		putString(CONTROL_PATH, path);
+	}
+
+	public void setControlUserName(String name) {
+		putString(CONTROL_USER_NAME, name);
 	}
 
 	/**
@@ -194,13 +218,17 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 * @param localAddr
 	 */
 	public void setLocalAddress(String localAddr) {
-		putString(TAG_LOCAL_ADDRESS, localAddr);
+		putString(LOCAL_ADDRESS, localAddr);
+	}
+
+	public void setMonitorAddress(String name) {
+		putString(MONITOR_ADDRESS, name);
 	}
 
 	public void setMonitorInvocationOptions(String optionString) {
 		monitorInvocationOptions.clear();
 		addMonitorInvocationOptions(optionString);
-		putString(TAG_MONITOR_INVOCATION_OPTIONS, convertInvocationOptionsStr(getMonitorInvocationOptions()));
+		putString(MONITOR_INVOCATION_OPTIONS, convertInvocationOptionsStr(getMonitorInvocationOptions()));
 	}
 
 	/**
@@ -209,7 +237,7 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 * @param options
 	 */
 	public void setMonitorOptions(int options) {
-		putString(TAG_MONITOR_OPTIONS, String.valueOf(options));
+		putString(MONITOR_OPTIONS, String.valueOf(options));
 	}
 
 	/**
@@ -218,7 +246,11 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	 * @param path
 	 */
 	public void setMonitorPath(String path) {
-		putString(TAG_MONITOR_PATH, path);
+		putString(MONITOR_PATH, path);
+	}
+
+	public void setMonitorUserName(String name) {
+		putString(MONITOR_USER_NAME, name);
 	}
 
 	/*
@@ -235,13 +267,17 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 	protected void clearRMData() {
 		controlInvocationOptions.clear();
 		monitorInvocationOptions.clear();
-		putString(TAG_CONTROL_PATH, ZEROSTR);
-		putString(TAG_MONITOR_PATH, ZEROSTR);
-		putString(TAG_CONTROL_OPTIONS, ZEROSTR);
-		putString(TAG_MONITOR_OPTIONS, ZEROSTR);
-		putString(TAG_MONITOR_INVOCATION_OPTIONS, ZEROSTR);
-		putString(TAG_CONTROL_INVOCATION_OPTIONS, ZEROSTR);
-		putString(TAG_LOCAL_ADDRESS, ZEROSTR);
+		putString(CONTROL_USER_NAME, ZEROSTR);
+		putString(MONITOR_USER_NAME, ZEROSTR);
+		putString(CONTROL_ADDRESS, ZEROSTR);
+		putString(MONITOR_ADDRESS, ZEROSTR);
+		putString(CONTROL_PATH, ZEROSTR);
+		putString(MONITOR_PATH, ZEROSTR);
+		putString(CONTROL_OPTIONS, ZEROSTR);
+		putString(MONITOR_OPTIONS, ZEROSTR);
+		putString(MONITOR_INVOCATION_OPTIONS, ZEROSTR);
+		putString(CONTROL_INVOCATION_OPTIONS, ZEROSTR);
+		putString(LOCAL_ADDRESS, ZEROSTR);
 	}
 
 	/**

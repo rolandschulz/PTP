@@ -1,6 +1,5 @@
 package org.eclipse.ptp.rm.jaxb.core;
 
-import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
@@ -13,10 +12,6 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  */
 public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 
-	ResourceManagerData getData();
-
 	IJAXBResourceManagerConfiguration getJAXBRMConfiguration();
-
-	void setData(ResourceManagerData data);
 
 }

@@ -11,45 +11,32 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
+import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
-import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
+import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFileJob;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
-public final class JAXBResourceManager extends AbstractResourceManager implements IJAXBResourceManagerControl {
+public final class JAXBResourceManager extends AbstractResourceManager implements IJAXBNonNLSConstants {
 
-	private ResourceManagerData rmdata;
-	private final JAXBServiceProvider config;
+	private final IJAXBResourceManagerConfiguration config;
 
-	public JAXBResourceManager(IPUniverse universe, JAXBServiceProvider jaxbServiceProvider) {
+	public JAXBResourceManager(IPUniverse universe, IResourceManagerConfiguration jaxbServiceProvider) {
 		super(universe, jaxbServiceProvider);
-		config = jaxbServiceProvider;
-		setRuntimeProperties();
-	}
-
-	public ResourceManagerData getData() {
-		return rmdata;
-	}
-
-	public IJAXBResourceManagerConfiguration getJAXBRMConfiguration() {
-		return config;
-	}
-
-	public void setData(ResourceManagerData rmdata) {
-		this.rmdata = rmdata;
+		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
+		setFixedConfigurationProperties();
 	}
 
 	@Override
 	protected void doCleanUp() {
-		/*
-		 * Do we need to break down any structures here? Might be a good idea to
-		 * empty the env.
-		 */
+
 	}
 
 	@Override
@@ -61,13 +48,14 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	@Override
 	protected void doDispose() {
 		/*
-		 * Close connections?
+		 * Do we need to break down any structures here? Might be a good idea to
+		 * empty the env
 		 */
 	}
 
 	@Override
 	protected void doShutdown() throws CoreException {
-		doShutdown();
+		doOnShutdown();
 		doDisconnect();
 	}
 
@@ -82,7 +70,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	@Override
 	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
-		// TODO Auto-generated method stub
+		updatePropertyValuesFromTab(configuration);
 		return null;
 	}
 
@@ -96,11 +84,25 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	}
 
+	/*
+	 * run the shut down commands, if any
+	 */
+	private void doOnShutdown() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * run the start up commands, if any
+	 */
 	private void doOnStartUp() {
 		// TODO Auto-generated method stub
 
 	}
 
+	/*
+	 * This has to come from the monitoring part
+	 */
 	private void getAvailableQueues() {
 		// TODO Auto-generated method stub
 
@@ -143,29 +145,40 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	 * Issue across the connection; capture the stream(s); parse the stream(s),
 	 * adding to environment
 	 */
-	private void runCommand(Command command, Map<String, Object> env) {
+	private void runCommand(Command command) {
 
 	}
 
 	/*
-	 * Should get the values, run through them in map: if Attribute, setValue()
-	 * if Property, setValue();
-	 */
-	private void setPropertyValuesFromTab(ILaunchConfiguration configuration) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * need to get the control connection, for remote.host. home is then just
-	 * ~/.eclipsesettings parse out the connection <property
-	 * name="remote.host"/> <property name="user.name"/> <property
-	 * name="remote.home"/>
+	 * 
 	 * 
 	 * then set managed-file source/target from the above
 	 */
-	private void setRuntimeProperties() {
-		// TODO Auto-generated method stub
+	private void setFixedConfigurationProperties() {
+		Map<String, Object> env = RMVariableMap.getInstance().getVariables();
+		env.put(CONTROL_USER_VAR, config.getControlUserName());
+		env.put(MONITOR_USER_VAR, config.getMonitorUserName());
+		env.put(CONTROL_ADDRESS_VAR, config.getControlAddress());
+		env.put(MONITOR_ADDRESS_VAR, config.getMonitorAddress());
+	}
 
+	/*
+	 * Transfers the values from the configuration to the environment.
+	 */
+	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
+		@SuppressWarnings("unchecked")
+		Map<String, String> lcattr = configuration.getAttributes();
+		Map<String, Object> env = RMVariableMap.getInstance().getVariables();
+		for (String key : lcattr.keySet()) {
+			String value = lcattr.get(key);
+			Object target = env.get(key);
+			if (target instanceof Property) {
+				((Property) target).setValue(value);
+			} else if (target instanceof JobAttribute) {
+				((JobAttribute) target).setValue(value);
+			} else {
+				env.put(key, value);
+			}
+		}
 	}
 }

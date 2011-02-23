@@ -104,6 +104,10 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractContr
 		config.setMonitorInvocationOptions(targetArgs);
 		config.setMonitorOptions(options);
 		config.setLocalAddress(localAddr);
+		if (connection != null) {
+			config.setMonitorUserName(connection.getUsername());
+			config.setMonitorAddress(connection.getAddress());
+		}
 	}
 
 	@Override

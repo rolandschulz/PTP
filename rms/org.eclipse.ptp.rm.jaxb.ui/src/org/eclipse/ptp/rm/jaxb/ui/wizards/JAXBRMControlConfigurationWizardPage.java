@@ -105,5 +105,9 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 		config.setControlInvocationOptions(targetArgs);
 		config.setControlOptions(options);
 		config.setLocalAddress(localAddr);
+		if (connection != null) {
+			config.setControlUserName(connection.getUsername());
+			config.setControlAddress(connection.getAddress());
+		}
 	}
 }
