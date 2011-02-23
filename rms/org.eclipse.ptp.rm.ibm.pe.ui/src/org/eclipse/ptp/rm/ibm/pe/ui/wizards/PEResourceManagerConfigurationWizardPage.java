@@ -24,32 +24,33 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.pe.ui.wizards;
 
-import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.ui.messages.Messages;
+import org.eclipse.ptp.rm.ui.wizards.AbstractProxyOptions;
 import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
-import org.eclipse.swt.widgets.Shell;
 
 public final class PEResourceManagerConfigurationWizardPage extends AbstractRemoteProxyResourceManagerConfigurationWizardPage {
-
-	private final IRMConfigurationWizard configWizard;
 
 	public PEResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.getString("PEDialogs.ConfigurationTitle")); //$NON-NLS-1$
 		setTitle(Messages.getString("PEDialogs.ConfigurationTitle")); //$NON-NLS-1$
 		setDescription(Messages.getString("PEDialogs.Configuration")); //$NON-NLS-1$
-		configWizard = wizard;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.ui.wizards.
+	 * AbstractRemoteProxyResourceManagerConfigurationWizardPage
+	 * #createProxyOptions(org.eclipse.jface.wizard.WizardPage,
+	 * org.eclipse.ptp.rmsystem.IRemoteResourceManagerConfiguration,
+	 * java.lang.String)
+	 */
 	@Override
-	protected String createOptionsDialog(Shell shell, String initialOptions) {
-		PEResourceManagerOptionDialog dialog;
-
-		dialog = new PEResourceManagerOptionDialog(shell, configWizard, initialOptions);
-		if (dialog.open() == Dialog.OK) {
-			return dialog.getValue();
-		}
-		return initialOptions;
+	protected AbstractProxyOptions createProxyOptions(WizardPage wizardPage, IRemoteResourceManagerConfiguration config) {
+		return new PEResourceManagerOptions(wizardPage, (IPEResourceManagerConfiguration) config);
 	}
-
 }

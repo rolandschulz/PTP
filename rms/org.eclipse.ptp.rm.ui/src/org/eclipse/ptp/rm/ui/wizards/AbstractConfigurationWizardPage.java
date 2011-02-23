@@ -20,10 +20,9 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
-public abstract class AbstractConfigurationWizardPage extends
-RMConfigurationWizardPage {
+public abstract class AbstractConfigurationWizardPage extends RMConfigurationWizardPage {
 
 	private final WizardPageWidgetListener listener = createListener();
 	private final WizardPageDataSource dataSource = createDataSource();
@@ -33,15 +32,19 @@ RMConfigurationWizardPage {
 	}
 
 	/**
-	 * Create listener for the wizard page. The listener must extend {@link WizardPageWidgetListener} and add
-	 * specific behavior for widgets of the the preference page.
+	 * Create listener for the wizard page. The listener must extend
+	 * {@link WizardPageWidgetListener} and add specific behavior for widgets of
+	 * the the preference page.
+	 * 
 	 * @return the listener
 	 */
 	protected abstract WizardPageWidgetListener createListener();
 
 	/**
-	 * Create data source to handle page content. The listener must extend {@link WizardPageDataSource} and add
-	 * specific behavior for widgets of the the preference page.
+	 * Create data source to handle page content. The listener must extend
+	 * {@link WizardPageDataSource} and add specific behavior for widgets of the
+	 * the preference page.
+	 * 
 	 * @return the listener
 	 */
 	protected abstract WizardPageDataSource createDataSource();
@@ -71,7 +74,7 @@ RMConfigurationWizardPage {
 
 	/**
 	 * Convenience method for creating a button widget.
-	 *
+	 * 
 	 * @param parent
 	 * @param label
 	 * @param type
@@ -87,7 +90,7 @@ RMConfigurationWizardPage {
 
 	/**
 	 * Convenience method for creating a check button widget.
-	 *
+	 * 
 	 * @param parent
 	 * @param label
 	 * @return the check button widget
@@ -106,11 +109,10 @@ RMConfigurationWizardPage {
 	public void createControl(Composite parent) {
 		listener.disable();
 		Composite composite = doCreateContents(parent);
-		//		doCreateContents(composite);
 		setControl(composite);
 		listener.enable();
 	}
 
-	abstract protected Composite doCreateContents(Composite composite);
+	protected abstract Composite doCreateContents(Composite composite);
 
 }

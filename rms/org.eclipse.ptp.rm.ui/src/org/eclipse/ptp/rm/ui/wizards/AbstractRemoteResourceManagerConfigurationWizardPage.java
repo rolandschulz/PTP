@@ -32,6 +32,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ui.messages.Messages;
+import org.eclipse.ptp.ui.preferences.ScrolledPageContent;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
@@ -43,8 +44,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 /**
  * Abstract base class for wizard pages used to configure remote resource
@@ -247,7 +252,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 
 	public AbstractRemoteResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard, String title) {
 		super(wizard, title);
-
 		setPageComplete(false);
 	}
 
@@ -262,8 +266,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout topLayout = new GridLayout();
+		topLayout.marginHeight = 0;
+		topLayout.marginWidth = 0;
 		composite.setLayout(topLayout);
-		createContents(composite);
+		Composite pageContent = createContents(composite);
+		pageContent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		setControl(composite);
 	}
 
@@ -311,16 +318,39 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	}
 
 	/**
+	 * @since 2.0
+	 */
+	protected ScrolledPageContent getParentScrolledComposite(Control control) {
+		Control parent = control.getParent();
+		while (!(parent instanceof ScrolledPageContent) && parent != null) {
+			parent = parent.getParent();
+		}
+		if (parent instanceof ScrolledPageContent) {
+			return (ScrolledPageContent) parent;
+		}
+		return null;
+	}
+
+	/**
 	 * Create the contents of the wizard page.
 	 * 
 	 * @param parent
 	 * @param colSpan
 	 */
-	private void createContents(Composite parent) {
+	private Composite createContents(Composite parent) {
+		ScrolledPageContent pageContent = new ScrolledPageContent(parent);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 4;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+
+		Composite composite = pageContent.getBody();
+		composite.setLayout(layout);
+
 		/*
 		 * Composite for remote information
 		 */
-		Composite remoteComp = new Composite(parent, SWT.NONE);
+		Composite remoteComp = new Composite(composite, SWT.NONE);
 		GridLayout remoteLayout = new GridLayout();
 		remoteLayout.numColumns = 4;
 		remoteLayout.marginWidth = 0;
@@ -343,6 +373,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd.horizontalSpan = 3;
 		remoteCombo.setLayoutData(gd);
 		remoteCombo.addModifyListener(getWidgetListener());
+		remoteCombo.setFocus();
 
 		/*
 		 * Remote location
@@ -364,9 +395,24 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		newConnectionButton.addSelectionListener(getWidgetListener());
 
 		/*
-		 * Multiplexing options
+		 * Advanced options
 		 */
-		Group mxGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		ExpandableComposite advancedOptions = new ExpandableComposite(composite, SWT.NONE, ExpandableComposite.TWISTIE
+				| ExpandableComposite.CLIENT_INDENT);
+		advancedOptions.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_AdvancedOptions);
+		advancedOptions.addExpansionListener(new ExpansionAdapter() {
+			@Override
+			public void expansionStateChanged(ExpansionEvent e) {
+				ScrolledPageContent parent = getParentScrolledComposite((ExpandableComposite) e.getSource());
+				if (parent != null) {
+					parent.reflow(true);
+				}
+			}
+		});
+		advancedOptions.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
+
+		Group mxGroup = new Group(advancedOptions, SWT.SHADOW_ETCHED_IN);
+		advancedOptions.setClient(mxGroup);
 		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
 		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		mxGroup.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_3);
@@ -403,6 +449,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		portForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_6,
 				"mxGroup", listener); //$NON-NLS-1$
 		portForwardingButton.addSelectionListener(getWidgetListener());
+
+		return pageContent;
 	}
 
 	/**
