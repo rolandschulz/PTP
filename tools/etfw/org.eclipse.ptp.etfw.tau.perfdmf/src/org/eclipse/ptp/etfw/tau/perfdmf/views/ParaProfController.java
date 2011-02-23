@@ -158,7 +158,7 @@ public class ParaProfController {
 	}
 
 	public TreeTuple uploadTrial(String profile, int dbid, String app, String exp, String tri) {
-		String comBuf = "control upload " + profile + " " + dbid + " " + app + " " + exp + " " + tri; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		String comBuf = "control upload " + profile + "/tauprofile.xml " + dbid + " " + app + " " + exp + " " + tri; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		int res = issueCommand(comBuf);
 		if (res != 0)
 			return null;
