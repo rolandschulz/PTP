@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Default Fortran code templates -->
+<!-- Author: Jeff Overbey -->
+<templates>
+
+  <!--==========================================================================================-->
+  <!-- Constructs -->
+  <!--==========================================================================================-->
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.where_lc"
+    name="where...end where"
+    description="Where construct (lower case)">where (${mask_expression})
+&#009;${cursor}
+end where</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.where_uc"
+    name="WHERE...END WHERE"
+    description="Where construct (upper case)">WHERE (${mask_expression})
+&#009;${cursor}
+END WHERE</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.forall_lc"
+    name="forall...end forall"
+    description="Forall construct (lower case)">forall (${index_name} = ${lower}:${upper})
+&#009;${cursor}
+end forall</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.forall_uc"
+    name="FORALL...END FORALL"
+    description="Forall construct (upper case)">FORALL (${index_name} = ${lower}:${upper})
+&#009;${cursor}
+END FORALL</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.do_lc"
+    name="do...end do"
+    description="Do-loop construct (lower case)">do ${variable} = ${lower}, ${upper}
+&#009;${cursor}
+end do</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.do_uc"
+    name="DO...END DO"
+    description="Do-loop construct (upper case)">DO ${variable} = ${lower}, ${upper}
+&#009;${cursor}
+END DO</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.do_while_lc"
+    name="do while...end do"
+    description="Do-while construct (lower case)">do while (${expression})
+&#009;${cursor}
+end do</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.do_while_uc"
+    name="DO WHILE...END DO"
+    description="Do-while construct (upper case)">DO WHILE (${expression})
+&#009;${cursor}
+END DO</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.if_lc"
+    name="if...then"
+    description="If-then construct (lower case)">if (${expression}) then
+&#009;${cursor}
+end if</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.if_uc"
+    name="IF...THEN"
+    description="If-then construct (upper case)">IF (${expression}) THEN
+&#009;${cursor}
+END IF</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.select_lc"
+    name="select...end select"
+    description="Select case construct (lower case)">select case (${case_expression})
+&#009;case (${value_range_list})
+&#009;&#009;${cursor}
+&#009;case default
+&#009;&#009;
+end select</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.select_uc"
+    name="SELECT...END SELECT"
+    description="Select case construct (upper case)">SELECT CASE (${case_expression})
+&#009;CASE (${value_range_list})
+&#009;&#009;${cursor}
+&#009;CASE DEFAULT
+&#009;&#009;
+END SELECT</template>
+
+  <!--==========================================================================================-->
+  <!-- Statements -->
+  <!--==========================================================================================-->
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.implicit_none_lc"
+    name="implicit none"
+    description="Implicit none statement (lower case)">implicit none
+${cursor}</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.implicit_none_uc"
+    name="IMPLICIT NONE"
+    description="Implicit none statement (upper case)">IMPLICIT NONE
+${cursor}</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.print_lc"
+    name="print *, ..."
+    description="Print statement (lower case)">print *, ${cursor}</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.print_uc"
+    name="PRINT *, ..."
+    description="Print statement (upper case)">PRINT *, ${cursor}</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.call_lc"
+    name="call ..."
+    description="Call statement (lower case)">call ${cursor}</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.call_uc"
+    name="CALL ..."
+    description="Call statement (upper case)">CALL ${cursor}</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.allocate_lc"
+    name="allocate (...)"
+    description="Allocate statement (lower case)">allocate (${cursor})
+</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.allocate_uc"
+    name="ALLOCATE (...)"
+    description="Allocate statement (upper case)">ALLOCATE (${cursor})
+</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.nullify_lc"
+    name="nullify (...)"
+    description="Nullify statement (lower case)">nullify (${cursor})
+</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.nullify_uc"
+    name="NULLIFY (...)"
+    description="Nulify statement (upper case)">NULLIFY (${cursor})
+</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.deallocate_lc"
+    name="deallocate (...)"
+    description="Deallocate statement (lower case)">deallocate (${cursor})
+</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.deallocate_uc"
+    name="DEALLOCATE (...)"
+    description="Deallocate statement (upper case)">DEALLOCATE (${cursor})
+</template>
+
+  <!--==========================================================================================-->
+  <!-- Declarations -->
+  <!--==========================================================================================-->
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.type_lc"
+    name="type...end type"
+    description="Derived type declaration (lower case)">type ${name}
+&#009;${cursor}
+end type ${name}</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.type_uc"
+    name="TYPE...END TYPE"
+    description="Derived type declaration (upper case)">TYPE ${name}
+&#009;${cursor}
+END TYPE ${name}</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.interface_lc"
+    name="interface...end interface"
+    description="Interface declaration (lower case)">interface ${generic_spec}
+&#009;${cursor}
+end interface ${generic_spec}</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.interface_uc"
+    name="INTERFACE...END INTERFACE"
+    description="Interface declaration (upper case)">INTERFACE ${generic_spec}
+&#009;${cursor}
+END INTERFACE ${generic_spec}</template>
+
+  <!--==========================================================================================-->
+  <!-- Program Units -->
+  <!--==========================================================================================-->
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.program_lc"
+    name="program...end program"
+    description="Main program (lower case)">program ${name}
+&#009;implicit none
+&#009;${cursor}
+end program ${name}</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.program_uc"
+    name="PROGRAM...END PROGRAM"
+    description="Main program (upper case)">PROGRAM ${name}
+&#009;IMPLICIT NONE
+&#009;${cursor}
+END PROGRAM ${name}</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.module_lc"
+    name="module...end module"
+    description="Module (lower case)">module ${name}
+&#009;implicit none
+&#009;${cursor}
+contains
+&#009;
+end module ${name}</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.module_uc"
+    name="MODULE...END MODULE"
+    description="Module (upper case)">MODULE ${name}
+&#009;IMPLICIT NONE
+&#009;${cursor}
+CONTAINS
+&#009;
+END MODULE ${name}</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.subroutine_lc"
+    name="subroutine...end subroutine"
+    description="Subroutine (lower case)">subroutine ${name}(${parameters})
+&#009;${cursor}
+end subroutine ${name}</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.subroutine_uc"
+    name="SUBROUTINE...END SUBROUTINE"
+    description="Subroutine (upper case)">SUBROUTINE ${name}(${parameters})
+&#009;${cursor}
+END SUBROUTINE ${name}</template>
+
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.function_lc"
+    name="function...end function"
+    description="Function (lower case)">${return_type} function ${name}(${parameters})
+&#009;${cursor}
+end function ${name}</template>
+  <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
+    id="org.eclipse.photran.ui.template.function_uc"
+    name="FUNCTION...END FUNCTION"
+    description="Function (upper case)">${return_type} FUNCTION ${name}(${parameters})
+&#009;${cursor}
+END FUNCTION ${name}</template>
+
+</templates>

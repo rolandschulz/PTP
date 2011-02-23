@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.editor_vpg.contentassist;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -25,6 +27,7 @@ import org.eclipse.photran.internal.core.intrinsics.IntrinsicProcDescription;
 import org.eclipse.photran.internal.core.intrinsics.Intrinsics;
 import org.eclipse.photran.internal.core.model.FortranElement;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.ui.editor.CompletionComputer;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -34,80 +37,21 @@ import org.eclipse.swt.graphics.Image;
  * 
  * @see FortranCompletionProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int)
  */
-class FortranCompletionProposalComputer
+class FortranCompletionProposalComputer extends CompletionComputer
 {
     private HashMap<String, TreeSet<Definition>> defs;
     private String scope;
-    
-    private int prefixIndex;
-    private String prefix;
-    private int suffixIndex;
-    private String suffix;
-    private int replOffset;
-    private int replLen;
 
     FortranCompletionProposalComputer(HashMap<String, TreeSet<Definition>> defs, String scope, IDocument document, int offset) throws BadLocationException
     {
+        super(document, offset);
         this.defs = defs;
         this.scope = scope;
-
-        this.prefixIndex = findPrefix(document, offset);
-        this.prefix = document.get(prefixIndex, offset-prefixIndex).toLowerCase();
-        
-        this.suffixIndex = findSuffix(document, offset);
-        this.suffix = document.get(offset, suffixIndex-offset).toLowerCase();
-        
-        this.replOffset = prefixIndex;
-        this.replLen = suffixIndex - prefixIndex;
     }
 
-    private int findPrefix(IDocument s, int offset) throws BadLocationException
+    public List<ICompletionProposal> proposalsFromDefs() throws BadLocationException
     {
-        for (offset--; offset >= 0; offset--)
-        {
-            char c = s.getChar(offset);
-            if (!Character.isLetter(c) && !Character.isDigit(c) && c != '_')
-                return offset + 1;
-        }
-        return 0;
-    }
-
-    private int findSuffix(IDocument s, int offset) throws BadLocationException
-    {
-        int length = s.getLength();
-        for (; offset < length; offset++)
-        {
-            char c = s.getChar(offset);
-            if (!Character.isLetter(c) && !Character.isDigit(c) && c != '_')
-                return offset;
-        }
-        return length;
-    }
-
-    public ICompletionProposal[] compute() throws BadLocationException
-    {
-        PhotranVPG.getInstance().debug("FortranCompletionProposalComputer#compute()", null); //$NON-NLS-1$
-        PhotranVPG.getInstance().debug("    Scope: " + scope, null); //$NON-NLS-1$
-        if (defs != null && defs.get(scope) != null)
-            PhotranVPG.getInstance().debug("    Definitions in scope: " + defs.get(scope).size(), null); //$NON-NLS-1$
-        
-        TreeSet<FortranCompletionProposal> proposals1 = new TreeSet<FortranCompletionProposal>();
-        addProposalsFromDefs(proposals1);
-        
-        TreeSet<FortranCompletionProposal> proposals2 = new TreeSet<FortranCompletionProposal>();
-        addIntrinsicProposals(proposals2);
-        
-        CompletionProposal[] result = new CompletionProposal[proposals1.size() + proposals2.size()];
-        int i = 0;
-        for (FortranCompletionProposal proposal : proposals1)
-            result[i++] = proposal.wrappedProposal;
-        for (FortranCompletionProposal proposal : proposals2)
-            result[i++] = proposal.wrappedProposal;
-        return result;
-    }
-
-    private void addProposalsFromDefs(TreeSet<FortranCompletionProposal> proposals) throws BadLocationException
-    {
+        TreeSet<FortranCompletionProposal> proposals = new TreeSet<FortranCompletionProposal>();
         for (;;)
         {
             addProposals(defs.get(scope), proposals);
@@ -118,6 +62,15 @@ class FortranCompletionProposalComputer
             else
                 scope = scope.substring(colon+1);
         }
+        return toProposalArray(proposals);
+    }
+
+    private List<ICompletionProposal> toProposalArray(TreeSet<FortranCompletionProposal> proposals)
+    {
+        List<ICompletionProposal> result = new ArrayList<ICompletionProposal>(proposals.size());
+        for (FortranCompletionProposal p : proposals)
+            result.add(p.wrappedProposal);
+        return result;
     }
 
     private void addProposals(Iterable<Definition> proposalsToConsider,
@@ -141,9 +94,9 @@ class FortranCompletionProposalComputer
         }
     }
 
-    private void addIntrinsicProposals(TreeSet<FortranCompletionProposal> proposals)
-        throws BadLocationException
+    public List<ICompletionProposal> proposalsFromIntrinsics() throws BadLocationException
     {
+        TreeSet<FortranCompletionProposal> proposals = new TreeSet<FortranCompletionProposal>();
         for (IntrinsicProcDescription proc : Intrinsics.getAllIntrinsicProcedures())
         {
             String canonicalizedId = PhotranVPG.canonicalizeIdentifier(proc.genericName);
@@ -157,6 +110,7 @@ class FortranCompletionProposalComputer
                 }
             }
         }
+        return toProposalArray(proposals);
     }
 
     private HashMap<Classification, Image> imageCache = new HashMap<Classification, Image>(); 

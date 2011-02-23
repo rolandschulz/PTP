@@ -53,27 +53,7 @@ public final class FortranPreferences
 
     public static final FortranIntegerPreference FIXED_FORM_COMMENT_COLUMN = new FortranIntegerPreference("fixedformcommentcolum", 72, 9999, 72); //$NON-NLS-1$
     public static final FortranBooleanPreference CONVERT_TABS_TO_SPACES = new FortranBooleanPreference("converttabs", true); //$NON-NLS-1$
-    public static final FortranIntegerPreference TAB_WIDTH = new FortranIntegerPreference("tabwidth", 0, 16, 0) //$NON-NLS-1$
-    {
-        /**
-         * Determines the tab width to use in the Fortran editor.
-         * <ol>
-         * <li> First, it looks at the custom Fortran editor preference.  If it is
-         *      non-zero, this width is used.
-         * <li> If the custom preference is not set, the workspace-wide text editor
-         *      preference is used instead.
-         * </ol>
-         */
-        @Override public int getValue()
-        {
-            int customValue = super.getValue();
-            if (customValue > 0)
-                return customValue;
-            else
-                return EditorsPlugin.getDefault().getPreferenceStore().getInt(
-                    AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
-        }
-    };
+    public static final FortranTabWidthPreference TAB_WIDTH = new FortranTabWidthPreference("tabwidth", 0, 16, 0); //$NON-NLS-1$
     
     private FortranPreferences() {}
 

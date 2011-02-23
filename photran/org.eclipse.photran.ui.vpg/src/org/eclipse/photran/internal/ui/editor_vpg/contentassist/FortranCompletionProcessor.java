@@ -12,6 +12,7 @@ package org.eclipse.photran.internal.ui.editor_vpg.contentassist;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -26,10 +27,16 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.photran.internal.ui.editor.FortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranTemplateCompletionProcessor;
 import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorTasks;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
+/**
+ * Fortran content assist processor which uses the VPG to determine which identifiers are in scope.
+ * 
+ * @author Jeff Overbey
+ */
 public class FortranCompletionProcessor implements IContentAssistProcessor
 {
     /** Scope map: scopes.get(n) is the qualified name of the scope at line (n+1) */
@@ -66,36 +73,49 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
 
     public synchronized ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
     {
-        if (defs == null) return null;
+        FortranCompletionProposalComputer computer = null;
+        List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(256);
         
-//        return new ICompletionProposal[]
-//        {
-//            new CompletionProposal("Hello", offset, 0, 5),
-//            new CompletionProposal("Goodbye", offset, 0, 7)
-//        };
-        
-        try
+        if (defs != null)
         {
-            errorMessage = null;
             
-            IDocument document = viewer.getDocument();
+    //        return new ICompletionProposal[]
+    //        {
+    //            new CompletionProposal("Hello", offset, 0, 5),
+    //            new CompletionProposal("Goodbye", offset, 0, 7)
+    //        };
             
-            int line = determineLineNumberForOffset(offset, document);
-            String scopeName = determineScopeNameForLine(line);
-            
-            if (scopeName == null)
-                return null;
-            else
+            try
             {
-                return new FortranCompletionProposalComputer(defs, scopeName, document, offset)
-                           .compute();
+                errorMessage = null;
+                
+                IDocument document = viewer.getDocument();
+                
+                int line = determineLineNumberForOffset(offset, document);
+                String scopeName = determineScopeNameForLine(line);
+                
+                if (scopeName != null)
+                    computer = new FortranCompletionProposalComputer(defs, scopeName, document, offset);
+
+                // Include proposals in this order:
+                
+                // 1. Local variables, functions, etc.
+                if (computer != null) proposals.addAll(computer.proposalsFromDefs());
+                
+                // 2. Code templates
+                for (ICompletionProposal proposal : new FortranTemplateCompletionProcessor().computeCompletionProposals(viewer, offset))
+                    proposals.add(proposal);
+
+                // 3. Intrinsic procedures
+                if (computer != null) proposals.addAll(computer.proposalsFromIntrinsics());
+            }
+            catch (Exception e)
+            {
+                errorMessage = e.getClass().getName() + " - " + e.getMessage(); //$NON-NLS-1$
             }
         }
-        catch (Exception e)
-        {
-            errorMessage = e.getClass().getName() + " - " + e.getMessage(); //$NON-NLS-1$
-            return null;
-        }
+        
+        return proposals.toArray(new ICompletionProposal[proposals.size()]);
     }
 
     private int determineLineNumberForOffset(int offset, IDocument document) throws BadLocationException

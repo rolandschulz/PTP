@@ -108,36 +108,9 @@ public final class Reindenter
             ast.accept(strategy.createVisitor(ast, firstTokenInRegion, lastTokenInRegion));
     }
     
-    public static String spaces(int count)
-    {
-        if (count < 0) throw new IllegalArgumentException();
-
-        switch (count)
-        {
-            case 0:  return ""; //$NON-NLS-1$
-            case 1:  return " "; //$NON-NLS-1$
-            case 2:  return "  "; //$NON-NLS-1$
-            case 3:  return "   "; //$NON-NLS-1$
-            case 4:  return "    "; //$NON-NLS-1$
-            case 5:  return "     "; //$NON-NLS-1$
-            case 6:  return "      "; //$NON-NLS-1$
-            case 7:  return "       "; //$NON-NLS-1$
-            case 8:  return "        "; //$NON-NLS-1$
-            case 9:  return "         "; //$NON-NLS-1$
-            case 10: return "          "; //$NON-NLS-1$
-            case 11: return "           "; //$NON-NLS-1$
-            case 12: return "            "; //$NON-NLS-1$
-            case 13: return "             "; //$NON-NLS-1$
-            case 14: return "              "; //$NON-NLS-1$
-            case 15: return "               "; //$NON-NLS-1$
-            case 16: return "                "; //$NON-NLS-1$
-            default: return "                " + spaces(count-16); //$NON-NLS-1$
-        }
-    }
-    
     public static String defaultIndentation()
     {
-        return spaces(FortranPreferences.TAB_WIDTH.getValue());
+        return FortranPreferences.TAB_WIDTH.getStringOfSpaces();
     }
     
     private Reindenter() {}

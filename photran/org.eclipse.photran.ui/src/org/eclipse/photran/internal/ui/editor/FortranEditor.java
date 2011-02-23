@@ -35,6 +35,8 @@ import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension7;
 import org.eclipse.jface.text.MarginPainter;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
@@ -554,6 +556,9 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
 
     public static class FortranSourceViewerConfiguration extends CDTBasedSourceViewerConfiguration
     {
+        protected static final Color WHITE = new Color(null, new RGB(255, 255, 255));
+        //protected static final Color LIGHT_YELLOW = new Color(null, new RGB(255, 255, 191));
+
         protected PresentationReconciler reconciler;
 
         public FortranSourceViewerConfiguration(FortranEditor editor)
@@ -607,6 +612,24 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
         protected ITokenScanner getTokenScanner()
         {
             return ((FortranEditor)editor).getTokenScanner();
+        }
+
+        /**
+         * Default to a content assistant which shows Fortran code templates.
+         * <p>
+         * Subclasses may override this to provide a content assistant with more functionality.
+         */
+        @Override public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
+        {
+            ContentAssistant assistant = new ContentAssistant();
+            FortranTemplateCompletionProcessor templateProcessor = new FortranTemplateCompletionProcessor();
+            for (String partitionType : FortranEditor.PARTITION_TYPES)
+                assistant.setContentAssistProcessor(templateProcessor, partitionType);
+            assistant.enableAutoActivation(false); //assistant.setAutoActivationDelay(500);
+            assistant.setProposalPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
+            assistant.setContextInformationPopupBackground(WHITE);
+            assistant.setProposalSelectorBackground(WHITE);
+            return assistant;
         }
     }
 

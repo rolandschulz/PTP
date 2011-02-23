@@ -193,6 +193,18 @@
       </menuContribution>
    </extension>
 
+   <!--========================-->
+   <!-- Fortran code templates -->
+   <!--========================-->
+   <extension point="org.eclipse.ui.editors.templates">
+      <contextType
+         name="Fortran"
+         class="org.eclipse.photran.internal.ui.editor.FortranTemplateContext"
+         id="org.eclipse.photran.ui.template.context" />
+      <include
+         file="templates/defaults.xml" />
+   </extension>
+
    <!--===================================-->
    <!-- Fortran-specific preference pages -->
    <!--===================================-->
@@ -214,6 +226,12 @@
             category="org.eclipse.photran.ui.MainFortranPreferencePage"
             class="org.eclipse.photran.internal.ui.preferences.CDTFortranPreferencePage"
             id="org.eclipse.photran.ui.CDTFortranPreferencePage">
+      </page>
+      <page
+            name="Templates"
+            category="org.eclipse.photran.ui.MainFortranPreferencePage"
+            class="org.eclipse.photran.internal.ui.preferences.FortranTemplatesPreferencePage"
+            id="org.eclipse.photran.ui.FortranTemplatesPreferencePage">
       </page>
    </extension>
 
