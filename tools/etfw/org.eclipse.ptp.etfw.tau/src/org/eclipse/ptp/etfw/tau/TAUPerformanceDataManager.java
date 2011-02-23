@@ -204,19 +204,24 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 				projtype+="_"+expAppend; //$NON-NLS-1$
 			}
 			
+			File xmlprof=null;
 			File[] profs = getProfiles(directory);
 			if(!useP&&profs==null||profs.length==0)
 			{
-				Display.getDefault().syncExec(new Runnable() {
-					public void run() {
-						MessageDialog
-						.openInformation(
-								PlatformUI.getWorkbench()
-								.getDisplay()
-								.getActiveShell(),
-								Messages.TAUPerformanceDataManager_TAUWarning,
-						Messages.TAUPerformanceDataManager_NoProfData);
-					}});
+				xmlprof = new File(directory+File.separatorChar+PROFXML);
+				if(!xmlprof.canRead()){
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							MessageDialog
+							.openInformation(
+									PlatformUI.getWorkbench()
+									.getDisplay()
+									.getActiveShell(),
+									Messages.TAUPerformanceDataManager_TAUWarning,
+							Messages.TAUPerformanceDataManager_NoProfData);
+						}});
+					return;
+				}
 			}
 			
 			boolean runtauinc = configuration.getAttribute(ITAULaunchConfigurationConstants.TAUINC, false);
@@ -278,7 +283,9 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 				}
 			}
 			
-			removeProfiles(profs);
+			removeProfiles(profs);//TODO: xml profiles don't make a mess, so save?
+			//if(xmlprof!=null)
+				//xmlprof.delete();
 			
 			boolean useperfex=configuration.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_LAUNCH_PERFEX, false);
 			if(useperfex){
@@ -349,10 +356,13 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 		
 	}
 	
+	private static final String PROFDOT="profile.";
+	private static final String PROFXML="tauprofile.xml";
+	
 	private static File[] getProfiles(String directory){
 		class Profilefilter implements FilenameFilter {
 			public boolean accept(File dir, String name) {
-				if (name.indexOf("profile.") != 0) //$NON-NLS-1$
+				if (name.indexOf(PROFDOT) != 0) //$NON-NLS-1$
 					return false;
 				return true;
 			}
