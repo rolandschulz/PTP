@@ -7,6 +7,8 @@
 
 package org.eclipse.ptp.rm.jaxb.core.data;
 
+import java.math.BigInteger;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -25,10 +27,8 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}anyType" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="index" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" />
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -37,13 +37,24 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "value" })
-@XmlRootElement(name = "property")
-public class Property {
+@XmlType(name = "")
+@XmlRootElement(name = "set")
+public class Set {
 
-	protected Object value;
-	@XmlAttribute
+	@XmlAttribute(required = true)
+	protected BigInteger index;
+	@XmlAttribute(required = true)
 	protected String name;
+
+	/**
+	 * Gets the value of the index property.
+	 * 
+	 * @return possible object is {@link BigInteger }
+	 * 
+	 */
+	public BigInteger getIndex() {
+		return index;
+	}
 
 	/**
 	 * Gets the value of the name property.
@@ -56,13 +67,14 @@ public class Property {
 	}
 
 	/**
-	 * Gets the value of the value property.
+	 * Sets the value of the index property.
 	 * 
-	 * @return possible object is {@link Object }
+	 * @param value
+	 *            allowed object is {@link BigInteger }
 	 * 
 	 */
-	public Object getValue() {
-		return value;
+	public void setIndex(BigInteger value) {
+		this.index = value;
 	}
 
 	/**
@@ -74,17 +86,6 @@ public class Property {
 	 */
 	public void setName(String value) {
 		this.name = value;
-	}
-
-	/**
-	 * Sets the value of the value property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link Object }
-	 * 
-	 */
-	public void setValue(Object value) {
-		this.value = value;
 	}
 
 }
