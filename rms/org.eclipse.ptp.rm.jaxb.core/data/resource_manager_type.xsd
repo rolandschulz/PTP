@@ -405,8 +405,9 @@
 					</xs:annotation>
 				</xs:element>
 				<xs:element maxOccurs="unbounded" ref="token"/>
-				<xs:element maxOccurs="unbounded" ref="put"/>
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="put"/>
 				<xs:element minOccurs="0" maxOccurs="unbounded" ref="set"/>
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="add"/>
 			</xs:sequence>
 			<xs:attribute name="name" use="required" type="xs:string"/>
 			<xs:attribute name="stderr" type="xs:boolean"/>
@@ -427,14 +428,25 @@
 	<xs:element name="set">
       <xs:annotation>
          <xs:documentation>
-            Value assigned to the name is the token with the given index in the returned list; in the context of this
-            implementation, set refers to the name of an attribute or element of JobAttribute.  Set can be used
-            together with a single put without index, designating the variable to which to assign the JobAttribute.
+            Value assigned to the getter is the token with the given index in the returned list; in the context of this
+            implementation, getter refers to the name of an attribute or element of JobAttribute. 
+            name designates the variable to which to assign the JobAttribute.
          </xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:attribute name="name" use="required" type="xs:string"/>
+         <xs:attribute name="getter" use="required" type="xs:string"/>
          <xs:attribute name="index"  use="required" type="xs:integer"/>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="add">
+      <xs:annotation>
+         <xs:documentation>
+            Value is added to list; name designates the variable to which to assign the list.
+         </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:attribute name="name" use="required" type="xs:string"/>
       </xs:complexType>
    </xs:element>
 	<xs:element name="token">

@@ -4,6 +4,9 @@
       <control-connection>ssh://abe.ncsa.uiuc.edu/usr/local/bin/qsub</control-connection>
    </site>
 	<control>
+	   <on-start-up>
+	     <command-ref>find_queues</command-ref>
+	   </on-start-up>
 		<managed-files>
 			<file-staging-location>~/.eclipsesettings</file-staging-location>
 			<managed-file name="pbs_script" uniqueIdSuffix="true" deleteAfterUse="true">
@@ -19,6 +22,14 @@
 			<command-ref>cancel_job</command-ref>
 		</cancel-job>
 		<commands>
+		   <command name="find_queues">
+            <arglist>
+               <arg>qstat -Q -f</arg>
+               <arg>| grep Queue:</arg>
+               <arg>| cut -d ' ' -f 2</arg>
+            </arglist>
+            <parser-ref>queueParser</parser-ref>
+         </command>
 			<command name="submit_script">
 				<arglist>
 					<arg>qsub</arg>
@@ -34,11 +45,16 @@
 			</command>
 		</commands>
 		<parsers>
-			<stream-parser name="jobIdParser" stderr="false">
+			<stream-parser name="queueParser" stderr="false">
 				<parse-lines>n-1</parse-lines>
-				<token delim="[.]" return="0"/>
-				<put name="jobId" index="0"/>
+				<token delim="[\n]" return="0"/>
+				<add name="available_queues"/>
 			</stream-parser>
+			<stream-parser name="jobIdParser" stderr="false">
+            <parse-lines>n-1</parse-lines>
+            <token delim="[.]" return="0"/>
+            <put name="jobId" index="0"/>
+         </stream-parser>
 		</parsers>
 		<script shell="#!/bin/bash">
 			<directive-definitions>
