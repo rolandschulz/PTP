@@ -8,7 +8,6 @@
 
 package org.eclipse.ptp.rm.jaxb.core.data;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -25,8 +24,6 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="getter" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="index" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" />
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -37,63 +34,11 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "set")
-public class Set {
+@XmlRootElement(name = "add")
+public class Add {
 
-    @XmlAttribute(required = true)
-    protected String getter;
-    @XmlAttribute(required = true)
-    protected BigInteger index;
     @XmlAttribute(required = true)
     protected String name;
-
-    /**
-     * Gets the value of the getter property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getGetter() {
-        return getter;
-    }
-
-    /**
-     * Sets the value of the getter property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setGetter(String value) {
-        this.getter = value;
-    }
-
-    /**
-     * Gets the value of the index property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    public BigInteger getIndex() {
-        return index;
-    }
-
-    /**
-     * Sets the value of the index property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setIndex(BigInteger value) {
-        this.index = value;
-    }
 
     /**
      * Gets the value of the name property.

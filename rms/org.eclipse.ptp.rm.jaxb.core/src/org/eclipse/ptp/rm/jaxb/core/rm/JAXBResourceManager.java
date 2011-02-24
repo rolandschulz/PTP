@@ -64,7 +64,6 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		doConnect();
 		doOnStartUp();
 		maybeDiscoverAttributes();
-		getAvailableQueues();
 	}
 
 	@Override
@@ -97,14 +96,6 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	 * run the start up commands, if any
 	 */
 	private void doOnStartUp() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * This has to come from the monitoring part
-	 */
-	private void getAvailableQueues() {
 		// TODO Auto-generated method stub
 
 	}
