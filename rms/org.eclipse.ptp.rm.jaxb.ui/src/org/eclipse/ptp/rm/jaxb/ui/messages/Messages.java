@@ -20,6 +20,11 @@ public class Messages extends NLS {
 	public static String OpenResourceManagerEditor;
 	public static String OpenResourceManagerEditorAction_error;
 	public static String OpenResourceManagerEditorAction_title;
+
+	public static String ConfigUtils_exportResourceTitle;
+	public static String ConfigUtils_exportResourceError_0;
+	public static String ConfigUtils_exportResourceError_1;
+
 	public static String JAXBUIPlugin_Exception_InternalError;
 	public static String JAXBConnectionWizardPage_Description;
 	public static String JAXBConfigurationWizardPage_Description;

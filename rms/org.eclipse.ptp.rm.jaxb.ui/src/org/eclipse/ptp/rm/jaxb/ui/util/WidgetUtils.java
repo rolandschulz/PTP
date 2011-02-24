@@ -19,6 +19,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.SWT;
@@ -63,6 +64,14 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 			c.addSelectionListener(l);
 		}
 		return c;
+	}
+
+	public static String chooseValueUserPrompt(Shell shell, String message, String title, String original) {
+		InputDialog nameDialog = new InputDialog(shell, message, title, original, null);
+		if (nameDialog.open() != Window.CANCEL) {
+			return nameDialog.getValue();
+		}
+		return null;
 	}
 
 	public static Group createAnonymousNonFillingGroup(Composite parent, int columns) {
