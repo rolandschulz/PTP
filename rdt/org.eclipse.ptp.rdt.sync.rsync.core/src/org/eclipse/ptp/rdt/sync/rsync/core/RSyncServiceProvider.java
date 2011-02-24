@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.rsync.core;
 
+import java.util.EnumSet;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -18,6 +20,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -44,7 +47,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 * synchronize(org.eclipse.core.resources.IResourceDelta,
 	 * org.eclipse.core.runtime.IProgressMonitor, boolean)
 	 */
-	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, boolean force) throws CoreException {
+	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		switch (delta.getKind()) {
 		case IResourceDelta.ADDED:
 			System.out.println("ensureSync kind=ADDED");
@@ -62,10 +65,10 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			IResource resource = child.getResource();
 			if (resource instanceof IProject) {
 				System.out.println("ensureSync project=" + child.getResource().getName());
-				synchronize(child, monitor, force);
+				synchronize(child, monitor, syncFlags);
 			} else if (resource instanceof IFolder) {
 				System.out.println("ensureSync folder=" + child.getResource().getName());
-				synchronize(child, monitor, force);
+				synchronize(child, monitor, syncFlags);
 			} else if (resource instanceof IFile) {
 				System.out.println("ensureSync file=" + child.getResource().getName());
 			}
@@ -181,5 +184,6 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	public void setRemoteServices(IRemoteServices services) {
 		putString(RSYNC_SERVICES_ID, services.getId());
 	}
+
 
 }
