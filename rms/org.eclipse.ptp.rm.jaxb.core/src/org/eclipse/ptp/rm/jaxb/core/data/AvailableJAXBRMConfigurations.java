@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -28,24 +29,27 @@ public class AvailableJAXBRMConfigurations implements IJAXBNonNLSConstants {
 	private String[] types;
 	private Properties rmXmlNames;
 	private Properties rmXmlValues;
-	private Map<String, String> external;
+	private final Map<String, String> external;
 
 	private AvailableJAXBRMConfigurations() {
 		setInternal();
-		setExternal(null);
+		this.external = new TreeMap<String, String>();
 	}
 
 	public void addExternalPath(String path) {
-		external.put(path, null);
+		if (new File(path).exists()) {
+			external.put(path, null);
+		}
 	}
 
 	public void addExternalPaths(String[] path) {
 		for (String p : path) {
-			external.put(p, null);
+			addExternalPath(p);
 		}
 	}
 
 	public String[] getExternal() {
+		pruneExternal();
 		List<String> list = new ArrayList<String>(external.keySet());
 		list.add(0, ZEROSTR);
 		return list.toArray(new String[0]);
@@ -61,16 +65,6 @@ public class AvailableJAXBRMConfigurations implements IJAXBNonNLSConstants {
 
 	public String[] getTypes() {
 		return types;
-	}
-
-	public void removeExternal(String[] path) {
-		for (String p : path) {
-			external.remove(p);
-		}
-	}
-
-	public void removeExternalPath(String path) {
-		external.remove(path);
 	}
 
 	private void getPluginResourceConfigurations() throws IOException {
@@ -107,13 +101,12 @@ public class AvailableJAXBRMConfigurations implements IJAXBNonNLSConstants {
 		}
 	}
 
-	private void setExternal(String[] external) {
-		this.external = new TreeMap<String, String>();
-		if (external == null) {
-			return;
-		}
-		for (int i = 0; i < external.length; i++) {
-			this.external.put(external[i], null);
+	private void pruneExternal() {
+		for (Iterator<String> k = external.keySet().iterator(); k.hasNext();) {
+			String key = k.next();
+			if (!new File(key).exists()) {
+				k.remove();
+			}
 		}
 	}
 

@@ -64,6 +64,7 @@ public interface IJAXBNonNLSConstants {
 	String EXTERNAL_RM_XSD_PATHS = "external_rm_schema_paths";//$NON-NLS-1$
 	String SELECTED_ATTRIBUTES = "selected_attributes";//$NON-NLS-1$
 	String VALID_ATTRIBUTES = "valid_attributes"; //$NON-NLS-1$
+	String IS_PRESET = "is_preset";//$NON-NLS-1$
 
 	String CONTROL_USER_NAME = "controlUserName";//$NON-NLS-1$
 	String MONITOR_USER_NAME = "monitorUserName";//$NON-NLS-1$
