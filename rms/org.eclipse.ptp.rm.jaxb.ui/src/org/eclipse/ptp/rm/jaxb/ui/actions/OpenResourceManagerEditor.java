@@ -19,19 +19,16 @@
 package org.eclipse.ptp.rm.jaxb.ui.actions;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URL;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.ConfigurationChoiceDialog;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
@@ -58,17 +55,20 @@ public class OpenResourceManagerEditor implements IViewActionDelegate, IJAXBNonN
 			return;
 		}
 
-		if (dialog.isPreset()) {
-			// open a copy dialog
-		}
-
 		try {
-			URL fUrl = FileLocator.toFileURL(JAXBUtils.getURL(selected));
-			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			URI uri = fUrl.toURI();
-			File fileToOpen = new File(uri);
+			File fileToOpen = null;
+			if (dialog.isPreset()) {
+				fileToOpen = ConfigUtils.exportResource(selected, part.getSite().getShell());
+				if (fileToOpen == null) {
+					return;
+				}
+			} else {
+				fileToOpen = new File(selected);
+			}
+
 			if (fileToOpen.exists() && fileToOpen.isFile()) {
 				IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				IDE.openEditorOnFileStore(page, fileStore);
 			}
 		} catch (Throwable t) {

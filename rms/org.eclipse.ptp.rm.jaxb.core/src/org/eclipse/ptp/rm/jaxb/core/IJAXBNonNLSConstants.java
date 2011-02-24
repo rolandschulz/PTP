@@ -8,6 +8,9 @@ package org.eclipse.ptp.rm.jaxb.core;
  */
 public interface IJAXBNonNLSConstants {
 
+	int UNDEFINED = -1;
+	int COPY_BUFFER_SIZE = 64 * 1024;
+
 	/* CHARACTERS */
 	String ZEROSTR = "";//$NON-NLS-1$
 	String TAB = "\t"; //$NON-NLS-1$

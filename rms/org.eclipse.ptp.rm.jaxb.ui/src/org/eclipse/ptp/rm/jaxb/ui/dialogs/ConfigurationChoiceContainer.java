@@ -176,6 +176,7 @@ public abstract class ConfigurationChoiceContainer implements IJAXBNonNLSConstan
 			if (result != null) {
 				selected = result;
 				choice.setText(selected);
+				isPreset = false;
 				updateExternal();
 			}
 		}
