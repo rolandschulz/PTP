@@ -10,19 +10,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URI;
-import java.net.URL;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -30,8 +20,6 @@ import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
@@ -51,10 +39,6 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.progress.UIJob;
 
 /**
  * A set of convenience wrappers around JFace and SWT widget construction
@@ -428,27 +412,6 @@ public class WidgetUtils implements IJAXBNonNLSConstants {
 			return combo.getText();
 		}
 		return combo.getItem(i);
-	}
-
-	public static void openIDEEditor(final String file) throws IOException {
-		final URL fUrl = FileLocator.toFileURL(JAXBUtils.getURL(file));
-		new UIJob(Messages.WidgetUtils_openIDEEditor) {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				try {
-					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-					URI uri = fUrl.toURI();
-					File fileToOpen = new File(uri);
-					if (fileToOpen.exists() && fileToOpen.isFile()) {
-						IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
-						IDE.openEditorOnFileStore(page, fileStore);
-					}
-				} catch (Throwable e) {
-					return new Status(Status.ERROR, JAXBUIPlugin.PLUGIN_ID, Status.ERROR, e.getMessage(), e);
-				}
-				return Status.OK_STATUS;
-			}
-		}.schedule();
 	}
 
 	public static String select(Combo combo, String name) {

@@ -16,46 +16,35 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.actions;
+package org.eclipse.ptp.rm.jaxb.ui.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.wizards.RMServicesConfigurationWizard;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;
+import org.eclipse.ui.IViewActionDelegate;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 
-public class EditResourceManagerAction extends Action {
+public class HideResourceManagerEditor implements IViewActionDelegate, IJAXBNonNLSConstants {
+	private IViewPart part;
 
-	private IResourceManagerConfiguration fSelectedRM;
-	private final Shell fShell;
-
-	public EditResourceManagerAction(Shell shell) {
-		super(Messages.EditResourceManagerAction_0);
-		fShell = shell;
+	public void init(IViewPart view) {
+		this.part = view;
 	}
 
-	public void dispose() {
-	}
-
-	@Override
-	public void run() {
-		final RMServicesConfigurationWizard wizard = new RMServicesConfigurationWizard(fSelectedRM);
-
-		final WizardDialog dialog = new WizardDialog(fShell, wizard);
-		dialog.open();
+	public void run(IAction action) {
+		try {
+			IWorkbenchPage page = part.getViewSite().getWorkbenchWindow().getActivePage();
+			page.setEditorAreaVisible(false);
+		} catch (Throwable e) {
+			WidgetUtils.errorMessage(part.getSite().getShell(), e, Messages.HideResourceManagerEditorAction_error,
+					Messages.HideResourceManagerEditorAction_title, false);
+		}
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
-
 	}
 
-	/**
-	 * @since 5.0
-	 */
-	public void setResourceManager(IResourceManagerConfiguration config) {
-		fSelectedRM = config;
-	}
 }

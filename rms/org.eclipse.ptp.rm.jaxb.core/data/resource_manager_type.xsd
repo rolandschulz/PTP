@@ -406,7 +406,7 @@
 				</xs:element>
 				<xs:element maxOccurs="unbounded" ref="token"/>
 				<xs:element maxOccurs="unbounded" ref="put"/>
-				<xs:element maxOccurs="unbounded" ref="set"/>
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="set"/>
 			</xs:sequence>
 			<xs:attribute name="name" use="required" type="xs:string"/>
 			<xs:attribute name="stderr" type="xs:boolean"/>
