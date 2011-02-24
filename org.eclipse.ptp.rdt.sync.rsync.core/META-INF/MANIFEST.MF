@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.remote.ui,
  org.eclipse.ptp.services.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.rdt.sync.rsync.core
 Bundle-Vendor: %plugin.provider
 Bundle-Localization: plugin
