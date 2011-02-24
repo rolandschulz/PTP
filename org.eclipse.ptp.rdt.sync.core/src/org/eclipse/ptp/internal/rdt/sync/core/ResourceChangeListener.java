@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
@@ -64,7 +65,7 @@ public class ResourceChangeListener {
 		protected IStatus run(IProgressMonitor monitor) {
 			monitor.beginTask(Messages.ResourceChangeListener_jobName, 1);
 			try {
-				fSyncProvider.synchronize(fDelta, monitor, false);
+				fSyncProvider.synchronize(fDelta, monitor, SyncFlag.NO_FORCE);
 			} catch (CoreException e) {
 				System.out.println("sync failed: " + e.getLocalizedMessage()); //$NON-NLS-1$
 				e.printStackTrace();
