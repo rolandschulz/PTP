@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.Site;
@@ -18,6 +19,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		IJAXBNonNLSConstants {
 
 	private ResourceManagerData rmdata;
+	private IRemoteServices service;
 
 	public JAXBServiceProvider() {
 		super();
@@ -186,10 +188,6 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		return list.split(CM);
 	}
 
-	public ResourceManagerData getResourceManagerData() {
-		return rmdata;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -207,6 +205,10 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 
 	public String getSelectedAttributeSet() {
 		return getString(SELECTED_ATTRIBUTES, null);
+	}
+
+	public IRemoteServices getService() {
+		return service;
 	}
 
 	public String getValidAttributeSet() {
@@ -230,6 +232,10 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		keySet().remove(VALID_ATTRIBUTES);
 	}
 
+	public ResourceManagerData resourceManagerData() {
+		return rmdata;
+	}
+
 	public void setDefaultNameAndDesc() {
 		String name = JAXB;
 		String conn = getConnectionName();
@@ -250,6 +256,10 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 
 	public void setSelectedAttributeSet(String serialized) {
 		putString(SELECTED_ATTRIBUTES, serialized);
+	}
+
+	public void setService(IRemoteServices service) {
+		this.service = service;
 	}
 
 	public void setValidAttributeSet(String serialized) {

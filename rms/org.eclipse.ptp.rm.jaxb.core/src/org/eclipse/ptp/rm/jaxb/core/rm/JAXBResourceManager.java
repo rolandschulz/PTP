@@ -71,6 +71,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
 		updatePropertyValuesFromTab(configuration);
+		// handle files here
 		return null;
 	}
 

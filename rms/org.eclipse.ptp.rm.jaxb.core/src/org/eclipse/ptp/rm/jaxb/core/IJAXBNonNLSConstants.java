@@ -90,4 +90,5 @@ public interface IJAXBNonNLSConstants {
 	String DIRECTORY = "directory";//$NON-NLS-1$
 	String MPI_CMD = "mpiCommand";//$NON-NLS-1$
 	String MPI_ARGS = "mpiArgs";//$NON-NLS-1$
+
 }

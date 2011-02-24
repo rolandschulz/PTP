@@ -1,5 +1,6 @@
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.rmsystem.IControlMonitorRMConfiguration;
 
@@ -7,91 +8,101 @@ public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConf
 	/**
 	 * @since 5.0
 	 */
-	public void addExternalRMInstanceXMLLocation(String location);
+	void addExternalRMInstanceXMLLocation(String location);
 
 	/**
 	 * @since 5.0
 	 */
-	public String getDefaultControlHost();
+	String getDefaultControlHost();
 
 	/**
 	 * @since 5.0
 	 */
-	public String getDefaultControlPath();
+	String getDefaultControlPath();
 
 	/**
 	 * @since 5.0
 	 */
-	public String getDefaultControlPort();
+	String getDefaultControlPort();
 
 	/**
 	 * @since 5.0
 	 */
-	public String getDefaultMonitorHost();
+	String getDefaultMonitorHost();
 
 	/**
 	 * @since 5.0
 	 */
-	public String getDefaultMonitorPath();
+	String getDefaultMonitorPath();
 
 	/**
 	 * @since 5.0
 	 */
-	public String getDefaultMonitorPort();
+	String getDefaultMonitorPort();
 
 	/**
 	 * @since 5.0
 	 */
 
-	public String[] getExternalRMInstanceXMLLocations();
+	String[] getExternalRMInstanceXMLLocations();
 
 	/**
 	 * @since 5.0
 	 */
-	public ResourceManagerData getResourceManagerData();
+	String getRMInstanceXMLLocation();
 
 	/**
 	 * @since 5.0
 	 */
-	public String getRMInstanceXMLLocation();
+	String getSelectedAttributeSet();
 
 	/**
 	 * @since 5.0
 	 */
-	public String getSelectedAttributeSet();
+	IRemoteServices getService();
 
 	/**
 	 * @since 5.0
 	 */
-	public String getValidAttributeSet();
+	String getValidAttributeSet();
 
 	/**
 	 * @since 5.0
 	 */
-	public void realizeRMDataFromXML() throws Throwable;
+	void realizeRMDataFromXML() throws Throwable;
 
 	/**
 	 * @since 5.0
 	 */
-	public void removeSelectedAttributeSet();
+	void removeSelectedAttributeSet();
 
 	/**
 	 * @since 5.0
 	 */
-	public void removeValidAttributeSet();
+	void removeValidAttributeSet();
 
 	/**
 	 * @since 5.0
 	 */
-	public void setRMInstanceXMLLocation(String location);
+	ResourceManagerData resourceManagerData();
 
 	/**
 	 * @since 5.0
 	 */
-	public void setSelectedAttributeSet(String serialized);
+	void setRMInstanceXMLLocation(String location);
 
 	/**
 	 * @since 5.0
 	 */
-	public void setValidAttributeSet(String serialized);
+	void setSelectedAttributeSet(String serialized);
+
+	/**
+	 * @since 5.0
+	 */
+	void setService(IRemoteServices service);
+
+	/**
+	 * @since 5.0
+	 */
+	void setValidAttributeSet(String serialized);
 }

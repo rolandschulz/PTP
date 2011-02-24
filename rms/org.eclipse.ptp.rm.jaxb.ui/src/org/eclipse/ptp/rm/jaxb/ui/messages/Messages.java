@@ -14,6 +14,12 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.jaxb.ui.messages.messages"; //$NON-NLS-1$
+	public static String HideResourceManagerEditor;
+	public static String HideResourceManagerEditorAction_error;
+	public static String HideResourceManagerEditorAction_title;
+	public static String OpenResourceManagerEditor;
+	public static String OpenResourceManagerEditorAction_error;
+	public static String OpenResourceManagerEditorAction_title;
 	public static String JAXBUIPlugin_Exception_InternalError;
 	public static String JAXBConnectionWizardPage_Description;
 	public static String JAXBConfigurationWizardPage_Description;
@@ -59,8 +65,7 @@ public class Messages extends NLS {
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_5;
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_6;
 
-	public static String WidgetUtils_openIDEEditor;
-	public static String WidgetUtils_hideIDEEditor;
+	public static String ResourceManagerEditor_title;
 
 	static {
 		// initialize resource bundle
