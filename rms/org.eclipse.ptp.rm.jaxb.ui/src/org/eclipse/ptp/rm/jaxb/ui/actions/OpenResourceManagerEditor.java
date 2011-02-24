@@ -30,6 +30,7 @@ import org.eclipse.ptp.rm.jaxb.ui.dialogs.ConfigurationChoiceDialog;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;
+import org.eclipse.ptp.ui.views.ResourceManagerView;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -38,14 +39,14 @@ import org.eclipse.ui.ide.IDE;
 
 public class OpenResourceManagerEditor implements IViewActionDelegate, IJAXBNonNLSConstants {
 
-	private IViewPart part;
+	private ResourceManagerView view;
 
 	public void init(IViewPart view) {
-		this.part = view;
+		this.view = (ResourceManagerView) view;
 	}
 
 	public void run(IAction action) {
-		ConfigurationChoiceDialog dialog = new ConfigurationChoiceDialog(part.getSite().getShell(), null);
+		ConfigurationChoiceDialog dialog = new ConfigurationChoiceDialog(view, view.getState());
 		if (dialog.open() == Window.CANCEL) {
 			return;
 		}
@@ -58,7 +59,7 @@ public class OpenResourceManagerEditor implements IViewActionDelegate, IJAXBNonN
 		try {
 			File fileToOpen = null;
 			if (dialog.isPreset()) {
-				fileToOpen = ConfigUtils.exportResource(selected, part.getSite().getShell());
+				fileToOpen = ConfigUtils.exportResource(selected, view.getSite().getShell());
 				if (fileToOpen == null) {
 					return;
 				}
@@ -72,7 +73,7 @@ public class OpenResourceManagerEditor implements IViewActionDelegate, IJAXBNonN
 				IDE.openEditorOnFileStore(page, fileStore);
 			}
 		} catch (Throwable t) {
-			WidgetUtils.errorMessage(part.getSite().getShell(), t, Messages.OpenResourceManagerEditorAction_error,
+			WidgetUtils.errorMessage(view.getSite().getShell(), t, Messages.OpenResourceManagerEditorAction_error,
 					Messages.OpenResourceManagerEditorAction_title, false);
 		}
 	}

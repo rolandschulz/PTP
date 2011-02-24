@@ -10,22 +10,33 @@ package org.eclipse.ptp.rm.jaxb.ui.dialogs;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewPart;
 
 public class ConfigurationChoiceDialog extends Dialog implements IJAXBNonNLSConstants {
 
 	private ConfigurationChoiceContainer container;
 	private final IJAXBResourceManagerConfiguration config;
+	private final IMemento memento;
 	private String choice;
 	private boolean preset;
 
-	public ConfigurationChoiceDialog(Shell parentShell, IJAXBResourceManagerConfiguration config) {
-		super(parentShell);
+	public ConfigurationChoiceDialog(IViewPart part, IJAXBResourceManagerConfiguration config) {
+		super(part.getSite().getShell());
 		this.config = config;
+		this.memento = null;
+		choice = ZEROSTR;
+		preset = true;
+	}
+
+	public ConfigurationChoiceDialog(IViewPart part, IMemento memento) {
+		super(part.getSite().getShell());
+		this.config = null;
+		this.memento = memento;
 		choice = ZEROSTR;
 		preset = true;
 	}
@@ -56,21 +67,16 @@ public class ConfigurationChoiceDialog extends Dialog implements IJAXBNonNLSCons
 		container = new ConfigurationChoiceContainer(composite) {
 			@Override
 			protected void onUpdate() {
-				String selected = container.getSelected();
-				if (ZEROSTR.equals(selected)) {
-					return;
-				}
-				try {
-					JAXBUtils.validate(selected);
-				} catch (Throwable t) {
-					t.printStackTrace();
-					return;
+				String selected = getSelected();
+				if (selected == null) {
+					selected = ZEROSTR;
 				}
 				setChoice(selected);
-				setPreset(container.choiceIsPreset());
+				setPreset(choiceIsPreset());
 			}
 		};
 		container.setConfig(config);
+		container.setMemento(memento);
 		container.setAvailableConfigurations();
 		applyDialogFont(composite);
 		return composite;

@@ -2,7 +2,6 @@ package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.ConfigurationChoiceContainer;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
@@ -60,13 +59,6 @@ public class JAXBRMConfigurationSelectionWizardPage extends RMConfigurationWizar
 	private boolean isValidSetting() {
 		String selected = container.getSelected();
 		if (selected == null || selected.length() == 0) {
-			return false;
-		}
-		try {
-			JAXBUtils.validate(selected);
-			jaxbConfig.setRMInstanceXMLLocation(selected);
-		} catch (Throwable t) {
-			t.printStackTrace();
 			return false;
 		}
 		return true;

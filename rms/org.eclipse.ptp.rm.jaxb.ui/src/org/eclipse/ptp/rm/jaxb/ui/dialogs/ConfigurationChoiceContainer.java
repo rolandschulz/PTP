@@ -12,6 +12,7 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AvailableJAXBRMConfigurations;
 import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;
@@ -28,6 +29,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IMemento;
 
 public abstract class ConfigurationChoiceContainer implements IJAXBNonNLSConstants {
 
@@ -66,9 +68,11 @@ public abstract class ConfigurationChoiceContainer implements IJAXBNonNLSConstan
 	private String selected;
 	private boolean isPreset;
 	private IJAXBResourceManagerConfiguration config;
+	private IMemento memento;
 	private AvailableJAXBRMConfigurations available;
 
 	public ConfigurationChoiceContainer(Composite parent) {
+
 		shell = parent.getShell();
 		listener = new WidgetListener();
 		Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
@@ -123,40 +127,99 @@ public abstract class ConfigurationChoiceContainer implements IJAXBNonNLSConstan
 
 	public void setAvailableConfigurations() {
 		available = AvailableJAXBRMConfigurations.getInstance();
-		if (config != null) {
-			available.addExternalPaths(config.getExternalRMInstanceXMLLocations());
-		}
 		if (preset != null) {
 			preset.setItems(available.getTypes());
 		}
-		if (external != null) {
-			external.setItems(available.getExternal());
+
+		if (config != null) {
+			available.addExternalPaths(config.getExternalRMInstanceXMLLocations());
+		} else if (memento != null) {
+			available.addExternalPaths(getExternalLocations());
 		}
+
+		if (external != null) {
+			String[] items = available.getExternal();
+			external.setItems(items);
+			if (config != null) {
+				config.setExternalRMInstanceXMLLocations(items);
+			} else if (memento != null) {
+				setExternalRMInstanceXMLLocations(items);
+			}
+		}
+
 		if (config != null) {
 			selected = config.getRMInstanceXMLLocation();
+		} else if (memento != null) {
+			selected = memento.getString(RM_XSD_PATH);
 		}
-		String type = available.getTypeForPath(selected);
-		if (type != null) {
-			choice.setText(type);
-		} else {
-			choice.setText(selected);
+
+		if (selected != null) {
+			if (!ZEROSTR.equals(selected) && !new File(selected).exists()) {
+				selected = ZEROSTR;
+				if (config != null) {
+					config.setRMInstanceXMLLocation(ZEROSTR);
+				} else if (memento != null) {
+					memento.putString(RM_XSD_PATH, ZEROSTR);
+				}
+			}
+			String type = available.getTypeForPath(selected);
+			if (type != null) {
+				isPreset = true;
+				choice.setText(type);
+			} else {
+				isPreset = false;
+				choice.setText(selected);
+			}
 		}
+		onUpdate();
 	}
 
 	public void setConfig(IJAXBResourceManagerConfiguration config) {
 		this.config = config;
 	}
 
+	public void setExternalRMInstanceXMLLocations(String[] locations) {
+		if (locations == null || locations.length == 0) {
+			memento.putString(EXTERNAL_RM_XSD_PATHS, ZEROSTR);
+		} else {
+			StringBuffer list = new StringBuffer(locations[0]);
+			for (int i = 1; i < locations.length; i++) {
+				list.append(CM).append(locations[i]);
+			}
+			memento.putString(EXTERNAL_RM_XSD_PATHS, list.toString());
+		}
+	}
+
+	public void setMemento(IMemento memento) {
+		this.memento = memento;
+	}
+
 	protected abstract void onUpdate();
+
+	private String[] getExternalLocations() {
+		String list = memento.getString(EXTERNAL_RM_XSD_PATHS);
+		if (list == null) {
+			return new String[0];
+		}
+		return list.split(CM);
+	}
 
 	private void handleExternalSelected() {
 		String text = external.getText();
 		if (text != null) {
 			selected = text;
+			validateSelected();
 			isPreset = false;
 		} else {
 			selected = ZEROSTR;
 		}
+
+		if (memento != null) {
+			memento.putString(RM_XSD_PATH, selected);
+		} else if (config != null) {
+			config.setRMInstanceXMLLocation(selected);
+		}
+
 		choice.setText(text);
 	}
 
@@ -185,14 +248,20 @@ public abstract class ConfigurationChoiceContainer implements IJAXBNonNLSConstan
 	private void handlePresetSelected() {
 		String text = preset.getText();
 		if (text != null) {
-			if (text.length() == 0) {
-				selected = ZEROSTR;
-			} else {
-				selected = available.getPathForType(text);
-				isPreset = true;
-			}
-			choice.setText(text);
+			selected = available.getPathForType(text);
+			validateSelected();
+			isPreset = true;
+		} else {
+			selected = ZEROSTR;
 		}
+
+		if (memento != null) {
+			memento.putString(RM_XSD_PATH, selected);
+		} else if (config != null) {
+			config.setRMInstanceXMLLocation(selected);
+		}
+
+		choice.setText(text);
 	}
 
 	private void updateExternal() {
@@ -206,11 +275,24 @@ public abstract class ConfigurationChoiceContainer implements IJAXBNonNLSConstan
 		}
 		if (i == len) {
 			available.addExternalPath(selected);
+			String[] refreshed = available.getExternal();
 			if (config != null) {
-				config.addExternalRMInstanceXMLLocation(selected);
+				config.setExternalRMInstanceXMLLocations(refreshed);
+			} else if (memento != null) {
+				setExternalRMInstanceXMLLocations(refreshed);
 			}
 			external.setItems(available.getExternal());
 			external.select(i);
 		}
+	}
+
+	private boolean validateSelected() {
+		try {
+			JAXBUtils.validate(selected);
+		} catch (Throwable t) {
+			t.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 }
