@@ -78,7 +78,6 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
         
         if (defs != null)
         {
-            
     //        return new ICompletionProposal[]
     //        {
     //            new CompletionProposal("Hello", offset, 0, 5),
@@ -138,8 +137,11 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
 
     private final String determineScopeNameForLine(int line)
     {
-        String scopeName = scopes.get(line);
-        if (scopeName == null) return null;
+        String scopeName = ""; //$NON-NLS-1$
+        if (line < scopes.size())
+            scopeName = scopes.get(line);
+        if (scopeName == null)
+            scopeName = ""; //$NON-NLS-1$
         
         /*
          * Again, the mapping between scopes and lines is reconfigured only
@@ -154,8 +156,12 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
          * Therefore, populate the list of completion proposals based on
          * the *preceding* scope.
          */
-        while (scopeName.equals("") && line >= 0) //$NON-NLS-1$
-            scopeName = scopes.get(--line);
+        while (scopeName.equals("") && line > 0) //$NON-NLS-1$
+        {
+            line--;
+            if (line < scopes.size())
+                scopeName = scopes.get(line);
+        }
         return scopeName;
     }
 

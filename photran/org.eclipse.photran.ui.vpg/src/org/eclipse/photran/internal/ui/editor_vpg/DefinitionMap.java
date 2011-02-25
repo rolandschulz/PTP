@@ -43,12 +43,14 @@ public abstract class DefinitionMap<T>
     
     public DefinitionMap(IFortranAST ast)
     {
-        this(ast.getRoot());
+        // Should never be null, but it's happened (thanks, race condition)
+        // So make sure the user doesn't see an NPE
+        this(ast == null ? null : ast.getRoot());
     }
 
     public DefinitionMap(ASTExecutableProgramNode ast)
     {
-        if (PhotranVPGWriter.isEmpty(ast)) return;
+        if (ast == null || PhotranVPGWriter.isEmpty(ast)) return;
         
         try
         {

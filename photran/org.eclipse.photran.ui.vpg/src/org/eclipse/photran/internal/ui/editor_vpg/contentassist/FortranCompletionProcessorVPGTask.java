@@ -53,7 +53,9 @@ final class FortranCompletionProcessorVPGTask implements IFortranEditorVPGTask
                         
                         TreeSet<Definition> set = defs.get(qualifier);
                         if (set == null) set = new TreeSet<Definition>();
-                        set.addAll(allDefs);
+                        for (Definition def : allDefs)
+                            if (def != null)
+                                set.add(def);
                         defs.put(qualifier, set);
                     }
                     

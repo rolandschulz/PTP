@@ -144,7 +144,10 @@ public final class FortranTemplateCompletionProcessor extends TemplateCompletion
             IDocument doc = viewer.getDocument();
             int startOfLine = doc.getLineOffset(doc.getLineOfOffset(offset));
             StringBuilder prefix = new StringBuilder(doc.get(startOfLine, offset-startOfLine));
-            while (prefix.length() > 0 && !Character.isWhitespace(prefix.charAt(prefix.length()-1)))
+            // Make sure that if we try to insert a template at "    call <template>",
+            // for example, we use "    " for the indentation string (so we can't just
+            // check whether the last character is whitespace)
+            while (prefix.length() > 0 && !prefix.toString().trim().equals("")) //$NON-NLS-1$
                 prefix.deleteCharAt(prefix.length()-1);
             return prefix.toString();
         }

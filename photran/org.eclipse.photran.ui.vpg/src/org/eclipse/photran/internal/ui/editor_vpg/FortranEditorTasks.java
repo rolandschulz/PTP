@@ -36,6 +36,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.ui.FortranUIPlugin;
 import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.rephraserengine.core.vpg.eclipse.VPGJob;
+import org.eclipse.rephraserengine.core.vpg.eclipse.VPGSchedulingRule;
 
 /**
  * Dispatcher for a set of tasks to be run by the Fortran editor when its contents change (and
@@ -143,6 +144,7 @@ public class FortranEditorTasks
             if (dispatchASTTasksJob != null) return; // Already running an update
 
             dispatchASTTasksJob = new DispatchASTTasksJob();
+            dispatchASTTasksJob.setRule(VPGSchedulingRule.getInstance());
             dispatchASTTasksJob.setPriority(Job.DECORATE);
             dispatchASTTasksJob.schedule();
         }
@@ -157,6 +159,7 @@ public class FortranEditorTasks
 
                 vpgAST = null;
                 updateVPGJob = new UpdateVPGJob();
+                updateVPGJob.setRule(VPGSchedulingRule.getInstance());
                 updateVPGJob.setPriority(Job.DECORATE);
                 updateVPGJob.schedule();
             }
@@ -220,8 +223,8 @@ public class FortranEditorTasks
                                                 debug("        Task " + task.getClass().getSimpleName() + ":\t" + (System.currentTimeMillis()-start2) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                             }
                                                 debug("    Total Running Tasks:\t" + (System.currentTimeMillis()-start) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
+                            FortranEditorTasks.instance(editor).astTasks.removeAll(tasksToRemove);
                         }
-                        FortranEditorTasks.instance(editor).astTasks.removeAll(tasksToRemove);
                     }
                 }
                 catch (LexerException e)  { /* Ignore syntax errors */ }
@@ -246,7 +249,6 @@ public class FortranEditorTasks
             public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
             {
                 vpgAST = vpg.acquireTransientAST(PhotranVPG.getFilenameForIFile(editor.getIFile()));
-                updateVPGJob = null;
                 //scheduleVPGTaskDispatchJob();
 
                 if (vpgAST != null)
@@ -267,6 +269,7 @@ public class FortranEditorTasks
                         task.handle(editor.getIFile(), vpgAST, defMap);
                 }
 
+                updateVPGJob = null;
                 return Status.OK_STATUS;
             }
             

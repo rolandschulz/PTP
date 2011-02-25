@@ -1123,7 +1123,7 @@ public abstract class FortranResourceRefactoring
         {
             List<PhotranTokenRef> definitionsLocalToScope = new ArrayList<PhotranTokenRef>();
             for (Definition def : importingScope.getAllDefinitions())
-                if (!def.isIntrinsic())
+                if (def != null && !def.isIntrinsic())
                     definitionsLocalToScope.add(def.getTokenRef());
             return definitionsLocalToScope;
         }

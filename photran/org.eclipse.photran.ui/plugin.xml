@@ -32,12 +32,25 @@
 
    <!-- Commands, key bindings, and popup menu entries
    
+        - Build Project (Ctrl+Shift+B)
         - Comment/Uncomment (Ctrl+/)
         
         Each command should have its ID declared as a constant in AbstractFortranEditor, and
         it must be set up in AbstractFortranEditor#createActions().
         
         For menubarPath, see class ITextEditorActionConstants -->
+
+   <!-- Provide a key binding for the "Build Project" command in the Fortran editor
+        (command ID from org.eclipse.ui.IWorkbenchCommandConstants) -->
+   <extension
+         point="org.eclipse.ui.bindings">
+     <key
+            sequence="M1+M2+B"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.ui.project.buildProject"
+     />
+   </extension>
 
    <extension point="org.eclipse.ui.popupMenus">
 	  <viewerContribution 

@@ -133,7 +133,8 @@ public class IntroImplicitNoneRefactoring extends FortranResourceRefactoring
         final ArrayList<Definition> definitions = new ArrayList<Definition>(16);
 
         for (Definition def : scope.getAllDefinitions())
-            if (def != null && def.isImplicit()) definitions.add(def);
+            if (def != null && def.isImplicit())
+                definitions.add(def);
 
         StringBuilder newStmts = new StringBuilder();
         newStmts.append("implicit none" + EOL); //$NON-NLS-1$

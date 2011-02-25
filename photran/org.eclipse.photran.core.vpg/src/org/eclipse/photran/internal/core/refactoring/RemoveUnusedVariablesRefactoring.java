@@ -148,7 +148,7 @@ public class RemoveUnusedVariablesRefactoring extends FortranResourceRefactoring
         
         for (Definition def : scope.getAllDefinitions())
         {
-            if (def.isLocalVariable() && def.findAllReferences(true).isEmpty())
+            if (def != null && def.isLocalVariable() && def.findAllReferences(true).isEmpty())
             {
                 removeVariableDeclFor(def);
                 hasChanged = true;

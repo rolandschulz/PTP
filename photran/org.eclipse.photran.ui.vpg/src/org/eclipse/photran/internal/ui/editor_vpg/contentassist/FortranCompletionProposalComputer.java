@@ -19,15 +19,20 @@ import java.util.TreeSet;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.contentassist.CompletionProposal;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.templates.DocumentTemplateContext;
+import org.eclipse.jface.text.templates.Template;
+import org.eclipse.jface.text.templates.TemplateProposal;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Classification;
 import org.eclipse.photran.internal.core.intrinsics.IntrinsicProcDescription;
 import org.eclipse.photran.internal.core.intrinsics.Intrinsics;
 import org.eclipse.photran.internal.core.model.FortranElement;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.ui.FortranTemplateManager;
 import org.eclipse.photran.internal.ui.editor.CompletionComputer;
+import org.eclipse.photran.internal.ui.editor.FortranTemplateContext;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -102,11 +107,11 @@ class FortranCompletionProposalComputer extends CompletionComputer
             String canonicalizedId = PhotranVPG.canonicalizeIdentifier(proc.genericName);
             if (canonicalizedId.startsWith(prefix) && canonicalizedId.endsWith(suffix))
             {
-                proposals.add(createProposal(proc.genericName.toLowerCase(), proc.description));
+                //proposals.add(createProposal(proc.genericName.toLowerCase(), proc.description));
 
                 for (String proposal : proc.getAllForms())
                 {
-                    proposals.add(createProposal(proposal.toLowerCase()));
+                    proposals.add(createProposal(proposal.toLowerCase(), proc.description));
                 }
             }
         }
@@ -170,16 +175,60 @@ class FortranCompletionProposalComputer extends CompletionComputer
 
     private FortranCompletionProposal createProposal(String identifier, String description, Image image)
     {
+//        return new FortranCompletionProposal(
+//            identifier,
+//            new CompletionProposal(identifier,
+//                                   replOffset,
+//                                   replLen,
+//                                   identifier.length(),
+//                                   image,
+//                                   displayString(identifier, description),
+//                                   null,
+//                                   null));
         return new FortranCompletionProposal(
             identifier,
-            new CompletionProposal(identifier,
-                                   replOffset,
-                                   replLen,
-                                   identifier.length(),
-                                   image,
-                                   displayString(identifier, description),
-                                   null,
-                                   null));
+            new TemplateProposal(new Template(
+                                    displayString(identifier, description),
+                                    displayString(identifier, description),
+                                    FortranTemplateContext.ID,
+                                    replaceArgumentsWithTemplateVariables(identifier),
+                                    true),
+                                 new DocumentTemplateContext(
+                                     FortranTemplateManager.getInstance().getContextTypeRegistry().getContextType(FortranTemplateContext.ID),
+                                     document,
+                                     replOffset,
+                                     replLen),
+                                 new Region(replOffset, replLen),
+                                 image,
+                                 100));
+    }
+
+    /**
+     * Converts "len(string, kind)" into "len(${string}, ${kind})", for example
+     */
+    private String replaceArgumentsWithTemplateVariables(String string)
+    {
+        if (string.contains("(") && string.contains(")") && string.endsWith(")")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        {
+            int lparen = string.indexOf('(');
+            int rparen = string.lastIndexOf(')'); // == string.length()-1
+            String name = string.substring(0, lparen);
+            String[] args = string.substring(lparen+1, rparen).split(","); //$NON-NLS-1$
+            
+            StringBuilder sb = new StringBuilder(string.length() + 16);
+            sb.append(name);
+            sb.append('(');
+            for (int i = 0; i < args.length; i++)
+            {
+                if (i > 0) sb.append(", "); //$NON-NLS-1$
+                sb.append("${"); //$NON-NLS-1$
+                sb.append(args[i].trim().replace(' ', '_'));
+                sb.append('}');
+            }
+            sb.append(')');
+            return sb.toString();
+        }
+        else return string;
     }
 
     private String displayString(String identifier, String description)
@@ -201,12 +250,12 @@ class FortranCompletionProposalComputer extends CompletionComputer
     private static class FortranCompletionProposal implements Comparable<FortranCompletionProposal>
     {
         public final String canonicalizedId;
-        public final CompletionProposal wrappedProposal;
+        public final ICompletionProposal wrappedProposal;
 
-        public FortranCompletionProposal(String identifier, CompletionProposal completionProposal)
+        public FortranCompletionProposal(String identifier, ICompletionProposal proposal)
         {
             this.canonicalizedId = PhotranVPG.canonicalizeIdentifier(identifier);
-            this.wrappedProposal = completionProposal;
+            this.wrappedProposal = proposal;
         }
 
         public int compareTo(FortranCompletionProposal o)

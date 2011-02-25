@@ -137,7 +137,7 @@ public class UnrollLoopRefactoring extends FortranEditorRefactoring
             List<Definition> defList = scope.getAllDefinitions();
             for (Definition d : defList)
             {
-                if (d.getCanonicalizedName().equals(LOOP_UPPER_BOUND.toLowerCase()))
+                if (d != null && d.getCanonicalizedName().equals(LOOP_UPPER_BOUND.toLowerCase()))
                 {
                     LOOP_UPPER_BOUND = "loopUpperBound" + Integer.toString(i); //$NON-NLS-1$
                     canUse = false;

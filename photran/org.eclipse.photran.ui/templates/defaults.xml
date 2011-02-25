@@ -127,35 +127,29 @@ ${cursor}</template>
   <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
     id="org.eclipse.photran.ui.template.allocate_lc"
     name="allocate (...)"
-    description="Allocate statement (lower case)">allocate (${cursor})
-</template>
+    description="Allocate statement (lower case)">allocate (${cursor})</template>
   <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
     id="org.eclipse.photran.ui.template.allocate_uc"
     name="ALLOCATE (...)"
-    description="Allocate statement (upper case)">ALLOCATE (${cursor})
-</template>
+    description="Allocate statement (upper case)">ALLOCATE (${cursor})</template>
 
   <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
     id="org.eclipse.photran.ui.template.nullify_lc"
     name="nullify (...)"
-    description="Nullify statement (lower case)">nullify (${cursor})
-</template>
+    description="Nullify statement (lower case)">nullify (${cursor})</template>
   <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
     id="org.eclipse.photran.ui.template.nullify_uc"
     name="NULLIFY (...)"
-    description="Nulify statement (upper case)">NULLIFY (${cursor})
-</template>
+    description="Nulify statement (upper case)">NULLIFY (${cursor})</template>
 
   <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
     id="org.eclipse.photran.ui.template.deallocate_lc"
     name="deallocate (...)"
-    description="Deallocate statement (lower case)">deallocate (${cursor})
-</template>
+    description="Deallocate statement (lower case)">deallocate (${cursor})</template>
   <template autoinsert="true" context="org.eclipse.photran.ui.template.context" deleted="false" enabled="true"
     id="org.eclipse.photran.ui.template.deallocate_uc"
     name="DEALLOCATE (...)"
-    description="Deallocate statement (upper case)">DEALLOCATE (${cursor})
-</template>
+    description="Deallocate statement (upper case)">DEALLOCATE (${cursor})</template>
 
   <!--==========================================================================================-->
   <!-- Declarations -->

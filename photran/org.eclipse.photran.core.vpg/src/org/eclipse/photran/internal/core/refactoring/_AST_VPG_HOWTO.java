@@ -195,7 +195,8 @@ public class _AST_VPG_HOWTO
     void findAllSymbolsDefinedInTheScopeOf(ScopingNode scope)
     {
         for (Definition symbol : scope.getAllDefinitions())
-            System.out.println(symbol.getCanonicalizedName());
+            if (symbol != null)
+                System.out.println(symbol.getCanonicalizedName());
     }
     
     void findAllPublicallyAccessibleSymbolsDefinedIn(ScopingNode scope)

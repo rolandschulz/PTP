@@ -22,6 +22,7 @@ import org.eclipse.photran.internal.core.FortranCorePlugin;
 
 
 /**
+ * Provides the list of all Fortran 2008 intrinsic procedures.
  * 
  * @author Jeff Overbey
  */

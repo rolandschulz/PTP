@@ -22,6 +22,7 @@ import org.eclipse.jface.text.IDocument;
  */
 public abstract class CompletionComputer
 {
+    protected final IDocument document;
     protected final int prefixIndex;
     protected final String prefix;
     protected final int suffixIndex;
@@ -31,6 +32,8 @@ public abstract class CompletionComputer
 
     protected CompletionComputer(IDocument document, int offset) throws BadLocationException
     {
+        this.document = document;
+        
         this.prefixIndex = findPrefix(document, offset);
         this.prefix = document.get(prefixIndex, offset-prefixIndex).toLowerCase();
         

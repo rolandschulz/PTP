@@ -62,7 +62,12 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
 					try
 					{
 						for (Definition d : scope.getAllDefinitions())
-							println(describeDeclaration(d));
+						{
+						    if (d == null)
+						        println("(null)"); //$NON-NLS-1$
+						    else
+						        println(describeDeclaration(d));
+						}
 					}
 					catch (Exception e)
 					{

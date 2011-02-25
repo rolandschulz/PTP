@@ -586,7 +586,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 
             for (Definition def : fn.getAllDefinitions())
             {
-                if (def.getCanonicalizedName().equals(this.getCanonicalizedName()))
+                if (def != null && def.getCanonicalizedName().equals(this.getCanonicalizedName()))
                 {
                     result.add(def.getTokenRef());
                     result.addAll(def.internalFindAllReferences(false));

@@ -101,7 +101,7 @@ public class TileLoopRefactoring extends FortranEditorRefactoring
             List<Definition> defList = scope.getAllDefinitions();
             for (Definition d : defList)
             {
-                if (d.getCanonicalizedName().equals(newIndexVar.toLowerCase()))
+                if (d != null && d.getCanonicalizedName().equals(newIndexVar.toLowerCase()))
                 {
                     newIndexVar = indexVar + Integer.toString(i);
                     canUse = false;
