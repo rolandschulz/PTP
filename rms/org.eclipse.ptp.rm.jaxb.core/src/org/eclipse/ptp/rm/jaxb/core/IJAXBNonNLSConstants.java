@@ -10,8 +10,11 @@ public interface IJAXBNonNLSConstants {
 
 	int UNDEFINED = -1;
 	int COPY_BUFFER_SIZE = 64 * 1024;
+	int STREAM_BUFFER_SIZE = 1024;
+	int EOF = -1;
 
 	/* CHARACTERS */
+	String LEN = "N";//$NON-NLS-1$
 	String ZEROSTR = "";//$NON-NLS-1$
 	String TAB = "\t"; //$NON-NLS-1$
 	String SP = " ";//$NON-NLS-1$
@@ -26,6 +29,7 @@ public interface IJAXBNonNLSConstants {
 	String LT = "<"; //$NON-NLS-1$
 	String LTS = "</";//$NON-NLS-1$
 	String GT = ">";//$NON-NLS-1$
+	String HYPH = "-";//$NON-NLS-1$
 	String AMP = "@";//$NON-NLS-1$
 	String DOL = "$";//$NON-NLS-1$
 	String OPENV = "${";//$NON-NLS-1$
@@ -49,6 +53,8 @@ public interface IJAXBNonNLSConstants {
 	String YES = "yes";//$NON-NLS-1$
 	String NO = "no";//$NON-NLS-1$
 	String GET = "get";//$NON-NLS-1$
+	String SET = "set";//$NON-NLS-1$
+	String VALUE = "value";//$NON-NLS-1$
 
 	/* STANDARD PROPERTIES */
 	String JAVA_USER_HOME = "user.home";//$NON-NLS-1$

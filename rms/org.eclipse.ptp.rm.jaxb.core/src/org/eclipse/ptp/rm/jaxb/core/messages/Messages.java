@@ -14,11 +14,16 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.jaxb.core.messages.messages"; //$NON-NLS-1$
+
 	public static String JAXBCorePlugin_Exception_InternalError;
 	public static String JAXBServiceProvider_defaultDescription;
 	public static String JAXBServiceProvider_defaultName;
 	public static String JAXBResourceManager_initError;
 	public static String RMVariableResolver_derefError;
+	public static String Copy_Operation_Null_FileManager;
+	public static String Copy_Operation_cancelled_by_user;
+	public static String Copy_Operation_Local_resource_does_not_exist;
+	public static String StreamParserNoSuchVariableError;
 
 	static {
 		// initialize resource bundle
