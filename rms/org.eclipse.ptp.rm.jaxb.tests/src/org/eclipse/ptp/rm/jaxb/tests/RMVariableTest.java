@@ -24,9 +24,9 @@ public class RMVariableTest extends TestCase implements IJAXBNonNLSConstants {
 		try {
 			JAXBUtils.validate(xml);
 			JAXBUtils.initializeRMData(xml);
-			String exp = RMVariableMap.dereference("${rm:stagein#description}");
+			String exp = RMVariableMap.dereference("${rm:stagein#description}"); //$NON-NLS-1$
 			System.out.println(exp);
-			assertEquals("The list of files to be staged in prior to job execution.", exp);
+			assertEquals(Messages.RMVariableTest_1, exp);
 		} catch (Throwable t) {
 			t.printStackTrace();
 			assert (t != null);

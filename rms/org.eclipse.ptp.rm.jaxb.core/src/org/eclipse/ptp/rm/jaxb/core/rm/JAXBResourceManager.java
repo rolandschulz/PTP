@@ -9,6 +9,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
@@ -28,10 +30,64 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	private final IJAXBResourceManagerConfiguration config;
 
+	private IRemoteServices remoteServices;
+	private IRemoteServices localServices;
+	private IRemoteConnectionManager remoteConnectionManager;
+	private IRemoteConnectionManager localConnectionManager;
+	private IRemoteConnection remoteConnection;
+	private IRemoteConnection localConnection;
+	private IRemoteFileManager remoteFileManager;
+	private IRemoteFileManager localFileManager;
+	private IRemoteProcessBuilder processBuilder;
+
 	public JAXBResourceManager(IPUniverse universe, IResourceManagerConfiguration jaxbServiceProvider) {
 		super(universe, jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
 		setFixedConfigurationProperties();
+	}
+
+	/*
+	 * The "do" methods should be Jobs.
+	 */
+
+	public IJAXBResourceManagerConfiguration getConfig() {
+		return config;
+	}
+
+	public IRemoteConnection getLocalConnection() {
+		return localConnection;
+	}
+
+	public IRemoteConnectionManager getLocalConnectionManager() {
+		return localConnectionManager;
+	}
+
+	public IRemoteFileManager getLocalFileManager() {
+		return localFileManager;
+	}
+
+	public IRemoteServices getLocalServices() {
+		return localServices;
+	}
+
+	public IRemoteProcessBuilder getProcessBuilder() {
+		return processBuilder;
+	}
+
+	public IRemoteConnection getRemoteConnection() {
+		return remoteConnection;
+	}
+
+	public IRemoteConnectionManager getRemoteConnectionManager() {
+		return remoteConnectionManager;
+	}
+
+	public IRemoteFileManager getRemoteFileManager() {
+		return remoteFileManager;
+	}
+
+	public IRemoteServices getRemoteServices() {
+		return remoteServices;
 	}
 
 	@Override
@@ -61,6 +117,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+		initializeConnections();
 		doConnect();
 		doOnStartUp();
 		maybeDiscoverAttributes();
@@ -71,10 +128,14 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 			throws CoreException {
 		updatePropertyValuesFromTab(configuration);
 		// handle files here
+		// according to mode, select the job type
+		// run job commands
 		return null;
 	}
 
 	private void doConnect() {
+		getControlConnection();
+
 		// TODO Auto-generated method stub
 
 	}
@@ -96,24 +157,17 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	 * run the start up commands, if any
 	 */
 	private void doOnStartUp() {
-		// TODO Auto-generated method stub
 
+		// also run maybe discover attributes
 	}
 
 	private IRemoteConnection getControlConnection() {
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(config.getRemoteServicesId(),
-				new NullProgressMonitor());
-		if (remoteServices != null) {
-			IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
-			if (rconnMgr != null) {
-				return rconnMgr.getConnection(config.getConnectionName());
-			}
-		}
+
 		return null;
 	}
 
-	private ManagedFileJob handleManagedFile(ManagedFiles files, ManagedFile file, Map<String, Object> env) {
-		ManagedFileJob job = new ManagedFileJob(file, files, getControlConnection(), env);
+	private ManagedFileJob handleManagedFile(ManagedFiles files, ManagedFile file) {
+		ManagedFileJob job = new ManagedFileJob(file, files, this);
 		job.schedule();
 		return job;
 	}
@@ -127,16 +181,35 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	}
 
+	private void initializeConnections() {
+		localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+		assert (localServices != null);
+		localConnectionManager = localServices.getConnectionManager();
+		assert (localConnectionManager != null);
+		/*
+		 * Since it's a local service, it doesn't matter which parameter is
+		 * passed
+		 */
+		localConnection = localConnectionManager.getConnection(ZEROSTR);
+		assert (localConnection != null);
+		localFileManager = localServices.getFileManager(localConnection);
+		assert (localFileManager != null);
+		remoteServices = PTPRemoteCorePlugin.getDefault()
+				.getRemoteServices(config.getRemoteServicesId(), new NullProgressMonitor());
+		assert (null != remoteServices);
+		remoteConnectionManager = remoteServices.getConnectionManager();
+		assert (null != remoteConnectionManager);
+		remoteConnection = remoteConnectionManager.getConnection(config.getConnectionName());
+		assert (null != remoteConnection);
+		remoteFileManager = remoteServices.getFileManager(remoteConnection);
+		assert (null != remoteFileManager);
+	}
+
 	private void maybeDiscoverAttributes() {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * Do this as Job. Assemble the args. Dereference the entire command string.
-	 * Issue across the connection; capture the stream(s); parse the stream(s),
-	 * adding to environment
-	 */
 	private void runCommand(Command command) {
 
 	}
@@ -173,4 +246,5 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 			}
 		}
 	}
+
 }

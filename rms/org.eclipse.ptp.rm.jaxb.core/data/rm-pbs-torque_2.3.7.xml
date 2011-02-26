@@ -46,14 +46,16 @@
 		</commands>
 		<parsers>
 			<stream-parser name="queueParser" stderr="false">
-				<parse-lines>n-1</parse-lines>
-				<token delim="[\n]" return="0"/>
-				<add name="available_queues"/>
+				<range>0:N</range>
+				<token>
+				  <add name="available_queues"/>
+				</token>
 			</stream-parser>
 			<stream-parser name="jobIdParser" stderr="false">
-            <parse-lines>n-1</parse-lines>
-            <token delim="[.]" return="0"/>
-            <put name="jobId" index="0"/>
+            <range>0:N</range>
+            <token delim="[.]">
+               <put name="jobId" range="0"/>
+            </token>
          </stream-parser>
 		</parsers>
 		<script shell="#!/bin/bash">
