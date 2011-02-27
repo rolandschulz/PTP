@@ -7,6 +7,9 @@
 
 package org.eclipse.ptp.rm.jaxb.core.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -26,7 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{}arglist"/>
+ *         &lt;element ref="{}command-ref" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -36,32 +39,40 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "arglist" })
-@XmlRootElement(name = "execute-command")
-public class ExecuteCommand {
+@XmlType(name = "", propOrder = { "commandRef" })
+@XmlRootElement(name = "submit-interactive")
+public class SubmitInteractive {
 
-	@XmlElement(required = true)
-	protected Arglist arglist;
-
-	/**
-	 * Gets the value of the arglist property.
-	 * 
-	 * @return possible object is {@link Arglist }
-	 * 
-	 */
-	public Arglist getArglist() {
-		return arglist;
-	}
+	@XmlElement(name = "command-ref", required = true)
+	protected List<String> commandRef;
 
 	/**
-	 * Sets the value of the arglist property.
+	 * Gets the value of the commandRef property.
 	 * 
-	 * @param value
-	 *            allowed object is {@link Arglist }
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a
+	 * snapshot. Therefore any modification you make to the returned list will
+	 * be present inside the JAXB object. This is why there is not a
+	 * <CODE>set</CODE> method for the commandRef property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getCommandRef().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list {@link String }
+	 * 
 	 * 
 	 */
-	public void setArglist(Arglist value) {
-		this.arglist = value;
+	public List<String> getCommandRef() {
+		if (commandRef == null) {
+			commandRef = new ArrayList<String>();
+		}
+		return this.commandRef;
 	}
 
 }
