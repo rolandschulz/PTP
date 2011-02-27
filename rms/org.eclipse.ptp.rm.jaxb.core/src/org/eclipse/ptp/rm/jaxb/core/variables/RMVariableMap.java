@@ -21,6 +21,12 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 		initialized = false;
 	}
 
+	public void clear() {
+		variables.clear();
+		discovered.clear();
+		initialized = false;
+	}
+
 	public Map<String, Object> getDiscovered() {
 		return discovered;
 	}

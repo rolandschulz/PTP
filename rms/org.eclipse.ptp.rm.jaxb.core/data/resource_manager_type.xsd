@@ -60,12 +60,12 @@
 				<xs:element minOccurs="0" ref="managed-files"/>
 				<xs:element minOccurs="0" ref="on-start-up"/>
 				<xs:element minOccurs="0" ref="discover-attributes"/>
-				<xs:element name="run-commands">
+				<xs:element name="submit-commands">
 					<xs:complexType>
 						<xs:choice minOccurs="1" maxOccurs="3">
-							<xs:element ref="run-interactive"/>
-							<xs:element ref="run-batch"/>
-							<xs:element ref="run-debug"/>
+							<xs:element ref="submit-interactive"/>
+							<xs:element ref="submit-batch"/>
+							<xs:element ref="submit-debug"/>
 						</xs:choice>
 					</xs:complexType>
 				</xs:element>
@@ -147,7 +147,7 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="run-interactive">
+	<xs:element name="submit-interactive">
 		<xs:annotation>
 			<xs:documentation>
 				The command(s) for running interactive jobs.
@@ -159,7 +159,7 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="run-batch">
+	<xs:element name="submit-batch">
 		<xs:annotation>
 			<xs:documentation>
 				The command(s) for running jobs through the scheduler.
@@ -171,7 +171,7 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="run-debug">
+	<xs:element name="submit-debug">
 		<xs:annotation>
 			<xs:documentation>
 				The command(s) for running debug jobs.

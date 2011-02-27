@@ -49,6 +49,13 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		return new JAXBServiceProvider(this);
 	}
 
+	public void clearReferences() {
+		map.clear();
+		map = null;
+		rmdata = null;
+		service = null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -22,6 +22,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
@@ -70,9 +71,8 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 					localFile.delete();
 				}
 			} catch (Throwable t) {
-				t.printStackTrace();
 				progress.done();
-				return new Status(Status.ERROR, JAXBCorePlugin.getUniqueIdentifier(), Messages.ManagedFilesJobError, t);
+				return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
 			}
 			progress.worked(5);
 		}

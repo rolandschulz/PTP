@@ -100,6 +100,10 @@ public interface IJAXBNonNLSConstants {
 	String MONITOR_ADDRESS_VAR = "monitor.address";//$NON-NLS-1$
 	String ARPA = ".in-addr.arpa";//$NON-NLS-1$
 
+	String STARTUP = "OnStartUp";;//$NON-NLS-1$
+	String SHUTDOWN = "OnShutDown";;//$NON-NLS-1$
+	String DISCATTR = "DiscoverAttributes";;//$NON-NLS-1$
+
 	String QUEUES = "available_queues";//$NON-NLS-1$
 	String JOB_ID = "jobId";//$NON-NLS-1$
 	String EXEC_PATH = "executablePath";//$NON-NLS-1$

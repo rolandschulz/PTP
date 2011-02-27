@@ -29,5 +29,6 @@ Export-Package: org.eclipse.ptp.rm.jaxb.core,
  org.eclipse.ptp.rm.jaxb.core.rm,
  org.eclipse.ptp.rm.jaxb.core.rmsystem,
  org.eclipse.ptp.rm.jaxb.core.runnable,
+ org.eclipse.ptp.rm.jaxb.core.utils,
  org.eclipse.ptp.rm.jaxb.core.variables,
  org.eclipse.ptp.rm.jaxb.core.xml
