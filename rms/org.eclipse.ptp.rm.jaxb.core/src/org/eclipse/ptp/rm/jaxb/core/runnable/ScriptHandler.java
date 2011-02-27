@@ -40,21 +40,27 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private void addDirectives(DirectiveDefinitions defs, StringBuffer buffer) {
+		if (defs == null) {
+			return;
+		}
 		for (DirectiveDefinition def : defs.getDirectiveDefinition()) {
 			String key = def.getValueFrom();
 			String value = getValue(key);
 			if (value != null && !ZEROSTR.equals(value)) {
-				buffer.append(def.getContent()).append(value).append(REMOTE_LINE_SEP);
+				buffer.append(def.getContent()).append(value.trim()).append(REMOTE_LINE_SEP);
 			}
 		}
 	}
 
 	private void addEnvironment(EnvironmentDefinitions defs, StringBuffer buffer) {
+		if (defs == null) {
+			return;
+		}
 		for (EnvironmentDefinition def : defs.getEnvironmentDefinition()) {
 			String key = def.getValueFrom();
 			String value = getValue(key);
 			if (value != null && !ZEROSTR.equals(value)) {
-				buffer.append(def.getContent()).append(value).append(REMOTE_LINE_SEP);
+				buffer.append(def.getContent()).append(value.trim()).append(REMOTE_LINE_SEP);
 			}
 		}
 	}
@@ -65,6 +71,9 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private void addPostExecute(PostExecuteCommands commands, StringBuffer buffer) {
+		if (commands == null) {
+			return;
+		}
 		for (Arglist args : commands.getArglist()) {
 			new ArglistImpl(args).toString(buffer);
 			buffer.append(REMOTE_LINE_SEP);
@@ -72,6 +81,9 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private void addPreExecute(PreExecuteCommands commands, StringBuffer buffer) {
+		if (commands == null) {
+			return;
+		}
 		for (Arglist args : commands.getArglist()) {
 			new ArglistImpl(args).toString(buffer);
 			buffer.append(REMOTE_LINE_SEP);

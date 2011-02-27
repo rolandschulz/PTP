@@ -1,5 +1,7 @@
 package org.eclipse.ptp.rm.jaxb.core.data;
 
+import java.util.Iterator;
+
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
@@ -14,11 +16,43 @@ public class ArglistImpl implements IJAXBNonNLSConstants {
 	}
 
 	public void toString(StringBuffer buffer) {
-		if (args.dynamicAppend) {
+		if (args.isDynamicAppend()) {
 			composeDynamicArgs(buffer);
 		} else {
 			composeStandardArgs(buffer);
 		}
+	}
+
+	private String addDynamicArg(String name, Arg next) {
+		String content = next.getContent();
+		content = content.replaceAll(AMP, name + PD).trim();
+		String undefined = next.getIsUndefinedIfEquals();
+		undefined = undefined.replaceAll(AMP, name + PD);
+		content = map.getString(content);
+		if (undefined != null) {
+			undefined = undefined.trim();
+			undefined = map.getString(undefined);
+			if (undefined.equals(content)) {
+				return ZEROSTR;
+			}
+		}
+		return content;
+	}
+
+	private String addStandardArg(Arg next) {
+		String dereferenced = map.getString(next.getContent());
+		if (dereferenced != null) {
+			dereferenced = dereferenced.trim();
+		}
+		String undefined = next.getIsUndefinedIfEquals();
+		if (undefined != null) {
+			undefined = undefined.trim();
+			undefined = map.getString(undefined);
+			if (undefined.equals(dereferenced)) {
+				return ZEROSTR;
+			}
+		}
+		return dereferenced;
 	}
 
 	/*
@@ -29,40 +63,29 @@ public class ArglistImpl implements IJAXBNonNLSConstants {
 	 */
 	private void composeDynamicArgs(StringBuffer buffer) {
 		for (String name : map.getDiscovered().keySet()) {
-			for (Arg arg : args.getArg()) {
-				String content = arg.getContent();
-				content = content.replaceAll(AMP, name + PD);
-				String undefined = arg.getIsUndefinedIfEquals();
-				undefined = undefined.replaceAll(AMP, name + PD);
-				content = map.getString(content);
-				if (undefined != null) {
-					undefined = map.getString(undefined);
-					if (undefined.equals(content)) {
-						continue;
-					}
+			Iterator<Arg> i = args.getArg().iterator();
+			if (i.hasNext()) {
+				buffer.append(addDynamicArg(name, i.next()));
+			}
+			while (i.hasNext()) {
+				String arg = addDynamicArg(name, i.next());
+				if (!ZEROSTR.equals(arg)) {
+					buffer.append(SP).append(arg);
 				}
-				if (buffer.length() > 0) {
-					buffer.append(SP);
-				}
-				buffer.append(content);
 			}
 		}
 	}
 
 	private void composeStandardArgs(StringBuffer buffer) {
-		for (Arg arg : args.getArg()) {
-			String dereferenced = map.getString(arg.getContent());
-			String undefined = arg.getIsUndefinedIfEquals();
-			if (undefined != null) {
-				undefined = map.getString(undefined);
-				if (undefined.equals(dereferenced)) {
-					continue;
-				}
+		Iterator<Arg> i = args.getArg().iterator();
+		if (i.hasNext()) {
+			buffer.append(addStandardArg(i.next()));
+		}
+		while (i.hasNext()) {
+			String arg = addStandardArg(i.next());
+			if (!ZEROSTR.equals(arg)) {
+				buffer.append(SP).append(arg);
 			}
-			if (buffer.length() > 0) {
-				buffer.append(SP);
-			}
-			buffer.append(dereferenced);
 		}
 	}
 }

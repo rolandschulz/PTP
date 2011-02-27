@@ -26,17 +26,29 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 
-	private final JAXBResourceManager rm;
 	private final String sourceDir;
 	private final String stagingDir;
 	private final List<ManagedFile> files;
+	private final IRemoteFileManager localFileManager;
+	private final IRemoteFileManager remoteFileManager;
 
-	public ManagedFilesJob(ManagedFiles files, JAXBResourceManager rm) throws CoreException {
+	public ManagedFilesJob(ManagedFiles files, IRemoteFileManager localFileManager, IRemoteFileManager remoteFileManager)
+			throws CoreException {
 		super(Messages.ManagedFilesJob);
-		this.rm = rm;
-		sourceDir = RMVariableMap.getInstance().getString(files.getFileSourceLocation());
+		this.localFileManager = localFileManager;
+		this.remoteFileManager = remoteFileManager;
+		String key = files.getFileSourceLocation();
+		if (key == null) {
+			sourceDir = System.getProperty(JAVA_TMP_DIR);
+		} else {
+			sourceDir = RMVariableMap.getInstance().getString(key);
+		}
 		stagingDir = RMVariableMap.getInstance().getString(files.getFileStagingLocation());
 		this.files = files.getManagedFile();
+	}
+
+	public ManagedFilesJob(ManagedFiles files, JAXBResourceManager rm) throws CoreException {
+		this(files, rm.getLocalFileManager(), rm.getRemoteFileManager());
 	}
 
 	@Override
@@ -52,7 +64,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 				/**
 				 * no support for Windows as target ...
 				 */
-				String target = stagingDir + REMOTE_PATH_SEP + RMVariableMap.getInstance().getString(file.getName());
+				String target = stagingDir + REMOTE_PATH_SEP + localFile.getName();
 				copyFileToRemoteHost(localFile.getAbsolutePath(), target, progress);
 				if (file.isDeleteAfterUse()) {
 					localFile.delete();
@@ -83,8 +95,6 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	private void copyFileToRemoteHost(String localPath, String remotePath, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 15);
 		try {
-			IRemoteFileManager localFileManager = rm.getLocalFileManager();
-			IRemoteFileManager remoteFileManager = rm.getRemoteFileManager();
 			progress.newChild(5);
 			if (progress.isCanceled()) {
 				throw new CoreException(new Status(IStatus.ERROR, JAXBCorePlugin.getUniqueIdentifier(),

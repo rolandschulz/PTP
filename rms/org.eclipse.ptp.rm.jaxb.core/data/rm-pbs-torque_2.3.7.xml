@@ -4,15 +4,15 @@
       <control-connection>ssh://abe.ncsa.uiuc.edu/usr/local/bin/qsub</control-connection>
    </site>
 	<control>
-	   <on-start-up>
-	     <command-ref>find_queues</command-ref>
-	   </on-start-up>
 		<managed-files>
-			<file-staging-location>~/.eclipsesettings</file-staging-location>
-			<managed-file name="pbs_script" uniqueIdSuffix="true" deleteAfterUse="true">
+			<file-staging-location>.eclipsesettings</file-staging-location>
+			<managed-file name="pbs_script" uniqueIdPrefix="true" deleteAfterUse="true">
 				<contents>${rm:script}</contents>
 			</managed-file>
 		</managed-files>
+		<on-start-up>
+        <command-ref>find_queues</command-ref>
+      </on-start-up>
 		<run-commands>
 			<run-batch>
 				<command-ref>submit_script</command-ref>
@@ -54,47 +54,49 @@
 			<stream-parser name="jobIdParser" stderr="false">
             <range>0:N</range>
             <token delim="[.]">
-               <put name="jobId" range="0"/>
+               <put name="jobId">
+                  <range>0</range>
+               </put>
             </token>
          </stream-parser>
 		</parsers>
 		<script shell="#!/bin/bash">
 			<directive-definitions>
-				<directive-definition valueFrom="PBSJOB_Account_Name"># @ PBS -A </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Checkpoint"># @ PBS -c </directive-definition>
-				<directive-definition valueFrom="PBSJOB_depend"># @ PBS -W depend=</directive-definition>
-				<directive-definition valueFrom="PBSJOB_destination"># @ PBS -q </directive-definition>
-				<directive-definition valueFrom="PBSJOB_directive"># @ PBS -C </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Error_Path"># @ PBS -e </directive-definition>
-				<directive-definition valueFrom="PBSJOB_export_all"># @ PBS -V </directive-definition>
-				<directive-definition valueFrom="PBSJOB_group_list"># @ PBS -W group_list=</directive-definition>
-				<directive-definition valueFrom="PBSJOB_Hold_Types"># @ PBS -h </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Job_Name"># @ PBS -N </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Join_Path"># @ PBS -j </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Keep_Files"># @ PBS -k </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Mail_Points"># @ PBS -m </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Mail_Users"># @ PBS -M </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Output_Path"># @ PBS -o </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Priority"># @ PBS -p </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Rerunnable"># @ PBS -r </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Resource_List.arch"># @ PBS -l arch= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Resource_List.cput"># @ PBS -l cput= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Resource_List.file"># @ PBS -l file= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Resource_List.host"># @ PBS -l host= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Resource_List.mem"># @ PBS -l mem= </directive-definition>
-				<directive-definition valueFrom="Resource_List.nice"># @ PBS -l nice= </directive-definition>
-				<directive-definition valueFrom="Resource_List.nodes"># @ PBS -l nodes= </directive-definition>
-				<directive-definition valueFrom="Resource_List.ompthreads"># @ PBS -l ompthreads= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Resource_List.pcput"># @ PBS -l pcput= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Resource_List.pmem"># @ PBS -l pmem= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Resource_List.pvmem"># @ PBS -l pvmem= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Resource_List.vmem"># @ PBS -l vmem= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Resource_List.walltime"># @ PBS -l walltime= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Shell_Path_List"># @ PBS -S </directive-definition>
-				<directive-definition valueFrom="PBSJOB_stagein"># @ PBS -W stagein= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_stageout"># @ PBS -W stageout= </directive-definition>
-				<directive-definition valueFrom="PBSJOB_User_List"># @ PBS -u </directive-definition>
-				<directive-definition valueFrom="PBSJOB_Variable_List"># @ PBS -v </directive-definition>
+				<directive-definition valueFrom="Account_Name"># @ PBS -A </directive-definition>
+				<directive-definition valueFrom="Checkpoint"># @ PBS -c </directive-definition>
+				<directive-definition valueFrom="depend"># @ PBS -W depend=</directive-definition>
+				<directive-definition valueFrom="destination"># @ PBS -q </directive-definition>
+				<directive-definition valueFrom="directive"># @ PBS -C </directive-definition>
+				<directive-definition valueFrom="Error_Path"># @ PBS -e </directive-definition>
+				<directive-definition valueFrom="export_all"># @ PBS -V </directive-definition>
+				<directive-definition valueFrom="group_list"># @ PBS -W group_list=</directive-definition>
+				<directive-definition valueFrom="Hold_Types"># @ PBS -h </directive-definition>
+				<directive-definition valueFrom="Job_Name"># @ PBS -N </directive-definition>
+				<directive-definition valueFrom="Join_Path"># @ PBS -j </directive-definition>
+				<directive-definition valueFrom="Keep_Files"># @ PBS -k </directive-definition>
+				<directive-definition valueFrom="Mail_Points"># @ PBS -m </directive-definition>
+				<directive-definition valueFrom="Mail_Users"># @ PBS -M </directive-definition>
+				<directive-definition valueFrom="Output_Path"># @ PBS -o </directive-definition>
+				<directive-definition valueFrom="Priority"># @ PBS -p </directive-definition>
+				<directive-definition valueFrom="Rerunnable"># @ PBS -r </directive-definition>
+				<directive-definition valueFrom="Resource_List.arch"># @ PBS -l arch=</directive-definition>
+				<directive-definition valueFrom="Resource_List.cput"># @ PBS -l cput=</directive-definition>
+				<directive-definition valueFrom="Resource_List.file"># @ PBS -l file=</directive-definition>
+				<directive-definition valueFrom="Resource_List.host"># @ PBS -l host=</directive-definition>
+				<directive-definition valueFrom="Resource_List.mem"># @ PBS -l mem=</directive-definition>
+				<directive-definition valueFrom="Resource_List.nice"># @ PBS -l nice=</directive-definition>
+				<directive-definition valueFrom="Resource_List.nodes"># @ PBS -l nodes=</directive-definition>
+				<directive-definition valueFrom="Resource_List.ompthreads"># @ PBS -l ompthreads=</directive-definition>
+				<directive-definition valueFrom="Resource_List.pcput"># @ PBS -l pcput=</directive-definition>
+				<directive-definition valueFrom="Resource_List.pmem"># @ PBS -l pmem=</directive-definition>
+				<directive-definition valueFrom="Resource_List.pvmem"># @ PBS -l pvmem=</directive-definition>
+				<directive-definition valueFrom="Resource_List.vmem"># @ PBS -l vmem=</directive-definition>
+				<directive-definition valueFrom="Resource_List.walltime"># @ PBS -l walltime=</directive-definition>
+				<directive-definition valueFrom="Shell_Path_List"># @ PBS -S </directive-definition>
+				<directive-definition valueFrom="stagein"># @ PBS -W stagein=</directive-definition>
+				<directive-definition valueFrom="stageout"># @ PBS -W stageout=</directive-definition>
+				<directive-definition valueFrom="User_List"># @ PBS -u </directive-definition>
+				<directive-definition valueFrom="Variable_List"># @ PBS -v </directive-definition>
 			</directive-definitions>
 			<pre-execute-commands>
 				<arglist>

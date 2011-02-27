@@ -23,8 +23,8 @@ public class PutImpl extends AbstractRangePart {
 
 	public void doPut(int i, String segment) {
 		if (range == null || range.isInRange(i)) {
-			Object value = property.getValue();
-			if (value != null && value instanceof String) {
+			String value = property.getValue();
+			if (value != null) {
 				segment = value.toString() + segment;
 			}
 			property.setValue(segment);

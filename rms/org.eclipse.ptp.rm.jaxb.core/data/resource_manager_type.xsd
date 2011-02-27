@@ -89,7 +89,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="value" minOccurs="0"/>
+				<xs:element name="value" minOccurs="0" type="xs:string"/>
 			</xs:sequence>
 			<xs:attribute name="name" type="xs:string"/>
 		</xs:complexType>
@@ -119,8 +119,8 @@
 				<xs:element name="contents" minOccurs="0" type="xs:string"/>
 			</xs:sequence>
 			<xs:attribute name="name" use="required"/>
-			<xs:attribute name="uniqueIdPrefix" type="xs:boolean"/>
-			<xs:attribute name="deleteAfterUse" type="xs:boolean"/>
+			<xs:attribute name="uniqueIdPrefix" type="xs:boolean" default="false"/>
+			<xs:attribute name="deleteAfterUse" type="xs:boolean" default="false"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="on-start-up">
@@ -338,7 +338,7 @@
 			<xs:attribute name="id" use="required" type="xs:string"/>
 			<xs:attribute name="name" use="required" type="xs:string"/>
 			<xs:attribute name="type" use="required" type="xs:string"/>
-			<xs:attribute name="basic" type="xs:boolean">
+			<xs:attribute name="basic" type="xs:boolean" default="false">
 				<xs:annotation>
 					<xs:documentation>
 						Indicates if this attribute is part of a basic (required) set, or if it is an (advanced) option.
@@ -358,8 +358,8 @@
 				<xs:element minOccurs="0" maxOccurs="2" ref="parser-ref"/>
 			</xs:sequence>
 			<xs:attribute name="name" type="xs:string"/>
-			<xs:attribute name="displayStdout" type="xs:boolean"/>
-			<xs:attribute name="displayStderr" type="xs:boolean"/>
+			<xs:attribute name="displayStdout" type="xs:boolean" default="false"/>
+			<xs:attribute name="displayStderr" type="xs:boolean" default="false"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="arglist">
@@ -367,7 +367,7 @@
 			<xs:sequence>
 				<xs:element maxOccurs="unbounded" ref="arg"/>
 			</xs:sequence>
-			<xs:attribute name="dynamicAppend" type="xs:boolean">
+			<xs:attribute name="dynamicAppend" type="xs:boolean" default="false">
 				<xs:annotation>
 					<xs:documentation>
 						Iterate over all dynamic attributes, appending the sequence of args for each attribute.
@@ -409,8 +409,8 @@
 				<xs:element ref="token"/>
 			</xs:sequence>
 			<xs:attribute name="name" use="required" type="xs:string"/>
-			<xs:attribute name="stderr" type="xs:boolean"/>
-			<xs:attribute name="redirect" type="xs:boolean"/>
+			<xs:attribute name="stderr" type="xs:boolean" default="false"/>
+			<xs:attribute name="redirect" type="xs:boolean" default="false"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="token">
@@ -519,7 +519,7 @@
 			<xs:sequence>
 				<xs:element maxOccurs="unbounded" ref="tab-controller"/>
 			</xs:sequence>
-			<xs:attribute name="advancedModeEnabled" type="xs:boolean">
+			<xs:attribute name="advancedModeEnabled" type="xs:boolean" default="false">
 				<xs:annotation>
 					<xs:documentation>
 						If this is set to true, a tab-controller which allows the user to browse the local file system and/or workspace
@@ -584,8 +584,8 @@
 					<xs:element ref="all-attributes"/>
 				</xs:choice>
 			</xs:sequence>
-			<xs:attribute name="dynamic" type="xs:boolean"/>
-			<xs:attribute name="scrollable" type="xs:boolean"/>
+			<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
+			<xs:attribute name="scrollable" type="xs:boolean" default="false"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="all-attributes">
@@ -606,11 +606,11 @@
 				</xs:element>
 				<xs:element name="include">
 					<xs:complexType>
-						<xs:attribute name="headers" type="xs:boolean"/>
-						<xs:attribute name="sort" type="xs:boolean"/>
-						<xs:attribute name="name" type="xs:boolean"/>
-						<xs:attribute name="tooltip" type="xs:boolean"/>
-						<xs:attribute name="description" type="xs:boolean"/>
+						<xs:attribute name="headers" type="xs:boolean" default="true"/>
+						<xs:attribute name="sort" type="xs:boolean" default="true"/>
+						<xs:attribute name="name" type="xs:boolean" default="true"/>
+						<xs:attribute name="tooltip" type="xs:boolean" default="true"/>
+						<xs:attribute name="description" type="xs:boolean" default="true"/>
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
@@ -634,11 +634,11 @@
 				</xs:element>
 				<xs:element name="include">
 					<xs:complexType>
-						<xs:attribute name="headers" type="xs:boolean"/>
-						<xs:attribute name="sort" type="xs:boolean"/>
-						<xs:attribute name="name" type="xs:boolean"/>
-						<xs:attribute name="tooltip" type="xs:boolean"/>
-						<xs:attribute name="description" type="xs:boolean"/>
+						<xs:attribute name="headers" type="xs:boolean" default="true"/>
+                  <xs:attribute name="sort" type="xs:boolean" default="true"/>
+                  <xs:attribute name="name" type="xs:boolean" default="true"/>
+                  <xs:attribute name="tooltip" type="xs:boolean" default="true"/>
+                  <xs:attribute name="description" type="xs:boolean" default="true"/>
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
@@ -648,8 +648,8 @@
 		<xs:complexType>
 			<xs:attribute name="horizontalAlign" type="xs:string"/>
 			<xs:attribute name="verticalAlign" type="xs:string"/>
-			<xs:attribute name="grabExcessHorizontal" type="xs:boolean"/>
-			<xs:attribute name="grabExcessVertical" type="xs:boolean"/>
+			<xs:attribute name="grabExcessHorizontal" type="xs:boolean" default="true"/>
+			<xs:attribute name="grabExcessVertical" type="xs:boolean" default="false"/>
 			<xs:attribute name="horizontalSpan" type="xs:integer"/>
 			<xs:attribute name="verticalSpan" type="xs:integer"/>
 			<xs:attribute name="minHeight" type="xs:integer"/>
@@ -662,7 +662,7 @@
 		<xs:complexType>
 			<xs:attribute name="numColumns" type="xs:integer"/>
 			<xs:attribute name="horizontalSpacing" type="xs:integer"/>
-			<xs:attribute name="makeColumnsEqualWidth" type="xs:boolean"/>
+			<xs:attribute name="makeColumnsEqualWidth" type="xs:boolean" default="true"/>
 			<xs:attribute name="marginBottom" type="xs:integer"/>
 			<xs:attribute name="marginHeight" type="xs:integer"/>
 			<xs:attribute name="marginLeft" type="xs:integer"/>
@@ -717,7 +717,7 @@
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
-			<xs:attribute name="editable" type="xs:boolean"/>
+			<xs:attribute name="editable" type="xs:boolean" default="true"/>
 			<xs:attribute name="type" default="table">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -783,7 +783,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
-			<xs:attribute name="readOnly" type="xs:boolean"/>
+			<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="monitor">
