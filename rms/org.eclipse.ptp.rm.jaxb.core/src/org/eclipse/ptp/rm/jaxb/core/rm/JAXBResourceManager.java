@@ -193,12 +193,6 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		assert (null != remoteFileManager);
 	}
 
-	/*
-	 * Assemble the script: dereference the values: directives; environment;
-	 * commands, add each to string buffer. Assign the string to the "script"
-	 * variable.
-	 */
-
 	private void maybeDiscoverAttributes() {
 		// TODO Auto-generated method stub
 
@@ -231,11 +225,6 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	}
 
-	/*
-	 * 
-	 * 
-	 * then set managed-file source/target from the above
-	 */
 	private void setFixedConfigurationProperties() {
 		Map<String, Object> env = RMVariableMap.getInstance().getVariables();
 		env.put(CONTROL_USER_VAR, config.getControlUserName());
@@ -245,7 +234,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	}
 
 	/*
-	 * Transfers the values from the configuration to the environment.
+	 * Transfers the values from the configuration to the live map.
 	 */
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
 		@SuppressWarnings("unchecked")
@@ -258,8 +247,6 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 				((Property) target).setValue(value);
 			} else if (target instanceof JobAttribute) {
 				((JobAttribute) target).setValue(value);
-			} else {
-				env.put(key, value);
 			}
 		}
 	}

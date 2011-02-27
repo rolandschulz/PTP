@@ -29,6 +29,7 @@ public interface IJAXBNonNLSConstants {
 	String LT = "<"; //$NON-NLS-1$
 	String LTS = "</";//$NON-NLS-1$
 	String GT = ">";//$NON-NLS-1$
+	String GTLT = "><";//$NON-NLS-1$
 	String HYPH = "-";//$NON-NLS-1$
 	String AMP = "@";//$NON-NLS-1$
 	String DOL = "$";//$NON-NLS-1$
@@ -60,6 +61,7 @@ public interface IJAXBNonNLSConstants {
 
 	/* STANDARD PROPERTIES */
 	String JAVA_USER_HOME = "user.home";//$NON-NLS-1$
+	String JAVA_TMP_DIR = "java.io.tmpdir";//$NON-NLS-1$
 	String FILE_SCHEME = "file";//$NON-NLS-1$
 	String XMLSchema = "http://www.w3.org/2001/XMLSchema"; //$NON-NLS-1$
 	String DATA = "data/"; //$NON-NLS-1$
