@@ -24,6 +24,11 @@ public class Messages extends NLS {
 	public static String Copy_Operation_cancelled_by_user;
 	public static String Copy_Operation_Local_resource_does_not_exist;
 	public static String StreamParserNoSuchVariableError;
+	public static String ManagedFilesJob;
+	public static String ManagedFilesJobError;
+
+	public static String ScriptHandlerJob;
+	public static String ScriptHandlerWriteError;
 
 	static {
 		// initialize resource bundle

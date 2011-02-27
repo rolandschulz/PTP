@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class AddImpl extends AbstractRangePart {
@@ -11,7 +12,7 @@ public class AddImpl extends AbstractRangePart {
 	private List<String> list;
 
 	@SuppressWarnings("unchecked")
-	public AddImpl(Add add) {
+	public AddImpl(Add add) throws CoreException {
 		Map<String, Object> vars = RMVariableMap.getInstance().getVariables();
 		String name = add.getName();
 

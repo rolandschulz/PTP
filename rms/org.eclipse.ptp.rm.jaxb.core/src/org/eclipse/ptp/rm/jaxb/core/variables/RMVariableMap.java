@@ -25,6 +25,22 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 		return discovered;
 	}
 
+	/**
+	 * Performs the substitution on the string. rm: prefix points to the
+	 * RMVariableResolver.
+	 * 
+	 * @param expression
+	 * @return
+	 */
+	public String getString(String value) {
+		try {
+			return dereference(value.toString());
+		} catch (CoreException t) {
+			t.printStackTrace();
+		}
+		return value;
+	}
+
 	public Map<String, Object> getVariables() {
 		return variables;
 	}
@@ -41,27 +57,21 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 						.append(ja.getMin()).append(PD).append(ja.getValidator()).append(PD).append(ja.getDescription()).append(PD)
 						.append(ja.getTooltip()).append(LINE_SEP);
 
-			} else
+			} else {
 				buffer.append(e.getKey()).append(SP).append(e.getValue()).append(LINE_SEP);
+			}
 		}
 		System.out.println(buffer);
 	}
 
-	/**
-	 * Performs the substitution on the string. rm: prefix points to the
-	 * RMVariableResolver.
-	 * 
-	 * @param expression
-	 * @return
-	 * @throws CoreException
-	 */
-	public static String dereference(String expression) throws CoreException {
+	private String dereference(String expression) throws CoreException {
 		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
 	}
 
 	public synchronized static RMVariableMap getInstance() {
-		if (singleton == null)
+		if (singleton == null) {
 			singleton = new RMVariableMap();
+		}
 		return singleton;
 	}
 }

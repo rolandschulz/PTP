@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
-public class TokenImpl implements IJAXBNonNLSConstants {
+public class TokenImpl extends AbstractRangePart implements IJAXBNonNLSConstants {
 
 	private final String delim;
 	private List<AddImpl> adds;
 	private List<SetImpl> sets;
 	private List<PutImpl> puts;
 	private TokenImpl child;
-	private Range range;
 
 	public TokenImpl(Token token) throws Throwable {
-		this.delim = token.getDelim();
+		this.delim = RMVariableMap.getInstance().getString(token.getDelim());
 
 		String exp = token.getRange();
 		if (exp != null) {

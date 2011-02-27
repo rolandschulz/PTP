@@ -2,13 +2,14 @@ package org.eclipse.ptp.rm.jaxb.core.data;
 
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class PutImpl extends AbstractRangePart {
 
 	private final Property property;
 
-	public PutImpl(Put put) {
+	public PutImpl(Put put) throws CoreException {
 		Map<String, Object> vars = RMVariableMap.getInstance().getVariables();
 		String name = put.getName();
 		property = new Property();
