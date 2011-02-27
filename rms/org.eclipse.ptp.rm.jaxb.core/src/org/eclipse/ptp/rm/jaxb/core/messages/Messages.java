@@ -33,6 +33,14 @@ public class Messages extends NLS {
 	public static String MissingRunCommandsError;
 	public static String EmptyCommandDef;
 
+	public static String MissingArglistFromCommandError;
+	public static String CouldNotLaunch;
+	public static String StdoutParserError;
+	public static String StderrParserError;
+	public static String RMNoSuchParserError;
+	public static String ParserInternalError;
+	public static int ProcessExitValueError;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
