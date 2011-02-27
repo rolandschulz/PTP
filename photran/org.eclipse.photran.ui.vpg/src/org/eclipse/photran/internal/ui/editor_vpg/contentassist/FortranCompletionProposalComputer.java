@@ -163,10 +163,10 @@ class FortranCompletionProposalComputer extends CompletionComputer
         }
     }
 
-    private FortranCompletionProposal createProposal(String identifier)
-    {
-        return createProposal(identifier, null, null);
-    }
+//    private FortranCompletionProposal createProposal(String identifier)
+//    {
+//        return createProposal(identifier, null, null);
+//    }
 
     private FortranCompletionProposal createProposal(String identifier, String description)
     {
@@ -188,8 +188,8 @@ class FortranCompletionProposalComputer extends CompletionComputer
         return new FortranCompletionProposal(
             identifier,
             new TemplateProposal(new Template(
-                                    displayString(identifier, description),
-                                    displayString(identifier, description),
+                                    identifier,
+                                    description == null ? "" : description, //$NON-NLS-1$
                                     FortranTemplateContext.ID,
                                     replaceArgumentsWithTemplateVariables(identifier),
                                     true),
@@ -231,13 +231,13 @@ class FortranCompletionProposalComputer extends CompletionComputer
         else return string;
     }
 
-    private String displayString(String identifier, String description)
-    {
-        if (description == null)
-            return identifier;
-        else
-            return identifier + " - " + description; //$NON-NLS-1$
-    }
+//    private String displayString(String identifier, String description)
+//    {
+//        if (description == null)
+//            return identifier;
+//        else
+//            return identifier + " - " + description; //$NON-NLS-1$
+//    }
     
     /**
      * A single proposal which will appear in the content assist list.

@@ -333,7 +333,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 
         result.append(classification.toString());
 
-        if (!type.equals(Type.VOID))
+        if (!type.equals(Type.VOID) && !(type instanceof FunctionType))
         {
         	result.append(" - "); //$NON-NLS-1$
         	result.append(type);

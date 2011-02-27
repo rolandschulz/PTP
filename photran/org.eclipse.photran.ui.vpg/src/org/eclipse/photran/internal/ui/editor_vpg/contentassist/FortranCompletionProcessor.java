@@ -46,7 +46,11 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
     HashMap<String, TreeSet<Definition>> defs = new HashMap<String, TreeSet<Definition>>();
     
     private String errorMessage = null;
-    
+
+    //private final Color LIGHT_YELLOW = new Color(null, new RGB(255, 255, 191));
+    private final Color LIGHT_YELLOW = new Color(null, new RGB(255, 255, 223));
+    //private final Color WHITE = new Color(null, new RGB(255, 255, 255));
+
     public IContentAssistant setup(FortranEditor editor)
     {
         String contentAssistEnabledProperty = new SearchPathProperties().getProperty(
@@ -54,8 +58,6 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
             SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME);
         if (contentAssistEnabledProperty != null && contentAssistEnabledProperty.equals("true")) //$NON-NLS-1$
         {
-            final Color LIGHT_YELLOW = new Color(null, new RGB(255, 255, 191));
-            
             FortranEditorTasks.instance(editor).addASTTask(new FortranCompletionProcessorASTTask(this));
             FortranEditorTasks.instance(editor).addVPGTask(new FortranCompletionProcessorVPGTask(this));
             
