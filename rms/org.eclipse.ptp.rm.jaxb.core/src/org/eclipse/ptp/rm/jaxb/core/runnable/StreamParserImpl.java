@@ -29,7 +29,7 @@ public class StreamParserImpl extends Thread implements IJAXBNonNLSConstants {
 		this.in = in;
 		String exp = parser.getRange();
 		if (exp != null) {
-			lineRange = new Range(parser.getRange());
+			lineRange = new Range(exp);
 		}
 		Token t = parser.getToken();
 		assert (null != t);

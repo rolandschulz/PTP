@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
  * Which parts of output should be examined. Expression is a comma-delimited
@@ -19,7 +20,7 @@ public class Range implements IJAXBNonNLSConstants {
 	private int[] to;
 
 	public Range(String expression) {
-		parse(expression);
+		parse(RMVariableMap.getInstance().getString(expression));
 	}
 
 	public boolean isInRange(int line) {

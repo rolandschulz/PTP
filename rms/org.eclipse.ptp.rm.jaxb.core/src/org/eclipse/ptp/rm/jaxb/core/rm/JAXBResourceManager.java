@@ -17,10 +17,10 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
-import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFileJob;
+import org.eclipse.ptp.rm.jaxb.core.data.Script;
+import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.IJobStatus;
@@ -29,6 +29,8 @@ import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 public final class JAXBResourceManager extends AbstractResourceManager implements IJAXBNonNLSConstants {
 
 	private final IJAXBResourceManagerConfiguration config;
+
+	private final Control controlData;
 
 	private IRemoteServices remoteServices;
 	private IRemoteServices localServices;
@@ -43,6 +45,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	public JAXBResourceManager(IPUniverse universe, IResourceManagerConfiguration jaxbServiceProvider) {
 		super(universe, jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
+		controlData = config.resourceManagerData().getControl();
 		setFixedConfigurationProperties();
 	}
 
@@ -127,14 +130,16 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
 		updatePropertyValuesFromTab(configuration);
-		// handle files here
+		maybeHandleScript(controlData.getScript());
+		// create the script if necessary
+		// add it to managed files, io necessary
+		maybeHandleManagedFiles(controlData.getManagedFiles());
 		// according to mode, select the job type
 		// run job commands
 		return null;
 	}
 
 	private void doConnect() {
-		getControlConnection();
 
 		// TODO Auto-generated method stub
 
@@ -161,26 +166,6 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		// also run maybe discover attributes
 	}
 
-	private IRemoteConnection getControlConnection() {
-
-		return null;
-	}
-
-	private ManagedFileJob handleManagedFile(ManagedFiles files, ManagedFile file) {
-		ManagedFileJob job = new ManagedFileJob(file, files, this);
-		job.schedule();
-		return job;
-	}
-
-	/*
-	 * Assemble the script: dereference the values: directives; environment;
-	 * commands, add each to string buffer. Assign the string to the "script"
-	 * variable.
-	 */
-	private void handleScript(Control control, Map<String, Object> env) {
-
-	}
-
 	private void initializeConnections() {
 		localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		assert (localServices != null);
@@ -205,8 +190,29 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		assert (null != remoteFileManager);
 	}
 
+	/*
+	 * Assemble the script: dereference the values: directives; environment;
+	 * commands, add each to string buffer. Assign the string to the "script"
+	 * variable.
+	 */
+
 	private void maybeDiscoverAttributes() {
 		// TODO Auto-generated method stub
+
+	}
+
+	private void maybeHandleManagedFiles(ManagedFiles files) throws CoreException {
+		ManagedFilesJob job = new ManagedFilesJob(files, this);
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException t) {
+			t.printStackTrace();
+			// throw core exception?
+		}
+	}
+
+	private void maybeHandleScript(Script script) {
 
 	}
 

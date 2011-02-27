@@ -34,6 +34,7 @@ public interface IJAXBNonNLSConstants {
 	String DOL = "$";//$NON-NLS-1$
 	String OPENV = "${";//$NON-NLS-1$
 	String CLOSV = "}";//$NON-NLS-1$
+	String CLOSVAL = "#value}";//$NON-NLS-1$
 	String BKESC = "\\\\";//$NON-NLS-1$
 	String BKBKESC = "\\\\\\\\";//$NON-NLS-1$
 	String DLESC = "\\$";//$NON-NLS-1$
@@ -71,6 +72,9 @@ public interface IJAXBNonNLSConstants {
 	String SELECTED_ATTRIBUTES = "selected_attributes";//$NON-NLS-1$
 	String VALID_ATTRIBUTES = "valid_attributes"; //$NON-NLS-1$
 	String IS_PRESET = "is_preset";//$NON-NLS-1$
+	String SCRIPT_PATH = "script_path";//$NON-NLS-1$
+	String SCRIPT = "script";//$NON-NLS-1$
+	String SH = ".sh";//$NON-NLS-1$
 
 	String CONTROL_USER_NAME = "controlUserName";//$NON-NLS-1$
 	String MONITOR_USER_NAME = "monitorUserName";//$NON-NLS-1$

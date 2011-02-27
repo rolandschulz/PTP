@@ -352,7 +352,7 @@
 	<xs:element name="command-ref" type="xs:string"/>
 	<xs:element name="parser-ref" type="xs:string"/>
 	<xs:element name="command">
-		<xs:complexType mixed="true">
+		<xs:complexType>
 			<xs:sequence>
 				<xs:element maxOccurs="unbounded" ref="arglist"/>
 				<xs:element minOccurs="0" maxOccurs="2" ref="parser-ref"/>
@@ -363,7 +363,7 @@
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="arglist">
-		<xs:complexType mixed="true">
+		<xs:complexType>
 			<xs:sequence>
 				<xs:element maxOccurs="unbounded" ref="arg"/>
 			</xs:sequence>
@@ -376,15 +376,24 @@
 			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="arg" type="xs:string">
+	<xs:element name="arg">
 		<xs:annotation>
 			<xs:documentation>
 				The text of the argument will be parsed for references to the resource manager environment; e.g., ${a}, v=${v},
 				etc. By convention, '${@name}' and '${@value}' will refer to a given dynamic attribute name and value (of undefined position i in
-				the
-				list).
+				the list).
 			</xs:documentation>
 		</xs:annotation>
+		<xs:complexType mixed="true">
+			<xs:attribute name="isUndefinedIfEquals" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						If this is defined (even a zero-length string is valid), an equality check on the arg will be run and if satisfied the arg will be
+						eliminated from the list.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
 	</xs:element>
 	<xs:element name="stream-parser">
 		<xs:annotation>
