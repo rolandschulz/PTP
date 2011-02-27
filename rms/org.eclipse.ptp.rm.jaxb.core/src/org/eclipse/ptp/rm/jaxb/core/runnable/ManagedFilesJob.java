@@ -121,7 +121,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 					throw new FileNotFoundException(localFile.getAbsolutePath());
 				}
 			} else {
-				if (file.isUniqueIdSuffix()) {
+				if (file.isUniqueIdPrefix()) {
 					localFile = new File(sourceDir, UUID.randomUUID() + name);
 				}
 				contents = RMVariableMap.getInstance().getString(contents);

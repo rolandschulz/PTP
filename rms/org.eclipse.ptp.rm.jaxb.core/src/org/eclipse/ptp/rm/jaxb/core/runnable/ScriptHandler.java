@@ -1,17 +1,11 @@
 package org.eclipse.ptp.rm.jaxb.core.runnable;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.UUID;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.data.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.data.DirectiveDefinition;
@@ -19,7 +13,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.DirectiveDefinitions;
 import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentDefinition;
 import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentDefinitions;
 import org.eclipse.ptp.rm.jaxb.core.data.ExecuteCommand;
-import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.PostExecuteCommands;
 import org.eclipse.ptp.rm.jaxb.core.data.PreExecuteCommands;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
@@ -28,34 +21,20 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 
-	private Script script;
-	private File file;
-	private final String sourceDir;
 	private final RMVariableMap map;
+	private final Script script;
 
-	public ScriptHandler(Script script, ManagedFiles files) {
+	public ScriptHandler(Script script) {
 		super(Messages.ScriptHandlerJob);
+		this.script = script;
 		map = RMVariableMap.getInstance();
-		sourceDir = map.getString(files.getFileSourceLocation());
-	}
-
-	public File getFile() {
-		return file;
 	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		SubMonitor progress = SubMonitor.convert(monitor, 20);
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		String script = composeScript(monitor);
-		progress.worked(10);
-		try {
-			writeScript(script);
-		} catch (IOException t) {
-			t.printStackTrace();
-			progress.done();
-			return new Status(Status.ERROR, JAXBCorePlugin.getUniqueIdentifier(), Messages.ScriptHandlerWriteError, t);
-		}
-		map.getVariables().put(SCRIPT_PATH, file);
+		map.getVariables().put(SCRIPT, script);
 		progress.done();
 		return Status.OK_STATUS;
 	}
@@ -100,7 +79,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private void addShell(String shell, StringBuffer buffer) {
-		buffer.append(getValue(shell)).append(REMOTE_LINE_SEP);
+		buffer.append(map.getString(shell)).append(REMOTE_LINE_SEP);
 	}
 
 	private String composeScript(IProgressMonitor monitor) {
@@ -122,25 +101,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private String getValue(String key) {
-		String name = OPENV + key + CLOSVAL;
+		String name = OPENVRM + key + CLOSVAL;
 		return map.getString(name);
-	}
-
-	private void writeScript(String contents) throws IOException {
-		file = new File(sourceDir, UUID.randomUUID() + SCRIPT + SH);
-		FileWriter fw = null;
-		try {
-			fw = new FileWriter(file, false);
-			fw.write(contents);
-			fw.flush();
-		} finally {
-			try {
-				if (fw != null) {
-					fw.close();
-				}
-			} catch (IOException t) {
-				t.printStackTrace();
-			}
-		}
 	}
 }

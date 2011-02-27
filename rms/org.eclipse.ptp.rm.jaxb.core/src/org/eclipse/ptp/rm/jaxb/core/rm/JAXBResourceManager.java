@@ -21,6 +21,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
+import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.IJobStatus;
@@ -130,9 +131,11 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
 		updatePropertyValuesFromTab(configuration);
+		/*
+		 * create the script if necessary; adds the contents to env as
+		 * "${rm:script}"
+		 */
 		maybeHandleScript(controlData.getScript());
-		// create the script if necessary
-		// add it to managed files, io necessary
 		maybeHandleManagedFiles(controlData.getManagedFiles());
 		// according to mode, select the job type
 		// run job commands
@@ -208,12 +211,20 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 			job.join();
 		} catch (InterruptedException t) {
 			t.printStackTrace();
-			// throw core exception?
 		}
 	}
 
 	private void maybeHandleScript(Script script) {
-
+		if (script == null) {
+			return;
+		}
+		ScriptHandler job = new ScriptHandler(script);
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException t) {
+			t.printStackTrace();
+		}
 	}
 
 	private void runCommand(Command command) {
