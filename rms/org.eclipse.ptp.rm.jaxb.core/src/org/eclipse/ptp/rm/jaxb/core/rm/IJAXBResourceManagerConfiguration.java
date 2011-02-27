@@ -8,6 +8,11 @@ public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConf
 	/**
 	 * @since 5.0
 	 */
+	void clearReferences();
+
+	/**
+	 * @since 5.0
+	 */
 	String getDefaultControlHost();
 
 	/**

@@ -29,6 +29,9 @@ public class Messages extends NLS {
 
 	public static String ScriptHandlerJob;
 	public static String ScriptHandlerWriteError;
+	public static String RMNoSuchCommandError;
+	public static String MissingRunCommandsError;
+	public static String EmptyCommandDef;
 
 	static {
 		// initialize resource bundle

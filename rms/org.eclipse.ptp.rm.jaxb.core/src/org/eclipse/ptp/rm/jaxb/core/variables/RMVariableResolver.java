@@ -5,12 +5,11 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.variables.IDynamicVariable;
 import org.eclipse.core.variables.IDynamicVariableResolver;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 
 public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
 
@@ -23,10 +22,7 @@ public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 				try {
 					return invokeGetter(value, parts[1]);
 				} catch (Throwable t) {
-					t.printStackTrace();
-					Status status = new Status(Status.ERROR, JAXBCorePlugin.getUniqueIdentifier(),
-							Messages.RMVariableResolver_derefError, t);
-					throw new CoreException(status);
+					throw CoreExceptionUtils.newException(Messages.RMVariableResolver_derefError, t);
 				}
 			} else {
 				return value.toString();
