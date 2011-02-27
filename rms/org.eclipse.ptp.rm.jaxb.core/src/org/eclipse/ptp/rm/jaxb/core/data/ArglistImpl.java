@@ -32,10 +32,14 @@ public class ArglistImpl implements IJAXBNonNLSConstants {
 			for (Arg arg : args.getArg()) {
 				String content = arg.getContent();
 				content = content.replaceAll(AMP, name + PD);
-				content = map.getString(content);
 				String undefined = arg.getIsUndefinedIfEquals();
-				if (undefined != null && undefined.equals(content)) {
-					continue;
+				undefined = undefined.replaceAll(AMP, name + PD);
+				content = map.getString(content);
+				if (undefined != null) {
+					undefined = map.getString(undefined);
+					if (undefined.equals(content)) {
+						continue;
+					}
 				}
 				if (buffer.length() > 0) {
 					buffer.append(SP);
@@ -49,8 +53,11 @@ public class ArglistImpl implements IJAXBNonNLSConstants {
 		for (Arg arg : args.getArg()) {
 			String dereferenced = map.getString(arg.getContent());
 			String undefined = arg.getIsUndefinedIfEquals();
-			if (undefined != null && undefined.equals(dereferenced)) {
-				continue;
+			if (undefined != null) {
+				undefined = map.getString(undefined);
+				if (undefined.equals(dereferenced)) {
+					continue;
+				}
 			}
 			if (buffer.length() > 0) {
 				buffer.append(SP);
