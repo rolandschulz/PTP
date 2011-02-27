@@ -131,8 +131,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		try {
 			doConnect(monitor);
 		} catch (RemoteConnectionException t) {
-			// TODO Auto-generated catch block
-			t.printStackTrace();
+			throw CoreExceptionUtils.newException(t.getMessage(), t);
 		}
 		doOnStartUp(monitor);
 		maybeDiscoverAttributes(monitor);
@@ -333,7 +332,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	 * Write necessary content and stage to host if necessary.
 	 */
 	private void maybeHandleManagedFiles(ManagedFiles files) throws CoreException {
-		ManagedFilesJob job = new ManagedFilesJob(files, this);
+		ManagedFilesJob job = new ManagedFilesJob(files, localFileManager, remoteFileManager);
 		job.schedule();
 		try {
 			job.join();
@@ -366,7 +365,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + commandRef, null);
 		}
-		CommandJob job = new CommandJob(command);
+		CommandJob job = new CommandJob(command, processBuilder);
 		job.schedule();
 		try {
 			job.join();

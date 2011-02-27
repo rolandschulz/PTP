@@ -21,7 +21,6 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
@@ -46,10 +45,6 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 		}
 		stagingDir = RMVariableMap.getActiveInstance().getString(files.getFileStagingLocation());
 		this.files = files.getManagedFile();
-	}
-
-	public ManagedFilesJob(ManagedFiles files, JAXBResourceManager rm) throws CoreException {
-		this(files, rm.getLocalFileManager(), rm.getRemoteFileManager());
 	}
 
 	@Override

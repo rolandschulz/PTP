@@ -13,6 +13,8 @@ public class ArglistImpl implements IJAXBNonNLSConstants {
 	public ArglistImpl(Arglist args) {
 		this.args = args;
 		this.map = RMVariableMap.getActiveInstance();
+		assert (null != this.args);
+		assert (null != this.map);
 	}
 
 	public void toString(StringBuffer buffer) {

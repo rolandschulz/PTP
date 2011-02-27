@@ -380,7 +380,7 @@
 	<xs:element name="command">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="arglist"/>
+				<xs:element ref="arglist"/>
 				<xs:element minOccurs="0" maxOccurs="2" ref="parser-ref"/>
 			</xs:sequence>
 			<xs:attribute name="name" type="xs:string"/>
