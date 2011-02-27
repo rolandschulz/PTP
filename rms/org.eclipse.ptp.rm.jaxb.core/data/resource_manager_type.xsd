@@ -119,7 +119,7 @@
 				<xs:element name="contents" minOccurs="0" type="xs:string"/>
 			</xs:sequence>
 			<xs:attribute name="name" use="required"/>
-			<xs:attribute name="uniqueIdSuffix" type="xs:boolean"/>
+			<xs:attribute name="uniqueIdPrefix" type="xs:boolean"/>
 			<xs:attribute name="deleteAfterUse" type="xs:boolean"/>
 		</xs:complexType>
 	</xs:element>
@@ -379,8 +379,8 @@
 	<xs:element name="arg">
 		<xs:annotation>
 			<xs:documentation>
-				The text of the argument will be parsed for references to the resource manager environment; e.g., ${a}, v=${v},
-				etc. By convention, '${@name}' and '${@value}' will refer to a given dynamic attribute name and value (of undefined position i in
+				The text of the argument will be parsed for references to the resource manager environment; e.g., ${rm:a}, v=${rm:v},
+				etc. By convention, '${rm:@name}' and '${rm:@value}' will refer to a given dynamic attribute name and value (of undefined position i in
 				the list).
 			</xs:documentation>
 		</xs:annotation>

@@ -33,6 +33,7 @@ public interface IJAXBNonNLSConstants {
 	String AMP = "@";//$NON-NLS-1$
 	String DOL = "$";//$NON-NLS-1$
 	String OPENV = "${";//$NON-NLS-1$
+	String OPENVRM = "${rm:";//$NON-NLS-1$
 	String CLOSV = "}";//$NON-NLS-1$
 	String CLOSVAL = "#value}";//$NON-NLS-1$
 	String BKESC = "\\\\";//$NON-NLS-1$

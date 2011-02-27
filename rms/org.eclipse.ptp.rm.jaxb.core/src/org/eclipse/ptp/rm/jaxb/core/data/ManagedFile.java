@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;/sequence>
  *       &lt;attribute name="deleteAfterUse" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
- *       &lt;attribute name="uniqueIdSuffix" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="uniqueIdPrefix" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -49,7 +49,7 @@ public class ManagedFile {
 	@XmlAttribute(required = true)
 	protected String name;
 	@XmlAttribute
-	protected Boolean uniqueIdSuffix;
+	protected Boolean uniqueIdPrefix;
 
 	/**
 	 * Gets the value of the contents property.
@@ -82,13 +82,13 @@ public class ManagedFile {
 	}
 
 	/**
-	 * Gets the value of the uniqueIdSuffix property.
+	 * Gets the value of the uniqueIdPrefix property.
 	 * 
 	 * @return possible object is {@link Boolean }
 	 * 
 	 */
-	public Boolean isUniqueIdSuffix() {
-		return uniqueIdSuffix;
+	public Boolean isUniqueIdPrefix() {
+		return uniqueIdPrefix;
 	}
 
 	/**
@@ -125,14 +125,14 @@ public class ManagedFile {
 	}
 
 	/**
-	 * Sets the value of the uniqueIdSuffix property.
+	 * Sets the value of the uniqueIdPrefix property.
 	 * 
 	 * @param value
 	 *            allowed object is {@link Boolean }
 	 * 
 	 */
-	public void setUniqueIdSuffix(Boolean value) {
-		this.uniqueIdSuffix = value;
+	public void setUniqueIdPrefix(Boolean value) {
+		this.uniqueIdPrefix = value;
 	}
 
 }
