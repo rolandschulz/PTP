@@ -32,7 +32,9 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 			JAXBUtils.validate(xml);
 			rmdata = JAXBUtils.initializeRMData(xml);
 			if (rmdata != null) {
-				print(RMVariableMap.getInstance());
+				RMVariableMap map = RMVariableMap.setActiveInstance(null);
+				JAXBUtils.initializeMap(rmdata, map);
+				print(map);
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();

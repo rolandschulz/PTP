@@ -13,9 +13,10 @@ public class AddImpl extends AbstractRangePart {
 
 	@SuppressWarnings("unchecked")
 	public AddImpl(Add add) throws CoreException {
-		Map<String, Object> vars = RMVariableMap.getInstance().getVariables();
+		RMVariableMap map = RMVariableMap.getActiveInstance();
+		assert (null != map);
+		Map<String, Object> vars = RMVariableMap.getActiveInstance().getVariables();
 		String name = add.getName();
-
 		list = (List<String>) vars.get(name);
 		if (list == null) {
 			list = new ArrayList<String>();

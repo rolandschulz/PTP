@@ -47,6 +47,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		super(universe, jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
 		controlData = config.resourceManagerData().getControl();
+		config.setActive();
 		setFixedConfigurationProperties();
 	}
 
@@ -96,17 +97,18 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	@Override
 	protected void doCleanUp() {
-
+		config.setActive();
 	}
 
 	@Override
 	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
-		// TODO Auto-generated method stub
+		config.setActive();
 
 	}
 
 	@Override
 	protected void doDispose() {
+		config.setActive();
 		/*
 		 * Do we need to break down any structures here? Might be a good idea to
 		 * empty the env
@@ -115,12 +117,14 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	@Override
 	protected void doShutdown() throws CoreException {
+		config.setActive();
 		doOnShutdown();
 		doDisconnect();
 	}
 
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+		config.setActive();
 		initializeConnections();
 		doConnect();
 		doOnStartUp();
@@ -130,6 +134,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	@Override
 	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
+		config.setActive();
 		updatePropertyValuesFromTab(configuration);
 		/*
 		 * create the script if necessary; adds the contents to env as
@@ -194,6 +199,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	}
 
 	private void maybeDiscoverAttributes() {
+
 		// TODO Auto-generated method stub
 
 	}
@@ -226,7 +232,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	}
 
 	private void setFixedConfigurationProperties() {
-		Map<String, Object> env = RMVariableMap.getInstance().getVariables();
+		Map<String, Object> env = RMVariableMap.getActiveInstance().getVariables();
 		env.put(CONTROL_USER_VAR, config.getControlUserName());
 		env.put(MONITOR_USER_VAR, config.getMonitorUserName());
 		env.put(CONTROL_ADDRESS_VAR, config.getControlAddress());
@@ -239,7 +245,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
 		@SuppressWarnings("unchecked")
 		Map<String, String> lcattr = configuration.getAttributes();
-		Map<String, Object> env = RMVariableMap.getInstance().getVariables();
+		Map<String, Object> env = RMVariableMap.getActiveInstance().getVariables();
 		for (String key : lcattr.keySet()) {
 			String value = lcattr.get(key);
 			Object target = env.get(key);

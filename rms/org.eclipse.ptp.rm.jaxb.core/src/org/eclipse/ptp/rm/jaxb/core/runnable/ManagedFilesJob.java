@@ -41,9 +41,9 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 		if (key == null) {
 			sourceDir = System.getProperty(JAVA_TMP_DIR);
 		} else {
-			sourceDir = RMVariableMap.getInstance().getString(key);
+			sourceDir = RMVariableMap.getActiveInstance().getString(key);
 		}
-		stagingDir = RMVariableMap.getInstance().getString(files.getFileStagingLocation());
+		stagingDir = RMVariableMap.getActiveInstance().getString(files.getFileStagingLocation());
 		this.files = files.getManagedFile();
 	}
 
@@ -121,7 +121,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private File maybeWriteFile(ManagedFile file) throws IOException, CoreException {
-		String name = RMVariableMap.getInstance().getString(file.getName());
+		String name = RMVariableMap.getActiveInstance().getString(file.getName());
 		File localFile = new File(sourceDir, name);
 		String contents = file.getContents();
 		FileWriter fw = null;
@@ -134,7 +134,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 				if (file.isUniqueIdPrefix()) {
 					localFile = new File(sourceDir, UUID.randomUUID() + name);
 				}
-				contents = RMVariableMap.getInstance().getString(contents);
+				contents = RMVariableMap.getActiveInstance().getString(contents);
 				fw = new FileWriter(localFile, false);
 				fw.write(contents);
 				fw.flush();

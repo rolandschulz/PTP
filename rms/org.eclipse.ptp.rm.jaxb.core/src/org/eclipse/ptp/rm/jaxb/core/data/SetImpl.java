@@ -13,7 +13,9 @@ public class SetImpl extends AbstractRangePart implements IJAXBNonNLSConstants {
 	private final String setter;
 
 	public SetImpl(Set set) throws Throwable {
-		Map<String, Object> vars = RMVariableMap.getInstance().getVariables();
+		RMVariableMap map = RMVariableMap.getActiveInstance();
+		assert (null != map);
+		Map<String, Object> vars = map.getVariables();
 		String name = set.getName();
 		setter = set.getSetter();
 		target = vars.get(name);

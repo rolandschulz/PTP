@@ -9,14 +9,16 @@ import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 
 public class RMVariableMap implements IJAXBNonNLSConstants {
-	private static RMVariableMap singleton;
+	private static RMVariableMap active;
 
 	private final Map<String, Object> variables;
 	private final Map<String, Object> discovered;
+	private boolean initialized;
 
 	private RMVariableMap() {
 		variables = Collections.synchronizedMap(new TreeMap<String, Object>());
 		discovered = Collections.synchronizedMap(new TreeMap<String, Object>());
+		initialized = false;
 	}
 
 	public Map<String, Object> getDiscovered() {
@@ -43,14 +45,30 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 		return variables;
 	}
 
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	public void setInitialized(boolean initialized) {
+		this.initialized = initialized;
+	}
+
 	private String dereference(String expression) throws CoreException {
+		if (expression == null) {
+			return null;
+		}
 		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
 	}
 
-	public synchronized static RMVariableMap getInstance() {
-		if (singleton == null) {
-			singleton = new RMVariableMap();
+	public synchronized static RMVariableMap getActiveInstance() {
+		return active;
+	}
+
+	public synchronized static RMVariableMap setActiveInstance(RMVariableMap instance) {
+		if (instance == null) {
+			instance = new RMVariableMap();
 		}
-		return singleton;
+		RMVariableMap.active = instance;
+		return RMVariableMap.active;
 	}
 }

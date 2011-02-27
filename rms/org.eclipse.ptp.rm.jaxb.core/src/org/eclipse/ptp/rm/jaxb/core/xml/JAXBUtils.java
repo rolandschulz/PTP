@@ -51,16 +51,23 @@ public class JAXBUtils implements IJAXBNonNLSConstants {
 		return instance;
 	}
 
+	public static void initializeMap(ResourceManagerData rmData, RMVariableMap instance) {
+		Control control = rmData.getControl();
+		Map<String, Object> env = instance.getVariables();
+		env.clear();
+		addProperties(env, control);
+		addAttributes(env, control);
+		addCommands(env, control);
+		addFiles(env, control);
+		addParsers(env, control);
+		instance.getDiscovered().clear();
+		instance.setInitialized(true);
+	}
+
 	public static ResourceManagerData initializeRMData(String xml) throws IOException, SAXException, URISyntaxException,
 			JAXBException {
-		ResourceManagerData rmdata = null;
 		URL instance = getURL(xml);
-		rmdata = unmarshalResourceManagerData(instance);
-		if (rmdata != null) {
-			Control control = rmdata.getControl();
-			initialize(control);
-		}
-		return rmdata;
+		return unmarshalResourceManagerData(instance);
 	}
 
 	public static void serializeScript(Map<String, Object> env, Control control) {
@@ -126,16 +133,6 @@ public class JAXBUtils implements IJAXBNonNLSConstants {
 		for (Property property : properties) {
 			env.put(property.getName(), null);
 		}
-	}
-
-	private static void initialize(Control control) {
-		Map<String, Object> env = RMVariableMap.getInstance().getVariables();
-		env.clear();
-		addProperties(env, control);
-		addAttributes(env, control);
-		addCommands(env, control);
-		addFiles(env, control);
-		addParsers(env, control);
 	}
 
 	private static ResourceManagerData unmarshalResourceManagerData(URL xml) throws JAXBException, IOException {

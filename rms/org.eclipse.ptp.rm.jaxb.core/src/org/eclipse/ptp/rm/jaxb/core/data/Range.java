@@ -20,7 +20,10 @@ public class Range implements IJAXBNonNLSConstants {
 	private int[] to;
 
 	public Range(String expression) {
-		parse(RMVariableMap.getInstance().getString(expression));
+		RMVariableMap map = RMVariableMap.getActiveInstance();
+		assert (null != map);
+		expression = map.getString(expression);
+		parse(expression);
 	}
 
 	public boolean isInRange(int line) {
