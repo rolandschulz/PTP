@@ -40,14 +40,37 @@ import org.eclipse.swt.widgets.Text;
  */
 public class ToolPane implements IAppInput {
 
+	/**
+	 * A listener class to launch file or directory browsers from browse buttons
+	 * for a ToolPane's tools
+	 * 
+	 * @author wspear
+	 * 
+	 */
+	protected class MakeBrowseListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+
+			Object source = e.getSource();
+			for (int i = 0; i < options.length; i++) {
+				if (source == options[i].browser) {
+
+					ToolMaker.optBrowse(options[i]);
+					break;
+				}
+			}
+		}
+
+	}
+
 	public static final int ALL_COMPILERS = 0;
 	public static final int CC_COMPILER = 1;
 	public static final int CXX_COMPILER = 2;
 	public static final int F90_COMPILER = 3;
 	public static final int EXEC_UTIL = 4;
 	public static final int ANALYSIS = 5;
-	public static final int ENV_VAR = 6;
 
+	public static final int ENV_VAR = 6;
 
 	/**
 	 * If true then this pane is merely a placeholder for a pane defined
@@ -61,7 +84,7 @@ public class ToolPane implements IAppInput {
 	 */
 	private StringBuffer optString = null;
 
-	private Map<String,String> varMap = null;
+	private Map<String, String> varMap = null;
 
 	/**
 	 * The listener for browse buttons in this pane
@@ -118,34 +141,40 @@ public class ToolPane implements IAppInput {
 	 * String/character placed between option names and values Default: =
 	 */
 	public String separateNameValue = "=";
-
 	/**
 	 * This unique, generated ID is used to store the output of this pane in a
 	 * launch configuration
 	 */
 	public String configID = "";
+
 	public String configVarID = "";
 
 	/**
 	 * The type of tool the parameter defined by this pane goes to
 	 */
 	public int paneType = -1;
-	
+
 	/**
-	 * Control the pane normally but don't the user must set it to be displayed manually in a plugin
+	 * Control the pane normally but don't the user must set it to be displayed
+	 * manually in a plugin
+	 * 
+	 * @since 4.0
 	 */
 	public boolean embedded = false;
 
-	@SuppressWarnings("unchecked")
-	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {
-		Map<String,String> nullmap = null;
-		try {
-			return configuration.getAttribute(configVarID,
-					nullmap);
-		} catch (CoreException e) {
-			e.printStackTrace();
+	protected ToolPane(boolean virtual) {
+		this.virtual = virtual;
+		if (!virtual) {
+			browseListener = new MakeBrowseListener();
+			checkListener = new ToolPaneListener(this);
+			optString = new StringBuffer();
+			varMap = new LinkedHashMap<String, String>();
 		}
-		return nullmap;
+	}
+
+	@SuppressWarnings("unused")
+	private ToolPane() {
+		this.virtual = false;
 	}
 
 	public String getArgument(ILaunchConfiguration configuration) {
@@ -157,151 +186,45 @@ public class ToolPane implements IAppInput {
 		return "";
 	}
 
-	/**
-	 * A listener class to launch file or directory browsers from browse buttons
-	 * for a ToolPane's tools
-	 * 
-	 * @author wspear
-	 * 
-	 */
-	protected class MakeBrowseListener extends SelectionAdapter {
-		public void widgetSelected(SelectionEvent e) {
-
-			Object source = e.getSource();
-			for (int i = 0; i < options.length; i++) {
-				if (source == options[i].browser) {
-
-					ToolMaker.optBrowse(options[i]);
-					break;
-				}
-			}
+	@SuppressWarnings("unchecked")
+	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {
+		Map<String, String> nullmap = null;
+		try {
+			return configuration.getAttribute(configVarID, nullmap);
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
-
+		return nullmap;
 	}
 
-	/**
-	 * If the object is a tool in this pane update the associated strings and
-	 * displays for the object
-	 * 
-	 * @param source
-	 *            The object being searched for and updated if found
-	 * @return True if the object is found, otherwise false
-	 */
-	public boolean updateOptField(Object source) {
+	public ToolOption getOption(String optID) {
 		for (int i = 0; i < options.length; i++) {
-			if (source.equals(options[i].argbox)||source.equals(options[i].numopt)||source.equals(options[i].combopt)) {
-				OptArgUpdate(options[i]);
-				updateOptDisplay();
-				return true;
+			if (options[i].getID().equals(optID)) {
+				return options[i];
 			}
 		}
-		return false;
+		return null;
 	}
 
 	/**
-	 * For every option in this pane, if it is active/selected add its
-	 * name/value string to the collection of active values for the whole pane
+	 * Returns the complete argument output of this pane, or the empty string if
+	 * no input has been specified
 	 * 
+	 * @return
 	 */
-	public void OptUpdate() {
+	// TODO: Make the empty-string output optional
+	public String getOptionString() {
+		String out = optString.toString();
 
-		optString = new StringBuffer(this.prependOpts).append(this.encloseOpts);
-		varMap = new LinkedHashMap<String,String>();
-		
-		for (int i = 0; i < options.length; i++) {
-			if (options[i].unitCheck == null || options[i].unitCheck.getSelection()) {
-				
-				String text=options[i].getArg();
-				if(options[i].getArg()==null){
-					text = "";
-				}
-				
-				boolean useField=!options[i].fieldrequired||text.trim().length()>0;
-				
-				if(options[i].isArgument){
-					if(useField)
-						optString.append(options[i].optionLine).append(this.separateOpts);
-				}
-				else{
-					if(options[i].getArg()!=null)
-					{
-						
-						if(useField){
-							varMap.put(options[i].optName,text);
-						}
-					}else{
-						if(options[i].type==ToolOption.TOGGLE){
-							if(options[i].setOn!=null)
-								varMap.put(options[i].optName,options[i].setOn);
-						}
-					}
-				}
-				options[i].setWidgetsEnabled(true);
-			} else {
-				options[i].setWidgetsEnabled(false);
-				if(options[i].type==ToolOption.TOGGLE){
-					if(options[i].setOff!=null)
-					{
-						varMap.put(options[i].optName,options[i].setOff);
-					}
-				}
-			}
+		if (out.equals(prependOpts + encloseOpts + encloseOpts)) {
+			return "";
 		}
-		optString.append(this.encloseOpts);
 
-		updateOptDisplay();
+		return optString.toString();
 	}
 
-	/**
-	 * If the given ToolOption has an assoicated value field, the name/value
-	 * string is updated accordingly.
-	 * 
-	 * @param opt
-	 *            The ToolOption being updated
-	 */
-	protected void OptArgUpdate(ToolOption opt) {
-		String val = opt.getArg();
-		if(val==null)
-			val="";
-//		if (opt.type ==1||opt.type ==2||opt.type ==3) {
-//			val = opt.argbox.getText();
-//		}else if (opt.type==4){
-//			val=opt.numopt.getText();
-//		}
-			opt.optionLine = new StringBuffer(opt.optName).append(
-					this.separateNameValue).append(this.encloseValues).append(
-							val).append(this.encloseValues);
-
-			OptUpdate();
-		
-	}
-
-	/**
-	 * Sets the default values as suppled for the tools in this pane in the
-	 * given configuration
-	 * 
-	 * @param configuration
-	 *            The configuration where the default values are set
-	 */
-	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		for (int i = 0; i < options.length; i++) {
-			if (options[i].visible && !options[i].required)
-			{
-				configuration.setAttribute(options[i].confDefString,
-						options[i].defState);
-			}
-			if (options[i].usesTextBox())
-			{
-				configuration.setAttribute(options[i].confArgString,
-						options[i].defText);
-			}
-			if(options[i].numopt!=null){
-				configuration.setAttribute(options[i].confArgString, options[i].defNum);
-			}
-			if(options[i].combopt!=null){
-				configuration.setAttribute(options[i].confArgString,options[i].items[options[i].defNum]);
-			}
-		}
+	public Map<String, String> getVarMap() {
+		return varMap;
 	}
 
 	/**
@@ -313,88 +236,36 @@ public class ToolPane implements IAppInput {
 	 *            extracted
 	 * @throws CoreException
 	 */
-	public void initializePane(ILaunchConfiguration configuration)
-	throws CoreException {
+	public void initializePane(ILaunchConfiguration configuration) throws CoreException {
 		String arg = "";
 		for (int i = 0; i < options.length; i++) {
-			if (options[i].unitCheck != null)
-			{
-				options[i].unitCheck.setSelection(configuration.getAttribute(
-						options[i].confDefString, options[i].defState));
+			if (options[i].unitCheck != null) {
+				options[i].unitCheck.setSelection(configuration.getAttribute(options[i].confDefString, options[i].defState));
 			}
 
 			if (options[i].usesTextBox()) {
-				arg = configuration.getAttribute(options[i].confArgString,
-						options[i].defText);
-				if (arg != null)
+				arg = configuration.getAttribute(options[i].confArgString, options[i].defText);
+				if (arg != null) {
 					options[i].argbox.setText(arg);
+				}
 			}
-			
-			if(options[i].numopt!=null){
+
+			if (options[i].numopt != null) {
 				options[i].numopt.setSelection(configuration.getAttribute(options[i].confArgString, options[i].defNum));
 			}
-			
-			if(options[i].combopt!=null){
-				arg = configuration.getAttribute(options[i].confArgString,options[i].defText);
-				if(arg!=null){
+
+			if (options[i].combopt != null) {
+				arg = configuration.getAttribute(options[i].confArgString, options[i].defText);
+				if (arg != null) {
 					int dex = options[i].combopt.indexOf(arg);
-					if(dex>-1){
+					if (dex > -1) {
 						options[i].combopt.select(dex);
 					}
 				}
 			}
-			
+
 		}
 		updateOptDisplay();
-	}
-
-	/**
-	 * Places the current string of name/value pairs in the option-display text
-	 * box
-	 * 
-	 */
-	protected void updateOptDisplay() {
-		if (showOpts != null && optString != null) {
-			showOpts.setText(optString.toString());
-		}
-	}
-
-	/**
-	 * Saves the current pane-state in the supplied configuration
-	 * 
-	 * @param configuration
-	 *            The configuration where the pane-state is to be saved
-	 */
-	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		for (int i = 0; i < options.length; i++) {
-			boolean set=true;
-			if (options[i].unitCheck != null)
-			{
-				set=options[i].unitCheck.getSelection();
-				configuration.setAttribute(options[i].confDefString,set);
-			}
-			if (options[i].usesTextBox())
-			{
-				configuration.setAttribute(options[i].confArgString,options[i].argbox.getText());
-			}
-			
-			if(options[i].numopt!=null){
-				configuration.setAttribute(options[i].confArgString,options[i].numopt.getSelection());
-			}
-			
-			if(options[i].combopt!=null){
-				configuration.setAttribute(options[i].confArgString,options[i].items[options[i].combopt.getSelectionIndex()]);
-			}
-			//			if(options[i].type==ToolOption.TOGGLE){
-			//				String argVal=null;
-			//				if(set){
-			//					argVal=options[i].setOn;
-			//				}else{
-			//					argVal=options[i].setOff;
-			//				}
-			//				configuration.setAttribute(options[i].confArgString,argVal);
-			//			}
-		}
 	}
 
 	/**
@@ -421,45 +292,165 @@ public class ToolPane implements IAppInput {
 	}
 
 	/**
-	 * Returns the complete argument output of this pane, or the empty string if
-	 * no input has been specified
+	 * For every option in this pane, if it is active/selected add its
+	 * name/value string to the collection of active values for the whole pane
 	 * 
-	 * @return
 	 */
-	// TODO: Make the empty-string output optional
-	public String getOptionString() {
-		String out = optString.toString();
+	public void OptUpdate() {
 
-		if (out.equals(prependOpts + encloseOpts + encloseOpts))
-			return "";
+		optString = new StringBuffer(this.prependOpts).append(this.encloseOpts);
+		varMap = new LinkedHashMap<String, String>();
 
-		return optString.toString();
-	}
-
-	public Map<String,String> getVarMap(){
-		return varMap;
-	}
-
-	public ToolOption getOption(String optID) {
 		for (int i = 0; i < options.length; i++) {
-			if (options[i].getID().equals(optID)) {
-				return options[i];
+			if (options[i].unitCheck == null || options[i].unitCheck.getSelection()) {
+
+				String text = options[i].getArg();
+				if (options[i].getArg() == null) {
+					text = "";
+				}
+
+				boolean useField = !options[i].fieldrequired || text.trim().length() > 0;
+
+				if (options[i].isArgument) {
+					if (useField) {
+						optString.append(options[i].optionLine).append(this.separateOpts);
+					}
+				} else {
+					if (options[i].getArg() != null) {
+
+						if (useField) {
+							varMap.put(options[i].optName, text);
+						}
+					} else {
+						if (options[i].type == ToolOption.TOGGLE) {
+							if (options[i].setOn != null) {
+								varMap.put(options[i].optName, options[i].setOn);
+							}
+						}
+					}
+				}
+				options[i].setWidgetsEnabled(true);
+			} else {
+				options[i].setWidgetsEnabled(false);
+				if (options[i].type == ToolOption.TOGGLE) {
+					if (options[i].setOff != null) {
+						varMap.put(options[i].optName, options[i].setOff);
+					}
+				}
 			}
 		}
-		return null;
+		optString.append(this.encloseOpts);
+
+		updateOptDisplay();
 	}
 
+	/**
+	 * Saves the current pane-state in the supplied configuration
+	 * 
+	 * @param configuration
+	 *            The configuration where the pane-state is to be saved
+	 */
+	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+		for (int i = 0; i < options.length; i++) {
+			boolean set = true;
+			if (options[i].unitCheck != null) {
+				set = options[i].unitCheck.getSelection();
+				configuration.setAttribute(options[i].confDefString, set);
+			}
+			if (options[i].usesTextBox()) {
+				configuration.setAttribute(options[i].confArgString, options[i].argbox.getText());
+			}
 
+			if (options[i].numopt != null) {
+				configuration.setAttribute(options[i].confArgString, options[i].numopt.getSelection());
+			}
+
+			if (options[i].combopt != null) {
+				configuration.setAttribute(options[i].confArgString, options[i].items[options[i].combopt.getSelectionIndex()]);
+			}
+			// if(options[i].type==ToolOption.TOGGLE){
+			// String argVal=null;
+			// if(set){
+			// argVal=options[i].setOn;
+			// }else{
+			// argVal=options[i].setOff;
+			// }
+			// configuration.setAttribute(options[i].confArgString,argVal);
+			// }
+		}
+	}
+
+	/**
+	 * Sets the default values as suppled for the tools in this pane in the
+	 * given configuration
+	 * 
+	 * @param configuration
+	 *            The configuration where the default values are set
+	 */
+	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		for (int i = 0; i < options.length; i++) {
+			if (options[i].visible && !options[i].required) {
+				configuration.setAttribute(options[i].confDefString, options[i].defState);
+			}
+			if (options[i].usesTextBox()) {
+				configuration.setAttribute(options[i].confArgString, options[i].defText);
+			}
+			if (options[i].numopt != null) {
+				configuration.setAttribute(options[i].confArgString, options[i].defNum);
+			}
+			if (options[i].combopt != null) {
+				configuration.setAttribute(options[i].confArgString, options[i].items[options[i].defNum]);
+			}
+		}
+	}
+
+	/**
+	 * If the object is a tool in this pane update the associated strings and
+	 * displays for the object
+	 * 
+	 * @param source
+	 *            The object being searched for and updated if found
+	 * @return True if the object is found, otherwise false
+	 */
+	public boolean updateOptField(Object source) {
+		for (int i = 0; i < options.length; i++) {
+			if (source.equals(options[i].argbox) || source.equals(options[i].numopt) || source.equals(options[i].combopt)) {
+				OptArgUpdate(options[i]);
+				updateOptDisplay();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * If the given ToolOption has an assoicated value field, the name/value
+	 * string is updated accordingly.
+	 * 
+	 * @param opt
+	 *            The ToolOption being updated
+	 */
+	protected void OptArgUpdate(ToolOption opt) {
+		String val = opt.getArg();
+		if (val == null) {
+			val = "";
+		}
+		// if (opt.type ==1||opt.type ==2||opt.type ==3) {
+		// val = opt.argbox.getText();
+		// }else if (opt.type==4){
+		// val=opt.numopt.getText();
+		// }
+		opt.optionLine = new StringBuffer(opt.optName).append(this.separateNameValue).append(this.encloseValues).append(val)
+				.append(this.encloseValues);
+
+		OptUpdate();
+
+	}
 
 	protected void setName(String name) {
 		toolName = name;
 		configID = name + ToolsOptionsConstants.TOOL_PANE_ID_SUFFIX;
 		configVarID = name + ToolsOptionsConstants.TOOL_PANE_VAR_ID_SUFFIX;
-	}
-
-	protected void setOptions(List<ToolOption> toptions) {
-		options = new ToolOption[toptions.size()];
-		toptions.toArray(options);
 	}
 
 	// /**
@@ -475,20 +466,20 @@ public class ToolPane implements IAppInput {
 	// toptions.toArray(options);
 	// }
 
-	@SuppressWarnings("unused")
-	private ToolPane(){
-		this.virtual=false;
+	protected void setOptions(List<ToolOption> toptions) {
+		options = new ToolOption[toptions.size()];
+		toptions.toArray(options);
 	}
-	
-	protected ToolPane(boolean virtual) {
-		this.virtual = virtual;
-		if (!virtual) {
-			browseListener = new MakeBrowseListener();
-			checkListener = new ToolPaneListener(this);
-			optString = new StringBuffer();
-			varMap = new LinkedHashMap<String,String>();
+
+	/**
+	 * Places the current string of name/value pairs in the option-display text
+	 * box
+	 * 
+	 */
+	protected void updateOptDisplay() {
+		if (showOpts != null && optString != null) {
+			showOpts.setText(optString.toString());
 		}
 	}
-	
 
 }
