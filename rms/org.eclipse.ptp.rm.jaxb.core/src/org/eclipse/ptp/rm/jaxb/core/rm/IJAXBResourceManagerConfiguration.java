@@ -84,6 +84,11 @@ public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConf
 	/**
 	 * @since 5.0
 	 */
+	void setActive();
+
+	/**
+	 * @since 5.0
+	 */
 	void setExternalRMInstanceXMLLocations(String[] location);
 
 	/**

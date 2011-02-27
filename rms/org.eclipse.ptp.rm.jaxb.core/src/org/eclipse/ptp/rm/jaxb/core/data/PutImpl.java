@@ -10,7 +10,9 @@ public class PutImpl extends AbstractRangePart {
 	private final Property property;
 
 	public PutImpl(Put put) throws CoreException {
-		Map<String, Object> vars = RMVariableMap.getInstance().getVariables();
+		RMVariableMap map = RMVariableMap.getActiveInstance();
+		assert (null != map);
+		Map<String, Object> vars = map.getVariables();
 		String name = put.getName();
 		property = new Property();
 		property.setName(name);

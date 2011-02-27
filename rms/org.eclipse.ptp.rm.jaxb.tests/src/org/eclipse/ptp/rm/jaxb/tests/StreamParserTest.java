@@ -10,6 +10,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Range;
 import org.eclipse.ptp.rm.jaxb.core.data.StreamParser;
 import org.eclipse.ptp.rm.jaxb.core.data.Token;
 import org.eclipse.ptp.rm.jaxb.core.runnable.StreamParserImpl;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.junit.Test;
 
 public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
@@ -21,6 +22,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 	@Override
 	public void setUp() {
+		RMVariableMap.setActiveInstance(null);
 		if (getName().equals("testRange")) { //$NON-NLS-1$
 			lineRange = "3,8,12:15,21, 24:29,40:N"; //$NON-NLS-1$
 			oracle = new boolean[] { false, false, false, true, false, false, false, false, true, false, false, false, true, true,

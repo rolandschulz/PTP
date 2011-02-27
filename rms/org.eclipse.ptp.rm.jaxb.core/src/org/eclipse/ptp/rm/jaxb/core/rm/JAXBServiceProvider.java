@@ -10,6 +10,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.Site;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.rmsystem.AbstractControlMonitorRMServiceProvider;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -19,6 +20,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		IJAXBNonNLSConstants {
 
 	private ResourceManagerData rmdata;
+	private RMVariableMap map;
 	private IRemoteServices service;
 
 	public JAXBServiceProvider() {
@@ -225,6 +227,13 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 
 	public ResourceManagerData resourceManagerData() {
 		return rmdata;
+	}
+
+	public void setActive() {
+		map = RMVariableMap.setActiveInstance(map);
+		if (!map.isInitialized()) {
+			JAXBUtils.initializeMap(rmdata, map);
+		}
 	}
 
 	public void setDefaultNameAndDesc() {

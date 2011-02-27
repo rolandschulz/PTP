@@ -15,7 +15,7 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
 
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
-		Map<String, Object> variables = RMVariableMap.getInstance().getVariables();
+		Map<String, Object> variables = RMVariableMap.getActiveInstance().getVariables();
 		String[] parts = argument.split(PDRX);
 		Object value = variables.get(parts[0]);
 		if (value != null) {

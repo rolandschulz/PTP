@@ -8,14 +8,20 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class TokenImpl extends AbstractRangePart implements IJAXBNonNLSConstants {
 
-	private final String delim;
+	private String delim;
 	private List<AddImpl> adds;
 	private List<SetImpl> sets;
 	private List<PutImpl> puts;
 	private TokenImpl child;
 
 	public TokenImpl(Token token) throws Throwable {
-		this.delim = RMVariableMap.getInstance().getString(token.getDelim());
+		delim = token.getDelim();
+
+		RMVariableMap map = RMVariableMap.getActiveInstance();
+		assert (null != map);
+		if (delim != null) {
+			delim = map.getString(delim);
+		}
 
 		String exp = token.getRange();
 		if (exp != null) {

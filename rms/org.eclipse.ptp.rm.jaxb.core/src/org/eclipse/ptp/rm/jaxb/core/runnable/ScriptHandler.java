@@ -27,7 +27,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	public ScriptHandler(Script script) {
 		super(Messages.ScriptHandlerJob);
 		this.script = script;
-		map = RMVariableMap.getInstance();
+		map = RMVariableMap.getActiveInstance();
 	}
 
 	@Override

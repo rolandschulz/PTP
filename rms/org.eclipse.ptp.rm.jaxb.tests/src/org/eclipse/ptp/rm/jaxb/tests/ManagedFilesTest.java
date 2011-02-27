@@ -40,7 +40,9 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 			JAXBUtils.validate(xml);
 			ResourceManagerData rmdata = JAXBUtils.initializeRMData(xml);
 			controlData = rmdata.getControl();
-			env = RMVariableMap.getInstance().getVariables();
+			RMVariableMap map = RMVariableMap.setActiveInstance(null);
+			JAXBUtils.initializeMap(rmdata, map);
+			env = map.getVariables();
 		} catch (Throwable t) {
 			t.printStackTrace();
 			assertNotNull(t);
@@ -126,7 +128,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 		env.put("mpiArgs", "-np 8"); //$NON-NLS-1$ //$NON-NLS-2$
 		env.put("executablePath", "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (verbose) {
-			RMDataTest.print(RMVariableMap.getInstance());
+			RMDataTest.print(RMVariableMap.getActiveInstance());
 		}
 	}
 }
