@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -16,19 +17,24 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.CancelJob;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
-import org.eclipse.ptp.rm.jaxb.core.data.Control.RunCommands;
+import org.eclipse.ptp.rm.jaxb.core.data.Control.SubmitCommands;
 import org.eclipse.ptp.rm.jaxb.core.data.DiscoverAttributes;
+import org.eclipse.ptp.rm.jaxb.core.data.HoldJob;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.OnShutDown;
 import org.eclipse.ptp.rm.jaxb.core.data.OnStartUp;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.ReleaseJob;
 import org.eclipse.ptp.rm.jaxb.core.data.ResumeJob;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
+import org.eclipse.ptp.rm.jaxb.core.data.SubmitBatch;
+import org.eclipse.ptp.rm.jaxb.core.data.SubmitDebug;
+import org.eclipse.ptp.rm.jaxb.core.data.SubmitInteractive;
 import org.eclipse.ptp.rm.jaxb.core.data.SuspendJob;
+import org.eclipse.ptp.rm.jaxb.core.data.TerminateJob;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.runnable.CommandJob;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
@@ -145,7 +151,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		maybeHandleManagedFiles(controlData.getManagedFiles());
 		doJobSubmitCommand(mode);
 		/*
-		 * parser will have set this the jobId
+		 * parser will have set the jobId in the map
 		 */
 		return getJobStatus(currentJobId());
 	}
@@ -179,7 +185,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		CoreException ce = CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + operation, null);
 		List<String> cmds = null;
 		if (TERMINATE_OPERATION.equals(operation)) {
-			CancelJob job = controlData.getCancelJob();
+			TerminateJob job = controlData.getTerminateJob();
 			if (job == null) {
 				throw ce;
 			}
@@ -197,9 +203,17 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 			}
 			cmds = job.getCommandRef();
 		} else if (RELEASE_OPERATION.equals(operation)) {
-			throw ce;
+			ReleaseJob job = controlData.getReleaseJob();
+			if (job == null) {
+				throw ce;
+			}
+			cmds = job.getCommandRef();
 		} else if (HOLD_OPERATION.equals(operation)) {
-			throw ce;
+			HoldJob job = controlData.getHoldJob();
+			if (job == null) {
+				throw ce;
+			}
+			cmds = job.getCommandRef();
 		}
 		runCommands(cmds, operation);
 	}
@@ -217,14 +231,41 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	}
 
 	/*
-	 * Run either in interactive, batch or debug mode.
+	 * Run either in interactive, batch or debug mode. right now,
+	 * ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the two
+	 * choices, meaning a single configuration cannot support both batch and
+	 * interactive.
 	 */
 	private void doJobSubmitCommand(String mode) throws CoreException {
-		RunCommands commands = controlData.getRunCommands();
+		SubmitCommands commands = controlData.getSubmitCommands();
 		if (commands == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError, null);
 		}
-
+		List<Object> list = commands.getSubmitInteractiveOrSubmitBatchOrSubmitDebug();
+		List<String> cmds = null;
+		// check mode for type
+		for (Object job : list) {
+			if (job instanceof SubmitInteractive) {
+				SubmitInteractive interactive = (SubmitInteractive) job;
+				if (ILaunchManager.RUN_MODE.equals(mode)) {
+					cmds = interactive.getCommandRef();
+					break;
+				}
+			} else if (job instanceof SubmitBatch) {
+				SubmitBatch batch = (SubmitBatch) job;
+				if (ILaunchManager.RUN_MODE.equals(mode)) {
+					cmds = batch.getCommandRef();
+					break;
+				}
+			} else if (job instanceof SubmitDebug) {
+				SubmitDebug debug = (SubmitDebug) job;
+				if (ILaunchManager.DEBUG_MODE.equals(mode)) {
+					cmds = debug.getCommandRef();
+					break;
+				}
+			}
+		}
+		runCommands(cmds, mode);
 	}
 
 	/*

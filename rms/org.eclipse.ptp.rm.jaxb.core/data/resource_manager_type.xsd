@@ -69,9 +69,11 @@
 						</xs:choice>
 					</xs:complexType>
 				</xs:element>
-				<xs:element ref="cancel-job"/>
+				<xs:element ref="terminate-job"/>
 				<xs:element minOccurs="0" ref="suspend-job"/>
 				<xs:element minOccurs="0" ref="resume-job"/>
+				<xs:element minOccurs="0" ref="hold-job"/>
+            <xs:element minOccurs="0" ref="release-job"/>
 				<xs:element minOccurs="0" ref="on-shut-down"/>
 				<xs:element minOccurs="0" ref="commands"/>
 				<xs:element minOccurs="0" ref="parsers"/>
@@ -183,7 +185,7 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="cancel-job">
+	<xs:element name="terminate-job">
 		<xs:annotation>
 			<xs:documentation>
 				The command(s) for canceling or killing jobs.
@@ -219,6 +221,30 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+	<xs:element name="hold-job">
+      <xs:annotation>
+         <xs:documentation>
+            The command(s) for holding jobs.
+         </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element maxOccurs="unbounded" ref="command-ref"/>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="release-job">
+      <xs:annotation>
+         <xs:documentation>
+            The command(s) for releasing suspended jobs.
+         </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element maxOccurs="unbounded" ref="command-ref"/>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
 	<xs:element name="on-shut-down">
 		<xs:annotation>
 			<xs:documentation>
