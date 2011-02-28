@@ -132,6 +132,8 @@ public class Messages extends NLS {
 	public static String AbstractParallelLaunchConfigurationDelegate_debuggerPathNotSpecified;
 	public static String AbstractParallelLaunchConfigurationDelegate_Error_converting_rules;
 	public static String AbstractParallelLaunchConfigurationDelegate_Parallel_launcher_does_not_support;
+	public static String AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus;
+
 	public static String AbstractParallelLaunchConfigurationDelegate_Unsupported_resource_manager_type;
 
 	public static String PTPLaunchPlugin_0;

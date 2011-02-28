@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006, 2007 Los Alamos National Security, LLC.
+ * Copyright (c) 2005, 2006, 2007, 2011 Los Alamos National Security, LLC, and others.
  * This material was produced under U.S. Government contract DE-AC52-06NA25396
  * for Los Alamos National Laboratory (LANL), which is operated by the Los Alamos
  * National Security, LLC (LANS) for the U.S. Department of Energy.  The U.S. Government has

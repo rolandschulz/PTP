@@ -5,9 +5,9 @@ import java.util.Iterator;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.ISourceLocator;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
@@ -88,7 +88,7 @@ public class PLaunch extends Launch implements IPLaunch {
 	@Override
 	public boolean isTerminated() {
 		if (fResourceManager != null && fJobId != null) {
-			return fResourceManager.getJobStatus(fJobId).getState() == JobAttributes.State.COMPLETED;
+			return fResourceManager.getJobStatus(fJobId).getState().equals(IJobStatus.COMPLETED);
 		}
 		return super.isTerminated();
 	}
