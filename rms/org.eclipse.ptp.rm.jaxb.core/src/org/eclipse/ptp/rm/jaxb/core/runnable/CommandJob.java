@@ -34,6 +34,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private StreamParser stderrParser;
 	private StreamParserImpl stdoutParserImpl;
 	private StreamParserImpl stderrParserImpl;
+	private boolean success;
 
 	public CommandJob(Command command, JAXBResourceManager rm) {
 		super(command.getName());
@@ -41,9 +42,14 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		this.rm = rm;
 	}
 
+	public boolean getSuccess() {
+		return success;
+	}
+
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		try {
+			success = false;
 			IRemoteProcessBuilder builder = prepareCommand();
 			prepareEnv(builder);
 			prepareParsers();
@@ -93,7 +99,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		} catch (CoreException ce) {
 			return ce.getStatus();
 		}
-
+		success = true;
 		return Status.OK_STATUS;
 	}
 
@@ -103,10 +109,9 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError + command.getName(), null);
 		}
 		ArglistImpl arglist = new ArglistImpl(args);
-		StringBuffer buffer = new StringBuffer();
-		arglist.toString(buffer);
+		String[] cmdArgs = arglist.toArray();
 		IRemoteServices service = rm.getRemoteServices();
-		return service.getProcessBuilder(rm.getRemoteConnection(), buffer.toString());
+		return service.getProcessBuilder(rm.getRemoteConnection(), cmdArgs);
 	}
 
 	private void prepareEnv(IRemoteProcessBuilder builder) throws CoreException {

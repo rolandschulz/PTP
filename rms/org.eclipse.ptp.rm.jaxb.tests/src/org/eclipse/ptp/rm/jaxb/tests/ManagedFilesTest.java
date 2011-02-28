@@ -19,8 +19,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
 
 public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 

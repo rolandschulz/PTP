@@ -9,8 +9,8 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
 
 public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 

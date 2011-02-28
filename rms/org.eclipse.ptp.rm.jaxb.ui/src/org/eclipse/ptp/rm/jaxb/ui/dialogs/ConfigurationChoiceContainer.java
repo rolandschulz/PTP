@@ -12,7 +12,7 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AvailableJAXBRMConfigurations;
 import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;

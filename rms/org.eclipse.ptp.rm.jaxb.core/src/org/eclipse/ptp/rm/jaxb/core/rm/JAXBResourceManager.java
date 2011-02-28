@@ -1,8 +1,8 @@
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -67,7 +67,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		super(universe, jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
 		controlData = config.resourceManagerData().getControl();
-		dynSystemEnv = new HashMap<String, String>();
+		dynSystemEnv = new TreeMap<String, String>();
 	}
 
 	public boolean getAppendSysEnv() {
@@ -157,7 +157,9 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		 * "${rm:script}"
 		 */
 		maybeHandleScript(controlData.getScript());
-		maybeHandleManagedFiles(controlData.getManagedFiles());
+		if (!maybeHandleManagedFiles(controlData.getManagedFiles())) {
+			throw CoreExceptionUtils.newException(Messages.CannotCompleteSubmitFailedStaging, null);
+		}
 		doJobSubmitCommand(mode);
 		/*
 		 * parser will have set the jobId in the map
@@ -169,7 +171,11 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	 * @see updateJobId
 	 */
 	private String currentJobId() {
-		return (String) RMVariableMap.getActiveInstance().getVariables().get(JOB_ID);
+		Property p = (Property) RMVariableMap.getActiveInstance().getVariables().get(JOB_ID);
+		if (p != null) {
+			return p.getValue();
+		}
+		return null;
 	}
 
 	/*
@@ -350,7 +356,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	/*
 	 * Write necessary content and stage to host if necessary.
 	 */
-	private void maybeHandleManagedFiles(ManagedFiles files) throws CoreException {
+	private boolean maybeHandleManagedFiles(ManagedFiles files) throws CoreException {
 		ManagedFilesJob job = new ManagedFilesJob(files, localFileManager, remoteFileManager);
 		job.schedule();
 		try {
@@ -358,6 +364,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		} catch (InterruptedException t) {
 			t.printStackTrace();
 		}
+		return job.getSuccess();
 	}
 
 	/*
@@ -397,7 +404,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	/*
 	 * Create command job, schedule and join.
 	 */
-	private void runCommand(String commandRef) throws CoreException {
+	private boolean runCommand(String commandRef) throws CoreException {
 		Command command = (Command) RMVariableMap.getActiveInstance().getVariables().get(commandRef);
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + commandRef, null);
@@ -409,6 +416,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		} catch (InterruptedException t) {
 			t.printStackTrace();
 		}
+		return job.getSuccess();
 	}
 
 	/*
@@ -419,7 +427,9 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 			throw CoreExceptionUtils.newException(Messages.EmptyCommandDef + operation, null);
 		}
 		for (String ref : cmds) {
-			runCommand(ref);
+			if (!runCommand(ref)) {
+				return;
+			}
 		}
 	}
 
@@ -447,15 +457,16 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	 */
 	@SuppressWarnings("unchecked")
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
-		Map<String, String> lcattr = configuration.getAttributes();
+		@SuppressWarnings("rawtypes")
+		Map lcattr = configuration.getAttributes();
 		Map<String, Object> env = RMVariableMap.getActiveInstance().getVariables();
-		for (String key : lcattr.keySet()) {
-			String value = lcattr.get(key);
-			Object target = env.get(key);
+		for (Object key : lcattr.keySet()) {
+			Object value = lcattr.get(key);
+			Object target = env.get(key.toString());
 			if (target instanceof Property) {
-				((Property) target).setValue(value);
+				((Property) target).setValue(value.toString());
 			} else if (target instanceof JobAttribute) {
-				((JobAttribute) target).setValue(value);
+				((JobAttribute) target).setValue(value.toString());
 			}
 		}
 

@@ -11,11 +11,13 @@
 			</managed-file>
 		</managed-files>
 		<on-start-up>
-        <command-ref>find_queues</command-ref>
+       <!-- <command-ref>find_queues</command-ref> --> 
+            <command-ref>find_queues_local</command-ref>
       </on-start-up>
 		<submit-commands>
 			<submit-batch>
-				<command-ref>submit_script</command-ref>
+			<!-- 	<command-ref>submit_script</command-ref>-->
+			<command-ref>submit_script_local</command-ref>
 			</submit-batch>
 		</submit-commands>
 		<terminate-job>
@@ -27,27 +29,42 @@
                <arg>qstat -Q -f</arg>
                <arg>| grep Queue:</arg>
                <arg>| cut -d ' ' -f 2</arg>
+               <arg>| tr '\n' ' '</arg>
             </arglist>
             <parser-ref>queueParser</parser-ref>
+         </command>
+         <!-- FOR TESTING ONLY -->
+         <command name="find_queues_local">
+            <arglist>
+               <arg>/Users/arossi/qstat</arg>
+            </arglist>
+            <parser-ref>queueParser</parser-ref>
+         </command>
+         <command name="submit_script_local">
+            <arglist>
+               <arg>/Users/arossi/qsub</arg>
+               <arg>${rm:pbs_script#value}</arg>
+            </arglist>
+            <parser-ref>jobIdParser</parser-ref>
          </command>
 			<command name="submit_script">
 				<arglist>
 					<arg>qsub</arg>
-					<arg>${rm:pbs_script}</arg>
+					<arg>${rm:pbs_script#value}</arg>
 				</arglist>
 				<parser-ref>jobIdParser</parser-ref>
 			</command>
 			<command name="cancel_job">
 				<arglist>
 					<arg>qdel</arg>
-					<arg>${rm:jobId}</arg>
+					<arg>${rm:jobId#value}</arg>
 				</arglist>
 			</command>
 		</commands>
 		<parsers>
 			<stream-parser name="queueParser" stderr="false">
 				<range>0:N</range>
-				<token>
+				<token delim="[\s]">
 				  <add name="available_queues"/>
 				</token>
 			</stream-parser>
@@ -101,15 +118,15 @@
 			<pre-execute-commands>
 				<arglist>
 					<arg>cd</arg>
-					<arg>${rm:directory}</arg>
+					<arg>${rm:directory#value}</arg>
 				</arglist>
 			</pre-execute-commands>
 			<execute-command>
 				<arglist>
-					<arg>${rm:mpiCommand}</arg>
-					<arg>${rm:mpiArgs}</arg>
-					<arg>${rm:executablePath}</arg>
-					<arg>${rm:progArgs}</arg>
+					<arg>${rm:mpiCommand#value}</arg>
+					<arg>${rm:mpiArgs#value}</arg>
+					<arg>${rm:executablePath#value}</arg>
+					<arg>${rm:progArgs#value}</arg>
 				</arglist>
 			</execute-command>
 			<post-execute-commands>
@@ -379,7 +396,7 @@
 								<tooltip>${rm:destination#tooltip}</tooltip>
 								<content>
 									<arglist>
-										<arg>${rm:available_queues}</arg>
+										<arg>${rm:available_queues#value}</arg>
 									</arglist>
 								</content>
 								<saveValueTo>destination</saveValueTo>
