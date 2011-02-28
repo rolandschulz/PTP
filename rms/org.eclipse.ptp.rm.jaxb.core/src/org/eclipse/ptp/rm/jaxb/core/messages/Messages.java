@@ -39,7 +39,7 @@ public class Messages extends NLS {
 	public static String StderrParserError;
 	public static String RMNoSuchParserError;
 	public static String ParserInternalError;
-	public static int ProcessExitValueError;
+	public static String ProcessExitValueError;
 
 	static {
 		// initialize resource bundle

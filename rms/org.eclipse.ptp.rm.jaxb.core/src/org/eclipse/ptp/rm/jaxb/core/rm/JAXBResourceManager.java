@@ -367,7 +367,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		if (script == null) {
 			return;
 		}
-		ScriptHandler job = new ScriptHandler(script, dynSystemEnv);
+		ScriptHandler job = new ScriptHandler(script, dynSystemEnv, appendSysEnv);
 		job.schedule();
 		try {
 			job.join();
