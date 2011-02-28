@@ -1,6 +1,8 @@
 package org.eclipse.ptp.rm.jaxb.core.data;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -15,6 +17,16 @@ public class ArglistImpl implements IJAXBNonNLSConstants {
 		this.map = RMVariableMap.getActiveInstance();
 		assert (null != this.args);
 		assert (null != this.map);
+	}
+
+	public String[] toArray() {
+		List<String> list = new ArrayList<String>();
+		if (args.isDynamicAppend()) {
+			composeDynamicArgs(list);
+		} else {
+			composeStandardArgs(list);
+		}
+		return list.toArray(new String[0]);
 	}
 
 	public void toString(StringBuffer buffer) {
@@ -63,6 +75,24 @@ public class ArglistImpl implements IJAXBNonNLSConstants {
 	 * given dynamic attribute name and value (of undefined position i in the
 	 * list).
 	 */
+	private void composeDynamicArgs(List<String> list) {
+		for (String name : map.getDiscovered().keySet()) {
+			Iterator<Arg> i = args.getArg().iterator();
+			while (i.hasNext()) {
+				String arg = addDynamicArg(name, i.next());
+				if (!ZEROSTR.equals(arg)) {
+					list.add(arg);
+				}
+			}
+		}
+	}
+
+	/*
+	 * Iterate over all dynamic attributes, appending the sequence of args for
+	 * each attribute. By convention, '${@name}' and '${@value}' will refer to a
+	 * given dynamic attribute name and value (of undefined position i in the
+	 * list).
+	 */
 	private void composeDynamicArgs(StringBuffer buffer) {
 		for (String name : map.getDiscovered().keySet()) {
 			Iterator<Arg> i = args.getArg().iterator();
@@ -74,6 +104,16 @@ public class ArglistImpl implements IJAXBNonNLSConstants {
 				if (!ZEROSTR.equals(arg)) {
 					buffer.append(SP).append(arg);
 				}
+			}
+		}
+	}
+
+	private void composeStandardArgs(List<String> list) {
+		Iterator<Arg> i = args.getArg().iterator();
+		while (i.hasNext()) {
+			String arg = addStandardArg(i.next());
+			if (!ZEROSTR.equals(arg)) {
+				list.add(arg);
 			}
 		}
 	}

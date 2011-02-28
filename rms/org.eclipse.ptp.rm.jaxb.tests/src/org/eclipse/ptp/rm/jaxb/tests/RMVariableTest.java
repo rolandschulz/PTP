@@ -3,8 +3,8 @@ package org.eclipse.ptp.rm.jaxb.tests;
 import junit.framework.TestCase;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.xml.JAXBUtils;
 
 public class RMVariableTest extends TestCase implements IJAXBNonNLSConstants {
 

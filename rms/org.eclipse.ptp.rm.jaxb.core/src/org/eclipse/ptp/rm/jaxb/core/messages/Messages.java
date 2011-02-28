@@ -40,6 +40,7 @@ public class Messages extends NLS {
 	public static String RMNoSuchParserError;
 	public static String ParserInternalError;
 	public static String ProcessExitValueError;
+	public static String CannotCompleteSubmitFailedStaging;
 
 	static {
 		// initialize resource bundle

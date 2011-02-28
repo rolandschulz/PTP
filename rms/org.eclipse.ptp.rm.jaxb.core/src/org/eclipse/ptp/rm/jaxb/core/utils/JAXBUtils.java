@@ -1,4 +1,4 @@
-package org.eclipse.ptp.rm.jaxb.core.xml;
+package org.eclipse.ptp.rm.jaxb.core.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,7 +58,6 @@ public class JAXBUtils implements IJAXBNonNLSConstants {
 		addProperties(env, control);
 		addAttributes(env, control);
 		addCommands(env, control);
-		addFiles(env, control);
 		addParsers(env, control);
 		instance.getDiscovered().clear();
 		instance.setInitialized(true);

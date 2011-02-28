@@ -20,6 +20,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
+import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -31,6 +32,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	private final List<ManagedFile> files;
 	private final IRemoteFileManager localFileManager;
 	private final IRemoteFileManager remoteFileManager;
+	private boolean success;
 
 	public ManagedFilesJob(ManagedFiles files, IRemoteFileManager localFileManager, IRemoteFileManager remoteFileManager)
 			throws CoreException {
@@ -47,8 +49,13 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 		this.files = files.getManagedFile();
 	}
 
+	public boolean getSuccess() {
+		return success;
+	}
+
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		success = false;
 		SubMonitor progress = SubMonitor.convert(monitor, files.size() * 10);
 		/*
 		 * for now we handle the files serially
@@ -65,6 +72,14 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 				if (file.isDeleteAfterUse()) {
 					localFile.delete();
 				}
+				Property p = new Property();
+				p.setName(file.getName());
+				if (localFileManager == remoteFileManager) {
+					p.setValue(new File(System.getProperty(JAVA_USER_HOME), target).getAbsolutePath());
+				} else {
+					p.setValue(target);
+				}
+				RMVariableMap.getActiveInstance().getVariables().put(p.getName(), p);
 			} catch (Throwable t) {
 				progress.done();
 				return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
@@ -72,6 +87,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 			progress.worked(5);
 		}
 		progress.done();
+		success = true;
 		return Status.OK_STATUS;
 	}
 
