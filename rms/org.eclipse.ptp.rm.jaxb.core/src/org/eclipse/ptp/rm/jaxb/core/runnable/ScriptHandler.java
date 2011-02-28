@@ -1,5 +1,7 @@
 package org.eclipse.ptp.rm.jaxb.core.runnable;
 
+import java.util.Map;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -10,23 +12,27 @@ import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.data.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.data.DirectiveDefinition;
 import org.eclipse.ptp.rm.jaxb.core.data.DirectiveDefinitions;
-import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentDefinition;
-import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentDefinitions;
+import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
+import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariables;
 import org.eclipse.ptp.rm.jaxb.core.data.ExecuteCommand;
 import org.eclipse.ptp.rm.jaxb.core.data.PostExecuteCommands;
 import org.eclipse.ptp.rm.jaxb.core.data.PreExecuteCommands;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.utils.EnvVarUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 
 	private final RMVariableMap map;
+	private final JAXBResourceManager rm;
 	private final Script script;
 
-	public ScriptHandler(Script script) {
+	public ScriptHandler(Script script, JAXBResourceManager rm) {
 		super(Messages.ScriptHandlerJob);
 		this.script = script;
+		this.rm = rm;
 		map = RMVariableMap.getActiveInstance();
 	}
 
@@ -45,22 +51,29 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		}
 		for (DirectiveDefinition def : defs.getDirectiveDefinition()) {
 			String key = def.getValueFrom();
-			String value = getValue(key);
+			String value = EnvVarUtils.getValue(key, map);
 			if (value != null && !ZEROSTR.equals(value)) {
 				buffer.append(def.getContent()).append(value.trim()).append(REMOTE_LINE_SEP);
 			}
 		}
 	}
 
-	private void addEnvironment(EnvironmentDefinitions defs, StringBuffer buffer) {
-		if (defs == null) {
-			return;
-		}
-		for (EnvironmentDefinition def : defs.getEnvironmentDefinition()) {
-			String key = def.getValueFrom();
-			String value = getValue(key);
-			if (value != null && !ZEROSTR.equals(value)) {
-				buffer.append(def.getContent()).append(value.trim()).append(REMOTE_LINE_SEP);
+	private void addEnvironment(EnvironmentVariables vars, StringBuffer buffer) {
+		Map<String, String> live = rm.getDynSystemEnv();
+		String syntax = getSyntax(script.getShell());
+		if (!rm.getAppendSysEnv()) {
+			for (String var : live.keySet()) {
+				EnvVarUtils.addVariable(var, live.get(var), syntax, buffer);
+			}
+		} else {
+			if (vars != null) {
+				for (EnvironmentVariable var : vars.getEnvironmentVariable()) {
+					EnvVarUtils.addVariable(var, syntax, buffer, map);
+				}
+			}
+
+			for (String var : live.keySet()) {
+				EnvVarUtils.addVariable(var, live.get(var), syntax, buffer);
 			}
 		}
 	}
@@ -101,7 +114,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		progress.worked(5);
 		addDirectives(script.getDirectiveDefinitions(), buffer);
 		progress.worked(5);
-		addEnvironment(script.getEnvironmentDefinitions(), buffer);
+		addEnvironment(script.getEnvironmentVariables(), buffer);
 		progress.worked(5);
 		addPreExecute(script.getPreExecuteCommands(), buffer);
 		progress.worked(5);
@@ -112,8 +125,10 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		return buffer.toString();
 	}
 
-	private String getValue(String key) {
-		String name = OPENVRM + key + CLOSVAL;
-		return map.getString(name);
+	private String getSyntax(String shell) {
+		if (shell.indexOf(CSH) >= 0) {
+			return SETENV;
+		}
+		return EXPORT;
 	}
 }

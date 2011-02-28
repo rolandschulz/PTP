@@ -275,7 +275,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element minOccurs="0" ref="directive-definitions"/>
-				<xs:element minOccurs="0" ref="environment-definitions"/>
+				<xs:element minOccurs="0" ref="environment-variables"/>
 				<xs:element minOccurs="0" ref="pre-execute-commands"/>
 				<xs:element ref="execute-command"/>
 				<xs:element minOccurs="0" ref="post-execute-commands"/>
@@ -300,21 +300,30 @@
 			<xs:attribute name="valueFrom"/>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="environment-definitions">
+	<xs:element name="environment-variables">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="environment-definition"/>
+				<xs:element maxOccurs="unbounded" ref="environment-variable"/>
 			</xs:sequence>
+			<xs:attribute name="syntax" use="required">
+            <xs:simpleType>
+               <xs:restriction base="xs:string">
+                  <xs:enumeration value="sentenv"/>
+                  <xs:enumeration value="export"/>
+               </xs:restriction>
+            </xs:simpleType>
+         </xs:attribute>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="environment-definition">
+	<xs:element name="environment-variable">
 		<xs:annotation>
 			<xs:documentation>
 				'ValueFrom' refers to properties in the resource manager environment.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType mixed="true">
-			<xs:attribute name="valueFrom"/>
+		<xs:complexType >
+		   <xs:attribute name="variableName" use="required" type="xs:string"/>
+			<xs:attribute name="valueFrom" use="required" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="pre-execute-commands">
@@ -382,10 +391,14 @@
 			<xs:sequence>
 				<xs:element ref="arglist"/>
 				<xs:element minOccurs="0" maxOccurs="2" ref="parser-ref"/>
+				<xs:element minOccurs="0" ref="environment-variables"/>
 			</xs:sequence>
 			<xs:attribute name="name" type="xs:string"/>
 			<xs:attribute name="displayStdout" type="xs:boolean" default="false"/>
 			<xs:attribute name="displayStderr" type="xs:boolean" default="false"/>
+			<xs:attribute name="directory" type="xs:string"/>
+			<xs:attribute name="redirectStderr" type="xs:boolean" default="false"/>
+			<xs:attribute name="replaceEnvironment" type="xs:boolean" default="false"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="arglist">
