@@ -25,7 +25,7 @@
 		<!-- Update for new RSE version -->
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/S-3.3M4-201012140730/RSE-SDK-3.3M4.zip"/>
 		<!-- Update for new Mylyn version -->
-		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/mylyn-3.4.2-e3.4.zip"/>
+		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/mylyn-3.4.3-e3.4.zip"/>
 		<!-- Properties below here shouldn't need to be changed -->
 		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 		<property name="buildType" value="I" />
