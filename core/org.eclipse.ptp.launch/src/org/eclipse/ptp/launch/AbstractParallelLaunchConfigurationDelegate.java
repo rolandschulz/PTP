@@ -55,7 +55,6 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
@@ -75,6 +74,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.utils.core.ArgumentParser;
@@ -105,12 +105,15 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Wait for job to begin running, then call completion method
+	 * Wait for job to begin running, then perform post launch operations. The
+	 * job is guaranteed not to be in the UNDERTERMINED state.
 	 * 
 	 * <pre>
-	 * Job state transition is STARTING--->RUNNING---->COMPLETED
-	 *                                  ^            |
-	 *                                  |-SUSPENDED<-|
+	 * Job state transition is:
+	 * 
+	 *  SUBMITTED ----> RUNNING ----> COMPLETED
+	 *             ^              |
+	 *             |- SUSPENDED <-|
 	 * </pre>
 	 * 
 	 * We must call completion method when job state is RUNNING, however it is
@@ -152,7 +155,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			String jobId = fLaunch.getJobId();
 			fSubLock.lock();
 			try {
-				while (rm.getJobStatus(jobId).getState() == JobAttributes.State.STARTING) {
+				while (rm.getJobStatus(jobId).getState().equals(IJobStatus.SUBMITTED)) {
 					try {
 						fSubCondition.await(100, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
@@ -167,7 +170,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 
 			fSubLock.lock();
 			try {
-				while (rm.getJobStatus(jobId).getState() != JobAttributes.State.COMPLETED) {
+				while (!rm.getJobStatus(jobId).getState().equals(IJobStatus.COMPLETED)) {
 					try {
 						fSubCondition.await(100, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
@@ -907,6 +910,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			}
 			rm.addJobListener(fJobListener);
 			String jobId = rm.submitJob(configuration, mode, progress.newChild(5));
+			if (rm.getJobStatus(jobId).equals(IJobStatus.UNDETERMINED)) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
+			}
 			launch.setJobId(jobId);
 			launch.setResourceManager(rm);
 			JobSubmission jobSub = new JobSubmission(launch, debugger);

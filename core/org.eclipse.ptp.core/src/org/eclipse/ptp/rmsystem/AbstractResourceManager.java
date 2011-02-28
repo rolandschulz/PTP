@@ -39,8 +39,6 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
@@ -185,16 +183,16 @@ public abstract class AbstractResourceManager implements IResourceManagerControl
 						return null;
 					}
 
-					public AttributeManager getAttributes() {
-						return null;
-					}
-
 					public ILaunchConfiguration getLaunchConfiguration() {
 						return null;
 					}
 
-					public State getState() {
-						return JobAttributes.State.COMPLETED;
+					public String getState() {
+						return UNDETERMINED;
+					}
+
+					public String getStateDetail() {
+						return getState();
 					}
 
 					public IStreamsProxy getStreamsProxy() {

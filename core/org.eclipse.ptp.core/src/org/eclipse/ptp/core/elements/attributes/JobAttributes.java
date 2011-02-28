@@ -23,59 +23,11 @@ import org.eclipse.ptp.core.messages.Messages;
  */
 public class JobAttributes {
 	public enum State {
-		STARTING, RUNNING, SUSPENDED, COMPLETED
-	}
-
-	/**
-	 * @since 5.0
-	 */
-	public enum Status {
-		/*
-		 * job status cannot be determined
-		 */
-		UNDETERMINED,
-		/*
-		 * job is queued and waiting to be scheduled
-		 */
-		QUEUED_ACTIVE,
-		/*
-		 * job has been placed on hold by the system or the administrator
-		 */
-		SYSTEM_ON_HOLD,
-		/*
-		 * job has been placed on hold by a user
-		 */
-		USER_ON_HOLD,
-		/*
-		 * job has been placed on hold by both the system or administrator and a
-		 * user
-		 */
-		USER_SYSTEM_ON_HOLD,
-		/*
-		 * job has been scheduled and is running
-		 */
+		STARTING,
 		RUNNING,
-		/*
-		 * job has been suspended by the system or administrator
-		 */
-		SYSTEM_SUSPENDED,
-		/*
-		 * job has been suspended by a user
-		 */
-		USER_SUSPENDED,
-		/*
-		 * job has been suspended by both the system or administrator and a user
-		 */
-		USER_SYSTEM_SUSPENDED,
-		/*
-		 * job finished normally
-		 */
-		DONE,
-		/*
-		 * job exited abnormally before finishing
-		 */
-		FAILED
-	};
+		SUSPENDED,
+		COMPLETED
+	}
 
 	public static final int IO_FORWARDING_NONE = 0x0;
 	public static final int IO_FORWARDING_STDIN = 0x01;

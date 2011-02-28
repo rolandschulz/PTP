@@ -145,8 +145,31 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		 * 
 		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getState()
 		 */
-		public JobAttributes.State getState() {
-			return fJob.getState();
+		public String getState() {
+			switch (fJob.getState()) {
+			case COMPLETED:
+				return IJobStatus.COMPLETED;
+			case RUNNING:
+				return IJobStatus.RUNNING;
+			case STARTING:
+				return IJobStatus.SUBMITTED;
+			case SUSPENDED:
+				return IJobStatus.SUSPENDED;
+			}
+			return IJobStatus.UNDETERMINED;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getStateDetail()
+		 */
+		public String getStateDetail() {
+			StringAttribute statusAttr = fJob.getAttribute(JobAttributes.getStatusAttributeDefinition());
+			if (statusAttr != null) {
+				return statusAttr.getValue();
+			}
+			return getState();
 		}
 
 		/*
@@ -340,6 +363,14 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 */
 	public AbstractRuntimeResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
 		super(universe, config);
+	}
+
+	/**
+	 * @return the runtimeSystem
+	 * @since 5.0
+	 */
+	public IRuntimeSystem getRuntimeSystem() {
+		return runtimeSystem;
 	}
 
 	/*
@@ -1087,7 +1118,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	protected void doDispose() {
 		// TODO Auto-generated method stub
 
-	}
+	};
 
 	/*
 	 * (non-Javadoc)
@@ -1101,7 +1132,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		runtimeSystem.shutdown();
 
 		doAfterCloseConnection();
-	};
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -1220,13 +1251,5 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			}
 		}
 		return bitSet;
-	}
-
-	/**
-	 * @return the runtimeSystem
-	 * @since 5.0
-	 */
-	public IRuntimeSystem getRuntimeSystem() {
-		return runtimeSystem;
 	}
 }
