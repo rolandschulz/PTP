@@ -21,6 +21,9 @@ public class AddImpl extends AbstractRangePart {
 		if (list == null) {
 			list = new ArrayList<String>();
 			vars.put(name, list);
+			if (add.isDiscovered()) {
+				RMVariableMap.getActiveInstance().getDiscovered().put(name, list);
+			}
 		}
 		String exp = add.getRange();
 		if (exp != null) {

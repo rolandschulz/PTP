@@ -17,6 +17,9 @@ public class PutImpl extends AbstractRangePart {
 		property = new Property();
 		property.setName(name);
 		vars.put(name, property);
+		if (put.isDiscovered()) {
+			RMVariableMap.getActiveInstance().getDiscovered().put(name, property);
+		}
 		String exp = put.getRange();
 		if (exp != null) {
 			range = new Range(exp);

@@ -59,7 +59,6 @@
 				<xs:element minOccurs="0" maxOccurs="unbounded" ref="property"/>
 				<xs:element minOccurs="0" ref="managed-files"/>
 				<xs:element minOccurs="0" ref="on-start-up"/>
-				<xs:element minOccurs="0" ref="discover-attributes"/>
 				<xs:element name="submit-commands">
 					<xs:complexType>
 						<xs:choice minOccurs="1" maxOccurs="3">
@@ -73,7 +72,7 @@
 				<xs:element minOccurs="0" ref="suspend-job"/>
 				<xs:element minOccurs="0" ref="resume-job"/>
 				<xs:element minOccurs="0" ref="hold-job"/>
-            <xs:element minOccurs="0" ref="release-job"/>
+				<xs:element minOccurs="0" ref="release-job"/>
 				<xs:element minOccurs="0" ref="on-shut-down"/>
 				<xs:element minOccurs="0" ref="commands"/>
 				<xs:element minOccurs="0" ref="parsers"/>
@@ -129,18 +128,6 @@
 		<xs:annotation>
 			<xs:documentation>
 				Arbitrary commands which need to be run on startup.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="discover-attributes">
-		<xs:annotation>
-			<xs:documentation>
-				A command for retrieving (if possible) attributes defined by the service dynamically.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
@@ -222,29 +209,29 @@
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="hold-job">
-      <xs:annotation>
-         <xs:documentation>
-            The command(s) for holding jobs.
-         </xs:documentation>
-      </xs:annotation>
-      <xs:complexType>
-         <xs:sequence>
-            <xs:element maxOccurs="unbounded" ref="command-ref"/>
-         </xs:sequence>
-      </xs:complexType>
-   </xs:element>
-   <xs:element name="release-job">
-      <xs:annotation>
-         <xs:documentation>
-            The command(s) for releasing suspended jobs.
-         </xs:documentation>
-      </xs:annotation>
-      <xs:complexType>
-         <xs:sequence>
-            <xs:element maxOccurs="unbounded" ref="command-ref"/>
-         </xs:sequence>
-      </xs:complexType>
-   </xs:element>
+		<xs:annotation>
+			<xs:documentation>
+				The command(s) for holding jobs.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element maxOccurs="unbounded" ref="command-ref"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="release-job">
+		<xs:annotation>
+			<xs:documentation>
+				The command(s) for releasing suspended jobs.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element maxOccurs="unbounded" ref="command-ref"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 	<xs:element name="on-shut-down">
 		<xs:annotation>
 			<xs:documentation>
@@ -306,13 +293,13 @@
 				<xs:element maxOccurs="unbounded" ref="environment-variable"/>
 			</xs:sequence>
 			<xs:attribute name="syntax" use="required">
-            <xs:simpleType>
-               <xs:restriction base="xs:string">
-                  <xs:enumeration value="sentenv"/>
-                  <xs:enumeration value="export"/>
-               </xs:restriction>
-            </xs:simpleType>
-         </xs:attribute>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="sentenv"/>
+						<xs:enumeration value="export"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="environment-variable">
@@ -321,8 +308,8 @@
 				'ValueFrom' refers to properties in the resource manager environment.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType >
-		   <xs:attribute name="variableName" use="required" type="xs:string"/>
+		<xs:complexType>
+			<xs:attribute name="variableName" use="required" type="xs:string"/>
 			<xs:attribute name="valueFrom" use="required" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
@@ -418,8 +405,10 @@
 	<xs:element name="arg">
 		<xs:annotation>
 			<xs:documentation>
-				The text of the argument will be parsed for references to the resource manager environment; e.g., ${rm:a}, v=${rm:v},
-				etc. By convention, '${rm:@name}' and '${rm:@value}' will refer to a given dynamic attribute name and value (of undefined position i in
+				The text of the argument will be parsed for references to the resource manager environment; e.g., ${rm:a},
+				v=${rm:v},
+				etc. By convention, '${rm:@name}' and '${rm:@value}' will refer to a given dynamic attribute name and value (of undefined
+				position i in
 				the list).
 			</xs:documentation>
 		</xs:annotation>
@@ -427,7 +416,8 @@
 			<xs:attribute name="isUndefinedIfEquals" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						If this is defined (even a zero-length string is valid), an equality check on the arg will be run and if satisfied the arg will be
+						If this is defined (even a zero-length string is valid), an equality check on the arg will be run and if
+						satisfied the arg will be
 						eliminated from the list.
 					</xs:documentation>
 				</xs:annotation>
@@ -479,7 +469,7 @@
 			<xs:documentation>
 				Value is the concatenation of tokens matching the range; this is then added as an element to the named list. If
 				there is no such list, a list will be created and assigned to the variable name. If no range is present, the value equals the
-				entire element.
+				entire element. If discovered, the name will be indexed.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
@@ -487,6 +477,7 @@
 				<xs:element minOccurs="0" ref="range"/>
 			</xs:sequence>
 			<xs:attribute name="name" use="required" type="xs:string"/>
+			<xs:attribute name="discovered" type="xs:boolean" default="false"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="set">
@@ -494,9 +485,9 @@
 			<xs:documentation>
 				Value assigned to the setter is the concatenation of tokens matching the range; in the context of this
 				implementation, setter refers to the name of an attribute or element of JobAttribute or to a Property value; name designates the
-				variable to which the JobAttribute or Property has been assigned. If no such element exists an exception is thrown. If no
-				range is
-				present, the value equals the entire element.
+				variable to which the JobAttribute or Property has been assigned. If no such element exists and this is not a discovered attribute,
+				an exception is thrown. If no range is present, the value equals the entire element. If discovered, an Attribute will be
+				constructed if missing and the name will be indexed.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
@@ -505,6 +496,7 @@
 			</xs:sequence>
 			<xs:attribute name="name" use="required" type="xs:string"/>
 			<xs:attribute name="setter" use="required" type="xs:string"/>
+			<xs:attribute name="discovered" type="xs:boolean" default="false"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="put">
@@ -512,7 +504,7 @@
 			<xs:documentation>
 				Value is the concatenation of tokens matching the range; this is assigned as a Property variable with the given
 				name. This method will overwrite any variable with the same name. If no range is present, the value equals
-				the entire element.
+				the entire element. If discovered, the name will be indexed.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
@@ -520,6 +512,7 @@
 				<xs:element minOccurs="0" ref="range"/>
 			</xs:sequence>
 			<xs:attribute name="name" use="required" type="xs:string"/>
+			<xs:attribute name="discovered" type="xs:boolean" default="false"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="range" type="xs:string">
@@ -674,10 +667,10 @@
 				<xs:element name="include">
 					<xs:complexType>
 						<xs:attribute name="headers" type="xs:boolean" default="true"/>
-                  <xs:attribute name="sort" type="xs:boolean" default="true"/>
-                  <xs:attribute name="name" type="xs:boolean" default="true"/>
-                  <xs:attribute name="tooltip" type="xs:boolean" default="true"/>
-                  <xs:attribute name="description" type="xs:boolean" default="true"/>
+						<xs:attribute name="sort" type="xs:boolean" default="true"/>
+						<xs:attribute name="name" type="xs:boolean" default="true"/>
+						<xs:attribute name="tooltip" type="xs:boolean" default="true"/>
+						<xs:attribute name="description" type="xs:boolean" default="true"/>
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>

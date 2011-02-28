@@ -33,7 +33,6 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}property" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{}managed-files" minOccurs="0"/>
  *         &lt;element ref="{}on-start-up" minOccurs="0"/>
- *         &lt;element ref="{}discover-attributes" minOccurs="0"/>
  *         &lt;element name="submit-commands">
  *           &lt;complexType>
  *             &lt;complexContent>
@@ -67,9 +66,8 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "property", "managedFiles", "onStartUp", "discoverAttributes", "submitCommands", "terminateJob",
-		"suspendJob", "resumeJob", "holdJob", "releaseJob", "onShutDown", "commands", "parsers", "script", "attributeDefinitions",
-		"launchTab" })
+@XmlType(name = "", propOrder = { "property", "managedFiles", "onStartUp", "submitCommands", "terminateJob", "suspendJob",
+		"resumeJob", "holdJob", "releaseJob", "onShutDown", "commands", "parsers", "script", "attributeDefinitions", "launchTab" })
 @XmlRootElement(name = "control")
 public class Control {
 
@@ -145,8 +143,6 @@ public class Control {
 	protected ManagedFiles managedFiles;
 	@XmlElement(name = "on-start-up")
 	protected OnStartUp onStartUp;
-	@XmlElement(name = "discover-attributes")
-	protected DiscoverAttributes discoverAttributes;
 	@XmlElement(name = "submit-commands", required = true)
 	protected Control.SubmitCommands submitCommands;
 	@XmlElement(name = "terminate-job", required = true)
@@ -188,16 +184,6 @@ public class Control {
 	 */
 	public Commands getCommands() {
 		return commands;
-	}
-
-	/**
-	 * Gets the value of the discoverAttributes property.
-	 * 
-	 * @return possible object is {@link DiscoverAttributes }
-	 * 
-	 */
-	public DiscoverAttributes getDiscoverAttributes() {
-		return discoverAttributes;
 	}
 
 	/**
@@ -369,17 +355,6 @@ public class Control {
 	 */
 	public void setCommands(Commands value) {
 		this.commands = value;
-	}
-
-	/**
-	 * Sets the value of the discoverAttributes property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link DiscoverAttributes }
-	 * 
-	 */
-	public void setDiscoverAttributes(DiscoverAttributes value) {
-		this.discoverAttributes = value;
 	}
 
 	/**
