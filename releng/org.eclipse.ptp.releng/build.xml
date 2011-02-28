@@ -43,6 +43,7 @@
 		<property name="zipsdir" value="${buildDirectory}/${buildType}.${buildId}"/>
 		<property name="masterFile" value="ptp-master-${ptpBranchVersion}-${buildId}.zip"/>
 		<property name="masterFeature" value="org.eclipse.ptp.master_${ptpBranchVersion}.${timestamp}.jar"/>
+		<property name="proxyFile" value="ptp-proxy-${ptpBranchVersion}-${buildId}.zip"/>
 		<property name="eclipseTest" value="org.eclipse.test_3.2.0"/>
 		<property name="mailto" value="g.watson@computer.org"/>
 		<property name="eclipseRoot" value=":pserver:anonymous@dev.eclipse.org:/cvsroot/eclipse"/>
@@ -117,6 +118,49 @@
 
 		<zip destfile="${zipsdir}/${masterFile}"
 			basedir="${buildDirectory}/site/eclipse"/>
+		
+		<!-- generate proxy zip -->
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.aix.ppc_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.aix.ppc"/>
+		</copy>
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.linux.ppc_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.linux.ppc"/>
+		</copy>
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.linux.x86_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.linux.x86"/>
+		</copy>
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.linux.x86_64_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.linux.x86_64"/>
+		</copy>
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.macosx.ppc_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.macosx.ppc"/>
+		</copy>
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.macosx.x86_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.macosx.x86"/>
+		</copy>
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.debug.sdm_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.debug.sdm"/>
+		</copy>
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.proxy_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.proxy"/>
+		</copy>
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.utils_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.utils"/>
+		</copy>
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.rm.ibm.ll.proxy_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.rm.ibm.ll.proxy"/>
+		</copy>
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.rm.ibm.pe.proxy_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.rm.ibm.pe.proxy"/>
+		</copy>
+		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.rm.slurm.proxy_${ptpBranchVersion}.${timestamp}">
+			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.rm.slurm.proxy"/>
+		</copy>
+		<zip destfile="${zipsdir}/${proxyFile}">
+			<fileset dir="${buildDirectory}">
+				<include name="proxy/**/*"/>
+			</fileset>
+		</zip>
 	</target>
 
 	<target name="sign" depends="init" unless="hasErrors">
