@@ -21,7 +21,6 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.Control.SubmitCommands;
-import org.eclipse.ptp.rm.jaxb.core.data.DiscoverAttributes;
 import org.eclipse.ptp.rm.jaxb.core.data.HoldJob;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
@@ -144,7 +143,6 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
 		}
 		doOnStartUp(monitor);
-		maybeDiscoverAttributes(monitor);
 	}
 
 	@Override
@@ -339,18 +337,6 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		p.setName(name);
 		p.setValue(value);
 		env.put(name, p);
-	}
-
-	/*
-	 * Run the discover attributes commands, if any; these can include queues,
-	 * for instance.
-	 */
-	private void maybeDiscoverAttributes(IProgressMonitor monitor) throws CoreException {
-		DiscoverAttributes discoverAttributes = controlData.getDiscoverAttributes();
-		if (discoverAttributes == null) {
-			return;
-		}
-		runCommands(discoverAttributes.getCommandRef(), DISCATTR);
 	}
 
 	/*

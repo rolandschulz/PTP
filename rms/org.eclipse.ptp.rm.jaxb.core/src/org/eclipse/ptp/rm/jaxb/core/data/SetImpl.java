@@ -20,7 +20,11 @@ public class SetImpl extends AbstractRangePart implements IJAXBNonNLSConstants {
 		setter = set.getSetter();
 		target = vars.get(name);
 		if (target == null) {
-			throw new Exception(Messages.StreamParserNoSuchVariableError + name);
+			if (!set.isDiscovered()) {
+				throw new Exception(Messages.StreamParserNoSuchVariableError + name);
+			} else {
+				RMVariableMap.getActiveInstance().getDiscovered().put(name, target);
+			}
 		}
 		String exp = set.getRange();
 		if (exp != null) {
