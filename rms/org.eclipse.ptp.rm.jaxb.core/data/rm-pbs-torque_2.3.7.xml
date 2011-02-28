@@ -13,14 +13,14 @@
 		<on-start-up>
         <command-ref>find_queues</command-ref>
       </on-start-up>
-		<run-commands>
-			<run-batch>
+		<submit-commands>
+			<submit-batch>
 				<command-ref>submit_script</command-ref>
-			</run-batch>
-		</run-commands>
-		<cancel-job>
+			</submit-batch>
+		</submit-commands>
+		<terminate-job>
 			<command-ref>cancel_job</command-ref>
-		</cancel-job>
+		</terminate-job>
 		<commands>
 		   <command name="find_queues">
             <arglist>

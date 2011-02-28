@@ -1,5 +1,6 @@
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,11 +9,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
@@ -58,18 +59,27 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	private IRemoteConnection localConnection;
 	private IRemoteFileManager remoteFileManager;
 	private IRemoteFileManager localFileManager;
-	private IRemoteProcessBuilder processBuilder;
+
+	private final Map<String, String> dynSystemEnv;
+	private boolean appendSysEnv;
 
 	public JAXBResourceManager(IPUniverse universe, IResourceManagerConfiguration jaxbServiceProvider) {
 		super(universe, jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
 		controlData = config.resourceManagerData().getControl();
-		config.setActive();
-		setFixedConfigurationProperties();
+		dynSystemEnv = new HashMap<String, String>();
+	}
+
+	public boolean getAppendSysEnv() {
+		return appendSysEnv;
 	}
 
 	public IJAXBResourceManagerConfiguration getConfig() {
 		return config;
+	}
+
+	public Map<String, String> getDynSystemEnv() {
+		return dynSystemEnv;
 	}
 
 	public IRemoteConnection getLocalConnection() {
@@ -84,10 +94,6 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		return localFileManager;
 	}
 
-	public IRemoteProcessBuilder getProcessBuilder() {
-		return processBuilder;
-	}
-
 	public IRemoteConnection getRemoteConnection() {
 		return remoteConnection;
 	}
@@ -100,6 +106,10 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		return remoteFileManager;
 	}
 
+	public IRemoteServices getRemoteServices() {
+		return remoteServices;
+	}
+
 	@Override
 	protected void doCleanUp() {
 		config.clearReferences();
@@ -107,7 +117,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	@Override
 	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
-		config.setActive();
+		resetEnv();
 		updateJobId(jobId);
 		doControlCommand(operation);
 	}
@@ -119,14 +129,14 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	@Override
 	protected void doShutdown() throws CoreException {
-		config.setActive();
+		resetEnv();
 		doOnShutdown();
 		doDisconnect();
 	}
 
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
-		config.setActive();
+		resetEnv();
 		initializeConnections();
 		try {
 			doConnect(monitor);
@@ -140,7 +150,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	@Override
 	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
-		config.setActive();
+		resetEnv();
 		updatePropertyValuesFromTab(configuration);
 		/*
 		 * create the script if necessary; adds the contents to env as
@@ -168,7 +178,6 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	 * connections.
 	 */
 	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException {
-
 		if (!localConnection.isOpen()) {
 			localConnection.open(monitor);
 		}
@@ -316,6 +325,16 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		assert (null != remoteFileManager);
 	}
 
+	private void maybeAddProperty(String name, String value, Map<String, Object> env) {
+		if (value == null) {
+			return;
+		}
+		Property p = new Property();
+		p.setName(name);
+		p.setValue(value);
+		env.put(name, p);
+	}
+
 	/*
 	 * Run the discover attributes commands, if any; these can include queues,
 	 * for instance.
@@ -348,13 +367,31 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		if (script == null) {
 			return;
 		}
-		ScriptHandler job = new ScriptHandler(script);
+		ScriptHandler job = new ScriptHandler(script, dynSystemEnv);
 		job.schedule();
 		try {
 			job.join();
 		} catch (InterruptedException t) {
 			t.printStackTrace();
 		}
+	}
+
+	private void maybeOverwrite(String key1, String key2, ILaunchConfiguration configuration, Map<String, Object> env)
+			throws CoreException {
+		String value = null;
+		Property p = (Property) env.get(key1);
+		if (p != null) {
+			value = p.getValue();
+		}
+		value = configuration.getAttribute(key2, value);
+		maybeAddProperty(key1, value, env);
+	}
+
+	private void resetEnv() {
+		config.setActive();
+		setFixedConfigurationProperties();
+		dynSystemEnv.clear();
+		appendSysEnv = true;
 	}
 
 	/*
@@ -365,7 +402,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + commandRef, null);
 		}
-		CommandJob job = new CommandJob(command, processBuilder);
+		CommandJob job = new CommandJob(command, this);
 		job.schedule();
 		try {
 			job.join();
@@ -408,8 +445,8 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	/*
 	 * Transfers the values from the configuration to the live map.
 	 */
+	@SuppressWarnings("unchecked")
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
-		@SuppressWarnings("unchecked")
 		Map<String, String> lcattr = configuration.getAttributes();
 		Map<String, Object> env = RMVariableMap.getActiveInstance().getVariables();
 		for (String key : lcattr.keySet()) {
@@ -421,5 +458,11 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 				((JobAttribute) target).setValue(value);
 			}
 		}
+
+		dynSystemEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, dynSystemEnv));
+		appendSysEnv = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, appendSysEnv);
+		maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration, env);
+		maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration, env);
+		maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration, env);
 	}
 }

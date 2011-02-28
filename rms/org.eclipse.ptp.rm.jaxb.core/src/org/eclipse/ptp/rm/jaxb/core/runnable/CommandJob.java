@@ -3,6 +3,7 @@ package org.eclipse.ptp.rm.jaxb.core.runnable;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -11,36 +12,40 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.data.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
+import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
+import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariables;
 import org.eclipse.ptp.rm.jaxb.core.data.StreamParser;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.EnvVarUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class CommandJob extends Job implements IJAXBNonNLSConstants {
 
 	private final Command command;
-	private final IRemoteProcessBuilder builder;
+	private final JAXBResourceManager rm;
 	private StreamParser stdoutParser;
 	private StreamParser stderrParser;
 	private StreamParserImpl stdoutParserImpl;
 	private StreamParserImpl stderrParserImpl;
 
-	public CommandJob(Command command, IRemoteProcessBuilder builder) {
+	public CommandJob(Command command, JAXBResourceManager rm) {
 		super(command.getName());
 		this.command = command;
-		this.builder = builder;
+		this.rm = rm;
 	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		try {
-			prepareCommand();
-			prepareDir();
-			prepareEnv();
+			IRemoteProcessBuilder builder = prepareCommand();
+			prepareEnv(builder);
 			prepareParsers();
 
 			IRemoteProcess process = null;
@@ -92,7 +97,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		return Status.OK_STATUS;
 	}
 
-	private void prepareCommand() throws CoreException {
+	private IRemoteProcessBuilder prepareCommand() throws CoreException {
 		Arglist args = command.getArglist();
 		if (args == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError + command.getName(), null);
@@ -100,15 +105,35 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		ArglistImpl arglist = new ArglistImpl(args);
 		StringBuffer buffer = new StringBuffer();
 		arglist.toString(buffer);
-		builder.command(buffer.toString());
+		IRemoteServices service = rm.getRemoteServices();
+		return service.getProcessBuilder(rm.getRemoteConnection(), buffer.toString());
 	}
 
-	private void prepareDir() throws CoreException {
+	private void prepareEnv(IRemoteProcessBuilder builder) throws CoreException {
+		boolean append = rm.getAppendSysEnv();
+		if (!append) {
+			builder.environment().clear();
+			Map<String, String> live = rm.getDynSystemEnv();
+			for (String var : live.keySet()) {
+				builder.environment().put(var, live.get(var));
+			}
+		} else {
+			/*
+			 * first static env, then dynamic
+			 */
+			EnvironmentVariables vars = command.getEnvironmentVariables();
+			RMVariableMap map = RMVariableMap.getActiveInstance();
+			if (vars != null) {
+				for (EnvironmentVariable var : vars.getEnvironmentVariable()) {
+					EnvVarUtils.addVariable(var, builder.environment(), map);
+				}
+			}
 
-	}
-
-	private void prepareEnv() throws CoreException {
-
+			Map<String, String> live = rm.getDynSystemEnv();
+			for (String var : live.keySet()) {
+				builder.environment().put(var, live.get(var));
+			}
+		}
 	}
 
 	private void prepareParsers() throws CoreException {

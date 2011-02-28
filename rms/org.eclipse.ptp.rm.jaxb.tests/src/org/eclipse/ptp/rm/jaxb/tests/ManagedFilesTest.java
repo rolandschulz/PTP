@@ -123,10 +123,10 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 		env.put(MONITOR_USER_VAR, "fooUser"); //$NON-NLS-1$
 		env.put(CONTROL_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
 		env.put(MONITOR_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
-		env.put("directory", "/u/ncsa/arossi/test"); //$NON-NLS-1$ //$NON-NLS-2$
-		env.put("mpiCommand", "mpiexec"); //$NON-NLS-1$ //$NON-NLS-2$
-		env.put("mpiArgs", "-np 8"); //$NON-NLS-1$ //$NON-NLS-2$
-		env.put("executablePath", "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ //$NON-NLS-2$
+		env.put(DIRECTORY, "/u/ncsa/arossi/test"); //$NON-NLS-1$ 
+		env.put(MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
+		env.put(MPI_ARGS, "-np 8"); //$NON-NLS-1$ 
+		env.put(EXEC_PATH, "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ 
 		if (verbose) {
 			RMDataTest.print(RMVariableMap.getActiveInstance());
 		}
