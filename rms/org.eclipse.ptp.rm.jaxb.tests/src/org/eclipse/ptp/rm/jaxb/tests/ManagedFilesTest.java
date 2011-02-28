@@ -1,5 +1,6 @@
 package org.eclipse.ptp.rm.jaxb.tests;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -26,6 +27,8 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	private static final String xml = DATA + "rm-pbs-torque_2.3.7.xml"; //$NON-NLS-1$
 	private static Control controlData;
 	private static Map<String, Object> env;
+	private static Map<String, String> live;
+	private static boolean appendEnv;
 	private static boolean verbose = false;
 
 	private static IRemoteServices localServices;
@@ -43,6 +46,11 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 			RMVariableMap map = RMVariableMap.setActiveInstance(null);
 			JAXBUtils.initializeMap(rmdata, map);
 			env = map.getVariables();
+			appendEnv = true;
+			live = new HashMap<String, String>();
+			live.put("FOO_VAR_1", "FOO_VALUE_1"); //$NON-NLS-1$ //$NON-NLS-2$
+			live.put("FOO_VAR_2", "FOO_VALUE_2"); //$NON-NLS-1$ //$NON-NLS-2$
+			live.put("FOO_VAR_3", "FOO_VALUE_3"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (Throwable t) {
 			t.printStackTrace();
 			assertNotNull(t);
@@ -82,7 +90,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	private void composeScript() {
 		Script script = controlData.getScript();
 		assertNotNull(script);
-		ScriptHandler job = new ScriptHandler(script);
+		ScriptHandler job = new ScriptHandler(script, live, appendEnv);
 		job.schedule();
 		try {
 			job.join();

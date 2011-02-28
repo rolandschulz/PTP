@@ -19,20 +19,21 @@ import org.eclipse.ptp.rm.jaxb.core.data.PostExecuteCommands;
 import org.eclipse.ptp.rm.jaxb.core.data.PreExecuteCommands;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.EnvVarUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 
 	private final RMVariableMap map;
-	private final JAXBResourceManager rm;
+	private final Map<String, String> live;
+	private final boolean appendEnv;
 	private final Script script;
 
-	public ScriptHandler(Script script, JAXBResourceManager rm) {
+	public ScriptHandler(Script script, Map<String, String> live, boolean appendEnv) {
 		super(Messages.ScriptHandlerJob);
 		this.script = script;
-		this.rm = rm;
+		this.live = live;
+		this.appendEnv = appendEnv;
 		map = RMVariableMap.getActiveInstance();
 	}
 
@@ -59,9 +60,8 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private void addEnvironment(EnvironmentVariables vars, StringBuffer buffer) {
-		Map<String, String> live = rm.getDynSystemEnv();
 		String syntax = getSyntax(script.getShell());
-		if (!rm.getAppendSysEnv()) {
+		if (!appendEnv) {
 			for (String var : live.keySet()) {
 				EnvVarUtils.addVariable(var, live.get(var), syntax, buffer);
 			}
