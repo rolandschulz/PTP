@@ -42,7 +42,7 @@
       <navigatorContent
             activeByDefault="true"
             contentProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorContentProvider"
-            id="org.eclipse.ptp.rdt.ui.navigator.content"
+            id="org.eclipse.ptp.rdt.sync.ui.navigator.content"
             labelProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorLabelProvider"
             name="RDT elements"
             priority="highest">
@@ -84,7 +84,7 @@
                suppressedExtensionId="org.eclipse.cdt.ui.navigator.content">
          </override>
        <commonWizard
-	         associatedExtensionId="org.eclipse.ptp.rdt.ui.navigator.content"
+	         associatedExtensionId="org.eclipse.ptp.rdt.sync.ui.navigator.content"
 	         menuGroupId="org.eclipse.ptp.rdt.ui.newProject"
 	         type="new"
 	         wizardId="org.eclipse.ptp.rdt.sync.ui.newRemoteProjectWizard">
@@ -92,7 +92,15 @@
 	   </commonWizard>
       </navigatorContent>
    </extension>
-     
+   <extension
+       point="org.eclipse.ui.navigator.viewer">
+       <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+          <includes>
+              <contentExtension pattern="org.eclipse.ptp.rdt.sync.ui.navigator.content"/>
+          </includes>
+       </viewerContentBinding>
+   </extension>
+   
      <extension
            point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
         <wizardPage
