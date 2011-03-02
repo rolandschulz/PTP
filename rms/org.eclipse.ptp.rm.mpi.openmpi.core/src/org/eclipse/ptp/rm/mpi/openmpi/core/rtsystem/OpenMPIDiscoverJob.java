@@ -29,9 +29,7 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -39,7 +37,6 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
-import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIMachineAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPINodeAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
@@ -71,7 +68,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 	 * io.BufferedReader)
 	 */
 	@Override
-	protected IStatus parse(BufferedReader output) {
+	protected void parse(BufferedReader output) throws CoreException {
 		/*
 		 * Local copy of attributes from the RuntimeSystem
 		 */
@@ -84,133 +81,102 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		IOpenMPIResourceManagerConfiguration rmConfiguration = (IOpenMPIResourceManagerConfiguration) rts.getRmConfiguration();
 		assert fileMgr != null;
 
-		/*
-		 * MPI resource manager have only one machine and one queue. There they
-		 * are implicitly "discovered".
-		 */
 		IPResourceManager rm = (IPResourceManager) rts.getResourceManager().getAdapter(IPResourceManager.class);
-		String machineID = rts.createMachine(connection.getName());
-		rts.setMachineID(machineID);
-		String queueID = rts.createQueue(Messages.OpenMPIDiscoverJob_defaultQueueName);
-		rts.setQueueID(queueID);
-
-		IPMachine machine = rm.getMachineById(machineID);
+		IPMachine machine = rm.getMachineById(rts.getMachineID());
 		assert machine != null;
 
 		/*
-		 * Any exception from now on is caught in order to add the error message
-		 * as an attribute to the machine. Then, the exception is re-thrown.
+		 * STEP 1: Parse output of command. TODO: validate lines and write to
+		 * log if invalid lines were found.
 		 */
-		try {
-			/*
-			 * STEP 1: Parse output of command. TODO: validate lines and write
-			 * to log if invalid lines were found.
-			 */
-			parseOmpiInfo(output, info);
+		parseOmpiInfo(output, info);
 
-			/*
-			 * Check and/or set the OMPI version in the configuration. NOTE that
-			 * this may change any subsequent commands that are queried!
-			 */
-			String version = info.get("ompi:version:full"); //$NON-NLS-1$
-			if (version != null) {
-				if (!rmConfiguration.setDetectedVersion(version)) {
-					return new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(
-							Messages.OpenMPIDiscoverJob_Exception_InvalidVersion, version));
-				}
-			} else {
-				return new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(),
-						Messages.OpenMPIDiscoverJob_Exception_UnableToDetermineVersion);
+		/*
+		 * Check and/or set the OMPI version in the configuration. NOTE that
+		 * this may change any subsequent commands that are queried!
+		 */
+		String version = info.get("ompi:version:full"); //$NON-NLS-1$
+		if (version != null) {
+			if (!rmConfiguration.setDetectedVersion(version)) {
+				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(
+						Messages.OpenMPIDiscoverJob_Exception_InvalidVersion, version)));
 			}
-
-			/*
-			 * STEP 2: Read file that describes machine geography. If no nodes
-			 * are given, then we assume MPI default when host are not
-			 * configured: there is only one node on the machine. This part is a
-			 * bit tricky. OpenMPI 1.2 has a RDS (resource discovery system)
-			 * that knows the default hostfile as rds_hostfile_path parameter.
-			 * But the RDS was dropped by version 1.3. Then the
-			 * orte_default_hostfile parameter might be used instead, as long as
-			 * it was defined in the system wide MCA parameters.
-			 */
-			OpenMPIHostMap hostMap = readHostFile(connection, remoteServices, fileMgr, info, rmConfiguration);
-
-			/*
-			 * Create model according to data from discover.
-			 */
-			int rankCounter = 0;
-			boolean hasSomeError = false;
-			assert hostMap != null;
-
-			for (OpenMPIHostMap.Host host : hostMap.getHosts()) {
-
-				// Add node to model
-				String nodeId = rts.createNode(machineID, host.getName(), rankCounter++);
-				rts.setNodeIDForName(host.getName(), nodeId);
-
-				// Add processor information to node.
-				AttributeManager attrManager = new AttributeManager();
-				if (host.getNumProcessors() != 0) {
-					try {
-						attrManager.addAttribute(OpenMPINodeAttributes.getNumberOfNodesAttributeDefinition().create(
-								Integer.valueOf(host.getNumProcessors())));
-					} catch (IllegalValueException e) {
-						// This situation is not possible since
-						// host.getNumProcessors() is always valid.
-						assert false;
-					}
-				}
-				if (host.getMaxNumProcessors() != 0) {
-					try {
-						attrManager.addAttribute(OpenMPINodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(
-								Integer.valueOf(host.getMaxNumProcessors())));
-					} catch (IllegalValueException e) {
-						// This situation is not possible since
-						// host.getMaxNumProcessors() is always valid.
-						assert false;
-					}
-				}
-				if (host.getErrors() != 0) {
-					if ((host.getErrors() & Host.ERR_MAX_NUM_SLOTS) != 0) {
-						attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageAttributeDefinition().create(
-								Messages.OpenMPIDiscoverJob_Exception_InvalidMaxSlotsParameter));
-					} else if ((host.getErrors() & Host.ERR_NUM_SLOTS) != 0) {
-						attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageAttributeDefinition().create(
-								Messages.OpenMPIDiscoverJob_Exception_InvalidSlotsParameter));
-					} else if ((host.getErrors() & Host.ERR_UNKNOWN_ATTR) != 0) {
-						attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageAttributeDefinition().create(
-								Messages.OpenMPIDiscoverJob_Exception_IgnoredInvalidParameter));
-					}
-					attrManager.addAttribute(NodeAttributes.getStateAttributeDefinition().create(NodeAttributes.State.UP));
-					hasSomeError = true;
-				}
-				rts.changeNode(nodeId, attrManager);
-			}
-			if (hostMap.hasErrors) {
-				machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-				machine.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(
-						Messages.OpenMPIDiscoverJob_Exception_HostFileParseError));
-			}
-			if (hostMap.hasParseErrors() || hasSomeError) {
-				return new Status(IStatus.WARNING, OpenMPIPlugin.getDefault().getBundle().getSymbolicName(),
-						Messages.OpenMPIDiscoverJob_Exception_HostFileErrors);
-			}
-		} catch (Exception e) {
-			/*
-			 * Show message of all other exceptions and change machine status to
-			 * error.
-			 */
-			AttributeManager attrManager = new AttributeManager();
-			attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-			attrManager.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(
-					NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage())));
-			rts.changeMachine(machineID, attrManager);
-			rm.addAttribute(ResourceManagerAttributes.getStateAttributeDefinition().create(ResourceManagerAttributes.State.ERROR));
-			return new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(
-					Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage()), e);
+		} else {
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(),
+					Messages.OpenMPIDiscoverJob_Exception_UnableToDetermineVersion));
 		}
 
-		return Status.OK_STATUS;
+		/*
+		 * STEP 2: Read file that describes machine geography. If no nodes are
+		 * given, then we assume MPI default when host are not configured: there
+		 * is only one node on the machine. This part is a bit tricky. OpenMPI
+		 * 1.2 has a RDS (resource discovery system) that knows the default
+		 * hostfile as rds_hostfile_path parameter. But the RDS was dropped by
+		 * version 1.3. Then the orte_default_hostfile parameter might be used
+		 * instead, as long as it was defined in the system wide MCA parameters.
+		 */
+		OpenMPIHostMap hostMap;
+		try {
+			hostMap = readHostFile(connection, remoteServices, fileMgr, info, rmConfiguration);
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
+		}
+
+		/*
+		 * Create model according to data from discover.
+		 */
+		int rankCounter = 0;
+		boolean hasSomeError = false;
+		assert hostMap != null;
+
+		for (OpenMPIHostMap.Host host : hostMap.getHosts()) {
+
+			// Add node to model
+			String nodeId = rts.createNode(machine.getID(), host.getName(), rankCounter++);
+			rts.setNodeIDForName(host.getName(), nodeId);
+
+			// Add processor information to node.
+			AttributeManager attrManager = new AttributeManager();
+			if (host.getNumProcessors() != 0) {
+				try {
+					attrManager.addAttribute(OpenMPINodeAttributes.getNumberOfNodesAttributeDefinition().create(
+							Integer.valueOf(host.getNumProcessors())));
+				} catch (IllegalValueException e) {
+					// This situation is not possible since
+					// host.getNumProcessors() is always valid.
+					assert false;
+				}
+			}
+			if (host.getMaxNumProcessors() != 0) {
+				try {
+					attrManager.addAttribute(OpenMPINodeAttributes.getMaximalNumberOfNodesAttributeDefinition().create(
+							Integer.valueOf(host.getMaxNumProcessors())));
+				} catch (IllegalValueException e) {
+					// This situation is not possible since
+					// host.getMaxNumProcessors() is always valid.
+					assert false;
+				}
+			}
+			if (host.getErrors() != 0) {
+				if ((host.getErrors() & Host.ERR_MAX_NUM_SLOTS) != 0) {
+					attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageAttributeDefinition().create(
+							Messages.OpenMPIDiscoverJob_Exception_InvalidMaxSlotsParameter));
+				} else if ((host.getErrors() & Host.ERR_NUM_SLOTS) != 0) {
+					attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageAttributeDefinition().create(
+							Messages.OpenMPIDiscoverJob_Exception_InvalidSlotsParameter));
+				} else if ((host.getErrors() & Host.ERR_UNKNOWN_ATTR) != 0) {
+					attrManager.addAttribute(OpenMPINodeAttributes.getStatusMessageAttributeDefinition().create(
+							Messages.OpenMPIDiscoverJob_Exception_IgnoredInvalidParameter));
+				}
+				attrManager.addAttribute(NodeAttributes.getStateAttributeDefinition().create(NodeAttributes.State.UP));
+				hasSomeError = true;
+			}
+			rts.changeNode(nodeId, attrManager);
+		}
+		if (hostMap.hasParseErrors() || hasSomeError) {
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getDefault().getBundle().getSymbolicName(),
+					Messages.OpenMPIDiscoverJob_Exception_HostFileParseError));
+		}
 	}
 
 	private OpenMPIHostMap readHostFile(IRemoteConnection connection, IRemoteServices remoteServices, IRemoteFileManager fileMgr,
@@ -346,13 +312,15 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		} catch (InterruptedException e) {
 			// Ignore
 		}
-		if (process.exitValue() != 0)
+		if (process.exitValue() != 0) {
 			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(
 					Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedWithCode, Integer.valueOf(process.exitValue()))));
+		}
 		String hostname = br.readLine();
-		if (hostname == null)
+		if (hostname == null) {
 			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(),
 					Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedParse));
+		}
 		return hostname;
 	}
 

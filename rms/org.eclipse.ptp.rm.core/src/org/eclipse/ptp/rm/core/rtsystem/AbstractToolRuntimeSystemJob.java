@@ -62,7 +62,6 @@ import org.eclipse.ptp.utils.core.ArgumentParser;
 public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolRuntimeSystemJob {
 
 	private final String jobID;
-	private final String queueID;
 	private boolean debug = false;
 	private IRemoteProcess process = null;
 	private final AttributeManager attrMgr;
@@ -84,13 +83,14 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			.compile(("/$/{(/w+)(" + "(?:(?:////)|(?:///})|[^/}])*" + ")/}").replace('/', '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private static final Pattern parameterPattern = Pattern.compile(":((?:(?:////)|(?:///:)|(?:///})|[^:])*)".replace('/', '\\')); //$NON-NLS-1$
 
-	public AbstractToolRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem,
-			AttributeManager attrMgr) {
+	/**
+	 * @since 3.0
+	 */
+	public AbstractToolRuntimeSystemJob(String jobID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
 		super(name);
 		this.attrMgr = attrMgr;
 		this.rtSystem = rtSystem;
 		this.jobID = jobID;
-		this.queueID = queueID;
 	}
 
 	/*
@@ -286,15 +286,6 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 */
 	protected IRemoteProcess getProcess() {
 		return process;
-	}
-
-	/**
-	 * Get the queue id for this job
-	 * 
-	 * @return queue id
-	 */
-	protected String getQueueID() {
-		return queueID;
 	}
 
 	/*

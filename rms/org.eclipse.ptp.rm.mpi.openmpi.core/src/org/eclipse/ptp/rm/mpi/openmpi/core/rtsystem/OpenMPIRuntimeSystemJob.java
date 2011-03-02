@@ -102,9 +102,11 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	/** Main parser thread */
 	protected Thread parserThread;
 
-	public OpenMPIRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem,
-			AttributeManager attrMgr) {
-		super(jobID, queueID, name, rtSystem, attrMgr);
+	/**
+	 * @since 4.0
+	 */
+	public OpenMPIRuntimeSystemJob(String jobID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
+		super(jobID, name, rtSystem, attrMgr);
 	}
 
 	/**

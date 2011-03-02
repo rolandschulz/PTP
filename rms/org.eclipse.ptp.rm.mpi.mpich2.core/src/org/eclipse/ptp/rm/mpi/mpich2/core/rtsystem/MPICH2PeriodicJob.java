@@ -11,23 +11,20 @@
 package org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.BitSet;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
-import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2MachineAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 
@@ -48,79 +45,52 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 	}
 
 	@Override
-	protected IStatus parse(BufferedReader output) {
+	protected void parse(BufferedReader output) throws CoreException {
 		/*
 		 * MPI resource manager have only one machine and one queue. There they
 		 * are implicitly "discovered".
 		 */
 		IPResourceManager rm = (IPResourceManager) rts.getResourceManager().getAdapter(IPResourceManager.class);
-		IPMachine machine = rm.getMachineById(rts.getMachineID());
-		IPQueue queue = rm.getQueueById(rts.getQueueID());
 
 		/*
-		 * We may be called before the model has been set up properly. Do
-		 * nothing if this is the case.
+		 * Parse output of mpdlistjobs command.
 		 */
-		if (machine == null || queue == null) {
-			return Status.OK_STATUS;
+		MPICH2ListJobsParser parser = new MPICH2ListJobsParser();
+		MPICH2JobMap jobMap;
+		try {
+			jobMap = parser.parse(output);
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(),
+					parser.getErrorMessage()));
 		}
 
 		/*
-		 * Any exception from now on is caught in order to add the error message
-		 * as an attribute to the machine. Then, the exception is re-thrown.
+		 * Update model according to data. First create any new jobs.
 		 */
-		try {
-			/*
-			 * Parse output of mpdlistjobs command.
-			 */
-			MPICH2ListJobsParser parser = new MPICH2ListJobsParser();
-			MPICH2JobMap jobMap = parser.parse(output);
-			if (jobMap == null) {
-				return new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), parser.getErrorMessage());
-			}
-
-			/*
-			 * Update model according to data. First create any new jobs.
-			 */
-			for (List<MPICH2JobMap.Job> jobs : jobMap.getJobs()) {
-				for (MPICH2JobMap.Job job : jobs) {
-					IPJob pJob = rm.getJobById(job.getJobAlias());
-					if (pJob == null) {
-						// Not one of our jobs
-						continue;
+		for (List<MPICH2JobMap.Job> jobs : jobMap.getJobs()) {
+			for (MPICH2JobMap.Job job : jobs) {
+				IPJob pJob = rm.getJobById(job.getJobAlias());
+				if (pJob == null) {
+					// Not one of our jobs
+					continue;
+				}
+				final int jobRank = job.getRank();
+				boolean hasProcess = pJob.hasProcessByJobRank(jobRank);
+				final String processNodeId = hasProcess ? pJob.getProcessNodeId(jobRank) : null;
+				boolean processHasNode = processNodeId != null;
+				if (hasProcess && !processHasNode) {
+					String nodeID = rts.getNodeIDforName(job.getHost());
+					if (nodeID == null) {
+						throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(),
+								Messages.MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch));
 					}
-					final int jobRank = job.getRank();
-					boolean hasProcess = pJob.hasProcessByJobRank(jobRank);
-					final String processNodeId = hasProcess ? pJob.getProcessNodeId(jobRank) : null;
-					boolean processHasNode = processNodeId != null;
-					if (hasProcess && !processHasNode) {
-						String nodeID = rts.getNodeIDforName(job.getHost());
-						if (nodeID == null) {
-							return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(),
-									Messages.MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch, null);
-						}
-						AttributeManager attrMrg = new AttributeManager();
-						attrMrg.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));
-						BitSet processJobRanks = new BitSet();
-						processJobRanks.set(jobRank);
-						rts.changeProcesses(pJob.getID(), processJobRanks, attrMrg);
-					}
+					AttributeManager attrMrg = new AttributeManager();
+					attrMrg.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));
+					BitSet processJobRanks = new BitSet();
+					processJobRanks.set(jobRank);
+					rts.changeProcesses(pJob.getID(), processJobRanks, attrMrg);
 				}
 			}
-		} catch (Exception e) {
-			/*
-			 * Show message of all other exceptions and change machine status to
-			 * error.
-			 */
-			AttributeManager attrManager = new AttributeManager();
-			attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-			attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(
-					NLS.bind(Messages.MPICH2MonitorJob_Exception_InternalError, e.getMessage())));
-			rts.changeMachine(machine.getID(), attrManager);
-			return new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), NLS.bind(
-					Messages.MPICH2MonitorJob_Exception_InternalError, e.getMessage()), e);
 		}
-
-		return Status.OK_STATUS;
 	}
 }

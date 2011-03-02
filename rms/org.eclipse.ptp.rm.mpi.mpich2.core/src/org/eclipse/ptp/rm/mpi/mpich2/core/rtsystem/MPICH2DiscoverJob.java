@@ -11,18 +11,16 @@
 package org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
-import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2MachineAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2NodeAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
@@ -50,77 +48,44 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 	 * io.BufferedReader)
 	 */
 	@Override
-	protected IStatus parse(BufferedReader output) {
+	protected void parse(BufferedReader output) throws CoreException {
 		/*
-		 * MPI resource manager have only one machine and one queue. There they
-		 * are implicitly "discovered".
+		 * Parse output of trace command that describes the system
+		 * configuration.
 		 */
-		IPResourceManager rm = (IPResourceManager) rts.getResourceManager().getAdapter(IPResourceManager.class);
-		String machineID = rts.createMachine(rm.getName());
-		rts.setMachineID(machineID);
-		String queueID = rts.createQueue(Messages.MPICH2DiscoverJob_defaultQueueName);
-		rts.setQueueID(queueID);
-
-		IPMachine machine = rm.getMachineById(machineID);
-		assert machine != null;
-
-		/*
-		 * Any exception from now on is caught in order to add the error message
-		 * as an attribute to the machine. Then, the exception is re-thrown.
-		 */
+		MPICH2TraceParser parser = new MPICH2TraceParser();
+		MPICH2HostMap hostMap;
 		try {
-			/*
-			 * Parse output of trace command that describes the system
-			 * configuration.
-			 */
-			MPICH2TraceParser parser = new MPICH2TraceParser();
-			MPICH2HostMap hostMap = parser.parse(output);
-			if (hostMap == null) {
-				machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-				machine.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(
-						Messages.MPICH2DiscoverJob_Exception_HostFileParseError));
-				return new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), parser.getErrorMessage());
-			}
-
-			/*
-			 * Create model according to data from discover.
-			 */
-			int nodeCounter = 0;
-
-			for (MPICH2HostMap.Host host : hostMap.getHosts()) {
-
-				// Add node to model
-				String nodeId = rts.createNode(machineID, host.getName(), nodeCounter++);
-
-				// Add processor information to node.
-				AttributeManager attrManager = new AttributeManager();
-				if (host.getNumProcessors() != 0) {
-					try {
-						attrManager.addAttribute(MPICH2NodeAttributes.getNumberOfNodesAttributeDefinition().create(
-								Integer.valueOf(host.getNumProcessors())));
-					} catch (IllegalValueException e) {
-						// This situation is not possible since
-						// host.getNumProcessors() is always valid.
-						assert false;
-					}
-				}
-				rts.changeNode(nodeId, attrManager);
-				rts.setNodeIDForName(host.getName(), nodeId);
-			}
-		} catch (Exception e) {
-			/*
-			 * Show message of all other exceptions and change machine status to
-			 * error.
-			 */
-			AttributeManager attrManager = new AttributeManager();
-			attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-			attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(
-					NLS.bind(Messages.MPICH2DiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage())));
-			rts.changeMachine(machineID, attrManager);
-			return new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), NLS.bind(
-					Messages.MPICH2DiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage()), e);
+			hostMap = parser.parse(output);
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(),
+					parser.getErrorMessage()));
 		}
 
-		return Status.OK_STATUS;
+		/*
+		 * Create model according to data from discover.
+		 */
+		int nodeCounter = 0;
+
+		for (MPICH2HostMap.Host host : hostMap.getHosts()) {
+
+			// Add node to model
+			String nodeId = rts.createNode(rts.getMachineId(), host.getName(), nodeCounter++);
+
+			// Add processor information to node.
+			AttributeManager attrManager = new AttributeManager();
+			if (host.getNumProcessors() != 0) {
+				try {
+					attrManager.addAttribute(MPICH2NodeAttributes.getNumberOfNodesAttributeDefinition().create(
+							Integer.valueOf(host.getNumProcessors())));
+				} catch (IllegalValueException e) {
+					// This situation is not possible since
+					// host.getNumProcessors() is always valid.
+					assert false;
+				}
+			}
+			rts.changeNode(nodeId, attrManager);
+			rts.setNodeIDForName(host.getName(), nodeId);
+		}
 	}
 }

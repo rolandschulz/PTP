@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
@@ -27,9 +28,13 @@ import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
+import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPILaunchAttributes;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIMachineAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfigurationDefaults;
@@ -68,12 +73,12 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * createRuntimeSystemJob(java.lang.String, java.lang.String,
+	 * createRuntimeSystemJob(java.lang.String,
 	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
-		return new OpenMPIRuntimeSystemJob(jobID, queueID, Messages.OpenMPIRuntimeSystem_JobName, this, attrMgr);
+	public Job createRuntimeSystemJob(String jobID, AttributeManager attrMgr) {
+		return new OpenMPIRuntimeSystemJob(jobID, Messages.OpenMPIRuntimeSystem_JobName, this, attrMgr);
 	}
 
 	/*
@@ -144,8 +149,9 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	@Override
 	protected Job createDiscoverJob(IProgressMonitor monitor) {
-		if (!rmConfiguration.hasDiscoverCmd())
+		if (!rmConfiguration.hasDiscoverCmd()) {
 			return null;
+		}
 		Job job = new OpenMPIDiscoverJob(this, monitor);
 		job.setPriority(Job.INTERACTIVE);
 		job.setSystem(false);
@@ -204,7 +210,8 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
-		// Nothing to do
+		machineID = createMachine(connection.getName());
+		queueID = createQueue(Messages.OpenMPIDiscoverJob_defaultQueueName);
 	}
 
 	/*
@@ -218,11 +225,27 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 		// Nothing to do
 	}
 
-	protected void setMachineID(String machineID) {
-		this.machineID = machineID;
-	}
-
-	protected void setQueueID(String queueID) {
-		this.queueID = queueID;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * notifyMonitorFailed
+	 * (org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob,
+	 * java.lang.Exception)
+	 */
+	@Override
+	protected void notifyMonitorFailed(AbstractRemoteCommandJob job, Exception exception) {
+		/*
+		 * Show status message and change machine status to error.
+		 */
+		AttributeManager attrManager = new AttributeManager();
+		attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
+		attrManager.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(
+				NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandInternalError, exception.getMessage())));
+		changeMachine(machineID, attrManager);
+		IPResourceManager rm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		if (rm != null) {
+			rm.addAttribute(ResourceManagerAttributes.getStateAttributeDefinition().create(ResourceManagerAttributes.State.ERROR));
+		}
 	}
 }

@@ -66,9 +66,9 @@ public class OpenMPIHostMap {
 		}
 	}
 
-	List<Host> hosts = new ArrayList<Host>();
-	Map<String, Host> hostNameToHost = new HashMap<String, Host>();
-	boolean hasErrors = false;
+	private final List<Host> hosts = new ArrayList<Host>();
+	private final Map<String, Host> hostNameToHost = new HashMap<String, Host>();
+	private boolean hasErrors = false;
 
 	protected void addHost(Host host) {
 		hosts.add(host);
@@ -101,4 +101,12 @@ public class OpenMPIHostMap {
 	public boolean hasParseErrors() {
 		return hasErrors;
 	}
+
+	/**
+	 * @since 4.0
+	 */
+	public void setHasParseErrors(boolean flag) {
+		hasErrors = flag;
+	}
+
 }

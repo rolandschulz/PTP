@@ -14,36 +14,44 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPElement;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
+import org.eclipse.ptp.rm.generic.core.GenericRMCorePlugin;
 import org.eclipse.ptp.rm.generic.core.messages.Messages;
 import org.eclipse.ptp.rm.generic.core.rmsystem.EffectiveGenericRMConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 
-	/** The machine we are running on. */
-	private String fMachineID;
 	/** The node we are running on. */
 	private String fNodeID;
-	/** The queue that dispatches jobs */
-	private String fQueueID;
 
 	public GenericRMRuntimeSystem(IResourceManagerControl rm, IToolRMConfiguration config) {
 		super(rm, config);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * createRuntimeSystemJob(java.lang.String,
+	 * org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
-	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
-		return new GenericRMRuntimeSystemJob(jobID, queueID, Messages.GenericRMRuntimeSystem_JobName, this, attrMgr);
+	public Job createRuntimeSystemJob(String jobID, AttributeManager attrMgr) {
+		return new GenericRMRuntimeSystemJob(jobID, Messages.GenericRMRuntimeSystem_JobName, this, attrMgr);
 	}
 
 	/*
@@ -57,6 +65,16 @@ public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 	public List<IAttribute<?, ?, ?>> getAttributes(ILaunchConfiguration configuration, String mode) throws CoreException {
 		List<IAttribute<?, ?, ?>> attrs = super.getAttributes(configuration, mode);
 
+		IPResourceManager rm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		if (rm != null) {
+			IPQueue[] queues = rm.getQueues();
+			if (queues.length != 1) {
+				throw new CoreException(new Status(IStatus.ERROR, GenericRMCorePlugin.getUniqueIdentifier(),
+						Messages.GenericRMRuntimeSystem_noDefaultQueue));
+			}
+			attrs.add(JobAttributes.getQueueIdAttributeDefinition().create(queues[0].getID()));
+		}
+
 		/*
 		 * Always set the number of processes to 1
 		 */
@@ -67,18 +85,6 @@ public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 		}
 
 		return attrs;
-	}
-
-	public String getMachineID() {
-		return fMachineID;
-	}
-
-	public String getNodeID() {
-		return fNodeID;
-	}
-
-	public String getQueueID() {
-		return fQueueID;
 	}
 
 	/*
@@ -172,9 +178,9 @@ public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
-		setMachineID(createMachine(connection.getName()));
-		setNodeID(createNode(getMachineID(), connection.getAddress(), 0));
-		setQueueID(createQueue(Messages.GenericRMRuntimeSystem_0));
+		String machineId = createMachine(connection.getName());
+		fNodeID = createNode(machineId, connection.getAddress(), 0);
+		createQueue(Messages.GenericRMRuntimeSystem_0);
 	}
 
 	/*
@@ -188,15 +194,7 @@ public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 		// Nothing to do
 	}
 
-	protected void setMachineID(String machineID) {
-		fMachineID = machineID;
-	}
-
-	protected void setNodeID(String nodeID) {
-		fNodeID = nodeID;
-	}
-
-	protected void setQueueID(String queueID) {
-		fQueueID = queueID;
+	protected String getNodeId() {
+		return fNodeID;
 	}
 }

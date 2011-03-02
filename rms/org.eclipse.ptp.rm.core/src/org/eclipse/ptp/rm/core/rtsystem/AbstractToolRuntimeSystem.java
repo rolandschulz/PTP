@@ -305,7 +305,6 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		 */
 		String jobID = generateID().toString();
 		jobAttrMgr.addAttribute(JobAttributes.getJobIdAttributeDefinition().create(jobID));
-		jobAttrMgr.addAttribute(JobAttributes.getQueueIdAttributeDefinition().create(parentID));
 		jobAttrMgr.addAttribute(JobAttributes.getStatusAttributeDefinition().create(MPIJobAttributes.Status.NORMAL.toString()));
 		jobAttrMgr.addAttribute(JobAttributes.getUserIdAttributeDefinition().create(System.getenv("USER"))); //$NON-NLS-1$
 		jobAttrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(generateJobName()));
@@ -605,6 +604,13 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		doStartEvents();
 	}
 
+	/**
+	 * @since 3.0
+	 */
+	protected void notifyMonitorFailed(AbstractRemoteCommandJob job, Exception exception) {
+		// Override if necessary
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -755,7 +761,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		/*
 		 * Create the job that runs the application.
 		 */
-		Job job = createRuntimeSystemJob(jobID, queueID, attrMgr);
+		Job job = createRuntimeSystemJob(jobID, attrMgr);
 		jobs.put(jobID, job);
 		try {
 			pendingJobQueue.put(job);
@@ -856,12 +862,12 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 
 	/**
 	 * @param jobID
-	 * @param queueID
 	 * @param attrMgr
 	 * @return
 	 * @throws CoreException
+	 * @since 3.0
 	 */
-	protected abstract Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) throws CoreException;
+	protected abstract Job createRuntimeSystemJob(String jobID, AttributeManager attrMgr) throws CoreException;
 
 	/**
 	 * Template method to extend the filterEvents procedure.

@@ -56,9 +56,11 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	private InputStreamObserver stderrObserver;
 	private InputStreamObserver stdoutObserver;
 
-	public MPICH2RuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem,
-			AttributeManager attrMgr) {
-		super(jobID, queueID, name, rtSystem, attrMgr);
+	/**
+	 * @since 2.0
+	 */
+	public MPICH2RuntimeSystemJob(String jobID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
+		super(jobID, name, rtSystem, attrMgr);
 	}
 
 	/**
