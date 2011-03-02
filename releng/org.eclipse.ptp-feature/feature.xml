@@ -5,7 +5,9 @@
       version="5.0.0.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.ptp"
-      image="eclipse_update_120.jpg">
+      image="eclipse_update_120.jpg"
+      license-feature="org.eclipse.ptp.license"
+      license-feature-version="1.0.0.qualifier">
 
    <description url="http://eclipse.org/ptp">
       %description
@@ -14,10 +16,6 @@
    <copyright>
       %copyright
    </copyright>
-
-   <license url="%licenseURL">
-      %license
-   </license>
 
    <url>
       <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
