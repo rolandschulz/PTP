@@ -3,6 +3,7 @@ feature@org.eclipse.ptp.master=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsr
 
 ! PTP features
 feature@org.eclipse.ptp=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp-feature
+feature@org.eclipse.ptp.license=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.license-feature
 feature@org.eclipse.ptp.utils=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.utils-feature
 feature@org.eclipse.ptp.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.core-feature
 feature@org.eclipse.ptp.remote=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.remote-feature
