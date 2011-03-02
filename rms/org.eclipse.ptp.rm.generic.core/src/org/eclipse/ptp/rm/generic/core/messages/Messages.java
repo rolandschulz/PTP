@@ -19,6 +19,7 @@ public class Messages extends NLS {
 	public static String GenericRMServiceProvider_defaultDescription;
 	public static String GenericRMServiceProvider_defaultName;
 	public static String GenericRMRuntimeSystem_JobName;
+	public static String GenericRMRuntimeSystem_noDefaultQueue;
 	public static String GenericRMRuntimeSystemJob_Exception_ExecutionFailedWithExitValue;
 
 	static {

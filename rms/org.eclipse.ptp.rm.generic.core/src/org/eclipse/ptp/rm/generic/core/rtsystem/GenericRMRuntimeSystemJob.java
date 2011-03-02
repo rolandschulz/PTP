@@ -36,9 +36,8 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	private InputStreamObserver stderrObserver;
 	private InputStreamObserver stdoutObserver;
 
-	public GenericRMRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem,
-			AttributeManager attrMgr) {
-		super(jobID, queueID, name, rtSystem, attrMgr);
+	public GenericRMRuntimeSystemJob(String jobID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
+		super(jobID, name, rtSystem, attrMgr);
 	}
 
 	/**
@@ -75,7 +74,7 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		final BitSet processIndices = new BitSet();
 		processIndices.set(0);
 		AttributeManager attrMgr = new AttributeManager();
-		attrMgr.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(rts.getNodeID()));
+		attrMgr.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(rts.getNodeId()));
 		attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
 		getRtSystem().changeProcesses(job.getID(), processIndices, attrMgr);
 	}

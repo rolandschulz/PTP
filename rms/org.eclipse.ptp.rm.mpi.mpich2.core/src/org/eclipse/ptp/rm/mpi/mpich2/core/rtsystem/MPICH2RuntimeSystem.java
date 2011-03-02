@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
@@ -27,9 +28,12 @@ import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
+import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2LaunchAttributes;
+import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2MachineAttributes;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfigurationDefaults;
@@ -47,8 +51,6 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 
 	/** The machine where open mpi is running on. */
 	private String machineID;
-	/** The queue that dispatches jobs to mpi. */
-	private String queueID;
 	/** Mapping of discovered hosts and their ID for IPNode elements. */
 	private final Map<String, String> nodeNameToIDMap = new HashMap<String, String>();
 
@@ -63,24 +65,12 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * createRuntimeSystemJob(java.lang.String, java.lang.String,
+	 * createRuntimeSystemJob(java.lang.String,
 	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	public Job createRuntimeSystemJob(String jobID, String queueID, AttributeManager attrMgr) {
-		return new MPICH2RuntimeSystemJob(jobID, queueID, Messages.MPICH2RuntimeSystem_JobName, this, attrMgr);
-	}
-
-	public String getMachineID() {
-		return machineID;
-	}
-
-	public String getNodeIDforName(String hostname) {
-		return nodeNameToIDMap.get(hostname);
-	}
-
-	public String getQueueID() {
-		return queueID;
+	public Job createRuntimeSystemJob(String jobID, AttributeManager attrMgr) {
+		return new MPICH2RuntimeSystemJob(jobID, Messages.MPICH2RuntimeSystem_JobName, this, attrMgr);
 	}
 
 	/*
@@ -98,7 +88,8 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 		if (rm != null) {
 			IPQueue[] queues = rm.getQueues();
 			if (queues.length != 1) {
-				throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getUniqueIdentifier(), Messages.MPICH2RuntimeSystem_NoDefaultQueue));
+				throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getUniqueIdentifier(),
+						Messages.MPICH2RuntimeSystem_NoDefaultQueue));
 			}
 			attrs.add(JobAttributes.getQueueIdAttributeDefinition().create(queues[0].getID()));
 		}
@@ -108,13 +99,18 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 		try {
 			attrs.add(JobAttributes.getNumberOfProcessesAttributeDefinition().create(Integer.valueOf(numProcs)));
 		} catch (IllegalValueException e) {
-			throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getUniqueIdentifier(), Messages.MPICH2RuntimeSystem_InvalidConfiguration, e));
+			throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getUniqueIdentifier(),
+					Messages.MPICH2RuntimeSystem_InvalidConfiguration, e));
 		}
 
 		attrs.add(MPICH2LaunchAttributes.getLaunchArgumentsAttributeDefinition().create(
 				MPICH2LaunchConfiguration.calculateArguments(configuration)));
 
 		return attrs;
+	}
+
+	public String getNodeIDforName(String hostname) {
+		return nodeNameToIDMap.get(hostname);
 	}
 
 	/*
@@ -226,7 +222,8 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
-		// Nothing to do
+		machineID = createMachine(getResourceManager().getName());
+		createQueue(Messages.MPICH2DiscoverJob_defaultQueueName);
 	}
 
 	/*
@@ -240,11 +237,30 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 		// Nothing to do
 	}
 
-	protected void setMachineID(String machineID) {
-		this.machineID = machineID;
+	/**
+	 * @since 2.0
+	 */
+	protected String getMachineId() {
+		return machineID;
 	}
 
-	protected void setQueueID(String queueID) {
-		this.queueID = queueID;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * notifyMonitorFailed
+	 * (org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob)
+	 */
+	@Override
+	protected void notifyMonitorFailed(AbstractRemoteCommandJob job, Exception exception) {
+		/*
+		 * Show message of all other exceptions and change machine status to
+		 * error.
+		 */
+		AttributeManager attrManager = new AttributeManager();
+		attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
+		attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(
+				NLS.bind(Messages.MPICH2MonitorJob_Exception_InternalError, exception.getMessage())));
+		changeMachine(machineID, attrManager);
 	}
 }
