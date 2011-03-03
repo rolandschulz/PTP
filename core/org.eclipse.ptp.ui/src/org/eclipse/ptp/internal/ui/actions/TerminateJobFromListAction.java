@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class TerminateJobFromListAction extends Action {
 
-	JobsListView view;
+	private JobsListView view;
 
 	/**
 	 * 
