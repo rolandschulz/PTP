@@ -279,5 +279,4 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 			env.put("destination", queues.get(1)); //$NON-NLS-1$
 		}
 	}
-
 }

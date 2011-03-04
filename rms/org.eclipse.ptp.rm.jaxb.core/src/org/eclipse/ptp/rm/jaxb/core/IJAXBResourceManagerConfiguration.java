@@ -1,8 +1,7 @@
-package org.eclipse.ptp.rm.jaxb.core.rm;
+package org.eclipse.ptp.rm.jaxb.core;
 
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
-import org.eclipse.ptp.rm.jaxb.core.rmsystem.IControlMonitorRMConfiguration;
 
 public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConfiguration {
 	/**

@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.jaxb.core.rmsystem;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ptp.rm.jaxb.core.IControlMonitorRMConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProvider;

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="streamParserTokenizer" name="StreamParserTokenizer" schema="schema/streamParserTokenizer.exsd"/>
    <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
@@ -24,6 +25,14 @@
             resolver="org.eclipse.ptp.rm.jaxb.core.variables.RMVariableResolver"
             supportsArgument="true">
       </variable>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer">
+      <StreamParserTokenizer
+            class="org.eclipse.ptp.rm.jaxb.core.runnable.ConfigurableRegexTokenizer"
+            id="org.eclipse.ptp.rm.jaxb.configurableRegexTokenizer"
+            name="Configurable Regex Tokenizer">
+      </StreamParserTokenizer>
    </extension>
 
 </plugin>

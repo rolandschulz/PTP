@@ -1,10 +1,12 @@
-package org.eclipse.ptp.rm.jaxb.core.data;
+package org.eclipse.ptp.rm.jaxb.core.data.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.data.Arg;
+import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ArglistImpl implements IJAXBNonNLSConstants {

@@ -9,7 +9,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
-import org.eclipse.ptp.rm.jaxb.core.data.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.data.DirectiveDefinition;
 import org.eclipse.ptp.rm.jaxb.core.data.DirectiveDefinitions;
 import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
@@ -18,8 +17,9 @@ import org.eclipse.ptp.rm.jaxb.core.data.ExecuteCommand;
 import org.eclipse.ptp.rm.jaxb.core.data.PostExecuteCommands;
 import org.eclipse.ptp.rm.jaxb.core.data.PreExecuteCommands;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
+import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.core.utils.EnvVarUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
@@ -52,7 +52,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		}
 		for (DirectiveDefinition def : defs.getDirectiveDefinition()) {
 			String key = def.getValueFrom();
-			String value = EnvVarUtils.getValue(key, map);
+			String value = EnvironmentVariableUtils.getValue(key, map);
 			if (value != null && !ZEROSTR.equals(value)) {
 				buffer.append(def.getContent()).append(value.trim()).append(REMOTE_LINE_SEP);
 			}
@@ -63,17 +63,17 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		String syntax = getSyntax(script.getShell());
 		if (!appendEnv) {
 			for (String var : live.keySet()) {
-				EnvVarUtils.addVariable(var, live.get(var), syntax, buffer);
+				EnvironmentVariableUtils.addVariable(var, live.get(var), syntax, buffer);
 			}
 		} else {
 			if (vars != null) {
 				for (EnvironmentVariable var : vars.getEnvironmentVariable()) {
-					EnvVarUtils.addVariable(var, syntax, buffer, map);
+					EnvironmentVariableUtils.addVariable(var, syntax, buffer, map);
 				}
 			}
 
 			for (String var : live.keySet()) {
-				EnvVarUtils.addVariable(var, live.get(var), syntax, buffer);
+				EnvironmentVariableUtils.addVariable(var, live.get(var), syntax, buffer);
 			}
 		}
 	}

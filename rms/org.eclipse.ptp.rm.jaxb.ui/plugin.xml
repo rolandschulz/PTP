@@ -37,5 +37,12 @@
          </action>
       </viewContribution>
    </extension>
+   <extension
+         point="org.eclipse.ptp.launch.rmLaunchConfigurations">
+      <launchConfiguration
+            class="org.eclipse.ptp.rm.jaxb.ui.launch.JAXBRMLaunchConfigurationFactory"
+            id="org.eclipse.ptp.rm.jaxb.ui.launchConfiguration">
+      </launchConfiguration>
+   </extension>
 
 </plugin>

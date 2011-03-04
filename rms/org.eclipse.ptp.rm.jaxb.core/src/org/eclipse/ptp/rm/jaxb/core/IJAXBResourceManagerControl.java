@@ -1,6 +1,5 @@
 package org.eclipse.ptp.rm.jaxb.core;
 
-import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**

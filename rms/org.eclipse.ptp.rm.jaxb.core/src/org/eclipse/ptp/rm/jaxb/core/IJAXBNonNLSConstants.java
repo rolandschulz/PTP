@@ -33,6 +33,7 @@ public interface IJAXBNonNLSConstants {
 	String HYPH = "-";//$NON-NLS-1$
 	String AMP = "@";//$NON-NLS-1$
 	String DOL = "$";//$NON-NLS-1$
+	String PIP = "|";//$NON-NLS-1$
 	String OPENV = "${";//$NON-NLS-1$
 	String OPENVRM = "${rm:";//$NON-NLS-1$
 	String CLOSV = "}";//$NON-NLS-1$
@@ -105,8 +106,10 @@ public interface IJAXBNonNLSConstants {
 
 	String STARTUP = "OnStartUp";;//$NON-NLS-1$
 	String SHUTDOWN = "OnShutDown";;//$NON-NLS-1$
-	String DISCATTR = "DiscoverAttributes";;//$NON-NLS-1$
+	String DISCATTR = "DiscoverAttributes";//$NON-NLS-1$
 
+	String JOB_ATTRIBUTE = "jobAttribute";//$NON-NLS-1$
+	String PROPERTY = "property";//$NON-NLS-1$
 	String QUEUES = "available_queues";//$NON-NLS-1$
 	String JOB_ID = "jobId";//$NON-NLS-1$
 	String EXEC_PATH = "executablePath";//$NON-NLS-1$
@@ -115,4 +118,11 @@ public interface IJAXBNonNLSConstants {
 	String MPI_CMD = "mpiCommand";//$NON-NLS-1$
 	String MPI_ARGS = "mpiArgs";//$NON-NLS-1$
 
+	String CASE_INSENSITIVE = "CASE_INSENSITIVE";//$NON-NLS-1$
+	String MULTILINE = "MULTILINE";//$NON-NLS-1$
+	String DOTALL = "DOTALL";//$NON-NLS-1$
+	String UNICODE_CASE = "UNICODE_CASE";//$NON-NLS-1$
+	String CANON_EQ = "CANON_EQ";//$NON-NLS-1$
+	String LITERAL = "LITERAL";//$NON-NLS-1$
+	String COMMENTS = "COMMENTS";//$NON-NLS-1$
 }

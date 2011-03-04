@@ -1,0 +1,6 @@
+mca:.*:param:([^:]*)
+mca:.*:param:[^:]*:value:(.*)
+mca:.*:param:[^:]*:status:(.*)
+mca:.*:param:[^:]*:help:(.*)
+(.*):[^:]*
+.*:([^:]*)

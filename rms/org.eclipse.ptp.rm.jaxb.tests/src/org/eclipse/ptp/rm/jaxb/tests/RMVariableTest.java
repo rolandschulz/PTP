@@ -3,7 +3,7 @@ package org.eclipse.ptp.rm.jaxb.tests;
 import junit.framework.TestCase;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.utils.JAXBUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class RMVariableTest extends TestCase implements IJAXBNonNLSConstants {
@@ -22,9 +22,9 @@ public class RMVariableTest extends TestCase implements IJAXBNonNLSConstants {
 
 	public void testJAXBLoadVariables() {
 		try {
-			JAXBUtils.validate(xml);
+			JAXBInitializationUtils.validate(xml);
 			RMVariableMap map = RMVariableMap.setActiveInstance(null);
-			JAXBUtils.initializeMap(JAXBUtils.initializeRMData(xml), map);
+			JAXBInitializationUtils.initializeMap(JAXBInitializationUtils.initializeRMData(xml), map);
 			String exp = map.getString("${rm:stagein#description}"); //$NON-NLS-1$
 			System.out.println(exp);
 			assertEquals(Messages.RMVariableTest_1, exp);

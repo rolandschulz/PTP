@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.core.rmsystem;
+package org.eclipse.ptp.rm.jaxb.core;
 
 import java.util.List;
 

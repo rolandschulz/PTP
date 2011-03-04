@@ -9,7 +9,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
-import org.eclipse.ptp.rm.jaxb.core.utils.JAXBUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
@@ -29,11 +29,11 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 	public void testJAXBRMInstantiation() {
 		ResourceManagerData rmdata = null;
 		try {
-			JAXBUtils.validate(xml);
-			rmdata = JAXBUtils.initializeRMData(xml);
+			JAXBInitializationUtils.validate(xml);
+			rmdata = JAXBInitializationUtils.initializeRMData(xml);
 			if (rmdata != null) {
 				RMVariableMap map = RMVariableMap.setActiveInstance(null);
-				JAXBUtils.initializeMap(rmdata, map);
+				JAXBInitializationUtils.initializeMap(rmdata, map);
 				print(map);
 			}
 		} catch (Throwable t) {

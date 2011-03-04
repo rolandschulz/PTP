@@ -6,11 +6,12 @@ import java.net.URISyntaxException;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.Site;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.rmsystem.AbstractControlMonitorRMServiceProvider;
-import org.eclipse.ptp.rm.jaxb.core.utils.JAXBUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -220,7 +221,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		if (ZEROSTR.equals(location)) {
 			rmdata = null;
 		} else {
-			rmdata = JAXBUtils.initializeRMData(location);
+			rmdata = JAXBInitializationUtils.initializeRMData(location);
 		}
 	}
 
@@ -239,7 +240,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 	public void setActive() {
 		map = RMVariableMap.setActiveInstance(map);
 		if (!map.isInitialized()) {
-			JAXBUtils.initializeMap(rmdata, map);
+			JAXBInitializationUtils.initializeMap(rmdata, map);
 		}
 	}
 
