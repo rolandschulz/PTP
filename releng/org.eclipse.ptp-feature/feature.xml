@@ -16,6 +16,10 @@
       %copyright
    </copyright>
 
+   <license url="%licenseURL">
+      %license
+   </license>
+  
    <url>
       <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
    </url>
