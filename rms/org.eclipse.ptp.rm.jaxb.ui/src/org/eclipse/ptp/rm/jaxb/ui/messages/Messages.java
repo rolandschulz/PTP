@@ -14,6 +14,8 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.jaxb.ui.messages.messages"; //$NON-NLS-1$
+	public static String JAXBRMLaunchConfigurationFactory_doCreateError;
+
 	public static String HideResourceManagerEditor;
 	public static String HideResourceManagerEditorAction_error;
 	public static String HideResourceManagerEditorAction_title;

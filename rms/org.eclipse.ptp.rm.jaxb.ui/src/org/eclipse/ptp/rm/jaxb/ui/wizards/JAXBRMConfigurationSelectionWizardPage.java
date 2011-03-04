@@ -1,7 +1,7 @@
 package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.ConfigurationChoiceContainer;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;

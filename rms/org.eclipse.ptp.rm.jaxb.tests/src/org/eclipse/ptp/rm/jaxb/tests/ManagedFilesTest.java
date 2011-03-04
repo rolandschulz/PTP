@@ -19,7 +19,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
-import org.eclipse.ptp.rm.jaxb.core.utils.JAXBUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
@@ -40,11 +40,11 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	@Override
 	public void setUp() {
 		try {
-			JAXBUtils.validate(xml);
-			ResourceManagerData rmdata = JAXBUtils.initializeRMData(xml);
+			JAXBInitializationUtils.validate(xml);
+			ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(xml);
 			controlData = rmdata.getControl();
 			RMVariableMap map = RMVariableMap.setActiveInstance(null);
-			JAXBUtils.initializeMap(rmdata, map);
+			JAXBInitializationUtils.initializeMap(rmdata, map);
 			env = map.getVariables();
 			appendEnv = true;
 			live = new HashMap<String, String>();

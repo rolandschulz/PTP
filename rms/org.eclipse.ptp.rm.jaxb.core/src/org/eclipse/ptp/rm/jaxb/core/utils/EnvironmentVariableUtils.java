@@ -6,9 +6,9 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
-public class EnvVarUtils implements IJAXBNonNLSConstants {
+public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 
-	private EnvVarUtils() {
+	private EnvironmentVariableUtils() {
 	}
 
 	public static void addVariable(EnvironmentVariable var, Map<String, String> env, RMVariableMap map) {

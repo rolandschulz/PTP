@@ -1,4 +1,4 @@
-package org.eclipse.ptp.rm.jaxb.core.data;
+package org.eclipse.ptp.rm.jaxb.core.rm;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,15 +23,15 @@ import org.osgi.framework.Bundle;
  * @author arossi
  * 
  */
-public class AvailableJAXBRMConfigurations implements IJAXBNonNLSConstants {
+public class JAXBRMConfigurationManager implements IJAXBNonNLSConstants {
 
-	private static AvailableJAXBRMConfigurations instance;
+	private static JAXBRMConfigurationManager instance;
 	private String[] types;
 	private Properties rmXmlNames;
 	private Properties rmXmlValues;
 	private final Map<String, String> external;
 
-	private AvailableJAXBRMConfigurations() {
+	private JAXBRMConfigurationManager() {
 		setInternal();
 		this.external = new TreeMap<String, String>();
 	}
@@ -123,9 +123,9 @@ public class AvailableJAXBRMConfigurations implements IJAXBNonNLSConstants {
 		}
 	}
 
-	public synchronized static AvailableJAXBRMConfigurations getInstance() {
+	public synchronized static JAXBRMConfigurationManager getInstance() {
 		if (instance == null) {
-			instance = new AvailableJAXBRMConfigurations();
+			instance = new JAXBRMConfigurationManager();
 		}
 		return instance;
 	}

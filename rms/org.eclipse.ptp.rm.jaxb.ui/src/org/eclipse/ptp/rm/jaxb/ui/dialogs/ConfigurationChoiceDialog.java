@@ -9,7 +9,7 @@ package org.eclipse.ptp.rm.jaxb.ui.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;

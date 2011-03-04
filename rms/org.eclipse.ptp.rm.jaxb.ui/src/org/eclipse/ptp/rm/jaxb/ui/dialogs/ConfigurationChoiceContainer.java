@@ -10,9 +10,9 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.AvailableJAXBRMConfigurations;
-import org.eclipse.ptp.rm.jaxb.core.rm.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.utils.JAXBUtils;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.rm.JAXBRMConfigurationManager;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;
@@ -69,7 +69,7 @@ public abstract class ConfigurationChoiceContainer implements IJAXBNonNLSConstan
 	private boolean isPreset;
 	private IJAXBResourceManagerConfiguration config;
 	private IMemento memento;
-	private AvailableJAXBRMConfigurations available;
+	private JAXBRMConfigurationManager available;
 
 	public ConfigurationChoiceContainer(Composite parent) {
 
@@ -126,7 +126,7 @@ public abstract class ConfigurationChoiceContainer implements IJAXBNonNLSConstan
 	}
 
 	public void setAvailableConfigurations() {
-		available = AvailableJAXBRMConfigurations.getInstance();
+		available = JAXBRMConfigurationManager.getInstance();
 		if (preset != null) {
 			preset.setItems(available.getTypes());
 		}
@@ -288,7 +288,7 @@ public abstract class ConfigurationChoiceContainer implements IJAXBNonNLSConstan
 
 	private boolean validateSelected() {
 		try {
-			JAXBUtils.validate(selected);
+			JAXBInitializationUtils.validate(selected);
 		} catch (Throwable t) {
 			t.printStackTrace();
 			return false;

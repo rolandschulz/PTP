@@ -24,8 +24,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.Commands;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
-import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
-import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.Parsers;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
@@ -33,19 +31,19 @@ import org.eclipse.ptp.rm.jaxb.core.data.StreamParser;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.xml.sax.SAXException;
 
-public class JAXBUtils implements IJAXBNonNLSConstants {
+public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 
-	private JAXBUtils() {
+	private JAXBInitializationUtils() {
 	}
 
-	public static URL getURL(String xml) throws IOException {
-		URL instance = JAXBCorePlugin.getResource(xml);
+	public static URL getURL(String name) throws IOException {
+		URL instance = JAXBCorePlugin.getResource(name);
 		if (instance == null) {
-			File f = new File(xml);
+			File f = new File(name);
 			if (f.exists() && f.isFile()) {
 				instance = f.toURL();
 			} else {
-				throw new FileNotFoundException(xml);
+				throw new FileNotFoundException(name);
 			}
 		}
 		return instance;
@@ -67,9 +65,6 @@ public class JAXBUtils implements IJAXBNonNLSConstants {
 			JAXBException {
 		URL instance = getURL(xml);
 		return unmarshalResourceManagerData(instance);
-	}
-
-	public static void serializeScript(Map<String, Object> env, Control control) {
 	}
 
 	public static void validate(String xml) throws SAXException, IOException, URISyntaxException {
@@ -105,17 +100,6 @@ public class JAXBUtils implements IJAXBNonNLSConstants {
 		}
 	}
 
-	private static void addFiles(Map<String, Object> env, Control control) {
-		ManagedFiles mf = control.getManagedFiles();
-		if (mf == null) {
-			return;
-		}
-		List<ManagedFile> files = mf.getManagedFile();
-		for (ManagedFile file : files) {
-			env.put(file.getName(), file);
-		}
-	}
-
 	private static void addParsers(Map<String, Object> env, Control control) {
 		Parsers prsrs = control.getParsers();
 		if (prsrs == null) {
@@ -135,7 +119,7 @@ public class JAXBUtils implements IJAXBNonNLSConstants {
 	}
 
 	private static ResourceManagerData unmarshalResourceManagerData(URL xml) throws JAXBException, IOException {
-		JAXBContext jc = JAXBContext.newInstance(JAXB_CONTEXT, JAXBUtils.class.getClassLoader());
+		JAXBContext jc = JAXBContext.newInstance(JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
 		Unmarshaller u = jc.createUnmarshaller();
 		ResourceManagerData rmdata = (ResourceManagerData) u.unmarshal(xml.openStream());
 		return rmdata;
