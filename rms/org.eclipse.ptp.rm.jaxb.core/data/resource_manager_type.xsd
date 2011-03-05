@@ -540,30 +540,30 @@
 				<xs:element ref="add"/>
 				<xs:element ref="put"/>
 			</xs:choice>
-			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="to" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="set">
 		<xs:complexType>
-			<xs:attribute name="value" use="required" type="xs:int"/>
+			<xs:attribute name="valueIndex" use="required" type="xs:int"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="add">
 		<xs:complexType>
-			<xs:attribute name="values" use="required" type="xs:string"/>
+			<xs:attribute name="valueIndices" use="required" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="append">
 		<xs:complexType>
-			<xs:attribute name="values" use="required" type="xs:string"/>
-			<xs:attribute name="delim" type="xs:string"/>
-			<xs:attribute name="delimAtEnd" type="xs:boolean" default="false"/>
+			<xs:attribute name="valueIndices" use="required" type="xs:string"/>
+			<xs:attribute name="separator" type="xs:string"/>
+			<xs:attribute name="endSeparator" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="put">
 		<xs:complexType>
-			<xs:attribute name="keys" use="required" type="xs:string"/>
-			<xs:attribute name="values" use="required" type="xs:string"/>
+			<xs:attribute name="keyIndices" use="required" type="xs:string"/>
+			<xs:attribute name="valueIndices" use="required" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="validator">

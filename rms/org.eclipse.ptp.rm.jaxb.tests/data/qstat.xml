@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tokenizer>
+   <read delim="\n">
+      <match>
+         <regex>.*</regex>
+         <append target="available_queues" to="value" separator=", " groups="0"/>
+      </match>
+   </read>
+</tokenizer>
+
+<tokenizer>
+   <read delim="\n" all="true" save="1" fromLast="true">
+     
+   
+</tokenizer>

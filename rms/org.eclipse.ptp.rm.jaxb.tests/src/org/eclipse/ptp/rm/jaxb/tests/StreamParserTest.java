@@ -83,10 +83,31 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			match.setRegex(regex);
 			Assign assign = new Assign();
 			Append append = new Append();
-			append.setDelim(", "); //$NON-NLS-1$
-			append.setValues("0"); //$NON-NLS-1$
+			append.setSeparator(", "); //$NON-NLS-1$
+			append.setValueIndices("0"); //$NON-NLS-1$
 			assign.setAppend(append);
-			assign.setName("value"); //$NON-NLS-1$
+			assign.setTo("value"); //$NON-NLS-1$
+			match.getAssign().add(assign);
+			apply.getMatch().add(match);
+		} else if (name.equals("testParseQstat")) { //$NON-NLS-1$
+			apply = new Apply();
+			apply.setDelim(LINE_SEP);
+			String[] exp = regex();
+			for (String s : exp) {
+				// addApply(apply, s);
+			}
+
+			Match match = new Match();
+			match.setTarget(target);
+			Regex regex = new Regex();
+			regex.setContent(".*"); //$NON-NLS-1$
+			match.setRegex(regex);
+			Assign assign = new Assign();
+			Append append = new Append();
+			append.setSeparator(", "); //$NON-NLS-1$
+			append.setValueIndices("0"); //$NON-NLS-1$
+			assign.setAppend(append);
+			assign.setTo("value"); //$NON-NLS-1$
 			match.getAssign().add(assign);
 			apply.getMatch().add(match);
 		}
@@ -94,6 +115,10 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 	@Override
 	public void tearDown() {
+
+	}
+
+	public void testOpenMPI() {
 
 	}
 

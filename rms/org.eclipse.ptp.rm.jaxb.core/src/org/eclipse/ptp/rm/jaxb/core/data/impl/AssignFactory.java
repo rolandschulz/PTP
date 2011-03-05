@@ -13,7 +13,7 @@ public class AssignFactory {
 	}
 
 	public static IAssign createIAssign(Assign assign) {
-		String field = assign.getName();
+		String field = assign.getTo();
 		Add add = assign.getAdd();
 		if (add != null) {
 			return new AddImpl(field, add);

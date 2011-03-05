@@ -13,8 +13,8 @@ public class PutImpl extends AbstractRangeAssign {
 
 	public PutImpl(String field, Put put) {
 		this.field = field;
-		keys = new Range(put.getKeys());
-		range = new Range(put.getValues());
+		keys = new Range(put.getKeyIndices());
+		range = new Range(put.getValueIndices());
 		this.clzz = new Class[] { Object.class, Object.class };
 	}
 
