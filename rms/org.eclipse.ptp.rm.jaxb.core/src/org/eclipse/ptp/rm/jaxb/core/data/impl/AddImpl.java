@@ -10,6 +10,7 @@ public class AddImpl extends AbstractRangeAssign {
 	public AddImpl(String field, Add add) {
 		this.field = field;
 		range = new Range(add.getValues());
+		this.clzz = new Class[] { Object.class };
 	}
 
 	@SuppressWarnings("unchecked")

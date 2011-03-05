@@ -8,6 +8,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 
 	protected String field;
+	protected Class<?>[] clzz;
 
 	public void assign(Object target, String[] values) throws Throwable {
 		Object previous = get(target, field);
@@ -23,11 +24,6 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	}
 
 	private void set(Object target, String field, Object[] values) throws Throwable {
-		@SuppressWarnings("rawtypes")
-		Class[] clzz = new Class[values.length];
-		for (int i = 0; i < clzz.length; i++) {
-			clzz[i] = values[i].getClass();
-		}
 		String name = SET + field.substring(0, 1).toUpperCase() + field.substring(1);
 		Method method = target.getClass().getMethod(name, clzz);
 		method.invoke(target, values);
