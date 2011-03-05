@@ -172,7 +172,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	private String currentJobId() {
 		Property p = (Property) RMVariableMap.getActiveInstance().getVariables().get(JOB_ID);
 		if (p != null) {
-			return p.getValue();
+			return (String) p.getValue();
 		}
 		return null;
 	}
@@ -330,7 +330,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		assert (null != remoteFileManager);
 	}
 
-	private void maybeAddProperty(String name, String value, Map<String, Object> env) {
+	private void maybeAddProperty(String name, Object value, Map<String, Object> env) {
 		if (value == null) {
 			return;
 		}
@@ -370,14 +370,27 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void maybeOverwrite(String key1, String key2, ILaunchConfiguration configuration, Map<String, Object> env)
 			throws CoreException {
-		String value = null;
+		Object value = null;
 		Property p = (Property) env.get(key1);
 		if (p != null) {
 			value = p.getValue();
 		}
-		value = configuration.getAttribute(key2, value);
+
+		if (value instanceof Integer) {
+			value = configuration.getAttribute(key2, (Integer) value);
+		} else if (value instanceof Boolean) {
+			value = configuration.getAttribute(key2, (Boolean) value);
+		} else if (value instanceof String) {
+			value = configuration.getAttribute(key2, (String) value);
+		} else if (value instanceof List) {
+			value = configuration.getAttribute(key2, (List) value);
+		} else if (value instanceof Map) {
+			value = configuration.getAttribute(key2, (Map) value);
+		}
+
 		maybeAddProperty(key1, value, env);
 	}
 

@@ -15,6 +15,7 @@ public class PutImpl extends AbstractRangeAssign {
 		this.field = field;
 		keys = new Range(put.getKeys());
 		range = new Range(put.getValues());
+		this.clzz = new Class[] { Object.class, Object.class };
 	}
 
 	@SuppressWarnings("unchecked")

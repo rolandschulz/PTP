@@ -9,6 +9,7 @@ public class SetImpl extends AbstractAssign {
 	public SetImpl(String field, Set set) {
 		this.field = field;
 		index = set.getValue();
+		this.clzz = new Class[] { Object.class };
 	}
 
 	@Override

@@ -55,11 +55,8 @@ public class ApplyImpl implements IJAXBNonNLSConstants {
 		} else {
 			until = 0;
 		}
-		if (apply.getFor() == null) {
-			count = 0;
-		} else {
-			count = apply.getFor();
-		}
+
+		count = apply.getFor();
 		includeDelim = apply.isIncludeDelim();
 		buffer = new StringBuffer();
 	}

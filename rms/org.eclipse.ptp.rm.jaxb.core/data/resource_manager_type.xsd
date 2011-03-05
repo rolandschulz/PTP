@@ -90,7 +90,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="value" minOccurs="0" type="xs:string"/>
+				<xs:element name="value" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attribute name="name" type="xs:string"/>
 		</xs:complexType>
@@ -355,7 +355,7 @@
 				</xs:element>
 				<xs:element name="default" minOccurs="0" type="xs:string"/>
 				<xs:element minOccurs="0" ref="validator"/>
-				<xs:element name="value" minOccurs="0" type="xs:string"/>
+				<xs:element name="value" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attribute name="id" use="required" type="xs:string"/>
 			<xs:attribute name="name" use="required" type="xs:string"/>
@@ -484,7 +484,7 @@
 			</xs:sequence>
 			<xs:attribute name="delim" type="xs:string"/>
 			<xs:attribute name="includeDelim" type="xs:boolean" default="false"/>
-			<xs:attribute name="for" type="xs:int"/>
+			<xs:attribute name="for" type="xs:int" default="0"/>
 			<xs:attribute name="until" type="xs:string" default="EOS"/>
 		</xs:complexType>
 	</xs:element>

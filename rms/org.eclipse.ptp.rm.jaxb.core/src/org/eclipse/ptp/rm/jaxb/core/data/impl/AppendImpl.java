@@ -14,6 +14,7 @@ public class AppendImpl extends AbstractRangeAssign {
 		delim = append.getDelim();
 		delimAtEnd = append.isDelimAtEnd();
 		range = new Range(append.getValues());
+		this.clzz = new Class[] { Object.class };
 	}
 
 	@Override
