@@ -12,7 +12,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
 
 /**
  * <p>
@@ -26,8 +25,9 @@ import javax.xml.bind.annotation.XmlValue;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="flags" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="split" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
+ *       &lt;attribute name="idFrom" type="{http://www.w3.org/2001/XMLSchema}int" />
+ *       &lt;attribute name="ref" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="type" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -36,82 +36,78 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "content" })
-@XmlRootElement(name = "regex")
-public class Regex {
+@XmlType(name = "")
+@XmlRootElement(name = "target")
+public class Target {
 
-	@XmlValue
-	protected String content;
 	@XmlAttribute
-	protected String flags;
+	protected Integer idFrom;
 	@XmlAttribute
-	protected Boolean split;
+	protected String ref;
+	@XmlAttribute
+	protected String type;
 
 	/**
-	 * Gets the value of the content property.
+	 * Gets the value of the idFrom property.
+	 * 
+	 * @return possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getIdFrom() {
+		return idFrom;
+	}
+
+	/**
+	 * Gets the value of the ref property.
 	 * 
 	 * @return possible object is {@link String }
 	 * 
 	 */
-	public String getContent() {
-		return content;
+	public String getRef() {
+		return ref;
 	}
 
 	/**
-	 * Gets the value of the flags property.
+	 * Gets the value of the type property.
 	 * 
 	 * @return possible object is {@link String }
 	 * 
 	 */
-	public String getFlags() {
-		return flags;
+	public String getType() {
+		return type;
 	}
 
 	/**
-	 * Gets the value of the split property.
+	 * Sets the value of the idFrom property.
 	 * 
-	 * @return possible object is {@link Boolean }
+	 * @param value
+	 *            allowed object is {@link Integer }
 	 * 
 	 */
-	public boolean isSplit() {
-		if (split == null) {
-			return false;
-		} else {
-			return split;
-		}
+	public void setIdFrom(Integer value) {
+		this.idFrom = value;
 	}
 
 	/**
-	 * Sets the value of the content property.
+	 * Sets the value of the ref property.
 	 * 
 	 * @param value
 	 *            allowed object is {@link String }
 	 * 
 	 */
-	public void setContent(String value) {
-		this.content = value;
+	public void setRef(String value) {
+		this.ref = value;
 	}
 
 	/**
-	 * Sets the value of the flags property.
+	 * Sets the value of the type property.
 	 * 
 	 * @param value
 	 *            allowed object is {@link String }
 	 * 
 	 */
-	public void setFlags(String value) {
-		this.flags = value;
-	}
-
-	/**
-	 * Sets the value of the split property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link Boolean }
-	 * 
-	 */
-	public void setSplit(Boolean value) {
-		this.split = value;
+	public void setType(String value) {
+		this.type = value;
 	}
 
 }
