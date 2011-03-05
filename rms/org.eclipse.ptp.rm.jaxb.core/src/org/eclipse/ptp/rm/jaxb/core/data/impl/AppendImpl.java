@@ -6,14 +6,14 @@ import org.eclipse.ptp.rm.jaxb.core.data.Append;
 
 public class AppendImpl extends AbstractRangeAssign {
 
-	private final String delim;
-	private final boolean delimAtEnd;
+	private final String separator;
+	private final String endSeparator;
 
 	public AppendImpl(String field, Append append) {
 		this.field = field;
-		delim = append.getDelim();
-		delimAtEnd = append.isDelimAtEnd();
-		range = new Range(append.getValues());
+		separator = append.getSeparator();
+		endSeparator = append.getEndSeparator();
+		range = new Range(append.getValueIndices());
 		this.clzz = new Class[] { Object.class };
 	}
 
@@ -27,20 +27,20 @@ public class AppendImpl extends AbstractRangeAssign {
 		StringBuffer buffer = new StringBuffer();
 		if (previous != null && previous instanceof String) {
 			buffer.append(previous);
-			if (!delimAtEnd) {
-				buffer.append(delim);
+			if (null != separator) {
+				buffer.append(separator);
 			}
 		}
 		buffer.append(found.get(0).toString());
 		int sz = found.size();
 		for (int i = 1; i < sz; i++) {
-			if (delim != null) {
-				buffer.append(delim);
+			if (separator != null) {
+				buffer.append(separator);
 			}
 			buffer.append(found.get(i));
 		}
-		if (delimAtEnd) {
-			buffer.append(delim);
+		if (null != endSeparator) {
+			buffer.append(endSeparator);
 		}
 		return new Object[] { buffer.toString() };
 	}

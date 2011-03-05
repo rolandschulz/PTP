@@ -9,7 +9,7 @@ public class AddImpl extends AbstractRangeAssign {
 
 	public AddImpl(String field, Add add) {
 		this.field = field;
-		range = new Range(add.getValues());
+		range = new Range(add.getValueIndices());
 		this.clzz = new Class[] { Object.class };
 	}
 

@@ -5,22 +5,24 @@
 // Generated on: 2011.03.04 at 07:47:50 PM CST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  * 
  * <pre>
  * &lt;complexType>
@@ -44,188 +46,173 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "apply",
-    "match"
-})
+@XmlType(name = "", propOrder = { "apply", "match" })
 @XmlRootElement(name = "apply")
 public class Apply {
 
-    protected List<Apply> apply;
-    protected List<Match> match;
-    @XmlAttribute
-    protected String delim;
-    @XmlAttribute(name = "for")
-    protected Integer _for;
-    @XmlAttribute
-    protected Boolean includeDelim;
-    @XmlAttribute
-    protected String until;
+	protected List<Apply> apply;
+	protected List<Match> match;
+	@XmlAttribute
+	protected String delim;
+	@XmlAttribute(name = "for")
+	protected Integer _for;
+	@XmlAttribute
+	protected Boolean includeDelim;
+	@XmlAttribute
+	protected String until;
 
-    /**
-     * Gets the value of the apply property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the apply property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getApply().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Apply }
-     * 
-     * 
-     */
-    public List<Apply> getApply() {
-        if (apply == null) {
-            apply = new ArrayList<Apply>();
-        }
-        return this.apply;
-    }
+	/**
+	 * Gets the value of the apply property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a
+	 * snapshot. Therefore any modification you make to the returned list will
+	 * be present inside the JAXB object. This is why there is not a
+	 * <CODE>set</CODE> method for the apply property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getApply().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list {@link Apply }
+	 * 
+	 * 
+	 */
+	public List<Apply> getApply() {
+		if (apply == null) {
+			apply = new ArrayList<Apply>();
+		}
+		return this.apply;
+	}
 
-    /**
-     * Gets the value of the match property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the match property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getMatch().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Match }
-     * 
-     * 
-     */
-    public List<Match> getMatch() {
-        if (match == null) {
-            match = new ArrayList<Match>();
-        }
-        return this.match;
-    }
+	/**
+	 * Gets the value of the delim property.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getDelim() {
+		return delim;
+	}
 
-    /**
-     * Gets the value of the delim property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getDelim() {
-        return delim;
-    }
+	/**
+	 * Gets the value of the for property.
+	 * 
+	 * @return possible object is {@link Integer }
+	 * 
+	 */
+	public int getFor() {
+		if (_for == null) {
+			return 0;
+		} else {
+			return _for;
+		}
+	}
 
-    /**
-     * Sets the value of the delim property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setDelim(String value) {
-        this.delim = value;
-    }
+	/**
+	 * Gets the value of the match property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a
+	 * snapshot. Therefore any modification you make to the returned list will
+	 * be present inside the JAXB object. This is why there is not a
+	 * <CODE>set</CODE> method for the match property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getMatch().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list {@link Match }
+	 * 
+	 * 
+	 */
+	public List<Match> getMatch() {
+		if (match == null) {
+			match = new ArrayList<Match>();
+		}
+		return this.match;
+	}
 
-    /**
-     * Gets the value of the for property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public int getFor() {
-        if (_for == null) {
-            return  0;
-        } else {
-            return _for;
-        }
-    }
+	/**
+	 * Gets the value of the until property.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getUntil() {
+		if (until == null) {
+			return "EOS"; //$NON-NLS-1$
+		} else {
+			return until;
+		}
+	}
 
-    /**
-     * Sets the value of the for property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setFor(Integer value) {
-        this._for = value;
-    }
+	/**
+	 * Gets the value of the includeDelim property.
+	 * 
+	 * @return possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isIncludeDelim() {
+		if (includeDelim == null) {
+			return false;
+		} else {
+			return includeDelim;
+		}
+	}
 
-    /**
-     * Gets the value of the includeDelim property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isIncludeDelim() {
-        if (includeDelim == null) {
-            return false;
-        } else {
-            return includeDelim;
-        }
-    }
+	/**
+	 * Sets the value of the delim property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setDelim(String value) {
+		this.delim = value;
+	}
 
-    /**
-     * Sets the value of the includeDelim property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setIncludeDelim(Boolean value) {
-        this.includeDelim = value;
-    }
+	/**
+	 * Sets the value of the for property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setFor(Integer value) {
+		this._for = value;
+	}
 
-    /**
-     * Gets the value of the until property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getUntil() {
-        if (until == null) {
-            return "EOS";
-        } else {
-            return until;
-        }
-    }
+	/**
+	 * Sets the value of the includeDelim property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setIncludeDelim(Boolean value) {
+		this.includeDelim = value;
+	}
 
-    /**
-     * Sets the value of the until property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setUntil(String value) {
-        this.until = value;
-    }
+	/**
+	 * Sets the value of the until property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setUntil(String value) {
+		this.until = value;
+	}
 
 }

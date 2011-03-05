@@ -1,2 +1,0 @@
-#!/bin/bash
-ssh abe.ncsa.uiuc.edu qstat -Q -f | grep Queue: | cut -d ' ' -f 2 | tr '\n' ' '
