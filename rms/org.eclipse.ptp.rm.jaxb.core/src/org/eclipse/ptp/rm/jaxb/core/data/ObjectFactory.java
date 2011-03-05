@@ -272,14 +272,6 @@ public class ObjectFactory {
 	}
 
 	/**
-	 * Create an instance of {@link MatchGroup }
-	 * 
-	 */
-	public MatchGroup createMatchGroup() {
-		return new MatchGroup();
-	}
-
-	/**
 	 * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
 	 * 
 	 */
