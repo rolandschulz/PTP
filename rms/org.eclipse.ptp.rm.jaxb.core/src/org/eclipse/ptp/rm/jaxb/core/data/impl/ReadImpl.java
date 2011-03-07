@@ -116,7 +116,7 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 		}
 
 		if (all) {
-			while (looking) {
+			while (looking && !saved.isEmpty()) {
 				findMatches(saved.removeFirst());
 			}
 		}
