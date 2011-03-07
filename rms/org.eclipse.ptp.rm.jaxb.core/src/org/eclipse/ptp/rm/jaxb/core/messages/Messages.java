@@ -23,7 +23,6 @@ public class Messages extends NLS {
 	public static String Copy_Operation_cancelled_by_user;
 	public static String Copy_Operation_Local_resource_does_not_exist;
 	public static String StreamParserNoSuchVariableError;
-	public static String StreamParserNoSuchLinkError;
 	public static String StreamParserMissingTargetType;
 	public static String StreamParserInconsistentMapValues;
 	public static String ManagedFilesJob;
@@ -43,8 +42,9 @@ public class Messages extends NLS {
 	public static String ParserInternalError;
 	public static String ProcessExitValueError;
 	public static String CannotCompleteSubmitFailedStaging;
-	public static String DoApplyError;
+	public static String ReadSegmentError;
 	public static String IllegalFailedMatch;
+	public static String StreamTokenizerInstantiationError;
 
 	static {
 		// initialize resource bundle

@@ -8,9 +8,12 @@ import org.eclipse.ptp.rm.jaxb.core.data.Regex;
 
 public class RegexImpl implements IJAXBNonNLSConstants {
 
+	private static final String FLAG_SEP = OPENSQ + PIP + CLOSSQ;
+
 	private final String expression;
 	private final boolean split;
 	private final Pattern pattern;
+	private int lastChar;
 
 	public RegexImpl(Regex regex) {
 		this.expression = regex.getContent();
@@ -22,6 +25,10 @@ public class RegexImpl implements IJAXBNonNLSConstants {
 		return expression;
 	}
 
+	public int getLastChar() {
+		return lastChar;
+	}
+
 	public String[] getMatched(String sequence) {
 		String[] result = null;
 		if (split) {
@@ -29,10 +36,12 @@ public class RegexImpl implements IJAXBNonNLSConstants {
 		} else {
 			Matcher m = pattern.matcher(sequence);
 			if (m.matches()) {
-				result = new String[m.groupCount() + 1];
+				int count = m.groupCount();
+				result = new String[count + 1];
 				for (int i = 0; i < result.length; i++) {
 					result[i] = m.group(i);
 				}
+				lastChar = m.end(count);
 			}
 		}
 		return result;
@@ -43,7 +52,7 @@ public class RegexImpl implements IJAXBNonNLSConstants {
 			return 0;
 		}
 		int f = 0;
-		String[] split = flags.split(PIP);
+		String[] split = flags.split(FLAG_SEP);
 		for (String s : split) {
 			if (CASE_INSENSITIVE.equals(s.trim())) {
 				f |= Pattern.CASE_INSENSITIVE;
