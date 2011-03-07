@@ -1,26 +1,26 @@
 package org.eclipse.ptp.rm.jaxb.tests;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.data.Append;
-import org.eclipse.ptp.rm.jaxb.core.data.Apply;
-import org.eclipse.ptp.rm.jaxb.core.data.Assign;
+import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Match;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.Put;
+import org.eclipse.ptp.rm.jaxb.core.data.Read;
 import org.eclipse.ptp.rm.jaxb.core.data.Regex;
+import org.eclipse.ptp.rm.jaxb.core.data.Set;
+import org.eclipse.ptp.rm.jaxb.core.data.Target;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.AbstractRangeAssign;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ConfigurableRegexTokenizer;
-import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
@@ -54,8 +54,8 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	private String[] values;
 	private final boolean verbose = true;
 	private final boolean redirect = false;
-	private Apply apply;
 	private String target;
+	private List<Read> read;
 
 	@Override
 	public void setUp() {
@@ -69,47 +69,8 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 					false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, false,
 					false, false };
 			values = new String[oracle.length];
-		} else if (name.equals("testParseQstat")) { //$NON-NLS-1$
-			target = "available_queues"; //$NON-NLS-1$
-			Property p = new Property();
-			p.setName(target);
-			RMVariableMap.getActiveInstance().getVariables().put(target, p);
-			apply = new Apply();
-			apply.setDelim(LINE_SEP);
-			Match match = new Match();
-			match.setTarget(target);
-			Regex regex = new Regex();
-			regex.setContent(".*"); //$NON-NLS-1$
-			match.setRegex(regex);
-			Assign assign = new Assign();
-			Append append = new Append();
-			append.setSeparator(", "); //$NON-NLS-1$
-			append.setValueIndices("0"); //$NON-NLS-1$
-			assign.setAppend(append);
-			assign.setTo("value"); //$NON-NLS-1$
-			match.getAssign().add(assign);
-			apply.getMatch().add(match);
-		} else if (name.equals("testParseQstat")) { //$NON-NLS-1$
-			apply = new Apply();
-			apply.setDelim(LINE_SEP);
-			String[] exp = regex();
-			for (String s : exp) {
-				// addApply(apply, s);
-			}
-
-			Match match = new Match();
-			match.setTarget(target);
-			Regex regex = new Regex();
-			regex.setContent(".*"); //$NON-NLS-1$
-			match.setRegex(regex);
-			Assign assign = new Assign();
-			Append append = new Append();
-			append.setSeparator(", "); //$NON-NLS-1$
-			append.setValueIndices("0"); //$NON-NLS-1$
-			assign.setAppend(append);
-			assign.setTo("value"); //$NON-NLS-1$
-			match.getAssign().add(assign);
-			apply.getMatch().add(match);
+		} else {
+			read = new ArrayList<Read>();
 		}
 	}
 
@@ -118,17 +79,298 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 	}
 
-	public void testOpenMPI() {
-
+	public void testImplicitOrdering() {
+		target = ATTRIBUTE;
+		read.add(getRead(getName()));
+		runTokenizer(getImplicitOrdering());
+		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		for (Object o : d.values()) {
+			JobAttribute ja = (JobAttribute) o;
+			if (verbose) {
+				System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+				System.out.println("name " + ja.getName()); //$NON-NLS-1$
+				System.out.println("type " + ja.getType()); //$NON-NLS-1$
+				System.out.println("tooltip " + ja.getTooltip()); //$NON-NLS-1$
+				System.out.println("description " + ja.getDescription()); //$NON-NLS-1$
+				System.out.println("value " + ja.getValue()); //$NON-NLS-1$
+				System.out.println("*********************************"); //$NON-NLS-1$
+			}
+		}
 	}
 
-	public void testParseQstat() {
-		runTokenizer(getQstatOut());
-		Property p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
+	public void testImplicitWithTags1() {
+		Read rd = new Read();
+		/* 1 */
+		read.add(rd);
+		rd.setDelim("\n"); //$NON-NLS-1$
+		Match match = new Match();
+		rd.getMatch().add(match);
+		Regex regex = new Regex();
+		match.setRegex(regex);
+		regex.setContent("PROPERTY"); //$NON-NLS-1$
+		/* 2 */
+		rd = new Read();
+		read.add(rd);
+		rd.setDelim("\n"); //$NON-NLS-1$
+		rd.setMode(AND);
+		match = new Match();
+		rd.getMatch().add(match);
+		regex = new Regex();
+		match.setRegex(regex);
+		regex.setContent("name:(.*)"); //$NON-NLS-1$
+		Target target = new Target();
+		match.setTarget(target);
+		target.setType(PROPERTY);
+		Set set = new Set();
+		match.getSetOrAddOrPut().add(set);
+		set.setField("name"); //$NON-NLS-1$
+		set.setGroup(1);
+		/* 3 */
+		match = new Match();
+		rd.getMatch().add(match);
+		regex = new Regex();
+		match.setRegex(regex);
+		regex.setContent("value:(.*)"); //$NON-NLS-1$
+		set = new Set();
+		match.getSetOrAddOrPut().add(set);
+		set.setField("value"); //$NON-NLS-1$
+		set.setGroup(1);
+		rd = new Read();
+		/* 4 */
+		read.add(rd);
+		rd.setDelim("\n"); //$NON-NLS-1$
+		match = new Match();
+		rd.getMatch().add(match);
+		regex = new Regex();
+		match.setRegex(regex);
+		regex.setContent("ATTRIBUTE"); //$NON-NLS-1$
+		/* 5 */
+		rd = new Read();
+		read.add(rd);
+		rd.setDelim("\n"); //$NON-NLS-1$
+		rd.setMode(AND);
+		match = new Match();
+		rd.getMatch().add(match);
+		regex = new Regex();
+		match.setRegex(regex);
+		regex.setContent("name:(.*)"); //$NON-NLS-1$
+		target = new Target();
+		match.setTarget(target);
+		target.setType(ATTRIBUTE);
+		set = new Set();
+		match.getSetOrAddOrPut().add(set);
+		set.setField("name"); //$NON-NLS-1$
+		set.setGroup(1);
+		/* 6 */
+		match = new Match();
+		rd.getMatch().add(match);
+		regex = new Regex();
+		match.setRegex(regex);
+		regex.setContent("value:(.*)"); //$NON-NLS-1$
+		set = new Set();
+		match.getSetOrAddOrPut().add(set);
+		set.setField("value"); //$NON-NLS-1$
+		set.setGroup(1);
+		runTokenizer(getImplicitWithTags());
+		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		for (Object o : d.values()) {
+			if (o instanceof Property) {
+				Property p = (Property) o;
+				if (verbose) {
+					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+					System.out.println("name " + p.getName()); //$NON-NLS-1$
+					System.out.println("value " + p.getValue()); //$NON-NLS-1$
+					System.out.println("*********************************"); //$NON-NLS-1$
+				}
+			} else if (o instanceof JobAttribute) {
+				JobAttribute ja = (JobAttribute) o;
+				if (verbose) {
+					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+					System.out.println("name " + ja.getName()); //$NON-NLS-1$
+					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
+					System.out.println("*********************************"); //$NON-NLS-1$
+				}
+			}
+		}
+	}
+
+	public void testImplicitWithTags2() {
+		Read rd = new Read();
+		read.add(rd);
+		rd.setMaxMatchLen(32);
+		/* 1 */
+		Match m = new Match();
+		rd.getMatch().add(m);
+		Regex r = new Regex();
+		m.setRegex(r);
+		r.setContent(".*PROPERTY.*name:(\\w*).*value:([\\d.-]*).*"); //$NON-NLS-1$
+		r.setFlags("DOTALL"); //$NON-NLS-1$
+		Target t = new Target();
+		m.setTarget(t);
+		t.setType(PROPERTY);
+		Set set = new Set();
+		m.getSetOrAddOrPut().add(set);
+		set.setField("name"); //$NON-NLS-1$
+		set.setGroup(1);
+		set = new Set();
+		m.getSetOrAddOrPut().add(set);
+		set.setField("value"); //$NON-NLS-1$
+		set.setGroup(2);
+		/* 2 */
+		m = new Match();
+		rd.getMatch().add(m);
+		r = new Regex();
+		m.setRegex(r);
+		r.setContent(".*PROPERTY.*value:([\\d.-]*).*name:(\\w*).*"); //$NON-NLS-1$
+		r.setFlags("DOTALL"); //$NON-NLS-1$
+		t = new Target();
+		m.setTarget(t);
+		t.setType(PROPERTY);
+		set = new Set();
+		m.getSetOrAddOrPut().add(set);
+		set.setField("value"); //$NON-NLS-1$
+		set.setGroup(1);
+		set = new Set();
+		m.getSetOrAddOrPut().add(set);
+		set.setField("name"); //$NON-NLS-1$
+		set.setGroup(2);
+		/* 3 */
+		m = new Match();
+		rd.getMatch().add(m);
+		r = new Regex();
+		m.setRegex(r);
+		r.setContent(".*ATTRIBUTE.*name:(\\w*).*value:([\\d.-]*).*"); //$NON-NLS-1$
+		r.setFlags("DOTALL"); //$NON-NLS-1$
+		t = new Target();
+		m.setTarget(t);
+		t.setType(ATTRIBUTE);
+		set = new Set();
+		m.getSetOrAddOrPut().add(set);
+		set.setField("name"); //$NON-NLS-1$
+		set.setGroup(1);
+		set = new Set();
+		m.getSetOrAddOrPut().add(set);
+		set.setField("value"); //$NON-NLS-1$
+		set.setGroup(2);
+		/* 2 */
+		m = new Match();
+		rd.getMatch().add(m);
+		r = new Regex();
+		m.setRegex(r);
+		r.setContent(".*ATTRIBUTE.*value:([\\d.-]*).*name:(\\w*).*"); //$NON-NLS-1$
+		r.setFlags("DOTALL"); //$NON-NLS-1$
+		t = new Target();
+		m.setTarget(t);
+		t.setType(ATTRIBUTE);
+		set = new Set();
+		m.getSetOrAddOrPut().add(set);
+		set.setField("value"); //$NON-NLS-1$
+		set.setGroup(1);
+		set = new Set();
+		m.getSetOrAddOrPut().add(set);
+		set.setField("name"); //$NON-NLS-1$
+		set.setGroup(2);
+		runTokenizer(getImplicitWithTags());
+		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		for (Object o : d.values()) {
+			if (o instanceof Property) {
+				Property p = (Property) o;
+				if (verbose) {
+					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+					System.out.println("name " + p.getName()); //$NON-NLS-1$
+					System.out.println("value " + p.getValue()); //$NON-NLS-1$
+					System.out.println("*********************************"); //$NON-NLS-1$
+				}
+			} else if (o instanceof JobAttribute) {
+				JobAttribute ja = (JobAttribute) o;
+				if (verbose) {
+					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+					System.out.println("name " + ja.getName()); //$NON-NLS-1$
+					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
+					System.out.println("*********************************"); //$NON-NLS-1$
+				}
+			}
+		}
+	}
+
+	public void testJobId() {
+		target = "jobId"; //$NON-NLS-1$
+		Property p = new Property();
+		p.setName(target);
+		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		read.add(getRead(getName()));
+		runTokenizer(getNoiseBeforeJobId());
+		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
-			System.out.println(p.getValue());
+			System.out.println(target + " = " + p.getValue()); //$NON-NLS-1$
+		}
+	}
+
+	public void testJobStates() {
+		target = "jobStates"; //$NON-NLS-1$
+		Property p = new Property();
+		p.setName(target);
+		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		read.add(getRead(getName()));
+		runTokenizer(getJobStates());
+		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
+		assertNotNull(p);
+		assertNotNull(p.getValue());
+		if (verbose) {
+			System.out.println(target + " = " + p.getValue()); //$NON-NLS-1$
+		}
+	}
+
+	public void testOpenMPI() {
+		target = ATTRIBUTE;
+		read.add(getRead(getName()));
+		runTokenizer(getOpenMPIOut());
+		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		for (Object o : d.values()) {
+			JobAttribute ja = (JobAttribute) o;
+			if (verbose) {
+				System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+				System.out.println("name " + ja.getName()); //$NON-NLS-1$
+				System.out.println("value " + ja.getValue()); //$NON-NLS-1$
+				System.out.println("tooltip " + ja.getTooltip()); //$NON-NLS-1$
+				System.out.println("status " + ja.getStatus()); //$NON-NLS-1$
+				System.out.println("visible " + ja.isVisible()); //$NON-NLS-1$
+				System.out.println("readOnly " + ja.isReadOnly()); //$NON-NLS-1$
+				System.out.println("*********************************"); //$NON-NLS-1$
+			}
+		}
+	}
+
+	public void testParseQstat() {
+		target = "available_queues"; //$NON-NLS-1$
+		Property p = new Property();
+		p.setName(target);
+		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		read.add(getRead(getName()));
+		runTokenizer(getQstatOut());
+		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
+		assertNotNull(p);
+		assertNotNull(p.getValue());
+		if (verbose) {
+			System.out.println(target + " = " + p.getValue()); //$NON-NLS-1$
+		}
+	}
+
+	public void testPropertyDefs() {
+		target = PROPERTY;
+		read.add(getRead(getName()));
+		runTokenizer(getPropertyDefs());
+		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		for (Object o : d.values()) {
+			Property p = (Property) o;
+			if (verbose) {
+				System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+				System.out.println("name " + p.getName()); //$NON-NLS-1$
+				System.out.println("value " + p.getValue()); //$NON-NLS-1$
+				System.out.println("*********************************"); //$NON-NLS-1$
+			}
 		}
 	}
 
@@ -157,8 +399,218 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		}
 	}
 
+	private Read getRead(String name) {
+		Read read = new Read();
+		if (name.equals("testParseQstat")) { //$NON-NLS-1$
+			read.setDelim("\n"); //$NON-NLS-1$
+			Match match = new Match();
+			read.getMatch().add(match);
+			Regex regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent(".*"); //$NON-NLS-1$
+			Target target = new Target();
+			match.setTarget(target);
+			target.setRef(this.target);
+			Append append = new Append();
+			match.getSetOrAddOrPut().add(append);
+			append.setField("value"); //$NON-NLS-1$
+			append.setSeparator(", "); //$NON-NLS-1$
+			append.setGroups("0"); //$NON-NLS-1$
+		} else if (name.equals("testJobStates")) { //$NON-NLS-1$
+			read.setMaxMatchLen(32);
+			Match match = new Match();
+			read.getMatch().add(match);
+			Regex regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent(".*<job>([\\d]*):([\\w]*)</job>.*"); //$NON-NLS-1$
+			regex.setFlags("DOTALL"); //$NON-NLS-1$
+			Target target = new Target();
+			match.setTarget(target);
+			target.setRef(this.target);
+			Put append = new Put();
+			match.getSetOrAddOrPut().add(append);
+			append.setField("value"); //$NON-NLS-1$
+			append.setKeyGroups("1"); //$NON-NLS-1$
+			append.setValueGroups("2"); //$NON-NLS-1$
+		} else if (name.equals("testPropertyDefs")) { //$NON-NLS-1$
+			read.setDelim("\n"); //$NON-NLS-1$
+			Match match = new Match();
+			read.getMatch().add(match);
+			Regex regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent("<name>(.*)</name><value>(.*)</value>"); //$NON-NLS-1$
+			Target target = new Target();
+			match.setTarget(target);
+			target.setType(this.target);
+			Set set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("name"); //$NON-NLS-1$
+			set.setGroup(1);
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("value"); //$NON-NLS-1$
+			set.setGroup(2);
+		} else if (name.equals("testJobId")) { //$NON-NLS-1$
+			read.setDelim("\n"); //$NON-NLS-1$
+			read.setAll(true);
+			read.setSave(1);
+			Match match = new Match();
+			read.getMatch().add(match);
+			Regex regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent("([\\d]*)[.].*"); //$NON-NLS-1$
+			Target target = new Target();
+			match.setTarget(target);
+			target.setRef(this.target);
+			Set set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("value"); //$NON-NLS-1$
+			set.setGroup(1);
+		} else if (name.equals("testOpenMPI")) { //$NON-NLS-1$
+			read.setDelim("\n"); //$NON-NLS-1$
+			/* 1 */
+			Match match = new Match();
+			read.getMatch().add(match);
+			Regex regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent("mca:.*:param:([^:]*):value:(.*)"); //$NON-NLS-1$
+			Target target = new Target();
+			match.setTarget(target);
+			target.setType(this.target);
+			target.setIdFrom(1);
+			Set set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("name"); //$NON-NLS-1$
+			set.setGroup(1);
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("value"); //$NON-NLS-1$
+			set.setGroup(2);
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("visible"); //$NON-NLS-1$
+			set.setExpression(TRUE);
+			/* 2 */
+			match = new Match();
+			read.getMatch().add(match);
+			regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent("mca:.*:param:([^:]*):status:(.*)"); //$NON-NLS-1$
+			target = new Target();
+			match.setTarget(target);
+			target.setType(this.target);
+			target.setIdFrom(1);
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("status"); //$NON-NLS-1$
+			set.setGroup(2);
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("readOnly"); //$NON-NLS-1$
+			set.setExpression("true"); //$NON-NLS-1$
+			// set.setExpression("${this:status} == 'read-only'");
+			/* 3 */
+			match = new Match();
+			read.getMatch().add(match);
+			regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent("mca:.*:param:([^:]*):help:(.*)"); //$NON-NLS-1$
+			target = new Target();
+			match.setTarget(target);
+			target.setType(this.target);
+			target.setIdFrom(1);
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("tooltip"); //$NON-NLS-1$
+			set.setGroup(2);
+			/* 4 */
+			match = new Match();
+			read.getMatch().add(match);
+			regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent("(.*):([^:]*)"); //$NON-NLS-1$
+			target = new Target();
+			match.setTarget(target);
+			target.setType(this.target);
+			target.setIdFrom(1);
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("name"); //$NON-NLS-1$
+			set.setGroup(1);
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("value"); //$NON-NLS-1$
+			set.setGroup(2);
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("readOnly"); //$NON-NLS-1$
+			set.setExpression(TRUE);
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("visible"); //$NON-NLS-1$
+			set.setExpression(FALSE);
+		} else if (name.equals("testImplicitOrdering")) { //$NON-NLS-1$
+			read.setDelim("\n"); //$NON-NLS-1$
+			read.setMode(AND);
+			/* 1 */
+			Match match = new Match();
+			read.getMatch().add(match);
+			Regex regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent(".*"); //$NON-NLS-1$
+			Target target = new Target();
+			match.setTarget(target);
+			target.setType(this.target);
+			Set set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("name"); //$NON-NLS-1$
+			set.setGroup(0);
+			/* 2 */
+			match = new Match();
+			read.getMatch().add(match);
+			regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent(".*"); //$NON-NLS-1$
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("type"); //$NON-NLS-1$
+			set.setGroup(0);
+			/* 3 */
+			match = new Match();
+			read.getMatch().add(match);
+			regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent(".*"); //$NON-NLS-1$
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("description"); //$NON-NLS-1$
+			set.setGroup(0);
+			/* 4 */
+			match = new Match();
+			read.getMatch().add(match);
+			regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent(".*"); //$NON-NLS-1$
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("tooltip"); //$NON-NLS-1$
+			set.setGroup(0);
+			/* 5 */
+			match = new Match();
+			read.getMatch().add(match);
+			regex = new Regex();
+			match.setRegex(regex);
+			regex.setContent(".*"); //$NON-NLS-1$
+			set = new Set();
+			match.getSetOrAddOrPut().add(set);
+			set.setField("value"); //$NON-NLS-1$
+			set.setGroup(0);
+		}
+		return read;
+	}
+
 	private void runTokenizer(InputStream stream) {
-		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(apply);
+		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(read);
 		t.setInputStream(stream);
 		if (redirect) {
 			t.setRedirectStream(System.out);
@@ -169,7 +621,28 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			thr.join();
 		} catch (InterruptedException ignored) {
 		}
+	}
 
+	private static InputStream getImplicitOrdering() {
+		String content = "jobAttribute_1" + LINE_SEP + "java.lang.String" + LINE_SEP + LINE_SEP + LINE_SEP + "value_1" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ "jobAttribute_2" + LINE_SEP + "java.lang.String" + LINE_SEP + "meaingless attribute" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ "ignore this attribute" + LINE_SEP + "value_2" + LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getImplicitWithTags() {
+		String content = "PROPERTY" + LINE_SEP + "value:423.4" + LINE_SEP + "name:x" + LINE_SEP + "ATTRIBUTE" + LINE_SEP + "name:y" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				+ LINE_SEP + "value:-130.42" + LINE_SEP + "PROPERTY" + LINE_SEP + "name:z" + LINE_SEP + "value:-1.7" + LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getJobStates() {
+		String content = "blah blah xxxx blah blah xxxx blah blah xxxx blah blah xx" //$NON-NLS-1$
+				+ "<job>304823:RUNNING</job>fooblah blah xxxx\n  blah blah xxxx blah blah xxxx blah " //$NON-NLS-1$
+				+ " blah x\nx<job>312042:DONE</job>blah xxxx blah blah xxxx blah b" //$NON-NLS-1$
+				+ "blah blah xxxx foobarfoobr 231028388 <job>338831:SUSPENDED" //$NON-NLS-1$
+				+ "</job>fooroiq\npoiewmr<job>318388:QUEUED</job>blah blah xxxx"; //$NON-NLS-1$
+		return new ByteArrayInputStream(content.getBytes());
 	}
 
 	private static InputStream getNoiseBeforeJobId() {
@@ -209,6 +682,13 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
+	private static InputStream getPropertyDefs() {
+		String content = "<name>pnameA</name><value>pvalueA</value>" + LINE_SEP + "<name>pnameB</name><value>pvalueB</value>" //$NON-NLS-1$ //$NON-NLS-2$
+				+ LINE_SEP + "<name>pnameC</name><value>pvalueC</value>" + LINE_SEP + "<name>pnameD</name><value>pvalueD</value>" //$NON-NLS-1$ //$NON-NLS-2$
+				+ LINE_SEP + "<value>pvalueW</value><name>pnameW</name>" + LINE_SEP; //$NON-NLS-1$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
 	private static InputStream getQstatOut() {
 		String content = "normal" + LINE_SEP + "iacat2" + LINE_SEP + "indprio" + LINE_SEP + "lincoln_nomss" + LINE_SEP + "cap1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				+ LINE_SEP + "lincoln_debug" + LINE_SEP + "long" + LINE_SEP + "iacat" + LINE_SEP + "industrial" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -216,25 +696,4 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 				+ "lincoln_cuda3.2" + LINE_SEP + "fernsler" + LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$
 		return new ByteArrayInputStream(content.getBytes());
 	}
-
-	private static String[] regex() {
-		String[] result = new String[0];
-
-		try {
-			List<String> list = new ArrayList<String>();
-			URL url = JAXBInitializationUtils.getURL("data/regex"); //$NON-NLS-1$
-			if (url != null) {
-				String line = null;
-				BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-				while ((line = br.readLine()) != null) {
-					list.add(line);
-				}
-				result = list.toArray(new String[0]);
-			}
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
-		return result;
-	}
-
 }

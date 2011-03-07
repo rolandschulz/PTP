@@ -34,8 +34,10 @@ public interface IJAXBNonNLSConstants {
 	String AMP = "@";//$NON-NLS-1$
 	String DOL = "$";//$NON-NLS-1$
 	String PIP = "|";//$NON-NLS-1$
+	String OPENSQ = "[";//$NON-NLS-1$
 	String OPENV = "${";//$NON-NLS-1$
 	String OPENVRM = "${rm:";//$NON-NLS-1$
+	String CLOSSQ = "]";//$NON-NLS-1$
 	String CLOSV = "}";//$NON-NLS-1$
 	String CLOSVAL = "#value}";//$NON-NLS-1$
 	String BKESC = "\\\\";//$NON-NLS-1$
@@ -56,11 +58,16 @@ public interface IJAXBNonNLSConstants {
 	String FALSE = "false";//$NON-NLS-1$
 	String YES = "yes";//$NON-NLS-1$
 	String NO = "no";//$NON-NLS-1$
+	String OR = "or";//$NON-NLS-1$
+	String AND = "and";//$NON-NLS-1$
 	String GET = "get";//$NON-NLS-1$
 	String SET = "set";//$NON-NLS-1$
+	String IS = "is";//$NON-NLS-1$
+	String CLASS = "class";//$NON-NLS-1$
 	String VALUE = "value";//$NON-NLS-1$
 
 	/* STANDARD PROPERTIES */
+	String ID = "id";//$NON-NLS-1$
 	String JAVA_USER_HOME = "user.home";//$NON-NLS-1$
 	String JAVA_TMP_DIR = "java.io.tmpdir";//$NON-NLS-1$
 	String FILE_SCHEME = "file";//$NON-NLS-1$
@@ -109,6 +116,7 @@ public interface IJAXBNonNLSConstants {
 	String DISCATTR = "DiscoverAttributes";//$NON-NLS-1$
 
 	String JOB_ATTRIBUTE = "jobAttribute";//$NON-NLS-1$
+	String ATTRIBUTE = "attribute";//$NON-NLS-1$
 	String PROPERTY = "property";//$NON-NLS-1$
 	String QUEUES = "available_queues";//$NON-NLS-1$
 	String JOB_ID = "jobId";//$NON-NLS-1$
@@ -125,4 +133,6 @@ public interface IJAXBNonNLSConstants {
 	String CANON_EQ = "CANON_EQ";//$NON-NLS-1$
 	String LITERAL = "LITERAL";//$NON-NLS-1$
 	String COMMENTS = "COMMENTS";//$NON-NLS-1$
+
+	String TOKENIZER_EXT_PT = "streamParserTokenizer";//$NON-NLS-1$
 }

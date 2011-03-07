@@ -11,16 +11,26 @@ public class PutImpl extends AbstractRangeAssign {
 
 	private final Range keys;
 
-	public PutImpl(String field, Put put) {
-		this.field = field;
-		keys = new Range(put.getKeyIndices());
-		range = new Range(put.getValueIndices());
-		this.clzz = new Class[] { Object.class, Object.class };
+	public PutImpl(Put put) {
+		this.field = put.getField();
+		String rString = put.getKeyGroups();
+		if (rString == null) {
+			rString = put.getKeyIndices();
+		}
+		keys = new Range(rString);
+		rString = put.getValueGroups();
+		if (rString == null) {
+			rString = put.getValueIndices();
+		}
+		range = new Range(rString);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected Object[] getValue(Object previous, String[] values) {
+		if (values == null) {
+			return new Object[] { previous };
+		}
 		keys.setLen(values.length);
 
 		List<Object> foundKeys = keys.findInRange(values);

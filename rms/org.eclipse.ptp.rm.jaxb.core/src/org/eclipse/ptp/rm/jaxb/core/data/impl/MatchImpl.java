@@ -5,99 +5,111 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Assign;
-import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
+import org.eclipse.ptp.rm.jaxb.core.data.Add;
+import org.eclipse.ptp.rm.jaxb.core.data.Append;
 import org.eclipse.ptp.rm.jaxb.core.data.Match;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.Put;
+import org.eclipse.ptp.rm.jaxb.core.data.Regex;
+import org.eclipse.ptp.rm.jaxb.core.data.Set;
+import org.eclipse.ptp.rm.jaxb.core.data.Target;
 import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedRegexMatchException;
-import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.core.runnable.ConfigurableRegexTokenizer;
-import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class MatchImpl implements IJAXBNonNLSConstants {
 
-	private final ConfigurableRegexTokenizer tokenizer;
-	private final String id;
-	private final String linkTo;
-	private final String targetName;
-	private final String targetType;
+	private RegexImpl regex;
+	private TargetImpl target;
+	private List<IAssign> assign;
 	private final boolean errorOnMiss;
+	private boolean matched;
 
-	private final List<IAssign> assign;
-	private final RegexImpl regex;
-	private Object target;
-
-	public MatchImpl(ConfigurableRegexTokenizer tokenizer, Match match) {
-		this.tokenizer = tokenizer;
-		id = match.getId();
-		if (id != null) {
-			tokenizer.addMatch(this);
+	public MatchImpl(Match match) {
+		Regex r = match.getRegex();
+		if (r != null) {
+			regex = new RegexImpl(r);
 		}
-		linkTo = match.getLinkTo();
-		targetName = match.getTarget();
-		targetType = match.getType();
+		Target t = match.getTarget();
+		if (t != null) {
+			target = new TargetImpl(t);
+		}
+
+		List<Object> actions = match.getSetOrAddOrPut();
+		if (!actions.isEmpty()) {
+			assign = new ArrayList<IAssign>();
+			for (Object o : actions) {
+				if (o instanceof Add) {
+					assign.add(new AddImpl((Add) o));
+				} else if (o instanceof Append) {
+					assign.add(new AppendImpl((Append) o));
+				} else if (o instanceof Put) {
+					assign.add(new PutImpl((Put) o));
+				} else if (o instanceof Set) {
+					assign.add(new SetImpl((Set) o));
+				}
+			}
+		}
+
 		errorOnMiss = match.isErrorOnMiss();
-		regex = new RegexImpl(match.getRegex());
-		List<Assign> assign = match.getAssign();
-		this.assign = new ArrayList<IAssign>();
-		for (Assign a : assign) {
-			this.assign.add(AssignFactory.createIAssign(a));
+	}
+
+	public synchronized void clear() {
+		matched = false;
+		if (target != null) {
+			target.clear();
 		}
 	}
 
-	public boolean doMatch(String sequence) throws Throwable {
-		setTarget();
-
-		String[] matched = regex.getMatched(sequence);
-		if (matched == null) {
-			if (errorOnMiss) {
-				throw new UnsatisfiedRegexMatchException(regex.getExpression());
-			}
-			return false;
+	public synchronized int doMatch(String sequence) throws Throwable {
+		int end = 0;
+		if (matched) {
+			return end;
 		}
+
+		String[] tokens = null;
+
+		if (regex == null) {
+			matched = true;
+		} else {
+			tokens = regex.getMatched(sequence);
+			if (tokens == null) {
+				if (errorOnMiss) {
+					throw new UnsatisfiedRegexMatchException(regex.getExpression());
+				}
+				return end;
+			}
+			matched = true;
+			/*
+			 * return pos of the unmatched remainder
+			 */
+			end = regex.getLastChar();
+		}
+
+		if (target == null || assign == null) {
+			return end;
+		}
+
+		Object value = target.getTarget(tokens);
 
 		for (IAssign a : assign) {
-			a.assign(target, matched);
+			a.setTarget(value);
+			a.assign(tokens);
 		}
-		return true;
+
+		return end;
 	}
 
-	public String getId() {
-		return id;
+	public synchronized boolean getMatched() {
+		return matched;
 	}
 
 	public RegexImpl getRegex() {
 		return regex;
 	}
 
-	public Object getTarget() {
+	public TargetImpl getTarget() {
 		return target;
 	}
 
-	private void setTarget() throws IllegalStateException {
-		target = null;
-		if (targetName != null) {
-			String name = RMVariableMap.getActiveInstance().getString(targetName);
-			target = RMVariableMap.getActiveInstance().getVariables().get(name);
-			if (target == null) {
-				throw new IllegalStateException(Messages.StreamParserNoSuchVariableError + targetName);
-			}
-		} else if (linkTo != null) {
-			target = tokenizer.getLink(linkTo);
-			if (target == null) {
-				throw new IllegalStateException(Messages.StreamParserNoSuchLinkError + targetName);
-			}
-		} else if (targetType != null) {
-			if (JOB_ATTRIBUTE.equals(targetType)) {
-				target = new JobAttribute();
-			} else if (PROPERTY.equals(targetType)) {
-				target = new Property();
-			}
-			if (target != null) {
-				tokenizer.addTarget(target);
-			}
-		} else {
-			throw new IllegalStateException(Messages.StreamParserMissingTargetType);
-		}
+	public void setTarget(TargetImpl target) {
+		this.target = target;
 	}
 }

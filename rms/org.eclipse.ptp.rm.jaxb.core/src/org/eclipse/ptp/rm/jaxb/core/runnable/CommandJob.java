@@ -10,8 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -19,6 +22,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
@@ -206,12 +210,13 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		if (stdoutParser != null) {
 			try {
 				Tokenizer t = stdoutParser.getTokenizer();
+
 				String type = t.getType();
 
 				if (type != null) {
-					stdoutTokenizer = null; // get extension TODO
+					stdoutTokenizer = getTokenizer(type);
 				} else {
-					stdoutTokenizer = new ConfigurableRegexTokenizer(t.getApply());
+					stdoutTokenizer = new ConfigurableRegexTokenizer(t.getRead());
 				}
 
 				stdoutTokenizer.setInputStream(process.getInputStream());
@@ -236,9 +241,9 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				String type = t.getType();
 
 				if (type != null) {
-					stderrTokenizer = null; // get extension TODO
+					stderrTokenizer = getTokenizer(type);
 				} else {
-					stderrTokenizer = new ConfigurableRegexTokenizer(t.getApply());
+					stderrTokenizer = new ConfigurableRegexTokenizer(t.getRead());
 				}
 
 				stderrTokenizer.setInputStream(process.getErrorStream());
@@ -256,5 +261,24 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			stderrT = new Redirect(process.getErrorStream(), System.err);
 			stderrT.start();
 		}
+	}
+
+	public static IStreamParserTokenizer getTokenizer(String type) throws CoreException {
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBCorePlugin.PLUGIN_ID,
+				TOKENIZER_EXT_PT);
+		IConfigurationElement[] elements = extensionPoint.getConfigurationElements();
+		for (int i = 0; i < elements.length; i++) {
+			IConfigurationElement element = elements[i];
+			try {
+				if (element.getAttribute(ID).equals(type)) {
+					return (IStreamParserTokenizer) element.createExecutableExtension(CLASS);
+				}
+			} catch (CoreException ce) {
+				throw ce;
+			} catch (Throwable t) {
+				throw CoreExceptionUtils.newException(Messages.StreamTokenizerInstantiationError + type, t);
+			}
+		}
+		return null;
 	}
 }

@@ -360,6 +360,9 @@
 			<xs:attribute name="id" use="required" type="xs:string"/>
 			<xs:attribute name="name" use="required" type="xs:string"/>
 			<xs:attribute name="type" use="required" type="xs:string"/>
+			<xs:attribute name="visible" type="xs:boolean" default="true"/>
+			<xs:attribute name="status" type="xs:string"/>
+			<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 			<xs:attribute name="basic" type="xs:boolean" default="false">
 				<xs:annotation>
 					<xs:documentation>
@@ -453,68 +456,61 @@
 						</xs:annotation>
 					</xs:element>
 					<xs:sequence>
-						<xs:element ref="apply">
-							<xs:annotation>
-								<xs:documentation>
-									A tokenizer has a single root to its "apply" tree, but the number of sub-applies is indeterminate.
-								</xs:documentation>
-							</xs:annotation>
-						</xs:element>
+						<xs:element ref="read" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:choice>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="apply">
-		<xs:annotation>
-			<xs:documentation>
-				Defines a sequence of either sub-applies or a set of matches to perform. The delimiter will be ignored if there
-				are child applies, as the apply will then itself not do any work other than possibly to loop. The delimiter is the character
-				marking the end of a given stream segment which can be optionally included. "For" will repeat this apply a predefined number of
-				times (undefined/0 means indefinitely); "until" will repeat until the given delimiter is encountered; EOS = means end of stream.
-				All child applies are run in order; matches are understood to be 'or'd, each applied to the current segment until a match is found.
-			</xs:documentation>
-		</xs:annotation>
+	<xs:element name="read">
 		<xs:complexType>
 			<xs:sequence>
 				<xs:choice>
-					<xs:element ref="apply" maxOccurs="unbounded"/>
-					<xs:element ref="match" maxOccurs="unbounded"/>
+					<xs:element ref="match" minOccurs="0" maxOccurs="unbounded"/>
 				</xs:choice>
 			</xs:sequence>
 			<xs:attribute name="delim" type="xs:string"/>
 			<xs:attribute name="includeDelim" type="xs:boolean" default="false"/>
-			<xs:attribute name="for" type="xs:int" default="0"/>
-			<xs:attribute name="until" type="xs:string" default="EOS"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="match">
-		<xs:annotation>
-			<xs:documentation>
-				Consists of a regular expression to match and an assignment action. Matches can optionally be given an id for
-				linking, so that two matches can operate on the same underlying target. If a named target is given, it is understood that this
-				object pre-exists in the RM "environment" and that an exception will be thrown if it is not found. If "target" is left blank, and
-				no "linkTo" is set, then an object will be created of the type indicated; otherwise, the target of the match element pointed to by
-				the link will be used. All assigns are understood to reference this target.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="regex"/>
-				<xs:element ref="assign" maxOccurs="unbounded"/>
-			</xs:sequence>
-			<xs:attribute name="id" type="xs:string"/>
-			<xs:attribute name="linkTo" type="xs:string"/>
-			<xs:attribute name="errorOnMiss" type="xs:boolean" default="false"/>
-			<xs:attribute name="target" type="xs:string"/>
-			<xs:attribute name="type" default="jobAttribute">
+			<xs:attribute name="maxMatchLen" type="xs:int" default="0"/>
+			<xs:attribute name="all" type="xs:boolean" default="false"/>
+			<xs:attribute name="save" type="xs:int" default="0"/>
+			<xs:attribute name="mode" default="or">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="jobAttribute"/>
-						<xs:enumeration value="property"/>
+						<xs:enumeration value="or"/>
+						<xs:enumeration value="and"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="match">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="regex" minOccurs="0"/>
+				<xs:element ref="target" minOccurs="0"/>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element ref="set"/>
+					<xs:element ref="add"/>
+					<xs:element ref="put"/>
+					<xs:element ref="append"/>
+				</xs:choice>
+			</xs:sequence>
+			<xs:attribute name="errorOnMiss" type="xs:boolean" default="false"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="target">
+		<xs:complexType>
+			<xs:attribute name="ref" type="xs:string"/>
+			<xs:attribute name="type" default="property">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="property"/>
+						<xs:enumeration value="attribute"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="idFrom" type="xs:int"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="regex">
@@ -523,47 +519,38 @@
 			<xs:attribute name="split" type="xs:boolean" default="false"/>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="assign">
-		<xs:complexType>
-			<xs:annotation>
-				<xs:documentation>
-					In the set, append, add and put elements, value, values and keys refer to the group index of the matched regex,
-					or the index of the split array. A comma-delimited list of single integers or ranges expressed using a colon (e.g, 1:5); 'L' by
-					convention refers to the length of the array or number of groups. Set = single group; Add
-					= add each group separately to a list;
-					Append = concatenate the groups into a single string; Put = put key-value pairs into map.
-				</xs:documentation>
-			</xs:annotation>
-			<xs:choice>
-				<xs:element ref="set"/>
-				<xs:element ref="append"/>
-				<xs:element ref="add"/>
-				<xs:element ref="put"/>
-			</xs:choice>
-			<xs:attribute name="to" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
 	<xs:element name="set">
 		<xs:complexType>
-			<xs:attribute name="valueIndex" use="required" type="xs:int"/>
+			<xs:attribute name="field" type="xs:string"/>
+			<xs:attribute name="group" type="xs:int" default="0"/>
+			<xs:attribute name="index" type="xs:int" default="0"/>
+			<xs:attribute name="expression" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="add">
 		<xs:complexType>
-			<xs:attribute name="valueIndices" use="required" type="xs:string"/>
+			<xs:attribute name="field" type="xs:string"/>
+			<xs:attribute name="groups" type="xs:string"/>
+			<xs:attribute name="indices" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="append">
 		<xs:complexType>
-			<xs:attribute name="valueIndices" use="required" type="xs:string"/>
+			<xs:attribute name="field" type="xs:string"/>
+			<xs:attribute name="groups" type="xs:string"/>
+			<xs:attribute name="indices" type="xs:string"/>
 			<xs:attribute name="separator" type="xs:string"/>
-			<xs:attribute name="endSeparator" type="xs:string"/>
+			<xs:attribute name="startTag" type="xs:string"/>
+			<xs:attribute name="endTag" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="put">
 		<xs:complexType>
-			<xs:attribute name="keyIndices" use="required" type="xs:string"/>
-			<xs:attribute name="valueIndices" use="required" type="xs:string"/>
+			<xs:attribute name="field" type="xs:string"/>
+			<xs:attribute name="keyGroups" type="xs:string"/>
+			<xs:attribute name="keyIndices" type="xs:string"/>
+			<xs:attribute name="valueGroups" type="xs:string"/>
+			<xs:attribute name="valueIndices" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="validator">

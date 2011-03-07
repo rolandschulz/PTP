@@ -32,7 +32,7 @@ import org.osgi.framework.BundleContext;
 public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.llview.core"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.jaxb.core"; //$NON-NLS-1$
 
 	// The shared instance
 	private static JAXBCorePlugin fPlugin;
@@ -128,8 +128,9 @@ public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
 		if (getDefault() != null) {
 			Bundle bundle = getDefault().getBundle();
 			url = FileLocator.find(bundle, new Path(PATH_SEP + resource), null);
-		} else
+		} else {
 			url = new File(resource).toURL();
+		}
 		return url;
 	}
 
@@ -139,8 +140,9 @@ public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
 	 * @return unique identifier string
 	 */
 	public static String getUniqueIdentifier() {
-		if (getDefault() == null)
+		if (getDefault() == null) {
 			return PLUGIN_ID;
+		}
 		return getDefault().getBundle().getSymbolicName();
 	}
 

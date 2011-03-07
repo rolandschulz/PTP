@@ -1,0 +1,177 @@
+<examples>
+	<!-- EXAMPLE 1: output is a list of line-separated queue names to be assigned
+		to the known property "available-queues" -->
+	<tokenizer>
+		<read delim="\n">
+			<match>
+				<regex>.*</regex>
+				<target ref="available_queues"/>
+				<append field="value" separator="," groups="0"/>
+			</match>
+		</read>
+	</tokenizer>
+
+	<!-- EXAMPLE 2: output is to be searched for its final line which should
+		contain a job id of the form "[digits].[chars]" -->
+	<tokenizer>
+		<read delim="\n" all="true" save="1">
+			<match>
+				<regex>([\d]*)[.].*</regex>
+				<target ref="jobId"/>
+				<set field="value" group="1"/>
+			</match>
+		</read>
+	</tokenizer>
+
+	<!-- EXAMPLE 3: indeterminate number and order of lines containing parts
+		of attribute definitions, but each line bearing a distinct
+		id (e.g., openMPI attribute discovery) -->
+	<tokenizer>
+		<read delim="\n">
+			<match>
+				<regex>mca:.*:param:([^:]*):value:(.*)</regex>
+				<target type="attribute" idFrom="1"/>
+				<set field="name" group="1"/>
+				<set field="visible" expression="true"/>
+				<set field="value" group="2"/>
+			</match>
+			<match>
+				<regex>mca:.*:param:([^:]*):status:(.*)</regex>
+				<target type="attribute" idFrom="1"/>
+				<set field="status" group="2"/>
+				<set field="readOnly" expression="${this:status} == 'read-only'"/>
+			</match>
+			<match>
+				<regex>mca:.*:param:([^:]*):help:(.*)</regex>
+				<target type="attribute" idFrom="1"/>
+				<set field="tooltip" group="2"/>
+			</match>
+			<match>
+				<regex>(.*):([^:]*)</regex>
+				<target type="attribute" idFrom="1"/>
+				<set field="name" group="1"/>
+				<set field="value" group="2"/>
+				<set field="visible" expression="false"/>
+				<set field="read-only" expression="true"/>
+			</match>
+		</read>
+	</tokenizer>
+
+	<!-- EXAMPLE 4a: indeterminate number of definitions, but grouped
+		by delimiter -->
+	<tokenizer>
+		<read delim="\n">
+			<match>
+				<regex>PROPERTY</regex>
+			</match>
+		</read>
+		<read delim="\n" mode="and">
+			<match>
+				<regex>name:(.*)</regex>
+				<target type="property"/>
+				<set field="name" group="1"/>
+			</match>
+			<match>
+				<regex>value:(.*)</regex>
+				<set field="value" group="1"/>
+			</match>
+		</read>
+		<read delim="\n">
+			<match>
+            <regex>ATTRIBUTE</regex>
+         </match>
+		</read>
+		<read delim="\n" mode="and">
+			<match>
+				<regex>name:(.*)</regex>
+				<target type="attribute"/>
+				<set field="name" group="1"/>
+			</match>
+			<match>
+				<regex>value:(.*)</regex>
+				<set field="value" group="1"/>
+			</match>
+		</read>
+	</tokenizer>
+
+	<!-- EXAMPLE 4b: similar to 4a, but without delimiter (implicit ordering) -->
+	<tokenizer>
+		<read delim="\n" mode="and">
+			<match>
+				<regex>.*</regex>
+				<target type="attribute"/>
+				<set field="name" group="0"/>
+			</match>
+			<match>
+				<regex>.*</regex>
+				<set field="type" group="0"/>
+			</match>
+			<match>
+				<regex>.*</regex>
+				<set field="description" group="0"/>
+			</match>
+			<match>
+				<regex>.*</regex>
+				<set field="tooltip" group="0"/>
+			</match>
+			<match>
+				<regex>.*</regex>
+				<set field="value" group="0"/>
+			</match>
+		</read>
+	</tokenizer>
+	
+	<!-- EXAMPLE 4c: like 4a, but with indeterminate type order -->
+	<tokenizer>
+      <read maxMatchLen="32">
+         <match>
+            <regex flags="DOTALL">.*PROPERTY.*name:(\w*).*value:([\d.-]*).*</regex>
+            <target type="property"/>
+            <set field="name" group="1"/>
+            <set field="value" group="2"/>
+         </match>
+         <match>
+            <regex flags="DOTALL">.*PROPERTY.*value:([\d.-]*).*name:(\w*).*</regex>
+            <target type="property"/>
+            <set field="value" group="1"/>
+            <set field="name" group="2"/>
+         </match>
+         <match>
+            <regex flags="DOTALL">.*ATTRIBUTE.*name:(\w*).*value:([\d.-]*).*</regex>
+            <target type="attribute"/>
+            <set field="name" group="1"/>
+            <set field="value" group="2"/>
+         </match>
+         <match>
+            <regex flags="DOTALL">.*ATTRIBUTE.*value:([\d.-]*).*name:(\w*).*</regex>
+            <target type="attribute"/>
+            <set field="value" group="1"/>
+            <set field="name" group="2"/>
+         </match>
+      </read>
+   </tokenizer>
+
+	<!-- EXAMPLE 5: indeterminate number of property definitions, but on single line -->
+	<tokenizer>
+		<read delim="\n">
+			<match>
+				<regex>&lt;name&gt;(.*)&lt;/name&gt;&lt;value&gt;(.*)&lt;/value&gt;</regex>
+				<target type="property"/>
+				<set field="name" group="1"/>
+				<set field="value" group="2"/>
+			</match>
+		</read>
+	</tokenizer>
+
+	<!-- EXAMPLE 6: looking for values interspersed in the stream but which will
+		not exceed 64chars -->
+	<tokenizer>
+		<read maxMatchLen="32">
+			<match>
+				<regex flags="DOTALL">&lt;job&gt;([\d]*):([\w]*)&lt;/job&gt;</regex>
+				<target ref="jobStates"/>
+				<put field="value" keyGroups="1" valueGroups="2"/>
+			</match>
+		</read>
+	</tokenizer>
+</examples>

@@ -7,15 +7,21 @@ import org.eclipse.ptp.rm.jaxb.core.data.Add;
 
 public class AddImpl extends AbstractRangeAssign {
 
-	public AddImpl(String field, Add add) {
-		this.field = field;
-		range = new Range(add.getValueIndices());
-		this.clzz = new Class[] { Object.class };
+	public AddImpl(Add add) {
+		this.field = add.getField();
+		String rString = add.getGroups();
+		if (rString == null) {
+			rString = add.getIndices();
+		}
+		range = new Range(rString);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected Object[] getValue(Object previous, String[] values) {
+		if (values == null) {
+			return new Object[] { previous };
+		}
 		range.setLen(values.length);
 		List<Object> found = range.findInRange(values);
 		if (found.isEmpty()) {
