@@ -33,14 +33,14 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	private final boolean errorOnMiss;
 	private boolean matched;
 
-	public MatchImpl(Match match) {
+	public MatchImpl(String uuid, Match match) {
 		Regex r = match.getRegex();
 		if (r != null) {
 			regex = new RegexImpl(r);
 		}
 		Target t = match.getTarget();
 		if (t != null) {
-			target = new TargetImpl(t);
+			target = new TargetImpl(uuid, t);
 		}
 
 		List<Object> actions = match.getSetOrAddOrPut();
@@ -48,13 +48,13 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 			assign = new ArrayList<IAssign>();
 			for (Object o : actions) {
 				if (o instanceof Add) {
-					assign.add(new AddImpl((Add) o));
+					assign.add(new AddImpl(uuid, (Add) o));
 				} else if (o instanceof Append) {
-					assign.add(new AppendImpl((Append) o));
+					assign.add(new AppendImpl(uuid, (Append) o));
 				} else if (o instanceof Put) {
-					assign.add(new PutImpl((Put) o));
+					assign.add(new PutImpl(uuid, (Put) o));
 				} else if (o instanceof Set) {
-					assign.add(new SetImpl((Set) o));
+					assign.add(new SetImpl(uuid, (Set) o));
 				}
 			}
 		}
@@ -63,7 +63,7 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 		if (!tests.isEmpty()) {
 			this.tests = new ArrayList<TestImpl>();
 			for (Test test : tests) {
-				this.tests.add(new TestImpl(test));
+				this.tests.add(new TestImpl(uuid, test));
 			}
 		}
 

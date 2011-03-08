@@ -20,10 +20,12 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ArglistImpl implements IJAXBNonNLSConstants {
 
+	private final String uuid;
 	private final Arglist args;
 	private final RMVariableMap map;
 
-	public ArglistImpl(Arglist args) {
+	public ArglistImpl(String uuid, Arglist args) {
+		this.uuid = uuid;
 		this.args = args;
 		this.map = RMVariableMap.getActiveInstance();
 		assert (null != this.args);
@@ -53,10 +55,10 @@ public class ArglistImpl implements IJAXBNonNLSConstants {
 		content = content.replaceAll(AMP, name + PD).trim();
 		String undefined = next.getIsUndefinedIfEquals();
 		undefined = undefined.replaceAll(AMP, name + PD);
-		content = map.getString(content);
+		content = map.getString(uuid, content);
 		if (undefined != null) {
 			undefined = undefined.trim();
-			undefined = map.getString(undefined);
+			undefined = map.getString(uuid, undefined);
 			if (undefined.equals(content)) {
 				return ZEROSTR;
 			}
@@ -65,14 +67,14 @@ public class ArglistImpl implements IJAXBNonNLSConstants {
 	}
 
 	private String addStandardArg(Arg next) {
-		String dereferenced = map.getString(next.getContent());
+		String dereferenced = map.getString(uuid, next.getContent());
 		if (dereferenced != null) {
 			dereferenced = dereferenced.trim();
 		}
 		String undefined = next.getIsUndefinedIfEquals();
 		if (undefined != null) {
 			undefined = undefined.trim();
-			undefined = map.getString(undefined);
+			undefined = map.getString(uuid, undefined);
 			if (undefined.equals(dereferenced)) {
 				return ZEROSTR;
 			}

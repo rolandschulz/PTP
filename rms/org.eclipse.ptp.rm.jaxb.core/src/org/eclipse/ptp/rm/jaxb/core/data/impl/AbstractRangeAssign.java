@@ -26,7 +26,7 @@ public abstract class AbstractRangeAssign extends AbstractAssign {
 		public Range(String expression) {
 			RMVariableMap map = RMVariableMap.getActiveInstance();
 			assert (null != map);
-			this.expression = map.getString(expression);
+			this.expression = map.getString(uuid, expression);
 		}
 
 		public List<Object> findInRange(String[] values) {

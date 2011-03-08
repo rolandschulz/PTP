@@ -16,7 +16,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.Add;
 
 public class AddImpl extends AbstractRangeAssign {
 
-	public AddImpl(Add add) {
+	public AddImpl(String uuid, Add add) {
+		this.uuid = uuid;
 		this.field = add.getField();
 		String rString = add.getGroups();
 		if (rString == null) {

@@ -29,6 +29,7 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 	private static final byte xOR = 0;
 	private static final byte xAND = 1;
 
+	private final String uuid;
 	private final char delim;
 	private final List<MatchImpl> matches;
 	private final int maxLen;
@@ -44,7 +45,8 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 	private int nMatches;
 	private boolean looking;
 
-	public ReadImpl(Read read) {
+	public ReadImpl(String uuid, Read read) {
+		this.uuid = uuid;
 		String d = read.getDelim();
 		if (d != null) {
 			delim = d.charAt(0);
@@ -243,7 +245,7 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 		TargetImpl last = null;
 		TargetImpl current = null;
 		for (Match m : matches) {
-			MatchImpl mimpl = new MatchImpl(m);
+			MatchImpl mimpl = new MatchImpl(uuid, m);
 			current = mimpl.getTarget();
 			if (current != null) {
 				last = current;

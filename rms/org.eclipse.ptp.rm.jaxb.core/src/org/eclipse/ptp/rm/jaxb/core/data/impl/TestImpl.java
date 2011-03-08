@@ -29,6 +29,7 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	private static final short sOR = 6;
 	private static final short sNOT = 7;
 
+	private final String uuid;
 	private final short op;
 	private final String set;
 	private final List<String> values;
@@ -36,7 +37,8 @@ public class TestImpl implements IJAXBNonNLSConstants {
 
 	private Object target;
 
-	public TestImpl(Test test) {
+	public TestImpl(String uuid, Test test) {
+		this.uuid = uuid;
 		op = getOp(test.getOp());
 		set = test.getSet();
 		values = test.getValue();
@@ -44,7 +46,7 @@ public class TestImpl implements IJAXBNonNLSConstants {
 		if (!tests.isEmpty()) {
 			children = new ArrayList<TestImpl>();
 			for (Test t : tests) {
-				children.add(new TestImpl(t));
+				children.add(new TestImpl(uuid, t));
 			}
 		}
 	}
@@ -202,8 +204,8 @@ public class TestImpl implements IJAXBNonNLSConstants {
 			String field = expression.substring(5);
 			return AbstractAssign.get(target, field);
 		} else if (expression.indexOf(OPENV) >= 0) {
-			expression = RMVariableMap.getActiveInstance().getString(expression);
-			return RMVariableMap.getActiveInstance().getString(expression);
+			expression = RMVariableMap.getActiveInstance().getString(uuid, expression);
+			return RMVariableMap.getActiveInstance().getString(uuid, expression);
 		} else {
 			if (TRUE.equalsIgnoreCase(expression)) {
 				return true;

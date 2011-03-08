@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import junit.framework.TestCase;
 
@@ -60,6 +61,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		}
 	}
 
+	private String uuid;
 	private String lineRange;
 	private boolean[] oracle;
 	private String[] values;
@@ -305,7 +307,8 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	public void testJobId() {
-		target = "jobId"; //$NON-NLS-1$
+		uuid = UUID.randomUUID().toString();
+		target = uuid;
 		Property p = new Property();
 		p.setName(target);
 		RMVariableMap.getActiveInstance().getVariables().put(target, p);
@@ -622,7 +625,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	private void runTokenizer(InputStream stream) {
-		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(read);
+		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(uuid, read);
 		t.setInputStream(stream);
 		if (redirect) {
 			t.setRedirectStream(System.out);

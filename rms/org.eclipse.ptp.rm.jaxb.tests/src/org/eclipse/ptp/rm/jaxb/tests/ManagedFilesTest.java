@@ -84,7 +84,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 		ManagedFiles files = controlData.getManagedFiles();
 		assertNotNull(files);
 		try {
-			ManagedFilesJob job = new ManagedFilesJob(files, localFileManager, remoteFileManager);
+			ManagedFilesJob job = new ManagedFilesJob(null, files, localFileManager, remoteFileManager);
 			job.schedule();
 			try {
 				job.join();
@@ -100,7 +100,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	private void composeScript() {
 		Script script = controlData.getScript();
 		assertNotNull(script);
-		ScriptHandler job = new ScriptHandler(script, live, appendEnv);
+		ScriptHandler job = new ScriptHandler(null, script, live, appendEnv);
 		job.schedule();
 		try {
 			job.join();

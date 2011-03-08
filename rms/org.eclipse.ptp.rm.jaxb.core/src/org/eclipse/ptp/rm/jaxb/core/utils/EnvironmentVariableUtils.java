@@ -20,17 +20,17 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	private EnvironmentVariableUtils() {
 	}
 
-	public static void addVariable(EnvironmentVariable var, Map<String, String> env, RMVariableMap map) {
+	public static void addVariable(String uuid, EnvironmentVariable var, Map<String, String> env, RMVariableMap map) {
 		String key = var.getValueFrom();
-		String value = getValue(key, map);
+		String value = getValue(uuid, key, map);
 		if (value != null && !ZEROSTR.equals(value)) {
 			env.put(var.getVariableName(), value);
 		}
 	}
 
-	public static void addVariable(EnvironmentVariable var, String syntax, StringBuffer buffer, RMVariableMap map) {
+	public static void addVariable(String uuid, EnvironmentVariable var, String syntax, StringBuffer buffer, RMVariableMap map) {
 		String key = var.getValueFrom();
-		String value = getValue(key, map);
+		String value = getValue(uuid, key, map);
 		addVariable(var.getVariableName(), value, syntax, buffer);
 	}
 
@@ -44,9 +44,9 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 		}
 	}
 
-	public static String getValue(String key, RMVariableMap map) {
+	public static String getValue(String uuid, String key, RMVariableMap map) {
 		String name = OPENVRM + key + CLOSVAL;
-		return map.getString(name);
+		return map.getString(uuid, name);
 	}
 
 	private static void export(String name, String value, StringBuffer buffer) {

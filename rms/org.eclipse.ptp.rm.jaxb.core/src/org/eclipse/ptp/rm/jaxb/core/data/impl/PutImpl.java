@@ -20,7 +20,8 @@ public class PutImpl extends AbstractRangeAssign {
 
 	private final Range keys;
 
-	public PutImpl(Put put) {
+	public PutImpl(String uuid, Put put) {
+		this.uuid = uuid;
 		this.field = put.getField();
 		String rString = put.getKeyGroups();
 		if (rString == null) {

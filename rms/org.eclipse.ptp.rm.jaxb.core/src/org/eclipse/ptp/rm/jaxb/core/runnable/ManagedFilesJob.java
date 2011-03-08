@@ -36,6 +36,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 
+	private final String uuid;
 	private final String sourceDir;
 	private final String stagingDir;
 	private final List<ManagedFile> files;
@@ -43,18 +44,19 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	private final IRemoteFileManager remoteFileManager;
 	private boolean success;
 
-	public ManagedFilesJob(ManagedFiles files, IRemoteFileManager localFileManager, IRemoteFileManager remoteFileManager)
-			throws CoreException {
+	public ManagedFilesJob(String uuid, ManagedFiles files, IRemoteFileManager localFileManager,
+			IRemoteFileManager remoteFileManager) throws CoreException {
 		super(Messages.ManagedFilesJob);
+		this.uuid = uuid;
 		this.localFileManager = localFileManager;
 		this.remoteFileManager = remoteFileManager;
 		String key = files.getFileSourceLocation();
 		if (key == null) {
 			sourceDir = System.getProperty(JAVA_TMP_DIR);
 		} else {
-			sourceDir = RMVariableMap.getActiveInstance().getString(key);
+			sourceDir = RMVariableMap.getActiveInstance().getString(uuid, key);
 		}
-		stagingDir = RMVariableMap.getActiveInstance().getString(files.getFileStagingLocation());
+		stagingDir = RMVariableMap.getActiveInstance().getString(uuid, files.getFileStagingLocation());
 		this.files = files.getManagedFile();
 	}
 
@@ -141,7 +143,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private File maybeWriteFile(ManagedFile file) throws IOException, CoreException {
-		String name = RMVariableMap.getActiveInstance().getString(file.getName());
+		String name = RMVariableMap.getActiveInstance().getString(uuid, file.getName());
 		File localFile = new File(sourceDir, name);
 		String contents = file.getContents();
 		FileWriter fw = null;
@@ -154,7 +156,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 				if (file.isUniqueIdPrefix()) {
 					localFile = new File(sourceDir, UUID.randomUUID() + name);
 				}
-				contents = RMVariableMap.getActiveInstance().getString(contents);
+				contents = RMVariableMap.getActiveInstance().getString(uuid, contents);
 				fw = new FileWriter(localFile, false);
 				fw.write(contents);
 				fw.flush();

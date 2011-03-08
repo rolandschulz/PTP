@@ -18,6 +18,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 
 public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 
+	protected String uuid;
 	protected String field;
 	protected Object target;
 

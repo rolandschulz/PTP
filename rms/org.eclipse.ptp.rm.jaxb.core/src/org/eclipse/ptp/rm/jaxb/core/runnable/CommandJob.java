@@ -80,6 +80,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		}
 	}
 
+	private final String uuid;
 	private final Command command;
 	private final JAXBResourceManager rm;
 	private StreamParser stdoutParser;
@@ -90,10 +91,11 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private Thread stderrT;
 	private boolean success;
 
-	public CommandJob(Command command, JAXBResourceManager rm) {
+	public CommandJob(String jobUUID, Command command, JAXBResourceManager rm) {
 		super(command.getName());
 		this.command = command;
 		this.rm = rm;
+		this.uuid = jobUUID;
 	}
 
 	public boolean getSuccess() {
@@ -163,7 +165,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		List<String> refs = command.getParserRef();
 		if (refs != null) {
 			for (String ref : refs) {
-				ref = RMVariableMap.getActiveInstance().getString(ref);
+				ref = RMVariableMap.getActiveInstance().getString(uuid, ref);
 				StreamParser p = (StreamParser) RMVariableMap.getActiveInstance().getVariables().get(ref);
 				if (p == null) {
 					throw CoreExceptionUtils.newException(Messages.RMNoSuchParserError + ref, null);
@@ -182,7 +184,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		if (args == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError + command.getName(), null);
 		}
-		ArglistImpl arglist = new ArglistImpl(args);
+		ArglistImpl arglist = new ArglistImpl(uuid, args);
 		String[] cmdArgs = arglist.toArray();
 		IRemoteServices service = rm.getRemoteServices();
 		return service.getProcessBuilder(rm.getRemoteConnection(), cmdArgs);
@@ -204,7 +206,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			RMVariableMap map = RMVariableMap.getActiveInstance();
 			if (vars != null) {
 				for (EnvironmentVariable var : vars.getEnvironmentVariable()) {
-					EnvironmentVariableUtils.addVariable(var, builder.environment(), map);
+					EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), map);
 				}
 			}
 
@@ -225,7 +227,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				if (type != null) {
 					stdoutTokenizer = getTokenizer(type);
 				} else {
-					stdoutTokenizer = new ConfigurableRegexTokenizer(t.getRead());
+					stdoutTokenizer = new ConfigurableRegexTokenizer(uuid, t.getRead());
 				}
 
 				stdoutTokenizer.setInputStream(process.getInputStream());
@@ -252,7 +254,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				if (type != null) {
 					stderrTokenizer = getTokenizer(type);
 				} else {
-					stderrTokenizer = new ConfigurableRegexTokenizer(t.getRead());
+					stderrTokenizer = new ConfigurableRegexTokenizer(uuid, t.getRead());
 				}
 
 				stderrTokenizer.setInputStream(process.getErrorStream());
