@@ -18,6 +18,7 @@ public class AppendImpl extends AbstractRangeAssign {
 	private final String separator;
 	private final String endTag;
 	private final String startTag;
+	private final List<String> values;
 
 	public AppendImpl(String uuid, Append append) {
 		this.uuid = uuid;
@@ -30,15 +31,37 @@ public class AppendImpl extends AbstractRangeAssign {
 			rString = append.getIndices();
 		}
 		range = new Range(rString);
+		this.values = append.getValue();
 	}
 
 	@Override
-	protected Object[] getValue(Object previous, String[] values) {
+	protected Object[] getValue(Object previous, String[] values) throws Throwable {
+		if (!this.values.isEmpty()) {
+			StringBuffer norm = new StringBuffer();
+			if (startTag != null) {
+				norm.append(startTag);
+			}
+			norm.append((String) normalizedValue(target, uuid, this.values.get(0)));
+			int len = this.values.size();
+			for (int i = 1; i < len; i++) {
+				if (separator != null) {
+					norm.append(separator);
+				}
+				norm.append((String) normalizedValue(target, uuid, this.values.get(i)));
+			}
+			if (endTag != null) {
+				norm.append(endTag);
+			}
+			return new Object[] { norm.toString() };
+		}
+
 		if (values == null) {
 			return new Object[] { previous };
 		}
+
 		range.setLen(values.length);
 		List<Object> found = range.findInRange(values);
+
 		if (found.isEmpty()) {
 			return new Object[] { previous };
 		}

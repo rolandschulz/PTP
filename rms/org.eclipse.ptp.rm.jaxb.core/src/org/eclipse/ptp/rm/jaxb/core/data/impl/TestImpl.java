@@ -16,7 +16,6 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Test;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
-import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class TestImpl implements IJAXBNonNLSConstants {
 
@@ -110,8 +109,8 @@ public class TestImpl implements IJAXBNonNLSConstants {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private int evaluateComparable(String string1, String string2) throws Throwable {
-		Object value1 = getValue(string1);
-		Object value2 = getValue(string2);
+		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1);
+		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2);
 		if (value1 == null || value2 == null) {
 			return 1;
 		}
@@ -124,8 +123,8 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	}
 
 	private boolean evaluateEquals(String string1, String string2) throws Throwable {
-		Object value1 = getValue(string1);
-		Object value2 = getValue(string2);
+		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1);
+		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2);
 		if (value1 == null) {
 			return value2 == null;
 		}
@@ -194,34 +193,6 @@ public class TestImpl implements IJAXBNonNLSConstants {
 			return sNOT;
 		}
 		return sEQ;
-	}
-
-	private Object getValue(String expression) throws Throwable {
-		if (expression.startsWith(THIS)) {
-			if (target == null) {
-				return null;
-			}
-			String field = expression.substring(5);
-			return AbstractAssign.get(target, field);
-		} else if (expression.indexOf(OPENV) >= 0) {
-			expression = RMVariableMap.getActiveInstance().getString(uuid, expression);
-			return RMVariableMap.getActiveInstance().getString(uuid, expression);
-		} else {
-			if (TRUE.equalsIgnoreCase(expression)) {
-				return true;
-			}
-			if (FALSE.equalsIgnoreCase(expression)) {
-				return false;
-			}
-			try {
-				if (expression.indexOf(DOT) >= 0) {
-					return new Double(expression);
-				}
-				return new Integer(expression);
-			} catch (NumberFormatException nfe) {
-				return expression;
-			}
-		}
 	}
 
 	private void validate(short op) throws Throwable {

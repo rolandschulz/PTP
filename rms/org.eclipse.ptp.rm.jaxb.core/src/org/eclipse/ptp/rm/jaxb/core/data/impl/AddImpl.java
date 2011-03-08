@@ -16,6 +16,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.Add;
 
 public class AddImpl extends AbstractRangeAssign {
 
+	private final List<String> values;
+
 	public AddImpl(String uuid, Add add) {
 		this.uuid = uuid;
 		this.field = add.getField();
@@ -24,11 +26,20 @@ public class AddImpl extends AbstractRangeAssign {
 			rString = add.getIndices();
 		}
 		range = new Range(rString);
+		values = add.getValue();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Object[] getValue(Object previous, String[] values) {
+	protected Object[] getValue(Object previous, String[] values) throws Throwable {
+		if (!this.values.isEmpty()) {
+			List<String> norm = new ArrayList<String>();
+			for (String v : this.values) {
+				norm.add((String) normalizedValue(target, uuid, v));
+			}
+			return new Object[] { norm };
+		}
+
 		if (values == null) {
 			return new Object[] { previous };
 		}

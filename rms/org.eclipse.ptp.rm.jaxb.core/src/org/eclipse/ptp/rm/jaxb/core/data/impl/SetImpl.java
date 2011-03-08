@@ -29,9 +29,9 @@ public class SetImpl extends AbstractAssign {
 	}
 
 	@Override
-	protected Object[] getValue(Object previous, String[] values) {
+	protected Object[] getValue(Object previous, String[] values) throws Throwable {
 		if (value != null) {
-			return new Object[] { value };
+			return new Object[] { normalizedValue(target, uuid, value) };
 		}
 		if (values == null) {
 			return new Object[] { previous };
