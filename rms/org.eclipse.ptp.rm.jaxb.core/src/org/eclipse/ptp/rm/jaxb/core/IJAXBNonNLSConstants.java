@@ -34,6 +34,7 @@ public interface IJAXBNonNLSConstants {
 	String AMP = "@";//$NON-NLS-1$
 	String DOL = "$";//$NON-NLS-1$
 	String PIP = "|";//$NON-NLS-1$
+	String DOT = ".";//$NON-NLS-1$
 	String OPENSQ = "[";//$NON-NLS-1$
 	String OPENV = "${";//$NON-NLS-1$
 	String OPENVRM = "${rm:";//$NON-NLS-1$
@@ -58,13 +59,20 @@ public interface IJAXBNonNLSConstants {
 	String FALSE = "false";//$NON-NLS-1$
 	String YES = "yes";//$NON-NLS-1$
 	String NO = "no";//$NON-NLS-1$
+	String NOT = "not";//$NON-NLS-1$
 	String OR = "or";//$NON-NLS-1$
 	String AND = "and";//$NON-NLS-1$
+	String xEQ = "EQ";//$NON-NLS-1$
+	String xLT = "LT";//$NON-NLS-1$
+	String xGT = "GT";//$NON-NLS-1$
+	String xLE = "LE";//$NON-NLS-1$
+	String xGE = "GE";//$NON-NLS-1$
 	String GET = "get";//$NON-NLS-1$
 	String SET = "set";//$NON-NLS-1$
 	String IS = "is";//$NON-NLS-1$
 	String CLASS = "class";//$NON-NLS-1$
 	String VALUE = "value";//$NON-NLS-1$
+	String THIS = "this.";//$NON-NLS-1$
 
 	/* STANDARD PROPERTIES */
 	String ID = "id";//$NON-NLS-1$

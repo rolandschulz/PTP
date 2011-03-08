@@ -12,6 +12,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Put;
 import org.eclipse.ptp.rm.jaxb.core.data.Regex;
 import org.eclipse.ptp.rm.jaxb.core.data.Set;
 import org.eclipse.ptp.rm.jaxb.core.data.Target;
+import org.eclipse.ptp.rm.jaxb.core.data.Test;
 import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedRegexMatchException;
 
 public class MatchImpl implements IJAXBNonNLSConstants {
@@ -19,6 +20,7 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	private RegexImpl regex;
 	private TargetImpl target;
 	private List<IAssign> assign;
+	private List<TestImpl> tests;
 	private final boolean errorOnMiss;
 	private boolean matched;
 
@@ -48,14 +50,28 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 			}
 		}
 
+		List<Test> tests = match.getTest();
+		if (!tests.isEmpty()) {
+			this.tests = new ArrayList<TestImpl>();
+			for (Test test : tests) {
+				this.tests.add(new TestImpl(test));
+			}
+		}
+
 		errorOnMiss = match.isErrorOnMiss();
 	}
 
-	public synchronized void clear() {
-		matched = false;
+	public synchronized void clear() throws Throwable {
 		if (target != null) {
+			if (tests != null) {
+				for (TestImpl t : tests) {
+					t.setTarget(target.getTarget());
+					t.doTest();
+				}
+			}
 			target.clear();
 		}
+		matched = false;
 	}
 
 	public synchronized int doMatch(String sequence) throws Throwable {
@@ -87,10 +103,10 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 			return end;
 		}
 
-		Object value = target.getTarget(tokens);
+		Object t = target.getTarget(tokens);
 
 		for (IAssign a : assign) {
-			a.setTarget(value);
+			a.setTarget(t);
 			a.assign(tokens);
 		}
 

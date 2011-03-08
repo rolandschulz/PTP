@@ -22,7 +22,7 @@ public class TargetImpl implements IJAXBNonNLSConstants {
 		fromId = target.getIdFrom();
 	}
 
-	public void clear() {
+	public synchronized void clear() {
 		/*
 		 * Store target if anonymous, which should have a name by now
 		 */
@@ -37,6 +37,10 @@ public class TargetImpl implements IJAXBNonNLSConstants {
 			}
 			target = null; // only if not a reference
 		}
+	}
+
+	public Object getTarget() {
+		return target;
 	}
 
 	public Object getTarget(String[] tokens) throws CoreException {
@@ -81,6 +85,7 @@ public class TargetImpl implements IJAXBNonNLSConstants {
 				}
 			}
 		}
+
 		return target;
 	}
 }

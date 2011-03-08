@@ -7,14 +7,17 @@ import junit.framework.TestCase;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
+import org.eclipse.ptp.rm.jaxb.core.data.Parsers;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
+import org.eclipse.ptp.rm.jaxb.core.data.StreamParser;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 
-	private static final String xml = DATA + "rm-pbs-torque_2.3.7.xml"; //$NON-NLS-1$
+	private static final String rmxml = DATA + "rm-pbs-torque_2.3.7.xml"; //$NON-NLS-1$
+	private static final String tokxml = DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
 
 	@Override
 	public void setUp() {
@@ -29,8 +32,24 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 	public void testJAXBRMInstantiation() {
 		ResourceManagerData rmdata = null;
 		try {
-			JAXBInitializationUtils.validate(xml);
-			rmdata = JAXBInitializationUtils.initializeRMData(xml);
+			JAXBInitializationUtils.validate(rmxml);
+			rmdata = JAXBInitializationUtils.initializeRMData(rmxml);
+			if (rmdata != null) {
+				RMVariableMap map = RMVariableMap.setActiveInstance(null);
+				JAXBInitializationUtils.initializeMap(rmdata, map);
+				print(map);
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+			assert (t != null);
+		}
+	}
+
+	public void testJAXBTokeinizerInstantiation() {
+		ResourceManagerData rmdata = null;
+		try {
+			JAXBInitializationUtils.validate(tokxml);
+			rmdata = JAXBInitializationUtils.initializeRMData(tokxml);
 			if (rmdata != null) {
 				RMVariableMap map = RMVariableMap.setActiveInstance(null);
 				JAXBInitializationUtils.initializeMap(rmdata, map);
@@ -57,6 +76,11 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 			} else if (o instanceof Property) {
 				Property p = (Property) o;
 				buffer.append(LT).append(p.getName()).append(GTLT).append(p.getValue()).append(GT).append(LINE_SEP);
+			} else if (o instanceof Parsers) {
+				Parsers p = (Parsers) o;
+				for (StreamParser sp : p.getStreamParser()) {
+					System.out.println(sp.getName());
+				}
 			} else {
 				buffer.append(LT).append(e.getKey()).append(GTLT).append(e.getValue()).append(GT).append(LINE_SEP);
 			}
