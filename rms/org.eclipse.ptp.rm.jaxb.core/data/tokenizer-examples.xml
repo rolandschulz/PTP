@@ -168,7 +168,7 @@
 				<tokenizer>
 					<read delim="\n">
 						<match>
-							<regex>&lt;name&gt;(.*)&lt;/name&gt;&lt;value&gt;(.*)&lt;/value&gt;</regex>
+							<regex expression="<name>(.*)</name><value>(.*)</value>"/>
 							<target type="property"/>
 							<set field="name" group="1"/>
 							<set field="value" group="2"/>

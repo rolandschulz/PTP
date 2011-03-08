@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2011 University of Illinois All rights reserved. This program
+ * and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html 
+ * 	
+ * Contributors: 
+ * 	Albert L. Rossi - design and implementation
+ ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
 import java.net.URI;
@@ -38,6 +47,13 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		super(provider);
 	}
 
+	public void clearReferences() {
+		map.clear();
+		map = null;
+		rmdata = null;
+		service = null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -46,13 +62,6 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 	@Override
 	public IServiceProviderWorkingCopy copy() {
 		return new JAXBServiceProvider(this);
-	}
-
-	public void clearReferences() {
-		map.clear();
-		map = null;
-		rmdata = null;
-		service = null;
 	}
 
 	public String getDefaultControlHost() {

@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2011 University of Illinois All rights reserved. This program
+ * and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html 
+ * 	
+ * Contributors: 
+ * 	Albert L. Rossi - design and implementation
+ ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
 import java.util.List;
@@ -107,6 +116,71 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	public IRemoteServices getRemoteServices() {
 		return remoteServices;
+	}
+
+	@Override
+	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
+		resetEnv();
+		updateJobId(jobId);
+		doControlCommand(operation);
+	}
+
+	@Override
+	protected void doDispose() {
+		// NOP for the moment
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doGetJobStatus
+	 * (java.lang.String)
+	 */
+	@Override
+	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void doShutdown() throws CoreException {
+		resetEnv();
+		doOnShutdown();
+		doDisconnect();
+		config.clearReferences();
+	}
+
+	@Override
+	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+		resetEnv();
+		initializeConnections();
+		try {
+			doConnect(monitor);
+		} catch (RemoteConnectionException t) {
+			throw CoreExceptionUtils.newException(t.getMessage(), t);
+		}
+		doOnStartUp(monitor);
+	}
+
+	@Override
+	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
+			throws CoreException {
+		resetEnv();
+		updatePropertyValuesFromTab(configuration);
+		/*
+		 * create the script if necessary; adds the contents to env as
+		 * "${rm:script}"
+		 */
+		maybeHandleScript(controlData.getScript());
+		if (!maybeHandleManagedFiles(controlData.getManagedFiles())) {
+			throw CoreExceptionUtils.newException(Messages.CannotCompleteSubmitFailedStaging, null);
+		}
+		doJobSubmitCommand(mode);
+		/*
+		 * parser will have set the jobId in the map
+		 */
+		return getJobStatus(currentJobId());
 	}
 
 	/*
@@ -396,8 +470,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * Transfers the values from the configuration to the live map. Runs
-	 * validator? or should this be in UI?
+	 * Transfers the values from the configuration to the live map.
 	 */
 	@SuppressWarnings("unchecked")
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
@@ -419,70 +492,5 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration, env);
 		maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration, env);
 		maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration, env);
-	}
-
-	@Override
-	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
-		resetEnv();
-		updateJobId(jobId);
-		doControlCommand(operation);
-	}
-
-	@Override
-	protected void doDispose() {
-		// NOP for the moment
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doGetJobStatus
-	 * (java.lang.String)
-	 */
-	@Override
-	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected void doShutdown() throws CoreException {
-		resetEnv();
-		doOnShutdown();
-		doDisconnect();
-		config.clearReferences();
-	}
-
-	@Override
-	protected void doStartup(IProgressMonitor monitor) throws CoreException {
-		resetEnv();
-		initializeConnections();
-		try {
-			doConnect(monitor);
-		} catch (RemoteConnectionException t) {
-			throw CoreExceptionUtils.newException(t.getMessage(), t);
-		}
-		doOnStartUp(monitor);
-	}
-
-	@Override
-	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
-			throws CoreException {
-		resetEnv();
-		updatePropertyValuesFromTab(configuration);
-		/*
-		 * create the script if necessary; adds the contents to env as
-		 * "${rm:script}"
-		 */
-		maybeHandleScript(controlData.getScript());
-		if (!maybeHandleManagedFiles(controlData.getManagedFiles())) {
-			throw CoreExceptionUtils.newException(Messages.CannotCompleteSubmitFailedStaging, null);
-		}
-		doJobSubmitCommand(mode);
-		/*
-		 * parser will have set the jobId in the map
-		 */
-		return getJobStatus(currentJobId());
 	}
 }
