@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -62,6 +63,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.part.ViewPart;
@@ -322,6 +325,13 @@ public class JobsListView extends ViewPart {
 		createColumns(viewer);
 
 		getSite().setSelectionProvider(viewer);
+
+		MenuManager contextMenu = new MenuManager();
+		contextMenu.setRemoveAllWhenShown(true);
+		getSite().registerContextMenu(contextMenu, viewer);
+		Control control = viewer.getControl();
+		Menu menu = contextMenu.createContextMenu(control);
+		control.setMenu(menu);
 
 		// Use view toolbar
 		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();

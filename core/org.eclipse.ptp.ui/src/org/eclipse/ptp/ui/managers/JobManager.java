@@ -37,6 +37,7 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.model.PProcessUI;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.ui.IJobManager;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
@@ -80,8 +81,9 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 			List<IElement> elements = new ArrayList<IElement>();
 			for (Integer processJobRank : new BitSetIterable(job.getProcessJobRanks())) {
 				final String key = getProcessKey(job, processJobRank);
-				if (set.contains(key))
+				if (set.contains(key)) {
 					continue;
+				}
 				elements.add(createProcessElement(set, key, job, processJobRank));
 			}
 			set.addElements(elements.toArray(new IElement[0]));
@@ -156,7 +158,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 		}
 		IPJob job = getJob();
 		if (job != null) {
-			IResourceManagerControl rm = job.getResourceManager();
+			IResourceManager rm = job.getResourceManager();
 			if (rm != null) {
 				return rm.getName() + ": " + job.getName(); //$NON-NLS-1$
 			}
@@ -189,8 +191,9 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 */
 	public String getName(String id) {
 		IPJob job = findJobById(id);
-		if (job == null)
+		if (job == null) {
 			return ""; //$NON-NLS-1$
+		}
 		return job.getName();
 	}
 
@@ -239,8 +242,9 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 */
 	public String[] getSets(String jid) {
 		IElementHandler eHandler = getElementHandler(jid);
-		if (eHandler == null)
+		if (eHandler == null) {
 			return new String[0];
+		}
 
 		IElement[] elements = eHandler.getElements();
 		String[] sets = new String[elements.length];
@@ -272,7 +276,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public Image getImage(IElement element) {
 		IPJob job = getJob();
 		if (job != null) {
-			IResourceManagerControl rm = job.getResourceManager();
+			IResourceManager rm = job.getResourceManager();
 			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
 					rm.getResourceManagerId());
 			if (presentation != null) {
@@ -334,14 +338,17 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public boolean isCurrentSetContainProcess(String jid, String processID) {
 		IPJob job = getJob();
 		if (job != null) {
-			if (!job.getID().equals(jid))
+			if (!job.getID().equals(jid)) {
 				return false;
+			}
 			IElementHandler elementHandler = getElementHandler(jid);
-			if (elementHandler == null)
+			if (elementHandler == null) {
 				return false;
+			}
 			IElementSet set = (IElementSet) elementHandler.getElementByID(getCurrentSetId());
-			if (set == null)
+			if (set == null) {
 				return false;
+			}
 			return set.contains(processID);
 		}
 		return false;
@@ -353,8 +360,9 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 * @see org.eclipse.ptp.ui.IElementManager#isJobStop(java.lang.String)
 	 */
 	public boolean isJobStop(String job_id) {
-		if (isNoJob(job_id))
+		if (isNoJob(job_id)) {
 			return true;
+		}
 		IPJob job = findJobById(job_id);
 		return (job == null || job.getState() == JobAttributes.State.COMPLETED);
 	}

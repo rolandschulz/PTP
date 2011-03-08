@@ -65,7 +65,7 @@ import org.eclipse.ptp.rm.core.messages.Messages;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
@@ -170,7 +170,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/** Progress monitor for startup. Used to cancel startup if necessary */
 	private IProgressMonitor startupMonitor = null;
 
-	private final IResourceManagerControl fResourceManager;
+	private final IResourceManager fResourceManager;
 
 	/** Attribute definitions for the RTS. */
 	protected AttributeDefinitionManager attrMgr = new AttributeDefinitionManager();
@@ -192,7 +192,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/**
 	 * @since 3.0
 	 */
-	public AbstractToolRuntimeSystem(IResourceManagerControl rm, IToolRMConfiguration config) {
+	public AbstractToolRuntimeSystem(IResourceManager rm, IToolRMConfiguration config) {
 		fResourceManager = rm;
 		this.jobNumber = 0;
 		this.rmConfiguration = config;
@@ -514,7 +514,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/**
 	 * @since 3.0
 	 */
-	public IResourceManagerControl getResourceManager() {
+	public IResourceManager getResourceManager() {
 		return fResourceManager;
 	}
 

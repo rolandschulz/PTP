@@ -7,5 +7,21 @@
             class="org.eclipse.ptp.rm.slurm.core.SLURMPreferenceManager">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerFactory"
+            id="org.eclipse.ptp.rm.slurm.SLURMServiceProvider"
+            name="SLURM">
+      </resourceManager>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerFactory"
+            id="org.eclipse.ptp.rm.slurm.core.resourceManager3"
+            name="name">
+      </resourceManager>
+   </extension>
 
 </plugin>

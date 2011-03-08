@@ -10,11 +10,12 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIRuntimeSystem;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerControl;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 /**
@@ -26,8 +27,9 @@ public class OpenMPIResourceManager extends AbstractToolResourceManager {
 	/**
 	 * @since 4.0
 	 */
-	public OpenMPIResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
-		super(universe, config);
+	public OpenMPIResourceManager(IResourceManagerConfiguration config, AbstractRuntimeResourceManagerControl control,
+			AbstractRuntimeResourceManagerMonitor monitor) {
+		super(config, control, monitor);
 	}
 
 	/*

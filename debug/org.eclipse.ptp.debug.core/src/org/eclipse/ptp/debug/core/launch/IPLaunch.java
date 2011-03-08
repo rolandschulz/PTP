@@ -3,7 +3,7 @@ package org.eclipse.ptp.debug.core.launch;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * Extend ILaunch to support parallel debug jobs
@@ -43,7 +43,7 @@ public interface IPLaunch extends ILaunch {
 	 * @return resource manager used to launch the job
 	 * @since 5.0
 	 */
-	public IResourceManagerControl getResourceManager();
+	public IResourceManager getResourceManager();
 
 	/**
 	 * Set the job ID associated with this launch
@@ -59,5 +59,5 @@ public interface IPLaunch extends ILaunch {
 	 * @param rm
 	 * @since 5.0
 	 */
-	public void setResourceManager(IResourceManagerControl rm);
+	public void setResourceManager(IResourceManager rm);
 }

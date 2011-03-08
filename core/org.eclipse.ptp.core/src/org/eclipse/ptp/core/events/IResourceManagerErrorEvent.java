@@ -16,7 +16,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.events;
 
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * @since 5.0
@@ -31,5 +31,5 @@ public interface IResourceManagerErrorEvent {
 	 * @return
 	 * @since 5.0
 	 */
-	public IResourceManagerControl getSource();
+	public IResourceManager getSource();
 }

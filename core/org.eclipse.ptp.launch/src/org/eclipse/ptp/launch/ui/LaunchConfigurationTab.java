@@ -30,7 +30,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
@@ -147,7 +147,7 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected IResourceManagerControl getResourceManager(ILaunchConfiguration configuration) {
+	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) {
 		final String rmUniqueName;
 		try {
 			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
@@ -167,10 +167,11 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	 */
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
-		if (style == -1)
+		if (style == -1) {
 			gd = new GridData();
-		else
+		} else {
 			gd = new GridData(style);
+		}
 		gd.horizontalSpan = space;
 		return gd;
 	}

@@ -20,7 +20,7 @@
 package org.eclipse.ptp.internal.core.events;
 
 import org.eclipse.ptp.core.events.IJobChangedEvent;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * @author grw
@@ -28,10 +28,10 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  */
 public class JobChangedEvent implements IJobChangedEvent {
 
-	private final IResourceManagerControl fResourceManager;
+	private final IResourceManager fResourceManager;
 	private final String fJobId;
 
-	public JobChangedEvent(IResourceManagerControl rm, String jobId) {
+	public JobChangedEvent(IResourceManager rm, String jobId) {
 		fResourceManager = rm;
 		fJobId = jobId;
 	}
@@ -50,7 +50,7 @@ public class JobChangedEvent implements IJobChangedEvent {
 	 * 
 	 * @see org.eclipse.ptp.core.events.IJobChangedEvent#getSource()
 	 */
-	public IResourceManagerControl getSource() {
+	public IResourceManager getSource() {
 		return fResourceManager;
 	}
 

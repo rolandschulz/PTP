@@ -21,13 +21,14 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchDelegate;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerMonitor;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBServiceProvider;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
@@ -216,7 +217,8 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 	public void testResourceManager() {
 		try {
 			emulateConfigureWizard();
-			rm = new JAXBResourceManager(PTPCorePlugin.getDefault().getModelManager().getUniverse(), rmConfig);
+			rm = new JAXBResourceManager(rmConfig, new JAXBResourceManagerControl(rmConfig), new JAXBResourceManagerMonitor(
+					rmConfig));
 			rm.start(new NullProgressMonitor());
 			try {
 				Thread.sleep(2000);

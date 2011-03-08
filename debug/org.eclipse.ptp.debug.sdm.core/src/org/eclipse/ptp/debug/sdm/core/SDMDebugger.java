@@ -64,8 +64,8 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.utils.core.BitSetIterable;
 
 /**
@@ -241,7 +241,7 @@ public class SDMDebugger implements IPDebugger {
 			/*
 			 * Prepare the Master SDM controller thread if required by the RM.
 			 */
-			IResourceManagerControl rm = getResourceManager(configuration);
+			IResourceManager rm = getResourceManager(configuration);
 
 			if (rm.getConfiguration().needsDebuggerLaunchHelp()) {
 				/*
@@ -284,7 +284,7 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	private int getJobSize(IPLaunch launch) {
 		int nprocs = 1;
-		IResourceManagerControl rmc = launch.getResourceManager();
+		IResourceManager rmc = launch.getResourceManager();
 		if (rmc != null) {
 			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 			if (rm != null) {
@@ -309,11 +309,11 @@ public class SDMDebugger implements IPDebugger {
 	 * @return resource manager or null if none specified
 	 * @throws CoreException
 	 */
-	private IResourceManagerControl getResourceManager(ILaunchConfiguration configuration) throws CoreException {
+	private IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 				(String) null);
-		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm.getState().equals(IResourceManagerControl.STARTED_STATE)) {
+		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
 			return rm;
 		}
 		return null;
@@ -357,7 +357,7 @@ public class SDMDebugger implements IPDebugger {
 			IPath routingFilePath = new Path(getWorkingDirectory(configuration));
 			routingFilePath = routingFilePath.append("routing_file"); //$NON-NLS-1$
 
-			IResourceManagerControl rm = getResourceManager(configuration);
+			IResourceManager rm = getResourceManager(configuration);
 			IResourceManagerConfiguration conf = rm.getConfiguration();
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),
 					progress.newChild(5));
@@ -417,7 +417,7 @@ public class SDMDebugger implements IPDebugger {
 	 * @since 5.0
 	 */
 	private IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		IResourceManagerControl rm = getResourceManager(configuration);
+		IResourceManager rm = getResourceManager(configuration);
 		if (rm == null) {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_4));
 		}

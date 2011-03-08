@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="resourceManager"/>
+            <element ref="resourceManager" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -52,7 +52,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.rmsystem.IResourceManagerFactory"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -66,7 +66,7 @@
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  A human readable name for the resource manager
+                  A name for this resource manager.
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>

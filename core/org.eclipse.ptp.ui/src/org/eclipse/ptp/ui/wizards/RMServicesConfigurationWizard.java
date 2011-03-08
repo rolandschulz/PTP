@@ -198,7 +198,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 
 	/**
 	 * Wizard page for selecting a service configuration from a list of service
-	 * configurations.
+	 * configurations. NOT USED.
 	 */
 	private class SelectServiceConfigurationPage extends WizardPage {
 		private AddServiceConfigurationWidget serviceConfigWidget;

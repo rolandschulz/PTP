@@ -23,7 +23,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * Abstract class that is the extension point for contributing Dynamic
@@ -50,8 +50,7 @@ public abstract class AbstractRMLaunchConfigurationFactory {
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	public IRMLaunchConfigurationDynamicTab create(IResourceManagerControl rm, ILaunchConfigurationDialog dialog)
-			throws CoreException {
+	public IRMLaunchConfigurationDynamicTab create(IResourceManager rm, ILaunchConfigurationDialog dialog) throws CoreException {
 		if (!getResourceManagerClass().isInstance(rm)) {
 			throw makeCoreException(NLS.bind(Messages.AbstractRMLaunchConfigurationFactory_0, rm.getName()));
 		}
@@ -65,7 +64,7 @@ public abstract class AbstractRMLaunchConfigurationFactory {
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #getResourceManagerClass()
 	 */
-	public abstract Class<? extends IResourceManagerControl> getResourceManagerClass();
+	public abstract Class<? extends IResourceManager> getResourceManagerClass();
 
 	/**
 	 * Method to actually create the tab.
@@ -78,6 +77,6 @@ public abstract class AbstractRMLaunchConfigurationFactory {
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected abstract IRMLaunchConfigurationDynamicTab doCreate(IResourceManagerControl rm, ILaunchConfigurationDialog dialog)
+	protected abstract IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException;
 }

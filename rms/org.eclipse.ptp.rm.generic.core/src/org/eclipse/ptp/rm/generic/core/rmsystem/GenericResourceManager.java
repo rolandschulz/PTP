@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.generic.core.rmsystem;
 
-import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManager;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.generic.core.rtsystem.GenericRMRuntimeSystem;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerControl;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 /**
@@ -24,19 +26,20 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
  */
 public class GenericResourceManager extends AbstractToolResourceManager {
 
-	public GenericResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
-		super(universe, config);
+	public GenericResourceManager(IResourceManagerConfiguration config, AbstractRuntimeResourceManagerControl control,
+			AbstractRuntimeResourceManagerMonitor monitor) {
+		super(config, control, monitor);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateRuntimeSystem
+	 * org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager#doCreateRuntimeSystem
 	 * ()
 	 */
 	@Override
-	protected IRuntimeSystem doCreateRuntimeSystem() {
+	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
 		IToolRMConfiguration config = (IToolRMConfiguration) getConfiguration();
 		return new GenericRMRuntimeSystem(this, config);
 	}

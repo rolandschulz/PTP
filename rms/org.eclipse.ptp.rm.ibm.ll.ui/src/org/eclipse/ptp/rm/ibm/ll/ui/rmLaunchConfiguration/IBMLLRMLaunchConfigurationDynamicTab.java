@@ -62,7 +62,7 @@ import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManager;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.ll.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -375,7 +375,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 	private TextRowWidget llWallClockLimitSoft = null;
 
-	public IBMLLRMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
+	public IBMLLRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":IBMLLRMLaunchConfigurationDynamicTab entered."); //$NON-NLS-1$
@@ -433,7 +433,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #canSave(org.eclipse.swt.widgets.Control,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":canSave entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
@@ -507,8 +507,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createBooleanOption entered."); //$NON-NLS-1$
 		widget = null;
-		attrDef = (StringSetAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
-				.getAttributeDefinition(id);
+		attrDef = (StringSetAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attrDef != null) {
 			widget = new BooleanRowWidget(parent, id, attrDef, LL_PTP_SUBMIT_MODE_RADIOBOX);
 			widget.setValidationRequired();
@@ -540,8 +539,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createCheckbox entered."); //$NON-NLS-1$
 		widget = null;
-		attrDef = (StringAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
-				.getAttributeDefinition(id);
+		attrDef = (StringAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attrDef != null) {
 			widget = new CheckboxRowWidget(parent, id, attrDef);
 			widget.setValidationRequired();
@@ -570,7 +568,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createCombobox entered."); //$NON-NLS-1$
 		widget = null;
-		attr = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
+		attr = currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new ComboRowWidget(parent, id, attr, true, selector_id);
 			widget.setValidationRequired();
@@ -593,7 +591,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param queue
 	 *            Currently selected queue
 	 */
-	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) {
+	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createControl entered."); //$NON-NLS-1$
 		IIBMLLResourceManagerConfiguration config;
@@ -654,8 +652,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createDualField entered."); //$NON-NLS-1$
 		widget = null;
-		attr1 = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id1);
-		attr2 = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id2);
+		attr1 = currentRM.getAttributeDefinitionManager().getAttributeDefinition(id1);
+		attr2 = currentRM.getAttributeDefinitionManager().getAttributeDefinition(id2);
 		if ((attr1 != null) && (attr2 != null)) {
 			widget = new DualFieldRowWidget(parent, id1, id2, attr1, attr2);
 			widget.addModifyListener(eventMonitor);
@@ -686,7 +684,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createEditableCombobox entered."); //$NON-NLS-1$
 		widget = null;
-		attr = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
+		attr = currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new ComboRowWidget(parent, id, attr, false, selector_id);
 			widget.setValidationRequired();
@@ -724,7 +722,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createFileSelector entered."); //$NON-NLS-1$
 		widget = null;
-		attr = (StringAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
+		attr = (StringAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new FileSelectorRowWidget(parent, id, selectorID, attr);
 			widget.setData(id);
@@ -982,7 +980,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createTextWidget entered."); //$NON-NLS-1$
 		widget = null;
-		attr = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
+		attr = currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new TextRowWidget(parent, id, attr);
 			widget.addModifyListener(eventMonitor);
@@ -1099,7 +1097,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		// NumberFormatException, so a try/catch block is required, where the
 		// string
 		// value is returned in thecase of a NumberFormatException
-		rmAttrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(attrName);
+		rmAttrDef = currentRM.getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		if (rmAttrDef instanceof IntegerAttributeDefinition || rmAttrDef instanceof BigIntegerAttributeDefinition) {
 			long intVal;
 
@@ -1154,7 +1152,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":getAttrLocalDefaultValue entered."); //$NON-NLS-1$
 		localDefaultEnv = attrName.replaceFirst("^MP_", "EN_"); //$NON-NLS-1$ //$NON-NLS-2$
-		attrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(localDefaultEnv);
+		attrDef = currentRM.getAttributeDefinitionManager().getAttributeDefinition(localDefaultEnv);
 		if (attrDef != null) {
 			try {
 				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
@@ -1163,7 +1161,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 			} catch (IllegalValueException e) {
 			}
 		}
-		attrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(attrName);
+		attrDef = currentRM.getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		if (attrDef != null) {
 			try {
 				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
@@ -1409,8 +1407,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManagerControl rm, IPQueue queue,
-			ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		currentRM = (IBMLLResourceManager) rm;
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":initializeFrom entered."); //$NON-NLS-1$
@@ -1432,7 +1429,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":isValid entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
@@ -1463,8 +1460,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":isValidListSelection entered."); //$NON-NLS-1$
-		attrDef = (StringSetAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
-				.getAttributeDefinition(attrName);
+		attrDef = (StringSetAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		if (attrDef != null) {
 			try {
 				attr = attrDef.create(widget.getValue());
@@ -1518,7 +1514,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":performApply entered."); //$NON-NLS-1$
 		currentLaunchConfig = configuration;
@@ -1680,7 +1676,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		if (control != null) {
 			String attrValue;
 
-			attrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(attr);
+			attrDef = currentRM.getAttributeDefinitionManager().getAttributeDefinition(attr);
 			try {
 				if ((attrDef instanceof IntegerAttributeDefinition) || (attrDef instanceof BigIntegerAttributeDefinition)) {
 					attrValue = getIntegerValue(control.getValue());
@@ -1806,14 +1802,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManagerControl rmc, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManager rm, IPQueue queue) {
 		IAttribute<?, ?, ?> rmAttrs[];
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setDefaults entered."); //$NON-NLS-1$
 		currentLaunchConfig = config;
-		IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
-		rmAttrs = rm.getAttributes();
+		IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
+		rmAttrs = prm.getAttributes();
 		for (int i = 0; i < rmAttrs.length; i++) {
 			try {
 				config.setAttribute(rmAttrs[i].getDefinition().getId(), rmAttrs[i].getDefinition().create().getValueAsString());
@@ -2405,8 +2401,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":validateLongNumericRange entered."); //$NON-NLS-1$
-		attrDef = (BigIntegerAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
-				.getAttributeDefinition(attrName);
+		attrDef = (BigIntegerAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		try {
 			attr = attrDef.create(value);
 		} catch (IllegalValueException e) {
@@ -2615,8 +2610,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":validateNumericRange entered."); //$NON-NLS-1$
-		attrDef = (IntegerAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
-				.getAttributeDefinition(attrName);
+		attrDef = (IntegerAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		try {
 			attr = attrDef.create(value);
 		} catch (IllegalValueException e) {

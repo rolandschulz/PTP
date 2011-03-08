@@ -27,7 +27,7 @@ import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.slurm.core.SLURMJobAttributes;
 import org.eclipse.ptp.rm.slurm.core.SLURMLaunchConfiguration;
 import org.eclipse.ptp.rm.slurm.ui.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -74,7 +74,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 	private Composite control;
 
-	public SLURMRMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
+	public SLURMRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 	}
 
@@ -86,7 +86,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #canSave(org.eclipse.swt.widgets.Control,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
 			@SuppressWarnings("unused")
@@ -136,7 +136,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #createControl(org.eclipse.swt.widgets.Composite,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) {
+	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout(1, true));
 		GridData gd;
@@ -290,8 +290,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManagerControl rm, IPQueue queue,
-			ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 
 		int jobnumProcs;
 		try {
@@ -377,7 +376,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
 
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm, IPQueue queue) {
 
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
@@ -434,7 +433,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 
 		IntegerAttribute iattr0 = null;
 		try {
@@ -466,26 +465,29 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		StringAttribute sattr0 = null;
 		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef();
 		sattr0 = new StringAttribute(jobPartitionAttrDef, partString);
-		if (sattr0.getValue().length() > 0)
+		if (sattr0.getValue().length() > 0) {
 			configuration.setAttribute(SLURMLaunchConfiguration.ATTR_JOBPARTITION, sattr0.getValue());
-		else
+		} else {
 			configuration.removeAttribute(SLURMLaunchConfiguration.ATTR_JOBPARTITION);
+		}
 
 		StringAttribute sattr1 = null;
 		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef();
 		sattr1 = new StringAttribute(jobReqNodeListAttrDef, reqNodeListString);
-		if (sattr1.getValue().length() > 0)
+		if (sattr1.getValue().length() > 0) {
 			configuration.setAttribute(SLURMLaunchConfiguration.ATTR_JOBREQNODELIST, sattr1.getValue());
-		else
+		} else {
 			configuration.removeAttribute(SLURMLaunchConfiguration.ATTR_JOBREQNODELIST);
+		}
 
 		StringAttribute sattr2 = null;
 		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef();
 		sattr2 = new StringAttribute(jobExcNodeListAttrDef, excNodeListString);
-		if (sattr2.getValue().length() > 0)
+		if (sattr2.getValue().length() > 0) {
 			configuration.setAttribute(SLURMLaunchConfiguration.ATTR_JOBEXCNODELIST, sattr2.getValue());
-		else
+		} else {
 			configuration.removeAttribute(SLURMLaunchConfiguration.ATTR_JOBEXCNODELIST);
+		}
 
 		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	}
@@ -498,7 +500,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
 			configuration.setAttribute(SLURMLaunchConfiguration.ATTR_NUMPROCS, numProcsAttrDef.create().getValue());

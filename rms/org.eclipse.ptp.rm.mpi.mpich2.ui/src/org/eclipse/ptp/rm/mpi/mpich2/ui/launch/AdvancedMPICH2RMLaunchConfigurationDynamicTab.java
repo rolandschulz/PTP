@@ -24,7 +24,7 @@ import org.eclipse.ptp.rm.mpi.mpich2.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -152,7 +152,7 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	/**
 	 * @since 2.0
 	 */
-	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout());
 
@@ -222,13 +222,13 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		configuration.setAttribute(MPICH2LaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
 				MPICH2LaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS);
 		configuration.setAttribute(MPICH2LaunchConfiguration.ATTR_ARGUMENTS, MPICH2LaunchConfigurationDefaults.ATTR_ARGUMENTS);

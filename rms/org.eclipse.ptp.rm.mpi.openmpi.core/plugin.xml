@@ -16,4 +16,12 @@
             class="org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerFactory"
+            id="org.eclipse.ptp.rm.mpi.openmpi.OpenMPIServiceProvider"
+            name="Open MPI">
+      </resourceManager>
+   </extension>
 </plugin>

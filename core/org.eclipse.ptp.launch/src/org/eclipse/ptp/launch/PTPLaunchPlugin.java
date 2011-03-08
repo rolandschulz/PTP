@@ -51,8 +51,8 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -222,7 +222,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	private ResourceBundle resourceBundle;
 
 	// Map of resource managers to launch configuration factories
-	private final Map<Class<? extends IResourceManagerControl>, AbstractRMLaunchConfigurationFactory> rmLaunchConfigurationFactories = new HashMap<Class<? extends IResourceManagerControl>, AbstractRMLaunchConfigurationFactory>();
+	private final Map<Class<? extends IResourceManager>, AbstractRMLaunchConfigurationFactory> rmLaunchConfigurationFactories = new HashMap<Class<? extends IResourceManager>, AbstractRMLaunchConfigurationFactory>();
 
 	/**
 	 * The constructor.
@@ -266,11 +266,11 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	public IResourceManagerControl getResourceManager(ILaunchConfiguration configuration) throws CoreException {
+	public IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 				(String) null);
-		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm.getState().equals(IResourceManagerControl.STARTED_STATE)) {
+		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
 			return rm;
 		}
 		return null;
@@ -284,7 +284,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 * @return launch configuration factory
 	 * @since 5.0
 	 */
-	public AbstractRMLaunchConfigurationFactory getRMLaunchConfigurationFactory(IResourceManagerControl rm) {
+	public AbstractRMLaunchConfigurationFactory getRMLaunchConfigurationFactory(IResourceManager rm) {
 		if (rm == null) {
 			return null;
 		}
@@ -353,7 +353,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 * @since 5.0
 	 */
 	public IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		IResourceManagerControl rm = getResourceManager(configuration);
+		IResourceManager rm = getResourceManager(configuration);
 		if (rm == null) {
 			throw new CoreException(new Status(IStatus.ERROR, getUniqueIdentifier(), Messages.PTPLaunchPlugin_4));
 		}
@@ -406,7 +406,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 				try {
 					AbstractRMLaunchConfigurationFactory factory = (AbstractRMLaunchConfigurationFactory) ce
 							.createExecutableExtension("class"); //$NON-NLS-1$
-					Class<? extends IResourceManagerControl> resourceManagerClass = factory.getResourceManagerClass();
+					Class<? extends IResourceManager> resourceManagerClass = factory.getResourceManagerClass();
 					rmLaunchConfigurationFactories.put(resourceManagerClass, factory);
 				} catch (CoreException e) {
 					log(e);

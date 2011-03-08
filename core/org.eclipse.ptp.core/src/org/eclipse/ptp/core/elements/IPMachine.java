@@ -24,7 +24,7 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * Interface class for a model of a machine. Machines are comprised of nodes
@@ -97,7 +97,7 @@ public interface IPMachine extends IPElement {
 	 * @return the machine's parent resource manager
 	 * @since 5.0
 	 */
-	public IResourceManagerControl getResourceManager();
+	public IResourceManager getResourceManager();
 
 	/**
 	 * Get the state of the machine

@@ -10,14 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.ll.ui;
 
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLCorePlugin;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceConstants;
-import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManager;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
@@ -72,20 +69,6 @@ public class LLServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	@Override
 	public IServiceProviderWorkingCopy copy() {
 		return new LLServiceProvider(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
-	 */
-	@SuppressWarnings("rawtypes")
-	@Override
-	public Object getAdapter(Class adapter) {
-		if (adapter == IResourceManagerControl.class) {
-			return new IBMLLResourceManager(PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
-		}
-		return null;
 	}
 
 	/*

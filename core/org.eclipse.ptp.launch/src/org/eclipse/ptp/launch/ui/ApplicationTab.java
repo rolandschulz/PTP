@@ -48,8 +48,8 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -494,7 +494,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			initPath = project.getLocationURI().getPath();
 		}
 
-		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(getLaunchConfiguration());
+		IResourceManager rm = getResourceManager(getLaunchConfiguration());
 		if (rm != null) {
 			IResourceManagerConfiguration conf = rm.getConfiguration();
 			IRemoteServices remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),
@@ -572,8 +572,9 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	 */
 	protected void handleProjectButtonSelected() {
 		IProject project = chooseProject();
-		if (project == null)
+		if (project == null) {
 			return;
+		}
 
 		String projectName = project.getName();
 		projText.setText(projectName);

@@ -44,15 +44,15 @@ import org.eclipse.ptp.internal.core.elements.events.ChangedNodeEvent;
 import org.eclipse.ptp.internal.core.elements.events.MachineChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewNodeEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveNodeEvent;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class PMachine extends Parent implements IPMachine {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
 	private final String arch = Messages.PMachine_0;
-	private final IResourceManagerControl fResourceManager;
+	private final IResourceManager fResourceManager;
 
-	public PMachine(String id, IResourceManagerControl rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
+	public PMachine(String id, IResourceManager rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
 		super(id, parent, attrs);
 		fResourceManager = rm;
 		/*
@@ -227,7 +227,7 @@ public class PMachine extends Parent implements IPMachine {
 	 * 
 	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
 	 */
-	public IResourceManagerControl getResourceManager() {
+	public IResourceManager getResourceManager() {
 		return fResourceManager;
 	}
 

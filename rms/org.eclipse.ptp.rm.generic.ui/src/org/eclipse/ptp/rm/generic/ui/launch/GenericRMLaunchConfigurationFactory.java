@@ -15,18 +15,25 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.generic.core.rmsystem.GenericResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class GenericRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory {
 
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManagerControl rm, ILaunchConfigurationDialog dialog)
+	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
 		return new GenericRMLaunchConfigurationDynamicTab(rm, dialog);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
+	 * #getResourceManagerClass()
+	 */
 	@Override
-	public Class<? extends IResourceManagerControl> getResourceManagerClass() {
+	public Class<? extends IResourceManager> getResourceManagerClass() {
 		return GenericResourceManager.class;
 	}
 }

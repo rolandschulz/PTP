@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 
 /**
@@ -203,7 +203,7 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	 * 
 	 * @return
 	 */
-	public IResourceManagerControl getResourceManager();
+	public IResourceManager getResourceManager();
 
 	/**
 	 * Remove listener for child events
@@ -223,7 +223,7 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	 * @param machine
 	 * @since 5.0
 	 */
-	public void removeMachines(IPResourceManager rm, Collection<IPMachine> machines);
+	public void removeMachines(Collection<IPMachine> machines);
 
 	/**
 	 * Remove nodes from the machine.
@@ -240,7 +240,7 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	 * @param queue
 	 * @since 5.0
 	 */
-	public void removeQueues(IPResourceManager rm, Collection<IPQueue> queues);
+	public void removeQueues(Collection<IPQueue> queues);
 
 	/**
 	 * Remove all terminated jobs from the resource manager. A terminated job is

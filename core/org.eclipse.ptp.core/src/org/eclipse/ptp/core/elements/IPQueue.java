@@ -22,7 +22,7 @@ import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public interface IPQueue extends IPElement {
 	/**
@@ -54,7 +54,7 @@ public interface IPQueue extends IPElement {
 	 * @return IResourceManagerControl
 	 * @since 5.0
 	 */
-	public IResourceManagerControl getResourceManager();
+	public IResourceManager getResourceManager();
 
 	/**
 	 * Get the internal state of the process.

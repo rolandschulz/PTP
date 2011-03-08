@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * A Job can be a parallel or sequential job, consisting of one or more
@@ -192,7 +192,7 @@ public interface IPJob extends IPElement {
 	 * 
 	 * @since 5.0
 	 */
-	public IResourceManagerControl getResourceManager();
+	public IResourceManager getResourceManager();
 
 	/**
 	 * @param processJobRank

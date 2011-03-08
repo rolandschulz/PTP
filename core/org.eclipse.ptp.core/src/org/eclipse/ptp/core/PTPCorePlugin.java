@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.core.util.DebugUtil;
-import org.eclipse.ptp.internal.core.ModelManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 

@@ -21,32 +21,20 @@
  */
 package org.eclipse.ptp.rmsystem;
 
-import org.eclipse.ui.IMemento;
-
 /**
  * @author rsqrd
  * 
  */
 public interface IResourceManagerFactory {
 	/**
-	 * Copy a configuration. This can be used to provide a temporary working
-	 * copy of a configuration
-	 * 
-	 * @param configuration
-	 *            configuration to copy
-	 * @return copy of the configuration
-	 */
-	public IResourceManagerConfiguration copyConfiguration(IResourceManagerConfiguration configuration);
-
-	/**
-	 * Create a resource manager using the supplied configuration
+	 * Create a resource manager using the supplied configuration.
 	 * 
 	 * @param configuration
 	 *            configuration to use when creating resource manager
 	 * @return resource manager control
 	 * @since 5.0
 	 */
-	public IResourceManagerControl create(IResourceManagerConfiguration configuration);
+	public IResourceManager create(IResourceManagerConfiguration configuration);
 
 	/**
 	 * Create a default configuration
@@ -68,24 +56,4 @@ public interface IResourceManagerFactory {
 	 * @return factory name
 	 */
 	public String getName();
-
-	/**
-	 * Load a resource manager configuration from saved state
-	 * 
-	 * @param memento
-	 *            saved state of configuration
-	 * @return resource manager configuration
-	 */
-	public IResourceManagerConfiguration loadConfiguration(IMemento memento);
-
-	/**
-	 * Replace a resource manager configuration with a working copy.
-	 * 
-	 * @param configuration
-	 *            working copy
-	 * @param resourceManager
-	 *            resource manager
-	 * @since 5.0
-	 */
-	public void saveConfiguration(IResourceManagerConfiguration configuration, IResourceManagerControl resourceManager);
 }

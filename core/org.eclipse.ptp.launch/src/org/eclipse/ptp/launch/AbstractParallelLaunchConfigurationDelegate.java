@@ -75,8 +75,8 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
@@ -151,7 +151,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 */
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-			IResourceManagerControl rm = fLaunch.getResourceManager();
+			IResourceManager rm = fLaunch.getResourceManager();
 			String jobId = fLaunch.getJobId();
 			fSubLock.lock();
 			try {
@@ -414,7 +414,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException {
-		IResourceManagerControl rm = getResourceManager(configuration);
+		IResourceManager rm = getResourceManager(configuration);
 		if (rm != null) {
 			IResourceManagerConfiguration conf = rm.getConfiguration();
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault()
@@ -629,8 +629,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		SubMonitor progress = SubMonitor.convert(monitor, 30);
 
 		try {
-			IResourceManagerControl rmc = getResourceManager(configuration);
-			if (rmc == null) {
+			IResourceManager rm = getResourceManager(configuration);
+			if (rm == null) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
 			}
@@ -780,10 +780,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected IResourceManagerControl getResourceManager(ILaunchConfiguration configuration) throws CoreException {
+	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		String rmUniqueName = getResourceManagerUniqueName(configuration);
-		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm.getState().equals(IResourceManagerControl.STARTED_STATE)) {
+		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
 			return rm;
 		}
 		return null;
@@ -903,7 +903,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			final IResourceManagerControl rm = getResourceManager(configuration);
+			final IResourceManager rm = getResourceManager(configuration);
 			if (rm == null) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));

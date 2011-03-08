@@ -31,14 +31,14 @@ import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.generic.core.GenericRMCorePlugin;
 import org.eclipse.ptp.rm.generic.core.messages.Messages;
 import org.eclipse.ptp.rm.generic.core.rmsystem.EffectiveGenericRMConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	/** The node we are running on. */
 	private String fNodeID;
 
-	public GenericRMRuntimeSystem(IResourceManagerControl rm, IToolRMConfiguration config) {
+	public GenericRMRuntimeSystem(IResourceManager rm, IToolRMConfiguration config) {
 		super(rm, config);
 	}
 

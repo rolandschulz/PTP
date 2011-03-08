@@ -26,7 +26,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -107,7 +107,7 @@ public class ResourceMappingSourceContainerBrowser extends AbstractSourceContain
 		} catch (CoreException e) {
 		}
 		if (rmName != null) {
-			IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmName);
+			IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmName);
 			if (rm != null) {
 				String remId = rm.getConfiguration().getRemoteServicesId();
 				String connName = rm.getConfiguration().getConnectionName();

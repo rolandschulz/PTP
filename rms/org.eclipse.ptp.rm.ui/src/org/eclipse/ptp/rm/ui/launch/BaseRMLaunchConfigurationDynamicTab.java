@@ -17,7 +17,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 
@@ -42,15 +42,16 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.core.elements.IPResourceManager,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManagerControl rm, IPQueue queue) {
-		if (dataSource.canSave())
+	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
+		if (dataSource.canSave()) {
 			return new RMLaunchValidation(true, null);
+		}
 		return new RMLaunchValidation(false, dataSource.getErrorMessage());
 	}
 
@@ -74,23 +75,23 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.core.elements.IPResourceManager,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManagerControl rm, IPQueue queue,
-			ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		dataSource.setResourceManager(rm);
 		dataSource.setQueue(queue);
 		dataSource.setConfiguration(configuration);
 		widgetListener.disable();
 		dataSource.loadAndUpdate();
 		widgetListener.enable();
-		if (dataSource.getErrorMessage() == null)
+		if (dataSource.getErrorMessage() == null) {
 			return new RMLaunchValidation(true, null);
+		}
 		return new RMLaunchValidation(false, dataSource.getErrorMessage());
 	}
 
@@ -100,15 +101,16 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
-	 * org.eclipse.ptp.core.elements.IPResourceManager,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManagerControl rm, IPQueue queue) {
-		if (dataSource.canAccept())
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
+		if (dataSource.canAccept()) {
 			return new RMLaunchValidation(true, null);
+		}
 		return new RMLaunchValidation(false, dataSource.getErrorMessage());
 	}
 
@@ -118,19 +120,20 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.core.elements.IPResourceManager,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		dataSource.setResourceManager(rm);
 		dataSource.setQueue(queue);
 		dataSource.setConfigurationWorkingCopy(configuration);
 		dataSource.storeAndValidate();
-		if (dataSource.getErrorMessage() == null)
+		if (dataSource.getErrorMessage() == null) {
 			return new RMLaunchValidation(true, null);
+		}
 		return new RMLaunchValidation(false, dataSource.getErrorMessage());
 	}
 

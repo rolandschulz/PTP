@@ -45,7 +45,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -83,7 +83,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 	/**
 	 * @since 2.0
 	 */
-	public AdvancedOpenMpiRMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
+	public AdvancedOpenMpiRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		info = ((OpenMPIResourceManager) rm).getOmpiInfo();
 	}
@@ -193,15 +193,17 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 
 		@Override
 		protected void validateLocal() throws ValidationException {
-			if (!useDefArgs && args == null)
+			if (!useDefArgs && args == null) {
 				throw new ValidationException(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyArguments);
+			}
 			if (!useDefParams) {
 				for (Object object : paramsViewer.getCheckedElements()) {
 					if (object instanceof Parameter) {
 						Parameter param = (Parameter) object;
-						if (param.getValue().equals("")) //$NON-NLS-1$
+						if (param.getValue().equals("")) { //$NON-NLS-1$
 							throw new ValidationException(
 									Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyParameter);
+						}
 					}
 				}
 			}
@@ -235,7 +237,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 	/**
 	 * @since 2.0
 	 */
-	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout());
 
@@ -390,8 +392,9 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 			 */
 			@Override
 			public String getText(Object element) {
-				if (element instanceof Parameter)
+				if (element instanceof Parameter) {
 					return ((Parameter) element).getValue();
+				}
 				return null;
 			}
 
@@ -445,7 +448,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
 				OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_ARGUMENTS, OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS);
