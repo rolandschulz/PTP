@@ -126,7 +126,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		resetEnv();
 		doControlCommand(operation);
 		/*
-		 * TO DO: call the update handler
+		 * TODO: call the update handler
 		 */
 	}
 

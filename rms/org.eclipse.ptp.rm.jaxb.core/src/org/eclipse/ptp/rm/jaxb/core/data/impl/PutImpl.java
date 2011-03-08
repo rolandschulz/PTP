@@ -14,11 +14,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.ptp.rm.jaxb.core.data.Put;
+import org.eclipse.ptp.rm.jaxb.core.data.Put.Entry;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
 public class PutImpl extends AbstractRangeAssign {
 
 	private final Range keys;
+	private final List<Entry> entries;
 
 	public PutImpl(String uuid, Put put) {
 		this.uuid = uuid;
@@ -33,11 +35,20 @@ public class PutImpl extends AbstractRangeAssign {
 			rString = put.getValueIndices();
 		}
 		range = new Range(rString);
+		this.entries = put.getEntry();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Object[] getValue(Object previous, String[] values) {
+	protected Object[] getValue(Object previous, String[] values) throws Throwable {
+		if (!this.entries.isEmpty()) {
+			Map<String, String> norm = new TreeMap<String, String>();
+			for (Entry e : this.entries) {
+				norm.put((String) normalizedValue(target, uuid, e.getKey()), (String) normalizedValue(target, uuid, e.getValue()));
+			}
+			return new Object[] { norm };
+		}
+
 		if (values == null) {
 			return new Object[] { previous };
 		}

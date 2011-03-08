@@ -15,6 +15,7 @@ import java.math.BigInteger;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 
@@ -31,7 +32,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		this.target = target;
 	}
 
-	protected abstract Object[] getValue(Object previous, String[] values);
+	protected abstract Object[] getValue(Object previous, String[] values) throws Throwable;
 
 	static Object get(Object target, String field) throws Throwable {
 		String name = GET + field.substring(0, 1).toUpperCase() + field.substring(1);
@@ -43,6 +44,34 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 			method = target.getClass().getMethod(name, (Class[]) null);
 		}
 		return method.invoke(target, (Object[]) null);
+	}
+
+	static Object normalizedValue(Object target, String uuid, String expression) throws Throwable {
+		if (expression.startsWith(THIS)) {
+			if (target == null) {
+				return null;
+			}
+			String field = expression.substring(5);
+			return AbstractAssign.get(target, field);
+		} else if (expression.indexOf(OPENV) >= 0) {
+			expression = RMVariableMap.getActiveInstance().getString(uuid, expression);
+			return RMVariableMap.getActiveInstance().getString(uuid, expression);
+		} else {
+			if (TRUE.equalsIgnoreCase(expression)) {
+				return true;
+			}
+			if (FALSE.equalsIgnoreCase(expression)) {
+				return false;
+			}
+			try {
+				if (expression.indexOf(DOT) >= 0) {
+					return new Double(expression);
+				}
+				return new Integer(expression);
+			} catch (NumberFormatException nfe) {
+				return expression;
+			}
+		}
 	}
 
 	static void set(Object target, String field, Object[] values) throws Throwable {
