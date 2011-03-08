@@ -19,6 +19,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Read;
 import org.eclipse.ptp.rm.jaxb.core.data.Regex;
 import org.eclipse.ptp.rm.jaxb.core.data.Set;
 import org.eclipse.ptp.rm.jaxb.core.data.Target;
+import org.eclipse.ptp.rm.jaxb.core.data.Test;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.AbstractRangeAssign;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ConfigurableRegexTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -504,11 +505,12 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			match.getSetOrAddOrPut().add(set);
 			set.setField("status"); //$NON-NLS-1$
 			set.setGroup(2);
-			set = new Set();
-			match.getSetOrAddOrPut().add(set);
-			set.setField("readOnly"); //$NON-NLS-1$
-			set.setExpression("true"); //$NON-NLS-1$
-			// set.setExpression("${this:status} == 'read-only'");
+			Test test = new Test();
+			match.getTest().add(test);
+			test.setOp("EQ");//$NON-NLS-1$
+			test.getValue().add("this.status");//$NON-NLS-1$
+			test.getValue().add("read-only");//$NON-NLS-1$
+			test.setSet("readOnly");//$NON-NLS-1$
 			/* 3 */
 			match = new Match();
 			read.getMatch().add(match);
@@ -664,7 +666,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 				+ LINE_SEP
 				+ "mca:mpi:base:param:mpi_param_check:data_source:default value" //$NON-NLS-1$
 				+ LINE_SEP
-				+ "mca:mpi:base:param:mpi_param_check:status:writable" //$NON-NLS-1$
+				+ "mca:mpi:base:param:mpi_param_check:status:read-only" //$NON-NLS-1$
 				+ LINE_SEP
 				+ "mca:mpi:base:param:mpi_param_check:help:Whether you want MPI API parameters checked at run-time or not.  Possible values are 0 (no checking) and 1 (perform checking at run-time)" //$NON-NLS-1$
 				+ LINE_SEP

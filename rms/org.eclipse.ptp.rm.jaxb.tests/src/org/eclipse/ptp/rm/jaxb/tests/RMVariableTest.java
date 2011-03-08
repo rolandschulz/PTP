@@ -20,6 +20,15 @@ public class RMVariableTest extends TestCase implements IJAXBNonNLSConstants {
 
 	}
 
+	public void testExpression() {
+		try {
+
+		} catch (Throwable t) {
+			t.printStackTrace();
+			assert (t != null);
+		}
+	}
+
 	public void testJAXBLoadVariables() {
 		try {
 			JAXBInitializationUtils.validate(xml);

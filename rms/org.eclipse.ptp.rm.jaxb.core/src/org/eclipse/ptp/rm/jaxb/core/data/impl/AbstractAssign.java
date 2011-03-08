@@ -12,8 +12,8 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	protected Object target;
 
 	public void assign(String[] values) throws Throwable {
-		Object previous = get(field);
-		set(field, getValue(previous, values));
+		Object previous = get(target, field);
+		set(target, field, getValue(previous, values));
 	}
 
 	public void setTarget(Object target) {
@@ -22,7 +22,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 
 	protected abstract Object[] getValue(Object previous, String[] values);
 
-	private Object get(String field) throws Throwable {
+	static Object get(Object target, String field) throws Throwable {
 		String name = GET + field.substring(0, 1).toUpperCase() + field.substring(1);
 		Method method = null;
 		try {
@@ -34,7 +34,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		return method.invoke(target, (Object[]) null);
 	}
 
-	private void set(String field, Object[] values) throws Throwable {
+	static void set(Object target, String field, Object[] values) throws Throwable {
 		String name = SET + field.substring(0, 1).toUpperCase() + field.substring(1);
 		Method[] methods = target.getClass().getMethods();
 		Method setter = null;

@@ -45,6 +45,9 @@ public class Messages extends NLS {
 	public static String ReadSegmentError;
 	public static String IllegalFailedMatch;
 	public static String StreamTokenizerInstantiationError;
+	public static String MalformedExpressionError;
+	public static String ReadClearError;
+	public static String UndefinedTargetForTestError;
 
 	static {
 		// initialize resource bundle

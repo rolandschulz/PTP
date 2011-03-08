@@ -59,7 +59,7 @@
 				<xs:element minOccurs="0" maxOccurs="unbounded" ref="property"/>
 				<xs:element minOccurs="0" ref="managed-files"/>
 				<xs:element minOccurs="0" ref="on-start-up"/>
-				<xs:element name="submit-commands">
+				<xs:element minOccurs="0" name="submit-commands">
 					<xs:complexType>
 						<xs:choice minOccurs="1" maxOccurs="3">
 							<xs:element ref="submit-interactive"/>
@@ -68,7 +68,7 @@
 						</xs:choice>
 					</xs:complexType>
 				</xs:element>
-				<xs:element ref="terminate-job"/>
+				<xs:element minOccurs="0" ref="terminate-job"/>
 				<xs:element minOccurs="0" ref="suspend-job"/>
 				<xs:element minOccurs="0" ref="resume-job"/>
 				<xs:element minOccurs="0" ref="hold-job"/>
@@ -77,8 +77,8 @@
 				<xs:element minOccurs="0" ref="commands"/>
 				<xs:element minOccurs="0" ref="parsers"/>
 				<xs:element minOccurs="0" ref="script"/>
-				<xs:element ref="attribute-definitions"/>
-				<xs:element ref="launch-tab"/>
+				<xs:element minOccurs="0" ref="attribute-definitions"/>
+				<xs:element minOccurs="0" ref="launch-tab"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -409,8 +409,7 @@
 		<xs:annotation>
 			<xs:documentation>
 				The text of the argument will be parsed for references to the resource manager environment; e.g., ${rm:a},
-				v=${rm:v},
-				etc. By convention, '${rm:@name}' and '${rm:@value}' will refer to a given dynamic attribute name and value (of undefined
+				v=${rm:v}, etc. By convention, '${rm:@name}' and '${rm:@value}' will refer to a given dynamic attribute name and value (of undefined
 				position i in
 				the list).
 			</xs:documentation>
@@ -465,9 +464,7 @@
 	<xs:element name="read">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:choice>
-					<xs:element ref="match" minOccurs="0" maxOccurs="unbounded"/>
-				</xs:choice>
+				<xs:element ref="match" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 			<xs:attribute name="delim" type="xs:string"/>
 			<xs:attribute name="includeDelim" type="xs:boolean" default="false"/>
@@ -495,8 +492,40 @@
 					<xs:element ref="put"/>
 					<xs:element ref="append"/>
 				</xs:choice>
+				<xs:element ref="test" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 			<xs:attribute name="errorOnMiss" type="xs:boolean" default="false"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="test">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="test" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="2">
+					<xs:annotation>
+						<xs:documentation>
+							.*[${rm:}]*.* refers to a variable in the RM environment;
+							"this.FIELD" refers to the value of the given field on the current target;
+							other strings will be converted in conformity with the inferred type of the comparison.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="op">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="EQ"/>
+						<xs:enumeration value="LT"/>
+						<xs:enumeration value="GT"/>
+						<xs:enumeration value="LE"/>
+						<xs:enumeration value="GE"/>
+						<xs:enumeration value="AND"/>
+						<xs:enumeration value="OR"/>
+						<xs:enumeration value="NOT"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="set" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="target">

@@ -125,9 +125,13 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 		return segment == null || all;
 	}
 
-	private void clear() {
+	private void clear() throws CoreException {
 		for (MatchImpl m : matches) {
-			m.clear();
+			try {
+				m.clear();
+			} catch (Throwable t) {
+				throw CoreExceptionUtils.newException(Messages.ReadClearError, t);
+			}
 		}
 	}
 

@@ -15,7 +15,6 @@
 					</read>
 				</tokenizer>
 			</stream-parser>
-
 			<!-- EXAMPLE 2: output is to be searched for its final line which should
 				contain a job id of the form "[digits].[chars]" -->
 			<stream-parser name="2" stderr="false">
@@ -46,7 +45,10 @@
 							<regex>mca:.*:param:([^:]*):status:(.*)</regex>
 							<target type="attribute" idFrom="1"/>
 							<set field="status" group="2"/>
-							<set field="readOnly" expression="${this:status} == 'read-only'"/>
+							<test set="readOnly" op="EQ">
+							  <value>this.status</value>
+							  <value>read-only</value>
+							</test>
 						</match>
 						<match>
 							<regex>mca:.*:param:([^:]*):help:(.*)</regex>
@@ -59,7 +61,7 @@
 							<set field="name" group="1"/>
 							<set field="value" group="2"/>
 							<set field="visible" expression="false"/>
-							<set field="read-only" expression="true"/>
+							<set field="readOnly" expression="true"/>
 						</match>
 					</read>
 				</tokenizer>
