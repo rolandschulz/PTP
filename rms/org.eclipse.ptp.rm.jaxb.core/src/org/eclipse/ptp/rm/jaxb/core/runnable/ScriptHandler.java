@@ -33,13 +33,15 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 
+	private final String uuid;
 	private final RMVariableMap map;
 	private final Map<String, String> live;
 	private final boolean appendEnv;
 	private final Script script;
 
-	public ScriptHandler(Script script, Map<String, String> live, boolean appendEnv) {
+	public ScriptHandler(String uuid, Script script, Map<String, String> live, boolean appendEnv) {
 		super(Messages.ScriptHandlerJob);
+		this.uuid = uuid;
 		this.script = script;
 		this.live = live;
 		this.appendEnv = appendEnv;
@@ -61,7 +63,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		}
 		for (DirectiveDefinition def : defs.getDirectiveDefinition()) {
 			String key = def.getValueFrom();
-			String value = EnvironmentVariableUtils.getValue(key, map);
+			String value = EnvironmentVariableUtils.getValue(uuid, key, map);
 			if (value != null && !ZEROSTR.equals(value)) {
 				buffer.append(def.getContent()).append(value.trim()).append(REMOTE_LINE_SEP);
 			}
@@ -77,7 +79,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		} else {
 			if (vars != null) {
 				for (EnvironmentVariable var : vars.getEnvironmentVariable()) {
-					EnvironmentVariableUtils.addVariable(var, syntax, buffer, map);
+					EnvironmentVariableUtils.addVariable(uuid, var, syntax, buffer, map);
 				}
 			}
 
@@ -88,7 +90,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private void addExecute(ExecuteCommand commands, StringBuffer buffer) {
-		new ArglistImpl(commands.getArglist()).toString(buffer);
+		new ArglistImpl(uuid, commands.getArglist()).toString(buffer);
 		buffer.append(REMOTE_LINE_SEP);
 	}
 
@@ -97,7 +99,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			return;
 		}
 		for (Arglist args : commands.getArglist()) {
-			new ArglistImpl(args).toString(buffer);
+			new ArglistImpl(uuid, args).toString(buffer);
 			buffer.append(REMOTE_LINE_SEP);
 		}
 	}
@@ -107,13 +109,13 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			return;
 		}
 		for (Arglist args : commands.getArglist()) {
-			new ArglistImpl(args).toString(buffer);
+			new ArglistImpl(uuid, args).toString(buffer);
 			buffer.append(REMOTE_LINE_SEP);
 		}
 	}
 
 	private void addShell(String shell, StringBuffer buffer) {
-		buffer.append(map.getString(shell)).append(REMOTE_LINE_SEP);
+		buffer.append(map.getString(uuid, shell)).append(REMOTE_LINE_SEP);
 	}
 
 	private String composeScript(IProgressMonitor monitor) {

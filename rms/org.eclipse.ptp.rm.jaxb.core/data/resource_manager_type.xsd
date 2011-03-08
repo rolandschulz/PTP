@@ -68,6 +68,7 @@
 						</xs:choice>
 					</xs:complexType>
 				</xs:element>
+				<xs:element minOccurs="0" ref="get-job-status"/>
 				<xs:element minOccurs="0" ref="terminate-job"/>
 				<xs:element minOccurs="0" ref="suspend-job"/>
 				<xs:element minOccurs="0" ref="resume-job"/>
@@ -172,6 +173,18 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+	<xs:element name="get-job-status">
+      <xs:annotation>
+         <xs:documentation>
+            The command(s) for retrieving job status.
+         </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element maxOccurs="unbounded" ref="command-ref"/>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
 	<xs:element name="terminate-job">
 		<xs:annotation>
 			<xs:documentation>

@@ -31,11 +31,13 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	private InputStream in;
 	private OutputStream out;
 	private List<ReadImpl> read;
+	private String uuid;
 
 	public ConfigurableRegexTokenizer() {
 	}
 
-	public ConfigurableRegexTokenizer(List<Read> read) {
+	public ConfigurableRegexTokenizer(String uuid, List<Read> read) {
+		this.uuid = uuid;
 		setRead(read);
 	}
 
@@ -73,11 +75,15 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	public void setRead(List<Read> read) {
 		this.read = new ArrayList<ReadImpl>();
 		for (Read r : read) {
-			this.read.add(new ReadImpl(r));
+			this.read.add(new ReadImpl(uuid, r));
 		}
 	}
 
 	public void setRedirectStream(OutputStream stream) {
 		out = stream;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 }

@@ -82,6 +82,7 @@ public interface IJAXBNonNLSConstants {
 	String CLASS = "class";//$NON-NLS-1$
 	String VALUE = "value";//$NON-NLS-1$
 	String THIS = "this.";//$NON-NLS-1$
+	String UUID_TAG = "@UUID@";//$NON-NLS-1$
 
 	/* STANDARD PROPERTIES */
 	String ID = "id";//$NON-NLS-1$
@@ -128,9 +129,10 @@ public interface IJAXBNonNLSConstants {
 	String MONITOR_ADDRESS_VAR = "monitor.address";//$NON-NLS-1$
 	String ARPA = ".in-addr.arpa";//$NON-NLS-1$
 
-	String STARTUP = "OnStartUp";;//$NON-NLS-1$
-	String SHUTDOWN = "OnShutDown";;//$NON-NLS-1$
+	String STARTUP = "OnStartUp";//$NON-NLS-1$
+	String SHUTDOWN = "OnShutDown";//$NON-NLS-1$
 	String DISCATTR = "DiscoverAttributes";//$NON-NLS-1$
+	String JOBSTATUS = "GetJobStatus";//$NON-NLS-1$
 
 	String JOB_ATTRIBUTE = "jobAttribute";//$NON-NLS-1$
 	String ATTRIBUTE = "attribute";//$NON-NLS-1$

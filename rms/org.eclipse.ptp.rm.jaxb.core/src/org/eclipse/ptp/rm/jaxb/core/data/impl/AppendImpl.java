@@ -19,7 +19,8 @@ public class AppendImpl extends AbstractRangeAssign {
 	private final String endTag;
 	private final String startTag;
 
-	public AppendImpl(Append append) {
+	public AppendImpl(String uuid, Append append) {
+		this.uuid = uuid;
 		this.field = append.getField();
 		separator = append.getSeparator();
 		startTag = append.getStartTag();

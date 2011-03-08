@@ -20,12 +20,14 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class TargetImpl implements IJAXBNonNLSConstants {
 
+	private final String uuid;
 	private final String ref;
 	private final Integer fromId;
 	private final String type;
 	private Object target;
 
-	public TargetImpl(Target target) {
+	public TargetImpl(String uuid, Target target) {
+		this.uuid = uuid;
 		ref = target.getRef();
 		type = target.getType();
 		fromId = target.getIdFrom();
@@ -58,7 +60,7 @@ public class TargetImpl implements IJAXBNonNLSConstants {
 		}
 		RMVariableMap vmap = RMVariableMap.getActiveInstance();
 		if (ref != null) {
-			String name = vmap.getString(ref);
+			String name = vmap.getString(uuid, ref);
 			target = vmap.getVariables().get(name);
 			if (target == null) {
 				throw CoreExceptionUtils.newException(Messages.StreamParserNoSuchVariableError + ref, null);

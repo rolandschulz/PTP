@@ -17,7 +17,8 @@ public class SetImpl extends AbstractAssign {
 
 	private final String value;
 
-	public SetImpl(Set set) {
+	public SetImpl(String uuid, Set set) {
+		this.uuid = uuid;
 		this.field = set.getField();
 		index = set.getIndex();
 		int group = set.getGroup();

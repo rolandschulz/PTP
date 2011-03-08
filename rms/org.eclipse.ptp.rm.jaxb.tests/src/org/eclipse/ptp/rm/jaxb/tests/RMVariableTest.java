@@ -44,7 +44,7 @@ public class RMVariableTest extends TestCase implements IJAXBNonNLSConstants {
 			JAXBInitializationUtils.validate(xml);
 			RMVariableMap map = RMVariableMap.setActiveInstance(null);
 			JAXBInitializationUtils.initializeMap(JAXBInitializationUtils.initializeRMData(xml), map);
-			String exp = map.getString("${rm:stagein#description}"); //$NON-NLS-1$
+			String exp = map.getString(null, "${rm:stagein#description}"); //$NON-NLS-1$
 			System.out.println(exp);
 			assertEquals(Messages.RMVariableTest_1, exp);
 		} catch (Throwable t) {
