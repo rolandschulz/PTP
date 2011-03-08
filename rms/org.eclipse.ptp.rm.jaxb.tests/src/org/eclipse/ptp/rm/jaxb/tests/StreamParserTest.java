@@ -490,7 +490,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			set = new Set();
 			match.getSetOrAddOrPut().add(set);
 			set.setField("visible"); //$NON-NLS-1$
-			set.setExpression(TRUE);
+			set.setValue(TRUE);
 			/* 2 */
 			match = new Match();
 			read.getMatch().add(match);
@@ -546,11 +546,11 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			set = new Set();
 			match.getSetOrAddOrPut().add(set);
 			set.setField("readOnly"); //$NON-NLS-1$
-			set.setExpression(TRUE);
+			set.setValue(TRUE);
 			set = new Set();
 			match.getSetOrAddOrPut().add(set);
 			set.setField("visible"); //$NON-NLS-1$
-			set.setExpression(FALSE);
+			set.setValue(FALSE);
 		} else if (name.equals("testImplicitOrdering")) { //$NON-NLS-1$
 			read.setDelim("\n"); //$NON-NLS-1$
 			read.setMode(AND);

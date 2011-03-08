@@ -6,7 +6,7 @@ public class SetImpl extends AbstractAssign {
 
 	private int index;
 
-	private final String expression;
+	private final String value;
 
 	public SetImpl(Set set) {
 		this.field = set.getField();
@@ -15,13 +15,13 @@ public class SetImpl extends AbstractAssign {
 		if (index == 0 && group != 0) {
 			index = group;
 		}
-		expression = set.getExpression();
+		value = set.getValue();
 	}
 
 	@Override
 	protected Object[] getValue(Object previous, String[] values) {
-		if (expression != null) {
-			return new Object[] { expression };
+		if (value != null) {
+			return new Object[] { value };
 		}
 		if (values == null) {
 			return new Object[] { previous };
