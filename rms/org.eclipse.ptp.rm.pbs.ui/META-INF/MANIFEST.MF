@@ -23,5 +23,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.rm.core,
  com.ibm.icu;bundle-version="4.2.1"
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.rm.pbs.ui
+Export-Package: org.eclipse.ptp.rm.pbs.ui;x-internal:=true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

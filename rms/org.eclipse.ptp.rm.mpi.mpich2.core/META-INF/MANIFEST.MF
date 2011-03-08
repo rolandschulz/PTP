@@ -15,9 +15,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.rm.core,
  org.eclipse.ptp.remote.core
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.rm.mpi.mpich2.core,
- org.eclipse.ptp.rm.mpi.mpich2.core.launch,
- org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem,
- org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem
+Export-Package: org.eclipse.ptp.rm.mpi.mpich2.core;x-friends:="org.eclipse.ptp.rm.mpi.mpich2.ui",
+ org.eclipse.ptp.rm.mpi.mpich2.core.launch;x-friends:="org.eclipse.ptp.rm.mpi.mpich2.ui",
+ org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;x-friends:="org.eclipse.ptp.rm.mpi.mpich2.ui",
+ org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem;x-friends:="org.eclipse.ptp.rm.mpi.mpich2.ui"
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

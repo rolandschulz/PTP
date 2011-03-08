@@ -18,9 +18,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.services.core;bundle-version="1.0.0",
  org.eclipse.ptp.services.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.rm.mpi.openmpi.ui,
- org.eclipse.ptp.rm.mpi.openmpi.ui.launch,
- org.eclipse.ptp.rm.mpi.openmpi.ui.messages,
- org.eclipse.ptp.rm.mpi.openmpi.ui.wizards
+Export-Package: org.eclipse.ptp.rm.mpi.openmpi.ui;x-internal:=true,
+ org.eclipse.ptp.rm.mpi.openmpi.ui.launch;x-internal:=true,
+ org.eclipse.ptp.rm.mpi.openmpi.ui.wizards;x-internal:=true
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

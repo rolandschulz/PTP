@@ -16,10 +16,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.rm.core,
  org.eclipse.ptp.utils.core
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.rm.mpi.openmpi.core,
- org.eclipse.ptp.rm.mpi.openmpi.core.launch,
- org.eclipse.ptp.rm.mpi.openmpi.core.parameters,
- org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem,
- org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem
+Export-Package: org.eclipse.ptp.rm.mpi.openmpi.core;x-friends:="org.eclipse.ptp.rm.mpi.openmpi.ui",
+ org.eclipse.ptp.rm.mpi.openmpi.core.launch;x-friends:="org.eclipse.ptp.rm.mpi.openmpi.ui",
+ org.eclipse.ptp.rm.mpi.openmpi.core.parameters;x-friends:="org.eclipse.ptp.rm.mpi.openmpi.ui",
+ org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;x-friends:="org.eclipse.ptp.rm.mpi.openmpi.ui",
+ org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem;x-friends:="org.eclipse.ptp.rm.mpi.openmpi.ui"
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
