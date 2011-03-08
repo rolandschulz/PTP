@@ -130,7 +130,9 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 */
 	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
 		IJobStatus status = doSubmitJob(configuration, mode, monitor);
-		return status.getJobId();
+		String jobId = status.getJobId();
+		getResourceManager().fireJobChanged(jobId);
+		return jobId;
 	}
 
 	/**
@@ -198,10 +200,10 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 		return fModelManager;
 	}
 
-	protected IResourceManager getResourceManager() {
+	protected AbstractResourceManager getResourceManager() {
 		if (fResourceManager == null) {
 			fResourceManager = fModelManager.getResourceManagerFromUniqueName(fConfig.getUniqueName());
 		}
-		return fResourceManager;
+		return (AbstractResourceManager) fResourceManager;
 	}
 }
