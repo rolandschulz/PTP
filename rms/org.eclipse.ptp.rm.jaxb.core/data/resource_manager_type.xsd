@@ -553,7 +553,7 @@
 			<xs:attribute name="field" type="xs:string"/>
 			<xs:attribute name="group" type="xs:int" default="0"/>
 			<xs:attribute name="index" type="xs:int" default="0"/>
-			<xs:attribute name="expression" type="xs:string"/>
+			<xs:attribute name="value" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="add">

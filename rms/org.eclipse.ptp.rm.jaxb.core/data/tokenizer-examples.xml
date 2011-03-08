@@ -38,7 +38,7 @@
 							<regex>mca:.*:param:([^:]*):value:(.*)</regex>
 							<target type="attribute" idFrom="1"/>
 							<set field="name" group="1"/>
-							<set field="visible" expression="true"/>
+							<set field="visible" value="true"/>
 							<set field="value" group="2"/>
 						</match>
 						<match>
@@ -60,8 +60,8 @@
 							<target type="attribute" idFrom="1"/>
 							<set field="name" group="1"/>
 							<set field="value" group="2"/>
-							<set field="visible" expression="false"/>
-							<set field="readOnly" expression="true"/>
+							<set field="visible" value="false"/>
+							<set field="readOnly" value="true"/>
 						</match>
 					</read>
 				</tokenizer>

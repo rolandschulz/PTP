@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="expression" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="value" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="field" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="group" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
  *       &lt;attribute name="index" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
@@ -42,23 +42,13 @@ import javax.xml.bind.annotation.XmlType;
 public class Set {
 
 	@XmlAttribute
-	protected String expression;
+	protected String value;
 	@XmlAttribute
 	protected String field;
 	@XmlAttribute
 	protected Integer group;
 	@XmlAttribute
 	protected Integer index;
-
-	/**
-	 * Gets the value of the expression property.
-	 * 
-	 * @return possible object is {@link String }
-	 * 
-	 */
-	public String getExpression() {
-		return expression;
-	}
 
 	/**
 	 * Gets the value of the field property.
@@ -99,14 +89,13 @@ public class Set {
 	}
 
 	/**
-	 * Sets the value of the expression property.
+	 * Gets the value of the value property.
 	 * 
-	 * @param value
-	 *            allowed object is {@link String }
+	 * @return possible object is {@link String }
 	 * 
 	 */
-	public void setExpression(String value) {
-		this.expression = value;
+	public String getValue() {
+		return value;
 	}
 
 	/**
@@ -140,6 +129,17 @@ public class Set {
 	 */
 	public void setIndex(Integer value) {
 		this.index = value;
+	}
+
+	/**
+	 * Sets the value of the value property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 }
