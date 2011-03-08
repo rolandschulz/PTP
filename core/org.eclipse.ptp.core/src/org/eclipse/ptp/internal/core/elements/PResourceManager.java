@@ -71,8 +71,8 @@ import org.eclipse.ptp.internal.core.elements.events.NewQueueEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveJobEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveQueueEvent;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * @author rsqrd
@@ -92,7 +92,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	}
 
 	private final ListenerList childListeners = new ListenerList();
-	private final IResourceManagerControl fResourceManager;
+	private final IResourceManager fResourceManager;
 
 	private final ListenerList listeners = new ListenerList();
 	private final IMachineChildListener machineNodeListener;
@@ -105,7 +105,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/**
 	 * @since 5.0
 	 */
-	public PResourceManager(IPUniverse universe, IResourceManagerControl rm) {
+	public PResourceManager(IPUniverse universe, IResourceManager rm) {
 		super(universe.getNextResourceManagerId(), universe, getDefaultAttributes(rm.getConfiguration()));
 		fResourceManager = rm;
 
@@ -315,16 +315,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 		fireNewQueues(queues);
 	}
 
-	/**
-	 * Remove all the model elements below the RM. This is called when the RM
-	 * shuts down and ensures that everything is cleaned up properly.
-	 */
-	public void cleanUp() {
-		removeJobs(Arrays.asList(getJobs()));
-		removeQueues(this, Arrays.asList(getQueues()));
-		removeMachines(this, Arrays.asList(getMachines()));
-	}
-
 	public void dispose() {
 		listeners.clear();
 		childListeners.clear();
@@ -474,7 +464,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/**
 	 * @since 5.0
 	 */
-	public IResourceManagerControl getResourceManager() {
+	public IResourceManager getResourceManager() {
 		return fResourceManager;
 	}
 
@@ -574,10 +564,10 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#removeMachines(org.eclipse
-	 * .ptp.core.elements.IPResourceManager, java.util.Collection)
+	 * org.eclipse.ptp.core.elements.IPResourceManager#removeMachines(java.util
+	 * .Collection)
 	 */
-	public void removeMachines(IPResourceManager rm, Collection<IPMachine> machines) {
+	public void removeMachines(Collection<IPMachine> machines) {
 		synchronized (machinesById) {
 			for (IPMachine machine : machines) {
 				machine.removeNodes(Arrays.asList(machine.getNodes()));
@@ -604,10 +594,10 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#removeQueues(org.eclipse
-	 * .ptp.core.elements.IPResourceManager, java.util.Collection)
+	 * org.eclipse.ptp.core.elements.IPResourceManager#removeQueues(java.util
+	 * .Collection)
 	 */
-	public void removeQueues(IPResourceManager rm, Collection<IPQueue> queues) {
+	public void removeQueues(Collection<IPQueue> queues) {
 		synchronized (queuesById) {
 			for (IPQueue queue : queues) {
 				queue.removeJobs(Arrays.asList(queue.getJobs()));
@@ -642,7 +632,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 * @param state
 	 */
 	public synchronized void setState(ResourceManagerAttributes.State state) {
-		fResourceManager.setState(state.name());
+		getResourceManager().setState(state.name());
 	}
 
 	/*

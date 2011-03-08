@@ -42,6 +42,7 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.launch.messages.Messages;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
@@ -216,7 +217,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	@Override
 	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
 		final String jobId = launch.getJobId();
-		final IResourceManagerControl rm = launch.getResourceManager();
+		final IResourceManager rm = launch.getResourceManager();
 		final ILaunchConfiguration configuration = launch.getLaunchConfiguration();
 
 		/*
@@ -312,8 +313,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 						if (window != null) {
 							IWorkbenchPage page = window.getActivePage();
 							if (page != null) {
-								if (page.getPerspective().getId().equals(perspectiveID))
+								if (page.getPerspective().getId().equals(perspectiveID)) {
 									return;
+								}
 
 								try {
 									window.getWorkbench().showPerspective(perspectiveID, window);

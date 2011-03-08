@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.messages.Messages;
@@ -75,7 +75,7 @@ public class StartResourceManagersObjectActionDelegate extends AbstractResourceM
 	 */
 	@Override
 	protected boolean isEnabledFor(IPResourceManager rmManager) {
-		if (rmManager.getResourceManager().getState().equals(IResourceManagerControl.STOPPED_STATE)) {
+		if (rmManager.getResourceManager().getState().equals(IResourceManager.STOPPED_STATE)) {
 			return true;
 		}
 		return false;

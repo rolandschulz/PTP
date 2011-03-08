@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManagerFactory"
+            id="org.eclipse.ptp.rm.pbs.PBSServiceProvider"
+            name="PBS">
+      </resourceManager>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManagerFactory"
+            id="org.eclipse.ptp.rm.pbs.core.resourceManager2"
+            name="name">
+      </resourceManager>
+   </extension>
+
+</plugin>

@@ -17,14 +17,14 @@
 package org.eclipse.ptp.internal.core.events;
 
 import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class ResourceManagerErrorEvent implements IResourceManagerErrorEvent {
 
-	private final IResourceManagerControl rm;
+	private final IResourceManager rm;
 	private final String message;
 
-	public ResourceManagerErrorEvent(final IResourceManagerControl rm, final String message) {
+	public ResourceManagerErrorEvent(final IResourceManager rm, final String message) {
 		this.rm = rm;
 		this.message = message;
 	}
@@ -45,7 +45,7 @@ public class ResourceManagerErrorEvent implements IResourceManagerErrorEvent {
 	 * @see
 	 * org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent#getSource()
 	 */
-	public IResourceManagerControl getSource() {
+	public IResourceManager getSource() {
 		return rm;
 	}
 

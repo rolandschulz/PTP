@@ -16,4 +16,20 @@
             class="org.eclipse.ptp.rm.generic.core.GenericRMPreferenceManager">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.generic.core.rmsystem.GenericResourceManagerFactory"
+            id="org.eclipse.ptp.rm.generic.GenericRMServiceProvider"
+            name="Generic Remote Launch">
+      </resourceManager>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.generic.core.rmsystem.GenericResourceManagerFactory"
+            id="org.eclipse.ptp.rm.generic.GenericRMServiceProvider"
+            name="name">
+      </resourceManager>
+   </extension>
 </plugin>

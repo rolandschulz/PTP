@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.core;
+package org.eclipse.ptp.core;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,17 +24,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.IServiceConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
@@ -44,11 +44,12 @@ import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
 import org.eclipse.ptp.internal.core.events.ResourceManagerAddedEvent;
-import org.eclipse.ptp.internal.core.events.ResourceManagerRemovedEvent;
 import org.eclipse.ptp.internal.core.events.ResourceManagerChangedEvent;
 import org.eclipse.ptp.internal.core.events.ResourceManagerErrorEvent;
+import org.eclipse.ptp.internal.core.events.ResourceManagerRemovedEvent;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelEvent;
@@ -58,14 +59,20 @@ import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 /**
- * @author greg
+ * Model manager for resource manager framework.
  * 
+ * @since 5.0
  */
 public class ModelManager implements IModelManager {
-	private class RMStartupJob extends Job {
-		private final IResourceManagerControl resourceManager;
 
-		public RMStartupJob(IResourceManagerControl rm) {
+	private static String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
+	private static String CLASS_ATTRIBUTE = "class"; //$NON-NLS-1$
+	private static String EXTENSION_POINT = "org.eclipse.ptp.core.resourceManagers"; //$NON-NLS-1$
+
+	private class RMStartupJob extends Job {
+		private final IResourceManager resourceManager;
+
+		public RMStartupJob(IResourceManager rm) {
 			super(Messages.ModelManager_0 + rm.getName());
 			resourceManager = rm;
 		}
@@ -97,7 +104,7 @@ public class ModelManager implements IModelManager {
 			case IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED: {
 				IServiceProvider provider = ((IServiceConfiguration) event.getSource()).getServiceProvider(fLaunchService);
 				if (provider != null && provider instanceof IResourceManagerConfiguration) {
-					IResourceManagerControl rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
+					IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
 							.getUniqueName());
 					if (rm != null) {
 						doRemoveResourceManager(rm);
@@ -113,7 +120,7 @@ public class ModelManager implements IModelManager {
 					if (oldProvider instanceof IResourceManagerConfiguration) {
 						IServiceProvider newProvider = config.getServiceProvider(fLaunchService);
 						if (newProvider != null && newProvider instanceof IResourceManagerConfiguration) {
-							IResourceManagerControl rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) oldProvider)
+							IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) oldProvider)
 									.getUniqueName());
 							if (rm != null) {
 								rm.setConfiguration((IResourceManagerConfiguration) newProvider);
@@ -123,13 +130,13 @@ public class ModelManager implements IModelManager {
 				} else {
 					IServiceProvider newProvider = config.getServiceProvider(fLaunchService);
 					if (newProvider != null && newProvider instanceof IResourceManagerConfiguration) {
-						IResourceManagerControl rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) newProvider)
+						IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) newProvider)
 								.getUniqueName());
 						if (rm == null) {
-							rm = (IResourceManagerControl) ((IResourceManagerConfiguration) newProvider)
-									.getAdapter(IResourceManagerControl.class);
-							if (rm != null) {
-								addResourceManager(rm);
+							IResourceManagerFactory factory = getResourceManagerFactory(((IResourceManagerConfiguration) newProvider)
+									.getResourceManagerId());
+							if (factory != null) {
+								addResourceManager(factory.create((IResourceManagerConfiguration) newProvider));
 							}
 						}
 					}
@@ -140,7 +147,7 @@ public class ModelManager implements IModelManager {
 			case IServiceModelEvent.SERVICE_PROVIDER_CHANGED: {
 				IServiceProvider provider = (IServiceProvider) event.getSource();
 				if (provider != null && provider instanceof IResourceManagerConfiguration) {
-					IResourceManagerControl rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
+					IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
 							.getUniqueName());
 					if (rm != null) {
 						fireResourceManagerChanged(rm);
@@ -152,12 +159,14 @@ public class ModelManager implements IModelManager {
 		}
 	};
 
-	private final ListenerList resourceManagerListeners = new ListenerList();
+	private final ListenerList fResourceManagerListeners = new ListenerList();
 
 	protected final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
-	protected final Map<String, IResourceManagerControl> resourceManagers = new HashMap<String, IResourceManagerControl>();
+	protected final Map<String, IResourceManager> fResourceManagers = new HashMap<String, IResourceManager>();
 	protected final IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
-	protected final IPUniverse universe = new PUniverse();
+	protected final IPUniverse fUniverse = new PUniverse();
+
+	protected Map<String, IResourceManagerFactory> fResourceManagerFactories = null;
 
 	public ModelManager() {
 		fServiceManager.addEventListener(fServiceEventListener, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED
@@ -173,7 +182,7 @@ public class ModelManager implements IModelManager {
 	 * .IResourceManagerListener)
 	 */
 	public void addListener(IResourceManagerListener listener) {
-		resourceManagerListeners.add(listener);
+		fResourceManagerListeners.add(listener);
 	}
 
 	/*
@@ -181,11 +190,11 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.core.IModelManager#addResourceManager(org.eclipse.ptp
-	 * .core.elementcontrols.IResourceManagerControl)
+	 * .rmsystem.IResourceManager)
 	 */
-	public void addResourceManager(IResourceManagerControl rm) {
-		synchronized (resourceManagers) {
-			resourceManagers.put(rm.getUniqueName(), rm);
+	public void addResourceManager(IResourceManager rm) {
+		synchronized (fResourceManagers) {
+			fResourceManagers.put(rm.getUniqueName(), rm);
 		}
 		fireNewResourceManager(rm);
 	}
@@ -195,10 +204,10 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.core.IModelManager#addResourceManagers(org.eclipse.ptp
-	 * .core.elementcontrols.IResourceManagerControl[])
+	 * .rmsystem.IResourceManager[])
 	 */
-	public void addResourceManagers(IResourceManagerControl[] rms) {
-		for (IResourceManagerControl rm : rms) {
+	public void addResourceManagers(IResourceManager[] rms) {
+		for (IResourceManager rm : rms) {
 			addResourceManager(rm);
 		}
 	}
@@ -210,10 +219,10 @@ public class ModelManager implements IModelManager {
 	 *            rm that has changed
 	 * @since 5.0
 	 */
-	public void fireResourceManagerChanged(IResourceManagerControl rm) {
+	public void fireResourceManagerChanged(IResourceManager rm) {
 		IResourceManagerChangedEvent e = new ResourceManagerChangedEvent(rm);
 
-		for (Object listener : resourceManagerListeners.getListeners()) {
+		for (Object listener : fResourceManagerListeners.getListeners()) {
 			((IResourceManagerListener) listener).handleEvent(e);
 		}
 	}
@@ -226,10 +235,10 @@ public class ModelManager implements IModelManager {
 	 * @param message
 	 *            error message
 	 */
-	public void fireResourceManagerError(IResourceManagerControl rm, String message) {
+	public void fireResourceManagerError(IResourceManager rm, String message) {
 		IResourceManagerErrorEvent e = new ResourceManagerErrorEvent(rm, message);
 
-		for (Object listener : resourceManagerListeners.getListeners()) {
+		for (Object listener : fResourceManagerListeners.getListeners()) {
 			((IResourceManagerListener) listener).handleEvent(e);
 		}
 	}
@@ -241,9 +250,9 @@ public class ModelManager implements IModelManager {
 	 * org.eclipse.ptp.core.IModelManager#getResourceManagerFromUniqueName(java
 	 * .lang.String)
 	 */
-	public IResourceManagerControl getResourceManagerFromUniqueName(String rmUniqueName) {
-		synchronized (resourceManagers) {
-			return resourceManagers.get(rmUniqueName);
+	public IResourceManager getResourceManagerFromUniqueName(String rmUniqueName) {
+		synchronized (fResourceManagers) {
+			return fResourceManagers.get(rmUniqueName);
 		}
 	}
 
@@ -252,9 +261,9 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @see org.eclipse.ptp.core.IModelManager#getResourceManagers()
 	 */
-	public IResourceManagerControl[] getResourceManagers() {
-		synchronized (resourceManagers) {
-			return resourceManagers.values().toArray(new IResourceManagerControl[0]);
+	public IResourceManager[] getResourceManagers() {
+		synchronized (fResourceManagers) {
+			return fResourceManagers.values().toArray(new IResourceManager[0]);
 		}
 	}
 
@@ -264,7 +273,7 @@ public class ModelManager implements IModelManager {
 	 * @see org.eclipse.ptp.core.IModelPresentation#getUniverse()
 	 */
 	public IPUniverse getUniverse() {
-		return universe;
+		return fUniverse;
 	}
 
 	/*
@@ -284,7 +293,7 @@ public class ModelManager implements IModelManager {
 	 * @see org.eclipse.ptp.core.IModelManager#loadResourceManagers()
 	 */
 	public void loadResourceManagers() throws CoreException {
-		Set<IResourceManagerControl> rmsNeedStarting = new HashSet<IResourceManagerControl>();
+		Set<IResourceManager> rmsNeedStarting = new HashSet<IResourceManager>();
 
 		/*
 		 * Need to force service model to load so that the resource managers are
@@ -292,8 +301,8 @@ public class ModelManager implements IModelManager {
 		 */
 		fServiceManager.getActiveConfiguration();
 
-		synchronized (resourceManagers) {
-			for (IResourceManagerControl rm : resourceManagers.values()) {
+		synchronized (fResourceManagers) {
+			for (IResourceManager rm : fResourceManagers.values()) {
 				if (rm.getConfiguration().getAutoStart()) {
 					rmsNeedStarting.add(rm);
 				}
@@ -301,7 +310,7 @@ public class ModelManager implements IModelManager {
 		}
 
 		if (Preferences.getBoolean(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START_RMS)) {
-			startResourceManagers(rmsNeedStarting.toArray(new IResourceManagerControl[0]));
+			startResourceManagers(rmsNeedStarting.toArray(new IResourceManager[0]));
 		}
 	}
 
@@ -313,7 +322,7 @@ public class ModelManager implements IModelManager {
 	 * .listeners.IResourceManagerListener)
 	 */
 	public void removeListener(IResourceManagerListener listener) {
-		resourceManagerListeners.remove(listener);
+		fResourceManagerListeners.remove(listener);
 	}
 
 	/*
@@ -321,9 +330,9 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.core.IModelManager#removeResourceManager(org.eclipse.
-	 * ptp.core.elementcontrols.IResourceManagerControl)
+	 * ptp.rmsystem.IResourceManager)
 	 */
-	public void removeResourceManager(IResourceManagerControl rm) {
+	public void removeResourceManager(IResourceManager rm) {
 		IResourceManagerConfiguration rmConf = rm.getConfiguration();
 		if (rmConf instanceof IServiceProvider) {
 			removeProviderFromConfiguration((IServiceProvider) rmConf);
@@ -340,7 +349,7 @@ public class ModelManager implements IModelManager {
 	 */
 	public void removeResourceManagers(IResourceManagerConfiguration[] rms) {
 		for (IResourceManagerConfiguration rmConf : rms) {
-			IResourceManagerControl rm = getResourceManagerFromUniqueName(rmConf.getUniqueName());
+			IResourceManager rm = getResourceManagerFromUniqueName(rmConf.getUniqueName());
 			if (rm != null) {
 				removeResourceManager(rm);
 			}
@@ -364,8 +373,8 @@ public class ModelManager implements IModelManager {
 	public void shutdown() throws CoreException {
 		saveResourceManagers();
 		stopResourceManagers();
-		shutdownResourceManagers();
-		resourceManagerListeners.clear();
+		disposeResourceManagers();
+		fResourceManagerListeners.clear();
 	}
 
 	/*
@@ -383,14 +392,14 @@ public class ModelManager implements IModelManager {
 	 * @see org.eclipse.ptp.core.IModelManager#stopResourceManagers()
 	 */
 	public void stopResourceManagers() throws CoreException {
-		for (IResourceManagerControl resourceManager : getResourceManagers()) {
+		for (IResourceManager resourceManager : getResourceManagers()) {
 			resourceManager.stop();
 		}
 	}
 
-	private void doRemoveResourceManager(IResourceManagerControl rm) {
-		synchronized (resourceManagers) {
-			resourceManagers.remove(rm.getUniqueName());
+	private void doRemoveResourceManager(IResourceManager rm) {
+		synchronized (fResourceManagers) {
+			fResourceManagers.remove(rm.getUniqueName());
 		}
 		fireRemoveResourceManager(rm);
 		rm.dispose();
@@ -401,9 +410,9 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @param rm
 	 */
-	private void fireNewResourceManager(final IResourceManagerControl rm) {
+	private void fireNewResourceManager(final IResourceManager rm) {
 		IResourceManagerAddedEvent event = new ResourceManagerAddedEvent(this, rm);
-		for (Object listener : resourceManagerListeners.getListeners()) {
+		for (Object listener : fResourceManagerListeners.getListeners()) {
 			((IResourceManagerListener) listener).handleEvent(event);
 		}
 	}
@@ -413,9 +422,9 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @param rm
 	 */
-	private void fireRemoveResourceManager(final IResourceManagerControl rm) {
+	private void fireRemoveResourceManager(final IResourceManager rm) {
 		IResourceManagerRemovedEvent event = new ResourceManagerRemovedEvent(this, rm);
-		for (Object listener : resourceManagerListeners.getListeners()) {
+		for (Object listener : fResourceManagerListeners.getListeners()) {
 			((IResourceManagerListener) listener).handleEvent(event);
 		}
 	}
@@ -438,10 +447,10 @@ public class ModelManager implements IModelManager {
 	}
 
 	/**
-	 * shuts down all of the resource managers.
+	 * Dispose of all of the resource managers.
 	 */
-	private void shutdownResourceManagers() {
-		for (IResourceManagerControl resourceManager : getResourceManagers()) {
+	private void disposeResourceManagers() {
+		for (IResourceManager resourceManager : getResourceManagers()) {
 			resourceManager.dispose();
 		}
 	}
@@ -452,10 +461,48 @@ public class ModelManager implements IModelManager {
 	 * @param rmsNeedStarting
 	 * @throws CoreException
 	 */
-	private void startResourceManagers(IResourceManagerControl[] rmsNeedStarting) throws CoreException {
-		for (final IResourceManagerControl rm : rmsNeedStarting) {
+	private void startResourceManagers(IResourceManager[] rmsNeedStarting) throws CoreException {
+		for (final IResourceManager rm : rmsNeedStarting) {
 			Job job = new RMStartupJob(rm);
 			job.schedule();
 		}
 	}
+
+	private Map<String, IResourceManagerFactory> getResourceManagerFactories() {
+		if (fResourceManagerFactories != null) {
+			return fResourceManagerFactories;
+		}
+
+		fResourceManagerFactories = new HashMap<String, IResourceManagerFactory>();
+
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(EXTENSION_POINT);
+		final IExtension[] extensions = extensionPoint.getExtensions();
+
+		for (int iext = 0; iext < extensions.length; ++iext) {
+			final IExtension ext = extensions[iext];
+
+			final IConfigurationElement[] elements = ext.getConfigurationElements();
+
+			for (int i = 0; i < elements.length; i++) {
+				IConfigurationElement ce = elements[i];
+				try {
+					IResourceManagerFactory factory = (IResourceManagerFactory) ce.createExecutableExtension(CLASS_ATTRIBUTE);
+					String id = ce.getAttribute(ID_ATTRIBUTE);
+					// factory.setId(id);
+					fResourceManagerFactories.put(id, factory);
+				} catch (CoreException e) {
+					PTPCorePlugin.log(e);
+				}
+			}
+		}
+
+		return fResourceManagerFactories;
+	}
+
+	private IResourceManagerFactory getResourceManagerFactory(String id) {
+		getResourceManagerFactories();
+		return fResourceManagerFactories.get(id);
+	}
+
 }

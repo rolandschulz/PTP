@@ -8,7 +8,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * @author arossi
@@ -24,7 +24,7 @@ public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurat
 	 * #getResourceManagerClass()
 	 */
 	@Override
-	public Class<? extends IResourceManagerControl> getResourceManagerClass() {
+	public Class<? extends IResourceManager> getResourceManagerClass() {
 		return JAXBResourceManager.class;
 	}
 
@@ -33,11 +33,11 @@ public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurat
 	 * 
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #doCreate(org.eclipse.ptp.rmsystem.IResourceManagerControl,
+	 * #doCreate(org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManagerControl rm, ILaunchConfigurationDialog dialog)
+	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
 		if (!(rm instanceof IJAXBResourceManagerControl)) {
 			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_doCreateError + rm, null);

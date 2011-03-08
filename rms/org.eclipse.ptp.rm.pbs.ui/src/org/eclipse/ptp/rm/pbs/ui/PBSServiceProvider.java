@@ -15,13 +15,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui;
 
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
-import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
@@ -64,20 +61,6 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 		return new PBSServiceProvider(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
-	 */
-	@SuppressWarnings("rawtypes")
-	@Override
-	public Object getAdapter(Class adapter) {
-		if (adapter == IResourceManagerControl.class) {
-			return new PBSResourceManager(PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
-		}
-		return null;
-	}
-
 	/**
 	 * @return name of the current template for this resource manager (set in
 	 *         the edit wizard).
@@ -117,8 +100,9 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	 */
 	public String[] getTemplateNames() {
 		String nameList = getString(TEMPLATE_NAMES, null);
-		if (nameList == null)
+		if (nameList == null) {
 			return new String[0];
+		}
 		return nameList.split(CM);
 	}
 
@@ -147,18 +131,22 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 		String nameList = getString(TEMPLATE_NAMES, null);
 		if (nameList != null) {
 			String[] names = nameList.split(CM);
-			for (int i = 0; i < names.length; i++)
+			for (int i = 0; i < names.length; i++) {
 				if (names[i].equals(name)) {
 					names[i] = null;
 					break;
 				}
+			}
 			StringBuffer sb = new StringBuffer();
 			if (names.length > 0) {
-				if (names[0] != null)
+				if (names[0] != null) {
 					sb.append(names[0]);
-				for (int i = 1; i < names.length; i++)
-					if (names[i] != null)
+				}
+				for (int i = 1; i < names.length; i++) {
+					if (names[i] != null) {
 						sb.append(CM).append(names[i]);
+					}
+				}
 			}
 			putString(TEMPLATE_NAMES, sb.toString());
 		}
@@ -191,8 +179,9 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	public void setDefaultNameAndDesc() {
 		String name = PBS;
 		String conn = getConnectionName();
-		if (conn != null && !conn.equals(ZEROSTR))
+		if (conn != null && !conn.equals(ZEROSTR)) {
 			name += MARKER + conn;
+		}
 		setName(name);
 		setDescription(Messages.PBSResourceManager);
 	}
@@ -219,9 +208,11 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 		}
 
 		String[] names = nameList.split(CM);
-		for (String nm : names)
-			if (name.equals(nm))
+		for (String nm : names) {
+			if (name.equals(nm)) {
 				return;
+			}
+		}
 		putString(TEMPLATE_NAMES, nameList + CM + name);
 	}
 }

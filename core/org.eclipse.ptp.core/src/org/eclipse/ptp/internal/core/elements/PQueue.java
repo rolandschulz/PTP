@@ -34,14 +34,14 @@ import org.eclipse.ptp.core.elements.attributes.QueueAttributes.State;
 import org.eclipse.ptp.core.elements.events.IQueueChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 import org.eclipse.ptp.internal.core.elements.events.QueueChangeEvent;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class PQueue extends Parent implements IPQueue {
 	private final ListenerList fElementListeners = new ListenerList();
 	private final Map<String, IPJob> fJobs = new HashMap<String, IPJob>();
-	private final IResourceManagerControl fResourceManager;
+	private final IResourceManager fResourceManager;
 
-	public PQueue(String id, IResourceManagerControl rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
+	public PQueue(String id, IResourceManager rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
 		super(id, parent, attrs);
 		fResourceManager = rm;
 		/*
@@ -120,7 +120,7 @@ public class PQueue extends Parent implements IPQueue {
 	 * 
 	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
 	 */
-	public IResourceManagerControl getResourceManager() {
+	public IResourceManager getResourceManager() {
 		return fResourceManager;
 	}
 

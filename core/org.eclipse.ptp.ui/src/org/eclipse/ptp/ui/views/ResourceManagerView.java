@@ -82,8 +82,8 @@ import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.UIUtils;
@@ -458,8 +458,8 @@ public class ResourceManagerView extends ViewPart {
 		 * (org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent)
 		 */
 		public void handleEvent(IResourceManagerChangedEvent e) {
-			IResourceManagerControl rm = e.getSource();
-			if (rmManager != null && rm.getState().equals(IResourceManagerControl.STOPPED_STATE)
+			IResourceManager rm = e.getSource();
+			if (rmManager != null && rm.getState().equals(IResourceManager.STOPPED_STATE)
 					&& rm.getUniqueName().equals(rmManager.getSelected())) {
 				rmManager.fireSetDefaultRMEvent(null);
 			}
@@ -550,8 +550,8 @@ public class ResourceManagerView extends ViewPart {
 				if (!selection.isEmpty()) {
 					if (selection.getFirstElement() instanceof IPResourceManager) {
 						final IPResourceManager rm = (IPResourceManager) selection.getFirstElement();
-						if (rm.getResourceManager().getState().equals(IResourceManagerControl.STOPPED_STATE)
-								|| rm.getResourceManager().getState().equals(IResourceManagerControl.ERROR_STATE)) {
+						if (rm.getResourceManager().getState().equals(IResourceManager.STOPPED_STATE)
+								|| rm.getResourceManager().getState().equals(IResourceManager.ERROR_STATE)) {
 							IRunnableWithProgress runnable = new IRunnableWithProgress() {
 								public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 									try {
@@ -580,7 +580,7 @@ public class ResourceManagerView extends ViewPart {
 							return;
 						} else {
 							boolean shutdown = true;
-							if (rm.getResourceManager().getState().equals(IResourceManagerControl.STARTED_STATE)) {
+							if (rm.getResourceManager().getState().equals(IResourceManager.STARTED_STATE)) {
 								shutdown = MessageDialog.openConfirm(viewer.getControl().getShell(),
 										Messages.ResourceManagerView_Shutdown,
 										NLS.bind(Messages.ResourceManagerView_AreYouSure, rm.getName()));
@@ -627,7 +627,7 @@ public class ResourceManagerView extends ViewPart {
 		 * Add us to any existing RM's. I guess it's possible we could miss a RM
 		 * if a new event arrives while we're doing this, but is it a problem?
 		 */
-		for (IResourceManagerControl rm : mm.getResourceManagers()) {
+		for (IResourceManager rm : mm.getResourceManagers()) {
 			rm.addJobListener(jobListener);
 		}
 		mm.addListener(rmListener);
@@ -743,7 +743,7 @@ public class ResourceManagerView extends ViewPart {
 				final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
 				IPResourceManager rm = (IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
 				if (rm != null) {
-					if (!rm.getResourceManager().getState().equals(IResourceManagerControl.STOPPED_STATE)) {
+					if (!rm.getResourceManager().getState().equals(IResourceManager.STOPPED_STATE)) {
 						inContextForEditRM = false;
 						inContextForRemoveRM = false;
 					} else {
@@ -801,6 +801,7 @@ public class ResourceManagerView extends ViewPart {
 		UIUtils.safeRunAsyncInUIThread(safeRunnable);
 	}
 
+	@SuppressWarnings("unused")
 	private void updateViewer(final IPElement[] elements) {
 		ISafeRunnable safeRunnable = new SafeRunnable() {
 			public void run() throws Exception {

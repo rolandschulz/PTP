@@ -52,17 +52,17 @@ import org.eclipse.ptp.core.util.ProcessOutput;
 import org.eclipse.ptp.internal.core.elements.events.ChangedProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveProcessEvent;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class PJob extends Parent implements IPJob {
 
 	private final ListenerList childListeners = new ListenerList();
 	private final BitSet currentProcessJobRanks = new BitSet();
 	private final ProcessOutput processOutput;
-	private final IResourceManagerControl fResourceManager;
+	private final IResourceManager fResourceManager;
 	private final Map<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>> processAttributesMap = new HashMap<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>>();
 
-	public PJob(String id, IResourceManagerControl rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
+	public PJob(String id, IResourceManager rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
 		super(id, parent, attrs);
 
 		fResourceManager = rm;
@@ -342,7 +342,7 @@ public class PJob extends Parent implements IPJob {
 	 * 
 	 * @see org.eclipse.ptp.core.elements.IPJob#getResourceManager()
 	 */
-	public IResourceManagerControl getResourceManager() {
+	public IResourceManager getResourceManager() {
 		return fResourceManager;
 	}
 

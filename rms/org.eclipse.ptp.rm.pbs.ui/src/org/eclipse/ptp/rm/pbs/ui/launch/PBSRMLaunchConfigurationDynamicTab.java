@@ -52,7 +52,7 @@ import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
 import org.eclipse.ptp.rm.ui.utils.WidgetListener;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
@@ -90,8 +90,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 
 		@Override
 		public void modifyText(ModifyEvent e) {
-			if (!templateChangeListener.isEnabled())
+			if (!templateChangeListener.isEnabled()) {
 				return;
+			}
 			super.modifyText(e);
 		}
 
@@ -101,8 +102,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 
 		public void mouseDown(MouseEvent e) {
 			Combo c = (Combo) e.getSource();
-			if (c.getItemCount() != 0)
+			if (c.getItemCount() != 0) {
 				return;
+			}
 			disable();
 			String text = c.getText();
 			c.setItems(ConfigUtils.getCurrentQueues(getResourceManager()));
@@ -134,7 +136,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 * #setResourceManager(org.eclipse.ptp.core.elements.IPResourceManager)
 		 */
 		@Override
-		public void setResourceManager(IResourceManagerControl rm) {
+		public void setResourceManager(IResourceManager rm) {
 			super.setResourceManager(rm);
 		}
 
@@ -143,11 +145,13 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			if (dynamicControl == null || dynamicControl.isDisposed())
+			if (dynamicControl == null || dynamicControl.isDisposed()) {
 				return;
+			}
 			PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
-			if (template == null)
+			if (template == null) {
 				return;
+			}
 
 			AttributePlaceholder ap = null;
 			Object value = null;
@@ -157,20 +161,22 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 				Control c = e.getKey();
 				ap = e.getValue();
 				value = null;
-				if (c instanceof Text)
+				if (c instanceof Text) {
 					value = ((Text) c).getText();
-				else if (c instanceof Combo)
+				} else if (c instanceof Combo) {
 					value = ((Combo) c).getText();
-				else if (c instanceof Spinner)
+				} else if (c instanceof Spinner) {
 					value = ((Spinner) c).getSelection();
-				else if (c instanceof Button)
+				} else if (c instanceof Button) {
 					value = ((Button) c).getSelection();
-				if (value != null)
+				}
+				if (value != null) {
 					try {
 						ap.getAttribute().setValueAsString(value.toString());
 					} catch (IllegalValueException t) {
 						throw new ValidationException(t.toString());
 					}
+				}
 			}
 
 			if (templateChangeListener.isEnabled() && mpiCommand != null) {
@@ -188,11 +194,13 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		@Override
 		protected void copyToFields() {
-			if (dynamicControl == null || dynamicControl.isDisposed())
+			if (dynamicControl == null || dynamicControl.isDisposed()) {
 				return;
+			}
 			PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
-			if (template == null)
+			if (template == null) {
 				return;
+			}
 			AttributePlaceholder ap = null;
 			IAttribute<?, ?, ?> attr = null;
 			Object value = null;
@@ -200,27 +208,32 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 				Entry<Control, AttributePlaceholder> e = i.next();
 				ap = e.getValue();
 				attr = ap.getAttribute();
-				if (attr != null)
+				if (attr != null) {
 					value = attr.getValue();
+				}
 				Control c = e.getKey();
-				if (value != null)
-					if (c instanceof Text)
+				if (value != null) {
+					if (c instanceof Text) {
 						applyText((Text) c, (String) value);
-					else if (c instanceof Combo)
+					} else if (c instanceof Combo) {
 						applyText((Combo) c, (String) value);
-					else if (c instanceof Spinner)
+					} else if (c instanceof Spinner) {
 						((Spinner) c).setSelection((Integer) value);
-					else if (c instanceof Button)
+					} else if (c instanceof Button) {
 						((Button) c).setSelection((Boolean) value);
+					}
+				}
 			}
 
 			ap = template.getMpiCommand();
 			if (ap != null) {
 				attr = ap.getAttribute();
-				if (attr != null)
+				if (attr != null) {
 					value = attr.getValue();
-				if (value != null)
+				}
+				if (value != null) {
 					WidgetUtils.select(mpiCommand, (String) value);
+				}
 			}
 
 			WidgetUtils.select(templates, template.getName());
@@ -235,11 +248,13 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		@Override
 		protected void copyToStorage() {
 			ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
-			if (config == null)
+			if (config == null) {
 				return;
+			}
 			PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
-			if (template != null)
+			if (template != null) {
 				template.saveValues(config);
+			}
 		}
 
 		/*
@@ -257,8 +272,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			ILaunchConfiguration config = getConfiguration();
 			if (config != null) {
 				PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
-				if (template == null)
+				if (template == null) {
 					return;
+				}
 				template.setConfiguration(config);
 				try {
 					template.configure();
@@ -274,8 +290,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		@Override
 		protected void validateLocal() throws ValidationException {
-			if (dynamicControl == null || dynamicControl.isDisposed())
+			if (dynamicControl == null || dynamicControl.isDisposed()) {
 				return;
+			}
 			for (Iterator<Control> i = valueWidgets.keySet().iterator(); i.hasNext();) {
 				Control c = i.next();
 				if (c instanceof Text) {
@@ -286,14 +303,16 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 					/*
 					 * maybe restore default
 					 */
-					if (ZEROSTR.equals(value) && !ZEROSTR.equals(defaultString))
+					if (ZEROSTR.equals(value) && !ZEROSTR.equals(defaultString)) {
 						t.setText(defaultString);
+					}
 				} else if (c instanceof Combo) {
 					Combo cmb = (Combo) c;
 					String value = cmb.getText();
 					AttributePlaceholder ap = valueWidgets.get(c);
-					if (value.indexOf(QM) >= 0)
+					if (value.indexOf(QM) >= 0) {
 						throw new ValidationException(ap.getName() + CO + SP + Messages.PBSRMLaunchDataSource_ValueNotSet);
+					}
 				}
 			}
 		}
@@ -320,9 +339,11 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		@Override
 		public void modifyText(ModifyEvent e) {
 			Object o = e.getSource();
-			if (valueWidgets.containsKey(o))
-				if (!templateChangeListener.isEnabled())
+			if (valueWidgets.containsKey(o)) {
+				if (!templateChangeListener.isEnabled()) {
 					return;
+				}
+			}
 			super.modifyText(e);
 		}
 
@@ -336,10 +357,11 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {
 			Object o = e.getSource();
-			if (o == editPrepended || o == editPostpended || o == viewScript || o == editTemplates)
+			if (o == editPrepended || o == editPostpended || o == viewScript || o == editTemplates) {
 				widgetSelected(e);
-			else
+			} else {
 				super.widgetDefaultSelected(e);
+			}
 		}
 
 		/*
@@ -352,8 +374,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
-			if (template == null)
+			if (template == null) {
 				return;
+			}
 			AttributePlaceholder ap = null;
 			Object o = e.getSource();
 			String title = ZEROSTR;
@@ -366,9 +389,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			}
 
 			try {
-				if (ap != null)
+				if (ap != null) {
 					openEditor(ap, title);
-				else if (o == viewScript) {
+				} else if (o == viewScript) {
 					openReadOnly(template.realize());
 					super.widgetSelected(e);
 				}
@@ -385,8 +408,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 				IAttribute<?, ?, ?> attr = ap.getAttribute();
 				String attrval = attr.getValueAsString();
 				ScrollingEditableMessageDialog dialog = new ScrollingEditableMessageDialog(control.getShell(), title, attrval);
-				if (dialog.open() == Window.CANCEL)
+				if (dialog.open() == Window.CANCEL) {
 					return;
+				}
 				attr.setValueAsString(dialog.getValue());
 			} catch (Throwable t) {
 				WidgetUtils.errorMessage(control.getShell(), t, Messages.PBSBatchScriptTemplateEditError_message,
@@ -419,8 +443,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		@Override
 		protected void doWidgetSelected(SelectionEvent e) {
 			Object o = e.getSource();
-			if (o == editTemplates)
+			if (o == editTemplates) {
 				handleEditTemplates();
+			}
 		}
 	}
 
@@ -446,7 +471,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * 
 	 * @param resourceManager
 	 */
-	public PBSRMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
+	public PBSRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		setResourceManager(rm);
 		templateChangeListener = new TemplateChangeListener();
@@ -466,18 +491,20 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * which adds widgets on the basis of the PBS Job Attributes present in the
 	 * template.
 	 */
-	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetUtils.createComposite(parent, 1);
 		setResourceManager(rm);
-		if (parent instanceof ScrolledComposite)
+		if (parent instanceof ScrolledComposite) {
 			this.parent = (ScrolledComposite) parent;
+		}
 		createSelectionGroup(control);
 		rmNotRunningWarning();
 	}
 
 	public synchronized RMLaunchConfigurationDynamicTabWidgetListener createDestinationComboListener() {
-		if (destComboListener == null)
+		if (destComboListener == null) {
 			destComboListener = new DestinationComboListener(this);
+		}
 		return destComboListener;
 	}
 
@@ -530,7 +557,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	@Override
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		setResourceManager(rm);
 		RMLaunchValidation rmv = super.performApply(configuration, getResourceManager(), queue);
 		return rmv;
@@ -545,7 +572,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		setResourceManager(rm);
 		return new RMLaunchValidation(true, null);
 	}
@@ -568,8 +595,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 */
 	@Override
 	protected synchronized RMLaunchConfigurationDynamicTabDataSource createDataSource() {
-		if (dataSource == null)
+		if (dataSource == null) {
 			dataSource = new PBSRMLaunchDataSource(this);
+		}
 		return dataSource;
 	}
 
@@ -581,8 +609,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 */
 	@Override
 	protected synchronized RMLaunchConfigurationDynamicTabWidgetListener createListener() {
-		if (listener == null)
+		if (listener == null) {
 			listener = new PBSRMLaunchWidgetListener(this);
+		}
 		return listener;
 	}
 
@@ -594,8 +623,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			dynamicControl.dispose();
 			valueWidgets.clear();
 		}
-		if (control.isDisposed())
+		if (control.isDisposed()) {
 			return;
+		}
 		dynamicControl = WidgetUtils.createComposite(control, 1);
 		PBSBatchScriptTemplate template = pbsRM.getTemplateManager().getCurrent();
 		if (template == null && lconfig != null) {
@@ -612,8 +642,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 * We need to repeat this here (the ResourcesTab does it when it
 		 * initially builds the control).
 		 */
-		if (parent != null)
+		if (parent != null) {
 			parent.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		}
 	}
 
 	/*
@@ -622,26 +653,31 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * in the template.
 	 */
 	private void createOptionalGroup(Composite parent, PBSBatchScriptTemplate template) {
-		if (template == null)
+		if (template == null) {
 			return;
+		}
 		boolean[] nonNull = new boolean[] { null != template.getMpiCommand(), null != template.getPrependedBashCommands(),
 				null != template.getPostpendedBashCommands() };
 
-		if (!nonNull[0] && !nonNull[1] && !nonNull[2])
+		if (!nonNull[0] && !nonNull[1] && !nonNull[2]) {
 			return;
+		}
 
 		Group options = WidgetUtils.createFillingGroup(parent, Messages.PBSRMLaunchConfigGroup2_title, 3, 1, false);
 		options.setForeground(WidgetUtils.DKMG);
 
-		if (nonNull[0])
+		if (nonNull[0]) {
 			mpiCommand = WidgetUtils.createItemCombo(options, Messages.PBSBatchScriptTemplateMPICommand, MPICMDS, MPICMDS[0], null,
 					true, listener, 2);
-		if (nonNull[1])
+		}
+		if (nonNull[1]) {
 			editPrepended = WidgetUtils.createButton(options, Messages.PBSBatchScriptTemplateEditPrepend_title, null, SWT.PUSH, 1,
 					false, listener);
-		if (nonNull[2])
+		}
+		if (nonNull[2]) {
 			editPostpended = WidgetUtils.createButton(options, Messages.PBSBatchScriptTemplateEditPostpend_title, null, SWT.PUSH,
 					1, false, listener);
+		}
 	}
 
 	/*
@@ -704,14 +740,14 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 				try {
 					try {
 						Shell shell = PBSUIPlugin.getActiveWorkbenchShell();
-						if (getResourceManager() == null
-								|| !getResourceManager().getState().equals(IResourceManagerControl.STARTED_STATE)) {
+						if (getResourceManager() == null || !getResourceManager().getState().equals(IResourceManager.STARTED_STATE)) {
 							MessageDialog dialog = new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestStartTitle,
 									null, Messages.PBSAttributeTemplateManager_requestStartMessage, MessageDialog.QUESTION,
 									new String[] { Messages.PBSAttributeTemplateManager_requestStartContinue,
 											Messages.PBSAttributeTemplateManager_requestStartCancel }, 1);
-							if (MessageDialog.CANCEL == dialog.open())
+							if (MessageDialog.CANCEL == dialog.open()) {
 								return Status.OK_STATUS;
+							}
 						}
 						if (!pbsRM.getTemplateManager().handleBaseTemplates()) {
 							new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestInitializeTitle, null,
@@ -723,8 +759,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 						t.printStackTrace();
 					}
 					PBSBatchScriptTemplateWizard templateWizard = new PBSBatchScriptTemplateWizard(pbsRM);
-					if (Window.CANCEL != new WizardDialog(control.getShell(), templateWizard).open())
+					if (Window.CANCEL != new WizardDialog(control.getShell(), templateWizard).open()) {
 						repopulateTemplates(templateWizard.getSelectedTemplate());
+					}
 				} catch (Throwable t) {
 					t.printStackTrace();
 				}
@@ -745,16 +782,18 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 				String[] tempNames = pbsRM.getTemplateManager().findAvailableTemplates();
 				templates.setItems(tempNames);
 				int i = 0;
-				for (; i < tempNames.length; i++)
+				for (; i < tempNames.length; i++) {
 					if (tempNames[i].equals(oldTemplate)) {
 						templates.select(i);
 						break;
 					}
+				}
 				templateChangeListener.enable();
-				if (tempNames.length > 0 && i == tempNames.length)
+				if (tempNames.length > 0 && i == tempNames.length) {
 					templates.select(0);
-				else
+				} else {
 					fireTemplateChange(WidgetUtils.getSelected(templates));
+				}
 				return Status.OK_STATUS;
 			}
 		}.schedule();
@@ -765,14 +804,15 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * RM is not running.
 	 */
 	private String rmNotRunningWarning() {
-		IResourceManagerControl rm = getResourceManager();
+		IResourceManager rm = getResourceManager();
 		StringBuffer text = new StringBuffer();
 		if (rm != null) {
 			text.append(Messages.PBSAttributeTemplateManager_rmState);
 			String state = rm.getState();
 			text.append(state);
-			if (!IResourceManagerControl.STARTED_STATE.equals(state))
+			if (!IResourceManager.STARTED_STATE.equals(state)) {
 				text.append(Messages.PBSAttributeTemplateManager_rmNotStartedMessage);
+			}
 		}
 		return text.toString();
 	}
@@ -780,7 +820,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	/*
 	 * For consistency.
 	 */
-	private synchronized void setResourceManager(IResourceManagerControl resourceManager) {
+	private synchronized void setResourceManager(IResourceManager resourceManager) {
 		try {
 			pbsRM = (PBSResourceManager) resourceManager;
 		} catch (Throwable e) {

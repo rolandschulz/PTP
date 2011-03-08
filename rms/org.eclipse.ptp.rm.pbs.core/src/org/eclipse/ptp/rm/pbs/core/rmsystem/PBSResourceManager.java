@@ -14,13 +14,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rm.pbs.core.Activator;
 import org.eclipse.ptp.rm.pbs.core.rtsystem.PBSProxyRuntimeClient;
 import org.eclipse.ptp.rm.pbs.core.rtsystem.PBSRuntimeSystem;
 import org.eclipse.ptp.rm.pbs.core.templates.PBSBatchScriptTemplateManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerControl;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 public class PBSResourceManager extends AbstractRuntimeResourceManager {
@@ -29,52 +30,35 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	/**
 	 * @since 5.0
 	 */
-	public PBSResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
-		super(universe, config);
+	public PBSResourceManager(IResourceManagerConfiguration config, AbstractRuntimeResourceManagerControl control,
+			AbstractRuntimeResourceManagerMonitor monitor) {
+		super(config, control, monitor);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doAfterCloseConnection
+	 * org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager#getRuntimeSystem
 	 * ()
 	 */
 	@Override
-	protected void doAfterCloseConnection() {
+	public IRuntimeSystem getRuntimeSystem() {
+		return super.getRuntimeSystem();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doAfterOpenConnection
-	 * ()
+	/**
+	 * @since 5.0
 	 */
-	@Override
-	protected void doAfterOpenConnection() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doBeforeCloseConnection
-	 * ()
-	 */
-	@Override
-	protected void doBeforeCloseConnection() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doBeforeOpenConnection
-	 * ()
-	 */
-	@Override
-	protected void doBeforeOpenConnection() {
+	public PBSBatchScriptTemplateManager getTemplateManager() {
+		if (fTemplateManager == null) {
+			try {
+				fTemplateManager = new PBSBatchScriptTemplateManager(this);
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+		return fTemplateManager;
 	}
 
 	/*
@@ -96,19 +80,5 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 		}
 		PBSProxyRuntimeClient runtimeProxy = new PBSProxyRuntimeClient(config, baseId);
 		return new PBSRuntimeSystem(this, runtimeProxy);
-	}
-
-	/**
-	 * @since 5.0
-	 */
-	public PBSBatchScriptTemplateManager getTemplateManager() {
-		if (fTemplateManager == null) {
-			try {
-				fTemplateManager = new PBSBatchScriptTemplateManager(this);
-			} catch (Throwable e) {
-				e.printStackTrace();
-			}
-		}
-		return fTemplateManager;
 	}
 }

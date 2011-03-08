@@ -10,14 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.pe.ui;
 
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
 import org.eclipse.ptp.rm.ibm.pe.core.PECorePlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
-import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
@@ -58,20 +55,6 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	@Override
 	public IServiceProviderWorkingCopy copy() {
 		return new PEServiceProvider(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
-	 */
-	@SuppressWarnings("rawtypes")
-	@Override
-	public Object getAdapter(Class adapter) {
-		if (adapter == IResourceManagerControl.class) {
-			return new PEResourceManager(PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
-		}
-		return null;
 	}
 
 	/*

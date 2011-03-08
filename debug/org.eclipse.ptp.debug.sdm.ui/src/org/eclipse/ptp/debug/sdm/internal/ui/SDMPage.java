@@ -32,8 +32,8 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -54,7 +54,7 @@ import org.eclipse.swt.widgets.Text;
 public class SDMPage extends AbstractLaunchConfigurationTab {
 	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-	private IResourceManagerControl resourceManager = null;
+	private IResourceManager resourceManager = null;
 	private boolean pathIsDirty = true;
 	private boolean pathIsValid = false;
 
@@ -315,7 +315,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		try {
 			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 					EMPTY_STRING);
-			IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+			IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 			if (rm != null) {
 				IResourceManagerConfiguration rmConfig = rm.getConfiguration();
 				if (rmConfig instanceof IRemoteResourceManagerConfiguration) {
@@ -393,7 +393,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			return EMPTY_STRING;
 		}
 
-		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 		if (rm != null) {
 			/*
 			 * If the resource manager has been changed and this is a remote
@@ -438,7 +438,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * 
 	 * @return remote services
 	 */
-	private IRemoteServices getRemoteServices(IResourceManagerControl rm) {
+	private IRemoteServices getRemoteServices(IResourceManager rm) {
 		if (rm != null) {
 			IResourceManagerConfiguration rmConfig = rm.getConfiguration();
 			return PTPRemoteUIPlugin.getDefault().getRemoteServices(rmConfig.getRemoteServicesId(), getLaunchConfigurationDialog());
@@ -451,7 +451,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * 
 	 * @return IRemoteUIServices
 	 */
-	private IRemoteUIServices getRemoteUIServices(IResourceManagerControl rm) {
+	private IRemoteUIServices getRemoteUIServices(IResourceManager rm) {
 		IRemoteServices rsrv = getRemoteServices(rm);
 		if (rsrv != null) {
 			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(rsrv);
@@ -465,7 +465,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * 
 	 * @return IRemoteConnection
 	 */
-	private IRemoteConnection getRemoteConnection(IResourceManagerControl rm) {
+	private IRemoteConnection getRemoteConnection(IResourceManager rm) {
 		IRemoteServices rsrv = getRemoteServices(rm);
 		if (rsrv != null) {
 			String connName = rm.getConfiguration().getConnectionName();

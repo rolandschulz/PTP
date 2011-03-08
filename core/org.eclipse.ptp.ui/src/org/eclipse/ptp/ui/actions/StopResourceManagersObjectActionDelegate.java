@@ -26,7 +26,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.messages.Messages;
@@ -45,7 +45,7 @@ public class StopResourceManagersObjectActionDelegate extends AbstractResourceMa
 			/*
 			 * Only ask if we are really shutting down the RM
 			 */
-			if (rmManager.getResourceManager().getState().equals(IResourceManagerControl.STARTED_STATE)) {
+			if (rmManager.getResourceManager().getState().equals(IResourceManager.STARTED_STATE)) {
 				boolean shutdown = MessageDialog.openConfirm(getTargetShell(), Messages.StopResourceManagersObjectActionDelegate_0,
 						NLS.bind(Messages.StopResourceManagersObjectActionDelegate_1, rmManager.getName()));
 				if (!shutdown) {
@@ -69,8 +69,8 @@ public class StopResourceManagersObjectActionDelegate extends AbstractResourceMa
 	@Override
 	protected boolean isEnabledFor(IPResourceManager rmManager) {
 		String state = rmManager.getResourceManager().getState();
-		if (state.equals(IResourceManagerControl.STARTING_STATE) || state.equals(IResourceManagerControl.STARTED_STATE)
-				|| state.equals(IResourceManagerControl.ERROR_STATE)) {
+		if (state.equals(IResourceManager.STARTING_STATE) || state.equals(IResourceManager.STARTED_STATE)
+				|| state.equals(IResourceManager.ERROR_STATE)) {
 			return true;
 		}
 		return false;

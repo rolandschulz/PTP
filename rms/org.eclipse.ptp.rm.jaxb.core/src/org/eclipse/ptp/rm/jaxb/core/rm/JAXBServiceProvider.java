@@ -3,7 +3,6 @@ package org.eclipse.ptp.rm.jaxb.core.rm;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
@@ -13,7 +12,6 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.rmsystem.AbstractControlMonitorRMServiceProvider;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
@@ -55,20 +53,6 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		map = null;
 		rmdata = null;
 		service = null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
-	 */
-	@SuppressWarnings("rawtypes")
-	@Override
-	public Object getAdapter(Class adapter) {
-		if (adapter == IResourceManagerControl.class) {
-			return new JAXBResourceManager(PTPCorePlugin.getDefault().getModelManager().getUniverse(), this);
-		}
-		return null;
 	}
 
 	public String getDefaultControlHost() {

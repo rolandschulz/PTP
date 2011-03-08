@@ -20,8 +20,8 @@ package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 public interface IModelManager extends IModelPresentation {
@@ -39,7 +39,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @param addedManager
 	 * @since 5.0
 	 */
-	public void addResourceManager(IResourceManagerControl addedManager);
+	public void addResourceManager(IResourceManager addedManager);
 
 	/**
 	 * Add resource managers to the model.
@@ -47,7 +47,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @param addedManagers
 	 * @since 5.0
 	 */
-	public void addResourceManagers(IResourceManagerControl[] addedManagers);
+	public void addResourceManagers(IResourceManager[] addedManagers);
 
 	/**
 	 * Find the resource manager with the supplied unique name
@@ -56,7 +56,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @return resource manager
 	 * @since 5.0
 	 */
-	public IResourceManagerControl getResourceManagerFromUniqueName(String rmUniqueName);
+	public IResourceManager getResourceManagerFromUniqueName(String rmUniqueName);
 
 	/**
 	 * Get resource managers from the model.
@@ -64,7 +64,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @return all resource managers know by the model
 	 * @since 5.0
 	 */
-	public IResourceManagerControl[] getResourceManagers();
+	public IResourceManager[] getResourceManagers();
 
 	/**
 	 * Loads saved resource managers. Loading of resource manager configuration
@@ -89,7 +89,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @param removedManager
 	 * @since 5.0
 	 */
-	public void removeResourceManager(IResourceManagerControl removedManager);
+	public void removeResourceManager(IResourceManager removedManager);
 
 	/**
 	 * Remove resource managers from the model.

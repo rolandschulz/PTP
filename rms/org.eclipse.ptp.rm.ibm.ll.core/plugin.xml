@@ -12,5 +12,13 @@
             class="org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerFactory"
+            id="org.eclipse.ptp.rm.ibm.ll.LLServiceProvider"
+            name="IBM LoadLeveler">
+      </resourceManager>
+   </extension>
 
 </plugin>

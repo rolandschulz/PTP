@@ -17,15 +17,13 @@
 package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.listeners.IJobListener;
 
 /**
  * @since 5.0
  */
-public interface IResourceManagerControl extends IAdaptable {
+public interface IResourceManagerControl {
 	/**
 	 * Control operation to suspend a job
 	 */
@@ -48,30 +46,6 @@ public interface IResourceManagerControl extends IAdaptable {
 	public static final String TERMINATE_OPERATION = "TERMINATE"; //$NON-NLS-1$
 
 	/**
-	 * State indicating resource manager is stopped
-	 */
-	public static final String STOPPED_STATE = "STOPPED"; //$NON-NLS-1$
-	/**
-	 * State indicating resource manager is started
-	 */
-	public static final String STARTED_STATE = "STARTED"; //$NON-NLS-1$
-	/**
-	 * State indicating resource manager is in the process of starting
-	 */
-	public static final String STARTING_STATE = "STARTING"; //$NON-NLS-1$
-	/**
-	 * State indicating a resource manager error condition
-	 */
-	public static final String ERROR_STATE = "ERROR"; //$NON-NLS-1$
-
-	/**
-	 * Add a listener for job events
-	 * 
-	 * @param listener
-	 */
-	public void addJobListener(IJobListener listener);
-
-	/**
 	 * Perform control operation on job.
 	 * 
 	 * @param jobId
@@ -91,21 +65,6 @@ public interface IResourceManagerControl extends IAdaptable {
 	public void dispose();
 
 	/**
-	 * Get the configuration associated with this resource manager.
-	 * 
-	 * @return resource manager configuration
-	 */
-	public IResourceManagerConfiguration getConfiguration();
-
-	/**
-	 * Get a string description of this RM
-	 * 
-	 * @return string describing the RM
-	 * @since 5.0
-	 */
-	public String getDescription();
-
-	/**
 	 * Get the status of the job
 	 * 
 	 * @param jobId
@@ -115,87 +74,19 @@ public interface IResourceManagerControl extends IAdaptable {
 	public IJobStatus getJobStatus(String jobId);
 
 	/**
-	 * Get the name of this RM
-	 * 
-	 * @return string name of the RM
-	 * @since 5.0
-	 */
-	public String getName();
-
-	/**
-	 * Returns the extension point id of the resource manager
-	 * 
-	 * @return the extension point id of the resource manager
-	 * @since 5.0
-	 */
-	public String getResourceManagerId();
-
-	/**
-	 * Get the state of this RM
-	 * 
-	 * @return state value representing the state of the RM
-	 * @since 5.0
-	 */
-	public String getState();
-
-	/**
-	 * Get a unique name that can be used to identify this resource manager
-	 * persistently between PTP invocations. Used by the
-	 * ResourceManagerPersistence.
-	 * 
-	 * @return string representing a unique name for the resource manager
-	 * @since 5.0
-	 */
-	public String getUniqueName();
-
-	/**
-	 * Remove a listener for job events
-	 * 
-	 * @param listener
-	 */
-	public void removeJobListener(IJobListener listener);
-
-	/**
-	 * Set the configuration for this resource manager. This will replace the
-	 * existing configuration with a new configuration. The method is
-	 * responsible for dealing with any saved state that needs to be cleaned up.
-	 * 
-	 * @param config
-	 *            the new configuration
-	 */
-	public void setConfiguration(IResourceManagerConfiguration config);
-
-	/**
-	 * Set the state of this RM
-	 * 
-	 * @param state
-	 *            value representing the state of the RM
-	 * @since 5.0
-	 */
-	public void setState(String state);
-
-	/**
-	 * Start up the resource manager. This could potentially take a long time
-	 * (or forever), particularly if the RM is located on a remote system.
-	 * 
-	 * Callers can assume that the operation was successful if no exception is
-	 * thrown and the monitor was not cancelled. However, the resource manager
-	 * may still fail later due to some other condition.
+	 * Start the resource manager. Clients should not call this directly. Call
+	 * {@link IResourceManager#start(IProgressMonitor)} instead.
 	 * 
 	 * @param monitor
-	 *            the progress monitor to use for reporting progress to the
-	 *            user. It is the caller's responsibility to call done() on the
-	 *            given monitor. Accepts null, indicating that no progress
-	 *            should be reported and that the operation cannot be cancelled.
+	 *            progress monitor
 	 * @throws CoreException
-	 *             this exception is thrown if the resource manager fails to
-	 *             start
-	 * @since 5.0
+	 *             this exception is thrown if the start command fails
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Stop the resource manager.
+	 * Stop the resource manager. Clients should not call this directly. Call
+	 * {@link IResourceManager#stop()} instead.
 	 * 
 	 * @throws CoreException
 	 *             this exception is thrown if the stop command fails
@@ -204,19 +95,10 @@ public interface IResourceManagerControl extends IAdaptable {
 	public void stop() throws CoreException;
 
 	/**
-	 * Submit a job. The launch configuration must contain the appropriate
-	 * attributes for a successful job launch (e.g. the queue, etc.).
+	 * Stop the resource manager.
 	 * 
-	 * @param configuration
-	 *            launch configuration used to submit the job
-	 * @param mode
-	 *            launch mode {@see ILaunchManager}
-	 * @param monitor
-	 *            progress monitor for monitoring job submission.
-	 * @return a unique job ID representing the submitted job
 	 * @throws CoreException
-	 *             if the job submission fails or was canceled
-	 * @since 5.0
+	 *             this exception is thrown if the stop command fails
 	 */
 	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException;
 }

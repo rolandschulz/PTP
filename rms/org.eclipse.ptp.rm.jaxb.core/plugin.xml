@@ -34,5 +34,13 @@
             name="Configurable Regex Tokenizer">
       </StreamParserTokenizer>
    </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerFactory"
+            id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"
+            name="JAXB">
+      </resourceManager>
+   </extension>
 
 </plugin>

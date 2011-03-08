@@ -8,14 +8,14 @@ import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.rmsystem.IJobStatus;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * @since 5.0
  */
 public class PLaunch extends Launch implements IPLaunch {
 	private String fJobId;
-	private IResourceManagerControl fResourceManager;
+	private IResourceManager fResourceManager;
 
 	public PLaunch(ILaunchConfiguration launchConfiguration, String mode, ISourceLocator locator) {
 		super(launchConfiguration, mode, locator);
@@ -76,7 +76,7 @@ public class PLaunch extends Launch implements IPLaunch {
 	/**
 	 * @since 5.0
 	 */
-	public IResourceManagerControl getResourceManager() {
+	public IResourceManager getResourceManager() {
 		return fResourceManager;
 	}
 
@@ -112,12 +112,12 @@ public class PLaunch extends Launch implements IPLaunch {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.debug.core.launch.IPLaunch#setResourceManager(org.eclipse
-	 * .ptp.rmsystem.IResourceManagerControl)
+	 * .ptp.rmsystem.IResourceManager)
 	 */
 	/**
 	 * @since 5.0
 	 */
-	public void setResourceManager(IResourceManagerControl rm) {
+	public void setResourceManager(IResourceManager rm) {
 		fResourceManager = rm;
 	}
 }

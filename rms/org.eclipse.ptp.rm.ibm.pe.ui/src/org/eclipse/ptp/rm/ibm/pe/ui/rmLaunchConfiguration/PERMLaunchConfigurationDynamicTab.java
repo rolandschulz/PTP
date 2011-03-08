@@ -69,7 +69,7 @@ import org.eclipse.ptp.rm.ibm.pe.ui.widgets.FileSelectorRowWidget;
 import org.eclipse.ptp.rm.ibm.pe.ui.widgets.TextRowWidget;
 import org.eclipse.ptp.rm.ibm.pe.ui.widgets.WidgetAttributes;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -587,7 +587,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		}
 	}
 
-	public PERMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
+	public PERMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 	}
 
@@ -599,7 +599,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * #canSave(org.eclipse.swt.widgets.Control,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
 		if (allFieldsValid) {
 			return success;
 		}
@@ -942,7 +942,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		IAttributeDefinition<?, ?, ?> attr;
 
 		widget = null;
-		attr = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
+		attr = currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new TextRowWidget(parent, id, attr);
 			widget.addModifyListener(eventMonitor);
@@ -970,8 +970,8 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		IAttributeDefinition<?, ?, ?> attr2;
 
 		widget = null;
-		attr1 = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id1);
-		attr2 = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id2);
+		attr1 = currentRM.getAttributeDefinitionManager().getAttributeDefinition(id1);
+		attr2 = currentRM.getAttributeDefinitionManager().getAttributeDefinition(id2);
 		if ((attr1 != null) && (attr2 != null)) {
 			widget = new DualFieldRowWidget(parent, id1, id2, attr1, attr2);
 			widget.addModifyListener(eventMonitor);
@@ -997,8 +997,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		StringAttributeDefinition attrDef;
 
 		widget = null;
-		attrDef = (StringAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
-				.getAttributeDefinition(id);
+		attrDef = (StringAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attrDef != null) {
 			widget = new CheckboxRowWidget(parent, id, attrDef);
 			activeWidgets.add(widget);
@@ -1021,8 +1020,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		StringSetAttributeDefinition attrDef;
 
 		widget = null;
-		attrDef = (StringSetAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
-				.getAttributeDefinition(id);
+		attrDef = (StringSetAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attrDef != null) {
 			widget = new BooleanRowWidget(parent, id, attrDef, -1);
 			widget.addSelectionListener(eventMonitor);
@@ -1054,7 +1052,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		StringAttributeDefinition attr;
 
 		widget = null;
-		attr = (StringAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
+		attr = (StringAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new FileSelectorRowWidget(parent, id, selectorID, attr);
 			widget.setData(id);
@@ -1081,7 +1079,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		IAttributeDefinition<?, ?, ?> attr;
 
 		widget = null;
-		attr = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
+		attr = currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new ComboRowWidget(parent, id, attr, true);
 			widget.addSelectionListener(eventMonitor);
@@ -1106,7 +1104,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		IAttributeDefinition<?, ?, ?> attr;
 
 		widget = null;
-		attr = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(id);
+		attr = currentRM.getAttributeDefinitionManager().getAttributeDefinition(id);
 		if (attr != null) {
 			widget = new ComboRowWidget(parent, id, attr, false);
 			widget.addSelectionListener(eventMonitor);
@@ -1625,7 +1623,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param queue
 	 *            Currently selected queue
 	 */
-	public void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) {
+	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) {
 		IPEResourceManagerConfiguration config;
 		IRemoteConnectionManager connMgr;
 		currentRM = (PEResourceManager) rm;
@@ -1693,14 +1691,14 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		String localDefaultEnv;
 
 		localDefaultEnv = attrName.replaceFirst("^MP_", "EN_"); //$NON-NLS-1$ //$NON-NLS-2$
-		attrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(localDefaultEnv);
+		attrDef = currentRM.getAttributeDefinitionManager().getAttributeDefinition(localDefaultEnv);
 		if (attrDef != null) {
 			try {
 				return attrDef.create().getValueAsString();
 			} catch (IllegalValueException e) {
 			}
 		}
-		attrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(attrName);
+		attrDef = currentRM.getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		if (attrDef != null) {
 			try {
 				return attrDef.create().getValueAsString();
@@ -1747,7 +1745,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		// NumberFormatException, so a try/catch block is required, where the
 		// string
 		// value is returned in thecase of a NumberFormatException
-		rmAttrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(attrName);
+		rmAttrDef = currentRM.getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		if (rmAttrDef instanceof IntegerAttributeDefinition || rmAttrDef instanceof BigIntegerAttributeDefinition) {
 			long intVal;
 
@@ -1979,7 +1977,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		try {
 			IAttributeDefinition<?, ?, ?> def;
 
-			def = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(attributeName);
+			def = currentRM.getAttributeDefinitionManager().getAttributeDefinition(attributeName);
 			if (def != null) {
 				defaultValue = def.create().getValueAsString();
 			} else {
@@ -2000,8 +1998,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManagerControl rm, IPQueue queue,
-			ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
 			currentLaunchConfig = (ILaunchConfigurationWorkingCopy) configuration;
 		}
@@ -2020,7 +2017,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
 	@SuppressWarnings("unchecked")
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm, IPQueue queue) {
 		// If running in basic mode, then any PE command line options and
 		// environment variables are disallowed since those settings may
 		// conflict with what is specified in the resources tab panel.
@@ -2090,7 +2087,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		if (control != null) {
 			String attrValue;
 
-			attrDef = currentRM.getRuntimeSystem().getAttributeDefinitionManager().getAttributeDefinition(attr);
+			attrDef = currentRM.getAttributeDefinitionManager().getAttributeDefinition(attr);
 			try {
 				if ((attrDef instanceof IntegerAttributeDefinition) || (attrDef instanceof BigIntegerAttributeDefinition)) {
 					attrValue = getIntegerValue(control.getValue());
@@ -2226,7 +2223,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		currentLaunchConfig = configuration;
 		currentRM = (PEResourceManager) rm;
 		saveConfigurationData(configuration);
@@ -2241,7 +2238,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManagerControl rmc, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManager rmc, IPQueue queue) {
 		IAttribute<?, ?, ?> rmAttrs[];
 
 		currentLaunchConfig = config;
@@ -2825,8 +2822,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		@SuppressWarnings("unused")
 		StringSetAttribute attr;
 
-		attrDef = (StringSetAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
-				.getAttributeDefinition(attrName);
+		attrDef = (StringSetAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		if (attrDef != null) {
 			try {
 				attr = attrDef.create(widget.getValue());
@@ -2886,8 +2882,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		@SuppressWarnings("unused")
 		IntegerAttribute attr;
 
-		attrDef = (IntegerAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
-				.getAttributeDefinition(attrName);
+		attrDef = (IntegerAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		try {
 			attr = attrDef.create(value);
 		} catch (IllegalValueException e) {
@@ -2952,8 +2947,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		@SuppressWarnings("unused")
 		BigIntegerAttribute attr;
 
-		attrDef = (BigIntegerAttributeDefinition) currentRM.getRuntimeSystem().getAttributeDefinitionManager()
-				.getAttributeDefinition(attrName);
+		attrDef = (BigIntegerAttributeDefinition) currentRM.getAttributeDefinitionManager().getAttributeDefinition(attrName);
 		try {
 			attr = attrDef.create(value);
 		} catch (IllegalValueException e) {

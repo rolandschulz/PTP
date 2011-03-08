@@ -42,7 +42,7 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.EffectiveOpenMPIResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * 
@@ -65,7 +65,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/**
 	 * @since 4.0
 	 */
-	public OpenMPIRuntimeSystem(IResourceManagerControl rm, IOpenMPIResourceManagerConfiguration config) {
+	public OpenMPIRuntimeSystem(IResourceManager rm, IOpenMPIResourceManagerConfiguration config) {
 		super(rm, config);
 	}
 

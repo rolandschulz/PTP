@@ -27,13 +27,15 @@ package org.eclipse.ptp.rm.ibm.pe.core.rmsystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rm.ibm.pe.core.PECorePlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.rtsystem.PEProxyRuntimeClient;
 import org.eclipse.ptp.rm.ibm.pe.core.rtsystem.PERuntimeSystem;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerControl;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 public class PEResourceManager extends AbstractRuntimeResourceManager {
@@ -41,52 +43,16 @@ public class PEResourceManager extends AbstractRuntimeResourceManager {
 	/**
 	 * @since 5.0
 	 */
-	public PEResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
-		super(universe, config);
+	public PEResourceManager(IResourceManagerConfiguration config, AbstractRuntimeResourceManagerControl control,
+			AbstractRuntimeResourceManagerMonitor monitor) {
+		super(config, control, monitor);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doAfterCloseConnection
-	 * ()
+	/**
+	 * @since 5.0
 	 */
-	@Override
-	protected void doAfterCloseConnection() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doAfterOpenConnection
-	 * ()
-	 */
-	@Override
-	protected void doAfterOpenConnection() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doBeforeCloseConnection
-	 * ()
-	 */
-	@Override
-	protected void doBeforeCloseConnection() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doBeforeOpenConnection
-	 * ()
-	 */
-	@Override
-	protected void doBeforeOpenConnection() {
+	public AttributeDefinitionManager getAttributeDefinitionManager() {
+		return getRuntimeSystem().getAttributeDefinitionManager();
 	}
 
 	/*

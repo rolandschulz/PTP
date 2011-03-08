@@ -35,7 +35,7 @@ import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
@@ -72,13 +72,13 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 	private Combo resourceManagerCombo = null;
 
-	private IResourceManagerControl resourceManager = null;
-	private final Map<Integer, IResourceManagerControl> resourceManagers = new HashMap<Integer, IResourceManagerControl>();
-	private final HashMap<IResourceManagerControl, Integer> resourceManagerIndices = new HashMap<IResourceManagerControl, Integer>();
+	private IResourceManager resourceManager = null;
+	private final Map<Integer, IResourceManager> resourceManagers = new HashMap<Integer, IResourceManager>();
+	private final HashMap<IResourceManager, Integer> resourceManagerIndices = new HashMap<IResourceManager, Integer>();
 	// The composite that holds the RM's attributes for the launch configuration
 	private ScrolledComposite launchAttrsScrollComposite;
 
-	private final Map<IResourceManagerControl, IRMLaunchConfigurationDynamicTab> rmDynamicTabs = new HashMap<IResourceManagerControl, IRMLaunchConfigurationDynamicTab>();
+	private final Map<IResourceManager, IRMLaunchConfigurationDynamicTab> rmDynamicTabs = new HashMap<IResourceManager, IRMLaunchConfigurationDynamicTab>();
 
 	private final ContentsChangedListener launchContentsChangedListener = new ContentsChangedListener();
 
@@ -125,7 +125,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		comp.setLayoutData(gd);
 
-		IResourceManagerControl[] rms = PTPCorePlugin.getDefault().getModelManager().getResourceManagers();
+		IResourceManager[] rms = PTPCorePlugin.getDefault().getModelManager().getResourceManagers();
 		new Label(comp, SWT.NONE).setText(Messages.ApplicationTab_RM_Selection_Label);
 
 		resourceManagerCombo = new Combo(comp, SWT.READ_ONLY);
@@ -251,7 +251,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
 			return false;
 		}
-		if (!resourceManager.getState().equals(IResourceManagerControl.STARTED_STATE)) {
+		if (!resourceManager.getState().equals(IResourceManager.STARTED_STATE)) {
 			setErrorMessage(Messages.ResourcesTab_Resource_Manager_Not_Started);
 			return false;
 		}
@@ -297,7 +297,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		IResourceManagerControl rm = getResourceManagerDefault();
+		IResourceManager rm = getResourceManagerDefault();
 		if (rm == null) {
 			setErrorMessage(Messages.ResourcesTab_No_Resource_Manager);
 			return;
@@ -306,10 +306,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, rmName);
 
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
-		if (rmDynamicTab == null)
+		if (rmDynamicTab == null) {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
-		else
+		} else {
 			rmDynamicTab.setDefaults(configuration, rm, null);
+		}
 	}
 
 	/*
@@ -346,15 +347,16 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @return
 	 * @throws CoreException
 	 */
-	private IRMLaunchConfigurationDynamicTab createRMLaunchConfigurationDynamicTab(final IResourceManagerControl rm)
-			throws CoreException {
+	private IRMLaunchConfigurationDynamicTab createRMLaunchConfigurationDynamicTab(final IResourceManager rm) throws CoreException {
 
 		final AbstractRMLaunchConfigurationFactory rmFactory = PTPLaunchPlugin.getDefault().getRMLaunchConfigurationFactory(rm);
-		if (rmFactory == null)
+		if (rmFactory == null) {
 			return null;
+		}
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = rmFactory.create(rm, getLaunchConfigurationDialog());
-		if (rmDynamicTab == null)
+		if (rmDynamicTab == null) {
 			return null;
+		}
 		rmDynamicTab.addContentsChangedListener(launchContentsChangedListener);
 		return rmDynamicTab;
 	}
@@ -372,8 +374,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * 
 	 * @return resource manager
 	 */
-	private IResourceManagerControl getResourceManagerDefault() {
-		IResourceManagerControl[] rms = PTPCorePlugin.getDefault().getModelManager().getResourceManagers();
+	private IResourceManager getResourceManagerDefault() {
+		IResourceManager[] rms = PTPCorePlugin.getDefault().getModelManager().getResourceManagers();
 		if (rms.length != 1) {
 			return null;
 		}
@@ -383,7 +385,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/**
 	 * @return
 	 */
-	private IResourceManagerControl getResourceManagerFromCombo() {
+	private IResourceManager getResourceManagerFromCombo() {
 		if (resourceManagerCombo != null) {
 			int i = resourceManagerCombo.getSelectionIndex();
 			return resourceManagers.get(i);
@@ -398,8 +400,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param rm
 	 * @return
 	 */
-	private IRMLaunchConfigurationDynamicTab getRMLaunchConfigurationDynamicTab(final IResourceManagerControl rm) {
-		if (!rmDynamicTabs.containsKey(rm))
+	private IRMLaunchConfigurationDynamicTab getRMLaunchConfigurationDynamicTab(final IResourceManager rm) {
+		if (!rmDynamicTabs.containsKey(rm)) {
 			try {
 				IRMLaunchConfigurationDynamicTab rmDynamicTab = createRMLaunchConfigurationDynamicTab(rm);
 				rmDynamicTabs.put(rm, rmDynamicTab);
@@ -409,6 +411,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				PTPLaunchPlugin.errorDialog(e.getMessage(), e);
 				return null;
 			}
+		}
 		return rmDynamicTabs.get(rm);
 	}
 
@@ -432,11 +435,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param resource
 	 *            manager
 	 */
-	private void setResourceManagerComboSelection(IResourceManagerControl rm) {
+	private void setResourceManagerComboSelection(IResourceManager rm) {
 		final Integer results = resourceManagerIndices.get(rm);
 		int i = 0;
-		if (results != null)
+		if (results != null) {
 			i = results.intValue();
+		}
 		resourceManagerCombo.select(i);
 		rmSelectionChanged();
 	}
@@ -450,13 +454,14 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param queue
 	 * @param launchConfiguration
 	 */
-	private void updateLaunchAttributeControls(IResourceManagerControl rm, IPQueue queue, ILaunchConfiguration launchConfiguration) {
+	private void updateLaunchAttributeControls(IResourceManager rm, IPQueue queue, ILaunchConfiguration launchConfiguration) {
 		final ScrolledComposite launchAttrsScrollComp = getLaunchAttrsScrollComposite();
 		launchAttrsScrollComp.setContent(null);
-		for (Control child : launchAttrsScrollComp.getChildren())
+		for (Control child : launchAttrsScrollComp.getChildren()) {
 			child.dispose();
+		}
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
-		if (rmDynamicTab != null)
+		if (rmDynamicTab != null) {
 			try {
 				rmDynamicTab.createControl(launchAttrsScrollComp, rm, queue);
 				final Control dynControl = rmDynamicTab.getControl();
@@ -468,6 +473,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				setErrorMessage(e.getMessage());
 				PTPLaunchPlugin.errorDialog(e.getMessage(), e);
 			}
+		}
 		launchAttrsScrollComp.layout(true);
 	}
 }

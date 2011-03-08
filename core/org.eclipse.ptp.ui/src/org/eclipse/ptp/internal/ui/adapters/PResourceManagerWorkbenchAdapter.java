@@ -24,7 +24,7 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.messages.Messages;
@@ -100,7 +100,7 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	public Object[] getChildren(Object parentElement) {
 		IPResourceManager rm = getResourceManager(parentElement);
 		if (rm != null) {
-			if (!rm.getResourceManager().getState().equals(IResourceManagerControl.STARTED_STATE)) {
+			if (!rm.getResourceManager().getState().equals(IResourceManager.STARTED_STATE)) {
 				return new Object[0];
 			}
 			IPMachine[] machines = rm.getMachines();
@@ -159,7 +159,7 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 				return label;
 			}
 		}
-		final IResourceManagerControl resourceManager = ((IPResourceManager) object).getResourceManager();
+		final IResourceManager resourceManager = ((IPResourceManager) object).getResourceManager();
 		final String type = resourceManager.getConfiguration().getType();
 		if (type == null) {
 			return resourceManager.getName();

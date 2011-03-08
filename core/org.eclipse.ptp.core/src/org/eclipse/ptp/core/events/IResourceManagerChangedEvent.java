@@ -16,7 +16,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.events;
 
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * This event is sent when a resource manager state changes. It is sent to
@@ -33,6 +33,6 @@ public interface IResourceManagerChangedEvent {
 	 * @return the source of the event
 	 * @since 5.0
 	 */
-	public IResourceManagerControl getSource();
+	public IResourceManager getSource();
 
 }

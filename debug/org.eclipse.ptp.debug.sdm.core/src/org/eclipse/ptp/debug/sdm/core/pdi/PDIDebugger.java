@@ -57,8 +57,8 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * @author clement
@@ -269,7 +269,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 				throw new PDIException(null, Messages.PDIDebugger_7 + e.getMessage());
 			}
 
-			IResourceManagerControl rm = getResourceManager(configuration);
+			IResourceManager rm = getResourceManager(configuration);
 			if (rm != null) {
 				port = getSessionPort();
 				IResourceManagerConfiguration conf = rm.getConfiguration();
@@ -656,10 +656,11 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 */
 	public void setEnabledBreakpoint(TaskSet tasks, int bpid, boolean enabled) throws PDIException {
 		try {
-			if (enabled)
+			if (enabled) {
 				debugEnableBreakpoint(tasks, bpid);
-			else
+			} else {
 				debugDisableBreakpoint(tasks, bpid);
+			}
 		} catch (IOException e) {
 			throw new PDIException(tasks, Messages.PDIDebugger_30 + e.getMessage());
 		}
@@ -965,8 +966,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 */
 	private String getFilename(String fullPath) {
 		IPath path = new Path(fullPath);
-		if (path.isEmpty())
+		if (path.isEmpty()) {
 			return ""; //$NON-NLS-1$
+		}
 		return path.lastSegment();
 	}
 
@@ -1009,7 +1011,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @return
 	 * @throws CoreException
 	 */
-	private IResourceManagerControl getResourceManager(ILaunchConfiguration configuration) throws PDIException {
+	private IResourceManager getResourceManager(ILaunchConfiguration configuration) throws PDIException {
 		String rmUniqueName;
 		try {
 			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
@@ -1017,8 +1019,8 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		} catch (CoreException e) {
 			throw new PDIException(null, e.getMessage());
 		}
-		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm.getState().equals(IResourceManagerControl.STARTED_STATE)) {
+		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
 			return rm;
 		}
 		return null;

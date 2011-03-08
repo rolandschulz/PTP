@@ -21,12 +21,17 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class SDMRunner extends Job {
 	public enum SDMMasterState {
-		UNKNOWN, STARTING, RUNNING, FINISHED, ERROR
+		UNKNOWN,
+		STARTING,
+		RUNNING,
+		FINISHED,
+		ERROR
 	};
 
 	private List<String> command;
@@ -34,17 +39,17 @@ public class SDMRunner extends Job {
 	private SDMMasterState sdmState = SDMMasterState.STARTING;
 
 	private String jobId = null;
-	private IResourceManagerControl rmControl = null;
+	private IResourceManager rm = null;
 	private IRemoteProcess sdmProcess;
 
 	/**
 	 * @since 5.0
 	 */
-	public SDMRunner(IResourceManagerControl rmControl) {
+	public SDMRunner(IResourceManager rm) {
 		super(Messages.SDMRunner_0);
 		this.setPriority(Job.LONG);
 		this.setSystem(true);
-		this.rmControl = rmControl;
+		this.rm = rm;
 		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_4);
 	}
 
@@ -92,7 +97,7 @@ public class SDMRunner extends Job {
 			/*
 			 * Prepare remote connection.
 			 */
-			IResourceManagerConfiguration configuration = rmControl.getConfiguration();
+			IResourceManagerConfiguration configuration = rm.getConfiguration();
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
 					configuration.getRemoteServicesId(), monitor);
 			IRemoteConnectionManager connectionManager = remoteServices.getConnectionManager();
@@ -200,7 +205,7 @@ public class SDMRunner extends Job {
 			}
 			try {
 				DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_21, jobId);
-				rmControl.control(jobId, IResourceManagerControl.TERMINATE_OPERATION, null);
+				rm.control(jobId, IResourceManagerControl.TERMINATE_OPERATION, null);
 			} catch (CoreException e1) {
 				PTPDebugCorePlugin.log(e1);
 			}

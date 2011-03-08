@@ -15,7 +15,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * 
@@ -25,13 +25,13 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 public class OpenMPIRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory {
 
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManagerControl rm, ILaunchConfigurationDialog dialog)
+	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
 		return new NewOpenMPIRMLaunchConfigurationDynamicTab(rm, dialog);
 	}
 
 	@Override
-	public Class<? extends IResourceManagerControl> getResourceManagerClass() {
+	public Class<? extends IResourceManager> getResourceManagerClass() {
 		return OpenMPIResourceManager.class;
 	}
 

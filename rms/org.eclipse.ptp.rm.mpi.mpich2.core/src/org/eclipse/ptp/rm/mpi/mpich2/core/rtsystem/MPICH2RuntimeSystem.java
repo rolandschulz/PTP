@@ -40,7 +40,7 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfigurationDefaul
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.EffectiveMPICH2ResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * 
@@ -57,7 +57,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/**
 	 * @since 2.0
 	 */
-	public MPICH2RuntimeSystem(IResourceManagerControl rm, IMPICH2ResourceManagerConfiguration config) {
+	public MPICH2RuntimeSystem(IResourceManager rm, IMPICH2ResourceManagerConfiguration config) {
 		super(rm, config);
 	}
 

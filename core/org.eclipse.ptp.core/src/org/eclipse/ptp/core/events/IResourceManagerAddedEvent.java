@@ -12,7 +12,7 @@
 package org.eclipse.ptp.core.events;
 
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * @since 5.0
@@ -21,7 +21,7 @@ public interface IResourceManagerAddedEvent {
 	/**
 	 * @return
 	 */
-	public IResourceManagerControl getResourceManager();
+	public IResourceManager getResourceManager();
 
 	/**
 	 * @return

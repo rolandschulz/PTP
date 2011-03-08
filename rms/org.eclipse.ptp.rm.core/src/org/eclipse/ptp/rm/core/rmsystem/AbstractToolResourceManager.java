@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.core.rmsystem;
 
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerControl;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
 
 /**
  * @author Daniel Felix Ferber
@@ -22,60 +23,8 @@ public abstract class AbstractToolResourceManager extends AbstractRuntimeResourc
 	/**
 	 * @since 3.0
 	 */
-	public AbstractToolResourceManager(IPUniverse universe, IResourceManagerConfiguration config) {
-		super(universe, config);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#
-	 * doBeforeCloseConnection()
-	 */
-	@Override
-	protected void doBeforeCloseConnection() {
-		/*
-		 * Defaults to empty implementation
-		 */
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#
-	 * doAfterCloseConnection()
-	 */
-	@Override
-	protected void doAfterCloseConnection() {
-		/*
-		 * Defaults to empty implementation
-		 */
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doAfterOpenConnection
-	 * ()
-	 */
-	@Override
-	protected void doAfterOpenConnection() {
-		/*
-		 * Defaults to empty implementation
-		 */
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#
-	 * doBeforeOpenConnection()
-	 */
-	@Override
-	protected void doBeforeOpenConnection() {
-		/*
-		 * Defaults to empty implementation
-		 */
+	public AbstractToolResourceManager(IResourceManagerConfiguration config, AbstractRuntimeResourceManagerControl control,
+			AbstractRuntimeResourceManagerMonitor monitor) {
+		super(config, control, monitor);
 	}
 }

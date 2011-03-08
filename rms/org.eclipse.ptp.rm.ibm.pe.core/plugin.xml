@@ -12,5 +12,13 @@
             class="org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceManager">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerFactory"
+            id="org.eclipse.ptp.rm.ibm.pe.PEServiceProvider"
+            name="IBM Parallel Environment">
+      </resourceManager>
+   </extension>
 
 </plugin>

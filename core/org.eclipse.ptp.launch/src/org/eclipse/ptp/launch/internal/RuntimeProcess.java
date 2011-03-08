@@ -19,17 +19,18 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class RuntimeProcess implements IProcess, IJobListener {
 	private IPLaunch fLaunch = null;
-	private final IResourceManagerControl fResourceManager;
+	private final IResourceManager fResourceManager;
 	private String fJobId = null;
 	private Map<String, String> fAttributes;
 	private int fExitValue = -1;
 	private boolean fTerminated = false;
 
-	public RuntimeProcess(IPLaunch launch, IResourceManagerControl rm, String jobId, Map<String, String> attributes) {
+	public RuntimeProcess(IPLaunch launch, IResourceManager rm, String jobId, Map<String, String> attributes) {
 		fLaunch = launch;
 		fResourceManager = rm;
 		fJobId = jobId;
@@ -149,7 +150,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	 * .core.events.IJobChangeEvent)
 	 */
 	public void handleEvent(IJobChangedEvent e) {
-		IResourceManagerControl rm = e.getSource();
+		IResourceManager rm = e.getSource();
 		IJobStatus status = rm.getJobStatus(e.getJobId());
 		if (status.getState().equals(IJobStatus.COMPLETED)) {
 			terminated();

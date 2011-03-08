@@ -16,4 +16,12 @@
             class="org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerFactory"
+            id="org.eclipse.ptp.rm.mpi.mpich2.MPICH2ServiceProvider"
+            name="MPICH2">
+      </resourceManager>
+   </extension>
 </plugin>

@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -55,7 +55,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 *         configuration to be saved
 	 * @since 5.0
 	 */
-	public abstract RMLaunchValidation canSave(Control control, IResourceManagerControl rm, IPQueue queue);
+	public abstract RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue);
 
 	/**
 	 * Creates the top level control for the dynamic part of the parallel launch
@@ -73,7 +73,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	public abstract void createControl(Composite parent, IResourceManagerControl rm, IPQueue queue) throws CoreException;
+	public abstract void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException;
 
 	/**
 	 * Returns the top level control for the dynamic portion of the parallel
@@ -102,7 +102,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @return
 	 * @since 5.0
 	 */
-	public abstract RMLaunchValidation initializeFrom(Control control, IResourceManagerControl rm, IPQueue queue,
+	public abstract RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue,
 			ILaunchConfiguration configuration);
 
 	/**
@@ -122,7 +122,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @return whether this tab is in a valid state
 	 * @since 5.0
 	 */
-	public abstract RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManagerControl rm, IPQueue queue);
+	public abstract RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue);
 
 	/**
 	 * Copies values from this tab into the given launch configuration.
@@ -134,7 +134,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @return
 	 * @since 5.0
 	 */
-	public abstract RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm,
+	public abstract RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
 			IPQueue queue);
 
 	/**
@@ -155,7 +155,6 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @return
 	 * @since 5.0
 	 */
-	public abstract RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManagerControl rm,
-			IPQueue queue);
+	public abstract RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue);
 
 }

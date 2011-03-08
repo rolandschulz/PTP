@@ -118,6 +118,8 @@ public interface IJobStatus {
 	public String getStateDetail();
 
 	/**
+	 * Get streams proxy for job. Only available if job is in RUNNING state.
+	 * 
 	 * @return
 	 */
 	public IStreamsProxy getStreamsProxy();

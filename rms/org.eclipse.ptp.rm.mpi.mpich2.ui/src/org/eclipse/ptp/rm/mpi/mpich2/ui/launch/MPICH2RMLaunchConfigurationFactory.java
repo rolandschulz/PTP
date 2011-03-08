@@ -15,7 +15,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * 
@@ -29,11 +29,11 @@ public class MPICH2RMLaunchConfigurationFactory extends AbstractRMLaunchConfigur
 	 * 
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #doCreate(org.eclipse.ptp.core.elements.IPResourceManager,
+	 * #doCreate(org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManagerControl rm, ILaunchConfigurationDialog dialog)
+	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
 		return new NewMPICH2RMLaunchConfigurationDynamicTab(rm, dialog);
 	}
@@ -46,7 +46,7 @@ public class MPICH2RMLaunchConfigurationFactory extends AbstractRMLaunchConfigur
 	 * #getResourceManagerClass()
 	 */
 	@Override
-	public Class<? extends IResourceManagerControl> getResourceManagerClass() {
+	public Class<? extends IResourceManager> getResourceManagerClass() {
 		return MPICH2ResourceManager.class;
 	}
 

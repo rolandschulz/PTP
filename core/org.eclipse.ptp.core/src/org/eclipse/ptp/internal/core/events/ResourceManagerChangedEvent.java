@@ -20,7 +20,7 @@
 package org.eclipse.ptp.internal.core.events;
 
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * @author grw
@@ -28,9 +28,9 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  */
 public class ResourceManagerChangedEvent implements IResourceManagerChangedEvent {
 
-	private final IResourceManagerControl rm;
+	private final IResourceManager rm;
 
-	public ResourceManagerChangedEvent(IResourceManagerControl rm) {
+	public ResourceManagerChangedEvent(IResourceManager rm) {
 		this.rm = rm;
 	}
 
@@ -41,7 +41,7 @@ public class ResourceManagerChangedEvent implements IResourceManagerChangedEvent
 	 * org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent#getSource
 	 * ()
 	 */
-	public IResourceManagerControl getSource() {
+	public IResourceManager getSource() {
 		return rm;
 	}
 
