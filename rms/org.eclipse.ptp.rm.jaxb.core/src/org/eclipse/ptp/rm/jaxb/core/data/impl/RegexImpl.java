@@ -10,15 +10,18 @@ public class RegexImpl implements IJAXBNonNLSConstants {
 
 	private static final String FLAG_SEP = OPENSQ + PIP + CLOSSQ;
 
-	private final String expression;
+	private String expression;
 	private final boolean split;
 	private final Pattern pattern;
 	private int lastChar;
 
 	public RegexImpl(Regex regex) {
-		this.expression = regex.getContent();
-		this.split = regex.isSplit();
-		this.pattern = Pattern.compile(expression, getFlags(regex.getFlags()));
+		expression = regex.getExpression();
+		if (expression == null) {
+			expression = regex.getContent();
+		}
+		split = regex.isSplit();
+		pattern = Pattern.compile(expression, getFlags(regex.getFlags()));
 	}
 
 	public String getExpression() {
