@@ -546,6 +546,7 @@
 		<xs:complexType mixed="true">
 			<xs:attribute name="flags" type="xs:string"/>
 			<xs:attribute name="split" type="xs:boolean" default="false"/>
+			<xs:attribute name="expression" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="set">
