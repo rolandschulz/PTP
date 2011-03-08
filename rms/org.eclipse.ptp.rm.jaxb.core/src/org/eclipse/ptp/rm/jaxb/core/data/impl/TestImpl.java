@@ -90,6 +90,11 @@ public class TestImpl implements IJAXBNonNLSConstants {
 
 	public void setTarget(Object target) {
 		this.target = target;
+		if (children != null) {
+			for (TestImpl t : children) {
+				t.setTarget(target);
+			}
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
