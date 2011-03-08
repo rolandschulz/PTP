@@ -15,9 +15,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.core,
  org.eclipse.ptp.rm.core
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.rm.generic.core,
- org.eclipse.ptp.rm.generic.core.messages,
- org.eclipse.ptp.rm.generic.core.rmsystem,
- org.eclipse.ptp.rm.generic.core.rtsystem
+Export-Package: org.eclipse.ptp.rm.generic.core;x-friends:="org.eclipse.ptp.rm.generic.ui",
+ org.eclipse.ptp.rm.generic.core.messages;x-internal:=true,
+ org.eclipse.ptp.rm.generic.core.rmsystem;x-friends:="org.eclipse.ptp.rm.generic.ui",
+ org.eclipse.ptp.rm.generic.core.rtsystem;x-friends:="org.eclipse.ptp.rm.generic.ui"
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

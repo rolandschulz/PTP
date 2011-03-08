@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.rm.core
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.rm.slurm.core,
- org.eclipse.ptp.rm.slurm.core.rmsystem
+Export-Package: org.eclipse.ptp.rm.slurm.core;x-friends:="org.eclipse.ptp.rm.slurm.ui",
+ org.eclipse.ptp.rm.slurm.core.rmsystem;x-friends:="org.eclipse.ptp.rm.slurm.ui"
 Import-Package: org.eclipse.ptp.remote.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
