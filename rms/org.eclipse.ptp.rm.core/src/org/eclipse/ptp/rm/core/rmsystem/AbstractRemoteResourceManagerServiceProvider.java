@@ -13,10 +13,10 @@ package org.eclipse.ptp.rm.core.rmsystem;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
 
-public abstract class AbstractRemoteResourceManagerServiceProvider extends AbstractResourceManagerServiceProvider implements IRemoteResourceManagerConfiguration
+public abstract class AbstractRemoteResourceManagerServiceProvider extends AbstractResourceManagerConfiguration implements IRemoteResourceManagerConfiguration
 {
 	private static final String TAG_PROXY_PATH = "proxyPath"; //$NON-NLS-1$
 	private static final String TAG_OPTIONS = "options"; //$NON-NLS-1$

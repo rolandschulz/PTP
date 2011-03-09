@@ -15,10 +15,10 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IControlMonitorRMConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
 
-public abstract class AbstractControlMonitorRMServiceProvider extends AbstractResourceManagerServiceProvider implements
+public abstract class AbstractControlMonitorRMServiceProvider extends AbstractResourceManagerConfiguration implements
 		IControlMonitorRMConfiguration, IJAXBNonNLSConstants {
 
 	private final List<String> controlInvocationOptions = new ArrayList<String>();
