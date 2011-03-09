@@ -10,7 +10,7 @@
    <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
-            class="org.eclipse.ptp.rm.pbs.ui.PBSServiceProvider"
+            class="org.eclipse.ptp.rm.pbs.ui.PBSResourceManagerConfiguration"
             id="org.eclipse.ptp.rm.pbs.PBSServiceProvider"
             name="PBS"
             serviceId="org.eclipse.ptp.core.LaunchService">

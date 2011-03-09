@@ -11,17 +11,17 @@
 package org.eclipse.ptp.rm.generic.core.rmsystem;
 
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.generic.core.GenericRMCorePlugin;
 import org.eclipse.ptp.rm.generic.core.GenericRMPreferenceManager;
 import org.eclipse.ptp.rm.generic.core.messages.Messages;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
-public class GenericRMServiceProvider extends AbstractToolRMServiceProvider {
+public class GenericRMConfiguration extends AbstractToolRMConfiguration {
 
 	public static int CAPABILITIES = CAP_LAUNCH | CAP_REMOTE_INSTALL_PATH;
 
-	public GenericRMServiceProvider() {
+	public GenericRMConfiguration() {
 		super(CAPABILITIES);
 
 		setLaunchCmd(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_LAUNCH_CMD));
@@ -41,7 +41,7 @@ public class GenericRMServiceProvider extends AbstractToolRMServiceProvider {
 	 * @param provider
 	 *            provider we are making a copy from
 	 */
-	public GenericRMServiceProvider(GenericRMServiceProvider provider) {
+	public GenericRMConfiguration(GenericRMConfiguration provider) {
 		super(provider);
 	}
 
@@ -52,7 +52,7 @@ public class GenericRMServiceProvider extends AbstractToolRMServiceProvider {
 	 */
 	@Override
 	public IServiceProviderWorkingCopy copy() {
-		return new GenericRMServiceProvider(this);
+		return new GenericRMConfiguration(this);
 	}
 
 	/*

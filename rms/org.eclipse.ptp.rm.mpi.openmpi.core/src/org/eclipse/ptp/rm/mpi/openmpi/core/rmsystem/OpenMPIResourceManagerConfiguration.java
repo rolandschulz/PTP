@@ -14,13 +14,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
-public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implements IOpenMPIResourceManagerConfiguration {
+public class OpenMPIResourceManagerConfiguration extends AbstractToolRMConfiguration implements IOpenMPIResourceManagerConfiguration {
 
 	public static int OPENMPI_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_REMOTE_INSTALL_PATH;
 
@@ -34,7 +34,7 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	private int minorVersion = 0;
 	private int serviceVersion = 0;
 
-	public OpenMPIServiceProvider() {
+	public OpenMPIResourceManagerConfiguration() {
 		super(OPENMPI_CAPABILITIES);
 
 		/*
@@ -61,7 +61,7 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	 * @param provider
 	 *            provider we are making a copy from
 	 */
-	public OpenMPIServiceProvider(OpenMPIServiceProvider provider) {
+	public OpenMPIResourceManagerConfiguration(OpenMPIResourceManagerConfiguration provider) {
 		super(provider);
 		majorVersion = provider.getMajorVersion();
 		minorVersion = provider.getMinorVersion();
@@ -75,7 +75,7 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	 */
 	@Override
 	public IServiceProviderWorkingCopy copy() {
-		return new OpenMPIServiceProvider(this);
+		return new OpenMPIResourceManagerConfiguration(this);
 	}
 
 	/**
@@ -181,7 +181,7 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 			if (!validateVersion()) {
 				return false;
 			}
-			if (!getVersionId().equals(OpenMPIServiceProvider.VERSION_AUTO)) {
+			if (!getVersionId().equals(OpenMPIResourceManagerConfiguration.VERSION_AUTO)) {
 				return getVersionId().equals(getDetectedVersion());
 			}
 			return true;

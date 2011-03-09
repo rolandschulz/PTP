@@ -14,7 +14,7 @@ package org.eclipse.ptp.rm.slurm.ui;
 
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMPreferenceConstants;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.slurm.core.SLURMCorePlugin;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -23,14 +23,14 @@ import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 /**
  * Service provider for IBM Parallel Environment
  */
-public class SLURMServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements
+public class SLURMResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements
 		ISLURMResourceManagerConfiguration {
 	private static final String TAG_SLURMD_PATH = "slurmdPath"; //$NON-NLS-1$
 	private static final String TAG_SLURMD_ARGS = "slurmdArgs"; //$NON-NLS-1$
 	private static final String TAG_SLURMD_DEFAULTS = "slurmdDefaults"; //$NON-NLS-1$
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-	public SLURMServiceProvider() {
+	public SLURMResourceManagerConfiguration() {
 		super();
 		setDescription("SLURM Resource Manager"); //$NON-NLS-1$
 	}
@@ -41,7 +41,7 @@ public class SLURMServiceProvider extends AbstractRemoteResourceManagerServicePr
 	 * @param provider
 	 *            provider we are making a copy from
 	 */
-	public SLURMServiceProvider(IServiceProvider provider) {
+	public SLURMResourceManagerConfiguration(IServiceProvider provider) {
 		super(provider);
 	}
 
@@ -52,7 +52,7 @@ public class SLURMServiceProvider extends AbstractRemoteResourceManagerServicePr
 	 */
 	@Override
 	public IServiceProviderWorkingCopy copy() {
-		return new SLURMServiceProvider(this);
+		return new SLURMResourceManagerConfiguration(this);
 	}
 
 	/*

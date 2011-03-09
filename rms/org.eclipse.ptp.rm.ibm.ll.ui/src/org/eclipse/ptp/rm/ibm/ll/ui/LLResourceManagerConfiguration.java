@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rm.ibm.ll.ui;
 
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLCorePlugin;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
@@ -21,7 +21,7 @@ import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 /**
  * Service provider for LoadLeveler
  */
-public class LLServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements IIBMLLResourceManagerConfiguration {
+public class LLResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements IIBMLLResourceManagerConfiguration {
 	private static final String TAG_LL_LIBPATH = "LL_LibraryPath"; //$NON-NLS-1$
 	private static final String TAG_TRACE_OPTION = "LL_Trace"; //$NON-NLS-1$
 	private static final String TAG_INFO_MESSAGE = "LL_ProxyInfoMessage"; //$NON-NLS-1$
@@ -46,7 +46,7 @@ public class LLServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	private static final String TAG_MAX_NODE_POLL = "LL_MNodePollInterval"; //$NON-NLS-1$
 	private static final String TAG_JOB_POLL = "LL_JobPollInterval"; //$NON-NLS-1$
 
-	public LLServiceProvider() {
+	public LLResourceManagerConfiguration() {
 		super();
 		setDescription("IBM LL Resource Manager"); //$NON-NLS-1$
 	}
@@ -57,7 +57,7 @@ public class LLServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	 * @param provider
 	 *            provider we are making a copy from
 	 */
-	public LLServiceProvider(IServiceProvider provider) {
+	public LLResourceManagerConfiguration(IServiceProvider provider) {
 		super(provider);
 	}
 
@@ -68,7 +68,7 @@ public class LLServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	 */
 	@Override
 	public IServiceProviderWorkingCopy copy() {
-		return new LLServiceProvider(this);
+		return new LLResourceManagerConfiguration(this);
 	}
 
 	/*

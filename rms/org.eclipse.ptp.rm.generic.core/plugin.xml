@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
-            class="org.eclipse.ptp.rm.generic.core.rmsystem.GenericRMServiceProvider"
+            class="org.eclipse.ptp.rm.generic.core.rmsystem.GenericRMConfiguration"
             id="org.eclipse.ptp.rm.generic.GenericRMServiceProvider"
             name="Generic Remote Launch"
             serviceId="org.eclipse.ptp.core.LaunchService">
