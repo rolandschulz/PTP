@@ -17,11 +17,11 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.ConfigurationChoiceDialog;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
-import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.ui.views.ResourceManagerView;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
@@ -29,7 +29,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
-public class OpenResourceManagerEditor implements IViewActionDelegate, IJAXBNonNLSConstants {
+public class OpenResourceManagerEditor implements IViewActionDelegate, IJAXBUINonNLSConstants {
 
 	private ResourceManagerView view;
 
@@ -65,7 +65,7 @@ public class OpenResourceManagerEditor implements IViewActionDelegate, IJAXBNonN
 				IDE.openEditorOnFileStore(page, fileStore);
 			}
 		} catch (Throwable t) {
-			WidgetUtils.errorMessage(view.getSite().getShell(), t, Messages.OpenResourceManagerEditorAction_error,
+			WidgetActionUtils.errorMessage(view.getSite().getShell(), t, Messages.OpenResourceManagerEditorAction_error,
 					Messages.OpenResourceManagerEditorAction_title, false);
 		}
 	}

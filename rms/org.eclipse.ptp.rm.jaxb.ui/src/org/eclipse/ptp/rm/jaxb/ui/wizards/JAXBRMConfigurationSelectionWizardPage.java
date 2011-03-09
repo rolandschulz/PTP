@@ -10,8 +10,8 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.ConfigurationChoiceContainer;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
@@ -20,7 +20,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-public class JAXBRMConfigurationSelectionWizardPage extends RMConfigurationWizardPage implements IJAXBNonNLSConstants {
+public class JAXBRMConfigurationSelectionWizardPage extends RMConfigurationWizardPage implements IJAXBUINonNLSConstants {
 
 	private IJAXBResourceManagerConfiguration jaxbConfig;
 	private ConfigurationChoiceContainer container;

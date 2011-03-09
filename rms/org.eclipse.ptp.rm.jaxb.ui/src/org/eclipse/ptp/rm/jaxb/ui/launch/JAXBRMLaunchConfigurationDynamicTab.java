@@ -17,6 +17,7 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
@@ -29,7 +30,7 @@ import org.eclipse.swt.widgets.Control;
  * @author arossi
  * 
  */
-public class JAXBRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfigurationDynamicTab {
+public class JAXBRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfigurationDynamicTab implements IJAXBUINonNLSConstants {
 
 	private final IJAXBResourceManagerConfiguration rmConfig;
 	private final ILaunchConfigurationDialog dialog;

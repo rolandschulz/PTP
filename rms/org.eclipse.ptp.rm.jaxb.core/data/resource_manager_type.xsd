@@ -659,8 +659,10 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="title" type="xs:string"/>
-				<xs:element minOccurs="0" maxOccurs="unbounded" ref="group"/>
-				<xs:element minOccurs="0" maxOccurs="unbounded" ref="tab-folder"/>
+				<xs:choice maxOccurs="unbounded" >
+				  <xs:element ref="group"/>
+				  <xs:element ref="tab-folder"/>
+				</xs:choice>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -676,8 +678,10 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="title" type="xs:string"/>
-				<xs:element minOccurs="0" maxOccurs="unbounded" ref="group"/>
-				<xs:element minOccurs="0" maxOccurs="unbounded" ref="tab-folder"/>
+				<xs:choice maxOccurs="unbounded" >
+              <xs:element ref="group"/>
+              <xs:element ref="tab-folder"/>
+            </xs:choice>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

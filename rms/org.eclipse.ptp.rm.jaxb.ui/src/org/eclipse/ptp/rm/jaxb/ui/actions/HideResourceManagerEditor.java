@@ -12,14 +12,14 @@ package org.eclipse.ptp.rm.jaxb.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 
-public class HideResourceManagerEditor implements IViewActionDelegate, IJAXBNonNLSConstants {
+public class HideResourceManagerEditor implements IViewActionDelegate, IJAXBUINonNLSConstants {
 	private IViewPart part;
 
 	public void init(IViewPart view) {
@@ -31,7 +31,7 @@ public class HideResourceManagerEditor implements IViewActionDelegate, IJAXBNonN
 			IWorkbenchPage page = part.getViewSite().getWorkbenchWindow().getActivePage();
 			page.setEditorAreaVisible(false);
 		} catch (Throwable e) {
-			WidgetUtils.errorMessage(part.getSite().getShell(), e, Messages.HideResourceManagerEditorAction_error,
+			WidgetActionUtils.errorMessage(part.getSite().getShell(), e, Messages.HideResourceManagerEditorAction_error,
 					Messages.HideResourceManagerEditorAction_title, false);
 		}
 	}

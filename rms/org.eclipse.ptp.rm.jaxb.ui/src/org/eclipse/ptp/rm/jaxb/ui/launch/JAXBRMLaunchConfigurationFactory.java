@@ -17,6 +17,7 @@ import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
@@ -24,7 +25,7 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
  * @author arossi
  * 
  */
-public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory {
+public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory implements IJAXBUINonNLSConstants {
 
 	/*
 	 * (non-Javadoc)
