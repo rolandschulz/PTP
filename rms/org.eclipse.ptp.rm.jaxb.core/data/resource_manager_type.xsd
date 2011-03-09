@@ -631,31 +631,26 @@
 	<xs:element name="launch-tab">
 		<xs:annotation>
 			<xs:documentation>
-				This is a recursive description of the main UI element associated with the control part, the Launch Tab. NOTE: I
-				do not as yet know how many of the underlying widget options need to be exposed here for effective building in the createControl
-				method. What follows is minimal.
+				A recursive description of the UI element associated with the control part, the Launch Tab.
+				As in: org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab, provides a top-level "switch" between controllers.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="tab-controller"/>
+			   <xs:element maxOccurs="2" ref="tab-controller"/>
+				<xs:element minOccurs="0" name="custom-controller" type="xs:string">
+				  <xs:annotation>
+               <xs:documentation>
+                  Prebuilt. Allows the user to browse the local file system and/or workspace
+                  to open and edit a custom batch script will be created; this will include copy and renaming buttons.
+                  Use the string as the title to appear in the top-level folder tab.
+               </xs:documentation>
+            </xs:annotation>
+				</xs:element>
 			</xs:sequence>
-			<xs:attribute name="advancedModeEnabled" type="xs:boolean" default="false">
-				<xs:annotation>
-					<xs:documentation>
-						If this is set to true, a tab-controller which allows the user to browse the local file system and/or workspace
-						to open and edit a custom batch script will be created; this will include copy and renaming buttons.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="tab-controller">
-		<xs:annotation>
-			<xs:documentation>
-				as in: org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab; a top-level "switch" between views.
-			</xs:documentation>
-		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="title" type="xs:string"/>
