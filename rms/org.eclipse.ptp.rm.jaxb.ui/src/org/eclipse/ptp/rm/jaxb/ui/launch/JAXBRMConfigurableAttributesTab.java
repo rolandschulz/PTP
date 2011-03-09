@@ -10,9 +10,6 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
@@ -21,10 +18,11 @@ import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.ui.data.LaunchTabBuilder;
-import org.eclipse.ptp.rm.jaxb.ui.listener.JAXBRMLaunchTabWidgetListener;
-import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
+import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
+import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
+import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -32,25 +30,16 @@ import org.eclipse.swt.widgets.Control;
  * @author arossi
  * 
  */
-public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfigurationDynamicTab implements
-		IJAXBUINonNLSConstants {
+public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDynamicTab implements IJAXBUINonNLSConstants {
 
 	private final IJAXBResourceManagerConfiguration rmConfig;
-	private final ILaunchConfigurationDialog dialog;
-	private final LaunchTabBuilder launchTabData;
-	private final JAXBRMLaunchTabWidgetListener listener;
-	private final Map<Object, Object> widgetToValueIndex;
 
 	/**
 	 * @param dialog
 	 */
-	public JAXBRMLaunchConfigurationDynamicTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
+	public JAXBRMConfigurableAttributesTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		rmConfig = rm.getJAXBRMConfiguration();
-		this.dialog = dialog;
-		this.launchTabData = new LaunchTabBuilder(this);
-		this.listener = new JAXBRMLaunchTabWidgetListener(this);
-		this.widgetToValueIndex = new HashMap<Object, Object>();
 	}
 
 	/*
@@ -62,7 +51,6 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 	 * org.eclipse.ptp.rmsystem.IResourceManagerControl,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
-	@Override
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		// TODO Auto-generated method stub
 
@@ -75,30 +63,35 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #getControl()
 	 */
-	@Override
 	public Control getControl() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public ILaunchConfigurationDialog getDialog() {
-		return dialog;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#getImage
+	 * ()
+	 */
+	@Override
+	public Image getImage() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	public LaunchTabBuilder getLaunchTabData() {
-		return launchTabData;
-	}
-
-	public JAXBRMLaunchTabWidgetListener getListener() {
-		return listener;
-	}
-
-	public IJAXBResourceManagerConfiguration getRmConfig() {
-		return rmConfig;
-	}
-
-	public Map<Object, Object> getWidgetToValueIndex() {
-		return widgetToValueIndex;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#getText
+	 * ()
+	 */
+	@Override
+	public String getText() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/*
@@ -110,7 +103,6 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 	 * org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
-	@Override
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		// TODO Auto-generated method stub
 		return null;
@@ -127,4 +119,29 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 		// TODO Auto-generated method stub
 
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#
+	 * createDataSource()
+	 */
+	@Override
+	protected RMLaunchConfigurationDynamicTabDataSource createDataSource() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#
+	 * createListener()
+	 */
+	@Override
+	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
