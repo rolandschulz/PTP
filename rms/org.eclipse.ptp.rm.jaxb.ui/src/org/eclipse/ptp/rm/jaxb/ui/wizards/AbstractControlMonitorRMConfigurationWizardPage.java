@@ -45,9 +45,10 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IControlMonitorRMConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.RMUIPlugin;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
@@ -72,7 +73,7 @@ import org.eclipse.ui.progress.UIJob;
  * managers
  */
 public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RMConfigurationWizardPage implements
-		IJAXBNonNLSConstants {
+		IJAXBUINonNLSConstants {
 
 	/**
 	 * Job to validate targetPath. We use a job here so that the input is only
@@ -158,7 +159,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 				handlePathBrowseButtonSelected();
 			} else {
 				if (source == optionsButton) {
-					targetArgs = WidgetUtils.createOptionsDialog(getShell(), targetArgs);
+					targetArgs = WidgetActionUtils.openInputDialog(getShell(),
+							Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_14,
+							Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_15, targetArgs);
 				} else if (connectionSharingEnabled && source == shareConnectionButton) {
 					updateSettings();
 				} else if (source == newConnectionButton) {
@@ -701,7 +704,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		 * connection sharing
 		 */
 		if (connectionSharingEnabled) {
-			shareConnectionButton = WidgetUtils.createCheckButton(parent,
+			shareConnectionButton = WidgetBuilderUtils.createCheckButton(parent,
 					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3b);
 			shareConnectionButton.addSelectionListener(listener);
 		}
@@ -798,11 +801,11 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		 */
 		if (multiplexingEnabled) {
 			Group mxGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-			mxGroup.setLayout(WidgetUtils.createGridLayout(1, true, 10, 10));
-			mxGroup.setLayoutData(WidgetUtils.spanGridData(GridData.FILL_HORIZONTAL, 2));
+			mxGroup.setLayout(WidgetBuilderUtils.createGridLayout(1, true, 10, 10));
+			mxGroup.setLayoutData(WidgetBuilderUtils.spanGridData(GridData.FILL_HORIZONTAL, 2));
 			mxGroup.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_10);
 
-			noneButton = WidgetUtils.createRadioButton(mxGroup,
+			noneButton = WidgetBuilderUtils.createRadioButton(mxGroup,
 					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_11, "mxGroup", listener); //$NON-NLS-1$
 			noneButton.addSelectionListener(listener);
 
@@ -829,7 +832,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 			gd.horizontalSpan = 1;
 			localAddrCombo.setLayoutData(gd);
 
-			portForwardingButton = WidgetUtils.createRadioButton(mxGroup,
+			portForwardingButton = WidgetBuilderUtils.createRadioButton(mxGroup,
 					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_13, "mxGroup", listener); //$NON-NLS-1$
 			portForwardingButton.addSelectionListener(listener);
 		}
@@ -838,7 +841,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		 * Manual launch
 		 */
 		if (fManualLaunchEnabled) {
-			manualButton = WidgetUtils.createCheckButton(parent, "Launch server manually"); //$NON-NLS-1$
+			manualButton = WidgetBuilderUtils.createCheckButton(parent, "Launch server manually"); //$NON-NLS-1$
 			manualButton.addSelectionListener(listener);
 		}
 	}

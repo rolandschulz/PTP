@@ -19,13 +19,13 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBRMConfigurationManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
-import org.eclipse.ptp.rm.jaxb.ui.util.WidgetUtils;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 
-public abstract class ConfigurationChoiceContainer implements IJAXBNonNLSConstants {
+public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConstants {
 
 	private class WidgetListener implements SelectionListener {
 		public void widgetDefaultSelected(SelectionEvent e) {
@@ -86,34 +86,34 @@ public abstract class ConfigurationChoiceContainer implements IJAXBNonNLSConstan
 		shell = parent.getShell();
 		listener = new WidgetListener();
 		Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		GridLayout layout = WidgetUtils.createGridLayout(3, false, 10, 5);
-		GridData gd = WidgetUtils.spanGridData(GridData.FILL_HORIZONTAL, 3);
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(3, false, 10, 5);
+		GridData gd = WidgetBuilderUtils.spanGridData(GridData.FILL_HORIZONTAL, 3);
 		group.setLayout(layout);
 		group.setLayoutData(gd);
 
 		Label label = new Label(group, SWT.NONE);
 		label.setText(Messages.JAXBRMConfigurationSelectionWizardPage_4);
 
-		choice = WidgetUtils.createText(group, selected, true, null, null);
+		choice = WidgetBuilderUtils.createText(group, selected, true, null, null);
 		choice.setEditable(false);
 
 		group = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		layout = WidgetUtils.createGridLayout(3, true, 10, 0);
-		gd = WidgetUtils.spanGridData(GridData.FILL_HORIZONTAL, 3);
+		layout = WidgetBuilderUtils.createGridLayout(3, true, 10, 0);
+		gd = WidgetBuilderUtils.spanGridData(GridData.FILL_HORIZONTAL, 3);
 		group.setLayout(layout);
 		group.setLayoutData(gd);
 
-		preset = WidgetUtils.createItemCombo(group, Messages.JAXBRMConfigurationSelectionComboTitle_0, new String[0], ZEROSTR,
+		preset = WidgetBuilderUtils.createItemCombo(group, Messages.JAXBRMConfigurationSelectionComboTitle_0, new String[0], ZEROSTR,
 				ZEROSTR, true, null, 2);
 		preset.addSelectionListener(listener);
 
 		group = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		layout = WidgetUtils.createGridLayout(3, true, 10, 0);
-		gd = WidgetUtils.spanGridData(GridData.FILL_HORIZONTAL, 3);
+		layout = WidgetBuilderUtils.createGridLayout(3, true, 10, 0);
+		gd = WidgetBuilderUtils.spanGridData(GridData.FILL_HORIZONTAL, 3);
 		group.setLayout(layout);
 		group.setLayoutData(gd);
 
-		external = WidgetUtils.createItemCombo(group, Messages.JAXBRMConfigurationSelectionComboTitle_1, new String[0], ZEROSTR,
+		external = WidgetBuilderUtils.createItemCombo(group, Messages.JAXBRMConfigurationSelectionComboTitle_1, new String[0], ZEROSTR,
 				ZEROSTR, true, null, 2);
 		external.addSelectionListener(listener);
 

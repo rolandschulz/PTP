@@ -10,8 +10,8 @@
 package org.eclipse.ptp.rm.jaxb.ui.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 
-public class ConfigurationChoiceDialog extends Dialog implements IJAXBNonNLSConstants {
+public class ConfigurationChoiceDialog extends Dialog implements IJAXBUINonNLSConstants {
 
 	private ConfigurationChoiceContainer container;
 	private final IJAXBResourceManagerConfiguration config;
