@@ -20,7 +20,7 @@
    <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
-            class="org.eclipse.ptp.rm.ibm.ll.ui.LLServiceProvider"
+            class="org.eclipse.ptp.rm.ibm.ll.ui.LLResourceManagerConfiguration"
             id="org.eclipse.ptp.rm.ibm.ll.LLServiceProvider"
             name="IBM LoadLeveler"
             serviceId="org.eclipse.ptp.core.LaunchService">

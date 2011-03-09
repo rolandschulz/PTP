@@ -15,7 +15,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui;
 
-import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
@@ -25,10 +25,10 @@ import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 /**
  * Service provider for PBS batch scheduler.
  */
-public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements IPBSResourceManagerConfiguration,
+public class PBSResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements IPBSResourceManagerConfiguration,
 		IPBSNonNLSConstants {
 
-	public PBSServiceProvider() {
+	public PBSResourceManagerConfiguration() {
 		super();
 		setDescription(Messages.PBSResourceManager);
 	}
@@ -39,7 +39,7 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	 * @param provider
 	 *            provider we are making a copy from
 	 */
-	public PBSServiceProvider(IServiceProvider provider) {
+	public PBSResourceManagerConfiguration(IServiceProvider provider) {
 		super(provider);
 	}
 
@@ -58,7 +58,7 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	 */
 	@Override
 	public IServiceProviderWorkingCopy copy() {
-		return new PBSServiceProvider(this);
+		return new PBSResourceManagerConfiguration(this);
 	}
 
 	/**

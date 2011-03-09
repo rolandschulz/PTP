@@ -16,8 +16,11 @@ import java.util.List;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
 
-public abstract class AbstractRemoteResourceManagerServiceProvider extends AbstractResourceManagerConfiguration implements IRemoteResourceManagerConfiguration
-{
+/**
+ * @since 3.0
+ */
+public abstract class AbstractRemoteResourceManagerConfiguration extends AbstractResourceManagerConfiguration implements
+		IRemoteResourceManagerConfiguration {
 	private static final String TAG_PROXY_PATH = "proxyPath"; //$NON-NLS-1$
 	private static final String TAG_OPTIONS = "options"; //$NON-NLS-1$
 	private static final String TAG_INVOCATION_OPTIONS = "invocationOptions"; //$NON-NLS-1$
@@ -25,24 +28,26 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 
 	private final List<String> invocationOptions = new ArrayList<String>();
 
-	public AbstractRemoteResourceManagerServiceProvider() {
+	public AbstractRemoteResourceManagerConfiguration() {
 		// Empty
 	}
 
 	/**
 	 * Constructor for creating a working copy of the service provider
 	 * 
-	 * @param provider provider we are making a copy from
+	 * @param provider
+	 *            provider we are making a copy from
 	 */
-	public AbstractRemoteResourceManagerServiceProvider(IServiceProvider provider) {
+	public AbstractRemoteResourceManagerConfiguration(IServiceProvider provider) {
 		super(provider);
 	}
 
 	/**
-	 * Append invocation options to existing options. The contents of optionString are
-	 * split into space separated strings.
+	 * Append invocation options to existing options. The contents of
+	 * optionString are split into space separated strings.
 	 * 
-	 * @param optionString string containing the space separated invocation options
+	 * @param optionString
+	 *            string containing the space separated invocation options
 	 */
 	public void addInvocationOptions(String optionString) {
 		if (!optionString.equals("")) { //$NON-NLS-1$
@@ -71,8 +76,8 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	}
 
 	/**
-	 * Get the invocation options as a list of strings. Returns
-	 * an empty list if there are no options
+	 * Get the invocation options as a list of strings. Returns an empty list if
+	 * there are no options
 	 * 
 	 * @return list of strings containing invocation options
 	 */
@@ -112,12 +117,10 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 				return Integer.valueOf(options).intValue();
 			}
 			return 0;
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return 0;
 		}
 	}
-
 
 	/**
 	 * Get the proxy server path. This may be a path on a remote system.
@@ -129,10 +132,11 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	}
 
 	/**
-	 * Set the invocation options. The contents of optionString are split into space
-	 * separated strings. Any existing options are discarded.
+	 * Set the invocation options. The contents of optionString are split into
+	 * space separated strings. Any existing options are discarded.
 	 * 
-	 * @param optionString string containing the space separated invocation options
+	 * @param optionString
+	 *            string containing the space separated invocation options
 	 */
 	public void setInvocationOptions(String optionString) {
 		invocationOptions.clear();
@@ -167,8 +171,12 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 		putString(TAG_PROXY_PATH, proxyServerPath);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#testOption(int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#testOption
+	 * (int)
 	 */
 	public boolean testOption(int option) {
 		return (getOptions() & option) == option;

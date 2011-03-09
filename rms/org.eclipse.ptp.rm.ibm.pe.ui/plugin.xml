@@ -24,7 +24,7 @@
    <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
-            class="org.eclipse.ptp.rm.ibm.pe.ui.PEServiceProvider"
+            class="org.eclipse.ptp.rm.ibm.pe.ui.PEResourceManagerConfiguration"
             id="org.eclipse.ptp.rm.ibm.pe.PEServiceProvider"
             name="IBM Parallel Environment"
             serviceId="org.eclipse.ptp.core.LaunchService">

@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rm.ibm.pe.ui;
 
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.core.PECorePlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
@@ -21,7 +21,7 @@ import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 /**
  * Service provider for IBM Parallel Environment
  */
-public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements IPEResourceManagerConfiguration {
+public class PEResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements IPEResourceManagerConfiguration {
 	private static final String TAG_USE_LOADLEVELER = "PE_UseLoadLeveler"; //$NON-NLS-1$
 	private static final String TAG_DEBUG_LEVEL = "PE_DebugLevel"; //$NON-NLS-1$
 	private static final String TAG_RUN_MINIPROXY = "PE_RunMiniproxy"; //$NON-NLS-1$
@@ -32,7 +32,7 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	private static final String TAG_JOB_POLL_INTERVAL = "PE_JobPollInterval"; //$NON-NLS-1$
 	private static final String TAG_LIBRARY_OVERRIDE = "PE_LibraryOverride"; //$NON-NLS-1$
 
-	public PEServiceProvider() {
+	public PEResourceManagerConfiguration() {
 		super();
 		setDescription("IBM PE Resource Manager"); //$NON-NLS-1$
 	}
@@ -43,7 +43,7 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	 * @param provider
 	 *            provider we are making a copy from
 	 */
-	public PEServiceProvider(IServiceProvider provider) {
+	public PEResourceManagerConfiguration(IServiceProvider provider) {
 		super(provider);
 	}
 
@@ -54,7 +54,7 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	 */
 	@Override
 	public IServiceProviderWorkingCopy copy() {
-		return new PEServiceProvider(this);
+		return new PEResourceManagerConfiguration(this);
 	}
 
 	/*

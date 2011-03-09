@@ -11,16 +11,16 @@
 package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
-public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider implements IMPICH2ResourceManagerConfiguration {
+public class MPICH2ResourceManagerConfiguration extends AbstractToolRMConfiguration implements IMPICH2ResourceManagerConfiguration {
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
 
-	public MPICH2ServiceProvider() {
+	public MPICH2ResourceManagerConfiguration() {
 		super(MPICH2_CAPABILITIES);
 
 		setLaunchCmd(Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
@@ -43,7 +43,7 @@ public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider impleme
 	 * @param provider
 	 *            provider we are making a copy from
 	 */
-	public MPICH2ServiceProvider(MPICH2ServiceProvider provider) {
+	public MPICH2ResourceManagerConfiguration(MPICH2ResourceManagerConfiguration provider) {
 		super(provider);
 	}
 
@@ -54,7 +54,7 @@ public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider impleme
 	 */
 	@Override
 	public IServiceProviderWorkingCopy copy() {
-		return new MPICH2ServiceProvider(this);
+		return new MPICH2ResourceManagerConfiguration(this);
 	}
 
 	/*

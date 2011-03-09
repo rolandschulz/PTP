@@ -20,7 +20,7 @@
    <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
-            class="org.eclipse.ptp.rm.slurm.ui.SLURMServiceProvider"
+            class="org.eclipse.ptp.rm.slurm.ui.SLURMResourceManagerConfiguration"
             id="org.eclipse.ptp.rm.slurm.SLURMServiceProvider"
             name="SLURM"
             serviceId="org.eclipse.ptp.core.LaunchService">
