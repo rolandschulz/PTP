@@ -19,7 +19,10 @@ import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.core.ServiceProvider;
 import org.eclipse.ui.IMemento;
 
-public abstract class AbstractResourceManagerServiceProvider extends ServiceProvider implements IResourceManagerConfiguration,
+/**
+ * @since 5.0
+ */
+public abstract class AbstractResourceManagerConfiguration extends ServiceProvider implements IResourceManagerConfiguration,
 		IServiceProviderWorkingCopy {
 	private static final String TAG_AUTOSTART = "autoStart"; //$NON-NLS-1$
 	private static final String TAG_DESCRIPTION = "description"; //$NON-NLS-1$
@@ -36,7 +39,7 @@ public abstract class AbstractResourceManagerServiceProvider extends ServiceProv
 
 	private IServiceProvider fServiceProvider = null;
 
-	public AbstractResourceManagerServiceProvider() {
+	public AbstractResourceManagerConfiguration() {
 	}
 
 	/**
@@ -46,7 +49,7 @@ public abstract class AbstractResourceManagerServiceProvider extends ServiceProv
 	 * @param provider
 	 *            provider we are making a copy from
 	 */
-	public AbstractResourceManagerServiceProvider(IServiceProvider provider) {
+	public AbstractResourceManagerConfiguration(IServiceProvider provider) {
 		fServiceProvider = provider;
 		setProperties(provider.getProperties());
 		setDescriptor(provider.getDescriptor());
@@ -60,13 +63,16 @@ public abstract class AbstractResourceManagerServiceProvider extends ServiceProv
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null)
+		if (obj == null) {
 			return false;
-		if (this == obj)
+		}
+		if (this == obj) {
 			return true;
-		if (!(obj instanceof AbstractResourceManagerServiceProvider))
+		}
+		if (!(obj instanceof AbstractResourceManagerConfiguration)) {
 			return false;
-		return getUniqueName().equals(((AbstractResourceManagerServiceProvider) obj).getUniqueName());
+		}
+		return getUniqueName().equals(((AbstractResourceManagerConfiguration) obj).getUniqueName());
 	}
 
 	/*
