@@ -88,7 +88,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private boolean success;
 
 	public CommandJob(String jobUUID, Command command, JAXBResourceManager rm) {
-		super(ZEROSTR);
+		super(command.getName());
 		this.command = command;
 		this.rm = rm;
 		this.uuid = jobUUID;
