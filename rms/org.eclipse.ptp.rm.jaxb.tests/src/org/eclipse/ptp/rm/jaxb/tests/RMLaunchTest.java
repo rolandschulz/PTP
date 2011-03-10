@@ -231,14 +231,15 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 			System.out.println(rmConfig.getRemoteServicesId());
 			rm = new JAXBResourceManager(rmConfig, new JAXBResourceManagerControl(rmConfig), new JAXBResourceManagerMonitor(
 					rmConfig));
-			PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
+			PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm); // wrong
+																					// type!!!
 			rm.start(new NullProgressMonitor());
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException ignored) {
 			}
 			emulateLaunchTab();
-			System.out.println("SUBMITTED: " + rm.submitJob(launchConfig, ILaunchManager.RUN_MODE, new NullProgressMonitor()));
+			System.out.println("SUBMITTED: " + rm.submitJob(launchConfig, ILaunchManager.RUN_MODE, new NullProgressMonitor())); //$NON-NLS-1$
 			rm.stop();
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -252,7 +253,7 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 	private void emulateConfigureWizard() throws Throwable {
 		rmConfig = new JAXBServiceProvider();
 		// JAXBRMConfigurationSelectionWizardPage
-		rmConfig.setUniqueName("test-pbs-rm");
+		rmConfig.setUniqueName("test-pbs-rm"); //$NON-NLS-1$
 		rmConfig.setRMInstanceXMLLocation(xml);
 		// JAXBRMControlConfigurationWizardPage
 		rmConfig.realizeRMDataFromXML();
