@@ -148,23 +148,14 @@
 			<xs:element name="post-execute-command" minOccurs="0" maxOccurs="unbounded" type="rm:arglist"/>
 		</xs:sequence>
 		<xs:attribute name="shellDirective" use="required"/>
-		<xs:attribute name="syntax" use="required">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="sentenv"/>
-					<xs:enumeration value="export"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="command">
 		<xs:sequence>
 			<xs:element name="args" type="rm:arglist"/>
-			<xs:element name="stdout-parser" minOccurs="0" type="rm:stream-parser"/>
-			<xs:element name="stderr-parser" minOccurs="0" type="rm:stream-parser"/>
+			<xs:element name="stdout-parser" minOccurs="0" type="rm:tokenizer"/>
+			<xs:element name="stderr-parser" minOccurs="0" type="rm:tokenizer"/>
 			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:environment-variable"/>
 		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="displayStdout" type="xs:boolean" default="false"/>
 		<xs:attribute name="displayStderr" type="xs:boolean" default="false"/>
 		<xs:attribute name="directory" type="xs:string"/>
@@ -252,20 +243,6 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	<xs:complexType name="stream-parser">
-		<xs:annotation>
-			<xs:documentation>
-				These are attached to the stdout or stderr streams in order to capture the output of the command and add values
-				into the resource manager environment. If displayStdout or displayStderr of the command is true, the stream will be passed on to an
-				output stream will also be sent to the terminal.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="tokenizer" type="rm:tokenizer"/>
-		</xs:sequence>
-		<xs:attribute name="name" use="required" type="xs:string"/>
-		<xs:attribute name="stderr" type="xs:boolean" default="false"/>
-	</xs:complexType>
 	<xs:complexType name="tab-controller">
 		<xs:sequence>
 			<xs:element name="title" type="xs:string"/>
@@ -301,6 +278,13 @@
 		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="tokenizer">
+	   <xs:annotation>
+         <xs:documentation>
+            These are attached to the stdout or stderr streams in order to capture the output of the command and add values
+            into the resource manager environment. If displayStdout or displayStderr of the command is true, the stream will be passed on to an
+            output stream will also be sent to the terminal.
+         </xs:documentation>
+      </xs:annotation>
 		<xs:sequence>
 			<xs:choice>
 				<xs:element name="type" type="xs:string">

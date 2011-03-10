@@ -35,7 +35,6 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
-import org.eclipse.ptp.rm.jaxb.core.data.StreamParser;
 import org.eclipse.ptp.rm.jaxb.core.data.Tokenizer;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -82,8 +81,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private final String uuid;
 	private final Command command;
 	private final JAXBResourceManager rm;
-	private StreamParser stdoutParser;
-	private StreamParser stderrParser;
 	private IStreamParserTokenizer stdoutTokenizer;
 	private IStreamParserTokenizer stderrTokenizer;
 	private Thread stdoutT;
@@ -91,7 +88,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private boolean success;
 
 	public CommandJob(String jobUUID, Command command, JAXBResourceManager rm) {
-		super(command.getName());
+		super(ZEROSTR);
 		this.command = command;
 		this.rm = rm;
 		this.uuid = jobUUID;
@@ -109,8 +106,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			IRemoteProcessBuilder builder = prepareCommand();
 
 			prepareEnv(builder);
-			stdoutParser = command.getStdoutParser();
-			stderrParser = command.getStderrParser();
 
 			IRemoteProcess process = null;
 
@@ -164,7 +159,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private IRemoteProcessBuilder prepareCommand() throws CoreException {
 		Arglist args = command.getArgs();
 		if (args == null) {
-			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError + command.getName(), null);
+			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
 		}
 		ArglistImpl arglist = new ArglistImpl(uuid, args);
 		String[] cmdArgs = arglist.toArray();
@@ -198,10 +193,9 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private void runTokenizers(IRemoteProcess process) throws CoreException {
-		if (stdoutParser != null) {
+		Tokenizer t = command.getStdoutParser();
+		if (t != null) {
 			try {
-				Tokenizer t = stdoutParser.getTokenizer();
-
 				String type = t.getType();
 
 				if (type != null) {
@@ -218,17 +212,17 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 
 				stdoutT = new Thread(stdoutTokenizer);
 				stdoutT.start();
-			} catch (Throwable t) {
-				throw CoreExceptionUtils.newException(Messages.StdoutParserError, t);
+			} catch (Throwable e) {
+				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
 			}
 		} else if (command.isDisplayStdout()) {
 			stdoutT = new Redirect(process.getInputStream(), System.out);
 			stdoutT.start();
 		}
 
-		if (stderrParser != null) {
+		t = command.getStderrParser();
+		if (t != null) {
 			try {
-				Tokenizer t = stderrParser.getTokenizer();
 				String type = t.getType();
 
 				if (type != null) {
@@ -245,8 +239,8 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 
 				stderrT = new Thread(stderrTokenizer);
 				stderrT.start();
-			} catch (Throwable t) {
-				throw CoreExceptionUtils.newException(Messages.StderrParserError, t);
+			} catch (Throwable e) {
+				throw CoreExceptionUtils.newException(Messages.StderrParserError, e);
 			}
 		} else if (command.isDisplayStderr()) {
 			stderrT = new Redirect(process.getErrorStream(), System.err);

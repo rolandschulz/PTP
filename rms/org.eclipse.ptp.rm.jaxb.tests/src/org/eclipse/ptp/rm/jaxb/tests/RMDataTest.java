@@ -21,7 +21,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
-import org.eclipse.ptp.rm.jaxb.core.data.StreamParser;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
@@ -67,8 +66,7 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 			if (rmdata != null) {
 				List<Command> cmds = rmdata.getControlData().getStartUpCommand();
 				for (Command cmd : cmds) {
-					StreamParser p = cmd.getStdoutParser();
-					System.out.println(p.getTokenizer());
+					System.out.println(cmd.getStdoutParser());
 				}
 			}
 		} catch (Throwable t) {
