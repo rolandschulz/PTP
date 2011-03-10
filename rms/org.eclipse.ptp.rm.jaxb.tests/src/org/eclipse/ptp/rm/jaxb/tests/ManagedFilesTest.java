@@ -52,7 +52,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 		try {
 			JAXBInitializationUtils.validate(xml);
 			ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(xml);
-			controlData = rmdata.getControl();
+			controlData = rmdata.getControlData();
 			RMVariableMap map = RMVariableMap.setActiveInstance(null);
 			JAXBInitializationUtils.initializeMap(rmdata, map);
 			env = map.getVariables();
@@ -108,6 +108,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 			t.printStackTrace();
 		}
 		Object contents = env.get(SCRIPT);
+		System.out.println(contents);
 		assertNotNull(contents);
 	}
 

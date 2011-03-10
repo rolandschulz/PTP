@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.runnable;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -19,12 +20,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.data.DirectiveDefinition;
-import org.eclipse.ptp.rm.jaxb.core.data.DirectiveDefinitions;
 import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
-import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariables;
-import org.eclipse.ptp.rm.jaxb.core.data.ExecuteCommand;
-import org.eclipse.ptp.rm.jaxb.core.data.PostExecuteCommands;
-import org.eclipse.ptp.rm.jaxb.core.data.PreExecuteCommands;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -57,11 +53,23 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		return Status.OK_STATUS;
 	}
 
-	private void addDirectives(DirectiveDefinitions defs, StringBuffer buffer) {
+	private void addCommand(Arglist arglist, StringBuffer buffer) {
+		new ArglistImpl(uuid, arglist).toString(buffer);
+		buffer.append(REMOTE_LINE_SEP);
+	}
+
+	private void addCommands(List<Arglist> arglist, StringBuffer buffer) {
+		for (Arglist args : arglist) {
+			new ArglistImpl(uuid, args).toString(buffer);
+			buffer.append(REMOTE_LINE_SEP);
+		}
+	}
+
+	private void addDirectives(List<DirectiveDefinition> defs, StringBuffer buffer) {
 		if (defs == null) {
 			return;
 		}
-		for (DirectiveDefinition def : defs.getDirectiveDefinition()) {
+		for (DirectiveDefinition def : defs) {
 			String key = def.getValueFrom();
 			String value = EnvironmentVariableUtils.getValue(uuid, key, map);
 			if (value != null && !ZEROSTR.equals(value)) {
@@ -70,15 +78,14 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		}
 	}
 
-	private void addEnvironment(EnvironmentVariables vars, StringBuffer buffer) {
-		String syntax = getSyntax(script.getShell());
+	private void addEnvironment(String syntax, List<EnvironmentVariable> vars, StringBuffer buffer) {
 		if (!appendEnv) {
 			for (String var : live.keySet()) {
 				EnvironmentVariableUtils.addVariable(var, live.get(var), syntax, buffer);
 			}
 		} else {
 			if (vars != null) {
-				for (EnvironmentVariable var : vars.getEnvironmentVariable()) {
+				for (EnvironmentVariable var : vars) {
 					EnvironmentVariableUtils.addVariable(uuid, var, syntax, buffer, map);
 				}
 			}
@@ -89,31 +96,6 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		}
 	}
 
-	private void addExecute(ExecuteCommand commands, StringBuffer buffer) {
-		new ArglistImpl(uuid, commands.getArglist()).toString(buffer);
-		buffer.append(REMOTE_LINE_SEP);
-	}
-
-	private void addPostExecute(PostExecuteCommands commands, StringBuffer buffer) {
-		if (commands == null) {
-			return;
-		}
-		for (Arglist args : commands.getArglist()) {
-			new ArglistImpl(uuid, args).toString(buffer);
-			buffer.append(REMOTE_LINE_SEP);
-		}
-	}
-
-	private void addPreExecute(PreExecuteCommands commands, StringBuffer buffer) {
-		if (commands == null) {
-			return;
-		}
-		for (Arglist args : commands.getArglist()) {
-			new ArglistImpl(uuid, args).toString(buffer);
-			buffer.append(REMOTE_LINE_SEP);
-		}
-	}
-
 	private void addShell(String shell, StringBuffer buffer) {
 		buffer.append(map.getString(uuid, shell)).append(REMOTE_LINE_SEP);
 	}
@@ -121,17 +103,18 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	private String composeScript(IProgressMonitor monitor) {
 		SubMonitor progress = SubMonitor.convert(monitor, 30);
 		StringBuffer buffer = new StringBuffer();
-		addShell(script.getShell(), buffer);
+		String shell = script.getShellDirective();
+		addShell(shell, buffer);
 		progress.worked(5);
-		addDirectives(script.getDirectiveDefinitions(), buffer);
+		addDirectives(script.getDirective(), buffer);
 		progress.worked(5);
-		addEnvironment(script.getEnvironmentVariables(), buffer);
+		addEnvironment(getSyntax(shell), script.getVariable(), buffer);
 		progress.worked(5);
-		addPreExecute(script.getPreExecuteCommands(), buffer);
+		addCommands(script.getPreExecuteCommand(), buffer);
 		progress.worked(5);
-		addExecute(script.getExecuteCommand(), buffer);
+		addCommand(script.getExecuteCommand(), buffer);
 		progress.worked(5);
-		addPostExecute(script.getPostExecuteCommands(), buffer);
+		addCommands(script.getPostExecuteCommand(), buffer);
 		progress.done();
 		return buffer.toString();
 	}

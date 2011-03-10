@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import javax.xml.bind.JAXBElement;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -31,22 +33,10 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
-import org.eclipse.ptp.rm.jaxb.core.data.Control.SubmitCommands;
-import org.eclipse.ptp.rm.jaxb.core.data.GetJobStatus;
-import org.eclipse.ptp.rm.jaxb.core.data.HoldJob;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
-import org.eclipse.ptp.rm.jaxb.core.data.OnShutDown;
-import org.eclipse.ptp.rm.jaxb.core.data.OnStartUp;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.core.data.ReleaseJob;
-import org.eclipse.ptp.rm.jaxb.core.data.ResumeJob;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
-import org.eclipse.ptp.rm.jaxb.core.data.SubmitBatch;
-import org.eclipse.ptp.rm.jaxb.core.data.SubmitDebug;
-import org.eclipse.ptp.rm.jaxb.core.data.SubmitInteractive;
-import org.eclipse.ptp.rm.jaxb.core.data.SuspendJob;
-import org.eclipse.ptp.rm.jaxb.core.data.TerminateJob;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.runnable.CommandJob;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
@@ -77,7 +67,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	public JAXBResourceManagerControl(IResourceManagerConfiguration jaxbServiceProvider) {
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
-		controlData = config.resourceManagerData().getControl();
+		controlData = config.resourceManagerData().getControlData();
 		dynSystemEnv = new TreeMap<String, String>();
 	}
 
@@ -124,10 +114,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 		resetEnv();
-		doControlCommand(operation);
+		doControlCommand(jobId, operation);
 		/*
-		 * TODO: call the update handler
+		 * TODO: call the update handler?
 		 */
+		RMVariableMap.getActiveInstance().getVariables().remove(jobId);
 	}
 
 	@Override
@@ -144,15 +135,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	@Override
 	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
-		CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + JOBSTATUS, null);
-		GetJobStatus jobStatusCmd = controlData.getGetJobStatus();
-		if (jobStatusCmd != null) {
-			List<String> cmds = jobStatusCmd.getCommandRef();
-			if (!cmds.isEmpty()) {
-				runCommands(null, cmds, JOBSTATUS);
-			}
+		Command job = controlData.getGetJobStatus();
+		if (job == null) {
+			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + JOBSTATUS, null);
 		}
-		return null;
+		runCommand(jobId, job);
+		return statusFromEnv(jobId);
 	}
 
 	@Override
@@ -179,9 +167,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
 		resetEnv();
-		updatePropertyValuesFromTab(configuration);
-
 		String uuid = UUID.randomUUID().toString();
+		Property p = new Property();
+		RMVariableMap.getActiveInstance().getVariables().put(uuid, p);
+		updatePropertyValuesFromTab(configuration);
 
 		/*
 		 * create the script if necessary; adds the contents to env as
@@ -193,7 +182,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		doJobSubmitCommand(uuid, mode);
-		return statusFromUUID(uuid);
+		IJobStatus status = statusFromEnv(uuid);
+		// property should now contain the jobId as name
+		RMVariableMap.getActiveInstance().getVariables().remove(uuid);
+		RMVariableMap.getActiveInstance().getVariables().put(p.getName(), p);
+		return status;
 	}
 
 	/*
@@ -213,41 +206,36 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * If the command is not supported, throws exception
 	 */
-	private void doControlCommand(String operation) throws CoreException {
+	private void doControlCommand(String jobId, String operation) throws CoreException {
 		CoreException ce = CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + operation, null);
-		List<String> cmds = null;
+		Command job = null;
 		if (TERMINATE_OPERATION.equals(operation)) {
-			TerminateJob job = controlData.getTerminateJob();
+			job = controlData.getTerminateJob();
 			if (job == null) {
 				throw ce;
 			}
-			cmds = job.getCommandRef();
 		} else if (SUSPEND_OPERATION.equals(operation)) {
-			SuspendJob job = controlData.getSuspendJob();
+			job = controlData.getSuspendJob();
 			if (job == null) {
 				throw ce;
 			}
-			cmds = job.getCommandRef();
 		} else if (RESUME_OPERATION.equals(operation)) {
-			ResumeJob job = controlData.getResumeJob();
+			job = controlData.getResumeJob();
 			if (job == null) {
 				throw ce;
 			}
-			cmds = job.getCommandRef();
 		} else if (RELEASE_OPERATION.equals(operation)) {
-			ReleaseJob job = controlData.getReleaseJob();
+			job = controlData.getReleaseJob();
 			if (job == null) {
 				throw ce;
 			}
-			cmds = job.getCommandRef();
 		} else if (HOLD_OPERATION.equals(operation)) {
-			HoldJob job = controlData.getHoldJob();
+			job = controlData.getHoldJob();
 			if (job == null) {
 				throw ce;
 			}
-			cmds = job.getCommandRef();
 		}
-		runCommands(null, cmds, operation);
+		runCommand(jobId, job);
 	}
 
 	/*
@@ -269,57 +257,48 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * interactive.
 	 */
 	private void doJobSubmitCommand(String uuid, String mode) throws CoreException {
-		SubmitCommands commands = controlData.getSubmitCommands();
-		if (commands == null) {
+
+		List<JAXBElement<Command>> commands = controlData.getSubmitInteractiveOrSubmitBatchOrSubmitDebug();
+		if (commands.isEmpty()) {
 			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError, null);
 		}
-		List<Object> list = commands.getSubmitInteractiveOrSubmitBatchOrSubmitDebug();
-		List<String> cmds = null;
-		// check mode for type
-		for (Object job : list) {
-			if (job instanceof SubmitInteractive) {
-				SubmitInteractive interactive = (SubmitInteractive) job;
+		Command command = null;
+		for (JAXBElement<Command> job : commands) {
+			command = job.getValue();
+			if (job.getName().equals(SUBMIT_INTERACTIVE)) {
 				if (ILaunchManager.RUN_MODE.equals(mode)) {
-					cmds = interactive.getCommandRef();
 					break;
 				}
-			} else if (job instanceof SubmitBatch) {
-				SubmitBatch batch = (SubmitBatch) job;
+			} else if (job.getName().equals(SUBMIT_BATCH)) {
 				if (ILaunchManager.RUN_MODE.equals(mode)) {
-					cmds = batch.getCommandRef();
 					break;
 				}
-			} else if (job instanceof SubmitDebug) {
-				SubmitDebug debug = (SubmitDebug) job;
+			} else if (job.getName().equals(SUBMIT_DEBUG)) {
 				if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-					cmds = debug.getCommandRef();
 					break;
 				}
 			}
 		}
-		runCommands(uuid, cmds, mode);
+		if (command == null) {
+			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + mode, null);
+		}
+		runCommand(uuid, command);
 	}
 
 	/*
 	 * Run the shut down commands, if any
 	 */
 	private void doOnShutdown() throws CoreException {
-		OnShutDown onShutDown = controlData.getOnShutDown();
-		if (onShutDown == null) {
-			return;
-		}
-		runCommands(null, onShutDown.getCommandRef(), SHUTDOWN);
+		List<Command> onShutDown = controlData.getShutDownCommand();
+		runCommands(null, onShutDown, SHUTDOWN);
 	}
 
 	/*
 	 * Run the start up commands, if any
 	 */
 	private void doOnStartUp(IProgressMonitor monitor) throws CoreException {
-		OnStartUp onStartUp = controlData.getOnStartUp();
-		if (onStartUp == null) {
-			return;
-		}
-		runCommands(null, onStartUp.getCommandRef(), STARTUP);
+		List<Command> onStartUp = controlData.getStartUpCommand();
+		runCommands(null, onStartUp, STARTUP);
 	}
 
 	/*
@@ -424,10 +403,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * Create command job, schedule and join.
 	 */
-	private boolean runCommand(String uuid, String commandRef) throws CoreException {
-		Command command = (Command) RMVariableMap.getActiveInstance().getVariables().get(commandRef);
+	private boolean runCommand(String uuid, Command command) throws CoreException {
 		if (command == null) {
-			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + commandRef, null);
+			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 		CommandJob job = new CommandJob(uuid, command, (JAXBResourceManager) getResourceManager());
 		job.schedule();
@@ -442,12 +420,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * Run command sequence.
 	 */
-	private void runCommands(String uuid, List<String> cmds, String operation) throws CoreException {
-		if (cmds == null) {
+	private void runCommands(String uuid, List<Command> cmds, String operation) throws CoreException {
+		if (cmds.isEmpty()) {
 			throw CoreExceptionUtils.newException(Messages.EmptyCommandDef + operation, null);
 		}
-		for (String ref : cmds) {
-			if (!runCommand(uuid, ref)) {
+		for (Command cmd : cmds) {
+			if (!runCommand(uuid, cmd)) {
 				return;
 			}
 		}
@@ -467,16 +445,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * parser will have set the jobId against the UUID; we remove the env entry
 	 * here
 	 */
-	private IJobStatus statusFromUUID(final String uuid) {
-		final Property jobId = (Property) RMVariableMap.getActiveInstance().getVariables().remove(uuid);
-		final String state = (jobId == null ? IJobStatus.UNDETERMINED : IJobStatus.SUBMITTED);
-
+	private IJobStatus statusFromEnv(final String id) {
+		final Property jobId = (Property) RMVariableMap.getActiveInstance().getVariables().get(id);
 		return new IJobStatus() {
 			public String getJobId() {
 				if (jobId == null) {
-					return uuid;
+					return id;
 				}
-				return (String) jobId.getValue();
+				return jobId.getName();
 			}
 
 			public ILaunchConfiguration getLaunchConfiguration() {
@@ -484,7 +460,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 
 			public String getState() {
-				return state;
+				if (jobId == null) {
+					return IJobStatus.UNDETERMINED;
+				}
+				return (String) jobId.getValue();
 			}
 
 			public String getStateDetail() {

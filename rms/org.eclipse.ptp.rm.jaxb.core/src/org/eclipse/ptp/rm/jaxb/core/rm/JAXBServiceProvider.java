@@ -66,7 +66,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 
 	public String getDefaultControlHost() {
 		if (rmdata != null) {
-			Site site = rmdata.getSite();
+			Site site = rmdata.getSiteData();
 			URI defaultURI = null;
 			if (site != null) {
 				try {
@@ -84,7 +84,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 
 	public String getDefaultControlPath() {
 		if (rmdata != null) {
-			Site site = rmdata.getSite();
+			Site site = rmdata.getSiteData();
 			URI defaultURI = null;
 			if (site != null) {
 				try {
@@ -102,7 +102,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 
 	public String getDefaultControlPort() {
 		if (rmdata != null) {
-			Site site = rmdata.getSite();
+			Site site = rmdata.getSiteData();
 			URI defaultURI = null;
 			if (site != null) {
 				try {
@@ -123,7 +123,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 
 	public String getDefaultMonitorHost() {
 		if (rmdata != null) {
-			Site site = rmdata.getSite();
+			Site site = rmdata.getSiteData();
 			URI defaultURI = null;
 			if (site != null) {
 				try {
@@ -141,7 +141,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 
 	public String getDefaultMonitorPath() {
 		if (rmdata != null) {
-			Site site = rmdata.getSite();
+			Site site = rmdata.getSiteData();
 			URI defaultURI = null;
 			if (site != null) {
 				try {
@@ -160,7 +160,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 
 	public String getDefaultMonitorPort() {
 		if (rmdata != null) {
-			Site site = rmdata.getSite();
+			Site site = rmdata.getSiteData();
 			URI defaultURI = null;
 			if (site != null) {
 				try {

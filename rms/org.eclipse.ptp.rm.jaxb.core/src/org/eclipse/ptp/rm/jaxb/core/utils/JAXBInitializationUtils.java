@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
@@ -28,15 +29,10 @@ import javax.xml.validation.Validator;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.AttributeDefinitions;
-import org.eclipse.ptp.rm.jaxb.core.data.Command;
-import org.eclipse.ptp.rm.jaxb.core.data.Commands;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
-import org.eclipse.ptp.rm.jaxb.core.data.Parsers;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
-import org.eclipse.ptp.rm.jaxb.core.data.StreamParser;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.xml.sax.SAXException;
 
@@ -59,13 +55,11 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	}
 
 	public static void initializeMap(ResourceManagerData rmData, RMVariableMap instance) {
-		Control control = rmData.getControl();
+		Control control = rmData.getControlData();
 		Map<String, Object> env = instance.getVariables();
 		env.clear();
 		addProperties(env, control);
 		addAttributes(env, control);
-		addCommands(env, control);
-		addParsers(env, control);
 		instance.getDiscovered().clear();
 		instance.setInitialized(true);
 	}
@@ -87,36 +81,10 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	}
 
 	private static void addAttributes(Map<String, Object> env, Control control) {
-		AttributeDefinitions adefs = control.getAttributeDefinitions();
-		if (adefs == null) {
-			return;
-		}
-		List<JobAttribute> jobAttributes = adefs.getJobAttribute();
+		List<JobAttribute> jobAttributes = control.getJobAttribute();
 		for (JobAttribute jobAttribute : jobAttributes) {
 			String name = jobAttribute.getName();
 			env.put(name, jobAttribute);
-		}
-	}
-
-	private static void addCommands(Map<String, Object> env, Control control) {
-		Commands comms = control.getCommands();
-		if (comms == null) {
-			return;
-		}
-		List<Command> commands = comms.getCommand();
-		for (Command command : commands) {
-			env.put(command.getName(), command);
-		}
-	}
-
-	private static void addParsers(Map<String, Object> env, Control control) {
-		Parsers prsrs = control.getParsers();
-		if (prsrs == null) {
-			return;
-		}
-		List<StreamParser> parsers = prsrs.getStreamParser();
-		for (StreamParser parser : parsers) {
-			env.put(parser.getName(), parser);
 		}
 	}
 
@@ -130,7 +98,8 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	private static ResourceManagerData unmarshalResourceManagerData(URL xml) throws JAXBException, IOException {
 		JAXBContext jc = JAXBContext.newInstance(JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
 		Unmarshaller u = jc.createUnmarshaller();
-		ResourceManagerData rmdata = (ResourceManagerData) u.unmarshal(xml.openStream());
+		JAXBElement<?> o = (JAXBElement<?>) u.unmarshal(xml.openStream());
+		ResourceManagerData rmdata = (ResourceManagerData) o.getValue();
 		return rmdata;
 	}
 }
