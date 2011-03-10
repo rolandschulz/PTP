@@ -58,6 +58,8 @@ public interface IJAXBNonNLSConstants {
 	String LNSEPESC = "\\\\n";//$NON-NLS-1$
 	String TBESC = "\\t";//$NON-NLS-1$
 	String TBESCESC = "\\\\t";//$NON-NLS-1$
+	String LNESC = "\\n";//$NON-NLS-1$
+	String RTESC = "\\r";//$NON-NLS-1$
 	String LINE_SEP = System.getProperty("line.separator"); //$NON-NLS-1$
 	String REMOTE_LINE_SEP = "\n"; //$NON-NLS-1$
 	String REMOTE_PATH_SEP = "/"; //$NON-NLS-1$
@@ -82,7 +84,7 @@ public interface IJAXBNonNLSConstants {
 	String CLASS = "class";//$NON-NLS-1$
 	String VALUE = "value";//$NON-NLS-1$
 	String THIS = "this.";//$NON-NLS-1$
-	String JOB_ID_TAG = "@JobId@";//$NON-NLS-1$
+	String JOB_ID_TAG = "@jobId@";//$NON-NLS-1$
 
 	/* STANDARD PROPERTIES */
 	String ID = "id";//$NON-NLS-1$

@@ -63,7 +63,7 @@ public class TargetImpl implements IJAXBNonNLSConstants {
 			String name = vmap.getString(uuid, ref);
 			target = vmap.getVariables().get(name);
 			if (target == null) {
-				throw CoreExceptionUtils.newException(Messages.StreamParserNoSuchVariableError + ref, null);
+				throw CoreExceptionUtils.newException(Messages.StreamParserNoSuchVariableError + name, null);
 			}
 		} else {
 			String name = null;

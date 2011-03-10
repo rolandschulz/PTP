@@ -421,9 +421,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * Run command sequence.
 	 */
 	private void runCommands(String uuid, List<Command> cmds, String operation) throws CoreException {
-		if (cmds.isEmpty()) {
-			throw CoreExceptionUtils.newException(Messages.EmptyCommandDef + operation, null);
-		}
 		for (Command cmd : cmds) {
 			if (!runCommand(uuid, cmd)) {
 				return;

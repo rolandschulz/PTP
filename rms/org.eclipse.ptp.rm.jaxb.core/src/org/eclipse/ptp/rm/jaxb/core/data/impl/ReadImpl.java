@@ -49,7 +49,7 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 		this.uuid = uuid;
 		String d = read.getDelim();
 		if (d != null) {
-			delim = d.charAt(0);
+			delim = getChar(d);
 			includeDelim = read.isIncludeDelim();
 		} else {
 			delim = 0;
@@ -267,5 +267,14 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 				this.segment.delete(0, chars.length);
 			}
 		}
+	}
+
+	private static char getChar(String delim) {
+		if (delim.indexOf(RTESC) >= 0 || delim.indexOf(LNESC) >= 0) {
+			return LINE_SEP.charAt(0);
+		} else if (delim.indexOf(TBESC) >= 0) {
+			return TAB.charAt(0);
+		}
+		return delim.charAt(0);
 	}
 }

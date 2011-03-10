@@ -50,9 +50,9 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 	public String getString(String jobId, String value) {
 		try {
 			if (jobId != null) {
-				value.replaceAll(JOB_ID_TAG, jobId);
+				value = value.replaceAll(JOB_ID_TAG, jobId);
 			}
-			return dereference(value.toString());
+			return dereference(value);
 		} catch (CoreException t) {
 			t.printStackTrace();
 		}
