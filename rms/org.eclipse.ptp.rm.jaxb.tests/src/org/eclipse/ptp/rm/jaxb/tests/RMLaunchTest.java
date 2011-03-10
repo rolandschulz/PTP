@@ -31,6 +31,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchDelegate;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -227,15 +228,17 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 	public void testResourceManager() {
 		try {
 			emulateConfigureWizard();
+			System.out.println(rmConfig.getRemoteServicesId());
 			rm = new JAXBResourceManager(rmConfig, new JAXBResourceManagerControl(rmConfig), new JAXBResourceManagerMonitor(
 					rmConfig));
+			PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
 			rm.start(new NullProgressMonitor());
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException ignored) {
 			}
 			emulateLaunchTab();
-			rm.submitJob(launchConfig, ILaunchManager.RUN_MODE, new NullProgressMonitor());
+			System.out.println("SUBMITTED: " + rm.submitJob(launchConfig, ILaunchManager.RUN_MODE, new NullProgressMonitor()));
 			rm.stop();
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -249,6 +252,7 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 	private void emulateConfigureWizard() throws Throwable {
 		rmConfig = new JAXBServiceProvider();
 		// JAXBRMConfigurationSelectionWizardPage
+		rmConfig.setUniqueName("test-pbs-rm");
 		rmConfig.setRMInstanceXMLLocation(xml);
 		// JAXBRMControlConfigurationWizardPage
 		rmConfig.realizeRMDataFromXML();

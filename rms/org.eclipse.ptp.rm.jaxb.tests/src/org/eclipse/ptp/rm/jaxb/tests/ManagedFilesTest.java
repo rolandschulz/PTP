@@ -128,6 +128,13 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 		remoteFileManager = localFileManager;
 	}
 
+	private void putValue(String name, String value) {
+		Property p = new Property();
+		p.setName(name);
+		p.setValue(value);
+		env.put(name, p);
+	}
+
 	private void setTestValues() {
 		for (String key : env.keySet()) {
 			Object target = env.get(key);
@@ -138,14 +145,14 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 				((JobAttribute) target).setValue(value);
 			}
 		}
-		env.put(CONTROL_USER_VAR, "fooUser"); //$NON-NLS-1$
-		env.put(MONITOR_USER_VAR, "fooUser"); //$NON-NLS-1$
-		env.put(CONTROL_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
-		env.put(MONITOR_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
-		env.put(DIRECTORY, "/u/ncsa/arossi/test"); //$NON-NLS-1$ 
-		env.put(MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
-		env.put(MPI_ARGS, "-np 8"); //$NON-NLS-1$ 
-		env.put(EXEC_PATH, "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ 
+		putValue(CONTROL_USER_VAR, "fooUser"); //$NON-NLS-1$
+		putValue(MONITOR_USER_VAR, "fooUser"); //$NON-NLS-1$
+		putValue(CONTROL_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
+		putValue(MONITOR_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
+		putValue(DIRECTORY, "/u/ncsa/arossi/test"); //$NON-NLS-1$ 
+		putValue(MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
+		putValue(MPI_ARGS, "-np 8"); //$NON-NLS-1$ 
+		putValue(EXEC_PATH, "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ 
 		if (verbose) {
 			RMDataTest.print(RMVariableMap.getActiveInstance());
 		}

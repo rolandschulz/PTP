@@ -227,7 +227,7 @@
 				<contents>${rm:script}</contents>
 			</file>
 		</managed-files>
-		<script shellDirective="#!/bin/bash" syntax="export">
+		<script shellDirective="#!/bin/bash">
 			<directive valueFrom="Account_Name"># @ PBS -A </directive>
 			<directive valueFrom="Checkpoint"># @ PBS -c </directive>
 			<directive valueFrom="depend"># @ PBS -W depend=</directive>
@@ -279,56 +279,55 @@
 			</post-execute-command>
 		</script>
 		<!--
-			<startup-command name="find_queues">
+			<startup-command>
 			<args>
 			<arg>qstat -Q -f</arg>
 			<arg>| grep Queue:</arg>
 			<arg>| cut -d ' ' -f 2</arg>
 			<arg>| tr '\n' ' '</arg>
 			</<args>>
-			<stdout-parser name="queueParser" stderr="false">
-			<range>0:N</range>
-			<token delim="[\s]">
-			<add name="available_queues"/>
-			</token>
+			<stdout-parser>
+			<read delim="\n">
+			<match>
+			<expression>.*</expression>
+			<target ref="available_queues"/>
+			<append field="value" separator="," groups="0"/>
+			</match>
+			</read>
 			</stdout-parser>
 			</startup-command>
 		-->
 		<!-- FOR TESTING -->
-		<start-up-command name="find_queues_local">
+		<start-up-command name="get-queues">
 			<args>
 				<arg>/Users/arossi/qstat</arg>
 			</args>
-			<stdout-parser name="queueParser" stderr="false">
-				<tokenizer>
-					<read delim="\n">
-						<match>
-							<expression>.*</expression>
-							<target ref="available_queues"/>
-							<append field="value" separator="," groups="0"/>
-						</match>
-					</read>
-				</tokenizer>
+			<stdout-parser>
+				<read delim="\n">
+					<match>
+						<expression>.*</expression>
+						<target ref="available_queues"/>
+						<append field="value" separator="," groups="0"/>
+					</match>
+				</read>
 			</stdout-parser>
 		</start-up-command>
-		<submit-interactive name="submit_script_local">
+		<submit-interactive name="submit-interactive">
 			<args>
 				<arg>/Users/arossi/qsub</arg>
 				<arg>${rm:pbs_script#value}</arg>
 			</args>
-			<stdout-parser name="jobIdParser" stderr="false">
-				<tokenizer>
-					<read delim="\n" all="true" save="1">
-						<match>
-							<expression>([\d]*)[.].*</expression>
-							<target ref="jobId"/>
-							<set field="value" group="1"/>
-						</match>
-					</read>
-				</tokenizer>
+			<stdout-parser>
+				<read delim="\n" all="true" save="1">
+					<match>
+						<expression>([\d]*)[.].*</expression>
+						<target ref="jobId"/>
+						<set field="value" group="1"/>
+					</match>
+				</read>
 			</stdout-parser>
 		</submit-interactive>
-		<terminate-job name="cancel_job">
+		<terminate-job name="cancel">
 			<args>
 				<arg>qdel</arg>
 				<arg>${rm:jobId#value}</arg>
