@@ -57,7 +57,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 			sourceDir = RMVariableMap.getActiveInstance().getString(uuid, key);
 		}
 		stagingDir = RMVariableMap.getActiveInstance().getString(uuid, files.getFileStagingLocation());
-		this.files = files.getManagedFile();
+		this.files = files.getFile();
 	}
 
 	public boolean getSuccess() {

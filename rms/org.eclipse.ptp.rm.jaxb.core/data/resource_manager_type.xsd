@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-	<xs:element name="resource-manager-data">
+<xs:schema targetNamespace="http://org.eclipse.ptp/rm" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rm="http://org.eclipse.ptp/rm"
+	elementFormDefault="qualified">
+	<xs:element name="resource-manager-builder" type="rm:resource-manager-data"/>
+	<xs:complexType name="resource-manager-data">
 		<xs:annotation>
 			<xs:documentation>
 				It is assumed that the xml instance of the schema will bear a name which sufficiently distinguishes it from others
@@ -8,29 +10,25 @@
 				LoadLeveler version 4, etc.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element minOccurs="0" ref="site"/>
-				<xs:element ref="control"/>
-				<xs:element ref="monitor"/>
-			</xs:sequence>
-			<xs:attribute name="name" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="site">
+		<xs:sequence>
+			<xs:element name="site-data" minOccurs="0" type="rm:site"/>
+			<xs:element name="control-data" type="rm:control"/>
+			<xs:element name="monitor-data" type="rm:monitor"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="site">
 		<xs:annotation>
 			<xs:documentation>
 				An optional place to set remote site information.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element minOccurs="0" name="control-connection" type="xs:string"/>
-				<xs:element minOccurs="0" name="monitor-server-install" type="xs:string"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="control">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="control-connection" type="xs:string"/>
+			<xs:element minOccurs="0" name="monitor-server-install" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="control">
 		<xs:annotation>
 			<xs:documentation>
 				The implementation will construct a variable map serving as the resource manager "environment"; these are dereferenced in the
@@ -54,371 +52,235 @@
 				finally for describing how to construct the UI (Launch Configuration Tab).
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element minOccurs="0" maxOccurs="unbounded" ref="property"/>
-				<xs:element minOccurs="0" ref="managed-files"/>
-				<xs:element minOccurs="0" ref="on-start-up"/>
-				<xs:element minOccurs="0" name="submit-commands">
-					<xs:complexType>
-						<xs:choice minOccurs="1" maxOccurs="3">
-							<xs:element ref="submit-interactive"/>
-							<xs:element ref="submit-batch"/>
-							<xs:element ref="submit-debug"/>
-						</xs:choice>
-					</xs:complexType>
-				</xs:element>
-				<xs:element minOccurs="0" ref="get-job-status"/>
-				<xs:element minOccurs="0" ref="terminate-job"/>
-				<xs:element minOccurs="0" ref="suspend-job"/>
-				<xs:element minOccurs="0" ref="resume-job"/>
-				<xs:element minOccurs="0" ref="hold-job"/>
-				<xs:element minOccurs="0" ref="release-job"/>
-				<xs:element minOccurs="0" ref="on-shut-down"/>
-				<xs:element minOccurs="0" ref="commands"/>
-				<xs:element minOccurs="0" ref="parsers"/>
-				<xs:element minOccurs="0" ref="script"/>
-				<xs:element minOccurs="0" ref="attribute-definitions"/>
-				<xs:element minOccurs="0" ref="launch-tab"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="property">
+		<xs:sequence>
+			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property"/>
+			<xs:element name="job-attribute" minOccurs="0" maxOccurs="unbounded" type="rm:job-attribute"/>
+			<xs:element name="managed-files" minOccurs="0" type="rm:managed-files"/>
+			<xs:element name="script" minOccurs="0" type="rm:script"/>
+			<xs:element name="start-up-command" minOccurs="0" maxOccurs="unbounded" type="rm:command">
+				<xs:annotation>
+					<xs:documentation>
+						Arbitrary commands which need to be run on startup.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice minOccurs="1" maxOccurs="3">
+				<xs:element name="submit-interactive" type="rm:command"/>
+				<xs:element name="submit-batch" type="rm:command"/>
+				<xs:element name="submit-debug" type="rm:command"/>
+			</xs:choice>
+			<xs:element name="get-job-status" type="rm:command" minOccurs="0"/>
+			<xs:element name="terminate-job" type="rm:command" minOccurs="0"/>
+			<xs:element name="suspend-job" type="rm:command" minOccurs="0"/>
+			<xs:element name="resume-job" type="rm:command" minOccurs="0"/>
+			<xs:element name="hold-job" type="rm:command" minOccurs="0"/>
+			<xs:element name="release-job" type="rm:command" minOccurs="0"/>
+			<xs:element name="shut-down-command" minOccurs="0" maxOccurs="unbounded" type="rm:command">
+				<xs:annotation>
+					<xs:documentation>
+						Arbitrary commands which need to be run on shutdown.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="launch-tab" minOccurs="0" type="rm:launch-tab"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="property">
 		<xs:annotation>
 			<xs:documentation>
 				The value is any object type; these are set at runtime.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="value" minOccurs="0"/>
-			</xs:sequence>
-			<xs:attribute name="name" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="managed-files">
+		<xs:sequence>
+			<xs:element name="value" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="job-attribute">
+		<xs:sequence>
+			<xs:element name="description" type="xs:string"/>
+			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
+			<xs:element name="choice" minOccurs="0" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						A a comma-delimited set of values.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="default" minOccurs="0" type="xs:string"/>
+			<xs:element name="validator" minOccurs="0" type="rm:validator"/>
+			<xs:element name="value" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="id" use="required" type="xs:string"/>
+		<xs:attribute name="name" use="required" type="xs:string"/>
+		<xs:attribute name="type" use="required" type="xs:string"/>
+		<xs:attribute name="visible" type="xs:boolean" default="true"/>
+		<xs:attribute name="status" type="xs:string"/>
+		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
+		<xs:attribute name="basic" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Indicates if this attribute is part of a basic (required) set, or if it is an (advanced) option.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="min" type="xs:int"/>
+		<xs:attribute name="max" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="managed-files">
 		<xs:annotation>
 			<xs:documentation>
 				List of files to be staged.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="file-source-location" minOccurs="0" type="xs:string"/>
-				<xs:element name="file-staging-location" minOccurs="0" type="xs:string"/>
-				<xs:element maxOccurs="unbounded" ref="managed-file"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="managed-file">
+		<xs:sequence>
+			<xs:element name="file-source-location" minOccurs="0" type="xs:string"/>
+			<xs:element name="file-staging-location" minOccurs="0" type="xs:string"/>
+			<xs:element name="file" maxOccurs="unbounded" type="rm:managed-file"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="script">
+		<xs:sequence>
+			<xs:element name="directive" minOccurs="0" maxOccurs="unbounded" type="rm:directive-definition"/>
+			<xs:element name="variable" minOccurs="0" maxOccurs="unbounded" type="rm:environment-variable"/>
+			<xs:element name="pre-execute-command" minOccurs="0" maxOccurs="unbounded" type="rm:arglist"/>
+			<xs:element name="execute-command" type="rm:arglist"/>
+			<xs:element name="post-execute-command" minOccurs="0" maxOccurs="unbounded" type="rm:arglist"/>
+		</xs:sequence>
+		<xs:attribute name="shellDirective" use="required"/>
+		<xs:attribute name="syntax" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="sentenv"/>
+					<xs:enumeration value="export"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="command">
+		<xs:sequence>
+			<xs:element name="args" type="rm:arglist"/>
+			<xs:element name="stdout-parser" minOccurs="0" type="rm:stream-parser"/>
+			<xs:element name="stderr-parser" minOccurs="0" type="rm:stream-parser"/>
+			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:environment-variable"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="displayStdout" type="xs:boolean" default="false"/>
+		<xs:attribute name="displayStderr" type="xs:boolean" default="false"/>
+		<xs:attribute name="directory" type="xs:string"/>
+		<xs:attribute name="redirectStderr" type="xs:boolean" default="false"/>
+		<xs:attribute name="replaceEnvironment" type="xs:boolean" default="false"/>
+	</xs:complexType>
+	<xs:complexType name="launch-tab">
+		<xs:annotation>
+			<xs:documentation>
+				A recursive description of the UI element associated with the control part, the Launch Tab.
+				As in:
+				org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab, provides a top-level "switch" between controllers.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="basic" minOccurs="0" type="rm:tab-controller"/>
+			<xs:element name="advanced" minOccurs="0" type="rm:tab-controller"/>
+			<xs:element name="custom-controller" minOccurs="0" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Fixed type. Allows the user to browse the local file system and/or workspace
+						to open and edit a custom batch
+						script will be created; this will include copy and renaming buttons.
+						Use the string as the title to appear in the top-level
+						folder
+						tab.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="validator">
+		<xs:annotation>
+			<xs:documentation>
+				A regular expression or an acl used to validate an attribute value.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="regex" type="rm:regex"/>
+				<xs:element name="acl" type="xs:string"/>
+			</xs:choice>
+			<xs:element name="error-message" minOccurs="0" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="managed-file">
 		<xs:annotation>
 			<xs:documentation>
 				If 'contents' is present, the file is written.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="contents" minOccurs="0" type="xs:string"/>
-			</xs:sequence>
-			<xs:attribute name="name" use="required"/>
-			<xs:attribute name="uniqueIdPrefix" type="xs:boolean" default="false"/>
-			<xs:attribute name="deleteAfterUse" type="xs:boolean" default="false"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="on-start-up">
-		<xs:annotation>
-			<xs:documentation>
-				Arbitrary commands which need to be run on startup.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="submit-interactive">
-		<xs:annotation>
-			<xs:documentation>
-				The command(s) for running interactive jobs.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="submit-batch">
-		<xs:annotation>
-			<xs:documentation>
-				The command(s) for running jobs through the scheduler.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="submit-debug">
-		<xs:annotation>
-			<xs:documentation>
-				The command(s) for running debug jobs.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="get-job-status">
-		<xs:annotation>
-			<xs:documentation>
-				The command(s) for retrieving job status.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="terminate-job">
-		<xs:annotation>
-			<xs:documentation>
-				The command(s) for canceling or killing jobs.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="suspend-job">
-		<xs:annotation>
-			<xs:documentation>
-				The command(s) for suspending jobs.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="resume-job">
-		<xs:annotation>
-			<xs:documentation>
-				The command(s) for restarting suspended jobs.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="hold-job">
-		<xs:annotation>
-			<xs:documentation>
-				The command(s) for holding jobs.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="release-job">
-		<xs:annotation>
-			<xs:documentation>
-				The command(s) for releasing suspended jobs.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="on-shut-down">
-		<xs:annotation>
-			<xs:documentation>
-				Arbitrary commands which need to be run on shut-down.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command-ref"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="commands">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="command"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="parsers">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="stream-parser"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="script">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element minOccurs="0" ref="directive-definitions"/>
-				<xs:element minOccurs="0" ref="environment-variables"/>
-				<xs:element minOccurs="0" ref="pre-execute-commands"/>
-				<xs:element ref="execute-command"/>
-				<xs:element minOccurs="0" ref="post-execute-commands"/>
-			</xs:sequence>
-			<xs:attribute name="shell" use="required"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="directive-definitions">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="directive-definition"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="directive-definition">
+		<xs:sequence>
+			<xs:element name="contents" minOccurs="0" type="xs:string"/>
+		</xs:sequence>
+		<xs:attribute name="name" use="required"/>
+		<xs:attribute name="uniqueIdPrefix" type="xs:boolean" default="false"/>
+		<xs:attribute name="deleteAfterUse" type="xs:boolean" default="false"/>
+	</xs:complexType>
+	<xs:complexType mixed="true" name="directive-definition">
 		<xs:annotation>
 			<xs:documentation>
 				'ValueFrom' refers to properties in the resource manager environment.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType mixed="true">
-			<xs:attribute name="valueFrom"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="environment-variables">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="environment-variable"/>
-			</xs:sequence>
-			<xs:attribute name="syntax" use="required">
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="sentenv"/>
-						<xs:enumeration value="export"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:attribute>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="environment-variable">
+		<xs:attribute name="valueFrom"/>
+	</xs:complexType>
+	<xs:complexType name="environment-variable">
 		<xs:annotation>
 			<xs:documentation>
 				'ValueFrom' refers to properties in the resource manager environment.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
-			<xs:attribute name="variableName" use="required" type="xs:string"/>
-			<xs:attribute name="valueFrom" use="required" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="pre-execute-commands">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="arglist" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="execute-command">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="arglist"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="post-execute-commands">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="arglist" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="attribute-definitions">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="job-attribute" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="job-attribute">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="description" type="xs:string"/>
-				<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
-				<xs:element name="choice" minOccurs="0" type="xs:string">
-					<xs:annotation>
-						<xs:documentation>
-							A a comma-delimited set of values.
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name="default" minOccurs="0" type="xs:string"/>
-				<xs:element minOccurs="0" ref="validator"/>
-				<xs:element name="value" minOccurs="0"/>
-			</xs:sequence>
-			<xs:attribute name="id" use="required" type="xs:string"/>
-			<xs:attribute name="name" use="required" type="xs:string"/>
-			<xs:attribute name="type" use="required" type="xs:string"/>
-			<xs:attribute name="visible" type="xs:boolean" default="true"/>
-			<xs:attribute name="status" type="xs:string"/>
-			<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
-			<xs:attribute name="basic" type="xs:boolean" default="false">
-				<xs:annotation>
-					<xs:documentation>
-						Indicates if this attribute is part of a basic (required) set, or if it is an (advanced) option.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-			<xs:attribute name="min" type="xs:int"/>
-			<xs:attribute name="max" type="xs:int"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="command-ref" type="xs:string"/>
-	<xs:element name="parser-ref" type="xs:string"/>
-	<xs:element name="command">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="arglist"/>
-				<xs:element minOccurs="0" maxOccurs="2" ref="parser-ref"/>
-				<xs:element minOccurs="0" ref="environment-variables"/>
-			</xs:sequence>
-			<xs:attribute name="name" type="xs:string"/>
-			<xs:attribute name="displayStdout" type="xs:boolean" default="false"/>
-			<xs:attribute name="displayStderr" type="xs:boolean" default="false"/>
-			<xs:attribute name="directory" type="xs:string"/>
-			<xs:attribute name="redirectStderr" type="xs:boolean" default="false"/>
-			<xs:attribute name="replaceEnvironment" type="xs:boolean" default="false"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="arglist">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element maxOccurs="unbounded" ref="arg"/>
-			</xs:sequence>
-			<xs:attribute name="dynamicAppend" type="xs:boolean" default="false">
-				<xs:annotation>
-					<xs:documentation>
-						Iterate over all dynamic attributes, appending the sequence of args for each attribute.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="arg">
+		<xs:attribute name="variableName" use="required" type="xs:string"/>
+		<xs:attribute name="valueFrom" use="required" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="arglist">
+		<xs:sequence>
+			<xs:element name="arg" maxOccurs="unbounded" type="rm:arg"/>
+		</xs:sequence>
+		<xs:attribute name="dynamicAppend" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Iterate over all dynamic attributes, appending the sequence of args for each attribute.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="stream-parser">
+		<xs:annotation>
+			<xs:documentation>
+				These are attached to the stdout or stderr streams in order to capture the output of the command and add values
+				into the resource manager environment. If displayStdout or displayStderr of the command is true, the stream will be passed on to an
+				output stream will also be sent to the terminal.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="tokenizer" type="rm:tokenizer"/>
+		</xs:sequence>
+		<xs:attribute name="name" use="required" type="xs:string"/>
+		<xs:attribute name="stderr" type="xs:boolean" default="false"/>
+	</xs:complexType>
+	<xs:complexType name="tab-controller">
+		<xs:sequence>
+			<xs:element name="title" type="xs:string"/>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="tab-folder" type="rm:tab-folder"/>
+				<xs:element name="group" type="rm:group"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="regex" mixed="true">
+		<xs:attribute name="flags" type="xs:string"/>
+		<xs:attribute name="split" type="xs:boolean" default="false"/>
+		<xs:attribute name="expression" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType mixed="true" name="arg">
 		<xs:annotation>
 			<xs:documentation>
 				The text of the argument will be parsed for references to the resource manager environment; e.g., ${rm:a},
@@ -428,489 +290,352 @@
 				the list).
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType mixed="true">
-			<xs:attribute name="isUndefinedIfEquals" type="xs:string">
-				<xs:annotation>
-					<xs:documentation>
-						If this is defined (even a zero-length string is valid), an equality check on the arg will be run and if
-						satisfied the arg will be
-						eliminated from the list.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="stream-parser">
-		<xs:annotation>
-			<xs:documentation>
-				These are attached to the stdout or stderr streams in order to capture the output of the command and add values
-				into the resource manager environment. If displayStdout or displayStderr of the command is true, the stream will be passed on to an
-				output stream will also be sent to the terminal.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="tokenizer"/>
-			</xs:sequence>
-			<xs:attribute name="name" use="required" type="xs:string"/>
-			<xs:attribute name="stderr" type="xs:boolean" default="false"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="tokenizer">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:choice>
-					<xs:element name="type" type="xs:string">
-						<xs:annotation>
-							<xs:documentation>
-								Place to provide a custom tokenizer; type is the extension id contributing to
-								"org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer".
-							</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:sequence>
-						<xs:element ref="read" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:choice>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="read">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="match" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-			<xs:attribute name="delim" type="xs:string"/>
-			<xs:attribute name="includeDelim" type="xs:boolean" default="false"/>
-			<xs:attribute name="maxMatchLen" type="xs:int" default="0"/>
-			<xs:attribute name="all" type="xs:boolean" default="false"/>
-			<xs:attribute name="save" type="xs:int" default="0"/>
-			<xs:attribute name="mode" default="or">
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="or"/>
-						<xs:enumeration value="and"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:attribute>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="match">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="regex" minOccurs="0"/>
-				<xs:element ref="target" minOccurs="0"/>
-				<xs:choice minOccurs="0" maxOccurs="unbounded">
-					<xs:element ref="set"/>
-					<xs:element ref="add"/>
-					<xs:element ref="put"/>
-					<xs:element ref="append"/>
-				</xs:choice>
-				<xs:element ref="test" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-			<xs:attribute name="errorOnMiss" type="xs:boolean" default="false"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="test">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="test" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="2">
+		<xs:attribute name="isUndefinedIfEquals" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					If this is defined (even a zero-length string is valid), an equality check on the arg will be run and if
+					satisfied the arg will be
+					eliminated from the list.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tokenizer">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="type" type="xs:string">
 					<xs:annotation>
 						<xs:documentation>
-							.*[${rm:}]*.* refers to a variable in the RM environment;
-							"this.FIELD" refers to the value of the given field on
-							the current target;
-							other strings will be converted in conformity with the inferred type of the comparison.
+							Place to provide a custom tokenizer; type is the extension id contributing to
+							"org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer".
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-			</xs:sequence>
-			<xs:attribute name="op">
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="EQ"/>
-						<xs:enumeration value="LT"/>
-						<xs:enumeration value="GT"/>
-						<xs:enumeration value="LE"/>
-						<xs:enumeration value="GE"/>
-						<xs:enumeration value="AND"/>
-						<xs:enumeration value="OR"/>
-						<xs:enumeration value="NOT"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:attribute>
-			<xs:attribute name="set" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="target">
-		<xs:complexType>
-			<xs:attribute name="ref" type="xs:string"/>
-			<xs:attribute name="type" default="property">
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="property"/>
-						<xs:enumeration value="attribute"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:attribute>
-			<xs:attribute name="idFrom" type="xs:int"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="regex">
-		<xs:complexType mixed="true">
-			<xs:attribute name="flags" type="xs:string"/>
-			<xs:attribute name="split" type="xs:boolean" default="false"/>
-			<xs:attribute name="expression" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="set">
-		<xs:complexType>
-			<xs:attribute name="field" type="xs:string"/>
-			<xs:attribute name="group" type="xs:int" default="0"/>
-			<xs:attribute name="index" type="xs:int" default="0"/>
-			<xs:attribute name="value" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="add">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-			<xs:attribute name="field" type="xs:string"/>
-			<xs:attribute name="groups" type="xs:string"/>
-			<xs:attribute name="indices" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="append">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-			<xs:attribute name="field" type="xs:string"/>
-			<xs:attribute name="groups" type="xs:string"/>
-			<xs:attribute name="indices" type="xs:string"/>
-			<xs:attribute name="separator" type="xs:string"/>
-			<xs:attribute name="startTag" type="xs:string"/>
-			<xs:attribute name="endTag" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="put">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
-					<xs:complexType>
-						<xs:attribute name="key" type="xs:string"/>
-						<xs:attribute name="value" type="xs:string"/>
-					</xs:complexType>
-				</xs:element>
-			</xs:sequence>
-			<xs:attribute name="field" type="xs:string"/>
-			<xs:attribute name="keyGroups" type="xs:string"/>
-			<xs:attribute name="keyIndices" type="xs:string"/>
-			<xs:attribute name="valueGroups" type="xs:string"/>
-			<xs:attribute name="valueIndices" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="validator">
-		<xs:annotation>
-			<xs:documentation>
-				A regular expression or an acl used to validate an attribute value.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:choice>
-					<xs:element ref="regex"/>
-					<xs:element name="acl" type="xs:string"/>
-				</xs:choice>
-				<xs:element name="error-message" minOccurs="0" type="xs:string"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="launch-tab">
-		<xs:annotation>
-			<xs:documentation>
-				A recursive description of the UI element associated with the control part, the Launch Tab.
-				As in: org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab, provides a top-level "switch" between controllers.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-			   <xs:element maxOccurs="2" ref="tab-controller"/>
-				<xs:element minOccurs="0" name="custom-controller" type="xs:string">
-				  <xs:annotation>
-               <xs:documentation>
-                  Prebuilt. Allows the user to browse the local file system and/or workspace
-                  to open and edit a custom batch script will be created; this will include copy and renaming buttons.
-                  Use the string as the title to appear in the top-level folder tab.
-               </xs:documentation>
-            </xs:annotation>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="tab-controller">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="title" type="xs:string"/>
-				<xs:choice maxOccurs="unbounded" >
-				  <xs:element ref="group"/>
-				  <xs:element ref="tab-folder"/>
-				</xs:choice>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="tab-folder">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="title" type="xs:string"/>
-				<xs:element maxOccurs="unbounded" ref="tab-item"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="tab-item">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="title" type="xs:string"/>
-				<xs:choice maxOccurs="unbounded" >
-              <xs:element ref="group"/>
-              <xs:element ref="tab-folder"/>
-            </xs:choice>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="group">
+				<xs:sequence>
+					<xs:element name="read" maxOccurs="unbounded" type="rm:read"/>
+				</xs:sequence>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="tab-folder">
+		<xs:sequence>
+			<xs:element name="title" type="xs:string"/>
+			<xs:element name="item" maxOccurs="unbounded" type="rm:tab-item"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="group">
 		<xs:annotation>
 			<xs:documentation>
 				We may want a few tweaks here, such as borders, etc. Dynamic attribute means this group gets rebuilt if there is a
 				button allowing the user to select displayed attributes.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="grid-data" minOccurs="0"/>
-				<xs:element ref="grid-layout" minOccurs="0"/>
-				<xs:element name="title" type="xs:string" minOccurs="0"/>
-				<xs:element ref="style" minOccurs="0"/>
-				<xs:choice>
-					<xs:choice maxOccurs="unbounded">
-						<xs:element ref="group"/>
-						<xs:element ref="tab-folder"/>
-						<xs:element ref="widget"/>
-						<xs:element ref="viewer"/>
-					</xs:choice>
-					<xs:element ref="discovered-attributes"/>
-					<xs:element ref="all-attributes"/>
+		<xs:sequence>
+			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data"/>
+			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout"/>
+			<xs:element name="title" minOccurs="0" type="xs:string"/>
+			<xs:element name="style" minOccurs="0" type="rm:style"/>
+			<xs:choice>
+				<xs:choice maxOccurs="unbounded">
+					<xs:element name="tab-folder" type="rm:tab-folder"/>
+					<xs:element name="group" type="rm:group"/>
+					<xs:element name="widget" type="rm:widget"/>
+					<xs:element name="viewer" type="rm:viewer"/>
 				</xs:choice>
-			</xs:sequence>
-			<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
-			<xs:attribute name="scrollable" type="xs:boolean" default="false"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="all-attributes">
-		<xs:annotation>
-			<xs:documentation>
-				Indicates that all the attributes defined at initialization and runtime be placed in this group.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="viewer" minOccurs="0">
+				<xs:element name="discovered-attributes" type="rm:attribute-group">
 					<xs:annotation>
 						<xs:documentation>
-							The presence of this element indicates all attributes should be placed in a single table; otherwise, attributes
-							are mapped serially to widgets by type.
+							Indicates that all the attributes defined at runtime be placed in this group.
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="include">
-					<xs:complexType>
-						<xs:attribute name="headers" type="xs:boolean" default="true"/>
-						<xs:attribute name="sort" type="xs:boolean" default="true"/>
-						<xs:attribute name="name" type="xs:boolean" default="true"/>
-						<xs:attribute name="tooltip" type="xs:boolean" default="true"/>
-						<xs:attribute name="description" type="xs:boolean" default="true"/>
-					</xs:complexType>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="discovered-attributes">
-		<xs:annotation>
-			<xs:documentation>
-				Indicates that all the attributes defined at runtime be placed in this group.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="viewer" minOccurs="0">
+				<xs:element name="all-attributes" type="rm:attribute-group">
 					<xs:annotation>
 						<xs:documentation>
-							The presence of this element indicates all attributes should be placed in a single table; otherwise, attributes
-							are mapped serially to widgets by type.
+							Indicates that all the attributes defined at initialization and runtime be placed in this group.
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="include">
-					<xs:complexType>
-						<xs:attribute name="headers" type="xs:boolean" default="true"/>
-						<xs:attribute name="sort" type="xs:boolean" default="true"/>
-						<xs:attribute name="name" type="xs:boolean" default="true"/>
-						<xs:attribute name="tooltip" type="xs:boolean" default="true"/>
-						<xs:attribute name="description" type="xs:boolean" default="true"/>
-					</xs:complexType>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="grid-data">
-		<xs:complexType>
-			<xs:attribute name="horizontalAlign" type="xs:string"/>
-			<xs:attribute name="verticalAlign" type="xs:string"/>
-			<xs:attribute name="grabExcessHorizontal" type="xs:boolean" default="true"/>
-			<xs:attribute name="grabExcessVertical" type="xs:boolean" default="false"/>
-			<xs:attribute name="horizontalSpan" type="xs:int"/>
-			<xs:attribute name="verticalSpan" type="xs:int"/>
-			<xs:attribute name="minHeight" type="xs:int"/>
-			<xs:attribute name="minWidth" type="xs:int"/>
-			<xs:attribute name="heightHint" type="xs:int"/>
-			<xs:attribute name="widthHint" type="xs:int"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="grid-layout">
-		<xs:complexType>
-			<xs:attribute name="numColumns" type="xs:int"/>
-			<xs:attribute name="horizontalSpacing" type="xs:int"/>
-			<xs:attribute name="makeColumnsEqualWidth" type="xs:boolean" default="true"/>
-			<xs:attribute name="marginBottom" type="xs:int"/>
-			<xs:attribute name="marginHeight" type="xs:int"/>
-			<xs:attribute name="marginLeft" type="xs:int"/>
-			<xs:attribute name="marginRight" type="xs:int"/>
-			<xs:attribute name="marginTop" type="xs:int"/>
-			<xs:attribute name="marginWidth" type="xs:int"/>
-			<xs:attribute name="verticalSpacing" type="xs:int"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="column-data">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="style"/>
-			</xs:sequence>
-			<xs:attribute name="name" type="xs:string"/>
-			<xs:attribute name="width" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="style">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="tag" type="xs:string" maxOccurs="unbounded">
-					<xs:annotation>
-						<xs:documentation>
-							The strings will be converted into their integer values;
-							e.g., "SWT.NONE". They will then be 'or'd' ( | ).
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="viewer">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="grid-data" minOccurs="0"/>
-				<xs:element ref="grid-layout" minOccurs="0"/>
-				<xs:element name="label" minOccurs="0" type="xs:string"/>
-				<xs:element ref="style" minOccurs="0"/>
-				<xs:element ref="column-data" minOccurs="0"/>
-				<xs:element name="initial-rows" minOccurs="0">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="row" maxOccurs="unbounded">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="column-text" maxOccurs="unbounded" type="xs:string"/>
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-			</xs:sequence>
-			<xs:attribute name="editable" type="xs:boolean" default="true"/>
-			<xs:attribute name="type" default="table">
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="table"/>
-						<xs:enumeration value="tree"/>
-						<xs:enumeration value="checkboxTable"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:attribute>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="widget">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="label" minOccurs="0" type="xs:string"/>
-				<xs:element ref="style" minOccurs="0"/>
-				<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
-				<xs:element name="content" minOccurs="0">
-					<xs:annotation>
-						<xs:documentation>
-							The text of this element will be parsed for references to the resource manager environment; e.g., ${a},
-							version-${b}, etc.
-						</xs:documentation>
-					</xs:annotation>
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element ref="arglist"/>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="saveValueTo" type="xs:string" minOccurs="0">
-					<xs:annotation>
-						<xs:documentation>
-							The text of this element will be the name of a property.
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-			</xs:sequence>
-			<xs:attribute name="type" default="text">
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
+		<xs:attribute name="scrollable" type="xs:boolean" default="false"/>
+	</xs:complexType>
+	<xs:complexType name="read">
+		<xs:sequence>
+			<xs:element name="match" minOccurs="0" maxOccurs="unbounded" type="rm:match"/>
+		</xs:sequence>
+		<xs:attribute name="delim" type="xs:string"/>
+		<xs:attribute name="includeDelim" type="xs:boolean" default="false"/>
+		<xs:attribute name="maxMatchLen" type="xs:int" default="0"/>
+		<xs:attribute name="all" type="xs:boolean" default="false"/>
+		<xs:attribute name="save" type="xs:int" default="0"/>
+		<xs:attribute name="mode" default="or">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="or"/>
+					<xs:enumeration value="and"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tab-item">
+		<xs:sequence>
+			<xs:element name="title" type="xs:string"/>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="group" type="rm:group"/>
+				<xs:element name="tab-folder" type="rm:tab-folder"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="grid-data">
+		<xs:attribute name="horizontalAlign" type="xs:string"/>
+		<xs:attribute name="verticalAlign" type="xs:string"/>
+		<xs:attribute name="grabExcessHorizontal" type="xs:boolean" default="true"/>
+		<xs:attribute name="grabExcessVertical" type="xs:boolean" default="false"/>
+		<xs:attribute name="horizontalSpan" type="xs:int"/>
+		<xs:attribute name="verticalSpan" type="xs:int"/>
+		<xs:attribute name="minHeight" type="xs:int"/>
+		<xs:attribute name="minWidth" type="xs:int"/>
+		<xs:attribute name="heightHint" type="xs:int"/>
+		<xs:attribute name="widthHint" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="grid-layout">
+		<xs:attribute name="numColumns" type="xs:int"/>
+		<xs:attribute name="horizontalSpacing" type="xs:int"/>
+		<xs:attribute name="makeColumnsEqualWidth" type="xs:boolean" default="true"/>
+		<xs:attribute name="marginBottom" type="xs:int"/>
+		<xs:attribute name="marginHeight" type="xs:int"/>
+		<xs:attribute name="marginLeft" type="xs:int"/>
+		<xs:attribute name="marginRight" type="xs:int"/>
+		<xs:attribute name="marginTop" type="xs:int"/>
+		<xs:attribute name="marginWidth" type="xs:int"/>
+		<xs:attribute name="verticalSpacing" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="style">
+		<xs:sequence>
+			<xs:element name="tag" type="xs:string" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>
-						Custom, fixed widgets:
-						1. select-attributes: push button which brings up wizard exposing attribute names with
-						checkboxes, allowing dynamic groups to be rebuilt.
-						2. show-script: push button which displays the batch script as it would
-						currently be submitted.
+						The strings will be converted into their integer values;
+						e.g., "SWT.NONE". They will then be 'or'd' ( | ).
 					</xs:documentation>
 				</xs:annotation>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="label"/> <!-- automatically read-only -->
-						<xs:enumeration value="text"/>
-						<xs:enumeration value="pushButton"/> <!-- automatically read-only -->
-						<xs:enumeration value="radioButton"/> <!-- automatically read-only -->
-						<xs:enumeration value="spinner"/>
-						<xs:enumeration value="checkbox"/> <!-- automatically read-only -->
-						<xs:enumeration value="combo"/>
-						<xs:enumeration value="browseDirectoryButton"/>
-						<xs:enumeration value="browseExistingFileButton"/>
-						<xs:enumeration value="browseOrCreateFileButton"/>
-						<xs:enumeration value="selectAttributes"/> <!-- automatically read-only -->
-						<xs:enumeration value="showScript"/> <!-- automatically read-only -->
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:attribute>
-			<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="monitor">
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="widget">
+		<xs:sequence>
+			<xs:element name="label" minOccurs="0" type="xs:string"/>
+			<xs:element name="style" minOccurs="0" type="rm:style"/>
+			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
+			<xs:element name="content" minOccurs="0" type="rm:arglist">
+				<xs:annotation>
+					<xs:documentation>
+						The text of this element will be parsed for references to the resource manager environment; e.g., ${a},
+						version-${b}, etc.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="saveValueTo" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						The text of this element will be the name of a property.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="type" default="text">
+			<xs:annotation>
+				<xs:documentation>
+					Custom, fixed widgets:
+					1. select-attributes: push button which brings up wizard exposing attribute names with
+					checkboxes, allowing dynamic groups to be rebuilt.
+					2. show-script: push button which displays the batch script as it would
+					currently be submitted.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="label"/> <!-- automatically read-only -->
+					<xs:enumeration value="text"/>
+					<xs:enumeration value="pushButton"/> <!-- automatically read-only -->
+					<xs:enumeration value="radioButton"/> <!-- automatically read-only -->
+					<xs:enumeration value="spinner"/>
+					<xs:enumeration value="checkbox"/> <!-- automatically read-only -->
+					<xs:enumeration value="combo"/>
+					<xs:enumeration value="browseDirectoryButton"/>
+					<xs:enumeration value="browseExistingFileButton"/>
+					<xs:enumeration value="browseOrCreateFileButton"/>
+					<xs:enumeration value="selectAttributes"/> <!-- automatically read-only -->
+					<xs:enumeration value="showScript"/> <!-- automatically read-only -->
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
+	</xs:complexType>
+	<xs:complexType name="viewer">
+		<xs:sequence>
+			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data"/>
+			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout"/>
+			<xs:element name="label" minOccurs="0" type="xs:string"/>
+			<xs:element name="style" minOccurs="0" type="rm:style"/>
+			<xs:element name="column-data" minOccurs="0" type="rm:column-data"/>
+			<xs:element name="initial-rows" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="row" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="column-text" maxOccurs="unbounded" type="xs:string"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="editable" type="xs:boolean" default="true"/>
+		<xs:attribute name="type" default="table">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="table"/>
+					<xs:enumeration value="tree"/>
+					<xs:enumeration value="checkboxTable"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="attribute-group">
+		<xs:sequence>
+			<xs:element name="viewer" minOccurs="0" type="rm:viewer">
+				<xs:annotation>
+					<xs:documentation>
+						The presence of this element indicates all attributes should be placed in a single table; otherwise,
+						attributes
+						are mapped serially to widgets by type.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="include">
+				<xs:complexType>
+					<xs:attribute name="headers" type="xs:boolean" default="true"/>
+					<xs:attribute name="sort" type="xs:boolean" default="true"/>
+					<xs:attribute name="name" type="xs:boolean" default="true"/>
+					<xs:attribute name="tooltip" type="xs:boolean" default="true"/>
+					<xs:attribute name="description" type="xs:boolean" default="true"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="match">
+		<xs:sequence>
+			<xs:element name="expression" minOccurs="0" type="rm:regex"/>
+			<xs:element name="target" minOccurs="0" type="rm:target"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="add" type="rm:add"/>
+				<xs:element name="append" type="rm:append"/>
+				<xs:element name="put" type="rm:put"/>
+				<xs:element name="set" type="rm:set"/>
+			</xs:choice>
+			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test" />
+		</xs:sequence>
+		<xs:attribute name="errorOnMiss" type="xs:boolean" default="false"/>
+	</xs:complexType>
+	<xs:complexType name="column-data">
+		<xs:sequence>
+			<xs:element name="style" type="rm:style"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="width" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="target">
+		<xs:attribute name="ref" type="xs:string"/>
+		<xs:attribute name="type" default="property">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="property"/>
+					<xs:enumeration value="attribute"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="idFrom" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="set">
+		<xs:attribute name="field" type="xs:string"/>
+		<xs:attribute name="group" type="xs:int" default="0"/>
+		<xs:attribute name="index" type="xs:int" default="0"/>
+		<xs:attribute name="value" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="add">
+		<xs:sequence>
+			<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="field" type="xs:string"/>
+		<xs:attribute name="groups" type="xs:string"/>
+		<xs:attribute name="indices" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="append">
+		<xs:sequence>
+			<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="field" type="xs:string"/>
+		<xs:attribute name="groups" type="xs:string"/>
+		<xs:attribute name="indices" type="xs:string"/>
+		<xs:attribute name="separator" type="xs:string"/>
+		<xs:attribute name="startTag" type="xs:string"/>
+		<xs:attribute name="endTag" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="put">
+		<xs:sequence>
+			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="key" type="xs:string"/>
+					<xs:attribute name="value" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="field" type="xs:string"/>
+		<xs:attribute name="keyGroups" type="xs:string"/>
+		<xs:attribute name="keyIndices" type="xs:string"/>
+		<xs:attribute name="valueGroups" type="xs:string"/>
+		<xs:attribute name="valueIndices" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="test">
+		<xs:sequence>
+			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test"/>
+			<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="2">
+				<xs:annotation>
+					<xs:documentation>
+						.*[${rm:}]*.* refers to a variable in the RM environment;
+						"this.FIELD" refers to the value of the given field on
+						the current target;
+						other strings will be converted in conformity with the inferred type of the comparison.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="op">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="EQ"/>
+					<xs:enumeration value="LT"/>
+					<xs:enumeration value="GT"/>
+					<xs:enumeration value="LE"/>
+					<xs:enumeration value="GE"/>
+					<xs:enumeration value="AND"/>
+					<xs:enumeration value="OR"/>
+					<xs:enumeration value="NOT"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="set" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="monitor">
 		<xs:annotation>
 			<xs:documentation>
 				I have for the moment left this undefined.
 			</xs:documentation>
 		</xs:annotation>
-	</xs:element>
+	</xs:complexType>
 </xs:schema>

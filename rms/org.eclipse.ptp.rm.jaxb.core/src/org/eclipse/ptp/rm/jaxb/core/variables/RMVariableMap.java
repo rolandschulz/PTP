@@ -47,10 +47,10 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 	 * @param expression
 	 * @return
 	 */
-	public String getString(String uuid, String value) {
+	public String getString(String jobId, String value) {
 		try {
-			if (uuid != null) {
-				value.replaceAll(UUID_TAG, uuid);
+			if (jobId != null) {
+				value.replaceAll(JOB_ID_TAG, jobId);
 			}
 			return dereference(value.toString());
 		} catch (CoreException t) {

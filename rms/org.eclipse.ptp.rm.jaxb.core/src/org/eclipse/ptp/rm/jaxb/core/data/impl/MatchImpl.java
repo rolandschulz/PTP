@@ -34,7 +34,7 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	private boolean matched;
 
 	public MatchImpl(String uuid, Match match) {
-		Regex r = match.getRegex();
+		Regex r = match.getExpression();
 		if (r != null) {
 			regex = new RegexImpl(r);
 		}
@@ -43,7 +43,7 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 			target = new TargetImpl(uuid, t);
 		}
 
-		List<Object> actions = match.getSetOrAddOrPut();
+		List<Object> actions = match.getAddOrAppendOrPut();
 		if (!actions.isEmpty()) {
 			assign = new ArrayList<IAssign>();
 			for (Object o : actions) {

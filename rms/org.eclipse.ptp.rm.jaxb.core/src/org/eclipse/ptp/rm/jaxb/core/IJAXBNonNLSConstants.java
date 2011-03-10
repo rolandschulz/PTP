@@ -82,7 +82,7 @@ public interface IJAXBNonNLSConstants {
 	String CLASS = "class";//$NON-NLS-1$
 	String VALUE = "value";//$NON-NLS-1$
 	String THIS = "this.";//$NON-NLS-1$
-	String UUID_TAG = "@UUID@";//$NON-NLS-1$
+	String JOB_ID_TAG = "@JobId@";//$NON-NLS-1$
 
 	/* STANDARD PROPERTIES */
 	String ID = "id";//$NON-NLS-1$
@@ -122,7 +122,6 @@ public interface IJAXBNonNLSConstants {
 	String CONTROL_ADDRESS = "controlAddress"; //$NON-NLS-1$
 	String LOCAL_ADDRESS = "localAddress"; //$NON-NLS-1$
 	String MONITOR_ADDRESS = "monitorAddress"; //$NON-NLS-1$
-
 	String CONTROL_USER_VAR = "control.user.name";//$NON-NLS-1$
 	String CONTROL_ADDRESS_VAR = "control.address";//$NON-NLS-1$
 	String MONITOR_USER_VAR = "monitor.user.name";//$NON-NLS-1$
@@ -133,6 +132,9 @@ public interface IJAXBNonNLSConstants {
 	String SHUTDOWN = "OnShutDown";//$NON-NLS-1$
 	String DISCATTR = "DiscoverAttributes";//$NON-NLS-1$
 	String JOBSTATUS = "GetJobStatus";//$NON-NLS-1$
+	String SUBMIT_INTERACTIVE = "submit-interactive";//$NON-NLS-1$
+	String SUBMIT_BATCH = "submit-batch";//$NON-NLS-1$
+	String SUBMIT_DEBUG = "submit-debug";//$NON-NLS-1$
 
 	String JOB_ATTRIBUTE = "jobAttribute";//$NON-NLS-1$
 	String ATTRIBUTE = "attribute";//$NON-NLS-1$

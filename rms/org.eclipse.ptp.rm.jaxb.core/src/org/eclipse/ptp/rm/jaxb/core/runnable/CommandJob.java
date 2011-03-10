@@ -35,7 +35,6 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
-import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariables;
 import org.eclipse.ptp.rm.jaxb.core.data.StreamParser;
 import org.eclipse.ptp.rm.jaxb.core.data.Tokenizer;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
@@ -110,7 +109,8 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			IRemoteProcessBuilder builder = prepareCommand();
 
 			prepareEnv(builder);
-			getParsers();
+			stdoutParser = command.getStdoutParser();
+			stderrParser = command.getStderrParser();
 
 			IRemoteProcess process = null;
 
@@ -161,26 +161,8 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		return Status.OK_STATUS;
 	}
 
-	private void getParsers() throws CoreException {
-		List<String> refs = command.getParserRef();
-		if (refs != null) {
-			for (String ref : refs) {
-				ref = RMVariableMap.getActiveInstance().getString(uuid, ref);
-				StreamParser p = (StreamParser) RMVariableMap.getActiveInstance().getVariables().get(ref);
-				if (p == null) {
-					throw CoreExceptionUtils.newException(Messages.RMNoSuchParserError + ref, null);
-				}
-				if (p.isStderr()) {
-					stderrParser = p;
-				} else {
-					stdoutParser = p;
-				}
-			}
-		}
-	}
-
 	private IRemoteProcessBuilder prepareCommand() throws CoreException {
-		Arglist args = command.getArglist();
+		Arglist args = command.getArgs();
 		if (args == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError + command.getName(), null);
 		}
@@ -202,12 +184,10 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			/*
 			 * first static env, then dynamic
 			 */
-			EnvironmentVariables vars = command.getEnvironmentVariables();
+			List<EnvironmentVariable> vars = command.getEnvironment();
 			RMVariableMap map = RMVariableMap.getActiveInstance();
-			if (vars != null) {
-				for (EnvironmentVariable var : vars.getEnvironmentVariable()) {
-					EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), map);
-				}
+			for (EnvironmentVariable var : vars) {
+				EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), map);
 			}
 
 			Map<String, String> live = rm.getDynSystemEnv();

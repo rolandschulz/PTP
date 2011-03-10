@@ -119,7 +119,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		Match match = new Match();
 		rd.getMatch().add(match);
 		Regex regex = new Regex();
-		match.setRegex(regex);
+		match.setExpression(regex);
 		regex.setContent("PROPERTY"); //$NON-NLS-1$
 		/* 2 */
 		rd = new Read();
@@ -129,23 +129,23 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		match = new Match();
 		rd.getMatch().add(match);
 		regex = new Regex();
-		match.setRegex(regex);
+		match.setExpression(regex);
 		regex.setContent("name:(.*)"); //$NON-NLS-1$
 		Target target = new Target();
 		match.setTarget(target);
 		target.setType(PROPERTY);
 		Set set = new Set();
-		match.getSetOrAddOrPut().add(set);
+		match.getAddOrAppendOrPut().add(set);
 		set.setField("name"); //$NON-NLS-1$
 		set.setGroup(1);
 		/* 3 */
 		match = new Match();
 		rd.getMatch().add(match);
 		regex = new Regex();
-		match.setRegex(regex);
+		match.setExpression(regex);
 		regex.setContent("value:(.*)"); //$NON-NLS-1$
 		set = new Set();
-		match.getSetOrAddOrPut().add(set);
+		match.getAddOrAppendOrPut().add(set);
 		set.setField("value"); //$NON-NLS-1$
 		set.setGroup(1);
 		rd = new Read();
@@ -155,7 +155,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		match = new Match();
 		rd.getMatch().add(match);
 		regex = new Regex();
-		match.setRegex(regex);
+		match.setExpression(regex);
 		regex.setContent("ATTRIBUTE"); //$NON-NLS-1$
 		/* 5 */
 		rd = new Read();
@@ -165,23 +165,23 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		match = new Match();
 		rd.getMatch().add(match);
 		regex = new Regex();
-		match.setRegex(regex);
+		match.setExpression(regex);
 		regex.setContent("name:(.*)"); //$NON-NLS-1$
 		target = new Target();
 		match.setTarget(target);
 		target.setType(ATTRIBUTE);
 		set = new Set();
-		match.getSetOrAddOrPut().add(set);
+		match.getAddOrAppendOrPut().add(set);
 		set.setField("name"); //$NON-NLS-1$
 		set.setGroup(1);
 		/* 6 */
 		match = new Match();
 		rd.getMatch().add(match);
 		regex = new Regex();
-		match.setRegex(regex);
+		match.setExpression(regex);
 		regex.setContent("value:(.*)"); //$NON-NLS-1$
 		set = new Set();
-		match.getSetOrAddOrPut().add(set);
+		match.getAddOrAppendOrPut().add(set);
 		set.setField("value"); //$NON-NLS-1$
 		set.setGroup(1);
 		runTokenizer(getImplicitWithTags());
@@ -215,72 +215,72 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		Match m = new Match();
 		rd.getMatch().add(m);
 		Regex r = new Regex();
-		m.setRegex(r);
+		m.setExpression(r);
 		r.setContent(".*PROPERTY.*name:(\\w*).*value:([\\d.-]*).*"); //$NON-NLS-1$
 		r.setFlags("DOTALL"); //$NON-NLS-1$
 		Target t = new Target();
 		m.setTarget(t);
 		t.setType(PROPERTY);
 		Set set = new Set();
-		m.getSetOrAddOrPut().add(set);
+		m.getAddOrAppendOrPut().add(set);
 		set.setField("name"); //$NON-NLS-1$
 		set.setGroup(1);
 		set = new Set();
-		m.getSetOrAddOrPut().add(set);
+		m.getAddOrAppendOrPut().add(set);
 		set.setField("value"); //$NON-NLS-1$
 		set.setGroup(2);
 		/* 2 */
 		m = new Match();
 		rd.getMatch().add(m);
 		r = new Regex();
-		m.setRegex(r);
+		m.setExpression(r);
 		r.setContent(".*PROPERTY.*value:([\\d.-]*).*name:(\\w*).*"); //$NON-NLS-1$
 		r.setFlags("DOTALL"); //$NON-NLS-1$
 		t = new Target();
 		m.setTarget(t);
 		t.setType(PROPERTY);
 		set = new Set();
-		m.getSetOrAddOrPut().add(set);
+		m.getAddOrAppendOrPut().add(set);
 		set.setField("value"); //$NON-NLS-1$
 		set.setGroup(1);
 		set = new Set();
-		m.getSetOrAddOrPut().add(set);
+		m.getAddOrAppendOrPut().add(set);
 		set.setField("name"); //$NON-NLS-1$
 		set.setGroup(2);
 		/* 3 */
 		m = new Match();
 		rd.getMatch().add(m);
 		r = new Regex();
-		m.setRegex(r);
+		m.setExpression(r);
 		r.setContent(".*ATTRIBUTE.*name:(\\w*).*value:([\\d.-]*).*"); //$NON-NLS-1$
 		r.setFlags("DOTALL"); //$NON-NLS-1$
 		t = new Target();
 		m.setTarget(t);
 		t.setType(ATTRIBUTE);
 		set = new Set();
-		m.getSetOrAddOrPut().add(set);
+		m.getAddOrAppendOrPut().add(set);
 		set.setField("name"); //$NON-NLS-1$
 		set.setGroup(1);
 		set = new Set();
-		m.getSetOrAddOrPut().add(set);
+		m.getAddOrAppendOrPut().add(set);
 		set.setField("value"); //$NON-NLS-1$
 		set.setGroup(2);
 		/* 2 */
 		m = new Match();
 		rd.getMatch().add(m);
 		r = new Regex();
-		m.setRegex(r);
+		m.setExpression(r);
 		r.setContent(".*ATTRIBUTE.*value:([\\d.-]*).*name:(\\w*).*"); //$NON-NLS-1$
 		r.setFlags("DOTALL"); //$NON-NLS-1$
 		t = new Target();
 		m.setTarget(t);
 		t.setType(ATTRIBUTE);
 		set = new Set();
-		m.getSetOrAddOrPut().add(set);
+		m.getAddOrAppendOrPut().add(set);
 		set.setField("value"); //$NON-NLS-1$
 		set.setGroup(1);
 		set = new Set();
-		m.getSetOrAddOrPut().add(set);
+		m.getAddOrAppendOrPut().add(set);
 		set.setField("name"); //$NON-NLS-1$
 		set.setGroup(2);
 		runTokenizer(getImplicitWithTags());
@@ -420,13 +420,13 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			Match match = new Match();
 			read.getMatch().add(match);
 			Regex regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent(".*"); //$NON-NLS-1$
 			Target target = new Target();
 			match.setTarget(target);
 			target.setRef(this.target);
 			Append append = new Append();
-			match.getSetOrAddOrPut().add(append);
+			match.getAddOrAppendOrPut().add(append);
 			append.setField("value"); //$NON-NLS-1$
 			append.setSeparator(", "); //$NON-NLS-1$
 			append.setGroups("0"); //$NON-NLS-1$
@@ -435,14 +435,14 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			Match match = new Match();
 			read.getMatch().add(match);
 			Regex regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent(".*<job>([\\d]*):([\\w]*)</job>.*"); //$NON-NLS-1$
 			regex.setFlags("DOTALL"); //$NON-NLS-1$
 			Target target = new Target();
 			match.setTarget(target);
 			target.setRef(this.target);
 			Put append = new Put();
-			match.getSetOrAddOrPut().add(append);
+			match.getAddOrAppendOrPut().add(append);
 			append.setField("value"); //$NON-NLS-1$
 			append.setKeyGroups("1"); //$NON-NLS-1$
 			append.setValueGroups("2"); //$NON-NLS-1$
@@ -451,17 +451,17 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			Match match = new Match();
 			read.getMatch().add(match);
 			Regex regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent("<name>(.*)</name><value>(.*)</value>"); //$NON-NLS-1$
 			Target target = new Target();
 			match.setTarget(target);
 			target.setType(this.target);
 			Set set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("name"); //$NON-NLS-1$
 			set.setGroup(1);
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("value"); //$NON-NLS-1$
 			set.setGroup(2);
 		} else if (name.equals("testJobId")) { //$NON-NLS-1$
@@ -471,13 +471,13 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			Match match = new Match();
 			read.getMatch().add(match);
 			Regex regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent("([\\d]*)[.].*"); //$NON-NLS-1$
 			Target target = new Target();
 			match.setTarget(target);
 			target.setRef(this.target);
 			Set set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("value"); //$NON-NLS-1$
 			set.setGroup(1);
 		} else if (name.equals("testOpenMPI")) { //$NON-NLS-1$
@@ -486,36 +486,36 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			Match match = new Match();
 			read.getMatch().add(match);
 			Regex regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent("mca:.*:param:([^:]*):value:(.*)"); //$NON-NLS-1$
 			Target target = new Target();
 			match.setTarget(target);
 			target.setType(this.target);
 			target.setIdFrom(1);
 			Set set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("name"); //$NON-NLS-1$
 			set.setGroup(1);
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("value"); //$NON-NLS-1$
 			set.setGroup(2);
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("visible"); //$NON-NLS-1$
 			set.setValue(TRUE);
 			/* 2 */
 			match = new Match();
 			read.getMatch().add(match);
 			regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent("mca:.*:param:([^:]*):status:(.*)"); //$NON-NLS-1$
 			target = new Target();
 			match.setTarget(target);
 			target.setType(this.target);
 			target.setIdFrom(1);
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("status"); //$NON-NLS-1$
 			set.setGroup(2);
 			Test test = new Test();
@@ -528,40 +528,40 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			match = new Match();
 			read.getMatch().add(match);
 			regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent("mca:.*:param:([^:]*):help:(.*)"); //$NON-NLS-1$
 			target = new Target();
 			match.setTarget(target);
 			target.setType(this.target);
 			target.setIdFrom(1);
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("tooltip"); //$NON-NLS-1$
 			set.setGroup(2);
 			/* 4 */
 			match = new Match();
 			read.getMatch().add(match);
 			regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent("(.*):([^:]*)"); //$NON-NLS-1$
 			target = new Target();
 			match.setTarget(target);
 			target.setType(this.target);
 			target.setIdFrom(1);
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("name"); //$NON-NLS-1$
 			set.setGroup(1);
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("value"); //$NON-NLS-1$
 			set.setGroup(2);
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("readOnly"); //$NON-NLS-1$
 			set.setValue(TRUE);
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("visible"); //$NON-NLS-1$
 			set.setValue(FALSE);
 		} else if (name.equals("testImplicitOrdering")) { //$NON-NLS-1$
@@ -571,53 +571,53 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			Match match = new Match();
 			read.getMatch().add(match);
 			Regex regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent(".*"); //$NON-NLS-1$
 			Target target = new Target();
 			match.setTarget(target);
 			target.setType(this.target);
 			Set set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("name"); //$NON-NLS-1$
 			set.setGroup(0);
 			/* 2 */
 			match = new Match();
 			read.getMatch().add(match);
 			regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent(".*"); //$NON-NLS-1$
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("type"); //$NON-NLS-1$
 			set.setGroup(0);
 			/* 3 */
 			match = new Match();
 			read.getMatch().add(match);
 			regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent(".*"); //$NON-NLS-1$
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("description"); //$NON-NLS-1$
 			set.setGroup(0);
 			/* 4 */
 			match = new Match();
 			read.getMatch().add(match);
 			regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent(".*"); //$NON-NLS-1$
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("tooltip"); //$NON-NLS-1$
 			set.setGroup(0);
 			/* 5 */
 			match = new Match();
 			read.getMatch().add(match);
 			regex = new Regex();
-			match.setRegex(regex);
+			match.setExpression(regex);
 			regex.setContent(".*"); //$NON-NLS-1$
 			set = new Set();
-			match.getSetOrAddOrPut().add(set);
+			match.getAddOrAppendOrPut().add(set);
 			set.setField("value"); //$NON-NLS-1$
 			set.setGroup(0);
 		}
