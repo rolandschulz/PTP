@@ -9,12 +9,32 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
 
-public class JAXBResourceManagerMonitor extends AbstractRuntimeResourceManagerMonitor {
+public class JAXBResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	public JAXBResourceManagerMonitor(IResourceManagerConfiguration config) {
 		super(config);
+	}
+
+	@Override
+	protected void doDispose() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void doShutdown() throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+		// TODO Auto-generated method stub
+
 	}
 }

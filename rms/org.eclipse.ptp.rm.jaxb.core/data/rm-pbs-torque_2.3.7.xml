@@ -150,16 +150,11 @@
 		</job-attribute>
 		<job-attribute id="PBSJOB_Resource_List.nodes" name="Resource_List.nodes" basic="true" type="string">
 			<description>Number and/or type of nodes to be reserved for exclusive use by the job.</description>
-			<tooltip>The value is one or more node_specs joined with the '+' character, "node_spec[+node_spec...]. Each node_spec is a number
-				of
-				nodes required of the type declared in the node_spec and a name or one or more properity or properities desired for the nodes.
-				The
-				number, the name, and each properity in the node_spec are separated by a colon ':'. If no number is specified, one (1) is
-				assumed.
-				Units: string. The name of a node is its hostname. The properties of nodes are: ppn=# requested; defaults to 1; or an
-				arbitrary
-				string defined by system administrator. Example: To ask for 2 processors on each of two blue nodes and three processors
-				on one red
+			<tooltip>The value is one or more node_specs joined with the '+' character, "node_spec[+node_spec...]. Each node_spec is a number of
+				nodes required of the type declared in the node_spec and a name or one or more properity or properities desired for the nodes. The
+				number, the name, and each properity in the node_spec are separated by a colon ':'. If no number is specified, one (1) is assumed.
+				Units: string. The name of a node is its hostname. The properties of nodes are: ppn=# requested; defaults to 1; or an arbitrary
+				string defined by system administrator. Example: To ask for 2 processors on each of two blue nodes and three processors on one red
 				node: -l nodes=2:blue:ppn=2+red:ppn=3.
 			</tooltip>
 			<default>1</default>
@@ -312,7 +307,7 @@
 				</read>
 			</stdout-parser>
 		</start-up-command>
-		<submit-interactive name="submit-interactive">
+		<submit-interactive name="submit-interactive" displayStdout="true">
 			<args>
 				<arg>/Users/arossi/qsub</arg>
 				<arg>${rm:pbs_script#value}</arg>
@@ -321,8 +316,9 @@
 				<read delim="\n" all="true" save="1">
 					<match>
 						<expression>([\d]*)[.].*</expression>
-						<target ref="jobId"/>
-						<set field="value" group="1"/>
+						<target ref="@jobId@"/>
+						<set field="name" group="1"/>
+						<set field="value" value="SUBMITTED"/>
 					</match>
 				</read>
 			</stdout-parser>

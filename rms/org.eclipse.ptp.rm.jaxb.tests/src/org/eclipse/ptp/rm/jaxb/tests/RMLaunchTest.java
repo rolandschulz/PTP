@@ -228,11 +228,9 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 	public void testResourceManager() {
 		try {
 			emulateConfigureWizard();
-			System.out.println(rmConfig.getRemoteServicesId());
 			rm = new JAXBResourceManager(rmConfig, new JAXBResourceManagerControl(rmConfig), new JAXBResourceManagerMonitor(
 					rmConfig));
-			PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm); // wrong
-																					// type!!!
+			PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
 			rm.start(new NullProgressMonitor());
 			try {
 				Thread.sleep(2000);
