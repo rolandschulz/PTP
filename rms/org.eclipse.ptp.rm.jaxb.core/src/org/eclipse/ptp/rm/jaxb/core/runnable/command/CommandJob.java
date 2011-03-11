@@ -115,7 +115,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		this.rm = rm;
 		this.uuid = jobUUID;
 		this.proxy = new CommandJobStreamsProxy();
-		this.waitForId = false; // command.isWaitForId();
+		this.waitForId = command.isWaitForId();
 	}
 
 	public ICommandJobStreamsProxy getProxy() {
@@ -266,14 +266,16 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private void prepareEnv(IRemoteProcessBuilder builder) throws CoreException {
-		boolean append = rm.getAppendSysEnv();
-		if (!append) {
+		if (!rm.getAppendSysEnv()) {
 			builder.environment().clear();
 			Map<String, String> live = rm.getDynSystemEnv();
 			for (String var : live.keySet()) {
 				builder.environment().put(var, live.get(var));
 			}
 		} else {
+			if (command.isReplaceEnvironment()) {
+				builder.environment().clear();
+			}
 			/*
 			 * first static env, then dynamic
 			 */
@@ -288,6 +290,8 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				builder.environment().put(var, live.get(var));
 			}
 		}
+
+		builder.redirectErrorStream(command.isRedirectStderr());
 	}
 
 	private void runTokenizers(IRemoteProcess process) throws CoreException {
