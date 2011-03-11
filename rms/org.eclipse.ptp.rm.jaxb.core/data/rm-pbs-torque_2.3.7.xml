@@ -307,6 +307,21 @@
 				</read>
 			</stdout-parser>
 		</start-up-command>
+		<get-job-status name="get-job-status">
+		    <args>
+            <arg>qstat</arg>
+            <arg>| grep ${@jobId@}</arg>
+         </args>
+         <stdout-parser>
+            <read delim="\n">
+               <match>
+                  <expression>(.*[\s]*)\1\1\1([A-Z])[\s]*.*</expression>
+                  <target ref="@jobId@"/>
+                  <set field="value" groups="2"/>
+               </match>
+            </read>
+         </stdout-parser>
+		</get-job-status>
 		<submit-interactive name="submit-interactive">
 			<args>
 				<arg>/Users/arossi/qsub</arg>
