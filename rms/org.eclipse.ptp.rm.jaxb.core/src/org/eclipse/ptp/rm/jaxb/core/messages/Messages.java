@@ -47,6 +47,10 @@ public class Messages extends NLS {
 	public static String MalformedExpressionError;
 	public static String ReadClearError;
 	public static String UndefinedTargetForTestError;
+	public static String UnsupportedWriteException;
+	public static String ProcessRunError;
+	public static String CommandJobStreamMonitor_label;
+	public static String CommandJobNullMonitorStreamError;
 
 	static {
 		// initialize resource bundle

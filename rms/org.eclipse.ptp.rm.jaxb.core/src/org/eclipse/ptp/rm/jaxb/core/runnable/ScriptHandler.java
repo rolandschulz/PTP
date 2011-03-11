@@ -21,6 +21,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.data.DirectiveDefinition;
 import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
+import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -48,7 +49,10 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	protected IStatus run(IProgressMonitor monitor) {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		String script = composeScript(monitor);
-		map.getVariables().put(SCRIPT, script);
+		Property p = new Property();
+		p.setName(SCRIPT);
+		p.setValue(script);
+		map.getVariables().put(SCRIPT, p);
 		progress.done();
 		return Status.OK_STATUS;
 	}

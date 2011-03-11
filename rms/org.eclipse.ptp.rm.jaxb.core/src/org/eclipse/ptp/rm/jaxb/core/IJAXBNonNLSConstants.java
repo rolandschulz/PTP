@@ -19,8 +19,9 @@ public interface IJAXBNonNLSConstants {
 
 	int UNDEFINED = -1;
 	int COPY_BUFFER_SIZE = 64 * 1024;
-	int STREAM_BUFFER_SIZE = 1024;
+	int STREAM_BUFFER_SIZE = 8 * 1024;
 	int EOF = -1;
+	long MINUTE_IN_MS = 60 * 60 * 1000;
 
 	/* CHARACTERS */
 	String LEN = "N";//$NON-NLS-1$
@@ -158,4 +159,6 @@ public interface IJAXBNonNLSConstants {
 	String COMMENTS = "COMMENTS";//$NON-NLS-1$
 
 	String TOKENIZER_EXT_PT = "streamParserTokenizer";//$NON-NLS-1$
+	String TAIL = "tail";//$NON-NLS-1$
+	String MINUS_F = "-f";//$NON-NLS-1$
 }

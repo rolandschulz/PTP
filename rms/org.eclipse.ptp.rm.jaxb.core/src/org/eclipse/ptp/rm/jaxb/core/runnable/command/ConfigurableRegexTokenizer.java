@@ -7,14 +7,11 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.core.runnable;
+package org.eclipse.ptp.rm.jaxb.core.runnable.command;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +26,6 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 
 	private Throwable error;
 	private InputStream in;
-	private OutputStream out;
 	private List<ReadImpl> read;
 	private String uuid;
 
@@ -47,16 +43,12 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 
 	public void run() {
 		BufferedReader br = null;
-		BufferedWriter bw = null;
 		try {
 			br = new BufferedReader(new InputStreamReader(in));
-			if (out != null) {
-				bw = new BufferedWriter(new OutputStreamWriter(out));
-			}
 			boolean endOfStream = false;
 			while (!endOfStream) {
 				for (ReadImpl r : read) {
-					endOfStream = r.read(br, bw);
+					endOfStream = r.read(br);
 					if (endOfStream) {
 						break;
 					}
@@ -77,10 +69,6 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 		for (Read r : read) {
 			this.read.add(new ReadImpl(uuid, r));
 		}
-	}
-
-	public void setRedirectStream(OutputStream stream) {
-		out = stream;
 	}
 
 	public void setUuid(String uuid) {

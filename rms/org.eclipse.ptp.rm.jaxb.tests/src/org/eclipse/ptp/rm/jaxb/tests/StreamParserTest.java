@@ -32,7 +32,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Set;
 import org.eclipse.ptp.rm.jaxb.core.data.Target;
 import org.eclipse.ptp.rm.jaxb.core.data.Test;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.AbstractRangeAssign;
-import org.eclipse.ptp.rm.jaxb.core.runnable.ConfigurableRegexTokenizer;
+import org.eclipse.ptp.rm.jaxb.core.runnable.command.ConfigurableRegexTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
@@ -627,9 +627,9 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	private void runTokenizer(InputStream stream) {
 		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(uuid, read);
 		t.setInputStream(stream);
-		if (redirect) {
-			t.setRedirectStream(System.out);
-		}
+		// if (redirect) {
+		// t.setRedirectStream(System.out);
+		// }
 		Thread thr = new Thread(t);
 		thr.start();
 		try {

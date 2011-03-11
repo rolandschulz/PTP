@@ -157,11 +157,11 @@
 			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:environment-variable"/>
 		</xs:sequence>
 		<xs:attribute name="name" use="required" type="xs:string"/>
-		<xs:attribute name="displayStdout" type="xs:boolean" default="false"/>
-		<xs:attribute name="displayStderr" type="xs:boolean" default="false"/>
 		<xs:attribute name="directory" type="xs:string"/>
 		<xs:attribute name="redirectStderr" type="xs:boolean" default="false"/>
+		<xs:attribute name="streamBufferLimit" type="xs:int" default="-1"/>
 		<xs:attribute name="replaceEnvironment" type="xs:boolean" default="false"/>
+		<xs:attribute name="waitForId" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="launch-tab">
 		<xs:annotation>
