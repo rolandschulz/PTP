@@ -219,7 +219,7 @@
 		<managed-files>
 			<file-staging-location>.eclipsesettings</file-staging-location>
 			<file name="pbs_script" uniqueIdPrefix="true" deleteAfterUse="true">
-				<contents>${rm:script}</contents>
+				<contents>${rm:script#value}</contents>
 			</file>
 		</managed-files>
 		<script shellDirective="#!/bin/bash">
@@ -307,7 +307,7 @@
 				</read>
 			</stdout-parser>
 		</start-up-command>
-		<submit-interactive name="submit-interactive" displayStdout="true">
+		<submit-interactive name="submit-interactive">
 			<args>
 				<arg>/Users/arossi/qsub</arg>
 				<arg>${rm:pbs_script#value}</arg>

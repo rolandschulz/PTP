@@ -10,7 +10,6 @@
 package org.eclipse.ptp.rm.jaxb.core.data.impl;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -90,6 +89,10 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 		segment = new StringBuffer();
 	}
 
+	public void closeInputStream() throws IOException {
+		// NOP
+	}
+
 	/**
 	 * 
 	 * @param in
@@ -97,11 +100,11 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 	 * @return whether EOS has been encountered.
 	 * @throws CoreException
 	 */
-	public boolean read(BufferedReader in, BufferedWriter out) throws CoreException {
+	public boolean read(BufferedReader in) throws CoreException {
 		nMatches = 0;
 		looking = true;
 		while (looking) {
-			String s = findNextSegment(in, out);
+			String s = findNextSegment(in);
 
 			if (all) {
 				if (save != null) {
@@ -134,6 +137,10 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 
 		clear();
 		return segment == null || all;
+	}
+
+	public void write(String input) throws IOException {
+		throw new IOException(Messages.UnsupportedWriteException);
 	}
 
 	private void clear() throws CoreException {
@@ -181,59 +188,41 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 		return end;
 	}
 
-	private String findNextSegment(BufferedReader in, BufferedWriter out) throws CoreException {
+	private String findNextSegment(BufferedReader in) throws CoreException {
 		boolean endOfStream = false;
-		try {
-			while (true) {
-				int read = 0;
-				try {
-					read = in.read(chars);
-					if (read == EOF) {
-						endOfStream = true;
-						break;
-					}
-				} catch (EOFException eof) {
+		while (true) {
+			int read = 0;
+			try {
+				read = in.read(chars);
+				if (read == EOF) {
 					endOfStream = true;
 					break;
-				} catch (IOException t) {
-					throw CoreExceptionUtils.newException(Messages.ReadSegmentError, t);
 				}
+			} catch (EOFException eof) {
+				endOfStream = true;
+				break;
+			} catch (IOException t) {
+				throw CoreExceptionUtils.newException(Messages.ReadSegmentError, t);
+			}
 
-				try {
-					if (out != null) {
-						out.write(chars, 0, read);
-					}
-				} catch (IOException t) {
-					t.printStackTrace();
-				}
-
-				if (chars.length == 1) {
-					if (chars[0] == delim) {
-						if (includeDelim) {
-							if (segment != null) {
-								segment.append(delim);
-							}
+			if (chars.length == 1) {
+				if (chars[0] == delim) {
+					if (includeDelim) {
+						if (segment != null) {
+							segment.append(delim);
 						}
-						break;
 					}
-					segment.append(chars[0]);
-				} else {
-					segment.append(chars, 0, read);
 					break;
 				}
+				segment.append(chars[0]);
+			} else {
+				segment.append(chars, 0, read);
+				break;
 			}
+		}
 
-			if (endOfStream) {
-				return null;
-			}
-		} finally {
-			if (out != null) {
-				try {
-					out.flush();
-				} catch (IOException t) {
-					t.printStackTrace();
-				}
-			}
+		if (endOfStream) {
+			return null;
 		}
 
 		return segment.toString();
