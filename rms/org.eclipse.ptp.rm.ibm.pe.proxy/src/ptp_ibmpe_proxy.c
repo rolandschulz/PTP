@@ -5499,9 +5499,12 @@ int write_output(int fd, jobinfo * job, ioinfo * file_info)
 void check_bufsize(ioinfo * file_info)
 {
     if (file_info->remaining == 0) {
-        file_info->allocated = file_info->allocated * 2;
+		int prev_offset = file_info->cp - file_info->write_buf;
+		file_info->remaining = file_info->allocated;
+        file_info->allocated += file_info->allocated;
         file_info->write_buf = (char *) realloc(file_info->write_buf, file_info->allocated);
         malloc_check(file_info->write_buf, __FILE__, __LINE__);
+		file_info->cp = file_info->write_buf + prev_offset;
     }
 }
 
