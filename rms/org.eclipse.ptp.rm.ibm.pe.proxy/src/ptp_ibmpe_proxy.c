@@ -76,7 +76,7 @@
 #include <llapi.h>
 #endif
 
-#define PE_DUAL_POE_DEBUG				/* Include code for PE proxy support for the dual poe debugger.*/
+#define PE_SCI_DEBUG				/* Include code for PE proxy support for the sci mode debugger.*/
 
   /* #define DO_TIMING to obtain proxy timings */
 #ifdef DO_TIMING
@@ -97,7 +97,7 @@
 #ifndef POE
 #define POE "/usr/bin/poe"
 #endif /* POE */
-#define PMD_HELPER				"/usr/bin/pmdhelper"		/* default dual poe debugger helper */
+#define PMD_HELPER				"/usr/bin/pmdhelper"		/* default sci debugger helper */
 #define INFO_MESSAGE 0
 #define TRACE_MESSAGE 1
 #define TRACE_DETAIL_MESSAGE 2
@@ -145,10 +145,6 @@ typedef struct jobinfo
     pid_t poe_pid; /* Process id for main poe process      */
     pid_t task0_pid; /* Process id for app. task 0           */
     char *app_working_dir; /* Application working directory */
-#ifdef PE_DUAL_POE_DEBUG
-    jobinfoptr debugger_job; /* reference to debugger job */
-    jobinfoptr debuggee_job; /* reference to debuggee job */
-#endif
     int debugging; /* Job is being debugged 		*/
     char *sdm_debugdir; /* Directory path for SDM debugger      */
     char *sdm_debugname; /* Pathname to the top level debugger   */
@@ -702,7 +698,7 @@ static enum_launch_attr
                         "Specify how node's CPU should be used (MP_CPU_USE)", "multiple", "multiple|unique" }, {
                         "MP_EUIDEVICE", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Adapter:",
                         "Specify adapter to use for message passing (MP_EUIDEVICE)", "",
-                        "en0|fi0|tr0|sn_all|sn_single|ml0" }, { "MP_EUIDEVICE", ATTR_FOR_LINUX | ATTR_FOR_ALL_PROXY,
+                        "en0|en1|fi0|tr0|sn_all|sn_single|ml0" }, { "MP_EUIDEVICE", ATTR_FOR_LINUX | ATTR_FOR_ALL_PROXY,
                         "Adapter:", "Specify adapter to use for message passing (MP_EUIDEVICE)", "",
                         "ethx|sn_all|sn_single" },
                 { "MP_EUILIB", ATTR_FOR_ALL_OS | ATTR_FOR_ALL_PROXY, "Communications Subsystem:",
@@ -957,7 +953,7 @@ int PE_start_events(int trans_id, int nargs, char *args[])
 int PE_submit_job(int trans_id, int nargs, char *args[])
 {
     /*
-     * Submit a Parallel Environmnent application for execution.
+     * Submit a Parallel Environment application for execution.
      * This function:
      * 1) parses the passed argument list
      * 2) sets the current working directory
@@ -989,12 +985,9 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     char *env_sh_path = NULL;
     char **envp;
     jobinfo *job;
-    int debug_dual_poe_mode = 0;
+    int debug_sci_mode = 0;
     char pe_debugger_id[32] = { 0 }; // POE PID of parallel debugger.
     char *pmd_helper = 0;
-#ifdef PE_DUAL_POE_DEBUG
-    jobinfo *debugger_job;
-#endif
     int i;
     int argp_count;
     int argp_limit;
@@ -1156,12 +1149,19 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
                 else if (strcmp(args[i], "PE_ENV_SCRIPT") == 0) {
                     env_sh_path = strdup(cp + 1);
                 }
-#ifdef PE_DUAL_POE_DEBUG
+#ifdef PE_SCI_DEBUG
                 else if (strcmp(args[i], "PE_DEBUG_MODE") == 0) {
                     if (strcasecmp(cp + 1, "sdm") == 0)
                         debug_sdm_mode = 1;
+                    else if (strcasecmp(cp + 1, "sci") == 0) {
+                        debug_sci_mode++;
+                        if (!pmd_helper)
+                            pmd_helper = PMD_HELPER;
+                    }
+                    // temporarily leave check for "dual" for backwards
+                    // compatibility
                     else if (strcasecmp(cp + 1, "dual") == 0) {
-                        debug_dual_poe_mode++;
+                        debug_sci_mode++;
                         if (!pmd_helper)
                             pmd_helper = PMD_HELPER;
                     }
@@ -1281,17 +1281,17 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     job = (jobinfo *) malloc(sizeof(jobinfo));
     malloc_check(job, __FUNCTION__, __LINE__);
     memset(job, 0, sizeof(jobinfo));
-#ifdef PE_DUAL_POE_DEBUG
+#ifdef PE_SCI_DEBUG
     /*DEBUG*/
-    if (debug_dual_poe_mode) {
+    if (debug_sci_mode) {
         char *debugger_full_path;
 
         debug_sdm_mode = 0; // disable SDM debugger launch.
         /*
-         * If no path is specified, then try to locate execuable.
+         * If no path is specified, then try to locate executable.
          */
         if (debugger_path == NULL || debugger_name == NULL) {
-            post_submitjob_error(trans_id, jobid, "Debugger executuable not found");
+            post_submitjob_error(trans_id, jobid, "Debugger executable not found");
             if (current_hostlist != NULL) {
                 free(current_hostlist);
             }
@@ -1308,12 +1308,6 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             }
             return PTP_PROXY_RES_OK;
         }
-
-        debugger_job = (jobinfo *) malloc(sizeof(jobinfo));
-        malloc_check(debugger_job, __FUNCTION__, __LINE__);
-        memset(debugger_job, 0, sizeof(jobinfo));
-        debugger_job->debuggee_job = job;
-        job->debugger_job = debugger_job;
 
         TRACE_DETAIL("+++ Forking poe/debugger process\n");
         pid = fork();
@@ -1375,7 +1369,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         /* Parent continues on... */
         /* Augment the application's environment to include a debug marker based upon the poe pid of the debugger. */
         snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", pid);
-        debugger_job->poe_pid = pid;
+       
         /* TODO: Do some more initialization of debugger_job here */
     }
 #endif
@@ -1516,20 +1510,10 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     }
     else {
         if (pid == -1) {
-#ifdef PE_DUAL_POE_DEBUG
-            if (debug_dual_poe_mode) {
-                /* TODO: Take down debugger poe. */
-            }
-#endif
             post_submitjob_error(trans_id, jobid, "Fork failed");
             return PTP_PROXY_RES_OK;
         }
         else {
-#ifdef PE_DUAL_POE_DEBUG
-            if (debug_dual_poe_mode) {
-                job_enqueue(debugger_job, debugger_job->poe_pid);
-            }
-#endif
             if (!job->stdout_redirect) {
                 close(stdout_pipe[1]);
             }
@@ -1598,15 +1582,6 @@ int PE_terminate_job(int trans_id, int nargs, char *args[])
         job = GetListElement(jobs);
     }
     if (job != NULL) {
-#ifdef PE_DUAL_POE_DEBUG
-        /* Is this a debugger job? */
-        if (job->debuggee_job) {
-            jobinfo *debuggee_job = job->debuggee_job;
-            job->debuggee_job = NULL;
-            kill(debuggee_job->poe_pid, SIGTERM);
-            pthread_create(&kill_tid, &thread_attrs, kill_process, (void *) debuggee_job->poe_pid);
-        }
-#endif
         kill(job->poe_pid, SIGTERM);
         /*
          * Create a thread to kill the process with kill(9) if the
@@ -1770,10 +1745,6 @@ void job_enqueue(jobinfo *job, pid_t pid)
      */
     pthread_create(&job->startup_thread, &thread_attrs, startup_monitor, job);
     AddToList(jobs, job);
-#ifdef PE_DUAL_POE_DEBUG
-    if (job->debuggee_job)
-        return; // Don't report debugger
-#endif
     snprintf(jobname, sizeof jobname, "%s.%s", my_username, job->submit_jobid);
     jobname[sizeof jobname - 1] = '\0';
     sprintf(queue_id_str, "%d", queue_id);
@@ -2058,10 +2029,6 @@ startup_monitor(void *job_ident)
     free(cfginfo);
     job->tasks = tasks;
     job->numtasks = numtasks;
-#ifdef PE_DUAL_POE_DEBUG
-    if (job->debuggee_job != NULL) /* The debugger job doesn't report */
-        goto out;
-#endif
     /*
      * For each task in the application, send a new process event to the
      * GUI.
@@ -2261,9 +2228,6 @@ startup_monitor(void *job_ident)
             }
         }
     }
-#ifdef PE_DUAL_POE_DEBUG
-    out:
-#endif
     /*
      * The startup thread exits at this point, so clear the reference in
      * the job info
@@ -3450,7 +3414,7 @@ create_exec_parmlist(char *execname, char *targetname, int arg_count, char **arg
     malloc_check(argv, __FUNCTION__, __LINE__);
     i = 0;
     argv[i++] = execname;
-#ifdef PE_DUAL_POE_DEBUG
+#ifdef PE_SCI_DEBUG
     if (helper) {
         argv[i++] = helper;
     }
@@ -3535,9 +3499,9 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
     env_array = (char **) malloc(sizeof(char *) * env_array_size);
     for (i = 0; args[i] != NULL; i++) {
         if (strncmp(args[i], "MP_", 3) == 0) {
-#ifdef PE_DUAL_POE_DEBUG
+#ifdef PE_SCI_DEBUG
             if (is_debugger && strncmp(args[i], "MP_PROCS=", 9) == 0) {
-                int nprocs = atoi(args[i] + 9) + 1;
+                int nprocs = atoi(args[i] + 9);
                 char procs_str[128];
 
                 snprintf(procs_str, sizeof(procs_str), "MP_PROCS=%d", nprocs);
@@ -3560,9 +3524,9 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
             }
         }
     }
-#ifdef PE_DUAL_POE_DEBUG
+#ifdef PE_SCI_DEBUG
     if (is_debugger && !has_mp_procs)
-        add_environment_variable("MP_PROCS=2");
+        add_environment_variable("MP_PROCS=1");
 #endif
 
     if (split_io == 1) {
@@ -3574,7 +3538,7 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
     if (mp_rdma_count && mp_rdma_count[0] != '\0') {
         add_environment_variable(mp_rdma_count);
     }
-#ifdef PE_DUAL_POE_DEBUG
+#ifdef PE_SCI_DEBUG
     if (debugger_id && debugger_id[0] != '\0') {
         add_environment_variable(debugger_id);
     }
