@@ -66,7 +66,6 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	private boolean[] oracle;
 	private String[] values;
 	private final boolean verbose = true;
-	private final boolean redirect = false;
 	private String target;
 	private List<Read> read;
 
@@ -90,6 +89,39 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	@Override
 	public void tearDown() {
 
+	}
+
+	public void testGetStatus() {
+		target = "42226";//$NON-NLS-1$
+		Property p = new Property();
+		p.setName(target);
+		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		Read rd = new Read();
+		read.add(rd);
+		rd.setDelim("\n"); //$NON-NLS-1$
+		Match match = new Match();
+		rd.getMatch().add(match);
+		Regex regex = new Regex();
+		match.setExpression(regex);
+		regex.setContent(".+[\\s]+.+[\\s]+.+[\\s]+.+[\\s]+([A-Z])[\\s]+.+");//$NON-NLS-1$
+		Target target = new Target();
+		match.setTarget(target);
+		target.setRef(this.target);
+		Set set = new Set();
+		match.getAddOrAppendOrPut().add(set);
+		set.setField("value"); //$NON-NLS-1$
+		set.setGroup(1);
+		Test test = new Test();
+		match.getTest().add(test);
+		test.setOp("EQ");//$NON-NLS-1$
+		test.getValue().add("this.value");//$NON-NLS-1$
+		test.getValue().add("R");//$NON-NLS-1$
+		test.setSet("value");//$NON-NLS-1$
+
+		runTokenizer(getQstat());
+		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(this.target);
+		assertNotNull(p);
+		System.out.println(p.getName() + CM + SP + p.getValue());
 	}
 
 	public void testImplicitOrdering() {
@@ -701,6 +733,11 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		String content = "<name>pnameA</name><value>pvalueA</value>" + LINE_SEP + "<name>pnameB</name><value>pvalueB</value>" //$NON-NLS-1$ //$NON-NLS-2$
 				+ LINE_SEP + "<name>pnameC</name><value>pvalueC</value>" + LINE_SEP + "<name>pnameD</name><value>pvalueD</value>" //$NON-NLS-1$ //$NON-NLS-2$
 				+ LINE_SEP + "<value>pvalueW</value><name>pnameW</name>" + LINE_SEP; //$NON-NLS-1$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getQstat() {
+		String content = "42226.ember       g_zn_ph2         enoey             665:51:4 R normal  \n";//$NON-NLS-1$ 
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
