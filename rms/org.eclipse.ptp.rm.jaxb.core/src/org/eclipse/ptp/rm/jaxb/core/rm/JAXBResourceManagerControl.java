@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -58,7 +58,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		@Override
 		public void run() {
-			List<String> toPrune = new ArrayList<String>();
+			Map<String, String> toPrune = new HashMap<String, String>();
 
 			synchronized (map) {
 				running = true;
@@ -74,17 +74,19 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 						IJobStatus status = getJobStatus(jobId);
 						String state = status.getState();
 						if (IJobStatus.COMPLETED.equals(state) || IJobStatus.FAILED.equals(state)) {
-							toPrune.add(jobId);
+							toPrune.put(jobId, jobId);
 						} else if (IJobStatus.RUNNING.equals(state)) {
 							ICommandJobStreamsProxy proxy = map.get(jobId);
 							proxy.startMonitors();
 						}
 					}
-					for (String jobId : toPrune) {
-						ICommandJobStreamsProxy proxy = map.remove(jobId);
-						proxy.close();
+					for (Iterator<Map.Entry<String, ICommandJobStreamsProxy>> i = map.entrySet().iterator(); i.hasNext();) {
+						Map.Entry<String, ICommandJobStreamsProxy> e = i.next();
+						if (null != toPrune.remove(e.getKey())) {
+							e.getValue().close();
+							i.remove();
+						}
 					}
-					toPrune.clear();
 				}
 			}
 
@@ -135,6 +137,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	private final IJAXBResourceManagerConfiguration config;
 	private final Control controlData;
+	private final Map<String, String> dynSystemEnv;
+	private final StreamProxyMap streamsProxyMap;
 
 	private IRemoteServices remoteServices;
 	private IRemoteServices localServices;
@@ -144,9 +148,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private IRemoteConnection localConnection;
 	private IRemoteFileManager remoteFileManager;
 	private IRemoteFileManager localFileManager;
-
-	private final Map<String, String> dynSystemEnv;
-	private final StreamProxyMap streamsProxyMap;
 	private boolean appendSysEnv;
 
 	public JAXBResourceManagerControl(IResourceManagerConfiguration jaxbServiceProvider) {

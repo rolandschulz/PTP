@@ -35,10 +35,11 @@ import org.osgi.framework.Bundle;
 public class JAXBRMConfigurationManager implements IJAXBNonNLSConstants {
 
 	private static JAXBRMConfigurationManager instance;
+
+	private final Map<String, String> external;
 	private String[] types;
 	private Properties rmXmlNames;
 	private Properties rmXmlValues;
-	private final Map<String, String> external;
 
 	private JAXBRMConfigurationManager() {
 		setInternal();
