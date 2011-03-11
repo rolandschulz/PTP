@@ -36,6 +36,7 @@ feature@org.eclipse.ptp.rdt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot
 feature@org.eclipse.ptp.rdt.xlc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.xlc-feature
 feature@org.eclipse.ptp.rdt.remotetools=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.remotetools-feature
 feature@org.eclipse.ptp.rdt.remotejars=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.remotejars-feature
+feature@org.eclipse.ptp.rdt.sync=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.sync-feature
 
 ! GEM feature
 feature@org.eclipse.ptp.gem=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.gem-feature
@@ -146,6 +147,8 @@ plugin@org.eclipse.ptp.rdt.make.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/
 plugin@org.eclipse.ptp.rdt.core.remotejars=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.remotejars
 plugin@org.eclipse.ptp.rdt.core.stubs=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.stubs
 plugin@org.eclipse.ptp.rdt.server.dstore=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.server.dstore
+plugin@org.eclipse.ptp.rdt.sync.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.core
+plugin@org.eclipse.ptp.rdt.sync.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.ui
 
 ! GEM Plugins
 plugin@org.eclipse.ptp.gem=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/gem/org.eclipse.ptp.gem
