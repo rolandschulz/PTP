@@ -222,6 +222,12 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 
 	@Override
 	public void setUp() {
+		/*
+		 * You will need to copy all the executables in the
+		 * org.eclipse.ptp.rm.jaxb.tests/data directory to you home; it seems
+		 * the JUnit plugin runner does not actually execute in the directory
+		 * indicated by the Run Configuration.
+		 */
 	}
 
 	@Override
