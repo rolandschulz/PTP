@@ -161,12 +161,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 
 			setOutStreamRedirection(process);
 			setErrStreamRedirection(process);
-
-			if (remoteOutPath == null) {
-				proxy.startMonitors();
-			}
-
-			runTokenizers(process);
+			startConsumers(process);
 
 			synchronized (this) {
 				active = true;
@@ -182,7 +177,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (ZEROSTR + exit), null);
 			}
 
-			joinAll();
+			joinConsumers();
 		} catch (CoreException ce) {
 			return ce.getStatus();
 		} catch (Throwable t) {
@@ -194,8 +189,22 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		return Status.OK_STATUS;
 	}
 
-	private void joinAll() throws CoreException {
+	private void joinConsumers() throws CoreException {
 		Throwable t = null;
+
+		if (outSplitter != null) {
+			try {
+				outSplitter.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
+
+		if (errSplitter != null) {
+			try {
+				errSplitter.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
 
 		if (stdoutT != null) {
 			try {
@@ -211,20 +220,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			} catch (InterruptedException ignored) {
 			}
 			t = stderrTokenizer.getInternalError();
-		}
-
-		if (outSplitter != null) {
-			try {
-				outSplitter.join();
-			} catch (InterruptedException ignored) {
-			}
-		}
-
-		if (errSplitter != null) {
-			try {
-				errSplitter.join();
-			} catch (InterruptedException ignored) {
-			}
 		}
 
 		if (t != null) {
@@ -302,27 +297,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		builder.redirectErrorStream(command.isRedirectStderr());
 	}
 
-	private void runTokenizers(IRemoteProcess process) throws CoreException {
-		if (stdoutTokenizer != null) {
-			try {
-				stdoutTokenizer.setInputStream(tokenizerOut);
-				stdoutT = new Thread(stdoutTokenizer);
-				stdoutT.start();
-			} catch (Throwable e) {
-				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
-			}
-		}
-		if (stderrTokenizer != null) {
-			try {
-				stderrTokenizer.setInputStream(tokenizerErr);
-				stderrT = new Thread(stderrTokenizer);
-				stderrT.start();
-			} catch (Throwable e) {
-				throw CoreExceptionUtils.newException(Messages.StderrParserError, e);
-			}
-		}
-	}
-
 	private void setErrStreamRedirection(IRemoteProcess process) throws IOException {
 		if (stderrTokenizer != null) {
 			if (remoteErrPath == null) {
@@ -358,6 +332,39 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			proxy.setErrMonitor(new CommandJobStreamMonitor(process.getInputStream()));
 		} else {
 			proxy.setOutMonitor(new CommandJobStreamMonitor(rm, remoteOutPath));
+		}
+	}
+
+	private void startConsumers(IRemoteProcess process) throws CoreException {
+		if (outSplitter != null) {
+			outSplitter.start();
+		}
+
+		if (errSplitter != null) {
+			errSplitter.start();
+		}
+
+		if (remoteOutPath == null) {
+			proxy.startMonitors();
+		}
+
+		if (stdoutTokenizer != null) {
+			try {
+				stdoutTokenizer.setInputStream(tokenizerOut);
+				stdoutT = new Thread(stdoutTokenizer);
+				stdoutT.start();
+			} catch (Throwable e) {
+				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
+			}
+		}
+		if (stderrTokenizer != null) {
+			try {
+				stderrTokenizer.setInputStream(tokenizerErr);
+				stderrT = new Thread(stderrTokenizer);
+				stderrT.start();
+			} catch (Throwable e) {
+				throw CoreExceptionUtils.newException(Messages.StderrParserError, e);
+			}
 		}
 	}
 
