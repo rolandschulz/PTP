@@ -280,7 +280,7 @@
          <arg>| tr '\n' ' '</arg>
          -->
 			<args>
-				<arg>/Users/arossi/qstatF</arg>
+				<arg>./qstatF</arg>
 			</args>
 			<stdout-parser>
 				<read delim="\n">
@@ -300,7 +300,7 @@
 		<!-- ********************** FOR TESTING ********************** -->
 		<submit-interactive name="submit-interactive" waitForId="true">
          <args>
-            <arg>/Users/arossi/qsub</arg>
+            <arg>./qsub</arg>
             <arg>${rm:pbs_script#value}</arg>
          </args>
          <stdout-parser>
@@ -321,7 +321,7 @@
       <!-- ********************** FOR TESTING ********************** -->
 		<get-job-status name="get-job-status">
 			<args>
-				<arg>/Users/arossi/qstatId</arg>
+				<arg>./qstatId</arg>
 				<arg>@jobId@</arg>
 			</args>
 			<stdout-parser>
