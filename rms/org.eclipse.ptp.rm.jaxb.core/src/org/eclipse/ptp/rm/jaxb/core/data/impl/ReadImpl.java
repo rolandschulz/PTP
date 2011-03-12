@@ -43,6 +43,7 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 
 	private int nMatches;
 	private boolean looking;
+	private boolean endOfStream;
 
 	public ReadImpl(String uuid, Read read) {
 		this.uuid = uuid;
@@ -105,28 +106,29 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 		looking = true;
 		while (looking) {
 			String s = findNextSegment(in);
-
 			if (all) {
 				if (save != null) {
-					if (s != null) {
+					if (s != null && s.length() > 0) {
 						while (saved.size() >= save) {
 							saved.removeFirst();
 						}
 						saved.addLast(s);
 					}
 				}
-				if (s == null) {
+
+				if (endOfStream || s == null) {
 					break;
 				}
+
 				reset(s.length());
 				continue;
 			}
 
-			if (s == null) {
+			reset(findMatches(s));
+
+			if (endOfStream) {
 				return true;
 			}
-
-			reset(findMatches(s));
 		}
 
 		if (all) {
@@ -136,7 +138,7 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 		}
 
 		clear();
-		return segment == null || all;
+		return endOfStream || all;
 	}
 
 	public void write(String input) throws IOException {
@@ -189,7 +191,7 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 	}
 
 	private String findNextSegment(BufferedReader in) throws CoreException {
-		boolean endOfStream = false;
+		endOfStream = false;
 		while (true) {
 			int read = 0;
 			try {
@@ -208,9 +210,7 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 			if (chars.length == 1) {
 				if (chars[0] == delim) {
 					if (includeDelim) {
-						if (segment != null) {
-							segment.append(delim);
-						}
+						segment.append(delim);
 					}
 					break;
 				}
@@ -220,11 +220,6 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 				break;
 			}
 		}
-
-		if (endOfStream) {
-			return null;
-		}
-
 		return segment.toString();
 	}
 
