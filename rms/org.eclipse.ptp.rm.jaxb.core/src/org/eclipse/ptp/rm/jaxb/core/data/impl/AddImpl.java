@@ -13,42 +13,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.data.Add;
+import org.eclipse.ptp.rm.jaxb.core.data.Entry;
 
-public class AddImpl extends AbstractRangeAssign {
+public class AddImpl extends AbstractAssign {
 
-	private final List<String> values;
+	private final List<Entry> entries;
 
 	public AddImpl(String uuid, Add add) {
 		this.uuid = uuid;
-		this.field = add.getField();
-		String rString = add.getGroups();
-		if (rString == null) {
-			rString = add.getIndices();
-		}
-		range = new Range(rString);
-		values = add.getValue();
+		field = add.getField();
+		entries = add.getEntry();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected Object[] getValue(Object previous, String[] values) throws Throwable {
-		if (!this.values.isEmpty()) {
-			List<String> norm = new ArrayList<String>();
-			for (String v : this.values) {
-				norm.add((String) normalizedValue(target, uuid, v));
-			}
-			return new Object[] { norm };
-		}
-
-		if (values == null) {
-			return new Object[] { previous };
-		}
-		range.setLen(values.length);
-		List<Object> found = range.findInRange(values);
-		if (found.isEmpty()) {
-			return new Object[] { previous };
-		}
-
 		List<String> list = null;
 		if (previous != null && previous instanceof List<?>) {
 			list = (List<String>) previous;
@@ -56,10 +35,14 @@ public class AddImpl extends AbstractRangeAssign {
 			list = new ArrayList<String>();
 		}
 
-		for (Object o : found) {
-			list.add(o.toString());
+		if (!entries.isEmpty()) {
+			for (Entry e : entries) {
+				Object v = getValue(e, values);
+				if (v != null) {
+					list.add(v.toString());
+				}
+			}
 		}
-
 		return new Object[] { list };
 	}
 }

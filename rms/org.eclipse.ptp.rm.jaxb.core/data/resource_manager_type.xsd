@@ -563,8 +563,6 @@
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
 		<xs:attribute name="separator" type="xs:string"/>
-		<xs:attribute name="startTag" type="xs:string"/>
-		<xs:attribute name="endTag" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="put">
 		<xs:sequence>

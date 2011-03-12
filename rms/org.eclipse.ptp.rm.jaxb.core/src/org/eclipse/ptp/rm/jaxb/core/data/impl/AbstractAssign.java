@@ -18,6 +18,7 @@ import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Add;
 import org.eclipse.ptp.rm.jaxb.core.data.Append;
+import org.eclipse.ptp.rm.jaxb.core.data.Entry;
 import org.eclipse.ptp.rm.jaxb.core.data.Put;
 import org.eclipse.ptp.rm.jaxb.core.data.Set;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -35,6 +36,39 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 
 	public void setTarget(Object target) {
 		this.target = target;
+	}
+
+	protected int determineIndex(Entry entry) {
+		int index = entry.getValueIndex();
+		int group = entry.getValueGroup();
+		if (index == 0 && group != 0) {
+			index = group;
+		}
+		return index;
+	}
+
+	protected String getKey(Entry e, String[] values) throws Throwable {
+		String v = e.getValue();
+		if (v != null) {
+			return (String) normalizedValue(target, uuid, v, false);
+		}
+		int index = determineIndex(e);
+		if (values != null) {
+			return values[index];
+		}
+		return null;
+	}
+
+	protected Object getValue(Entry e, String[] values) throws Throwable {
+		String v = e.getValue();
+		if (v != null) {
+			return normalizedValue(target, uuid, v, true);
+		}
+		int index = determineIndex(e);
+		if (values != null) {
+			return values[index];
+		}
+		return null;
 	}
 
 	protected abstract Object[] getValue(Object previous, String[] values) throws Throwable;
@@ -74,7 +108,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		return method.invoke(target, (Object[]) null);
 	}
 
-	static Object normalizedValue(Object target, String uuid, String expression) throws Throwable {
+	static Object normalizedValue(Object target, String uuid, String expression, boolean convert) throws Throwable {
 		if (expression.startsWith(THIS)) {
 			if (target == null) {
 				return null;
@@ -84,7 +118,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		} else if (expression.indexOf(OPENV) >= 0) {
 			expression = RMVariableMap.getActiveInstance().getString(uuid, expression);
 			return RMVariableMap.getActiveInstance().getString(uuid, expression);
-		} else {
+		} else if (convert) {
 			if (TRUE.equalsIgnoreCase(expression)) {
 				return true;
 			}
@@ -100,6 +134,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 				return expression;
 			}
 		}
+		return expression;
 	}
 
 	static void set(Object target, String field, Object[] values) throws Throwable {
@@ -122,9 +157,6 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 			Throwable t = new IllegalArgumentException(name + SP + valueClass);
 			if (!param.equals(Object.class) && !param.isAssignableFrom(values[0].getClass())) {
 				if (valueClass.equals(String.class)) {
-					/*
-					 * TODO: evaluate expression
-					 */
 					if (param.equals(Boolean.class)) {
 						values[0] = new Boolean(values[0].toString());
 					} else if (param.equals(Integer.class)) {
