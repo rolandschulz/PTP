@@ -12,7 +12,12 @@ package org.eclipse.ptp.rm.jaxb.core.data.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.data.Add;
+import org.eclipse.ptp.rm.jaxb.core.data.Append;
+import org.eclipse.ptp.rm.jaxb.core.data.Put;
+import org.eclipse.ptp.rm.jaxb.core.data.Set;
 import org.eclipse.ptp.rm.jaxb.core.data.Test;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
@@ -30,15 +35,20 @@ public class TestImpl implements IJAXBNonNLSConstants {
 
 	private final String uuid;
 	private final short op;
-	private final String set;
 	private final List<String> values;
 	private List<TestImpl> children;
-
+	private final Add add;
+	private final Append append;
+	private final Put put;
+	private final Set set;
 	private Object target;
 
 	public TestImpl(String uuid, Test test) {
 		this.uuid = uuid;
 		op = getOp(test.getOp());
+		add = test.getAdd();
+		append = test.getAppend();
+		put = test.getPut();
 		set = test.getSet();
 		values = test.getValue();
 		List<Test> tests = test.getTest();
@@ -91,9 +101,7 @@ public class TestImpl implements IJAXBNonNLSConstants {
 			break;
 		}
 
-		if (set != null && target != null) {
-			AbstractAssign.set(target, set, new Object[] { result });
-		}
+		maybeDoAssign();
 
 		return result;
 	}
@@ -193,6 +201,32 @@ public class TestImpl implements IJAXBNonNLSConstants {
 			return sNOT;
 		}
 		return sEQ;
+	}
+
+	/*
+	 * These will be using only preassigned values, so the tokens[] param is
+	 * null
+	 */
+	private void maybeDoAssign() throws Throwable {
+		if (target == null) {
+			return;
+		}
+
+		IAssign assign = null;
+		if (add != null) {
+			assign = new AddImpl(uuid, add);
+		} else if (append != null) {
+			assign = new AppendImpl(uuid, append);
+		} else if (put != null) {
+			assign = new PutImpl(uuid, put);
+		} else if (set != null) {
+			assign = new SetImpl(uuid, set);
+		}
+
+		if (assign != null) {
+			assign.setTarget(target);
+			assign.assign(null);
+		}
 	}
 
 	private void validate(short op) throws Throwable {

@@ -130,6 +130,14 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		return b;
 	}
 
+	public void setRemoteErrPath(String remoteErrPath) {
+		this.remoteErrPath = remoteErrPath;
+	}
+
+	public void setRemoteOutPath(String remoteOutPath) {
+		this.remoteOutPath = remoteOutPath;
+	}
+
 	public boolean waitForId() {
 		return waitForId;
 	}

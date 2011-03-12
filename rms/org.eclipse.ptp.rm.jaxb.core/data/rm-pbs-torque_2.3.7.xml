@@ -5,6 +5,8 @@
 		<control-connection>ssh://abe.ncsa.uiuc.edu/usr/local/bin/qsub</control-connection>
 	</site-data>
 	<control-data>
+		<property name="stdout" value="${rm:Output_Path#value}"/><!-- property needed for forwarding stdout in batch -->
+		<property name="stderr" value="${rm:Error_Path#value}"/><!-- property needed for forwarding stderr in batch -->
 		<job-attribute id="mpiCommand" name="mpiCommand" basic="true" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
@@ -58,12 +60,9 @@
 		</job-attribute>
 		<job-attribute id="PBSJOB_group_list" name="group_list" type="string">
 			<description>A list of group_names@hosts which determines the group under which the job is run on a given host.</description>
-			<tooltip>Format: group_name[@host][,group_name[@host]...]. When a job is to be placed into execution, the server will select a
-				group
-				name according to the following ordered set of rules: 1) Select the group name from the list for which the associated host
-				name
-				matches the name of the execution host; 2) Select the group name which has no associated host name, the wildcard name; 3) Use
-				the
+			<tooltip>Format: group_name[@host][,group_name[@host]...]. When a job is to be placed into execution, the server will select a group
+				name according to the following ordered set of rules: 1) Select the group name from the list for which the associated host name
+				matches the name of the execution host; 2) Select the group name which has no associated host name, the wildcard name; 3) Use the
 				login group for the username under which the job will be run.
 			</tooltip>
 		</job-attribute>
@@ -308,19 +307,49 @@
 			</stdout-parser>
 		</start-up-command>
 		<get-job-status name="get-job-status">
-		    <args>
-            <arg>qstat</arg>
-            <arg>| grep ${@jobId@}</arg>
-         </args>
-         <stdout-parser>
-            <read delim="\n">
-               <match>
-                  <expression>(.*[\s]*)\1\1\1([A-Z])[\s]*.*</expression>
-                  <target ref="@jobId@"/>
-                  <set field="value" groups="2"/>
-               </match>
-            </read>
-         </stdout-parser>
+			<args>
+				<arg>qstat</arg>
+				<arg>| grep ${@jobId@}</arg>
+			</args>
+			<stdout-parser>
+				<read delim="\n">
+					<match>
+						<expression>(.*[\s]*)\1\1\1([A-Z])[\s]*.*</expression>
+						<target ref="@jobId@"/>
+						<set field="value" groups="2"/>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>Q</value>
+							<set field="value" value="QUEUED_ACTIVE"/>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>R</value>
+							<set field="value" value="RUNNING"/>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>S</value>
+							<set field="value" value="SUSPENDED"/>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>C</value>
+							<set field="value" value="COMPLETED"/>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>E</value>
+							<set field="value" value="COMPLETED"/>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>H</value>
+							<set field="value" value="SYSTEM_ON_HOLD"/>
+						</test>
+					</match>
+				</read>
+			</stdout-parser>
 		</get-job-status>
 		<submit-interactive name="submit-interactive">
 			<args>

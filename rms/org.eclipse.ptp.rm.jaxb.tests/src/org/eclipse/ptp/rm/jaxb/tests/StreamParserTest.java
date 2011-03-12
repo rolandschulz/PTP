@@ -116,8 +116,10 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		test.setOp("EQ");//$NON-NLS-1$
 		test.getValue().add("this.value");//$NON-NLS-1$
 		test.getValue().add("R");//$NON-NLS-1$
-		test.setSet("value");//$NON-NLS-1$
-
+		set = new Set();
+		test.setSet(set);
+		set.setField("value");//$NON-NLS-1$
+		set.setValue("RUNNING");//$NON-NLS-1$
 		runTokenizer(getQstat());
 		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(this.target);
 		assertNotNull(p);
@@ -555,7 +557,10 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			test.setOp("EQ");//$NON-NLS-1$
 			test.getValue().add("this.status");//$NON-NLS-1$
 			test.getValue().add("read-only");//$NON-NLS-1$
-			test.setSet("readOnly");//$NON-NLS-1$
+			set = new Set();
+			test.setSet(set);
+			set.setField("readOnly");//$NON-NLS-1$
+			set.setValue(TRUE);
 			/* 3 */
 			match = new Match();
 			read.getMatch().add(match);

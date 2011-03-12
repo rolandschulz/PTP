@@ -223,7 +223,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (job == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + JOBSTATUS, null);
 		}
-		runCommand(jobId, job, true);
+		runCommand(jobId, job, false, true);
 
 		Property p = (Property) RMVariableMap.getActiveInstance().getVariables().remove(jobId);
 		String state = IJobStatus.UNDETERMINED;
@@ -373,7 +373,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				throw ce;
 			}
 		}
-		runCommand(jobId, job, true);
+		runCommand(jobId, job, false, true);
 	}
 
 	/*
@@ -402,6 +402,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		Command command = null;
+		boolean batch = false;
 		for (JAXBElement<Command> job : commands) {
 			command = job.getValue();
 			if (job.getName().equals(SUBMIT_INTERACTIVE)) {
@@ -410,6 +411,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				}
 			} else if (job.getName().equals(SUBMIT_BATCH)) {
 				if (ILaunchManager.RUN_MODE.equals(mode)) {
+					batch = true;
 					break;
 				}
 			} else if (job.getName().equals(SUBMIT_DEBUG)) {
@@ -423,7 +425,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + mode, null);
 		}
 
-		return runCommand(uuid, command, false);
+		return runCommand(uuid, command, batch, false);
 	}
 
 	/*
@@ -553,12 +555,23 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * Create command job, and schedule.
 	 */
-	private CommandJob runCommand(String uuid, Command command, boolean join) throws CoreException {
+	private CommandJob runCommand(String uuid, Command command, boolean batch, boolean join) throws CoreException {
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
 		CommandJob job = new CommandJob(uuid, command, (JAXBResourceManager) getResourceManager());
+		if (batch) {
+			Property p = (Property) RMVariableMap.getActiveInstance().getVariables().get(STDOUT);
+			if (p != null) {
+				job.setRemoteOutPath((String) p.getValue());
+			}
+			p = (Property) RMVariableMap.getActiveInstance().getVariables().get(STDERR);
+			if (p != null) {
+				job.setRemoteErrPath((String) p.getValue());
+			}
+		}
+
 		job.schedule();
 
 		if (join) {
@@ -577,7 +590,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void runCommands(String uuid, List<Command> cmds, String operation) throws CoreException {
 		for (Command cmd : cmds) {
-			CommandJob job = runCommand(uuid, cmd, false);
+			CommandJob job = runCommand(uuid, cmd, false, false);
 
 			if (!job.isActive()) {
 				return;
