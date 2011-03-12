@@ -14,12 +14,8 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Add;
-import org.eclipse.ptp.rm.jaxb.core.data.Append;
 import org.eclipse.ptp.rm.jaxb.core.data.Match;
-import org.eclipse.ptp.rm.jaxb.core.data.Put;
 import org.eclipse.ptp.rm.jaxb.core.data.Regex;
-import org.eclipse.ptp.rm.jaxb.core.data.Set;
 import org.eclipse.ptp.rm.jaxb.core.data.Target;
 import org.eclipse.ptp.rm.jaxb.core.data.Test;
 import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedRegexMatchException;
@@ -43,19 +39,11 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 			target = new TargetImpl(uuid, t);
 		}
 
-		List<Object> actions = match.getAddOrAppendOrPut();
-		if (!actions.isEmpty()) {
-			assign = new ArrayList<IAssign>();
-			for (Object o : actions) {
-				if (o instanceof Add) {
-					assign.add(new AddImpl(uuid, (Add) o));
-				} else if (o instanceof Append) {
-					assign.add(new AppendImpl(uuid, (Append) o));
-				} else if (o instanceof Put) {
-					assign.add(new PutImpl(uuid, (Put) o));
-				} else if (o instanceof Set) {
-					assign.add(new SetImpl(uuid, (Set) o));
-				}
+		List<Object> assign = match.getAddOrAppendOrPut();
+		if (!assign.isEmpty()) {
+			this.assign = new ArrayList<IAssign>();
+			for (Object o : assign) {
+				AbstractAssign.add(uuid, o, this.assign);
 			}
 		}
 

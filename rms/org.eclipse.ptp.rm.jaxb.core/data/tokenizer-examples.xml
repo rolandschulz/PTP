@@ -57,7 +57,12 @@
 						<test op="EQ">
 							<value>this.status</value>
 							<value>read-only</value>
-							<set field="readOnly" value="true"/>
+							<if>
+								<set field="readOnly" value="true"/>
+							</if>
+							<else>
+								<set field="readOnly" value="false"/>
+							</else>
 						</test>
 					</match>
 					<match>
@@ -214,56 +219,68 @@
 				</read>
 			</stdout-parser>
 		</start-up-command>
-		<get-job-status name="get-job-status">
-          <args>
-            <arg>qstat</arg>
-            <arg>| grep ${@jobId@}</arg>
-         </args>
-         <stdout-parser>
-            <read delim="\n">
-               <match>
-                  <expression>(.*[\s]*)\1\1\1([A-Z])[\s]*.*</expression>
-                  <target ref="@jobId@"/>
-                  <set field="value" groups="2"/>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>Q</value>
-                     <set field="value" value="QUEUED_ACTIVE"/>
-                  </test>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>R</value>
-                     <set field="value" value="RUNNING"/>
-                  </test>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>S</value>
-                     <set field="value" value="SUSPENDED"/>
-                  </test>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>C</value>
-                     <set field="value" value="COMPLETED"/>
-                  </test>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>E</value>
-                     <set field="value" value="COMPLETED"/>
-                  </test>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>H</value>
-                     <set field="value" value="SYSTEM_ON_HOLD"/>
-                  </test>
-               </match>
-            </read>
-         </stdout-parser>
-      </get-job-status>
 		<submit-interactive name="test">
+         <args>
+            <arg></arg>
+         </args>
+      </submit-interactive>
+		<get-job-status name="get-job-status">
 			<args>
-				<arg></arg>
+				<arg>qstat</arg>
+				<arg>| grep ${@jobId@}</arg>
 			</args>
-		</submit-interactive>
+			<stdout-parser>
+				<read delim="\n">
+					<match>
+						<expression>.+[\\s]+.+[\\s]+.+[\\s]+.+[\\s]+([A-Z])[\\s]+.+</expression>
+						<target ref="@jobId@"/>
+						<set field="value" group="1"/>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>Q</value>
+							<if>
+								<set field="value" value="QUEUED_ACTIVE"/>
+							</if>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>R</value>
+							<if>
+								<set field="value" value="RUNNING"/>
+							</if>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>S</value>
+							<if>
+								<set field="value" value="SUSPENDED"/>
+							</if>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>C</value>
+							<if>
+								<set field="value" value="COMPLETED"/>
+							</if>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>E</value>
+							<if>
+								<set field="value" value="COMPLETED"/>
+							</if>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>H</value>
+							<if>
+								<set field="value" value="SYSTEM_ON_HOLD"/>
+							</if>
+						</test>
+					</match>
+				</read>
+			</stdout-parser>
+		</get-job-status>
 	</control-data>
 	<monitor-data/>
 </resource-manager-builder>
