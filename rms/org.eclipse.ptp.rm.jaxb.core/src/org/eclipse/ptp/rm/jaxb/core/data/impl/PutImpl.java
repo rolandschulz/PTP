@@ -13,59 +13,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.ptp.rm.jaxb.core.data.Entry;
 import org.eclipse.ptp.rm.jaxb.core.data.Put;
-import org.eclipse.ptp.rm.jaxb.core.data.Put.Entry;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
-public class PutImpl extends AbstractRangeAssign {
+public class PutImpl extends AbstractAssign {
 
-	private final Range keys;
 	private final List<Entry> entries;
 
 	public PutImpl(String uuid, Put put) {
 		this.uuid = uuid;
-		this.field = put.getField();
-		String rString = put.getKeyGroups();
-		if (rString == null) {
-			rString = put.getKeyIndices();
-		}
-		keys = new Range(rString);
-		rString = put.getValueGroups();
-		if (rString == null) {
-			rString = put.getValueIndices();
-		}
-		range = new Range(rString);
-		this.entries = put.getEntry();
+		field = put.getField();
+		entries = put.getEntry();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected Object[] getValue(Object previous, String[] values) throws Throwable {
-		if (!this.entries.isEmpty()) {
-			Map<String, String> norm = new TreeMap<String, String>();
-			for (Entry e : this.entries) {
-				norm.put((String) normalizedValue(target, uuid, e.getKey()), (String) normalizedValue(target, uuid, e.getValue()));
-			}
-			return new Object[] { norm };
-		}
-
-		if (values == null) {
-			return new Object[] { previous };
-		}
-		keys.setLen(values.length);
-
-		List<Object> foundKeys = keys.findInRange(values);
-		if (foundKeys.isEmpty()) {
-			return new Object[] { previous };
-		}
-
-		range.setLen(values.length);
-		List<Object> foundValues = range.findInRange(values);
-		int sz = foundKeys.size();
-		if (sz != foundValues.size()) {
-			throw new IllegalStateException(Messages.StreamParserInconsistentMapValues + sz + CM + foundValues.size());
-		}
-
 		Map<String, String> map = null;
 		if (previous != null && previous instanceof Map<?, ?>) {
 			map = (Map<String, String>) previous;
@@ -73,10 +37,17 @@ public class PutImpl extends AbstractRangeAssign {
 			map = new TreeMap<String, String>();
 		}
 
-		for (int i = 0; i < sz; i++) {
-			map.put(foundKeys.get(i).toString(), (String) foundValues.get(i));
+		if (!entries.isEmpty()) {
+			for (Entry e : entries) {
+				String k = getKey(e, values);
+				if (k == null) {
+					throw new IllegalStateException(Messages.StreamParserInconsistentMapValues + e.getKey() + CM + e.getKeyGroup()
+							+ CM + e.getKeyIndex());
+				}
+				String v = (String) getValue(e, values);
+				map.put(k, v);
+			}
 		}
-
 		return new Object[] { map };
 	}
 }

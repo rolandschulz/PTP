@@ -9,33 +9,30 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.data.impl;
 
+import org.eclipse.ptp.rm.jaxb.core.data.Entry;
 import org.eclipse.ptp.rm.jaxb.core.data.Set;
 
 public class SetImpl extends AbstractAssign {
 
-	private int index;
-
-	private final String value;
+	private final Entry entry;
 
 	public SetImpl(String uuid, Set set) {
 		this.uuid = uuid;
-		this.field = set.getField();
-		index = set.getIndex();
-		int group = set.getGroup();
-		if (index == 0 && group != 0) {
-			index = group;
-		}
-		value = set.getValue();
+		field = set.getField();
+		entry = set.getEntry();
 	}
 
 	@Override
 	protected Object[] getValue(Object previous, String[] values) throws Throwable {
+		if (entry == null) {
+			return null;
+		}
+
+		Object value = getValue(entry, values);
 		if (value != null) {
-			return new Object[] { normalizedValue(target, uuid, value) };
+			return new Object[] { value };
 		}
-		if (values == null) {
-			return new Object[] { previous };
-		}
-		return new Object[] { values[index] };
+
+		return new Object[] { previous };
 	}
 }

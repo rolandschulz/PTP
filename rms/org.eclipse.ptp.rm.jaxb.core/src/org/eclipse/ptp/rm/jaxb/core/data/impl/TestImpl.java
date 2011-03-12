@@ -144,8 +144,8 @@ public class TestImpl implements IJAXBNonNLSConstants {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private int evaluateComparable(String string1, String string2) throws Throwable {
-		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1);
-		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2);
+		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1, true);
+		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2, true);
 		if (value1 == null || value2 == null) {
 			return 1;
 		}
@@ -158,8 +158,8 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	}
 
 	private boolean evaluateEquals(String string1, String string2) throws Throwable {
-		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1);
-		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2);
+		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1, true);
+		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2, true);
 		if (value1 == null) {
 			return value2 == null;
 		}
