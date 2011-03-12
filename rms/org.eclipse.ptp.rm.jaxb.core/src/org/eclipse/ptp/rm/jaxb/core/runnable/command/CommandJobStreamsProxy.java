@@ -14,6 +14,7 @@ import java.io.IOException;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
 public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
@@ -37,7 +38,7 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 	}
 
 	public void closeInputStream() throws IOException {
-		throw new IOException(Messages.UnsupportedWriteException);
+		JAXBCorePlugin.log(new IOException(Messages.UnsupportedWriteException));
 	}
 
 	public IStreamMonitor getErrorStreamMonitor() {
@@ -69,6 +70,6 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 	}
 
 	public void write(String input) throws IOException {
-		throw new IOException(Messages.UnsupportedWriteException);
+		JAXBCorePlugin.log(new IOException(Messages.UnsupportedWriteException));
 	}
 }

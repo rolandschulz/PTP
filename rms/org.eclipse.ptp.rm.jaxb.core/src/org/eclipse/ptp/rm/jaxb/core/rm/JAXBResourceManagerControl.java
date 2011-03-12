@@ -234,18 +234,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			state = (String) p.getValue();
 		}
 
-		System.out.println(jobId + ": " + state);
-
 		CommandJobStatus status = new CommandJobStatus(jobId, state);
 		ICommandJobStreamsProxy proxy = streamsProxyMap.getProxy(jobId);
-		System.out.println(jobId + ", setting proxy in status: " + proxy);
 		status.setProxy(proxy);
 
 		if (IJobStatus.RUNNING.equals(state)) {
-			System.out.println(jobId + ", calling start (again?) on proxy monitor: " + proxy);
 			proxy.startMonitors();
 		} else if (IJobStatus.FAILED.equals(state) || IJobStatus.COMPLETED.equals(state)) {
-			System.out.println(jobId + ", calling close on proxy monitor: " + proxy);
 			proxy.close();
 			streamsProxyMap.removeProxy(jobId);
 		}
@@ -497,8 +492,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		job.schedule();
 		try {
 			job.join();
-		} catch (InterruptedException t) {
-			t.printStackTrace();
+		} catch (InterruptedException ignored) {
 		}
 		return job.getSuccess();
 	}
@@ -519,8 +513,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		job.schedule();
 		try {
 			job.join();
-		} catch (InterruptedException t) {
-			t.printStackTrace();
+		} catch (InterruptedException ignored) {
 		}
 	}
 

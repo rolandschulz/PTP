@@ -15,6 +15,7 @@ import java.net.URISyntaxException;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.Site;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -75,7 +76,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 						return defaultURI.getHost();
 					}
 				} catch (URISyntaxException t) {
-					t.printStackTrace();
+					JAXBCorePlugin.log(t);
 				}
 			}
 		}
@@ -93,7 +94,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 						return defaultURI.getPath();
 					}
 				} catch (URISyntaxException t) {
-					t.printStackTrace();
+					JAXBCorePlugin.log(t);
 				}
 			}
 		}
@@ -114,7 +115,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 						}
 					}
 				} catch (URISyntaxException t) {
-					t.printStackTrace();
+					JAXBCorePlugin.log(t);
 				}
 			}
 		}
@@ -132,7 +133,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 						return defaultURI.getHost();
 					}
 				} catch (URISyntaxException t) {
-					t.printStackTrace();
+					JAXBCorePlugin.log(t);
 				}
 			}
 		}
@@ -151,7 +152,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 						return defaultURI.getPath();
 					}
 				} catch (URISyntaxException t) {
-					t.printStackTrace();
+					JAXBCorePlugin.log(t);
 				}
 			}
 		}
@@ -170,7 +171,7 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 						return ZEROSTR + p;
 					}
 				} catch (URISyntaxException t) {
-					t.printStackTrace();
+					JAXBCorePlugin.log(t);
 				}
 			}
 		}

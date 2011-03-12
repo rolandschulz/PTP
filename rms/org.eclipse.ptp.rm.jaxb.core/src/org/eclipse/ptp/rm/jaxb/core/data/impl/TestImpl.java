@@ -16,7 +16,6 @@ import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Test;
 import org.eclipse.ptp.rm.jaxb.core.data.Test.Else;
-import org.eclipse.ptp.rm.jaxb.core.data.Test.If;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 
@@ -52,10 +51,10 @@ public class TestImpl implements IJAXBNonNLSConstants {
 			}
 		}
 
-		If listif = test.getIf();
-		if (listif != null) {
+		List<Object> listif = test.getAddOrAppendOrPut();
+		if (!listif.isEmpty()) {
 			ifcond = new ArrayList<IAssign>();
-			for (Object o : listif.getAddOrAppendOrPut()) {
+			for (Object o : listif) {
 				AbstractAssign.add(uuid, o, ifcond);
 			}
 		}

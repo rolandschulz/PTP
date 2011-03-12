@@ -66,7 +66,7 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 			if (rmdata != null) {
 				List<Command> cmds = rmdata.getControlData().getStartUpCommand();
 				for (Command cmd : cmds) {
-					System.out.println(cmd.getStdoutParser());
+					System.out.println(cmd.getName());
 				}
 			}
 		} catch (Throwable t) {

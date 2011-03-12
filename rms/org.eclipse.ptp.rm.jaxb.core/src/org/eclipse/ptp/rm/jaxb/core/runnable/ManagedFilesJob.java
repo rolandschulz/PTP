@@ -167,7 +167,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 					fw.close();
 				}
 			} catch (IOException t) {
-				t.printStackTrace();
+				JAXBCorePlugin.log(t);
 			}
 		}
 		return localFile;

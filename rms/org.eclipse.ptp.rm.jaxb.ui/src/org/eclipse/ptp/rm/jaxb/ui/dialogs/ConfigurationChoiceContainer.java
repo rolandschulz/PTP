@@ -23,6 +23,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBRMConfigurationManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
@@ -60,7 +61,7 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 				try {
 					handlePathBrowseButtonSelected(ConfigUtils.chooseLocalProject(shell));
 				} catch (Throwable t) {
-					t.printStackTrace();
+					JAXBUIPlugin.log(t);
 				}
 			}
 			onUpdate();
@@ -103,8 +104,8 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 		group.setLayout(layout);
 		group.setLayoutData(gd);
 
-		preset = WidgetBuilderUtils.createItemCombo(group, Messages.JAXBRMConfigurationSelectionComboTitle_0, new String[0], ZEROSTR,
-				ZEROSTR, true, null, 2);
+		preset = WidgetBuilderUtils.createItemCombo(group, Messages.JAXBRMConfigurationSelectionComboTitle_0, new String[0],
+				ZEROSTR, ZEROSTR, true, null, 2);
 		preset.addSelectionListener(listener);
 
 		group = new Group(parent, SWT.SHADOW_ETCHED_IN);
@@ -113,8 +114,8 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 		group.setLayout(layout);
 		group.setLayoutData(gd);
 
-		external = WidgetBuilderUtils.createItemCombo(group, Messages.JAXBRMConfigurationSelectionComboTitle_1, new String[0], ZEROSTR,
-				ZEROSTR, true, null, 2);
+		external = WidgetBuilderUtils.createItemCombo(group, Messages.JAXBRMConfigurationSelectionComboTitle_1, new String[0],
+				ZEROSTR, ZEROSTR, true, null, 2);
 		external.addSelectionListener(listener);
 
 		browseHomeButton = SWTUtil.createPushButton(group, Messages.JAXBRMConfigurationSelectionWizardPage_1, null);
@@ -300,7 +301,7 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 		try {
 			JAXBInitializationUtils.validate(selected);
 		} catch (Throwable t) {
-			t.printStackTrace();
+			JAXBUIPlugin.log(t);
 			return false;
 		}
 		return true;

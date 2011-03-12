@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 
 public class RMVariableMap implements IJAXBNonNLSConstants {
 	private static RMVariableMap active;
@@ -54,7 +55,7 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 			}
 			return dereference(value);
 		} catch (CoreException t) {
-			t.printStackTrace();
+			JAXBCorePlugin.log(t);
 		}
 		return value;
 	}

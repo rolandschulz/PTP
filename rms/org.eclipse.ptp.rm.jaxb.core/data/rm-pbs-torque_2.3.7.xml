@@ -258,8 +258,7 @@
 			<directive valueFrom="User_List"># @ PBS -u </directive>
 			<directive valueFrom="Variable_List"># @ PBS -v </directive>
 			<pre-execute-command>
-				<arg>cd</arg>
-				<arg>${rm:directory#value}</arg>
+				<arg isUndefinedIfEquals="cd">cd ${rm:directory#value}</arg>
 			</pre-execute-command>
 			<execute-command>
 				<arg>${rm:mpiCommand#value}</arg>
@@ -272,36 +271,28 @@
 				<arg>DONE</arg>
 			</post-execute-command>
 		</script>
-		<!--
-			<startup-command>
-			<args>
-			<arg>qstat -Q -f</arg>
-			<arg>| grep Queue:</arg>
-			<arg>| cut -d ' ' -f 2</arg>
-			<arg>| tr '\n' ' '</arg>
-			</<args>>
-			<stdout-parser>
-			<read delim="\n">
-			<match>
-			<expression>.*</expression>
-			<target ref="available_queues"/>
-			<append field="value" separator="," groups="0"/>
-			</match>
-			</read>
-			</stdout-parser>
-			</startup-command>
-		-->
 		<!-- ********************** FOR TESTING ********************** -->
 		<start-up-command name="get-queues">
+		   <!--
+         <arg>qstat -Q -f</arg>
+         <arg>| grep Queue:</arg>
+         <arg>| cut -d ' ' -f 2</arg>
+         <arg>| tr '\n' ' '</arg>
+         -->
 			<args>
 				<arg>/Users/arossi/qstatF</arg>
 			</args>
 			<stdout-parser>
 				<read delim="\n">
 					<match>
-						<expression>.*</expression>
-						<target ref="available_queues"/>
-						<append field="value" separator="," groups="0"/>
+						<expression>[^\s]+</expression>
+                  <target type="property"/>
+                  <set field="name">
+                     <entry value="available_queues"/>
+                  </set>
+                  <append field="value" separator=",">
+                     <entry valueGroup="0"/>
+                  </append>
 					</match>
 				</read>
 			</stdout-parser>
@@ -317,8 +308,12 @@
                <match>
                   <expression>([\d]*)[.].*</expression>
                   <target ref="@jobId@"/>
-                  <set field="name" group="1"/>
-                  <set field="value" value="SUBMITTED"/>
+                  <set field="name">
+                     <entry valueGroup="1"/>
+                  </set>
+                   <set field="value">
+                     <entry value="SUBMITTED"/>
+                  </set>
                </match>
             </read>
          </stdout-parser>
@@ -330,56 +325,58 @@
 				<arg>@jobId@</arg>
 			</args>
 			<stdout-parser>
-				<read delim="\n">
-					<match errorOnMiss="true">
-						<expression>.+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
-						<target ref="@jobId@"/>
-						<set field="value" group="1"/>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>Q</value>
-							<if>
-								<set field="value" value="QUEUED_ACTIVE"/>
-							</if>
-						</test>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>R</value>
-							<if>
-								<set field="value" value="RUNNING"/>
-							</if>
-						</test>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>S</value>
-							<if>
-								<set field="value" value="SUSPENDED"/>
-							</if>
-						</test>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>C</value>
-							<if>
-								<set field="value" value="COMPLETED"/>
-							</if>
-						</test>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>E</value>
-							<if>
-								<set field="value" value="COMPLETED"/>
-							</if>
-						</test>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>H</value>
-							<if>
-								<set field="value" value="SYSTEM_ON_HOLD"/>
-							</if>
-						</test>
-					</match>
-				</read>
-			</stdout-parser>
+            <read delim="\n">
+               <match>
+                  <expression>.+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
+                  <target ref="@jobId@"/>
+                  <set field="value">
+                     <entry valueGroup="1"/>
+                  </set>
+                  <test op="EQ">
+                     <value>this.value</value>
+                     <value>Q</value>
+                     <set field="value">
+                        <entry value="QUEUED_ACTIVE"/>
+                     </set>
+                  </test>
+                  <test op="EQ">
+                     <value>this.value</value>
+                     <value>R</value>
+                     <set field="value">
+                        <entry value="RUNNING"/>
+                     </set>
+                  </test>
+                  <test op="EQ">
+                     <value>this.value</value>
+                     <value>S</value>
+                     <set field="value">
+                        <entry value="SUSPENDED"/>
+                     </set>
+                  </test>
+                  <test op="EQ">
+                     <value>this.value</value>
+                     <value>C</value>
+                     <set field="value">
+                        <entry value="COMPLETED"/>
+                     </set>
+                  </test>
+                  <test op="EQ">
+                     <value>this.value</value>
+                     <value>E</value>
+                     <set field="value">
+                        <entry value="COMPLETED"/>
+                     </set>
+                  </test>
+                  <test op="EQ">
+                     <value>this.value</value>
+                     <value>H</value>
+                     <set field="value">
+                        <entry value="SYSTEM_ON_HOLD"/>
+                     </set>
+                  </test>
+               </match>
+            </read>
+         </stdout-parser>
 		</get-job-status>
 		<!-- 
 		<terminate-job name="cancel">

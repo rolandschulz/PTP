@@ -30,6 +30,8 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchDelegate;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.IStreamListener;
+import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -42,6 +44,7 @@ import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerMonitor;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBServiceProvider;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 
 public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 
@@ -237,7 +240,16 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 			} catch (InterruptedException ignored) {
 			}
 			emulateLaunchTab();
-			System.out.println("SUBMITTED: " + rm.submitJob(launchConfig, ILaunchManager.RUN_MODE, new NullProgressMonitor())); //$NON-NLS-1$
+			String jobId = rm.submitJob(launchConfig, ILaunchManager.RUN_MODE, new NullProgressMonitor());
+			System.out.println("SUBMITTED: " + jobId); //$NON-NLS-1$
+			IJobStatus status = rm.getJobStatus(jobId);
+			if (status != null) {
+				status.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener() {
+					public void streamAppended(String text, IStreamMonitor monitor) {
+						System.out.println(text);
+					}
+				});
+			}
 			rm.stop();
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -293,5 +305,6 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		if (queues != null) {
 			env.put("destination", queues.get(1)); //$NON-NLS-1$
 		}
+		env.put("directory", "/Users/arossi"); //$NON-NLS-1$//$NON-NLS-2$
 	}
 }
