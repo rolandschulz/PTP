@@ -38,7 +38,16 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		this.target = target;
 	}
 
-	protected int determineIndex(Entry entry) {
+	protected int determineKeyIndex(Entry entry) {
+		int index = entry.getKeyIndex();
+		int group = entry.getKeyGroup();
+		if (index == 0 && group != 0) {
+			index = group;
+		}
+		return index;
+	}
+
+	protected int determineValueIndex(Entry entry) {
 		int index = entry.getValueIndex();
 		int group = entry.getValueGroup();
 		if (index == 0 && group != 0) {
@@ -48,11 +57,11 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	}
 
 	protected String getKey(Entry e, String[] values) throws Throwable {
-		String v = e.getValue();
-		if (v != null) {
-			return (String) normalizedValue(target, uuid, v, false);
+		String k = e.getKey();
+		if (k != null) {
+			return (String) normalizedValue(target, uuid, k, false);
 		}
-		int index = determineIndex(e);
+		int index = determineKeyIndex(e);
 		if (values != null) {
 			return values[index];
 		}
@@ -64,7 +73,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		if (v != null) {
 			return normalizedValue(target, uuid, v, true);
 		}
-		int index = determineIndex(e);
+		int index = determineValueIndex(e);
 		if (values != null) {
 			return values[index];
 		}

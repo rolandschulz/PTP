@@ -21,7 +21,6 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -29,6 +28,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
@@ -49,7 +49,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 		 * @see org.eclipse.core.runtime.ISafeRunnable#handleException(java.lang.Throwable)
 		 */
 		public void handleException(Throwable exception) {
-			DebugPlugin.log(exception);
+			JAXBCorePlugin.log(exception);
 		}
 
 		public void notifyAppend(String text) {
@@ -229,7 +229,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 			process = fBuilder.start();
 			fStream = process.getInputStream();
 		} catch (IOException t) {
-			DebugPlugin.log(t);
+			JAXBCorePlugin.log(t);
 		}
 	}
 
@@ -242,7 +242,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	 */
 	private void read() {
 		if (fStream == null) {
-			DebugPlugin.log(CoreExceptionUtils.getErrorStatus(Messages.CommandJobNullMonitorStreamError, null));
+			JAXBCorePlugin.log(CoreExceptionUtils.getErrorStatus(Messages.CommandJobNullMonitorStreamError, null));
 			return;
 		}
 		lastSleep = System.currentTimeMillis();
@@ -275,14 +275,14 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 				break;
 			} catch (IOException ioe) {
 				if (!fKilled) {
-					DebugPlugin.log(ioe);
+					JAXBCorePlugin.log(ioe);
 				}
 				return;
 			} catch (NullPointerException e) {
 				// killing the stream monitor while reading can cause an NPE
 				// when reading from the stream
 				if (!fKilled && fThread != null) {
-					DebugPlugin.log(e);
+					JAXBCorePlugin.log(e);
 				}
 				return;
 			}
@@ -300,7 +300,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 		try {
 			fStream.close();
 		} catch (IOException e) {
-			DebugPlugin.log(e);
+			JAXBCorePlugin.log(e);
 		}
 	}
 }

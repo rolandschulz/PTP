@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.jaxb.ui.wizards;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
@@ -41,7 +42,7 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 		try {
 			jaxbConfig.realizeRMDataFromXML();
 		} catch (Throwable t) {
-			t.printStackTrace();
+			JAXBUIPlugin.log(t);
 		}
 	}
 

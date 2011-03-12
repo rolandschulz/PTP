@@ -76,7 +76,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				} catch (EOFException eof) {
 					break;
 				} catch (IOException t) {
-					t.printStackTrace();
+					JAXBCorePlugin.log(t);
 					break;
 				}
 			}
@@ -84,7 +84,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				try {
 					b.close();
 				} catch (IOException t) {
-					t.printStackTrace();
+					JAXBCorePlugin.log(t);
 				}
 			}
 			// input stream closed elsewhere

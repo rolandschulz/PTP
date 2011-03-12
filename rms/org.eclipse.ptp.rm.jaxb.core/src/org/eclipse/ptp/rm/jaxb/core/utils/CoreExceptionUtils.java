@@ -21,7 +21,7 @@ public class CoreExceptionUtils {
 
 	public static IStatus getErrorStatus(String message, Throwable t) {
 		if (t != null) {
-			t.printStackTrace();
+			JAXBCorePlugin.log(t);
 		}
 		return new Status(Status.ERROR, JAXBCorePlugin.getUniqueIdentifier(), Status.ERROR, message, t);
 	}

@@ -128,7 +128,7 @@ public class JAXBRMConfigurationManager implements IJAXBNonNLSConstants {
 			list.addAll(rmXmlNames.keySet());
 			types = list.toArray(new String[0]);
 		} catch (IOException t) {
-			t.printStackTrace();
+			JAXBCorePlugin.log(t);
 			types = new String[0];
 		}
 	}

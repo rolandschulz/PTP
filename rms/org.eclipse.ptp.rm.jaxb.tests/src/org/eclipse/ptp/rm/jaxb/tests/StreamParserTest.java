@@ -21,46 +21,100 @@ import junit.framework.TestCase;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
-import org.eclipse.ptp.rm.jaxb.core.data.Append;
+import org.eclipse.ptp.rm.jaxb.core.data.Command;
+import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
-import org.eclipse.ptp.rm.jaxb.core.data.Match;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.core.data.Put;
 import org.eclipse.ptp.rm.jaxb.core.data.Read;
-import org.eclipse.ptp.rm.jaxb.core.data.Regex;
-import org.eclipse.ptp.rm.jaxb.core.data.Set;
-import org.eclipse.ptp.rm.jaxb.core.data.Target;
-import org.eclipse.ptp.rm.jaxb.core.data.Test;
-import org.eclipse.ptp.rm.jaxb.core.data.Test.If;
-import org.eclipse.ptp.rm.jaxb.core.data.impl.AbstractRangeAssign;
+import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.runnable.command.ConfigurableRegexTokenizer;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
-	private class TestRangeAssign extends AbstractRangeAssign {
+	protected class Range {
 
-		@Override
-		protected Object[] getValue(Object previous, String[] values) {
-			return null;
+		private final String expression;
+		private int[] from;
+		private int[] to;
+		private int len;
+
+		public Range(String expression) {
+			RMVariableMap map = RMVariableMap.getActiveInstance();
+			assert (null != map);
+			this.expression = map.getString(uuid, expression);
 		}
 
-		private List<Object> getValid(String[] values) {
-			return range.findInRange(values);
+		public List<Object> findInRange(String[] values) {
+			List<Object> found = new ArrayList<Object>();
+			for (int i = 0; i < from.length; i++) {
+				if (from[i] == to[i]) {
+					found.add(values[from[i]]);
+				} else {
+					for (int j = from[i]; j < to[i]; j++) {
+						found.add(values[j]);
+					}
+				}
+			}
+			return found;
 		}
 
-		private void setRange(String exp) {
-			range = new Range(exp);
+		public boolean isInRange(int line) {
+			for (int i = 0; i < from.length; i++) {
+				if ((from[i] == line && line <= to[i]) || (from[i] < line && line < to[i])) {
+					return true;
+				}
+			}
+			return false;
 		}
 
-		private void setRLen(int len) {
-			range.setLen(len);
+		public void setLen(int len) {
+			this.len = len;
+			parse(expression);
 		}
 
-		private boolean test(int i) {
-			return range.isInRange(i);
+		private int maybeInterpretLength(String n) {
+			int i = -1;
+			if (n.indexOf(LEN) >= 0) {
+				String[] lenExp = n.split(HYPH);
+				if (lenExp.length == 2) {
+					i = len - Integer.parseInt(lenExp[1]);
+				} else {
+					i = len;
+				}
+			} else {
+				i = Integer.parseInt(n.trim());
+			}
+			return i;
+		}
+
+		private void parse(String expression) {
+			List<String> from = new ArrayList<String>();
+			List<String> to = new ArrayList<String>();
+			String[] commas = expression.split(CM);
+			for (int i = 0; i < commas.length; i++) {
+				String[] colon = commas[i].split(CO);
+				if (colon.length == 2) {
+					from.add(colon[0]);
+					to.add(colon[1]);
+				} else {
+					from.add(colon[0]);
+					to.add(colon[0]);
+				}
+			}
+
+			this.from = new int[from.size()];
+			this.to = new int[from.size()];
+
+			for (int i = 0; i < this.from.length; i++) {
+				this.from[i] = maybeInterpretLength(from.get(i).trim());
+				this.to[i] = maybeInterpretLength(to.get(i).trim());
+			}
 		}
 	}
+
+	private static final String tokxml = DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
 
 	private String uuid;
 	private String lineRange;
@@ -68,7 +122,8 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	private String[] values;
 	private final boolean verbose = true;
 	private String target;
-	private List<Read> read;
+	private List<Command> startup;
+	private Command getStatus;
 
 	@Override
 	public void setUp() {
@@ -83,7 +138,18 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 					false, false };
 			values = new String[oracle.length];
 		} else {
-			read = new ArrayList<Read>();
+			try {
+				JAXBInitializationUtils.validate(tokxml);
+				ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(tokxml);
+				if (rmdata != null) {
+					Control cd = rmdata.getControlData();
+					startup = cd.getStartUpCommand();
+					getStatus = cd.getGetJobStatus();
+				}
+			} catch (Throwable t) {
+				t.printStackTrace();
+				assert (t != null);
+			}
 		}
 	}
 
@@ -92,265 +158,27 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 	}
 
-	public void testGetStatus() {
-		target = "42226";//$NON-NLS-1$
+	public void test00ParseQstat() {
+		target = "available_queues"; //$NON-NLS-1$
 		Property p = new Property();
 		p.setName(target);
 		RMVariableMap.getActiveInstance().getVariables().put(target, p);
-		Read rd = new Read();
-		read.add(rd);
-		rd.setDelim("\n"); //$NON-NLS-1$
-		Match match = new Match();
-		rd.getMatch().add(match);
-		Regex regex = new Regex();
-		match.setExpression(regex);
-		regex.setContent(".+[\\s]+.+[\\s]+.+[\\s]+.+[\\s]+([A-Z])[\\s]+.+");//$NON-NLS-1$
-		Target target = new Target();
-		match.setTarget(target);
-		target.setRef(this.target);
-		Set set = new Set();
-		match.getAddOrAppendOrPut().add(set);
-		set.setField("value"); //$NON-NLS-1$
-		set.setGroup(1);
-		Test test = new Test();
-		match.getTest().add(test);
-		test.setOp("EQ");//$NON-NLS-1$
-		test.getValue().add("this.value");//$NON-NLS-1$
-		test.getValue().add("R");//$NON-NLS-1$
-		If ifc = new If();
-		test.setIf(ifc);
-		set = new Set();
-		ifc.getAddOrAppendOrPut().add(set);
-		set.setField("value");//$NON-NLS-1$
-		set.setValue("RUNNING");//$NON-NLS-1$
-		runTokenizer(getQstat());
-		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(this.target);
+		runTokenizer(startup.get(0).getStdoutParser().getRead(), getQstatOut());
+		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
 		assertNotNull(p);
-		System.out.println(p.getName() + CM + SP + p.getValue());
-	}
-
-	public void testImplicitOrdering() {
-		target = ATTRIBUTE;
-		read.add(getRead(getName()));
-		runTokenizer(getImplicitOrdering());
-		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
-		for (Object o : d.values()) {
-			JobAttribute ja = (JobAttribute) o;
-			if (verbose) {
-				System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
-				System.out.println("name " + ja.getName()); //$NON-NLS-1$
-				System.out.println("type " + ja.getType()); //$NON-NLS-1$
-				System.out.println("tooltip " + ja.getTooltip()); //$NON-NLS-1$
-				System.out.println("description " + ja.getDescription()); //$NON-NLS-1$
-				System.out.println("value " + ja.getValue()); //$NON-NLS-1$
-				System.out.println("*********************************"); //$NON-NLS-1$
-			}
+		assertNotNull(p.getValue());
+		if (verbose) {
+			System.out.println(target + " = " + p.getValue()); //$NON-NLS-1$
 		}
 	}
 
-	public void testImplicitWithTags1() {
-		Read rd = new Read();
-		/* 1 */
-		read.add(rd);
-		rd.setDelim("\n"); //$NON-NLS-1$
-		Match match = new Match();
-		rd.getMatch().add(match);
-		Regex regex = new Regex();
-		match.setExpression(regex);
-		regex.setContent("PROPERTY"); //$NON-NLS-1$
-		/* 2 */
-		rd = new Read();
-		read.add(rd);
-		rd.setDelim("\n"); //$NON-NLS-1$
-		rd.setMode(AND);
-		match = new Match();
-		rd.getMatch().add(match);
-		regex = new Regex();
-		match.setExpression(regex);
-		regex.setContent("name:(.*)"); //$NON-NLS-1$
-		Target target = new Target();
-		match.setTarget(target);
-		target.setType(PROPERTY);
-		Set set = new Set();
-		match.getAddOrAppendOrPut().add(set);
-		set.setField("name"); //$NON-NLS-1$
-		set.setGroup(1);
-		/* 3 */
-		match = new Match();
-		rd.getMatch().add(match);
-		regex = new Regex();
-		match.setExpression(regex);
-		regex.setContent("value:(.*)"); //$NON-NLS-1$
-		set = new Set();
-		match.getAddOrAppendOrPut().add(set);
-		set.setField("value"); //$NON-NLS-1$
-		set.setGroup(1);
-		rd = new Read();
-		/* 4 */
-		read.add(rd);
-		rd.setDelim("\n"); //$NON-NLS-1$
-		match = new Match();
-		rd.getMatch().add(match);
-		regex = new Regex();
-		match.setExpression(regex);
-		regex.setContent("ATTRIBUTE"); //$NON-NLS-1$
-		/* 5 */
-		rd = new Read();
-		read.add(rd);
-		rd.setDelim("\n"); //$NON-NLS-1$
-		rd.setMode(AND);
-		match = new Match();
-		rd.getMatch().add(match);
-		regex = new Regex();
-		match.setExpression(regex);
-		regex.setContent("name:(.*)"); //$NON-NLS-1$
-		target = new Target();
-		match.setTarget(target);
-		target.setType(ATTRIBUTE);
-		set = new Set();
-		match.getAddOrAppendOrPut().add(set);
-		set.setField("name"); //$NON-NLS-1$
-		set.setGroup(1);
-		/* 6 */
-		match = new Match();
-		rd.getMatch().add(match);
-		regex = new Regex();
-		match.setExpression(regex);
-		regex.setContent("value:(.*)"); //$NON-NLS-1$
-		set = new Set();
-		match.getAddOrAppendOrPut().add(set);
-		set.setField("value"); //$NON-NLS-1$
-		set.setGroup(1);
-		runTokenizer(getImplicitWithTags());
-		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
-		for (Object o : d.values()) {
-			if (o instanceof Property) {
-				Property p = (Property) o;
-				if (verbose) {
-					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
-					System.out.println("name " + p.getName()); //$NON-NLS-1$
-					System.out.println("value " + p.getValue()); //$NON-NLS-1$
-					System.out.println("*********************************"); //$NON-NLS-1$
-				}
-			} else if (o instanceof JobAttribute) {
-				JobAttribute ja = (JobAttribute) o;
-				if (verbose) {
-					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
-					System.out.println("name " + ja.getName()); //$NON-NLS-1$
-					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
-					System.out.println("*********************************"); //$NON-NLS-1$
-				}
-			}
-		}
-	}
-
-	public void testImplicitWithTags2() {
-		Read rd = new Read();
-		read.add(rd);
-		rd.setMaxMatchLen(32);
-		/* 1 */
-		Match m = new Match();
-		rd.getMatch().add(m);
-		Regex r = new Regex();
-		m.setExpression(r);
-		r.setContent(".*PROPERTY.*name:(\\w*).*value:([\\d.-]*).*"); //$NON-NLS-1$
-		r.setFlags("DOTALL"); //$NON-NLS-1$
-		Target t = new Target();
-		m.setTarget(t);
-		t.setType(PROPERTY);
-		Set set = new Set();
-		m.getAddOrAppendOrPut().add(set);
-		set.setField("name"); //$NON-NLS-1$
-		set.setGroup(1);
-		set = new Set();
-		m.getAddOrAppendOrPut().add(set);
-		set.setField("value"); //$NON-NLS-1$
-		set.setGroup(2);
-		/* 2 */
-		m = new Match();
-		rd.getMatch().add(m);
-		r = new Regex();
-		m.setExpression(r);
-		r.setContent(".*PROPERTY.*value:([\\d.-]*).*name:(\\w*).*"); //$NON-NLS-1$
-		r.setFlags("DOTALL"); //$NON-NLS-1$
-		t = new Target();
-		m.setTarget(t);
-		t.setType(PROPERTY);
-		set = new Set();
-		m.getAddOrAppendOrPut().add(set);
-		set.setField("value"); //$NON-NLS-1$
-		set.setGroup(1);
-		set = new Set();
-		m.getAddOrAppendOrPut().add(set);
-		set.setField("name"); //$NON-NLS-1$
-		set.setGroup(2);
-		/* 3 */
-		m = new Match();
-		rd.getMatch().add(m);
-		r = new Regex();
-		m.setExpression(r);
-		r.setContent(".*ATTRIBUTE.*name:(\\w*).*value:([\\d.-]*).*"); //$NON-NLS-1$
-		r.setFlags("DOTALL"); //$NON-NLS-1$
-		t = new Target();
-		m.setTarget(t);
-		t.setType(ATTRIBUTE);
-		set = new Set();
-		m.getAddOrAppendOrPut().add(set);
-		set.setField("name"); //$NON-NLS-1$
-		set.setGroup(1);
-		set = new Set();
-		m.getAddOrAppendOrPut().add(set);
-		set.setField("value"); //$NON-NLS-1$
-		set.setGroup(2);
-		/* 2 */
-		m = new Match();
-		rd.getMatch().add(m);
-		r = new Regex();
-		m.setExpression(r);
-		r.setContent(".*ATTRIBUTE.*value:([\\d.-]*).*name:(\\w*).*"); //$NON-NLS-1$
-		r.setFlags("DOTALL"); //$NON-NLS-1$
-		t = new Target();
-		m.setTarget(t);
-		t.setType(ATTRIBUTE);
-		set = new Set();
-		m.getAddOrAppendOrPut().add(set);
-		set.setField("value"); //$NON-NLS-1$
-		set.setGroup(1);
-		set = new Set();
-		m.getAddOrAppendOrPut().add(set);
-		set.setField("name"); //$NON-NLS-1$
-		set.setGroup(2);
-		runTokenizer(getImplicitWithTags());
-		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
-		for (Object o : d.values()) {
-			if (o instanceof Property) {
-				Property p = (Property) o;
-				if (verbose) {
-					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
-					System.out.println("name " + p.getName()); //$NON-NLS-1$
-					System.out.println("value " + p.getValue()); //$NON-NLS-1$
-					System.out.println("*********************************"); //$NON-NLS-1$
-				}
-			} else if (o instanceof JobAttribute) {
-				JobAttribute ja = (JobAttribute) o;
-				if (verbose) {
-					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
-					System.out.println("name " + ja.getName()); //$NON-NLS-1$
-					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
-					System.out.println("*********************************"); //$NON-NLS-1$
-				}
-			}
-		}
-	}
-
-	public void testJobId() {
+	public void test01JobId() {
 		uuid = UUID.randomUUID().toString();
 		target = uuid;
 		Property p = new Property();
 		p.setName(target);
 		RMVariableMap.getActiveInstance().getVariables().put(target, p);
-		read.add(getRead(getName()));
-		runTokenizer(getNoiseBeforeJobId());
+		runTokenizer(startup.get(1).getStdoutParser().getRead(), getNoiseBeforeJobId());
 		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
@@ -359,25 +187,9 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		}
 	}
 
-	public void testJobStates() {
-		target = "jobStates"; //$NON-NLS-1$
-		Property p = new Property();
-		p.setName(target);
-		RMVariableMap.getActiveInstance().getVariables().put(target, p);
-		read.add(getRead(getName()));
-		runTokenizer(getJobStates());
-		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
-		assertNotNull(p);
-		assertNotNull(p.getValue());
-		if (verbose) {
-			System.out.println(target + " = " + p.getValue()); //$NON-NLS-1$
-		}
-	}
-
-	public void testOpenMPI() {
+	public void test02OpenMPI() {
 		target = ATTRIBUTE;
-		read.add(getRead(getName()));
-		runTokenizer(getOpenMPIOut());
+		runTokenizer(startup.get(2).getStdoutParser().getRead(), getOpenMPIOut());
 		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
 		for (Object o : d.values()) {
 			JobAttribute ja = (JobAttribute) o;
@@ -394,25 +206,75 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		}
 	}
 
-	public void testParseQstat() {
-		target = "available_queues"; //$NON-NLS-1$
-		Property p = new Property();
-		p.setName(target);
-		RMVariableMap.getActiveInstance().getVariables().put(target, p);
-		read.add(getRead(getName()));
-		runTokenizer(getQstatOut());
-		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
-		assertNotNull(p);
-		assertNotNull(p.getValue());
-		if (verbose) {
-			System.out.println(target + " = " + p.getValue()); //$NON-NLS-1$
+	public void test03ImplicitWithTags() {
+		runTokenizer(startup.get(3).getStdoutParser().getRead(), getImplicitWithTags());
+		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		for (Object o : d.values()) {
+			if (o instanceof Property) {
+				Property p = (Property) o;
+				if (verbose) {
+					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+					System.out.println("name " + p.getName()); //$NON-NLS-1$
+					System.out.println("value " + p.getValue()); //$NON-NLS-1$
+					System.out.println("*********************************"); //$NON-NLS-1$
+				}
+			} else if (o instanceof JobAttribute) {
+				JobAttribute ja = (JobAttribute) o;
+				if (verbose) {
+					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+					System.out.println("name " + ja.getName()); //$NON-NLS-1$
+					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
+					System.out.println("*********************************"); //$NON-NLS-1$
+				}
+			}
 		}
 	}
 
-	public void testPropertyDefs() {
+	public void test04ImplicitOrdering() {
+		target = ATTRIBUTE;
+		runTokenizer(startup.get(4).getStdoutParser().getRead(), getImplicitOrdering());
+		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		for (Object o : d.values()) {
+			JobAttribute ja = (JobAttribute) o;
+			if (verbose) {
+				System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+				System.out.println("name " + ja.getName()); //$NON-NLS-1$
+				System.out.println("type " + ja.getType()); //$NON-NLS-1$
+				System.out.println("tooltip " + ja.getTooltip()); //$NON-NLS-1$
+				System.out.println("description " + ja.getDescription()); //$NON-NLS-1$
+				System.out.println("value " + ja.getValue()); //$NON-NLS-1$
+				System.out.println("*********************************"); //$NON-NLS-1$
+			}
+		}
+	}
+
+	public void test05ImplicitWithTagsDotall() {
+		runTokenizer(startup.get(5).getStdoutParser().getRead(), getImplicitWithTags());
+		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		for (Object o : d.values()) {
+			if (o instanceof Property) {
+				Property p = (Property) o;
+				if (verbose) {
+					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+					System.out.println("name " + p.getName()); //$NON-NLS-1$
+					System.out.println("value " + p.getValue()); //$NON-NLS-1$
+					System.out.println("*********************************"); //$NON-NLS-1$
+				}
+			} else if (o instanceof JobAttribute) {
+				JobAttribute ja = (JobAttribute) o;
+				if (verbose) {
+					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+					System.out.println("name " + ja.getName()); //$NON-NLS-1$
+					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
+					System.out.println("*********************************"); //$NON-NLS-1$
+				}
+			}
+		}
+	}
+
+	public void test06PropertyDefsSingleLine() {
 		target = PROPERTY;
-		read.add(getRead(getName()));
-		runTokenizer(getPropertyDefs());
+		runTokenizer(startup.get(6).getStdoutParser().getRead(), getPropertyDefs());
 		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
 		for (Object o : d.values()) {
 			Property p = (Property) o;
@@ -425,14 +287,39 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		}
 	}
 
+	public void test07JobStates() {
+		target = "jobStates"; //$NON-NLS-1$
+		Property p = new Property();
+		p.setName(target);
+		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		runTokenizer(startup.get(7).getStdoutParser().getRead(), getJobStates());
+		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
+		assertNotNull(p);
+		assertNotNull(p.getValue());
+		if (verbose) {
+			System.out.println(target + " = " + p.getValue()); //$NON-NLS-1$
+		}
+	}
+
+	public void test10GetStatus() {
+		target = "42226";//$NON-NLS-1$
+		uuid = target;
+		Property p = new Property();
+		p.setName(target);
+		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		runTokenizer(getStatus.getStdoutParser().getRead(), getQstat());
+		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(this.target);
+		assertNotNull(p);
+		System.out.println(p.getName() + CM + SP + p.getValue());
+	}
+
 	public void testRange() {
-		TestRangeAssign range = new TestRangeAssign();
-		range.setRange(lineRange);
-		range.setRLen(50);
+		Range range = new Range(lineRange);
+		range.setLen(50);
 		int trues = 0;
 
 		for (int i = 0; i < 50; i++) {
-			boolean b = range.test(i);
+			boolean b = range.isInRange(i);
 			if (oracle[i]) {
 				trues++;
 			}
@@ -443,235 +330,16 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			values[i] = "" + oracle[i]; //$NON-NLS-1$
 		}
 
-		List<Object> valid = range.getValid(values);
+		List<Object> valid = range.findInRange(values);
 		for (Object o : valid) {
 			assertEquals("true", o); //$NON-NLS-1$
 			assertEquals(trues, valid.size());
 		}
 	}
 
-	private Read getRead(String name) {
-		Read read = new Read();
-		if (name.equals("testParseQstat")) { //$NON-NLS-1$
-			read.setDelim("\n"); //$NON-NLS-1$
-			Match match = new Match();
-			read.getMatch().add(match);
-			Regex regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent(".*"); //$NON-NLS-1$
-			Target target = new Target();
-			match.setTarget(target);
-			target.setRef(this.target);
-			Append append = new Append();
-			match.getAddOrAppendOrPut().add(append);
-			append.setField("value"); //$NON-NLS-1$
-			append.setSeparator(", "); //$NON-NLS-1$
-			append.setGroups("0"); //$NON-NLS-1$
-		} else if (name.equals("testJobStates")) { //$NON-NLS-1$
-			read.setMaxMatchLen(32);
-			Match match = new Match();
-			read.getMatch().add(match);
-			Regex regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent(".*<job>([\\d]*):([\\w]*)</job>.*"); //$NON-NLS-1$
-			regex.setFlags("DOTALL"); //$NON-NLS-1$
-			Target target = new Target();
-			match.setTarget(target);
-			target.setRef(this.target);
-			Put append = new Put();
-			match.getAddOrAppendOrPut().add(append);
-			append.setField("value"); //$NON-NLS-1$
-			append.setKeyGroups("1"); //$NON-NLS-1$
-			append.setValueGroups("2"); //$NON-NLS-1$
-		} else if (name.equals("testPropertyDefs")) { //$NON-NLS-1$
-			read.setDelim("\n"); //$NON-NLS-1$
-			Match match = new Match();
-			read.getMatch().add(match);
-			Regex regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent("<name>(.*)</name><value>(.*)</value>"); //$NON-NLS-1$
-			Target target = new Target();
-			match.setTarget(target);
-			target.setType(this.target);
-			Set set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("name"); //$NON-NLS-1$
-			set.setGroup(1);
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("value"); //$NON-NLS-1$
-			set.setGroup(2);
-		} else if (name.equals("testJobId")) { //$NON-NLS-1$
-			read.setDelim("\n"); //$NON-NLS-1$
-			read.setAll(true);
-			read.setSave(1);
-			Match match = new Match();
-			read.getMatch().add(match);
-			Regex regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent("([\\d]*)[.].*"); //$NON-NLS-1$
-			Target target = new Target();
-			match.setTarget(target);
-			target.setRef(this.target);
-			Set set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("value"); //$NON-NLS-1$
-			set.setGroup(1);
-		} else if (name.equals("testOpenMPI")) { //$NON-NLS-1$
-			read.setDelim("\n"); //$NON-NLS-1$
-			/* 1 */
-			Match match = new Match();
-			read.getMatch().add(match);
-			Regex regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent("mca:.*:param:([^:]*):value:(.*)"); //$NON-NLS-1$
-			Target target = new Target();
-			match.setTarget(target);
-			target.setType(this.target);
-			target.setIdFrom(1);
-			Set set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("name"); //$NON-NLS-1$
-			set.setGroup(1);
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("value"); //$NON-NLS-1$
-			set.setGroup(2);
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("visible"); //$NON-NLS-1$
-			set.setValue(TRUE);
-			/* 2 */
-			match = new Match();
-			read.getMatch().add(match);
-			regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent("mca:.*:param:([^:]*):status:(.*)"); //$NON-NLS-1$
-			target = new Target();
-			match.setTarget(target);
-			target.setType(this.target);
-			target.setIdFrom(1);
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("status"); //$NON-NLS-1$
-			set.setGroup(2);
-			Test test = new Test();
-			match.getTest().add(test);
-			test.setOp("EQ");//$NON-NLS-1$
-			test.getValue().add("this.status");//$NON-NLS-1$
-			test.getValue().add("read-only");//$NON-NLS-1$
-			If ifc = new If();
-			test.setIf(ifc);
-			set = new Set();
-			ifc.getAddOrAppendOrPut().add(set);
-			set.setField("readOnly");//$NON-NLS-1$
-			set.setValue(TRUE);
-			/* 3 */
-			match = new Match();
-			read.getMatch().add(match);
-			regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent("mca:.*:param:([^:]*):help:(.*)"); //$NON-NLS-1$
-			target = new Target();
-			match.setTarget(target);
-			target.setType(this.target);
-			target.setIdFrom(1);
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("tooltip"); //$NON-NLS-1$
-			set.setGroup(2);
-			/* 4 */
-			match = new Match();
-			read.getMatch().add(match);
-			regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent("(.*):([^:]*)"); //$NON-NLS-1$
-			target = new Target();
-			match.setTarget(target);
-			target.setType(this.target);
-			target.setIdFrom(1);
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("name"); //$NON-NLS-1$
-			set.setGroup(1);
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("value"); //$NON-NLS-1$
-			set.setGroup(2);
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("readOnly"); //$NON-NLS-1$
-			set.setValue(TRUE);
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("visible"); //$NON-NLS-1$
-			set.setValue(FALSE);
-		} else if (name.equals("testImplicitOrdering")) { //$NON-NLS-1$
-			read.setDelim("\n"); //$NON-NLS-1$
-			read.setMode(AND);
-			/* 1 */
-			Match match = new Match();
-			read.getMatch().add(match);
-			Regex regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent(".*"); //$NON-NLS-1$
-			Target target = new Target();
-			match.setTarget(target);
-			target.setType(this.target);
-			Set set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("name"); //$NON-NLS-1$
-			set.setGroup(0);
-			/* 2 */
-			match = new Match();
-			read.getMatch().add(match);
-			regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent(".*"); //$NON-NLS-1$
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("type"); //$NON-NLS-1$
-			set.setGroup(0);
-			/* 3 */
-			match = new Match();
-			read.getMatch().add(match);
-			regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent(".*"); //$NON-NLS-1$
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("description"); //$NON-NLS-1$
-			set.setGroup(0);
-			/* 4 */
-			match = new Match();
-			read.getMatch().add(match);
-			regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent(".*"); //$NON-NLS-1$
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("tooltip"); //$NON-NLS-1$
-			set.setGroup(0);
-			/* 5 */
-			match = new Match();
-			read.getMatch().add(match);
-			regex = new Regex();
-			match.setExpression(regex);
-			regex.setContent(".*"); //$NON-NLS-1$
-			set = new Set();
-			match.getAddOrAppendOrPut().add(set);
-			set.setField("value"); //$NON-NLS-1$
-			set.setGroup(0);
-		}
-		return read;
-	}
-
-	private void runTokenizer(InputStream stream) {
+	private void runTokenizer(List<Read> read, InputStream stream) {
 		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(uuid, read);
 		t.setInputStream(stream);
-		// if (redirect) {
-		// t.setRedirectStream(System.out);
-		// }
 		Thread thr = new Thread(t);
 		thr.start();
 		try {
