@@ -14,11 +14,9 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Add;
-import org.eclipse.ptp.rm.jaxb.core.data.Append;
-import org.eclipse.ptp.rm.jaxb.core.data.Put;
-import org.eclipse.ptp.rm.jaxb.core.data.Set;
 import org.eclipse.ptp.rm.jaxb.core.data.Test;
+import org.eclipse.ptp.rm.jaxb.core.data.Test.Else;
+import org.eclipse.ptp.rm.jaxb.core.data.Test.If;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 
@@ -37,25 +35,36 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	private final short op;
 	private final List<String> values;
 	private List<TestImpl> children;
-	private final Add add;
-	private final Append append;
-	private final Put put;
-	private final Set set;
+	private List<IAssign> ifcond;
+	private List<IAssign> elsecond;
+
 	private Object target;
 
 	public TestImpl(String uuid, Test test) {
 		this.uuid = uuid;
 		op = getOp(test.getOp());
-		add = test.getAdd();
-		append = test.getAppend();
-		put = test.getPut();
-		set = test.getSet();
 		values = test.getValue();
 		List<Test> tests = test.getTest();
 		if (!tests.isEmpty()) {
 			children = new ArrayList<TestImpl>();
 			for (Test t : tests) {
 				children.add(new TestImpl(uuid, t));
+			}
+		}
+
+		If listif = test.getIf();
+		if (listif != null) {
+			ifcond = new ArrayList<IAssign>();
+			for (Object o : listif.getAddOrAppendOrPut()) {
+				AbstractAssign.add(uuid, o, ifcond);
+			}
+		}
+
+		Else listelse = test.getElse();
+		if (listelse != null) {
+			elsecond = new ArrayList<IAssign>();
+			for (Object o : listelse.getAddOrAppendOrPut()) {
+				AbstractAssign.add(uuid, o, elsecond);
 			}
 		}
 	}
@@ -101,8 +110,13 @@ public class TestImpl implements IJAXBNonNLSConstants {
 			break;
 		}
 
-		maybeDoAssign();
-
+		if (target != null) {
+			if (result) {
+				doAssign(ifcond);
+			} else {
+				doAssign(elsecond);
+			}
+		}
 		return result;
 	}
 
@@ -111,6 +125,19 @@ public class TestImpl implements IJAXBNonNLSConstants {
 		if (children != null) {
 			for (TestImpl t : children) {
 				t.setTarget(target);
+			}
+		}
+	}
+
+	/*
+	 * These will be using only preassigned values, so the tokens[] param is
+	 * null
+	 */
+	private void doAssign(List<IAssign> assign) throws Throwable {
+		if (assign != null) {
+			for (IAssign a : assign) {
+				a.setTarget(target);
+				a.assign(null);
 			}
 		}
 	}
@@ -201,32 +228,6 @@ public class TestImpl implements IJAXBNonNLSConstants {
 			return sNOT;
 		}
 		return sEQ;
-	}
-
-	/*
-	 * These will be using only preassigned values, so the tokens[] param is
-	 * null
-	 */
-	private void maybeDoAssign() throws Throwable {
-		if (target == null) {
-			return;
-		}
-
-		IAssign assign = null;
-		if (add != null) {
-			assign = new AddImpl(uuid, add);
-		} else if (append != null) {
-			assign = new AppendImpl(uuid, append);
-		} else if (put != null) {
-			assign = new PutImpl(uuid, put);
-		} else if (set != null) {
-			assign = new SetImpl(uuid, set);
-		}
-
-		if (assign != null) {
-			assign.setTarget(target);
-			assign.assign(null);
-		}
 	}
 
 	private void validate(short op) throws Throwable {

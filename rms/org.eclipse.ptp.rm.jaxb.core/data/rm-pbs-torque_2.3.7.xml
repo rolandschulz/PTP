@@ -5,8 +5,8 @@
 		<control-connection>ssh://abe.ncsa.uiuc.edu/usr/local/bin/qsub</control-connection>
 	</site-data>
 	<control-data>
-		<property name="stdout" value="${rm:Output_Path#value}"/><!-- property needed for forwarding stdout in batch -->
-		<property name="stderr" value="${rm:Error_Path#value}"/><!-- property needed for forwarding stderr in batch -->
+		<property name="stdout"><value>${rm:Output_Path#value}</value></property><!-- property needed for forwarding stdout in batch -->
+		<property name="stderr"><value>${rm:Error_Path#value}</value></property><!-- property needed for forwarding stderr in batch -->
 		<job-attribute id="mpiCommand" name="mpiCommand" basic="true" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
@@ -306,6 +306,22 @@
 				</read>
 			</stdout-parser>
 		</start-up-command>
+		<submit-interactive name="submit-interactive">
+         <args>
+            <arg>/Users/arossi/qsub</arg>
+            <arg>${rm:pbs_script#value}</arg>
+         </args>
+         <stdout-parser>
+            <read delim="\n" all="true" save="1">
+               <match>
+                  <expression>([\d]*)[.].*</expression>
+                  <target ref="@jobId@"/>
+                  <set field="name" group="1"/>
+                  <set field="value" value="SUBMITTED"/>
+               </match>
+            </read>
+         </stdout-parser>
+      </submit-interactive>
 		<get-job-status name="get-job-status">
 			<args>
 				<arg>qstat</arg>
@@ -314,59 +330,55 @@
 			<stdout-parser>
 				<read delim="\n">
 					<match>
-						<expression>(.*[\s]*)\1\1\1([A-Z])[\s]*.*</expression>
+						<expression>.+[\\s]+.+[\\s]+.+[\\s]+.+[\\s]+([A-Z])[\\s]+.+</expression>
 						<target ref="@jobId@"/>
-						<set field="value" groups="2"/>
+						<set field="value" group="1"/>
 						<test op="EQ">
 							<value>this.value</value>
 							<value>Q</value>
-							<set field="value" value="QUEUED_ACTIVE"/>
+							<if>
+								<set field="value" value="QUEUED_ACTIVE"/>
+							</if>
 						</test>
 						<test op="EQ">
 							<value>this.value</value>
 							<value>R</value>
-							<set field="value" value="RUNNING"/>
+							<if>
+								<set field="value" value="RUNNING"/>
+							</if>
 						</test>
 						<test op="EQ">
 							<value>this.value</value>
 							<value>S</value>
-							<set field="value" value="SUSPENDED"/>
+							<if>
+								<set field="value" value="SUSPENDED"/>
+							</if>
 						</test>
 						<test op="EQ">
 							<value>this.value</value>
 							<value>C</value>
-							<set field="value" value="COMPLETED"/>
+							<if>
+								<set field="value" value="COMPLETED"/>
+							</if>
 						</test>
 						<test op="EQ">
 							<value>this.value</value>
 							<value>E</value>
-							<set field="value" value="COMPLETED"/>
+							<if>
+								<set field="value" value="COMPLETED"/>
+							</if>
 						</test>
 						<test op="EQ">
 							<value>this.value</value>
 							<value>H</value>
-							<set field="value" value="SYSTEM_ON_HOLD"/>
+							<if>
+								<set field="value" value="SYSTEM_ON_HOLD"/>
+							</if>
 						</test>
 					</match>
 				</read>
 			</stdout-parser>
 		</get-job-status>
-		<submit-interactive name="submit-interactive">
-			<args>
-				<arg>/Users/arossi/qsub</arg>
-				<arg>${rm:pbs_script#value}</arg>
-			</args>
-			<stdout-parser>
-				<read delim="\n" all="true" save="1">
-					<match>
-						<expression>([\d]*)[.].*</expression>
-						<target ref="@jobId@"/>
-						<set field="name" group="1"/>
-						<set field="value" value="SUBMITTED"/>
-					</match>
-				</read>
-			</stdout-parser>
-		</submit-interactive>
 		<terminate-job name="cancel">
 			<args>
 				<arg>qdel</arg>

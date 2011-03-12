@@ -31,6 +31,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Regex;
 import org.eclipse.ptp.rm.jaxb.core.data.Set;
 import org.eclipse.ptp.rm.jaxb.core.data.Target;
 import org.eclipse.ptp.rm.jaxb.core.data.Test;
+import org.eclipse.ptp.rm.jaxb.core.data.Test.If;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.AbstractRangeAssign;
 import org.eclipse.ptp.rm.jaxb.core.runnable.command.ConfigurableRegexTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -116,8 +117,10 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		test.setOp("EQ");//$NON-NLS-1$
 		test.getValue().add("this.value");//$NON-NLS-1$
 		test.getValue().add("R");//$NON-NLS-1$
+		If ifc = new If();
+		test.setIf(ifc);
 		set = new Set();
-		test.setSet(set);
+		ifc.getAddOrAppendOrPut().add(set);
 		set.setField("value");//$NON-NLS-1$
 		set.setValue("RUNNING");//$NON-NLS-1$
 		runTokenizer(getQstat());
@@ -557,8 +560,10 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			test.setOp("EQ");//$NON-NLS-1$
 			test.getValue().add("this.status");//$NON-NLS-1$
 			test.getValue().add("read-only");//$NON-NLS-1$
+			If ifc = new If();
+			test.setIf(ifc);
 			set = new Set();
-			test.setSet(set);
+			ifc.getAddOrAppendOrPut().add(set);
 			set.setField("readOnly");//$NON-NLS-1$
 			set.setValue(TRUE);
 			/* 3 */

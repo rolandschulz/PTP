@@ -12,9 +12,14 @@ package org.eclipse.ptp.rm.jaxb.core.data.impl;
 
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.data.Add;
+import org.eclipse.ptp.rm.jaxb.core.data.Append;
+import org.eclipse.ptp.rm.jaxb.core.data.Put;
+import org.eclipse.ptp.rm.jaxb.core.data.Set;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
@@ -33,6 +38,29 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	}
 
 	protected abstract Object[] getValue(Object previous, String[] values) throws Throwable;
+
+	static void add(String uuid, Object assign, List<IAssign> list) {
+		if (assign instanceof Add) {
+			Add add = (Add) assign;
+			list.add(new AddImpl(uuid, add));
+			return;
+		}
+		if (assign instanceof Append) {
+			Append append = (Append) assign;
+			list.add(new AppendImpl(uuid, append));
+			return;
+		}
+		if (assign instanceof Put) {
+			Put put = (Put) assign;
+			list.add(new PutImpl(uuid, put));
+			return;
+		}
+		if (assign instanceof Set) {
+			Set set = (Set) assign;
+			list.add(new SetImpl(uuid, set));
+			return;
+		}
+	}
 
 	static Object get(Object target, String field) throws Throwable {
 		String name = GET + field.substring(0, 1).toUpperCase() + field.substring(1);

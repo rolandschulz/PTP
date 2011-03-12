@@ -517,7 +517,12 @@
 		<xs:sequence>
 			<xs:element name="expression" minOccurs="0" type="rm:regex"/>
 			<xs:element name="target" minOccurs="0" type="rm:target"/>
-			<xs:element name="assign" minOccurs="0" maxOccurs="unbounded" type="rm:assign"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="add" type="rm:add"/>
+				<xs:element name="append" type="rm:append"/>
+				<xs:element name="put" type="rm:put"/>
+				<xs:element name="set" type="rm:set"/>
+			</xs:choice>
 			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test"/>
 		</xs:sequence>
 		<xs:attribute name="errorOnMiss" type="xs:boolean" default="false"/>
@@ -540,14 +545,6 @@
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="idFrom" type="xs:int"/>
-	</xs:complexType>
-	<xs:complexType name="assign">
-		<xs:choice>
-			<xs:element name="add" type="rm:add"/>
-			<xs:element name="append" type="rm:append"/>
-			<xs:element name="put" type="rm:put"/>
-			<xs:element name="set" type="rm:set"/>
-		</xs:choice>
 	</xs:complexType>
 	<xs:complexType name="set">
 		<xs:attribute name="field" type="xs:string"/>
@@ -602,8 +599,26 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="if" minOccurs="0" maxOccurs="unbounded" type="rm:assign"/>
-			<xs:element name="else" minOccurs="0" maxOccurs="unbounded" type="rm:assign"/>
+			<xs:element name="if" minOccurs="0">
+				<xs:complexType>
+					<xs:choice maxOccurs="unbounded">
+						<xs:element name="add" type="rm:add"/>
+						<xs:element name="append" type="rm:append"/>
+						<xs:element name="put" type="rm:put"/>
+						<xs:element name="set" type="rm:set"/>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="else" minOccurs="0" >
+			   <xs:complexType>
+               <xs:choice maxOccurs="unbounded">
+                  <xs:element name="add" type="rm:add"/>
+                  <xs:element name="append" type="rm:append"/>
+                  <xs:element name="put" type="rm:put"/>
+                  <xs:element name="set" type="rm:set"/>
+               </xs:choice>
+            </xs:complexType>
+			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="op">
 			<xs:simpleType>
