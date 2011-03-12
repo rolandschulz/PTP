@@ -279,13 +279,13 @@
 		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="tokenizer">
-	   <xs:annotation>
-         <xs:documentation>
-            These are attached to the stdout or stderr streams in order to capture the output of the command and add values
-            into the resource manager environment. If displayStdout or displayStderr of the command is true, the stream will be passed on to an
-            output stream will also be sent to the terminal.
-         </xs:documentation>
-      </xs:annotation>
+		<xs:annotation>
+			<xs:documentation>
+				These are attached to the stdout or stderr streams in order to capture the output of the command and add values
+				into the resource manager environment. If displayStdout or displayStderr of the command is true, the stream will be passed on to an
+				output stream will also be sent to the terminal.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:choice>
 				<xs:element name="type" type="xs:string">
@@ -517,13 +517,8 @@
 		<xs:sequence>
 			<xs:element name="expression" minOccurs="0" type="rm:regex"/>
 			<xs:element name="target" minOccurs="0" type="rm:target"/>
-			<xs:choice minOccurs="0" maxOccurs="unbounded">
-				<xs:element name="add" type="rm:add"/>
-				<xs:element name="append" type="rm:append"/>
-				<xs:element name="put" type="rm:put"/>
-				<xs:element name="set" type="rm:set"/>
-			</xs:choice>
-			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test" />
+			<xs:element name="assign" minOccurs="0" maxOccurs="unbounded" type="rm:assign"/>
+			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test"/>
 		</xs:sequence>
 		<xs:attribute name="errorOnMiss" type="xs:boolean" default="false"/>
 	</xs:complexType>
@@ -545,6 +540,14 @@
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="idFrom" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="assign">
+		<xs:choice>
+			<xs:element name="add" type="rm:add"/>
+			<xs:element name="append" type="rm:append"/>
+			<xs:element name="put" type="rm:put"/>
+			<xs:element name="set" type="rm:set"/>
+		</xs:choice>
 	</xs:complexType>
 	<xs:complexType name="set">
 		<xs:attribute name="field" type="xs:string"/>
@@ -599,6 +602,8 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name="if" minOccurs="0" maxOccurs="unbounded" type="rm:assign"/>
+			<xs:element name="else" minOccurs="0" maxOccurs="unbounded" type="rm:assign"/>
 		</xs:sequence>
 		<xs:attribute name="op">
 			<xs:simpleType>
@@ -614,7 +619,6 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="set" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="monitor">
 		<xs:annotation>

@@ -110,6 +110,8 @@ public interface IJAXBNonNLSConstants {
 	String SH = ".sh";//$NON-NLS-1$
 	String SETENV = "setenv";//$NON-NLS-1$
 	String EXPORT = "export";//$NON-NLS-1$
+	String STDOUT = "stdout";//$NON-NLS-1$
+	String STDERR = "stderr";//$NON-NLS-1$
 
 	String CONTROL_USER_NAME = "controlUserName";//$NON-NLS-1$
 	String MONITOR_USER_NAME = "monitorUserName";//$NON-NLS-1$
