@@ -219,25 +219,33 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	@Override
 	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
+		Property p = new Property();
+		RMVariableMap.getActiveInstance().getVariables().put(jobId, p);
+
 		Command job = controlData.getGetJobStatus();
 		if (job == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + JOBSTATUS, null);
 		}
 		runCommand(jobId, job, false, true);
 
-		Property p = (Property) RMVariableMap.getActiveInstance().getVariables().remove(jobId);
+		p = (Property) RMVariableMap.getActiveInstance().getVariables().remove(jobId);
 		String state = IJobStatus.UNDETERMINED;
 		if (p != null) {
 			state = (String) p.getValue();
 		}
 
+		System.out.println(jobId + ": " + state);
+
 		CommandJobStatus status = new CommandJobStatus(jobId, state);
 		ICommandJobStreamsProxy proxy = streamsProxyMap.getProxy(jobId);
+		System.out.println(jobId + ", setting proxy in status: " + proxy);
 		status.setProxy(proxy);
 
 		if (IJobStatus.RUNNING.equals(state)) {
+			System.out.println(jobId + ", calling start (again?) on proxy monitor: " + proxy);
 			proxy.startMonitors();
 		} else if (IJobStatus.FAILED.equals(state) || IJobStatus.COMPLETED.equals(state)) {
+			System.out.println(jobId + ", calling close on proxy monitor: " + proxy);
 			proxy.close();
 			streamsProxyMap.removeProxy(jobId);
 		}

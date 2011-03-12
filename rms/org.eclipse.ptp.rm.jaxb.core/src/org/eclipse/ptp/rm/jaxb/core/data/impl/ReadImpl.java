@@ -220,6 +220,7 @@ public class ReadImpl implements IJAXBNonNLSConstants {
 				break;
 			}
 		}
+		System.out.println(segment);
 		return segment.toString();
 	}
 

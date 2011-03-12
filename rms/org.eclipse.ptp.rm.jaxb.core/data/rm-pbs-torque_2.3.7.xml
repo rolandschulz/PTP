@@ -291,10 +291,10 @@
 			</stdout-parser>
 			</startup-command>
 		-->
-		<!-- FOR TESTING -->
+		<!-- ********************** FOR TESTING ********************** -->
 		<start-up-command name="get-queues">
 			<args>
-				<arg>/Users/arossi/qstat</arg>
+				<arg>/Users/arossi/qstatF</arg>
 			</args>
 			<stdout-parser>
 				<read delim="\n">
@@ -306,7 +306,8 @@
 				</read>
 			</stdout-parser>
 		</start-up-command>
-		<submit-interactive name="submit-interactive">
+		<!-- ********************** FOR TESTING ********************** -->
+		<submit-interactive name="submit-interactive" waitForId="true">
          <args>
             <arg>/Users/arossi/qsub</arg>
             <arg>${rm:pbs_script#value}</arg>
@@ -322,15 +323,16 @@
             </read>
          </stdout-parser>
       </submit-interactive>
+      <!-- ********************** FOR TESTING ********************** -->
 		<get-job-status name="get-job-status">
 			<args>
-				<arg>qstat</arg>
-				<arg>| grep ${@jobId@}</arg>
+				<arg>/Users/arossi/qstatId</arg>
+				<arg>@jobId@</arg>
 			</args>
 			<stdout-parser>
 				<read delim="\n">
-					<match>
-						<expression>.+[\\s]+.+[\\s]+.+[\\s]+.+[\\s]+([A-Z])[\\s]+.+</expression>
+					<match errorOnMiss="true">
+						<expression>.+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
 						<target ref="@jobId@"/>
 						<set field="value" group="1"/>
 						<test op="EQ">
@@ -379,12 +381,14 @@
 				</read>
 			</stdout-parser>
 		</get-job-status>
+		<!-- 
 		<terminate-job name="cancel">
 			<args>
 				<arg>qdel</arg>
-				<arg>${rm:jobId#value}</arg>
+				<arg>@jobId@</arg>
 			</args>
 		</terminate-job>
+		 -->
 		<launch-tab>
 			<basic>
 				<title>Standard</title>

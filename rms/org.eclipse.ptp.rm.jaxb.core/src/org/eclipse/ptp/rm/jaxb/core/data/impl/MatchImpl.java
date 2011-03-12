@@ -18,7 +18,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.Match;
 import org.eclipse.ptp.rm.jaxb.core.data.Regex;
 import org.eclipse.ptp.rm.jaxb.core.data.Target;
 import org.eclipse.ptp.rm.jaxb.core.data.Test;
-import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedRegexMatchException;
 
 public class MatchImpl implements IJAXBNonNLSConstants {
 
@@ -26,7 +25,6 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	private TargetImpl target;
 	private List<IAssign> assign;
 	private List<TestImpl> tests;
-	private final boolean errorOnMiss;
 	private boolean matched;
 
 	public MatchImpl(String uuid, Match match) {
@@ -54,8 +52,6 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 				this.tests.add(new TestImpl(uuid, test));
 			}
 		}
-
-		errorOnMiss = match.isErrorOnMiss();
 	}
 
 	public synchronized void clear() throws Throwable {
@@ -84,9 +80,6 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 		} else {
 			tokens = regex.getMatched(sequence);
 			if (tokens == null) {
-				if (errorOnMiss) {
-					throw new UnsatisfiedRegexMatchException(regex.getExpression());
-				}
 				return end;
 			}
 			matched = true;
