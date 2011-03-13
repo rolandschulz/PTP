@@ -15,6 +15,10 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.data.Control;
+import org.eclipse.ptp.rm.jaxb.core.data.LaunchTab;
+import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -53,9 +57,17 @@ public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurat
 		if (!(rm instanceof IJAXBResourceManager)) {
 			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_doCreateError + rm, null);
 		}
-		return new JAXBRMCustomBatchScriptTab(((IJAXBResourceManager) rm).getControl(), dialog);
-		// return new
-		// JAXBRMLaunchConfigurationDynamicTab(((IJAXBResourceManager)
-		// rm).getControl(), dialog);
+		return new JAXBRMLaunchConfigurationDynamicTab(((IJAXBResourceManager) rm).getControl(), dialog);
+	}
+
+	static LaunchTab getLaunchTab(IJAXBResourceManagerConfiguration config) {
+		ResourceManagerData data = config.resourceManagerData();
+		if (data != null) {
+			Control control = data.getControlData();
+			if (control != null) {
+				return control.getLaunchTab();
+			}
+		}
+		return null;
 	}
 }

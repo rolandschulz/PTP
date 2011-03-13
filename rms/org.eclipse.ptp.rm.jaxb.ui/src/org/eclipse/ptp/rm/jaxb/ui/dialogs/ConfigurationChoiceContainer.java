@@ -27,7 +27,6 @@ import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
-import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -37,7 +36,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
@@ -45,11 +43,16 @@ import org.eclipse.ui.IMemento;
 public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConstants {
 
 	private class WidgetListener implements SelectionListener {
+		private boolean disabled = false;
+
 		public void widgetDefaultSelected(SelectionEvent e) {
 			widgetSelected(e);
 		}
 
-		public void widgetSelected(SelectionEvent e) {
+		public synchronized void widgetSelected(SelectionEvent e) {
+			if (disabled) {
+				return;
+			}
 			Object source = e.getSource();
 			if (source == preset) {
 				handlePresetSelected();
@@ -65,6 +68,14 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 				}
 			}
 			onUpdate();
+		}
+
+		private synchronized void disable() {
+			disabled = true;
+		}
+
+		private synchronized void enable() {
+			disabled = false;
 		}
 	}
 
@@ -83,46 +94,34 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 	private JAXBRMConfigurationManager available;
 
 	public ConfigurationChoiceContainer(Composite parent) {
-
 		shell = parent.getShell();
 		listener = new WidgetListener();
-		Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(3, false, 10, 5);
-		GridData gd = WidgetBuilderUtils.spanGridData(GridData.FILL_HORIZONTAL, 3);
-		group.setLayout(layout);
-		group.setLayoutData(gd);
 
-		Label label = new Label(group, SWT.NONE);
-		label.setText(Messages.JAXBRMConfigurationSelectionWizardPage_4);
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(3, true);
+		GridData gd = WidgetBuilderUtils.createGridDataFillH(3);
+		Group group = WidgetBuilderUtils.createGroup(parent, SWT.SHADOW_ETCHED_IN, layout, gd);
 
-		choice = WidgetBuilderUtils.createText(group, selected, true, null, null);
-		choice.setEditable(false);
+		WidgetBuilderUtils.createLabel(group, Messages.JAXBRMConfigurationSelectionWizardPage_4, SWT.LEFT, 1);
+		gd = WidgetBuilderUtils.createGridDataFillH(2);
+		choice = WidgetBuilderUtils.createText(group, SWT.BORDER, gd, true, selected);
 
-		group = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		layout = WidgetBuilderUtils.createGridLayout(3, true, 10, 0);
-		gd = WidgetBuilderUtils.spanGridData(GridData.FILL_HORIZONTAL, 3);
-		group.setLayout(layout);
-		group.setLayoutData(gd);
+		layout = WidgetBuilderUtils.createGridLayout(3, true);
+		gd = WidgetBuilderUtils.createGridDataFillH(3);
+		group = WidgetBuilderUtils.createGroup(parent, SWT.SHADOW_ETCHED_IN, layout, gd);
 
-		preset = WidgetBuilderUtils.createItemCombo(group, Messages.JAXBRMConfigurationSelectionComboTitle_0, new String[0],
-				ZEROSTR, ZEROSTR, true, null, 2);
-		preset.addSelectionListener(listener);
+		preset = WidgetBuilderUtils.createCombo(group, 2, new String[0], ZEROSTR,
+				Messages.JAXBRMConfigurationSelectionComboTitle_0, ZEROSTR, listener);
 
-		group = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		layout = WidgetBuilderUtils.createGridLayout(3, true, 10, 0);
-		gd = WidgetBuilderUtils.spanGridData(GridData.FILL_HORIZONTAL, 3);
-		group.setLayout(layout);
-		group.setLayoutData(gd);
+		layout = WidgetBuilderUtils.createGridLayout(3, true);
+		gd = WidgetBuilderUtils.createGridDataFillH(3);
+		group = WidgetBuilderUtils.createGroup(parent, SWT.SHADOW_ETCHED_IN, layout, gd);
 
-		external = WidgetBuilderUtils.createItemCombo(group, Messages.JAXBRMConfigurationSelectionComboTitle_1, new String[0],
-				ZEROSTR, ZEROSTR, true, null, 2);
-		external.addSelectionListener(listener);
+		external = WidgetBuilderUtils.createCombo(group, 2, new String[0], ZEROSTR,
+				Messages.JAXBRMConfigurationSelectionComboTitle_1, ZEROSTR, listener);
 
-		browseHomeButton = SWTUtil.createPushButton(group, Messages.JAXBRMConfigurationSelectionWizardPage_1, null);
-		browseHomeButton.addSelectionListener(listener);
-
-		browseProjectButton = SWTUtil.createPushButton(group, Messages.JAXBRMConfigurationSelectionWizardPage_2, null);
-		browseProjectButton.addSelectionListener(listener);
+		browseHomeButton = WidgetBuilderUtils.createPushButton(group, Messages.JAXBRMConfigurationSelectionWizardPage_1, listener);
+		browseProjectButton = WidgetBuilderUtils.createPushButton(group, Messages.JAXBRMConfigurationSelectionWizardPage_2,
+				listener);
 
 		selected = ZEROSTR;
 		isPreset = true;
@@ -138,8 +137,11 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 
 	public void setAvailableConfigurations() {
 		available = JAXBRMConfigurationManager.getInstance();
+
 		if (preset != null) {
+			listener.disable();
 			preset.setItems(available.getTypes());
+			listener.enable();
 		}
 
 		if (config != null) {
@@ -165,21 +167,25 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 		}
 
 		if (selected != null) {
-			if (!ZEROSTR.equals(selected) && !new File(selected).exists()) {
-				selected = ZEROSTR;
-				if (config != null) {
-					config.setRMInstanceXMLLocation(ZEROSTR);
-				} else if (memento != null) {
-					memento.putString(RM_XSD_PATH, ZEROSTR);
-				}
-			}
 			String type = available.getTypeForPath(selected);
 			if (type != null) {
 				isPreset = true;
 				choice.setText(type);
+				for (int i = 0; i < preset.getItems().length; i++) {
+					if (type.equals(preset.getItem(i))) {
+						preset.select(i);
+						break;
+					}
+				}
 			} else {
 				isPreset = false;
 				choice.setText(selected);
+				for (int i = 0; i < external.getItems().length; i++) {
+					if (selected.equals(external.getItem(i))) {
+						preset.select(i);
+						break;
+					}
+				}
 			}
 		}
 		onUpdate();

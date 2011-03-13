@@ -34,6 +34,7 @@ import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
@@ -155,6 +156,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	public JAXBResourceManagerControl(IResourceManagerConfiguration jaxbServiceProvider) {
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
+		try {
+			config.realizeRMDataFromXML();
+		} catch (Throwable t) {
+			JAXBCorePlugin.log(t);
+		}
+		assert (null != config.resourceManagerData());
 		controlData = config.resourceManagerData().getControlData();
 		dynSystemEnv = new TreeMap<String, String>();
 		streamsProxyMap = new StreamProxyMap();

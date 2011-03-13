@@ -252,6 +252,7 @@
 				<xs:element name="group" type="rm:group"/>
 			</xs:choice>
 		</xs:sequence>
+		<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="regex" mixed="true">
 		<xs:attribute name="flags" type="xs:string"/>
@@ -306,6 +307,7 @@
 			<xs:element name="title" type="xs:string"/>
 			<xs:element name="item" maxOccurs="unbounded" type="rm:tab-item"/>
 		</xs:sequence>
+		<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="group">
 		<xs:annotation>

@@ -7,6 +7,8 @@ import org.eclipse.swt.widgets.Display;
 
 public interface IJAXBUINonNLSConstants extends IJAXBNonNLSConstants {
 
+	int DEFAULT = UNDEFINED;
+
 	Color DKBL = Display.getDefault().getSystemColor(SWT.COLOR_DARK_BLUE);
 	Color DKMG = Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA);
 	Color DKRD = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);

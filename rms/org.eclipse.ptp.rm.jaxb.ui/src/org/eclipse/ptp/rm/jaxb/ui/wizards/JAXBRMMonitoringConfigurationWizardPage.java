@@ -61,7 +61,9 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractContr
 	@Override
 	protected void loadConnectionOptions() {
 		targetPath = config.getMonitorPath();
-		targetArgs = config.getMonitorInvocationOptionsStr();
+		if (targetArgs != null) {
+			targetArgs = config.getMonitorInvocationOptionsStr();
+		}
 		localAddr = config.getLocalAddress();
 		int options = config.getMonitorOptions();
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
@@ -89,7 +91,9 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractContr
 			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
 		}
 		config.setMonitorPath(targetPath);
-		config.setMonitorInvocationOptions(targetArgs);
+		if (targetArgs != null) {
+			config.setMonitorInvocationOptions(targetArgs);
+		}
 		config.setMonitorOptions(options);
 		config.setLocalAddress(localAddr);
 		if (connection != null) {

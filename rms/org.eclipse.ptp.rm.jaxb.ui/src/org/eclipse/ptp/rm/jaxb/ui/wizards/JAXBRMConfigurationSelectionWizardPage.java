@@ -14,10 +14,9 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.ConfigurationChoiceContainer;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 public class JAXBRMConfigurationSelectionWizardPage extends RMConfigurationWizardPage implements IJAXBUINonNLSConstants {
@@ -34,9 +33,7 @@ public class JAXBRMConfigurationSelectionWizardPage extends RMConfigurationWizar
 
 	@Override
 	public void createControl(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout topLayout = new GridLayout();
-		composite.setLayout(topLayout);
+		Composite composite = WidgetBuilderUtils.createComposite(parent, 1);
 		container = new ConfigurationChoiceContainer(composite) {
 			@Override
 			protected void onUpdate() {

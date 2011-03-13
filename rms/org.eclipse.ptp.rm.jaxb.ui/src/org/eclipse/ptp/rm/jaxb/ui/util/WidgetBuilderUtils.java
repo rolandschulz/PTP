@@ -1,15 +1,21 @@
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -28,84 +34,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	// c.addSelectionListener(l);
 	// }
 	// return c;
-	// }
-
-	// public static Group createAnonymousNonFillingGroup(Composite parent, int
-	// columns) {
-	// GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-	// data.horizontalAlignment = SWT.FILL;
-	// data.grabExcessHorizontalSpace = true;
-	// data.horizontalSpan = 1;
-	// data.verticalAlignment = SWT.LEFT;
-	// data.grabExcessVerticalSpace = false;
-	//
-	// GridLayout layout = new GridLayout();
-	// layout.numColumns = columns;
-	// layout.verticalSpacing = 1;
-	//
-	// Group group = new Group(parent, SWT.SHADOW_NONE | SWT.NO_TRIM);
-	// group.setLayout(layout);
-	// group.setLayoutData(data);
-	//
-	// return group;
-	// }
-
-	// public static Button createButton(Composite parent, String buttonText,
-	// Image image, int style, int colSpan, boolean fill,
-	// SelectionListener l) {
-	//
-	// Button button = new Button(parent, style);
-	// button.setText(buttonText);
-	// if (image != null) {
-	// button.setImage(image);
-	// }
-	//
-	// if (l != null) {
-	// button.addSelectionListener(l);
-	// }
-	//
-	// GridData data = new GridData();
-	// if (fill) {
-	// data.horizontalAlignment = SWT.FILL;
-	// }
-	// data.grabExcessHorizontalSpace = false;
-	// data.horizontalSpan = colSpan;
-	// button.setLayoutData(data);
-	//
-	// return button;
-	// }
-
-	// public static Composite createComposite(Composite parent, int columns) {
-	// GridLayout layout = new GridLayout();
-	// layout.numColumns = columns;
-	// layout.verticalSpacing = 1;
-	// Composite composite = new Composite(parent, SWT.NONE);
-	// composite.setLayout(layout);
-	// return composite;
-	// }
-
-	// public static Group createFillingGroup(Composite parent, String text, int
-	// columns, int colSpan, boolean verticalFill) {
-	// GridData data = new GridData();
-	// data.horizontalAlignment = GridData.FILL;
-	// data.verticalAlignment = GridData.FILL;
-	// data.grabExcessHorizontalSpace = true;
-	// data.grabExcessVerticalSpace = verticalFill;
-	// if (colSpan != -1) {
-	// data.horizontalSpan = colSpan;
-	// }
-	//
-	// GridLayout layout = new GridLayout();
-	// layout.numColumns = columns;
-	// layout.verticalSpacing = 9;
-	//
-	// Group group = new Group(parent, SWT.NO_TRIM | SWT.SHADOW_NONE);
-	// if (text != null) {
-	// group.setText(text);
-	// }
-	// group.setLayout(layout);
-	// group.setLayoutData(data);
-	// return group;
 	// }
 
 	// public static Table createFillingTable(Composite parent, int numColumns,
@@ -132,19 +60,22 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	// return t;
 	// }
 
-	// public static Label createLabel(Composite container, String text, int
-	// style, int colSpan) {
-	// GridData data = new GridData();
-	// data.horizontalSpan = colSpan;
-	//
-	// Label label = new Label(container, style);
-	// if (text == null) {
-	// text = ZEROSTR;
-	// }
-	// label.setText(text.trim());
-	// label.setLayoutData(data);
-	// return label;
-	// }
+	public static void applyMonospace(Text text) {
+		Display d = Display.getCurrent();
+		// three fonts for Mac, Linux, Windows ...
+		FontData[][] f = { d.getFontList(COURIER, true), d.getFontList(COURIER, false), d.getFontList(COURIER, true),
+				d.getFontList(COURIER, false), d.getFontList(COURIER, true), d.getFontList(COURIER, false) };
+		int i = 0;
+		for (; i < f.length; i++) {
+			if (f[i].length > 0) {
+				text.setFont(new Font(d, f[i]));
+				break;
+			}
+		}
+		if (i == f.length) {
+			Dialog.applyDialogFont(text);
+		}
+	}
 
 	// public static Spinner createSpinner(Composite container, String
 	// labelString, int min, int max, int initial, int colSpan,
@@ -174,100 +105,12 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	// return s;
 	// }
 
-	/**
-	 * Convenience method for creating a button widget.
-	 * 
-	 * @param parent
-	 * @param label
-	 * @param type
-	 * @return the button widget
-	 */
-	public static Button createButton(Composite parent, String label, int type) {
+	public static Button createButton(Composite parent, GridData data, String label, int type, SelectionListener listener) {
 		Button button = new Button(parent, type);
 		button.setText(label);
-		GridData data = new GridData();
-		button.setLayoutData(data);
-		return button;
-	}
-
-	/**
-	 * Convenience method for creating a check button widget.
-	 * 
-	 * @param parent
-	 * @param label
-	 * @return the check button widget
-	 */
-	public static Button createCheckButton(Composite parent, String label) {
-		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
-	}
-
-	/**
-	 * Convenience method for creating a grid layout.
-	 * 
-	 * @param columns
-	 * @param isEqual
-	 * @param mh
-	 * @param mw
-	 * @return the new grid layout
-	 */
-	public static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
-		gridLayout.marginHeight = mh;
-		gridLayout.marginWidth = mw;
-		return gridLayout;
-	}
-
-	public static Combo createItemCombo(Composite container, String labelString, String[] items, String initial, String tooltip,
-			boolean fill, ModifyListener listener, int colSpan) {
-		if (labelString != null) {
-			Label label = new Label(container, SWT.RIGHT);
-			label.setText(labelString);
-			if (tooltip != null) {
-				label.setToolTipText(tooltip);
-			}
+		if (data == null) {
+			data = createGridData(GridData.FILL_HORIZONTAL, DEFAULT);
 		}
-
-		GridData data = new GridData();
-		if (fill) {
-			data.horizontalAlignment = SWT.FILL;
-		}
-		data.grabExcessHorizontalSpace = true;
-		if (colSpan != -1) {
-			data.horizontalSpan = colSpan;
-		}
-		data.widthHint = 100;
-
-		Combo combo = new Combo(container, SWT.BORDER);
-		combo.setItems(items);
-		combo.setLayoutData(data);
-		if (initial != null) {
-			combo.setText(initial);
-		}
-		if (listener != null) {
-			combo.addModifyListener(listener);
-		}
-		return combo;
-	}
-
-	/**
-	 * Creates an new radio button instance and sets the default layout data.
-	 * 
-	 * @param group
-	 *            the composite in which to create the radio button
-	 * @param label
-	 *            the string to set into the radio button
-	 * @param value
-	 *            the string to identify radio button
-	 * @return the new radio button
-	 */
-	public static Button createRadioButton(Composite parent, String label, String value, SelectionListener listener) {
-		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT);
-		button.setData((null == value) ? label : value);
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		data.horizontalAlignment = GridData.FILL;
-		data.verticalAlignment = GridData.BEGINNING;
 		button.setLayoutData(data);
 		if (null != listener) {
 			button.addSelectionListener(listener);
@@ -275,25 +118,198 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return button;
 	}
 
-	public static Text createText(Composite container, String initialValue, boolean fill, ModifyListener listener, Color color) {
+	public static Button createButton(Composite parent, String label, int type) {
+		return createButton(parent, null, label, type, null);
+	}
 
-		GridData data = new GridData();
-		if (fill) {
-			data.horizontalAlignment = SWT.FILL;
+	public static Button createButton(Composite parent, String label, int type, SelectionListener listener) {
+		return createButton(parent, null, label, type, listener);
+	}
+
+	public static Button createCheckButton(Composite parent, String label, SelectionListener listener) {
+		return createButton(parent, label, SWT.CHECK | SWT.LEFT, listener);
+	}
+
+	public static Combo createCombo(Composite parent, int style, GridData data, Object listener) {
+		return createCombo(parent, style, data, new String[0], null, null, null, listener);
+	}
+
+	public static Combo createCombo(Composite parent, int style, GridData data, String[] items, String initial, String label,
+			String tooltip, Object listener) {
+		if (label != null) {
+			Label comboLabel = createLabel(parent, label, SWT.RIGHT, 1);
+			if (tooltip != null) {
+				comboLabel.setToolTipText(tooltip);
+			}
 		}
-		data.grabExcessHorizontalSpace = true;
-		Text text = new Text(container, SWT.BORDER);
+		Combo combo = new Combo(parent, style);
+		combo.setItems(items);
+		combo.setLayoutData(data);
+		if (initial != null) {
+			combo.setText(initial);
+		}
+		if (listener != null) {
+			if (listener instanceof ModifyListener) {
+				combo.addModifyListener((ModifyListener) listener);
+			} else if (listener instanceof SelectionListener) {
+				combo.addSelectionListener((SelectionListener) listener);
+			}
+		}
+		return combo;
+	}
+
+	public static Combo createCombo(Composite parent, int cols, String[] items, String initial, String labelString, String tooltip,
+			Object listener) {
+		GridData data = createGridData(GridData.FILL_HORIZONTAL, true, false, 100, DEFAULT, cols);
+		return createCombo(parent, SWT.BORDER, data, items, initial, labelString, tooltip, listener);
+	}
+
+	public static Composite createComposite(Composite parent, int columns) {
+		GridLayout layout = createGridLayout(columns, false, DEFAULT, DEFAULT, 1, DEFAULT);
+		return createComposite(parent, SWT.NONE, layout, null);
+	}
+
+	public static Composite createComposite(Composite parent, int style, GridLayout layout, GridData data) {
+		Composite composite = new Composite(parent, style);
+		composite.setLayout(layout);
+		if (data != null) {
+			composite.setData(data);
+		}
+		return composite;
+	}
+
+	public static GridData createGridData(int style, boolean grabH, boolean grabV, int wHint, int hHint, int cols) {
+		GridData data = new GridData();
+		if (style == DEFAULT) {
+			data = new GridData();
+		} else {
+			data = new GridData(style);
+		}
+		data.grabExcessHorizontalSpace = grabH;
+		data.grabExcessVerticalSpace = grabV;
+		if (wHint != DEFAULT) {
+			data.widthHint = wHint;
+		}
+		if (hHint != DEFAULT) {
+			data.heightHint = hHint;
+		}
+		if (cols != DEFAULT) {
+			data.horizontalSpan = cols;
+		}
+		return data;
+	}
+
+	public static GridData createGridData(int style, int cols) {
+		return createGridData(style, false, false, DEFAULT, DEFAULT, cols);
+	}
+
+	public static GridData createGridDataFill(int wHint, int hHint, int cols) {
+		return createGridData(GridData.FILL_BOTH, true, true, wHint, hHint, cols);
+	}
+
+	public static GridData createGridDataFillH(int cols) {
+		return createGridData(GridData.FILL_HORIZONTAL, true, false, DEFAULT, DEFAULT, cols);
+	}
+
+	public static GridLayout createGridLayout(int columns, boolean equal) {
+		return createGridLayout(columns, equal, DEFAULT, DEFAULT, DEFAULT, DEFAULT);
+	}
+
+	public static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+		return createGridLayout(columns, isEqual, mh, mw, DEFAULT, DEFAULT);
+	}
+
+	public static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw, int vSpace, int hSpace) {
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		if (mh != DEFAULT) {
+			gridLayout.marginHeight = mh;
+		}
+		if (mw != DEFAULT) {
+			gridLayout.marginWidth = mw;
+		}
+		if (vSpace != DEFAULT) {
+			gridLayout.verticalSpacing = vSpace;
+		}
+		if (hSpace != DEFAULT) {
+			gridLayout.horizontalSpacing = hSpace;
+		}
+		return gridLayout;
+	}
+
+	public static Group createGroup(Composite parent, int style, GridLayout layout, GridData data) {
+		return createGroup(parent, style, layout, data, null);
+	}
+
+	public static Group createGroup(Composite parent, int style, GridLayout layout, GridData data, String text) {
+		Group group = new Group(parent, style);
+		group.setLayout(layout);
+		group.setLayoutData(data);
+		if (text != null) {
+			group.setText(text);
+		}
+		return group;
+	}
+
+	public static Label createLabel(Composite container, String text, int style, GridData data) {
+		Label label = new Label(container, style);
+		if (text == null) {
+			text = ZEROSTR;
+		}
+		label.setText(text.trim());
+		if (data == null) {
+			data = createGridData(DEFAULT, 1);
+		}
+		label.setLayoutData(data);
+		return label;
+	}
+
+	public static Label createLabel(Composite container, String text, int style, int colSpan) {
+		GridData data = createGridData(DEFAULT, colSpan);
+		return createLabel(container, text, style, data);
+	}
+
+	public static Button createPushButton(Composite parent, String label, SelectionListener listener) {
+		Button button = SWTUtil.createPushButton(parent, label, null);
+		if (null != listener) {
+			button.addSelectionListener(listener);
+		}
+		return button;
+	}
+
+	public static Button createRadioButton(Composite parent, String label, String value, SelectionListener listener) {
+		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT, listener);
+		button.setData((null == value) ? label : value);
+		return button;
+	}
+
+	public static Text createText(Composite parent, int options, GridData data, boolean readOnly, String initialContents) {
+		return createText(parent, options, data, readOnly, initialContents, null, null);
+	}
+
+	public static Text createText(Composite parent, int options, GridData data, boolean readOnly, String initialContents,
+			ModifyListener listener, Color color) {
+		Text text = new Text(parent, options);
+		text.setLayoutData(data);
+		text.setEditable(!readOnly);
 		if (color != null) {
 			text.setBackground(color);
 		}
 		text.setLayoutData(data);
-		if (initialValue != null) {
-			text.setText(initialValue);
+		if (initialContents != null) {
+			text.setText(initialContents);
 		}
 		if (listener != null) {
 			text.addModifyListener(listener);
 		}
 		return text;
+	}
+
+	public static Text createText(Composite parent, String initialValue, boolean fill, boolean readOnly, ModifyListener listener,
+			Color color) {
+		GridData data = createGridData(fill ? GridData.FILL_HORIZONTAL : DEFAULT, true, false, DEFAULT, DEFAULT, DEFAULT);
+		return createText(parent, SWT.BORDER, data, readOnly, initialValue, listener, color);
 	}
 
 	/**
@@ -338,21 +354,5 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			}
 		}
 		return newLine.toString();
-	}
-
-	/**
-	 * @param style
-	 * @param space
-	 * @return
-	 */
-	public static GridData spanGridData(int style, int space) {
-		GridData gd = null;
-		if (style == -1) {
-			gd = new GridData();
-		} else {
-			gd = new GridData(style);
-		}
-		gd.horizontalSpan = space;
-		return gd;
 	}
 }

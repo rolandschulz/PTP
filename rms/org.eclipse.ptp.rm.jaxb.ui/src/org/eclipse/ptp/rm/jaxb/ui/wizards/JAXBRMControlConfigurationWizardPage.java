@@ -64,7 +64,9 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 	@Override
 	protected void loadConnectionOptions() {
 		targetPath = config.getControlPath();
-		targetArgs = config.getControlInvocationOptionsStr();
+		if (targetArgs != null) {
+			targetArgs = config.getControlInvocationOptionsStr();
+		}
 		localAddr = config.getLocalAddress();
 		int options = config.getControlOptions();
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
@@ -91,7 +93,9 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractControlM
 			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
 		}
 		config.setControlPath(targetPath);
-		config.setControlInvocationOptions(targetArgs);
+		if (targetArgs != null) {
+			config.setControlInvocationOptions(targetArgs);
+		}
 		config.setControlOptions(options);
 		config.setLocalAddress(localAddr);
 		if (connection != null) {
