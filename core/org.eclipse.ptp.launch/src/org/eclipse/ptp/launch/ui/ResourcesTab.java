@@ -47,7 +47,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 /**
@@ -152,18 +151,22 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 		createVerticalSpacer(comp, 2);
 
+		/*
+		 * This is unnecessary, and creates an additional embedding which can be
+		 * ugly.
+		 */
 		// The composite that holds the RM's attributes for the launch
 		// configuration
-		Group attrGroup = new Group(comp, SWT.NONE);
-		attrGroup.setText(Messages.ResourcesTab_Launch_Attributes);
-		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.horizontalSpan = numColumns;
-		attrGroup.setLayoutData(gd);
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 1;
-		attrGroup.setLayout(gridLayout);
+		// Group attrGroup = new Group(comp, SWT.NONE);
+		// attrGroup.setText(Messages.ResourcesTab_Launch_Attributes);
+		// gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		// gd.horizontalSpan = numColumns;
+		// attrGroup.setLayoutData(gd);
+		// GridLayout gridLayout = new GridLayout();
+		// gridLayout.numColumns = 1;
+		// attrGroup.setLayout(gridLayout);
 
-		final ScrolledComposite scrollComp = createLaunchAttributeControlComposite(attrGroup, numColumns);
+		final ScrolledComposite scrollComp = createLaunchAttributeControlComposite(comp, numColumns);
 		setLaunchAttrsScrollComposite(scrollComp);
 	}
 
