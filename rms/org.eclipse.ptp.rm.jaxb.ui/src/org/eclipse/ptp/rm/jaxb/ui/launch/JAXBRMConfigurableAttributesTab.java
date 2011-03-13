@@ -17,11 +17,15 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -33,13 +37,24 @@ import org.eclipse.swt.widgets.Control;
 public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDynamicTab implements IJAXBUINonNLSConstants {
 
 	private final IJAXBResourceManagerConfiguration rmConfig;
+	private final TabController controller;
+	private Composite control;
+	private ScrolledComposite parent;
+	private final String title;
 
 	/**
 	 * @param dialog
 	 */
-	public JAXBRMConfigurableAttributesTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
+	public JAXBRMConfigurableAttributesTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog,
+			TabController controller) {
 		super(dialog);
 		rmConfig = rm.getJAXBRMConfiguration();
+		this.controller = controller;
+		String t = controller.getTitle();
+		if (t == null) {
+			t = Messages.DefaultDynamicTab_title;
+		}
+		this.title = t;
 	}
 
 	/*
@@ -52,7 +67,10 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
-		// TODO Auto-generated method stub
+		control = WidgetBuilderUtils.createComposite(parent, 1);
+		if (parent instanceof ScrolledComposite) {
+			this.parent = (ScrolledComposite) parent;
+		}
 
 	}
 
@@ -64,8 +82,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	 * #getControl()
 	 */
 	public Control getControl() {
-		// TODO Auto-generated method stub
-		return null;
+		return control;
 	}
 
 	/*
@@ -90,8 +107,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	 */
 	@Override
 	public String getText() {
-		// TODO Auto-generated method stub
-		return null;
+		return title;
 	}
 
 	/*
@@ -128,8 +144,44 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	 */
 	@Override
 	protected RMLaunchConfigurationDynamicTabDataSource createDataSource() {
-		// TODO Auto-generated method stub
-		return null;
+		return new RMLaunchConfigurationDynamicTabDataSource(this) {
+
+			@Override
+			protected void copyFromFields() throws ValidationException {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			protected void copyToFields() {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			protected void copyToStorage() {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			protected void loadDefault() {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			protected void loadFromStorage() {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			protected void validateLocal() throws ValidationException {
+				// TODO Auto-generated method stub
+
+			}
+		};
 	}
 
 	/*
@@ -140,8 +192,8 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	 */
 	@Override
 	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
-		// TODO Auto-generated method stub
-		return null;
+		return new RMLaunchConfigurationDynamicTabWidgetListener(this) {
+		};
 	}
 
 }

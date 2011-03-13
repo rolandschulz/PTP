@@ -64,7 +64,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.progress.UIJob;
 
@@ -162,6 +161,9 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 					targetArgs = WidgetActionUtils.openInputDialog(getShell(),
 							Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_14,
 							Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_15, targetArgs);
+					if (targetArgs == null) {
+						targetArgs = ZEROSTR;
+					}
 				} else if (connectionSharingEnabled && source == shareConnectionButton) {
 					updateSettings();
 				} else if (source == newConnectionButton) {
@@ -226,9 +228,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 */
 	@Override
 	public void createControl(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout topLayout = new GridLayout();
-		composite.setLayout(topLayout);
+		Composite composite = WidgetBuilderUtils.createComposite(parent, 1);
 		createContents(composite);
 		setControl(composite);
 	}
@@ -705,144 +705,89 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 		 */
 		if (connectionSharingEnabled) {
 			shareConnectionButton = WidgetBuilderUtils.createCheckButton(parent,
-					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3b);
-			shareConnectionButton.addSelectionListener(listener);
+					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3b, listener);
 		}
 
 		/*
 		 * group for connection information
 		 */
-		Composite remoteComp = new Group(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 4;
-		layout.marginWidth = 0;
-		remoteComp.setLayout(layout);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 4;
-		remoteComp.setLayoutData(gd);
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(4, false);
+		GridData gd = WidgetBuilderUtils.createGridDataFillH(4);
+		Group remoteComp = WidgetBuilderUtils.createGroup(parent, SWT.NONE, layout, gd);
 
 		/*
 		 * connection provider
 		 */
-		Label label = new Label(remoteComp, SWT.NONE);
-		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_4);
-		gd = new GridData();
-		gd.horizontalSpan = 1;
-		label.setLayoutData(gd);
-
-		remoteCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 3;
-		remoteCombo.setLayoutData(gd);
-		remoteCombo.addModifyListener(listener);
+		WidgetBuilderUtils.createLabel(remoteComp, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_4, SWT.NONE,
+				1);
+		gd = WidgetBuilderUtils.createGridDataFillH(3);
+		remoteCombo = WidgetBuilderUtils.createCombo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY, gd, listener);
 
 		/*
 		 * connection location
 		 */
-		label = new Label(remoteComp, SWT.NONE);
-		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_5);
-		gd = new GridData();
-		gd.horizontalSpan = 1;
-		label.setLayoutData(gd);
-
-		connectionCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 2;
-		connectionCombo.setLayoutData(gd);
-		connectionCombo.addModifyListener(listener);
-
+		WidgetBuilderUtils.createLabel(remoteComp, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_5, SWT.NONE,
+				1);
+		gd = WidgetBuilderUtils.createGridDataFillH(2);
+		// int style, boolean grabH, boolean grabV, int wHint, int hHint, int
+		// cols
+		connectionCombo = WidgetBuilderUtils.createCombo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY, gd, listener);
 		newConnectionButton = SWTUtil.createPushButton(remoteComp,
 				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_6, null);
 
 		/*
 		 * group for service executable information
 		 */
-		Composite serviceComp = new Group(parent, SWT.NONE);
-		layout = new GridLayout();
-		layout.numColumns = 4;
-		layout.marginWidth = 0;
-		serviceComp.setLayout(layout);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 4;
-		serviceComp.setLayoutData(gd);
+		layout = WidgetBuilderUtils.createGridLayout(4, false);
+		gd = WidgetBuilderUtils.createGridDataFillH(4);
+		Group serviceComp = WidgetBuilderUtils.createGroup(parent, SWT.NONE, layout, gd);
 
 		/*
 		 * Service path
 		 */
-		label = new Label(serviceComp, SWT.NONE);
-		label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_7);
-		gd = new GridData();
-		gd.horizontalSpan = 1;
-		label.setLayoutData(gd);
+		WidgetBuilderUtils.createLabel(serviceComp, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_7, SWT.NONE,
+				1);
+		gd = WidgetBuilderUtils.createGridDataFillH(2);
+		targetPathText = WidgetBuilderUtils.createText(serviceComp, SWT.SINGLE | SWT.BORDER, gd, false, null, listener, null);
 
-		targetPathText = new Text(serviceComp, SWT.SINGLE | SWT.BORDER);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 1;
-		gd.grabExcessHorizontalSpace = true;
-		gd.widthHint = 100;
-		targetPathText.setLayoutData(gd);
-		targetPathText.addModifyListener(listener);
-
-		browseButton = SWTUtil.createPushButton(serviceComp, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_8,
-				null);
-		browseButton.addSelectionListener(listener);
+		browseButton = WidgetBuilderUtils.createPushButton(serviceComp,
+				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_8, listener);
 
 		if (targetOptionsEnabled) {
-			/*
-			 * options
-			 */
-			optionsButton = SWTUtil.createPushButton(serviceComp,
-					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_9, null);
-			optionsButton.addSelectionListener(listener);
+			optionsButton = WidgetBuilderUtils.createPushButton(serviceComp,
+					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_9, listener);
 		}
 
 		/*
 		 * Multiplexing options
 		 */
 		if (multiplexingEnabled) {
-			Group mxGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-			mxGroup.setLayout(WidgetBuilderUtils.createGridLayout(1, true, 10, 10));
-			mxGroup.setLayoutData(WidgetBuilderUtils.spanGridData(GridData.FILL_HORIZONTAL, 2));
-			mxGroup.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_10);
-
+			layout = WidgetBuilderUtils.createGridLayout(1, true);
+			gd = WidgetBuilderUtils.createGridDataFillH(2);
+			Group mxGroup = WidgetBuilderUtils.createGroup(parent, SWT.SHADOW_ETCHED_IN, layout, gd,
+					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_10);
 			noneButton = WidgetBuilderUtils.createRadioButton(mxGroup,
-					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_11, "mxGroup", listener); //$NON-NLS-1$
-			noneButton.addSelectionListener(listener);
+					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_11, Messages.MXGroupTitle, listener);
 
 			/*
 			 * Local address
 			 */
-			Composite addrComp = new Composite(mxGroup, SWT.NONE);
-			GridLayout addrLayout = new GridLayout();
-			addrLayout.numColumns = 2;
-			addrLayout.marginWidth = 0;
-			addrLayout.marginLeft = 15;
-			addrComp.setLayout(addrLayout);
-			gd = new GridData(GridData.FILL_HORIZONTAL);
-			addrComp.setLayoutData(gd);
-
-			label = new Label(addrComp, SWT.NONE);
-			label.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_12);
-			gd = new GridData();
-			gd.horizontalSpan = 1;
-			label.setLayoutData(gd);
-
-			localAddrCombo = new Combo(addrComp, SWT.DROP_DOWN);
-			gd = new GridData(GridData.FILL_HORIZONTAL);
-			gd.horizontalSpan = 1;
-			localAddrCombo.setLayoutData(gd);
-
+			layout = WidgetBuilderUtils.createGridLayout(2, true);
+			gd = WidgetBuilderUtils.createGridDataFillH(2);
+			Composite addrComp = WidgetBuilderUtils.createComposite(mxGroup, SWT.NONE, layout, gd);
+			WidgetBuilderUtils.createLabel(addrComp, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_12,
+					SWT.NONE, 1);
+			gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, DEFAULT, DEFAULT, 1);
+			localAddrCombo = WidgetBuilderUtils.createCombo(addrComp, SWT.DROP_DOWN, gd, listener);
 			portForwardingButton = WidgetBuilderUtils.createRadioButton(mxGroup,
-					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_13, "mxGroup", listener); //$NON-NLS-1$
-			portForwardingButton.addSelectionListener(listener);
+					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_13, Messages.MXGroupTitle, listener);
 		}
 
 		/*
 		 * Manual launch
 		 */
 		if (fManualLaunchEnabled) {
-			manualButton = WidgetBuilderUtils.createCheckButton(parent, "Launch server manually"); //$NON-NLS-1$
-			manualButton.addSelectionListener(listener);
+			manualButton = WidgetBuilderUtils.createCheckButton(parent, Messages.ManualLaunch, listener);
 		}
 	}
 

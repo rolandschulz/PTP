@@ -5,8 +5,12 @@
 		<control-connection>ssh://abe.ncsa.uiuc.edu/usr/local/bin/qsub</control-connection>
 	</site-data>
 	<control-data>
-		<property name="stdout"><value>${rm:Output_Path#value}</value></property><!-- property needed for forwarding stdout in batch -->
-		<property name="stderr"><value>${rm:Error_Path#value}</value></property><!-- property needed for forwarding stderr in batch -->
+		<property name="stdout">
+			<value>${rm:Output_Path#value}</value>
+		</property><!-- property needed for forwarding stdout in batch -->
+		<property name="stderr">
+			<value>${rm:Error_Path#value}</value>
+		</property><!-- property needed for forwarding stderr in batch -->
 		<job-attribute id="mpiCommand" name="mpiCommand" basic="true" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
@@ -273,12 +277,12 @@
 		</script>
 		<!-- ********************** FOR TESTING ********************** -->
 		<start-up-command name="get-queues">
-		   <!--
-         <arg>qstat -Q -f</arg>
-         <arg>| grep Queue:</arg>
-         <arg>| cut -d ' ' -f 2</arg>
-         <arg>| tr '\n' ' '</arg>
-         -->
+			<!--
+				<arg>qstat -Q -f</arg>
+				<arg>| grep Queue:</arg>
+				<arg>| cut -d ' ' -f 2</arg>
+				<arg>| tr '\n' ' '</arg>
+			-->
 			<args>
 				<arg>./qstatF</arg>
 			</args>
@@ -286,109 +290,109 @@
 				<read delim="\n">
 					<match>
 						<expression>[^\s]+</expression>
-                  <target type="property"/>
-                  <set field="name">
-                     <entry value="available_queues"/>
-                  </set>
-                  <append field="value" separator=",">
-                     <entry valueGroup="0"/>
-                  </append>
+						<target type="property"/>
+						<set field="name">
+							<entry value="available_queues"/>
+						</set>
+						<append field="value" separator=",">
+							<entry valueGroup="0"/>
+						</append>
 					</match>
 				</read>
 			</stdout-parser>
 		</start-up-command>
 		<!-- ********************** FOR TESTING ********************** -->
 		<submit-interactive name="submit-interactive" waitForId="true">
-         <args>
-            <arg>./qsub</arg>
-            <arg>${rm:pbs_script#value}</arg>
-         </args>
-         <stdout-parser>
-            <read delim="\n" all="true" save="1">
-               <match>
-                  <expression>([\d]*)[.].*</expression>
-                  <target ref="@jobId@"/>
-                  <set field="name">
-                     <entry valueGroup="1"/>
-                  </set>
-                   <set field="value">
-                     <entry value="SUBMITTED"/>
-                  </set>
-               </match>
-            </read>
-         </stdout-parser>
-      </submit-interactive>
-      <!-- ********************** FOR TESTING ********************** -->
+			<args>
+				<arg>./qsub</arg>
+				<arg>${rm:pbs_script#value}</arg>
+			</args>
+			<stdout-parser>
+				<read delim="\n" all="true" save="1">
+					<match>
+						<expression>([\d]*)[.].*</expression>
+						<target ref="@jobId@"/>
+						<set field="name">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="value">
+							<entry value="SUBMITTED"/>
+						</set>
+					</match>
+				</read>
+			</stdout-parser>
+		</submit-interactive>
+		<!-- ********************** FOR TESTING ********************** -->
 		<get-job-status name="get-job-status">
 			<args>
 				<arg>./qstatId</arg>
 				<arg>@jobId@</arg>
 			</args>
 			<stdout-parser>
-            <read delim="\n">
-               <match>
-                  <expression>.+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
-                  <target ref="@jobId@"/>
-                  <set field="value">
-                     <entry valueGroup="1"/>
-                  </set>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>Q</value>
-                     <set field="value">
-                        <entry value="QUEUED_ACTIVE"/>
-                     </set>
-                  </test>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>R</value>
-                     <set field="value">
-                        <entry value="RUNNING"/>
-                     </set>
-                  </test>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>S</value>
-                     <set field="value">
-                        <entry value="SUSPENDED"/>
-                     </set>
-                  </test>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>C</value>
-                     <set field="value">
-                        <entry value="COMPLETED"/>
-                     </set>
-                  </test>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>E</value>
-                     <set field="value">
-                        <entry value="COMPLETED"/>
-                     </set>
-                  </test>
-                  <test op="EQ">
-                     <value>this.value</value>
-                     <value>H</value>
-                     <set field="value">
-                        <entry value="SYSTEM_ON_HOLD"/>
-                     </set>
-                  </test>
-               </match>
-            </read>
-         </stdout-parser>
+				<read delim="\n">
+					<match>
+						<expression>.+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
+						<target ref="@jobId@"/>
+						<set field="value">
+							<entry valueGroup="1"/>
+						</set>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>Q</value>
+							<set field="value">
+								<entry value="QUEUED_ACTIVE"/>
+							</set>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>R</value>
+							<set field="value">
+								<entry value="RUNNING"/>
+							</set>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>S</value>
+							<set field="value">
+								<entry value="SUSPENDED"/>
+							</set>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>C</value>
+							<set field="value">
+								<entry value="COMPLETED"/>
+							</set>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>E</value>
+							<set field="value">
+								<entry value="COMPLETED"/>
+							</set>
+						</test>
+						<test op="EQ">
+							<value>this.value</value>
+							<value>H</value>
+							<set field="value">
+								<entry value="SYSTEM_ON_HOLD"/>
+							</set>
+						</test>
+					</match>
+				</read>
+			</stdout-parser>
 		</get-job-status>
-		<!-- 
-		<terminate-job name="cancel">
+		<!--
+			<terminate-job name="cancel">
 			<args>
-				<arg>qdel</arg>
-				<arg>@jobId@</arg>
+			<arg>qdel</arg>
+			<arg>@jobId@</arg>
 			</args>
-		</terminate-job>
-		 -->
+			</terminate-job>
+		-->
 		<launch-tab>
 			<basic>
-				<title>Standard</title>
+				<title>Basic Job Settings</title>
 				<group>
 					<grid-layout numColumns="2"/>
 					<title>Script Configuration</title>
@@ -399,107 +403,101 @@
 						<tooltip>Show the batch script as it would currently be submitted.</tooltip>
 					</widget>
 				</group>
-				<tab-folder>
-					<title>Job Settings</title>
-					<item>
-						<title>Basic</title>
-						<group>
-							<grid-layout numColumns="3"/>
-							<!-- row 1 -->
-							<widget type="text">
-								<label>Job Name: </label>
-								<tooltip>${rm:Job_Name#tooltip}</tooltip>
-								<content>
-									<arg>${rm:Job_Name#value}</arg>
-								</content>
-								<saveValueTo>Job_Name</saveValueTo>
-							</widget>
-							<widget type="label">
-								<content>
-									<arg>${rm:Job_Name#description}</arg>
-								</content>
-							</widget>
-							<!-- row 2 -->
-							<widget type="combo" readOnly="true">
-								<label>Queue: </label>
-								<tooltip>${rm:destination#tooltip}</tooltip>
-								<content>
-									<arg>${rm:available_queues#value}</arg>
-								</content>
-								<saveValueTo>destination</saveValueTo>
-							</widget>
-							<widget type="label">
-								<content>
-									<arg>${rm:destination#description}</arg>
-								</content>
-							</widget>
-							<!-- row 3 -->
-							<widget type="text">
-								<label>Nodes: </label>
-								<tooltip>${rm:Resource_List.nodes#tooltip}</tooltip>
-								<content>
-									<arg>${rm:Resource_List.nodes#value}</arg>
-								</content>
-								<saveValueTo>Resource_List.nodes</saveValueTo>
-							</widget>
-							<widget type="label">
-								<content>
-									<arg>${rm:Resource_List.nodes#description}</arg>
-								</content>
-							</widget>
-							<!-- row 4 -->
-							<widget type="text">
-								<label>Wallclock Time</label>
-								<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
-								<content>
-									<arg>${rm:Resource_List.walltime#value}</arg>
-								</content>
-								<saveValueTo>Resource_List.walltime</saveValueTo>
-							</widget>
-							<widget type="label">
-								<content>
-									<arg>${rm:Resource_List.walltime#description}</arg>
-								</content>
-							</widget>
-							<!-- row 5 -->
-							<widget type="combo" readOnly="true">
-								<label>MPI Command: </label>
-								<content>
-									<arg>mpiCommand</arg>
-								</content>
-							</widget>
-							<widget type="label">
-								<content>
-									<arg>MPI executable to use</arg>
-								</content>
-							</widget>
-							<!-- row 6 -->
-							<widget type="spinner" readOnly="true">
-								<label>MPI Number of Cores: </label>
-								<content>
-									<arg>mpiCores</arg>
-								</content>
-							</widget>
-							<widget type="label">
-								<content>
-									<arg>The number following "-np" on the command line</arg>
-								</content>
-							</widget>
-						</group>
-					</item>
-					<item>
-						<title>Detailed</title>
-						<group dynamic="true" scrollable="true">
-							<grid-layout numColumns="3"/>
-							<!-- iterates through all registered attributes, one to a row -->
-							<all-attributes>
-								<include sort="true" headers="true" name="true" tooltip="true" description="true"/>
-							</all-attributes>
-						</group>
-					</item>
-				</tab-folder>
+				<group>
+					<grid-layout numColumns="3"/>
+					<!-- row 1 -->
+					<widget type="text">
+						<label>Job Name: </label>
+						<tooltip>${rm:Job_Name#tooltip}</tooltip>
+						<content>
+							<arg>${rm:Job_Name#value}</arg>
+						</content>
+						<saveValueTo>Job_Name</saveValueTo>
+					</widget>
+					<widget type="label">
+						<content>
+							<arg>${rm:Job_Name#description}</arg>
+						</content>
+					</widget>
+					<!-- row 2 -->
+					<widget type="combo" readOnly="true">
+						<label>Queue: </label>
+						<tooltip>${rm:destination#tooltip}</tooltip>
+						<content>
+							<arg>${rm:available_queues#value}</arg>
+						</content>
+						<saveValueTo>destination</saveValueTo>
+					</widget>
+					<widget type="label">
+						<content>
+							<arg>${rm:destination#description}</arg>
+						</content>
+					</widget>
+					<!-- row 3 -->
+					<widget type="text">
+						<label>Nodes: </label>
+						<tooltip>${rm:Resource_List.nodes#tooltip}</tooltip>
+						<content>
+							<arg>${rm:Resource_List.nodes#value}</arg>
+						</content>
+						<saveValueTo>Resource_List.nodes</saveValueTo>
+					</widget>
+					<widget type="label">
+						<content>
+							<arg>${rm:Resource_List.nodes#description}</arg>
+						</content>
+					</widget>
+					<!-- row 4 -->
+					<widget type="text">
+						<label>Wallclock Time</label>
+						<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
+						<content>
+							<arg>${rm:Resource_List.walltime#value}</arg>
+						</content>
+						<saveValueTo>Resource_List.walltime</saveValueTo>
+					</widget>
+					<widget type="label">
+						<content>
+							<arg>${rm:Resource_List.walltime#description}</arg>
+						</content>
+					</widget>
+					<!-- row 5 -->
+					<widget type="combo" readOnly="true">
+						<label>MPI Command: </label>
+						<content>
+							<arg>mpiCommand</arg>
+						</content>
+					</widget>
+					<widget type="label">
+						<content>
+							<arg>MPI executable to use</arg>
+						</content>
+					</widget>
+					<!-- row 6 -->
+					<widget type="spinner" readOnly="true">
+						<label>MPI Number of Cores: </label>
+						<content>
+							<arg>mpiCores</arg>
+						</content>
+					</widget>
+					<widget type="label">
+						<content>
+							<arg>The number following "-np" on the command line</arg>
+						</content>
+					</widget>
+				</group>
 			</basic>
-			<custom-controller>Custom</custom-controller>
+			<advanced>
+            <title>Detailed</title>
+            <group dynamic="true" scrollable="true">
+               <grid-layout numColumns="3"/>
+               <!-- iterates through all registered attributes, one to a row -->
+               <all-attributes>
+                  <include sort="true" headers="true" name="true" tooltip="true" description="true"/>
+               </all-attributes>
+            </group>
+			</advanced>
+			<custom-controller>Import PBS Script</custom-controller>
 		</launch-tab>
 	</control-data>
 	<monitor-data/>

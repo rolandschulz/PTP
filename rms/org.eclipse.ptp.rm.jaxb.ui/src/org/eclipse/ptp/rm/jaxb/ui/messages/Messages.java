@@ -74,6 +74,13 @@ public class Messages extends NLS {
 
 	public static String ResourceManagerEditor_title;
 	public static String CustomBatchScriptTab_title;
+	public static String MXGroupTitle;
+	public static String ManualLaunch;
+	public static String LoadScript;
+	public static String SaveToFileButton;
+	public static String ClearScript;
+	public static String BatchScriptPath;
+	public static String DefaultDynamicTab_title;
 
 	static {
 		// initialize resource bundle
