@@ -11,4 +11,6 @@ public interface IJAXBUINonNLSConstants extends IJAXBNonNLSConstants {
 	Color DKMG = Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA);
 	Color DKRD = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
 
+	String COURIER = "Courier";//$NON-NLS-1$
+
 }

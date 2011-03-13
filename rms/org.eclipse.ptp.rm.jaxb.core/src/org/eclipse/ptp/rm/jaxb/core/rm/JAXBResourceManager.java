@@ -14,12 +14,14 @@ import java.util.Map;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
 
-public final class JAXBResourceManager extends AbstractResourceManager implements IJAXBNonNLSConstants {
+public final class JAXBResourceManager extends AbstractResourceManager implements IJAXBResourceManager, IJAXBNonNLSConstants {
 
 	private final JAXBResourceManagerControl fControl;
 
@@ -31,6 +33,10 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 
 	public boolean getAppendSysEnv() {
 		return fControl.getAppendSysEnv();
+	}
+
+	public IJAXBResourceManagerControl getControl() {
+		return fControl;
 	}
 
 	public Map<String, String> getDynSystemEnv() {

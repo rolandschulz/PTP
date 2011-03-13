@@ -73,6 +73,7 @@ public class Messages extends NLS {
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_6;
 
 	public static String ResourceManagerEditor_title;
+	public static String CustomBatchScriptTab_title;
 
 	static {
 		// initialize resource bundle

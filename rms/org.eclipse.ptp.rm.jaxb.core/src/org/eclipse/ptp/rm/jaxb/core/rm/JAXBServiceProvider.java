@@ -285,8 +285,8 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		rmdata = null;
 		setRemoteServicesId(null);
 		setConnectionName(null);
-		setConnectionName(CONTROL_CONNECTION_NAME, null);
-		setConnectionName(MONITOR_CONNECTION_NAME, null);
+		setConnectionName(null, CONTROL_CONNECTION_NAME);
+		setConnectionName(null, MONITOR_CONNECTION_NAME);
 		super.clearRMData();
 	}
 }
