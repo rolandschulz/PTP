@@ -392,7 +392,7 @@
 		-->
 		<launch-tab>
 			<basic>
-				<title>Basic Job Settings</title>
+				<title>Basic PBS Settings</title>
 				<group>
 					<grid-layout numColumns="2"/>
 					<title>Script Configuration</title>
@@ -487,8 +487,8 @@
 					</widget>
 				</group>
 			</basic>
-			<advanced>
-            <title>Detailed</title>
+			<advanced dynamic="true">
+            <title>Advanced PBS Settings</title>
             <group dynamic="true" scrollable="true">
                <grid-layout numColumns="3"/>
                <!-- iterates through all registered attributes, one to a row -->

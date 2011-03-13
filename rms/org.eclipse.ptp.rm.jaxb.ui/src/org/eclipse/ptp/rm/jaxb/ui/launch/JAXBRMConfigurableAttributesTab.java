@@ -25,10 +25,17 @@ import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 
 /**
  * @author arossi
@@ -36,11 +43,23 @@ import org.eclipse.swt.widgets.Control;
  */
 public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDynamicTab implements IJAXBUINonNLSConstants {
 
+	private class SelectAttributesListener implements SelectionListener {
+
+		public void widgetDefaultSelected(SelectionEvent e) {
+			widgetSelected(e);
+		}
+
+		public synchronized void widgetSelected(SelectionEvent e) {
+		}
+	}
+
 	private final IJAXBResourceManagerConfiguration rmConfig;
 	private final TabController controller;
 	private Composite control;
 	private ScrolledComposite parent;
 	private final String title;
+	private Button selectAttributes;
+	private SelectAttributesListener selectAttributesListener;
 
 	/**
 	 * @param dialog
@@ -71,7 +90,14 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		if (parent instanceof ScrolledComposite) {
 			this.parent = (ScrolledComposite) parent;
 		}
-
+		/*
+		 * fork off the rebuildable part from the first group which controls the
+		 * rebuild
+		 */
+		if (controller.isDynamic()) {
+			createSelectionGroup(control);
+		}
+		buildMain(control);
 	}
 
 	/*
@@ -196,4 +222,16 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		};
 	}
 
+	private void buildMain(Composite control2) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void createSelectionGroup(Composite control2) {
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(1, true);
+		GridData gd = WidgetBuilderUtils.createGridDataFillH(1);
+		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
+		selectAttributes = WidgetBuilderUtils.createPushButton(grp, Messages.SelectAttributesForDisplay,
+				new SelectAttributesListener());
+	}
 }
