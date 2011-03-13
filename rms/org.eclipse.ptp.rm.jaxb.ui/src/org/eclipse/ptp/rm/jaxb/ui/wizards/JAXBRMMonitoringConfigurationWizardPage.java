@@ -73,7 +73,7 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractContr
 
 	@Override
 	protected void setConnectionName(String name) {
-		String connectionName = name == null ? config.getConnectionName(CONTROL_CONNECTION_NAME) : name;
+		String connectionName = (name == null ? config.getConnectionName(CONTROL_CONNECTION_NAME) : name);
 		if (connectionName != null) {
 			config.setConnectionName(connectionName, MONITOR_CONNECTION_NAME);
 		}

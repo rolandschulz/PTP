@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -50,9 +50,12 @@ public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurat
 	@Override
 	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
-		if (!(rm instanceof IJAXBResourceManagerControl)) {
+		if (!(rm instanceof IJAXBResourceManager)) {
 			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_doCreateError + rm, null);
 		}
-		return new JAXBRMLaunchConfigurationDynamicTab((IJAXBResourceManagerControl) rm, dialog);
+		return new JAXBRMCustomBatchScriptTab(((IJAXBResourceManager) rm).getControl(), dialog);
+		// return new
+		// JAXBRMLaunchConfigurationDynamicTab(((IJAXBResourceManager)
+		// rm).getControl(), dialog);
 	}
 }

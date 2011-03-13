@@ -25,6 +25,7 @@ import org.eclipse.ptp.rm.jaxb.ui.data.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.ui.listener.JAXBRMLaunchTabWidgetListener;
 import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -41,6 +42,8 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 	private final JAXBRMLaunchTabWidgetListener listener;
 	private final Map<Object, Object> widgetToValueIndex;
 
+	private Control control;
+
 	/**
 	 * @param dialog
 	 */
@@ -51,6 +54,7 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 		this.launchTabData = new LaunchTabBuilder(this);
 		this.listener = new JAXBRMLaunchTabWidgetListener(this);
 		this.widgetToValueIndex = new HashMap<Object, Object>();
+		addDynamicTab(new JAXBRMCustomBatchScriptTab(rm, dialog));
 	}
 
 	/*
@@ -64,8 +68,8 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 	 */
 	@Override
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
-		// TODO Auto-generated method stub
-
+		control = new Composite(parent, SWT.NONE);
+		super.createControl(parent, rm, queue);
 	}
 
 	/*
@@ -77,8 +81,7 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 	 */
 	@Override
 	public Control getControl() {
-		// TODO Auto-generated method stub
-		return null;
+		return control;
 	}
 
 	public ILaunchConfigurationDialog getDialog() {

@@ -33,6 +33,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
@@ -50,7 +51,8 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
-public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBNonNLSConstants {
+public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl,
+		IJAXBNonNLSConstants {
 
 	private class StreamProxyMap extends Thread {
 		private final Map<String, ICommandJobStreamsProxy> map = new HashMap<String, ICommandJobStreamsProxy>();
@@ -169,6 +171,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	public Map<String, String> getDynSystemEnv() {
 		return dynSystemEnv;
+	}
+
+	public IJAXBResourceManagerConfiguration getJAXBRMConfiguration() {
+		return config;
 	}
 
 	public IRemoteConnection getLocalConnection() {
