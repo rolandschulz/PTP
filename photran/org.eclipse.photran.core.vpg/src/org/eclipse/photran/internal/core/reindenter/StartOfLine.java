@@ -448,4 +448,13 @@ final class StartOfLine
     {
         return label != null;
     }
+
+    /** @return true iff this is a continuation of the statement on the previous line */
+    public boolean isContinuationLine()
+    {
+        String whiteText = firstStmtToken.getWhiteBefore();
+        if (whiteText.indexOf('!') >= 0)
+            whiteText = whiteText.substring(0, whiteText.indexOf('!'));
+        return whiteText.indexOf('&') >= 0;
+    }
 }

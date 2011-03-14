@@ -36,6 +36,7 @@ public class ReindenterTestSuite extends TestSuite
         suite.addTest(getSuiteFor("09-bug331904.f90",Strategy.REINDENT_EACH_LINE));
         suite.addTest(getSuiteFor("10-continue.f90",Strategy.REINDENT_EACH_LINE));
         suite.addTest(getSuiteFor("11-select-case.f90",Strategy.REINDENT_EACH_LINE));
+        suite.addTest(getSuiteFor("12-line-continuations.f90",Strategy.REINDENT_EACH_LINE));
 
         return suite;
     }

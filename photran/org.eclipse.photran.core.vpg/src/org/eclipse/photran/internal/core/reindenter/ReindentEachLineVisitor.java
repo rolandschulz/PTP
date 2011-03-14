@@ -58,7 +58,7 @@ final class ReindentEachLineVisitor extends ReindentingVisitor
     {
         if (previousLine == null) // currentLine is the line in the file
             return ""; //$NON-NLS-1$
-        else if (previousLine.startsIndentedRegion() && !currentLine.endsIndentedRegion())
+        else if (previousLine.startsIndentedRegion() && !currentLine.isContinuationLine() && !currentLine.endsIndentedRegion())
             return StartOfLine.getIncreasedIndentation(previousIndentation);
         else if (currentLine.endsDoublyIndentedRegion() && !previousLine.startsIndentedRegion())
             return StartOfLine.getDecreasedIndentation(StartOfLine.getDecreasedIndentation(previousIndentation));
