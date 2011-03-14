@@ -55,6 +55,12 @@ public class FortranLanguage extends AbstractLanguage
     {
         return LANGUAGE_ID;
     }
+    
+    @Override
+    public String getName()
+    {
+        return Messages.FortranLanguage_Name;
+    }
 
     public IContributedModelBuilder createModelBuilder(ITranslationUnit tu)
     {
