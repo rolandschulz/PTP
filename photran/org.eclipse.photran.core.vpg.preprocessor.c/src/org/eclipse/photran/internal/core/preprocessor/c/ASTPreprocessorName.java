@@ -25,18 +25,11 @@ package org.eclipse.photran.internal.core.preprocessor.c;
 import org.eclipse.cdt.core.dom.ILinkage;
 import org.eclipse.cdt.core.dom.ast.ASTNodeProperty;
 import org.eclipse.cdt.core.dom.ast.IASTCompletionContext;
-//import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
-//import org.eclipse.cdt.core.dom.ast.IASTImageLocation;
-//import org.eclipse.cdt.core.dom.ast.ExpansionOverlapsBoundaryException;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTNameOwner;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
-//import org.eclipse.cdt.core.dom.ast.IASTNodeLocation;
-//import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.cdt.core.dom.ast.IMacroBinding;
-//import org.eclipse.cdt.internal.core.dom.Linkage;
-//import org.eclipse.cdt.core.parser.IToken;
 
 /**
  * Models IASTNames as needed for the preprocessor statements and macro expansions.
@@ -94,11 +87,13 @@ class ASTPreprocessorName extends ASTPreprocessorNode implements IASTName {
 
     @Deprecated
     @Override
-    //method added to conform with CDT interface
-	public IASTName copy() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public IASTName copy() {
+        throw new UnsupportedOperationException();
+    }
+
+    public IASTName copy(CopyStyle style) {
+        throw new UnsupportedOperationException();
+    }
 
     @Deprecated
     //method added to conform with CDT interface

@@ -259,6 +259,10 @@ class ASTInclusionStatement extends ASTPreprocessorNode implements IASTPreproces
 		return fIsSystemInclude;
 	}
 
+    public IASTName copy(CopyStyle style) {
+        throw new UnsupportedOperationException();
+    }
+
     @Deprecated
     //method added to conform with CDT interface
 	public boolean isResolvedByHeuristics() {
@@ -542,6 +546,10 @@ class ASTMacroExpansion extends ASTPreprocessorNode implements IASTPreprocessorM
 	void setContext(LocationCtxMacroExpansion expansionCtx) {
 		fContext= expansionCtx;
 	}
+
+	public IASTName copy(CopyStyle style) {
+        throw new UnsupportedOperationException();
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.core.dom.ast.IASTPreprocessorMacroExpansion#getName()
