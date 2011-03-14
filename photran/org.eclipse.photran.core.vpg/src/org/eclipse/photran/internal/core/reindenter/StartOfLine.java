@@ -220,26 +220,56 @@ final class StartOfLine
         setIndentation(newIndentation(getIndentation(), removeIndent, addIndent));
     }
 
+    /**
+     * Sets the indentation for the first (non-label) token on the line.
+     * <p>
+     * If <code>newIndentation</code> is eight spaces, then
+     * <pre>
+     * ! This is a comment
+     * print *, 0
+     * </pre>
+     * becomes
+     * <pre>
+     * ! This is a comment
+     *         print *, 0
+     * </pre>
+     * and
+     * <pre>
+     * ! This is a comment
+     * 10 print *, 0
+     * </pre>
+     * becomes
+     * <pre>
+     * ! This is a comment
+     * 10      print *, 0
+     * </pre>
+     * 
+     * In the preceding example, note that only six spaces are affixed, since the label is two
+     * characters long.
+     */
     public void setIndentation(String newIndentation)
     {
         getFirstTokenOnLine().setWhiteBefore(getComments() + newIndentation);
 
         if (label != null)
         {
-            Token lbl = label;
-            String lblIndentation = getIndentation(); //lbl.getWhiteBefore();
+            label.setWhiteBefore(getComments());
             
-            String combinedWhitespace = lblIndentation/*+fstStmtTok.getWhiteBefore()*/;
-            int value = combinedWhitespace.length() /*- fstStmtTok.getWhiteBefore().length()*/ - lbl.getText().length();
-            firstStmtToken.setWhiteBefore(combinedWhitespace.substring(0, value));
-            lbl.setWhiteBefore(""); //$NON-NLS-1$
+            int start = label.getText().length();
+            int end = newIndentation.length();
+            if (start < end)
+                firstStmtToken.setWhiteBefore(newIndentation.substring(start, end));
+            else
+                firstStmtToken.setWhiteBefore(" "); //$NON-NLS-1$
         }
     }
 
     private String newIndentation(String currentIndentation, String removeIndent, String addIndent)
     {
         String newIndentation;
-        if (currentIndentation.startsWith(removeIndent))
+        if (removeIndent.length() > currentIndentation.length())
+            newIndentation = ""; //$NON-NLS-1$
+        else if (currentIndentation.startsWith(removeIndent))
             newIndentation = currentIndentation.substring(removeIndent.length());
         else
             newIndentation = currentIndentation;
@@ -356,7 +386,15 @@ final class StartOfLine
      */
     public String getIncreasedIndentation()
     {
-        return getIndentation() + defaultIndentation();
+        return getIncreasedIndentation(getIndentation());
+    }
+
+    /**
+     * @return the indentation of this line, plus an additional unit of indentation
+     */
+    public static String getIncreasedIndentation(String currentIndentation)
+    {
+        return currentIndentation + defaultIndentation();
     }
     
     /**
@@ -364,12 +402,26 @@ final class StartOfLine
      */
     public String getDecreasedIndentation()
     {
-        String indentation = getIndentation();
+        return getDecreasedIndentation(getIndentation());
+    }
+    
+    /**
+     * @return the indentation of this line without its final unit of indentation
+     */
+    public static String getDecreasedIndentation(String indentation)
+    {
+        //String indentation = getIndentation();
         if (indentation.endsWith(defaultIndentation()))
             return indentation.substring(0, indentation.length()-defaultIndentation().length());
         else if (indentation.endsWith("\t")) //$NON-NLS-1$
             return indentation.substring(0, indentation.length()-1);
         else
             return indentation;
+    }
+
+    /** @return true iff this line starts with a numeric statement label */
+    public boolean hasLabel()
+    {
+        return label != null;
     }
 }

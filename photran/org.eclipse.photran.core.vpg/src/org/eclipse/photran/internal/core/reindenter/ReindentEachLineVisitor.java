@@ -24,12 +24,17 @@ import org.eclipse.photran.internal.core.reindenter.Reindenter.Strategy;
 final class ReindentEachLineVisitor extends ReindentingVisitor
 {   
     private StartOfLine previousLine;
+    private String previousIndentation;
     
     protected ReindentEachLineVisitor(IFortranAST ast, Token firstTokenInRegion, Token lastTokenInRegion)
     {
         super(ast, firstTokenInRegion, lastTokenInRegion);
         
         this.previousLine = StartOfLine.createForLastNonemptyLineAbove(getFirstLineToReindent(), this.ast);
+        if (this.previousLine == null)
+            this.previousIndentation = ""; //$NON-NLS-1$
+        else
+            this.previousIndentation = previousLine.getIndentation();
     }
 
     @Override protected void updateIndentation(StartOfLine currentLine)
@@ -40,6 +45,11 @@ final class ReindentEachLineVisitor extends ReindentingVisitor
         currentLine.reindent(currentIndentation, newIndentation);
         
         this.previousLine = currentLine;
+        // Lines with labels tend to have atypical indentation (heuristically),
+        // so try to avoid using them to compute the next line's indentation
+        // (unless we're the first line in the file)
+        if (!currentLine.hasLabel() || previousLine == null)
+            this.previousIndentation = currentLine.getIndentation();
     }
 
     private String computeNewIndentation(StartOfLine currentLine)
@@ -47,10 +57,10 @@ final class ReindentEachLineVisitor extends ReindentingVisitor
         if (previousLine == null) // currentLine is the line in the file
             return ""; //$NON-NLS-1$
         else if (previousLine.startsIndentedRegion() && !currentLine.endsIndentedRegion())
-            return previousLine.getIncreasedIndentation();
+            return StartOfLine.getIncreasedIndentation(previousIndentation);
         else if (currentLine.endsIndentedRegion() && !previousLine.startsIndentedRegion())
-            return previousLine.getDecreasedIndentation();
+            return StartOfLine.getDecreasedIndentation(previousIndentation);
         else
-            return previousLine.getIndentation();
+            return previousIndentation;
     }
 }
