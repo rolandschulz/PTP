@@ -97,7 +97,7 @@ public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConf
 	/**
 	 * @since 5.0
 	 */
-	void setActive();
+	void setActive() throws Throwable;
 
 	/**
 	 * @since 5.0

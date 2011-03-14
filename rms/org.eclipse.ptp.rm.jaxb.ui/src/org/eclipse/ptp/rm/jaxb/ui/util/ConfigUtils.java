@@ -10,9 +10,13 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
+import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -108,12 +112,52 @@ public class ConfigUtils implements IJAXBUINonNLSConstants {
 		return target;
 	}
 
+	public static String getFileContents(File file) throws Throwable {
+		StringBuffer buffer = new StringBuffer();
+		if (file.exists() && file.isFile()) {
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			try {
+				while (true) {
+					try {
+						String line = reader.readLine();
+						if (line == null) {
+							break;
+						}
+						buffer.append(line).append(LINE_SEP);
+					} catch (EOFException eof) {
+						break;
+					}
+				}
+			} finally {
+				reader.close();
+			}
+		}
+		return buffer.toString();
+	}
+
 	public static File getUserHome() {
 		return new File(System.getProperty(JAVA_USER_HOME));
 	}
 
 	public static IWorkspaceRoot getWorkspaceRoot() {
 		return ResourcesPlugin.getWorkspace().getRoot();
+	}
+
+	public static String writeContentsToFile(Shell shell, String contents, File file) throws Throwable {
+		FileDialog fileDialog = new FileDialog(shell, SWT.SINGLE | SWT.SAVE);
+		fileDialog.setText(Messages.ConfigUtils_exportResourceTitle);
+		fileDialog.setOverwrite(true);
+		fileDialog.setFileName(file.getName());
+		String path = fileDialog.open();
+		if (path == null) {
+			return null;
+		}
+
+		FileWriter fw = new FileWriter(path, false);
+		fw.write(contents);
+		fw.flush();
+		fw.close();
+		return path;
 	}
 
 	private static IProject[] getLocalProjects() {
@@ -126,5 +170,4 @@ public class ConfigUtils implements IJAXBUINonNLSConstants {
 		}
 		return local.toArray(new IProject[0]);
 	}
-
 }

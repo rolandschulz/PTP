@@ -252,6 +252,8 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 
 	public static Button createPushButton(Composite parent, String label, SelectionListener listener) {
 		Button button = SWTUtil.createPushButton(parent, label, null);
+		GridData data = createGridData(GridData.FILL_HORIZONTAL, 1);
+		button.setLayoutData(data);
 		if (null != listener) {
 			button.addSelectionListener(listener);
 		}

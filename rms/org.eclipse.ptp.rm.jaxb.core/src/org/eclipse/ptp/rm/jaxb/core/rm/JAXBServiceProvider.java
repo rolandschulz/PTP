@@ -225,9 +225,12 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		return rmdata;
 	}
 
-	public void setActive() {
+	public void setActive() throws Throwable {
 		map = RMVariableMap.setActiveInstance(map);
 		if (!map.isInitialized()) {
+			if (rmdata == null) {
+				realizeRMDataFromXML();
+			}
 			JAXBInitializationUtils.initializeMap(rmdata, map);
 		}
 	}
