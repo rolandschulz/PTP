@@ -44,12 +44,14 @@ final class ReindentEachLineVisitor extends ReindentingVisitor
 
         currentLine.reindent(currentIndentation, newIndentation);
         
-        this.previousLine = currentLine;
         // Lines with labels tend to have atypical indentation (heuristically),
         // so try to avoid using them to compute the next line's indentation
-        // (unless we're the first line in the file)
-        if (!currentLine.hasLabel() || previousLine == null)
+        // (unless we're the first line in the file or the first line in a
+        // DO-construct, IF-construct, etc.)
+        if (!currentLine.hasLabel() || previousLine == null || previousLine.startsIndentedRegion())
             this.previousIndentation = currentLine.getIndentation();
+
+        this.previousLine = currentLine;
     }
 
     private String computeNewIndentation(StartOfLine currentLine)
