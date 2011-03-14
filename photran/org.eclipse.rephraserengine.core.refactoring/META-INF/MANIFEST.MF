@@ -5,7 +5,8 @@ Bundle-SymbolicName: org.eclipse.rephraserengine.core.refactoring
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.rephraserengine.core.refactorings
+Export-Package: org.eclipse.rephraserengine.core.refactorings,
+ org.eclipse.rephraserengine.core.refactorings.simple
 Require-Bundle: org.eclipse.rephraserengine.core,
  org.eclipse.core.resources,
  org.eclipse.jface.text,
