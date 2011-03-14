@@ -1,6 +1,9 @@
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
@@ -17,6 +20,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
 public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
@@ -24,41 +29,16 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	private WidgetBuilderUtils() {
 	}
 
-	// public static TableColumn addTableColumn(final TableViewer viewer, final
-	// String columnName, int style, SelectionListener l) {
-	// Table t = viewer.getTable();
-	//
-	// TableColumn c = new TableColumn(t, style);
-	// c.setText(columnName);
-	// if (l != null) {
-	// c.addSelectionListener(l);
-	// }
-	// return c;
-	// }
+	public static TableColumn addTableColumn(final TableViewer viewer, final String columnName, int style, SelectionListener l) {
+		Table t = viewer.getTable();
 
-	// public static Table createFillingTable(Composite parent, int numColumns,
-	// int suggestedWidth, int colSpan, int tableStyle) {
-	// GridData data = new GridData();
-	// data.horizontalAlignment = GridData.FILL;
-	// data.verticalAlignment = GridData.FILL;
-	// data.grabExcessHorizontalSpace = true;
-	// data.grabExcessVerticalSpace = true;
-	// data.widthHint = 200;
-	// data.horizontalSpan = colSpan;
-	// data.heightHint = 150;
-	//
-	// Table t = new Table(parent, tableStyle);
-	// t.setHeaderVisible(true);
-	// t.setLinesVisible(true);
-	// t.setLayoutData(data);
-	//
-	// TableLayout layout = new TableLayout();
-	// for (int i = 0; i < numColumns; i++) {
-	// layout.addColumnData(new ColumnPixelData(suggestedWidth / numColumns));
-	// }
-	// t.setLayout(layout);
-	// return t;
-	// }
+		TableColumn c = new TableColumn(t, style);
+		c.setText(columnName);
+		if (l != null) {
+			c.addSelectionListener(l);
+		}
+		return c;
+	}
 
 	public static void applyMonospace(Text text) {
 		Display d = Display.getCurrent();
@@ -75,6 +55,23 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		if (i == f.length) {
 			Dialog.applyDialogFont(text);
 		}
+	}
+
+	public static Button createButton(Composite parent, GridData data, String label, int type, SelectionListener listener) {
+		Button button = new Button(parent, type);
+		button.setText(label);
+		if (data == null) {
+			data = createGridData(GridData.FILL_HORIZONTAL, DEFAULT);
+		}
+		button.setLayoutData(data);
+		if (null != listener) {
+			button.addSelectionListener(listener);
+		}
+		return button;
+	}
+
+	public static Button createButton(Composite parent, String label, int type) {
+		return createButton(parent, null, label, type, null);
 	}
 
 	// public static Spinner createSpinner(Composite container, String
@@ -104,23 +101,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	// }
 	// return s;
 	// }
-
-	public static Button createButton(Composite parent, GridData data, String label, int type, SelectionListener listener) {
-		Button button = new Button(parent, type);
-		button.setText(label);
-		if (data == null) {
-			data = createGridData(GridData.FILL_HORIZONTAL, DEFAULT);
-		}
-		button.setLayoutData(data);
-		if (null != listener) {
-			button.addSelectionListener(listener);
-		}
-		return button;
-	}
-
-	public static Button createButton(Composite parent, String label, int type) {
-		return createButton(parent, null, label, type, null);
-	}
 
 	public static Button createButton(Composite parent, String label, int type, SelectionListener listener) {
 		return createButton(parent, null, label, type, listener);
@@ -282,6 +262,19 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT, listener);
 		button.setData((null == value) ? label : value);
 		return button;
+	}
+
+	public static Table createTable(Composite parent, int style, int cols, int wHint, GridData data) {
+		Table t = new Table(parent, style);
+		t.setHeaderVisible(true);
+		t.setLinesVisible(true);
+		t.setLayoutData(data);
+		TableLayout layout = new TableLayout();
+		for (int i = 0; i < cols; i++) {
+			layout.addColumnData(new ColumnPixelData(wHint / cols));
+		}
+		t.setLayout(layout);
+		return t;
 	}
 
 	public static Text createText(Composite parent, int options, GridData data, boolean readOnly, String initialContents) {
