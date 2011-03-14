@@ -48,7 +48,7 @@ final class ReindentEachLineVisitor extends ReindentingVisitor
         // so try to avoid using them to compute the next line's indentation
         // (unless we're the first line in the file or the first line in a
         // DO-construct, IF-construct, etc.)
-        if (!currentLine.hasLabel() || previousLine == null || previousLine.startsIndentedRegion())
+        if (!currentLine.hasLabel() || previousLine == null || previousLine.startsIndentedRegion() || currentLine.endsIndentedRegion())
             this.previousIndentation = currentLine.getIndentation();
 
         this.previousLine = currentLine;
@@ -60,7 +60,10 @@ final class ReindentEachLineVisitor extends ReindentingVisitor
             return ""; //$NON-NLS-1$
         else if (previousLine.startsIndentedRegion() && !currentLine.endsIndentedRegion())
             return StartOfLine.getIncreasedIndentation(previousIndentation);
-        else if (currentLine.endsIndentedRegion() && !previousLine.startsIndentedRegion())
+        else if (currentLine.endsDoublyIndentedRegion() && !previousLine.startsIndentedRegion())
+            return StartOfLine.getDecreasedIndentation(StartOfLine.getDecreasedIndentation(previousIndentation));
+        else if (currentLine.endsIndentedRegion() && !previousLine.startsIndentedRegion()
+                || currentLine.endsDoublyIndentedRegion() && previousLine.startsIndentedRegion())
             return StartOfLine.getDecreasedIndentation(previousIndentation);
         else
             return previousIndentation;

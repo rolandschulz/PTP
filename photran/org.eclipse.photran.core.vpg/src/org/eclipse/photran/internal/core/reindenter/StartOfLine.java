@@ -22,6 +22,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAssociateStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTCaseConstructNode;
 import org.eclipse.photran.internal.core.parser.ASTCaseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
@@ -29,6 +30,7 @@ import org.eclipse.photran.internal.core.parser.ASTDoConstructNode;
 import org.eclipse.photran.internal.core.parser.ASTElseIfStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTElseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTElseWhereStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTEndSelectStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTForallConstructStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTIfThenStmtNode;
@@ -349,8 +351,9 @@ final class StartOfLine
     public boolean endsIndentedRegion()
     {
         Terminal t = firstStmtToken.getTerminal();
-        return t == Terminal.T_CASE
+        return t == Terminal.T_CASE && !isFirstCaseStmtInSelectConstruct()
             || t == Terminal.T_CONTAINS
+            || t == Terminal.T_CONTINUE // Heuristically used to end old-style DO-loops
             || t == Terminal.T_END
             || t == Terminal.T_ENDBEFORESELECT
             || t == Terminal.T_ENDBLOCK
@@ -371,7 +374,28 @@ final class StartOfLine
             || t == Terminal.T_ELSEWHERE
             || t == Terminal.T_ELSEIF;
     }
+
+    public boolean endsDoublyIndentedRegion()
+    {
+        /* SELECT CASE (i)
+         *     CASE (1)
+         *         PRINT *, "HI"
+         * END SELECT             ! << Note that indentation decreased by *two* levels
+         */
+        return firstStmtToken.findNearestAncestor(ASTEndSelectStmtNode.class) != null;
+    }
     
+    private boolean isFirstCaseStmtInSelectConstruct()
+    {
+        ASTCaseConstructNode selectConstruct = firstStmtToken.findNearestAncestor(ASTCaseConstructNode.class);
+        if (selectConstruct == null) return false;
+        
+        ASTCaseStmtNode firstCaseStmt = selectConstruct.getSelectCaseBody().findFirst(ASTCaseStmtNode.class);
+        if (firstCaseStmt == null) return false;
+        
+        return firstStmtToken.findNearestAncestor(ASTCaseStmtNode.class) == firstCaseStmt;
+    }
+
     @Override public String toString()
     {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
