@@ -70,4 +70,15 @@ public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurat
 		}
 		return null;
 	}
+
+	static boolean hasScript(IJAXBResourceManagerConfiguration config) {
+		ResourceManagerData data = config.resourceManagerData();
+		if (data != null) {
+			Control control = data.getControlData();
+			if (control != null) {
+				return control.getScript() != null;
+			}
+		}
+		return false;
+	}
 }

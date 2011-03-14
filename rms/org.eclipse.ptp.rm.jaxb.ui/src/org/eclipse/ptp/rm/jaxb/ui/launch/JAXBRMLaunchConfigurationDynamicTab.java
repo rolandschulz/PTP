@@ -10,19 +10,12 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTab;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
-import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
-import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.swt.widgets.Composite;
 
 /**
  * Top level constructs the main tab controllers.
@@ -32,38 +25,25 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfigurationDynamicTab {
 
-	private final IJAXBResourceManagerConfiguration rmConfig;
-	private final LaunchTab launchTabData;
-
 	public JAXBRMLaunchConfigurationDynamicTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
-		rmConfig = rm.getJAXBRMConfiguration();
-		launchTabData = JAXBRMLaunchConfigurationFactory.getLaunchTab(rmConfig);
-	}
-
-	@Override
-	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
-		if (!(rm instanceof IJAXBResourceManager)) {
-			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_doCreateError + rm, null);
-		}
-		IJAXBResourceManager jaxb = (IJAXBResourceManager) rm;
-		IJAXBResourceManagerControl rmControl = jaxb.getControl();
+		IJAXBResourceManagerConfiguration rmConfig = rm.getJAXBRMConfiguration();
+		LaunchTab launchTabData = JAXBRMLaunchConfigurationFactory.getLaunchTab(rmConfig);
+		boolean hasScript = JAXBRMLaunchConfigurationFactory.hasScript(rmConfig);
 		if (launchTabData != null) {
-			ILaunchConfigurationDialog dialog = getLaunchConfigurationDialog();
 			String title = null;
 			TabController controller = launchTabData.getBasic();
 			if (controller != null) {
-				addDynamicTab(new JAXBRMConfigurableAttributesTab(rmControl, dialog, controller));
+				addDynamicTab(new JAXBRMConfigurableAttributesTab(rm, dialog, controller, hasScript));
 			}
 			controller = launchTabData.getAdvanced();
 			if (controller != null) {
-				addDynamicTab(new JAXBRMConfigurableAttributesTab(rmControl, dialog, controller));
+				addDynamicTab(new JAXBRMConfigurableAttributesTab(rm, dialog, controller, hasScript));
 			}
 			title = launchTabData.getCustomController();
 			if (title != null) {
-				addDynamicTab(new JAXBRMCustomBatchScriptTab(rmControl, dialog, title));
+				addDynamicTab(new JAXBRMCustomBatchScriptTab(rm, dialog, title));
 			}
 		}
-		super.createControl(parent, rm, queue);
 	}
 }

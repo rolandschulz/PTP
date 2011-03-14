@@ -183,12 +183,6 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		return list.split(CM);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * getResourceManagerId()
-	 */
 	@Override
 	public String getResourceManagerId() {
 		return getId();

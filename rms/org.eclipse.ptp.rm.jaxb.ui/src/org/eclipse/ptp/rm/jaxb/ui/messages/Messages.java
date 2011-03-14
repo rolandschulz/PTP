@@ -82,6 +82,11 @@ public class Messages extends NLS {
 	public static String BatchScriptPath;
 	public static String DefaultDynamicTab_title;
 	public static String SelectAttributesForDisplay;
+	public static String ViewScript;
+	public static String ConfigureLaunchSettings;
+	public static String ViewValuesReplaced;
+	public static String AttributeName;
+	public static String AttributeDescription;
 
 	static {
 		// initialize resource bundle
