@@ -15,8 +15,6 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.jaxb.core.messages.messages"; //$NON-NLS-1$
 	public static String JAXBCorePlugin_Exception_InternalError;
 	public static String JAXBServiceProvider_defaultDescription;
-	public static String JAXBServiceProvider_defaultName;
-	public static String JAXBResourceManager_initError;
 	public static String RMVariableResolver_derefError;
 	public static String Copy_Operation_Null_FileManager;
 	public static String Copy_Operation_cancelled_by_user;
@@ -28,16 +26,13 @@ public class Messages extends NLS {
 	public static String ManagedFilesJobError;
 
 	public static String ScriptHandlerJob;
-	public static String ScriptHandlerWriteError;
 	public static String RMNoSuchCommandError;
 	public static String MissingRunCommandsError;
-	public static String EmptyCommandDef;
 
 	public static String MissingArglistFromCommandError;
 	public static String CouldNotLaunch;
 	public static String StdoutParserError;
 	public static String StderrParserError;
-	public static String RMNoSuchParserError;
 	public static String ParserInternalError;
 	public static String ProcessExitValueError;
 	public static String CannotCompleteSubmitFailedStaging;
@@ -46,7 +41,6 @@ public class Messages extends NLS {
 	public static String StreamTokenizerInstantiationError;
 	public static String MalformedExpressionError;
 	public static String ReadClearError;
-	public static String UndefinedTargetForTestError;
 	public static String UnsupportedWriteException;
 	public static String ProcessRunError;
 	public static String CommandJobStreamMonitor_label;

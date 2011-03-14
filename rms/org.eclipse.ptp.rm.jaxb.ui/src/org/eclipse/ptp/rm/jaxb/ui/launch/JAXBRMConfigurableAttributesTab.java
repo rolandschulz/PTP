@@ -20,7 +20,6 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -28,13 +27,13 @@ import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.data.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.AttributeChoiceDialog;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -51,9 +50,9 @@ import org.eclipse.swt.widgets.Group;
  */
 public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDynamicTab implements IJAXBUINonNLSConstants {
 
-	private class JAXBDataSource extends RMLaunchConfigurationDynamicTabDataSource {
+	private class JAXBUniversalDataSource extends RMLaunchConfigurationDynamicTabDataSource {
 
-		protected JAXBDataSource(BaseRMLaunchConfigurationDynamicTab page) {
+		protected JAXBUniversalDataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
 		}
 
@@ -94,6 +93,12 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 	}
 
+	private class JAXBUniversalWidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
+		public JAXBUniversalWidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
+			super(dynamicTab);
+		}
+	}
+
 	private class SelectAttributesListener implements SelectionListener {
 
 		public void widgetDefaultSelected(SelectionEvent e) {
@@ -101,44 +106,40 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 
 		public synchronized void widgetSelected(SelectionEvent e) {
-			Object source = e.getSource();
-			if (source == selectAttributes) {
-				buildMain(updateVisibleAttributes(true));
-			} else if (source == viewScript) {
+			try {
+				Object source = e.getSource();
+				if (source == selectAttributes) {
+					buildMain(updateVisibleAttributes(true));
+				} else if (source == viewScript) {
 
+				}
+			} catch (Throwable t) {
+				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.WidgetSelectedError,
+						Messages.WidgetSelectedErrorTitle, false);
 			}
 		}
 	}
 
-	private class UniversalWidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
-		public UniversalWidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
-			super(dynamicTab);
-		}
-	}
-
-	private final IJAXBResourceManagerConfiguration rmConfig;
+	private final JAXBRMLaunchConfigurationDynamicTab pTab;
 	private final TabController controller;
 	private final Map<Control, String> valueWidgets;
-	private final boolean hasScript;
 
 	private AttributeChoiceDialog selectionDialog;
 
-	private ScrolledComposite parent;
 	private Composite dynamicControl;
 	private Composite control;
 	private final String title;
 	private Button selectAttributes;
 	private Button viewScript;
 
-	private UniversalWidgetListener universalListener;
-	private JAXBDataSource dataSource;
+	private JAXBUniversalWidgetListener universalListener;
+	private JAXBUniversalDataSource dataSource;
 
 	public JAXBRMConfigurableAttributesTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog,
-			TabController controller, boolean hasScript) {
+			TabController controller, JAXBRMLaunchConfigurationDynamicTab pTab) {
 		super(dialog);
-		rmConfig = rm.getJAXBRMConfiguration();
+		this.pTab = pTab;
 		this.controller = controller;
-		this.hasScript = hasScript;
 		String t = controller.getTitle();
 		if (t == null) {
 			t = Messages.DefaultDynamicTab_title;
@@ -151,17 +152,18 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetBuilderUtils.createComposite(parent, 1);
-		if (parent instanceof ScrolledComposite) {
-			this.parent = (ScrolledComposite) parent;
-		}
 		selectionDialog = new AttributeChoiceDialog(parent.getShell());
 
 		if (controller.isDynamic()) {
 			createDynamicSelectionGroup(control);
-		} else if (hasScript) {
+		} else if (pTab.hasScript()) {
 			createViewScriptGroup(control);
 		}
-		buildMain(updateVisibleAttributes(false));
+		try {
+			buildMain(updateVisibleAttributes(false));
+		} catch (Throwable t) {
+			JAXBUIPlugin.log(t);
+		}
 	}
 
 	public Control getControl() {
@@ -192,7 +194,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	@Override
 	protected RMLaunchConfigurationDynamicTabDataSource createDataSource() {
 		if (dataSource == null) {
-			dataSource = new JAXBDataSource(this);
+			dataSource = new JAXBUniversalDataSource(this);
 		}
 		return dataSource;
 	}
@@ -200,7 +202,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	@Override
 	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
 		if (universalListener == null) {
-			universalListener = new UniversalWidgetListener(this);
+			universalListener = new JAXBUniversalWidgetListener(this);
 		}
 		return universalListener;
 	}
@@ -222,13 +224,12 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 		}
+
 		/*
 		 * We need to repeat this here (the ResourcesTab does it when it
 		 * initially builds the control).
 		 */
-		if (parent != null) {
-			parent.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		}
+		pTab.resize(control);
 
 		updateControls();
 
@@ -239,28 +240,28 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(4, true);
 		GridData gd = WidgetBuilderUtils.createGridDataFillH(4);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
-		WidgetBuilderUtils.createLabel(grp, Messages.ConfigureLaunchSettings, SWT.LEFT, 1);
+		WidgetBuilderUtils.createLabel(grp, Messages.ConfigureLaunchSettings, SWT.RIGHT, 1);
 		selectAttributes = WidgetBuilderUtils.createPushButton(grp, Messages.SelectAttributesForDisplay,
 				new SelectAttributesListener());
-		if (hasScript) {
-			WidgetBuilderUtils.createLabel(grp, Messages.ViewValuesReplaced, SWT.LEFT, 1);
+		if (pTab.hasScript()) {
 			viewScript = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, new SelectAttributesListener());
+			WidgetBuilderUtils.createLabel(grp, Messages.ViewValuesReplaced, SWT.LEFT, 1);
 		}
 	}
 
-	private void createViewScriptGroup(Composite control2) {
+	private void createViewScriptGroup(Composite control) {
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true);
 		GridData gd = WidgetBuilderUtils.createGridDataFillH(2);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
-		WidgetBuilderUtils.createLabel(grp, Messages.ViewValuesReplaced, SWT.LEFT, 1);
+		WidgetBuilderUtils.createLabel(grp, Messages.ViewValuesReplaced, SWT.RIGHT, 1);
 		viewScript = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, new SelectAttributesListener());
 	}
 
-	private Map<String, Boolean> updateVisibleAttributes(boolean showDialog) {
+	private Map<String, Boolean> updateVisibleAttributes(boolean showDialog) throws Throwable {
 		Map<String, Boolean> checked = null;
-		rmConfig.setActive();
+		pTab.getRmConfig().setActive();
 		selectionDialog.clearChecked();
-		selectionDialog.setCurrentlyVisible(rmConfig.getSelectedAttributeSet());
+		selectionDialog.setCurrentlyVisible(pTab.getRmConfig().getSelectedAttributeSet());
 		if (!showDialog || Window.OK == selectionDialog.open()) {
 			checked = selectionDialog.getChecked();
 			StringBuffer sb = new StringBuffer();
@@ -281,7 +282,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 					k.remove();
 				}
 			}
-			rmConfig.setSelectedAttributeSet(sb.toString());
+			pTab.getRmConfig().setSelectedAttributeSet(sb.toString());
 		}
 		return checked;
 	}
