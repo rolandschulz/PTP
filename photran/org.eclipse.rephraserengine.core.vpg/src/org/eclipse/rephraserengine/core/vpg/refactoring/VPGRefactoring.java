@@ -266,7 +266,7 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
             TextFileChange changeThisFile = new TextFileChange(getName() + " - " //$NON-NLS-1$
                     + file.getFullPath().toOSString(), file);
             changeThisFile.initializeValidationData(pm);
-            changeThisFile.setEdit(new ReplaceEdit(0, getSizeOf(file), getSourceCodeFromAST(ast)));
+            changeThisFile.setEdit(new ReplaceEdit(0, countCharsIn(file), getSourceCodeFromAST(ast)));
             allChanges.add(changeThisFile);
         } catch (Exception e) {
             throw new Error(e);
@@ -278,7 +278,7 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
         return ast.toString();
     }
 
-    private int getSizeOf(IFile file) throws CoreException, IOException
+    private int countCharsIn(IFile file) throws CoreException, IOException
     {
         int size = 0;
         Reader in = new BufferedReader(new InputStreamReader(file.getContents(true), file.getCharset()));
