@@ -250,15 +250,17 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 					}
 				}
 			} else if (resourcesToSearch[ir].getType() == IResource.FOLDER) {
-				try {
-					IResource[] modFound = FindModulesInResources(project, contentTypes, resource, ((IFolder)resourcesToSearch[ir]).members(), 
-							topBuildDir, usedNames);
-					if (modFound != null) {
-						for (int i=0; i<modFound.length; i++) {
-							modRes.add(modFound[i]);
+				if (!((IFolder)resourcesToSearch[ir]).isDerived()) {
+					try {
+						IResource[] modFound = FindModulesInResources(project, contentTypes, resource, ((IFolder)resourcesToSearch[ir]).members(), 
+								topBuildDir, usedNames);
+						if (modFound != null) {
+							for (int i=0; i<modFound.length; i++) {
+								modRes.add(modFound[i]);
+							}
 						}
-					}
-				} catch(Exception e) {}
+					} catch(Exception e) {}
+				}
 			}
 		}		
 		return (IResource[]) modRes.toArray(new IResource[modRes.size()]);
@@ -338,8 +340,8 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 					possibleMatchingFiles.add(f.getProjectRelativePath().toString().replaceFirst("\\..+", "")); 
 				}
 			}
-			//If its a folder, recurse
-			else if(resources[i] instanceof IContainer)
+			//If its a folder, recurse, but don't look in other build folders (Bug 326333)
+			else if(resources[i] instanceof IContainer && !resources[i].isDerived())
 			{
 				IContainer folder = (IContainer)resources[i];
 				IResource[] subResource = null;
