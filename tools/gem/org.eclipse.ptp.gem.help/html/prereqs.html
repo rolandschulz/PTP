@@ -27,10 +27,10 @@ The following prerequisites are required for GEM installation.
 
 <ul>
 	<li>Java 1.5 or later</li>
-    <li><a href="http://www.cs.utah.edu/formal_verification/ISP-release/">ISP</a> version 0.2.0 or later</li>
-    <li><a href="http://eclipse.org/downloads">Eclipse SDK</a> version 3.6 or later</li>
-    <li><a href="http://eclipse.org/cdt/">Eclipse C/C++ Development Tools (CDT)</a> version 7.0.0 or later</li>
-    <li><a href="http://eclipse.org/ptp/">Eclipse Parallel Tools Platform (PTP)</a> version 4.0.0 or later</li>
+    <li><a href="http://www.cs.utah.edu/formal_verification/ISP-release/">ISP</a> version 0.3.0 or later</li>
+    <li><a href="http://eclipse.org/downloads">Eclipse SDK</a> version 3.7 or later</li>
+    <li><a href="http://eclipse.org/cdt/">Eclipse C/C++ Development Tools (CDT)</a> version 8.0.0 or later</li>
+    <li><a href="http://eclipse.org/ptp/">Eclipse Parallel Tools Platform (PTP)</a> version 5.0.0 or later</li>
 </ul>
 
 <br>
@@ -69,27 +69,27 @@ manager is already running when it is loaded.
 <br>
 
 <hr>
-<h2>Here are some of the major requirements for ISP to be able to run:</h2>
+<h2>Here are some of the major requirements for GEM to be able to run:</h2>
 <br>
 <ul>
     <li>
-        <b>Machine:</b> ISP can be run on machines with one or more CPU cores. With more cores,
-        ISP’s OpenMP parallelization can help speed up model checking.
+        <b>Machine:</b> GEM can be run on machines with one or more CPU cores. With more cores,
+        GEM&#39;s OpenMP parallelization can help speed up model checking.
     </li>
     <li>
-        <b>Sockets:</b> ISP can be run with TCP sockets or Unix-domain sockets. The latter is
-        much faster, but requires all ISP runs to occur within one machine. A distributed ISP
+        <b>Sockets:</b> GEM can be run with TCP sockets or Unix-domain sockets. The latter is
+        much faster, but requires all GEM runs to occur within one machine. A distributed GEM
         checker is in our future plans.
     </li>
     <li>
         <b>Operating Systems:</b> GEM is designed for Linux and MacOS X
     </li>
     <li>
-        <b>MPI Librarys:</b> The current ISP release is for MPICH 2.1. We have successfully tested
-        GEM/ISP with OpenMPI as well as Microsoft’s MPI (sometimes called CCS) and Intel&#169; MPI. 
+        <b>MPI Librarys:</b> The current GEM release is for MPICH2. We have successfully tested
+        GEM with OpenMPI as well as Microsoft’s MPI (sometimes called CCS) and Intel&#169; MPI. 
         An enhanced configure and make will be released corresponding to these MPI libraries also. 
         If you are interested, kindly let us know and we can help tailor the current distribution 
-        with these other MPI libraries. For MAC OS/X, one can run ISP using the OpenMPI that comes by default.        
+        with these other MPI libraries. For MAC OS/X, one can run GEM using the OpenMPI that comes by default.        
     </li>
 </ul>
 
