@@ -165,7 +165,16 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 			if (o != null) {
 				s = o.toString();
 			}
-			flat.put(ja.getName(), s);
+			String name = ja.getName();
+			flat.put(name, s);
+			s = ja.getDescription();
+			if (s != null) {
+				flat.put(name + PD + DESC, s);
+			}
+			s = ja.getTooltip();
+			if (s != null) {
+				flat.put(name + PD + TOOLTIP, s);
+			}
 		} else if (value == null) {
 			flat.put(key, null);
 		} else {

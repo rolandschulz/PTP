@@ -415,21 +415,17 @@
 	</xs:complexType>
 	<xs:complexType name="widget">
 		<xs:sequence>
+		   <xs:element name="grid-data" minOccurs="0" type="rm:grid-data"/>
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
-			<xs:element name="content" minOccurs="0" type="rm:arglist">
+			<xs:element name="value" minOccurs="0" type="xs:string"/>
+			
+			<xs:element name="displayValue" minOccurs="0" type="rm:arglist">
 				<xs:annotation>
 					<xs:documentation>
-						The text of this element will be parsed for references to the resource manager environment; e.g., ${a},
-						version-${b}, etc.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="saveValueTo" type="xs:string" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						The text of this element will be the name of a property.
+						The text of this element will be parsed for references to the environment; e.g., ${a},
+						version-${b}.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -462,6 +458,8 @@
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
+		<xs:attribute name="valueFrom" type="xs:string"/>
+      <xs:attribute name="saveAs" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="viewer">
 		<xs:sequence>

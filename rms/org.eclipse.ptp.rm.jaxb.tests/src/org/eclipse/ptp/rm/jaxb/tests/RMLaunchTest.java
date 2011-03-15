@@ -39,6 +39,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerMonitor;
@@ -287,9 +288,9 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		rmConfig.setControlPath(targetPath);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void emulateLaunchTab() throws Throwable {
 		launchConfig = new TestLaunchConfiguration();
-		@SuppressWarnings("unchecked")
 		Map<Object, Object> env = launchConfig.getAttributes();
 		Map<String, String> live = new HashMap<String, String>();
 		live.put("FOO_VAR_1", "FOO_VALUE_1"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -306,10 +307,10 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		env.put("export_all", true); //$NON-NLS-1$
 		env.put(MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
 		env.put(MPI_ARGS, "-machinefile $PBS_NODEFILE -np 8"); //$NON-NLS-1$ 
-		@SuppressWarnings("rawtypes")
-		List queues = (List) RMVariableMap.getActiveInstance().getVariables().get("available_queues"); //$NON-NLS-1$ 
+		Property queues = (Property) RMVariableMap.getActiveInstance().getVariables().get("available_queues"); //$NON-NLS-1$ 
 		if (queues != null) {
-			env.put("destination", queues.get(1)); //$NON-NLS-1$
+			List<String> q = (List<String>) queues.getValue();
+			env.put("destination", q.get(0)); //$NON-NLS-1$
 		}
 		env.put("directory", "/Users/arossi"); //$NON-NLS-1$//$NON-NLS-2$
 	}
