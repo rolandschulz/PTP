@@ -53,7 +53,7 @@
 						<set field="name">
 							<entry valueGroup="1"/>
 						</set>
-						<set field="visible">
+						<set field="selected">
 							<entry value="true"/>
 						</set>
 						<set field="value">
@@ -95,7 +95,7 @@
 						<set field="value">
 							<entry valueGroup="2"/>
 						</set>
-						<set field="visible">
+						<set field="selected">
 							<entry value="false"/>
 						</set>
 						<set field="readOnly">
