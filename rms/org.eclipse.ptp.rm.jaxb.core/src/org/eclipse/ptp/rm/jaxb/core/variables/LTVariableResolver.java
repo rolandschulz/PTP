@@ -19,6 +19,11 @@ public class LTVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
 		LTVariableMap m = LTVariableMap.getActiveInstance();
 		if (m != null) {
+			argument = argument.replaceAll(OPENVRM, OPENVLT);
+			String[] split = argument.split(PD);
+			if (split.length > 1) {
+				argument = split[0] + CLOSV;
+			}
 			return m.getVariables().get(argument);
 		}
 		return null;
