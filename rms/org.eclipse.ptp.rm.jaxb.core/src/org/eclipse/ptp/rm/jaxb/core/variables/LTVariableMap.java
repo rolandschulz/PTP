@@ -16,9 +16,10 @@ import java.util.TreeMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 
-public class LTVariableMap implements IJAXBNonNLSConstants {
+public class LTVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	private static LTVariableMap active;
 
 	private final Map<String, String> variables;
@@ -56,6 +57,10 @@ public class LTVariableMap implements IJAXBNonNLSConstants {
 			JAXBCorePlugin.log(t);
 		}
 		return value;
+	}
+
+	public String getString(String jobId, String value) {
+		return getString(value);
 	}
 
 	public Map<String, String> getVariables() {

@@ -262,7 +262,8 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		if (args == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
 		}
-		ArglistImpl arglist = new ArglistImpl(uuid, args);
+		RMVariableMap map = RMVariableMap.getActiveInstance();
+		ArglistImpl arglist = new ArglistImpl(uuid, args, map);
 		String[] cmdArgs = arglist.toArray();
 		IRemoteServices service = rm.getRemoteServices();
 		return service.getProcessBuilder(rm.getRemoteConnection(), cmdArgs);

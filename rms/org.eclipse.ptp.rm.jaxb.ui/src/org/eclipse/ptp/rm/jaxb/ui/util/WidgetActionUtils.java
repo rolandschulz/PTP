@@ -22,6 +22,7 @@ import org.eclipse.ptp.rm.ui.utils.DataSource.ValidationException;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 
@@ -89,7 +90,11 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static void setValue(Control c, String dfltV) {
-		// TODO
+		if (c instanceof Text) {
+
+		} else if (c instanceof Combo) {
+
+		}
 
 	}
 
@@ -108,5 +113,69 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	public static void validate(Control c, Validator v, String defaultValue) throws ValidationException {
 		// TODO
 
+	}
+
+	/**
+	 * Facility to set the string value of a {@link Text} widget. Copied from
+	 * DataSource.
+	 * 
+	 * @param t
+	 *            The {@link Text} widget.
+	 * @param s
+	 *            The new string value.
+	 */
+	private static void applyText(Combo t, String s) {
+		assert t != null;
+		if (s == null) {
+			t.setText(ZEROSTR);
+		} else {
+			t.setText(s);
+		}
+	}
+
+	/**
+	 * Facility to set the string value of a {@link Text} widget. Copied from
+	 * DataSource.
+	 * 
+	 * @param t
+	 *            The {@link Text} widget.
+	 * @param s
+	 *            The new string value.
+	 */
+	private static void applyText(Text t, String s) {
+		assert t != null;
+		if (s == null) {
+			t.setText(ZEROSTR);
+		} else {
+			t.setText(s);
+		}
+	}
+
+	/**
+	 * Facility to get string value of a {@link Combo} widget, or null if the
+	 * widget is empty.
+	 * 
+	 * @param text
+	 *            The widget
+	 * @return The string value of widget or null widget is empty.
+	 */
+	private static String extractText(Combo text) {
+		assert text != null;
+		String s = text.getText().trim();
+		return (s.length() == 0 ? null : s);
+	}
+
+	/**
+	 * Facility to get string value of a {@link Text} widget, or null if the
+	 * widget is empty.
+	 * 
+	 * @param text
+	 *            The widget
+	 * @return The string value of widget or null widget is empty.
+	 */
+	private static String extractText(Text text) {
+		assert text != null;
+		String s = text.getText().trim();
+		return (s.length() == 0 ? null : s);
 	}
 }

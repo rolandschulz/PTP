@@ -58,13 +58,13 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private void addCommand(Arglist arglist, StringBuffer buffer) {
-		new ArglistImpl(uuid, arglist).toString(buffer);
+		new ArglistImpl(uuid, arglist, map).toString(buffer);
 		buffer.append(REMOTE_LINE_SEP);
 	}
 
 	private void addCommands(List<Arglist> arglist, StringBuffer buffer) {
 		for (Arglist args : arglist) {
-			new ArglistImpl(uuid, args).toString(buffer);
+			new ArglistImpl(uuid, args, map).toString(buffer);
 			buffer.append(REMOTE_LINE_SEP);
 		}
 	}
