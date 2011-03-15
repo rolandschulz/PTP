@@ -240,6 +240,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
 		try {
 			Property p = new Property();
+			p.setConfigurable(false);
 			RMVariableMap.getActiveInstance().getVariables().put(jobId, p);
 
 			Command job = controlData.getGetJobStatus();
@@ -318,6 +319,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 */
 			String uuid = UUID.randomUUID().toString();
 			Property p = new Property();
+			p.setConfigurable(false);
 			RMVariableMap.getActiveInstance().getVariables().put(uuid, p);
 
 			/*
@@ -518,13 +520,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		assert (null != remoteFileManager);
 	}
 
-	private void maybeAddProperty(String name, Object value, Map<String, Object> env) {
+	private void maybeAddProperty(String name, Object value, boolean configurable, Map<String, Object> env) {
 		if (value == null) {
 			return;
 		}
 		Property p = new Property();
 		p.setName(name);
 		p.setValue(value);
+		p.setConfigurable(configurable);
 		env.put(name, p);
 	}
 
@@ -582,7 +585,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			value = configuration.getAttribute(key2, (Map) value);
 		}
 
-		maybeAddProperty(key1, value, env);
+		maybeAddProperty(key1, value, true, env);
 	}
 
 	/*
@@ -657,10 +660,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * From the user runtime choices.
 	 */
 	private void setFixedConfigurationProperties(Map<String, Object> env) {
-		maybeAddProperty(CONTROL_USER_VAR, config.getControlUserName(), env);
-		maybeAddProperty(MONITOR_USER_VAR, config.getMonitorUserName(), env);
-		maybeAddProperty(CONTROL_ADDRESS_VAR, config.getControlAddress(), env);
-		maybeAddProperty(MONITOR_ADDRESS_VAR, config.getMonitorAddress(), env);
+		maybeAddProperty(CONTROL_USER_VAR, config.getControlUserName(), false, env);
+		maybeAddProperty(MONITOR_USER_VAR, config.getMonitorUserName(), false, env);
+		maybeAddProperty(CONTROL_ADDRESS_VAR, config.getControlAddress(), false, env);
+		maybeAddProperty(MONITOR_ADDRESS_VAR, config.getMonitorAddress(), false, env);
 	}
 
 	/*
@@ -681,7 +684,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			Object target = env.get(key.toString());
 			if (target instanceof Property) {
 				Property p = (Property) target;
-				if (!selected.containsKey(p.getName())) {
+				if (selected != null && !selected.containsKey(p.getName())) {
 					p.setValue(null);
 					p.setSelected(false);
 				} else {
@@ -689,7 +692,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				}
 			} else if (target instanceof JobAttribute) {
 				JobAttribute ja = (JobAttribute) target;
-				if (!selected.containsKey(ja.getName())) {
+				if (selected != null && !selected.containsKey(ja.getName())) {
 					ja.setValue(null);
 					ja.setSelected(false);
 				} else {

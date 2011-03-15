@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.jaxb.ui.launch;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -23,6 +24,7 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
+import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
@@ -38,7 +40,6 @@ import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
-import org.eclipse.ptp.rm.ui.utils.DataSource.ValidationException;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -102,7 +103,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			try {
 				ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
 				if (config == null) {
-					JAXBUIPlugin.log(Messages.MissingLaunchConfigurationError);
 					return;
 				}
 
@@ -122,15 +122,29 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			}
 		}
 
+		/*
+		 * Defaults are recorded in the Property or JobAttribute definitions and
+		 * are accessed via the RMVariableMap.
+		 */
 		@Override
 		protected void loadDefault() {
-			Map<String, String> dflt = LTVariableMap.getActiveInstance().getDefaults();
+			Map<String, Object> vars = RMVariableMap.getActiveInstance().getVariables();
+			Map<String, Object> disc = RMVariableMap.getActiveInstance().getDiscovered();
 			for (Control c : valueWidgets.keySet()) {
 				Widget w = valueWidgets.get(c);
 				String name = w.getSaveValueTo();
-				String dfltV = dflt.get(name);
-				if (dfltV != null) {
-					WidgetActionUtils.setValue(c, dfltV);
+				Object o = vars.get(name);
+				String defaultValue = null;
+				if (o == null) {
+					o = disc.get(name);
+				}
+				if (o instanceof Property) {
+					defaultValue = ((Property) o).getDefault();
+				} else if (o instanceof JobAttribute) {
+					defaultValue = ((JobAttribute) o).getDefault();
+				}
+				if (defaultValue != null) {
+					WidgetActionUtils.setValue(c, defaultValue);
 				}
 			}
 		}
@@ -145,7 +159,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			try {
 				ILaunchConfiguration config = getConfiguration();
 				if (config == null) {
-					JAXBUIPlugin.log(Messages.MissingLaunchConfigurationError);
 					return;
 				}
 
@@ -180,8 +193,11 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 					JobAttribute ja = (JobAttribute) o;
 					Validator v = ja.getValidator();
 					if (v != null) {
-						WidgetActionUtils.validate(c, v);
+						WidgetActionUtils.validate(c, v, ja.getDefault());
 					}
+				} else if (o instanceof Property) {
+					Property p = (Property) o;
+					WidgetActionUtils.validate(c, p.getDefault());
 				}
 			}
 		}
@@ -191,6 +207,19 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		public JAXBUniversalWidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
 			super(dynamicTab);
 		}
+		/*
+		 * The list of listeners will always include the ContentsChangedListener
+		 * of the Resources Tab, which bottoms out in an updateButtons call
+		 * which enables the "Apply" button.
+		 * 
+		 * The performApply of the ResourcesTab calls the performApply of the
+		 * BaseRMLaunchConfigurationDynamicTab which calls the storeAndValidate
+		 * method of the DataSource.
+		 * 
+		 * The methods loadAndUpdate() and justUpdate() on the DataSource can be
+		 * used to refresh. The former is called on RM initialization, which
+		 * takes place when the RM becomes visible.
+		 */
 	}
 
 	private class SelectAttributesListener implements SelectionListener {
@@ -229,8 +258,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	private JAXBUniversalWidgetListener universalListener;
 	private JAXBUniversalDataSource dataSource;
 
-	private boolean loading;
-
 	public JAXBRMConfigurableAttributesTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog,
 			TabController controller, JAXBRMLaunchConfigurationDynamicTab pTab) {
 		super(dialog);
@@ -253,7 +280,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
-		loading = true;
 		control = WidgetBuilderUtils.createComposite(parent, 1);
 		selectionDialog = new AttributeChoiceDialog(parent.getShell());
 
@@ -267,7 +293,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 		}
-		loading = false;
 	}
 
 	public Control getControl() {
@@ -286,15 +311,17 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		/*
-		 * Defaults are recorded in the LTVariableMap.
+		 * See dataSource loadDefaults
 		 */
 		return null;
 	}
 
 	@Override
 	public void updateControls() {
-		dataSource.loadFromStorage();
-		dataSource.copyToFields();
+		/*
+		 * This controls the visible and enabled settings of the widgets. For
+		 * the dynamic tab, these are not configurable, so this is a NOP
+		 */
 	}
 
 	@Override
@@ -315,7 +342,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	private void buildMain(Map<String, Boolean> checked) {
 		universalListener.disable();
-		saveSettings();
+		dataSource.storeAndValidate();
 
 		if (dynamicControl != null) {
 			dynamicControl.dispose();
@@ -340,6 +367,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		 */
 		pTab.resize(control);
 
+		dataSource.loadAndUpdate();
 		updateControls();
 		universalListener.enable();
 	}
@@ -365,19 +393,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		viewScript = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, new SelectAttributesListener());
 	}
 
-	private void saveSettings() {
-		if (loading) {
-			return;
-		}
-
-		try {
-			dataSource.copyFromFields();
-			dataSource.copyToStorage();
-		} catch (ValidationException t) {
-			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnSaveWidgets, Messages.ErrorOnSaveTitle, false);
-		}
-	}
-
 	private Map<String, Boolean> updateVisibleAttributes(boolean showDialog) throws Throwable {
 		Map<String, Boolean> checked = null;
 		selectionDialog.clearChecked();
@@ -385,7 +400,12 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		selectionDialog.setCurrentlyVisible(selected);
 		if (!showDialog || Window.OK == selectionDialog.open()) {
 			checked = selectionDialog.getChecked();
-			selected.clear();
+			if (selected == null) {
+				selected = new TreeMap<String, String>();
+			} else {
+				selected.clear();
+			}
+
 			Iterator<String> k = checked.keySet().iterator();
 			if (k.hasNext()) {
 				String key = k.next();

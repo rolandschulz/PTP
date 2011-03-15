@@ -91,7 +91,7 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	private static void addProperties(Map<String, Object> env, Control control) {
 		List<Property> properties = control.getProperty();
 		for (Property property : properties) {
-			env.put(property.getName(), null);
+			env.put(property.getName(), property);
 		}
 	}
 

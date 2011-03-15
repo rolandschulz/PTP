@@ -36,7 +36,6 @@ import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
-import org.eclipse.ptp.rm.ui.utils.DataSource.ValidationException;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -127,6 +126,19 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 	}
 
 	private class JAXBBatchScriptWidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
+		/*
+		 * The list of listeners will always include the ContentsChangedListener
+		 * of the Resources Tab, which bottoms out in an updateButtons call
+		 * which enables the "Apply" button.
+		 * 
+		 * The performApply of the ResourcesTab calls the performApply of the
+		 * BaseRMLaunchConfigurationDynamicTab which calls the storeAndValidate
+		 * method of the DataSource.
+		 * 
+		 * The methods loadAndUpdate() and justUpdate() on the DataSource can be
+		 * used to refresh. The former is called on RM initialization, which
+		 * takes place when the RM becomes visible.
+		 */
 		private boolean toContents = false;
 
 		public JAXBBatchScriptWidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
@@ -169,6 +181,8 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 						selected = newPath;
 						updateContents();
 					}
+				} else if (source == revert) {
+					updateContents();
 				} else if (source == clear) {
 					selected = ZEROSTR;
 					updateContents();
@@ -191,6 +205,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 
 	private Button browseProjectButton;
 	private Button saveToFile;
+	private Button revert;
 	private Button clear;
 
 	private JAXBBatchScriptDataSource dataSource;
@@ -248,6 +263,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 		gd = WidgetBuilderUtils.createGridDataFillH(6);
 		comp = WidgetBuilderUtils.createComposite(control, SWT.NONE, layout, gd);
 		saveToFile = WidgetBuilderUtils.createPushButton(comp, Messages.SaveToFileButton, listener);
+		revert = WidgetBuilderUtils.createPushButton(comp, Messages.RevertScript, listener);
 		clear = WidgetBuilderUtils.createPushButton(comp, Messages.ClearScript, listener);
 		selected = ZEROSTR;
 		pTab.resize(control);
@@ -278,8 +294,16 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 	public void updateControls() {
 		if (fileDirty) {
 			saveToFile.setEnabled(true);
+			revert.setEnabled(true);
 		} else {
 			saveToFile.setEnabled(false);
+			revert.setEnabled(false);
+		}
+
+		if (ZEROSTR.equals(contents)) {
+			clear.setEnabled(false);
+		} else {
+			clear.setEnabled(true);
 		}
 	}
 
@@ -317,15 +341,6 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 		return path == null ? ZEROSTR : path;
 	}
 
-	private void saveSettings() {
-		try {
-			dataSource.copyFromFields();
-			dataSource.copyToStorage();
-		} catch (ValidationException t) {
-			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnSaveWidgets, Messages.ErrorOnSaveTitle, false);
-		}
-	}
-
 	private void updateContents() throws Throwable {
 		if (!ZEROSTR.equals(selected)) {
 			contents = ConfigUtils.getFileContents(new File(selected));
@@ -333,7 +348,9 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			contents = ZEROSTR;
 		}
 		dataSource.copyToFields();
-		saveSettings();
+		/*
+		 * contents can be saved using Apply
+		 */
 		fileDirty = false;
 		updateControls();
 	}
