@@ -116,13 +116,13 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 			Property p = (Property) value;
 			flat.put(key + PD + NAME, p.getName());
 			flat.put(key + PD + VALUE, (String) p.getValue());
+			flat.put(key + PD + SELECTED, ZEROSTR + p.isSelected());
 		} else if (value instanceof JobAttribute) {
 			JobAttribute ja = (JobAttribute) value;
 			flat.put(key + PD + BASIC, ZEROSTR + ja.isBasic());
 			flat.put(key + PD + CHOICE, ja.getChoice());
 			flat.put(key + PD + sDEFAULT, ja.getDefault());
 			flat.put(key + PD + DESC, ja.getDescription());
-			flat.put(key + PD + ID, ja.getId());
 			flat.put(key + PD + MAX, ZEROSTR + ja.getMax());
 			flat.put(key + PD + MIN, ZEROSTR + ja.getMin());
 			flat.put(key + PD + NAME, ja.getName());
@@ -131,7 +131,7 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 			flat.put(key + PD + TOOLTIP, ja.getTooltip());
 			flat.put(key + PD + TYPE, ja.getType());
 			flat.put(key + PD + VALUE, (String) ja.getValue());
-			flat.put(key + PD + VISIBLE, ZEROSTR + ja.isVisible());
+			flat.put(key + PD + SELECTED, ZEROSTR + ja.isSelected());
 		} else if (value == null) {
 			flat.put(key, null);
 		} else {

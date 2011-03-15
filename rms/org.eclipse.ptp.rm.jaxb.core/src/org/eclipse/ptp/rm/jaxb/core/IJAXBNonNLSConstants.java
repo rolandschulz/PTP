@@ -97,7 +97,7 @@ public interface IJAXBNonNLSConstants {
 	String TOOLTIP = "tooltip";//$NON-NLS-1$
 	String TYPE = "type";//$NON-NLS-1$
 	String VALIDATOR = "validator";//$NON-NLS-1$
-	String VISIBLE = "visible";//$NON-NLS-1$
+	String SELECTED = "visible";//$NON-NLS-1$
 	String THIS = "this.";//$NON-NLS-1$
 	String JOB_ID_TAG = "@jobId@";//$NON-NLS-1$
 
