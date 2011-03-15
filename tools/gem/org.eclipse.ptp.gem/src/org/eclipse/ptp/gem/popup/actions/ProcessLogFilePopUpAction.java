@@ -29,6 +29,7 @@ import org.eclipse.ptp.gem.preferences.PreferenceConstants;
 import org.eclipse.ptp.gem.util.GemUtilities;
 import org.eclipse.ptp.gem.views.GemAnalyzer;
 import org.eclipse.ptp.gem.views.GemBrowser;
+import org.eclipse.ptp.gem.views.GemConsole;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbench;
@@ -76,7 +77,7 @@ public class ProcessLogFilePopUpAction implements IObjectActionDelegate {
 			final IWorkbenchPage page = window.getActivePage();
 			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
 
-			// Open Analyzer and Browser Views in order determined by preference
+			// Open GEM views in order determined by preference
 			try {
 				final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
 				if (activeView.equals("analyzer")) { //$NON-NLS-1$
@@ -86,6 +87,8 @@ public class ProcessLogFilePopUpAction implements IObjectActionDelegate {
 					page.showView(GemAnalyzer.ID);
 					page.showView(GemBrowser.ID);
 				}
+				// Now open the Console View
+				page.showView(GemConsole.ID);
 			} catch (final PartInitException e) {
 				GemUtilities.logExceptionDetail(e);
 			}

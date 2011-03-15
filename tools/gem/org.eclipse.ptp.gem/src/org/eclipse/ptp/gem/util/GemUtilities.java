@@ -615,11 +615,11 @@ public class GemUtilities {
 			return;
 		}
 
-		// Tell the Analyzer where to find the source and log files
 		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+		// Tell the Analyzer where to find the source and log files
 		final IViewPart gemViewPart = window.getActivePage().findView(GemAnalyzer.ID);
 		analyzer = (GemAnalyzer) gemViewPart;
-
 		// Clear the Analyzer view in case we're doing a repeated run
 		analyzer.clear();
 		analyzer.init(inputFile);
@@ -627,7 +627,6 @@ public class GemUtilities {
 		// Tell the Browser where to find the source and log files
 		final IViewPart browserPart = window.getActivePage().findView(GemBrowser.ID);
 		browser = (GemBrowser) browserPart;
-
 		// Clear the Browser view in case we're doing a repeated run
 		browser.clear();
 		browser.init();
