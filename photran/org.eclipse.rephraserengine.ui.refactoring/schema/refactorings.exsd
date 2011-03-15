@@ -2,9 +2,9 @@
 <!-- Schema file written by PDE -->
 <schema targetNamespace="org.eclipse.rephraserengine.ui.refactoring" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appinfo>
+      <appInfo>
          <meta.schema plugin="org.eclipse.rephraserengine.ui.refactoring" id="refactorings" name="Refactorings"/>
-      </appinfo>
+      </appInfo>
       <documentation>
          Allows plug-ins to contribute to the Refactor menu.
       </documentation>
@@ -12,9 +12,9 @@
 
    <element name="extension">
       <annotation>
-         <appinfo>
+         <appInfo>
             <meta.element />
-         </appinfo>
+         </appInfo>
       </annotation>
       <complexType>
          <sequence>
@@ -23,6 +23,7 @@
             </choice>
             <choice minOccurs="1" maxOccurs="unbounded">
                <element ref="group"/>
+               <element ref="submenu"/>
                <element ref="resourceRefactoring"/>
                <element ref="command"/>
                <element ref="editorRefactoring"/>
@@ -31,25 +32,25 @@
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute translatable="true"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>
@@ -60,44 +61,44 @@
          <attribute name="class" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.rephraserengine.core.refactorings.IResourceRefactoring"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
          <attribute name="label" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="command" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
          <attribute name="inputPage" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.rephraserengine.ui.refactoring.CustomUserInputPage:"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
          <attribute name="require_env" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
@@ -109,44 +110,44 @@
          <attribute name="class" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
          <attribute name="label" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="command" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
          <attribute name="inputPage" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.rephraserengine.ui.refactoring.CustomUserInputPage:"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
          <attribute name="require_env" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
@@ -160,8 +161,33 @@
                <element ref="command"/>
                <element ref="resourceRefactoring"/>
                <element ref="editorRefactoring"/>
+               <element ref="submenu"/>
             </choice>
          </sequence>
+      </complexType>
+   </element>
+
+   <element name="submenu">
+      <complexType>
+         <sequence>
+            <choice minOccurs="1" maxOccurs="unbounded">
+               <element ref="group"/>
+               <element ref="submenu"/>
+               <element ref="resourceRefactoring"/>
+               <element ref="command"/>
+               <element ref="editorRefactoring"/>
+            </choice>
+         </sequence>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
@@ -170,11 +196,11 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>
@@ -185,31 +211,31 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.rephraserengine.core.refactorings.IResourceFilter"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
    <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="since"/>
-      </appinfo>
+      </appInfo>
       <documentation>
          1.0
       </documentation>
    </annotation>
 
    <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="examples"/>
-      </appinfo>
+      </appInfo>
       <documentation>
-   &lt;extension
+         &lt;extension
          point=&quot;org.eclipse.rephraserengine.ui.refactoring.refactorings&quot;&gt;
 
       &lt;!-- The resource filter determines what must be selected for these refactorings to be visible --&gt;
@@ -249,6 +275,11 @@
              class=&quot;org.eclipse.photran.internal.core.refactoring.AddEmptySubprogramRefactoring&quot; /&gt;
 
       &lt;/group&gt;
+      &lt;!-- A submenu defines a pop-out menu with the given name --&gt;
+      &lt;submenu name=&quot;&amp;amp;Submenu&quot;&gt;
+         &lt;resourceRefactoring
+            class=&quot;org.eclipse.rephraserengine.examples.text.ConvertTabsToSpacesRefactoring&quot; /&gt;
+      &lt;/submenu&gt;
    &lt;/extension&gt;
       </documentation>
    </annotation>

@@ -21,103 +21,113 @@
          <editorRefactoring command="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand" />
          <editorRefactoring command="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand" />
       </group>
-      <group><!-- Refactorings that change local variable declarations -->
-         <resourceRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.IntroImplicitNoneRefactoring"
-         />
-         <resourceRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.DataToParameterRefactoring"
-         />
-         <resourceRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.RemoveUnusedVariablesRefactoring"
-         />
-         <resourceRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.StandardizeStatementsRefactoring"
-         />
+      <group>
+          <submenu name="Subprogram"><!-- Refactorings that change subprograms -->
+             <editorRefactoring
+                 class = "org.eclipse.photran.internal.core.refactoring.SafeDeleteInternalSubprogramRefactoring"
+             />
+             <editorRefactoring
+                    class="org.eclipse.photran.internal.core.refactoring.PermuteSubroutineArgsRefactoring"
+                    inputPage="org.eclipse.photran.internal.ui.refactoring.PermuteSubroutineArgsInputPage"
+             />
+          </submenu>
       </group>
-      <group><!-- Refactorings that change subprograms -->
-         <editorRefactoring
-             class = "org.eclipse.photran.internal.core.refactoring.SafeDeleteInternalSubprogramRefactoring"
-         />
-         <editorRefactoring
-                class="org.eclipse.photran.internal.core.refactoring.PermuteSubroutineArgsRefactoring"
-                inputPage="org.eclipse.photran.internal.ui.refactoring.PermuteSubroutineArgsInputPage"
-         />
-       </group>
-      <group><!-- Refactorings that change declarations in modules -->
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring"
-         />
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.EncapsulateVariableRefactoring"
-         />
+      <group>
+          <submenu name="Module"><!-- Refactorings that change declarations in modules -->
+             <editorRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring"
+             />
+             <editorRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.EncapsulateVariableRefactoring"
+             />
+          </submenu>
+          <submenu name="Use Statement"><!-- Refactorings for USE statements -->
+             <editorRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.AddOnlyToUseStmtRefactoring"
+                 inputPage="org.eclipse.photran.internal.ui.refactoring.AddOnlyToUseStmtInputPage"
+             />
+             <editorRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.MinOnlyListRefactoring"
+             />
+          </submenu>
       </group>
-      <group><!-- Refactorings for USE statements -->
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.AddOnlyToUseStmtRefactoring"
-             inputPage="org.eclipse.photran.internal.ui.refactoring.AddOnlyToUseStmtInputPage"
-         />
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.MinOnlyListRefactoring"
-         />
+      <group>
+          <submenu name="Common Block"><!-- Refactorings for COMMON blocks -->
+             <editorRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.CommonVarNamesRefactoring"
+                 inputPage="org.eclipse.photran.internal.ui.refactoring.CommonVarNamesInputPage"
+             />
+             <editorRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.MoveSavedToCommonBlockRefactoring"
+             />
+             <!--editorRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.MoveCommonToModuleRefactoring"
+             /-->
+          </submenu>
       </group>
-      <group><!-- Refactorings for COMMON blocks -->
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.CommonVarNamesRefactoring"
-             inputPage="org.eclipse.photran.internal.ui.refactoring.CommonVarNamesInputPage"
-         />
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.MoveSavedToCommonBlockRefactoring"
-         />
-         <!--editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.MoveCommonToModuleRefactoring"
-         /-->
+      <group>
+          <submenu name="Do Loop"><!-- Loop transformations (for performance improvement) -->
+             <editorRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.InterchangeLoopsRefactoring"
+             />
+             <editorRefactoring
+             	class="org.eclipse.photran.internal.core.refactoring.FuseLoopsRefactoring"
+             />
+             <editorRefactoring
+                class="org.eclipse.photran.internal.core.refactoring.ReverseLoopRefactoring"
+             />
+             <editorRefactoring
+             	class="org.eclipse.photran.internal.core.refactoring.TileLoopRefactoring"
+             />
+             <editorRefactoring
+                class="org.eclipse.photran.internal.core.refactoring.UnrollLoopRefactoring"
+             />
+          </submenu>
       </group>
-      <group><!-- Refactorings that eliminate old language constructs -->
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.ReplaceOldStyleDoLoopRefactoring"
-         />
-         <resourceRefactoring
-         	class="org.eclipse.photran.internal.core.refactoring.RemoveArithmeticIfRefactoring"
-         />
-         <editorRefactoring
-         	class="org.eclipse.photran.internal.core.refactoring.RemoveComputedGoToRefactoring"
-         />
+      <group>
+          <submenu name="Obsolete Language Features"><!-- Refactorings that remove obsolete features -->
+             <resourceRefactoring
+                class="org.eclipse.photran.internal.core.refactoring.RemoveArithmeticIfRefactoring"
+             />
+             <editorRefactoring
+                class="org.eclipse.photran.internal.core.refactoring.RemoveComputedGoToRefactoring"
+             />
+             <editorRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.ReplaceCharacterStarRefactoring"
+             />
+             <resourceRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.RepObsOpersRefactoring"
+             />
+             <editorRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.ReplaceOldStyleDoLoopRefactoring"
+             />
+          </submenu>
       </group>
-      <group><!-- Refactorings for performance/loop transformations -->
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.InterchangeLoopsRefactoring"
-         />
-         <editorRefactoring
-         	class="org.eclipse.photran.internal.core.refactoring.ReverseLoopRefactoring"
-         />
-         <editorRefactoring
-         	class="org.eclipse.photran.internal.core.refactoring.UnrollLoopRefactoring"
-         />
-         <editorRefactoring
-         	class="org.eclipse.photran.internal.core.refactoring.FuseLoopsRefactoring"
-         />
-         <editorRefactoring
-         	class="org.eclipse.photran.internal.core.refactoring.TileLoopRefactoring"
-         />
-      </group>
-      <group><!-- Refactorings that reformat code -->
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.RemoveUnreferencedLabelsRefactoring"
-         />         
-         <resourceRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.AddIdentifierToEndRefactoring"
-         />
-         <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.ReplaceCharacterStarRefactoring"
-         />
-         <resourceRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.RepObsOpersRefactoring"
-         />
-         <resourceRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.KeywordCaseRefactoring"
-             inputPage="org.eclipse.photran.internal.ui.refactoring.KeywordCaseInputPage"
-         />
+      <group>
+          <submenu name="Coding Style"><!-- Refactorings to improve coding style -->
+             <resourceRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.AddIdentifierToEndRefactoring"
+             />
+             <resourceRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.KeywordCaseRefactoring"
+                 inputPage="org.eclipse.photran.internal.ui.refactoring.KeywordCaseInputPage"
+             />
+             <resourceRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.DataToParameterRefactoring"
+             />
+             <resourceRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.IntroImplicitNoneRefactoring"
+             />
+             <editorRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.RemoveUnreferencedLabelsRefactoring"
+             />         
+             <resourceRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.RemoveUnusedVariablesRefactoring"
+             />
+             <resourceRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.StandardizeStatementsRefactoring"
+             />
+          </submenu>
       </group>
    </extension>
 

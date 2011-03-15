@@ -149,6 +149,6 @@ public class SafeDeleteInternalSubprogramRefactoring extends FortranEditorRefact
     @Override
     public String getName()
     {
-        return "Safe-Delete Non-Generic Internal Subprogram"; //$NON-NLS-1$
+        return Messages.SafeDeleteInternalSubprogramRefactoring_Name;
     }
 }

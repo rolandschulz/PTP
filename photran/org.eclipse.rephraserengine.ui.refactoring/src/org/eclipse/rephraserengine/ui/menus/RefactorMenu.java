@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 University of Illinois at Urbana-Champaign and others.
+ * Copyright (c) 2009, 2011 University of Illinois at Urbana-Champaign and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring;
 import org.eclipse.rephraserengine.core.refactorings.IResourceRefactoring;
@@ -129,6 +130,13 @@ public final class RefactorMenu extends CompoundContributionItem
                 result.add(new SeparatorContributionItem());
 
             result.addAll(loadRefactoringsFrom(elt.getChildren()));
+        }
+        else if (elt.getName().equals("submenu")) //$NON-NLS-1$
+        {
+            MenuManager submenu = new MenuManager(elt.getAttribute("name")); //$NON-NLS-1$
+            for (IContributionItem subitem : fixMenu(loadRefactoringsFrom(elt.getChildren())))
+                submenu.add(subitem);
+            result.add(submenu);
         }
         else if (elt.getName().equals("resourceRefactoring")) //$NON-NLS-1$
         {

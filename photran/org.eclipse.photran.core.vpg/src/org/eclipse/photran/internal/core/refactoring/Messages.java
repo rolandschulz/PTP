@@ -404,6 +404,8 @@ public class Messages extends NLS
 
     public static String SafeDeleteInternalSubprogramRefactoring_MultipleDefinitions;
 
+    public static String SafeDeleteInternalSubprogramRefactoring_Name;
+
     public static String SafeDeleteInternalSubprogramRefactoring_NoDefinition;
 
     public static String SafeDeleteInternalSubprogramRefactoring_NoSubroutineSelected;
