@@ -11,7 +11,7 @@ program Test5 !<<<<< 1, 1, 46, 18, pass
        END DO
     ! simple Do Loop with Continue
     do i = 1,10
-120     continue
+120 continue
     END DO
 ! simple f90 Do Loop
     do i =1,100
@@ -24,7 +24,7 @@ program Test5 !<<<<< 1, 1, 46, 18, pass
             VSAV(I,K)=VCLIN(I,K)
             UCLIN(I,K)=UP(I,K)
             VCLIN(I,K)=VP(I,K)
-140         CONTINUE
+140     CONTINUE
         END DO
     END DO
  ! More Complex Do Loop
@@ -36,7 +36,7 @@ program Test5 !<<<<< 1, 1, 46, 18, pass
              UP (I,K)=UP (I,K)+SFU (I)
              VP (I,K)=VP (I,K)+SFV (I)
          ENDIF
-170      CONTINUE
+170  CONTINUE
      END DO
  END DO
  ! More complex Shared Do Loop Termination
@@ -44,7 +44,7 @@ program Test5 !<<<<< 1, 1, 46, 18, pass
      DO I=1,IMT
          DPDX(I,K)=RHON(I,K-1)+RHON(I,K)
          DPDY(I,K)=RHOS(I,K-1)+RHOS(I,K)
-270      CONTINUE
+270  CONTINUE
      END DO
  END DO
  ! Complex Shared Do Loop Termination

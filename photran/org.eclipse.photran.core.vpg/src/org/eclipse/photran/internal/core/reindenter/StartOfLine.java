@@ -25,11 +25,13 @@ import org.eclipse.photran.internal.core.parser.ASTBlockStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCaseConstructNode;
 import org.eclipse.photran.internal.core.parser.ASTCaseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTContinueStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDoConstructNode;
 import org.eclipse.photran.internal.core.parser.ASTElseIfStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTElseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTElseWhereStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTEndDoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndSelectStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTForallConstructStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
@@ -456,5 +458,15 @@ final class StartOfLine
         if (whiteText.indexOf('!') >= 0)
             whiteText = whiteText.substring(0, whiteText.indexOf('!'));
         return whiteText.indexOf('&') >= 0;
+    }
+
+    public boolean isEndDoStmt()
+    {
+        return firstStmtToken.findNearestAncestor(ASTEndDoStmtNode.class) != null;
+    }
+
+    public boolean isContinueStmt()
+    {
+        return firstStmtToken.findNearestAncestor(ASTContinueStmtNode.class) != null;
     }
 }

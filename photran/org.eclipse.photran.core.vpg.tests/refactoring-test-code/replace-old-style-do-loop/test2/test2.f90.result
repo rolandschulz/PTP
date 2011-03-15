@@ -1,5 +1,5 @@
 program Test2 !<<<<< 1, 1, 4, 18, pass
     do i = 1,10
-100     continue
+100 continue
     END DO
 end program Test2

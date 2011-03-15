@@ -62,6 +62,9 @@ final class ReindentEachLineVisitor extends ReindentingVisitor
             return StartOfLine.getIncreasedIndentation(previousIndentation);
         else if (currentLine.endsDoublyIndentedRegion() && !previousLine.startsIndentedRegion())
             return StartOfLine.getDecreasedIndentation(StartOfLine.getDecreasedIndentation(previousIndentation));
+        else if (currentLine.isEndDoStmt() && previousLine.isContinueStmt())
+                //|| currentLine.isContinueStmt() && previousLine.isEndDoStmt())
+            return previousIndentation;
         else if (currentLine.endsIndentedRegion() && !previousLine.startsIndentedRegion()
                 || currentLine.endsDoublyIndentedRegion() && previousLine.startsIndentedRegion())
             return StartOfLine.getDecreasedIndentation(previousIndentation);
