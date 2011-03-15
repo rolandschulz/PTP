@@ -146,16 +146,9 @@ public class AttributeChoiceDialog extends Dialog implements IJAXBUINonNLSConsta
 		return map;
 	}
 
-	public void setCurrentlyVisible(String current) {
+	public void setCurrentlyVisible(Map<String, String> currentlyVisible) {
 		Map<?, ?>[] vars = new Map<?, ?>[] { RMVariableMap.getActiveInstance().getVariables(),
 				RMVariableMap.getActiveInstance().getDiscovered() };
-		Map<String, String> currentlyVisible = new TreeMap<String, String>();
-		if (current != null) {
-			String[] selected = current.split(CM);
-			for (String s : selected) {
-				currentlyVisible.put(s, s);
-			}
-		}
 		for (Map<?, ?> m : vars) {
 			for (Object s : m.keySet()) {
 				Object o = m.get(s);

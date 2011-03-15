@@ -25,6 +25,11 @@
             resolver="org.eclipse.ptp.rm.jaxb.core.variables.RMVariableResolver"
             supportsArgument="true">
       </variable>
+      <variable
+            description="Dynamic launch tab configuration variable"
+            name="lt"
+            resolver="org.eclipse.ptp.rm.jaxb.core.variables.LTVariableResolver">
+      </variable>
    </extension>
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer">

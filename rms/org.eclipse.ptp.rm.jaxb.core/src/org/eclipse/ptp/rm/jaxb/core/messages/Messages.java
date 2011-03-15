@@ -45,6 +45,7 @@ public class Messages extends NLS {
 	public static String ProcessRunError;
 	public static String CommandJobStreamMonitor_label;
 	public static String CommandJobNullMonitorStreamError;
+	public static String IllegalVariableValueType;
 
 	static {
 		// initialize resource bundle

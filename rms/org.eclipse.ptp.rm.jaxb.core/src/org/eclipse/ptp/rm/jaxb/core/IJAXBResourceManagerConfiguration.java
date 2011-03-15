@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+import java.util.Map;
+
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
@@ -62,7 +64,7 @@ public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConf
 	/**
 	 * @since 5.0
 	 */
-	String getSelectedAttributeSet();
+	Map<String, String> getSelectedAttributeSet();
 
 	/**
 	 * @since 5.0
@@ -112,7 +114,7 @@ public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConf
 	/**
 	 * @since 5.0
 	 */
-	void setSelectedAttributeSet(String serialized);
+	void setSelectedAttributeSet(Map<String, String> map);
 
 	/**
 	 * @since 5.0

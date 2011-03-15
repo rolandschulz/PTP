@@ -11,6 +11,9 @@ package org.eclipse.ptp.rm.jaxb.core.rm;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
@@ -192,8 +195,17 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		return getString(RM_XSD_PATH, ZEROSTR);
 	}
 
-	public String getSelectedAttributeSet() {
-		return getString(SELECTED_ATTRIBUTES, null);
+	public Map<String, String> getSelectedAttributeSet() {
+		String serialized = getString(SELECTED_ATTRIBUTES, null);
+		if (serialized != null && !ZEROSTR.equals(serialized)) {
+			String[] keys = serialized.split(CM);
+			Map<String, String> m = new TreeMap<String, String>();
+			for (String k : keys) {
+				m.put(k, k);
+			}
+			return m;
+		}
+		return null;
 	}
 
 	public IRemoteServices getService() {
@@ -265,8 +277,16 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		}
 	}
 
-	public void setSelectedAttributeSet(String serialized) {
-		putString(SELECTED_ATTRIBUTES, serialized);
+	public void setSelectedAttributeSet(Map<String, String> map) {
+		StringBuffer sb = new StringBuffer();
+		Iterator<String> s = map.keySet().iterator();
+		if (s.hasNext()) {
+			sb.append(s.next());
+		}
+		while (s.hasNext()) {
+			sb.append(CM).append(s.next());
+		}
+		putString(SELECTED_ATTRIBUTES, sb.toString());
 	}
 
 	public void setService(IRemoteServices service) {
