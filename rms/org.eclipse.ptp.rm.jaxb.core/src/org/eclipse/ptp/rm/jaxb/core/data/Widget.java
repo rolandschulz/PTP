@@ -40,16 +40,14 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *             &lt;enumeration value="label"/>
  *             &lt;enumeration value="text"/>
- *             &lt;enumeration value="pushButton"/>
- *             &lt;enumeration value="radioButton"/>
  *             &lt;enumeration value="spinner"/>
  *             &lt;enumeration value="checkbox"/>
+ *             &lt;enumeration value="radioButton"/>
  *             &lt;enumeration value="combo"/>
+ *             &lt;enumeration value="pushButton"/>
  *             &lt;enumeration value="browseDirectoryButton"/>
  *             &lt;enumeration value="browseExistingFileButton"/>
  *             &lt;enumeration value="browseOrCreateFileButton"/>
- *             &lt;enumeration value="selectAttributes"/>
- *             &lt;enumeration value="showScript"/>
  *           &lt;/restriction>
  *         &lt;/simpleType>
  *       &lt;/attribute>
@@ -149,7 +147,7 @@ public class Widget {
 	 */
 	public String getType() {
 		if (type == null) {
-			return "text";
+			return "text"; //$NON-NLS-1$
 		} else {
 			return type;
 		}
