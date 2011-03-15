@@ -22,10 +22,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
-import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
-import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -87,6 +85,11 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 		}
 
+		/*
+		 * The LTVariableMap is initialized from the active instance of the
+		 * RMVariableMap once. Its values are updated from the most recent
+		 * LaunchConfiguration here.
+		 */
 		@Override
 		protected void loadFromStorage() {
 			try {
@@ -97,20 +100,17 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 				}
 
 				Map<?, ?> attrMap = config.getAttributes();
-				StringBuffer sb = new StringBuffer();
+				LTVariableMap ltmap = LTVariableMap.getActiveInstance();
+				Map<String, String> vars = ltmap.getVariables();
+				Map<String, String> disc = ltmap.getDiscovered();
+				Map<String, String> defaults = ltmap.getDefaults();
+				for (Object k : attrMap.keySet()) {
+					if (vars.containsKey(k)) {
+						vars.put((String) k, (String) attrMap.get(k));
+					} else if (disc.containsKey(k)) {
+						disc.put((String) k, (String) attrMap.get(k));
+					} else {
 
-				pTab.getRmConfig().setActive();
-
-				for (Widget w : valueWidgets.values()) {
-					String saveTo = w.getSaveValueTo();
-					Object content = attrMap.get(saveTo);
-					if (content != null) {
-
-					}
-					Arglist args = w.getContent();
-					if (args != null) {
-
-						new ArglistImpl(null, args).toString(sb);
 					}
 				}
 
@@ -223,7 +223,9 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	}
 
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		// TODO Auto-generated method stub
+		/*
+		 * Defaults are recorded in the LT map.
+		 */
 		return null;
 	}
 

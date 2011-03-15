@@ -44,12 +44,29 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 		return discovered;
 	}
 
+	public void getFlattenedDefaults(Map<String, String> defaults) {
+		for (String s : variables.keySet()) {
+			getDefault(s, variables.get(s), defaults);
+		}
+
+	}
+
+	/**
+	 * A flat name=value map of only the configurable attributes and properties.
+	 * 
+	 * @param flat
+	 */
 	public void getFlattenedDiscovered(Map<String, String> flat) {
 		for (String s : discovered.keySet()) {
 			getFlattened(s, discovered.get(s), flat);
 		}
 	}
 
+	/**
+	 * A flat name=value map of only the configurable attributes and properties.
+	 * 
+	 * @param flat
+	 */
 	public void getFlattenedVariables(Map<String, String> flat) {
 		for (String s : variables.keySet()) {
 			getFlattened(s, variables.get(s), flat);
@@ -94,6 +111,18 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
 	}
 
+	private void getDefault(String s, Object object, Map<String, String> defaults) {
+		if (object instanceof JobAttribute) {
+			JobAttribute ja = (JobAttribute) object;
+			String defaultValue = ja.getDefault();
+			if (defaultValue != null) {
+				defaults.put(ja.getName(), defaultValue);
+			}
+		} else {
+
+		}
+	}
+
 	public synchronized static RMVariableMap getActiveInstance() {
 		return active;
 	}
@@ -109,29 +138,22 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 	/*
 	 * It is assumed that the caller of the flattened map does not need
 	 * properties or attributes with complex values like lists or maps. Hence we
-	 * simply cast the value to a string.
+	 * simply cast the value to a string. Only configurable properties and
+	 * attributes are mapped.
 	 */
 	private static void getFlattened(String key, Object value, Map<String, String> flat) throws ArrayStoreException {
 		if (value instanceof Property) {
 			Property p = (Property) value;
-			flat.put(key + PD + NAME, p.getName());
-			flat.put(key + PD + VALUE, (String) p.getValue());
-			flat.put(key + PD + SELECTED, ZEROSTR + p.isSelected());
+			if (!p.isConfigurable()) {
+				return;
+			}
+			flat.put(p.getName(), (String) p.getValue());
 		} else if (value instanceof JobAttribute) {
 			JobAttribute ja = (JobAttribute) value;
-			flat.put(key + PD + BASIC, ZEROSTR + ja.isBasic());
-			flat.put(key + PD + CHOICE, ja.getChoice());
-			flat.put(key + PD + sDEFAULT, ja.getDefault());
-			flat.put(key + PD + DESC, ja.getDescription());
-			flat.put(key + PD + MAX, ZEROSTR + ja.getMax());
-			flat.put(key + PD + MIN, ZEROSTR + ja.getMin());
-			flat.put(key + PD + NAME, ja.getName());
-			flat.put(key + PD + READONLY, ZEROSTR + ja.isReadOnly());
-			flat.put(key + PD + STATUS, ja.getStatus());
-			flat.put(key + PD + TOOLTIP, ja.getTooltip());
-			flat.put(key + PD + TYPE, ja.getType());
-			flat.put(key + PD + VALUE, (String) ja.getValue());
-			flat.put(key + PD + SELECTED, ZEROSTR + ja.isSelected());
+			if (!ja.isConfigurable()) {
+				return;
+			}
+			flat.put(ja.getName(), (String) ja.getValue());
 		} else if (value == null) {
 			flat.put(key, null);
 		} else {

@@ -664,12 +664,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * Transfers the values from the configuration to the live map.
+	 * Updates selection: if not selected, value is nulled out. Transfers the
+	 * values from the configuration to the live map.
 	 */
 	@SuppressWarnings("unchecked")
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
 		Map<String, Object> env = RMVariableMap.getActiveInstance().getVariables();
 		env.remove(SCRIPT); // to ensure the most recent script is used
+
+		Map<String, String> selected = config.getSelectedAttributeSet();
 
 		@SuppressWarnings("rawtypes")
 		Map lcattr = configuration.getAttributes();
@@ -677,9 +680,21 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			Object value = lcattr.get(key);
 			Object target = env.get(key.toString());
 			if (target instanceof Property) {
-				((Property) target).setValue(value.toString());
+				Property p = (Property) target;
+				if (!selected.containsKey(p.getName())) {
+					p.setValue(null);
+					p.setSelected(false);
+				} else {
+					p.setValue(value.toString());
+				}
 			} else if (target instanceof JobAttribute) {
-				((JobAttribute) target).setValue(value.toString());
+				JobAttribute ja = (JobAttribute) target;
+				if (!selected.containsKey(ja.getName())) {
+					ja.setValue(null);
+					ja.setSelected(false);
+				} else {
+					ja.setValue(value);
+				}
 			}
 		}
 
