@@ -15,13 +15,19 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
+import org.eclipse.ptp.rm.jaxb.core.data.Widget;
+import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
+import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.data.LaunchTabBuilder;
@@ -32,6 +38,7 @@ import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
+import org.eclipse.ptp.rm.ui.utils.DataSource.ValidationException;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -82,14 +89,39 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 		@Override
 		protected void loadFromStorage() {
-			// TODO Auto-generated method stub
+			try {
+				ILaunchConfiguration config = getConfiguration();
+				if (config == null) {
+					JAXBUIPlugin.log(Messages.MissingLaunchConfigurationError);
+					return;
+				}
 
+				Map<?, ?> attrMap = config.getAttributes();
+				StringBuffer sb = new StringBuffer();
+
+				pTab.getRmConfig().setActive();
+
+				for (Widget w : valueWidgets.values()) {
+					String saveTo = w.getSaveValueTo();
+					Object content = attrMap.get(saveTo);
+					if (content != null) {
+
+					}
+					Arglist args = w.getContent();
+					if (args != null) {
+
+						new ArglistImpl(null, args).toString(sb);
+					}
+				}
+
+			} catch (Throwable t) {
+				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnLoadFromStore, Messages.ErrorOnLoadTitle,
+						false);
+			}
 		}
 
 		@Override
 		protected void validateLocal() throws ValidationException {
-			// TODO Auto-generated method stub
-
 		}
 	}
 
@@ -122,7 +154,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	private final JAXBRMLaunchConfigurationDynamicTab pTab;
 	private final TabController controller;
-	private final Map<Control, String> valueWidgets;
+	private final Map<Control, Widget> valueWidgets;
 
 	private AttributeChoiceDialog selectionDialog;
 
@@ -135,6 +167,8 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	private JAXBUniversalWidgetListener universalListener;
 	private JAXBUniversalDataSource dataSource;
 
+	private boolean loading;
+
 	public JAXBRMConfigurableAttributesTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog,
 			TabController controller, JAXBRMLaunchConfigurationDynamicTab pTab) {
 		super(dialog);
@@ -145,12 +179,19 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			t = Messages.DefaultDynamicTab_title;
 		}
 		this.title = t;
-		valueWidgets = new HashMap<Control, String>();
+		valueWidgets = new HashMap<Control, Widget>();
 		createListener();
 		createDataSource();
+		try {
+			pTab.getRmConfig().setActive();
+			LTVariableMap.setActiveInstance(RMVariableMap.getActiveInstance());
+		} catch (Throwable t1) {
+			JAXBUIPlugin.log(t1);
+		}
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
+		loading = true;
 		control = WidgetBuilderUtils.createComposite(parent, 1);
 		selectionDialog = new AttributeChoiceDialog(parent.getShell());
 
@@ -164,6 +205,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 		}
+		loading = false;
 	}
 
 	public Control getControl() {
@@ -209,14 +251,17 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	private void buildMain(Map<String, Boolean> checked) {
 		universalListener.disable();
+		saveSettings();
 
 		if (dynamicControl != null) {
 			dynamicControl.dispose();
 			valueWidgets.clear();
 		}
+
 		if (control.isDisposed()) {
 			return;
 		}
+
 		dynamicControl = WidgetBuilderUtils.createComposite(control, 1);
 		LaunchTabBuilder builder = new LaunchTabBuilder(controller, valueWidgets, checked);
 		try {
@@ -232,7 +277,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		pTab.resize(control);
 
 		updateControls();
-
 		universalListener.enable();
 	}
 
@@ -257,19 +301,32 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		viewScript = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, new SelectAttributesListener());
 	}
 
+	private void saveSettings() {
+		if (loading) {
+			return;
+		}
+
+		try {
+			dataSource.copyFromFields();
+			dataSource.copyToStorage();
+		} catch (ValidationException t) {
+			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnSaveWidgets, Messages.ErrorOnSaveTitle, false);
+		}
+	}
+
 	private Map<String, Boolean> updateVisibleAttributes(boolean showDialog) throws Throwable {
 		Map<String, Boolean> checked = null;
-		pTab.getRmConfig().setActive();
 		selectionDialog.clearChecked();
-		selectionDialog.setCurrentlyVisible(pTab.getRmConfig().getSelectedAttributeSet());
+		Map<String, String> selected = pTab.getRmConfig().getSelectedAttributeSet();
+		selectionDialog.setCurrentlyVisible(selected);
 		if (!showDialog || Window.OK == selectionDialog.open()) {
 			checked = selectionDialog.getChecked();
-			StringBuffer sb = new StringBuffer();
+			selected.clear();
 			Iterator<String> k = checked.keySet().iterator();
 			if (k.hasNext()) {
 				String key = k.next();
 				if (checked.get(key)) {
-					sb.append(key);
+					selected.put(key, key);
 				} else {
 					k.remove();
 				}
@@ -277,12 +334,12 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			while (k.hasNext()) {
 				String key = k.next();
 				if (checked.get(key)) {
-					sb.append(CM).append(key);
+					selected.put(key, key);
 				} else {
 					k.remove();
 				}
 			}
-			pTab.getRmConfig().setSelectedAttributeSet(sb.toString());
+			pTab.getRmConfig().setSelectedAttributeSet(selected);
 		}
 		return checked;
 	}

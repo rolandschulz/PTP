@@ -11,22 +11,22 @@
 		<property name="stderr">
 			<value>${rm:Error_Path#value}</value>
 		</property><!-- property needed for forwarding stderr in batch -->
-		<job-attribute id="mpiCommand" name="mpiCommand" basic="true" type="choice">
+		<job-attribute name="mpiCommand" basic="true" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
 		</job-attribute>
-		<job-attribute id="mpiCores" name="mpiCores" min="1" basic="true" type="integer">
+		<job-attribute name="mpiCores" min="1" basic="true" type="integer">
 			<description>the '-np' value</description>
 		</job-attribute>
-		<job-attribute id="mpiArgs" name="mpiArgs" basic="true" type="string">
+		<job-attribute name="mpiArgs" basic="true" type="string">
 			<description>Which mpi options to use.</description>
 			<default>-machinefile $PBS_NODEFILE -np ${rm:mpiCores}</default>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Account_Name" name="Account_Name" basic="true" type="string">
+		<job-attribute name="Account_Name" basic="true" type="string">
 			<description>Account to which to charge this job.</description>
 			<tooltip>Format: string</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Checkpoint" name="Checkpoint" type="choice">
+		<job-attribute name="Checkpoint" type="choice">
 			<description>Determines when checkpointing (if supported) will be performed by PBS on behalf of the job.</description>
 			<tooltip>Format: the strings "n" (no checkpointing), "s" (to be performed only when the server executing the job is shutdown), "c"s
 				(to be performed at the default minimum time for thes servers executing the job), "c=mmmm" (to be performed at an intervals ofs
@@ -36,33 +36,33 @@
 			<choice>,u,n,s,c,c=????</choice>
 			<default>u</default>
 		</job-attribute>
-		<job-attribute id="PBSJOB_depend" name="depend" type="string">
+		<job-attribute name="depend" type="string">
 			<description>The type of inter-job dependencies specified by the job owner.</description>
 			<tooltip>Format: "type:jobid[,jobid...]"; default value: no dependencies.</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_destination" name="destination" type="string" basic="true">
+		<job-attribute name="destination" type="string" basic="true">
 			<description>Designation of the queue to which to submit the job.</description>
 			<tooltip>Format: queue[@server].</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_directive" name="directive" type="string">
+		<job-attribute name="directive" type="string">
 			<description>Defines the prefix that declares a directive to the qsub command within the script file.</description>
 			<tooltip>See the paragraph on script directives in the Extended Description section. If the option is presented with a
 				directive_prefix argument that is the null string, qsub will not scan the script file for directives.
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Error_Path" name="Error_Path" type="string">
+		<job-attribute name="Error_Path" type="string">
 			<description>The final path name for the file containing the job's standard error stream.</description>
 			<tooltip>Format: "[hostname:]pathname". If the option is not specified, the default file name for the standard error stream will be
 				used. The default name has the following form: job_name.eSeq_num where job_name is the name of the job, see -N option, and Seq_num
 				is the job number assigned when the job is submitted; default value: (job_name).e(job_number).
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_export_all" name="export_all" basic="true" type="boolean">
+		<job-attribute name="export_all" basic="true" type="boolean">
 			<description>Declares that all environment variables in the qsub command's environment are to be exported to the batch job.
 			</description>
 			<default>true</default>
 		</job-attribute>
-		<job-attribute id="PBSJOB_group_list" name="group_list" type="string">
+		<job-attribute name="group_list" type="string">
 			<description>A list of group_names@hosts which determines the group under which the job is run on a given host.</description>
 			<tooltip>Format: group_name[@host][,group_name[@host]...]. When a job is to be placed into execution, the server will select a group
 				name according to the following ordered set of rules: 1) Select the group name from the list for which the associated host name
@@ -70,88 +70,88 @@
 				login group for the username under which the job will be run.
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Hold_Types" name="Hold_Types" type="choice">
+		<job-attribute name="Hold_Types" type="choice">
 			<description>The set of holds currently applied to the job.</description>
 			<tooltip>If the set is not null, the job will not be scheduled for execution and is said to be in the hold state. Note, the hold
 				state takes precedence over the wait state. Format: string made up of the letters 'u', 's', 'o'; default value: no hold.
 			</tooltip>
 			<choice>,u,s,o</choice>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Job_Name" name="Job_Name" type="string" basic="true">
+		<job-attribute name="Job_Name" type="string" basic="true">
 			<description>The name assigned to the job by the qsub or qalter command.</description>
 			<tooltip>Format: string up to 15 characters, first character must be alphabetic; default value: the base name of the job script or
 				STDIN.
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Join_Path" name="Join_Path" type="boolean">
+		<job-attribute name="Join_Path" type="boolean">
 			<description>Merge stdout and stderr into stdout.</description>
 			<tooltip>Format: boolean, values accepted are "True", "TRUE", "true", "Y", "y", "1", "False", "FALSE", "false", "N", "n", "0";
 				default value: false.
 			</tooltip>
 			<default>false</default>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Keep_Files" name="Keep_Files" type="choice">
+		<job-attribute name="Keep_Files" type="choice">
 			<description>Retain these streams on the execution host upon job termination.</description>
 			<tooltip>Format: "o", "e", "oe" or "eo"; default value: no keep, return files to submission host.</tooltip>
 			<choice>,o,e,oe,eo</choice>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Mail_Points" name="Mail_Points" type="choice">
+		<job-attribute name="Mail_Points" type="choice">
 			<description>Identifies at which state changes the server will send mail about the job.</description>
 			<tooltip>Format: string made up of the letters 'a' for abort, 'b' for beginning, and default value: 'a', send on job abort.
 			</tooltip>
 			<choice>,a,b</choice>
 			<default>a</default>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Mail_Users" name="Mail_Users" type="string">
+		<job-attribute name="Mail_Users" type="string">
 			<description>The set of users to whom mail may be sent when the job makes certain state changes.</description>
 			<tooltip>Format: "user@host[,user@host]"; default value: job owner only.</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Output_Path" name="Output_Path" type="string">
+		<job-attribute name="Output_Path" type="string">
 			<description>The final path name for the file containing the job's standard output stream.</description>
 			<tooltip>Format: "[hostname:]pathname". If the option is not specified, the default file name for the standard error stream will be
 				used. The default name has the following form: job_name.oSeq_num where job_name is the name of the job, see -N option, and Seq_num
 				is the job number assigned when the job is submitted; default value: (job_name).o(job_number).
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Priority" name="Priority" type="string">
+		<job-attribute name="Priority" type="string">
 			<description>The job scheduling priority assigned by the user.</description>
 			<tooltip>Format: "[+|-]nnnnn"; default value: undefined.</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Rerunnable" name="Rerunnable" type="choice">
+		<job-attribute name="Rerunnable" type="choice">
 			<description>The rerunnable flag assigned by the user.</description>
 			<tooltip>Format: "y" or "n", see Join_Path; default value: y, job is rerunable.</tooltip>
 			<choice>,n,y</choice>
 			<default>y</default>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.arch" name="Resource_List.arch" type="string">
+		<job-attribute name="Resource_List.arch" type="string">
 			<description>Specifies the administrator defined system architecture requried.</description>
 			<tooltip>This defaults to whatever the PBS_MACH string is set to in "local.mk". Units: string.</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.cput" name="Resource_List.cput" type="string">
+		<job-attribute name="Resource_List.cput" type="string">
 			<description>Maximum amount of CPU time used by all processes in the job.</description>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.file" name="Resource_List.file" type="string">
+		<job-attribute name="Resource_List.file" type="string">
 			<description>The largest size of any single file that may be created by the job.</description>
 			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 				(kilo), mb/mw (mega), gb/bw (giga).
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.host" name="Resource_List.host" type="string">
+		<job-attribute name="Resource_List.host" type="string">
 			<description>Name of host on which job should be run.</description>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.mem" name="Resource_List.mem" type="string">
+		<job-attribute name="Resource_List.mem" type="string">
 			<description>Maximum amount of memory used by all concurrent processes in the job.</description>
 			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 				(kilo), mb/mw (mega), gb/bw (giga).
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.nice" name="Resource_List.nice" type="integer" min="0" max="10">
+		<job-attribute name="Resource_List.nice" type="integer" min="0" max="10">
 			<description>The nice value under which the job is to be run.</description>
 			<tooltip>0 to 10.</tooltip>
 			<default>0</default>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.nodes" name="Resource_List.nodes" basic="true" type="string">
+		<job-attribute name="Resource_List.nodes" basic="true" type="string">
 			<description>Number and/or type of nodes to be reserved for exclusive use by the job.</description>
 			<tooltip>The value is one or more node_specs joined with the '+' character, "node_spec[+node_spec...]. Each node_spec is a number of
 				nodes required of the type declared in the node_spec and a name or one or more properity or properities desired for the nodes. The
@@ -162,52 +162,52 @@
 			</tooltip>
 			<default>1</default>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.ompthreads" name="Resource_List.ompthreads" type="integer" min="1">
+		<job-attribute name="Resource_List.ompthreads" type="integer" min="1">
 			<description>Number of threads per processor for Open MP jobs.</description>
 			<default>1</default>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.pcput" name="Resource_List.pcput" type="string">
+		<job-attribute name="Resource_List.pcput" type="string">
 			<description>Maximum amount of CPU time used by any single process in the job.</description>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.pmem" name="Resource_List.pmem" type="string">
+		<job-attribute name="Resource_List.pmem" type="string">
 			<description>Maximum amount of physical memory (workingset) used by any single process of the job.</description>
 			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 				(kilo), mb/mw (mega), gb/bw (giga).
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.pvmem" name="Resource_List.pvmem" type="string">
+		<job-attribute name="Resource_List.pvmem" type="string">
 			<description>Maximum amount of virtual memory used by any single process in the job.</description>
 			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 				(kilo), mb/mw (mega), gb/bw (giga).
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.vmem" name="Resource_List.vmem" type="string">
+		<job-attribute name="Resource_List.vmem" type="string">
 			<description>Maximum amount of virtual memory used by all concurrent processes in the job.</description>
 			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 				(kilo), mb/mw (mega), gb/bw (giga).
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Resource_List.walltime" name="Resource_List.walltime" basic="true" type="string">
+		<job-attribute name="Resource_List.walltime" basic="true" type="string">
 			<description>Maximum amount of real time during which the job can be in the running state.</description>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Shell_Path_List" name="Shell_Path_List" type="string">
+		<job-attribute name="Shell_Path_List" type="string">
 			<description>A set of absolute paths of the program to process the job's script file.</description>
 			<tooltip>Format: path[@host][,path[@host]...]. If this is null, then the user's login shell on the host of execution will be used.
 				Default value: null, login shell.
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_stagein" name="stagein" type="string">
+		<job-attribute name="stagein" type="string">
 			<description>The list of files to be staged in prior to job execution.</description>
 			<tooltip>Format: local_path@remote_host:remote_path.</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_stageout" name="stageout" type="string">
+		<job-attribute name="stageout" type="string">
 			<description>The list of files to be staged out after job execution.</description>
 			<tooltip>Format: local_path@remote_host:remote_path.</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_User_List" name="User_List" type="string">
+		<job-attribute name="User_List" type="string">
 			<description>The list of user@hosts which determines the user name under which the job is run on a given host.</description>
 			<tooltip>When a job is to be placed into execution, the server will select a user name from the list according to the following
 				ordered set of rules: 1) Select the user name from the list for which the associated host name matches the name of the execution
@@ -216,7 +216,7 @@
 				value: job owner name.
 			</tooltip>
 		</job-attribute>
-		<job-attribute id="PBSJOB_Variable_List" name="Variable_List" type="string">
+		<job-attribute  name="Variable_List" type="string">
 			<description>This is the list of environment variables passed with the Queue Job batch request.</description>
 		</job-attribute>
 		<managed-files>

@@ -48,6 +48,7 @@ public interface IJAXBNonNLSConstants {
 	String OPENSQ = "[";//$NON-NLS-1$
 	String OPENV = "${";//$NON-NLS-1$
 	String OPENVRM = "${rm:";//$NON-NLS-1$
+	String OPENVLT = "${lt:";//$NON-NLS-1$
 	String CLOSSQ = "]";//$NON-NLS-1$
 	String CLOSV = "}";//$NON-NLS-1$
 	String CLOSVAL = "#value}";//$NON-NLS-1$
@@ -83,7 +84,20 @@ public interface IJAXBNonNLSConstants {
 	String SET = "set";//$NON-NLS-1$
 	String IS = "is";//$NON-NLS-1$
 	String CLASS = "class";//$NON-NLS-1$
+	String NAME = "name";//$NON-NLS-1$
 	String VALUE = "value";//$NON-NLS-1$
+	String BASIC = "basic";//$NON-NLS-1$
+	String CHOICE = "choice";//$NON-NLS-1$
+	String sDEFAULT = "default";//$NON-NLS-1$
+	String DESC = "description";//$NON-NLS-1$
+	String MAX = "max";//$NON-NLS-1$
+	String MIN = "min";//$NON-NLS-1$
+	String READONLY = "readOnly";//$NON-NLS-1$
+	String STATUS = "status";//$NON-NLS-1$
+	String TOOLTIP = "tooltip";//$NON-NLS-1$
+	String TYPE = "type";//$NON-NLS-1$
+	String VALIDATOR = "validator";//$NON-NLS-1$
+	String VISIBLE = "visible";//$NON-NLS-1$
 	String THIS = "this.";//$NON-NLS-1$
 	String JOB_ID_TAG = "@jobId@";//$NON-NLS-1$
 

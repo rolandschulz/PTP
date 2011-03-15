@@ -17,6 +17,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
+import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
 public class RMVariableMap implements IJAXBNonNLSConstants {
 	private static RMVariableMap active;
@@ -39,6 +42,18 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 
 	public Map<String, Object> getDiscovered() {
 		return discovered;
+	}
+
+	public void getFlattenedDiscovered(Map<String, String> flat) {
+		for (String s : discovered.keySet()) {
+			getFlattened(s, discovered.get(s), flat);
+		}
+	}
+
+	public void getFlattenedVariables(Map<String, String> flat) {
+		for (String s : variables.keySet()) {
+			getFlattened(s, variables.get(s), flat);
+		}
 	}
 
 	/**
@@ -89,5 +104,38 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 		}
 		RMVariableMap.active = instance;
 		return RMVariableMap.active;
+	}
+
+	/*
+	 * It is assumed that the caller of the flattened map does not need
+	 * properties or attributes with complex values like lists or maps. Hence we
+	 * simply cast the value to a string.
+	 */
+	private static void getFlattened(String key, Object value, Map<String, String> flat) throws ArrayStoreException {
+		if (value instanceof Property) {
+			Property p = (Property) value;
+			flat.put(key + PD + NAME, p.getName());
+			flat.put(key + PD + VALUE, (String) p.getValue());
+		} else if (value instanceof JobAttribute) {
+			JobAttribute ja = (JobAttribute) value;
+			flat.put(key + PD + BASIC, ZEROSTR + ja.isBasic());
+			flat.put(key + PD + CHOICE, ja.getChoice());
+			flat.put(key + PD + sDEFAULT, ja.getDefault());
+			flat.put(key + PD + DESC, ja.getDescription());
+			flat.put(key + PD + ID, ja.getId());
+			flat.put(key + PD + MAX, ZEROSTR + ja.getMax());
+			flat.put(key + PD + MIN, ZEROSTR + ja.getMin());
+			flat.put(key + PD + NAME, ja.getName());
+			flat.put(key + PD + READONLY, ZEROSTR + ja.isReadOnly());
+			flat.put(key + PD + STATUS, ja.getStatus());
+			flat.put(key + PD + TOOLTIP, ja.getTooltip());
+			flat.put(key + PD + TYPE, ja.getType());
+			flat.put(key + PD + VALUE, (String) ja.getValue());
+			flat.put(key + PD + VISIBLE, ZEROSTR + ja.isVisible());
+		} else if (value == null) {
+			flat.put(key, null);
+		} else {
+			throw new ArrayStoreException(Messages.IllegalVariableValueType + value.getClass());
+		}
 	}
 }
