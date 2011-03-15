@@ -49,15 +49,15 @@ public class LTVariableMap implements IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Performs the substitution on the string. rm: prefix points to the
-	 * RMVariableResolver.
+	 * The rm: prefix points to the RMVariableResolver, lt: to the
+	 * LTVariableResolver, so we substitute the latter and pass it off.
 	 * 
 	 * @param expression
 	 * @return
 	 */
 	public String getString(String value) {
 		try {
-
+			value = value.replaceAll(OPENVRM, OPENVLT);
 			return dereference(value);
 		} catch (CoreException t) {
 			JAXBCorePlugin.log(t);

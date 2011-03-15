@@ -1,4 +1,4 @@
-package org.eclipse.ptp.rm.jaxb.ui.data;
+package org.eclipse.ptp.rm.jaxb.ui.util;
 
 import java.util.Map;
 
