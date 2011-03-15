@@ -23,25 +23,18 @@ public class LTVariableMap implements IJAXBNonNLSConstants {
 
 	private final Map<String, String> variables;
 	private final Map<String, String> discovered;
-	private final Map<String, String> defaults;
 	private boolean initialized;
 
 	private LTVariableMap() {
 		variables = Collections.synchronizedMap(new TreeMap<String, String>());
 		discovered = Collections.synchronizedMap(new TreeMap<String, String>());
-		defaults = Collections.synchronizedMap(new TreeMap<String, String>());
 		initialized = false;
 	}
 
 	public void clear() {
 		variables.clear();
 		discovered.clear();
-		defaults.clear();
 		initialized = false;
-	}
-
-	public Map<String, String> getDefaults() {
-		return defaults;
 	}
 
 	public Map<String, String> getDiscovered() {
@@ -92,7 +85,6 @@ public class LTVariableMap implements IJAXBNonNLSConstants {
 		LTVariableMap.active = new LTVariableMap();
 		rmVars.getFlattenedVariables(active.variables);
 		rmVars.getFlattenedDiscovered(active.discovered);
-		rmVars.getFlattenedDefaults(active.defaults);
 		return LTVariableMap.active;
 	}
 }

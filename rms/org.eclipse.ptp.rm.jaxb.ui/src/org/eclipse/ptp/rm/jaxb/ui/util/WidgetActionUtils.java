@@ -93,7 +93,19 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 
 	}
 
-	public static void validate(Control c, Validator v) throws ValidationException {
+	/**
+	 * If the text is empty and there is a default value, resets the widget
+	 * value to its default.
+	 */
+	public static void validate(Control c, String string) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * If validation fails, resets the widget value to its default
+	 */
+	public static void validate(Control c, Validator v, String defaultValue) throws ValidationException {
 		// TODO
 
 	}

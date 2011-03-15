@@ -92,6 +92,7 @@ public class AttributeChoiceDialog extends Dialog implements IJAXBUINonNLSConsta
 		private String name;
 		private String description;
 		private boolean checked;
+		private boolean configurable;
 
 		private CheckedProperty(Object o) {
 			if (o instanceof JobAttribute) {
@@ -99,15 +100,18 @@ public class AttributeChoiceDialog extends Dialog implements IJAXBUINonNLSConsta
 				name = ja.getName();
 				checked = ja.isSelected();
 				description = ja.getDescription();
+				configurable = ja.isConfigurable();
 			} else if (o instanceof Property) {
 				Property p = (Property) o;
 				name = p.getName();
 				checked = p.isSelected();
 				description = ZEROSTR;
+				configurable = p.isConfigurable();
 			} else if (o instanceof String) {
 				checked = true;
 				name = o.toString();
 				description = ZEROSTR;
+				configurable = true;
 			}
 		}
 
@@ -153,7 +157,10 @@ public class AttributeChoiceDialog extends Dialog implements IJAXBUINonNLSConsta
 					o = s;
 				}
 				CheckedProperty p = new CheckedProperty(o);
-				if (currentlyVisible.containsKey(s)) {
+				if (!p.configurable) {
+					continue;
+				}
+				if (currentlyVisible == null || currentlyVisible.containsKey(s)) {
 					// override default settings
 					p.checked = true;
 				}

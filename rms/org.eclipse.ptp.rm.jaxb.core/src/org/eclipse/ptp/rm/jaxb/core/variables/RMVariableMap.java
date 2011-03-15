@@ -142,22 +142,25 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 	/*
 	 * It is assumed that the caller of the flattened map does not need
 	 * properties or attributes with complex values like lists or maps. Hence we
-	 * simply cast the value to a string. Only configurable properties and
-	 * attributes are mapped.
+	 * simply cast the value to a string.
 	 */
 	private static void getFlattened(String key, Object value, Map<String, String> flat) throws ArrayStoreException {
 		if (value instanceof Property) {
 			Property p = (Property) value;
-			if (!p.isConfigurable()) {
-				return;
+			Object o = p.getValue();
+			String s = null;
+			if (o != null) {
+				s = o.toString();
 			}
-			flat.put(p.getName(), (String) p.getValue());
+			flat.put(p.getName(), s);
 		} else if (value instanceof JobAttribute) {
 			JobAttribute ja = (JobAttribute) value;
-			if (!ja.isConfigurable()) {
-				return;
+			Object o = ja.getValue();
+			String s = null;
+			if (o != null) {
+				s = o.toString();
 			}
-			flat.put(ja.getName(), (String) ja.getValue());
+			flat.put(ja.getName(), s);
 		} else if (value == null) {
 			flat.put(key, null);
 		} else {

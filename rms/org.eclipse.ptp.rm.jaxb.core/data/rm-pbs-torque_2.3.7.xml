@@ -5,6 +5,7 @@
 		<control-connection>ssh://abe.ncsa.uiuc.edu/usr/local/bin/qsub</control-connection>
 	</site-data>
 	<control-data>
+		<property name="available_queues" configurable="false"/>
 		<property name="stdout">
 			<value>${rm:Output_Path#value}</value>
 		</property><!-- property needed for forwarding stdout in batch -->
@@ -216,7 +217,7 @@
 				value: job owner name.
 			</tooltip>
 		</job-attribute>
-		<job-attribute  name="Variable_List" type="string">
+		<job-attribute name="Variable_List" type="string">
 			<description>This is the list of environment variables passed with the Queue Job batch request.</description>
 		</job-attribute>
 		<managed-files>
@@ -290,10 +291,7 @@
 				<read delim="\n">
 					<match>
 						<expression>[^\s]+</expression>
-						<target type="property"/>
-						<set field="name">
-							<entry value="available_queues"/>
-						</set>
+						<target ref="available_queues"/>
 						<append field="value" separator=",">
 							<entry valueGroup="0"/>
 						</append>
@@ -488,14 +486,14 @@
 				</group>
 			</basic>
 			<advanced dynamic="true">
-            <title>Advanced PBS Settings</title>
-            <group dynamic="true" scrollable="true">
-               <grid-layout numColumns="3"/>
-               <!-- iterates through all registered attributes, one to a row -->
-               <all-attributes>
-                  <include sort="true" headers="true" name="true" tooltip="true" description="true"/>
-               </all-attributes>
-            </group>
+				<title>Advanced PBS Settings</title>
+				<group dynamic="true" scrollable="true">
+					<grid-layout numColumns="3"/>
+					<!-- iterates through all registered attributes, one to a row -->
+					<all-attributes>
+						<include sort="true" headers="true" name="true" tooltip="true" description="true"/>
+					</all-attributes>
+				</group>
 			</advanced>
 			<custom-controller>Import PBS Script</custom-controller>
 		</launch-tab>

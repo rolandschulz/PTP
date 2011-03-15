@@ -89,6 +89,7 @@ public class Messages extends NLS {
 	public static String FileContentsDirty;
 	public static String ErrorOnCopyToStorageTitle;
 	public static String ErrorOnCopyToStorage;
+	public static String RevertScript;
 
 	static {
 		// initialize resource bundle
