@@ -22,15 +22,17 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
+import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
 import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
-import org.eclipse.ptp.rm.jaxb.ui.data.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.AttributeChoiceDialog;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
@@ -63,26 +65,74 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			// TODO Auto-generated method stub
-
+			Map<String, String> vars = LTVariableMap.getActiveInstance().getVariables();
+			Map<String, String> disc = LTVariableMap.getActiveInstance().getDiscovered();
+			for (Control c : valueWidgets.keySet()) {
+				String value = WidgetActionUtils.getValueString(c);
+				Widget w = valueWidgets.get(c);
+				String name = w.getSaveValueTo();
+				if (vars.containsKey(name)) {
+					vars.put(name, value);
+				} else if (disc.containsKey(name)) {
+					disc.put(name, value);
+				}
+			}
 		}
 
 		@Override
 		protected void copyToFields() {
-			// TODO Auto-generated method stub
-
+			Map<String, String> vars = LTVariableMap.getActiveInstance().getVariables();
+			Map<String, String> disc = LTVariableMap.getActiveInstance().getDiscovered();
+			for (Control c : valueWidgets.keySet()) {
+				Widget w = valueWidgets.get(c);
+				String name = w.getSaveValueTo();
+				String dfltV = vars.get(name);
+				if (dfltV == null) {
+					dfltV = disc.get(name);
+				}
+				if (dfltV != null) {
+					WidgetActionUtils.setValue(c, dfltV);
+				}
+			}
 		}
 
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		protected void copyToStorage() {
-			// TODO Auto-generated method stub
+			try {
+				ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
+				if (config == null) {
+					JAXBUIPlugin.log(Messages.MissingLaunchConfigurationError);
+					return;
+				}
 
+				Map attrMap = config.getAttributes();
+				LTVariableMap ltmap = LTVariableMap.getActiveInstance();
+				Map<?, ?>[] m = new Map<?, ?>[] { ltmap.getVariables(), ltmap.getDiscovered() };
+				for (int i = 0; i < m.length; i++) {
+					for (Object k : m[i].keySet()) {
+						Object v = m[i].get(k);
+						attrMap.put(k, v);
+					}
+				}
+				config.setAttributes(attrMap);
+			} catch (Throwable t) {
+				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnCopyToStorage,
+						Messages.ErrorOnCopyToStorageTitle, false);
+			}
 		}
 
 		@Override
 		protected void loadDefault() {
-			// TODO Auto-generated method stub
-
+			Map<String, String> dflt = LTVariableMap.getActiveInstance().getDefaults();
+			for (Control c : valueWidgets.keySet()) {
+				Widget w = valueWidgets.get(c);
+				String name = w.getSaveValueTo();
+				String dfltV = dflt.get(name);
+				if (dfltV != null) {
+					WidgetActionUtils.setValue(c, dfltV);
+				}
+			}
 		}
 
 		/*
@@ -103,17 +153,13 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 				LTVariableMap ltmap = LTVariableMap.getActiveInstance();
 				Map<String, String> vars = ltmap.getVariables();
 				Map<String, String> disc = ltmap.getDiscovered();
-				Map<String, String> defaults = ltmap.getDefaults();
 				for (Object k : attrMap.keySet()) {
 					if (vars.containsKey(k)) {
 						vars.put((String) k, (String) attrMap.get(k));
 					} else if (disc.containsKey(k)) {
 						disc.put((String) k, (String) attrMap.get(k));
-					} else {
-
 					}
 				}
-
 			} catch (Throwable t) {
 				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnLoadFromStore, Messages.ErrorOnLoadTitle,
 						false);
@@ -122,6 +168,22 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 		@Override
 		protected void validateLocal() throws ValidationException {
+			Map<String, Object> vars = RMVariableMap.getActiveInstance().getVariables();
+			/*
+			 * If there are validators, run them against the value
+			 */
+			for (Control c : valueWidgets.keySet()) {
+				Widget w = valueWidgets.get(c);
+				String name = w.getSaveValueTo();
+				Object o = vars.get(name);
+				if (o instanceof JobAttribute) {
+					JobAttribute ja = (JobAttribute) o;
+					Validator v = ja.getValidator();
+					if (v != null) {
+						WidgetActionUtils.validate(c, v);
+					}
+				}
+			}
 		}
 	}
 
@@ -224,7 +286,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		/*
-		 * Defaults are recorded in the LT map.
+		 * Defaults are recorded in the LTVariableMap.
 		 */
 		return null;
 	}

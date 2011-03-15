@@ -87,6 +87,8 @@ public class Messages extends NLS {
 	public static String TextModifiedErrorTitle;
 	public static String TextModifiedError;
 	public static String FileContentsDirty;
+	public static String ErrorOnCopyToStorageTitle;
+	public static String ErrorOnCopyToStorage;
 
 	static {
 		// initialize resource bundle

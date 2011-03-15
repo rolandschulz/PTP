@@ -16,8 +16,11 @@ import java.io.StringWriter;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.ui.utils.DataSource.ValidationException;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 public class WidgetActionUtils implements IJAXBUINonNLSConstants {
@@ -53,6 +56,11 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		return combo.getItem(i);
 	}
 
+	public static String getValueString(Control c) {
+
+		return null;
+	}
+
 	public static String openInputDialog(Shell shell, String message, String title, String original) {
 		InputDialog nameDialog = new InputDialog(shell, message, title, original, null);
 		if (nameDialog.open() != Window.CANCEL) {
@@ -78,5 +86,15 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 			combo.select(i);
 		}
 		return combo.getItem(i);
+	}
+
+	public static void setValue(Control c, String dfltV) {
+		// TODO
+
+	}
+
+	public static void validate(Control c, Validator v) throws ValidationException {
+		// TODO
+
 	}
 }

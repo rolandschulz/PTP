@@ -118,8 +118,12 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 			if (defaultValue != null) {
 				defaults.put(ja.getName(), defaultValue);
 			}
-		} else {
-
+		} else if (object instanceof Property) {
+			Property p = (Property) object;
+			String defaultValue = p.getDefault();
+			if (defaultValue != null) {
+				defaults.put(p.getName(), defaultValue);
+			}
 		}
 	}
 
