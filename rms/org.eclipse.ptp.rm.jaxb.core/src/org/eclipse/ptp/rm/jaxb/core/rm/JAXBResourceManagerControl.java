@@ -585,7 +585,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			value = configuration.getAttribute(key2, (Map) value);
 		}
 
-		maybeAddProperty(key1, value, true, env);
+		maybeAddProperty(key1, value, false, env);
 	}
 
 	/*

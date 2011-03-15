@@ -19,7 +19,7 @@
 		<job-attribute name="mpiCores" min="1" basic="true" type="integer">
 			<description>the '-np' value</description>
 		</job-attribute>
-		<job-attribute name="mpiArgs" basic="true" type="string">
+		<job-attribute name="mpiArgs" basic="true" type="string" configurable="false">
 			<description>Which mpi options to use.</description>
 			<default>-machinefile $PBS_NODEFILE -np ${rm:mpiCores}</default>
 		</job-attribute>
@@ -292,9 +292,9 @@
 					<match>
 						<expression>[^\s]+</expression>
 						<target ref="available_queues"/>
-						<append field="value" separator=",">
+						<add field="value">
 							<entry valueGroup="0"/>
-						</append>
+						</add>
 					</match>
 				</read>
 			</stdout-parser>
@@ -392,96 +392,64 @@
 			<basic>
 				<title>Basic PBS Settings</title>
 				<group>
-					<grid-layout numColumns="2"/>
-					<title>Script Configuration</title>
-					<widget type="selectAttributes">
-						<tooltip>Choose the attributes to display in the Detailed Tab.</tooltip>
-					</widget>
-					<widget type="showScript" readOnly="true">
-						<tooltip>Show the batch script as it would currently be submitted.</tooltip>
-					</widget>
-				</group>
-				<group>
 					<grid-layout numColumns="3"/>
 					<!-- row 1 -->
-					<widget type="text">
+					<widget type="text" valueFrom="Job_Name" saveAs="Job_Name">
 						<label>Job Name: </label>
 						<tooltip>${rm:Job_Name#tooltip}</tooltip>
-						<content>
-							<arg>${rm:Job_Name#value}</arg>
-						</content>
-						<saveValueTo>Job_Name</saveValueTo>
 					</widget>
 					<widget type="label">
-						<content>
+						<displayValue>
 							<arg>${rm:Job_Name#description}</arg>
-						</content>
+						</displayValue>
 					</widget>
 					<!-- row 2 -->
-					<widget type="combo" readOnly="true">
+					<widget type="combo" readOnly="true" valueFrom="available_queues" saveAs="destination">
 						<label>Queue: </label>
 						<tooltip>${rm:destination#tooltip}</tooltip>
-						<content>
-							<arg>${rm:available_queues#value}</arg>
-						</content>
-						<saveValueTo>destination</saveValueTo>
 					</widget>
 					<widget type="label">
-						<content>
+						<displayValue>
 							<arg>${rm:destination#description}</arg>
-						</content>
+						</displayValue>
 					</widget>
 					<!-- row 3 -->
-					<widget type="text">
+					<widget type="text" valueFrom="Resource_List.nodes" saveAs="Resource_List.nodes">
 						<label>Nodes: </label>
 						<tooltip>${rm:Resource_List.nodes#tooltip}</tooltip>
-						<content>
-							<arg>${rm:Resource_List.nodes#value}</arg>
-						</content>
-						<saveValueTo>Resource_List.nodes</saveValueTo>
 					</widget>
 					<widget type="label">
-						<content>
+						<displayValue>
 							<arg>${rm:Resource_List.nodes#description}</arg>
-						</content>
+						</displayValue>
 					</widget>
 					<!-- row 4 -->
-					<widget type="text">
+					<widget type="text" valueFrom="Resource_List.walltime" saveAs="Resource_List.walltime">
 						<label>Wallclock Time</label>
 						<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
-						<content>
-							<arg>${rm:Resource_List.walltime#value}</arg>
-						</content>
-						<saveValueTo>Resource_List.walltime</saveValueTo>
 					</widget>
 					<widget type="label">
-						<content>
+						<displayValue>
 							<arg>${rm:Resource_List.walltime#description}</arg>
-						</content>
+						</displayValue>
 					</widget>
 					<!-- row 5 -->
-					<widget type="combo" readOnly="true">
+					<widget type="combo" readOnly="true" valueFrom="mpiCommand" saveAs="mpiCommand">
 						<label>MPI Command: </label>
-						<content>
-							<arg>mpiCommand</arg>
-						</content>
 					</widget>
 					<widget type="label">
-						<content>
-							<arg>MPI executable to use</arg>
-						</content>
+						<displayValue>
+                     <arg>${rm:mpiCommand#description}</arg>
+                  </displayValue>
 					</widget>
 					<!-- row 6 -->
-					<widget type="spinner" readOnly="true">
+					<widget type="spinner" readOnly="true" valueFrom="mpiCores" saveAs="mpiCores">
 						<label>MPI Number of Cores: </label>
-						<content>
-							<arg>mpiCores</arg>
-						</content>
 					</widget>
 					<widget type="label">
-						<content>
-							<arg>The number following "-np" on the command line</arg>
-						</content>
+						<displayValue>
+							<arg>${rm:mpiCores#description}</arg>
+						</displayValue>
 					</widget>
 				</group>
 			</basic>
