@@ -23,11 +23,15 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.data.Arg;
+import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
+import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -69,9 +73,12 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			Map<String, String> vars = LTVariableMap.getActiveInstance().getVariables();
 			Map<String, String> disc = LTVariableMap.getActiveInstance().getDiscovered();
 			for (Control c : valueWidgets.keySet()) {
-				String value = WidgetActionUtils.getValueString(c);
 				Widget w = valueWidgets.get(c);
 				String name = w.getSaveValueTo();
+				if (name == null) {
+					continue;
+				}
+				String value = WidgetActionUtils.getValueString(c);
 				if (vars.containsKey(name)) {
 					vars.put(name, value);
 				} else if (disc.containsKey(name)) {
@@ -82,18 +89,17 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 		@Override
 		protected void copyToFields() {
-			Map<String, String> vars = LTVariableMap.getActiveInstance().getVariables();
-			Map<String, String> disc = LTVariableMap.getActiveInstance().getDiscovered();
+			IVariableMap map = LTVariableMap.getActiveInstance();
+			StringBuffer b = new StringBuffer();
 			for (Control c : valueWidgets.keySet()) {
+				b.setLength(0);
 				Widget w = valueWidgets.get(c);
-				String name = w.getSaveValueTo();
-				String dfltV = vars.get(name);
-				if (dfltV == null) {
-					dfltV = disc.get(name);
+				Arglist arglist = w.getContent();
+				if (arglist == null) {
+					continue;
 				}
-				if (dfltV != null) {
-					WidgetActionUtils.setValue(c, dfltV);
-				}
+				new ArglistImpl(null, arglist, map).toString(b);
+				WidgetActionUtils.setValue(c, b.toString());
 			}
 		}
 
@@ -125,6 +131,9 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		/*
 		 * Defaults are recorded in the Property or JobAttribute definitions and
 		 * are accessed via the RMVariableMap.
+		 * 
+		 * Only widgets whose content is savable may have a valid default. Thus
+		 * the default value overwrites content, which will be a single arg.
 		 */
 		@Override
 		protected void loadDefault() {
@@ -132,7 +141,15 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			Map<String, Object> disc = RMVariableMap.getActiveInstance().getDiscovered();
 			for (Control c : valueWidgets.keySet()) {
 				Widget w = valueWidgets.get(c);
+				Arglist args = w.getContent();
+				if (args != null) {
+					continue;
+				}
 				String name = w.getSaveValueTo();
+				if (name == null) {
+					continue;
+				}
+				args = new Arglist();
 				Object o = vars.get(name);
 				String defaultValue = null;
 				if (o == null) {
@@ -144,7 +161,10 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 					defaultValue = ((JobAttribute) o).getDefault();
 				}
 				if (defaultValue != null) {
-					WidgetActionUtils.setValue(c, defaultValue);
+					w.setContent(args);
+					Arg arg = new Arg();
+					args.getArg().add(arg);
+					arg.setContent(defaultValue);
 				}
 			}
 		}

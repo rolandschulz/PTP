@@ -16,12 +16,13 @@ import java.util.TreeMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
-public class RMVariableMap implements IJAXBNonNLSConstants {
+public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	private static RMVariableMap active;
 
 	private final Map<String, Object> variables;
@@ -71,6 +72,10 @@ public class RMVariableMap implements IJAXBNonNLSConstants {
 		for (String s : variables.keySet()) {
 			getFlattened(s, variables.get(s), flat);
 		}
+	}
+
+	public String getString(String value) {
+		return getString(null, value);
 	}
 
 	/**

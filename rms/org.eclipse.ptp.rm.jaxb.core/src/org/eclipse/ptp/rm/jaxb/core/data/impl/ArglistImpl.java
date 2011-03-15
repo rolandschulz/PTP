@@ -14,20 +14,20 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.Arg;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
-import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ArglistImpl implements IJAXBNonNLSConstants {
 
 	private final String uuid;
 	private final Arglist args;
-	private final RMVariableMap map;
+	private final IVariableMap map;
 
-	public ArglistImpl(String uuid, Arglist args) {
+	public ArglistImpl(String uuid, Arglist args, IVariableMap map) {
 		this.uuid = uuid;
 		this.args = args;
-		this.map = RMVariableMap.getActiveInstance();
+		this.map = map;
 		assert (null != this.args);
 		assert (null != this.map);
 	}
