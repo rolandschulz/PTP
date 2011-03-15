@@ -71,6 +71,9 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
         addField(new ColorFieldEditor(FortranPreferences.COLOR_STRINGS.getName(),
                                       Messages.EditorPreferencePage_StringsFieldLabel,
                                       getFieldEditorParent()));
+        addField(new ColorFieldEditor(FortranPreferences.COLOR_NUMBERS_PUNCTUATION.getName(),
+                                      Messages.EditorPreferencePage_NumbersPunctuationLabel,
+                                      getFieldEditorParent()));
         addField(new ColorFieldEditor(FortranPreferences.COLOR_CPP.getName(),
                                       Messages.EditorPreferencePage_CPPDirectivesFieldLabel,
                                       getFieldEditorParent()));

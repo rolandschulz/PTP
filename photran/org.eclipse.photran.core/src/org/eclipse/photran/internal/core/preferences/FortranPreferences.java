@@ -41,12 +41,13 @@ public final class FortranPreferences
     public static final FortranBooleanPreference ENABLE_FIXED_FORM_FOLDING = new FortranBooleanPreference("fixedfolding", false); //$NON-NLS-1$
     public static final FortranBooleanPreference ENABLE_FREE_FORM_FOLDING = new FortranBooleanPreference("freefolding", false); //$NON-NLS-1$
 
-    public static final FortranRGBPreference COLOR_COMMENTS    = new FortranRGBPreference("comments",    new RGB(63,  127, 95 )); //$NON-NLS-1$
-    public static final FortranRGBPreference COLOR_IDENTIFIERS = new FortranRGBPreference("identifiers", new RGB(0,   0,   192)); //$NON-NLS-1$
-    public static final FortranRGBPreference COLOR_INTRINSICS  = new FortranRGBPreference("intrinsics",  new RGB(96,  0,   192)); //$NON-NLS-1$
-    public static final FortranRGBPreference COLOR_KEYWORDS    = new FortranRGBPreference("keywords",    new RGB(127, 0,   85 )); //$NON-NLS-1$
-    public static final FortranRGBPreference COLOR_STRINGS     = new FortranRGBPreference("strings",     new RGB(42,  0,   255)); //$NON-NLS-1$
-    public static final FortranRGBPreference COLOR_CPP         = new FortranRGBPreference("cpp",         new RGB(128, 128, 128)); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_COMMENTS            = new FortranRGBPreference("comments",    new RGB(63,  127, 95 )); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_IDENTIFIERS         = new FortranRGBPreference("identifiers", new RGB(0,   0,   192)); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_INTRINSICS          = new FortranRGBPreference("intrinsics",  new RGB(96,  0,   192)); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_KEYWORDS            = new FortranRGBPreference("keywords",    new RGB(127, 0,   85 )); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_STRINGS             = new FortranRGBPreference("strings",     new RGB(42,  0,   255)); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_NUMBERS_PUNCTUATION = new FortranRGBPreference("nums_punc",   new RGB(0,   0,   0  )); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_CPP                 = new FortranRGBPreference("cpp",         new RGB(128, 128, 128)); //$NON-NLS-1$
 
     public static final FortranStringPreference PREFERRED_MODEL_BUILDER = new FortranStringPreference("modelbuilder", ""); //$NON-NLS-1$ //$NON-NLS-2$
     public static final FortranStringPreference PREFERRED_DOM_PARSER = new FortranStringPreference("domparser", ""); //$NON-NLS-1$ //$NON-NLS-2$

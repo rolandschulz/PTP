@@ -119,6 +119,8 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
     private Token colorKeywords = createTokenFromRGBPreference(FortranPreferences.COLOR_KEYWORDS);
 
+    private Token colorNumbersAndPunctuation = createTokenFromRGBPreference(FortranPreferences.COLOR_NUMBERS_PUNCTUATION);
+    
     private static Token createTokenFromRGBPreference(FortranRGBPreference p)
     {
         int style;
@@ -176,7 +178,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         setRules(rules);
 
         // Punctuation, numbers, etc.
-        setDefaultReturnToken(new Token(new TextAttribute(new Color(Display.getCurrent(), new RGB(0, 0, 0)))));
+        setDefaultReturnToken(colorNumbersAndPunctuation);
     }
 
     private void createSpecialWordRules(SalesScanKeywordRule salesRule, Eclipse33WordRule wordRule)
@@ -225,6 +227,8 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
                 updateToken(colorIntrinsics, newVal);
             else if (property.equals(FortranPreferences.COLOR_KEYWORDS.getName()))
                 updateToken(colorKeywords, newVal);
+            else if (property.equals(FortranPreferences.COLOR_NUMBERS_PUNCTUATION.getName()))
+                updateToken(colorNumbersAndPunctuation, newVal);
         }
 
         private void updateToken(Token token, String newColor)
