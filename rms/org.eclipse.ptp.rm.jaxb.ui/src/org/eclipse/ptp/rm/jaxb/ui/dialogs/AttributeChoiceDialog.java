@@ -11,19 +11,15 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.data.CheckedProperty;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.providers.AttributeOrPropertyContentProvider;
+import org.eclipse.ptp.rm.jaxb.ui.providers.AttributeOrPropertyLabelProvider;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -33,97 +29,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 
 public class AttributeChoiceDialog extends Dialog implements IJAXBUINonNLSConstants {
-	private class AttributeOrPropertyContentProvider implements IStructuredContentProvider {
-		public void dispose() {
-		}
-
-		public Object[] getElements(Object inputElement) {
-			if (inputElement instanceof List<?>) {
-				List<CheckedProperty> cpList = new ArrayList<CheckedProperty>();
-				List<?> in = (List<?>) inputElement;
-				for (Object o : in) {
-					if (o instanceof CheckedProperty) {
-						cpList.add((CheckedProperty) o);
-					} else {
-						cpList.add(new CheckedProperty(o));
-					}
-				}
-				return cpList.toArray();
-			}
-			return new Object[] { new CheckedProperty(inputElement) };
-		}
-
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		}
-	}
-
-	private class AttributeOrPropertyLabelProvider implements ITableLabelProvider {
-
-		public void addListener(ILabelProviderListener listener) {
-		}
-
-		public void dispose() {
-		}
-
-		public Image getColumnImage(Object element, int columnIndex) {
-			return null;
-		}
-
-		public String getColumnText(Object element, int columnIndex) {
-			CheckedProperty p = (CheckedProperty) element;
-			switch (columnIndex) {
-			case 0:
-				return p.name;
-			case 1:
-				return p.description;
-			}
-			return ZEROSTR;
-		}
-
-		public boolean isLabelProperty(Object element, String property) {
-			return false;
-		}
-
-		public void removeListener(ILabelProviderListener listener) {
-		}
-	}
-
-	private class CheckedProperty {
-		private String name;
-		private String description;
-		private boolean checked;
-		private boolean configurable;
-
-		private CheckedProperty(Object o) {
-			if (o instanceof JobAttribute) {
-				JobAttribute ja = (JobAttribute) o;
-				name = ja.getName();
-				checked = ja.isSelected();
-				description = ja.getDescription();
-				configurable = ja.isConfigurable();
-			} else if (o instanceof Property) {
-				Property p = (Property) o;
-				name = p.getName();
-				checked = p.isSelected();
-				description = ZEROSTR;
-				configurable = p.isConfigurable();
-			} else if (o instanceof String) {
-				checked = true;
-				name = o.toString();
-				description = ZEROSTR;
-				configurable = true;
-			}
-		}
-
-		@Override
-		public String toString() {
-			return name + CM + SP + description + CM + SP + checked;
-		}
-
-		private void setChecked(boolean checked) {
-			this.checked = checked;
-		}
-	}
 
 	private CheckboxTableViewer preferences;
 	private final List<CheckedProperty> allProps;
@@ -142,7 +47,7 @@ public class AttributeChoiceDialog extends Dialog implements IJAXBUINonNLSConsta
 	public Map<String, Boolean> getChecked() {
 		Map<String, Boolean> map = new TreeMap<String, Boolean>();
 		for (CheckedProperty p : allProps) {
-			map.put(p.name, p.checked);
+			map.put(p.getName(), p.isChecked());
 		}
 		return map;
 	}
@@ -157,12 +62,12 @@ public class AttributeChoiceDialog extends Dialog implements IJAXBUINonNLSConsta
 					o = s;
 				}
 				CheckedProperty p = new CheckedProperty(o);
-				if (!p.configurable) {
+				if (!p.isConfigurable()) {
 					continue;
 				}
 				if (currentlyVisible == null || currentlyVisible.containsKey(s)) {
 					// override default settings
-					p.checked = true;
+					p.setChecked(true);
 				}
 				allProps.add(p);
 			}
@@ -175,7 +80,7 @@ public class AttributeChoiceDialog extends Dialog implements IJAXBUINonNLSConsta
 		toggle = true;
 		for (Object o : selected) {
 			CheckedProperty p = (CheckedProperty) o;
-			boolean checked = p.checked;
+			boolean checked = p.isChecked();
 			preferences.setChecked(p, !checked);
 			p.setChecked(!checked);
 		}
@@ -228,7 +133,7 @@ public class AttributeChoiceDialog extends Dialog implements IJAXBUINonNLSConsta
 
 	private void initialize() {
 		for (CheckedProperty p : allProps) {
-			preferences.setChecked(p, p.checked);
+			preferences.setChecked(p, p.isChecked());
 		}
 	}
 }

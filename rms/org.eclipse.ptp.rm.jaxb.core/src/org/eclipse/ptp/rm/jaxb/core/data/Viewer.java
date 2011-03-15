@@ -63,6 +63,7 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;enumeration value="table"/>
  *             &lt;enumeration value="tree"/>
  *             &lt;enumeration value="checkboxTable"/>
+ *             &lt;enumeration value="checkboxTree"/>
  *           &lt;/restriction>
  *         &lt;/simpleType>
  *       &lt;/attribute>

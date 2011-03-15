@@ -19,9 +19,13 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.ui.utils.DataSource.ValidationException;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 public class WidgetActionUtils implements IJAXBUINonNLSConstants {
@@ -60,6 +64,27 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	public static String getValueString(Control c) {
 
 		return null;
+	}
+
+	public static boolean isSettable(Control uiElement) {
+		if (uiElement instanceof Label) {
+			return true;
+		}
+		if (uiElement instanceof Text) {
+			return true;
+		}
+		if (uiElement instanceof Combo) {
+			return true;
+		}
+		if (uiElement instanceof Spinner) {
+			return true;
+		}
+		if (uiElement instanceof Button) {
+			Button b = (Button) uiElement;
+			int style = b.getStyle();
+			return (style == (style | SWT.CHECK)) || (style == (style | SWT.RADIO));
+		}
+		return false;
 	}
 
 	public static String openInputDialog(Shell shell, String message, String title, String original) {

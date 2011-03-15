@@ -415,12 +415,11 @@
 	</xs:complexType>
 	<xs:complexType name="widget">
 		<xs:sequence>
-		   <xs:element name="grid-data" minOccurs="0" type="rm:grid-data"/>
+			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data"/>
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="value" minOccurs="0" type="xs:string"/>
-			
 			<xs:element name="displayValue" minOccurs="0" type="rm:arglist">
 				<xs:annotation>
 					<xs:documentation>
@@ -442,24 +441,22 @@
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="label"/> <!-- automatically read-only -->
+					<xs:enumeration value="label"/>
 					<xs:enumeration value="text"/>
-					<xs:enumeration value="pushButton"/> <!-- automatically read-only -->
-					<xs:enumeration value="radioButton"/> <!-- automatically read-only -->
+					<xs:enumeration value="checkbox"/>
 					<xs:enumeration value="spinner"/>
-					<xs:enumeration value="checkbox"/> <!-- automatically read-only -->
 					<xs:enumeration value="combo"/>
+					<xs:enumeration value="pushButton"/>
+					<xs:enumeration value="radioButton"/>
 					<xs:enumeration value="browseDirectoryButton"/>
 					<xs:enumeration value="browseExistingFileButton"/>
 					<xs:enumeration value="browseOrCreateFileButton"/>
-					<xs:enumeration value="selectAttributes"/> <!-- automatically read-only -->
-					<xs:enumeration value="showScript"/> <!-- automatically read-only -->
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 		<xs:attribute name="valueFrom" type="xs:string"/>
-      <xs:attribute name="saveAs" type="xs:string"/>
+		<xs:attribute name="saveAs" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="viewer">
 		<xs:sequence>
@@ -468,19 +465,7 @@
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="column-data" minOccurs="0" type="rm:column-data"/>
-			<xs:element name="initial-rows" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="row" maxOccurs="unbounded">
-							<xs:complexType>
-								<xs:sequence>
-									<xs:element name="column-text" maxOccurs="unbounded" type="xs:string"/>
-								</xs:sequence>
-							</xs:complexType>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="rows" maxOccurs="unbounded" type="rm:widget-row"/>
 		</xs:sequence>
 		<xs:attribute name="editable" type="xs:boolean" default="true"/>
 		<xs:attribute name="type" default="table">
@@ -489,6 +474,7 @@
 					<xs:enumeration value="table"/>
 					<xs:enumeration value="tree"/>
 					<xs:enumeration value="checkboxTable"/>
+					<xs:enumeration value="checkboxTree"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -534,6 +520,13 @@
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="width" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="widget-row">
+		<xs:sequence>
+			<xs:element name="column" maxOccurs="unbounded" type="rm:widget"/>
+			<xs:element name="children" minOccurs="0" maxOccurs="unbounded" type="rm:widget-row"/>
+		</xs:sequence>
+		<xs:attribute name="index" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="target">
 		<xs:attribute name="ref" type="xs:string"/>
