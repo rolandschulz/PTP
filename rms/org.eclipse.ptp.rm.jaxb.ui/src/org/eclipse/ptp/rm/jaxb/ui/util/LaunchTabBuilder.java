@@ -21,6 +21,5 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	}
 
 	public void build(Composite parent) throws Throwable {
-
 	}
 }
