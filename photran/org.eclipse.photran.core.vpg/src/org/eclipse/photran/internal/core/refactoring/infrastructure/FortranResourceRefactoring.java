@@ -533,7 +533,7 @@ public abstract class FortranResourceRefactoring
         return getNode(firstToken, lastToken, node);
     }
     /**end test code*/
-    protected static ASTNode getNode(IFortranAST ast, ITextSelection selection, Class<? extends ASTNode> node)
+    protected static <T extends IASTNode> T getNode(IFortranAST ast, ITextSelection selection, Class<T> node)
     {
         Token firstToken = findFirstTokenAfter(ast, selection.getOffset());
         Token lastToken = findLastTokenBefore(ast, selection.getOffset()+selection.getLength());
@@ -542,13 +542,13 @@ public abstract class FortranResourceRefactoring
         return getNode(firstToken, lastToken, node);
     }
 
-    protected static ASTNode getNode(Token firstToken, Token lastToken, Class<? extends ASTNode> node)
+    protected static <T extends IASTNode> T getNode(Token firstToken, Token lastToken, Class<T> node)
     {
         assert(firstToken != null);
         assert(lastToken  != null);
-        ASTNode firstTokenNode = firstToken.findNearestAncestor(node);
-        ASTNode lastTokenNode = lastToken.findNearestAncestor(node);
-        if(firstTokenNode == null || lastTokenNode == null || firstTokenNode != lastTokenNode)
+        T firstTokenNode = firstToken.findNearestAncestor(node);
+        T lastTokenNode = lastToken.findNearestAncestor(node);
+        if (firstTokenNode == null || lastTokenNode == null || firstTokenNode != lastTokenNode)
             return null;
         return firstTokenNode;
         //return null;

@@ -89,7 +89,11 @@ public class Messages extends NLS
     public static String RenameAction_MatchExternalSubprograms;
 
     public static String RenameAction_RenameAtoB;
-    
+
+    public static String IfConstructStatementConversionAction_AddEmptyElseBlock;
+
+    public static String RefactoringAction_ClickOKToRunTheRefactoring;
+
     public static String RemoveRealAndDoublePrecisionLoopCountersInputPage_ReplaceRealDoublePrecisionLoopCounter;
 
     public static String RemoveRealAndDoublePrecisionLoopCountersInputPage_ReplaceWithDoLoop;

@@ -267,6 +267,18 @@ public class Messages extends NLS
     public static String ExtractLocalVariableRefactoring_VarsOnlyExtractedFromStmtsIn;
 
     public static String InterchangeLoopsRefactoring_Name;
+    
+    public static String IfConstructStatementConversionRefactoring_Name;
+    
+    public static String IfConstructStatementConversionRefactoring_SelectAValidIfStatement;
+
+    public static String IfConstructStatementConversionRefactoring_InvalidNamedConstruct;
+    
+    public static String IfConstructStatementConversionRefactoring_TooManyStatements;
+    
+    public static String FortranEditorRefactoring_CantPerformRefactoringOnReadOnlyFile;
+    
+    public static String FortranEditorRefactoring_CantPerformRefactoringOnFileThatDoesNotExist;
 
     public static String InterchangeLoopsRefactoring_SelectTwoPerfNextedLoops;
 
