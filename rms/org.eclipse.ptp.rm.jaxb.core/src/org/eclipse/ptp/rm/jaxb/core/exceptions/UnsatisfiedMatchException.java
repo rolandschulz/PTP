@@ -9,22 +9,22 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.exceptions;
 
-public class UnsatisfiedRegexMatchException extends Exception {
+public class UnsatisfiedMatchException extends Exception {
 
 	private static final long serialVersionUID = 4521238998263940220L;
 
-	public UnsatisfiedRegexMatchException() {
+	public UnsatisfiedMatchException() {
 	}
 
-	public UnsatisfiedRegexMatchException(String message) {
+	public UnsatisfiedMatchException(String message) {
 		super(message);
 	}
 
-	public UnsatisfiedRegexMatchException(String message, Throwable cause) {
+	public UnsatisfiedMatchException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public UnsatisfiedRegexMatchException(Throwable cause) {
+	public UnsatisfiedMatchException(Throwable cause) {
 		super(cause);
 	}
 }

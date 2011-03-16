@@ -198,10 +198,10 @@
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:choice>
-				<xs:element name="regex" type="rm:regex"/>
-				<xs:element name="acl" type="xs:string"/>
-			</xs:choice>
+			<xs:sequence>
+				<xs:element name="regex" minOccurs="0" type="rm:regex"/>
+				<xs:element name="fileInfo" minOccurs="0" type="rm:file-match"/>
+			</xs:sequence>
 			<xs:element name="error-message" minOccurs="0" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -217,6 +217,14 @@
 		<xs:attribute name="name" use="required"/>
 		<xs:attribute name="uniqueIdPrefix" type="xs:boolean" default="false"/>
 		<xs:attribute name="deleteAfterUse" type="xs:boolean" default="false"/>
+	</xs:complexType>
+	<xs:complexType name="file-match">
+		<xs:sequence>
+			<xs:element name="attribute" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="lastModified" type="xs:string"/>
+		<xs:attribute name="length" type="xs:long"/>
+		<xs:attribute name="isDirectory" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType mixed="true" name="directive-definition">
 		<xs:annotation>
@@ -454,8 +462,8 @@
 		<xs:attribute name="type" default="checkboxTable">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-				   <xs:enumeration value="valueTable"/>
-				   <xs:enumeration value="valueTree"/>
+					<xs:enumeration value="valueTable"/>
+					<xs:enumeration value="valueTree"/>
 					<xs:enumeration value="checkboxTable"/>
 					<xs:enumeration value="checkboxTree"/>
 				</xs:restriction>

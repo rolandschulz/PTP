@@ -13,12 +13,21 @@ package org.eclipse.ptp.rm.jaxb.ui.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.rm.jaxb.core.data.FileMatch;
+import org.eclipse.ptp.rm.jaxb.core.data.Regex;
 import org.eclipse.ptp.rm.jaxb.core.data.Validator;
+import org.eclipse.ptp.rm.jaxb.core.data.impl.RegexImpl;
+import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedMatchException;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
-import org.eclipse.ptp.rm.ui.utils.DataSource.ValidationException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -179,16 +188,65 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	 * If the text is empty and there is a default value, resets the widget
 	 * value to its default.
 	 */
-	public static void validate(Control c, String string) {
-		// TODO Auto-generated method stub
-
+	public static void validate(Control c, String defaultV) {
+		String value = getValueString(c);
+		if (value == null && defaultV != null) {
+			setValue(c, defaultV);
+		}
 	}
 
 	/**
-	 * If validation fails, resets the widget value to its default
+	 * If validation fails, resets the widget value to its default and throws an
+	 * exception.
 	 */
-	public static void validate(Control c, Validator v, String defaultValue) throws ValidationException {
-		// TODO
+	public static void validate(Control c, Validator v, String defaultV, IRemoteFileManager fileManager) throws Exception {
+		String value = getValueString(c);
+		Regex reg = v.getRegex();
+		String error = v.getErrorMessage();
+		if (error == null) {
+			error = ZEROSTR;
+		}
+		if (reg != null && !validateAgainstRegex(reg, value)) {
+			throw new UnsatisfiedMatchException(error + CO + SP + reg.getExpression() + CM + SP + value);
+		} else {
+			FileMatch match = v.getFileInfo();
+			try {
+				if (match != null && !validate(match, value, fileManager)) {
+					throw new UnsatisfiedMatchException(error + CO + SP + value);
+				}
+			} catch (CoreException ce) {
+				throw new UnsatisfiedMatchException(ce);
+			}
+		}
+	}
 
+	private static boolean validate(FileMatch match, String value, IRemoteFileManager fileManager) throws CoreException {
+		if (fileManager == null) {
+			return false;
+		}
+		IFileStore rres = fileManager.getResource(value);
+		IFileInfo info = rres.fetchInfo(EFS.NONE, new NullProgressMonitor());
+		if (!info.exists()) {
+			return false;
+		}
+		if (match.isIsDirectory() != info.isDirectory()) {
+			return false;
+		}
+		Long len = match.getLength();
+		if (len != null && len != info.getLength()) {
+			return false;
+		}
+
+		/*
+		 * Date comparison?
+		 */
+
+		for (String s : match.getAttribute()) {
+		}
+		return false;
+	}
+
+	private static boolean validateAgainstRegex(Regex reg, String value) {
+		return new RegexImpl(reg).getMatched(value) != null;
 	}
 }

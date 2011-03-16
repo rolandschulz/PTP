@@ -134,7 +134,6 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 						Messages.Copy_Operation_Local_resource_does_not_exist));
 			}
 			IFileStore rres = remoteFileManager.getResource(remotePath);
-
 			// Copy file
 			lres.copy(rres, EFS.OVERWRITE, progress.newChild(5));
 		} finally {

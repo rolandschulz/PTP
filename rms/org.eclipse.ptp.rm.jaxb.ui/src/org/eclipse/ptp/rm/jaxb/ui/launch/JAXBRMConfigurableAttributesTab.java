@@ -238,7 +238,11 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 					JobAttribute ja = (JobAttribute) o;
 					Validator v = ja.getValidator();
 					if (v != null) {
-						WidgetActionUtils.validate(c, v, ja.getDefault());
+						try {
+							WidgetActionUtils.validate(c, v, ja.getDefault());
+						} catch (Throwable t) {
+							throw new ValidationException(t.getMessage());
+						}
 					}
 				} else if (o instanceof Property) {
 					Property p = (Property) o;

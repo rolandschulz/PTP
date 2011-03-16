@@ -45,6 +45,7 @@ public interface IJAXBNonNLSConstants {
 	String DOL = "$";//$NON-NLS-1$
 	String PIP = "|";//$NON-NLS-1$
 	String DOT = ".";//$NON-NLS-1$
+	String Z3 = "000";//$NON-NLS-1$
 	String OPENSQ = "[";//$NON-NLS-1$
 	String OPENV = "${";//$NON-NLS-1$
 	String OPENVRM = "${rm:";//$NON-NLS-1$
