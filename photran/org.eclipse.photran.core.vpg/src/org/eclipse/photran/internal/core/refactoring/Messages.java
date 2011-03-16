@@ -115,6 +115,10 @@ public class Messages extends NLS
     public static String ExtractProcedureRefactoring_ProcedureContainsLabels;
 
     public static String ExtractProcedureRefactoring_StatementCannotBeExtracted;
+    
+    public static String MakeSaveExplicitRefactoring_Name;
+    
+    public static String MakeSaveExplicitRefactoring_SelectedFileCannotBeParsed;
 
     public static String MinOnlyListRefactoring_ModuleIsEmpty;
 

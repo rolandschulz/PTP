@@ -134,6 +134,9 @@
              <resourceRefactoring
                  class="org.eclipse.photran.internal.core.refactoring.IntroImplicitNoneRefactoring"
              />
+             <resourceRefactoring
+                 class="org.eclipse.photran.internal.core.refactoring.MakeSaveExplicitRefactoring"
+             />
              <editorRefactoring
                  class="org.eclipse.photran.internal.core.refactoring.RemoveUnreferencedLabelsRefactoring"
              />         
