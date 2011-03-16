@@ -89,6 +89,9 @@
              <resourceRefactoring
                 class="org.eclipse.photran.internal.core.refactoring.RemoveArithmeticIfRefactoring"
              />
+             <resourceRefactoring
+                command="org.eclipse.photran.ui.RemoveAssignedGotoRefactoringCommand"
+             />
              <editorRefactoring
                 class="org.eclipse.photran.internal.core.refactoring.RemoveBranchToEndIfRefactoring"
              />
@@ -175,9 +178,14 @@
             id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand">
       </command>
       <command
-            name="Convert Between If Statement and If Construct"
+            name="Convert Between If Statement and If Construct..."
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
            id="org.eclipse.photran.ui.IfConstructStatementConversionRefactoringCommand">
+      </command>
+      <command
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.RemoveAssignedGotoRefactoringCommand"
+            name="Remove Assigned Goto...">
       </command>
    </extension>
 
@@ -238,6 +246,11 @@
                definitionId="org.eclipse.photran.ui.IfConstructStatementConversionRefactoringCommand"
                class="org.eclipse.photran.internal.ui.refactoring.IfConstructStatementConversionAction"
                id="org.eclipse.photran.ui.IfConstructStatementConversionRefactoringAction"/>
+         <action
+               label="Remove Assigned Goto"
+               definitionId="org.eclipse.photran.ui.RemoveAssignedGotoRefactoringCommand"
+               class="org.eclipse.photran.internal.ui.refactoring.RemoveAssignedGotoAction"
+               id="org.eclipse.photran.ui.RemoveAssignedGotoAction"/>
       </actionSet>
    </extension>
 

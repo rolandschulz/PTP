@@ -24,6 +24,14 @@ public class Messages extends NLS
 {
     private static final String BUNDLE_NAME = "org.eclipse.photran.internal.ui.refactoring.messages"; //$NON-NLS-1$
 
+    public static String RemoveAssignGotoInputPage_ClickOKMessage;
+
+    public static String RemoveAssignGotoInputPage_Yes;
+    
+    public static String RemoveAssignGotoInputPage_No;
+
+    public static String RemoveAssignGotoInputPage_Prompt;
+
     public static String AbstractFortranRefactoringActionDelegate_ErrorTitle;
 
     public static String AbstractFortranRefactoringActionDelegate_FileInEditorCannotBeRefactored;

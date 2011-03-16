@@ -1,0 +1,8 @@
+! Test 7: 1 ASSIGN Label, Change value on label 
+! Test passes and changes the assign statements to one variable to assignments
+program one_label_reassign_address !<<<<< 1, 1, 8, 12, true, pass
+    label1 = 100
+    label1 = 200
+200 continue
+100 stop
+end program

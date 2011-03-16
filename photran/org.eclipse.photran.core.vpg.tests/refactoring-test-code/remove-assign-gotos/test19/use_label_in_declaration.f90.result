@@ -1,0 +1,13 @@
+! Test Case 19 Label Used in Declaration
+! Test passes because a declaration is not an action statement
+program use_label_in_declaration !<<<<< 1, 1, 10, 37, true, pass
+    implicit none
+    integer label
+    label = 20
+    select case (label)
+    case (20); goto 20
+    case default; stop "Unknown label"
+    end select
+
+20  continue
+end program use_label_in_declaration

@@ -460,6 +460,20 @@ public class Messages extends NLS
     
     public static String RemoveUnreferencedLabelsRefactoring_ThereMustBeAtLeastOneLabeledStatement;
     
+    public static String RemoveAssignedGotoRefactoring_AllLabelsUsedInActionStatement;
+
+    public static String RemoveAssignedGotoRefactoring_ForFile;
+
+    public static String RemoveAssignedGotoRefactoring_LabelNotFound;
+
+    public static String RemoveAssignedGotoRefactoring_NothingToBeRefactored;
+
+    public static String RemoveAssignedGotoRefactoring_TheFollowingLabelsCannotBeRefactored;
+
+    public static String RemoveAssignedGoToRefactoring_Name;
+    
+    public static String RemoveAssignedGoToRefactoring_SelectedFileCannotBeParsed;
+
     static
     {
         // initialize resource bundle

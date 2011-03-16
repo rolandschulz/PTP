@@ -1,0 +1,16 @@
+! Test Case 21 Two of the Same Assign Statements
+! Test passes and creates one select case statement with one select case 
+program two_assign_same_label_withgotos !<<<<< 1, 1, 13, 12, true, pass
+
+    label = 100
+    goto 1000
+    
+100 label = 100
+    goto 1000
+
+1000 print *, "Infinite loop"
+     select case (label)
+     case (100); goto 100
+     case default; stop "Unknown label"
+     end select
+end program

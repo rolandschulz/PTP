@@ -1,0 +1,26 @@
+! Test Case 23 1 ASSIGN Label, goto 2 different addresses, without the default case
+! Test passes but does not include the default case in the two select case statements
+program one_label_goto_two_different_addresses !<<<<< 1, 1, 20, 12, false, pass
+
+    label = 100
+    goto 1000
+
+100 label = 200
+    goto 2000
+
+200 stop
+
+1000 print *, "First goto reaches here"
+     select case (label)
+     case (100); goto 100
+     case (200); goto 200
+     end select
+
+2000 print *, "Second goto reaches here"
+     select case (label)
+     case (100); goto 100
+     case (200); goto 200
+     end select
+
+3000 print *, "Fall-through"
+end program

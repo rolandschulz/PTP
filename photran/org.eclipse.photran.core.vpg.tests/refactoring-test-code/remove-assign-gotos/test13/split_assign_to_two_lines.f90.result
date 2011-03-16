@@ -1,0 +1,14 @@
+! Test 13: Split assign statement with ampersand
+! Test passes by replacing the split-up assigned goto and creating a select case
+program split_assign_to_two_lines !<<<<< 1, 1, 13, 12, true, pass
+
+    label = 100
+    goto 1000
+100 stop
+
+1000 print *, "Subroutine like stuff here"
+     select case (label)
+     case (100); goto 100
+     case default; stop "Unknown label"
+     end select
+end program

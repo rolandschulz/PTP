@@ -1,0 +1,48 @@
+! Test 6: 2 ASSIGN Labels, Three GOTO address each
+! Test passes and creates two select cases and replaces the assign statements
+program two_labels_one_address !<<<<< 1, 1, 38, 12, true, pass
+    real :: area
+    real :: radius
+
+    label1 = 20
+    goto 7000
+
+10  label1 = 30
+    goto 7000
+
+20  label1 = 10
+    goto 7000
+    stop
+
+
+30  radius = 3.0
+    label2 = 200
+    goto 9000
+
+200 radius = 4.0
+    label2 = 300
+    goto 9000
+
+300 radius = 5.0
+    label2 = 325
+    goto 9000
+
+325 stop
+
+7000 print *, "hello"
+     select case (label1)
+     case (10); goto 10
+     case (20); goto 20
+     case (30); goto 30
+     case default; stop "Unknown label"
+     end select
+
+9000 area = 3.1415 * r**2
+     select case (label2)
+     case (200); goto 200
+     case (300); goto 300
+     case (325); goto 325
+     case default; stop "Unknown label"
+     end select
+
+end program
