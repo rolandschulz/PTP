@@ -219,10 +219,36 @@
 		<xs:attribute name="deleteAfterUse" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="file-match">
-		<xs:sequence>
-			<xs:element name="attribute" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-		<xs:attribute name="lastModified" type="xs:string"/>
+	   <xs:annotation>
+            <xs:documentation>
+               efsAttributes is an or'd string of tags corresponding to the EFS integer constants.
+               use "yyyy/MM/dd HH:mm:ss" format for modified strings.
+            </xs:documentation>
+         </xs:annotation>
+		<xs:attribute name="efsAttributes">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="ATTRIBUTE_READ_ONLY"/>
+					<xs:enumeration value="ATTRIBUTE_IMMUTABLE"/>
+					<xs:enumeration value="ATTRIBUTE_OWNER_READ"/>
+					<xs:enumeration value="ATTRIBUTE_OWNER_WRITE"/>
+					<xs:enumeration value="ATTRIBUTE_OWNER_EXECUTE"/>
+					<xs:enumeration value="ATTRIBUTE_GROUP_READ"/>
+					<xs:enumeration value="ATTRIBUTE_GROUP_WRITE"/>
+					<xs:enumeration value="ATTRIBUTE_GROUP_EXECUTE"/>
+					<xs:enumeration value="ATTRIBUTE_OTHER_READ"/>
+					<xs:enumeration value="ATTRIBUTE_OTHER_WRITE"/>
+					<xs:enumeration value="ATTRIBUTE_OTHER_EXECUTE"/>
+					<xs:enumeration value="ATTRIBUTE_EXECUTABLE"/>
+					<xs:enumeration value="ATTRIBUTE_ARCHIVE"/>
+					<xs:enumeration value="ATTRIBUTE_HIDDEN"/>
+					<xs:enumeration value="ATTRIBUTE_SYMLINK"/>
+					<xs:enumeration value="ATTRIBUTE_LINK_TARGET"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="lastModifiedBefore" type="xs:string"/>
+		<xs:attribute name="lastModifiedAfter" type="xs:string"/>
 		<xs:attribute name="length" type="xs:long"/>
 		<xs:attribute name="isDirectory" type="xs:boolean" default="false"/>
 	</xs:complexType>

@@ -12,6 +12,10 @@ package org.eclipse.ptp.rm.jaxb.ui.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -203,10 +207,12 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		String value = getValueString(c);
 		Regex reg = v.getRegex();
 		String error = v.getErrorMessage();
+
 		if (error == null) {
 			error = ZEROSTR;
 		}
-		if (reg != null && !validateAgainstRegex(reg, value)) {
+
+		if (reg != null && new RegexImpl(reg).getMatched(value) == null) {
 			throw new UnsatisfiedMatchException(error + CO + SP + reg.getExpression() + CM + SP + value);
 		} else {
 			FileMatch match = v.getFileInfo();
@@ -217,6 +223,58 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 			} catch (CoreException ce) {
 				throw new UnsatisfiedMatchException(ce);
 			}
+		}
+	}
+
+	private static int getAttributeValue(String efsAttrStr) {
+		int attributes = 0;
+		String[] split = efsAttrStr.split(PIP);
+		for (String s : split) {
+			s = s.trim();
+			if (ATTRIBUTE_READ_ONLY.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_READ_ONLY;
+			} else if (ATTRIBUTE_IMMUTABLE.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_IMMUTABLE;
+			} else if (ATTRIBUTE_OWNER_READ.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_OWNER_READ;
+			} else if (ATTRIBUTE_OWNER_WRITE.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_OWNER_WRITE;
+			} else if (ATTRIBUTE_OWNER_EXECUTE.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_OWNER_EXECUTE;
+			} else if (ATTRIBUTE_GROUP_READ.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_GROUP_READ;
+			} else if (ATTRIBUTE_GROUP_WRITE.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_GROUP_WRITE;
+			} else if (ATTRIBUTE_GROUP_EXECUTE.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_GROUP_EXECUTE;
+			} else if (ATTRIBUTE_OTHER_READ.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_OTHER_READ;
+			} else if (ATTRIBUTE_OTHER_WRITE.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_OTHER_WRITE;
+			} else if (ATTRIBUTE_OTHER_EXECUTE.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_OTHER_EXECUTE;
+			} else if (ATTRIBUTE_EXECUTABLE.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_EXECUTABLE;
+			} else if (ATTRIBUTE_ARCHIVE.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_ARCHIVE;
+			} else if (ATTRIBUTE_HIDDEN.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_HIDDEN;
+			} else if (ATTRIBUTE_SYMLINK.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_SYMLINK;
+			} else if (ATTRIBUTE_LINK_TARGET.equals(s)) {
+				attributes |= EFS.ATTRIBUTE_LINK_TARGET;
+			}
+		}
+		return attributes;
+	}
+
+	private static Long getTimeInMillis(String dateTime) {
+		DateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		try {
+			Date d = formatter.parse(dateTime);
+			return new Long(d.getTime());
+		} catch (ParseException pe) {
+			return null;
 		}
 	}
 
@@ -236,17 +294,28 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		if (len != null && len != info.getLength()) {
 			return false;
 		}
-
-		/*
-		 * Date comparison?
-		 */
-
-		for (String s : match.getAttribute()) {
+		String date = match.getLastModifiedAfter();
+		if (date != null) {
+			Long t = getTimeInMillis(date);
+			if (t != null && t > info.getLastModified()) {
+				return false;
+			}
 		}
-		return false;
-	}
 
-	private static boolean validateAgainstRegex(Regex reg, String value) {
-		return new RegexImpl(reg).getMatched(value) != null;
+		date = match.getLastModifiedBefore();
+		if (date != null) {
+			Long t = getTimeInMillis(date);
+			if (t != null && t < info.getLastModified()) {
+				return false;
+			}
+		}
+
+		String attributes = match.getEfsAttributes();
+		int a = getAttributeValue(attributes);
+		if (!info.getAttribute(a)) {
+			return false;
+		}
+
+		return true;
 	}
 }
