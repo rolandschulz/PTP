@@ -1,0 +1,7 @@
+program logicalbasic ! Tests that logical parameters work correctly.
+
+end program logicalbasic
+subroutine sub(y,z) !<<<<< 4, 1, 4, 5, logical; intent(in) :: y, 0, .true., pass
+    logical, intent(in) :: y
+    integer, intent(in) :: z
+end subroutine

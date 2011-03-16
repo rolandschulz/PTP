@@ -111,6 +111,12 @@ public class Messages extends NLS
     public static String RemoveRealAndDoublePrecisionLoopCountersInputPage_ClickOKMessage;
     
     public static String RemoveRealAndDoublePrecisionLoopCountersInputPage_ClickPreviewMessage;
+
+    public static String AddSubroutineParameterAction_DefaultLabel;
+
+    public static String AddSubroutineParameterAction_DeclarationLabel;
+
+    public static String AddSubroutineParameterAction_LocationLabel;
     
     static
     {

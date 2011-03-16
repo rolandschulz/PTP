@@ -64,6 +64,22 @@ public class Messages extends NLS
     public static String AddOnlyToUseStmtRefactoring_ProjectDoesNotExist;
 
     public static String AddOnlyToUseStmtRefactoring_SelectModuleName;
+    
+    public static String AddSubroutineParameterRefactoring_InvalidDeclaration;
+    
+    public static String AddSubroutineParameterRefactoring_InvalidDefaultValue;
+    
+    public static String AddSubroutineParameterRefactoring_InvalidParameterPosition;
+    
+    public static String AddSubroutineParameterRefactoring_matchingDeclarationsDoNotUniquelyBind;
+    
+    public static String AddSubroutineParameterRefactoring_Name;
+    
+    public static String AddSubroutineParameterRefactoring_NameConflictsWith;
+    
+    public static String AddSubroutineParameterRefactoring_NameMightConflictWithSubprogram;
+
+    public static String AddSubroutineParameterRefactoring_selectSubroutineError;
 
     public static String EncapsulateVariableRefactoring_CannotEncapsulateArrays;
 
