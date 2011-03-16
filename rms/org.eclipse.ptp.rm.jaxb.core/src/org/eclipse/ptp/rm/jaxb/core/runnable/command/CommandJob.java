@@ -32,6 +32,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
@@ -40,7 +41,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
 import org.eclipse.ptp.rm.jaxb.core.data.Tokenizer;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -93,7 +93,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 
 	private final String uuid;
 	private final Command command;
-	private final JAXBResourceManager rm;
+	private final IJAXBResourceManagerControl rm;
 	private final ICommandJobStreamsProxy proxy;
 	private final boolean waitForId;
 
@@ -109,7 +109,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private String remoteOutPath;
 	private String remoteErrPath;
 
-	public CommandJob(String jobUUID, Command command, JAXBResourceManager rm) {
+	public CommandJob(String jobUUID, Command command, IJAXBResourceManagerControl rm) {
 		super(command.getName());
 		this.command = command;
 		this.rm = rm;

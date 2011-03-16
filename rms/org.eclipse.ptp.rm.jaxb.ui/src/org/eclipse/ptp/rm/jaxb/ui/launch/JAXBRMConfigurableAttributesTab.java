@@ -22,6 +22,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
@@ -239,7 +240,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 					Validator v = ja.getValidator();
 					if (v != null) {
 						try {
-							WidgetActionUtils.validate(c, v, ja.getDefault());
+							WidgetActionUtils.validate(c, v, ja.getDefault(), fileManager);
 						} catch (Throwable t) {
 							throw new ValidationException(t.getMessage());
 						}
@@ -259,11 +260,11 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		/*
 		 * The list of listeners will always include the ContentsChangedListener
 		 * of the Resources Tab, which bottoms out in an updateButtons call
-		 * which enables the "Apply" button.
+		 * enabling the "Apply" button.
 		 * 
-		 * The performApply of the ResourcesTab calls the performApply of the
-		 * BaseRMLaunchConfigurationDynamicTab which calls the storeAndValidate
-		 * method of the DataSource.
+		 * The performApply() method of the ResourcesTab calls performApply() on
+		 * the BaseRMLaunchConfigurationDynamicTab which in turn calls the
+		 * storeAndValidate() method of the DataSource.
 		 * 
 		 * The methods loadAndUpdate() and justUpdate() on the DataSource can be
 		 * used to refresh. The former is called on RM initialization, which
@@ -292,6 +293,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 	}
 
+	private final IRemoteFileManager fileManager;
 	private final JAXBRMLaunchConfigurationDynamicTab pTab;
 	private final TabController controller;
 	private final Map<Control, Widget> valueWidgets;
@@ -310,6 +312,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	public JAXBRMConfigurableAttributesTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog,
 			TabController controller, JAXBRMLaunchConfigurationDynamicTab pTab) {
 		super(dialog);
+		fileManager = rm.getRemoteFileManager();
 		this.pTab = pTab;
 		this.controller = controller;
 		String t = controller.getTitle();
@@ -369,7 +372,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	public void updateControls() {
 		/*
 		 * This controls the visible and enabled settings of the widgets. For
-		 * the this tab, these are not configurable, so this is a NOP
+		 * this tab, these are not configurable, so this is a NOP
 		 */
 	}
 

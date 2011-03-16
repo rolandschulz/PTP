@@ -613,7 +613,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		CommandJob job = new CommandJob(uuid, command, (JAXBResourceManager) getResourceManager());
+		CommandJob job = new CommandJob(uuid, command, this);
 		if (batch) {
 			Property p = (Property) RMVariableMap.getActiveInstance().getVariables().get(STDOUT);
 			if (p != null) {

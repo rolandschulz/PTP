@@ -28,9 +28,9 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 
 /**
@@ -85,6 +85,31 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	private final IRemoteProcessBuilder fBuilder;
 	private IRemoteProcess process;
 
+	public CommandJobStreamMonitor(IJAXBResourceManagerControl rm, String remoteFilePath) {
+		this(rm, remoteFilePath, null);
+	}
+
+	/**
+	 * Registers a process which can be started to monitor a remote file via
+	 * tail -f.
+	 * 
+	 * @param rm
+	 *            resource manager providing remote service
+	 * @param remoteFilePath
+	 *            of the file to be monitored
+	 * @param encoding
+	 *            stream encoding or <code>null</code> for system default
+	 */
+	public CommandJobStreamMonitor(IJAXBResourceManagerControl rm, String remoteFilePath, String encoding) {
+		fContents = new StringBuffer();
+		fEncoding = encoding;
+		String[] args = new String[] { TAIL, MINUS_F, remoteFilePath };
+		IRemoteServices service = rm.getRemoteServices();
+		IRemoteConnection connection = rm.getRemoteConnection();
+		fBuilder = service.getProcessBuilder(connection, args);
+		bufferLimit = UNDEFINED;
+	}
+
 	public CommandJobStreamMonitor(InputStream stream) {
 		this(stream, null);
 	}
@@ -103,31 +128,6 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 		fEncoding = encoding;
 		fContents = new StringBuffer();
 		fBuilder = null;
-		bufferLimit = UNDEFINED;
-	}
-
-	public CommandJobStreamMonitor(JAXBResourceManager rm, String remoteFilePath) {
-		this(rm, remoteFilePath, null);
-	}
-
-	/**
-	 * Registers a process which can be started to monitor a remote file via
-	 * tail -f.
-	 * 
-	 * @param rm
-	 *            resource manager providing remote service
-	 * @param remoteFilePath
-	 *            of the file to be monitored
-	 * @param encoding
-	 *            stream encoding or <code>null</code> for system default
-	 */
-	public CommandJobStreamMonitor(JAXBResourceManager rm, String remoteFilePath, String encoding) {
-		fContents = new StringBuffer();
-		fEncoding = encoding;
-		String[] args = new String[] { TAIL, MINUS_F, remoteFilePath };
-		IRemoteServices service = rm.getRemoteServices();
-		IRemoteConnection connection = rm.getRemoteConnection();
-		fBuilder = service.getProcessBuilder(connection, args);
 		bufferLimit = UNDEFINED;
 	}
 
