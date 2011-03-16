@@ -19,6 +19,8 @@ public class Messages extends NLS
 {
     private static final String BUNDLE_NAME = "org.eclipse.photran.internal.ui.actions.messages"; //$NON-NLS-1$
 
+    public static String CorrectIndentationAction_NotAvailableForFixedForm;
+
     public static String DisplaySymbolTable_WaitingForBackgroundWorkToComplete;
 
     public static String FindAllDeclarationsInScope_ErrorTitle;

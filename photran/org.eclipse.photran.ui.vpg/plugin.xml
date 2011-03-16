@@ -399,8 +399,8 @@
 	        id="org.eclipse.photran.ui.FixedReindenterContribution">
 	     <action 
 	           label="%action.label.reindent" 
-               definitionId="org.eclipse.photran.ui.ReindenterCommand"
-	           class="org.eclipse.photran.internal.ui.actions.ReindentAction" 
+               definitionId="org.eclipse.photran.ui.CorrectIndentationCommand"
+	           class="org.eclipse.photran.internal.ui.actions.CorrectIndentationAction" 
 	           menubarPath="group.edit" 
 	           id="org.eclipse.photran.ui.ReindenterMenuAction"/>
 	  </viewerContribution>
@@ -415,7 +415,7 @@
       <command
             categoryId="org.eclipse.photran.ui.SourceEditingCategory"
             description="%command.description"
-            id="org.eclipse.photran.ui.ReindenterCommand"
+            id="org.eclipse.photran.ui.CorrectIndentationCommand"
             name="%command.name.reindent">
       </command>
    </extension>
@@ -428,8 +428,8 @@
 	     <action 
 	           label="%action.label.reindent.0" 
                menubarPath="org.eclipse.jdt.ui.source.menu/editGroup"
-               definitionId="org.eclipse.photran.ui.ReindenterCommand"
-	           class="org.eclipse.photran.internal.ui.actions.ReindentAction"
+               definitionId="org.eclipse.photran.ui.CorrectIndentationCommand"
+	           class="org.eclipse.photran.internal.ui.actions.CorrectIndentationAction"
 	           id="org.eclipse.photran.ui.ReindenterAction">
 	     </action>
       </actionSet>
@@ -449,7 +449,7 @@
             sequence="M1+I"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.ReindenterCommand"/>
+            commandId="org.eclipse.photran.ui.CorrectIndentationCommand"/>
    </extension>
 
    <!--====================================-->

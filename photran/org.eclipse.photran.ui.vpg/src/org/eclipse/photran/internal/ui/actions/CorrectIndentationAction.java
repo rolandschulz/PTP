@@ -34,25 +34,25 @@ import org.eclipse.photran.internal.core.reindenter.Reindenter.Strategy;
 import org.eclipse.photran.internal.core.sourceform.SourceForm;
 
 /**
- * The Reindent action in the Fortran editor's context menu.
+ * The Correct Indentation action in the Fortran editor's context menu.
  * 
  * @author Esfar Huq
  * @author Rui Wang
  * @author Jeff Overbey
  */
-public class ReindentAction extends FortranEditorASTActionDelegate
+public class CorrectIndentationAction extends FortranEditorASTActionDelegate
 {
     public void run(IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException
     {
         try
         {
-            ITextSelection selection = getFortranEditor().getSelection();
-
-            String sourceCode = reindent(selection);
-
-            setTextInEditor(sourceCode);
-            
-            setEditorSelectionTo(selection, sourceCode);
+            if (ensureNotFixedForm())
+            {
+                ITextSelection selectedRegion = getFortranEditor().getSelection();
+                String sourceCode = reindent(selectedRegion);
+                setTextInEditor(sourceCode);
+                setEditorSelectionTo(selectedRegion, sourceCode);
+            }
         }
         catch (Exception e)
         {
@@ -60,6 +60,19 @@ public class ReindentAction extends FortranEditorASTActionDelegate
             if (message == null) message = e.getClass().getName();
             MessageDialog.openError(getFortranEditor().getShell(), "Error", message); //$NON-NLS-1$
         }
+    }
+
+    /** @return true iff the file in the editor has free source form */
+    private boolean ensureNotFixedForm()
+    {
+        IFile ifile = getFortranEditor().getIFile();
+        if (ifile != null && SourceForm.of(ifile).isFixedForm())
+        {
+            MessageDialog.openError(getFortranEditor().getShell(), "Error", //$NON-NLS-1$
+                Messages.CorrectIndentationAction_NotAvailableForFixedForm);
+            return false;
+        }
+        else return true;
     }
 
     private String reindent(ITextSelection selection) throws IOException, LexerException, SyntaxException
