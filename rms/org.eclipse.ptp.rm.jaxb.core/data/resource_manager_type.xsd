@@ -324,27 +324,11 @@
 			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout"/>
 			<xs:element name="title" minOccurs="0" type="xs:string"/>
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
-			<xs:choice>
-				<xs:choice maxOccurs="unbounded">
-					<xs:element name="tab-folder" type="rm:tab-folder"/>
-					<xs:element name="group" type="rm:group"/>
-					<xs:element name="widget" type="rm:widget"/>
-					<xs:element name="viewer" type="rm:viewer"/>
-				</xs:choice>
-				<xs:element name="discovered-attributes" type="rm:attribute-group">
-					<xs:annotation>
-						<xs:documentation>
-							Indicates that all the attributes defined at runtime be placed in this group.
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name="all-attributes" type="rm:attribute-group">
-					<xs:annotation>
-						<xs:documentation>
-							Indicates that all the attributes defined at initialization and runtime be placed in this group.
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="tab-folder" type="rm:tab-folder"/>
+				<xs:element name="group" type="rm:group"/>
+				<xs:element name="widget" type="rm:widget"/>
+				<xs:element name="viewer" type="rm:attribute-viewer"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
@@ -458,47 +442,40 @@
 		<xs:attribute name="valueFrom" type="xs:string"/>
 		<xs:attribute name="saveAs" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="viewer">
+	<xs:complexType name="attribute-viewer">
 		<xs:sequence>
 			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data"/>
 			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout"/>
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="column-data" minOccurs="0" type="rm:column-data"/>
-			<xs:element name="rows" maxOccurs="unbounded" type="rm:widget-row"/>
+			<xs:element name="items" type="rm:viewer-items"/>
 		</xs:sequence>
-		<xs:attribute name="editable" type="xs:boolean" default="true"/>
-		<xs:attribute name="type" default="table">
+		<xs:attribute name="type" default="checkboxTable">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="table"/>
-					<xs:enumeration value="tree"/>
+				   <xs:enumeration value="valueTable"/>
+				   <xs:enumeration value="valueTree"/>
 					<xs:enumeration value="checkboxTable"/>
 					<xs:enumeration value="checkboxTree"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="sort" type="xs:boolean" default="true"/>
 	</xs:complexType>
-	<xs:complexType name="attribute-group">
+	<xs:complexType name="viewer-items">
 		<xs:sequence>
-			<xs:element name="viewer" minOccurs="0" type="rm:viewer">
-				<xs:annotation>
-					<xs:documentation>
-						The presence of this element indicates all attributes should be placed in a single table; otherwise,
-						attributes
-						are mapped serially to widgets by type.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
 			<xs:element name="include">
 				<xs:complexType>
 					<xs:attribute name="headers" type="xs:boolean" default="true"/>
-					<xs:attribute name="sort" type="xs:boolean" default="true"/>
 					<xs:attribute name="name" type="xs:boolean" default="true"/>
 					<xs:attribute name="tooltip" type="xs:boolean" default="true"/>
 					<xs:attribute name="description" type="xs:boolean" default="true"/>
+					<xs:attribute name="allPredefined" type="xs:boolean" default="false"/>
+					<xs:attribute name="allDiscovered" type="xs:boolean" default="true"/>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="ref" maxOccurs="unbounded" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="match">
@@ -520,13 +497,6 @@
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="width" type="xs:string"/>
-	</xs:complexType>
-	<xs:complexType name="widget-row">
-		<xs:sequence>
-			<xs:element name="column" maxOccurs="unbounded" type="rm:widget"/>
-			<xs:element name="children" minOccurs="0" maxOccurs="unbounded" type="rm:widget-row"/>
-		</xs:sequence>
-		<xs:attribute name="index" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="target">
 		<xs:attribute name="ref" type="xs:string"/>

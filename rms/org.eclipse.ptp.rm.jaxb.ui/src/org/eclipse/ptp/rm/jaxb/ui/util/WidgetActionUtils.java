@@ -61,8 +61,38 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		return combo.getItem(i);
 	}
 
-	public static String getValueString(Control c) {
+	public static String getValueString(Control uiElement) {
+		assert uiElement != null;
+		String s = null;
 
+		if (uiElement instanceof Label) {
+			Label c = (Label) uiElement;
+			s = c.getText();
+		}
+		if (uiElement instanceof Text) {
+			Text c = (Text) uiElement;
+			s = c.getText();
+		}
+		if (uiElement instanceof Combo) {
+			Combo c = (Combo) uiElement;
+			s = getSelected(c);
+		}
+		if (uiElement instanceof Spinner) {
+			Spinner c = (Spinner) uiElement;
+			s = ZEROSTR + c.getSelection();
+		}
+		if (uiElement instanceof Button) {
+			Button c = (Button) uiElement;
+			int style = c.getStyle();
+			if ((style == (style | SWT.CHECK)) || (style == (style | SWT.RADIO))) {
+				s = ZEROSTR + c.getSelection();
+			}
+		}
+
+		if (s != null) {
+			s = s.trim();
+			return (s.length() == 0 ? null : s);
+		}
 		return null;
 	}
 
@@ -114,13 +144,35 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		return combo.getItem(i);
 	}
 
-	public static void setValue(Control c, String dfltV) {
-		if (c instanceof Text) {
-
-		} else if (c instanceof Combo) {
-
+	public static void setValue(Control uiElement, String value) {
+		assert uiElement != null;
+		if (value == null) {
+			value = ZEROSTR;
 		}
 
+		if (uiElement instanceof Label) {
+			Label c = (Label) uiElement;
+			c.setText(value);
+		}
+		if (uiElement instanceof Text) {
+			Text c = (Text) uiElement;
+			c.setText(value);
+		}
+		if (uiElement instanceof Combo) {
+			Combo c = (Combo) uiElement;
+			select(c, value);
+		}
+		if (uiElement instanceof Spinner) {
+			Spinner c = (Spinner) uiElement;
+			c.setSelection(Integer.parseInt(value));
+		}
+		if (uiElement instanceof Button) {
+			Button c = (Button) uiElement;
+			int style = c.getStyle();
+			if ((style == (style | SWT.CHECK)) || (style == (style | SWT.RADIO))) {
+				c.setSelection(Boolean.parseBoolean(value));
+			}
+		}
 	}
 
 	/**
@@ -138,69 +190,5 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	public static void validate(Control c, Validator v, String defaultValue) throws ValidationException {
 		// TODO
 
-	}
-
-	/**
-	 * Facility to set the string value of a {@link Text} widget. Copied from
-	 * DataSource.
-	 * 
-	 * @param t
-	 *            The {@link Text} widget.
-	 * @param s
-	 *            The new string value.
-	 */
-	private static void applyText(Combo t, String s) {
-		assert t != null;
-		if (s == null) {
-			t.setText(ZEROSTR);
-		} else {
-			t.setText(s);
-		}
-	}
-
-	/**
-	 * Facility to set the string value of a {@link Text} widget. Copied from
-	 * DataSource.
-	 * 
-	 * @param t
-	 *            The {@link Text} widget.
-	 * @param s
-	 *            The new string value.
-	 */
-	private static void applyText(Text t, String s) {
-		assert t != null;
-		if (s == null) {
-			t.setText(ZEROSTR);
-		} else {
-			t.setText(s);
-		}
-	}
-
-	/**
-	 * Facility to get string value of a {@link Combo} widget, or null if the
-	 * widget is empty.
-	 * 
-	 * @param text
-	 *            The widget
-	 * @return The string value of widget or null widget is empty.
-	 */
-	private static String extractText(Combo text) {
-		assert text != null;
-		String s = text.getText().trim();
-		return (s.length() == 0 ? null : s);
-	}
-
-	/**
-	 * Facility to get string value of a {@link Text} widget, or null if the
-	 * widget is empty.
-	 * 
-	 * @param text
-	 *            The widget
-	 * @return The string value of widget or null widget is empty.
-	 */
-	private static String extractText(Text text) {
-		assert text != null;
-		String s = text.getText().trim();
-		return (s.length() == 0 ? null : s);
 	}
 }
