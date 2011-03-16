@@ -43,7 +43,7 @@
 	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
 	
 	<!-- CDT VERSIONS MUST BE UPDATED FOR NEW CDT VERSION -->
-	<property name="cdtVersion" value="201012131338"/>
+	<property name="cdtVersion" value="201103111317"/>
 	
 	<!-- CDT branch need to be added for PTP maintenance builds -->
 	<property name="cdtBranch" value=""/>
@@ -55,13 +55,13 @@
 	<property name="cdtCoreLinuxPPCVersion" value="linux.ppc_5.1.0.${cdtVersion}"/>
 	<property name="cdtCoreLinuxx86Version" value="linux.x86_5.2.0.${cdtVersion}"/>
 	
-	<property name="cdtLRParserVersion" value="5.1.0.${cdtVersion}"/>
+	<property name="cdtLRParserVersion" value="5.2.0.${cdtVersion}"/>
 	<property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/>
 	
 	<property name="cdtUPCParserVersion" value="5.1.0.${cdtVersion}"/>
 	<property name="cdtUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/>
 	
-	<property name="cdtLRParserXLCVersion" value="1.0.0.${cdtVersion}"/>
+	<property name="cdtLRParserXLCVersion" value="5.1.0.${cdtVersion}"/>
 	<property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/>
 	
 	<property name="rdtXLCPropertiesPath" value="${basedir}/../org.eclipse.ptp.rdt.xlc/properties"/>
