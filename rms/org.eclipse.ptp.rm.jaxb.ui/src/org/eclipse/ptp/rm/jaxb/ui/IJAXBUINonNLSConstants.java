@@ -15,4 +15,12 @@ public interface IJAXBUINonNLSConstants extends IJAXBNonNLSConstants {
 
 	String COURIER = "Courier";//$NON-NLS-1$
 
+	String COLUMN_NAME = "Name";//$NON-NLS-1$
+	String COLUMN_VALUE = "Value";//$NON-NLS-1$
+	String COLUMN_DEFAULT = "Default";//$NON-NLS-1$
+	String COLUMN_DESC = "Description";//$NON-NLS-1$
+	String COLUMN_STATUS = "Status";//$NON-NLS-1$
+	String COLUMN_TOOLTIP = "Tooltip";//$NON-NLS-1$
+	String COLUMN_TYPE = "Type";//$NON-NLS-1$
+
 }

@@ -7,7 +7,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.jaxb.ui.data.CheckedProperty;
 
-public class AttributeOrPropertyContentProvider implements IStructuredContentProvider {
+public class CheckedPropertyContentProvider implements IStructuredContentProvider {
 	public void dispose() {
 	}
 

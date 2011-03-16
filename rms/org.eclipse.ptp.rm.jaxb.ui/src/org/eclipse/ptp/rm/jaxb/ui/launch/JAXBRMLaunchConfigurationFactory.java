@@ -16,7 +16,6 @@ import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTab;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
@@ -58,7 +57,7 @@ public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurat
 		if (!(rm instanceof IJAXBResourceManager)) {
 			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_doCreateError + rm, null);
 		}
-		return new JAXBRMLaunchConfigurationDynamicTab((IJAXBResourceManagerControl) rm, dialog);
+		return new JAXBRMLaunchConfigurationDynamicTab(((IJAXBResourceManager) rm).getControl(), dialog);
 	}
 
 	static LaunchTab getLaunchTab(IJAXBResourceManagerConfiguration config) {

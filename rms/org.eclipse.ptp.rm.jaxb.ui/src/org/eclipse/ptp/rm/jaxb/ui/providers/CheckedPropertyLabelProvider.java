@@ -6,7 +6,7 @@ import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.data.CheckedProperty;
 import org.eclipse.swt.graphics.Image;
 
-public class AttributeOrPropertyLabelProvider implements ITableLabelProvider, IJAXBUINonNLSConstants {
+public class CheckedPropertyLabelProvider implements ITableLabelProvider, IJAXBUINonNLSConstants {
 
 	public void addListener(ILabelProviderListener listener) {
 	}

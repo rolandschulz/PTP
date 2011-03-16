@@ -25,4 +25,8 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 		super(jaxbServiceProvider, control, monitor);
 		fControl = (JAXBResourceManagerControl) control;
 	}
+
+	public JAXBResourceManagerControl getControl() {
+		return fControl;
+	}
 }

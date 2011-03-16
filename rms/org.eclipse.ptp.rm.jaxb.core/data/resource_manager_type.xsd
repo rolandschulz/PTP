@@ -485,13 +485,11 @@
 			<xs:element name="column-data" minOccurs="0" type="rm:column-data"/>
 			<xs:element name="items" type="rm:viewer-items"/>
 		</xs:sequence>
-		<xs:attribute name="type" default="checkboxTable">
+		<xs:attribute name="type" default="table">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="valueTable"/>
-					<xs:enumeration value="valueTree"/>
-					<xs:enumeration value="checkboxTable"/>
-					<xs:enumeration value="checkboxTree"/>
+					<xs:enumeration value="table"/>
+					<xs:enumeration value="tree"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
