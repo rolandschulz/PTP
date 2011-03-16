@@ -660,10 +660,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * From the user runtime choices.
 	 */
 	private void setFixedConfigurationProperties(Map<String, Object> env) {
-		maybeAddProperty(CONTROL_USER_VAR, config.getControlUserName(), false, env);
-		maybeAddProperty(MONITOR_USER_VAR, config.getMonitorUserName(), false, env);
-		maybeAddProperty(CONTROL_ADDRESS_VAR, config.getControlAddress(), false, env);
-		maybeAddProperty(MONITOR_ADDRESS_VAR, config.getMonitorAddress(), false, env);
+		maybeAddProperty(CONTROL_USER_VAR, remoteConnection.getUsername(), false, env);
+		maybeAddProperty(CONTROL_ADDRESS_VAR, remoteConnection.getAddress(), false, env);
 	}
 
 	/*

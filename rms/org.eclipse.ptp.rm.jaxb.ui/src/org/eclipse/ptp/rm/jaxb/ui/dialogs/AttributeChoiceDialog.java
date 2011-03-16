@@ -16,8 +16,8 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.data.CheckedProperty;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.providers.AttributeOrPropertyContentProvider;
-import org.eclipse.ptp.rm.jaxb.ui.providers.AttributeOrPropertyLabelProvider;
+import org.eclipse.ptp.rm.jaxb.ui.providers.CheckedPropertyContentProvider;
+import org.eclipse.ptp.rm.jaxb.ui.providers.CheckedPropertyLabelProvider;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -104,8 +104,8 @@ public class AttributeChoiceDialog extends Dialog implements IJAXBUINonNLSConsta
 		preferences = new CheckboxTableViewer(t);
 		WidgetBuilderUtils.addTableColumn(preferences, Messages.AttributeName, SWT.LEFT, null);
 		WidgetBuilderUtils.addTableColumn(preferences, Messages.AttributeDescription, SWT.LEFT, null);
-		preferences.setContentProvider(new AttributeOrPropertyContentProvider());
-		preferences.setLabelProvider(new AttributeOrPropertyLabelProvider());
+		preferences.setContentProvider(new CheckedPropertyContentProvider());
+		preferences.setLabelProvider(new CheckedPropertyLabelProvider());
 		preferences.setInput(allProps);
 		preferences.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {

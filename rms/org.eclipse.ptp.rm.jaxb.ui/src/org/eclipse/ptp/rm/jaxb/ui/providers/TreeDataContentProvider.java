@@ -1,0 +1,66 @@
+/*******************************************************************************
+ * Copyright (c) 2011 University of Illinois All rights reserved. This program
+ * and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html 
+ * 	
+ * Contributors: 
+ * 	Albert L. Rossi - modifications
+ *  M Venkataramana - original code: http://eclipse.dzone.com/users/venkat_r_m
+ ******************************************************************************/
+package org.eclipse.ptp.rm.jaxb.ui.providers;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
+import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.ui.data.ViewerData;
+import org.eclipse.ptp.rm.jaxb.ui.data.RowData;
+
+public class TreeDataContentProvider implements ITreeContentProvider {
+	public void dispose() {
+	}
+
+	public Object[] getChildren(Object parentElement) {
+		List<Object> children = new ArrayList<Object>();
+		RowData rowData = (RowData) parentElement;
+		Object data = rowData.getData();
+		if (data instanceof Property) {
+			Property p = (Property) data;
+			children.add(p.getName());
+			children.add(p.getDefault());
+			children.add(p.getValue());
+		} else if (data instanceof JobAttribute) {
+			JobAttribute ja = (JobAttribute) data;
+			children.add(ja.getName());
+			children.add(ja.getDefault());
+			children.add(ja.getValue());
+			children.add(ja.getType());
+			children.add(ja.getDescription());
+			children.add(ja.getTooltip());
+			children.add(ja.getStatus());
+		}
+		return children.toArray();
+	}
+
+	public Object[] getElements(Object inputElement) {
+		return ((ViewerData) inputElement).getRows().toArray();
+	}
+
+	public Object getParent(Object element) {
+		return null;
+	}
+
+	public boolean hasChildren(Object element) {
+		RowData rowData = (RowData) element;
+		Object data = rowData.getData();
+		return (data instanceof Property) || (data instanceof JobAttribute);
+	}
+
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+	}
+
+}

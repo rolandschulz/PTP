@@ -90,6 +90,13 @@ public class Messages extends NLS {
 	public static String ErrorOnCopyToStorageTitle;
 	public static String ErrorOnCopyToStorage;
 	public static String RevertScript;
+	public static String InvalidOptionIndex;
+	public static String InvalidOption;
+	public static String UnsupportedColumnDescriptor;
+	public static String InvalidColumnName;
+	public static String UnsupportedColumnType;
+	public static String TreeDataLabelProviderColumnError;
+	public static String TableDataLabelProviderColumnError;
 
 	static {
 		// initialize resource bundle
