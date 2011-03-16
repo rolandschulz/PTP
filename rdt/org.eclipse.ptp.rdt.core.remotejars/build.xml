@@ -43,7 +43,7 @@
 	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
 	
 	<!-- CDT VERSIONS MUST BE UPDATED FOR NEW CDT VERSION -->
-	<property name="cdtVersion" value="201103111317"/>
+	<property name="cdtVersion" value="201103111109"/>
 	
 	<!-- CDT branch need to be added for PTP maintenance builds -->
 	<property name="cdtBranch" value=""/>
