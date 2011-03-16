@@ -90,10 +90,13 @@
                 class="org.eclipse.photran.internal.core.refactoring.RemoveArithmeticIfRefactoring"
              />
              <editorRefactoring
-                class="org.eclipse.photran.internal.core.refactoring.RemoveComputedGoToRefactoring"
+                class="org.eclipse.photran.internal.core.refactoring.RemoveBranchToEndIfRefactoring"
              />
              <editorRefactoring
                  class="org.eclipse.photran.internal.core.refactoring.ReplaceCharacterStarRefactoring"
+             />
+             <editorRefactoring
+                class="org.eclipse.photran.internal.core.refactoring.RemoveComputedGoToRefactoring"
              />
              <resourceRefactoring
                  class="org.eclipse.photran.internal.core.refactoring.RepObsOpersRefactoring"
@@ -101,7 +104,14 @@
              <editorRefactoring
                  class="org.eclipse.photran.internal.core.refactoring.ReplaceOldStyleDoLoopRefactoring"
              />
-          </submenu>
+             <editorRefactoring
+                class="org.eclipse.photran.internal.core.refactoring.RemovePauseStmtRefactoring"
+             />
+             <editorRefactoring
+                class="org.eclipse.photran.internal.core.refactoring.RemoveRealAndDoublePrecisionLoopCountersRefactoring"
+                inputPage="org.eclipse.photran.internal.ui.refactoring.RemoveRealAndDoublePrecisionLoopCountersInputPage"
+             />
+         </submenu>
       </group>
       <group>
           <submenu name="Coding Style"><!-- Refactorings to improve coding style -->

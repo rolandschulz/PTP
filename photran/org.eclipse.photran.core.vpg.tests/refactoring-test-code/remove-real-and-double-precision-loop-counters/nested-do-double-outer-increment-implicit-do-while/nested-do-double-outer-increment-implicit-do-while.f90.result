@@ -1,0 +1,19 @@
+! Check that nested DO loop doesn't affect refactoring
+! behavior. Select outer DO loop - DOUBLE data type
+! and increment behavior - implicit step count.
+! (This test selecting to replace with DO WHILE loop.)
+
+PROGRAM NestedDoDoubleOuterIncrementImplicit
+  DOUBLE PRECISION :: counter, sum, counterin, sumin
+  sum = 0.0
+  sumin = 0.0
+  counter = 1.2
+  DO WHILE (counter <= 1.8)                         !<<<<< 10, 3, 10, 29, 1, pass
+    sum = sum + counter
+    DO counterin = 1.2, 1.8, 0.1
+      sumin = sumin + counterin
+    END DO
+    counter = counter + 1
+  END DO
+  PRINT *, sum
+END PROGRAM NestedDoDoubleOuterIncrementImplicit

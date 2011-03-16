@@ -1,0 +1,20 @@
+! GOTO statement is an outer IF block so existing CONTINIUE
+! statement is targetted and since no inner GOTOs remain
+! END if label is removed. (more complicated DO/IF structure
+! to make sure refactoring is unaffected by other program  
+! structures.)
+
+PROGRAM test_numbered_statement_after_continue
+   INTEGER :: sum, i
+   sum = 0
+   DO 20, i = 1, 10
+     IF (MOD(i,2).eq.0) THEN
+       GOTO 20
+     END IF
+     sum = sum + i
+     IF (sum.ge.100) THEN
+       sum = sum + sum
+     END IF                     !<<<<< 17, 1, 17, 12, pass
+20 CONTINUE
+30 PRINT *, 'sum:', sum
+END PROGRAM test_numbered_statement_after_continue

@@ -1,0 +1,16 @@
+! When upper and lower bounds are the same value
+! refactoring should proceed with same value used.
+
+PROGRAM EqualLbUb
+  REAL :: counter, sum
+  sum = 0.0
+  counter = 1.2
+  DO                                !<<<<< 7, 3, 7, 29, 0, pass
+    sum = sum + counter
+    counter = counter - 0.1
+    IF(counter < 1.2) THEN
+      EXIT
+    END IF
+  END DO
+  PRINT *, sum
+END PROGRAM EqualLbUb

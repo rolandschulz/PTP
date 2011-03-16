@@ -373,6 +373,18 @@ public abstract class FortranResourceRefactoring
         return null;
     }
 
+    @SuppressWarnings("unchecked")
+    protected static <T extends IASTNode> T findEnclosingNode(IFortranAST ast, ITextSelection selection, Class<T> type)
+    {
+        IASTNode node = findEnclosingNode(ast, selection);
+        if (node == null) return null;
+        
+        if (type.isAssignableFrom(node.getClass()))
+            return (T)node;
+        else
+            return node.findNearestAncestor(type);
+    }
+
     protected static boolean nodeExactlyEnclosesRegion(IASTNode parent, Token firstToken, Token lastToken)
     {
         return parent.findFirstToken() == firstToken && parent.findLastToken() == lastToken;

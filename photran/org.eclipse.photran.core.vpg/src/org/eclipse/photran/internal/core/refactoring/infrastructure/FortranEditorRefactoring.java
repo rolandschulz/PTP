@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
@@ -93,5 +96,23 @@ public abstract class FortranEditorRefactoring
     {
         if (!PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(fileInEditor))
             fail(Messages.FortranEditorRefactoring_AnalysisRefactoringNotEnabled);
+    }
+    
+    @Override
+    protected void postCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
+    {
+        vpg.releaseAST(fileInEditor);
+        this.astOfFileInEditor = null;
+    }
+
+    @Override
+    protected void preCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
+    {
+        // If the user clicked the Preview button, then decided to go back...
+        if (astOfFileInEditor == null)
+        {
+            // Re-acquire the AST, and re-analyze the selection
+            checkInitialConditions(pm);
+        }
     }
 }

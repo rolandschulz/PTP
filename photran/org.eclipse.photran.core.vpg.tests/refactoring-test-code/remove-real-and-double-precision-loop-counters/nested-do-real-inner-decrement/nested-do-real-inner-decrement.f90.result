@@ -1,0 +1,21 @@
+! Check that nested DO loop doesn't affect refactoring
+! behavior. Select inner DO loop - REAL data type
+! and decrement behavior - explicit step count.
+
+PROGRAM NestedDoRealInnerDecrement
+  REAL :: counter, sum, counterin, sumin
+  sum = 0.0
+  sumin = 0.0
+  DO counter = 1.2, 1.8, 0.1
+    sum = sum + counter
+    counterin = 1.8
+    DO                                          !<<<<< 11, 5, 11, 33, 0, pass
+      sumin = sumin + counterin
+      counterin = counterin - 0.1
+      IF(counterin < 1.2) THEN
+        EXIT
+      END IF
+    END DO
+  END DO
+  PRINT *, sum
+END PROGRAM NestedDoRealInnerDecrement

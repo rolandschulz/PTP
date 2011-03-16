@@ -200,11 +200,17 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
         //pm.beginTask("Constructing workspace transformation; please wait...", IProgressMonitor.UNKNOWN);
         // allChanges constructed above in #checkFinalConditions
         doCreateChange(pm);
+        postCreateChange(pm);
         //pm.done();
         return allChanges;
     }
 
     protected abstract void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException;
+
+    /** @since 3.0 */
+    protected void postCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
+    {
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Utilities for Subclasses

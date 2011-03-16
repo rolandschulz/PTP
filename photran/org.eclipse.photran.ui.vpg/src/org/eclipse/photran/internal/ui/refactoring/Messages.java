@@ -7,6 +7,11 @@
  *
  * Contributors:
  *    UIUC - Initial API and implementation
+ *    Rita Chow - Photran Modifications
+ *    Nicola Hall - Photran Modifications
+ *    Jerry Hsiao - Photran Modifications
+ *    Mark Mozolewski - Photran Modifications
+ *    Chamil Wijenayaka - Photran Modifications
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.refactoring;
 
@@ -84,6 +89,17 @@ public class Messages extends NLS
     public static String RenameAction_MatchExternalSubprograms;
 
     public static String RenameAction_RenameAtoB;
+    
+    public static String RemoveRealAndDoublePrecisionLoopCountersInputPage_ReplaceRealDoublePrecisionLoopCounter;
+
+    public static String RemoveRealAndDoublePrecisionLoopCountersInputPage_ReplaceWithDoLoop;
+    
+    public static String RemoveRealAndDoublePrecisionLoopCountersInputPage_ReplaceWithDoWhileLoop;
+    
+    public static String RemoveRealAndDoublePrecisionLoopCountersInputPage_ClickOKMessage;
+    
+    public static String RemoveRealAndDoublePrecisionLoopCountersInputPage_ClickPreviewMessage;
+    
     static
     {
         // initialize resource bundle

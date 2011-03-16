@@ -356,9 +356,35 @@ public class Messages extends NLS
 
     public static String RemoveArithmeticIfRefactoring_Name;
 
+    public static String RemoveBranchToEndIfRefactoring_BranchToImmediateEndIf;
+
+    public static String RemoveBranchToEndIfRefactoring_Name;
+
+    public static String RemoveBranchToEndIfRefactoring_NoEnclosingIfConstruct;
+
+    public static String RemoveBranchToEndIfRefactoring_NoGotoStatementReferencingThisLabel;
+
+    public static String RemoveBranchToEndIfRefactoring_NoGotoStatements;
+
+    public static String RemoveBranchToEndIfRefactoring_PleaseSelectLabeledEndIfStatement;
+
     public static String RemoveComputedGoToRefactoring_Name;
 
     public static String RemoveComputedGoToRefactoring_PleaseSelectComputedGotoStmt;
+
+    public static String RemovePauseStmtRefactoring_Name;
+
+    public static String RemovePauseStmtRefactoring_PleaseSelectAPauseStatement;
+
+    public static String RemoveRealAndDoublePrecisionLoopCountersRefactoring_Name;
+
+    public static String RemoveRealAndDoublePrecisionLoopCountersRefactoring_NotRealOrDoublePrecision;
+
+    public static String RemoveRealAndDoublePrecisionLoopCountersRefactoring_NoUniqueDeclaration;
+
+    public static String RemoveRealAndDoublePrecisionLoopCountersRefactoring_PleaseSelectACountedDoLoop;
+
+    public static String RemoveRealAndDoublePrecisionLoopCountersRefactoring_PleaseSelectADoLoop;
 
     public static String RemoveUnusedVariablesRefactoring_CouldNotCompleteOperation;
 
