@@ -10,38 +10,45 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIfStatement;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
  * @author pazel
- *
+ * 
  */
-public class PASTIf extends PASTNode implements IASTPreprocessorIfStatement
-{
+public class PASTIf extends PASTNode implements IASTPreprocessorIfStatement {
 	protected IASTPreprocessorIfStatement if_ = null;
-	
-    /**
-     * PASTIf - constructor
-     * @param ifx
-     */
-	public PASTIf(IASTPreprocessorIfStatement ifx)
-	{
-		super((ASTNode)ifx);
+
+	/**
+	 * PASTIf - constructor
+	 * 
+	 * @param ifx
+	 */
+	public PASTIf(IASTPreprocessorIfStatement ifx) {
+		super((ASTNode) ifx);
 		if_ = ifx;
 	}
-    
-    public String getType()
-    {
-        return "#if";
-    }
+
+	/**
+	 * @since 4.1
+	 */
+	public IASTNode copy(CopyStyle style) {
+		return if_.copy(style);
+	}
+
+	@Override
+	public String getType() {
+		return "#if"; //$NON-NLS-1$
+	}
 
 	public boolean taken() {
 		return if_.taken();
 	}
 
-	//cdt40
+	// cdt40
 	public char[] getCondition() {
 		return if_.getCondition();
 	}

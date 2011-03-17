@@ -13,36 +13,44 @@ package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.dom.ast.IASTFunctionStyleMacroParameter;
 import org.eclipse.cdt.core.dom.ast.IASTName;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorFunctionStyleMacroDefinition;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
  * @author pazel
- *
+ * 
  */
-public class PASTFunctionMacro extends PASTNode implements IASTPreprocessorFunctionStyleMacroDefinition
-{
+public class PASTFunctionMacro extends PASTNode implements IASTPreprocessorFunctionStyleMacroDefinition {
 	protected IASTPreprocessorFunctionStyleMacroDefinition macro_ = null;
-	
-    /**
-     * PASTFunctionMacro - "define" function macro (Constructor)
-     * @param macro
-     */
-	public PASTFunctionMacro(IASTPreprocessorFunctionStyleMacroDefinition macro)
-	{
-		super((ASTNode)macro);
+
+	/**
+	 * PASTFunctionMacro - "define" function macro (Constructor)
+	 * 
+	 * @param macro
+	 */
+	public PASTFunctionMacro(IASTPreprocessorFunctionStyleMacroDefinition macro) {
+		super((ASTNode) macro);
 		macro_ = macro;
 	}
-    
-    public String getType()
-    {
-        return "#define";
-    }
 
-    /**
-     * Delegated methods for interface IASTPreprocessorFunctionStyleMacroDefinition
-     */
+	/**
+	 * @since 4.1
+	 */
+	public IASTNode copy(CopyStyle style) {
+		return macro_.copy(style);
+	}
+
+	@Override
+	public String getType() {
+		return "#define"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Delegated methods for interface
+	 * IASTPreprocessorFunctionStyleMacroDefinition
+	 */
 	public String getExpansion() {
 		return macro_.getExpansion();
 	}
@@ -52,15 +60,15 @@ public class PASTFunctionMacro extends PASTNode implements IASTPreprocessorFunct
 	}
 
 	public void setExpansion(String exp) {
-	  macro_.setExpansion(exp);	
+		macro_.setExpansion(exp);
 	}
 
 	public void setName(IASTName name) {
-      macro_.setName(name);		
+		macro_.setName(name);
 	}
 
 	public void addParameter(IASTFunctionStyleMacroParameter parm) {
-      macro_.addParameter(parm);		
+		macro_.addParameter(parm);
 	}
 
 	public IASTFunctionStyleMacroParameter[] getParameters() {
@@ -78,5 +86,5 @@ public class PASTFunctionMacro extends PASTNode implements IASTPreprocessorFunct
 	public boolean isPartOfTranslationUnitFile() {
 		return macro_.isPartOfTranslationUnitFile();
 	}
-	
+
 }

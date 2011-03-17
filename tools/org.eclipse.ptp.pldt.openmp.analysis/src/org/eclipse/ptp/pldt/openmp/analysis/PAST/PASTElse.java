@@ -11,36 +11,43 @@
 
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorElseStatement;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
  * @author pazel
- *
+ * 
  */
-public class PASTElse extends PASTNode implements IASTPreprocessorElseStatement
-{
+public class PASTElse extends PASTNode implements IASTPreprocessorElseStatement {
 	protected IASTPreprocessorElseStatement else_ = null;
-	
-    /**
-     * PASTElse - Else preprocessor statement (Constructor)
-     * @param elsee
-     */
-	public PASTElse(IASTPreprocessorElseStatement elsee)
-	{
-		super((ASTNode)elsee);
+
+	/**
+	 * PASTElse - Else preprocessor statement (Constructor)
+	 * 
+	 * @param elsee
+	 */
+	public PASTElse(IASTPreprocessorElseStatement elsee) {
+		super((ASTNode) elsee);
 		else_ = elsee;
 	}
-    
-    public String getType()
-    {
-        return "#else";
-    }
 
-    /**
-     * taken - reflects ASTElse choice
-     */
+	/**
+	 * @since 4.1
+	 */
+	public IASTNode copy(CopyStyle style) {
+		return else_.copy(style);
+	}
+
+	@Override
+	public String getType() {
+		return "#else"; //$NON-NLS-1$
+	}
+
+	/**
+	 * taken - reflects ASTElse choice
+	 */
 	public boolean taken() {
 		return else_.taken();
 	}
