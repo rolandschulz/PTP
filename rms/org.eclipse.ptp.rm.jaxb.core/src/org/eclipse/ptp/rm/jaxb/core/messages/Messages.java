@@ -46,9 +46,6 @@ public class Messages extends NLS {
 	public static String CommandJobStreamMonitor_label;
 	public static String CommandJobNullMonitorStreamError;
 	public static String IllegalVariableValueType;
-	public static String ACLParseError;
-	public static String CannotConvertToDecimal;
-	public static String CannotConvertToChar;
 	public static String RemoteConnectionError;
 	public static String LocalConnectionError;
 
