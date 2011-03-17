@@ -20,9 +20,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
-import org.eclipse.ptp.remotetools.environment.control.ITargetConfig;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElementStatus;
 import org.eclipse.ptp.remotetools.environment.core.ITargetEventListener;
@@ -123,9 +121,12 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java
 	 * .lang.String, java.util.Map)
 	 */
-	public IRemoteConnection newConnection(String name, Map<String, String> attributes) throws RemoteConnectionException {
+	/**
+	 * @since 5.0
+	 */
+	public IRemoteConnection newConnection(String name) throws RemoteConnectionException {
 		String id = EnvironmentPlugin.getDefault().getEnvironmentUniqueID();
-		TargetElement element = new TargetElement(fRemoteHost, name, attributes, id);
+		TargetElement element = new TargetElement(fRemoteHost, name, id);
 		fRemoteHost.addElement(element);
 		return createConnection(element);
 	}
@@ -150,23 +151,8 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 	 * @throws RemoteConnectionException
 	 */
 	private IRemoteConnection createConnection(ITargetElement element) throws RemoteConnectionException {
-		ITargetConfig config;
 		try {
-			config = element.getControl().getConfig();
-		} catch (CoreException e) {
-			throw new RemoteConnectionException(e.getMessage());
-		}
-		String address = config.getConnectionAddress();
-		if (address == null) {
-			throw new RemoteConnectionException(Messages.RemoteToolsConnectionManager_1);
-		}
-		String user = config.getLoginUsername();
-		if (user == null) {
-			throw new RemoteConnectionException(Messages.RemoteToolsConnectionManager_2);
-		}
-		try {
-			RemoteToolsConnection conn = new RemoteToolsConnection(element.getName(), address, user, element, fRemoteServices);
-			return conn;
+			return new RemoteToolsConnection(element.getName(), element, fRemoteServices);
 		} catch (CoreException e) {
 			throw new RemoteConnectionException(e.getMessage());
 		}

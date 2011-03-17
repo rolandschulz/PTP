@@ -11,12 +11,21 @@
  */
 package org.eclipse.ptp.remotetools.environment.control;
 
+import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
+
 /**
  * Describes a target created from the environment.
  * 
  * @since 2.0
  */
 public interface ITargetConfig {
+	/**
+	 * Get all the attributes for this configuration
+	 * 
+	 * @return control attributes
+	 */
+	public ControlAttributes getAttributes();
+
 	/**
 	 * Get cipher type for connection
 	 * 
@@ -85,6 +94,16 @@ public interface ITargetConfig {
 	public boolean isPasswordAuth();
 
 	/**
+	 * Set the value for the give attribute
+	 * 
+	 * @param key
+	 *            attribute key
+	 * @param value
+	 *            attribute value
+	 */
+	public void setAttribute(String key, String value);
+
+	/**
 	 * Set the cipher type
 	 * 
 	 * @param cipherType
@@ -113,14 +132,6 @@ public interface ITargetConfig {
 	public void setConnectionTimeout(int connectionTimeout);
 
 	/**
-	 * Set authentication type
-	 * 
-	 * @param isPasswordAuth
-	 *            true if password authentication is used
-	 */
-	public void setPasswordAuth(boolean isPasswordAuth);
-
-	/**
 	 * Set the passphrase.
 	 * 
 	 * @param keyPassphrase
@@ -147,4 +158,12 @@ public interface ITargetConfig {
 	 * @param username
 	 */
 	public void setLoginUsername(String username);
+
+	/**
+	 * Set authentication type
+	 * 
+	 * @param isPasswordAuth
+	 *            true if password authentication is used
+	 */
+	public void setPasswordAuth(boolean isPasswordAuth);
 }

@@ -14,8 +14,10 @@ package org.eclipse.ptp.remotetools.environment.core;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.remotetools.environment.control.ITargetConfig;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
+import org.eclipse.ptp.remotetools.environment.extension.ITargetTypeExtension;
 import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
 
 /**
@@ -43,16 +45,6 @@ public class TargetElement implements ITargetElement {
 	/**
 	 * @since 2.0
 	 */
-	public TargetElement(TargetTypeElement type, String name, Map<String, String> attrs, String id) {
-		this(type, id);
-		this.attributes = new ControlAttributes(attrs);
-		this.name = name;
-		this.type = type;
-	}
-
-	/**
-	 * @since 2.0
-	 */
 	public TargetElement(TargetTypeElement type, String name, ControlAttributes attrs, String id) {
 		this(type, id);
 		this.attributes = attrs;
@@ -63,14 +55,20 @@ public class TargetElement implements ITargetElement {
 	/**
 	 * @since 2.0
 	 */
-	public void update(ControlAttributes attr) {
-		try {
-			ITargetControl ctrl = getControl();
-			ctrl.updateConfiguration();
-			dirty = false;
-		} catch (CoreException e) {
-			dirty = true;
-		}
+	public TargetElement(TargetTypeElement type, String name, Map<String, String> attrs, String id) {
+		this(type, id);
+		this.attributes = new ControlAttributes(attrs);
+		this.name = name;
+		this.type = type;
+	}
+
+	/**
+	 * @since 2.0
+	 */
+	public TargetElement(TargetTypeElement type, String name, String id) {
+		this(type, id);
+		this.name = name;
+		this.type = type;
 	}
 
 	/*
@@ -84,25 +82,35 @@ public class TargetElement implements ITargetElement {
 	 * @since 2.0
 	 */
 	public ControlAttributes getAttributes() {
-		return attributes;
+		try {
+			return getControl().getConfig().getAttributes();
+		} catch (CoreException e) {
+		}
+		return null;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#setAttributes
-	 * (java.util.Map)
+	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#getControl()
 	 */
-	/**
-	 * @since 2.0
+	public ITargetControl getControl() throws CoreException {
+		if (control == null) {
+			ITargetTypeExtension ext = type.getExtension();
+			ITargetConfig config = ext.createConfig(attributes);
+			control = ext.createControl(config);
+		}
+		return control;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#getId()
 	 */
-	public void setAttributes(ControlAttributes attributes) {
-		this.attributes = attributes;
-		if (getStatus() == ITargetStatus.STOPPED) {
-			update(attributes);
-		} else
-			dirty = true;
+	public String getId() {
+		return id;
 	}
 
 	/*
@@ -119,28 +127,10 @@ public class TargetElement implements ITargetElement {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#setName(java
-	 * .lang.String)
+	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#getStatus()
 	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#getControl()
-	 */
-	public ITargetControl getControl() throws CoreException {
-		if (control == null) {
-			control = type.getExtension().controlFactory(this);
-		}
-		return control;
-	}
-
-	public void setControl(ITargetControl control) {
-		this.control = control;
+	public int getStatus() {
+		return status;
 	}
 
 	/*
@@ -153,26 +143,50 @@ public class TargetElement implements ITargetElement {
 		return type;
 	}
 
-	public void setType(TargetTypeElement type) {
-		this.type = type;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#setAttributes
+	 * (java.util.Map)
+	 */
+	/**
+	 * @since 2.0
+	 */
+	public void setAttributes(ControlAttributes attributes) {
+		this.attributes = attributes;
+		if (getStatus() == ITargetStatus.STOPPED) {
+			update();
+		} else {
+			dirty = true;
+		}
+	}
+
+	public void setControl(ITargetControl control) {
+		this.control = control;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#getStatus()
+	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#setName(java
+	 * .lang.String)
 	 */
-	public int getStatus() {
-		return status;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void setStatus(int status) {
 		this.status = status;
 		if (status == ITargetStatus.STOPPED && dirty) {
-			update(getAttributes());
+			update();
 
 		}
+	}
+
+	public void setType(TargetTypeElement type) {
+		this.type = type;
 	}
 
 	/*
@@ -186,13 +200,14 @@ public class TargetElement implements ITargetElement {
 		return this.getName() != null ? this.getName() : super.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#getId()
-	 */
-	public String getId() {
-		return id;
+	private void update() {
+		try {
+			ITargetControl ctrl = getControl();
+			ctrl.updateConfiguration();
+			dirty = false;
+		} catch (CoreException e) {
+			dirty = true;
+		}
 	}
 
 }

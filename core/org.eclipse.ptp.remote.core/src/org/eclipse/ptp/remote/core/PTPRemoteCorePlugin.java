@@ -416,32 +416,4 @@ public class PTPRemoteCorePlugin extends Plugin {
 		}
 	}
 
-	/**
-	 * Attempts to load the remote services with a given ID. If no services are
-	 * loaded, it loads them all.
-	 * 
-	 * @param id
-	 */
-	private void retrieveRemoteServices(String id) {
-		if (allRemoteServicesById == null) {
-			retrieveRemoteServices();
-		} else {
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, REMOTE_SERVICES_EXTENSION_POINT_ID);
-			final IExtension[] extensions = extensionPoint.getExtensions();
-
-			for (IExtension ext : extensions) {
-				final IConfigurationElement[] elements = ext.getConfigurationElements();
-
-				for (IConfigurationElement ce : elements) {
-					RemoteServicesProxy proxy = new RemoteServicesProxy(ce);
-					if (proxy.getId().equals(id)) {
-						allRemoteServicesById.put(proxy.getId(), proxy);
-						allRemoteServicesByScheme.put(proxy.getScheme(), proxy);
-					}
-				}
-			}
-		}
-	}
-
 }

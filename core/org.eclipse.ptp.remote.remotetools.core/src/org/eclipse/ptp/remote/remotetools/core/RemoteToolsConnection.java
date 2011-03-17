@@ -37,29 +37,27 @@ import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
 import org.eclipse.ptp.remotetools.exception.PortForwardingException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 
+/**
+ * @since 5.0
+ */
 public class RemoteToolsConnection implements IRemoteConnection {
-	private final String fConnName;
-	private String fAddress;
-	private String fUserName;
 	private String fWorkingDir = null;
 	private Map<String, String> fEnv = null;
 	private Map<String, String> fProperties = null;
-	private final IRemoteServices fRemoteServices;
 
+	private final String fConnName;
+	private final IRemoteServices fRemoteServices;
 	private final ITargetElement fTargetElement;
 	private final ITargetControl fTargetControl;
 	private final ListenerList fListeners = new ListenerList();
 
 	/**
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public RemoteToolsConnection(String name, String address, String userName, ITargetElement element, IRemoteServices services)
-			throws CoreException {
+	public RemoteToolsConnection(String name, ITargetElement element, IRemoteServices services) throws CoreException {
 		fTargetElement = element;
 		fTargetControl = element.getControl();
 		fConnName = name;
-		fAddress = address;
-		fUserName = userName;
 		fRemoteServices = services;
 	}
 
@@ -260,7 +258,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAddress()
 	 */
 	public String getAddress() {
-		return fAddress;
+		return fTargetControl.getConfig().getConnectionAddress();
 	}
 
 	/*
@@ -269,7 +267,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAttributes()
 	 */
 	public Map<String, String> getAttributes() {
-		return fTargetElement.getAttributes().getAttributesAsMap();
+		return fTargetControl.getConfig().getAttributes().getAttributesAsMap();
 	}
 
 	/*
@@ -356,7 +354,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getUsername()
 	 */
 	public String getUsername() {
-		return fUserName;
+		return fTargetControl.getConfig().getLoginUsername();
 	}
 
 	/*
@@ -378,29 +376,6 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			}
 		}
 		return fWorkingDir;
-	}
-
-	/**
-	 * Get the result of executing a pwd command.
-	 * 
-	 * @return current working directory
-	 */
-	private String getPwd() {
-		IRemoteExecutionManager exeMgr = null;
-		try {
-			exeMgr = createExecutionManager();
-		} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
-			// Ignore
-		}
-		if (exeMgr != null) {
-			try {
-				return exeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
-			} catch (RemoteExecutionException e) {
-			} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
-			} catch (CancelException e) {
-			}
-		}
-		return null;
 	}
 
 	/*
@@ -454,7 +429,21 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * )
 	 */
 	public void setAddress(String address) {
-		fAddress = address;
+		fTargetControl.getConfig().setConnectionAddress(address);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnection#setAttribute(java.lang.
+	 * String, java.lang.String)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public void setAttribute(String key, String value) {
+		fTargetControl.getConfig().setAttribute(key, value);
 	}
 
 	/*
@@ -472,11 +461,25 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnection#setPassword(java.lang.String
+	 * )
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public void setPassword(String password) {
+		fTargetControl.getConfig().setLoginPassword(password);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#setUsername(java.lang.String
 	 * )
 	 */
 	public void setUsername(String userName) {
-		fUserName = userName;
+		fTargetControl.getConfig().setLoginUsername(userName);
 	}
 
 	/*
@@ -503,6 +506,29 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public boolean supportsTCPPortForwarding() {
 		return true;
+	}
+
+	/**
+	 * Get the result of executing a pwd command.
+	 * 
+	 * @return current working directory
+	 */
+	private String getPwd() {
+		IRemoteExecutionManager exeMgr = null;
+		try {
+			exeMgr = createExecutionManager();
+		} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
+			// Ignore
+		}
+		if (exeMgr != null) {
+			try {
+				return exeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
+			} catch (RemoteExecutionException e) {
+			} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
+			} catch (CancelException e) {
+			}
+		}
+		return null;
 	}
 
 	private void loadProperties() {

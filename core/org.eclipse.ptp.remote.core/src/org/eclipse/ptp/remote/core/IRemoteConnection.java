@@ -110,14 +110,12 @@ public interface IRemoteConnection {
 	public String getAddress();
 
 	/**
-	 * Get the attributes for the connection. This includes everything needed to
-	 * recreate the connection using the
-	 * {@link IRemoteConnectionManager#newConnection(Map)} method.
+	 * Get the implementation specific attributes for the connection.
 	 * 
 	 * NOTE: the attributes do not include any security related information
-	 * (e.g. username, key, password, etc.)
+	 * (e.g. passwords, keys, etc.)
 	 * 
-	 * @return a map containing the connection attributes
+	 * @return a map containing the connection attribute keys and values
 	 */
 	public Map<String, String> getAttributes();
 
@@ -126,6 +124,7 @@ public interface IRemoteConnection {
 	 * connection must be open prior to calling this method.
 	 * 
 	 * @return the remote environment
+	 * @since 5.0
 	 */
 	public Map<String, String> getEnv();
 
@@ -233,11 +232,32 @@ public interface IRemoteConnection {
 	public void setAddress(String address);
 
 	/**
+	 * Set an implementation dependent attribute for the connection. Attributes
+	 * keys supported by the connection can be obtained using
+	 * {@link #getAttributes()}
+	 * 
+	 * @param key
+	 *            attribute key
+	 * @param value
+	 *            attribute value
+	 * @since 5.0
+	 */
+	public void setAttribute(String key, String value);
+
+	/**
 	 * Set the name for this connection
 	 * 
 	 * @param name
 	 */
 	public void setName(String name);
+
+	/**
+	 * Set the password for this connection
+	 * 
+	 * @param password
+	 * @since 5.0
+	 */
+	public void setPassword(String password);
 
 	/**
 	 * Set the username for this connection
