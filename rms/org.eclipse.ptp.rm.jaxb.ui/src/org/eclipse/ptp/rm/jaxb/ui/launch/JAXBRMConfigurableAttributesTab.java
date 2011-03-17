@@ -406,7 +406,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 
 		dynamicControl = WidgetBuilderUtils.createComposite(control, 1);
-		LaunchTabBuilder builder = new LaunchTabBuilder(controller, valueWidgets, checked);
+		LaunchTabBuilder builder = new LaunchTabBuilder(controller, RMVariableMap.getActiveInstance(), valueWidgets, checked);
 		try {
 			builder.build(dynamicControl);
 		} catch (Throwable t) {

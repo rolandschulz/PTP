@@ -109,27 +109,6 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		return null;
 	}
 
-	public static boolean isSettable(Control uiElement) {
-		if (uiElement instanceof Label) {
-			return true;
-		}
-		if (uiElement instanceof Text) {
-			return true;
-		}
-		if (uiElement instanceof Combo) {
-			return true;
-		}
-		if (uiElement instanceof Spinner) {
-			return true;
-		}
-		if (uiElement instanceof Button) {
-			Button b = (Button) uiElement;
-			int style = b.getStyle();
-			return (style == (style | SWT.CHECK)) || (style == (style | SWT.RADIO));
-		}
-		return false;
-	}
-
 	public static String openInputDialog(Shell shell, String message, String title, String original) {
 		InputDialog nameDialog = new InputDialog(shell, message, title, original, null);
 		if (nameDialog.open() != Window.CANCEL) {
@@ -226,7 +205,7 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		}
 	}
 
-	private static int getAttributeValue(String efsAttrStr) {
+	private static int getEfsAttributeValue(String efsAttrStr) {
 		int attributes = 0;
 		String[] split = efsAttrStr.split(PIP);
 		for (String s : split) {
@@ -311,7 +290,7 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		}
 
 		String attributes = match.getEfsAttributes();
-		int a = getAttributeValue(attributes);
+		int a = getEfsAttributeValue(attributes);
 		if (!info.getAttribute(a)) {
 			return false;
 		}

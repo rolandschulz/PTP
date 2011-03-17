@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
@@ -107,34 +108,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	public static Button createCheckButton(Composite parent, String label, SelectionListener listener) {
 		return createButton(parent, label, SWT.CHECK | SWT.LEFT, listener);
 	}
-
-	// public static Spinner createSpinner(Composite container, String
-	// labelString, int min, int max, int initial, int colSpan,
-	// boolean fill, ModifyListener listener) {
-	// if (labelString != null) {
-	// GridData data = new GridData();
-	// Label label = new Label(container, SWT.NONE);
-	// label.setText(labelString);
-	// label.setLayoutData(data);
-	// }
-	//
-	// GridData data = new GridData();
-	// if (fill) {
-	// data.horizontalAlignment = SWT.FILL;
-	// }
-	// data.grabExcessHorizontalSpace = false;
-	// data.horizontalSpan = colSpan;
-	//
-	// Spinner s = new Spinner(container, SWT.NONE);
-	// s.setMaximum(max);
-	// s.setMinimum(min);
-	// s.setSelection(initial);
-	// s.setLayoutData(data);
-	// if (listener != null) {
-	// s.addModifyListener(listener);
-	// }
-	// return s;
-	// }
 
 	public static Combo createCombo(Composite parent, int style, GridData data, Object listener) {
 		return createCombo(parent, style, data, new String[0], null, null, null, listener);
@@ -290,6 +263,23 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT, listener);
 		button.setData((null == value) ? label : value);
 		return button;
+	}
+
+	public static Spinner createSpinner(Composite parent, GridData data, String label, int min, int max, int initial,
+			ModifyListener listener) {
+		if (label != null) {
+			createLabel(parent, label, SWT.RIGHT, 1);
+		}
+
+		Spinner s = new Spinner(parent, SWT.NONE);
+		s.setMaximum(max);
+		s.setMinimum(min);
+		s.setSelection(initial);
+		s.setLayoutData(data);
+		if (listener != null) {
+			s.addModifyListener(listener);
+		}
+		return s;
 	}
 
 	public static Table createTable(Composite parent, int style, int cols, int wHint, GridData data) {
