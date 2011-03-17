@@ -16,18 +16,17 @@ import java.util.Map;
  * A base class for service provider working copy implementations.
  * 
  */
-public class ServiceProviderWorkingCopy extends ServiceProvider implements
-		IServiceProviderWorkingCopy {
+public class ServiceProviderWorkingCopy extends ServiceProvider implements IServiceProviderWorkingCopy {
 	private IServiceProvider fProvider;
 	private boolean fIsDirty = false;
 
 	public ServiceProviderWorkingCopy(IServiceProvider provider) {
 		if (provider instanceof IServiceProviderWorkingCopy) {
-			fProvider = ((IServiceProviderWorkingCopy)provider).getOriginal();
+			fProvider = ((IServiceProviderWorkingCopy) provider).getOriginal();
 		} else {
 			fProvider = provider;
 		}
-		setProperties(provider.getProperties());
+		internalSetProperties(provider.getProperties());
 		setDescriptor(provider.getDescriptor());
 	}
 
@@ -79,6 +78,7 @@ public class ServiceProviderWorkingCopy extends ServiceProvider implements
 	 */
 	public void save() {
 		fProvider.setProperties(getProperties());
+		fIsDirty = false;
 	}
 
 	/*

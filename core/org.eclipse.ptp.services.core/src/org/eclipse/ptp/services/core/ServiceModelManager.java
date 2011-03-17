@@ -208,7 +208,6 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private IServiceConfiguration fDefaultServiceConfiguration = null;
 	private final ServiceModelEventManager fEventManager = new ServiceModelEventManager();
 	private boolean fModelLoaded = false;
-
 	private boolean fEventsEnabled = true;
 
 	private static ServiceModelManager fInstance;
@@ -235,8 +234,9 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	public void addConfiguration(IProject project, IServiceConfiguration conf) {
 		checkAndLoadModel();
 
-		if (project == null || conf == null)
+		if (project == null || conf == null) {
 			throw new NullPointerException();
+		}
 
 		Map<String, IServiceConfiguration> confs = fProjectConfigurations.get(project);
 		if (confs == null) {
@@ -459,31 +459,41 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * (org.eclipse.ptp.services.core.IServiceProviderDescriptor)
 	 */
 	public IServiceProvider getServiceProvider(IServiceProviderDescriptor desc) {
-		if (desc != null) {
-			IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesCorePlugin.PLUGIN_ID,
-					PROVIDER_EXTENSION_ID);
-			if (extensionPoint != null) {
-				for (IExtension extension : extensionPoint.getExtensions()) {
-					for (IConfigurationElement element : extension.getConfigurationElements()) {
-						if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
-							String attr = element.getAttribute(ATTR_ID);
-							if (attr != null && attr.equals(desc.getId())) {
-								try {
-									IServiceProvider provider = (IServiceProvider) element.createExecutableExtension(ATTR_CLASS);
-									provider.setDescriptor(desc);
-									return provider;
-								} catch (Exception e) {
-									ServicesCorePlugin.getDefault().log(e);
-									return null;
+		/*
+		 * Avoid generating SERVICE_PROVIDER_CHANGED events when service
+		 * providers are created. This may happen if the constructor contains
+		 * put method calls.
+		 */
+		fEventsEnabled = false;
+		try {
+			if (desc != null) {
+				IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ServicesCorePlugin.PLUGIN_ID,
+						PROVIDER_EXTENSION_ID);
+				if (extensionPoint != null) {
+					for (IExtension extension : extensionPoint.getExtensions()) {
+						for (IConfigurationElement element : extension.getConfigurationElements()) {
+							if (element.getName().equals(PROVIDER_ELEMENT_NAME)) {
+								String attr = element.getAttribute(ATTR_ID);
+								if (attr != null && attr.equals(desc.getId())) {
+									try {
+										IServiceProvider provider = (IServiceProvider) element
+												.createExecutableExtension(ATTR_CLASS);
+										provider.setDescriptor(desc);
+										return provider;
+									} catch (Exception e) {
+										ServicesCorePlugin.getDefault().log(e);
+										return null;
+									}
 								}
 							}
 						}
 					}
 				}
 			}
+			return null;
+		} finally {
+			fEventsEnabled = true;
 		}
-
-		return null;
 	}
 
 	/*
@@ -730,7 +740,9 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 *            event to notify
 	 */
 	public void notifyListeners(IServiceModelEvent event) {
-		fEventManager.notifyListeners(event);
+		if (fEventsEnabled) {
+			fEventManager.notifyListeners(event);
+		}
 	}
 
 	/**
@@ -738,8 +750,9 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 */
 	public void printServiceModel() {
 		System.out.println("Service Model: "); //$NON-NLS-1$
-		if (fProjectConfigurations.isEmpty())
+		if (fProjectConfigurations.isEmpty()) {
 			System.out.println("  Service Model is empty"); //$NON-NLS-1$
+		}
 
 		for (Entry<IProject, Map<String, IServiceConfiguration>> entry : fProjectConfigurations.entrySet()) {
 			IProject project = entry.getKey();
@@ -754,8 +767,9 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @since 2.0
 	 */
 	public void remap(IProject removedProject, IProject addedProject) {
-		if (removedProject == null || addedProject == null)
+		if (removedProject == null || addedProject == null) {
 			throw new NullPointerException();
+		}
 
 		if (isConfigured(removedProject)) {
 			fProjectConfigurations.put(addedProject, fProjectConfigurations.remove(removedProject));
@@ -860,8 +874,9 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 *             if file is null
 	 */
 	public void saveModelConfiguration(Writer writer) throws IOException {
-		if (writer == null)
+		if (writer == null) {
 			throw new NullPointerException();
+		}
 		saveModelConfiguration(fConfigurations, fProjectConfigurations, fActiveConfigurations, writer);
 		notifyListeners(new ServiceModelEvent(this, IServiceModelEvent.SERVICE_MODEL_SAVED));
 	}
@@ -974,8 +989,9 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @return
 	 */
 	private IServiceProvider loadServiceProvider(IMemento providerMemento, IService service) {
-		if (service == null)
+		if (service == null) {
 			return null;
+		}
 
 		String providerId = providerMemento.getString(ATTR_PROVIDER_ID);
 		IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
@@ -1062,7 +1078,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 								if (nullProvider instanceof ServiceProvider) {
 									String providerId = service.getId() + ".nullProvider"; //$NON-NLS-1$
 									ServiceProviderDescriptor descriptor = new ServiceProviderDescriptor(providerId,
-											Messages.ServiceModelManager_3, service.getId(), "0"); //$NON-NLS-2$
+											Messages.ServiceModelManager_3, service.getId(), "0"); //$NON-NLS-1$
 									((ServiceProvider) nullProvider).setDescriptor(descriptor);
 								}
 								service.setNullServiceProvider(nullProvider);
