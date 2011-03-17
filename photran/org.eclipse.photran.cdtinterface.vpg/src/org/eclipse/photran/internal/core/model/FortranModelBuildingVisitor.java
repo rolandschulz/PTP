@@ -273,7 +273,7 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
     {
         IASTListNode<ASTExternalNameListNode> list = node.getExternalNameList();
         for (int i = 0; i < list.size(); i++)
-            addToModel(node, setPos(configureElement(new FortranElement.Subprogram(getCurrentParent()), list.get(i).getExternalName()), node));
+            addToModelNoChildren(setPos(configureElement(new FortranElement.Subprogram(getCurrentParent()), list.get(i).getExternalName()), node));
     }
 
     @Override public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node)
@@ -309,7 +309,7 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
     {
         IASTListNode<ASTIntrinsicListNode> list = node.getIntrinsicList();
         for (int i = 0; i < list.size(); i++)
-            addToModel(node, setPos(configureElement(new FortranElement.Variable(getCurrentParent()), list.get(i).getIntrinsicProcedureName()), node));
+            addToModelNoChildren(setPos(configureElement(new FortranElement.Subprogram(getCurrentParent()), list.get(i).getIntrinsicProcedureName()), node));
     }
 
     @Override public void visitASTStmtFunctionStmtNode(ASTStmtFunctionStmtNode node)
