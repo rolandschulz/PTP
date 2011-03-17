@@ -534,6 +534,9 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             // END FORTRAN 2003
             else
             {
+                if (isType(keyword) && match("implicit", firstTokenPos)) //$NON-NLS-1$
+                    return true;
+
                 int precedingKeywordOffset = findPrecedingKeyword(column);
                 if (precedingKeywordOffset == column) return false;
                 String precedingKeyword = precedingKeywordAsString(column, precedingKeywordOffset);
