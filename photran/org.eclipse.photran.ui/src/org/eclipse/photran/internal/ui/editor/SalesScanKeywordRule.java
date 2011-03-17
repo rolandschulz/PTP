@@ -106,7 +106,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         Assert.isNotNull(word);
         Assert.isNotNull(token);
 
-        fWords.put(word, token);
+        fWords.put(word.toLowerCase(), token);
     }
 
     /**
@@ -121,7 +121,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         Assert.isNotNull(word);
         Assert.isNotNull(token);
 
-        fIdentifiers.put(word, token);
+        fIdentifiers.put(word.toLowerCase(), token);
     }
 
     /*
@@ -135,18 +135,9 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 scanner.unread();
                 populateBuffers(scanner);
 
-                String buffer = fBuffer.toString();
+                String buffer = fBuffer.toString().toLowerCase();
+
                 IToken token = fWords.get(buffer);
-
-                for (String key : fWords.keySet())
-                {
-                    if (buffer.equalsIgnoreCase(key))
-                    {
-                        token = fWords.get(key);
-                        break;
-                    }
-                }
-
                 if (token != null)
                     return salesScan(token, (IToken)fIdentifiers.get(buffer));
 
@@ -154,10 +145,10 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                     for (int i = fBuffer.length() - 1; i >= 0; i--)
                         scanner.unread();
 
-                for (String key : fIdentifiers.keySet())
-                    if (buffer.equalsIgnoreCase(key))
-                        return fIdentifiers.get(key);
-                return fDefaultToken;
+                if (fIdentifiers.containsKey(buffer))
+                    return fIdentifiers.get(buffer);
+                else
+                    return fDefaultToken;
         }
 
         scanner.unread();
@@ -278,7 +269,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
     private IToken salesScan(IToken tokenIfKeyword, IToken tokenIfIdentifier)
     {
         SalesScanner salesScanner = new SalesScanner(fLineBuffer.toString(), fBuffer.toString());
-        boolean result = salesScanner.retainAsKeyword(fWordCol);
+        boolean retainAsKeyword = salesScanner.retainAsKeyword(fWordCol);
 
 //        System.out.println();
 //        System.out.println("\"" + fLineBuffer + "\"");
@@ -290,7 +281,12 @@ public class SalesScanKeywordRule extends WordRule implements IRule
 //        System.out.println("Open context equals?  " + salesScanner.openContextEquals);
 //        System.out.println("Letter follows paren? " + salesScanner.letterFollowsParenthetical);
 
-        return result ? tokenIfKeyword : (tokenIfIdentifier == null ? fDefaultToken : tokenIfIdentifier);
+        if (retainAsKeyword)
+            return tokenIfKeyword;
+        else if (tokenIfIdentifier == null)
+            return fDefaultToken;
+        else
+            return tokenIfIdentifier;
     }
 
     /**
