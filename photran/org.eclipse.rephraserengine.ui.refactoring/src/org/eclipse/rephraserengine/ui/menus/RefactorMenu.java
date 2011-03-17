@@ -133,10 +133,14 @@ public final class RefactorMenu extends CompoundContributionItem
         }
         else if (elt.getName().equals("submenu")) //$NON-NLS-1$
         {
-            MenuManager submenu = new MenuManager(elt.getAttribute("name")); //$NON-NLS-1$
-            for (IContributionItem subitem : fixMenu(loadRefactoringsFrom(elt.getChildren())))
-                submenu.add(subitem);
-            result.add(submenu);
+            IContributionItem[] subitems = fixMenu(loadRefactoringsFrom(elt.getChildren()));
+            if (!isEmpty(subitems))
+            {
+                MenuManager submenu = new MenuManager(elt.getAttribute("name")); //$NON-NLS-1$
+                for (IContributionItem subitem : subitems)
+                    submenu.add(subitem);
+                result.add(submenu);
+            }
         }
         else if (elt.getName().equals("resourceRefactoring")) //$NON-NLS-1$
         {
@@ -354,7 +358,11 @@ public final class RefactorMenu extends CompoundContributionItem
     /** @since 3.0 */
     public boolean isEmpty()
     {
-        IContributionItem[] items = getContributionItems();
+        return isEmpty(getContributionItems());
+    }
+
+    private boolean isEmpty(IContributionItem[] items)
+    {
         if (items.length == 0)
             return true;
         else if (items.length == 1 && items[0] instanceof EmptyMenuContributionItem)
