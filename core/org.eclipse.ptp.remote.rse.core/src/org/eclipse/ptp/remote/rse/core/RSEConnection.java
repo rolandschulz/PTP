@@ -46,12 +46,13 @@ import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.IShell
 
 public class RSEConnection implements IRemoteConnection {
 	private IShellService fShellService = null;
+
 	private ISubSystem fSubSystem = null;
 	private Map<String, String> fEnv = null;
 	private Map<String, String> fProperties = null;
 	private IPath fWorkingDir = null;
-
 	private final IHost fRseHost;
+
 	private final IRemoteConnection fConnection = this;
 	private final IRemoteServices fRemoteServices;
 	private final ListenerList fListeners = new ListenerList();
@@ -371,10 +372,46 @@ public class RSEConnection implements IRemoteConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnection#setAttribute(java.lang.
+	 * String, java.lang.String)
+	 */
+	public void setAttribute(String key, String value) {
+		// TODO implement
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnection#setAttributes(java.util
+	 * .Map)
+	 */
+	/**
+	 * @since 4.1
+	 */
+	public void setAttributes(Map<String, String> attributes) {
+		// TODO Auto-generated method stub
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#setName(java.lang.String)
 	 */
 	public void setName(String name) {
 		fRseHost.setAliasName(name);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnection#setPassword(java.lang.String
+	 * )
+	 */
+	public void setPassword(String password) {
+		// TODO is this possible?
 	}
 
 	/*

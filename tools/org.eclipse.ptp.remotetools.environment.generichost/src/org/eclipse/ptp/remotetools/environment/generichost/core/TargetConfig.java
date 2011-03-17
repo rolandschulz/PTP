@@ -31,6 +31,17 @@ public class TargetConfig implements ITargetConfig {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.remotetools.environment.control.ITargetConfig#getAttributes
+	 * ()
+	 */
+	public ControlAttributes getAttributes() {
+		return fAttrs;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.remotetools.environment.control.ITargetConfig#getCipherType
 	 * ()
 	 */
@@ -118,6 +129,17 @@ public class TargetConfig implements ITargetConfig {
 	 */
 	public boolean isPasswordAuth() {
 		return fAttrs.getBoolean(ConfigFactory.ATTR_IS_PASSWORD_AUTH);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.environment.control.ITargetConfig#setAttribute
+	 * (java.lang.String, java.lang.String)
+	 */
+	public void setAttribute(String key, String value) {
+		fAttrs.setString(key, value);
 	}
 
 	/*

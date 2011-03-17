@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -34,23 +32,23 @@ public class FileStoreTests extends TestCase {
 	private IRemoteServices fRemoteServices;
 	private IRemoteConnection fRemoteConnection;
 	private IRemoteFileManager fRemoteFileManager;
-	
+
 	public void testFileStore() {
-		URI	path1Uri = fRemoteFileManager.toURI(PATH1);
-		URI	path2Uri = fRemoteFileManager.toURI(PATH2);
+		URI path1Uri = fRemoteFileManager.toURI(PATH1);
+		URI path2Uri = fRemoteFileManager.toURI(PATH2);
 		assertNotNull(path1Uri);
 		assertNotNull(path2Uri);
-		
+
 		IFileStore store1 = null;
 		IFileStore store2 = null;
-		
+
 		try {
 			store1 = EFS.getStore(path1Uri);
 			store2 = EFS.getStore(path2Uri);
 		} catch (Exception e) {
 			fail(e.getLocalizedMessage());
 		}
-		
+
 		for (int i = 0; i < 5; i++) {
 			assertFalse(store1.fetchInfo().exists());
 			try {
@@ -59,7 +57,7 @@ public class FileStoreTests extends TestCase {
 				e.getLocalizedMessage();
 			}
 			assertTrue(store1.fetchInfo().exists());
-			
+
 			assertFalse(store2.fetchInfo().exists());
 			try {
 				OutputStream stream = store2.openOutputStream(EFS.NONE, null);
@@ -71,7 +69,7 @@ public class FileStoreTests extends TestCase {
 				e.getLocalizedMessage();
 			}
 			assertTrue(store2.fetchInfo().exists());
-			
+
 			try {
 				InputStream stream = store2.openInputStream(EFS.NONE, null);
 				assertNotNull(stream);
@@ -82,14 +80,14 @@ public class FileStoreTests extends TestCase {
 			} catch (Exception e) {
 				e.getLocalizedMessage();
 			}
-	
+
 			try {
 				store2.delete(EFS.NONE, null);
 			} catch (CoreException e) {
 				e.getLocalizedMessage();
 			}
 			assertFalse(store2.fetchInfo().exists());
-	
+
 			try {
 				store1.delete(EFS.NONE, null);
 			} catch (CoreException e) {
@@ -100,41 +98,36 @@ public class FileStoreTests extends TestCase {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Override
 	protected void setUp() throws Exception {
 		fRemoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.RemoteTools");
 		assertNotNull(fRemoteServices);
-		
+
 		IRemoteConnectionManager connMgr = fRemoteServices.getConnectionManager();
 		assertNotNull(connMgr);
-		
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("ptp.localhost-selection", "false");
-		map.put("ptp.login-username", USERNAME);
-		map.put("ptp.login-password", PASSWORD);
-		map.put("ptp.connection-address", HOST);
-		map.put("ptp.connection-port", "22");
-		map.put("ptp.key-path", "");
-		map.put("ptp.key-passphrase", "");
-		map.put("ptp.is-passwd-auth", "true");
-		map.put("ptp.connection-timeout", "5");
-		map.put("ptp.cipher-type", "default");
-		
+
 		try {
-			fRemoteConnection = connMgr.newConnection(CONNECTION_NAME, map);
+			fRemoteConnection = connMgr.newConnection(CONNECTION_NAME);
 		} catch (RemoteConnectionException e) {
 			fail(e.getLocalizedMessage());
 		}
 		assertNotNull(fRemoteConnection);
-		
+		fRemoteConnection.setAddress(HOST);
+		fRemoteConnection.setUsername(USERNAME);
+		fRemoteConnection.setPassword(PASSWORD);
+
 		fRemoteFileManager = fRemoteServices.getFileManager(fRemoteConnection);
 		assertNotNull(fRemoteFileManager);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	@Override
@@ -144,5 +137,5 @@ public class FileStoreTests extends TestCase {
 		assertNotNull(connMgr);
 		connMgr.removeConnection(fRemoteConnection);
 	}
-	
+
 }

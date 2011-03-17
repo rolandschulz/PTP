@@ -12,9 +12,11 @@
 package org.eclipse.ptp.remotetools.environment.extension;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.remotetools.environment.control.ITargetConfig;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.wizard.AbstractEnvironmentDialogPage;
+import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
 
 /**
  * Provides an interface that is an extension of a target type. This extension
@@ -27,14 +29,21 @@ import org.eclipse.ptp.remotetools.environment.wizard.AbstractEnvironmentDialogP
 public interface ITargetTypeExtension {
 
 	/**
-	 * Given the attributes, produces a fresh new control instance.
+	 * Given the target configuration, produces a fresh new control instance.
 	 * 
 	 * @param element
 	 *            TODO
 	 * 
 	 * @return the control instance
+	 * @since 2.0
 	 */
-	ITargetControl controlFactory(ITargetElement element) throws CoreException;
+	ITargetControl createControl(ITargetConfig config) throws CoreException;
+
+	/**
+	 * @return
+	 * @since 2.0
+	 */
+	ITargetConfig createConfig(ControlAttributes attrs) throws CoreException;
 
 	/**
 	 * Provides an array with all the attributes' name needed by the associated

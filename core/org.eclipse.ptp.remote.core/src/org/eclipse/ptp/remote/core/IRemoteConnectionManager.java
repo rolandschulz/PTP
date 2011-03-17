@@ -11,7 +11,6 @@
 package org.eclipse.ptp.remote.core;
 
 import java.net.URI;
-import java.util.Map;
 
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
@@ -45,17 +44,15 @@ public interface IRemoteConnectionManager {
 	public IRemoteConnection[] getConnections();
 
 	/**
-	 * Creates a remote connection using the supplied attributes. The attributes
-	 * are specific to the remote service provider and can be obtained using
-	 * {@link IRemoteConnection#getAttributes()}.
+	 * Creates a new remote connection named with supplied name. The connection
+	 * attributes will be the default for the implementation.
 	 * 
 	 * @param name
 	 *            name of the connection
-	 * @param attributes
-	 *            map containing attributes used to create the connection
 	 * @return a new connection or null if the creation failed for some reason
+	 * @since 5.0
 	 */
-	public IRemoteConnection newConnection(String name, Map<String, String> attributes) throws RemoteConnectionException;
+	public IRemoteConnection newConnection(String name) throws RemoteConnectionException;
 
 	/**
 	 * Remove a connection and all resources associated with it.

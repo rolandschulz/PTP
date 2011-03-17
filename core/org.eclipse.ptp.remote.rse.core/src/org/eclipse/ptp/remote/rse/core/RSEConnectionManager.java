@@ -85,9 +85,12 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java
-	 * .lang.String, java.util.Map)
+	 * .lang.String)
 	 */
-	public IRemoteConnection newConnection(String name, Map<String, String> attributes) throws RemoteConnectionException {
+	/**
+	 * @since 5.0
+	 */
+	public IRemoteConnection newConnection(String name) throws RemoteConnectionException {
 		// TODO implement
 		return null;
 	}

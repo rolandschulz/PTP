@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -58,8 +56,12 @@ public class RemoteConnectionTests extends TestCase {
 			while ((line = stdout.readLine()) != null) {
 				String[] kv = line.trim().split("="); //$NON-NLS-1$
 				if (kv.length == 2) {
-					if (kv[0].equals("FOO"))assertTrue(kv[1].equals("BAR")); //$NON-NLS-1$ //$NON-NLS-2$
-					if (kv[0].equals("USER"))assertTrue(kv[1].equals("FOO")); //$NON-NLS-1$ //$NON-NLS-2$
+					if (kv[0].equals("FOO")) {
+						assertTrue(kv[1].equals("BAR")); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+					if (kv[0].equals("USER")) {
+						assertTrue(kv[1].equals("FOO")); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -125,24 +127,15 @@ public class RemoteConnectionTests extends TestCase {
 		IRemoteConnectionManager connMgr = fRemoteServices.getConnectionManager();
 		assertNotNull(connMgr);
 
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("org.eclipse.ptp.remotetools.environment.generichost.localhost-selection", "false"); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("org.eclipse.ptp.remotetools.environment.generichost.login-username", USERNAME); //$NON-NLS-1$
-		map.put("org.eclipse.ptp.remotetools.environment.generichost.login-password", PASSWORD); //$NON-NLS-1$
-		map.put("org.eclipse.ptp.remotetools.environment.generichost.connection-address", HOST); //$NON-NLS-1$
-		map.put("org.eclipse.ptp.remotetools.environment.generichost.connection-port", "22"); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("org.eclipse.ptp.remotetools.environment.generichost.key-path", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("org.eclipse.ptp.remotetools.environment.generichost.key-passphrase", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("org.eclipse.ptp.remotetools.environment.generichost.is-passwd-auth", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("org.eclipse.ptp.remotetools.environment.generichost.connection-timeout", "5"); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("org.eclipse.ptp.remotetools.environment.generichost.cipher-type", "default"); //$NON-NLS-1$ //$NON-NLS-2$
-
 		try {
-			fRemoteConnection = connMgr.newConnection("test_connection", map); //$NON-NLS-1$
+			fRemoteConnection = connMgr.newConnection("test_connection"); //$NON-NLS-1$
 		} catch (RemoteConnectionException e) {
 			fail(e.getLocalizedMessage());
 		}
 		assertNotNull(fRemoteConnection);
+		fRemoteConnection.setAddress(HOST);
+		fRemoteConnection.setUsername(USERNAME);
+		fRemoteConnection.setPassword(PASSWORD);
 
 		try {
 			fRemoteConnection.open(new NullProgressMonitor());

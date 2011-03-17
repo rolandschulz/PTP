@@ -12,11 +12,13 @@
 package org.eclipse.ptp.remotetools.environment.generichost.core;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.remotetools.environment.control.ITargetConfig;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.extension.ITargetTypeExtension;
 import org.eclipse.ptp.remotetools.environment.generichost.ui.ConfigurationPage;
 import org.eclipse.ptp.remotetools.environment.wizard.AbstractEnvironmentDialogPage;
+import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
 
 /**
  * Factory for the environment.
@@ -29,10 +31,13 @@ public class Environment implements ITargetTypeExtension {
 		super();
 	}
 
-	public ITargetControl controlFactory(ITargetElement element) throws CoreException {
-		ConfigFactory factory = new ConfigFactory(element.getAttributes());
-		TargetConfig config = factory.createTargetConfig();
+	public ITargetControl createControl(ITargetConfig config) throws CoreException {
 		return new TargetControl(config, new AuthInfo(config));
+	}
+
+	public ITargetConfig createConfig(ControlAttributes attributes) throws CoreException {
+		ConfigFactory factory = new ConfigFactory(attributes);
+		return factory.createTargetConfig();
 	}
 
 	public String[] getControlAttributeNames() {
