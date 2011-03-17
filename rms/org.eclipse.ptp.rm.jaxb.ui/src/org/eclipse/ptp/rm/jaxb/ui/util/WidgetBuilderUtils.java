@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ptp.rm.jaxb.core.data.Style;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.cell.ColumnViewerCellModifier;
 import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
@@ -365,6 +366,245 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			}
 		}
 		return newLine.toString();
+	}
+
+	public static int getStyle(Style style) {
+		int swt = 0;
+
+		if (style == null) {
+			return swt;
+		}
+
+		List<String> split = style.getTag();
+
+		for (String s : split) {
+			s = s.trim();
+
+			if (ARROW.equals(s)) {
+				swt |= SWT.ARROW;
+			}
+			if (BACKGROUND.equals(s)) {
+				swt |= SWT.BACKGROUND;
+			}
+			if (BALLOON.equals(s)) {
+				swt |= SWT.BALLOON;
+			}
+			if (BAR.equals(s)) {
+				swt |= SWT.BAR;
+			}
+			if (BORDER.equals(s)) {
+				swt |= SWT.BORDER;
+			}
+			if (BORDER_DASH.equals(s)) {
+				swt |= SWT.BORDER_DASH;
+			}
+			if (BORDER_DOT.equals(s)) {
+				swt |= SWT.BORDER_DOT;
+			}
+			if (BORDER_SOLID.equals(s)) {
+				swt |= SWT.BORDER_SOLID;
+			}
+			if (BOTTOM.equals(s)) {
+				swt |= SWT.BOTTOM;
+			}
+			if (CASCADE.equals(s)) {
+				swt |= SWT.CASCADE;
+			}
+			if (CENTER.equals(s)) {
+				swt |= SWT.CENTER;
+			}
+			if (CHECK.equals(s)) {
+				swt |= SWT.CHECK;
+			}
+			if (DIALOG_TRIM.equals(s)) {
+				swt |= SWT.DIALOG_TRIM;
+			}
+			if (DOWN.equals(s)) {
+				swt |= SWT.DOWN;
+			}
+			if (DROP_DOWN.equals(s)) {
+				swt |= SWT.DROP_DOWN;
+			}
+			if (FILL.equals(s)) {
+				swt |= SWT.FILL;
+			}
+			if (FILL_EVEN_ODD.equals(s)) {
+				swt |= SWT.FILL_EVEN_ODD;
+			}
+			if (FILL_WINDING.equals(s)) {
+				swt |= SWT.FILL_WINDING;
+			}
+			if (FOREGROUND.equals(s)) {
+				swt |= SWT.FOREGROUND;
+			}
+			if (FULL_SELECTION.equals(s)) {
+				swt |= SWT.FULL_SELECTION;
+			}
+			if (H_SCROLL.equals(s)) {
+				swt |= SWT.H_SCROLL;
+			}
+			if (HORIZONTAL.equals(s)) {
+				swt |= SWT.HORIZONTAL;
+			}
+			if (LEAD.equals(s)) {
+				swt |= SWT.LEAD;
+			}
+			if (LEFT.equals(s)) {
+				swt |= SWT.LEFT;
+			}
+			if (LEFT_TO_RIGHT.equals(s)) {
+				swt |= SWT.LEFT_TO_RIGHT;
+			}
+			if (LINE_CUSTOM.equals(s)) {
+				swt |= SWT.LINE_CUSTOM;
+			}
+			if (LINE_DASH.equals(s)) {
+				swt |= SWT.LINE_DASH;
+			}
+			if (LINE_DASHDOT.equals(s)) {
+				swt |= SWT.LINE_DASHDOT;
+			}
+			if (LINE_DASHDOTDOT.equals(s)) {
+				swt |= SWT.LINE_DASHDOTDOT;
+			}
+			if (LINE_DOT.equals(s)) {
+				swt |= SWT.LINE_DOT;
+			}
+			if (LINE_SOLID.equals(s)) {
+				swt |= SWT.LINE_SOLID;
+			}
+			if (MODELESS.equals(s)) {
+				swt |= SWT.MODELESS;
+			}
+			if (MULTI.equals(s)) {
+				swt |= SWT.MULTI;
+			}
+			if (NO.equals(s)) {
+				swt |= SWT.NO;
+			}
+			if (NO_BACKGROUND.equals(s)) {
+				swt |= SWT.NO_BACKGROUND;
+			}
+			if (NO_FOCUS.equals(s)) {
+				swt |= SWT.NO_FOCUS;
+			}
+			if (NO_MERGE_PAINTS.equals(s)) {
+				swt |= SWT.NO_MERGE_PAINTS;
+			}
+			if (NO_RADIO_GROUP.equals(s)) {
+				swt |= SWT.NO_RADIO_GROUP;
+			}
+			if (NO_REDRAW_RESIZE.equals(s)) {
+				swt |= SWT.NO_REDRAW_RESIZE;
+			}
+			if (NO_SCROLL.equals(s)) {
+				swt |= SWT.NO_SCROLL;
+			}
+			if (NO_TRIM.equals(s)) {
+				swt |= SWT.NO_TRIM;
+			}
+			if (NONE.equals(s)) {
+				swt |= SWT.NONE;
+			}
+			if (NORMAL.equals(s)) {
+				swt |= SWT.NORMAL;
+			}
+			if (ON_TOP.equals(s)) {
+				swt |= SWT.ON_TOP;
+			}
+			if (OPEN.equals(s)) {
+				swt |= SWT.OPEN;
+			}
+			if (POP_UP.equals(s)) {
+				swt |= SWT.POP_UP;
+			}
+			if (PRIMARY_MODAL.equals(s)) {
+				swt |= SWT.PRIMARY_MODAL;
+			}
+			if (PUSH.equals(s)) {
+				swt |= SWT.PUSH;
+			}
+			if (RADIO.equals(s)) {
+				swt |= SWT.RADIO;
+			}
+			if (READ_ONLY.equals(s)) {
+				swt |= SWT.READ_ONLY;
+			}
+			if (RESIZE.equals(s)) {
+				swt |= SWT.RESIZE;
+			}
+			if (RIGHT.equals(s)) {
+				swt |= SWT.RIGHT;
+			}
+			if (RIGHT_TO_LEFT.equals(s)) {
+				swt |= SWT.RIGHT_TO_LEFT;
+			}
+			if (SCROLL_LINE.equals(s)) {
+				swt |= SWT.SCROLL_LINE;
+			}
+			if (SCROLL_LOCK.equals(s)) {
+				swt |= SWT.SCROLL_LOCK;
+			}
+			if (SCROLL_PAGE.equals(s)) {
+				swt |= SWT.SCROLL_PAGE;
+			}
+			if (SHADOW_ETCHED_IN.equals(s)) {
+				swt |= SWT.SHADOW_ETCHED_IN;
+			}
+			if (SHADOW_ETCHED_OUT.equals(s)) {
+				swt |= SWT.SHADOW_ETCHED_OUT;
+			}
+			if (SHADOW_IN.equals(s)) {
+				swt |= SWT.SHADOW_IN;
+			}
+			if (SHADOW_NONE.equals(s)) {
+				swt |= SWT.SHADOW_NONE;
+			}
+			if (SHADOW_OUT.equals(s)) {
+				swt |= SWT.SHADOW_OUT;
+			}
+			if (SHELL_TRIM.equals(s)) {
+				swt |= SWT.SHELL_TRIM;
+			}
+			if (SHORT.equals(s)) {
+				swt |= SWT.SHORT;
+			}
+			if (SIMPLE.equals(s)) {
+				swt |= SWT.SIMPLE;
+			}
+			if (SINGLE.equals(s)) {
+				swt |= SWT.SINGLE;
+			}
+			if (SMOOTH.equals(s)) {
+				swt |= SWT.SMOOTH;
+			}
+			if (TITLE.equals(s)) {
+				swt |= SWT.TITLE;
+			}
+			if (TOGGLE.equals(s)) {
+				swt |= SWT.TOGGLE;
+			}
+			if (TOP.equals(s)) {
+				swt |= SWT.TOP;
+			}
+			if (UP.equals(s)) {
+				swt |= SWT.UP;
+			}
+			if (V_SCROLL.equals(s)) {
+				swt |= SWT.V_SCROLL;
+			}
+			if (VERTICAL.equals(s)) {
+				swt |= SWT.VERTICAL;
+			}
+			if (WRAP.equals(s)) {
+				swt |= SWT.WRAP;
+			}
+			if (YES.equals(s)) {
+				swt |= SWT.YES;
+			}
+		}
+
+		return swt;
 	}
 
 	public static void setupTableForEditing(TableViewer tableViewer, List<ColumnDescriptor> columnDescriptors) {
