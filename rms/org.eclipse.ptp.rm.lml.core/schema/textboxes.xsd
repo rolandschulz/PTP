@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+          LML - LLView markup language 
+
+   Copyright (c) 2011 Forschungszentrum Juelich GmbH
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+ -->
+<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
+
+
+    <include schemaLocation="lgui.xsd"></include>
+    <include schemaLocation="entities.xsd"></include>
+    <complexType name="textbox_type">
+    	<complexContent>
+    		<extension base="lml:gobject_type">
+    			<choice>
+		    		<element name="text" type="string"></element>
+		    		<element name="info" type="lml:textinfo_type"></element>
+		    	</choice>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="textinfo_type">
+    	<sequence>
+    		<element name="data" type="lml:infodata_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="infobox_type">
+    	<complexContent>
+    		<extension base="lml:gobject_type">
+
+
+
+    			<attribute name="type" type="NCName" default="notype">
+    				<annotation>
+    					<documentation>this attribute references to type-attributes of information-tags. This infobox will only show elements with the given type.</documentation>
+    				</annotation></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+</schema>

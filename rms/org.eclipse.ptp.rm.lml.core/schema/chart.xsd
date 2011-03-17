@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+          LML - LLView markup language 
+
+   Copyright (c) 2011 Forschungszentrum Juelich GmbH
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+ -->
+<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
+
+	<include schemaLocation="lgui.xsd"></include>
+	
+    <complexType name="chart_type">
+    	<annotation>
+    		<documentation>
+    			Collects data of a chart describing a histogram or other
+    			diagrams.
+    		</documentation>
+    	</annotation>
+    	<complexContent>
+    		<extension base="lml:gobject_type">
+		    	<sequence>
+		    		<element name="axes" type="lml:axes_type" minOccurs="0"
+		    			maxOccurs="1">
+		    		</element>
+		    		<element name="data" type="lml:datacollection_type" minOccurs="0" maxOccurs="unbounded"></element>
+		    	</sequence>
+    		</extension>    	
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="axis_type">
+        <annotation>
+        	<documentation>Type for either x- or y-axis. Contains important data of these objects.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="ticlabels" type="lml:ticlabels_type" minOccurs="0" maxOccurs="1"></element>
+    	</sequence>
+    	<attribute name="type" type="lml:axis_type_constants" default="linear"></attribute>
+    	<attribute name="unit" type="string">
+    		<annotation>
+    			<documentation>
+    				Examples: hour, days, volt
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="label" type="string">
+    		<annotation>
+    			<documentation>
+    				Description of what this axis is showing.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="shortlabel" type="string"></attribute>
+    	<attribute name="min" type="double" use="required"></attribute>
+    	<attribute name="max" type="double" use="required"></attribute>
+    	<attribute name="ticcount" type="nonNegativeInteger" default="10"></attribute>
+    </complexType>
+
+    <simpleType name="axis_type_constants">
+        <annotation>
+        	<documentation>Defines possible axis-types. Defines how numbers are arranged in this axis.</documentation>
+        </annotation>
+        <restriction base="string">
+    		<enumeration value="linear"></enumeration>
+    		<enumeration value="log"></enumeration>
+    	</restriction>
+    </simpleType>
+
+    <complexType name="ticlabel_type">
+        <annotation>
+        	<documentation>One ticlabel is one name or string, that is shown on an axis instead of a numerical value. The tic-labels will be shown in addition to normal tic-labels given by inserting ticcount-times a numerical value into the axis.</documentation>
+        </annotation>
+        <attribute name="pos" type="double" use="required"></attribute>
+    	<attribute name="text" type="string">
+    		<annotation>
+    			<documentation>not required. If not set pos will be printed</documentation>
+    		</annotation></attribute>
+    </complexType>
+
+    <complexType name="ticlabels_type">
+        <annotation>
+        	<documentation>Collects a list of ticlabels.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="label" type="lml:ticlabel_type" minOccurs="1" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="axes_type">
+        <annotation>
+        	<documentation>Combines one x-axis-element and one y-axis-element.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="x" type="lml:axis_type" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    		<element name="y" type="lml:axis_type" minOccurs="1" maxOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="datapoint_type">
+    	<annotation>
+    		<documentation>
+    			One point in a diagram. Could define one bar in a bar
+    			chart.
+    		</documentation>
+    	</annotation>
+    	<attribute name="x" type="double" use="required"></attribute>
+    	<attribute name="y" type="double" use="required"></attribute>
+    	<attribute name="oid" type="NCName"></attribute>
+    </complexType>
+
+    <complexType name="datarect_type">
+    	<annotation>
+    		<documentation>
+    			One rect in a diagram. Used in timeline-diagram for
+    			usage-prediction in llview. (x,y) is upper left corner of the rect.
+    		</documentation>
+    	</annotation>
+    	<complexContent>
+    		<extension base="lml:datapoint_type">
+    			<attribute name="w" type="double" use="required">
+    				<annotation>
+    					<documentation>width</documentation>
+    				</annotation>
+    			</attribute>
+    			<attribute name="h" type="double" use="required">
+    				<annotation>
+    					<documentation>height</documentation>
+    				</annotation>
+    			</attribute>
+    			<attribute name="text" type="string">
+    				<annotation>
+    					<documentation>This text should be shown within the rect if possible</documentation>
+    				</annotation></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="datacollection_type">
+        <annotation>
+        	<documentation>Defines a set of datapoints and datarects.
+Saves real data of a diagram.</documentation>
+        </annotation>
+        <sequence minOccurs="0" maxOccurs="unbounded">
+    		<element name="p" type="lml:datapoint_type" minOccurs="0"
+    			maxOccurs="unbounded">
+    		</element>
+    		<element name="r" type="lml:datarect_type" minOccurs="0"
+    			maxOccurs="unbounded">
+    		</element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="description" type="string"></attribute>
+    </complexType>
+
+    <complexType name="chartgroup_type">
+        <annotation>
+        	<documentation>A group of charts. Could be displayed as overlay-diagrams.</documentation>
+        </annotation>
+        <complexContent>
+    		<extension base="lml:gobject_type">
+    			<sequence>
+    				<element name="chart" type="lml:chart_type" minOccurs="1" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+</schema>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+          LML - LLView markup language 
+
+   Copyright (c) 2011 Forschungszentrum Juelich GmbH
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+ -->
+<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
+
+
+    <include schemaLocation="colors.xsd"></include>
+    
+    <complexType name="entities_type">
+        <annotation>
+        	<documentation>Dummy-root-object. Contains key and keyref definitions to define foreign keys and primary keys.
+Primary key is here objects/object.id . Foreign key is information/info.id</documentation>
+        </annotation>
+        <sequence>
+    		<element name="objects" type="lml:objects_type" minOccurs="0" maxOccurs="1"></element>
+    		<element name="information" type="lml:information_type" minOccurs="0" maxOccurs="1"></element>
+    	</sequence>
+    </complexType>
+    
+    
+    <complexType name="objects_type">
+        <annotation>
+        	<documentation>Collects a list of objects. Can only exist once in whole lml-file.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="object" type="lml:object_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>    	
+    </complexType>
+
+    <complexType name="object_type">
+        <annotation>
+        	<documentation>Defines one instance within the batch-system. 
+For example one object could represent one job on the batch-system or one node.
+Even the system is one object.
+The color defines with which color this object is identified and painted.</documentation>
+        </annotation>
+        <attribute name="type" type="lml:object_name" use="required"></attribute>
+    	<attribute name="id" type="NCName" use="required"></attribute>
+    	<attribute name="color" type="lml:hexcolor_type" default="#FFF"></attribute>
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+
+    <simpleType name="object_name">
+    	<annotation>
+    		<documentation>
+    			Contains a list of possible types of objects in a batch
+    			system.
+    		</documentation>
+    	</annotation>
+    	<restriction base="string">
+    		<enumeration value="job"></enumeration>
+    		<enumeration value="node"></enumeration>
+    		<enumeration value="system"></enumeration>
+    		<enumeration value="queue"></enumeration>
+    		<enumeration value="scheduler"></enumeration>
+    		<enumeration value="class"></enumeration>
+    		<enumeration value="partition"></enumeration>
+    		<enumeration value="partmap"></enumeration>
+    		<enumeration value="smallpartition"></enumeration>
+    	</restriction>
+    </simpleType>
+
+    <complexType name="information_type">
+        <annotation>
+        	<documentation>Collects a list of infos. Exists a most once.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="info" type="lml:info_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="info_type">
+    	<annotation>
+    		<documentation>
+    			Is referenced to an existing object-instance by id.
+    			description gives a brief idea of what this info
+    			contains. Collects a list of key-value-pairs. For
+    			example key="cpucount" value="290.000".
+    		</documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="data" type="lml:infodata_type" minOccurs="0"
+    			maxOccurs="unbounded">
+    		</element>
+    	</sequence>
+    	<attribute name="oid" type="NCName" use="required"></attribute>
+    	<attribute name="description" type="string"></attribute>
+    	<attribute name="type" type="NCName" default="notype">
+    		<annotation>
+    			<documentation>This attribute is used to distinguish between types of information. Type could be "short", "long", "unnecessary" ...
+Then you can categorize the given information.</documentation>
+    		</annotation></attribute>
+    </complexType>
+
+    <complexType name="infodata_type">
+        <annotation>
+        	<documentation>Key value pair for information.</documentation>
+        </annotation>
+        <attribute name="key" type="string" use="required"></attribute>
+    	<attribute name="value" type="string"></attribute>
+    </complexType>  
+
+</schema>

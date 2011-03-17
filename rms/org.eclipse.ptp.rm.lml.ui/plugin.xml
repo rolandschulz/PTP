@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.eclipse.ptp.rm.lml.ui.views"
+            name="%ParallelViewCategory.name">
+      </category>
+      <view
+            category="org.eclipse.ptp.rm.lml.ui.views"
+            class="org.eclipse.ptp.rm.lml.ui.views.NodesView"
+            icon="icons/parallel_perspective.gif"
+            id="org.eclipse.ptp.rm.lml.ui.views.NodesView"
+            name="%NodesView.name">
+      </view>
+      <view
+            category="org.eclipse.ptp.rm.lml.ui.views"
+            class="org.eclipse.ptp.rm.lml.ui.views.LMLView"
+            icon="icons/rm/rm_view.gif"
+            id="org.eclipse.ptp.rm.lml.ui.views.LMLView"
+            name="%LMLView.name">
+      </view>
+      <view
+            category="org.eclipse.ptp.rm.lml.ui.views"
+            class="org.eclipse.ptp.rm.lml.ui.views.JobsListView"
+            icon="icons/parallel_perspective.gif"
+            id="org.eclipse.ptp.rm.lml.ui.views.JobsListView"
+            name="%JobListView.name">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.ptp.rm.lml.internal.ui.LMLRuntimePerspectiveFactory"
+            icon="icons/parallel_perspective.gif"
+            id="org.eclipse.ptp.rm.lml.ui.LMLRunPerspective"
+            name="%Perspective.name">
+      </perspective>
+   </extension>
+
+</plugin>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+          LML - LLView markup language 
+
+   Copyright (c) 2011 Forschungszentrum Juelich GmbH
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+ -->
+<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
+
+    <complexType name="relation_type">
+    	<annotation>
+    		<documentation>
+    			A set of objects, which are related to each other. Could
+    			contain a list of jobs of one user. If any job in the
+    			relation is focused, every job in this set will be
+    			highlighted. keyid can be used to define objects which are connected to all added objects in this relation_type. If keyid is not defined, all elements in this tag will be used as keys.
+    		</documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="el" type="lml:relation_element_type"
+    			minOccurs="0" maxOccurs="unbounded">
+    		</element>
+    	</sequence>
+    	<attribute name="id" type="NCName" use="required">
+    		<annotation>
+    			<documentation>
+    				This id can be referenced by all objects in lml. Is
+    				similar to an id of an object-tag within the
+    				objects-tag.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="name" type="string">
+    		<annotation>
+    			<documentation>Name of this set.</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="keyid" type="NCName">
+    		<annotation>
+    			<documentation>ID-Ref to one object or relation which is related to all elements added in this tag.</documentation>
+    		</annotation></attribute>
+    </complexType>
+
+    <complexType name="relation_element_type">
+    	<attribute name="refid" type="NCName">
+    		<annotation>
+    			<documentation>Reference-Id to an object-tag or another relation.</documentation>
+    		</annotation></attribute>
+    </complexType>
+
+    <complexType name="relations_type">
+    	<sequence>
+    		<element name="rel" type="lml:relation_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+</schema>
