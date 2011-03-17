@@ -293,13 +293,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
 		getResourceManager().setState(IResourceManager.STARTING_STATE);
 		try {
-			resetEnv();
 			initializeConnections();
 			try {
 				doConnect(monitor);
 			} catch (RemoteConnectionException t) {
 				throw CoreExceptionUtils.newException(t.getMessage(), t);
 			}
+			resetEnv();
 			doOnStartUp(monitor);
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
@@ -383,10 +383,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException {
 		if (!localConnection.isOpen()) {
-			localConnection.open(monitor);
+			throw new RemoteConnectionException(Messages.LocalConnectionError);
 		}
 		if (!remoteConnection.isOpen()) {
-			remoteConnection.open(monitor);
+			throw new RemoteConnectionException(Messages.RemoteConnectionError + remoteConnection.getAddress());
 		}
 	}
 

@@ -49,6 +49,8 @@ public class Messages extends NLS {
 	public static String ACLParseError;
 	public static String CannotConvertToDecimal;
 	public static String CannotConvertToChar;
+	public static String RemoteConnectionError;
+	public static String LocalConnectionError;
 
 	static {
 		// initialize resource bundle

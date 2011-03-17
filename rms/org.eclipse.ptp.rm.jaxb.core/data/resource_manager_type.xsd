@@ -285,8 +285,8 @@
 		<xs:sequence>
 			<xs:element name="title" type="xs:string"/>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element name="tab-folder" type="rm:tab-folder"/>
-				<xs:element name="group" type="rm:group"/>
+				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
+				<xs:element name="group-descriptor" type="rm:group-descriptor"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
@@ -339,14 +339,14 @@
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="tab-folder">
+	<xs:complexType name="tab-folder-descriptor">
 		<xs:sequence>
 			<xs:element name="title" type="xs:string"/>
-			<xs:element name="item" maxOccurs="unbounded" type="rm:tab-item"/>
+			<xs:element name="item" maxOccurs="unbounded" type="rm:tab-item-descriptor"/>
 		</xs:sequence>
 		<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
 	</xs:complexType>
-	<xs:complexType name="group">
+	<xs:complexType name="group-descriptor">
 		<xs:annotation>
 			<xs:documentation>
 				We may want a few tweaks here, such as borders, etc. Dynamic attribute means this group gets rebuilt if there is a
@@ -354,13 +354,13 @@
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data"/>
-			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout"/>
+			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data-descriptor"/>
+			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout-descriptor"/>
 			<xs:element name="title" minOccurs="0" type="xs:string"/>
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element name="tab-folder" type="rm:tab-folder"/>
-				<xs:element name="group" type="rm:group"/>
+				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
+				<xs:element name="group" type="rm:group-descriptor"/>
 				<xs:element name="widget" type="rm:widget"/>
 				<xs:element name="viewer" type="rm:attribute-viewer"/>
 			</xs:choice>
@@ -386,16 +386,16 @@
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
-	<xs:complexType name="tab-item">
+	<xs:complexType name="tab-item-descriptor">
 		<xs:sequence>
 			<xs:element name="title" type="xs:string"/>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element name="group" type="rm:group"/>
-				<xs:element name="tab-folder" type="rm:tab-folder"/>
+				<xs:element name="group" type="rm:group-descriptor"/>
+				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="grid-data">
+	<xs:complexType name="grid-data-descriptor">
 		<xs:attribute name="horizontalAlign" type="xs:string"/>
 		<xs:attribute name="verticalAlign" type="xs:string"/>
 		<xs:attribute name="grabExcessHorizontal" type="xs:boolean" default="true"/>
@@ -407,7 +407,7 @@
 		<xs:attribute name="heightHint" type="xs:int"/>
 		<xs:attribute name="widthHint" type="xs:int"/>
 	</xs:complexType>
-	<xs:complexType name="grid-layout">
+	<xs:complexType name="grid-layout-descriptor">
 		<xs:attribute name="numColumns" type="xs:int"/>
 		<xs:attribute name="horizontalSpacing" type="xs:int"/>
 		<xs:attribute name="makeColumnsEqualWidth" type="xs:boolean" default="true"/>
@@ -433,7 +433,7 @@
 	</xs:complexType>
 	<xs:complexType name="widget">
 		<xs:sequence>
-			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data"/>
+			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data-descriptor"/>
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
@@ -478,8 +478,8 @@
 	</xs:complexType>
 	<xs:complexType name="attribute-viewer">
 		<xs:sequence>
-			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data"/>
-			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout"/>
+			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data-descriptor"/>
+			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout-descriptor"/>
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="column-data" minOccurs="0" type="rm:column-data"/>
