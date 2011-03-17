@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+          LML - LLView markup language 
+
+   Copyright (c) 2011 Forschungszentrum Juelich GmbH
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+ -->
+<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
+
+	<include schemaLocation="lgui.xsd"></include>
+
+    <annotation>
+    	<documentation>Gives a brief overview of running jobs on the system.</documentation></annotation>
+    <complexType name="job_type">
+        <annotation>
+        	<documentation>Describes one job in the usagebar. Saves how many cpus are used by this job and how many cpus are on one node.
+If this job is running on different node-architectures, where cpupernode differs, a list of jobparts has to be used.
+So one job can be divided into jobparts for a more detailled description.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="jobpart" type="lml:job_part_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    	<attribute name="oid" type="NCName" use="required"></attribute>
+    	<attribute name="cpucount" type="nonNegativeInteger" use="required"></attribute>
+    	<attribute name="cpupernode" type="positiveInteger"></attribute>
+    </complexType>
+    
+    <complexType name="job_part_type">
+    	<attribute name="cpucount" type="nonNegativeInteger" use="required"></attribute>
+    	<attribute name="cpupernode" type="positiveInteger"></attribute>
+    </complexType>
+
+    <complexType name="usagebar_type">
+    	<annotation>
+    		<documentation>
+    			Defines several jobs, that are now running on the
+    			system. CpuCount can be computed by adding all
+    			cpuCount-attributes of the defined job-tags.
+    		</documentation>
+    	</annotation>
+    	<complexContent>
+    		<extension base="lml:gobject_type">
+    			<sequence>
+    				<element name="job" type="lml:job_type"
+    					minOccurs="0" maxOccurs="unbounded">
+    				</element>
+    			</sequence>
+    			<attribute name="cpucount" type="nonNegativeInteger"
+    				use="required">
+    				<annotation>
+    					<documentation>
+    						defines how many cpus are in the whole
+    						system
+    					</documentation>
+    				</annotation>
+    			</attribute>
+    			<attribute name="cpupernode" type="positiveInteger" default="1"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+</schema>

@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+          LML - LLView markup language 
+
+   Copyright (c) 2011 Forschungszentrum Juelich GmbH
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+ -->
+<schema targetNamespace="http://www.llview.de"
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:lml="http://www.llview.de">
+
+    <include schemaLocation=""></include>
+    <include schemaLocation="lgui.xsd"></include>
+    <complexType name="element_type">
+    	<annotation>
+    		<documentation>
+    			Abstract element type for either scheme- or
+    			data-elements. This element is repeated (max-min+1)
+    			times, if step in the scheme-section is 1. max should be
+    			higher then min. If max is left out, max will be set to
+    			min (max=min). min="0", max="0" means there is only one
+    			element.
+    		</documentation>
+    	</annotation>
+    	<attribute name="min" type="nonNegativeInteger">
+    		<annotation>
+    			<documentation>
+    				Defines a list of elements. In default-case (count
+    				is not defined) count is set to one.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="max" type="nonNegativeInteger"></attribute>
+    	<attribute name="list" type="lml:list_type"></attribute>
+    </complexType>
+
+
+
+
+    <complexType name="scheme_type">
+        <annotation>
+        	<documentation>Scheme description of batch-system. Describes an empty instance of the actual batch system.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="el1" type="lml:scheme_element1" minOccurs="1" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+
+
+    <complexType name="data_type">
+    	<sequence>
+    		<element name="el1" type="lml:data_element1" minOccurs="1" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="nodedisplay">
+    	<annotation>
+    		<documentation>
+    			Representation of the overview about cpus and which jobs
+    			are running on which cpu/node. Designed as tree.
+    			Scheme-tag describes an empty batch-system, data-tag the
+    			actual situation in this system. Data-tag connects
+    			elements in the nodedisplay with jobs, which are running
+    			in the system.
+    		</documentation>
+    	</annotation>
+    	<complexContent>
+    		<extension base="lml:gobject_type">
+    			<sequence>
+    				<element name="scheme" type="lml:scheme_type">
+
+    					<!-- defines unique tag-names within nodedisplay/scheme -->
+    					<key name="schemetagKey">
+    						<selector xpath=".//el" />
+    						<field xpath="@tagname" />
+    					</key>
+
+    				</element>
+    				<element name="data" type="lml:data_type">
+
+    					<!-- References to allowed tagnames within scheme-tag 
+    						<keyref name="schemetagRef" refer="lml:schemetagKey">
+    						<selector xpath=".//el"/>
+    						<field xpath="@tagname"/>
+    						</keyref>-->
+    					<!-- referenced implicit names can only be used once -->
+    					<unique name="refidsUnique">
+        					<selector xpath=".//*"/>
+        					<field xpath="@refid"/>
+        				</unique>
+
+    				</element>
+    			</sequence>
+    			<attribute name="refto" type="string"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element1">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element name="el2" type="lml:scheme_element2" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="scheme_element10">
+    	<complexContent>
+    		<extension base="lml:scheme_element"></extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element9">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element name="el10" type="lml:scheme_element10" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element8">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element name="el9" type="lml:scheme_element9" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element7">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element name="el8" type="lml:scheme_element8" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element6">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element name="el7" type="lml:scheme_element7" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element5">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element name="el6" type="lml:scheme_element6" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element4">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element name="el5" type="lml:scheme_element5" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element3">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element name="el4" type="lml:scheme_element4" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element2">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element name="el3" type="lml:scheme_element3" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+    
+    
+    <complexType name="data_element1">
+    	<complexContent>
+    		<extension base="lml:data_element">
+    			<sequence>
+    				<element name="el2" type="lml:data_element2" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="data_element10">
+    	<complexContent>
+    		<extension base="lml:data_element"></extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="data_element9">
+    	<complexContent>
+    		<extension base="lml:data_element">
+    			<sequence>
+    				<element name="el10" type="lml:data_element10" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="data_element8">
+    	<complexContent>
+    		<extension base="lml:data_element">
+    			<sequence>
+    				<element name="el9" type="lml:data_element9" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="data_element7">
+    	<complexContent>
+    		<extension base="lml:data_element">
+    			<sequence>
+    				<element name="el8" type="lml:data_element8" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="data_element6">
+    	<complexContent>
+    		<extension base="lml:data_element">
+    			<sequence>
+    				<element name="el7" type="lml:data_element7" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="data_element5">
+    	<complexContent>
+    		<extension base="lml:data_element">
+    			<sequence>
+    				<element name="el6" type="lml:data_element6" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="data_element4">
+    	<complexContent>
+    		<extension base="lml:data_element">
+    			<sequence>
+    				<element name="el5" type="lml:data_element5" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="data_element3">
+    	<complexContent>
+    		<extension base="lml:data_element">
+    			<sequence>
+    				<element name="el4" type="lml:data_element4" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="data_element2">
+    	<complexContent>
+    		<extension base="lml:data_element">
+    			<sequence>
+    				<element name="el3" type="lml:data_element3" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+
+    <complexType name="data_element">
+    	<annotation>
+    		<documentation>
+    			Abstract base-type for el-tags in data-tag. Could be
+    			used for special attributes, which only data-elements
+    			are allowed to include.
+    		</documentation>
+    	</annotation>
+    	<complexContent>
+    		<extension base="lml:element_type">
+    			<attribute name="oid" type="NCName">
+    				<annotation>
+    					<documentation>
+    						Reference to one job within objects-tag. To
+    						make sure, that every physical element is
+    						connected to one job, this attribute is
+    						required.
+    					</documentation>
+    				</annotation>
+    			</attribute>
+    			<attribute name="name" type="NCName">
+    				<annotation>
+    					<documentation>
+    						For example: R30-M1 (Name of a node in
+    						jugene).
+    					</documentation>
+    				</annotation>
+    			</attribute>
+    			<attribute name="description" type="string">
+    				<annotation>
+    					<documentation>
+    						For example: A running node.
+    					</documentation>
+    				</annotation>
+    			</attribute>
+    			<attribute name="status" type="string">
+    				<annotation>
+    					<documentation>
+    						For example running, waiting, broken.
+    					</documentation>
+    				</annotation>
+    			</attribute>
+    			<attribute name="refid" type="string"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element">
+    	<annotation>
+    		<documentation>
+    			All el?-tags will be subtypes of this type. Tagname has
+    			to be defined here. Data-elements must not repeat this
+    			tagname.
+    		</documentation>
+    	</annotation>
+    	<complexContent>
+    		<extension base="lml:element_type">
+    			<attribute name="tagname" type="NCName"></attribute>
+    			<attribute name="mask" default="%d-">
+    				<annotation>
+    					<documentation>
+    						If mask is not defined, default-mask is
+    						"%d-". To separate name-parts of implicit
+    						names use the length of the mask or a given
+    						separator. An unidentifying mask like "%d"
+    						is not allowed.
+    					</documentation>
+    				</annotation>
+    				<simpleType>
+    					<restriction base="string">
+    						<pattern
+    							value="(([^%])*%(\-|\+|\s|\#)*0(\-|\+|\s|\#)*(\d)+d([^%])*)|(([^%])*%(\-|\+|\s|\#)*d([^%\d])+)|(([^%])*%(\-|\+|\s|\#)*1d([^%])*)">
+    						</pattern>
+    					</restriction>
+    				</simpleType>
+    			</attribute>
+    			<attribute name="step" type="positiveInteger"
+    				default="1">
+    				<annotation>
+    					<documentation>
+    						default-step-width is 1. This is the value,
+    						which is set, if step is not defined.
+    					</documentation>
+    				</annotation>
+    			</attribute>
+    			<attribute name="map" type="lml:namemapping_type">
+    				<annotation>
+    					<documentation>Map names as implicit names to these components. mask and map can not be used together. map defines special names for all elements within this list. names must be separated by commas.</documentation>
+    				</annotation></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+
+    <simpleType name="list_type">
+        <annotation>
+        	<documentation>Type for list-attribute in scheme- or data-tag. It allowes the definition of several positive integer-values seperated by commas.</documentation>
+        </annotation>
+        <restriction base="string">
+    		<pattern value="\s*\d+\s*(\s*,\s*\d+)*"></pattern>
+    	</restriction>
+    </simpleType>
+
+    <simpleType name="namemapping_type">
+        <annotation>
+        	<documentation>This type is used to map special names to elements of the nodedisplay. Usually a digit has to be printed with a mask-atttribute, but if the name does not contain a digit, this type will be used to define those special names.</documentation>
+        </annotation>
+        <restriction base="string">
+    		<pattern value=".*(,.*)*"></pattern>
+    	</restriction>
+    </simpleType>
+</schema>
