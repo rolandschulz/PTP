@@ -35,11 +35,6 @@ public class ASTEndSubroutineStmtNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTEndSubroutineStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndSubroutineStmtNode
 
-    public boolean hasEndSubroutine()
-    {
-        return hiddenTSubroutine != null || hiddenTEndsubroutine != null;
-    }
-    
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
         return this.label;
@@ -103,5 +98,10 @@ public class ASTEndSubroutineStmtNode extends ASTNode
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
+
+
+/////////////////////////////////// User Code //////////////////////////////////
+
+ public boolean hasEndSubroutine() { return hiddenTSubroutine != null || hiddenTEndsubroutine != null; }
 }
 

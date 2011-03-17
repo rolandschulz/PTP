@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.photran.internal.core.parser.ASTNodeUtil.NonNullIterator;
 
@@ -173,6 +174,11 @@ public class ASTSeparatedListNode<T extends IASTNode> extends AbstractList<T> im
     // Searching
     ///////////////////////////////////////////////////////////////////////////
 
+    public <T extends IASTNode> Set<T> findAll(Class<T> targetClass)
+    {
+        return ASTNodeUtil.findAll(this, targetClass);
+    }
+
     @SuppressWarnings("hiding")
     public <T extends IASTNode> T findNearestAncestor(Class<T> targetClass)
     {
@@ -224,7 +230,23 @@ public class ASTSeparatedListNode<T extends IASTNode> extends AbstractList<T> im
 
     public void replaceChild(IASTNode node, IASTNode withNode)
     {
-        throw new UnsupportedOperationException();
+        int i = entries.indexOf(node);
+        if (i >= 0)
+        {
+            entries.set(i, (T)withNode);
+            if (withNode != null) withNode.setParent(this);
+            return;
+        }
+
+        i = separators.indexOf(node);
+        if (i >= 0)
+        {
+            separators.set(i, (Token)withNode);
+            if (withNode != null) withNode.setParent(this);
+            return;
+        }
+
+        throw new IllegalStateException("Child node not found");
     }
 
     public void removeFromTree()

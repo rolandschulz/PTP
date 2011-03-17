@@ -301,18 +301,18 @@ xImplLkahead = (","|";"|{LineTerminator}|"!")
 
 NumDotLkahead = [^A-Za-z]
 
-CppIfdef="#ifdef"[^\r\n]*{LineTerminator}
-CppIfndef="#ifndef"[^\r\n]*{LineTerminator}
-CppIf="#if"[^\r\n]*{LineTerminator}
-CppElse="#else"[^\r\n]*{LineTerminator}
-CppElif="#elif"[^\r\n]*{LineTerminator}
-CppEndIf="#endif"[^\r\n]*{LineTerminator}
-CppInclude="#include"[^\r\n]*{LineTerminator}
-CppDefine="#define"[^\r\n]*{LineTerminator}
-CppUndef="#undef"[^\r\n]*{LineTerminator}
-CppLine="#line"[^\r\n]*{LineTerminator}
-CppError="#error"[^\r\n]*{LineTerminator}
-CppPragma="#pragma"[^\r\n]*{LineTerminator}
+CppIfdef="#"[ \t]*"ifdef"[^\r\n]*{LineTerminator}
+CppIfndef="#"[ \t]*"ifndef"[^\r\n]*{LineTerminator}
+CppIf="#"[ \t]*"if"[^\r\n]*{LineTerminator}
+CppElse="#"[ \t]*"else"[^\r\n]*{LineTerminator}
+CppElif="#"[ \t]*"elif"[^\r\n]*{LineTerminator}
+CppEndIf="#"[ \t]*"endif"[^\r\n]*{LineTerminator}
+CppInclude="#"[ \t]*"include"[^\r\n]*{LineTerminator}
+CppDefine="#"[ \t]*"define"[^\r\n]*{LineTerminator}
+CppUndef="#"[ \t]*"undef"[^\r\n]*{LineTerminator}
+CppLine="#"[ \t]*"line"[^\r\n]*{LineTerminator}
+CppError="#"[ \t]*"error"[^\r\n]*{LineTerminator}
+CppPragma="#"[ \t]*"pragma"[^\r\n]*{LineTerminator}
 CppDirective={CppIfdef}|{CppIfndef}|{CppIf}|{CppElse}|{CppElif}|{CppEndIf}|{CppInclude}|{CppDefine}|{CppUndef}|{CppLine}|{CppError}|{CppPragma}
 
 FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}

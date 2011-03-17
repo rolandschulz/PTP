@@ -189,7 +189,7 @@ final class ContainsStmtParsingTables extends ParsingTables
             
             byte[] decoded = new byte[compressedBytes];
             base64Decode(decoded,
-                "eNpz/dnAfoChgdHhBgOD610g/sUABg2sEJoBAKYcBwU=");
+                "eNpz/dPAfoChgdHhBgOD6wMg/ssABg2sEJoBAKboBw4=");
             
             byte[] buffer = new byte[uncompressedBytes];
             Inflater inflater = new Inflater();

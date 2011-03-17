@@ -14,6 +14,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.photran.internal.core.parser.ASTNodeUtil.NonNullIterator;
 
@@ -133,6 +134,11 @@ public abstract class ASTNode implements IASTNode
     ///////////////////////////////////////////////////////////////////////////
     // Searching
     ///////////////////////////////////////////////////////////////////////////
+
+    public <T extends IASTNode> Set<T> findAll(Class<T> targetClass)
+    {
+        return ASTNodeUtil.findAll(this, targetClass);
+    }
 
     public <T extends IASTNode> T findNearestAncestor(Class<T> targetClass)
     {

@@ -33,7 +33,7 @@ public class ASTForallConstructStmtNode extends ASTNodeWithErrorRecoverySymbols 
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTForallConstructStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTForall; // in ASTForallConstructStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTForallConstructStmtNode
-    ASTForallTripletSpecListNode forallTripletSpecList; // in ASTForallConstructStmtNode
+    IASTListNode<ASTForallTripletSpecListNode> forallTripletSpecList; // in ASTForallConstructStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTForallConstructStmtNode
     ASTScalarMaskExprNode scalarMaskExpr; // in ASTForallConstructStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTForallConstructStmtNode
@@ -63,12 +63,12 @@ public class ASTForallConstructStmtNode extends ASTNodeWithErrorRecoverySymbols 
     }
 
 
-    public ASTForallTripletSpecListNode getForallTripletSpecList()
+    public IASTListNode<ASTForallTripletSpecListNode> getForallTripletSpecList()
     {
         return this.forallTripletSpecList;
     }
 
-    public void setForallTripletSpecList(ASTForallTripletSpecListNode newValue)
+    public void setForallTripletSpecList(IASTListNode<ASTForallTripletSpecListNode> newValue)
     {
         this.forallTripletSpecList = newValue;
         if (newValue != null) newValue.setParent(this);
@@ -128,7 +128,7 @@ public class ASTForallConstructStmtNode extends ASTNodeWithErrorRecoverySymbols 
         case 2:  this.hiddenTColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 3:  this.hiddenTForall = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.forallTripletSpecList = (ASTForallTripletSpecListNode)value; if (value != null) value.setParent(this); return;
+        case 5:  this.forallTripletSpecList = (IASTListNode<ASTForallTripletSpecListNode>)value; if (value != null) value.setParent(this); return;
         case 6:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 7:  this.scalarMaskExpr = (ASTScalarMaskExprNode)value; if (value != null) value.setParent(this); return;
         case 8:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;

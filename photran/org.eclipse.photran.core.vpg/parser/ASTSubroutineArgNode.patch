@@ -1,0 +1,16 @@
+--- ASTSubroutineArgNode.java	2011-03-17 10:54:17.000000000 -0500
++++ ASTSubroutineArgNode.java.new	2011-03-17 11:06:41.000000000 -0500
+@@ -43,7 +43,12 @@
+     public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
+     {
+         this.name = newValue;
+-        if (newValue != null) newValue.setParent(this);
++        if (newValue != null) 
++        {
++            newValue.setParent(this);
++            hiddenTEquals = new Token(Terminal.T_EQUALS, "=");
++            hiddenTEquals.setParent(this);
++        }
+     }
+ 
+ 

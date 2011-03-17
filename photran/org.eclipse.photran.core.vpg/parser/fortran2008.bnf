@@ -81,6 +81,12 @@
 * IActionStmt =>    Token getLabel(); void setLabel(Token label);
 * ASTTypeSpecNode =>    public org.eclipse.photran.internal.core.lexer.Token getCharacterToken() { return this.isCharacter; }
 
+* ASTEndFunctionStmtNode => public boolean hasEndFunction() { return hiddenTFunction != null || hiddenTEndfunction != null; }
+* ASTEndModuleStmtNode => public boolean hasEndModule() { return hiddenTModule != null || hiddenTEndmodule != null; }
+* ASTEndProgramStmtNode => public boolean hasEndProgram() { return hiddenTProgram != null || endToken.getTerminal() == Terminal.T_ENDPROGRAM; }
+* ASTEndSubroutineStmtNode => public boolean hasEndSubroutine() { return hiddenTSubroutine != null || hiddenTEndsubroutine != null; }
+# ASTSubroutineArgNode patched manually via ASTSubroutineArgNode.patch
+
 #######################################################################################################################
 # Section 2 Rules
 #######################################################################################################################
@@ -2096,10 +2102,11 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 <ScalarMaskExpr> ::= (inline):<MaskExpr>
 
 # R750
-<ForallTripletSpecList> ::=
+(list):<ForallTripletSpecList> ::=
   | <Name> -:T_EQUALS Lb:<Subscript> -:T_COLON Ub:<Subscript>
   | <Name> -:T_EQUALS Lb:<Subscript> -:T_COLON Ub:<Subscript> -:T_COLON stepExpr:<Expr>
-
+  | <ForallTripletSpecList> -:T_COMMA <Name> -:T_EQUALS Lb:<Subscript> -:T_COLON Ub:<Subscript>
+  | <ForallTripletSpecList> -:T_COMMA <Name> -:T_EQUALS Lb:<Subscript> -:T_COLON Ub:<Subscript> -:T_COLON stepExpr:<Expr>
 # R751
 (superclass):<ForallBodyConstruct> ::=
   | <AssignmentStmt>
@@ -3061,6 +3068,7 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 
 # F03 R1209
 <ImportStmt> ::=
+  | (inline):<LblDef> -:T_IMPORT                                  -:T_EOS
   | (inline):<LblDef> -:T_IMPORT                     <ImportList> -:T_EOS
   | (inline):<LblDef> -:T_IMPORT -:T_COLON -:T_COLON <ImportList> -:T_EOS
 

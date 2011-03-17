@@ -13,6 +13,7 @@ package org.eclipse.photran.internal.core.parser;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("all")
 public interface IASTNode extends Cloneable
@@ -26,6 +27,7 @@ public interface IASTNode extends Cloneable
     void removeFromTree();
     void replaceWith(IASTNode newNode);
     void replaceWith(String literalString);
+    <T extends IASTNode> Set<T> findAll(Class<T> targetClass);
     <T extends IASTNode> T findNearestAncestor(Class<T> targetClass);
     <T extends IASTNode> T findFirst(Class<T> targetClass);
     <T extends IASTNode> T findLast(Class<T> targetClass);

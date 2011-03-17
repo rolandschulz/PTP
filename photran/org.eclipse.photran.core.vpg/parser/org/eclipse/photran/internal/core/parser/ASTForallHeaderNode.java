@@ -29,17 +29,17 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTForallHeaderNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTForallHeaderNode
-    ASTForallTripletSpecListNode forallTripletSpecList; // in ASTForallHeaderNode
+    IASTListNode<ASTForallTripletSpecListNode> forallTripletSpecList; // in ASTForallHeaderNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTForallHeaderNode
     ASTScalarMaskExprNode scalarMaskExpr; // in ASTForallHeaderNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTForallHeaderNode
 
-    public ASTForallTripletSpecListNode getForallTripletSpecList()
+    public IASTListNode<ASTForallTripletSpecListNode> getForallTripletSpecList()
     {
         return this.forallTripletSpecList;
     }
 
-    public void setForallTripletSpecList(ASTForallTripletSpecListNode newValue)
+    public void setForallTripletSpecList(IASTListNode<ASTForallTripletSpecListNode> newValue)
     {
         this.forallTripletSpecList = newValue;
         if (newValue != null) newValue.setParent(this);
@@ -88,7 +88,7 @@ public class ASTForallHeaderNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.forallTripletSpecList = (ASTForallTripletSpecListNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.forallTripletSpecList = (IASTListNode<ASTForallTripletSpecListNode>)value; if (value != null) value.setParent(this); return;
         case 2:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 3:  this.scalarMaskExpr = (ASTScalarMaskExprNode)value; if (value != null) value.setParent(this); return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;

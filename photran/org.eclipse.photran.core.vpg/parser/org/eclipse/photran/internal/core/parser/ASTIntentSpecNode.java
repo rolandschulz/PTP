@@ -30,8 +30,8 @@ public class ASTIntentSpecNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token isIntentOut; // in ASTIntentSpecNode
     org.eclipse.photran.internal.core.lexer.Token isIntentInOut; // in ASTIntentSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isIntentIn; // in ASTIntentSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTOut; // in ASTIntentSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isIntentIn; // in ASTIntentSpecNode
 
     public boolean isIntentOut()
     {
@@ -87,8 +87,8 @@ public class ASTIntentSpecNode extends ASTNode
         {
         case 0:  return this.isIntentOut;
         case 1:  return this.isIntentInOut;
-        case 2:  return this.isIntentIn;
-        case 3:  return this.hiddenTOut;
+        case 2:  return this.hiddenTOut;
+        case 3:  return this.isIntentIn;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -99,8 +99,8 @@ public class ASTIntentSpecNode extends ASTNode
         {
         case 0:  this.isIntentOut = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 1:  this.isIntentInOut = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.isIntentIn = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.hiddenTOut = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTOut = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.isIntentIn = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

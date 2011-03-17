@@ -13,6 +13,7 @@ package org.eclipse.photran.internal.core.lexer;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -346,6 +347,11 @@ public class Token implements IToken, IASTNode
     public void accept(IASTVisitor visitor)
     {
         visitor.visitToken(this);
+    }
+
+    public <T extends IASTNode> Set<T> findAll(Class<T> targetClass)
+    {
+        return ASTNodeUtil.findAll(this, targetClass);
     }
 
     public <T extends IASTNode> T findFirst(Class<T> targetClass)

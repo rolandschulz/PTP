@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.photran.internal.core.parser.ASTNodeUtil.NonNullIterator;
 
@@ -133,6 +134,11 @@ public class ASTListNode<T extends IASTNode> extends ArrayList<T> implements IAS
     ///////////////////////////////////////////////////////////////////////////
     // Searching
     ///////////////////////////////////////////////////////////////////////////
+
+    public <T extends IASTNode> Set<T> findAll(Class<T> targetClass)
+    {
+        return ASTNodeUtil.findAll(this, targetClass);
+    }
 
     @SuppressWarnings("hiding")
     public <T extends IASTNode> T findNearestAncestor(Class<T> targetClass)

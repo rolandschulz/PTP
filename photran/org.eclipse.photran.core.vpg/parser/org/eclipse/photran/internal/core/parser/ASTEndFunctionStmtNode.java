@@ -35,11 +35,6 @@ public class ASTEndFunctionStmtNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTEndFunctionStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndFunctionStmtNode
 
-    public boolean hasEndFunction()
-    {
-        return hiddenTFunction != null || hiddenTEndfunction != null;
-    }
-    
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
         return this.label;
@@ -103,5 +98,10 @@ public class ASTEndFunctionStmtNode extends ASTNode
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
+
+
+/////////////////////////////////// User Code //////////////////////////////////
+
+ public boolean hasEndFunction() { return hiddenTFunction != null || hiddenTEndfunction != null; }
 }
 

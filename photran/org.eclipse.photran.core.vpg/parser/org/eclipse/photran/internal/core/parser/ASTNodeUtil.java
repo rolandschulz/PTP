@@ -13,8 +13,10 @@ package org.eclipse.photran.internal.core.parser;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("all")
 public final class ASTNodeUtil
@@ -33,6 +35,32 @@ public final class ASTNodeUtil
         IASTNode parent = node.getParent();
         if (parent == null) throw new IllegalArgumentException("Cannot remove root node");
         parent.replaceChild(node, newNode);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends IASTNode> Set<T> findAll(IASTNode node, final Class<T> clazz)
+    {
+        class V extends GenericASTVisitor
+        {
+            Set<T> result = new HashSet<T>();
+
+            @Override public void visitASTNode(IASTNode node)
+            {
+                if (clazz.isAssignableFrom(node.getClass()))
+                    result.add((T)node);
+                traverseChildren(node);
+            }
+
+            @Override public void visitToken(Token node)
+            {
+                if (clazz.isAssignableFrom(node.getClass()))
+                    result.add((T)node);
+            }
+        };
+
+        V v = new V();
+        node.accept(v);
+        return v.result;
     }
 
     @SuppressWarnings("unchecked")

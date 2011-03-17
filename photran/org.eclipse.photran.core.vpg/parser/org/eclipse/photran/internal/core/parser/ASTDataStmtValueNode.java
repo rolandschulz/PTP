@@ -31,9 +31,9 @@ public class ASTDataStmtValueNode extends ASTNode
     ASTNamedConstantUseNode namedConstKind; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hasConstIntKind; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTDataStmtValueNode
-    ASTConstantNode constant; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token isNull; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTDataStmtValueNode
+    ASTConstantNode constant; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTDataStmtValueNode
 
     public ASTNamedConstantUseNode getNamedConstKind()
@@ -60,18 +60,6 @@ public class ASTDataStmtValueNode extends ASTNode
     }
 
 
-    public ASTConstantNode getConstant()
-    {
-        return this.constant;
-    }
-
-    public void setConstant(ASTConstantNode newValue)
-    {
-        this.constant = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
     public boolean isNull()
     {
         return this.isNull != null;
@@ -80,6 +68,18 @@ public class ASTDataStmtValueNode extends ASTNode
     public void setIsNull(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isNull = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public ASTConstantNode getConstant()
+    {
+        return this.constant;
+    }
+
+    public void setConstant(ASTConstantNode newValue)
+    {
+        this.constant = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -103,9 +103,9 @@ public class ASTDataStmtValueNode extends ASTNode
         case 0:  return this.namedConstKind;
         case 1:  return this.hasConstIntKind;
         case 2:  return this.hiddenTAsterisk;
-        case 3:  return this.constant;
-        case 4:  return this.isNull;
-        case 5:  return this.hiddenTLparen;
+        case 3:  return this.isNull;
+        case 4:  return this.hiddenTLparen;
+        case 5:  return this.constant;
         case 6:  return this.hiddenTRparen;
         default: throw new IllegalArgumentException("Invalid index");
         }
@@ -118,9 +118,9 @@ public class ASTDataStmtValueNode extends ASTNode
         case 0:  this.namedConstKind = (ASTNamedConstantUseNode)value; if (value != null) value.setParent(this); return;
         case 1:  this.hasConstIntKind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 2:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.constant = (ASTConstantNode)value; if (value != null) value.setParent(this); return;
-        case 4:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.constant = (ASTConstantNode)value; if (value != null) value.setParent(this); return;
         case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
