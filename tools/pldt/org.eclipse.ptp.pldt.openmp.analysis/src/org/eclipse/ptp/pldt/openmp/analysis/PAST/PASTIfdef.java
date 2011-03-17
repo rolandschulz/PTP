@@ -11,33 +11,39 @@
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.IASTName;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIfdefStatement;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
  * @author pazel
- *
+ * 
  */
-public class PASTIfdef extends PASTNode implements IASTPreprocessorIfdefStatement
-{
+public class PASTIfdef extends PASTNode implements IASTPreprocessorIfdefStatement {
 	protected IASTPreprocessorIfdefStatement ifdef_ = null;
-	
-    /**
-     * PASTIfdef - constructor
-     * @param ifdef
-     */
-	public PASTIfdef(IASTPreprocessorIfdefStatement ifdef)
-	{
-		super((ASTNode)ifdef);
+
+	/**
+	 * PASTIfdef - constructor
+	 * 
+	 * @param ifdef
+	 */
+	public PASTIfdef(IASTPreprocessorIfdefStatement ifdef) {
+		super((ASTNode) ifdef);
 		ifdef_ = ifdef;
 	}
-    
-    public String getType()
-    {
-        return "#ifdef";
-    }
 
+	/**
+	 * @since 4.1
+	 */
+	public IASTNode copy(CopyStyle style) {
+		return ifdef_.copy(style);
+	}
+
+	@Override
+	public String getType() {
+		return "#ifdef"; //$NON-NLS-1$
+	}
 
 	public boolean taken() {
 		return ifdef_.taken();

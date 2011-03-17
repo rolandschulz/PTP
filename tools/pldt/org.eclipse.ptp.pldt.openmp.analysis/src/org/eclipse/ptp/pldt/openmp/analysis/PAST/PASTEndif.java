@@ -10,36 +10,43 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorEndifStatement;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
  * @author pazel
- *
+ * 
  */
-public class PASTEndif extends PASTNode implements IASTPreprocessorEndifStatement
-{
-	private IASTPreprocessorEndifStatement   endif_ = null;
-	
-    /**
-     * PASTEndif - Endif proprocessor statment (Constructor)
-     * @param endif: ASTEndif
-     */
-    public PASTEndif(IASTPreprocessorEndifStatement endif)
-    {
-    	super((ASTNode)endif);
-    	endif_ = endif;
-    }
-     
-    public String getType()
-    {
-        return "#endif";
-    }
+public class PASTEndif extends PASTNode implements IASTPreprocessorEndifStatement {
+	private IASTPreprocessorEndifStatement endif_ = null;
+
+	/**
+	 * PASTEndif - Endif proprocessor statment (Constructor)
+	 * 
+	 * @param endif
+	 *            : ASTEndif
+	 */
+	public PASTEndif(IASTPreprocessorEndifStatement endif) {
+		super((ASTNode) endif);
+		endif_ = endif;
+	}
+
+	/**
+	 * @since 4.1
+	 */
+	public IASTNode copy(CopyStyle style) {
+		return endif_.copy(style);
+	}
+
+	@Override
+	public String getType() {
+		return "#endif"; //$NON-NLS-1$
+	}
 
 	public boolean isPartOfTranslationUnitFile() {
 		return endif_.isPartOfTranslationUnitFile();
 	}
 
-    
 }

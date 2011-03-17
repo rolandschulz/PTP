@@ -10,32 +10,40 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorErrorStatement;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
  * @author pazel
- *
+ * 
  */
-public class PASTError extends PASTNode implements IASTPreprocessorErrorStatement
-{
+public class PASTError extends PASTNode implements IASTPreprocessorErrorStatement {
 	protected IASTPreprocessorErrorStatement error_ = null;
-	
-    /**
-     * PASTError - Error preprocessor statment (Constructor)
-     * @param error: ASTError
-     */
-	public PASTError(IASTPreprocessorErrorStatement error)
-	{
-		super((ASTNode)error);
+
+	/**
+	 * PASTError - Error preprocessor statment (Constructor)
+	 * 
+	 * @param error
+	 *            : ASTError
+	 */
+	public PASTError(IASTPreprocessorErrorStatement error) {
+		super((ASTNode) error);
 		error_ = error;
 	}
-    
-    public String getType()
-    {
-        return "#error";
-    }
+
+	/**
+	 * @since 4.1
+	 */
+	public IASTNode copy(CopyStyle style) {
+		return error_.copy(style);
+	}
+
+	@Override
+	public String getType() {
+		return "#error"; //$NON-NLS-1$
+	}
 
 	public char[] getMessage() {
 		return error_.getMessage();
@@ -44,6 +52,5 @@ public class PASTError extends PASTNode implements IASTPreprocessorErrorStatemen
 	public boolean isPartOfTranslationUnitFile() {
 		return error_.isPartOfTranslationUnitFile();
 	}
-
 
 }

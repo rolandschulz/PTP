@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorPragmaStatement;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 import org.eclipse.ptp.pldt.common.util.Utility;
@@ -46,13 +47,20 @@ public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatem
 		content_ = pPragma.getContent();
 	}
 
+	/**
+	 * @since 4.1
+	 */
+	public IASTNode copy(CopyStyle style) {
+		return pragma_.copy(style);
+	}
+
 	protected IASTPreprocessorPragmaStatement getASTPragma() {
 		return pragma_;
 	}
 
 	@Override
 	public String getType() {
-		return "#pragma";
+		return "#pragma"; //$NON-NLS-1$
 	}
 
 	/**

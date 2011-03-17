@@ -11,33 +11,40 @@
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.IASTName;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIncludeStatement;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
  * @author pazel
- *
+ * 
  */
-public class PASTInclusionStatement extends PASTNode implements IASTPreprocessorIncludeStatement
-{
+public class PASTInclusionStatement extends PASTNode implements IASTPreprocessorIncludeStatement {
 	protected IASTPreprocessorIncludeStatement incl_ = null;
-	
-    /**
-     * PASTInclusionStatement - constructor
-     * @param incl: ASTInclusionStatement
-     */
-	public PASTInclusionStatement(IASTPreprocessorIncludeStatement incl)
-	{
-		super((ASTNode)incl);
+
+	/**
+	 * PASTInclusionStatement - constructor
+	 * 
+	 * @param incl
+	 *            : ASTInclusionStatement
+	 */
+	public PASTInclusionStatement(IASTPreprocessorIncludeStatement incl) {
+		super((ASTNode) incl);
 		incl_ = incl;
 	}
-    
-    public String getType()
-    {
-        return "#include";
-    }
 
+	/**
+	 * @since 4.1
+	 */
+	public IASTNode copy(CopyStyle style) {
+		return incl_.copy(style);
+	}
+
+	@Override
+	public String getType() {
+		return "#include"; //$NON-NLS-1$
+	}
 
 	public String getPath() {
 		return incl_.getPath();
@@ -52,10 +59,13 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 	public boolean isSystemInclude() {
 		return incl_.isSystemInclude();
 	}
+
 	// cdt40
+	@Override
 	public boolean isActive() {
 		return incl_.isActive();
 	}
+
 	// cdt40
 	public boolean isResolved() {
 		return incl_.isResolved();
@@ -63,17 +73,20 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 
 	/**
 	 * CDT 6.0 implement isPartOfTranslationUnitFile()
+	 * 
 	 * @return
 	 */
 	public boolean isPartOfTranslationUnitFile() {
 		return incl_.isPartOfTranslationUnitFile();
 	}
+
 	/**
-	 * CDT 6.0 implement  IASTPreprocessorIncludeStatement.isResolvedByHeuristics()
+	 * CDT 6.0 implement
+	 * IASTPreprocessorIncludeStatement.isResolvedByHeuristics()
 	 */
-	public boolean isResolvedByHeuristics(){
+	public boolean isResolvedByHeuristics() {
 		return false;
-		
+
 	}
-	
+
 }

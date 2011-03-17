@@ -11,36 +11,43 @@
 package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 
 import org.eclipse.cdt.core.dom.ast.IASTName;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorUndefStatement;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * 
  * @author pazel
- *
+ * 
  */
-public class PASTUndef extends PASTNode implements IASTPreprocessorUndefStatement
-{
+public class PASTUndef extends PASTNode implements IASTPreprocessorUndefStatement {
 	protected IASTPreprocessorUndefStatement undef_ = null;
-	
-    /**
-     * PASTUndef - constructor
-     * @param undef
-     */
-	public PASTUndef(IASTPreprocessorUndefStatement undef)
-	{
-		super((ASTNode)undef);
+
+	/**
+	 * PASTUndef - constructor
+	 * 
+	 * @param undef
+	 */
+	public PASTUndef(IASTPreprocessorUndefStatement undef) {
+		super((ASTNode) undef);
 		undef_ = undef;
 	}
-    
-    public String getType()
-    {
-        return "#undef";
-    }
 
-    /**
-     * Delegate methods for IASTPreprocessorUndefStatement 
-     */
+	/**
+	 * @since 4.1
+	 */
+	public IASTNode copy(CopyStyle style) {
+		return undef_.copy(style);
+	}
+
+	@Override
+	public String getType() {
+		return "#undef"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Delegate methods for IASTPreprocessorUndefStatement
+	 */
 	public IASTName getMacroName() {
 		return undef_.getMacroName();
 	}
