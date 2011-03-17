@@ -64,7 +64,7 @@ public class Messages extends NLS {
 	public static String CustomBatchScriptTab_title;
 	public static String MXGroupTitle;
 	public static String ManualLaunch;
-	public static String LoadScript;
+
 	public static String SaveToFileButton;
 	public static String ClearScript;
 	public static String BatchScriptPath;
@@ -75,8 +75,6 @@ public class Messages extends NLS {
 	public static String ViewValuesReplaced;
 	public static String AttributeName;
 	public static String AttributeDescription;
-	public static String ErrorOnSaveWidgets;
-	public static String ErrorOnSaveTitle;
 	public static String ErrorOnLoadTitle;
 	public static String ErrorOnLoadFromStore;
 	public static String WidgetSelectedError;
@@ -84,8 +82,6 @@ public class Messages extends NLS {
 	public static String MissingLaunchConfigurationError;
 	public static String JAXBRMLaunchConfigurationFactory_doCreateError;
 
-	public static String TextModifiedErrorTitle;
-	public static String TextModifiedError;
 	public static String FileContentsDirty;
 	public static String ErrorOnCopyToStorageTitle;
 	public static String ErrorOnCopyToStorage;
