@@ -26,7 +26,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 @SuppressWarnings("all")
-public class ASTPauseStmtNode extends ASTNode implements IActionStmt
+public class ASTPauseStmtNode extends ASTNode implements IActionStmt, IObsoleteActionStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTPauseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTPause; // in ASTPauseStmtNode
@@ -75,6 +75,8 @@ public class ASTPauseStmtNode extends ASTNode implements IActionStmt
     {
         visitor.visitASTPauseStmtNode(this);
         visitor.visitIActionStmt(this);
+        visitor.visitIObsoleteActionStmt(this);
+        visitor.visitIObsoleteActionStmt(this);
         visitor.visitASTNode(this);
     }
 

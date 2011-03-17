@@ -77,6 +77,9 @@
 * ASTCaseStmtNode(implements=IActionStmt,also-visit=IActionStmt)
 * ASTForallConstructStmtNode(implements=IActionStmt,also-visit=IActionStmt)
 
+* ASTPauseStmtNode(implements=IObsoleteActionStmt,also-visit=IObsoleteActionStmt)
+* ASTAssignStmtNode(implements=IObsoleteActionStmt,also-visit=IObsoleteActionStmt)
+
 # Custom code
 * IActionStmt =>    Token getLabel(); void setLabel(Token label);
 * ASTTypeSpecNode =>    public org.eclipse.photran.internal.core.lexer.Token getCharacterToken() { return this.isCharacter; }

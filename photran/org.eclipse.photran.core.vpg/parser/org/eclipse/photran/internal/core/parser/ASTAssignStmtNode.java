@@ -26,7 +26,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 @SuppressWarnings("all")
-public class ASTAssignStmtNode extends ASTNode implements IActionStmt
+public class ASTAssignStmtNode extends ASTNode implements IActionStmt, IObsoleteActionStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTAssignStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTAssign; // in ASTAssignStmtNode
@@ -76,6 +76,8 @@ public class ASTAssignStmtNode extends ASTNode implements IActionStmt
     {
         visitor.visitASTAssignStmtNode(this);
         visitor.visitIActionStmt(this);
+        visitor.visitIObsoleteActionStmt(this);
+        visitor.visitIObsoleteActionStmt(this);
         visitor.visitASTNode(this);
     }
 
