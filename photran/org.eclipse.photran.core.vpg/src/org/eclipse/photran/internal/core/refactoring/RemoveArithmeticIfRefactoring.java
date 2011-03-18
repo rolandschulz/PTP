@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 University of Illinois at Urbana-Champaign and others.
+ * Copyright (c) 2010, 2011 University of Illinois at Urbana-Champaign and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -30,6 +30,7 @@ import org.eclipse.photran.internal.core.reindenter.Reindenter.Strategy;
  * Refactoring to remove arithmetic if statements in Fortran files.
  *
  * @author Matthew Fotzler
+ * @author Jeff Overbey - Bug 335794
  */
 public class RemoveArithmeticIfRefactoring extends FortranResourceRefactoring
 {
@@ -72,7 +73,6 @@ public class RemoveArithmeticIfRefactoring extends FortranResourceRefactoring
         if (ast == null) return;
 
         List<ASTArithmeticIfStmtNode> nodesToReplace = findNodesToReplace(ast);
-        
         if (!nodesToReplace.isEmpty())
         {
             for (ASTArithmeticIfStmtNode node : nodesToReplace)
@@ -84,23 +84,15 @@ public class RemoveArithmeticIfRefactoring extends FortranResourceRefactoring
 
     private List<ASTArithmeticIfStmtNode> findNodesToReplace(IFortranAST ast)
     {
-        ArithmeticIfRemovingVisitor replacer = new ArithmeticIfRemovingVisitor();
-        ast.accept(replacer);
-        return replacer.nodes;
-    }
-
-    private static final class ArithmeticIfRemovingVisitor extends GenericASTVisitor
-    {
-        private ArrayList<ASTArithmeticIfStmtNode> nodes = new ArrayList<ASTArithmeticIfStmtNode>();
-
-        @Override
-        public void visitASTNode(IASTNode node)
-        {    
-            if (node instanceof ASTArithmeticIfStmtNode)
-                nodes.add((ASTArithmeticIfStmtNode)node);
-
-            traverseChildren(node);
-        }
+        final List<ASTArithmeticIfStmtNode> result = new LinkedList<ASTArithmeticIfStmtNode>();
+        ast.accept(new GenericASTVisitor()
+        {
+            @Override public void visitASTArithmeticIfStmtNode(ASTArithmeticIfStmtNode node)
+            {
+                result.add(node);
+            }
+        });
+        return result;
     }
 
     private void replaceNode(ASTArithmeticIfStmtNode node, IFortranAST ast)
@@ -110,6 +102,8 @@ public class RemoveArithmeticIfRefactoring extends FortranResourceRefactoring
         String third = node.getThird().getLabel().getText();
         String conditionVariable = node.getExpr().toString();
         String newNodeString = node.findFirstToken().getWhiteBefore();
+        if (node.getLabel() != null)
+            newNodeString += node.getLabel().getText() + " "; //$NON-NLS-1$
         newNodeString += 
             "if(" + conditionVariable + "< 0) then" + node.findLastToken().getWhiteBefore() +  //$NON-NLS-1$ //$NON-NLS-2$
             "\ngoto " +  first +  //$NON-NLS-1$

@@ -1,0 +1,22 @@
+if(ifcur-2< 0) then !<<<<< 1,1,pass
+    goto 120
+else if(ifcur-2 == 0) then 
+    goto 60
+else 
+    goto 120
+end if
+60 if(4*ip2-ip4< 0) then
+    goto 80
+else if(4*ip2-ip4 == 0) then 
+    goto 80
+else 
+    goto 120
+end if
+80 if(ifact(if+1)-2< 0) then
+    goto 120
+else if(ifact(if+1)-2 == 0) then 
+    goto 100
+else 
+    goto 120
+end if
+end
