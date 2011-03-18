@@ -38,8 +38,8 @@ public final class FortranPreferences
 
     public static final FortranBooleanPreference ENABLE_VPG_LOGGING = new FortranBooleanPreference("vpglogging", false); //$NON-NLS-1$
     public static final FortranBooleanPreference SHOW_PARSE_TREE = new FortranBooleanPreference("parsetree", false); //$NON-NLS-1$
-    public static final FortranBooleanPreference ENABLE_FIXED_FORM_FOLDING = new FortranBooleanPreference("fixedfolding", false); //$NON-NLS-1$
-    public static final FortranBooleanPreference ENABLE_FREE_FORM_FOLDING = new FortranBooleanPreference("freefolding", false); //$NON-NLS-1$
+    public static final FortranBooleanPreference ENABLE_FOLDING = new FortranBooleanPreference("folding", true); //$NON-NLS-1$
+    public static final FortranBooleanPreference ENABLE_RULER = new FortranBooleanPreference("ruler", true); //$NON-NLS-1$
 
     public static final FortranRGBPreference COLOR_COMMENTS            = new FortranRGBPreference("comments",    new RGB(63,  127, 95 )); //$NON-NLS-1$
     public static final FortranRGBPreference COLOR_IDENTIFIERS         = new FortranRGBPreference("identifiers", new RGB(0,   0,   192)); //$NON-NLS-1$

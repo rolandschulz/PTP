@@ -67,11 +67,8 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
@@ -125,7 +122,6 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
 
     protected IPreferenceStore fCombinedPreferenceStore;
     protected Composite fMainComposite;
-    protected FortranHorizontalRuler fHRuler;
     protected Color verticalLineColor;
     protected boolean contentTypeMismatch;
 
@@ -178,26 +174,8 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
     {
         super.createPartControl(parent);
 
-        if (shouldDisplayHorizontalRulerRatherThanFolding())
-        {
-            Composite childComp = (Composite)((Composite) parent.getChildren()[0]).getChildren()[0];
-            GridLayout layout = new GridLayout();
-            layout.marginHeight = 0;
-            layout.marginWidth = 0;
-            layout.verticalSpacing = 2;
-            childComp.setLayout(layout);
-
-            GridData data = new GridData(GridData.FILL_BOTH);
-            childComp.getChildren()[0].setLayoutData(data);
-
-            fMainComposite = childComp;
-
-            createHorizontalRuler(fMainComposite);
-        }
-        else
-        {
+        if (FortranPreferences.ENABLE_FOLDING.getValue())
             installProjectionSupport();
-        }
 
         createLightGrayLines();
 
@@ -411,47 +389,6 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
     @Override protected void initializeKeyBindingScopes()
     {
         setKeyBindingScopes(new String[] { "org.eclipse.ui.textEditorScope", FORTRAN_EDITOR_CONTEXT_ID }); //$NON-NLS-1$
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Custom Ruler
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @param mainComposite
-     * This creates the horizontal ruler and adds it to the top of the editor
-     */
-    protected void createHorizontalRuler(Composite mainComposite)
-    {
-        GC gc = new GC(getSourceViewer().getTextWidget());
-        GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        data.heightHint = gc.getFontMetrics().getHeight();
-        gc.dispose();
-
-        fHRuler = getFortranHorizontalRuler(mainComposite);
-        fHRuler.setFont(getSourceViewer().getTextWidget().getFont());
-        fHRuler.setSourceViewer(getSourceViewer());
-        fHRuler.setLayoutData(data);
-        fHRuler.moveAbove(null);
-    }
-
-    /*
-     * TODO: The code for drawing a horizontal ruler doesn't work when projection support
-     * (folding) is enabled, since it uses a ProjectionViewer and the ugly "childComp = ..."
-     * needs to change somehow.  In the mean time, we provide the option to choose one or
-     * the other, but not both.
-     */
-    protected boolean shouldDisplayHorizontalRulerRatherThanFolding()
-    {
-        if (isFixedForm())
-            return FortranPreferences.ENABLE_FIXED_FORM_FOLDING.getValue() == false;
-        else
-            return FortranPreferences.ENABLE_FREE_FORM_FOLDING.getValue() == false;
-    }
-
-    protected FortranHorizontalRuler getFortranHorizontalRuler(Composite mainComposite)
-    {
-        return new FortranHorizontalRuler(getVerticalRuler(), mainComposite, isFixedForm());
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

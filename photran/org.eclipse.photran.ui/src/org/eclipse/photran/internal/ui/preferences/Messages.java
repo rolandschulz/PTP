@@ -31,6 +31,8 @@ public class Messages extends NLS
 
     public static String EditorPreferencePage_EnableFolding;
 
+    public static String EditorPreferencePage_EnableHorizRuler;
+
     public static String EditorPreferencePage_FixedFormLineLength;
 
     public static String EditorPreferencePage_IdentifiersFieldLabel;

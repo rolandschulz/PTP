@@ -25,12 +25,22 @@ import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Custom source viewer that uses spaces, rather than tabs, to implement the Shift Left
- * and Shift Right actions if the corresponding workspace preference is enabled.
+ * Custom source viewer for the Fortran editor.
+ * <p>
+ * This source viewer
+ * <ul>
+ * <li>includes a horizontal (column) ruler; and
+ * <li>uses spaces, rather than tabs, to implement the Shift Left and Shift Right actions if the
+ *     corresponding workspace preference is enabled.
+ * </ul>
  * 
  * @author Jeff Overbey based on CSourceViewer (see attributions in copyright header)
  */
@@ -47,6 +57,35 @@ public class FortranSourceViewer extends ProjectionViewer
         int styles)
     {
         super(parent, ruler, overviewRuler, showsAnnotationOverview, styles);
+    }
+
+    @Override protected void createControl(Composite parent, int styles)
+    {
+        if (FortranPreferences.ENABLE_RULER.getValue())
+        {
+            Composite composite = new Composite(parent, SWT.NONE);
+            GridLayout layout = new GridLayout(1, false);
+            layout.horizontalSpacing = 0;
+            layout.verticalSpacing = 1;
+            layout.marginWidth = layout.marginHeight = 0;
+            composite.setLayout(layout);
+            
+            HorizontalRuler ruler = new HorizontalRuler(composite, SWT.NONE);
+            GridData gridData = new GridData(SWT.FILL, SWT.TOP, true, false);
+            gridData.heightHint = 15;
+            ruler.setLayoutData(gridData);
+            ruler.setSize(ruler.getSize().x, 15);
+            
+            Composite editorWrapper = new Composite(composite, SWT.NONE);
+            editorWrapper.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            editorWrapper.setLayout(new FillLayout());
+            super.createControl(editorWrapper, styles);
+            
+            ruler.configure(getVerticalRuler(), getTextWidget());
+            
+            parent.layout(true);
+        }
+        else super.createControl(parent, styles);
     }
 
     @Override

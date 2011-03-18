@@ -24,15 +24,13 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
 {
     @Override protected void createFieldEditors()
     {
-        addField(new BooleanFieldEditor(FortranPreferences.ENABLE_FREE_FORM_FOLDING.getName(),
+        addField(new BooleanFieldEditor(FortranPreferences.ENABLE_FOLDING.getName(),
                                         Messages.EditorPreferencePage_EnableFolding,
                                         getFieldEditorParent()));
 
-        /* Fixed form folding does not seem to work, so disable it for now
-        addField(new BooleanFieldEditor(FortranPreferences.ENABLE_FIXED_FORM_FOLDING.getName(),
-                                        "Enable folding rather than ruler in fixed-form Fortran editors",
+        addField(new BooleanFieldEditor(FortranPreferences.ENABLE_RULER.getName(),
+                                        Messages.EditorPreferencePage_EnableHorizRuler,
                                         getFieldEditorParent()));
-        */
 
         addField(new BooleanFieldEditor(FortranPreferences.CONVERT_TABS_TO_SPACES.getName(),
             Messages.EditorPreferencePage_ConvertTabsToSpaces,
