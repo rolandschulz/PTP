@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
@@ -43,6 +42,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class CommandJob extends Job implements IJAXBNonNLSConstants {
@@ -265,8 +265,8 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		RMVariableMap map = RMVariableMap.getActiveInstance();
 		ArglistImpl arglist = new ArglistImpl(uuid, args, map);
 		String[] cmdArgs = arglist.toArray();
-		IRemoteServices service = rm.getRemoteServices();
-		return service.getProcessBuilder(rm.getRemoteConnection(), cmdArgs);
+		RemoteServicesDelegate delegate = rm.getRemoteServicesDelegate();
+		return delegate.getRemoteServices().getProcessBuilder(delegate.getRemoteConnection(), cmdArgs);
 	}
 
 	private void prepareEnv(IRemoteProcessBuilder builder) throws CoreException {

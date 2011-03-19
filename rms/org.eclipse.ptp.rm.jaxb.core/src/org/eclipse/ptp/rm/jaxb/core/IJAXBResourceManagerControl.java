@@ -11,10 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.util.Map;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
@@ -34,18 +31,6 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 
 	IJAXBResourceManagerConfiguration getJAXBRMConfiguration();
 
-	IRemoteConnection getLocalConnection();
-
-	IRemoteConnectionManager getLocalConnectionManager();
-
-	IRemoteFileManager getLocalFileManager();
-
-	IRemoteConnection getRemoteConnection();
-
-	IRemoteConnectionManager getRemoteConnectionManager();
-
-	IRemoteFileManager getRemoteFileManager();
-
-	IRemoteServices getRemoteServices();
+	RemoteServicesDelegate getRemoteServicesDelegate();
 
 }

@@ -20,15 +20,10 @@ import javax.xml.bind.JAXBElement;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
@@ -47,6 +42,7 @@ import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.runnable.command.CommandJob;
 import org.eclipse.ptp.rm.jaxb.core.runnable.command.CommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
@@ -143,20 +139,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private final Control controlData;
 	private final Map<String, String> dynSystemEnv;
 	private final StreamProxyMap streamsProxyMap;
-
-	private IRemoteServices remoteServices;
-	private IRemoteServices localServices;
-	private IRemoteConnectionManager remoteConnectionManager;
-	private IRemoteConnectionManager localConnectionManager;
-	private IRemoteConnection remoteConnection;
-	private IRemoteConnection localConnection;
-	private IRemoteFileManager remoteFileManager;
-	private IRemoteFileManager localFileManager;
+	private final RemoteServicesDelegate delegate;
 	private boolean appendSysEnv;
 
 	public JAXBResourceManagerControl(AbstractResourceManagerConfiguration jaxbServiceProvider) {
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
+		delegate = new RemoteServicesDelegate(config.getRemoteServicesId(), config.getConnectionName());
 		try {
 			config.realizeRMDataFromXML();
 		} catch (Throwable t) {
@@ -185,32 +174,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		return config;
 	}
 
-	public IRemoteConnection getLocalConnection() {
-		return localConnection;
-	}
-
-	public IRemoteConnectionManager getLocalConnectionManager() {
-		return localConnectionManager;
-	}
-
-	public IRemoteFileManager getLocalFileManager() {
-		return localFileManager;
-	}
-
-	public IRemoteConnection getRemoteConnection() {
-		return remoteConnection;
-	}
-
-	public IRemoteConnectionManager getRemoteConnectionManager() {
-		return remoteConnectionManager;
-	}
-
-	public IRemoteFileManager getRemoteFileManager() {
-		return remoteFileManager;
-	}
-
-	public IRemoteServices getRemoteServices() {
-		return remoteServices;
+	public RemoteServicesDelegate getRemoteServicesDelegate() {
+		return delegate;
 	}
 
 	@Override
@@ -293,7 +258,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
 		getResourceManager().setState(IResourceManager.STARTING_STATE);
 		try {
-			initializeConnections();
 			try {
 				doConnect(monitor);
 			} catch (RemoteConnectionException t) {
@@ -382,11 +346,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * connections.
 	 */
 	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException {
-		if (!localConnection.isOpen()) {
+		IRemoteConnection conn = delegate.getLocalConnection();
+		if (!conn.isOpen()) {
 			throw new RemoteConnectionException(Messages.LocalConnectionError);
 		}
-		if (!remoteConnection.isOpen()) {
-			throw new RemoteConnectionException(Messages.RemoteConnectionError + remoteConnection.getAddress());
+		conn = delegate.getRemoteConnection();
+		if (!conn.isOpen()) {
+			throw new RemoteConnectionException(Messages.RemoteConnectionError + conn.getAddress());
 		}
 	}
 
@@ -429,11 +395,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * Close the connections.
 	 */
 	private void doDisconnect() {
-		if (localConnection.isOpen()) {
-			localConnection.close();
+		IRemoteConnection conn = delegate.getLocalConnection();
+		if (conn.isOpen()) {
+			conn.close();
 		}
-		if (!remoteConnection.isOpen()) {
-			remoteConnection.close();
+		conn = delegate.getRemoteConnection();
+		if (conn.isOpen()) {
+			conn.close();
 		}
 	}
 
@@ -493,33 +461,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		runCommands(null, onStartUp, STARTUP);
 	}
 
-	/*
-	 * For use by the command and file jobs.
-	 */
-	private void initializeConnections() {
-		localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
-		assert (localServices != null);
-		localConnectionManager = localServices.getConnectionManager();
-		assert (localConnectionManager != null);
-		/*
-		 * Since it's a local service, it doesn't matter which parameter is
-		 * passed
-		 */
-		localConnection = localConnectionManager.getConnection(ZEROSTR);
-		assert (localConnection != null);
-		localFileManager = localServices.getFileManager(localConnection);
-		assert (localFileManager != null);
-		remoteServices = PTPRemoteCorePlugin.getDefault()
-				.getRemoteServices(config.getRemoteServicesId(), new NullProgressMonitor());
-		assert (null != remoteServices);
-		remoteConnectionManager = remoteServices.getConnectionManager();
-		assert (null != remoteConnectionManager);
-		remoteConnection = remoteConnectionManager.getConnection(config.getConnectionName());
-		assert (null != remoteConnection);
-		remoteFileManager = remoteServices.getFileManager(remoteConnection);
-		assert (null != remoteFileManager);
-	}
-
 	private void maybeAddProperty(String name, Object value, boolean configurable, Map<String, Object> env) {
 		if (value == null) {
 			return;
@@ -535,7 +476,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * Write content to file if indicated, and stage to host.
 	 */
 	private boolean maybeHandleManagedFiles(String uuid, ManagedFiles files) throws CoreException {
-		ManagedFilesJob job = new ManagedFilesJob(uuid, files, localFileManager, remoteFileManager);
+		ManagedFilesJob job = new ManagedFilesJob(uuid, files, delegate);
 		job.schedule();
 		try {
 			job.join();
@@ -660,8 +601,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * From the user runtime choices.
 	 */
 	private void setFixedConfigurationProperties(Map<String, Object> env) {
-		maybeAddProperty(CONTROL_USER_VAR, remoteConnection.getUsername(), false, env);
-		maybeAddProperty(CONTROL_ADDRESS_VAR, remoteConnection.getAddress(), false, env);
+		IRemoteConnection rc = delegate.getRemoteConnection();
+		maybeAddProperty(CONTROL_USER_VAR, rc.getUsername(), false, env);
+		maybeAddProperty(CONTROL_ADDRESS_VAR, rc.getAddress(), false, env);
 	}
 
 	/*
