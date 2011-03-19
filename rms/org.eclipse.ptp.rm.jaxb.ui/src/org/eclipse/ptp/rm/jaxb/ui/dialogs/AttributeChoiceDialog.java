@@ -97,7 +97,7 @@ public class AttributeChoiceDialog extends Dialog implements IJAXBUINonNLSConsta
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true);
-		GridData gdfill = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, true, 600, 300, 2);
+		GridData gdfill = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, true, 600, 300, 2, DEFAULT);
 		Group grp = WidgetBuilderUtils.createGroup(composite, SWT.BORDER, layout, gdfill);
 		int style = SWT.H_SCROLL | SWT.V_SCROLL | SWT.CHECK | SWT.MULTI | SWT.WRAP;
 		Table t = WidgetBuilderUtils.createTable(grp, style, 2, 600, gdfill);

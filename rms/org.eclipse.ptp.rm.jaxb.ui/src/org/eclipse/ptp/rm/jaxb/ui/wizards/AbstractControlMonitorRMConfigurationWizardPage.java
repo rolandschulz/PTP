@@ -777,7 +777,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 			Composite addrComp = WidgetBuilderUtils.createComposite(mxGroup, SWT.NONE, layout, gd);
 			WidgetBuilderUtils.createLabel(addrComp, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_12,
 					SWT.NONE, 1);
-			gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, DEFAULT, DEFAULT, 1);
+			gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, DEFAULT, DEFAULT, 1, DEFAULT);
 			localAddrCombo = WidgetBuilderUtils.createCombo(addrComp, SWT.DROP_DOWN, gd, listener);
 			portForwardingButton = WidgetBuilderUtils.createRadioButton(mxGroup,
 					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_13, Messages.MXGroupTitle, listener);
