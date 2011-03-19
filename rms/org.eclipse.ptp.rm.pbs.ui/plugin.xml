@@ -8,19 +8,17 @@
             id="org.eclipse.ptp.pbs.ui.launchConfiguration"/>
    </extension>
    <extension
-         point="org.eclipse.ptp.services.core.providers">
-      <provider
-            class="org.eclipse.ptp.rm.pbs.ui.PBSResourceManagerConfiguration"
-            id="org.eclipse.ptp.rm.pbs.PBSServiceProvider"
-            name="PBS"
-            serviceId="org.eclipse.ptp.core.LaunchService">
-      </provider>
-   </extension>
-   <extension
          point="org.eclipse.ptp.services.ui.providerContributors">
       <providerContributor
-            class="org.eclipse.ptp.rm.pbs.ui.PBSProviderContributor"
-            id="org.eclipse.ptp.rm.pbs.PBSServiceProvider">
+            class="org.eclipse.ptp.ui.wizards.RMProviderContributor"
+            id="org.eclipse.ptp.rm.pbs.resourceManager">
       </providerContributor>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
+      <configurationWizard
+            class="org.eclipse.ptp.rm.pbs.ui.wizards.PBSRMConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.rm.pbs.resourceManager">
+      </configurationWizard>
    </extension>
 </plugin>

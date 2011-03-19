@@ -10,11 +10,13 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
-import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage;
+import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
+import org.eclipse.ptp.rm.ui.wizards.WizardPageDataSource;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
 /**
@@ -23,84 +25,75 @@ import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
  * @author arossi
  * 
  */
-public final class JAXBRMControlConfigurationWizardPage extends AbstractControlMonitorRMConfigurationWizardPage {
+public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage {
 
-	private IJAXBResourceManagerConfiguration jaxbConfig;
+	private class JAXBRMDataSource extends RMDataSource {
+		protected JAXBRMDataSource(AbstractConfigurationWizardPage page) {
+			super(page);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rm.ui.wizards.
+		 * AbstractRemoteResourceManagerConfigurationWizardPage
+		 * .RMDataSource#loadFromStorage()
+		 */
+		@Override
+		protected void loadFromStorage() {
+			IJAXBResourceManagerConfiguration config = (IJAXBResourceManagerConfiguration) getConfiguration();
+			try {
+				config.realizeRMDataFromXML();
+			} catch (Throwable t) {
+				JAXBUIPlugin.log(t);
+			}
+			super.loadFromStorage();
+		}
+	}
 
 	public JAXBRMControlConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.JAXBRMControlConfigurationWizardPage_Title);
 		setPageComplete(false);
-		isValid = false;
 		setTitle(Messages.JAXBRMControlConfigurationWizardPage_Title);
 		setDescription(Messages.JAXBConnectionWizardPage_Description);
-		connectionSharingEnabled = false;
 	}
 
-	@Override
-	protected void configureInternal() {
-		jaxbConfig = (IJAXBResourceManagerConfiguration) config;
-		try {
-			jaxbConfig.realizeRMDataFromXML();
-		} catch (Throwable t) {
-			JAXBUIPlugin.log(t);
-		}
-	}
-
-	/**
-	 * Handle creation of a new connection by pressing the 'New...' button.
-	 * Calls handleRemoteServicesSelected() to update the connection combo with
-	 * the new connection.
+	/*
+	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rm.ui.wizards.
+	 * AbstractRemoteResourceManagerConfigurationWizardPage#createDataSource()
+	 */
+	@Override
+	protected WizardPageDataSource createDataSource() {
+		return new JAXBRMDataSource(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#getConfiguration()
+	 */
+	@Override
+	protected IJAXBResourceManagerConfiguration getConfiguration() {
+		return (IJAXBResourceManagerConfiguration) super.getConfiguration();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.ui.wizards.
+	 * AbstractRemoteResourceManagerConfigurationWizardPage
+	 * #handleNewRemoteConnectionSelected()
 	 */
 	@Override
 	protected void handleNewRemoteConnectionSelected() {
-		if (uiConnectionManager != null) {
+		if (getRemoteUIConnectionManager() != null) {
 			String[] hints = new String[] { ConfigFactory.ATTR_CONNECTION_ADDRESS, ConfigFactory.ATTR_CONNECTION_PORT };
-			String[] defaults = new String[] { jaxbConfig.getDefaultControlHost(), jaxbConfig.getDefaultControlPort() };
-			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell(), hints, defaults));
-		}
-	}
-
-	@Override
-	protected void loadConnectionOptions() {
-		targetPath = config.getControlPath();
-		if (targetArgs != null) {
-			targetArgs = config.getControlInvocationOptionsStr();
-		}
-		localAddr = config.getLocalAddress();
-		int options = config.getControlOptions();
-		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
-		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
-		if (ZEROSTR.equals(targetPath)) {
-			targetPath = jaxbConfig.getDefaultControlPath();
-		}
-	}
-
-	@Override
-	protected void setConnectionName(String name) {
-		if (name != null) {
-			jaxbConfig.setConnectionName(name, CONTROL_CONNECTION_NAME);
-		}
-	}
-
-	@Override
-	protected void setConnectionOptions() {
-		int options = 0;
-		if (muxPortFwd) {
-			options |= IRemoteProxyOptions.PORT_FORWARDING;
-		}
-		if (manualLaunch) {
-			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
-		}
-		config.setControlPath(targetPath);
-		if (targetArgs != null) {
-			config.setControlInvocationOptions(targetArgs);
-		}
-		config.setControlOptions(options);
-		config.setLocalAddress(localAddr);
-		if (connection != null) {
-			config.setControlUserName(connection.getUsername());
-			config.setControlAddress(connection.getAddress());
+			String[] defaults = new String[] { getConfiguration().getDefaultControlHost(),
+					getConfiguration().getDefaultControlPort() };
+			handleRemoteServiceSelected(getRemoteUIConnectionManager().newConnection(getShell(), hints, defaults));
 		}
 	}
 }

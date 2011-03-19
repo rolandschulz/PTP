@@ -24,27 +24,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.pe.core.rmsystem;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.rm.ibm.pe.core.PECorePlugin;
-import org.eclipse.ptp.rm.ibm.pe.core.rtsystem.PEProxyRuntimeClient;
-import org.eclipse.ptp.rm.ibm.pe.core.rtsystem.PERuntimeSystem;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager;
-import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerControl;
-import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
-import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 public class PEResourceManager extends AbstractRuntimeResourceManager {
 
 	/**
 	 * @since 5.0
 	 */
-	public PEResourceManager(IResourceManagerConfiguration config, AbstractRuntimeResourceManagerControl control,
-			AbstractRuntimeResourceManagerMonitor monitor) {
+	public PEResourceManager(PEResourceManagerConfiguration config, PEResourceManagerControl control,
+			PEResourceManagerMonitor monitor) {
 		super(config, control, monitor);
 	}
 
@@ -53,26 +42,5 @@ public class PEResourceManager extends AbstractRuntimeResourceManager {
 	 */
 	public AttributeDefinitionManager getAttributeDefinitionManager() {
 		return getRuntimeSystem().getAttributeDefinitionManager();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateRuntimeSystem
-	 * ()
-	 */
-	@Override
-	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
-		IPEResourceManagerConfiguration config = (IPEResourceManagerConfiguration) getConfiguration();
-		IPResourceManager rm = (IPResourceManager) getAdapter(IPResourceManager.class);
-		int baseId;
-		try {
-			baseId = Integer.parseInt(rm.getID());
-		} catch (NumberFormatException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PECorePlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
-		}
-		PEProxyRuntimeClient runtimeProxy = new PEProxyRuntimeClient(config, baseId);
-		return new PERuntimeSystem(runtimeProxy);
 	}
 }

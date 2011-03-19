@@ -163,7 +163,7 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 
 	public IBMLLResourceManagerOptionWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.getString("Wizard.InvocationOptionsTitle")); //$NON-NLS-1$
-		this.config = (IIBMLLResourceManagerConfiguration) wizard.getConfiguration();
+		this.config = (IIBMLLResourceManagerConfiguration) getConfiguration();
 		setTitle(Messages.getString("Wizard.InvocationOptionsTitle")); //$NON-NLS-1$
 		setDescription(Messages.getString("Wizard.InvocationOptions")); //$NON-NLS-1$
 	}
@@ -496,8 +496,9 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 	}
 
 	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals("")) //$NON-NLS-1$
+		if (text.trim().length() == 0 || text.equals("")) { //$NON-NLS-1$
 			return null;
+		}
 
 		return text;
 	}
@@ -608,10 +609,11 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
-		if (style == -1)
+		if (style == -1) {
 			gd = new GridData();
-		else
+		} else {
 			gd = new GridData(style);
+		}
 		gd.horizontalSpan = space;
 		return gd;
 	}

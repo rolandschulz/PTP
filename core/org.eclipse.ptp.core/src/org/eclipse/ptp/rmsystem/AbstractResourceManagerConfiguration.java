@@ -10,48 +10,36 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
-import java.util.Map;
 import java.util.UUID;
 
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.core.ServiceProvider;
-import org.eclipse.ui.IMemento;
 
 /**
  * @since 5.0
  */
 public abstract class AbstractResourceManagerConfiguration extends ServiceProvider implements IResourceManagerConfiguration,
-		IServiceProviderWorkingCopy {
+		IResourceManagerComponentConfiguration {
+	public static final String BASE = "base."; //$NON-NLS-1$
+	public static final String CONTROL = "control."; //$NON-NLS-1$
+	public static final String MONITOR = "monitor."; //$NON-NLS-1$
+
 	private static final String TAG_AUTOSTART = "autoStart"; //$NON-NLS-1$
 	private static final String TAG_DESCRIPTION = "description"; //$NON-NLS-1$
 	private static final String TAG_NAME = "name"; //$NON-NLS-1$
 	private static final String TAG_UNIQUE_NAME = "uniqName"; //$NON-NLS-1$
 	private static final String TAG_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String TAG_REMOTE_SERVICES_ID = "remoteServicesID"; //$NON-NLS-1$
-	private static final String TAG_STATE = "state"; //$NON-NLS-1$
-
-	/*
-	 * If we're a working copy, keep a copy of the original
-	 */
-	private boolean fIsDirty = false;
 
 	private IServiceProvider fServiceProvider = null;
+	private String fNamespace = ""; //$NON-NLS-1$
 
 	public AbstractResourceManagerConfiguration() {
 	}
 
-	/**
-	 * Constructor for creating a working copy of the service provider Don't
-	 * register listeners as this copy will just be discarded at some point.
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public AbstractResourceManagerConfiguration(IServiceProvider provider) {
+	public AbstractResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		fServiceProvider = provider;
-		setProperties(provider.getProperties());
+		fNamespace = namespace;
 		setDescriptor(provider.getDescriptor());
 	}
 
@@ -82,7 +70,19 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getAutoStart()
 	 */
 	public boolean getAutoStart() {
-		return getBoolean(TAG_AUTOSTART, false);
+		return getBoolean(BASE, TAG_AUTOSTART, false);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.services.core.ServiceProvider#getBoolean(java.lang.String
+	 * , boolean)
+	 */
+	@Override
+	public boolean getBoolean(String key, boolean defaultVal) {
+		return getBoolean(fNamespace, key, defaultVal);
 	}
 
 	/*
@@ -103,27 +103,29 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getDescription()
 	 */
 	public String getDescription() {
-		return getString(TAG_DESCRIPTION, ""); //$NON-NLS-1$
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.services.core.ServiceProvider#getName()
-	 */
-	@Override
-	public String getName() {
-		return getString(TAG_NAME, ""); //$NON-NLS-1$
+		return getString(BASE, TAG_DESCRIPTION, ""); //$NON-NLS-1$
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.services.core.IServiceProviderWorkingCopy#getOriginal()
+	 * org.eclipse.ptp.services.core.ServiceProvider#getInt(java.lang.String,
+	 * int)
 	 */
-	public IServiceProvider getOriginal() {
-		return fServiceProvider;
+	@Override
+	public int getInt(String key, int defaultVal) {
+		return getInt(fNamespace, key, defaultVal);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getName()
+	 */
+	@Override
+	public String getName() {
+		return getString(BASE, TAG_NAME, ""); //$NON-NLS-1$
 	}
 
 	/*
@@ -151,10 +153,13 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getState()
+	 * @see
+	 * org.eclipse.ptp.services.core.ServiceProvider#getString(java.lang.String,
+	 * java.lang.String)
 	 */
-	public ResourceManagerAttributes.State getState() {
-		return ResourceManagerAttributes.State.valueOf(getString(TAG_STATE, ResourceManagerAttributes.State.STOPPED.toString()));
+	@Override
+	public String getString(String key, String defaultVal) {
+		return getString(fNamespace, key, defaultVal);
 	}
 
 	/*
@@ -173,10 +178,10 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getUniqueName()
 	 */
 	public String getUniqueName() {
-		String name = getString(TAG_UNIQUE_NAME, null);
+		String name = getString(BASE, TAG_UNIQUE_NAME, null);
 		if (name == null) {
 			name = UUID.randomUUID().toString();
-			putString(TAG_UNIQUE_NAME, name);
+			putString(BASE, TAG_UNIQUE_NAME, name);
 		}
 		return name;
 	}
@@ -193,15 +198,6 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.services.core.IServiceProviderWorkingCopy#isDirty()
-	 */
-	public boolean isDirty() {
-		return fIsDirty;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#
 	 * needsDebuggerLaunchHelp()
 	 */
@@ -213,40 +209,36 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.services.core.ServiceProvider#putString(java.lang.String,
-	 * java.lang.String)
+	 * org.eclipse.ptp.services.core.ServiceProvider#putBoolean(java.lang.String
+	 * , boolean)
 	 */
 	@Override
-	public void putString(String key, String value) {
-		fIsDirty = true;
-		super.putString(key, value);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.services.core.IServiceProviderWorkingCopy#save()
-	 */
-	public void save() {
-		if (fServiceProvider != null) {
-			fServiceProvider.setProperties(getProperties());
-			fIsDirty = false;
-		}
+	public void putBoolean(String key, boolean value) {
+		putBoolean(fNamespace, key, value);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#save(org.eclipse
-	 * .ui.IMemento)
+	 * org.eclipse.ptp.services.core.ServiceProvider#putInt(java.lang.String,
+	 * int)
 	 */
-	public void save(IMemento memento) {
-		/*
-		 * Not needed (needs to be @deprecated). Currently used to bridge
-		 * between RM configurations and service configurations.
-		 */
-		memento.putString(TAG_UNIQUE_NAME, getUniqueName());
+	@Override
+	public void putInt(String key, int value) {
+		putInt(fNamespace, key, value);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.services.core.ServiceProvider#putString(java.lang.String,
+	 * java.lang.String)
+	 */
+	@Override
+	public void putString(String key, String value) {
+		putString(fNamespace, key, value);
 	}
 
 	/*
@@ -257,7 +249,7 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * )
 	 */
 	public void setAutoStart(boolean flag) {
-		putBoolean(TAG_AUTOSTART, flag);
+		putBoolean(BASE, TAG_AUTOSTART, flag);
 	}
 
 	/*
@@ -279,7 +271,7 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * (java.lang.String)
 	 */
 	public void setDescription(String description) {
-		putString(TAG_DESCRIPTION, description);
+		putString(BASE, TAG_DESCRIPTION, description);
 	}
 
 	/*
@@ -290,20 +282,7 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * .String)
 	 */
 	public void setName(String name) {
-		putString(TAG_NAME, name);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.services.core.ServiceProvider#setProperties(java.util
-	 * .Map)
-	 */
-	@Override
-	public void setProperties(Map<String, String> properties) {
-		fIsDirty = true;
-		super.setProperties(properties);
+		putString(BASE, TAG_NAME, name);
 	}
 
 	/*
@@ -318,24 +297,6 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	}
 
 	/**
-	 * @param id
-	 */
-	public void setResourceManagerId(String id) {
-		// Do nothing (needs to be @deprecated)
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setState(org.eclipse
-	 * .ptp.core.elements.attributes.ResourceManagerAttributes.State)
-	 */
-	public void setState(ResourceManagerAttributes.State state) {
-		putString(TAG_STATE, state.name());
-	}
-
-	/**
 	 * Set the IResourceManagerConfiguration unique name. This is only used to
 	 * transition to the new service model framework. It is set to the name of
 	 * the service configuration that was created for this service provider.
@@ -343,6 +304,52 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * @param id
 	 */
 	public void setUniqueName(String id) {
-		putString(TAG_UNIQUE_NAME, id);
+		putString(BASE, TAG_UNIQUE_NAME, id);
 	}
+
+	private boolean getBoolean(String namespace, String key, boolean defaultVal) {
+		if (fServiceProvider != null) {
+			return fServiceProvider.getBoolean(namespace + key, defaultVal);
+		}
+		return super.getBoolean(namespace + key, defaultVal);
+	}
+
+	private int getInt(String namespace, String key, int defaultVal) {
+		if (fServiceProvider != null) {
+			return fServiceProvider.getInt(namespace + key, defaultVal);
+		}
+		return super.getInt(namespace + key, defaultVal);
+	}
+
+	private String getString(String namespace, String key, String defaultVal) {
+		if (fServiceProvider != null) {
+			return fServiceProvider.getString(namespace + key, defaultVal);
+		}
+		return super.getString(namespace + key, defaultVal);
+	}
+
+	private void putBoolean(String namespace, String key, boolean value) {
+		if (fServiceProvider != null) {
+			fServiceProvider.putBoolean(namespace + key, value);
+		} else {
+			super.putBoolean(namespace + key, value);
+		}
+	}
+
+	private void putInt(String namespace, String key, int value) {
+		if (fServiceProvider != null) {
+			fServiceProvider.putInt(namespace + key, value);
+		} else {
+			super.putInt(namespace + key, value);
+		}
+	}
+
+	private void putString(String namespace, String key, String value) {
+		if (fServiceProvider != null) {
+			fServiceProvider.putString(namespace + key, value);
+		} else {
+			super.putString(namespace + key, value);
+		}
+	}
+
 }

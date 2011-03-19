@@ -10,53 +10,92 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.generic.core.rmsystem;
 
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerControl;
+import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
+import org.eclipse.ptp.services.core.IServiceProvider;
 
-public class GenericResourceManagerFactory implements IResourceManagerFactory {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerFactory#create(org.eclipse.ptp
-	 * .rmsystem.IResourceManagerConfiguration)
-	 */
-	public IResourceManager create(IResourceManagerConfiguration configuration) {
-		GenericResourceManagerControl control = new GenericResourceManagerControl(configuration);
-		GenericResourceManagerMonitor monitor = new GenericResourceManagerMonitor(configuration);
-		return new GenericResourceManager(configuration, control, monitor);
-	}
+public class GenericResourceManagerFactory extends AbstractResourceManagerFactory {
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#create(org.eclipse
+	 * .ptp.rmsystem.IResourceManagerConfiguration,
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl,
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor)
 	 */
-	public IResourceManagerConfiguration createConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public IResourceManager create(IResourceManagerConfiguration configuration, IResourceManagerControl control,
+			IResourceManagerMonitor monitor) {
+		return new GenericResourceManager((AbstractResourceManagerConfiguration) configuration,
+				(AbstractRuntimeResourceManagerControl) control, (AbstractRuntimeResourceManagerMonitor) monitor);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#getId()
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration(
+	 * org.eclipse.ptp.services.core.IServiceProvider)
 	 */
-	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider) {
+		return new GenericRMConfiguration(GenericRMConfiguration.BASE, provider);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#getName()
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createControl
+	 * (org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public IResourceManagerControl createControl(IResourceManagerComponentConfiguration configuration) {
+		return new GenericResourceManagerControl((AbstractResourceManagerConfiguration) configuration);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#
+	 * createControlConfiguration
+	 * (org.eclipse.ptp.services.core.IServiceProvider)
+	 */
+	@Override
+	public IResourceManagerComponentConfiguration createControlConfiguration(IServiceProvider provider) {
+		return new GenericRMConfiguration(GenericRMConfiguration.BASE, provider);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createMonitor
+	 * (org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 */
+	@Override
+	public IResourceManagerMonitor createMonitor(IResourceManagerComponentConfiguration configuration) {
+		return new GenericResourceManagerMonitor((AbstractResourceManagerConfiguration) configuration);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#
+	 * createMonitorConfiguration
+	 * (org.eclipse.ptp.services.core.IServiceProvider)
+	 */
+	@Override
+	public IResourceManagerComponentConfiguration createMonitorConfiguration(IServiceProvider provider) {
+		return new GenericRMConfiguration(GenericRMConfiguration.BASE, provider);
 	}
 }

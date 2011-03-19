@@ -15,7 +15,7 @@ import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.generic.core.GenericRMCorePlugin;
 import org.eclipse.ptp.rm.generic.core.GenericRMPreferenceManager;
 import org.eclipse.ptp.rm.generic.core.messages.Messages;
-import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
+import org.eclipse.ptp.services.core.IServiceProvider;
 
 public class GenericRMConfiguration extends AbstractToolRMConfiguration {
 
@@ -23,7 +23,10 @@ public class GenericRMConfiguration extends AbstractToolRMConfiguration {
 
 	public GenericRMConfiguration() {
 		super(CAPABILITIES);
+	}
 
+	public GenericRMConfiguration(String namespace, IServiceProvider provider) {
+		super(CAPABILITIES, namespace, provider);
 		setLaunchCmd(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_LAUNCH_CMD));
 		setDebugCmd(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_DEBUG_CMD));
 		setRemoteInstallPath(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(),
@@ -33,37 +36,6 @@ public class GenericRMConfiguration extends AbstractToolRMConfiguration {
 		setUseToolDefaults(true);
 		setCommandsEnabled(false);
 		setDescription(Messages.GenericRMServiceProvider_defaultDescription);
-	}
-
-	/**
-	 * Constructor for creating a working copy of the service provider
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public GenericRMConfiguration(GenericRMConfiguration provider) {
-		super(provider);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.services.core.IServiceProvider#copy()
-	 */
-	@Override
-	public IServiceProviderWorkingCopy copy() {
-		return new GenericRMConfiguration(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * getResourceManagerId()
-	 */
-	@Override
-	public String getResourceManagerId() {
-		return getId();
 	}
 
 	/*

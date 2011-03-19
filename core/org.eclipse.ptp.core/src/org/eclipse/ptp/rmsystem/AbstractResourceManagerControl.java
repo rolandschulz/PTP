@@ -33,11 +33,11 @@ import org.eclipse.ptp.core.PTPCorePlugin;
  * 
  */
 public abstract class AbstractResourceManagerControl implements IResourceManagerControl {
-	private final IResourceManagerConfiguration fConfig;
+	private final AbstractResourceManagerConfiguration fConfig;
 	private final ModelManager fModelManager = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
 	private IResourceManager fResourceManager = null;
 
-	public AbstractResourceManagerControl(IResourceManagerConfiguration config) {
+	public AbstractResourceManagerControl(AbstractResourceManagerConfiguration config) {
 		fConfig = config;
 	}
 
@@ -59,6 +59,17 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 */
 	public void dispose() {
 		doDispose();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration
+	 * ()
+	 */
+	public IResourceManagerComponentConfiguration getControlConfiguration() {
+		return fConfig;
 	}
 
 	/*
@@ -191,10 +202,6 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 */
 	protected abstract IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException;
-
-	protected IResourceManagerConfiguration getConfiguration() {
-		return fConfig;
-	}
 
 	protected ModelManager getModelManager() {
 		return fModelManager;

@@ -65,7 +65,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.utils.core.BitSetIterable;
 
 /**
@@ -358,7 +358,7 @@ public class SDMDebugger implements IPDebugger {
 			routingFilePath = routingFilePath.append("routing_file"); //$NON-NLS-1$
 
 			IResourceManager rm = getResourceManager(configuration);
-			IResourceManagerConfiguration conf = rm.getConfiguration();
+			IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),
 					progress.newChild(5));
 			if (progress.isCanceled()) {
@@ -421,7 +421,7 @@ public class SDMDebugger implements IPDebugger {
 		if (rm == null) {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_4));
 		}
-		IResourceManagerConfiguration conf = rm.getConfiguration();
+		IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
 		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), monitor);
 		if (monitor.isCanceled()) {
 			throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);

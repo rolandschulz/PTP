@@ -10,7 +10,7 @@
    <extension
          point="org.eclipse.ptp.services.ui.providerContributors">
       <providerContributor
-            class="org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIProviderContributor"
+            class="org.eclipse.ptp.ui.wizards.RMProviderContributor"
             id="org.eclipse.ptp.rm.mpi.openmpi.OpenMPIServiceProvider">
       </providerContributor>
    </extension>
@@ -20,5 +20,12 @@
             class="org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIRuntimeModelPresentation"
             id="org.eclipse.ptp.rm.mpi.openmpi.OpenMPIServiceProvider">
       </runtimeModelPresentation>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
+      <configurationWizard
+            class="org.eclipse.ptp.rm.mpi.openmpi.ui.wizards.OpenMPIRMConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.rm.ibm.pe.core.control">
+      </configurationWizard>
    </extension>
 </plugin>

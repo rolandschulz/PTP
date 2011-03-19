@@ -5,6 +5,9 @@ import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 public interface IRMConfigurationWizard extends IWizard {
 
-	public IResourceManagerConfiguration getConfiguration();
+	/**
+	 * @since 5.0
+	 */
+	public IResourceManagerConfiguration getBaseConfiguration();
 
 }

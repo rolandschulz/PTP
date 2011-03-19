@@ -45,8 +45,8 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.messages.Messages;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
@@ -85,7 +85,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/**
 	 * @since 5.0
 	 */
-	public AbstractRuntimeResourceManagerMonitor(IResourceManagerConfiguration config) {
+	public AbstractRuntimeResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
 	}
 

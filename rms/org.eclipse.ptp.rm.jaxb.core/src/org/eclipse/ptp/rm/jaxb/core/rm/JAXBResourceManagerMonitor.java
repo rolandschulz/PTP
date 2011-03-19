@@ -11,12 +11,15 @@ package org.eclipse.ptp.rm.jaxb.core.rm;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
+/**
+ * JAXB resource manager monitor used for testing
+ */
 public class JAXBResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
-	public JAXBResourceManagerMonitor(IResourceManagerConfiguration config) {
+	public JAXBResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
 	}
 

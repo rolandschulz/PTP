@@ -11,13 +11,12 @@
 package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 /**
  * @since 2.0
  */
 public class MPICH2ResourceManagerControl extends AbstractToolResourceManagerControl {
-	public MPICH2ResourceManagerControl(IResourceManagerConfiguration config) {
+	public MPICH2ResourceManagerControl(MPICH2ResourceManagerConfiguration config) {
 		super(config);
 	}
 }

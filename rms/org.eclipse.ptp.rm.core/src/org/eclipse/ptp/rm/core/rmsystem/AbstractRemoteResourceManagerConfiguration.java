@@ -25,21 +25,15 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	private static final String TAG_OPTIONS = "options"; //$NON-NLS-1$
 	private static final String TAG_INVOCATION_OPTIONS = "invocationOptions"; //$NON-NLS-1$
 	private static final String TAG_LOCAL_ADDRESS = "localAddress"; //$NON-NLS-1$
+	private static final String TAG_USE_DEFAULT = "useDefault"; //$NON-NLS-1$
 
 	private final List<String> invocationOptions = new ArrayList<String>();
 
 	public AbstractRemoteResourceManagerConfiguration() {
-		// Empty
 	}
 
-	/**
-	 * Constructor for creating a working copy of the service provider
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public AbstractRemoteResourceManagerConfiguration(IServiceProvider provider) {
-		super(provider);
+	public AbstractRemoteResourceManagerConfiguration(String namespace, IServiceProvider provider) {
+		super(namespace, provider);
 	}
 
 	/**
@@ -57,22 +51,6 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 				invocationOptions.add(option);
 			}
 		}
-	}
-
-	/**
-	 * Convert invocation options to a string
-	 * 
-	 * @return invocation options separated by spaces
-	 */
-	private String convertInvocationOptionsStr() {
-		String opts = ""; //$NON-NLS-1$
-		for (int i = 0; i < invocationOptions.size(); i++) {
-			if (i > 0) {
-				opts += " "; //$NON-NLS-1$
-			}
-			opts += invocationOptions.get(i);
-		}
-		return opts;
 	}
 
 	/**
@@ -131,6 +109,17 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		return getString(TAG_PROXY_PATH, ""); //$NON-NLS-1$
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration#
+	 * getUseDefault()
+	 */
+	public boolean getUseDefault() {
+		return getBoolean(TAG_USE_DEFAULT, true);
+	}
+
 	/**
 	 * Set the invocation options. The contents of optionString are split into
 	 * space separated strings. Any existing options are discarded.
@@ -175,10 +164,37 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration#
+	 * setUseDefault(boolean)
+	 */
+	public void setUseDefault(boolean flag) {
+		putBoolean(TAG_USE_DEFAULT, flag);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#testOption
 	 * (int)
 	 */
 	public boolean testOption(int option) {
 		return (getOptions() & option) == option;
+	}
+
+	/**
+	 * Convert invocation options to a string
+	 * 
+	 * @return invocation options separated by spaces
+	 */
+	private String convertInvocationOptionsStr() {
+		String opts = ""; //$NON-NLS-1$
+		for (int i = 0; i < invocationOptions.size(); i++) {
+			if (i > 0) {
+				opts += " "; //$NON-NLS-1$
+			}
+			opts += invocationOptions.get(i);
+		}
+		return opts;
 	}
 }

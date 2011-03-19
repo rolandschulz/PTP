@@ -10,15 +10,22 @@
    <extension
          point="org.eclipse.ptp.services.ui.providerContributors">
       <providerContributor
-            class="org.eclipse.ptp.rm.mpi.mpich2.ui.MPICH2ProviderContributor"
-            id="org.eclipse.ptp.rm.mpi.mpich2.MPICH2ServiceProvider">
+            class="org.eclipse.ptp.ui.wizards.RMProviderContributor"
+            id="org.eclipse.ptp.rm.mpi.mpich2.resourceManager">
       </providerContributor>
    </extension>
    <extension
          point="org.eclipse.ptp.ui.runtimeModelPresentations">
       <runtimeModelPresentation
             class="org.eclipse.ptp.rm.mpi.mpich2.ui.MPICH2RuntimeModelPresentation"
-            id="org.eclipse.ptp.rm.mpi.mpich2.MPICH2ServiceProvider">
+            id="org.eclipse.ptp.rm.mpi.mpich2.resourceManager">
       </runtimeModelPresentation>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
+      <configurationWizard
+            class="org.eclipse.ptp.rm.mpi.mpich2.ui.wizards.MPICH2RMConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.rm.mpi.mpich2.resourceManager">
+      </configurationWizard>
    </extension>
 </plugin>

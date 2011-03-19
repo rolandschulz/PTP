@@ -11,6 +11,8 @@
 package org.eclipse.ptp.ui.wizards;
 
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.ptp.core.ModelManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.ui.wizards.ServiceProviderConfigurationWizard;
@@ -31,12 +33,41 @@ public class RMServiceProviderConfigurationWizard extends ServiceProviderConfigu
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.ui.wizards.IRMConfigurationWizard#getConfiguration()
+	 * @see
+	 * org.eclipse.ptp.ui.wizards.IRMConfigurationWizard#getBaseConfiguration()
 	 */
-	public IResourceManagerConfiguration getConfiguration() {
-		if (fProvider instanceof IResourceManagerConfiguration) {
-			return (IResourceManagerConfiguration) fProvider;
-		}
-		return null;
+	/**
+	 * @since 5.0
+	 */
+	public IResourceManagerConfiguration getBaseConfiguration() {
+		return ModelManager.getInstance().createBaseConfiguration(fProvider);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.wizards.IRMConfigurationWizard#getControlConfiguration
+	 * ()
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IResourceManagerComponentConfiguration getControlConfiguration() {
+		return ModelManager.getInstance().createControlConfiguration(fProvider);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.wizards.IRMConfigurationWizard#getMonitorConfiguration
+	 * ()
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IResourceManagerComponentConfiguration getMonitorConfiguration() {
+		return ModelManager.getInstance().createMonitorConfiguration(fProvider);
 	}
 }

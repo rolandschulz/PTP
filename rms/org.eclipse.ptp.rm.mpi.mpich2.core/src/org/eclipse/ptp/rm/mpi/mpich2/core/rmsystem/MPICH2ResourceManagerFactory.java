@@ -10,56 +10,99 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
+import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**
  * @since 2.0
  */
-public class MPICH2ResourceManagerFactory implements IResourceManagerFactory {
+public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory {
+	private MPICH2ResourceManagerConfiguration fConfiguration;
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerFactory#create(org.eclipse.ptp
-	 * .rmsystem.IResourceManagerConfiguration)
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#create(org.eclipse
+	 * .ptp.rmsystem.IResourceManagerConfiguration,
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl,
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor)
 	 */
-	public IResourceManager create(IResourceManagerConfiguration configuration) {
-		MPICH2ResourceManagerControl control = new MPICH2ResourceManagerControl(configuration);
-		MPICH2ResourceManagerMonitor monitor = new MPICH2ResourceManagerMonitor(configuration);
-		return new MPICH2ResourceManager(configuration, control, monitor);
+	@Override
+	public IResourceManager create(IResourceManagerConfiguration configuration, IResourceManagerControl control,
+			IResourceManagerMonitor monitor) {
+		return new MPICH2ResourceManager((MPICH2ResourceManagerConfiguration) configuration,
+				(MPICH2ResourceManagerControl) control, (MPICH2ResourceManagerMonitor) monitor);
+	}
+
+	@Override
+	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider) {
+		return createCommonConfiguration(provider);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createControl
+	 * (org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration)
 	 */
-	public IResourceManagerConfiguration createConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public IResourceManagerControl createControl(IResourceManagerComponentConfiguration configuration) {
+		return new MPICH2ResourceManagerControl((MPICH2ResourceManagerConfiguration) configuration);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#getId()
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#
+	 * createControlConfiguration
+	 * (org.eclipse.ptp.services.core.IServiceProvider)
 	 */
-	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public IResourceManagerComponentConfiguration createControlConfiguration(IServiceProvider provider) {
+		return createCommonConfiguration(provider);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#getName()
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createMonitor
+	 * (org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration)
 	 */
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public IResourceManagerMonitor createMonitor(IResourceManagerComponentConfiguration configuration) {
+		return new MPICH2ResourceManagerMonitor((MPICH2ResourceManagerConfiguration) configuration);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#
+	 * createMonitorConfiguration
+	 * (org.eclipse.ptp.services.core.IServiceProvider)
+	 */
+	@Override
+	public IResourceManagerComponentConfiguration createMonitorConfiguration(IServiceProvider provider) {
+		return createCommonConfiguration(provider);
+	}
+
+	private MPICH2ResourceManagerConfiguration createCommonConfiguration(IServiceProvider provider) {
+		if (fConfiguration == null) {
+			fConfiguration = new MPICH2ResourceManagerConfiguration(MPICH2ResourceManagerConfiguration.BASE, provider);
+		}
+		return fConfiguration;
+	} /*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createConfiguration
+	 * (org.eclipse.ptp.services.core.IServiceProvider)
+	 */
 }

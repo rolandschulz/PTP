@@ -11,11 +11,11 @@
 package org.eclipse.ptp.rm.generic.core.rmsystem;
 
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManagerMonitor;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 
 public class GenericResourceManagerMonitor extends AbstractToolResourceManagerMonitor {
 
-	public GenericResourceManagerMonitor(IResourceManagerConfiguration config) {
+	public GenericResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
 	}
 }

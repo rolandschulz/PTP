@@ -18,9 +18,10 @@ import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
-import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
+import org.eclipse.ptp.services.core.IServiceProvider;
 
-public class OpenMPIResourceManagerConfiguration extends AbstractToolRMConfiguration implements IOpenMPIResourceManagerConfiguration {
+public class OpenMPIResourceManagerConfiguration extends AbstractToolRMConfiguration implements
+		IOpenMPIResourceManagerConfiguration {
 
 	public static int OPENMPI_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_REMOTE_INSTALL_PATH;
 
@@ -31,12 +32,17 @@ public class OpenMPIResourceManagerConfiguration extends AbstractToolRMConfigura
 	 * persists while the RM is running.
 	 */
 	private int majorVersion = 0;
+
 	private int minorVersion = 0;
+
 	private int serviceVersion = 0;
 
 	public OpenMPIResourceManagerConfiguration() {
 		super(OPENMPI_CAPABILITIES);
+	}
 
+	public OpenMPIResourceManagerConfiguration(String namespace, IServiceProvider provider) {
+		super(OPENMPI_CAPABILITIES, namespace, provider);
 		/*
 		 * By default, assume openmpi auto configuration.
 		 */
@@ -53,29 +59,6 @@ public class OpenMPIResourceManagerConfiguration extends AbstractToolRMConfigura
 		setUseToolDefaults(true);
 		setCommandsEnabled(false);
 		setDescription(Messages.OpenMPIResourceManagerConfiguration_defaultDescription);
-	}
-
-	/**
-	 * Constructor for creating a working copy of the service provider
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public OpenMPIResourceManagerConfiguration(OpenMPIResourceManagerConfiguration provider) {
-		super(provider);
-		majorVersion = provider.getMajorVersion();
-		minorVersion = provider.getMinorVersion();
-		serviceVersion = provider.getServiceVersion();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.services.core.IServiceProvider#copy()
-	 */
-	@Override
-	public IServiceProviderWorkingCopy copy() {
-		return new OpenMPIResourceManagerConfiguration(this);
 	}
 
 	/**
@@ -202,5 +185,29 @@ public class OpenMPIResourceManagerConfiguration extends AbstractToolRMConfigura
 	private boolean validateVersion() {
 		return getDetectedVersion().equals(VERSION_12) || getDetectedVersion().equals(VERSION_13)
 				|| getDetectedVersion().equals(VERSION_14);
+	}
+
+	/**
+	 * @param majorVersion
+	 *            the majorVersion to set
+	 */
+	protected void setMajorVersion(int majorVersion) {
+		this.majorVersion = majorVersion;
+	}
+
+	/**
+	 * @param minorVersion
+	 *            the minorVersion to set
+	 */
+	protected void setMinorVersion(int minorVersion) {
+		this.minorVersion = minorVersion;
+	}
+
+	/**
+	 * @param serviceVersion
+	 *            the serviceVersion to set
+	 */
+	protected void setServiceVersion(int serviceVersion) {
+		this.serviceVersion = serviceVersion;
 	}
 }

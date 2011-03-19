@@ -13,34 +13,24 @@
  *                            - modifications to use new interface methods and
  *                              constants (09/14/2010)
  *******************************************************************************/
-package org.eclipse.ptp.rm.pbs.ui;
+package org.eclipse.ptp.rm.pbs.core.rmsystem;
 
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
-import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
-import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
+import org.eclipse.ptp.rm.pbs.core.messages.Messages;
 import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 /**
  * Service provider for PBS batch scheduler.
  */
-public class PBSResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements IPBSResourceManagerConfiguration,
-		IPBSNonNLSConstants {
+public class PBSResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements IPBSNonNLSConstants {
 
 	public PBSResourceManagerConfiguration() {
-		super();
-		setDescription(Messages.PBSResourceManager);
 	}
 
-	/**
-	 * Constructor for creating a working copy of the service provider
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public PBSResourceManagerConfiguration(IServiceProvider provider) {
-		super(provider);
+	public PBSResourceManagerConfiguration(String namespace, IServiceProvider provider) {
+		super(namespace, provider);
+		setDescription(Messages.PBSResourceManagerConfiguration_PBSResourceManager);
 	}
 
 	/**
@@ -49,16 +39,6 @@ public class PBSResourceManagerConfiguration extends AbstractRemoteResourceManag
 	public void addTemplate(String name, String serialized) {
 		addTemplateName(name);
 		putString(TEMPLATE_PREFIX + name, serialized);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
-	 */
-	@Override
-	public IServiceProviderWorkingCopy copy() {
-		return new PBSResourceManagerConfiguration(this);
 	}
 
 	/**
@@ -183,7 +163,7 @@ public class PBSResourceManagerConfiguration extends AbstractRemoteResourceManag
 			name += MARKER + conn;
 		}
 		setName(name);
-		setDescription(Messages.PBSResourceManager);
+		setDescription(Messages.PBSResourceManagerConfiguration_PBSResourceManager);
 	}
 
 	/**

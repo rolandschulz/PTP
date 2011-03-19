@@ -33,6 +33,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -440,7 +441,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	private IRemoteServices getRemoteServices(IResourceManager rm) {
 		if (rm != null) {
-			IResourceManagerConfiguration rmConfig = rm.getConfiguration();
+			IResourceManagerComponentConfiguration rmConfig = rm.getControlConfiguration();
 			return PTPRemoteUIPlugin.getDefault().getRemoteServices(rmConfig.getRemoteServicesId(), getLaunchConfigurationDialog());
 		}
 		return null;
@@ -468,7 +469,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private IRemoteConnection getRemoteConnection(IResourceManager rm) {
 		IRemoteServices rsrv = getRemoteServices(rm);
 		if (rsrv != null) {
-			String connName = rm.getConfiguration().getConnectionName();
+			String connName = rm.getControlConfiguration().getConnectionName();
 			if (connName != null) {
 				IRemoteConnectionManager mgr = rsrv.getConnectionManager();
 				if (mgr != null) {

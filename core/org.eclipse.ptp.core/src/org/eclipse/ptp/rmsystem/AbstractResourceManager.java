@@ -23,7 +23,6 @@ package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.ModelManager;
@@ -35,11 +34,9 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PResourceManager;
-import org.eclipse.ptp.internal.core.events.JobChangedEvent;
 
 /**
  * @author rsqrd
@@ -47,20 +44,18 @@ import org.eclipse.ptp.internal.core.events.JobChangedEvent;
  * 
  */
 public abstract class AbstractResourceManager implements IResourceManager {
-	private final ListenerList fJobListeners = new ListenerList();
 	private final PResourceManager fPResourceManager;
-	private final IResourceManagerControl fResourceManagerControl;
-	private final IResourceManagerMonitor fResourceManagerMonitor;
+	private final AbstractResourceManagerControl fResourceManagerControl;
+	private final AbstractResourceManagerMonitor fResourceManagerMonitor;
 	private final ModelManager fModelManager = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
-
-	private IResourceManagerConfiguration fConfig;
+	private AbstractResourceManagerConfiguration fConfig;
 	private String fState;
 
 	/**
 	 * @since 5.0
 	 */
-	public AbstractResourceManager(IResourceManagerConfiguration config, IResourceManagerControl control,
-			IResourceManagerMonitor monitor) {
+	public AbstractResourceManager(AbstractResourceManagerConfiguration config, AbstractResourceManagerControl control,
+			AbstractResourceManagerMonitor monitor) {
 		fConfig = config;
 		fResourceManagerControl = control;
 		fResourceManagerMonitor = monitor;
@@ -72,14 +67,15 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#addJobListener(org.eclipse
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#addJobListener(org.eclipse
 	 * .ptp.core.listeners.IJobListener)
 	 */
 	/**
 	 * @since 5.0
 	 */
 	public void addJobListener(IJobListener listener) {
-		fJobListeners.add(listener);
+		fResourceManagerMonitor.addJobListener(listener);
 	}
 
 	/*
@@ -122,12 +118,6 @@ public abstract class AbstractResourceManager implements IResourceManager {
 		if (adapter == IResourceManagerConfiguration.class) {
 			return getConfiguration();
 		}
-		if (adapter == IResourceManagerControl.class) {
-			return fResourceManagerControl;
-		}
-		if (adapter == IResourceManagerMonitor.class) {
-			return fResourceManagerMonitor;
-		}
 		return null;
 	}
 
@@ -136,10 +126,37 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getConfiguration()
 	 */
+	/**
+	 * @since 5.0
+	 */
 	public IResourceManagerConfiguration getConfiguration() {
-		synchronized (this) {
-			return fConfig;
-		}
+		return fConfig;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getControl()
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IResourceManagerControl getControl() {
+		return fResourceManagerControl;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration
+	 * ()
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IResourceManagerComponentConfiguration getControlConfiguration() {
+		return fResourceManagerControl.getControlConfiguration();
 	}
 
 	/*
@@ -168,6 +185,32 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 */
 	public IJobStatus getJobStatus(String jobId) {
 		return fResourceManagerControl.getJobStatus(jobId);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getMonitor()
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IResourceManagerMonitor getMonitor() {
+		return fResourceManagerMonitor;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#getMonitorConfiguration
+	 * ()
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IResourceManagerComponentConfiguration getMonitorConfiguration() {
+		return fResourceManagerMonitor.getMonitorConfiguration();
 	}
 
 	/*
@@ -212,23 +255,27 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#removeJobListener(org
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJobListener(org
 	 * .eclipse.ptp.core.listeners.IJobListener)
 	 */
 	/**
 	 * @since 5.0
 	 */
 	public void removeJobListener(IJobListener listener) {
-		fJobListeners.remove(listener);
+		fResourceManagerMonitor.addJobListener(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Set the configuration for this resource manager. This will replace the
+	 * existing configuration with a new configuration. The method is
+	 * responsible for dealing with any saved state that needs to be cleaned up.
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#setConfiguration(org
-	 * .eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 * @param config
+	 *            the new configuration
+	 * @since 5.0
 	 */
-	public void setConfiguration(IResourceManagerConfiguration config) {
+	public void setConfiguration(AbstractResourceManagerConfiguration config) {
 		synchronized (this) {
 			fConfig = config;
 		}
@@ -390,11 +437,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * @since 5.0
 	 */
 	protected void fireJobChanged(String jobId) {
-		IJobChangedEvent e = new JobChangedEvent(this, jobId);
-
-		for (Object listener : fJobListeners.getListeners()) {
-			((IJobListener) listener).handleEvent(e);
-		}
+		fResourceManagerMonitor.fireJobChanged(jobId);
 	}
 
 	/**

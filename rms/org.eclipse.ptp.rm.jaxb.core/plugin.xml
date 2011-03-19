@@ -7,7 +7,7 @@
       <provider
             class="org.eclipse.ptp.rm.jaxb.core.rm.JAXBServiceProvider"
             id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"
-            name="JAXB"
+            name="JAXB (test monitor)"
             serviceId="org.eclipse.ptp.core.LaunchService">
       </provider>
    </extension>
@@ -43,9 +43,15 @@
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
             class="org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerFactory"
-            id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"
-            name="JAXB">
+            id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider">
+         <resourceManagerControl
+             class="org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerFactory"
+             id="org.eclipse.ptp.rm.jaxb.control">
+         </resourceManagerControl>
+         <resourceManagerMonitor
+            class="org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerMonitorFactory"
+            id="org.eclipse.ptp.rm.jaxb.monitor">
+         </resourceManagerMonitor>
       </resourceManager>
    </extension>
-
 </plugin>

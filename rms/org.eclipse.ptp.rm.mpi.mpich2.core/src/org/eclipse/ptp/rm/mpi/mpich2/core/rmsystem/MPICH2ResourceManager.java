@@ -10,13 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManager;
-import org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem.MPICH2RuntimeSystem;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerControl;
-import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
-import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 /**
  * 
@@ -28,21 +22,8 @@ public class MPICH2ResourceManager extends AbstractToolResourceManager {
 	/**
 	 * @since 2.0
 	 */
-	public MPICH2ResourceManager(IResourceManagerConfiguration config, AbstractRuntimeResourceManagerControl control,
-			AbstractRuntimeResourceManagerMonitor monitor) {
+	public MPICH2ResourceManager(MPICH2ResourceManagerConfiguration config, MPICH2ResourceManagerControl control,
+			MPICH2ResourceManagerMonitor monitor) {
 		super(config, control, monitor);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateRuntimeSystem
-	 * ()
-	 */
-	@Override
-	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
-		IMPICH2ResourceManagerConfiguration config = (IMPICH2ResourceManagerConfiguration) getConfiguration();
-		return new MPICH2RuntimeSystem(this, config);
 	}
 }

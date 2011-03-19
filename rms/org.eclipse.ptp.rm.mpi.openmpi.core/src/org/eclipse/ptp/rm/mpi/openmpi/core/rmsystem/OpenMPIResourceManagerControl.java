@@ -11,13 +11,13 @@
 package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 
 /**
  * @since 4.0
  */
 public class OpenMPIResourceManagerControl extends AbstractToolResourceManagerControl {
-	public OpenMPIResourceManagerControl(IResourceManagerConfiguration config) {
+	public OpenMPIResourceManagerControl(AbstractResourceManagerConfiguration config) {
 		super(config);
 	}
 }

@@ -19,7 +19,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
-import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
+import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.wizards.AbstractProxyOptions;
 import org.eclipse.swt.SWT;
@@ -106,14 +106,14 @@ public class PEResourceManagerOptions extends AbstractProxyOptions {
 	private IRemoteUIServices remoteUIService;
 	private EventMonitor eventMonitor;
 
-	public PEResourceManagerOptions(WizardPage wizardPage, IPEResourceManagerConfiguration config) {
+	public PEResourceManagerOptions(WizardPage wizardPage, PEResourceManagerConfiguration config) {
 		super(wizardPage, config);
 		setInitialOptions();
 	}
 
 	@Override
-	protected IPEResourceManagerConfiguration getConfiguration() {
-		return (IPEResourceManagerConfiguration) super.getConfiguration();
+	protected PEResourceManagerConfiguration getConfiguration() {
+		return (PEResourceManagerConfiguration) super.getConfiguration();
 	}
 
 	private void setInitialOptions() {

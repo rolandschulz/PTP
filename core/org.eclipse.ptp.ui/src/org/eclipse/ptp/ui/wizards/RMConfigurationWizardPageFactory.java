@@ -18,32 +18,58 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.wizards;
 
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
-
 
 /**
  * Abstract class that is the extension point for contributing
  * ConfigurationWizardPages to this plug-in.
  * 
  * @author rsqrd
- *
+ * 
  */
 public abstract class RMConfigurationWizardPageFactory {
+	private String fId;
+	private String fName;
+
+	/**
+	 * @return the id
+	 * @since 5.0
+	 */
+	public String getId() {
+		return fId;
+	}
+
+	/**
+	 * @return the name
+	 * @since 5.0
+	 */
+	public String getName() {
+		return fName;
+	}
 
 	/**
 	 * Retrieves the RM specific configuration pages.
 	 * 
-	 * @param wizard 
+	 * @param wizard
 	 * @return The contributed ConfigurationWizardPages
 	 */
 	public abstract RMConfigurationWizardPage[] getPages(IRMConfigurationWizard wizard);
 
 	/**
-	 * Which IResourceManagerFactory does this contributed set
-	 * of ConfigurationWizardPages serve?
-	 * 
-	 * @return
+	 * @param id
+	 *            the id to set
+	 * @since 5.0
 	 */
-	public abstract Class<? extends IResourceManagerFactory> getRMFactoryClass();
+	public void setId(String id) {
+		fId = id;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 * @since 5.0
+	 */
+	public void setName(String name) {
+		fName = name;
+	}
 
 }

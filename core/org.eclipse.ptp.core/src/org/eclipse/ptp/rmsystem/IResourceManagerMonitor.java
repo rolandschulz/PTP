@@ -13,15 +13,37 @@ package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.core.listeners.IJobListener;
 
 /**
  * @since 5.0
  */
 public interface IResourceManagerMonitor {
 	/**
+	 * Add a listener for job events
+	 * 
+	 * @param listener
+	 */
+	public void addJobListener(IJobListener listener);
+
+	/**
 	 * Safely dispose of this resource manager monitor.
 	 */
 	public void dispose();
+
+	/**
+	 * Get the configuration associated with this resource manager monitor.
+	 * 
+	 * @return resource manager configuration
+	 */
+	public IResourceManagerComponentConfiguration getMonitorConfiguration();
+
+	/**
+	 * Remove a listener for job events
+	 * 
+	 * @param listener
+	 */
+	public void removeJobListener(IJobListener listener);
 
 	/**
 	 * Start the resource manager. Clients should not call this directly. Call

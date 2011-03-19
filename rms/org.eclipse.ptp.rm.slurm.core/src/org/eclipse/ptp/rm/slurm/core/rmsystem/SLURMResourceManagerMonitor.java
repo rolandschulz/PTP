@@ -24,7 +24,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.slurm.core.rmsystem;
 
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
 
 /**
@@ -35,7 +34,7 @@ public class SLURMResourceManagerMonitor extends AbstractRuntimeResourceManagerM
 	/**
 	 * @since 5.0
 	 */
-	public SLURMResourceManagerMonitor(IResourceManagerConfiguration config) {
+	public SLURMResourceManagerMonitor(SLURMResourceManagerConfiguration config) {
 		super(config);
 	}
 }

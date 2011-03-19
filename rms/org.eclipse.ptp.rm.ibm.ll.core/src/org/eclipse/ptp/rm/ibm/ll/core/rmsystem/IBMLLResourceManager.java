@@ -24,26 +24,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.ll.core.rmsystem;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.rm.ibm.ll.core.IBMLLCorePlugin;
-import org.eclipse.ptp.rm.ibm.ll.core.rtsystem.IBMLLProxyRuntimeClient;
-import org.eclipse.ptp.rm.ibm.ll.core.rtsystem.IBMLLRuntimeSystem;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerControl;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
-import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 public class IBMLLResourceManager extends AbstractRuntimeResourceManager {
 
 	/**
 	 * @since 5.0
 	 */
-	public IBMLLResourceManager(IResourceManagerConfiguration config, AbstractRuntimeResourceManagerControl control,
+	public IBMLLResourceManager(AbstractResourceManagerConfiguration config, AbstractRuntimeResourceManagerControl control,
 			AbstractRuntimeResourceManagerMonitor monitor) {
 		super(config, control, monitor);
 	}
@@ -53,25 +45,5 @@ public class IBMLLResourceManager extends AbstractRuntimeResourceManager {
 	 */
 	public AttributeDefinitionManager getAttributeDefinitionManager() {
 		return getRuntimeSystem().getAttributeDefinitionManager();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateRuntimeSystem
-	 * ()
-	 */
-	@Override
-	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
-		IIBMLLResourceManagerConfiguration config = (IIBMLLResourceManagerConfiguration) getConfiguration();
-		IPResourceManager rm = (IPResourceManager) getAdapter(IPResourceManager.class);
-		int baseId;
-		try {
-			baseId = Integer.parseInt(rm.getID());
-		} catch (NumberFormatException e) {
-			throw new CoreException(new Status(IStatus.ERROR, IBMLLCorePlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
-		}
-		return new IBMLLRuntimeSystem(new IBMLLProxyRuntimeClient(config, baseId));
 	}
 }

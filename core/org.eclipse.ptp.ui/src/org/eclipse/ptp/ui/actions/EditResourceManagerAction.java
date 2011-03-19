@@ -22,14 +22,14 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.RMServicesConfigurationWizard;
 import org.eclipse.swt.widgets.Shell;
 
 public class EditResourceManagerAction extends Action {
 
-	private IResourceManagerConfiguration fSelectedRM;
+	private IResourceManager fSelectedRM;
 	private final Shell fShell;
 
 	public EditResourceManagerAction(Shell shell) {
@@ -55,7 +55,7 @@ public class EditResourceManagerAction extends Action {
 	/**
 	 * @since 5.0
 	 */
-	public void setResourceManager(IResourceManagerConfiguration config) {
+	public void setResourceManager(IResourceManager config) {
 		fSelectedRM = config;
 	}
 }

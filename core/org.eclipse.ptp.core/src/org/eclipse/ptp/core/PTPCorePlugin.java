@@ -112,10 +112,6 @@ public class PTPCorePlugin extends Plugin {
 	 * Resource bundle
 	 */
 	private ResourceBundle resourceBundle;
-	/*
-	 * ModelManager for this Eclipse session
-	 */
-	private ModelManager modelManager;
 
 	/**
 	 * The constructor.
@@ -136,7 +132,7 @@ public class PTPCorePlugin extends Plugin {
 	 * @return the model manager
 	 */
 	public IModelManager getModelManager() {
-		return modelManager;
+		return ModelManager.getInstance();
 	}
 
 	/**
@@ -227,8 +223,7 @@ public class PTPCorePlugin extends Plugin {
 			public void doneSaving(ISaveContext saveContext) {
 			}
 		});
-		modelManager = new ModelManager();
-		modelManager.start();
+		ModelManager.getInstance().start();
 	}
 
 	/**
@@ -237,7 +232,7 @@ public class PTPCorePlugin extends Plugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		try {
-			modelManager.shutdown();
+			ModelManager.getInstance().shutdown();
 			Preferences.savePreferences(getUniqueIdentifier());
 			ResourcesPlugin.getWorkspace().removeSaveParticipant(getUniqueIdentifier());
 		} finally {

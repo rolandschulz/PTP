@@ -11,17 +11,32 @@
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
             class="org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerFactory"
-            id="org.eclipse.ptp.rm.slurm.SLURMServiceProvider"
-            name="SLURM">
+            id="org.eclipse.ptp.rm.slurm.resourceManager">
+         <resourceManagerControl
+             class="org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerFactory"
+             id="org.eclipse.ptp.rm.slurm.control">
+         </resourceManagerControl>
+         <resourceManagerMonitor
+            class="org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerFactory"
+            id="org.eclipse.ptp.rm.slurm.monitor">
+         </resourceManagerMonitor>
       </resourceManager>
    </extension>
    <extension
-         point="org.eclipse.ptp.core.resourceManagers">
-      <resourceManager
-            class="org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerFactory"
-            id="org.eclipse.ptp.rm.slurm.core.resourceManager3"
-            name="name">
-      </resourceManager>
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManagerConfiguration"
+            id="org.eclipse.ptp.rm.slurm.resourceManager"
+            name="SLURM"
+            serviceId="org.eclipse.ptp.core.LaunchService">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.core.runtimeSystems">
+      <runtimeSystem
+            class="org.eclipse.ptp.rm.slurm.core.rtsystem.SLURMRuntimeSystemFactory"
+            id="org.eclipse.ptp.rm.slurm.resourceManager">
+      </runtimeSystem>
    </extension>
 
 </plugin>

@@ -51,9 +51,9 @@ import org.eclipse.ptp.core.elements.events.INewProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.messages.Messages;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IJobStatus;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
@@ -359,7 +359,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/**
 	 * @since 5.0
 	 */
-	public AbstractRuntimeResourceManagerControl(IResourceManagerConfiguration config) {
+	public AbstractRuntimeResourceManagerControl(AbstractResourceManagerConfiguration config) {
 		super(config);
 	}
 

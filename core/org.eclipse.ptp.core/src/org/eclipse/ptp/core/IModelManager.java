@@ -21,7 +21,6 @@ package org.eclipse.ptp.core;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 public interface IModelManager extends IModelPresentation {
@@ -97,7 +96,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @param removedRMs
 	 * @since 5.0
 	 */
-	public void removeResourceManagers(IResourceManagerConfiguration[] removedRMs);
+	public void removeResourceManagers(IResourceManager[] removedRMs);
 
 	/**
 	 * Save the resource manager configurations
@@ -107,20 +106,6 @@ public interface IModelManager extends IModelPresentation {
 	 */
 	@Deprecated
 	public void saveResourceManagers();
-
-	/**
-	 * Shuts down the model manager. Should only be called at plugin shutdown.
-	 * 
-	 * @throws CoreException
-	 */
-	public void shutdown() throws CoreException;
-
-	/**
-	 * Start the model manager. Should only be called once at plugin startup.
-	 * 
-	 * @throws CoreException
-	 */
-	public void start() throws CoreException;
 
 	/**
 	 * stops all of the resource managers.

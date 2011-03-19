@@ -57,7 +57,7 @@ public class JAXBRMConfigurationSelectionWizardPage extends RMConfigurationWizar
 	}
 
 	private void initContents() {
-		jaxbConfig = (IJAXBResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
+		jaxbConfig = (IJAXBResourceManagerConfiguration) getConfiguration();
 		container.setConfig(jaxbConfig);
 		container.setAvailableConfigurations();
 		setPageComplete(isValidSetting());

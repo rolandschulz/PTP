@@ -47,9 +47,14 @@ import org.eclipse.ptp.internal.core.events.ResourceManagerAddedEvent;
 import org.eclipse.ptp.internal.core.events.ResourceManagerChangedEvent;
 import org.eclipse.ptp.internal.core.events.ResourceManagerErrorEvent;
 import org.eclipse.ptp.internal.core.events.ResourceManagerRemovedEvent;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerControlFactory;
+import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
+import org.eclipse.ptp.rmsystem.IResourceManagerMonitorFactory;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelEvent;
@@ -65,9 +70,65 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  */
 public class ModelManager implements IModelManager {
 
-	private static String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
-	private static String CLASS_ATTRIBUTE = "class"; //$NON-NLS-1$
-	private static String EXTENSION_POINT = "org.eclipse.ptp.core.resourceManagers"; //$NON-NLS-1$
+	private class RMFactory {
+		private String fId;
+		private String fControlId;
+		private String fMonitorId;
+		private AbstractResourceManagerFactory fFactory;
+
+		/**
+		 * @return the controlFactory
+		 */
+		public String getControlId() {
+			return fControlId;
+		}
+
+		public AbstractResourceManagerFactory getFactory() {
+			return fFactory;
+		}
+
+		/**
+		 * @return the id
+		 */
+		public String getId() {
+			return fId;
+		}
+
+		/**
+		 * @return the monitorFactory
+		 */
+		public String getMonitorId() {
+			return fMonitorId;
+		}
+
+		/**
+		 * @param id
+		 *            the controlFactory to set
+		 */
+		public void setControlId(String id) {
+			fControlId = id;
+		}
+
+		public void setFactory(AbstractResourceManagerFactory factory) {
+			fFactory = factory;
+		}
+
+		/**
+		 * @param id
+		 *            the id to set
+		 */
+		public void setId(String id) {
+			fId = id;
+		}
+
+		/**
+		 * @param monitorFactory
+		 *            the monitorFactory to set
+		 */
+		public void setMonitorId(String id) {
+			fMonitorId = id;
+		}
+	}
 
 	private class RMStartupJob extends Job {
 		private final IResourceManager resourceManager;
@@ -97,11 +158,26 @@ public class ModelManager implements IModelManager {
 
 	}
 
+	private static String RM_NAME = "resourceManager"; //$NON-NLS-1$
+	private static String RM_CONTROL_NAME = "resourceManagerControl"; //$NON-NLS-1$
+	private static String RM_MONITOR_NAME = "resourceManagerMonitor"; //$NON-NLS-1$
+	private static String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
+	private static String CLASS_ATTRIBUTE = "class"; //$NON-NLS-1$
+	private static String EXTENSION_POINT = "org.eclipse.ptp.core.resourceManagers"; //$NON-NLS-1$
+
+	public static ModelManager getInstance() {
+		return fInstance;
+	}
+
 	private final IServiceModelEventListener fServiceEventListener = new IServiceModelEventListener() {
 
 		public void handleEvent(IServiceModelEvent event) {
 			switch (event.getType()) {
 			case IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED: {
+				/*
+				 * The service configuration has been removed, so remove the
+				 * resource manager associated with it (if any).
+				 */
 				IServiceProvider provider = ((IServiceConfiguration) event.getSource()).getServiceProvider(fLaunchService);
 				if (provider != null && provider instanceof IResourceManagerConfiguration) {
 					IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
@@ -114,29 +190,25 @@ public class ModelManager implements IModelManager {
 			}
 
 			case IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED: {
+				/*
+				 * The service configuration has changed. Check if the old
+				 * provider is null, in which case this is likely to be a new
+				 * provider being added to a new configuration.
+				 */
 				IServiceConfiguration config = (IServiceConfiguration) event.getSource();
-				IServiceProvider oldProvider = event.getOldProvider();
-				if (oldProvider != null) {
-					if (oldProvider instanceof IResourceManagerConfiguration) {
-						IServiceProvider newProvider = config.getServiceProvider(fLaunchService);
-						if (newProvider != null && newProvider instanceof IResourceManagerConfiguration) {
-							IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) oldProvider)
-									.getUniqueName());
-							if (rm != null) {
-								rm.setConfiguration((IResourceManagerConfiguration) newProvider);
-							}
-						}
-					}
-				} else {
+				if (event.getOldProvider() == null) {
 					IServiceProvider newProvider = config.getServiceProvider(fLaunchService);
 					if (newProvider != null && newProvider instanceof IResourceManagerConfiguration) {
+						/*
+						 * Check if the rm already exists. Only add a new one if
+						 * it doesn't.
+						 */
 						IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) newProvider)
 								.getUniqueName());
 						if (rm == null) {
-							IResourceManagerFactory factory = getResourceManagerFactory(((IResourceManagerConfiguration) newProvider)
-									.getResourceManagerId());
+							RMFactory factory = getResourceManagerFactory(newProvider.getId());
 							if (factory != null) {
-								addResourceManager(factory.create((IResourceManagerConfiguration) newProvider));
+								addResourceManager(createResourceManager(factory, newProvider));
 							}
 						}
 					}
@@ -145,6 +217,10 @@ public class ModelManager implements IModelManager {
 			}
 
 			case IServiceModelEvent.SERVICE_PROVIDER_CHANGED: {
+				/*
+				 * The service provider has been modified, so let the UI know
+				 * that something has changed and it should update.
+				 */
 				IServiceProvider provider = (IServiceProvider) event.getSource();
 				if (provider != null && provider instanceof IResourceManagerConfiguration) {
 					IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
@@ -159,14 +235,18 @@ public class ModelManager implements IModelManager {
 		}
 	};
 
+	private static final ModelManager fInstance = new ModelManager();
+
 	private final ListenerList fResourceManagerListeners = new ListenerList();
+	private final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
+	private final Map<String, IResourceManager> fResourceManagers = new HashMap<String, IResourceManager>();
+	private final IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
 
-	protected final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
-	protected final Map<String, IResourceManager> fResourceManagers = new HashMap<String, IResourceManager>();
-	protected final IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
-	protected final IPUniverse fUniverse = new PUniverse();
+	private final IPUniverse fUniverse = new PUniverse();
 
-	protected Map<String, IResourceManagerFactory> fResourceManagerFactories = null;
+	private Map<String, RMFactory> fResourceManagerFactories = null;
+	private Map<String, IResourceManagerControlFactory> fResourceManagerControlFactories = null;
+	private Map<String, IResourceManagerMonitorFactory> fResourceManagerMonitorFactories = null;
 
 	public ModelManager() {
 		fServiceManager.addEventListener(fServiceEventListener, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED
@@ -213,6 +293,57 @@ public class ModelManager implements IModelManager {
 	}
 
 	/**
+	 * Create a base configuration from the give service provider
+	 * 
+	 * @param provider
+	 *            service provider
+	 * @return base configuration
+	 */
+	public IResourceManagerConfiguration createBaseConfiguration(IServiceProvider provider) {
+		RMFactory factory = getResourceManagerFactory(provider.getId());
+		if (factory != null) {
+			return factory.getFactory().createConfiguration(provider);
+		}
+		return null;
+	}
+
+	/**
+	 * Create a control configuration from the give service provider
+	 * 
+	 * @param provider
+	 *            service provider
+	 * @return control configuration
+	 */
+	public IResourceManagerComponentConfiguration createControlConfiguration(IServiceProvider provider) {
+		RMFactory factory = getResourceManagerFactory(provider.getId());
+		if (factory != null) {
+			IResourceManagerControlFactory controlFactory = fResourceManagerControlFactories.get(factory.getControlId());
+			if (controlFactory != null) {
+				return controlFactory.createControlConfiguration(provider);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Create a monitor configuration from the give service provider
+	 * 
+	 * @param provider
+	 *            service provider
+	 * @return monitor configuration
+	 */
+	public IResourceManagerComponentConfiguration createMonitorConfiguration(IServiceProvider provider) {
+		RMFactory factory = getResourceManagerFactory(provider.getId());
+		if (factory != null) {
+			IResourceManagerMonitorFactory monitorFactory = fResourceManagerMonitorFactories.get(factory.getMonitorId());
+			if (monitorFactory != null) {
+				return monitorFactory.createMonitorConfiguration(provider);
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Fire an event to notify that a resource manager has changed
 	 * 
 	 * @param rm
@@ -241,6 +372,22 @@ public class ModelManager implements IModelManager {
 		for (Object listener : fResourceManagerListeners.getListeners()) {
 			((IResourceManagerListener) listener).handleEvent(e);
 		}
+	}
+
+	public String getControlFactoryId(String rmId) {
+		RMFactory factory = getResourceManagerFactory(rmId);
+		if (factory != null) {
+			return factory.getControlId();
+		}
+		return null;
+	}
+
+	public String getMonitorFactoryId(String rmId) {
+		RMFactory factory = getResourceManagerFactory(rmId);
+		if (factory != null) {
+			return factory.getMonitorId();
+		}
+		return null;
 	}
 
 	/*
@@ -345,14 +492,11 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.core.IModelManager#removeResourceManagers(org.eclipse
-	 * .ptp.rmsystem.IResourceManagerConfiguration[])
+	 * .ptp.rmsystem.IResourceManager[])
 	 */
-	public void removeResourceManagers(IResourceManagerConfiguration[] rms) {
-		for (IResourceManagerConfiguration rmConf : rms) {
-			IResourceManager rm = getResourceManagerFromUniqueName(rmConf.getUniqueName());
-			if (rm != null) {
-				removeResourceManager(rm);
-			}
+	public void removeResourceManagers(IResourceManager[] rms) {
+		for (IResourceManager rm : rms) {
+			removeResourceManager(rm);
 		}
 	}
 
@@ -397,6 +541,60 @@ public class ModelManager implements IModelManager {
 		}
 	}
 
+	private String addControlFactory(IConfigurationElement element) {
+		String id = element.getAttribute(ID_ATTRIBUTE);
+		if (element.getAttribute(CLASS_ATTRIBUTE) != null) {
+			try {
+				IResourceManagerControlFactory factory = (IResourceManagerControlFactory) element
+						.createExecutableExtension(CLASS_ATTRIBUTE);
+				fResourceManagerControlFactories.put(id, factory);
+			} catch (Exception e) {
+				PTPCorePlugin.log(e);
+			}
+		}
+		return id;
+	}
+
+	private String addMonitorFactory(IConfigurationElement element) {
+		String id = element.getAttribute(ID_ATTRIBUTE);
+		if (element.getAttribute(CLASS_ATTRIBUTE) != null) {
+			try {
+				IResourceManagerMonitorFactory factory = (IResourceManagerMonitorFactory) element
+						.createExecutableExtension(CLASS_ATTRIBUTE);
+				fResourceManagerMonitorFactories.put(id, factory);
+			} catch (Exception e) {
+				PTPCorePlugin.log(e);
+			}
+		}
+		return id;
+	}
+
+	private IResourceManager createResourceManager(RMFactory factory, IServiceProvider provider) {
+		IResourceManagerControl control = null;
+		IResourceManagerMonitor monitor = null;
+		IResourceManagerControlFactory controlFactory = fResourceManagerControlFactories.get(factory.getControlId());
+		if (controlFactory != null) {
+			IResourceManagerComponentConfiguration controlConfig = controlFactory.createControlConfiguration(provider);
+			control = controlFactory.createControl(controlConfig);
+		}
+		IResourceManagerMonitorFactory monitorFactory = fResourceManagerMonitorFactories.get(factory.getMonitorId());
+		if (monitorFactory != null) {
+			IResourceManagerComponentConfiguration monitorConfig = monitorFactory.createMonitorConfiguration(provider);
+			monitor = monitorFactory.createMonitor(monitorConfig);
+		}
+		IResourceManagerConfiguration config = factory.getFactory().createConfiguration(provider);
+		return factory.getFactory().create(config, control, monitor);
+	}
+
+	/**
+	 * Dispose of all of the resource managers.
+	 */
+	private void disposeResourceManagers() {
+		for (IResourceManager resourceManager : getResourceManagers()) {
+			resourceManager.dispose();
+		}
+	}
+
 	private void doRemoveResourceManager(IResourceManager rm) {
 		synchronized (fResourceManagers) {
 			fResourceManagers.remove(rm.getUniqueName());
@@ -429,6 +627,53 @@ public class ModelManager implements IModelManager {
 		}
 	}
 
+	private void getResourceManagerFactories() {
+		if (fResourceManagerFactories == null) {
+			fResourceManagerFactories = new HashMap<String, RMFactory>();
+			fResourceManagerControlFactories = new HashMap<String, IResourceManagerControlFactory>();
+			fResourceManagerMonitorFactories = new HashMap<String, IResourceManagerMonitorFactory>();
+
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry.getExtensionPoint(EXTENSION_POINT);
+
+			for (IExtension ext : extensionPoint.getExtensions()) {
+				for (IConfigurationElement ce : ext.getConfigurationElements()) {
+					if (ce.getName().equals(RM_NAME)) {
+						RMFactory factory = new RMFactory();
+						IConfigurationElement[] el = ce.getChildren();
+						if (el.length == 2) {
+							try {
+								factory.setFactory((AbstractResourceManagerFactory) ce.createExecutableExtension(CLASS_ATTRIBUTE));
+								factory.setControlId(addControlFactory(el[0]));
+								factory.setMonitorId(addMonitorFactory(el[1]));
+								factory.setId(ce.getAttribute(ID_ATTRIBUTE));
+								fResourceManagerFactories.put(factory.getId(), factory);
+							} catch (Exception e) {
+								PTPCorePlugin.log(e);
+							}
+						}
+					} else if (ce.getName().equals(RM_CONTROL_NAME)) {
+						addControlFactory(ce);
+					} else if (ce.getName().equals(RM_MONITOR_NAME)) {
+						addMonitorFactory(ce);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get the resource manager factory corresponding to the id
+	 * 
+	 * @param id
+	 *            id of factory
+	 * @return resource manager factory
+	 */
+	private RMFactory getResourceManagerFactory(String id) {
+		getResourceManagerFactories();
+		return fResourceManagerFactories.get(id);
+	}
+
 	/**
 	 * Remove provider from a service configurations
 	 * 
@@ -439,19 +684,10 @@ public class ModelManager implements IModelManager {
 		Set<IServiceConfiguration> configs = fServiceManager.getConfigurations();
 
 		for (IServiceConfiguration config : configs) {
-			if (provider == config.getServiceProvider(fLaunchService)) {
+			if (provider.equals(config.getServiceProvider(fLaunchService))) {
 				config.setServiceProvider(fLaunchService, null);
 				break;
 			}
-		}
-	}
-
-	/**
-	 * Dispose of all of the resource managers.
-	 */
-	private void disposeResourceManagers() {
-		for (IResourceManager resourceManager : getResourceManagers()) {
-			resourceManager.dispose();
 		}
 	}
 
@@ -466,43 +702,6 @@ public class ModelManager implements IModelManager {
 			Job job = new RMStartupJob(rm);
 			job.schedule();
 		}
-	}
-
-	private Map<String, IResourceManagerFactory> getResourceManagerFactories() {
-		if (fResourceManagerFactories != null) {
-			return fResourceManagerFactories;
-		}
-
-		fResourceManagerFactories = new HashMap<String, IResourceManagerFactory>();
-
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(EXTENSION_POINT);
-		final IExtension[] extensions = extensionPoint.getExtensions();
-
-		for (int iext = 0; iext < extensions.length; ++iext) {
-			final IExtension ext = extensions[iext];
-
-			final IConfigurationElement[] elements = ext.getConfigurationElements();
-
-			for (int i = 0; i < elements.length; i++) {
-				IConfigurationElement ce = elements[i];
-				try {
-					IResourceManagerFactory factory = (IResourceManagerFactory) ce.createExecutableExtension(CLASS_ATTRIBUTE);
-					String id = ce.getAttribute(ID_ATTRIBUTE);
-					// factory.setId(id);
-					fResourceManagerFactories.put(id, factory);
-				} catch (CoreException e) {
-					PTPCorePlugin.log(e);
-				}
-			}
-		}
-
-		return fResourceManagerFactories;
-	}
-
-	private IResourceManagerFactory getResourceManagerFactory(String id) {
-		getResourceManagerFactories();
-		return fResourceManagerFactories.get(id);
 	}
 
 }

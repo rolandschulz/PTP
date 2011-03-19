@@ -36,6 +36,7 @@ public class Messages extends NLS {
 	public static String PBSBatchScriptTemplateManager_removeError;
 	public static String PBSBatchScriptTemplateManager_illegalArgument;
 	public static String PBSBatchScriptTemplateManager_storeError;
+	public static String PBSResourceManagerConfiguration_PBSResourceManager;
 
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.pbs.core.messages.messages"; //$NON-NLS-1$
 

@@ -19,7 +19,6 @@ package org.eclipse.ptp.rmsystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.listeners.IJobListener;
 
 /**
  * @since 5.0
@@ -43,13 +42,6 @@ public interface IResourceManager extends IResourceManagerControl, IResourceMana
 	public static final String ERROR_STATE = "ERROR"; //$NON-NLS-1$
 
 	/**
-	 * Add a listener for job events
-	 * 
-	 * @param listener
-	 */
-	public void addJobListener(IJobListener listener);
-
-	/**
 	 * Safely dispose of this Resource Manager.
 	 */
 	public void dispose();
@@ -62,12 +54,26 @@ public interface IResourceManager extends IResourceManagerControl, IResourceMana
 	public IResourceManagerConfiguration getConfiguration();
 
 	/**
+	 * Get the controller part of this resource manager
+	 * 
+	 * @return resource manager control
+	 */
+	public IResourceManagerControl getControl();
+
+	/**
 	 * Get a string description of this RM
 	 * 
 	 * @return string describing the RM
 	 * @since 5.0
 	 */
 	public String getDescription();
+
+	/**
+	 * Get the monitor part of this resource manager
+	 * 
+	 * @return resource manager monitor
+	 */
+	public IResourceManagerMonitor getMonitor();
 
 	/**
 	 * Get the name of this RM
@@ -102,23 +108,6 @@ public interface IResourceManager extends IResourceManagerControl, IResourceMana
 	 * @since 5.0
 	 */
 	public String getUniqueName();
-
-	/**
-	 * Remove a listener for job events
-	 * 
-	 * @param listener
-	 */
-	public void removeJobListener(IJobListener listener);
-
-	/**
-	 * Set the configuration for this resource manager. This will replace the
-	 * existing configuration with a new configuration. The method is
-	 * responsible for dealing with any saved state that needs to be cleaned up.
-	 * 
-	 * @param config
-	 *            the new configuration
-	 */
-	public void setConfiguration(IResourceManagerConfiguration config);
 
 	/**
 	 * Set the state of this RM

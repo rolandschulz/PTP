@@ -10,56 +10,71 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
+import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**
  * @since 5.0
  */
-public class JAXBResourceManagerFactory implements IResourceManagerFactory {
+public class JAXBResourceManagerFactory extends AbstractResourceManagerFactory {
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerFactory#create(org.eclipse.ptp
-	 * .rmsystem.IResourceManagerConfiguration)
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#create(org.eclipse
+	 * .ptp.rmsystem.IResourceManagerConfiguration,
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl,
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor)
 	 */
-	public IResourceManager create(IResourceManagerConfiguration configuration) {
-		JAXBResourceManagerControl control = new JAXBResourceManagerControl(configuration);
-		JAXBResourceManagerMonitor monitor = new JAXBResourceManagerMonitor(configuration);
-		return new JAXBResourceManager(configuration, control, monitor);
+	@Override
+	public IResourceManager create(IResourceManagerConfiguration configuration, IResourceManagerControl control,
+			IResourceManagerMonitor monitor) {
+		return new JAXBResourceManager((AbstractResourceManagerConfiguration) configuration,
+				(AbstractResourceManagerControl) control, (AbstractResourceManagerMonitor) monitor);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createConfiguration
+	 * (org.eclipse.ptp.services.core.IServiceProvider)
 	 */
-	public IResourceManagerConfiguration createConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider) {
+		return new JAXBServiceProvider(JAXBServiceProvider.BASE, provider);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#getId()
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createControl
+	 * (org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
-	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public IResourceManagerControl createControl(IResourceManagerComponentConfiguration configuration) {
+		return new JAXBResourceManagerControl((AbstractResourceManagerConfiguration) configuration);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#getName()
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#
+	 * createControlConfiguration
+	 * (org.eclipse.ptp.services.core.IServiceProvider)
 	 */
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public IResourceManagerComponentConfiguration createControlConfiguration(IServiceProvider provider) {
+		return new JAXBServiceProvider(JAXBServiceProvider.CONTROL, provider);
 	}
 }

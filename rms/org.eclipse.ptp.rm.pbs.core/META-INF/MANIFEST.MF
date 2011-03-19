@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.rm.core,
  org.eclipse.ptp.rm.pbs.core.server,
- org.eclipse.ptp.proxy.protocol
+ org.eclipse.ptp.proxy.protocol,
+ org.eclipse.ptp.services.core
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.rm.pbs.core;x-friends:="org.eclipse.ptp.rm.pbs.ui",
  org.eclipse.ptp.rm.pbs.core.attributes;x-friends:="org.eclipse.ptp.rm.pbs.ui",

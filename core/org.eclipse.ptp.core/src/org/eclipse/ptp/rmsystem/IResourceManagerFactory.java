@@ -21,8 +21,10 @@
  */
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ptp.services.core.IServiceProvider;
+
 /**
- * @author rsqrd
+ * Factory to create a resource manager.
  * 
  */
 public interface IResourceManagerFactory {
@@ -31,29 +33,24 @@ public interface IResourceManagerFactory {
 	 * 
 	 * @param configuration
 	 *            configuration to use when creating resource manager
-	 * @return resource manager control
+	 * @param control
+	 *            resource manager control
+	 * @param monitor
+	 *            resource manager monitor
+	 * @return resource manager
 	 * @since 5.0
 	 */
-	public IResourceManager create(IResourceManagerConfiguration configuration);
+	public IResourceManager create(IResourceManagerConfiguration configuration, IResourceManagerControl control,
+			IResourceManagerMonitor monitor);
 
 	/**
-	 * Create a default configuration
+	 * Create a resource manager configuration using the supplied service
+	 * provider
 	 * 
-	 * @return default configuration
+	 * @param provider
+	 *            service provider
+	 * @return resource manager configuration
+	 * @since 5.0
 	 */
-	public IResourceManagerConfiguration createConfiguration();
-
-	/**
-	 * Get the ID of this factory
-	 * 
-	 * @return factory ID
-	 */
-	public String getId();
-
-	/**
-	 * Get the name of this factory
-	 * 
-	 * @return factory name
-	 */
-	public String getName();
+	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider);
 }

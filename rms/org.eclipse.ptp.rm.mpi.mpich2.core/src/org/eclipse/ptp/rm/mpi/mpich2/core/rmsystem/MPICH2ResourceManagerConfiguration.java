@@ -15,13 +15,17 @@ import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
-import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
+import org.eclipse.ptp.services.core.IServiceProvider;
 
 public class MPICH2ResourceManagerConfiguration extends AbstractToolRMConfiguration implements IMPICH2ResourceManagerConfiguration {
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
 
 	public MPICH2ResourceManagerConfiguration() {
 		super(MPICH2_CAPABILITIES);
+	}
+
+	public MPICH2ResourceManagerConfiguration(String namespace, IServiceProvider provider) {
+		super(MPICH2_CAPABILITIES, namespace, provider);
 
 		setLaunchCmd(Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
 				+ MPICH2PreferenceManager.PREFS_LAUNCH_CMD));
@@ -35,26 +39,6 @@ public class MPICH2ResourceManagerConfiguration extends AbstractToolRMConfigurat
 				+ MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_TIME));
 		setRemoteInstallPath(Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
 				+ MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
-	}
-
-	/**
-	 * Constructor for creating a working copy of the service provider
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public MPICH2ResourceManagerConfiguration(MPICH2ResourceManagerConfiguration provider) {
-		super(provider);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
-	 */
-	@Override
-	public IServiceProviderWorkingCopy copy() {
-		return new MPICH2ResourceManagerConfiguration(this);
 	}
 
 	/*

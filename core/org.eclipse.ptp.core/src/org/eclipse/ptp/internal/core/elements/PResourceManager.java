@@ -334,6 +334,9 @@ public class PResourceManager extends Parent implements IPResourceManager {
 		if (adapter == IPResourceManager.class) {
 			return this;
 		}
+		if (adapter == IResourceManager.class) {
+			return fResourceManager;
+		}
 		if (adapter == IResourceManagerConfiguration.class) {
 			return fResourceManager.getConfiguration();
 		}

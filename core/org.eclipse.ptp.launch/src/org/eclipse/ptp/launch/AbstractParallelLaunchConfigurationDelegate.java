@@ -76,7 +76,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
@@ -416,7 +416,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			throws CoreException {
 		IResourceManager rm = getResourceManager(configuration);
 		if (rm != null) {
-			IResourceManagerConfiguration conf = rm.getConfiguration();
+			IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault()
 					.getRemoteServices(conf.getRemoteServicesId(), monitor);
 			if (remoteServices != null) {

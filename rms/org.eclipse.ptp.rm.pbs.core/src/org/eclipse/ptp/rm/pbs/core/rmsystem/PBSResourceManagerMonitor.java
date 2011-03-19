@@ -11,13 +11,12 @@
 package org.eclipse.ptp.rm.pbs.core.rmsystem;
 
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolResourceManagerMonitor;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 /**
  * @since 5.0
  */
 public class PBSResourceManagerMonitor extends AbstractToolResourceManagerMonitor {
-	public PBSResourceManagerMonitor(IResourceManagerConfiguration config) {
+	public PBSResourceManagerMonitor(PBSResourceManagerConfiguration config) {
 		super(config);
 	}
 }

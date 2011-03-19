@@ -8,20 +8,18 @@
  * Contributors:
  * IBM - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.rm.ibm.pe.ui;
+package org.eclipse.ptp.rm.ibm.pe.core.rmsystem;
 
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.core.PECorePlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
-import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 /**
  * Service provider for IBM Parallel Environment
  */
-public class PEResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements IPEResourceManagerConfiguration {
+public class PEResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration {
 	private static final String TAG_USE_LOADLEVELER = "PE_UseLoadLeveler"; //$NON-NLS-1$
 	private static final String TAG_DEBUG_LEVEL = "PE_DebugLevel"; //$NON-NLS-1$
 	private static final String TAG_RUN_MINIPROXY = "PE_RunMiniproxy"; //$NON-NLS-1$
@@ -33,28 +31,11 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	private static final String TAG_LIBRARY_OVERRIDE = "PE_LibraryOverride"; //$NON-NLS-1$
 
 	public PEResourceManagerConfiguration() {
-		super();
+	}
+
+	public PEResourceManagerConfiguration(String namespace, IServiceProvider provider) {
+		super(namespace, provider);
 		setDescription("IBM PE Resource Manager"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Constructor for creating a working copy of the service provider
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public PEResourceManagerConfiguration(IServiceProvider provider) {
-		super(provider);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
-	 */
-	@Override
-	public IServiceProviderWorkingCopy copy() {
-		return new PEResourceManagerConfiguration(this);
 	}
 
 	/*

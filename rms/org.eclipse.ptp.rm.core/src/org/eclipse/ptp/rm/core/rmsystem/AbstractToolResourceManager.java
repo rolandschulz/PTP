@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.core.rmsystem;
 
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerControl;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
@@ -23,7 +23,7 @@ public abstract class AbstractToolResourceManager extends AbstractRuntimeResourc
 	/**
 	 * @since 3.0
 	 */
-	public AbstractToolResourceManager(IResourceManagerConfiguration config, AbstractRuntimeResourceManagerControl control,
+	public AbstractToolResourceManager(AbstractResourceManagerConfiguration config, AbstractRuntimeResourceManagerControl control,
 			AbstractRuntimeResourceManagerMonitor monitor) {
 		super(config, control, monitor);
 	}

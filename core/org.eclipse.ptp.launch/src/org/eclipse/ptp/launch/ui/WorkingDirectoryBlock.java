@@ -34,7 +34,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -231,7 +231,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 	protected void handleWorkingDirBrowseButtonSelected() {
 		IResourceManager rm = getResourceManager(getLaunchConfiguration());
 		if (rm != null) {
-			IResourceManagerConfiguration conf = rm.getConfiguration();
+			IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
 			IRemoteServices remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),
 					getLaunchConfigurationDialog());
 			if (remoteServices != null) {

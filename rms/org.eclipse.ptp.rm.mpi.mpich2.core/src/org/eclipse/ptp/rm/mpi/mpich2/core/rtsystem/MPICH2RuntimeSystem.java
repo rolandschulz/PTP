@@ -39,8 +39,8 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfigurationDefaults;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.EffectiveMPICH2ResourceManagerConfiguration;
-import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManager;
+import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration;
 
 /**
  * 
@@ -57,8 +57,8 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/**
 	 * @since 2.0
 	 */
-	public MPICH2RuntimeSystem(IResourceManager rm, IMPICH2ResourceManagerConfiguration config) {
-		super(rm, config);
+	public MPICH2RuntimeSystem(MPICH2ResourceManager rm) {
+		super(rm);
 	}
 
 	/*
@@ -128,6 +128,10 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 		nodeNameToIDMap.put(hostname, nodeID);
 	}
 
+	private MPICH2ResourceManagerConfiguration getConfiguration() {
+		return (MPICH2ResourceManagerConfiguration) getResourceManager().getConfiguration();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -148,7 +152,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	 */
 	@Override
 	protected Job createDiscoverJob(IProgressMonitor monitor) {
-		if (!rmConfiguration.hasDiscoverCmd()) {
+		if (!getConfiguration().hasDiscoverCmd()) {
 			return null;
 		}
 		Job job = new MPICH2DiscoverJob(this, monitor);
@@ -166,7 +170,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	 */
 	@Override
 	protected Job createPeriodicMonitorJob(IProgressMonitor monitor) {
-		if (!rmConfiguration.hasPeriodicMonitorCmd()) {
+		if (!getConfiguration().hasPeriodicMonitorCmd()) {
 			return null;
 		}
 		Job job = new MPICH2PeriodicJob(this, monitor);
