@@ -219,12 +219,12 @@
 		<xs:attribute name="deleteAfterUse" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="file-match">
-	   <xs:annotation>
-            <xs:documentation>
-               efsAttributes is an or'd string of tags corresponding to the EFS integer constants.
-               use "yyyy/MM/dd HH:mm:ss" format for modified strings.
-            </xs:documentation>
-         </xs:annotation>
+		<xs:annotation>
+			<xs:documentation>
+				efsAttributes is an or'd string of tags corresponding to the EFS integer constants.
+				use "yyyy/MM/dd HH:mm:ss" format for modified strings.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:attribute name="efsAttributes">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -348,7 +348,7 @@
 	<xs:complexType name="group-descriptor">
 		<xs:annotation>
 			<xs:documentation>
-			   Dynamic means this group gets rebuilt; in that case, a
+				Dynamic means this group gets rebuilt; in that case, a
 				button allowing the user to select displayed attributes is added.
 			</xs:documentation>
 		</xs:annotation>
@@ -393,6 +393,9 @@
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="grid-data-descriptor">
+		<xs:sequence>
+			<xs:element name="style" minOccurs="0" type="rm:style"/>
+		</xs:sequence>
 		<xs:attribute name="horizontalAlign" type="xs:string"/>
 		<xs:attribute name="verticalAlign" type="xs:string"/>
 		<xs:attribute name="grabExcessHorizontal" type="xs:boolean" default="true"/>
