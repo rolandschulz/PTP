@@ -29,6 +29,7 @@ public interface IJAXBUINonNLSConstants extends IJAXBNonNLSConstants {
 	String BACKGROUND = "BACKGROUND";//$NON-NLS-1$
 	String BALLOON = "BALLOON";//$NON-NLS-1$
 	String BAR = "BAR";//$NON-NLS-1$
+	String BEGINNING = "BEGINNING";//$NON-NLS-1$
 	String BORDER = "BORDER";//$NON-NLS-1$
 	String BORDER_DASH = "BORDER_DASH";//$NON-NLS-1$
 	String BORDER_DOT = "BORDER_DOT";//$NON-NLS-1$

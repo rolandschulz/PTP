@@ -252,7 +252,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 				.createPushButton(comp, Messages.JAXBRMConfigurationSelectionWizardPage_2, listener);
 
 		layout = WidgetBuilderUtils.createGridLayout(1, true);
-		gd = WidgetBuilderUtils.createGridData(GridData.FILL_BOTH, true, true, 130, 300, 1);
+		gd = WidgetBuilderUtils.createGridData(GridData.FILL_BOTH, true, true, 130, 300, 1, DEFAULT);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
 		int style = SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL;
 		gdsub = WidgetBuilderUtils.createGridDataFill(DEFAULT, DEFAULT, 1);
