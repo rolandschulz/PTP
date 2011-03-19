@@ -19,6 +19,7 @@
 package org.eclipse.ptp.ui.views;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -83,7 +84,6 @@ import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.UIUtils;
@@ -755,21 +755,20 @@ public class ResourceManagerView extends ViewPart {
 		manager.add(removeResourceManagerAction);
 		removeResourceManagerAction.setEnabled(inContextForRemoveRM);
 		if (inContextForRemoveRM) {
-			IResourceManagerConfiguration[] configs = new IResourceManagerConfiguration[selection.size()];
-			for (int i = 0; i < configs.length; ++i) {
+			List<IResourceManager> rms = new ArrayList<IResourceManager>();
+			for (int i = 0; i < selection.size(); ++i) {
 				final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
-				configs[i] = (IResourceManagerConfiguration) menuContrib.getAdapter(IResourceManagerConfiguration.class);
+				rms.add((IResourceManager) menuContrib.getAdapter(IResourceManager.class));
 			}
-			removeResourceManagerAction.setResourceManagers(configs);
+			removeResourceManagerAction.setResourceManagers(rms.toArray(new IResourceManager[0]));
 		}
 		manager.add(editResourceManagerAction);
 		editResourceManagerAction.setEnabled(inContextForEditRM);
 		if (inContextForEditRM) {
 			final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[0];
-			IResourceManagerConfiguration config = (IResourceManagerConfiguration) menuContrib
-					.getAdapter(IResourceManagerConfiguration.class);
-			if (config != null) {
-				editResourceManagerAction.setResourceManager(config);
+			IResourceManager rm = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
+			if (rm != null) {
+				editResourceManagerAction.setResourceManager(rm);
 			}
 		}
 		manager.add(new Separator());
@@ -777,9 +776,10 @@ public class ResourceManagerView extends ViewPart {
 		selectResourceManagerAction.setEnabled(inContextForSelectRM);
 		if (inContextForSelectRM) {
 			final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[0];
-			IResourceManagerConfiguration config = (IResourceManagerConfiguration) menuContrib
-					.getAdapter(IResourceManagerConfiguration.class);
-			selectResourceManagerAction.setResourceManager(config.getUniqueName());
+			IResourceManager rm = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
+			if (rm != null) {
+				selectResourceManagerAction.setResourceManager(rm);
+			}
 		}
 	}
 

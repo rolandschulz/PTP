@@ -13,12 +13,34 @@
       </initializer>
    </extension>
    <extension
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerConfiguration"
+            id="org.eclipse.ptp.rm.ibm.pe.resourceManager"
+            name="IBM Parallel Environment"
+            serviceId="org.eclipse.ptp.core.LaunchService">
+      </provider>
+   </extension>
+   <extension
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
             class="org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerFactory"
-            id="org.eclipse.ptp.rm.ibm.pe.PEServiceProvider"
-            name="IBM Parallel Environment">
+            id="org.eclipse.ptp.rm.ibm.pe.resourceManager">
+         <resourceManagerControl
+               class="org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerFactory"
+               id="org.eclipse.ptp.rm.ibm.pe.core.control">
+         </resourceManagerControl>
+         <resourceManagerMonitor
+               class="org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerFactory"
+               id="org.eclipse.ptp.rm.ibm.pe.core.monitor">
+         </resourceManagerMonitor>
       </resourceManager>
    </extension>
-
+   <extension
+         point="org.eclipse.ptp.core.runtimeSystems">
+      <runtimeSystem
+            class="org.eclipse.ptp.rm.ibm.pe.core.rtsystem.PERuntimeSystemFactory"
+            id="org.eclipse.ptp.rm.ibm.pe.resourceManager">
+      </runtimeSystem>
+   </extension>
 </plugin>

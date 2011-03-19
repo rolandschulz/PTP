@@ -52,7 +52,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -357,7 +357,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		if (rm == null) {
 			throw new CoreException(new Status(IStatus.ERROR, getUniqueIdentifier(), Messages.PTPLaunchPlugin_4));
 		}
-		IResourceManagerConfiguration conf = rm.getConfiguration();
+		IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
 		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), monitor);
 		if (monitor.isCanceled()) {
 			throw new CoreException(new Status(IStatus.ERROR, getUniqueIdentifier(),

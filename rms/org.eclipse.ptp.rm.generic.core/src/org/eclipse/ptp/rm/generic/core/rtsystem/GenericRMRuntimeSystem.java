@@ -26,20 +26,19 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
-import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem;
 import org.eclipse.ptp.rm.generic.core.GenericRMCorePlugin;
 import org.eclipse.ptp.rm.generic.core.messages.Messages;
 import org.eclipse.ptp.rm.generic.core.rmsystem.EffectiveGenericRMConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rm.generic.core.rmsystem.GenericResourceManager;
 
 public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	/** The node we are running on. */
 	private String fNodeID;
 
-	public GenericRMRuntimeSystem(IResourceManager rm, IToolRMConfiguration config) {
-		super(rm, config);
+	public GenericRMRuntimeSystem(GenericResourceManager rm) {
+		super(rm);
 	}
 
 	/*

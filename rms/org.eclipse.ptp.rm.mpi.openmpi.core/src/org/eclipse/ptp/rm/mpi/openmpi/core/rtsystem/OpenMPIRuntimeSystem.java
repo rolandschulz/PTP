@@ -41,8 +41,8 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfigurationDefa
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.rm.mpi.openmpi.core.parameters.OmpiInfo;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.EffectiveOpenMPIResourceManagerConfiguration;
-import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManager;
+import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration;
 
 /**
  * 
@@ -65,8 +65,8 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/**
 	 * @since 4.0
 	 */
-	public OpenMPIRuntimeSystem(IResourceManager rm, IOpenMPIResourceManagerConfiguration config) {
-		super(rm, config);
+	public OpenMPIRuntimeSystem(OpenMPIResourceManager rm) {
+		super(rm);
 	}
 
 	/*
@@ -142,6 +142,10 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 		nodeToIDMap.put(name, id);
 	}
 
+	private OpenMPIResourceManagerConfiguration getConfiguration() {
+		return (OpenMPIResourceManagerConfiguration) getResourceManager().getConfiguration();
+	}
+
 	@Override
 	protected Job createContinuousMonitorJob(IProgressMonitor monitor) {
 		return null;
@@ -149,7 +153,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 
 	@Override
 	protected Job createDiscoverJob(IProgressMonitor monitor) {
-		if (!rmConfiguration.hasDiscoverCmd()) {
+		if (!getConfiguration().hasDiscoverCmd()) {
 			return null;
 		}
 		Job job = new OpenMPIDiscoverJob(this, monitor);
@@ -159,6 +163,12 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 		return job;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * createPeriodicMonitorJob(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected Job createPeriodicMonitorJob(IProgressMonitor monitor) {
 		return null;

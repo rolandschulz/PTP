@@ -20,7 +20,7 @@ import java.util.Properties;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
-import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
+import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.ui.PBSUIPlugin;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 import org.eclipse.ptp.rm.pbs.ui.utils.WidgetUtils;
@@ -42,7 +42,7 @@ public final class PBSResourceManagerConfigurationWizardPage extends AbstractRem
 	private String[] types;
 	private Combo proxyTypes;
 	private final Properties proxyConfigs;
-	private IPBSResourceManagerConfiguration pbsConfig;
+	private PBSResourceManagerConfiguration pbsConfig;
 
 	public PBSResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.PBSResourceManagerConfigurationWizardPage_name);
@@ -69,9 +69,9 @@ public final class PBSResourceManagerConfigurationWizardPage extends AbstractRem
 	@Override
 	protected void initContents() {
 		super.initContents();
-		pbsConfig = (IPBSResourceManagerConfiguration) config;
+		pbsConfig = (PBSResourceManagerConfiguration) getConfiguration();
 		String proxyPath = pbsConfig.getProxyConfiguration();
-		if (proxyPath != null && proxyPath.length() != 0)
+		if (proxyPath != null && proxyPath.length() != 0) {
 			for (int i = 0; i < types.length; i++) {
 				String path = proxyConfigs.getProperty(types[i]);
 				if (proxyPath.equals(path)) {
@@ -79,13 +79,15 @@ public final class PBSResourceManagerConfigurationWizardPage extends AbstractRem
 					break;
 				}
 			}
+		}
 	}
 
 	@Override
 	protected boolean isValidSetting() {
 		String choice = proxyTypes.getText();
-		if (choice == null || choice.length() == 0)
+		if (choice == null || choice.length() == 0) {
 			return false;
+		}
 		return super.isValidSetting();
 	}
 
@@ -95,19 +97,22 @@ public final class PBSResourceManagerConfigurationWizardPage extends AbstractRem
 		if (PBSUIPlugin.getDefault() != null) {
 			Bundle bundle = PBSUIPlugin.getDefault().getBundle();
 			url = FileLocator.find(bundle, new Path(SRC + PATH_SEP + RM_CONFIG_PROPS), null);
-		} else
+		} else {
 			url = new File(RM_CONFIG_PROPS).toURL();
+		}
 
-		if (url == null)
+		if (url == null) {
 			return;
+		}
 		InputStream s = null;
 		try {
 			s = url.openStream();
 			proxyConfigs.load(s);
 		} finally {
 			try {
-				if (s != null)
+				if (s != null) {
 					s.close();
+				}
 			} catch (IOException e) {
 			}
 		}

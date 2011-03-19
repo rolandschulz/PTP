@@ -13,6 +13,8 @@
  */
 package org.eclipse.ptp.rm.core.rmsystem;
 
+import org.eclipse.ptp.services.core.IServiceProvider;
+
 /**
  * @author greg
  * @since 3.0
@@ -38,15 +40,9 @@ public abstract class AbstractToolRMConfiguration extends AbstractRemoteResource
 		fCapabilities = capabilities;
 	}
 
-	/**
-	 * Constructor for creating a working copy of the service provider
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public AbstractToolRMConfiguration(AbstractToolRMConfiguration provider) {
-		super(provider);
-		fCapabilities = provider.getCapabilities();
+	public AbstractToolRMConfiguration(int capabilities, String namespace, IServiceProvider provider) {
+		super(namespace, provider);
+		fCapabilities = capabilities;
 	}
 
 	/*

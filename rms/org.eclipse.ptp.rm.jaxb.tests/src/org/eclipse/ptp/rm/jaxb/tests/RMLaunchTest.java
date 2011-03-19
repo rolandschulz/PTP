@@ -282,10 +282,12 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		IRemoteConnection localConnection = localConnectionManager.getConnection(ZEROSTR);
 		assert (localConnection != null);
 		rmConfig.setRemoteServicesId(localServices.getId());
-		rmConfig.setConnectionName(localConnection.getName(), CONTROL_CONNECTION_NAME);
-		rmConfig.setControlUserName(localConnection.getUsername());
-		rmConfig.setControlAddress(localConnection.getAddress());
-		rmConfig.setControlPath(targetPath);
+		rmConfig.setConnectionName(localConnection.getName());
+		// rmConfig.setConnectionName(localConnection.getName(),
+		// CONTROL_CONNECTION_NAME);
+		// rmConfig.setControlUserName(localConnection.getUsername());
+		// rmConfig.setControlAddress(localConnection.getAddress());
+		// rmConfig.setControlPath(targetPath);
 	}
 
 	@SuppressWarnings("unchecked")

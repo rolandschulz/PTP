@@ -173,10 +173,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	/**
 	 * @since 1.1
 	 */
-	protected IRemoteResourceManagerConfiguration config;
-	/**
-	 * @since 1.1
-	 */
 	protected String proxyPath = EMPTY_STRING;
 	/**
 	 * @since 1.1
@@ -296,7 +292,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		super(wizard, title);
 		setPageComplete(false);
 		isValid = false;
-		config = (IRemoteResourceManagerConfiguration) wizard.getConfiguration();
 	}
 
 	/*
@@ -334,14 +329,14 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
 		}
 		if (remoteServices != null) {
-			config.setRemoteServicesId(remoteServices.getId());
+			getConfiguration().setRemoteServicesId(remoteServices.getId());
 		}
 		if (connection != null) {
-			config.setConnectionName(connection.getName());
+			getConfiguration().setConnectionName(connection.getName());
 		}
-		config.setLocalAddress(localAddr);
-		config.setProxyServerPath(proxyPath);
-		config.setOptions(options);
+		getConfiguration().setLocalAddress(localAddr);
+		getConfiguration().setProxyServerPath(proxyPath);
+		getConfiguration().setOptions(options);
 		fProxyOptions.save();
 		return true;
 	}
@@ -498,7 +493,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			proxyOptionsArea.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 4));
 			pageContent.adaptChild(proxyOptionsArea);
 
-			fProxyOptions = createProxyOptions(this, config);
+			fProxyOptions = createProxyOptions(this, getConfiguration());
 			fProxyOptions.setRemoteConnection(connection);
 			Composite optionsComp = fProxyOptions.createContents(proxyOptionsArea);
 			proxyOptionsArea.setClient(optionsComp);
@@ -655,23 +650,23 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * Load the initial wizard state from the configuration settings.
 	 */
 	private void loadSaved() {
-		proxyPath = config.getProxyServerPath();
-		localAddr = config.getLocalAddress();
+		proxyPath = getConfiguration().getProxyServerPath();
+		localAddr = getConfiguration().getLocalAddress();
 
-		String rmID = config.getRemoteServicesId();
+		String rmID = getConfiguration().getRemoteServicesId();
 		if (rmID != null) {
 			IWizardContainer container = null;
 			if (getControl().isVisible()) {
 				container = getWizard().getContainer();
 			}
 			remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(rmID, container);
-			String conn = config.getConnectionName();
+			String conn = getConfiguration().getConnectionName();
 			if (remoteServices != null && conn != null) {
 				connection = remoteServices.getConnectionManager().getConnection(conn);
 			}
 		}
 
-		int options = config.getOptions();
+		int options = getConfiguration().getOptions();
 
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
@@ -836,6 +831,15 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		if (proxyPathEnabled) {
 			proxyPathText.setText(proxyPath);
 		}
+	}
+
+	/**
+	 * @since 2.0
+	 */
+	@Override
+	protected IRemoteResourceManagerConfiguration getConfiguration() {
+		return (IRemoteResourceManagerConfiguration) super.getConfiguration();
+
 	}
 
 	/**

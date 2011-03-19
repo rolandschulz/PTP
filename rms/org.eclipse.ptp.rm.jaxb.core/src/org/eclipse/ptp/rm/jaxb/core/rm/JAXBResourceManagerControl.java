@@ -48,10 +48,10 @@ import org.eclipse.ptp.rm.jaxb.core.runnable.command.CommandJob;
 import org.eclipse.ptp.rm.jaxb.core.runnable.command.CommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl,
 		IJAXBNonNLSConstants {
@@ -154,7 +154,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private IRemoteFileManager localFileManager;
 	private boolean appendSysEnv;
 
-	public JAXBResourceManagerControl(IResourceManagerConfiguration jaxbServiceProvider) {
+	public JAXBResourceManagerControl(AbstractResourceManagerConfiguration jaxbServiceProvider) {
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
 		try {

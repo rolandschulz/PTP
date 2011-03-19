@@ -19,19 +19,21 @@
 package org.eclipse.ptp.ui.wizards;
 
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Abstract class to subclass contributed WizardPages to create
- * new Resource Managers
+ * Abstract class to subclass contributed WizardPages to create new Resource
+ * Managers
  * 
  * @author rsqrd
- *
+ * 
  */
 public abstract class RMConfigurationWizardPage extends WizardPage {
 
 	private final IRMConfigurationWizard wizard;
-	
+	private IResourceManagerComponentConfiguration fConfiguration;
+
 	/**
 	 * @param wizard
 	 * @param pageName
@@ -41,8 +43,12 @@ public abstract class RMConfigurationWizardPage extends WizardPage {
 		this.wizard = wizard;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
 	public abstract void createControl(Composite parent);
 
@@ -51,5 +57,19 @@ public abstract class RMConfigurationWizardPage extends WizardPage {
 	 */
 	protected IRMConfigurationWizard getConfigurationWizard() {
 		return wizard;
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	protected IResourceManagerComponentConfiguration getConfiguration() {
+		return fConfiguration;
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	protected void setConfiguration(IResourceManagerComponentConfiguration config) {
+		fConfiguration = config;
 	}
 }

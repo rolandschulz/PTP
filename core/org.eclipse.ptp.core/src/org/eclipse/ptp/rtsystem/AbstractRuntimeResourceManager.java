@@ -18,14 +18,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.rtsystem;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 
 /**
  * @author greg
@@ -33,25 +40,43 @@ import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
  * 
  */
 public abstract class AbstractRuntimeResourceManager extends AbstractResourceManager {
+	private static String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
+	private static String CLASS_ATTRIBUTE = "class"; //$NON-NLS-1$
+	private static String EXTENSION_POINT = "org.eclipse.ptp.core.runtimeSystems"; //$NON-NLS-1$
 
-	private IRuntimeSystem fRuntimeSystem = null;
+	private static final Map<String, IRuntimeSystem> fRuntimeSystems = new HashMap<String, IRuntimeSystem>();
+	private static Map<String, IRuntimeSystemFactory> fRuntimeSystemFactories = null;
+
+	private static void getRuntimeSystemFactories() {
+		if (fRuntimeSystemFactories == null) {
+			fRuntimeSystemFactories = new HashMap<String, IRuntimeSystemFactory>();
+
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry.getExtensionPoint(EXTENSION_POINT);
+
+			for (IExtension ext : extensionPoint.getExtensions()) {
+				for (IConfigurationElement ce : ext.getConfigurationElements()) {
+					String id = ce.getAttribute(ID_ATTRIBUTE);
+					if (ce.getAttribute(CLASS_ATTRIBUTE) != null) {
+						try {
+							IRuntimeSystemFactory factory = (IRuntimeSystemFactory) ce.createExecutableExtension(CLASS_ATTRIBUTE);
+							fRuntimeSystemFactories.put(id, factory);
+						} catch (Exception e) {
+							PTPCorePlugin.log(e);
+						}
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * @since 5.0
 	 */
-	public AbstractRuntimeResourceManager(IResourceManagerConfiguration config, IResourceManagerControl control,
-			IResourceManagerMonitor monitor) {
+	public AbstractRuntimeResourceManager(AbstractResourceManagerConfiguration config,
+			AbstractRuntimeResourceManagerControl control, AbstractRuntimeResourceManagerMonitor monitor) {
 		super(config, control, monitor);
 	}
-
-	/**
-	 * create a new runtime system
-	 * 
-	 * @return the new runtime system
-	 * @throws CoreException
-	 *             TODO
-	 */
-	protected abstract IRuntimeSystem doCreateRuntimeSystem() throws CoreException;
 
 	/*
 	 * (non-Javadoc)
@@ -73,8 +98,8 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	protected void doShutdown() throws CoreException {
 		CoreException exception = null;
 		try {
-			if (fRuntimeSystem != null) {
-				fRuntimeSystem.shutdown();
+			if (getRuntimeSystem() != null) {
+				getRuntimeSystem().shutdown();
 			}
 		} catch (CoreException e) {
 			// Catch exception so we can shut down control and monitor anyway
@@ -98,12 +123,10 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		monitor.subTask(Messages.AbstractRuntimeResourceManager_5);
 
-		fRuntimeSystem = doCreateRuntimeSystem();
-
 		super.doStartup(subMon.newChild(50));
 
 		try {
-			fRuntimeSystem.startup(subMon.newChild(50));
+			getRuntimeSystem().startup(subMon.newChild(50));
 		} catch (CoreException e) {
 			doShutdown();
 			throw e;
@@ -171,11 +194,22 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	}
 
 	/**
-	 * @return the runtimeSystem
-	 * @since 5.0
+	 * Get the runtime system for this resource manager
+	 * 
+	 * @return runtime system or null if there is no corresponding runtime
+	 *         system
 	 */
 	protected IRuntimeSystem getRuntimeSystem() {
-		return fRuntimeSystem;
+		String uniqueId = getConfiguration().getUniqueName();
+		IRuntimeSystem rts = fRuntimeSystems.get(uniqueId);
+		if (rts == null) {
+			getRuntimeSystemFactories();
+			IRuntimeSystemFactory factory = fRuntimeSystemFactories.get(getConfiguration().getResourceManagerId());
+			if (factory != null) {
+				rts = factory.create(this);
+				fRuntimeSystems.put(uniqueId, rts);
+			}
+		}
+		return rts;
 	}
-
 }

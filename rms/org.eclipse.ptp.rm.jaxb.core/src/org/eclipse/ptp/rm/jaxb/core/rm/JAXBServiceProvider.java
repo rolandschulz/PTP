@@ -16,19 +16,18 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.Site;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.core.rmsystem.AbstractControlMonitorRMServiceProvider;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
-public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider implements IJAXBResourceManagerConfiguration,
+public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfiguration implements IJAXBResourceManagerConfiguration,
 		IJAXBNonNLSConstants {
 
 	private ResourceManagerData rmdata;
@@ -36,19 +35,11 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 	private IRemoteServices service;
 
 	public JAXBServiceProvider() {
-		super();
-		setDescription(Messages.JAXBServiceProvider_defaultDescription);
 	}
 
-	/**
-	 * Constructor for creating a working copy of the service provider Don't
-	 * register listeners as this copy will just be discarded at some point.
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public JAXBServiceProvider(IServiceProvider provider) {
-		super(provider);
+	public JAXBServiceProvider(String namespace, IServiceProvider provider) {
+		super(namespace, provider);
+		setDescription(Messages.JAXBServiceProvider_defaultDescription);
 	}
 
 	public void clearReferences() {
@@ -56,16 +47,6 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		map = null;
 		rmdata = null;
 		service = null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.services.core.IServiceProvider#copy()
-	 */
-	@Override
-	public IServiceProviderWorkingCopy copy() {
-		return new JAXBServiceProvider(this);
 	}
 
 	public String getDefaultControlHost() {
@@ -297,13 +278,12 @@ public class JAXBServiceProvider extends AbstractControlMonitorRMServiceProvider
 		putString(VALID_ATTRIBUTES, serialized);
 	}
 
-	@Override
+	// @Override
 	protected void clearRMData() {
 		rmdata = null;
 		setRemoteServicesId(null);
 		setConnectionName(null);
-		setConnectionName(null, CONTROL_CONNECTION_NAME);
-		setConnectionName(null, MONITOR_CONNECTION_NAME);
-		super.clearRMData();
+		setInvocationOptions(ZEROSTR);
+		setLocalAddress(ZEROSTR);
 	}
 }

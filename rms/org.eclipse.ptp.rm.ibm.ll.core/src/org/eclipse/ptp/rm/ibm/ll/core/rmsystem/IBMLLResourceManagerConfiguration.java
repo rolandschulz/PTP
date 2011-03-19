@@ -8,20 +8,19 @@
  * Contributors:
  * IBM - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.rm.ibm.ll.ui;
+package org.eclipse.ptp.rm.ibm.ll.core.rmsystem;
 
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLCorePlugin;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceConstants;
-import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 /**
  * Service provider for LoadLeveler
  */
-public class LLResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements IIBMLLResourceManagerConfiguration {
+public class IBMLLResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements
+		IIBMLLResourceManagerConfiguration {
 	private static final String TAG_LL_LIBPATH = "LL_LibraryPath"; //$NON-NLS-1$
 	private static final String TAG_TRACE_OPTION = "LL_Trace"; //$NON-NLS-1$
 	private static final String TAG_INFO_MESSAGE = "LL_ProxyInfoMessage"; //$NON-NLS-1$
@@ -46,29 +45,16 @@ public class LLResourceManagerConfiguration extends AbstractRemoteResourceManage
 	private static final String TAG_MAX_NODE_POLL = "LL_MNodePollInterval"; //$NON-NLS-1$
 	private static final String TAG_JOB_POLL = "LL_JobPollInterval"; //$NON-NLS-1$
 
-	public LLResourceManagerConfiguration() {
-		super();
+	public IBMLLResourceManagerConfiguration() {
+	}
+
+	public IBMLLResourceManagerConfiguration(String namespace, IServiceProvider provider) {
+		super(namespace, provider);
 		setDescription("IBM LL Resource Manager"); //$NON-NLS-1$
 	}
 
-	/**
-	 * Constructor for creating a working copy of the service provider
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public LLResourceManagerConfiguration(IServiceProvider provider) {
-		super(provider);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
-	 */
-	@Override
-	public IServiceProviderWorkingCopy copy() {
-		return new LLResourceManagerConfiguration(this);
+	public IBMLLResourceManagerConfiguration(String namespace, IBMLLResourceManagerConfiguration base) {
+		super(namespace, base);
 	}
 
 	/*

@@ -12,6 +12,7 @@
 package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.managers.RMManager;
 import org.eclipse.ptp.ui.messages.Messages;
@@ -19,7 +20,7 @@ import org.eclipse.ptp.ui.views.ResourceManagerView;
 
 public class SelectDefaultResourceManagerAction extends Action {
 
-	private String fRmId;
+	private IResourceManager fRM;
 	private final ResourceManagerView fView;
 
 	public SelectDefaultResourceManagerAction(ResourceManagerView view) {
@@ -31,7 +32,7 @@ public class SelectDefaultResourceManagerAction extends Action {
 	public void run() {
 		RMManager rm = PTPUIPlugin.getDefault().getRMManager();
 		if (rm != null) {
-			rm.fireSetDefaultRMEvent(fRmId);
+			rm.fireSetDefaultRMEvent(fRM.getUniqueName());
 		}
 		fView.refreshViewer();
 	}
@@ -39,7 +40,7 @@ public class SelectDefaultResourceManagerAction extends Action {
 	/**
 	 * @since 5.0
 	 */
-	public void setResourceManager(String rmId) {
-		fRmId = rmId;
+	public void setResourceManager(IResourceManager rm) {
+		fRM = rm;
 	}
 }

@@ -21,7 +21,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
-import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
+import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.SWT;
@@ -76,7 +76,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 	private Label jobPollLabel;
 	private final Shell parentShell;
 	private String proxyOptions;
-	private final IPEResourceManagerConfiguration fConfig;
+	private final PEResourceManagerConfiguration fConfig;
 	private final IRMConfigurationWizard fWizard;
 	private IRemoteServices remoteService;
 	private IRemoteUIServices remoteUIService;
@@ -126,7 +126,8 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		super(parent);
 		parentShell = parent;
 		fWizard = wizard;
-		fConfig = (IPEResourceManagerConfiguration) wizard.getConfiguration();
+		// fConfig = (PEResourceManagerConfiguration) wizard.getConfiguration();
+		fConfig = null;
 		setInitialOptions(initialOptions);
 		create();
 	}

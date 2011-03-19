@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.ptp.rm.jaxb.core.IControlMonitorRMConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
-import org.eclipse.ptp.services.core.IServiceProvider;
 
 public abstract class AbstractControlMonitorRMServiceProvider extends AbstractResourceManagerConfiguration implements
 		IControlMonitorRMConfiguration, IJAXBNonNLSConstants {
@@ -26,16 +25,6 @@ public abstract class AbstractControlMonitorRMServiceProvider extends AbstractRe
 
 	public AbstractControlMonitorRMServiceProvider() {
 		// Empty
-	}
-
-	/**
-	 * Constructor for creating a working copy of the service provider
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public AbstractControlMonitorRMServiceProvider(IServiceProvider provider) {
-		super(provider);
 	}
 
 	/**

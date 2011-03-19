@@ -12,9 +12,10 @@ package org.eclipse.ptp.rm.jaxb.core;
 import java.util.Map;
 
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
-public interface IJAXBResourceManagerConfiguration extends IControlMonitorRMConfiguration {
+public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManagerConfiguration {
 	/**
 	 * @since 5.0
 	 */

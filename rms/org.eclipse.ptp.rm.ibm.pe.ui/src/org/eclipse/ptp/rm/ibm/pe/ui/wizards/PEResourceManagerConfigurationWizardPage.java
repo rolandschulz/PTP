@@ -26,7 +26,7 @@ package org.eclipse.ptp.rm.ibm.pe.ui.wizards;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
+import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.wizards.AbstractProxyOptions;
 import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteProxyResourceManagerConfigurationWizardPage;
@@ -51,6 +51,6 @@ public final class PEResourceManagerConfigurationWizardPage extends AbstractRemo
 	 */
 	@Override
 	protected AbstractProxyOptions createProxyOptions(WizardPage wizardPage, IRemoteResourceManagerConfiguration config) {
-		return new PEResourceManagerOptions(wizardPage, (IPEResourceManagerConfiguration) config);
+		return new PEResourceManagerOptions(wizardPage, (PEResourceManagerConfiguration) config);
 	}
 }

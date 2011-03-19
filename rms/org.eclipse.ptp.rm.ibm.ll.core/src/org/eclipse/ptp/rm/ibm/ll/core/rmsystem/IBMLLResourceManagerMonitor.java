@@ -24,7 +24,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.ll.core.rmsystem;
 
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
 
 /**
@@ -35,7 +35,7 @@ public class IBMLLResourceManagerMonitor extends AbstractRuntimeResourceManagerM
 	/**
 	 * @since 5.0
 	 */
-	public IBMLLResourceManagerMonitor(IResourceManagerConfiguration config) {
+	public IBMLLResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
 	}
 }

@@ -24,7 +24,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.pe.core.rmsystem;
 
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerMonitor;
 
 /**
@@ -35,7 +34,7 @@ public class PEResourceManagerMonitor extends AbstractRuntimeResourceManagerMoni
 	/**
 	 * @since 5.0
 	 */
-	public PEResourceManagerMonitor(IResourceManagerConfiguration config) {
+	public PEResourceManagerMonitor(PEResourceManagerConfiguration config) {
 		super(config);
 	}
 }

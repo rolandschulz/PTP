@@ -5,7 +5,7 @@
          point="org.eclipse.ptp.services.core.providers">
       <provider
             class="org.eclipse.ptp.rm.generic.core.rmsystem.GenericRMConfiguration"
-            id="org.eclipse.ptp.rm.generic.GenericRMServiceProvider"
+            id="org.eclipse.ptp.rm.generic.GenericResourceManager"
             name="Generic Remote Launch"
             serviceId="org.eclipse.ptp.core.LaunchService">
       </provider>
@@ -20,8 +20,22 @@
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
             class="org.eclipse.ptp.rm.generic.core.rmsystem.GenericResourceManagerFactory"
-            id="org.eclipse.ptp.rm.generic.GenericRMServiceProvider"
-            name="Generic Remote Launch">
+            id="org.eclipse.ptp.rm.generic.GenericResourceManager">
+         <resourceManagerControl
+               class="org.eclipse.ptp.rm.generic.core.rmsystem.GenericResourceManagerFactory"
+               id="org.eclipse.ptp.rm.generic.core.control">
+         </resourceManagerControl>
+         <resourceManagerMonitor
+               class="org.eclipse.ptp.rm.generic.core.rmsystem.GenericResourceManagerFactory"
+               id="org.eclipse.ptp.rm.generic.core.monitor">
+         </resourceManagerMonitor>
       </resourceManager>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.core.runtimeSystems">
+      <runtimeSystem
+            class="org.eclipse.ptp.rm.generic.core.rtsystem.GenericRuntimeSystemFactory"
+            id="org.eclipse.ptp.rm.generic.GenericResourceManager">
+      </runtimeSystem>
    </extension>
 </plugin>

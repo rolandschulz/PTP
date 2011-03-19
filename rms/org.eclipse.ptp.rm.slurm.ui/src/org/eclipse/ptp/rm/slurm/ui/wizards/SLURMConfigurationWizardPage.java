@@ -210,7 +210,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	 */
 	private void initContents() {
 		loading = true;
-		config = (ISLURMResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
+		config = (ISLURMResourceManagerConfiguration) getConfiguration();
 		loadSaved();
 		updateSettings();
 		defaultSetting();
@@ -348,8 +348,9 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	 * @return cleaned up text.
 	 */
 	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
 			return null;
+		}
 
 		return text;
 	}
@@ -439,10 +440,11 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	 */
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
-		if (style == -1)
+		if (style == -1) {
 			gd = new GridData();
-		else
+		} else {
 			gd = new GridData(style);
+		}
 		gd.horizontalSpan = space;
 		return gd;
 	}

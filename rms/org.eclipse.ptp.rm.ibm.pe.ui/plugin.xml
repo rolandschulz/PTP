@@ -22,20 +22,18 @@
             id="org.eclipse.ptp.ibmpe.ui.launchConfiguration"/>
    </extension>
    <extension
-         point="org.eclipse.ptp.services.core.providers">
-      <provider
-            class="org.eclipse.ptp.rm.ibm.pe.ui.PEResourceManagerConfiguration"
-            id="org.eclipse.ptp.rm.ibm.pe.PEServiceProvider"
-            name="IBM Parallel Environment"
-            serviceId="org.eclipse.ptp.core.LaunchService">
-      </provider>
-   </extension>
-   <extension
          point="org.eclipse.ptp.services.ui.providerContributors">
       <providerContributor
-            class="org.eclipse.ptp.rm.ibm.pe.ui.PEProviderContributor"
-            id="org.eclipse.ptp.rm.ibm.pe.PEServiceProvider">
+            class="org.eclipse.ptp.ui.wizards.RMProviderContributor"
+            id="org.eclipse.ptp.rm.ibm.pe.resourceManager">
       </providerContributor>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
+      <configurationWizard
+            class="org.eclipse.ptp.rm.ibm.pe.ui.wizards.PERMConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.rm.ibm.pe.resourceManager">
+      </configurationWizard>
    </extension>
 
 </plugin>

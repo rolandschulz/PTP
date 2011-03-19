@@ -64,15 +64,12 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	 * .IPMachine)
 	 */
 	public void addMachine(IPMachine mac) {
-		if (mac != null) {
-			IElementHandler handler;
-			if (!machineList.containsKey(mac.getID())) {
-				handler = new ElementHandler();
-				machineList.put(mac.getID(), mac);
-				setElementHandler(mac.getID(), handler);
-			} else {
-				handler = getElementHandler(mac.getID());
-			}
+		if (mac != null && !machineList.containsKey(mac.getID())) {
+			IElementHandler handler = new ElementHandler();
+			machineList.put(mac.getID(), mac);
+			setElementHandler(mac.getID(), handler);
+			// } else {
+			// handler = getElementHandler(mac.getID());
 			List<IElement> elements = new ArrayList<IElement>();
 			IElementSet set = handler.getSetRoot();
 			for (IPNode node : mac.getNodes()) {

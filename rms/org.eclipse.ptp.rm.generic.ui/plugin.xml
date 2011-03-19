@@ -10,15 +10,22 @@
    <extension
          point="org.eclipse.ptp.services.ui.providerContributors">
       <providerContributor
-            class="org.eclipse.ptp.rm.generic.ui.GenericRMProviderContributor"
-            id="org.eclipse.ptp.rm.generic.GenericRMServiceProvider">
+            class="org.eclipse.ptp.ui.wizards.RMProviderContributor"
+            id="org.eclipse.ptp.rm.generic.GenericResourceManager">
       </providerContributor>
    </extension>
    <extension
          point="org.eclipse.ptp.ui.runtimeModelPresentations">
       <runtimeModelPresentation
             class="org.eclipse.ptp.rm.generic.ui.GenericRMRuntimeModelPresentation"
-            id="org.eclipse.ptp.rm.generic.GenericRMServiceProvider">
+            id="org.eclipse.ptp.rm.generic.GenericResourceManager">
       </runtimeModelPresentation>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
+      <configurationWizard
+            class="org.eclipse.ptp.rm.generic.ui.wizards.GenericRMConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.rm.generic.core.control">
+      </configurationWizard>
    </extension>
 </plugin>

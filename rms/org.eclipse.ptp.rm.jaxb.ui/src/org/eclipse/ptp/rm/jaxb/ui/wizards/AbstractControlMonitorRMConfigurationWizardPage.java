@@ -44,7 +44,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.jaxb.core.IControlMonitorRMConfiguration;
+import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
@@ -178,7 +178,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 
 	public static final int VALIDATE_TIMER = 250;
 
-	protected IControlMonitorRMConfiguration config;
+	protected IRemoteResourceManagerConfiguration config;
 	protected String targetPath = ZEROSTR;
 	protected String targetArgs = ZEROSTR;
 	protected String localAddr = ZEROSTR;
@@ -458,7 +458,7 @@ public abstract class AbstractControlMonitorRMConfigurationWizardPage extends RM
 	 */
 	protected void initContents() {
 		loading = true;
-		config = (IControlMonitorRMConfiguration) getConfigurationWizard().getConfiguration();
+		config = (IRemoteResourceManagerConfiguration) getConfiguration();
 		configureInternal();
 		loadSaved();
 		updateSettings();

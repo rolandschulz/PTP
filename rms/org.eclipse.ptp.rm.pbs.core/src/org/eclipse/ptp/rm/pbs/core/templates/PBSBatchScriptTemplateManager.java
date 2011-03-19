@@ -22,8 +22,8 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.rm.pbs.core.ConfigUtils;
 import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.core.messages.Messages;
-import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
+import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 /**
@@ -52,8 +52,9 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 		String name = imported.getName();
 		name = validateTemplateNameForEdit(name);
 		String template = ConfigUtils.readFull(imported, PBSBatchScriptTemplate.BUFFER_SIZE);
-		if (ZEROSTR.equals(template))
+		if (ZEROSTR.equals(template)) {
 			throw new Throwable(Messages.PBSBatchScriptTemplateManager_zerostringError);
+		}
 		ByteArrayInputStream bais = new ByteArrayInputStream(template.getBytes());
 		new PBSBatchScriptTemplate(converter).load(bais);
 		getRMConfig().addTemplate(name, template);
@@ -64,19 +65,21 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 		try {
 			String validated = validateTemplateNameForEdit(renamed);
 			String template = getRMConfig().getTemplate(original);
-			if (ZEROSTR.equals(template))
+			if (ZEROSTR.equals(template)) {
 				throw new Throwable(Messages.PBSBatchScriptTemplateManager_zerostringError);
+			}
 			File export = new File(dir, validated);
 			fw = new FileWriter(export, false);
 			fw.write(template);
 			fw.flush();
 		} finally {
-			if (fw != null)
+			if (fw != null) {
 				try {
 					fw.close();
 				} catch (IOException t) {
 					t.printStackTrace();
 				}
+			}
 		}
 	}
 
@@ -85,9 +88,10 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	 * <code>_template</code> strings and loads their names.
 	 */
 	public String[] findAvailableTemplates() {
-		IPBSResourceManagerConfiguration c = getRMConfig();
-		if (c == null)
+		PBSResourceManagerConfiguration c = getRMConfig();
+		if (c == null) {
 			return new String[0];
+		}
 		return c.getTemplateNames();
 	}
 
@@ -103,16 +107,18 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	 * @return name
 	 */
 	public String getCurrentTemplateName() {
-		if (current != null)
+		if (current != null) {
 			return current.getName();
-		IPBSResourceManagerConfiguration c = getRMConfig();
-		if (c != null)
+		}
+		PBSResourceManagerConfiguration c = getRMConfig();
+		if (c != null) {
 			return c.getCurrentTemplateName();
+		}
 		return FULL_TEMPLATE;
 	}
 
-	public IPBSResourceManagerConfiguration getRMConfig() {
-		return (IPBSResourceManagerConfiguration) resourceManager.getConfiguration();
+	public PBSResourceManagerConfiguration getRMConfig() {
+		return (PBSResourceManagerConfiguration) resourceManager.getConfiguration();
 	}
 
 	/**
@@ -121,14 +127,15 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	 * @throws Throwable
 	 */
 	public boolean handleBaseTemplates() throws Throwable {
-		IPBSResourceManagerConfiguration c = getRMConfig();
+		PBSResourceManagerConfiguration c = getRMConfig();
 		if (!configureConverter()) {
 			return false;
 		}
 		String fullTemplate = converter.generateFullBatchScriptTemplate();
 		if (fullTemplate == null || ZEROSTR.equals(fullTemplate)) {
-			if (c != null)
+			if (c != null) {
 				fullTemplate = c.getTemplate(FULL_TEMPLATE);
+			}
 			if (fullTemplate == null || ZEROSTR.equals(fullTemplate)) {
 				return false;
 			}
@@ -137,8 +144,9 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 		if (c != null) {
 			c.addTemplate(FULL_TEMPLATE, fullTemplate);
 			String minTemplate = converter.generateMinBatchScriptTemplate();
-			if (minTemplate != null && !ZEROSTR.equals(minTemplate))
+			if (minTemplate != null && !ZEROSTR.equals(minTemplate)) {
 				c.addTemplate(MIN_TEMPLATE, minTemplate);
+			}
 		}
 		return true;
 	}
@@ -155,16 +163,19 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	 * @return populated template object
 	 */
 	public PBSBatchScriptTemplate loadTemplate(String choice, ILaunchConfiguration config) {
-		IPBSResourceManagerConfiguration c = getRMConfig();
-		if (c == null)
+		PBSResourceManagerConfiguration c = getRMConfig();
+		if (c == null) {
 			return null;
+		}
 		PBSBatchScriptTemplate template = null;
-		if (choice == null || ConfigUtils.ZEROSTR.equals(choice))
+		if (choice == null || ConfigUtils.ZEROSTR.equals(choice)) {
 			choice = c.getCurrentTemplateName();
+		}
 		try {
 			String serialized = c.getTemplate(choice);
-			if (serialized == null)
+			if (serialized == null) {
 				return null;
+			}
 			ByteArrayInputStream bais = new ByteArrayInputStream(serialized.getBytes());
 			template = new PBSBatchScriptTemplate(converter);
 			template.setConfiguration(config);
@@ -189,11 +200,13 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	 * @throws IllegalAccessError
 	 */
 	public void removeTemplate(String name) throws IllegalAccessError {
-		if (name.equals(FULL_TEMPLATE) || name.equals(MIN_TEMPLATE))
+		if (name.equals(FULL_TEMPLATE) || name.equals(MIN_TEMPLATE)) {
 			throw new IllegalAccessError(name + Messages.PBSBatchScriptTemplateManager_removeError);
-		IPBSResourceManagerConfiguration c = getRMConfig();
-		if (c != null)
+		}
+		PBSResourceManagerConfiguration c = getRMConfig();
+		if (c != null) {
 			c.removeTemplate(name);
+		}
 	}
 
 	/**
@@ -207,9 +220,10 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	 */
 	public void storeTemplate(String editedContent, String name) {
 		validateTemplateNameForEdit(name);
-		IPBSResourceManagerConfiguration c = getRMConfig();
-		if (c != null)
+		PBSResourceManagerConfiguration c = getRMConfig();
+		if (c != null) {
 			c.addTemplate(name, editedContent);
+		}
 	}
 
 	/**
@@ -223,12 +237,14 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	 * @throws IllegalAccessError
 	 */
 	public String validateTemplateNameForEdit(String name) throws IllegalArgumentException, IllegalAccessError {
-		if (name.length() == 0)
+		if (name.length() == 0) {
 			throw new IllegalArgumentException(Messages.PBSBatchScriptTemplateManager_illegalArgument);
-		if (!name.endsWith(TEMPLATE_SUFFIX))
+		}
+		if (!name.endsWith(TEMPLATE_SUFFIX)) {
 			name = name + TEMPLATE_SUFFIX;
-		else if (name.equals(FULL_TEMPLATE) || name.equals(MIN_TEMPLATE))
+		} else if (name.equals(FULL_TEMPLATE) || name.equals(MIN_TEMPLATE)) {
 			throw new IllegalAccessError(name + Messages.PBSBatchScriptTemplateManager_storeError);
+		}
 		return name;
 	}
 
@@ -240,15 +256,18 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 		IAttributeDefinition<?, ?, ?>[] modelAttributes = getModelAttributeDefinitions();
 		if (modelAttributes == null) {
 			String stored = null;
-			IPBSResourceManagerConfiguration c = getRMConfig();
-			if (c != null)
+			PBSResourceManagerConfiguration c = getRMConfig();
+			if (c != null) {
 				stored = c.getValidAttributeSet();
-			if (stored == null)
+			}
+			if (stored == null) {
 				return false;
+			}
 			ByteArrayInputStream bais = new ByteArrayInputStream(stored.getBytes());
 			converter.getData().deserialize(bais);
-		} else
+		} else {
 			converter.setAttributeDefinitions(modelAttributes);
+		}
 		converter.initialize();
 		storeValidAttributeSet(true);
 		return true;
@@ -256,12 +275,14 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 
 	private IAttributeDefinition<?, ?, ?>[] getModelAttributeDefinitions() {
 		IRuntimeSystem rts = resourceManager.getRuntimeSystem();
-		if (rts == null)
+		if (rts == null) {
 			return null;
+		}
 		IAttributeDefinition<?, ?, ?>[] defs = rts.getAttributeDefinitionManager().getAttributeDefinitions();
 
-		if (defs.length == 0)
+		if (defs.length == 0) {
 			return null;
+		}
 		return defs;
 	}
 
@@ -273,11 +294,13 @@ public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 	 * list exists, this method simply returns.
 	 */
 	private void storeValidAttributeSet(boolean force) throws Throwable {
-		IPBSResourceManagerConfiguration c = getRMConfig();
-		if (c == null)
+		PBSResourceManagerConfiguration c = getRMConfig();
+		if (c == null) {
 			return;
-		if (!force && c.getValidAttributeSet() != null)
+		}
+		if (!force && c.getValidAttributeSet() != null) {
 			return;
+		}
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(16 * 1024);
 		converter.getData().serialize(baos);
 		c.setValidAttributeSet(baos.toString());

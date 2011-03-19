@@ -20,8 +20,22 @@
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
             class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerFactory"
-            id="org.eclipse.ptp.rm.mpi.openmpi.OpenMPIServiceProvider"
-            name="Open MPI">
+            id="org.eclipse.ptp.rm.mpi.openmpi.OpenMPIServiceProvider">
+         <resourceManagerControl
+             class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerFactory"
+             id="org.eclipse.ptp.rm.ibm.pe.core.control">
+         </resourceManagerControl>
+         <resourceManagerMonitor
+            class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerFactory"
+            id="org.eclipse.ptp.rm.ibm.pe.core.monitor">
+         </resourceManagerMonitor>
       </resourceManager>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.core.runtimeSystems">
+      <runtimeSystem
+            class="org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIRuntimeSystemFactory"
+            id="org.eclipse.ptp.rm.mpi.openmpi.OpenMPIServiceProvider">
+      </runtimeSystem>
    </extension>
 </plugin>

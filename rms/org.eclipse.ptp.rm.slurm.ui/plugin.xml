@@ -18,26 +18,24 @@
             id="org.eclipse.ptp.slurm.ui.launchConfiguration"/>
    </extension>
    <extension
-         point="org.eclipse.ptp.services.core.providers">
-      <provider
-            class="org.eclipse.ptp.rm.slurm.ui.SLURMResourceManagerConfiguration"
-            id="org.eclipse.ptp.rm.slurm.SLURMServiceProvider"
-            name="SLURM"
-            serviceId="org.eclipse.ptp.core.LaunchService">
-      </provider>
-   </extension>
-   <extension
          point="org.eclipse.ptp.services.ui.providerContributors">
       <providerContributor
-            class="org.eclipse.ptp.rm.slurm.ui.SLURMProviderContributor"
-            id="org.eclipse.ptp.rm.slurm.SLURMServiceProvider">
+            class="org.eclipse.ptp.ui.wizards.RMProviderContributor"
+            id="org.eclipse.ptp.rm.slurm.resourceManager">
       </providerContributor>
    </extension>
     <extension
          point="org.eclipse.ptp.ui.runtimeModelPresentations">
       <runtimeModelPresentation
             class="org.eclipse.ptp.rm.slurm.ui.SLURMRuntimeModelPresentation"
-            id="org.eclipse.ptp.rm.slurm.SLURMServiceProvider">
+            id="org.eclipse.ptp.rm.slurm.resourceManager">
       </runtimeModelPresentation>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
+      <configurationWizard
+            class="org.eclipse.ptp.rm.slurm.ui.wizards.SLURMRMConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.rm.slurm.resourceManager">
+      </configurationWizard>
    </extension>
 </plugin>

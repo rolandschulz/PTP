@@ -11,37 +11,43 @@
 package org.eclipse.ptp.rm.ui.wizards;
 
 import org.eclipse.ptp.rm.ui.utils.DataSource;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public abstract class WizardPageDataSource extends DataSource {
-	private AbstractConfigurationWizardPage page;
-	private IResourceManagerConfiguration config;
+	private final AbstractConfigurationWizardPage fPage;
+	private IResourceManagerComponentConfiguration fComponentConfig;
 
 	protected WizardPageDataSource(AbstractConfigurationWizardPage page) {
-		this.page = page;
+		fPage = page;
 	}
 
 	@Override
 	protected void setErrorMessage(ValidationException e) {
-		page.setErrorMessage(e.getLocalizedMessage());
-		page.setPageComplete(false);
+		fPage.setErrorMessage(e.getLocalizedMessage());
+		fPage.setPageComplete(false);
 	}
 
 	@Override
 	protected void update() {
-		page.updateControls();
+		fPage.updateControls();
 	}
 
-	public IResourceManagerConfiguration getConfig() {
-		return config;
+	/**
+	 * @since 2.0
+	 */
+	public IResourceManagerComponentConfiguration getConfiguration() {
+		return fComponentConfig;
 	}
 
-	public void setConfig(IResourceManagerConfiguration config) {
-		this.config = config;
+	/**
+	 * @since 2.0
+	 */
+	public void setConfiguration(IResourceManagerComponentConfiguration config) {
+		fComponentConfig = config;
 	}
 }

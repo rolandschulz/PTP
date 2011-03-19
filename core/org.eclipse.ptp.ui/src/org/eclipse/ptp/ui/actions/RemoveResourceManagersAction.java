@@ -23,13 +23,13 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 
 public class RemoveResourceManagersAction extends Action {
 
-	private IResourceManagerConfiguration[] fSelectedRMs;
+	private IResourceManager[] fSelectedRMs;
 	private final Shell fShell;
 
 	public RemoveResourceManagersAction(Shell shell) {
@@ -62,7 +62,7 @@ public class RemoveResourceManagersAction extends Action {
 	/**
 	 * @since 5.0
 	 */
-	public void setResourceManagers(IResourceManagerConfiguration[] rms) {
+	public void setResourceManagers(IResourceManager[] rms) {
 		fSelectedRMs = rms;
 	}
 

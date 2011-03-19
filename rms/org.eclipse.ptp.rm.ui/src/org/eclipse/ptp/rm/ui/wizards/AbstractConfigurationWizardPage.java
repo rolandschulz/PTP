@@ -62,7 +62,7 @@ public abstract class AbstractConfigurationWizardPage extends RMConfigurationWiz
 		if (visible) {
 			resetErrorMessages();
 			listener.disable();
-			dataSource.setConfig(getConfigurationWizard().getConfiguration());
+			dataSource.setConfiguration(getConfiguration());
 			dataSource.loadAndUpdate();
 			listener.enable();
 			updateControls();

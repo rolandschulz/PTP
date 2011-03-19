@@ -20,7 +20,7 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.ui.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
@@ -127,8 +127,8 @@ public abstract class AbstractToolRMConfigurationWizardPage extends AbstractConf
 		}
 
 		@Override
-		public void setConfig(IResourceManagerConfiguration configuration) {
-			super.setConfig(configuration);
+		public void setConfiguration(IResourceManagerComponentConfiguration configuration) {
+			super.setConfiguration(configuration);
 			// Store a local reference to the configuration
 			this.config = (IToolRMConfiguration) configuration;
 		}
@@ -562,7 +562,7 @@ public abstract class AbstractToolRMConfigurationWizardPage extends AbstractConf
 		 */
 
 		IRemoteUIServices remUIServices = null;
-		IRemoteResourceManagerConfiguration config = (IRemoteResourceManagerConfiguration) getDataSource().getConfig();
+		IRemoteResourceManagerConfiguration config = (IRemoteResourceManagerConfiguration) getDataSource().getConfiguration();
 		String rmID = config.getRemoteServicesId();
 		IWizardContainer container = null;
 		if (getControl().isVisible()) {

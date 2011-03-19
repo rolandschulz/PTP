@@ -26,7 +26,6 @@ package org.eclipse.ptp.rm.slurm.core.rmsystem;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.slurm.core.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.AbstractRuntimeResourceManagerControl;
 import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 import org.eclipse.swt.widgets.Display;
@@ -40,7 +39,7 @@ public class SLURMResourceManagerControl extends AbstractRuntimeResourceManagerC
 	/**
 	 * @since 5.0
 	 */
-	public SLURMResourceManagerControl(IResourceManagerConfiguration config) {
+	public SLURMResourceManagerControl(SLURMResourceManagerConfiguration config) {
 		super(config);
 	}
 

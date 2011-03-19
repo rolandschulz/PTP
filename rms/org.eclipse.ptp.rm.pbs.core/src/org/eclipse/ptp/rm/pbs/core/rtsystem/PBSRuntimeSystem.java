@@ -21,8 +21,8 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteProxyRuntimeSystem;
 import org.eclipse.ptp.rm.pbs.core.Activator;
 import org.eclipse.ptp.rm.pbs.core.IPBSNonNLSConstants;
-import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
+import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.templates.PBSBatchScriptTemplate;
 
 /**
@@ -46,7 +46,7 @@ public class PBSRuntimeSystem extends AbstractRemoteProxyRuntimeSystem {
 	public List<IAttribute<?, ?, ?>> getAttributes(ILaunchConfiguration configuration, String mode) throws CoreException {
 		List<IAttribute<?, ?, ?>> attrs = super.getAttributes(configuration, mode);
 
-		IPBSResourceManagerConfiguration rmConfig = (IPBSResourceManagerConfiguration) fRM.getConfiguration();
+		PBSResourceManagerConfiguration rmConfig = (PBSResourceManagerConfiguration) fRM.getConfiguration();
 		String current = rmConfig.getCurrentTemplateName();
 		PBSBatchScriptTemplate template = fRM.getTemplateManager().loadTemplate(current, configuration);
 		try {

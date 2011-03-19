@@ -16,9 +16,31 @@
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
             class="org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerFactory"
-            id="org.eclipse.ptp.rm.ibm.ll.LLServiceProvider"
-            name="IBM LoadLeveler">
+            id="org.eclipse.ptp.rm.ibm.ll.LLServiceProvider">
+         <resourceManagerControl
+               class="org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerFactory"
+               id="org.eclipse.ptp.rm.ibm.ll.core.control">
+         </resourceManagerControl>
+         <resourceManagerMonitor
+               class="org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerFactory"
+               id="org.eclipse.ptp.rm.ibm.ll.core.monitor">
+         </resourceManagerMonitor>
       </resourceManager>
    </extension>
-
+      <extension
+         point="org.eclipse.ptp.core.runtimeSystems">
+      <runtimeSystem
+            class="org.eclipse.ptp.rm.ibm.ll.core.rtsystem.IBMLLRuntimeSystemFactory"
+            id="org.eclipse.ptp.rm.ibm.ll.LLServiceProvider">
+      </runtimeSystem>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManagerConfiguration"
+            id="org.eclipse.ptp.rm.ibm.ll.LLServiceProvider"
+            name="IBM LoadLeveler"
+            serviceId="org.eclipse.ptp.core.LaunchService">
+      </provider>
+   </extension>
 </plugin>

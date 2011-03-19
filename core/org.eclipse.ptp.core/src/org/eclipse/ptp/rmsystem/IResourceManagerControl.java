@@ -65,6 +65,13 @@ public interface IResourceManagerControl {
 	public void dispose();
 
 	/**
+	 * Get the configuration associated with this resource manager control.
+	 * 
+	 * @return resource manager control configuration
+	 */
+	public IResourceManagerComponentConfiguration getControlConfiguration();
+
+	/**
 	 * Get the status of the job
 	 * 
 	 * @param jobId

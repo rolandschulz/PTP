@@ -10,15 +10,13 @@
  * Contributors:
  * 	Jie Jiang, National University of Defense Technology
  *******************************************************************************/
-package org.eclipse.ptp.rm.slurm.ui;
+package org.eclipse.ptp.rm.slurm.core.rmsystem;
 
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMPreferenceConstants;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.slurm.core.SLURMCorePlugin;
-import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 /**
  * Service provider for IBM Parallel Environment
@@ -31,39 +29,11 @@ public class SLURMResourceManagerConfiguration extends AbstractRemoteResourceMan
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	public SLURMResourceManagerConfiguration() {
-		super();
+	}
+
+	public SLURMResourceManagerConfiguration(String namespace, IServiceProvider provider) {
+		super(namespace, provider);
 		setDescription("SLURM Resource Manager"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Constructor for creating a working copy of the service provider
-	 * 
-	 * @param provider
-	 *            provider we are making a copy from
-	 */
-	public SLURMResourceManagerConfiguration(IServiceProvider provider) {
-		super(provider);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
-	 */
-	@Override
-	public IServiceProviderWorkingCopy copy() {
-		return new SLURMResourceManagerConfiguration(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * getResourceManagerId()
-	 */
-	@Override
-	public String getResourceManagerId() {
-		return getId();
 	}
 
 	/*

@@ -12,21 +12,19 @@ package org.eclipse.ptp.rm.jaxb.core.rm;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
 
 public final class JAXBResourceManager extends AbstractResourceManager implements IJAXBResourceManager, IJAXBNonNLSConstants {
 
-	private final JAXBResourceManagerControl fControl;
-
-	public JAXBResourceManager(IResourceManagerConfiguration jaxbServiceProvider, IResourceManagerControl control,
-			IResourceManagerMonitor monitor) {
+	public JAXBResourceManager(AbstractResourceManagerConfiguration jaxbServiceProvider, AbstractResourceManagerControl control,
+			AbstractResourceManagerMonitor monitor) {
 		super(jaxbServiceProvider, control, monitor);
-		fControl = (JAXBResourceManagerControl) control;
 	}
 
+	@Override
 	public JAXBResourceManagerControl getControl() {
-		return fControl;
+		return (JAXBResourceManagerControl) super.getControl();
 	}
 }

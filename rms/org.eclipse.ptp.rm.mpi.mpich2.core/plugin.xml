@@ -5,7 +5,7 @@
          point="org.eclipse.ptp.services.core.providers">
       <provider
             class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration"
-            id="org.eclipse.ptp.rm.mpi.mpich2.MPICH2ServiceProvider"
+            id="org.eclipse.ptp.rm.mpi.mpich2.resourceManager"
             name="MPICH2"
             serviceId="org.eclipse.ptp.core.LaunchService">
       </provider>
@@ -20,8 +20,22 @@
          point="org.eclipse.ptp.core.resourceManagers">
       <resourceManager
             class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerFactory"
-            id="org.eclipse.ptp.rm.mpi.mpich2.MPICH2ServiceProvider"
-            name="MPICH2">
+            id="org.eclipse.ptp.rm.mpi.mpich2.resourceManager">
+         <resourceManagerControl
+             class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerFactory"
+             id="org.eclipse.ptp.rm.mpi.mpich2.control">
+         </resourceManagerControl>
+         <resourceManagerMonitor
+            class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerFactory"
+            id="org.eclipse.ptp.rm.mpi.mpich2.monitor">
+         </resourceManagerMonitor>
       </resourceManager>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.core.runtimeSystems">
+      <runtimeSystem
+            class="org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem.MPICH2RuntimeSystemFactory"
+            id="org.eclipse.ptp.rm.mpi.mpich2.resourceManager">
+      </runtimeSystem>
    </extension>
 </plugin>

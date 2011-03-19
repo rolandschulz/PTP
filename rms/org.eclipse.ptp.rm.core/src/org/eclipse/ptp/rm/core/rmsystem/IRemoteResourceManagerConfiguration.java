@@ -12,21 +12,22 @@ package org.eclipse.ptp.rm.core.rmsystem;
 
 import java.util.List;
 
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 
-public interface IRemoteResourceManagerConfiguration extends IResourceManagerConfiguration {
+public interface IRemoteResourceManagerConfiguration extends IResourceManagerComponentConfiguration {
 
 	/**
-	 * Append invocation options to existing options. The contents of optionString are 
-	 * split into space separated strings.
+	 * Append invocation options to existing options. The contents of
+	 * optionString are split into space separated strings.
 	 * 
-	 * @param optionString string containing the space separated invocation options
+	 * @param optionString
+	 *            string containing the space separated invocation options
 	 */
 	public void addInvocationOptions(String optionString);
 
 	/**
-	 * Get the invocation options as a list of strings. Returns
-	 * an empty list if there are no options
+	 * Get the invocation options as a list of strings. Returns an empty list if
+	 * there are no options
 	 * 
 	 * @return list of strings containing invocation options
 	 */
@@ -61,10 +62,19 @@ public interface IRemoteResourceManagerConfiguration extends IResourceManagerCon
 	public String getProxyServerPath();
 
 	/**
-	 * Set the invocation options. The contents of optionString are split into space
-	 * separated strings. Any existing options are discarded.
+	 * Get the default configuration flag
 	 * 
-	 * @param optionString string containing the space separated invocation options
+	 * @return true if the default configuration should be used
+	 * @since 3.0
+	 */
+	public boolean getUseDefault();
+
+	/**
+	 * Set the invocation options. The contents of optionString are split into
+	 * space separated strings. Any existing options are discarded.
+	 * 
+	 * @param optionString
+	 *            string containing the space separated invocation options
 	 */
 	public void setInvocationOptions(String optionString);
 
@@ -90,9 +100,19 @@ public interface IRemoteResourceManagerConfiguration extends IResourceManagerCon
 	public void setProxyServerPath(String proxyServerPath);
 
 	/**
+	 * Set the default configuration flag
+	 * 
+	 * @param flag
+	 *            true if the default configuration should be used
+	 * @since 3.0
+	 */
+	public void setUseDefault(boolean flag);
+
+	/**
 	 * Test if option is set.
 	 * 
-	 * @param option option to check
+	 * @param option
+	 *            option to check
 	 * @return true if option is set
 	 */
 	public boolean testOption(int option);
