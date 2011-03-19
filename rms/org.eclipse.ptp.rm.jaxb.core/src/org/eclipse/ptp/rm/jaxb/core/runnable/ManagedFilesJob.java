@@ -16,15 +16,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
@@ -32,24 +29,30 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.FileUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
+/**
+ * A managed file is a client-side file which needs to be moved to the resource
+ * to which the job will be submitted.
+ * 
+ * @author arossi
+ * 
+ */
 public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 
 	private final String uuid;
 	private final String sourceDir;
 	private final String stagingDir;
 	private final List<ManagedFile> files;
-	private final IRemoteFileManager localFileManager;
-	private final IRemoteFileManager remoteFileManager;
+	private final RemoteServicesDelegate delegate;
 	private boolean success;
 
-	public ManagedFilesJob(String uuid, ManagedFiles files, IRemoteFileManager localFileManager,
-			IRemoteFileManager remoteFileManager) throws CoreException {
+	public ManagedFilesJob(String uuid, ManagedFiles files, RemoteServicesDelegate delegate) throws CoreException {
 		super(Messages.ManagedFilesJob);
 		this.uuid = uuid;
-		this.localFileManager = localFileManager;
-		this.remoteFileManager = remoteFileManager;
+		this.delegate = delegate;
 		String key = files.getFileSourceLocation();
 		if (key == null) {
 			sourceDir = System.getProperty(JAVA_TMP_DIR);
@@ -85,7 +88,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 				}
 				Property p = new Property();
 				p.setName(file.getName());
-				if (localFileManager == remoteFileManager) {
+				if (delegate.getLocalFileManager() == delegate.getRemoteFileManager()) {
 					p.setValue(new File(System.getProperty(JAVA_USER_HOME), target).getAbsolutePath());
 				} else {
 					p.setValue(target);
@@ -118,24 +121,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 		SubMonitor progress = SubMonitor.convert(monitor, 15);
 		try {
 			progress.newChild(5);
-			if (progress.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, JAXBCorePlugin.getUniqueIdentifier(),
-						Messages.Copy_Operation_cancelled_by_user, null));
-			}
-			if (remoteFileManager == null) {
-				throw new CoreException(new Status(IStatus.ERROR, JAXBCorePlugin.getUniqueIdentifier(),
-						Messages.Copy_Operation_Null_FileManager));
-			}
-
-			IFileStore lres = localFileManager.getResource(localPath);
-			if (!lres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
-				// Local file not found!
-				throw new CoreException(new Status(IStatus.ERROR, JAXBCorePlugin.getUniqueIdentifier(),
-						Messages.Copy_Operation_Local_resource_does_not_exist));
-			}
-			IFileStore rres = remoteFileManager.getResource(remotePath);
-			// Copy file
-			lres.copy(rres, EFS.OVERWRITE, progress.newChild(5));
+			FileUtils.copy(delegate.getLocalFileManager(), localPath, delegate.getRemoteFileManager(), remotePath, progress);
 		} finally {
 			progress.done();
 		}

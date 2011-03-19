@@ -22,16 +22,15 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.debug.core.IStreamListener;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 
 /**
  * Monitors the output stream of a system process and notifies listeners of
@@ -104,9 +103,8 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 		fContents = new StringBuffer();
 		fEncoding = encoding;
 		String[] args = new String[] { TAIL, MINUS_F, remoteFilePath };
-		IRemoteServices service = rm.getRemoteServices();
-		IRemoteConnection connection = rm.getRemoteConnection();
-		fBuilder = service.getProcessBuilder(connection, args);
+		RemoteServicesDelegate delegate = rm.getRemoteServicesDelegate();
+		fBuilder = delegate.getRemoteServices().getProcessBuilder(delegate.getRemoteConnection(), args);
 		bufferLimit = UNDEFINED;
 	}
 
