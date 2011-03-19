@@ -140,12 +140,12 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 
 	public static Combo createCombo(Composite parent, int cols, String[] items, String initial, String labelString, String tooltip,
 			Object listener) {
-		GridData data = createGridData(GridData.FILL_HORIZONTAL, true, false, 100, DEFAULT, cols);
+		GridData data = createGridData(GridData.FILL_HORIZONTAL, true, false, 100, DEFAULT, cols, DEFAULT);
 		return createCombo(parent, SWT.BORDER, data, items, initial, labelString, tooltip, listener);
 	}
 
 	public static Composite createComposite(Composite parent, int columns) {
-		GridLayout layout = createGridLayout(columns, false, DEFAULT, DEFAULT, 1, DEFAULT);
+		GridLayout layout = createGridLayout(columns, false, DEFAULT, 1, DEFAULT, DEFAULT);
 		return createComposite(parent, SWT.NONE, layout, null);
 	}
 
@@ -158,8 +158,14 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return composite;
 	}
 
-	public static GridData createGridData(int style, boolean grabH, boolean grabV, int wHint, int hHint, int cols) {
+	public static GridData createGridData(int style, boolean grabH, boolean grabV, int wHint, int hHint, int hSpan, int vSpan) {
+		return createGridData(style, grabH, grabV, wHint, hHint, DEFAULT, DEFAULT, hSpan, vSpan, DEFAULT, DEFAULT);
+	}
+
+	public static GridData createGridData(int style, boolean grabH, boolean grabV, int wHint, int hHint, int minW, int minH,
+			int hSpan, int vSpan, int hAlign, int vAlign) {
 		GridData data = new GridData();
+
 		if (style == DEFAULT) {
 			data = new GridData();
 		} else {
@@ -173,22 +179,37 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		if (hHint != DEFAULT) {
 			data.heightHint = hHint;
 		}
-		if (cols != DEFAULT) {
-			data.horizontalSpan = cols;
+		if (minW != DEFAULT) {
+			data.minimumWidth = minW;
+		}
+		if (minH != DEFAULT) {
+			data.minimumHeight = minH;
+		}
+		if (hSpan != DEFAULT) {
+			data.horizontalSpan = hSpan;
+		}
+		if (vSpan != DEFAULT) {
+			data.verticalSpan = vSpan;
+		}
+		if (hAlign != DEFAULT) {
+			data.horizontalAlignment = hAlign;
+		}
+		if (vAlign != DEFAULT) {
+			data.verticalAlignment = vAlign;
 		}
 		return data;
 	}
 
 	public static GridData createGridData(int style, int cols) {
-		return createGridData(style, false, false, DEFAULT, DEFAULT, cols);
+		return createGridData(style, false, false, DEFAULT, DEFAULT, cols, DEFAULT);
 	}
 
 	public static GridData createGridDataFill(int wHint, int hHint, int cols) {
-		return createGridData(GridData.FILL_BOTH, true, true, wHint, hHint, cols);
+		return createGridData(GridData.FILL_BOTH, true, true, wHint, hHint, cols, DEFAULT);
 	}
 
 	public static GridData createGridDataFillH(int cols) {
-		return createGridData(GridData.FILL_HORIZONTAL, true, false, DEFAULT, DEFAULT, cols);
+		return createGridData(GridData.FILL_HORIZONTAL, true, false, DEFAULT, DEFAULT, cols, DEFAULT);
 	}
 
 	public static GridLayout createGridLayout(int columns, boolean equal) {
@@ -199,21 +220,38 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return createGridLayout(columns, isEqual, mh, mw, DEFAULT, DEFAULT);
 	}
 
-	public static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw, int vSpace, int hSpace) {
+	public static GridLayout createGridLayout(int columns, boolean isEqual, int hSpace, int vSpace, int mw, int mh) {
+		return createGridLayout(columns, isEqual, hSpace, vSpace, mw, mh, DEFAULT, DEFAULT, DEFAULT, DEFAULT);
+	}
+
+	public static GridLayout createGridLayout(int columns, boolean isEqual, int hSpace, int vSpace, int mw, int mh, int mL, int mR,
+			int mT, int mB) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
-		if (mh != DEFAULT) {
-			gridLayout.marginHeight = mh;
-		}
-		if (mw != DEFAULT) {
-			gridLayout.marginWidth = mw;
+		if (hSpace != DEFAULT) {
+			gridLayout.horizontalSpacing = hSpace;
 		}
 		if (vSpace != DEFAULT) {
 			gridLayout.verticalSpacing = vSpace;
 		}
-		if (hSpace != DEFAULT) {
-			gridLayout.horizontalSpacing = hSpace;
+		if (mw != DEFAULT) {
+			gridLayout.marginWidth = mw;
+		}
+		if (mh != DEFAULT) {
+			gridLayout.marginHeight = mh;
+		}
+		if (mL != DEFAULT) {
+			gridLayout.marginLeft = mL;
+		}
+		if (mR != DEFAULT) {
+			gridLayout.marginRight = mR;
+		}
+		if (mT != DEFAULT) {
+			gridLayout.marginTop = mT;
+		}
+		if (mB != DEFAULT) {
+			gridLayout.marginBottom = mB;
 		}
 		return gridLayout;
 	}
@@ -320,7 +358,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 
 	public static Text createText(Composite parent, String initialValue, boolean fill, boolean readOnly, ModifyListener listener,
 			Color color) {
-		GridData data = createGridData(fill ? GridData.FILL_HORIZONTAL : DEFAULT, true, false, DEFAULT, DEFAULT, DEFAULT);
+		GridData data = createGridData(fill ? GridData.FILL_HORIZONTAL : DEFAULT, true, false, DEFAULT, DEFAULT, DEFAULT, DEFAULT);
 		return createText(parent, SWT.BORDER, data, readOnly, initialValue, listener, color);
 	}
 
@@ -368,16 +406,113 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return newLine.toString();
 	}
 
-	public static int getStyle(Style style) {
-		int swt = 0;
-
+	public static int getStyle(String style) {
 		if (style == null) {
-			return swt;
+			return SWT.NONE;
+		}
+		return getStyle(style.split(PIP));
+	}
+
+	public static int getStyle(Style style) {
+		if (style == null) {
+			return SWT.NONE;
+		}
+		return getStyle(style.getTag().toArray(new String[0]));
+	}
+
+	public static void setupTableForEditing(TableViewer tableViewer, List<ColumnDescriptor> columnDescriptors) {
+		/* create table column items */
+		for (ColumnDescriptor columnDescriptor : columnDescriptors) {
+			TableColumn columnItem = new TableColumn(tableViewer.getTable(), SWT.LEFT);
+			columnItem.setText(columnDescriptor.getColumnName());
+			if (columnDescriptor.isWidthSpecified()) {
+				columnItem.setWidth(columnDescriptor.getWidth());
+			}
 		}
 
-		List<String> split = style.getTag();
+		/* set column properties */
+		String[] columnProperties = new String[columnDescriptors.size()];
+		for (int i = 0; i < columnDescriptors.size(); i++) {
+			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
+			columnProperties[i] = columnDescriptor.getColumnName();
+		}
+		tableViewer.setColumnProperties(columnProperties);
 
-		for (String s : split) {
+		/* set column editors */
+		CellEditor[] cellEditors = new CellEditor[columnDescriptors.size()];
+		for (int i = 0; i < columnDescriptors.size(); i++) {
+			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
+			CellEditor cellEditor = null;
+			if (columnDescriptor.isText()) {
+				cellEditor = new TextCellEditor(tableViewer.getTable());
+			} else if (columnDescriptor.isCombo()) {
+				cellEditor = new ComboBoxCellEditor(tableViewer.getTable(), columnDescriptor.getOptions());
+			} else if (columnDescriptor.isButton()) {
+				cellEditor = new CheckboxCellEditor(tableViewer.getTable());
+			} else {
+				throw new IllegalArgumentException(Messages.UnsupportedColumnType + columnDescriptor.getType());
+			}
+
+			cellEditors[i] = cellEditor;
+		}
+		tableViewer.setCellEditors(cellEditors);
+
+		/* set cell modifier */
+		tableViewer.setCellModifier(new ColumnViewerCellModifier(tableViewer, columnDescriptors));
+
+		/* set controller */
+		tableViewer.setContentProvider(new TableDataContentProvider()); /* controller */
+		tableViewer.setLabelProvider(new TableDataLabelProvider(columnDescriptors)); /* controller */
+	}
+
+	public static void setupTreeForEditing(TreeViewer treeViewer, List<ColumnDescriptor> columnDescriptors) {
+		/* create table column items */
+		for (ColumnDescriptor columnDescriptor : columnDescriptors) {
+			TreeColumn columnItem = new TreeColumn(treeViewer.getTree(), SWT.LEFT);
+			columnItem.setText(columnDescriptor.getColumnName());
+			if (columnDescriptor.isWidthSpecified()) {
+				columnItem.setWidth(columnDescriptor.getWidth());
+			}
+		}
+
+		/* set column properties */
+		String[] columnProperties = new String[columnDescriptors.size()];
+		for (int i = 0; i < columnDescriptors.size(); i++) {
+			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
+			columnProperties[i] = columnDescriptor.getColumnName();
+		}
+		treeViewer.setColumnProperties(columnProperties);
+
+		/* set column editors */
+		CellEditor[] cellEditors = new CellEditor[columnDescriptors.size()];
+		for (int i = 0; i < columnDescriptors.size(); i++) {
+			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
+			CellEditor cellEditor = null;
+			if (columnDescriptor.isText()) {
+				cellEditor = new TextCellEditor(treeViewer.getTree());
+			} else if (columnDescriptor.isCombo()) {
+				cellEditor = new ComboBoxCellEditor(treeViewer.getTree(), columnDescriptor.getOptions());
+				cellEditor = new CheckboxCellEditor(treeViewer.getTree());
+			} else {
+				throw new IllegalArgumentException(Messages.UnsupportedColumnType + columnDescriptor.getType());
+			}
+
+			cellEditors[i] = cellEditor;
+		}
+		treeViewer.setCellEditors(cellEditors);
+
+		/* set cell modifier */
+		treeViewer.setCellModifier(new ColumnViewerCellModifier(treeViewer, columnDescriptors));
+
+		/* set controller */
+		treeViewer.setContentProvider(new TreeDataContentProvider()); /* controller */
+		treeViewer.setLabelProvider(new TreeDataLabelProvider(columnDescriptors)); /* controller */
+	}
+
+	private static int getStyle(String[] style) {
+		int swt = 0;
+
+		for (String s : style) {
 			s = s.trim();
 
 			if (ARROW.equals(s)) {
@@ -391,6 +526,9 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			}
 			if (BAR.equals(s)) {
 				swt |= SWT.BAR;
+			}
+			if (BEGINNING.equals(s)) {
+				swt |= SWT.BEGINNING;
 			}
 			if (BORDER.equals(s)) {
 				swt |= SWT.BORDER;
@@ -605,94 +743,5 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		}
 
 		return swt;
-	}
-
-	public static void setupTableForEditing(TableViewer tableViewer, List<ColumnDescriptor> columnDescriptors) {
-		/* create table column items */
-		for (ColumnDescriptor columnDescriptor : columnDescriptors) {
-			TableColumn columnItem = new TableColumn(tableViewer.getTable(), SWT.LEFT);
-			columnItem.setText(columnDescriptor.getColumnName());
-			if (columnDescriptor.isWidthSpecified()) {
-				columnItem.setWidth(columnDescriptor.getWidth());
-			}
-		}
-
-		/* set column properties */
-		String[] columnProperties = new String[columnDescriptors.size()];
-		for (int i = 0; i < columnDescriptors.size(); i++) {
-			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
-			columnProperties[i] = columnDescriptor.getColumnName();
-		}
-		tableViewer.setColumnProperties(columnProperties);
-
-		/* set column editors */
-		CellEditor[] cellEditors = new CellEditor[columnDescriptors.size()];
-		for (int i = 0; i < columnDescriptors.size(); i++) {
-			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
-			CellEditor cellEditor = null;
-			if (columnDescriptor.isText()) {
-				cellEditor = new TextCellEditor(tableViewer.getTable());
-			} else if (columnDescriptor.isCombo()) {
-				cellEditor = new ComboBoxCellEditor(tableViewer.getTable(), columnDescriptor.getOptions());
-			} else if (columnDescriptor.isButton()) {
-				cellEditor = new CheckboxCellEditor(tableViewer.getTable());
-			} else {
-				throw new IllegalArgumentException(Messages.UnsupportedColumnType + columnDescriptor.getType());
-			}
-
-			cellEditors[i] = cellEditor;
-		}
-		tableViewer.setCellEditors(cellEditors);
-
-		/* set cell modifier */
-		tableViewer.setCellModifier(new ColumnViewerCellModifier(tableViewer, columnDescriptors));
-
-		/* set controller */
-		tableViewer.setContentProvider(new TableDataContentProvider()); /* controller */
-		tableViewer.setLabelProvider(new TableDataLabelProvider(columnDescriptors)); /* controller */
-	}
-
-	public static void setupTreeForEditing(TreeViewer treeViewer, List<ColumnDescriptor> columnDescriptors) {
-		/* create table column items */
-		for (ColumnDescriptor columnDescriptor : columnDescriptors) {
-			TreeColumn columnItem = new TreeColumn(treeViewer.getTree(), SWT.LEFT);
-			columnItem.setText(columnDescriptor.getColumnName());
-			if (columnDescriptor.isWidthSpecified()) {
-				columnItem.setWidth(columnDescriptor.getWidth());
-			}
-		}
-
-		/* set column properties */
-		String[] columnProperties = new String[columnDescriptors.size()];
-		for (int i = 0; i < columnDescriptors.size(); i++) {
-			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
-			columnProperties[i] = columnDescriptor.getColumnName();
-		}
-		treeViewer.setColumnProperties(columnProperties);
-
-		/* set column editors */
-		CellEditor[] cellEditors = new CellEditor[columnDescriptors.size()];
-		for (int i = 0; i < columnDescriptors.size(); i++) {
-			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
-			CellEditor cellEditor = null;
-			if (columnDescriptor.isText()) {
-				cellEditor = new TextCellEditor(treeViewer.getTree());
-			} else if (columnDescriptor.isCombo()) {
-				cellEditor = new ComboBoxCellEditor(treeViewer.getTree(), columnDescriptor.getOptions());
-				cellEditor = new CheckboxCellEditor(treeViewer.getTree());
-			} else {
-				throw new IllegalArgumentException(Messages.UnsupportedColumnType + columnDescriptor.getType());
-			}
-
-			cellEditors[i] = cellEditor;
-		}
-		treeViewer.setCellEditors(cellEditors);
-
-		/* set cell modifier */
-		treeViewer.setCellModifier(new ColumnViewerCellModifier(treeViewer, columnDescriptors));
-
-		/* set controller */
-		treeViewer.setContentProvider(new TreeDataContentProvider()); /* controller */
-		treeViewer.setLabelProvider(new TreeDataLabelProvider(columnDescriptors)); /* controller */
 	}
 }
