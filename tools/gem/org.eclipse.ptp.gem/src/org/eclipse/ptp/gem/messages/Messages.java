@@ -22,6 +22,7 @@ public class Messages extends NLS {
 	public static String GemAnalyzer_20;
 	public static String GemAnalyzer_21;
 	public static String GemAnalyzer_22;
+	public static String GemAnalyzer_23;
 	public static String GemAnalyzer_24;
 	public static String GemAnalyzer_25;
 	public static String GemAnalyzer_26;
@@ -36,7 +37,6 @@ public class Messages extends NLS {
 	public static String GemAnalyzer_35;
 	public static String GemAnalyzer_36;
 	public static String GemAnalyzer_37;
-	public static String GemAnalyzer_38;
 	public static String GemAnalyzer_39;
 	public static String GemAnalyzer_4;
 	public static String GemAnalyzer_40;
@@ -158,6 +158,7 @@ public class Messages extends NLS {
 	public static String GemUtilities_9;
 	public static String HbvLogFilePopUpAction_0;
 	public static String HbvLogFilePopUpAction_1;
+	public static String HbvLogFilePopUpAction_2;
 	public static String IspPreferencePage_0;
 	public static String IspPreferencePage_1;
 	public static String IspPreferencePage_10;

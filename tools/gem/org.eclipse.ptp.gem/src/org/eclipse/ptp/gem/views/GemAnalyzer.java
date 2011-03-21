@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -433,7 +432,7 @@ public class GemAnalyzer extends ViewPart {
 		final FormData deadlockMessageFormData = new FormData();
 		deadlockMessageFormData.left = new FormAttachment(0, 5);
 		deadlockMessageFormData.top = new FormAttachment(0, 5);
-		deadlockMessageFormData.width = 325;
+		deadlockMessageFormData.width = 300;
 		this.errorMessageLabel.setLayoutData(deadlockMessageFormData);
 		final Font errorMessageLabelFont = setFontSize(this.errorMessageLabel.getFont(), 10);
 		this.errorMessageLabel.setFont(errorMessageLabelFont);
@@ -743,17 +742,38 @@ public class GemAnalyzer extends ViewPart {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				final URI uri = GemUtilities.getMostRecentURI();
-				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-				IPath sourcefilePath = null;
+				IPath sourceFilePath = null;
+				IFile sourceFile = null;
 
 				if (uri != null) {
-					sourcefilePath = new Path(uri.getPath());
+					sourceFilePath = new Path(uri.getPath());
 				}
 
-				final IFile sourceFile = workspaceRoot.getFileForLocation(sourcefilePath);
+				final IProject currentProject = GemUtilities.getProjectLogFile().getProject();
+				final String currentProjectPath = currentProject.getLocationURI().getPath();
+				if (sourceFilePath != null) {
+					sourceFilePath = sourceFilePath.makeRelativeTo(new Path(currentProjectPath));
+					sourceFile = currentProject.getFile(sourceFilePath);
+				}
+
 				if (sourceFile != null && sourceFile.exists()) {
+					/*
+					 * Currently, GEM does not support the Happens Before Viewer
+					 * with remote projects.
+					 * 
+					 * Check if the project is local or remote and abort if it
+					 * is.
+					 */
+					if (GemUtilities.isRemoteProject()) {
+						GemUtilities
+								.showErrorDialog(Messages.GemAnalyzer_23);
+						return;
+					}
+
+					// Otherwise launch the HB viewer
 					GemUtilities.doHbv(sourceFile);
 				} else {
+					// There was a local error while creating the log file.
 					final String message = Messages.GemAnalyzer_13;
 					GemUtilities.showErrorDialog(message);
 				}
@@ -875,7 +895,7 @@ public class GemAnalyzer extends ViewPart {
 		this.lockRanksComboList = new Combo(this.transitionsGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
 		final Font lockRanksComboFont = setFontSize(this.lockRanksComboList.getFont(), 8);
 		this.lockRanksComboList.setFont(lockRanksComboFont);
-		final String[] items = new String[] { Messages.GemAnalyzer_38 };
+		final String[] items = new String[] { Messages.GemAnalyzer_83 };
 		this.lockRanksComboList.setItems(items);
 		this.lockRanksComboList.setToolTipText(Messages.GemAnalyzer_39);
 		final FormData lockRanksFormData = new FormData();
@@ -896,15 +916,15 @@ public class GemAnalyzer extends ViewPart {
 		if (matches != null) {
 			final int listSize = matches.size();
 			for (int i = 0; i < listSize; i++) {
-				final Envelope currEnv = matches.get(i);
-				final String fileInfo = currEnv.getFilePath();
-				final IPath filePath = new Path(fileInfo);
-				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-				final IFile sourceFile = workspaceRoot.getFileForLocation(filePath);
+				final Envelope currentMatchEnvelope = matches.get(i);
+				final String matchFilePathString = currentMatchEnvelope.getFilePath();
+				final IFile sourceFile = GemUtilities.getSourceFile(matchFilePathString, this.activeFile);
+
+				// Add the match to the right code view window
 				this.rightViewer.add(new ListElement(sourceFile, sourceFile.getName() + Messages.GemAnalyzer_40
-						+ currEnv.getLinenumber()
+						+ currentMatchEnvelope.getLinenumber()
 						+ Messages.GemAnalyzer_41
-						+ currEnv.getRank(), currEnv.getLinenumber(), false));
+						+ currentMatchEnvelope.getRank(), currentMatchEnvelope.getLinenumber(), false));
 			}
 		}
 	}
@@ -1028,12 +1048,10 @@ public class GemAnalyzer extends ViewPart {
 	 * successful MPI call.
 	 */
 	private String getCallText(Envelope env, boolean isLeft) {
-		final String sourcefileInfo = env.getFilePath();
 		final String newline = System.getProperty("line.separator"); //$NON-NLS-1$
-		final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		final IPath sourcefilePath = new Path(sourcefileInfo);
-		final IFile sourcefile = workspaceRoot.getFileForLocation(sourcefilePath);
-		final String fileName = sourcefile.getName();
+		final String sourceFilePathString = env.getFilePath();
+		final IFile sourceFile = GemUtilities.getSourceFile(sourceFilePathString, this.activeFile);
+		final String fileName = sourceFile.getName();
 		final StringBuffer stringBuffer = new StringBuffer();
 
 		// determine which ranks are involved; by default only call's rank
@@ -1041,9 +1059,9 @@ public class GemAnalyzer extends ViewPart {
 		if (env.isCollective() && this.lockedRank == -1) {
 
 			// If it was a group call then discover who else is here
-			// Also see if we're looking at a single rank or not
 			final int numRanksInvolved[] = new int[1];
 			if (this.lockedRank == -1) {
+				// Also see if we're looking at a single rank or not
 				ranks = this.transitions.getRanksInvolved(numRanksInvolved);
 			}
 
@@ -1121,7 +1139,7 @@ public class GemAnalyzer extends ViewPart {
 	 * thread to do updates.
 	 * 
 	 * @param sourceFile
-	 *            The file resource to initialize this viewer with.
+	 *            The file resource to initialize this view with.
 	 * @return void
 	 */
 	public void init(IFile sourceFile) {
@@ -1390,8 +1408,11 @@ public class GemAnalyzer extends ViewPart {
 	 * Reads in the contents of the specified file and populates the
 	 * ListViewers.
 	 * 
-	 * @param sourcefile
-	 *            A String containing the absolute path to the source file.
+	 * @param leftSourceFile
+	 *            The handle on the file resource for the left code view window.
+	 * @param rightSourceFile
+	 *            The handle on the file resource for the right code view
+	 *            window.
 	 * @return void
 	 */
 	public void parseSourceFile(IFile leftSourceFile, IFile rightSourceFile) {
@@ -1569,6 +1590,9 @@ public class GemAnalyzer extends ViewPart {
 
 	}
 
+	/**
+	 * see org.eclipse.ui.IWorkbenchPage
+	 */
 	@Override
 	public void setFocus() {
 		final Thread setFocusThread = new Thread() {
@@ -1703,9 +1727,9 @@ public class GemAnalyzer extends ViewPart {
 	/**
 	 * Updates the Analyzer view.
 	 * 
-	 * @param sourcePath
-	 *            the fully qualified path to the source file to display in the
-	 *            Analyzer view's code windows.
+	 * @param sourceFile
+	 *            The source file resource to display in the Analyzer View's
+	 *            code windows.
 	 * @param transitions
 	 *            The Transitions object holding holding all transitions per
 	 *            interleaving.
@@ -1739,12 +1763,12 @@ public class GemAnalyzer extends ViewPart {
 			}
 
 			final IPath nextLeftFilePath = new Path(nextLeftFileInfo);
-			final String nextLeftFileName = nextLeftFilePath.segment(nextLeftFilePath.segmentCount() - 1);
+			final String nextLeftFileName = nextLeftFilePath.lastSegment();
 			String nextRightFileName = emptyString;
 
 			if (nextRightFileInfo.length() != 0) {
 				final IPath nextRightFilePath = new Path(nextRightFileInfo);
-				nextRightFileName = nextRightFilePath.segment(nextRightFilePath.segmentCount() - 1);
+				nextRightFileName = nextRightFilePath.lastSegment();
 			}
 
 			final boolean updateWindowContent = this.currLeftFile == null || this.currRightFile == null
@@ -1753,23 +1777,18 @@ public class GemAnalyzer extends ViewPart {
 
 			if (updateWindowContent) {
 				final String projectName = this.activeFile.getProject().getName();
-				final IProject currentProject = ResourcesPlugin.getWorkspace()
-						.getRoot().getProject(projectName);
+				final IProject currentProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 
-				// Get the next source files for the code viewers
-				final IPath leftProjectRelativePath = new Path(nextLeftFileInfo);
-				final IPath rightProjectRelativePath = new Path(nextRightFileInfo);
-				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-				final IFile nextLeftSourceFile = workspaceRoot.getFileForLocation(leftProjectRelativePath);
-
+				// Get the next left and right source files for the code viewers
+				final IFile nextLeftSourceFile = GemUtilities.getSourceFile(nextLeftFileInfo, this.activeFile);
 				if (!nextLeftSourceFile.exists()) {
 					GemUtilities.refreshProject(currentProject);
 				}
 
 				IFile nextRightSourceFile = null;
-				final boolean isEmptyPath = rightProjectRelativePath.toString().length() == 0;
+				final boolean isEmptyPath = nextRightFileInfo.length() == 0;
 				if (!isEmptyPath) {
-					nextRightSourceFile = workspaceRoot.getFileForLocation(rightProjectRelativePath);
+					nextRightSourceFile = GemUtilities.getSourceFile(nextRightFileInfo, this.activeFile);
 					if (!nextRightSourceFile.exists()) {
 						GemUtilities.refreshProject(currentProject);
 					}

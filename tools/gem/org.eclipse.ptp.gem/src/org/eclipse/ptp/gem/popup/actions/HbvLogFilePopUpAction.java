@@ -16,6 +16,10 @@
 
 package org.eclipse.ptp.gem.popup.actions;
 
+//import java.io.File;
+
+//import org.eclipse.core.filesystem.EFS;
+//import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -63,11 +67,22 @@ public class HbvLogFilePopUpAction implements IObjectActionDelegate {
 			GemUtilities.showErrorDialog(Messages.HbvLogFilePopUpAction_0);
 		} else {
 			final IFile logFile = (IFile) this.selection.getFirstElement();
-			String hbv = GemPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.GEM_PREF_HBV_PATH);
-
-			// Sync the project resources with the underlying file system
 			final String projectName = logFile.getProject().getName();
 			final IProject currentProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			String hbv = GemPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.GEM_PREF_HBV_PATH);
+
+			/*
+			 * Currently, GEM does not support the Happens Before Viewer with
+			 * remote projects.
+			 * 
+			 * Check if the project is local or remote and abort if it is.
+			 */
+			if (logFile.getLocation() == null) {
+				GemUtilities.showErrorDialog(Messages.HbvLogFilePopUpAction_2);
+				return;
+			}
+
+			// Sync the project resources with the underlying file system
 			GemUtilities.refreshProject(currentProject);
 
 			// Check the log file and execute the command via thread
