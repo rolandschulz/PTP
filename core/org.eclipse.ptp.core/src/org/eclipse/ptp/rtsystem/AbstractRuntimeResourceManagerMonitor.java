@@ -151,12 +151,8 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 				}
 			}
 
-			getPResourceManager().addJobAttributes(changedJobs, attrs.getAttributes());
+			doUpdateJobs(changedJobs, attrs);
 			changedJobs.clear();
-
-			for (String jobId : jobIds) {
-				getResourceManager().fireJobChanged(jobId);
-			}
 		}
 	}
 
@@ -184,7 +180,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 				}
 			}
 
-			getPResourceManager().addMachineAttributes(machines, attrs.getAttributes());
+			doUpdateMachines(machines, attrs);
 			machines.clear();
 		}
 	}
@@ -237,7 +233,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 			for (String elementId : jobIds) {
 				IPJob job = getPResourceManager().getJobById(elementId);
 				if (job == null) {
-					job = getPResourceManager().newJob(elementId, jobAttrs);
+					job = doCreateJob(elementId, jobAttrs);
 					newJobs.add(job);
 				}
 			}
@@ -266,7 +262,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 			for (String elementId : machineIds) {
 				IPMachine machine = getPResourceManager().getMachineById(elementId);
 				if (machine == null) {
-					machine = getPResourceManager().newMachine(elementId, attrs);
+					machine = doCreateMachine(elementId, attrs);
 					newMachines.add(machine);
 				}
 			}
@@ -298,7 +294,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 				for (String elementId : nodeIds) {
 					IPNode node = getPResourceManager().getNodeById(elementId);
 					if (node == null) {
-						node = getPResourceManager().newNode(machine, elementId, attrs);
+						node = doCreateNode(machine, elementId, attrs);
 						newNodes.add(node);
 					}
 				}
@@ -356,7 +352,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 			for (String elementId : queueIds) {
 				IPQueue queue = getPResourceManager().getQueueById(elementId);
 				if (queue == null) {
-					queue = getPResourceManager().newQueue(elementId, attrs);
+					queue = doCreateQueue(elementId, attrs);
 					newQueues.add(queue);
 				}
 			}
@@ -399,7 +395,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 			}
 
 			for (Map.Entry<IPMachine, List<IPNode>> entry : map.entrySet()) {
-				entry.getKey().addNodeAttributes(entry.getValue(), attrs.getAttributes());
+				doUpdateNodes(entry.getKey(), entry.getValue(), attrs);
 			}
 
 			map.clear();
@@ -454,7 +450,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 				}
 			}
 
-			getPResourceManager().addQueueAttributes(queues, attrs.getAttributes());
+			doUpdateQueues(queues, attrs);
 			queues.clear();
 		}
 	}
@@ -707,6 +703,50 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 		return true;
 	}
 
+	/**
+	 * Create the job.
+	 * 
+	 * @param jobId
+	 * @param attrs
+	 * @return
+	 */
+	protected IPJob doCreateJob(String jobId, AttributeManager attrs) {
+		return getPResourceManager().newJob(jobId, attrs);
+	}
+
+	/**
+	 * Create the machine.
+	 * 
+	 * @param machineId
+	 * @param attrs
+	 * @return
+	 */
+	protected IPMachine doCreateMachine(String machineId, AttributeManager attrs) {
+		return getPResourceManager().newMachine(machineId, attrs);
+	}
+
+	/**
+	 * Create the node.
+	 * 
+	 * @param machine
+	 * @param nodeId
+	 * @param attrs
+	 * @return
+	 */
+	protected IPNode doCreateNode(IPMachine machine, String nodeId, AttributeManager attrs) {
+		return getPResourceManager().newNode(machine, nodeId, attrs);
+	}
+
+	/**
+	 * Template pattern method to actually create the queue.
+	 * 
+	 * @param queueId
+	 * @return
+	 */
+	protected IPQueue doCreateQueue(String queueId, AttributeManager attrs) {
+		return getPResourceManager().newQueue(queueId, attrs);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -738,6 +778,58 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
 		getRuntimeSystem().addRuntimeEventListener(this);
+	}
+
+	/**
+	 * Template pattern method to actually update the jobs.
+	 * 
+	 * @param job
+	 * @param attrs
+	 * @return changes were made
+	 */
+	protected void doUpdateJobs(Collection<IPJob> jobs, AttributeManager attrs) {
+		getPResourceManager().addJobAttributes(jobs, attrs.getAttributes());
+		for (IPJob job : jobs) {
+			getResourceManager().fireJobChanged(job.getID());
+		}
+
+	}
+
+	/**
+	 * Template pattern method to actually update the machines.
+	 * 
+	 * @param machine
+	 * @param attrs
+	 * @return changes were made
+	 */
+	protected void doUpdateMachines(Collection<IPMachine> machines, AttributeManager attrs) {
+		getPResourceManager().addMachineAttributes(machines, attrs.getAttributes());
+	}
+
+	/**
+	 * Template pattern method to update a collection of nodes.
+	 * 
+	 * @param machine
+	 *            parent machine
+	 * @param nodes
+	 *            collection of nodes to update
+	 * @param attrs
+	 *            new/changed attibutes for each node in the collection
+	 * @return changes were made
+	 */
+	protected void doUpdateNodes(IPMachine machine, Collection<IPNode> nodes, AttributeManager attrs) {
+		machine.addNodeAttributes(nodes, attrs.getAttributes());
+	}
+
+	/**
+	 * Template pattern method to actually update the queues.
+	 * 
+	 * @param queue
+	 * @param attrs
+	 * @return changes were made
+	 */
+	protected void doUpdateQueues(Collection<IPQueue> queues, AttributeManager attrs) {
+		getPResourceManager().addQueueAttributes(queues, attrs.getAttributes());
 	}
 
 	/**
