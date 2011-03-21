@@ -53,11 +53,11 @@ public class Transitions {
 	/**
 	 * Constructor
 	 * 
-	 * @param logfile
+	 * @param logFile
 	 *            The Resource representing the log file to parse.
 	 * @throws ParseException
 	 */
-	public Transitions(IFile logfile) throws ParseException {
+	public Transitions(IFile logFile) throws ParseException {
 		this.transitionList = new ArrayList<ArrayList<Envelope>>();
 		this.errorCalls = new ArrayList<HashMap<String, Envelope>>();
 		this.irrelevantBarriers = null;
@@ -71,7 +71,7 @@ public class Transitions {
 		this.deadlock = false;
 		this.assertionViolation = false;
 		this.resourceLeak = false;
-		parseLogFile(logfile);
+		parseLogFile(logFile);
 	}
 
 	/**

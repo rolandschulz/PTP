@@ -148,8 +148,8 @@ public class GemConsole extends ViewPart {
 	}
 
 	/**
-	 * Initializing everything and creates threads to be used by the main UI
-	 * thread to do updates.
+	 * Initializes everything for this view and creates threads to be used by
+	 * the main UI thread to perform view updates.
 	 * 
 	 * @param none
 	 * @return void
@@ -239,6 +239,9 @@ public class GemConsole extends ViewPart {
 				.getImageDescriptor(ISharedImages.IMG_LCL_LINKTO_HELP));
 	}
 
+	/**
+	 * see org.eclipse.ui.IWorkbenchPage
+	 */
 	@Override
 	public void setFocus() {
 		final Thread setFocusThread = new Thread() {
@@ -263,7 +266,8 @@ public class GemConsole extends ViewPart {
 	 * content.
 	 * 
 	 * @param message
-	 *            The string to display in this console.
+	 *            The string to append to the existing text in the text console
+	 *            viewer of this view part.
 	 * @return void
 	 */
 	public void write(String message) {
@@ -276,7 +280,7 @@ public class GemConsole extends ViewPart {
 	 * Writes the string to the console as an error message.
 	 * 
 	 * @param consoleStdErrMessage
-	 *            The string to write to this Console that represents stderr.
+	 *            The string that represents stderr to write to this Console.
 	 * @return void
 	 */
 	public void writeStdErr(String consoleStdErrMessage) {
@@ -299,7 +303,7 @@ public class GemConsole extends ViewPart {
 	 * Writes the string to the console as a standard message.
 	 * 
 	 * @param consoleStdOutMessage
-	 *            The string to write to this Console that represents stdout.
+	 *            The string that represents stdout to write to this Console.
 	 * @void
 	 */
 	public void writeStdOut(String consoleStdOutMessage) {

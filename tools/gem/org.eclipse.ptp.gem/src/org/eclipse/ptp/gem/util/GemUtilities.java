@@ -39,7 +39,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -55,6 +54,13 @@ import org.eclipse.ptp.gem.preferences.PreferenceConstants;
 import org.eclipse.ptp.gem.views.GemAnalyzer;
 import org.eclipse.ptp.gem.views.GemBrowser;
 import org.eclipse.ptp.gem.views.GemConsole;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
@@ -72,6 +78,7 @@ public class GemUtilities {
 	}
 
 	private static Process process;
+	private static IRemoteProcess remoteProcess;
 	private static GemAnalyzer analyzer;
 	private static GemBrowser browser;
 	private static GemConsole console;
@@ -83,7 +90,7 @@ public class GemUtilities {
 	private static String outputSameMessage;
 	private static String outputSameDetails;
 	private static IFile gemInputFile;
-	private static IFile gemLogfile;
+	private static IFile gemLogFile;
 
 	// This thread exists to update SWT components belonging to the UI thread.
 	private final static Thread updateGemConsoleThread = new Thread() {
@@ -167,7 +174,7 @@ public class GemUtilities {
 	 * specified input source file.
 	 * 
 	 * @param inputFile
-	 *            The resource handle representing the input file.
+	 *            The resource handle representing the GEM input file.
 	 * @return void
 	 */
 	public static void doHbv(IFile inputFile) {
@@ -217,7 +224,7 @@ public class GemUtilities {
 
 		// Create GEM directory to hold the generated log file and executable
 		final IProject currentProject = inputFile.getProject();
-		gemLogfile = currentProject.getFile(getLogfilePath(inputFile));
+		gemLogFile = currentProject.getFile(getLogfilePath(inputFile));
 		final IFolder gemFolder = currentProject.getFolder(new Path("gem")); //$NON-NLS-1$
 
 		if (!gemFolder.exists()) {
@@ -239,8 +246,8 @@ public class GemUtilities {
 		}
 
 		// generate the path for the log file to be created by ISP
-		IPath logfilePath = new Path(gemFolder.getLocationURI().getPath());
-		logfilePath = logfilePath.append(currentProject.getName()).removeFileExtension().addFileExtension("gem.log"); //$NON-NLS-1$
+		IPath logFilePath = new Path(gemFolder.getLocationURI().getPath());
+		logFilePath = logFilePath.append(currentProject.getName()).removeFileExtension().addFileExtension("gem.log"); //$NON-NLS-1$
 
 		final int numprocs = pstore.getInt(PreferenceConstants.GEM_PREF_NUMPROCS);
 		int portnum = pstore.getInt(PreferenceConstants.GEM_PREF_PORTNUM);
@@ -292,7 +299,7 @@ public class GemUtilities {
 		stringBuffer.append((reportPreference) ? reportnum + " " : ""); //$NON-NLS-1$ //$NON-NLS-2$
 		stringBuffer.append((fibPreference) ? "-f " : ""); //$NON-NLS-1$ //$NON-NLS-2$
 		stringBuffer.append("-l "); //$NON-NLS-1$
-		stringBuffer.append(logfilePath);
+		stringBuffer.append(logFilePath);
 		stringBuffer.append(" "); //$NON-NLS-1$
 		stringBuffer.append(executablePath);
 		// Now add command line options
@@ -310,8 +317,8 @@ public class GemUtilities {
 	}
 
 	/**
-	 * Compiles the specified file with ispcc, which links against the profiler
-	 * (interposition layer) library.
+	 * Compiles the specified file with ispcc (mpicc wrapper), which links
+	 * against the profiler (interposition layer) library.
 	 * 
 	 * @param inputFile
 	 *            The resource handle representing the source code file to
@@ -377,9 +384,9 @@ public class GemUtilities {
 	 * @param inputFile
 	 *            The resource handle representing the file for GEM to process.
 	 * @param compile
-	 *            Whether or not to run ispcc.
+	 *            Whether or not to run ispcc script.
 	 * @param verify
-	 *            Whether or not to run ISP.
+	 *            Whether or not to run ISP on the profiled executable.
 	 * @return void
 	 */
 	public static int generateLogFile(IFile inputFile, boolean compile, boolean verify) {
@@ -401,7 +408,8 @@ public class GemUtilities {
 	 * Returns a string representing the version of ISP being used.
 	 * 
 	 * @param none
-	 * @return String The version of ISP installed on the target machine.
+	 * @return String The patured stdout string representing the version of ISP
+	 *         installed on the target machine.
 	 */
 	public static String getIspVersion() {
 		// Get the location of ISP
@@ -486,7 +494,8 @@ public class GemUtilities {
 	 * Returns the value of 'outputSameDetails'
 	 * 
 	 * @param none
-	 * @return String The details of the output comparison.
+	 * @return String The string representation of details of the output
+	 *         comparison.
 	 */
 	public static String getOutputSameDetails() {
 		return outputSameDetails;
@@ -496,41 +505,163 @@ public class GemUtilities {
 	 * Returns the value of 'outputSameMessage'
 	 * 
 	 * @param none
-	 * @return String The output to compare against.
+	 * @return String The output string to compare against.
 	 */
 	public static String getOutputSameMessage() {
 		return outputSameMessage;
 	}
 
 	/**
-	 * Returns the path of the source files form the specified logFile path.
+	 * Returns the generated log file for the current project being verified.
+	 * 
+	 * @param none
+	 * @return IFile the log file for the current project being verified.
+	 */
+	public static IFile getProjectLogFile() {
+		return gemLogFile;
+	}
+
+	/**
+	 * Returns the IRemoteCOnnection associated with the specified
+	 * IRemoteServices.
+	 * 
+	 * @param service
+	 *            The IRemotesServices object for which the IRemoteCOnnections
+	 *            object belongs.
+	 * @return IRemoteConnection The IRemoteConnection associated with the
+	 *         specified IRemoteServices.
+	 */
+	public static IRemoteConnection getRemoteConnection(IRemoteServices service) {
+		IRemoteConnection currentConnection = null;
+		IRemoteConnectionManager connectionManager = null;
+		IRemoteConnection[] connections = null;
+		if (service != null) {
+			connectionManager = service.getConnectionManager();
+		}
+		if (connectionManager != null) {
+			connections = connectionManager.getConnections();
+		}
+		if (connections != null) {
+			for (final IRemoteConnection connection : connections) {
+				if (connection.isOpen()) {
+					currentConnection = connection;
+					break;
+				}
+			}
+		}
+		return currentConnection;
+	}
+
+	/**
+	 * Returns the IRemoteFileManager for the specified project resource.
+	 * 
+	 * @param projectResource
+	 *            The IResource object to get the IRemoteFileManager for.
+	 * @return IRemoteFileManager The IRemoteFileManager for the specified
+	 *         project resource.
+	 */
+	public static IRemoteFileManager getRemoteFileManager(IFile projectResource) {
+		final URI projectURI = projectResource.getProject().getLocationURI();
+		final String scheme = projectURI.getScheme();
+		final IRemoteServices service = getRemoteService(scheme);
+		final IRemoteFileManager remoteFileManager = service.getFileManager(getRemoteConnection(getRemoteService(scheme)));
+
+		return remoteFileManager;
+	}
+
+	/**
+	 * Returns the RemoteProcessBuilder object associated with the connection
+	 * used by the specified remote project.
+	 * 
+	 * @param currentProject
+	 *            The project for which we need the connection.
+	 * @param args
+	 *            The command line arguments for the RemoteProcessBuilder to be
+	 *            used.
+	 * @return IRemoteProcessBuilder The RemoteProcessBuilder object associated
+	 *         with the connection used by the specified remote project.
+	 */
+	public static IRemoteProcessBuilder getRemoteProcessBuilder(IProject currentProject, String[] args) {
+		final URI projectURI = currentProject.getLocationURI();
+		final String scheme = projectURI.getScheme();
+		final IRemoteServices currentService = getRemoteService(scheme);
+		final IRemoteConnection currentConnection = getRemoteConnection(currentService);
+		final IRemoteProcessBuilder rpb = currentService.getProcessBuilder(currentConnection, args);
+
+		return rpb;
+	}
+
+	/**
+	 * Returns the IRemoteServices matching the specified scheme.
+	 * 
+	 * @param scheme
+	 *            The scheme to match to the IRemoteServices used by the caller.
+	 * @param IRemoteServices
+	 *            The IRemoteServices matching the specified scheme.
+	 */
+	public static IRemoteServices getRemoteService(String scheme) {
+		IRemoteServices currentService = null;
+		final IRemoteServices[] services = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
+		for (final IRemoteServices service : services) {
+			if (service.getScheme().equals(scheme)) {
+				currentService = service;
+				break;
+			}
+		}
+		return currentService;
+	}
+
+	/**
+	 * Returns an IFile resource with path relative to the current project.
+	 * 
+	 * @param fullPath
+	 *            The string representation of the full path to a file contained
+	 *            within the current project.
+	 * @param resource
+	 *            A resource within the current project (can be the current
+	 *            project itself).
+	 * @return IFile The resource handle to the requested source file.
+	 */
+	public static IFile getSourceFile(String fullPath, IResource resource) {
+		final String projectName = resource.getProject().getName();
+		final IProject currentProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		final String currentProjectPath = currentProject.getLocationURI().getPath();
+		IPath sourceFilePath = new Path(fullPath);
+		sourceFilePath = sourceFilePath.makeRelativeTo(new Path(currentProjectPath));
+		final IFile sourceFile = currentProject.getFile(sourceFilePath);
+
+		return sourceFile;
+	}
+
+	/**
+	 * Returns the handle to the source files form the specified logFile path.
 	 * This method will be used when GEM is run on an existing executable and
 	 * the source file necessary to populate the Analyzer code windows is
 	 * needed.
 	 * 
-	 * @param logfile
+	 * @param logFile
 	 *            The resource handle representing the log file.
-	 * @return String The first source file name found in the log file. This
-	 *         will include its full path on the local file system.
+	 * @return String The handle to the first source file found in the log file.
 	 */
-	public static IFile getSourceFilePath(IFile logfile) {
+	public static IFile getSourceFilePathFromLog(IFile logFile) {
 
 		Scanner scanner = null;
 		InputStream logFileStream = null;
-		String sourcefileInfo = ""; //$NON-NLS-1$
+		String sourceFilePathInfo = ""; //$NON-NLS-1$
 
-		if (!logfile.exists()) {
-			refreshProject(logfile.getProject());
+		if (!logFile.exists()) {
+			refreshProject(logFile.getProject());
 		}
 
 		// Scan the second line of the log file for first source file name
 		try {
-			logFileStream = logfile.getContents(true);
+			logFileStream = logFile.getContents(true);
 		} catch (final CoreException e) {
 			logExceptionDetail(e);
 		}
-		scanner = new Scanner(logFileStream);
+
 		// If the log file is empty
+		scanner = new Scanner(logFileStream);
 		if (!scanner.hasNextLine()) {
 			if (taskStatus != TaskStatus.ABORTED) {
 				GemUtilities.showErrorDialog(Messages.GemUtilities_4);
@@ -547,11 +678,10 @@ public class GemUtilities {
 			return null;
 		}
 
-		sourcefileInfo = scanner.nextLine();
-		sourcefileInfo = sourcefileInfo.substring(sourcefileInfo.indexOf("/"), sourcefileInfo.lastIndexOf(" ")); //$NON-NLS-1$ //$NON-NLS-2$
-		final IPath sourcefilePath = new Path(sourcefileInfo);
-		final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		final IFile sourceFile = workspaceRoot.getFileForLocation(sourcefilePath);
+		// Grab the path string for the source file form the log file line
+		sourceFilePathInfo = scanner.nextLine();
+		sourceFilePathInfo = sourceFilePathInfo.substring(sourceFilePathInfo.indexOf("/"), sourceFilePathInfo.lastIndexOf(" ")); //$NON-NLS-1$ //$NON-NLS-2$
+		final IFile sourceFile = getSourceFile(sourceFilePathInfo, logFile);
 
 		// Close the open InputStream
 		try {
@@ -587,7 +717,7 @@ public class GemUtilities {
 			return minorVersionNum >= 5;
 		}
 
-		// otherwise we have a compatible version
+		// otherwise we know have a compatible version, v0.3.0+
 		return true;
 	}
 
@@ -670,7 +800,7 @@ public class GemUtilities {
 					if (gemInputFile.getFileExtension().equals("log")) { //$NON-NLS-1$
 						logFile = gemInputFile;
 					} else {
-						logFile = gemLogfile;
+						logFile = gemLogFile;
 					}
 
 					if (logFile == null) {
@@ -681,7 +811,7 @@ public class GemUtilities {
 
 					Transitions transitions = null;
 					transitions = initTransitions(logFile);
-					sourceFile = getSourceFilePath(logFile);
+					sourceFile = getSourceFilePathFromLog(logFile);
 
 					if (transitions == null || sourceFile == null) {
 						// Error message issued in getSourceFilePath()
@@ -754,6 +884,20 @@ public class GemUtilities {
 		}
 	}
 
+	/**
+	 * Returns whether or not the current project being verified by GEM is
+	 * remote or not. The IResource method, <code>getLocation()</code> returns
+	 * the absolute path in the local file system to this resource, or null if
+	 * no path can be determined.
+	 * 
+	 * @param none
+	 * @return boolean True if the current project being verified by GEM is
+	 *         remote, false otherwise.
+	 */
+	public static boolean isRemoteProject() {
+		return gemInputFile.getLocation() == null;
+	}
+
 	/*
 	 * Kills the child processes spawned from the global process object and then
 	 * forcibly closes the global process object. This would be, for example
@@ -763,22 +907,53 @@ public class GemUtilities {
 		final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
 		final String processName = pstore.getString(PreferenceConstants.GEM_PREF_PROCESS_NAME);
 		final String command = "pkill " + processName; //$NON-NLS-1$
-		Process killProc = null;
-		try {
-			killProc = Runtime.getRuntime().exec(command);
-		} catch (final IOException e) {
-			logExceptionDetail(e);
-		} finally {
-			if (killProc != null) {
-				try {
-					killProc.waitFor();
-				} catch (final InterruptedException e) {
-					logExceptionDetail(e);
-				}
-				killProc.destroy();
+		final String projectName = gemInputFile.getProject().getName();
+		final IProject currentProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		final boolean isRemoteProject = (currentProject.getLocation() == null);
+
+		if (isRemoteProject) {
+			final String[] args = command.split(" ", -1); //$NON-NLS-1$
+			final IRemoteProcessBuilder rpb = getRemoteProcessBuilder(currentProject, args);
+			try {
+				remoteProcess = rpb.start();
+			} catch (final IOException e) {
+				logExceptionDetail(e);
 			}
-			if (process != null) {
-				process.destroy();
+			try {
+				remoteProcess = rpb.start();
+			} catch (final IOException e) {
+				logExceptionDetail(e);
+			} finally {
+				if (remoteProcess != null) {
+					try {
+						remoteProcess.waitFor();
+					} catch (final InterruptedException e) {
+						logExceptionDetail(e);
+					}
+					remoteProcess.destroy();
+				}
+				if (remoteProcess != null) {
+					remoteProcess.destroy();
+				}
+			}
+		} else {
+			Process killProc = null;
+			try {
+				killProc = Runtime.getRuntime().exec(command);
+			} catch (final IOException e) {
+				logExceptionDetail(e);
+			} finally {
+				if (killProc != null) {
+					try {
+						killProc.waitFor();
+					} catch (final InterruptedException e) {
+						logExceptionDetail(e);
+					}
+					killProc.destroy();
+				}
+				if (process != null) {
+					process.destroy();
+				}
 			}
 		}
 	}
@@ -843,20 +1018,37 @@ public class GemUtilities {
 	 * @return int Returns 1 if everything went smoothly, -1 otherwise.
 	 */
 	public static int runCommand(String command, boolean verbose) {
+
+		// Find out if the current project is local or remote
+		final String projectName = gemInputFile.getProject().getName();
+		final IProject currentProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		final boolean isRemoteProject = currentProject.getLocation() == null;
+
 		try {
 			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
-			process = Runtime.getRuntime().exec(command);
 			final StringBuffer stringBuffer = new StringBuffer();
 			String stdOut = ""; //$NON-NLS-1$
 			String stdOutResult = ""; //$NON-NLS-1$
 			String stdErr = ""; //$NON-NLS-1$
 			String stdErrResult = ""; //$NON-NLS-1$
-			final BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			final BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-			consoleStdOutMessage = "";//$NON-NLS-1$
-			consoleStdErrMessage = "";//$NON-NLS-1$
 
-			// clear the console if the preference is set
+			// Check if the current project is remote
+			if (isRemoteProject) {
+				final String[] args = command.split(" ", -1); //$NON-NLS-1$
+				final IRemoteProcessBuilder rpb = getRemoteProcessBuilder(currentProject, args);
+				remoteProcess = rpb.start();
+			} else {
+				process = Runtime.getRuntime().exec(command);
+			}
+
+			final BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(
+					isRemoteProject ? remoteProcess.getInputStream() : process.getInputStream()));
+			final BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(
+					isRemoteProject ? remoteProcess.getErrorStream() : process.getErrorStream()));
+			consoleStdOutMessage = ""; //$NON-NLS-1$
+			consoleStdErrMessage = ""; //$NON-NLS-1$
+
+			// Clear the console if the preference is set
 			final boolean clearConsole = pstore.getBoolean(PreferenceConstants.GEM_PREF_CLRCON);
 			if (clearConsole) {
 				console.clear();
@@ -865,7 +1057,8 @@ public class GemUtilities {
 			// Try breaks when the process is terminated prematurely
 			try {
 				// read the process input stream
-				while (process != null && (stdOut = stdOutReader.readLine()) != null && taskStatus == TaskStatus.ACTIVE) {
+				while ((isRemoteProject ? remoteProcess != null : process != null) && (stdOut = stdOutReader.readLine()) != null
+						&& taskStatus == TaskStatus.ACTIVE) {
 					stringBuffer.append(stdOut);
 					stringBuffer.append("\n"); //$NON-NLS-1$
 					consoleStdOutMessage += stdOut + "\n";//$NON-NLS-1$
@@ -874,6 +1067,7 @@ public class GemUtilities {
 						consoleStdOutMessage = "";//$NON-NLS-1$
 					}
 				}
+
 				stdOutResult = stringBuffer.toString();
 
 				// cleanup, send last few lines
@@ -881,7 +1075,8 @@ public class GemUtilities {
 
 				// read the process error stream
 				stringBuffer.setLength(0);
-				while (process != null && (stdErr = stdErrReader.readLine()) != null && taskStatus == TaskStatus.ACTIVE) {
+				while ((isRemoteProject ? remoteProcess != null : process != null) && (stdErr = stdErrReader.readLine()) != null
+						&& taskStatus == TaskStatus.ACTIVE) {
 					stringBuffer.append(stdErr);
 					stringBuffer.append("\n"); //$NON-NLS-1$
 					consoleStdErrMessage += stdErr + "\n";//$NON-NLS-1$
@@ -891,6 +1086,7 @@ public class GemUtilities {
 						consoleStdErrMessage = "";//$NON-NLS-1$
 					}
 				}
+
 				stdErrResult = stringBuffer.toString();
 
 				// cleanup, send last few lines
@@ -903,13 +1099,14 @@ public class GemUtilities {
 			consoleStdOutMessage = stdOutResult;
 			consoleStdErrMessage = stdErrResult;
 
-			outputSameMessage = ""; // means that the output was not compared //$NON-NLS-1$
+			// means that the output was not compared
+			outputSameMessage = ""; //$NON-NLS-1$
 			outputSameDetails = ""; //$NON-NLS-1$
 			if (verbose && pstore.getBoolean(PreferenceConstants.GEM_PREF_COMPARE_OUTPUT)) {
 				compareOutput(consoleStdOutMessage);
 			}
 
-			if (process == null) {
+			if (isRemoteProject ? remoteProcess == null : process == null) {
 				return -1;
 			}
 
@@ -942,9 +1139,8 @@ public class GemUtilities {
 	 * Saves the URI of the last used file to the preference store. This URI
 	 * will be represented as a String in the preference store.
 	 * 
-	 * @param relativePath
-	 *            The String representation of the URI for the last used file in
-	 *            the workspace.
+	 * @param mostRecentURI
+	 *            The URI of the last used file in the currently used workspace.
 	 * @return void
 	 */
 	public static void saveMostRecentURI(URI mostRecentURI) {
@@ -958,6 +1154,8 @@ public class GemUtilities {
 	 * 
 	 * @param file
 	 *            The local file to write the specified content to.
+	 * @param content
+	 *            The content to write to the specified local file.
 	 * @return void
 	 */
 	public static void saveToLocalFile(File file, String content) {
@@ -1048,9 +1246,9 @@ public class GemUtilities {
 	 * Simply open an ExceptionDetailsDialog for the specified exception.
 	 * 
 	 * @param message
-	 *            The message body.
+	 *            The message body for the exception dialog.
 	 * @param e
-	 *            The Exception title.
+	 *            The exception title.
 	 * @return void
 	 */
 	public static void showExceptionDialog(String message, Exception e) {
@@ -1062,7 +1260,7 @@ public class GemUtilities {
 	 * Simply opens a dialog with the specified String.
 	 * 
 	 * @param message
-	 *            The message body.
+	 *            The message body for the information dialog.
 	 * @return void
 	 */
 	public static void showInformationDialog(String message) {
@@ -1072,14 +1270,14 @@ public class GemUtilities {
 
 	/**
 	 * Clears and shuts down all GEM views then forcibly terminates the shared
-	 * Process object associated with this class and all its children.
+	 * Process object associated with this class and all its children. This
+	 * prevents destroying a process after it has finished, but before the
+	 * termination buttons have been deactivated.
 	 * 
 	 * @param none
 	 * @return void
 	 */
 	public static void terminateOperation() {
-		// Prevents destroying a process after it has finished (but before the
-		// termination buttons have been deactivated)
 		if (taskStatus != TaskStatus.IDLE) {
 			taskStatus = TaskStatus.ABORTED;
 			analyzer.clear();

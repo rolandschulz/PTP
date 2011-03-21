@@ -121,21 +121,21 @@
       <!-- PopUpMenus extension point and contributions (nameFilter="*.log") -->      
       <objectContribution
             adaptable="true"
-            id="org.eclipse.ptp.gem.logfilePopupMenu"
+            id="org.eclipse.ptp.gem.logFilePopupMenu"
             nameFilter="*.log"
             objectClass="org.eclipse.core.resources.IFile">
          <menu
                label="GEM"
                path="additions"
-               id="logfileMenu">
-            <separator name="logfileGroup"/>
+               id="logFileMenu">
+            <separator name="logFileGroup"/>
          </menu>
          <action
                class="org.eclipse.ptp.gem.popup.actions.HbvLogFilePopUpAction"
                enablesFor="1"
                id="org.eclipse.ptp.gem.hbvLogPopup"
                label="Launch Happens Before Viewer"
-               menubarPath="logfileMenu/logfileGroup"
+               menubarPath="logFileMenu/logFileGroup"
                icon="icons/hbv-trident.gif">
          </action>
          <action
@@ -143,7 +143,7 @@
                enablesFor="1"
                id="org.eclipse.ptp.gem.LogFilePopUpAction"
                label="Process GEM Log File"
-               menubarPath="logfileMenu/logfileGroup"
+               menubarPath="logFileMenu/logFileGroup"
                icon="icons/trident.gif">
          </action>
       </objectContribution>

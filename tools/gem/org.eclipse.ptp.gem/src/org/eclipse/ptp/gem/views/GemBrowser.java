@@ -29,10 +29,6 @@ import javax.swing.JFrame;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -114,9 +110,9 @@ public class GemBrowser extends ViewPart {
 	SelectionListener listener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(SelectionEvent event) {
-			String eventText;
-			IFile sourceFile;
-			Integer lineNumber;
+			String eventText = null;
+			IFile sourceFile = null;
+			Integer lineNumber = null;
 
 			final Object o = event.getSource();
 			if (o instanceof Tree) {
@@ -130,22 +126,20 @@ public class GemBrowser extends ViewPart {
 					final Matcher browserLineMatcher = browserLinePattern.matcher(eventText);
 
 					if (browserLineMatcher.matches()) {
-						final String filePath = browserLineMatcher.group(3);
+						final String filePathString = browserLineMatcher.group(3);
 						String lineNumStr = browserLineMatcher.group(5);
+
 						final Pattern lineNumberPattern = Pattern.compile("(^[0-9]+)?+(.+?)"); //$NON-NLS-1$
 						final Matcher lineNumberMatcher = lineNumberPattern.matcher(lineNumStr);
 
 						if (lineNumberMatcher.matches()) {
 							lineNumStr = lineNumberMatcher.group(1);
 							lineNumber = Integer.parseInt(lineNumStr);
-
-							final IPath sourcefilePath = new Path(filePath);
-							final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-							sourceFile = workspaceRoot.getFile(sourcefilePath);
+							sourceFile = GemUtilities.getSourceFile(filePathString, GemUtilities.getProjectLogFile());
 							if (sourceFile != null) {
 								openEditor(lineNumber, sourceFile);
 							} else {
-								final String message = Messages.GemBrowser_0 + filePath;
+								final String message = Messages.GemBrowser_0 + filePathString;
 								GemUtilities.showErrorDialog(message);
 								return;
 							}
@@ -430,9 +424,8 @@ public class GemBrowser extends ViewPart {
 				}
 
 				errorFound = true;
-				final IPath sourcefilePath = new Path(env.getFilePath());
-				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-				final IFile sourceFile = workspaceRoot.getFileForLocation(sourcefilePath);
+
+				final IFile sourceFile = GemUtilities.getSourceFile(env.getFilePath(), GemUtilities.getProjectLogFile());
 				if (sourceFile != null) {
 					final String basePath = sourceFile.getFullPath().toPortableString();
 					fileItem = new TreeItem(interleavingItem, SWT.NULL);
@@ -566,9 +559,7 @@ public class GemBrowser extends ViewPart {
 				}
 				errorFound = true;
 
-				final IPath sourcefilePath = new Path(env.getFilePath());
-				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-				final IFile sourceFile = workspaceRoot.getFileForLocation(sourcefilePath);
+				final IFile sourceFile = GemUtilities.getSourceFile(env.getFilePath(), GemUtilities.getProjectLogFile());
 				if (sourceFile != null) {
 					final String basePath = sourceFile.getFullPath().toPortableString();
 					fileItem = new TreeItem(interleavingItem, SWT.NULL);
@@ -655,12 +646,10 @@ public class GemBrowser extends ViewPart {
 				}
 
 				final StringTokenizer tokenizer = new StringTokenizer(line);
-				final String filePath = tokenizer.nextToken();
+				final String filePathString = tokenizer.nextToken();
 				final String lineNumber = tokenizer.nextToken();
 
-				final IPath sourcefilePath = new Path(filePath);
-				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-				final IFile sourceFile = workspaceRoot.getFileForLocation(sourcefilePath);
+				final IFile sourceFile = GemUtilities.getSourceFile(filePathString, GemUtilities.getProjectLogFile());
 				if (sourceFile != null) {
 					final String basePath = sourceFile.getFullPath().toPortableString();
 					final String text = "FIB" + "\t" + basePath + "\tLine: " + lineNumber; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -747,9 +736,7 @@ public class GemBrowser extends ViewPart {
 					prevInterleaving = env.getInterleaving();
 				}
 
-				final IPath sourcefilePath = new Path(env.getFilePath());
-				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-				final IFile sourceFile = workspaceRoot.getFileForLocation(sourcefilePath);
+				final IFile sourceFile = GemUtilities.getSourceFile(env.getFilePath(), GemUtilities.getProjectLogFile());
 				if (sourceFile != null) {
 					final String basePath = sourceFile.getFullPath().toPortableString();
 					final String text = env.getLeakResource() + "\t" + basePath + "\tLine: " + env.getLinenumber(); //$NON-NLS-1$ //$NON-NLS-2$
@@ -808,13 +795,10 @@ public class GemBrowser extends ViewPart {
 				}
 
 				final StringTokenizer tokenizer = new StringTokenizer(line);
-				final String filePath = tokenizer.nextToken();
+				final String filePathString = tokenizer.nextToken();
 				final String lineNumber = tokenizer.nextToken();
 
-				final IPath sourcefilePath = new Path(filePath);
-				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-				final IFile sourceFile = workspaceRoot.getFileForLocation(sourcefilePath);
-
+				final IFile sourceFile = GemUtilities.getSourceFile(filePathString, GemUtilities.getProjectLogFile());
 				if (sourceFile != null) {
 					final String basePath = sourceFile.getFullPath().toPortableString();
 					final String text = "Type_Mismatch" + "\t" + basePath + "\tLine: " + lineNumber; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -834,8 +818,8 @@ public class GemBrowser extends ViewPart {
 	}
 
 	/**
-	 * Initializing everything and creates threads to be used by the main UI
-	 * thread to do updates.
+	 * Initializing everything for this view and creates threads to be used by
+	 * the main UI thread to do updates.
 	 * 
 	 * @param none
 	 * @return void
@@ -978,6 +962,9 @@ public class GemBrowser extends ViewPart {
 		Display.getDefault().syncExec(GemBrowser.this.disableTerminateButtonThread);
 	}
 
+	/**
+	 * see org.eclipse.ui.IWorkbenchPage
+	 */
 	@Override
 	public void setFocus() {
 		final Thread setFocusThread = new Thread() {

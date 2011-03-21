@@ -87,7 +87,6 @@ public class ProcessLogFilePopUpAction implements IObjectActionDelegate {
 					page.showView(GemAnalyzer.ID);
 					page.showView(GemBrowser.ID);
 				}
-				// Now open the Console View
 				page.showView(GemConsole.ID);
 			} catch (final PartInitException e) {
 				GemUtilities.logExceptionDetail(e);
