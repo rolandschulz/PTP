@@ -78,6 +78,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.services.core.BuildScenario;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -311,7 +312,12 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				ServiceModelManager smm = ServiceModelManager.getInstance();
 				
 				try{
-					IServiceConfiguration serviceConfig = smm.getActiveConfiguration(getProject());
+					BuildScenario buildScenario = this.getBuildScenarioForConfiguration(configuration);
+					IServiceConfiguration serviceConfig = smm.getConfigurationForBuildScenario(getProject(), buildScenario);
+					if (serviceConfig == null) {
+						throw new RuntimeException("Cannot find service configuration for build scenario"); //$NON-NLS-1$
+					}
+					// IServiceConfiguration serviceConfig = smm.getActiveConfiguration(getProject());
 					IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
 					IServiceProvider provider = serviceConfig.getServiceProvider(buildService);
 					IRemoteExecutionServiceProvider executionProvider = null;
@@ -498,6 +504,13 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		return (isClean);
 	}
 	
+	private BuildScenario getBuildScenarioForConfiguration(IConfiguration config) {
+		String provider = config.getBuildProperties().getProperty("remoteSyncProvider").getValue().getName(); //$NON-NLS-1$
+		String conn = config.getBuildProperties().getProperty("remoteConnection").getValue().getName(); //$NON-NLS-1$
+		String location = config.getBuildProperties().getProperty("remoteLocation").getValue().getName(); //$NON-NLS-1$
+		return new BuildScenario(provider, conn, location);
+	}
+
 	private void removeAllMarkers(IProject currProject) throws CoreException {
 		IWorkspace workspace = currProject.getWorkspace();
 
