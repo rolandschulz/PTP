@@ -21,6 +21,8 @@ import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.services.core.BuildScenario;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -186,8 +188,7 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 	
 	@Override
 	/**
-	 * Store remote location information into the .cproject file for the current project. Note that the information is relative
-	 * to the current (default) build configuration.
+	 * Store remote location information both to the service model manager and to the selected build configuration (.cproject file)
 	 * 
 	 * @throws RuntimeException on problems retrieving the project or its build information.
 	 */
@@ -196,6 +197,13 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 		if (project == null) {
 			throw new RuntimeException("Current project not found."); //$NON-NLS-1$
 		}
+		
+		// Register with service model manager
+		BuildScenario buildScenario = new BuildScenario(fSelectedProvider.getName(), fSelectedConnection.getName(),
+																										fLocationText.getText());
+		ServiceModelManager.getInstance().addBuildScenario(project, buildScenario);
+		
+		// Store to build configuration
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$

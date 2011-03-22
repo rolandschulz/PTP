@@ -12,29 +12,30 @@
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
 import java.io.IOException;
-import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
+import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.services.core.BuildScenario;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.internal.core.ServiceConfiguration;
 
 /**
  * An operation which handles configuring the remote portions of the Remote
@@ -72,14 +73,6 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 				config.setServiceProvider(buildService, rbsp);
 			}
 			
-			/* START HERE March 22, 2011 */
-			if (config instanceof ServiceConfiguration) {
-			ServiceConfiguration sconfig = (ServiceConfiguration) config;
-			ISyncServiceProvider provider = participant.getProvider(project);
-			sconfig.createFileInfo(project.getFullPath(), "remoteSyncProvider", provider.getName()); //$NON-NLS-1$ 
-			sconfig.createFileInfo(project.getFullPath(), "remoteConnection", provider.getRemoteConnection()); //$NON-NLS-1$ 
-			sconfig.createFileInfo(project.getFullPath(), "remoteLocation", provider.getLocation()); //$NON-NLS-1$ 
-			
 			smm.addConfiguration(project, config);
 
 			try {
@@ -88,6 +81,23 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 				RDTSyncUIPlugin.log(e.toString(), e);
 			}
 		}
+		
+		// Register this initial build scenario with the service model manager
+		ISyncServiceProvider provider = participant.getProvider(project);
+		BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection().getName(),
+																										provider.getLocation());
+		ServiceModelManager.getInstance().addBuildScenario(project, buildScenario);
+
+		// Add information about remote location to the initial build configuration (.cproject file)
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
+		}
+		buildInfo.getDefaultConfiguration().createFileInfo(project.getFullPath(), "remoteSyncProvider", provider.getName()); //$NON-NLS-1$ 
+		buildInfo.getDefaultConfiguration().createFileInfo(project.getFullPath(), "remoteConnection", //$NON-NLS-1$
+																					provider.getRemoteConnection().getName());
+		buildInfo.getDefaultConfiguration().createFileInfo(project.getFullPath(), "remoteLocation", provider.getLocation()); //$NON-NLS-1$ 
+		ManagedBuildManager.saveBuildInfo(project, true);
 
 		monitor.done();
 	}

@@ -233,9 +233,19 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @since 2.1
 	 */
 	public void addBuildScenario(IProject project, BuildScenario buildScenario) {
+		checkAndLoadModel();
 		IServiceConfiguration sConfig = this.copyActiveServiceConfiguration(project);
 		this.modifyServiceConfigurationForBuildScenario(sConfig, buildScenario);
 		fProjectBuildScenarioToSConfigMap.get(project).put(buildScenario, sConfig);
+		
+		// Update service model manager data structures
+		// We do not want to change the active configuration, so we store it and reset it after updating data structures. This is
+		// necessary according to the interface documentation but not necessary for this implementation, which does not change
+		// the active configuration.
+		IServiceConfiguration activeConfig = this.getActiveConfiguration(project);
+		this.addConfiguration(sConfig);
+		this.addConfiguration(project, sConfig);
+		this.setActiveConfiguration(project, activeConfig);
 	}
 	
 	private IServiceConfiguration copyActiveServiceConfiguration(IProject project) {
@@ -245,6 +255,8 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		for (IService service : oldConfig.getServices()) {
 			ServiceProvider oldProvider = (ServiceProvider) oldConfig.getServiceProvider(service);
 			try {
+				// The memento creation methods seem the most robust way to copy state. It is more robust than getProperties() and
+				// setProperties(), which saveState() and restoreState() use by default but which can be overriden by subclasses.
 				ServiceProvider newProvider = oldProvider.getClass().newInstance();
 				XMLMemento oldProviderState = XMLMemento.createWriteRoot(PROVIDER_ELEMENT_NAME);
 				oldProvider.saveState(oldProviderState);
@@ -428,6 +440,22 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	public IServiceConfiguration getConfiguration(String id) {
 		checkAndLoadModel();
 		return fConfigurations.get(id);
+	}
+	
+	/**
+	 * Return the service configuration that should be used for a given project and build scenario
+	 * 
+	 * @param project
+	 * @param buildScenario
+	 * @return service configuration
+	 */
+	public IServiceConfiguration getConfigurationForBuildScenario(IProject project, BuildScenario buildScenario) {
+		checkAndLoadModel();
+		Map<BuildScenario, IServiceConfiguration> buildMap = fProjectBuildScenarioToSConfigMap.get(project);
+		if (buildMap == null) {
+			throw new RuntimeException("Project not found: " + project.getName());
+		}
+		return buildMap.get(buildScenario);
 	}
 
 	/*
