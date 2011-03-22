@@ -47,7 +47,7 @@ public class JAXBRMConfigurationManager implements IJAXBNonNLSConstants {
 	}
 
 	public void addExternalPath(String path) {
-		if (new File(path).exists()) {
+		if (new File(path).exists()) { // needs to support remote TODO
 			external.put(path, null);
 		}
 	}

@@ -14,9 +14,8 @@ import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.ui.wizards.AbstractConfigurationWizardPage;
+import org.eclipse.ptp.rm.ui.dialogs.ConnectionChoiceContainer;
 import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
-import org.eclipse.ptp.rm.ui.wizards.WizardPageDataSource;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
 /**
@@ -27,9 +26,38 @@ import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
  */
 public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage {
 
-	private class JAXBRMDataSource extends RMDataSource {
-		protected JAXBRMDataSource(AbstractConfigurationWizardPage page) {
+	private class JAXBRMConnectionChoiceContainer extends RMConnectionChoiceContainer {
+
+		private class JAXBRMDataSource extends RMDataSource {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ptp.rm.ui.wizards.
+			 * AbstractRemoteResourceManagerConfigurationWizardPage
+			 * .RMDataSource#loadFromStorage()
+			 */
+			@Override
+			protected void loadFromStorage() {
+				IJAXBResourceManagerConfiguration config = (IJAXBResourceManagerConfiguration) getConfiguration();
+				try {
+					config.realizeRMDataFromXML();
+				} catch (Throwable t) {
+					JAXBUIPlugin.log(t);
+				}
+				super.loadFromStorage();
+			}
+		}
+
+		protected JAXBRMConnectionChoiceContainer(AbstractRemoteResourceManagerConfigurationWizardPage page) {
 			super(page);
+		}
+
+		@Override
+		public RMDataSource getDataSource() {
+			if (dataSource == null) {
+				dataSource = new JAXBRMDataSource();
+			}
+			return dataSource;
 		}
 
 		/*
@@ -37,18 +65,18 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 		 * 
 		 * @see org.eclipse.ptp.rm.ui.wizards.
 		 * AbstractRemoteResourceManagerConfigurationWizardPage
-		 * .RMDataSource#loadFromStorage()
+		 * #handleNewRemoteConnectionSelected()
 		 */
 		@Override
-		protected void loadFromStorage() {
-			IJAXBResourceManagerConfiguration config = (IJAXBResourceManagerConfiguration) getConfiguration();
-			try {
-				config.realizeRMDataFromXML();
-			} catch (Throwable t) {
-				JAXBUIPlugin.log(t);
+		protected void handleNewRemoteConnectionSelected() {
+			if (getRemoteUIConnectionManager() != null) {
+				String[] hints = new String[] { ConfigFactory.ATTR_CONNECTION_ADDRESS, ConfigFactory.ATTR_CONNECTION_PORT };
+				String[] defaults = new String[] { getConfiguration().getDefaultControlHost(),
+						getConfiguration().getDefaultControlPort() };
+				handleRemoteServiceSelected(getRemoteUIConnectionManager().newConnection(getShell(), hints, defaults));
 			}
-			super.loadFromStorage();
 		}
+
 	}
 
 	public JAXBRMControlConfigurationWizardPage(IRMConfigurationWizard wizard) {
@@ -58,15 +86,12 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 		setDescription(Messages.JAXBConnectionWizardPage_Description);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.ui.wizards.
-	 * AbstractRemoteResourceManagerConfigurationWizardPage#createDataSource()
-	 */
 	@Override
-	protected WizardPageDataSource createDataSource() {
-		return new JAXBRMDataSource(this);
+	protected ConnectionChoiceContainer getChoiceContainer() {
+		if (choiceContainer == null) {
+			choiceContainer = new JAXBRMConnectionChoiceContainer(this);
+		}
+		return choiceContainer;
 	}
 
 	/*
@@ -78,22 +103,5 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 	@Override
 	protected IJAXBResourceManagerConfiguration getConfiguration() {
 		return (IJAXBResourceManagerConfiguration) super.getConfiguration();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.ui.wizards.
-	 * AbstractRemoteResourceManagerConfigurationWizardPage
-	 * #handleNewRemoteConnectionSelected()
-	 */
-	@Override
-	protected void handleNewRemoteConnectionSelected() {
-		if (getRemoteUIConnectionManager() != null) {
-			String[] hints = new String[] { ConfigFactory.ATTR_CONNECTION_ADDRESS, ConfigFactory.ATTR_CONNECTION_PORT };
-			String[] defaults = new String[] { getConfiguration().getDefaultControlHost(),
-					getConfiguration().getDefaultControlPort() };
-			handleRemoteServiceSelected(getRemoteUIConnectionManager().newConnection(getShell(), hints, defaults));
-		}
 	}
 }

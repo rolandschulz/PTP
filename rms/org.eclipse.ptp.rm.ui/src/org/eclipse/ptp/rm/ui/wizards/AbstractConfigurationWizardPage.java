@@ -31,26 +31,12 @@ public abstract class AbstractConfigurationWizardPage extends RMConfigurationWiz
 		super(wizard, pageName);
 	}
 
-	/**
-	 * Create listener for the wizard page. The listener must extend
-	 * {@link WizardPageWidgetListener} and add specific behavior for widgets of
-	 * the the preference page.
-	 * 
-	 * @return the listener
-	 */
-	protected abstract WizardPageWidgetListener createListener();
-
-	/**
-	 * Create data source to handle page content. The listener must extend
-	 * {@link WizardPageDataSource} and add specific behavior for widgets of the
-	 * the preference page.
-	 * 
-	 * @return the listener
-	 */
-	protected abstract WizardPageDataSource createDataSource();
-
-	protected WizardPageWidgetListener getWidgetListener() {
-		return listener;
+	@Override
+	public void createControl(Composite parent) {
+		listener.disable();
+		Composite composite = doCreateContents(parent);
+		setControl(composite);
+		listener.enable();
 	}
 
 	public WizardPageDataSource getDataSource() {
@@ -99,20 +85,34 @@ public abstract class AbstractConfigurationWizardPage extends RMConfigurationWiz
 		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
 	}
 
+	/**
+	 * Create data source to handle page content. The listener must extend
+	 * {@link WizardPageDataSource} and add specific behavior for widgets of the
+	 * the preference page.
+	 * 
+	 * @return the listener
+	 */
+	protected abstract WizardPageDataSource createDataSource();
+
+	/**
+	 * Create listener for the wizard page. The listener must extend
+	 * {@link WizardPageWidgetListener} and add specific behavior for widgets of
+	 * the the preference page.
+	 * 
+	 * @return the listener
+	 */
+	protected abstract WizardPageWidgetListener createListener();
+
+	protected abstract Composite doCreateContents(Composite composite);
+
+	protected WizardPageWidgetListener getWidgetListener() {
+		return listener;
+	}
+
 	protected void resetErrorMessages() {
 		setPageComplete(true);
 		setErrorMessage(null);
 		setMessage(null);
 	}
-
-	@Override
-	public void createControl(Composite parent) {
-		listener.disable();
-		Composite composite = doCreateContents(parent);
-		setControl(composite);
-		listener.enable();
-	}
-
-	protected abstract Composite doCreateContents(Composite composite);
 
 }

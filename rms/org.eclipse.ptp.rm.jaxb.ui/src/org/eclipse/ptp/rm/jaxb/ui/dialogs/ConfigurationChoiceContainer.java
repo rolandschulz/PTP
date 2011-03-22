@@ -10,22 +10,19 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.dialogs;
 
-import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBRMConfigurationManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
+import org.eclipse.ptp.rm.jaxb.ui.util.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -58,14 +55,8 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 				handlePresetSelected();
 			} else if (source == external) {
 				handleExternalSelected();
-			} else if (source == browseHomeButton) {
-				handlePathBrowseButtonSelected(ConfigUtils.getUserHome());
-			} else if (source == browseProjectButton) {
-				try {
-					handlePathBrowseButtonSelected(ConfigUtils.chooseLocalProject(shell));
-				} catch (Throwable t) {
-					JAXBUIPlugin.log(t);
-				}
+			} else if (source == browseButton) {
+				handlePathBrowseButtonSelected();
 			}
 			onUpdate();
 		}
@@ -82,14 +73,15 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 	private final Text choice;
 	private final Combo preset;
 	private final Combo external;
-	private final Button browseHomeButton;
-	private final Button browseProjectButton;
+	private final Button browseButton;
 	private final WidgetListener listener;
 	private final Shell shell;
+	private ConnectionChoiceDialog connectionDialog;
 
 	private String selected;
 	private boolean isPreset;
 	private IJAXBResourceManagerConfiguration config;
+	private RemoteServicesDelegate delegate;
 	private IMemento memento;
 	private JAXBRMConfigurationManager available;
 
@@ -119,9 +111,7 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 		external = WidgetBuilderUtils.createCombo(group, 2, new String[0], ZEROSTR,
 				Messages.JAXBRMConfigurationSelectionComboTitle_1, ZEROSTR, listener);
 
-		browseHomeButton = WidgetBuilderUtils.createPushButton(group, Messages.JAXBRMConfigurationSelectionWizardPage_1, listener);
-		browseProjectButton = WidgetBuilderUtils.createPushButton(group, Messages.JAXBRMConfigurationSelectionWizardPage_2,
-				listener);
+		browseButton = WidgetBuilderUtils.createPushButton(group, Messages.JAXBRMConfigurationSelectionWizardPage_1, listener);
 
 		selected = ZEROSTR;
 		isPreset = true;
@@ -195,6 +185,10 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 		this.config = config;
 	}
 
+	public void setDelegate(RemoteServicesDelegate delegate) {
+		this.delegate = delegate;
+	}
+
 	public void setExternalRMInstanceXMLLocations(String[] locations) {
 		if (locations == null || locations.length == 0) {
 			memento.putString(EXTERNAL_RM_XSD_PATHS, ZEROSTR);
@@ -240,25 +234,37 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 		choice.setText(text);
 	}
 
-	private void handlePathBrowseButtonSelected(File initPath) {
-		if (initPath == null) {
+	private void handlePathBrowseButtonSelected() {
+
+		if (Window.OK != openConnectionChoiceDialog()) {
 			return;
 		}
-		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
-		IRemoteUIServices localUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(localServices);
-		if (localServices != null && localUIServices != null) {
-			IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
-			IRemoteConnection lconn = lconnMgr.getConnection(ZEROSTR);
-			IRemoteUIFileManager localUIFileMgr = localUIServices.getUIFileManager();
-			localUIFileMgr.setConnection(lconn);
-			String result = localUIFileMgr.browseFile(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0,
-					initPath.getAbsolutePath(), 0);
-			if (result != null) {
-				selected = result;
-				choice.setText(selected);
-				isPreset = false;
-				updateExternal();
-			}
+
+		IRemoteResourceManagerConfiguration c = connectionDialog.getConfig();
+		String id = c.getRemoteServicesId();
+		String name = c.getConnectionName();
+		if (delegate == null) {
+			delegate = new RemoteServicesDelegate(id, name);
+		}
+
+		URI uri = null;
+		if (name == null || name.indexOf(LOCAL) >= 0) {
+			uri = delegate.getLocalHome();
+		} else {
+			uri = delegate.getRemoteHome();
+		}
+
+		try {
+			uri = RemoteUIServicesUtils.browse(shell, uri, delegate);
+		} catch (URISyntaxException t) {
+			t.printStackTrace();
+		}
+
+		if (uri != null) {
+			selected = uri.toString();
+			choice.setText(selected);
+			isPreset = false;
+			updateExternal();
 		}
 	}
 
@@ -279,6 +285,11 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 		}
 
 		choice.setText(text);
+	}
+
+	private int openConnectionChoiceDialog() {
+		connectionDialog = new ConnectionChoiceDialog(shell);
+		return connectionDialog.open();
 	}
 
 	private void updateExternal() {

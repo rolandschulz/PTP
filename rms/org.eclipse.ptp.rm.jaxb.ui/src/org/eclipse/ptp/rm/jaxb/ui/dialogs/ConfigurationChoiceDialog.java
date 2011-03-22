@@ -21,7 +21,6 @@ import org.eclipse.ui.IViewPart;
 
 public class ConfigurationChoiceDialog extends Dialog implements IJAXBUINonNLSConstants {
 
-	private ConfigurationChoiceContainer container;
 	private final IJAXBResourceManagerConfiguration config;
 	private final IMemento memento;
 	private String choice;
@@ -66,7 +65,7 @@ public class ConfigurationChoiceDialog extends Dialog implements IJAXBUINonNLSCo
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
-		container = new ConfigurationChoiceContainer(composite) {
+		ConfigurationChoiceContainer container = new ConfigurationChoiceContainer(composite) {
 			@Override
 			protected void onUpdate() {
 				String selected = getSelected();

@@ -11,6 +11,8 @@
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -18,19 +20,13 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
+import org.eclipse.ptp.rm.jaxb.ui.util.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
@@ -63,14 +59,21 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			selected = choice.getText();
+			String uriStr = choice.getText();
+			if (!ZEROSTR.equals(selected)) {
+				try {
+					selected = new URI(uriStr);
+				} catch (URISyntaxException t) {
+					throw new ValidationException(Messages.ErrorOnCopyFromFields);
+				}
+			}
 			contents = editor.getText();
 		}
 
 		@Override
 		protected void copyToFields() {
 			if (selected != null) {
-				choice.setText(selected);
+				choice.setText(selected.toString());
 			}
 			if (contents != null) {
 				listener.toContents = true;
@@ -87,10 +90,10 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 				return;
 			}
 
-			if (ZEROSTR.equals(selected)) {
+			if (null == selected) {
 				config.removeAttribute(SCRIPT_PATH);
 			} else {
-				config.setAttribute(SCRIPT_PATH, selected);
+				config.setAttribute(SCRIPT_PATH, selected.toString());
 			}
 
 			if (ZEROSTR.equals(contents)) {
@@ -112,9 +115,12 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 				return;
 			}
 			try {
-				selected = config.getAttribute(SCRIPT_PATH, ZEROSTR);
+				String uriStr = config.getAttribute(SCRIPT_PATH, ZEROSTR);
+				if (!ZEROSTR.equals(selected)) {
+					selected = new URI(uriStr);
+				}
 				contents = config.getAttribute(SCRIPT, ZEROSTR);
-			} catch (CoreException t) {
+			} catch (Throwable t) {
 				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnLoadFromStore, Messages.ErrorOnLoadTitle,
 						false);
 			}
@@ -166,17 +172,13 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			Object source = e.getSource();
 			try {
 				if (source == browseHomeButton) {
-					selected = handlePathBrowseButtonSelected(ConfigUtils.getUserHome(), IRemoteUIConstants.OPEN);
-					updateContents();
-				} else if (source == browseProjectButton) {
-					selected = handlePathBrowseButtonSelected(ConfigUtils.chooseLocalProject(control.getShell()),
-							IRemoteUIConstants.OPEN);
+					selected = RemoteUIServicesUtils.browse(control.getShell(), RemoteUIServicesUtils.getUserHome(), delegate);
 					updateContents();
 				} else if (source == saveToFile) {
-					if (ZEROSTR.equals(selected)) {
+					if (null == selected) {
 						return;
 					}
-					String newPath = ConfigUtils.writeContentsToFile(control.getShell(), contents, new File(selected));
+					URI newPath = RemoteUIServicesUtils.writeContentsToFile(control.getShell(), contents, selected);
 					if (newPath != null) {
 						selected = newPath;
 						updateContents();
@@ -184,7 +186,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 				} else if (source == revert) {
 					updateContents();
 				} else if (source == clear) {
-					selected = ZEROSTR;
+					selected = null;
 					updateContents();
 				}
 				super.widgetSelected(e);
@@ -196,14 +198,13 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 	}
 
 	private final JAXBRMLaunchConfigurationDynamicTab pTab;
+	private final RemoteServicesDelegate delegate;
 	private final String title;
 
 	private Composite control;
 	private Text choice;
 	private Text editor;
 	private Button browseHomeButton;
-
-	private Button browseProjectButton;
 	private Button saveToFile;
 	private Button revert;
 	private Button clear;
@@ -211,7 +212,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 	private JAXBBatchScriptDataSource dataSource;
 	private JAXBBatchScriptWidgetListener listener;
 
-	private String selected;
+	private URI selected;
 	private String contents;
 	private boolean fileDirty;
 	private boolean loading;
@@ -227,6 +228,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			title = Messages.CustomBatchScriptTab_title;
 		}
 		this.title = title;
+		this.delegate = rm.getRemoteServicesDelegate();
 	}
 
 	@Override
@@ -246,10 +248,8 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 		Composite comp = WidgetBuilderUtils.createComposite(control, SWT.NONE, layout, gd);
 		WidgetBuilderUtils.createLabel(comp, Messages.BatchScriptPath, SWT.LEFT, 1);
 		GridData gdsub = WidgetBuilderUtils.createGridDataFillH(3);
-		choice = WidgetBuilderUtils.createText(comp, SWT.BORDER, gdsub, true, selected);
+		choice = WidgetBuilderUtils.createText(comp, SWT.BORDER, gdsub, true, selected.toString());
 		browseHomeButton = WidgetBuilderUtils.createPushButton(comp, Messages.JAXBRMConfigurationSelectionWizardPage_1, listener);
-		browseProjectButton = WidgetBuilderUtils
-				.createPushButton(comp, Messages.JAXBRMConfigurationSelectionWizardPage_2, listener);
 
 		layout = WidgetBuilderUtils.createGridLayout(1, true);
 		gd = WidgetBuilderUtils.createGridData(GridData.FILL_BOTH, true, true, 130, 300, 1, DEFAULT);
@@ -265,7 +265,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 		saveToFile = WidgetBuilderUtils.createPushButton(comp, Messages.SaveToFileButton, listener);
 		revert = WidgetBuilderUtils.createPushButton(comp, Messages.RevertScript, listener);
 		clear = WidgetBuilderUtils.createPushButton(comp, Messages.ClearScript, listener);
-		selected = ZEROSTR;
+		selected = null;
 		pTab.resize(control);
 		fileDirty = false;
 		updateControls();
@@ -321,24 +321,6 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			listener = new JAXBBatchScriptWidgetListener(this);
 		}
 		return listener;
-	}
-
-	private String handlePathBrowseButtonSelected(File initPath, int opt) {
-		if (initPath == null) {
-			return ZEROSTR;
-		}
-		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
-		IRemoteUIServices localUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(localServices);
-		String path = null;
-		if (localServices != null && localUIServices != null) {
-			IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
-			IRemoteConnection lconn = lconnMgr.getConnection(ZEROSTR);
-			IRemoteUIFileManager localUIFileMgr = localUIServices.getUIFileManager();
-			localUIFileMgr.setConnection(lconn);
-			path = localUIFileMgr.browseFile(control.getShell(), Messages.JAXBRMConfigurationSelectionWizardPage_0,
-					initPath.getAbsolutePath(), opt);
-		}
-		return path == null ? ZEROSTR : path;
 	}
 
 	private void updateContents() throws Throwable {

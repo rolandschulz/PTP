@@ -504,10 +504,10 @@
 					<xs:attribute name="tooltip" type="xs:boolean" default="true"/>
 					<xs:attribute name="description" type="xs:boolean" default="true"/>
 					<xs:attribute name="allPredefined" type="xs:boolean" default="false"/>
-					<xs:attribute name="allDiscovered" type="xs:boolean" default="true"/>
+					<xs:attribute name="allDiscovered" type="xs:boolean" default="false"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="ref" maxOccurs="unbounded" type="xs:string"/>
+			<xs:element name="ref" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="match">
