@@ -10,23 +10,22 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.actions;
 
-import java.io.File;
+import java.net.URI;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.ConfigurationChoiceDialog;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
+import org.eclipse.ptp.rm.jaxb.ui.util.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.ui.views.ResourceManagerView;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.ide.IDE;
 
 public class OpenResourceManagerEditor implements IViewActionDelegate, IJAXBUINonNLSConstants {
@@ -49,21 +48,20 @@ public class OpenResourceManagerEditor implements IViewActionDelegate, IJAXBUINo
 		}
 
 		try {
-			File fileToOpen = null;
+			URI uri = new URI(selected);
+			URI fileToOpen = null;
 			if (dialog.isPreset()) {
-				fileToOpen = ConfigUtils.exportResource(selected, view.getSite().getShell());
+				fileToOpen = RemoteUIServicesUtils.exportResource(uri, view.getSite().getShell());
 				if (fileToOpen == null) {
 					return;
 				}
 			} else {
-				fileToOpen = new File(selected);
+				fileToOpen = uri;
 			}
 
-			if (fileToOpen.exists() && fileToOpen.isFile()) {
-				IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
-				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-				IDE.openEditorOnFileStore(page, fileStore);
-			}
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			IDE.openEditor(page, uri, EditorsUI.DEFAULT_TEXT_EDITOR_ID, true);
+			// }
 		} catch (Throwable t) {
 			WidgetActionUtils.errorMessage(view.getSite().getShell(), t, Messages.OpenResourceManagerEditorAction_error,
 					Messages.OpenResourceManagerEditorAction_title, false);

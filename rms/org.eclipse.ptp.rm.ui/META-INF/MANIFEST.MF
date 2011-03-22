@@ -20,6 +20,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.ui
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.rm.ui,
+ org.eclipse.ptp.rm.ui.dialogs,
  org.eclipse.ptp.rm.ui.launch,
  org.eclipse.ptp.rm.ui.preferences,
  org.eclipse.ptp.rm.ui.utils,

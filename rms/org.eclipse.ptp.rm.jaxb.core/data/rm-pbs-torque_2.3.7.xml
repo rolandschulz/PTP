@@ -63,12 +63,17 @@
 			</description>
 			<default>true</default>
 		</job-attribute>
-		<job-attribute name="group_list" type="string">
-			<description>A list of group_names@hosts which determines the group under which the job is run on a given host.</description>
-			<tooltip>Format: group_name[@host][,group_name[@host]...]. When a job is to be placed into execution, the server will select a group
-				name according to the following ordered set of rules: 1) Select the group name from the list for which the associated host name
-				matches the name of the execution host; 2) Select the group name which has no associated host name, the wildcard name; 3) Use the
-				login group for the username under which the job will be run.
+		<job-attribute name="group-descriptor_list" type="string">
+			<description>A list of group-descriptor_names@hosts which determines the group-descriptor under which the job is run on a given
+				host.
+			</description>
+			<tooltip>Format: group-descriptor_name[@host][,group-descriptor_name[@host]...]. When a job is to be placed into execution, the
+				server will select a group-descriptor
+				name according to the following ordered set of rules: 1) Select the group-descriptor name from
+				the list for which the associated host name
+				matches the name of the execution host; 2) Select the group-descriptor name which has no
+				associated host name, the wildcard name; 3) Use the
+				login group-descriptor for the username under which the job will be run.
 			</tooltip>
 		</job-attribute>
 		<job-attribute name="Hold_Types" type="choice">
@@ -234,7 +239,7 @@
 			<directive valueFrom="directive"># @ PBS -C </directive>
 			<directive valueFrom="Error_Path"># @ PBS -e </directive>
 			<directive valueFrom="export_all"># @ PBS -V </directive>
-			<directive valueFrom="group_list"># @ PBS -W group_list=</directive>
+			<directive valueFrom="group-descriptor_list"># @ PBS -W group-descriptor_list=</directive>
 			<directive valueFrom="Hold_Types"># @ PBS -h </directive>
 			<directive valueFrom="Job_Name"># @ PBS -N </directive>
 			<directive valueFrom="Join_Path"># @ PBS -j </directive>
@@ -391,7 +396,7 @@
 		<launch-tab>
 			<basic>
 				<title>Basic PBS Settings</title>
-				<group>
+				<group-descriptor>
 					<grid-layout numColumns="3"/>
 					<!-- row 1 -->
 					<widget type="text" valueFrom="Job_Name" saveAs="Job_Name">
@@ -439,8 +444,8 @@
 					</widget>
 					<widget type="label">
 						<displayValue>
-                     <arg>${rm:mpiCommand#description}</arg>
-                  </displayValue>
+							<arg>${rm:mpiCommand#description}</arg>
+						</displayValue>
 					</widget>
 					<!-- row 6 -->
 					<widget type="spinner" readOnly="true" valueFrom="mpiCores" saveAs="mpiCores">
@@ -451,17 +456,19 @@
 							<arg>${rm:mpiCores#description}</arg>
 						</displayValue>
 					</widget>
-				</group>
+				</group-descriptor>
 			</basic>
 			<advanced dynamic="true">
 				<title>Advanced PBS Settings</title>
-				<group dynamic="true" scrollable="true">
+				<group-descriptor>
 					<grid-layout numColumns="3"/>
 					<!-- iterates through all registered attributes, one to a row -->
-					<all-attributes>
-						<include sort="true" headers="true" name="true" tooltip="true" description="true"/>
-					</all-attributes>
-				</group>
+					<viewer sort="true" type="table">
+						<items>
+							<include headers="true" name="true" tooltip="true" description="true" allPredefined="true"/>
+						</items>
+					</viewer>
+				</group-descriptor>
 			</advanced>
 			<custom-controller>Import PBS Script</custom-controller>
 		</launch-tab>

@@ -1,5 +1,7 @@
 package org.eclipse.ptp.rm.jaxb.core.utils;
 
+import java.net.URI;
+
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -17,6 +19,8 @@ public class RemoteServicesDelegate implements IJAXBNonNLSConstants {
 	private final IRemoteConnection localConnection;
 	private final IRemoteFileManager remoteFileManager;
 	private final IRemoteFileManager localFileManager;
+	private final URI localHome;
+	private final URI remoteHome;
 
 	public RemoteServicesDelegate(String remoteServicesId, String remoteConnectionName) {
 		localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
@@ -31,14 +35,25 @@ public class RemoteServicesDelegate implements IJAXBNonNLSConstants {
 		assert (localConnection != null);
 		localFileManager = localServices.getFileManager(localConnection);
 		assert (localFileManager != null);
-		remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, new NullProgressMonitor());
-		assert (null != remoteServices);
-		remoteConnectionManager = remoteServices.getConnectionManager();
-		assert (null != remoteConnectionManager);
-		remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
-		assert (null != remoteConnection);
-		remoteFileManager = remoteServices.getFileManager(remoteConnection);
-		assert (null != remoteFileManager);
+
+		if (remoteServicesId != null) {
+			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, new NullProgressMonitor());
+			assert (null != remoteServices);
+			remoteConnectionManager = remoteServices.getConnectionManager();
+			assert (null != remoteConnectionManager);
+			remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
+			assert (null != remoteConnection);
+			remoteFileManager = remoteServices.getFileManager(remoteConnection);
+			assert (null != remoteFileManager);
+		} else {
+			remoteServices = localServices;
+			remoteConnectionManager = localConnectionManager;
+			remoteConnection = localConnection;
+			remoteFileManager = localFileManager;
+		}
+
+		localHome = localFileManager.toURI(localConnection.getWorkingDirectory());
+		remoteHome = remoteFileManager.toURI(remoteConnection.getWorkingDirectory());
 	}
 
 	public IRemoteConnection getLocalConnection() {
@@ -51,6 +66,10 @@ public class RemoteServicesDelegate implements IJAXBNonNLSConstants {
 
 	public IRemoteFileManager getLocalFileManager() {
 		return localFileManager;
+	}
+
+	public URI getLocalHome() {
+		return localHome;
 	}
 
 	public IRemoteServices getLocalServices() {
@@ -67,6 +86,10 @@ public class RemoteServicesDelegate implements IJAXBNonNLSConstants {
 
 	public IRemoteFileManager getRemoteFileManager() {
 		return remoteFileManager;
+	}
+
+	public URI getRemoteHome() {
+		return remoteHome;
 	}
 
 	public IRemoteServices getRemoteServices() {

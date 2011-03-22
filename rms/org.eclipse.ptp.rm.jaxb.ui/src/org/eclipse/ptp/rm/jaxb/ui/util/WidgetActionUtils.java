@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.jaxb.ui.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,6 +21,8 @@ import java.util.Date;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -32,6 +35,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedMatchException;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -40,10 +44,31 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.dialogs.ElementListSelectionDialog;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 
 	private WidgetActionUtils() {
+	}
+
+	/**
+	 * Open a dialog that allows the user to choose a project.
+	 * 
+	 * @return selected project
+	 */
+	public static URI chooseProject(Shell shell) {
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
+		ElementListSelectionDialog dialog = new ElementListSelectionDialog(shell, labelProvider);
+		dialog.setTitle(Messages.JAXBRMConfigurationSelectionWizardPage_Project_Selection_Title);
+		dialog.setMessage(Messages.JAXBRMConfigurationSelectionWizardPage_Project_Selection_Message);
+		dialog.setElements(projects);
+		if (dialog.open() == Window.OK) {
+			IProject p = (IProject) dialog.getFirstResult();
+			return p.getLocationURI();
+		}
+		return null;
 	}
 
 	public static void errorMessage(Shell s, Throwable e, String message, String title, boolean causeTrace) {

@@ -93,6 +93,9 @@ public class Messages extends NLS {
 	public static String UnsupportedColumnType;
 	public static String TreeDataLabelProviderColumnError;
 	public static String TableDataLabelProviderColumnError;
+	public static String RemoteConnectionSelection;
+	public static String JAXBRMConnectionChoiceTitle;
+	public static String ErrorOnCopyFromFields;
 
 	static {
 		// initialize resource bundle

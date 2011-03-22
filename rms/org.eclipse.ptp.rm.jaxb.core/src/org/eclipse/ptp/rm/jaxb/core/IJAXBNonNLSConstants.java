@@ -101,6 +101,7 @@ public interface IJAXBNonNLSConstants {
 	String SELECTED = "visible";//$NON-NLS-1$
 	String THIS = "this.";//$NON-NLS-1$
 	String JOB_ID_TAG = "@jobId@";//$NON-NLS-1$
+	String LOCAL = "local";//$NON-NLS-1$
 
 	/* STANDARD PROPERTIES */
 	String ID = "id";//$NON-NLS-1$

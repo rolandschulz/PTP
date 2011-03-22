@@ -20,45 +20,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.dialogs.ElementListSelectionDialog;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 public class ConfigUtils implements IJAXBUINonNLSConstants {
 
 	private ConfigUtils() {
-	}
-
-	/**
-	 * Open a dialog that allows the user to choose a project.
-	 * 
-	 * @return selected project
-	 */
-	public static File chooseLocalProject(Shell shell) {
-		IProject[] projects = getLocalProjects();
-		WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(shell, labelProvider);
-		dialog.setTitle(Messages.JAXBRMConfigurationSelectionWizardPage_Project_Selection_Title);
-		dialog.setMessage(Messages.JAXBRMConfigurationSelectionWizardPage_Project_Selection_Message);
-		dialog.setElements(projects);
-		if (dialog.open() == Window.OK) {
-			IProject project = (IProject) dialog.getFirstResult();
-			return new File(project.getLocationURI());
-		}
-		return null;
 	}
 
 	public static File exportResource(String resource, Shell shell) throws Throwable {
@@ -135,14 +108,6 @@ public class ConfigUtils implements IJAXBUINonNLSConstants {
 		return buffer.toString();
 	}
 
-	public static File getUserHome() {
-		return new File(System.getProperty(JAVA_USER_HOME));
-	}
-
-	public static IWorkspaceRoot getWorkspaceRoot() {
-		return ResourcesPlugin.getWorkspace().getRoot();
-	}
-
 	public static String writeContentsToFile(Shell shell, String contents, File file) throws Throwable {
 		FileDialog fileDialog = new FileDialog(shell, SWT.SINGLE | SWT.SAVE);
 		fileDialog.setText(Messages.ConfigUtils_exportResourceTitle);
@@ -158,16 +123,5 @@ public class ConfigUtils implements IJAXBUINonNLSConstants {
 		fw.flush();
 		fw.close();
 		return path;
-	}
-
-	private static IProject[] getLocalProjects() {
-		IProject[] all = getWorkspaceRoot().getProjects();
-		List<IProject> local = new ArrayList<IProject>();
-		for (IProject p : all) {
-			if (FILE_SCHEME.equals(p.getLocationURI().getScheme())) {
-				local.add(p);
-			}
-		}
-		return local.toArray(new IProject[0]);
 	}
 }

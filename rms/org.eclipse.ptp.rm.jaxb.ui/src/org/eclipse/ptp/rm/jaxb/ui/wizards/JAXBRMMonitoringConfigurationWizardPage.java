@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.jaxb.ui.wizards;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.ui.dialogs.ConnectionChoiceContainer;
 import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
@@ -24,6 +25,31 @@ import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
  */
 public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage {
 
+	private class JAXBRMConnectionChoiceContainer extends RMConnectionChoiceContainer {
+
+		protected JAXBRMConnectionChoiceContainer(AbstractRemoteResourceManagerConfigurationWizardPage page) {
+			super(page);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rm.ui.wizards.
+		 * AbstractRemoteResourceManagerConfigurationWizardPage
+		 * #handleNewRemoteConnectionSelected()
+		 */
+		@Override
+		protected void handleNewRemoteConnectionSelected() {
+			if (getRemoteUIConnectionManager() != null) {
+				String[] hints = new String[] { IRemoteUIConnectionManager.CONNECTION_ADDRESS_HINT,
+						IRemoteUIConnectionManager.CONNECTION_PORT_HINT };
+				String[] defaults = new String[] { getConfiguration().getDefaultMonitorHost(),
+						getConfiguration().getDefaultMonitorPort() };
+				handleRemoteServiceSelected(getRemoteUIConnectionManager().newConnection(getShell(), hints, defaults));
+			}
+		}
+	}
+
 	public JAXBRMMonitoringConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		this(wizard, Messages.JAXBRMMonitoringConfigurationWizardPage_Title);
 	}
@@ -33,7 +59,15 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 		setPageComplete(false);
 		setTitle(Messages.JAXBRMMonitoringConfigurationWizardPage_Title);
 		setDescription(Messages.JAXBConnectionWizardPage_Description);
-		setEnableUseDefault(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3b);
+		choiceContainer.setEnableUseDefault(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3b);
+	}
+
+	@Override
+	protected ConnectionChoiceContainer getChoiceContainer() {
+		if (choiceContainer == null) {
+			choiceContainer = new JAXBRMConnectionChoiceContainer(this);
+		}
+		return choiceContainer;
 	}
 
 	/*
@@ -45,23 +79,5 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 	@Override
 	protected IJAXBResourceManagerConfiguration getConfiguration() {
 		return (IJAXBResourceManagerConfiguration) super.getConfiguration();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.ui.wizards.
-	 * AbstractRemoteResourceManagerConfigurationWizardPage
-	 * #handleNewRemoteConnectionSelected()
-	 */
-	@Override
-	protected void handleNewRemoteConnectionSelected() {
-		if (getRemoteUIConnectionManager() != null) {
-			String[] hints = new String[] { IRemoteUIConnectionManager.CONNECTION_ADDRESS_HINT,
-					IRemoteUIConnectionManager.CONNECTION_PORT_HINT };
-			String[] defaults = new String[] { getConfiguration().getDefaultMonitorHost(),
-					getConfiguration().getDefaultMonitorPort() };
-			handleRemoteServiceSelected(getRemoteUIConnectionManager().newConnection(getShell(), hints, defaults));
-		}
 	}
 }

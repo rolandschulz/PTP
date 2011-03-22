@@ -213,10 +213,6 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	private static final String xml = DATA + "rm-pbs-torque_2.3.7.xml"; //$NON-NLS-1$
-
-	// set the exec dir in the config to the data dir of this plugin
-	private static final String targetPath = "qsub"; //$NON-NLS-1$
-
 	private JAXBServiceProvider rmConfig;
 	private JAXBResourceManager rm;
 	private ILaunchConfiguration launchConfig;
@@ -283,11 +279,6 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		assert (localConnection != null);
 		rmConfig.setRemoteServicesId(localServices.getId());
 		rmConfig.setConnectionName(localConnection.getName());
-		// rmConfig.setConnectionName(localConnection.getName(),
-		// CONTROL_CONNECTION_NAME);
-		// rmConfig.setControlUserName(localConnection.getUsername());
-		// rmConfig.setControlAddress(localConnection.getAddress());
-		// rmConfig.setControlPath(targetPath);
 	}
 
 	@SuppressWarnings("unchecked")

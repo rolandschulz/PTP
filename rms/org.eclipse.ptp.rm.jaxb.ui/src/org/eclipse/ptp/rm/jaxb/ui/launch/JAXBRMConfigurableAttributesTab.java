@@ -22,7 +22,6 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
@@ -32,6 +31,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
+import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -240,7 +240,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 					Validator v = ja.getValidator();
 					if (v != null) {
 						try {
-							WidgetActionUtils.validate(c, v, ja.getDefault(), fileManager);
+							WidgetActionUtils.validate(c, v, ja.getDefault(), delegate.getRemoteFileManager());
 						} catch (Throwable t) {
 							throw new ValidationException(t.getMessage());
 						}
@@ -293,7 +293,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 	}
 
-	private final IRemoteFileManager fileManager;
+	private final RemoteServicesDelegate delegate;
 	private final JAXBRMLaunchConfigurationDynamicTab pTab;
 	private final TabController controller;
 	private final Map<Control, Widget> valueWidgets;
@@ -312,7 +312,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	public JAXBRMConfigurableAttributesTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog,
 			TabController controller, JAXBRMLaunchConfigurationDynamicTab pTab) {
 		super(dialog);
-		fileManager = rm.getRemoteFileManager();
+		delegate = rm.getRemoteServicesDelegate();
 		this.pTab = pTab;
 		this.controller = controller;
 		String t = controller.getTitle();

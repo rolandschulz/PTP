@@ -15,11 +15,6 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
@@ -30,6 +25,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
@@ -41,11 +37,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	private static boolean appendEnv;
 	private static boolean verbose = false;
 
-	private static IRemoteServices localServices;
-	private static IRemoteConnectionManager localConnectionManager;
-	private static IRemoteConnection localConnection;
-	private static IRemoteFileManager localFileManager;
-	private static IRemoteFileManager remoteFileManager;
+	private RemoteServicesDelegate delegate;
 
 	@Override
 	public void setUp() {
@@ -84,7 +76,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 		ManagedFiles files = controlData.getManagedFiles();
 		assertNotNull(files);
 		try {
-			ManagedFilesJob job = new ManagedFilesJob(null, files, localFileManager, remoteFileManager);
+			ManagedFilesJob job = new ManagedFilesJob(null, files, delegate);
 			job.schedule();
 			try {
 				job.join();
@@ -113,19 +105,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	private void initializeConnections() {
-		localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
-		assert (localServices != null);
-		localConnectionManager = localServices.getConnectionManager();
-		assert (localConnectionManager != null);
-		/*
-		 * Since it's a local service, it doesn't matter which parameter is
-		 * passed
-		 */
-		localConnection = localConnectionManager.getConnection(ZEROSTR);
-		assert (localConnection != null);
-		localFileManager = localServices.getFileManager(localConnection);
-		assert (localFileManager != null);
-		remoteFileManager = localFileManager;
+		delegate = new RemoteServicesDelegate(null, null);
 	}
 
 	private void putValue(String name, String value) {
