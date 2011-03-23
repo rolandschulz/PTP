@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: LML Data Access
+Bundle-SymbolicName: org.eclipse.ptp.rm.lml.da
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: eclipse.org
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
