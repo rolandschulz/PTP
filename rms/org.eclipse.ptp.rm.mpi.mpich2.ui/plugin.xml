@@ -25,7 +25,7 @@
          point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
             class="org.eclipse.ptp.rm.mpi.mpich2.ui.wizards.MPICH2RMConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.mpi.mpich2.resourceManager">
+            id="org.eclipse.ptp.rm.mpi.mpich2.control">
       </configurationWizard>
    </extension>
 </plugin>

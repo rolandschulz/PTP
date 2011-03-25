@@ -18,7 +18,7 @@
          point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
             class="org.eclipse.ptp.rm.pbs.ui.wizards.PBSRMConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.pbs.resourceManager">
+            id="org.eclipse.ptp.rm.pbs.control">
       </configurationWizard>
    </extension>
 </plugin>

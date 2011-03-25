@@ -29,7 +29,7 @@
          point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
             class="org.eclipse.ptp.rm.ibm.ll.ui.wizards.IBMLLConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.ibm.ll.LLServiceProvider">
+            id="org.eclipse.ptp.rm.ibm.ll.core.control">
       </configurationWizard>
    </extension>
 </plugin>
