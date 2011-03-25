@@ -1,9 +1,8 @@
 package org.eclipse.ptp.services.core;
 
-/*
- * Class for build information that will be mapped to a specific service configuration.
- */
 /**
+ * Class for build information that will be mapped to a specific service configuration. Utility methods for reading and writing
+ * the information to an IConfiguration (a .cproject file) are also provided.
  * @since 2.1
  */
 public class BuildScenario {

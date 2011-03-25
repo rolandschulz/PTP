@@ -236,7 +236,13 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		checkAndLoadModel();
 		IServiceConfiguration sConfig = this.copyActiveServiceConfiguration(project);
 		this.modifyServiceConfigurationForBuildScenario(sConfig, buildScenario);
-		fProjectBuildScenarioToSConfigMap.get(project).put(buildScenario, sConfig);
+		Map<BuildScenario, IServiceConfiguration> confs = fProjectBuildScenarioToSConfigMap.get(project);
+		if (confs == null) {
+			 confs = new HashMap<BuildScenario, IServiceConfiguration>();
+			 fProjectBuildScenarioToSConfigMap.put(project, confs);
+		}
+		
+		confs.put(buildScenario, sConfig);
 		
 		// Update service model manager data structures
 		// We do not want to change the active configuration, so we store it and reset it after updating data structures. This is
@@ -269,7 +275,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			}
 		}
 		
-		return null;
+		return newConfig;
 	}
 	
 	private void modifyServiceConfigurationForBuildScenario(IServiceConfiguration sConfig, BuildScenario bs) {
@@ -448,6 +454,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @param project
 	 * @param buildScenario
 	 * @return service configuration
+	 * @since 2.1
 	 */
 	public IServiceConfiguration getConfigurationForBuildScenario(IProject project, BuildScenario buildScenario) {
 		checkAndLoadModel();

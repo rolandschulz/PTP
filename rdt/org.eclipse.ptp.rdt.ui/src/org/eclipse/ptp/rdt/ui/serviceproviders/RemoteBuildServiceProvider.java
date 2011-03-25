@@ -209,6 +209,9 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 		return "RemoteBuildServiceProvider(" + getRemoteConnectionName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	/**
+	 * @since 3.0
+	 */
 	@Override
 	public void changeRemoteInformation(String remoteConnectionName, String location) {
 		putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, remoteConnectionName);
