@@ -230,21 +230,38 @@
       </handler>
    </extension>
    
-   
+
    <!-- Menus extension point and contributions (toolbar buttons) -->
-   <extension point="org.eclipse.ui.menus">
-     <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-        <toolbar id="org.eclipse.ptp.gem.toolbar">
-        </toolbar>
-     </menuContribution>
-     <menuContribution locationURI="toolbar:org.eclipse.ptp.gem.toolbar?after=additions">
-            <command
+   <extension
+   		point="org.eclipse.ui.menus">
+      <menuContribution
+      		locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar id="org.eclipse.ptp.gem.toolbar">
+             <command
                   commandId="org.eclipse.ptp.gem.commands.gemCommand"
                   icon="icons/trident.gif"
                   id="org.eclipse.ptp.gem.toolbar.refCommand"
                   style="pulldown"
                   tooltip="Formally Verify MPI Program">
-            </command>
+                <visibleWhen
+                	checkEnabled="false">
+                  <or>
+                     <with
+                           variable="activeWorkbenchWindow.activePerspective">
+                        <equals
+                              value="org.eclipse.cdt.ui.CPerspective">
+                        </equals>
+                     </with>
+                     <with
+                           variable="activeWorkbenchWindow.activePerspective">
+                        <equals
+                              value="org.eclipse.ptp.rdt.ui.remoteCPerspective">
+                        </equals>
+                     </with>
+                  </or>
+                </visibleWhen>
+             </command>
+         </toolbar>
       </menuContribution>
       <menuContribution locationURI="menu:org.eclipse.ptp.gem.toolbar.refCommand?after=additions">
             <command
