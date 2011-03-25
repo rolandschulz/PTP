@@ -136,9 +136,13 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		}
 	}
 	
+	private BuildScenario getBuildScenarioForConfiguration(IConfiguration config) {
+		String provider = config.getBuildProperties().getProperty("remoteSyncProvider").getValue().getName(); //$NON-NLS-1$
+		String conn = config.getBuildProperties().getProperty("remoteConnection").getValue().getName(); //$NON-NLS-1$
+		String location = config.getBuildProperties().getProperty("remoteLocation").getValue().getName(); //$NON-NLS-1$
+		return new BuildScenario(provider, conn, location);
+	}
 	
-	
-
 	public static final String REMOTE_MAKE_BUILDER_ID = "org.eclipse.ptp.rdt.core.remoteMakeBuilder"; //$NON-NLS-1$
 	
 	/* (non-Javadoc)
@@ -504,13 +508,6 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		return (isClean);
 	}
 	
-	private BuildScenario getBuildScenarioForConfiguration(IConfiguration config) {
-		String provider = config.getBuildProperties().getProperty("remoteSyncProvider").getValue().getName(); //$NON-NLS-1$
-		String conn = config.getBuildProperties().getProperty("remoteConnection").getValue().getName(); //$NON-NLS-1$
-		String location = config.getBuildProperties().getProperty("remoteLocation").getValue().getName(); //$NON-NLS-1$
-		return new BuildScenario(provider, conn, location);
-	}
-
 	private void removeAllMarkers(IProject currProject) throws CoreException {
 		IWorkspace workspace = currProject.getWorkspace();
 

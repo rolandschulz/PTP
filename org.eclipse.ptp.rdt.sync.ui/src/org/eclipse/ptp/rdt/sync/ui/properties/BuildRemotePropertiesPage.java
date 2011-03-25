@@ -4,8 +4,11 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.cdt.core.settings.model.ICResourceDescription;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.managedbuilder.ui.properties.AbstractCBuildPropertyTab;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Path;
@@ -13,6 +16,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -33,13 +37,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISelectionService;
-import org.eclipse.ui.dialogs.PropertyPage;
 
-public class BuildRemotePropertiesPage extends PropertyPage {
+public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 	public BuildRemotePropertiesPage() {
 		super();
 	}
@@ -52,6 +54,8 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 
 	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
 	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
+	private final Map<IRemoteServices, Integer> fComboRemoteServicesProviderToIndexMap = new HashMap<IRemoteServices, Integer>();
+	private final Map<IRemoteConnection, Integer> fComboRemoteConnectionToIndexMap = new HashMap<IRemoteConnection, Integer>();
 
 	private Button fBrowseButton;
 	private Button fNewConnectionButton;
@@ -62,21 +66,21 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 	/**
 	 * @see PreferencePage#createContents(Composite)
 	 */
-	protected Control createContents(Composite parent) {
-		final Composite configArea = new Composite(parent, SWT.NONE);
+	@Override
+	protected void createControls(Composite parent) {
+		super.createControls(parent);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
-		configArea.setLayout(layout);
+		usercomp.setLayout(layout);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		configArea.setLayoutData(gd);
+		usercomp.setLayoutData(gd);
 
 		// Label for "Provider:"
-		Label providerLabel = new Label(configArea, SWT.LEFT);
-		// providerLabel.setText(Messages.RemoteServicesProviderSelectionDialog_1);
-		providerLabel.setText(((IStructuredSelection)(PTPRemoteUIPlugin.getActiveWorkbenchWindow().getSelectionService().getSelection())).getFirstElement().toString());
+		Label providerLabel = new Label(usercomp, SWT.LEFT);
+		providerLabel.setText(Messages.RemoteServicesProviderSelectionDialog_1);
 
 		// combo for providers
-		fProviderCombo = new Combo(configArea, SWT.DROP_DOWN | SWT.READ_ONLY);
+		fProviderCombo = new Combo(usercomp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		gd = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
 		gd.horizontalSpan = 2;
 		fProviderCombo.setLayoutData(gd);
@@ -97,6 +101,7 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 		for (int k = 0; k < providers.length; k++) {
 			fProviderCombo.add(providers[k].getName(), k);
 			fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
+			fComboRemoteServicesProviderToIndexMap.put(providers[k], k);
 		}
 
 		// set selected host to be the first one if we're not restoring from
@@ -106,11 +111,11 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 
 		// connection combo
 		// Label for "Connection:"
-		Label connectionLabel = new Label(configArea, SWT.LEFT);
+		Label connectionLabel = new Label(usercomp, SWT.LEFT);
 		connectionLabel.setText("Connection:"); //$NON-NLS-1$
 
 		// combo for providers
-		fConnectionCombo = new Combo(configArea, SWT.DROP_DOWN | SWT.READ_ONLY);
+		fConnectionCombo = new Combo(usercomp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		// set layout to grab horizontal space
 		fConnectionCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		fConnectionCombo.addSelectionListener(new SelectionAdapter() {
@@ -124,7 +129,7 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 		populateConnectionCombo(fConnectionCombo);
 
 		// new connection button
-		fNewConnectionButton = new Button(configArea, SWT.PUSH);
+		fNewConnectionButton = new Button(usercomp, SWT.PUSH);
 		fNewConnectionButton.setText("Connection: "); //$NON-NLS-1$
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
@@ -139,10 +144,10 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 			}
 		});
 
-		Label locationLabel = new Label(configArea, SWT.LEFT);
+		Label locationLabel = new Label(usercomp, SWT.LEFT);
 		locationLabel.setText("Location:"); //$NON-NLS-1$
 
-		fLocationText = new Text(configArea, SWT.SINGLE | SWT.BORDER);
+		fLocationText = new Text(usercomp, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		gd.grabExcessHorizontalSpace = true;
@@ -156,7 +161,7 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 		});
 
 		// new connection button
-		fBrowseButton = new Button(configArea, SWT.PUSH);
+		fBrowseButton = new Button(usercomp, SWT.PUSH);
 		fBrowseButton.setText("Browse:"); //$NON-NLS-1$
 		fBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -182,11 +187,8 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 				}
 			}
 		});
-		
-		return configArea;
 	}
 	
-	@Override
 	/**
 	 * Store remote location information both to the service model manager and to the selected build configuration (.cproject file)
 	 * 
@@ -208,9 +210,10 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 		if (buildInfo == null) {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 		}
-		buildInfo.getSelectedConfiguration().createFileInfo(project.getFullPath(), "remoteSyncProvider", fSelectedProvider.getName()); //$NON-NLS-1$ 
-		buildInfo.getSelectedConfiguration().createFileInfo(project.getFullPath(), "remoteConnection", fSelectedConnection.getName()); //$NON-NLS-1$ 
-		buildInfo.getSelectedConfiguration().createFileInfo(project.getFullPath(), "remoteLocation", fLocationText.getText()); //$NON-NLS-1$ 
+				
+		getCfg().createFileInfo(project.getFullPath(), "remoteSyncProvider", fSelectedProvider.getName()); //$NON-NLS-1$ 
+		getCfg().createFileInfo(project.getFullPath(), "remoteConnection", fSelectedConnection.getName()); //$NON-NLS-1$ 
+		getCfg().createFileInfo(project.getFullPath(), "remoteLocation", fLocationText.getText()); //$NON-NLS-1$ 
 		ManagedBuildManager.saveBuildInfo(project, true);
 		
 		return true;
@@ -291,6 +294,7 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 		for (int k = 0; k < connections.length; k++) {
 			connectionCombo.add(connections[k].getName(), k);
 			fComboIndexToRemoteConnectionMap.put(k, connections[k]);
+			fComboRemoteConnectionToIndexMap.put(connections[k], k);
 		}
 
 		connectionCombo.select(0);
@@ -317,5 +321,35 @@ public class BuildRemotePropertiesPage extends PropertyPage {
 		}
 		
 		return null;
+	}
+
+	@Override
+	public void performApply(ICResourceDescription src,
+			ICResourceDescription dst) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void performDefaults() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateData(ICResourceDescription cfg) {
+		IConfiguration config= getCfg(cfg.getConfiguration());
+		String provider = config.getBuildProperties().getProperty("remoteSyncProvider").getValue().getName(); //$NON-NLS-1$
+		String conn = config.getBuildProperties().getProperty("remoteConnection").getValue().getName(); //$NON-NLS-1$
+		String location = config.getBuildProperties().getProperty("remoteLocation").getValue().getName(); //$NON-NLS-1$
+		fProviderCombo.select(fComboRemoteServicesProviderToIndexMap.get(provider));
+		fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(conn));
+		fLocationText.setText(location);
+	}
+
+	@Override
+	protected void updateButtons() {
+		// TODO Auto-generated method stub
+		
 	}
 }
