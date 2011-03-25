@@ -32,7 +32,7 @@
          point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
             class="org.eclipse.ptp.rm.ibm.pe.ui.wizards.PERMConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.ibm.pe.resourceManager">
+            id="org.eclipse.ptp.rm.ibm.pe.core.control">
       </configurationWizard>
    </extension>
 

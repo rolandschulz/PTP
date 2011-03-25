@@ -25,7 +25,7 @@
          point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
             class="org.eclipse.ptp.rm.mpi.openmpi.ui.wizards.OpenMPIRMConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.ibm.pe.core.control">
+            id="org.eclipse.ptp.rm.mpi.openmpi.control">
       </configurationWizard>
    </extension>
 </plugin>

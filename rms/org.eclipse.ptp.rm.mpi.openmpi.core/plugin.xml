@@ -23,11 +23,11 @@
             id="org.eclipse.ptp.rm.mpi.openmpi.OpenMPIServiceProvider">
          <resourceManagerControl
              class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerFactory"
-             id="org.eclipse.ptp.rm.ibm.pe.core.control">
+             id="org.eclipse.ptp.rm.mpi.openmpi.control">
          </resourceManagerControl>
          <resourceManagerMonitor
             class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerFactory"
-            id="org.eclipse.ptp.rm.ibm.pe.core.monitor">
+            id="org.eclipse.ptp.rm.mpi.openmpi.monitor">
          </resourceManagerMonitor>
       </resourceManager>
    </extension>
