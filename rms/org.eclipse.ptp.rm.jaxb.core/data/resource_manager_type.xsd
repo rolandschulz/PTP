@@ -37,12 +37,8 @@
 				<!-- from runtime configuration information -->
 				control.user.name
 				control.address
-				monitor.user.name
-				monitor.address
 				<!-- from the monitoring part -->
 				available_queues
-				<!-- from the launch command stdout parser -->
-				jobId
 				<!-- from the other Run Configuration tabs -->
 				executablePath
 				progArgs
@@ -54,7 +50,7 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property"/>
-			<xs:element name="job-attribute" minOccurs="0" maxOccurs="unbounded" type="rm:job-attribute"/>
+			<xs:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="rm:attribute"/>
 			<xs:element name="managed-files" minOccurs="0" type="rm:managed-files"/>
 			<xs:element name="script" minOccurs="0" type="rm:script"/>
 			<xs:element name="start-up-command" minOccurs="0" maxOccurs="unbounded" type="rm:command">
@@ -64,10 +60,11 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:choice minOccurs="1" maxOccurs="3">
+			<xs:choice minOccurs="1" maxOccurs="4">
 				<xs:element name="submit-interactive" type="rm:command"/>
 				<xs:element name="submit-batch" type="rm:command"/>
-				<xs:element name="submit-debug" type="rm:command"/>
+				<xs:element name="submit-debug-interactive" type="rm:command"/>
+				<xs:element name="submit-debug-batch" type="rm:command"/>
 			</xs:choice>
 			<xs:element name="get-job-status" type="rm:command" minOccurs="0"/>
 			<xs:element name="terminate-job" type="rm:command" minOccurs="0"/>
@@ -88,45 +85,39 @@
 	<xs:complexType name="property">
 		<xs:annotation>
 			<xs:documentation>
-				The value is any object type; these are set at runtime.
+				The value for properties and attributes can by any primitive type,
+				or lists or maps of strings.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="value" minOccurs="0"/>
 			<xs:element name="default" minOccurs="0" type="xs:string"/>
+			<xs:element name="value" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="selected" type="xs:boolean" default="true"/>
 		<xs:attribute name="configurable" type="xs:boolean" default="true"/>
 	</xs:complexType>
-	<xs:complexType name="job-attribute">
+	<xs:complexType name="attribute">
 		<xs:sequence>
 			<xs:element name="description" type="xs:string"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="choice" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						A a comma-delimited set of values.
+						A a comma-delimited set of values for combo-box display.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="default" minOccurs="0" type="xs:string"/>
-			<xs:element name="validator" minOccurs="0" type="rm:validator"/>
 			<xs:element name="value" minOccurs="0"/>
+			<xs:element name="validator" minOccurs="0" type="rm:validator"/>
 		</xs:sequence>
 		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="type" use="required" type="xs:string"/>
-		<xs:attribute name="configurable" type="xs:boolean" default="true"/>
+		<xs:attribute name="visible" type="xs:boolean" default="true"/>
 		<xs:attribute name="selected" type="xs:boolean" default="true"/>
 		<xs:attribute name="status" type="xs:string"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
-		<xs:attribute name="basic" type="xs:boolean" default="false">
-			<xs:annotation>
-				<xs:documentation>
-					Indicates if this attribute is part of a basic (required) set, or if it is an (advanced) option.
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
 		<xs:attribute name="min" type="xs:int"/>
 		<xs:attribute name="max" type="xs:int"/>
 	</xs:complexType>
@@ -144,20 +135,16 @@
 	</xs:complexType>
 	<xs:complexType name="script">
 		<xs:sequence>
-			<xs:element name="directive" minOccurs="0" maxOccurs="unbounded" type="rm:directive-definition"/>
-			<xs:element name="variable" minOccurs="0" maxOccurs="unbounded" type="rm:environment-variable"/>
-			<xs:element name="pre-execute-command" minOccurs="0" maxOccurs="unbounded" type="rm:arglist"/>
-			<xs:element name="execute-command" type="rm:arglist"/>
-			<xs:element name="post-execute-command" minOccurs="0" maxOccurs="unbounded" type="rm:arglist"/>
+			<xs:element name="line" minOccurs="0" maxOccurs="unbounded" type="rm:arg"/>
 		</xs:sequence>
-		<xs:attribute name="shellDirective" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="command">
 		<xs:sequence>
-			<xs:element name="args" type="rm:arglist"/>
+			<xs:element name="arg" maxOccurs="unbounded" type="rm:arg"/>
+			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:name-value-pair"/>
 			<xs:element name="stdout-parser" minOccurs="0" type="rm:tokenizer"/>
 			<xs:element name="stderr-parser" minOccurs="0" type="rm:tokenizer"/>
-			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:environment-variable"/>
+			<xs:element name="redirect-parser" minOccurs="0" type="rm:tokenizer"/>
 		</xs:sequence>
 		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="directory" type="xs:string"/>
@@ -222,7 +209,8 @@
 		<xs:annotation>
 			<xs:documentation>
 				efsAttributes is an or'd string of tags corresponding to the EFS integer constants.
-				use "yyyy/MM/dd HH:mm:ss" format for modified strings.
+				use "yyyy/MM/dd HH:mm:ss"
+				format for modified strings.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:attribute name="efsAttributes">
@@ -252,34 +240,9 @@
 		<xs:attribute name="length" type="xs:long"/>
 		<xs:attribute name="isDirectory" type="xs:boolean" default="false"/>
 	</xs:complexType>
-	<xs:complexType mixed="true" name="directive-definition">
-		<xs:annotation>
-			<xs:documentation>
-				'ValueFrom' refers to properties in the resource manager environment.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:attribute name="valueFrom"/>
-	</xs:complexType>
-	<xs:complexType name="environment-variable">
-		<xs:annotation>
-			<xs:documentation>
-				'ValueFrom' refers to properties in the resource manager environment.
-			</xs:documentation>
-		</xs:annotation>
-		<xs:attribute name="variableName" use="required" type="xs:string"/>
-		<xs:attribute name="valueFrom" use="required" type="xs:string"/>
-	</xs:complexType>
-	<xs:complexType name="arglist">
-		<xs:sequence>
-			<xs:element name="arg" maxOccurs="unbounded" type="rm:arg"/>
-		</xs:sequence>
-		<xs:attribute name="dynamicAppend" type="xs:boolean" default="false">
-			<xs:annotation>
-				<xs:documentation>
-					Iterate over all dynamic attributes, appending the sequence of args for each attribute.
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
+	<xs:complexType name="name-value-pair">
+		<xs:attribute name="name" use="required" type="xs:string"/>
+		<xs:attribute name="value" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="tab-controller">
 		<xs:sequence>
@@ -299,11 +262,7 @@
 	<xs:complexType mixed="true" name="arg">
 		<xs:annotation>
 			<xs:documentation>
-				The text of the argument will be parsed for references to the resource manager environment; e.g., ${rm:a},
-				v=${rm:v}, etc. By convention, '${rm:@name}' and '${rm:@value}' will refer to a given dynamic attribute name and value (of
-				undefined
-				position i in
-				the list).
+				The text of the argument will be parsed for references to the resource manager environment.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:attribute name="isUndefinedIfEquals" type="xs:string">
@@ -333,11 +292,15 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:sequence>
-					<xs:element name="read" maxOccurs="unbounded" type="rm:read"/>
-				</xs:sequence>
+				<xs:element name="or" type="rm:or"/>
+				<xs:element name="and" type="rm:and"/>
 			</xs:choice>
 		</xs:sequence>
+		<xs:attribute name="delim" type="xs:string"/>
+		<xs:attribute name="includeDelim" type="xs:boolean" default="false"/>
+		<xs:attribute name="maxMatchLen" type="xs:int" default="0"/>
+		<xs:attribute name="all" type="xs:boolean" default="false"/>
+		<xs:attribute name="save" type="xs:int" default="0"/>
 	</xs:complexType>
 	<xs:complexType name="tab-folder-descriptor">
 		<xs:sequence>
@@ -349,7 +312,8 @@
 		<xs:annotation>
 			<xs:documentation>
 				Dynamic means this group gets rebuilt; in that case, a
-				button allowing the user to select displayed attributes is added.
+				button allowing the user to select displayed attributes is
+				added.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -365,23 +329,19 @@
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="read">
+	<xs:complexType name="or">
 		<xs:sequence>
-			<xs:element name="match" minOccurs="0" maxOccurs="unbounded" type="rm:match"/>
+			<xs:element name="or" minOccurs="0" maxOccurs="unbounded" type="rm:or"/>
+			<xs:element name="and" minOccurs="0" maxOccurs="unbounded" type="rm:and"/>
+			<xs:element name="target" minOccurs="0" maxOccurs="unbounded" type="rm:target"/>
 		</xs:sequence>
-		<xs:attribute name="delim" type="xs:string"/>
-		<xs:attribute name="includeDelim" type="xs:boolean" default="false"/>
-		<xs:attribute name="maxMatchLen" type="xs:int" default="0"/>
-		<xs:attribute name="all" type="xs:boolean" default="false"/>
-		<xs:attribute name="save" type="xs:int" default="0"/>
-		<xs:attribute name="mode" default="or">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="or"/>
-					<xs:enumeration value="and"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="and">
+		<xs:sequence>
+			<xs:element name="or" minOccurs="0" maxOccurs="unbounded" type="rm:or"/>
+			<xs:element name="and" minOccurs="0" maxOccurs="unbounded" type="rm:and"/>
+			<xs:element name="target" minOccurs="0" maxOccurs="unbounded" type="rm:target"/>
+		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="tab-item-descriptor">
 		<xs:sequence>
@@ -438,25 +398,21 @@
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="value" minOccurs="0" type="xs:string"/>
-			<xs:element name="displayValue" minOccurs="0" type="rm:arglist">
+			<xs:element name="displayValue" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
 						The text of this element will be parsed for references to the environment; e.g., ${a},
 						version-${b}.
 					</xs:documentation>
 				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="arg" maxOccurs="unbounded" type="rm:arg"/>
+					</xs:sequence>
+				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="type" default="text">
-			<xs:annotation>
-				<xs:documentation>
-					Custom, fixed widgets:
-					1. select-attributes: push button which brings up wizard exposing attribute names with
-					checkboxes, allowing dynamic groups to be rebuilt.
-					2. show-script: push button which displays the batch script as it would
-					currently be submitted.
-				</xs:documentation>
-			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="label"/>
@@ -477,6 +433,14 @@
 		<xs:attribute name="saveAs" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="attribute-viewer">
+		<xs:annotation>
+			<xs:documentation>
+				These display their value columns as editable widgets. They are provided with checkboxes to indicate which
+				attributes have been chosen. A toggle button is provided to collapse and reopen the unchecked items in the viewer. The viewer
+				outputs its selected values to the environment (and on update removes unselected ones). The name of the viewer is also stored
+				against a string of all selected values, constructed from a template.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data-descriptor"/>
 			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout-descriptor"/>
@@ -484,6 +448,7 @@
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="column-data" minOccurs="0" type="rm:column-data"/>
 			<xs:element name="items" type="rm:viewer-items"/>
+			<xs:element name="value" type="rm:template"/>
 		</xs:sequence>
 		<xs:attribute name="type" default="table">
 			<xs:simpleType>
@@ -493,6 +458,7 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="sort" type="xs:boolean" default="true"/>
 	</xs:complexType>
 	<xs:complexType name="viewer-items">
@@ -510,27 +476,22 @@
 			<xs:element name="ref" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="match">
-		<xs:sequence>
-			<xs:element name="expression" minOccurs="0" type="rm:regex"/>
-			<xs:element name="target" minOccurs="0" type="rm:target"/>
-			<xs:choice minOccurs="0" maxOccurs="unbounded">
-				<xs:element name="add" type="rm:add"/>
-				<xs:element name="append" type="rm:append"/>
-				<xs:element name="put" type="rm:put"/>
-				<xs:element name="set" type="rm:set"/>
-			</xs:choice>
-			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test"/>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="column-data">
-		<xs:sequence>
-			<xs:element name="style" type="rm:style"/>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="width" type="xs:string"/>
+	<xs:complexType name="template">
+		<xs:attribute name="pattern" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					Express the template using @name, etc., markers for the attribute fields. Example: '@name="@value"' would generate a string of name-value
+					assignments (the default separator being whitespace).
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="separator" type="xs:string" default=" "/>
 	</xs:complexType>
 	<xs:complexType name="target">
+		<xs:sequence>
+			<xs:element name="match" maxOccurs="unbounded" type="rm:match"/>
+			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test"/>
+		</xs:sequence>
 		<xs:attribute name="ref" type="xs:string"/>
 		<xs:attribute name="type" default="property">
 			<xs:simpleType>
@@ -540,7 +501,24 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="idFrom" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="match">
+		<xs:sequence>
+			<xs:element name="expression" minOccurs="0" type="rm:regex"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="add" type="rm:add"/>
+				<xs:element name="append" type="rm:append"/>
+				<xs:element name="put" type="rm:put"/>
+				<xs:element name="set" type="rm:set"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="column-data">
+		<xs:sequence>
+			<xs:element name="style" type="rm:style"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="width" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="set">
 		<xs:sequence>
@@ -581,10 +559,8 @@
 			<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="2">
 				<xs:annotation>
 					<xs:documentation>
-						.*[${rm:}]*.* refers to a variable in the RM environment;
-						"this.FIELD" refers to the value of the given field on
-						the current target;
-						other strings will be converted in conformity with the inferred type of the comparison.
+						.*[${rm:}]*.* refers to a variable in the RM environment; "#FIELD" refers to the value of the given field on the
+						current target; other strings will be converted in conformity with the inferred type of the comparison.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>

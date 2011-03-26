@@ -61,7 +61,7 @@ public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurat
 	}
 
 	static LaunchTab getLaunchTab(IJAXBResourceManagerConfiguration config) {
-		ResourceManagerData data = config.resourceManagerData();
+		ResourceManagerData data = config.getResourceManagerData();
 		if (data != null) {
 			Control control = data.getControlData();
 			if (control != null) {
@@ -72,7 +72,7 @@ public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurat
 	}
 
 	static boolean hasScript(IJAXBResourceManagerConfiguration config) {
-		ResourceManagerData data = config.resourceManagerData();
+		ResourceManagerData data = config.getResourceManagerData();
 		if (data != null) {
 			Control control = data.getControlData();
 			if (control != null) {

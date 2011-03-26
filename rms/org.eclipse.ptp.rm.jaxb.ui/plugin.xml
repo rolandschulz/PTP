@@ -9,35 +9,6 @@
       </providerContributor>
    </extension>
    <extension
-         point="org.eclipse.ui.viewActions">
-      <viewContribution
-            id="org.eclipse.ptp.ui.views.resourceManagerView"
-            targetID="org.eclipse.ptp.ui.views.resourceManagerView">
-         <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.OpenResourceManagerEditor"
-               helpContextId="Select a preset or custom configuration to edit"
-               icon="icons/edit.gif"
-               id="org.eclipse.ptp.rm.jaxb.openResourceManagerEditorViewAction"
-               label="Open Resource Manager Configuration Editor"
-               menubarPath="editor"
-               style="push"
-               toolbarPath="editor"
-               tooltip="Select a preset or custom configuration to edit">
-         </action>
-         <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.HideResourceManagerEditor"
-               helpContextId="Hide the editor area"
-               icon="icons/stop.png"
-               id="org.eclipse.ptp.rm.jaxb.hideResourceManagerEditorViewAction"
-               label="Hide Resource Manager Configuration Editor"
-               menubarPath="editor"
-               style="push"
-               toolbarPath="editor"
-               tooltip="Hide the editor area">
-         </action>
-      </viewContribution>
-   </extension>
-   <extension
          point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration
             class="org.eclipse.ptp.rm.jaxb.ui.launch.JAXBRMLaunchConfigurationFactory"
@@ -47,7 +18,7 @@
    <extension
          point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
-            class="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMConfigurationWizardPageFactory"
+            class="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMControlConfigurationWizardPageFactory"
             id="org.eclipse.ptp.rm.jaxb.control">
       </configurationWizard>
       <configurationWizard

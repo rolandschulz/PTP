@@ -11,20 +11,21 @@
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.jface.window.Window;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
@@ -36,7 +37,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
-import org.eclipse.ptp.rm.jaxb.ui.dialogs.AttributeChoiceDialog;
+import org.eclipse.ptp.rm.jaxb.ui.data.RowData;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
@@ -253,23 +254,69 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 	}
 
-	private class JAXBUniversalWidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
+	/*
+	 * The list of listeners will always include the ContentsChangedListener of
+	 * the Resources Tab, which bottoms out in an updateButtons call enabling
+	 * the "Apply" button.
+	 * 
+	 * The performApply() method of the ResourcesTab calls performApply() on the
+	 * BaseRMLaunchConfigurationDynamicTab which in turn calls the
+	 * storeAndValidate() method of the DataSource.
+	 * 
+	 * The methods loadAndUpdate() and justUpdate() on the DataSource can be
+	 * used to refresh. The former is called on RM initialization, which takes
+	 * place when the RM becomes visible.
+	 */
+	private class JAXBUniversalWidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener implements
+			ISelectionChangedListener {
 		public JAXBUniversalWidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
 			super(dynamicTab);
 		}
+
 		/*
-		 * The list of listeners will always include the ContentsChangedListener
-		 * of the Resources Tab, which bottoms out in an updateButtons call
-		 * enabling the "Apply" button.
+		 * This reconstructs the content string for the viewer and overwrites
+		 * the associated environment entry.
 		 * 
-		 * The performApply() method of the ResourcesTab calls performApply() on
-		 * the BaseRMLaunchConfigurationDynamicTab which in turn calls the
-		 * storeAndValidate() method of the DataSource.
+		 * (non-Javadoc)
 		 * 
-		 * The methods loadAndUpdate() and justUpdate() on the DataSource can be
-		 * used to refresh. The former is called on RM initialization, which
-		 * takes place when the RM becomes visible.
+		 * @see
+		 * org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged
+		 * (org.eclipse.jface.viewers.SelectionChangedEvent)
 		 */
+		public void selectionChanged(SelectionChangedEvent event) {
+			if (isEnabled()) {
+				Object o = event.getSource();
+				AttributeViewer av = viewers.get(o);
+				String pattern = ZEROSTR;
+				String separator = SP;
+				if (av != null) {
+					// Template template = av.getTemplate();
+					// if (template == null) return;
+					// pattern = template.getPattern();
+					// separator = template.getSeparator();
+					StringBuffer sb = new StringBuffer();
+					Viewer viewer = (Viewer) o;
+
+					RowData[] rows = (RowData[]) viewer.getInput();
+					if (rows.length != 0) {
+						sb.append(rows[0].getReplaced(pattern));
+					}
+
+					for (int i = 1; i < rows.length; i++) {
+						if (separator != null) {
+							sb.append(separator);
+							sb.append(rows[i].getReplaced(pattern));
+						}
+					}
+
+					// Map<String, String> vars =
+					// LTVariableMap.getActiveInstance().getVariables();
+					// vars.put(av.getName(), sb.toString());
+
+				}
+				maybeFireContentsChanged();
+			}
+		}
 	}
 
 	private class SelectAttributesListener implements SelectionListener {
@@ -281,9 +328,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		public synchronized void widgetSelected(SelectionEvent e) {
 			try {
 				Object source = e.getSource();
-				if (source == selectAttributes) {
-					buildMain(updateVisibleAttributes(true));
-				} else if (source == viewScript) {
+				if (source == viewScript) {
 
 				}
 			} catch (Throwable t) {
@@ -297,13 +342,11 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	private final JAXBRMLaunchConfigurationDynamicTab pTab;
 	private final TabController controller;
 	private final Map<Control, Widget> valueWidgets;
-
-	private AttributeChoiceDialog selectionDialog;
+	private final Map<Viewer, AttributeViewer> viewers;
 
 	private Composite dynamicControl;
 	private Composite control;
 	private final String title;
-	private Button selectAttributes;
 	private Button viewScript;
 
 	private JAXBUniversalWidgetListener universalListener;
@@ -321,6 +364,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 		this.title = t;
 		valueWidgets = new HashMap<Control, Widget>();
+		viewers = new HashMap<Viewer, AttributeViewer>();
 		createListener();
 		createDataSource();
 		try {
@@ -333,15 +377,12 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetBuilderUtils.createComposite(parent, 1);
-		selectionDialog = new AttributeChoiceDialog(parent.getShell());
 
-		if (controller.isDynamic()) {
-			createDynamicSelectionGroup(control);
-		} else if (pTab.hasScript()) {
+		if (pTab.hasScript()) {
 			createViewScriptGroup(control);
 		}
 		try {
-			buildMain(updateVisibleAttributes(false));
+			// buildMain(updateVisibleAttributes(false));
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 		}
@@ -424,19 +465,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		universalListener.enable();
 	}
 
-	private void createDynamicSelectionGroup(Composite control) {
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(4, true);
-		GridData gd = WidgetBuilderUtils.createGridDataFillH(4);
-		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
-		WidgetBuilderUtils.createLabel(grp, Messages.ConfigureLaunchSettings, SWT.RIGHT, 1);
-		selectAttributes = WidgetBuilderUtils.createPushButton(grp, Messages.SelectAttributesForDisplay,
-				new SelectAttributesListener());
-		if (pTab.hasScript()) {
-			viewScript = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, new SelectAttributesListener());
-			WidgetBuilderUtils.createLabel(grp, Messages.ViewValuesReplaced, SWT.LEFT, 1);
-		}
-	}
-
 	private void createViewScriptGroup(Composite control) {
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true);
 		GridData gd = WidgetBuilderUtils.createGridDataFillH(2);
@@ -445,38 +473,40 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		viewScript = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, new SelectAttributesListener());
 	}
 
-	private Map<String, Boolean> updateVisibleAttributes(boolean showDialog) throws Throwable {
-		Map<String, Boolean> checked = null;
-		selectionDialog.clearChecked();
-		Map<String, String> selected = pTab.getRmConfig().getSelectedAttributeSet();
-		selectionDialog.setCurrentlyVisible(selected);
-		if (!showDialog || Window.OK == selectionDialog.open()) {
-			checked = selectionDialog.getChecked();
-			if (selected == null) {
-				selected = new TreeMap<String, String>();
-			} else {
-				selected.clear();
-			}
-
-			Iterator<String> k = checked.keySet().iterator();
-			if (k.hasNext()) {
-				String key = k.next();
-				if (checked.get(key)) {
-					selected.put(key, key);
-				} else {
-					k.remove();
-				}
-			}
-			while (k.hasNext()) {
-				String key = k.next();
-				if (checked.get(key)) {
-					selected.put(key, key);
-				} else {
-					k.remove();
-				}
-			}
-			pTab.getRmConfig().setSelectedAttributeSet(selected);
-		}
-		return checked;
-	}
+	// private Map<String, Boolean> updateVisibleAttributes(boolean showDialog)
+	// throws Throwable {
+	// Map<String, Boolean> checked = null;
+	// selectionDialog.clearChecked();
+	// Map<String, String> selected =
+	// pTab.getRmConfig().getSelectedAttributeSet();
+	// selectionDialog.setCurrentlyVisible(selected);
+	// if (!showDialog || Window.OK == selectionDialog.open()) {
+	// checked = selectionDialog.getChecked();
+	// if (selected == null) {
+	// selected = new TreeMap<String, String>();
+	// } else {
+	// selected.clear();
+	// }
+	//
+	// Iterator<String> k = checked.keySet().iterator();
+	// if (k.hasNext()) {
+	// String key = k.next();
+	// if (checked.get(key)) {
+	// selected.put(key, key);
+	// } else {
+	// k.remove();
+	// }
+	// }
+	// while (k.hasNext()) {
+	// String key = k.next();
+	// if (checked.get(key)) {
+	// selected.put(key, key);
+	// } else {
+	// k.remove();
+	// }
+	// }
+	// pTab.getRmConfig().setSelectedAttributeSet(selected);
+	// }
+	// return checked;
+	// }
 }

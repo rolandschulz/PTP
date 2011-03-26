@@ -78,6 +78,19 @@ public class RowData implements IJAXBUINonNLSConstants {
 		return data;
 	}
 
+	public String getReplaced(String pattern) {
+		String name = getColumnDisplayValue(COLUMN_NAME);
+		String value = getColumnDisplayValue(COLUMN_VALUE);
+		String result = new String(pattern);
+		if (name != null) {
+			result = result.replaceAll(NAME_TAG, name);
+		}
+		if (value != null) {
+			result = result.replaceAll(VALUE_TAG, name);
+		}
+		return result;
+	}
+
 	public void setColumnValue(String columnName, String displayValue) {
 		if (COLUMN_VALUE.equals(columnName)) {
 			WidgetActionUtils.setValue(valueControl, displayValue);

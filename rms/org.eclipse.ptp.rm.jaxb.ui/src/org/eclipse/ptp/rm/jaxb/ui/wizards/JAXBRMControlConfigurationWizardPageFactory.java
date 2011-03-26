@@ -17,7 +17,7 @@ import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 
-public class JAXBRMConfigurationWizardPageFactory extends RMConfigurationWizardPageFactory {
+public class JAXBRMControlConfigurationWizardPageFactory extends RMConfigurationWizardPageFactory {
 
 	/*
 	 * (non-Javadoc)
@@ -29,7 +29,6 @@ public class JAXBRMConfigurationWizardPageFactory extends RMConfigurationWizardP
 	@Override
 	public RMConfigurationWizardPage[] getPages(IRMConfigurationWizard wizard) {
 		List<RMConfigurationWizardPage> pages = new ArrayList<RMConfigurationWizardPage>();
-		pages.add(new JAXBRMConfigurationSelectionWizardPage(wizard));
 		pages.add(new JAXBRMControlConfigurationWizardPage(wizard));
 		return pages.toArray(new RMConfigurationWizardPage[0]);
 	}

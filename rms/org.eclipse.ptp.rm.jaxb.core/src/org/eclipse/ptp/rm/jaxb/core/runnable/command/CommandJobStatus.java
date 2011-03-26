@@ -11,6 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core.runnable.command;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
+import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
@@ -23,6 +24,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private ILaunchConfiguration launchConfig;
 	private String state;
 	private ICommandJobStreamsProxy proxy;
+	private IRemoteProcess process;
 	private boolean waitEnabled;
 
 	public CommandJobStatus() {
@@ -37,6 +39,15 @@ public class CommandJobStatus implements ICommandJobStatus {
 		waitEnabled = false;
 	}
 
+	public synchronized void cancel() {
+		if (proxy != null) {
+			proxy.close();
+		}
+		if (process != null) {
+			process.destroy();
+		}
+	}
+
 	public void cancelWait() {
 		synchronized (this) {
 			waitEnabled = false;
@@ -44,21 +55,19 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
-	public String getJobId() {
-		synchronized (this) {
-			return jobId;
-		}
+	public synchronized String getJobId() {
+		return jobId;
 	}
 
 	public ILaunchConfiguration getLaunchConfiguration() {
 		return launchConfig;
 	}
 
-	public String getState() {
+	public synchronized String getState() {
 		return state;
 	}
 
-	public String getStateDetail() {
+	public synchronized String getStateDetail() {
 		return state;
 	}
 
@@ -66,12 +75,30 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return proxy;
 	}
 
+	public boolean isInteractive() {
+		return process != null;
+	}
+
 	public void setLaunchConfig(ILaunchConfiguration launchConfig) {
 		this.launchConfig = launchConfig;
 	}
 
+	public void setProcess(IRemoteProcess process) {
+		this.process = process;
+	}
+
 	public void setProxy(ICommandJobStreamsProxy proxy) {
 		this.proxy = proxy;
+	}
+
+	public synchronized void setState(String state) {
+		this.state = state;
+	}
+
+	public synchronized void startProxy() {
+		if (proxy != null) {
+			proxy.startMonitors();
+		}
 	}
 
 	public void waitForJobId(String uuid) {

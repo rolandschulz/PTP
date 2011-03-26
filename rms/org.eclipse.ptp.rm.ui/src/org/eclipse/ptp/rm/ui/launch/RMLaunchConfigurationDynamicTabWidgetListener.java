@@ -17,8 +17,7 @@ import org.eclipse.swt.events.SelectionEvent;
 public abstract class RMLaunchConfigurationDynamicTabWidgetListener extends WidgetListener {
 	private final BaseRMLaunchConfigurationDynamicTab dynamicTab;
 
-	public RMLaunchConfigurationDynamicTabWidgetListener(
-			BaseRMLaunchConfigurationDynamicTab dynamicTab) {
+	public RMLaunchConfigurationDynamicTabWidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
 		super();
 		this.dynamicTab = dynamicTab;
 	}
@@ -26,22 +25,22 @@ public abstract class RMLaunchConfigurationDynamicTabWidgetListener extends Widg
 	@Override
 	public void modifyText(ModifyEvent e) {
 		super.modifyText(e);
-		if (isEnabled()) {
-			dynamicTab.fireContentsChanged();
-		}
-	}
-
-	@Override
-	public void widgetSelected(SelectionEvent e) {
-		super.widgetSelected(e);
-		if (isEnabled()) {
-			dynamicTab.fireContentsChanged();
-		}
+		maybeFireContentsChanged();
 	}
 
 	@Override
 	public void widgetDefaultSelected(SelectionEvent e) {
 		super.widgetDefaultSelected(e);
+		maybeFireContentsChanged();
+	}
+
+	@Override
+	public void widgetSelected(SelectionEvent e) {
+		super.widgetSelected(e);
+		maybeFireContentsChanged();
+	}
+
+	protected void maybeFireContentsChanged() {
 		if (isEnabled()) {
 			dynamicTab.fireContentsChanged();
 		}

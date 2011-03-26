@@ -9,10 +9,21 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
 public interface ICommandJobStatus extends IJobStatus {
+	void cancel();
+
 	void cancelWait();
+
+	boolean isInteractive();
+
+	void setProcess(IRemoteProcess process);
+
+	void setState(String state);
+
+	void startProxy();
 
 	void waitForJobId(String uuid);
 }

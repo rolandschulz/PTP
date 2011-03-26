@@ -100,8 +100,10 @@ public interface IJAXBNonNLSConstants {
 	String VALIDATOR = "validator";//$NON-NLS-1$
 	String SELECTED = "visible";//$NON-NLS-1$
 	String THIS = "this.";//$NON-NLS-1$
-	String JOB_ID_TAG = "@jobId@";//$NON-NLS-1$
 	String LOCAL = "local";//$NON-NLS-1$
+	String JOB_ID_TAG = "@jobId";//$NON-NLS-1$
+	String NAME_TAG = AMP + NAME;
+	String VALUE_TAG = AMP + VALUE;
 
 	/* STANDARD PROPERTIES */
 	String ID = "id";//$NON-NLS-1$
@@ -156,7 +158,8 @@ public interface IJAXBNonNLSConstants {
 	String JOBSTATUS = "GetJobStatus";//$NON-NLS-1$
 	String SUBMIT_INTERACTIVE = "submit-interactive";//$NON-NLS-1$
 	String SUBMIT_BATCH = "submit-batch";//$NON-NLS-1$
-	String SUBMIT_DEBUG = "submit-debug";//$NON-NLS-1$
+	String SUBMIT_DEBUG_INTERACTIVE = "submit-debug-interactive";//$NON-NLS-1$
+	String SUBMIT_DEBUG_BATCH = "submit-debug-batch";//$NON-NLS-1$
 
 	String JOB_ATTRIBUTE = "jobAttribute";//$NON-NLS-1$
 	String ATTRIBUTE = "attribute";//$NON-NLS-1$

@@ -30,7 +30,7 @@
 				<read delim="\n" all="true" save="1">
 					<match>
 						<expression>([\d]*)[.].*</expression>
-						<target ref="@jobId@"/>
+						<target ref="@jobId"/>
 						<set field="value">
 							<entry valueGroup="1"/>
 						</set>
@@ -120,10 +120,10 @@
 				<read delim="\n" mode="and">
 					<match>
 						<expression>name:(.*)</expression>
-						<target type="property"/>
-						<set field="name">
-							<entry valueGroup="1"/>
-						</set>
+						<target type="property" idFrom="1"/>
+<!--						<set field="name">-->
+<!--							<entry valueGroup="1"/>-->
+<!--						</set>-->
 					</match>
 					<match>
 						<expression>value:(.*)</expression>
@@ -140,10 +140,10 @@
 				<read delim="\n" mode="and">
 					<match>
 						<expression>name:(.*)</expression>
-						<target type="attribute"/>
-						<set field="name">
-							<entry valueGroup="1"/>
-						</set>
+						<target type="attribute" idFrom="1"/>
+<!--						<set field="name">-->
+<!--							<entry valueGroup="1"/>-->
+<!--						</set>-->
 					</match>
 					<match>
 						<expression>value:(.*)</expression>
@@ -291,13 +291,13 @@
 		<get-job-status name="test10GetStatus">
 			<args>
             <arg>/Users/arossi/qstatId</arg>
-            <arg>@jobId@</arg>
+            <arg>${rm:@jobId#value}</arg>
          </args>
 			<stdout-parser>
 				<read delim="\n">
 					<match>
 						<expression>.+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
-						<target ref="@jobId@"/>
+						<target ref="@jobId"/>
 						<set field="value">
 						   <entry valueGroup="1"/>
 						</set>
