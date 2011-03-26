@@ -7,9 +7,6 @@
 
 package org.eclipse.ptp.rm.jaxb.core.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -17,21 +14,18 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>
- * Java class for append complex type.
+ * Java class for template complex type.
  * 
  * <p>
  * The following schema fragment specifies the expected content contained within
  * this class.
  * 
  * <pre>
- * &lt;complexType name="append">
+ * &lt;complexType name="template">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="entry" type="{http://org.eclipse.ptp/rm}entry" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="field" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="separator" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="pattern" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="separator" type="{http://www.w3.org/2001/XMLSchema}string" default=" " />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -40,52 +34,22 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "append", propOrder = { "entry" })
-public class Append {
+@XmlType(name = "template")
+public class Template {
 
-	protected List<Entry> entry;
 	@XmlAttribute
-	protected String field;
+	protected String pattern;
 	@XmlAttribute
 	protected String separator;
 
 	/**
-	 * Gets the value of the entry property.
-	 * 
-	 * <p>
-	 * This accessor method returns a reference to the live list, not a
-	 * snapshot. Therefore any modification you make to the returned list will
-	 * be present inside the JAXB object. This is why there is not a
-	 * <CODE>set</CODE> method for the entry property.
-	 * 
-	 * <p>
-	 * For example, to add a new item, do as follows:
-	 * 
-	 * <pre>
-	 * getEntry().add(newItem);
-	 * </pre>
-	 * 
-	 * 
-	 * <p>
-	 * Objects of the following type(s) are allowed in the list {@link Entry }
-	 * 
-	 * 
-	 */
-	public List<Entry> getEntry() {
-		if (entry == null) {
-			entry = new ArrayList<Entry>();
-		}
-		return this.entry;
-	}
-
-	/**
-	 * Gets the value of the field property.
+	 * Gets the value of the pattern property.
 	 * 
 	 * @return possible object is {@link String }
 	 * 
 	 */
-	public String getField() {
-		return field;
+	public String getPattern() {
+		return pattern;
 	}
 
 	/**
@@ -95,18 +59,22 @@ public class Append {
 	 * 
 	 */
 	public String getSeparator() {
-		return separator;
+		if (separator == null) {
+			return " "; //$NON-NLS-1$
+		} else {
+			return separator;
+		}
 	}
 
 	/**
-	 * Sets the value of the field property.
+	 * Sets the value of the pattern property.
 	 * 
 	 * @param value
 	 *            allowed object is {@link String }
 	 * 
 	 */
-	public void setField(String value) {
-		this.field = value;
+	public void setPattern(String value) {
+		this.pattern = value;
 	}
 
 	/**
