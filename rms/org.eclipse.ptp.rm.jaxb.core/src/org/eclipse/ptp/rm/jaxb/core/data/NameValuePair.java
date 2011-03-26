@@ -10,26 +10,22 @@ package org.eclipse.ptp.rm.jaxb.core.data;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>
- * Java class for column-data complex type.
+ * Java class for name-value-pair complex type.
  * 
  * <p>
  * The following schema fragment specifies the expected content contained within
  * this class.
  * 
  * <pre>
- * &lt;complexType name="column-data">
+ * &lt;complexType name="name-value-pair">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="style" type="{http://org.eclipse.ptp/rm}style"/>
- *       &lt;/sequence>
- *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="width" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="value" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -38,15 +34,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "column-data", propOrder = { "style" })
-public class ColumnData {
+@XmlType(name = "name-value-pair")
+public class NameValuePair {
 
-	@XmlElement(required = true)
-	protected Style style;
-	@XmlAttribute
+	@XmlAttribute(required = true)
 	protected String name;
 	@XmlAttribute
-	protected String width;
+	protected String value;
 
 	/**
 	 * Gets the value of the name property.
@@ -59,23 +53,13 @@ public class ColumnData {
 	}
 
 	/**
-	 * Gets the value of the style property.
-	 * 
-	 * @return possible object is {@link Style }
-	 * 
-	 */
-	public Style getStyle() {
-		return style;
-	}
-
-	/**
-	 * Gets the value of the width property.
+	 * Gets the value of the value property.
 	 * 
 	 * @return possible object is {@link String }
 	 * 
 	 */
-	public String getWidth() {
-		return width;
+	public String getValue() {
+		return value;
 	}
 
 	/**
@@ -90,25 +74,14 @@ public class ColumnData {
 	}
 
 	/**
-	 * Sets the value of the style property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link Style }
-	 * 
-	 */
-	public void setStyle(Style value) {
-		this.style = value;
-	}
-
-	/**
-	 * Sets the value of the width property.
+	 * Sets the value of the value property.
 	 * 
 	 * @param value
 	 *            allowed object is {@link String }
 	 * 
 	 */
-	public void setWidth(String value) {
-		this.width = value;
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 }
