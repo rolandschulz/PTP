@@ -25,6 +25,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
@@ -35,6 +36,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
@@ -52,8 +54,8 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
 public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl,
 		IJAXBNonNLSConstants {
 
-	private class StreamProxyMap extends Thread {
-		private final Map<String, ICommandJobStreamsProxy> map = new HashMap<String, ICommandJobStreamsProxy>();
+	private class JobStatusMap extends Thread {
+		private final Map<String, ICommandJobStatus> map = new HashMap<String, ICommandJobStatus>();
 		private boolean running = false;
 
 		@Override
@@ -76,14 +78,19 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 						if (IJobStatus.COMPLETED.equals(state) || IJobStatus.FAILED.equals(state)) {
 							toPrune.put(jobId, jobId);
 						} else if (IJobStatus.RUNNING.equals(state)) {
-							ICommandJobStreamsProxy proxy = map.get(jobId);
-							proxy.startMonitors();
+							ICommandJobStatus commandJobStatus = map.get(jobId);
+							if (commandJobStatus != null) {
+								commandJobStatus.startProxy();
+							}
 						}
 					}
-					for (Iterator<Map.Entry<String, ICommandJobStreamsProxy>> i = map.entrySet().iterator(); i.hasNext();) {
-						Map.Entry<String, ICommandJobStreamsProxy> e = i.next();
+					for (Iterator<Map.Entry<String, ICommandJobStatus>> i = map.entrySet().iterator(); i.hasNext();) {
+						Map.Entry<String, ICommandJobStatus> e = i.next();
 						if (null != toPrune.remove(e.getKey())) {
-							e.getValue().close();
+							ICommandJobStatus status = e.getValue();
+							if (status != null) {
+								status.cancel();
+							}
 							i.remove();
 						}
 					}
@@ -92,25 +99,27 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			synchronized (map) {
 				for (String jobId : map.keySet()) {
-					ICommandJobStreamsProxy proxy = map.remove(jobId);
-					proxy.close();
+					ICommandJobStatus status = map.get(jobId);
+					if (status != null) {
+						status.cancel();
+					}
 				}
 				map.clear();
 			}
 		}
 
-		private void addProxy(String jobId, ICommandJobStreamsProxy proxy) {
+		private void addJobStatus(String jobId, ICommandJobStatus status) {
 			synchronized (map) {
-				map.put(jobId, proxy);
+				map.put(jobId, status);
 			}
 		}
 
-		private ICommandJobStreamsProxy getProxy(String jobId) {
-			ICommandJobStreamsProxy proxy = null;
+		private ICommandJobStatus getStatus(String jobId) {
+			ICommandJobStatus status = null;
 			synchronized (map) {
-				proxy = map.get(jobId);
+				status = map.get(jobId);
 			}
-			return proxy;
+			return status;
 		}
 
 		private void halt() {
@@ -128,7 +137,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			return b;
 		}
 
-		private void removeProxy(String jobId) {
+		private void removeJobStatus(String jobId) {
 			synchronized (map) {
 				map.remove(jobId);
 			}
@@ -138,7 +147,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private final IJAXBResourceManagerConfiguration config;
 	private final Control controlData;
 	private final Map<String, String> dynSystemEnv;
-	private final StreamProxyMap streamsProxyMap;
+	private final JobStatusMap jobStatusMap;
 	private final RemoteServicesDelegate delegate;
 	private boolean appendSysEnv;
 
@@ -146,16 +155,23 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
 		delegate = new RemoteServicesDelegate(config.getRemoteServicesId(), config.getConnectionName());
+		ResourceManagerData d = null;
+
 		try {
 			config.realizeRMDataFromXML();
+			d = config.getResourceManagerData();
 		} catch (Throwable t) {
 			JAXBCorePlugin.log(t);
 		}
-		assert (null != config.resourceManagerData());
-		controlData = config.resourceManagerData().getControlData();
+
+		if (d != null) {
+			controlData = d.getControlData();
+		} else {
+			controlData = null;
+		}
 		dynSystemEnv = new TreeMap<String, String>();
-		streamsProxyMap = new StreamProxyMap();
-		streamsProxyMap.start();
+		jobStatusMap = new JobStatusMap();
+		jobStatusMap.start();
 	}
 
 	public boolean getAppendSysEnv() {
@@ -220,15 +236,19 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				state = (String) p.getValue();
 			}
 
-			CommandJobStatus status = new CommandJobStatus(jobId, state);
-			ICommandJobStreamsProxy proxy = streamsProxyMap.getProxy(jobId);
-			status.setProxy(proxy);
+			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
+			if (status == null) {
+				status = new CommandJobStatus(jobId, state);
+				jobStatusMap.addJobStatus(jobId, status);
+			} else {
+				status.setState(state);
+			}
 
 			if (IJobStatus.RUNNING.equals(state)) {
-				proxy.startMonitors();
+				status.startProxy();
 			} else if (IJobStatus.FAILED.equals(state) || IJobStatus.COMPLETED.equals(state)) {
-				proxy.close();
-				streamsProxyMap.removeProxy(jobId);
+				status.cancel();
+				jobStatusMap.removeJobStatus(jobId);
 			}
 
 			return status;
@@ -246,7 +266,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			doOnShutdown();
 			doDisconnect();
 			config.clearReferences();
-			streamsProxyMap.halt();
+			jobStatusMap.halt();
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
 			throw ce;
@@ -275,69 +295,66 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
-		try {
-			resetEnv();
-			/*
-			 * give submission a unique id which will in most cases be replaced
-			 * by the resource-generated id for the job/process
-			 */
-			String uuid = UUID.randomUUID().toString();
-			Property p = new Property();
-			p.setConfigurable(false);
-			RMVariableMap.getActiveInstance().getVariables().put(uuid, p);
+		resetEnv();
+		/*
+		 * give submission a unique id which will in most cases be replaced by
+		 * the resource-generated id for the job/process
+		 */
+		String uuid = UUID.randomUUID().toString();
+		Property p = new Property();
+		p.setConfigurable(false);
+		RMVariableMap.getActiveInstance().getVariables().put(uuid, p);
 
-			/*
-			 * overwrite property/attribute values based on user choices
-			 */
-			updatePropertyValuesFromTab(configuration);
+		/*
+		 * overwrite property/attribute values based on user choices
+		 */
+		updatePropertyValuesFromTab(configuration);
 
-			/*
-			 * create the script if necessary; adds the contents to env as
-			 * "${rm:script}" (property, cleared during
-			 * #updatePropertyValuesFromTab and possibly reset from custom
-			 * script contents passed in through the launch configuration; if
-			 * so, the following returns immediately)
-			 */
-			maybeHandleScript(uuid, controlData.getScript());
+		/*
+		 * create the script if necessary; adds the contents to env as
+		 * "${rm:script}" (property, cleared during #updatePropertyValuesFromTab
+		 * and possibly reset from custom script contents passed in through the
+		 * launch configuration; if so, the following returns immediately)
+		 */
+		maybeHandleScript(uuid, controlData.getScript());
 
-			/*
-			 * if the script is to be staged, a managed file pointing to
-			 * ${rm:script#value} as its content must exist.
-			 */
-			if (!maybeHandleManagedFiles(uuid, controlData.getManagedFiles())) {
-				throw CoreExceptionUtils.newException(Messages.CannotCompleteSubmitFailedStaging, null);
-			}
-
-			CommandJob job = doJobSubmitCommand(uuid, mode);
-
-			/*
-			 * If the submit job lacks a jobId on the standard streams, then we
-			 * assign it the UUID (it is most probably interactive); else we
-			 * wait for the id to be set by the tokenizer.
-			 */
-			CommandJobStatus status = null;
-			if (job.waitForId()) {
-				status = new CommandJobStatus();
-				status.waitForJobId(uuid);
-			} else {
-				String state = job.isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
-				status = new CommandJobStatus(uuid, state);
-			}
-
-			/*
-			 * property containing actual jobId as name was accessed in the wait
-			 * call
-			 */
-			RMVariableMap.getActiveInstance().getVariables().remove(uuid);
-			ICommandJobStreamsProxy proxy = job.getProxy();
-			status.setProxy(proxy);
-			streamsProxyMap.addProxy(status.getJobId(), proxy);
-			status.setLaunchConfig(configuration);
-			return status;
-		} catch (CoreException ce) {
-			getResourceManager().setState(IResourceManager.ERROR_STATE);
-			throw ce;
+		/*
+		 * if the script is to be staged, a managed file pointing to
+		 * ${rm:script#value} as its content must exist.
+		 */
+		if (!maybeHandleManagedFiles(uuid, controlData.getManagedFiles())) {
+			throw CoreExceptionUtils.newException(Messages.CannotCompleteSubmitFailedStaging, null);
 		}
+
+		CommandJob job = doJobSubmitCommand(uuid, mode);
+
+		/*
+		 * If the submit job lacks a jobId on the standard streams, then we
+		 * assign it the UUID (it is most probably interactive); else we wait
+		 * for the id to be set by the tokenizer.
+		 */
+		CommandJobStatus status = null;
+		if (job.waitForId()) {
+			status = new CommandJobStatus();
+			status.waitForJobId(uuid);
+		} else {
+			String state = job.isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
+			status = new CommandJobStatus(uuid, state);
+		}
+
+		/*
+		 * property containing actual jobId as name was accessed in the wait
+		 * call
+		 */
+		RMVariableMap.getActiveInstance().getVariables().remove(uuid);
+		ICommandJobStreamsProxy proxy = job.getProxy();
+		status.setProxy(proxy);
+		jobStatusMap.addJobStatus(status.getJobId(), status);
+		status.setLaunchConfig(configuration);
+		if (!job.isBatch()) {
+			status.setProcess(job.getProcess());
+		}
+		return status;
 	}
 
 	/*
@@ -363,6 +380,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		CoreException ce = CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + operation, null);
 		Command job = null;
 		if (TERMINATE_OPERATION.equals(operation)) {
+			if (maybeKillInteractive(jobId)) {
+				return;
+			}
+
 			job = controlData.getTerminateJob();
 			if (job == null) {
 				throw ce;
@@ -406,7 +427,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * Run either in interactive, batch or debug mode. right now,
+	 * Run either in interactive, batch or debug mode right now,
 	 * ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the two
 	 * choices, meaning a single configuration cannot support both batch and
 	 * interactive.
@@ -431,8 +452,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					batch = true;
 					break;
 				}
-			} else if (job.getName().equals(SUBMIT_DEBUG)) {
+			} else if (job.getName().equals(SUBMIT_DEBUG_INTERACTIVE)) {
 				if (ILaunchManager.DEBUG_MODE.equals(mode)) {
+					break;
+				}
+			} else if (job.getName().equals(SUBMIT_DEBUG_BATCH)) {
+				if (ILaunchManager.DEBUG_MODE.equals(mode)) {
+					batch = true;
 					break;
 				}
 			}
@@ -505,6 +531,16 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 	}
 
+	private boolean maybeKillInteractive(String jobId) {
+		ICommandJobStatus status = jobStatusMap.getStatus(jobId);
+		if (status != null && status.isInteractive()) {
+			status.cancel();
+			jobStatusMap.removeJobStatus(jobId);
+			return true;
+		}
+		return false;
+	}
+
 	@SuppressWarnings("rawtypes")
 	private void maybeOverwrite(String key1, String key2, ILaunchConfiguration configuration, Map<String, Object> env)
 			throws CoreException {
@@ -554,7 +590,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		CommandJob job = new CommandJob(uuid, command, this);
+		CommandJob job = new CommandJob(uuid, command, batch, this);
 		if (batch) {
 			Property p = (Property) RMVariableMap.getActiveInstance().getVariables().get(STDOUT);
 			if (p != null) {

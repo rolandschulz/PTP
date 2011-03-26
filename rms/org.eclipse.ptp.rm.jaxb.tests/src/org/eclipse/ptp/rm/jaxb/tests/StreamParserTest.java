@@ -177,6 +177,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		target = uuid;
 		Property p = new Property();
 		p.setName(target);
+		p.setValue(target);
 		RMVariableMap.getActiveInstance().getVariables().put(target, p);
 		runTokenizer(startup.get(1).getStdoutParser().getRead(), getNoiseBeforeJobId());
 		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);

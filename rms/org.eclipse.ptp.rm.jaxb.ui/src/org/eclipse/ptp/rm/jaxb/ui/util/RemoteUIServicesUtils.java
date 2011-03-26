@@ -6,8 +6,8 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.remotetools.core.RemoteToolsFileStore;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
@@ -19,37 +19,42 @@ import org.eclipse.swt.widgets.Shell;
 
 public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 
-	public static URI browse(Shell shell, URI uri, RemoteServicesDelegate delegate) throws URISyntaxException {
-		if (uri == null) {
-			return null;
-		}
-
+	public static URI browse(Shell shell, URI current, RemoteServicesDelegate delegate, boolean remote) throws URISyntaxException {
 		IRemoteUIServices uIServices = null;
 		IRemoteUIFileManager uiFileManager = null;
+		IRemoteConnection conn = null;
+		URI home = null;
 		String path = null;
 
-		if (FILE_SCHEME.equals(uri.getScheme())) {
+		if (!remote) {
 			uIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(delegate.getLocalServices());
 			uiFileManager = uIServices.getUIFileManager();
-			uiFileManager.setConnection(delegate.getLocalConnection());
-			File f = new File(uri.getPath());
-			path = f.getAbsolutePath();
+			conn = delegate.getLocalConnection();
+			home = delegate.getLocalHome();
 		} else {
 			uIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(delegate.getRemoteServices());
 			uiFileManager = uIServices.getUIFileManager();
-			uiFileManager.setConnection(delegate.getRemoteConnection());
-			path = RemoteToolsFileStore.getInstance(uri).getName();
+			conn = delegate.getRemoteConnection();
+			home = delegate.getRemoteHome();
 		}
 
+		path = current == null ? home.getPath() : current.getPath();
+
 		try {
+			uiFileManager.setConnection(conn);
+			uiFileManager.showConnections(remote);
 			path = uiFileManager
 					.browseFile(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, IRemoteUIConstants.OPEN);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
 
-		return path == null ? null : new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), path,
-				uri.getQuery(), uri.getFragment());
+		if (path == null) {
+			return current;
+		}
+
+		return new URI(home.getScheme(), home.getUserInfo(), home.getHost(), home.getPort(), path, home.getQuery(),
+				home.getFragment());
 	}
 
 	public static URI exportResource(URI resource, Shell shell) throws Throwable {

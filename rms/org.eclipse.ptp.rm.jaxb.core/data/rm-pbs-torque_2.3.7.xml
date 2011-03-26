@@ -329,7 +329,7 @@
 		<get-job-status name="get-job-status">
 			<args>
 				<arg>/Users/arossi/qstatId</arg>
-				<arg>@jobId@</arg>
+				<arg>${rm:@jobId#value}</arg>
 			</args>
 			<stdout-parser>
 				<read delim="\n">

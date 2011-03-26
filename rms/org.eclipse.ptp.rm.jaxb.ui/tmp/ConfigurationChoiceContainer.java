@@ -76,7 +76,6 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 	private final Button browseButton;
 	private final WidgetListener listener;
 	private final Shell shell;
-	private ConnectionChoiceDialog connectionDialog;
 
 	private String selected;
 	private boolean isPreset;
@@ -240,7 +239,7 @@ public abstract class ConfigurationChoiceContainer implements IJAXBUINonNLSConst
 			return;
 		}
 
-		IRemoteResourceManagerConfiguration c = connectionDialog.getConfig();
+		IRemoteResourceManagerConfiguration c = null;
 		String id = c.getRemoteServicesId();
 		String name = c.getConnectionName();
 		if (delegate == null) {

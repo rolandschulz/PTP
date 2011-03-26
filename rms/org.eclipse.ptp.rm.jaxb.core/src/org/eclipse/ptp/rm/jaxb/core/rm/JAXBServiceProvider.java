@@ -11,10 +11,13 @@ package org.eclipse.ptp.rm.jaxb.core.rm;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
@@ -26,9 +29,12 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.osgi.framework.Bundle;
 
 public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfiguration implements IJAXBResourceManagerConfiguration,
 		IJAXBNonNLSConstants {
+
+	private static final String DEFAULT_PBS = "rm-pbs-torque_2.3.7.xml"; //$NON-NLS-1$
 
 	private ResourceManagerData rmdata;
 	private RMVariableMap map;
@@ -167,13 +173,34 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		return list.split(CM);
 	}
 
+	public ResourceManagerData getResourceManagerData() {
+		return rmdata;
+	}
+
 	@Override
 	public String getResourceManagerId() {
 		return getId();
 	}
 
+	/*
+	 * FOR TESTING ONLY: DEFAULT XML SET WHEN THE CONFIGURATION MANAGEMENT IS IN
+	 * PLACE, REMOVE XXX
+	 */
 	public String getRMInstanceXMLLocation() {
-		return getString(RM_XSD_PATH, ZEROSTR);
+		String loc = getString(RM_XSD_PATH, ZEROSTR);
+
+		if (ZEROSTR.equals(loc)) {
+			Bundle bundle = JAXBCorePlugin.getDefault().getBundle();
+			URL uri = FileLocator.find(bundle, new Path(DATA + DEFAULT_PBS), null);
+			if (uri != null) {
+				loc = uri.getPath();
+				putString(RM_XSD_PATH, loc);
+			}
+		}
+
+		System.out.println(loc);
+
+		return loc;
 	}
 
 	public Map<String, String> getSelectedAttributeSet() {
@@ -212,10 +239,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 
 	public void removeValidAttributeSet() {
 		keySet().remove(VALID_ATTRIBUTES);
-	}
-
-	public ResourceManagerData resourceManagerData() {
-		return rmdata;
 	}
 
 	public void setActive() throws Throwable {

@@ -97,6 +97,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private final ICommandJobStreamsProxy proxy;
 	private final boolean waitForId;
 
+	private IRemoteProcess process;
 	private IStreamParserTokenizer stdoutTokenizer;
 	private IStreamParserTokenizer stderrTokenizer;
 	private Thread stdoutT;
@@ -105,17 +106,27 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private InputStream tokenizerErr;
 	private StreamSplitter outSplitter;
 	private StreamSplitter errSplitter;
-	private boolean active;
 	private String remoteOutPath;
 	private String remoteErrPath;
+	private boolean active;
+	private final boolean batch;
 
-	public CommandJob(String jobUUID, Command command, IJAXBResourceManagerControl rm) {
+	public CommandJob(String jobUUID, Command command, boolean batch, IJAXBResourceManagerControl rm) {
 		super(command.getName());
 		this.command = command;
+		this.batch = batch;
 		this.rm = rm;
 		this.uuid = jobUUID;
 		this.proxy = new CommandJobStreamsProxy();
 		this.waitForId = command.isWaitForId();
+	}
+
+	public boolean isBatch() {
+		return batch;
+	}
+
+	public IRemoteProcess getProcess() {
+		return process;
 	}
 
 	public ICommandJobStreamsProxy getProxy() {
@@ -152,7 +163,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			prepareEnv(builder);
 			maybeInitializeTokenizers();
 
-			IRemoteProcess process = null;
+			process = null;
 			try {
 				process = builder.start();
 			} catch (IOException t) {
