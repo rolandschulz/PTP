@@ -5,47 +5,39 @@
 		<!-- EXAMPLE 1: output is a list of line-separated queue names to be assigned
 			to the known property "available-queues" -->
 		<start-up-command name="test00ParseQstat">
-			<args>
-				<arg></arg>
-			</args>
-			<stdout-parser>
-				<read delim="\n">
+			<arg/>
+			<stdout-parser delim="\n">
+				<target ref="available_queues">
 					<match>
 						<expression>[^\s]+</expression>
-						<target ref="available_queues"/>
 						<append field="value" separator=",">
 							<entry valueGroup="0"/>
 						</append>
 					</match>
-				</read>
+				</target>
 			</stdout-parser>
 		</start-up-command>
 		<!-- EXAMPLE 2: output is to be searched for its final line which should
 			contain a job id of the form "[digits].[chars]" -->
 		<start-up-command name="test01JobId">
-			<args>
-				<arg></arg>
-			</args>
-			<stdout-parser>
-				<read delim="\n" all="true" save="1">
+			<arg/>
+			<stdout-parser delim="\n" all="true" save="1">
+				<target ref="@jobId">
 					<match>
 						<expression>([\d]*)[.].*</expression>
-						<target ref="@jobId"/>
 						<set field="value">
 							<entry valueGroup="1"/>
 						</set>
 					</match>
-				</read>
+				</target>
 			</stdout-parser>
 		</start-up-command>
 		<!-- EXAMPLE 3: indeterminate number and order of lines containing parts
 			of attribute definitions, but each line bearing a distinct
 			id (e.g., openMPI attribute discovery) -->
 		<start-up-command name="test02OpenMPI">
-			<args>
-				<arg></arg>
-			</args>
-			<stdout-parser>
+			<arg/>
+			<stdout-parser delim="\n">
 				<read delim="\n">
 					<match>
 						<expression>mca:.*:param:([^:]*):value:(.*)</expression>
@@ -108,10 +100,8 @@
 		<!-- EXAMPLE 4: indeterminate number of definitions, but grouped
 			by delimiter -->
 		<start-up-command name="test03ImplicitWithTags">
-			<args>
-				<arg></arg>
-			</args>
-			<stdout-parser>
+			<arg/>
+			<stdout-parser delim="\n">
 				<read delim="\n">
 					<match>
 						<expression>PROPERTY</expression>
@@ -121,9 +111,9 @@
 					<match>
 						<expression>name:(.*)</expression>
 						<target type="property" idFrom="1"/>
-<!--						<set field="name">-->
-<!--							<entry valueGroup="1"/>-->
-<!--						</set>-->
+						<!-- <set field="name"> -->
+						<!-- <entry valueGroup="1"/> -->
+						<!-- </set> -->
 					</match>
 					<match>
 						<expression>value:(.*)</expression>
@@ -141,9 +131,9 @@
 					<match>
 						<expression>name:(.*)</expression>
 						<target type="attribute" idFrom="1"/>
-<!--						<set field="name">-->
-<!--							<entry valueGroup="1"/>-->
-<!--						</set>-->
+						<!-- <set field="name"> -->
+						<!-- <entry valueGroup="1"/> -->
+						<!-- </set> -->
 					</match>
 					<match>
 						<expression>value:(.*)</expression>
@@ -156,10 +146,8 @@
 		</start-up-command>
 		<!-- EXAMPLE 5: similar to 4, but without delimiter (implicit ordering) -->
 		<start-up-command name="test04ImplicitOrdering">
-			<args>
-				<arg></arg>
-			</args>
-			<stdout-parser>
+			<arg/>
+			<stdout-parser delim="\n">
 				<read delim="\n" mode="and">
 					<match>
 						<expression>.*</expression>
@@ -197,64 +185,63 @@
 		</start-up-command>
 		<!-- EXAMPLE 6: like 4, but with indeterminate type order -->
 		<start-up-command name="test05ImplicitWithTagsDotall">
-			<args>
-				<arg></arg>
-			</args>
-			<stdout-parser>
-				<read maxMatchLen="32">
-					<match>
-						<expression flags="DOTALL">.*PROPERTY.*name:(\w*).*value:([\d.-]*).*</expression>
-						<target type="property"/>
-						<set field="name">
-							<entry valueGroup="1"/>
-						</set>
-						<set field="value">
-							<entry valueGroup="2"/>
-						</set>
-					</match>
-					<match>
-						<expression flags="DOTALL">.*PROPERTY.*value:([\d.-]*).*name:(\w*).*</expression>
-						<target type="property"/>
-						<set field="name">
-							<entry valueGroup="2"/>
-						</set>
-						<set field="value">
-							<entry valueGroup="1"/>
-						</set>
-					</match>
-					<match>
-						<expression flags="DOTALL">.*ATTRIBUTE.*name:(\w*).*value:([\d.-]*).*</expression>
-						<target type="attribute"/>
-						<set field="name">
-							<entry valueGroup="1"/>
-						</set>
-						<set field="value">
-							<entry valueGroup="2"/>
-						</set>
-					</match>
-					<match>
-						<expression flags="DOTALL">.*ATTRIBUTE.*value:([\d.-]*).*name:(\w*).*</expression>
-						<target type="attribute"/>
-						<set field="name">
-							<entry valueGroup="2"/>
-						</set>
-						<set field="value">
-							<entry valueGroup="1"/>
-						</set>
-					</match>
-				</read>
+			<arg/>
+			<stdout-parser maxMatchLen="32">
+				<or>
+					<target type="property">
+						<match>
+							<expression flags="DOTALL">.*PROPERTY.*name:(\w*).*value:([\d.-]*).*</expression>
+							<set field="name">
+								<entry valueGroup="1"/>
+							</set>
+							<set field="value">
+								<entry valueGroup="2"/>
+							</set>
+						</match>
+					</target>
+					<target type="property">
+						<match>
+							<expression flags="DOTALL">.*PROPERTY.*value:([\d.-]*).*name:(\w*).*</expression>
+							<set field="name">
+								<entry valueGroup="2"/>
+							</set>
+							<set field="value">
+								<entry valueGroup="1"/>
+							</set>
+						</match>
+					</target>
+					<target type="attribute">
+						<match>
+							<expression flags="DOTALL">.*ATTRIBUTE.*name:(\w*).*value:([\d.-]*).*</expression>
+							<set field="name">
+								<entry valueGroup="1"/>
+							</set>
+							<set field="value">
+								<entry valueGroup="2"/>
+							</set>
+						</match>
+					</target>
+					<target type="attribute">
+						<match>
+							<expression flags="DOTALL">.*ATTRIBUTE.*value:([\d.-]*).*name:(\w*).*</expression>
+							<set field="name">
+								<entry valueGroup="2"/>
+							</set>
+							<set field="value">
+								<entry valueGroup="1"/>
+							</set>
+						</match>
+					</target>
+				</or>
 			</stdout-parser>
 		</start-up-command>
 		<!-- EXAMPLE 7: indeterminate number of property definitions, but on single line -->
 		<start-up-command name="test06PropertyDefsSingleLine">
-			<args>
-				<arg></arg>
-			</args>
-			<stdout-parser>
-				<read delim="\n">
+			<arg/>
+			<stdout-parser delim="\n">
+				<target type="property">
 					<match>
 						<expression expression="&lt;name&gt;(.*)&lt;/name&gt;&lt;value&gt;(.*)&lt;/value&gt;"/>
-						<target type="property"/>
 						<set field="name">
 							<entry valueGroup="1"/>
 						</set>
@@ -262,17 +249,15 @@
 							<entry valueGroup="2"/>
 						</set>
 					</match>
-				</read>
+				</target>
 			</stdout-parser>
 		</start-up-command>
 		<!-- EXAMPLE 8: looking for values interspersed in the stream but which will
 			not exceed 32 chars -->
 		<start-up-command name="test07JobStates">
-			<args>
-				<arg></arg>
-			</args>
-			<stdout-parser>
-				<read maxMatchLen="32">
+			<arg/>
+			<stdout-parser maxMatchLen="32">
+				<target ref="jobStates">
 					<match>
 						<expression flags="DOTALL">.*&lt;job&gt;([\d]*):([\w]*)&lt;/job&gt;.*</expression>
 						<target ref="jobStates"/>
@@ -280,26 +265,21 @@
 							<entry keyGroup="1" valueGroup="2"/>
 						</put>
 					</match>
-				</read>
+				</target>
 			</stdout-parser>
 		</start-up-command>
 		<submit-interactive name="empty">
-			<args>
-				<arg></arg>
-			</args>
+			<arg/>
 		</submit-interactive>
 		<get-job-status name="test10GetStatus">
-			<args>
-            <arg>/Users/arossi/qstatId</arg>
-            <arg>${rm:@jobId#value}</arg>
-         </args>
-			<stdout-parser>
-				<read delim="\n">
+			<arg/>
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
 					<match>
 						<expression>.+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
 						<target ref="@jobId"/>
 						<set field="value">
-						   <entry valueGroup="1"/>
+							<entry valueGroup="1"/>
 						</set>
 						<test op="EQ">
 							<value>this.value</value>
@@ -344,7 +324,7 @@
 							</set>
 						</test>
 					</match>
-				</read>
+				</target>
 			</stdout-parser>
 		</get-job-status>
 	</control-data>

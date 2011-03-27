@@ -11,6 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core.data.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IMatchable;
-import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Match;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
@@ -52,70 +52,6 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 			tests.add(new TestImpl(uuid, t));
 		}
 		targets = new ArrayList<Object>();
-	}
-
-	public synchronized void clear() throws Throwable {
-		Map<String, Object> hash = new HashMap<String, Object>();
-		String name = null;
-
-		/*
-		 * Store target if anonymous, which should have a name by now
-		 */
-		for (Object t : targets) {
-			if (PROPERTY.equals(type)) {
-				Property p = (Property) t;
-				name = p.getName();
-				if (name == null) {
-					// shouldn't happen!
-					JAXBCorePlugin.log(Messages.StreamParserNamelessPropertyWarning);
-				} else {
-					Property pp = (Property) hash.get(name);
-					if (pp != null) {
-						merge(pp, p);
-					} else {
-						hash.put(name, p);
-					}
-				}
-			} else if (ATTRIBUTE.equals(type)) {
-				Attribute a = (Attribute) t;
-				name = a.getName();
-				if (name == null) {
-					// shouldn't happen!
-					JAXBCorePlugin.log(Messages.StreamParserNamelessAttributeWarning);
-				} else {
-					Attribute aa = (Attribute) hash.get(name);
-					if (aa != null) {
-						merge(aa, a);
-					} else {
-						hash.put(name, a);
-					}
-				}
-			}
-		}
-
-		Map<String, Object> vmap = RMVariableMap.getActiveInstance().getDiscovered();
-
-		for (Object o : hash.values()) {
-			if (PROPERTY.equals(type)) {
-				Property p = (Property) o;
-				name = p.getName();
-				for (TestImpl t : tests) {
-					t.setTarget(p);
-					t.doTest();
-				}
-			} else if (ATTRIBUTE.equals(type)) {
-				Attribute a = (Attribute) o;
-				name = a.getName();
-				for (TestImpl t : tests) {
-					t.setTarget(a);
-					t.doTest();
-				}
-			}
-			vmap.put(name, o);
-		}
-
-		hash.clear();
-		targets.clear();
 	}
 
 	/*
@@ -161,8 +97,119 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		return target;
 	}
 
+	public synchronized void postProcess() throws Throwable {
+		Map<String, Object> hash = new HashMap<String, Object>();
+		String name = null;
+		Property lastP = null;
+		Attribute lastA = null;
+
+		Iterator<Object> i = targets.iterator();
+
+		if (i.hasNext()) {
+			if (PROPERTY.equals(type)) {
+				lastP = (Property) i.next();
+				name = lastP.getName();
+				if (name != null) {
+					hash.put(name, lastP);
+					lastP = null;
+				}
+			} else if (ATTRIBUTE.equals(type)) {
+				lastA = (Attribute) i.next();
+				name = lastA.getName();
+				if (name != null) {
+					hash.put(name, lastA);
+					lastA = null;
+				}
+			}
+		}
+
+		while (i.hasNext()) {
+			if (PROPERTY.equals(type)) {
+				Property current = (Property) i.next();
+				name = current.getName();
+				if (name != null) {
+					Property prev = (Property) hash.get(name);
+					if (prev != null) {
+						merge(prev, current);
+					} else {
+						if (lastP != null) {
+							merge(lastP, current);
+							hash.put(name, lastP);
+							lastP = null;
+						} else {
+							hash.put(name, current);
+						}
+					}
+				} else {
+					if (lastP != null) {
+						merge(lastP, current);
+					} else {
+						lastP = current;
+					}
+				}
+			} else if (ATTRIBUTE.equals(type)) {
+				Attribute current = (Attribute) i.next();
+				name = current.getName();
+				if (name != null) {
+					Attribute prev = (Attribute) hash.get(name);
+					if (prev != null) {
+						merge(prev, current);
+					} else {
+						if (lastA != null) {
+							merge(lastA, current);
+							hash.put(name, lastA);
+							lastA = null;
+						} else {
+							hash.put(name, current);
+						}
+					}
+				} else {
+					if (lastP != null) {
+						merge(lastA, current);
+					} else {
+						lastA = current;
+					}
+				}
+			}
+		}
+
+		if (lastP != null) {
+			throw new Throwable(Messages.StreamParserNamelessPropertyWarning);
+		}
+		if (lastA != null) {
+			throw new Throwable(Messages.StreamParserNamelessAttributeWarning);
+		}
+
+		Map<String, Object> vmap = RMVariableMap.getActiveInstance().getDiscovered();
+
+		for (Object o : hash.values()) {
+			if (PROPERTY.equals(type)) {
+				Property p = (Property) o;
+				name = p.getName();
+				for (TestImpl t : tests) {
+					t.setTarget(p);
+					t.doTest();
+				}
+			} else if (ATTRIBUTE.equals(type)) {
+				Attribute a = (Attribute) o;
+				name = a.getName();
+				for (TestImpl t : tests) {
+					t.setTarget(a);
+					t.doTest();
+				}
+			}
+			vmap.put(name, o);
+		}
+
+		hash.clear();
+		targets.clear();
+	}
+
 	private void merge(Attribute a, Attribute aa) {
 		String s = aa.getChoice();
+		if (null == a.getName()) {
+			a.setName(aa.getName());
+		}
 		if (null != s) {
 			a.setChoice(s);
 		}
@@ -204,6 +251,9 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	}
 
 	private void merge(Property p, Property pp) {
+		if (null != p.getName()) {
+			p.setName(pp.getName());
+		}
 		Object o = pp.getValue();
 		if (null != o) {
 			p.setValue(o);

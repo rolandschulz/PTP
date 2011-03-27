@@ -34,11 +34,11 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
+import org.eclipse.ptp.rm.jaxb.core.data.Arg;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
-import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
+import org.eclipse.ptp.rm.jaxb.core.data.NameValuePair;
 import org.eclipse.ptp.rm.jaxb.core.data.Tokenizer;
-import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
+import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
@@ -121,10 +121,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		this.waitForId = command.isWaitForId();
 	}
 
-	public boolean isBatch() {
-		return batch;
-	}
-
 	public IRemoteProcess getProcess() {
 		return process;
 	}
@@ -139,6 +135,10 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			b = active;
 		}
 		return b;
+	}
+
+	public boolean isBatch() {
+		return batch;
 	}
 
 	public void setRemoteErrPath(String remoteErrPath) {
@@ -161,7 +161,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			}
 			IRemoteProcessBuilder builder = prepareCommand();
 			prepareEnv(builder);
-			maybeInitializeTokenizers();
 
 			process = null;
 			try {
@@ -170,6 +169,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				throw CoreExceptionUtils.newException(Messages.CouldNotLaunch + builder.command(), t);
 			}
 
+			maybeInitializeTokenizers(builder);
 			setOutStreamRedirection(process);
 			setErrStreamRedirection(process);
 			startConsumers(process);
@@ -238,15 +238,24 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		}
 	}
 
-	private void maybeInitializeTokenizers() throws CoreException {
-		Tokenizer t = command.getStdoutParser();
+	private void maybeInitializeTokenizers(IRemoteProcessBuilder builder) throws CoreException {
+		Tokenizer t = null;
+
+		if (builder.redirectErrorStream()) {
+			t = command.getRedirectParser();
+		}
+
+		if (t == null) {
+			t = command.getStdoutParser();
+		}
+
 		if (t != null) {
 			try {
 				String type = t.getType();
 				if (type != null) {
 					stdoutTokenizer = getTokenizer(type);
 				} else {
-					stdoutTokenizer = new ConfigurableRegexTokenizer(uuid, t.getRead());
+					stdoutTokenizer = new ConfigurableRegexTokenizer(uuid, t);
 				}
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
@@ -260,7 +269,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				if (type != null) {
 					stderrTokenizer = getTokenizer(type);
 				} else {
-					stderrTokenizer = new ConfigurableRegexTokenizer(uuid, t.getRead());
+					stderrTokenizer = new ConfigurableRegexTokenizer(uuid, t);
 				}
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
@@ -269,13 +278,12 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private IRemoteProcessBuilder prepareCommand() throws CoreException {
-		Arglist args = command.getArgs();
+		List<Arg> args = command.getArg();
 		if (args == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
 		}
 		RMVariableMap map = RMVariableMap.getActiveInstance();
-		ArglistImpl arglist = new ArglistImpl(uuid, args, map);
-		String[] cmdArgs = arglist.toArray();
+		String[] cmdArgs = ArgImpl.getArgs(uuid, args, map);
 		RemoteServicesDelegate delegate = rm.getRemoteServicesDelegate();
 		return delegate.getRemoteServices().getProcessBuilder(delegate.getRemoteConnection(), cmdArgs);
 	}
@@ -294,9 +302,9 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			/*
 			 * first static env, then dynamic
 			 */
-			List<EnvironmentVariable> vars = command.getEnvironment();
+			List<NameValuePair> vars = command.getEnvironment();
 			RMVariableMap map = RMVariableMap.getActiveInstance();
-			for (EnvironmentVariable var : vars) {
+			for (NameValuePair var : vars) {
 				EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), map);
 			}
 

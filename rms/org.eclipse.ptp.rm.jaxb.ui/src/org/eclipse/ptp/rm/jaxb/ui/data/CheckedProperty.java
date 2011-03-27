@@ -1,6 +1,6 @@
 package org.eclipse.ptp.rm.jaxb.ui.data;
 
-import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 
@@ -8,26 +8,26 @@ public class CheckedProperty implements IJAXBUINonNLSConstants {
 	private String name;
 	private String description;
 	private boolean checked;
-	private boolean configurable;
+	private boolean visible;
 
 	public CheckedProperty(Object o) {
-		if (o instanceof JobAttribute) {
-			JobAttribute ja = (JobAttribute) o;
+		if (o instanceof Attribute) {
+			Attribute ja = (Attribute) o;
 			name = ja.getName();
 			checked = ja.isSelected();
 			description = ja.getDescription();
-			configurable = ja.isConfigurable();
+			visible = ja.isVisible();
 		} else if (o instanceof Property) {
 			Property p = (Property) o;
 			name = p.getName();
 			checked = p.isSelected();
 			description = ZEROSTR;
-			configurable = p.isConfigurable();
+			visible = p.isVisible();
 		} else if (o instanceof String) {
 			checked = true;
 			name = o.toString();
 			description = ZEROSTR;
-			configurable = true;
+			visible = true;
 		}
 	}
 
@@ -44,7 +44,7 @@ public class CheckedProperty implements IJAXBUINonNLSConstants {
 	}
 
 	public boolean isConfigurable() {
-		return configurable;
+		return visible;
 	}
 
 	public void setChecked(boolean checked) {
@@ -52,7 +52,7 @@ public class CheckedProperty implements IJAXBUINonNLSConstants {
 	}
 
 	public void setConfigurable(boolean configurable) {
-		this.configurable = configurable;
+		this.visible = configurable;
 	}
 
 	public void setDescription(String description) {

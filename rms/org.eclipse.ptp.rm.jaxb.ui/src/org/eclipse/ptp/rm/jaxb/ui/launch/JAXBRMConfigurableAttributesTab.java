@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -24,14 +25,14 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.data.Arglist;
+import org.eclipse.ptp.rm.jaxb.core.data.Arg;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
-import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
-import org.eclipse.ptp.rm.jaxb.core.data.impl.ArglistImpl;
+import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -105,15 +106,18 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 					}
 					if (o instanceof Property) {
 						value = ((Property) o).getValue();
-					} else if (o instanceof JobAttribute) {
-						value = ((JobAttribute) o).getValue();
+					} else if (o instanceof Attribute) {
+						value = ((Attribute) o).getValue();
 					}
 				} else {
-					Arglist arglist = w.getDisplayValue();
-					if (arglist != null) {
-						b.setLength(0);
-						new ArglistImpl(null, arglist, map).toString(b);
-						value = b.toString();
+					Widget.DisplayValue dv = w.getDisplayValue();
+					if (dv != null) {
+						List<Arg> arglist = dv.getArg();
+						if (arglist != null) {
+							b.setLength(0);
+							ArgImpl.toString(null, arglist, map, b);
+							value = b.toString();
+						}
 					}
 				}
 
@@ -184,8 +188,8 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 				}
 				if (o instanceof Property) {
 					defaultValue = ((Property) o).getDefault();
-				} else if (o instanceof JobAttribute) {
-					defaultValue = ((JobAttribute) o).getDefault();
+				} else if (o instanceof Attribute) {
+					defaultValue = ((Attribute) o).getDefault();
 				}
 				if (defaultValue != null) {
 					w.setValue(defaultValue);
@@ -236,8 +240,8 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 					continue;
 				}
 				Object o = vars.get(name);
-				if (o instanceof JobAttribute) {
-					JobAttribute ja = (JobAttribute) o;
+				if (o instanceof Attribute) {
+					Attribute ja = (Attribute) o;
 					Validator v = ja.getValidator();
 					if (v != null) {
 						try {

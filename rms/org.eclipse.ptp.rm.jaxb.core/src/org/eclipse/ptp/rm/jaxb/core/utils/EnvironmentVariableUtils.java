@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.jaxb.core.utils;
 import java.util.Map;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentVariable;
+import org.eclipse.ptp.rm.jaxb.core.data.NameValuePair;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
@@ -20,25 +20,19 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	private EnvironmentVariableUtils() {
 	}
 
-	public static void addVariable(String uuid, EnvironmentVariable var, Map<String, String> env, RMVariableMap map) {
-		String key = var.getValueFrom();
+	public static void addVariable(String uuid, NameValuePair var, Map<String, String> env, RMVariableMap map) {
+		String key = var.getName();
 		String value = getValue(uuid, key, map);
 		if (value != null && !ZEROSTR.equals(value)) {
-			env.put(var.getVariableName(), value);
+			env.put(var.getName(), value);
 		}
 	}
 
-	public static void addVariable(String uuid, EnvironmentVariable var, String syntax, StringBuffer buffer, RMVariableMap map) {
-		String key = var.getValueFrom();
-		String value = getValue(uuid, key, map);
-		addVariable(var.getVariableName(), value, syntax, buffer);
-	}
-
-	public static void addVariable(String name, String value, String syntax, StringBuffer buffer) {
+	public static void addVariable(String name, String value, String directive, StringBuffer buffer) {
 		if (value != null && !ZEROSTR.equals(value)) {
-			if (SETENV.equals(syntax)) {
+			if (SETENV.equals(getSyntax(directive))) {
 				setenv(name, value, buffer);
-			} else if (EXPORT.equals(syntax)) {
+			} else if (EXPORT.equals(getSyntax(directive))) {
 				export(name, value, buffer);
 			}
 		}
@@ -51,6 +45,13 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 
 	private static void export(String name, String value, StringBuffer buffer) {
 		buffer.append(EXPORT).append(SP).append(name).append(EQ).append(QT).append(value).append(QT).append(REMOTE_LINE_SEP);
+	}
+
+	private static Object getSyntax(String directive) {
+		if (directive.indexOf(CSH) >= 0) {
+			return SETENV;
+		}
+		return EXPORT;
 	}
 
 	private static void setenv(String name, String value, StringBuffer buffer) {

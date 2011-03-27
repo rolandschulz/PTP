@@ -29,8 +29,8 @@ import javax.xml.validation.Validator;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
-import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -81,8 +81,8 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	}
 
 	private static void addAttributes(Map<String, Object> env, Control control) {
-		List<JobAttribute> jobAttributes = control.getJobAttribute();
-		for (JobAttribute jobAttribute : jobAttributes) {
+		List<Attribute> jobAttributes = control.getAttribute();
+		for (Attribute jobAttribute : jobAttributes) {
 			String name = jobAttribute.getName();
 			env.put(name, jobAttribute);
 		}

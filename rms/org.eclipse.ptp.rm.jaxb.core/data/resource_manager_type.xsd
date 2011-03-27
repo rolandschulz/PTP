@@ -95,7 +95,7 @@
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="selected" type="xs:boolean" default="true"/>
-		<xs:attribute name="configurable" type="xs:boolean" default="true"/>
+		<xs:attribute name="visible" type="xs:boolean" default="true"/>
 	</xs:complexType>
 	<xs:complexType name="attribute">
 		<xs:sequence>
@@ -137,6 +137,8 @@
 		<xs:sequence>
 			<xs:element name="line" minOccurs="0" maxOccurs="unbounded" type="rm:arg"/>
 		</xs:sequence>
+		<xs:attribute name="envBegin" type="xs:int" default="-1"/>
+		<xs:attribute name="envEnd" type="xs:int" default="-1"/>
 	</xs:complexType>
 	<xs:complexType name="command">
 		<xs:sequence>
@@ -294,6 +296,7 @@
 				</xs:element>
 				<xs:element name="or" type="rm:or"/>
 				<xs:element name="and" type="rm:and"/>
+				<xs:element name="target" type="rm:target"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="delim" type="xs:string"/>
@@ -330,18 +333,18 @@
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="or">
-		<xs:sequence>
-			<xs:element name="or" minOccurs="0" maxOccurs="unbounded" type="rm:or"/>
-			<xs:element name="and" minOccurs="0" maxOccurs="unbounded" type="rm:and"/>
-			<xs:element name="target" minOccurs="0" maxOccurs="unbounded" type="rm:target"/>
-		</xs:sequence>
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="or" minOccurs="0" type="rm:or"/>
+         <xs:element name="and" minOccurs="0" type="rm:and"/>
+         <xs:element name="target" minOccurs="0" type="rm:target"/>
+		</xs:choice>
 	</xs:complexType>
 	<xs:complexType name="and">
-		<xs:sequence>
-			<xs:element name="or" minOccurs="0" maxOccurs="unbounded" type="rm:or"/>
-			<xs:element name="and" minOccurs="0" maxOccurs="unbounded" type="rm:and"/>
-			<xs:element name="target" minOccurs="0" maxOccurs="unbounded" type="rm:target"/>
-		</xs:sequence>
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="or" minOccurs="0" type="rm:or"/>
+			<xs:element name="and" minOccurs="0" type="rm:and"/>
+			<xs:element name="target" minOccurs="0" type="rm:target"/>
+		</xs:choice>
 	</xs:complexType>
 	<xs:complexType name="tab-item-descriptor">
 		<xs:sequence>
@@ -406,9 +409,9 @@
 					</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="arg" maxOccurs="unbounded" type="rm:arg"/>
-					</xs:sequence>
+				  <xs:sequence>
+				     <xs:element name="arg" maxOccurs="unbounded" type="rm:arg"/>
+				  </xs:sequence>
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
@@ -480,7 +483,8 @@
 		<xs:attribute name="pattern" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
-					Express the template using @name, etc., markers for the attribute fields. Example: '@name="@value"' would generate a string of name-value
+					Express the template using @name, etc., markers for the attribute fields. Example: '@name="@value"' would
+					generate a string of name-value
 					assignments (the default separator being whitespace).
 				</xs:documentation>
 			</xs:annotation>

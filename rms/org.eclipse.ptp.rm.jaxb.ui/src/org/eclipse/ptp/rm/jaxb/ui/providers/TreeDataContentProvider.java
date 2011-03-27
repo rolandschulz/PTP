@@ -15,10 +15,10 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.ui.data.ViewerData;
 import org.eclipse.ptp.rm.jaxb.ui.data.RowData;
+import org.eclipse.ptp.rm.jaxb.ui.data.ViewerData;
 
 public class TreeDataContentProvider implements ITreeContentProvider {
 	public void dispose() {
@@ -33,8 +33,8 @@ public class TreeDataContentProvider implements ITreeContentProvider {
 			children.add(p.getName());
 			children.add(p.getDefault());
 			children.add(p.getValue());
-		} else if (data instanceof JobAttribute) {
-			JobAttribute ja = (JobAttribute) data;
+		} else if (data instanceof Attribute) {
+			Attribute ja = (Attribute) data;
 			children.add(ja.getName());
 			children.add(ja.getDefault());
 			children.add(ja.getValue());
@@ -57,7 +57,7 @@ public class TreeDataContentProvider implements ITreeContentProvider {
 	public boolean hasChildren(Object element) {
 		RowData rowData = (RowData) element;
 		Object data = rowData.getData();
-		return (data instanceof Property) || (data instanceof JobAttribute);
+		return (data instanceof Property) || (data instanceof Attribute);
 	}
 
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
