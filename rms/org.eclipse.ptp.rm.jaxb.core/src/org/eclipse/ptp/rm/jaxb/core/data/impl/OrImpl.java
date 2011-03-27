@@ -1,39 +1,35 @@
 package org.eclipse.ptp.rm.jaxb.core.data.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ptp.rm.jaxb.core.IMatchable;
 import org.eclipse.ptp.rm.jaxb.core.data.And;
 import org.eclipse.ptp.rm.jaxb.core.data.Or;
 import org.eclipse.ptp.rm.jaxb.core.data.Target;
 
-public class OrImpl {
+public class OrImpl implements IMatchable {
 
-	private final String uuid;
-	private final List<OrImpl> ors;
-	private final List<AndImpl> ands;
-	private final List<TargetImpl> targets;
+	private List<IMatchable> matchTargets;
 
 	public OrImpl(String uuid, Or or) {
-		this.uuid = uuid;
-		ors = new ArrayList<OrImpl>();
-		List<Or> odata = or.getOr();
-		for (Or o : odata) {
-			ors.add(new OrImpl(uuid, o));
-		}
-		ands = new ArrayList<AndImpl>();
-		List<And> adata = or.getAnd();
-		for (And a : adata) {
-			ands.add(new AndImpl(uuid, a));
-		}
-		targets = new ArrayList<TargetImpl>();
-		List<Target> tdata = or.getTarget();
-		for (Target t : tdata) {
-			targets.add(new TargetImpl(uuid, t));
+		List<Object> targets = or.getOrOrAndOrTarget();
+		for (Object t : targets) {
+			if (t instanceof Or) {
+				matchTargets.add(new OrImpl(uuid, (Or) t));
+			} else if (t instanceof And) {
+				matchTargets.add(new AndImpl(uuid, (And) t));
+			} else if (t instanceof Target) {
+				matchTargets.add(new TargetImpl(uuid, (Target) t));
+			}
 		}
 	}
 
-	public synchronized void doMatch(StringBuffer segment) throws Throwable {
-
+	public synchronized boolean doMatch(StringBuffer segment) throws Throwable {
+		for (IMatchable t : matchTargets) {
+			if (t.doMatch(segment)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
