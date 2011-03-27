@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.data;
 
-import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
@@ -44,8 +44,8 @@ public class RowData implements IJAXBUINonNLSConstants {
 			} else if (COLUMN_DEFAULT.equals(columnName)) {
 				value = p.getDefault();
 			}
-		} else if (data instanceof JobAttribute) {
-			JobAttribute ja = (JobAttribute) data;
+		} else if (data instanceof Attribute) {
+			Attribute ja = (Attribute) data;
 			if (COLUMN_NAME.equals(columnName)) {
 				value = ja.getName();
 			} else if (COLUMN_DESC.equals(columnName)) {

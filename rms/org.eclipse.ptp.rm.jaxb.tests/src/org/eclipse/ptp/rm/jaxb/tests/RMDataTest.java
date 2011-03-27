@@ -17,8 +17,8 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
-import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
@@ -80,8 +80,8 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 		for (Iterator<Map.Entry<String, Object>> i = map.getVariables().entrySet().iterator(); i.hasNext();) {
 			Map.Entry<String, Object> e = i.next();
 			Object o = e.getValue();
-			if (o instanceof JobAttribute) {
-				JobAttribute ja = (JobAttribute) o;
+			if (o instanceof Attribute) {
+				Attribute ja = (Attribute) o;
 				buffer.append(LT).append(GTLT).append(ja.getName()).append(GTLT).append(ja.getType()).append(GTLT)
 						.append(ja.getDefault()).append(GTLT).append(ja.getChoice()).append(GTLT).append(ja.getMax()).append(GTLT)
 						.append(ja.getMin()).append(GTLT).append(ja.getValidator()).append(GTLT).append(ja.getDescription())

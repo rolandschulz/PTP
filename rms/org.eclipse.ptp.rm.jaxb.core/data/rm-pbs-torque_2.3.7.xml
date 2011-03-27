@@ -5,29 +5,29 @@
 		<control-connection>ssh://abe.ncsa.uiuc.edu/usr/local/bin/qsub</control-connection>
 	</site-data>
 	<control-data>
-		<property name="available_queues" configurable="false"/>
+		<property name="available_queues" visible="false"/>
 		<property name="stdout">
 			<value>${rm:Output_Path#value}</value>
 		</property><!-- property needed for forwarding stdout in batch -->
 		<property name="stderr">
 			<value>${rm:Error_Path#value}</value>
 		</property><!-- property needed for forwarding stderr in batch -->
-		<job-attribute name="mpiCommand" basic="true" type="choice">
+		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
-		</job-attribute>
-		<job-attribute name="mpiCores" min="1" basic="true" type="integer">
+		</attribute>
+		<attribute name="mpiCores" min="1" type="integer">
 			<description>the '-np' value</description>
-		</job-attribute>
-		<job-attribute name="mpiArgs" basic="true" type="string" configurable="false">
+		</attribute>
+		<attribute name="mpiArgs" type="string" visible="false">
 			<description>Which mpi options to use.</description>
 			<default>-machinefile $PBS_NODEFILE -np ${rm:mpiCores}</default>
-		</job-attribute>
-		<job-attribute name="Account_Name" basic="true" type="string">
+		</attribute>
+		<attribute name="Account_Name" type="string">
 			<description>Account to which to charge this job.</description>
 			<tooltip>Format: string</tooltip>
-		</job-attribute>
-		<job-attribute name="Checkpoint" type="choice">
+		</attribute>
+		<attribute name="Checkpoint" type="choice">
 			<description>Determines when checkpointing (if supported) will be performed by PBS on behalf of the job.</description>
 			<tooltip>Format: the strings "n" (no checkpointing), "s" (to be performed only when the server executing the job is shutdown), "c"s
 				(to be performed at the default minimum time for thes servers executing the job), "c=mmmm" (to be performed at an intervals ofs
@@ -36,34 +36,34 @@
 			</tooltip>
 			<choice>,u,n,s,c,c=????</choice>
 			<default>u</default>
-		</job-attribute>
-		<job-attribute name="depend" type="string">
+		</attribute>
+		<attribute name="depend" type="string">
 			<description>The type of inter-job dependencies specified by the job owner.</description>
 			<tooltip>Format: "type:jobid[,jobid...]"; default value: no dependencies.</tooltip>
-		</job-attribute>
-		<job-attribute name="destination" type="string" basic="true">
+		</attribute>
+		<attribute name="destination" type="string" basic="true">
 			<description>Designation of the queue to which to submit the job.</description>
 			<tooltip>Format: queue[@server].</tooltip>
-		</job-attribute>
-		<job-attribute name="directive" type="string">
+		</attribute>
+		<attribute name="directive" type="string">
 			<description>Defines the prefix that declares a directive to the qsub command within the script file.</description>
 			<tooltip>See the paragraph on script directives in the Extended Description section. If the option is presented with a
 				directive_prefix argument that is the null string, qsub will not scan the script file for directives.
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="Error_Path" type="string">
+		</attribute>
+		<attribute name="Error_Path" type="string">
 			<description>The final path name for the file containing the job's standard error stream.</description>
 			<tooltip>Format: "[hostname:]pathname". If the option is not specified, the default file name for the standard error stream will be
 				used. The default name has the following form: job_name.eSeq_num where job_name is the name of the job, see -N option, and Seq_num
 				is the job number assigned when the job is submitted; default value: (job_name).e(job_number).
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="export_all" basic="true" type="boolean">
+		</attribute>
+		<attribute name="export_all" type="boolean">
 			<description>Declares that all environment variables in the qsub command's environment are to be exported to the batch job.
 			</description>
 			<default>true</default>
-		</job-attribute>
-		<job-attribute name="group-descriptor_list" type="string">
+		</attribute>
+		<attribute name="group-descriptor_list" type="string">
 			<description>A list of group-descriptor_names@hosts which determines the group-descriptor under which the job is run on a given
 				host.
 			</description>
@@ -75,89 +75,89 @@
 				associated host name, the wildcard name; 3) Use the
 				login group-descriptor for the username under which the job will be run.
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="Hold_Types" type="choice">
+		</attribute>
+		<attribute name="Hold_Types" type="choice">
 			<description>The set of holds currently applied to the job.</description>
 			<tooltip>If the set is not null, the job will not be scheduled for execution and is said to be in the hold state. Note, the hold
 				state takes precedence over the wait state. Format: string made up of the letters 'u', 's', 'o'; default value: no hold.
 			</tooltip>
 			<choice>,u,s,o</choice>
-		</job-attribute>
-		<job-attribute name="Job_Name" type="string" basic="true">
+		</attribute>
+		<attribute name="Job_Name" type="string" basic="true">
 			<description>The name assigned to the job by the qsub or qalter command.</description>
 			<tooltip>Format: string up to 15 characters, first character must be alphabetic; default value: the base name of the job script or
 				STDIN.
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="Join_Path" type="boolean">
+		</attribute>
+		<attribute name="Join_Path" type="boolean">
 			<description>Merge stdout and stderr into stdout.</description>
 			<tooltip>Format: boolean, values accepted are "True", "TRUE", "true", "Y", "y", "1", "False", "FALSE", "false", "N", "n", "0";
 				default value: false.
 			</tooltip>
 			<default>false</default>
-		</job-attribute>
-		<job-attribute name="Keep_Files" type="choice">
+		</attribute>
+		<attribute name="Keep_Files" type="choice">
 			<description>Retain these streams on the execution host upon job termination.</description>
 			<tooltip>Format: "o", "e", "oe" or "eo"; default value: no keep, return files to submission host.</tooltip>
 			<choice>,o,e,oe,eo</choice>
-		</job-attribute>
-		<job-attribute name="Mail_Points" type="choice">
+		</attribute>
+		<attribute name="Mail_Points" type="choice">
 			<description>Identifies at which state changes the server will send mail about the job.</description>
 			<tooltip>Format: string made up of the letters 'a' for abort, 'b' for beginning, and default value: 'a', send on job abort.
 			</tooltip>
 			<choice>,a,b</choice>
 			<default>a</default>
-		</job-attribute>
-		<job-attribute name="Mail_Users" type="string">
+		</attribute>
+		<attribute name="Mail_Users" type="string">
 			<description>The set of users to whom mail may be sent when the job makes certain state changes.</description>
 			<tooltip>Format: "user@host[,user@host]"; default value: job owner only.</tooltip>
-		</job-attribute>
-		<job-attribute name="Output_Path" type="string">
+		</attribute>
+		<attribute name="Output_Path" type="string">
 			<description>The final path name for the file containing the job's standard output stream.</description>
 			<tooltip>Format: "[hostname:]pathname". If the option is not specified, the default file name for the standard error stream will be
 				used. The default name has the following form: job_name.oSeq_num where job_name is the name of the job, see -N option, and Seq_num
 				is the job number assigned when the job is submitted; default value: (job_name).o(job_number).
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="Priority" type="string">
+		</attribute>
+		<attribute name="Priority" type="string">
 			<description>The job scheduling priority assigned by the user.</description>
 			<tooltip>Format: "[+|-]nnnnn"; default value: undefined.</tooltip>
-		</job-attribute>
-		<job-attribute name="Rerunnable" type="choice">
+		</attribute>
+		<attribute name="Rerunnable" type="choice">
 			<description>The rerunnable flag assigned by the user.</description>
 			<tooltip>Format: "y" or "n", see Join_Path; default value: y, job is rerunable.</tooltip>
 			<choice>,n,y</choice>
 			<default>y</default>
-		</job-attribute>
-		<job-attribute name="Resource_List.arch" type="string">
+		</attribute>
+		<attribute name="Resource_List.arch" type="string">
 			<description>Specifies the administrator defined system architecture requried.</description>
 			<tooltip>This defaults to whatever the PBS_MACH string is set to in "local.mk". Units: string.</tooltip>
-		</job-attribute>
-		<job-attribute name="Resource_List.cput" type="string">
+		</attribute>
+		<attribute name="Resource_List.cput" type="string">
 			<description>Maximum amount of CPU time used by all processes in the job.</description>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
-		</job-attribute>
-		<job-attribute name="Resource_List.file" type="string">
+		</attribute>
+		<attribute name="Resource_List.file" type="string">
 			<description>The largest size of any single file that may be created by the job.</description>
 			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 				(kilo), mb/mw (mega), gb/bw (giga).
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="Resource_List.host" type="string">
+		</attribute>
+		<attribute name="Resource_List.host" type="string">
 			<description>Name of host on which job should be run.</description>
-		</job-attribute>
-		<job-attribute name="Resource_List.mem" type="string">
+		</attribute>
+		<attribute name="Resource_List.mem" type="string">
 			<description>Maximum amount of memory used by all concurrent processes in the job.</description>
 			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 				(kilo), mb/mw (mega), gb/bw (giga).
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="Resource_List.nice" type="integer" min="0" max="10">
+		</attribute>
+		<attribute name="Resource_List.nice" type="integer" min="0" max="10">
 			<description>The nice value under which the job is to be run.</description>
 			<tooltip>0 to 10.</tooltip>
 			<default>0</default>
-		</job-attribute>
-		<job-attribute name="Resource_List.nodes" basic="true" type="string">
+		</attribute>
+		<attribute name="Resource_List.nodes" type="string">
 			<description>Number and/or type of nodes to be reserved for exclusive use by the job.</description>
 			<tooltip>The value is one or more node_specs joined with the '+' character, "node_spec[+node_spec...]. Each node_spec is a number of
 				nodes required of the type declared in the node_spec and a name or one or more properity or properities desired for the nodes. The
@@ -167,53 +167,53 @@
 				node: -l nodes=2:blue:ppn=2+red:ppn=3.
 			</tooltip>
 			<default>1</default>
-		</job-attribute>
-		<job-attribute name="Resource_List.ompthreads" type="integer" min="1">
+		</attribute>
+		<attribute name="Resource_List.ompthreads" type="integer" min="1">
 			<description>Number of threads per processor for Open MP jobs.</description>
 			<default>1</default>
-		</job-attribute>
-		<job-attribute name="Resource_List.pcput" type="string">
+		</attribute>
+		<attribute name="Resource_List.pcput" type="string">
 			<description>Maximum amount of CPU time used by any single process in the job.</description>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
-		</job-attribute>
-		<job-attribute name="Resource_List.pmem" type="string">
+		</attribute>
+		<attribute name="Resource_List.pmem" type="string">
 			<description>Maximum amount of physical memory (workingset) used by any single process of the job.</description>
 			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 				(kilo), mb/mw (mega), gb/bw (giga).
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="Resource_List.pvmem" type="string">
+		</attribute>
+		<attribute name="Resource_List.pvmem" type="string">
 			<description>Maximum amount of virtual memory used by any single process in the job.</description>
 			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 				(kilo), mb/mw (mega), gb/bw (giga).
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="Resource_List.vmem" type="string">
+		</attribute>
+		<attribute name="Resource_List.vmem" type="string">
 			<description>Maximum amount of virtual memory used by all concurrent processes in the job.</description>
 			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 				(kilo), mb/mw (mega), gb/bw (giga).
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="Resource_List.walltime" basic="true" type="string">
+		</attribute>
+		<attribute name="Resource_List.walltime" type="string">
 			<description>Maximum amount of real time during which the job can be in the running state.</description>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
-		</job-attribute>
-		<job-attribute name="Shell_Path_List" type="string">
+		</attribute>
+		<attribute name="Shell_Path_List" type="string">
 			<description>A set of absolute paths of the program to process the job's script file.</description>
 			<tooltip>Format: path[@host][,path[@host]...]. If this is null, then the user's login shell on the host of execution will be used.
 				Default value: null, login shell.
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="stagein" type="string">
+		</attribute>
+		<attribute name="stagein" type="string">
 			<description>The list of files to be staged in prior to job execution.</description>
 			<tooltip>Format: local_path@remote_host:remote_path.</tooltip>
-		</job-attribute>
-		<job-attribute name="stageout" type="string">
+		</attribute>
+		<attribute name="stageout" type="string">
 			<description>The list of files to be staged out after job execution.</description>
 			<tooltip>Format: local_path@remote_host:remote_path.</tooltip>
-		</job-attribute>
-		<job-attribute name="User_List" type="string">
+		</attribute>
+		<attribute name="User_List" type="string">
 			<description>The list of user@hosts which determines the user name under which the job is run on a given host.</description>
 			<tooltip>When a job is to be placed into execution, the server will select a user name from the list according to the following
 				ordered set of rules: 1) Select the user name from the list for which the associated host name matches the name of the execution
@@ -221,65 +221,60 @@
 				Default
 				value: job owner name.
 			</tooltip>
-		</job-attribute>
-		<job-attribute name="Variable_List" type="string">
+		</attribute>
+		<attribute name="Variable_List" type="string">
 			<description>This is the list of environment variables passed with the Queue Job batch request.</description>
-		</job-attribute>
+		</attribute>
 		<managed-files>
 			<file-staging-location>.eclipsesettings</file-staging-location>
 			<file name="pbs_script" uniqueIdPrefix="true" deleteAfterUse="true">
 				<contents>${rm:script#value}</contents>
 			</file>
 		</managed-files>
-		<script shellDirective="#!/bin/bash">
-			<directive valueFrom="Account_Name"># @ PBS -A </directive>
-			<directive valueFrom="Checkpoint"># @ PBS -c </directive>
-			<directive valueFrom="depend"># @ PBS -W depend=</directive>
-			<directive valueFrom="destination"># @ PBS -q </directive>
-			<directive valueFrom="directive"># @ PBS -C </directive>
-			<directive valueFrom="Error_Path"># @ PBS -e </directive>
-			<directive valueFrom="export_all"># @ PBS -V </directive>
-			<directive valueFrom="group-descriptor_list"># @ PBS -W group-descriptor_list=</directive>
-			<directive valueFrom="Hold_Types"># @ PBS -h </directive>
-			<directive valueFrom="Job_Name"># @ PBS -N </directive>
-			<directive valueFrom="Join_Path"># @ PBS -j </directive>
-			<directive valueFrom="Keep_Files"># @ PBS -k </directive>
-			<directive valueFrom="Mail_Points"># @ PBS -m </directive>
-			<directive valueFrom="Mail_Users"># @ PBS -M </directive>
-			<directive valueFrom="Output_Path"># @ PBS -o </directive>
-			<directive valueFrom="Priority"># @ PBS -p </directive>
-			<directive valueFrom="Rerunnable"># @ PBS -r </directive>
-			<directive valueFrom="Resource_List.arch"># @ PBS -l arch=</directive>
-			<directive valueFrom="Resource_List.cput"># @ PBS -l cput=</directive>
-			<directive valueFrom="Resource_List.file"># @ PBS -l file=</directive>
-			<directive valueFrom="Resource_List.host"># @ PBS -l host=</directive>
-			<directive valueFrom="Resource_List.mem"># @ PBS -l mem=</directive>
-			<directive valueFrom="Resource_List.nice"># @ PBS -l nice=</directive>
-			<directive valueFrom="Resource_List.nodes"># @ PBS -l nodes=</directive>
-			<directive valueFrom="Resource_List.ompthreads"># @ PBS -l ompthreads=</directive>
-			<directive valueFrom="Resource_List.pcput"># @ PBS -l pcput=</directive>
-			<directive valueFrom="Resource_List.pmem"># @ PBS -l pmem=</directive>
-			<directive valueFrom="Resource_List.pvmem"># @ PBS -l pvmem=</directive>
-			<directive valueFrom="Resource_List.vmem"># @ PBS -l vmem=</directive>
-			<directive valueFrom="Resource_List.walltime"># @ PBS -l walltime=</directive>
-			<directive valueFrom="Shell_Path_List"># @ PBS -S </directive>
-			<directive valueFrom="stagein"># @ PBS -W stagein=</directive>
-			<directive valueFrom="stageout"># @ PBS -W stageout=</directive>
-			<directive valueFrom="User_List"># @ PBS -u </directive>
-			<directive valueFrom="Variable_List"># @ PBS -v </directive>
-			<pre-execute-command>
-				<arg isUndefinedIfEquals="cd">cd ${rm:directory#value}</arg>
-			</pre-execute-command>
-			<execute-command>
-				<arg>${rm:mpiCommand#value}</arg>
-				<arg>${rm:mpiArgs#value}</arg>
-				<arg>${rm:executablePath#value}</arg>
-				<arg>${rm:progArgs#value}</arg>
-			</execute-command>
-			<post-execute-command>
-				<arg>touch</arg>
-				<arg>DONE</arg>
-			</post-execute-command>
+		<script>
+			<line>#!/bin/bash</line>
+			<line isUndefinedIfEquals="# @ PBS -A"># @ PBS -A ${rm:Account_Name#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -c"># @ PBS -c ${rm:Checkpoint#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -W"># @ PBS -W depend=${rm:depend#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -q"># @ PBS -q ${rm:destination#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -C"># @ PBS -C ${rm:line#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -e"># @ PBS -e ${rm:Error_Path#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -V"># @ PBS -V ${rm:export_all#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -W group_list="># @ PBS -W group_list=${rm:group_list#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -h"># @ PBS -h ${rm:Hold_Types#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -N"># @ PBS -N ${rm:Job_Name#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -j"># @ PBS -j ${rm:Join_Path#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -k"># @ PBS -k ${rm:Keep_Files#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -m"># @ PBS -m ${rm:Mail_Points#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -M"># @ PBS -M ${rm:Mail_Users#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -o"># @ PBS -o ${rm:Output_Path#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -p"># @ PBS -p ${rm:Priority#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -r"># @ PBS -r ${rm:Rerunnable#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l arch="># @ PBS -l arch=${rm:Resource_List.arch#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l cput="># @ PBS -l cput=${rm:Resource_List.cput#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l file="># @ PBS -l file=${rm:Resource_List.file#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l host="># @ PBS -l host=${rm:Resource_List.host#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l mem="># @ PBS -l mem=${rm:Resource_List.mem#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l nice="># @ PBS -l nice=${rm:Resource_List.nice#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l nodes="># @ PBS -l nodes=${rm:Resource_List.nodes#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l ompthreads="># @ PBS -l ompthreads=${rm:Resource_List.ompthreads#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l pcput="># @ PBS -l pcput=${rm:Resource_List.pcput#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l pmem="># @ PBS -l pmem=${rm:Resource_List.pmem#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l pvmem="># @ PBS -l pvmem=${rm:Resource_List.pvmem#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l vmem="># @ PBS -l vmem=${rm:Resource_List.vmem#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -l walltime="># @ PBS -l walltime=${rm:Resource_List.walltime#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -S"># @ PBS -S ${rm:Shell_Path_List#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -W stagein="># @ PBS -W stagein=${rm:stagein#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -W stageout="># @ PBS -W stageout=${rm:stageout#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -u"># @ PBS -u ${rm:User_List#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -v"># @ PBS -v ${rm:Variable_List#value}</line>
+			<line isUndefinedIfEquals="cd">cd ${rm:directory#value}</line>
+			<line>${rm:mpiCommand#value}</line>
+			<line>${rm:mpiArgs#value}</line>
+			<line>${rm:executablePath#value}</line>
+			<line>${rm:progArgs#value}</line>
+			<line>touch</line>
+			<line>DONE</line>
 		</script>
 		<!-- ********************** FOR TESTING ********************** -->
 		<start-up-command name="get-queues">
@@ -289,11 +284,9 @@
 				<arg>| cut -d ' ' -f 2</arg>
 				<arg>| tr '\n' ' '</arg>
 			-->
-			<args>
-				<arg>/Users/arossi/qstatF</arg>
-			</args>
-			<stdout-parser>
-				<read delim="\n">
+			<arg>/Users/arossi/qstatF</arg>
+			<stdout-parser delim="\n">
+				<target ref="available_queues">
 					<match>
 						<expression>[^\s]+</expression>
 						<target ref="available_queues"/>
@@ -301,20 +294,17 @@
 							<entry valueGroup="0"/>
 						</add>
 					</match>
-				</read>
+				</target>
 			</stdout-parser>
 		</start-up-command>
 		<!-- ********************** FOR TESTING ********************** -->
 		<submit-interactive name="submit-interactive" waitForId="true">
-			<args>
-				<arg>/Users/arossi/qsub</arg>
-				<arg>${rm:pbs_script#value}</arg>
-			</args>
-			<stdout-parser>
-				<read delim="\n" all="true" save="1">
+			<arg>/Users/arossi/qsub</arg>
+			<arg>${rm:pbs_script#value}</arg>
+			<stdout-parser delim="\n" all="true" save="1">
+				<target ref="@jobId">
 					<match>
 						<expression>([\d]*)[.].*</expression>
-						<target ref="@jobId@"/>
 						<set field="name">
 							<entry valueGroup="1"/>
 						</set>
@@ -322,75 +312,70 @@
 							<entry value="SUBMITTED"/>
 						</set>
 					</match>
-				</read>
+				</target>
 			</stdout-parser>
 		</submit-interactive>
 		<!-- ********************** FOR TESTING ********************** -->
 		<get-job-status name="get-job-status">
-			<args>
-				<arg>/Users/arossi/qstatId</arg>
-				<arg>${rm:@jobId#value}</arg>
-			</args>
-			<stdout-parser>
-				<read delim="\n">
+			<arg>/Users/arossi/qstatId</arg>
+			<arg>${rm:@jobId#value}</arg>
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
 					<match>
 						<expression>.+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
-						<target ref="@jobId@"/>
 						<set field="value">
 							<entry valueGroup="1"/>
 						</set>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>Q</value>
-							<set field="value">
-								<entry value="QUEUED_ACTIVE"/>
-							</set>
-						</test>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>R</value>
-							<set field="value">
-								<entry value="RUNNING"/>
-							</set>
-						</test>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>S</value>
-							<set field="value">
-								<entry value="SUSPENDED"/>
-							</set>
-						</test>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>C</value>
-							<set field="value">
-								<entry value="COMPLETED"/>
-							</set>
-						</test>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>E</value>
-							<set field="value">
-								<entry value="COMPLETED"/>
-							</set>
-						</test>
-						<test op="EQ">
-							<value>this.value</value>
-							<value>H</value>
-							<set field="value">
-								<entry value="SYSTEM_ON_HOLD"/>
-							</set>
-						</test>
 					</match>
-				</read>
+					<test op="EQ">
+						<value>this.value</value>
+						<value>Q</value>
+						<set field="value">
+							<entry value="QUEUED_ACTIVE"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>this.value</value>
+						<value>R</value>
+						<set field="value">
+							<entry value="RUNNING"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>this.value</value>
+						<value>S</value>
+						<set field="value">
+							<entry value="SUSPENDED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>this.value</value>
+						<value>C</value>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>this.value</value>
+						<value>E</value>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>this.value</value>
+						<value>H</value>
+						<set field="value">
+							<entry value="SYSTEM_ON_HOLD"/>
+						</set>
+					</test>
+				</target>
 			</stdout-parser>
 		</get-job-status>
 		<!--
 			<terminate-job name="cancel">
-			<args>
 			<arg>qdel</arg>
 			<arg>@jobId@</arg>
-			</args>
 			</terminate-job>
 		-->
 		<launch-tab>

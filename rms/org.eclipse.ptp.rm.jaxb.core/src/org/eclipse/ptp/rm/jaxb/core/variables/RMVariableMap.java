@@ -18,7 +18,7 @@ import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
@@ -117,8 +117,8 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	private void getDefault(String s, Object object, Map<String, String> defaults) {
-		if (object instanceof JobAttribute) {
-			JobAttribute ja = (JobAttribute) object;
+		if (object instanceof Attribute) {
+			Attribute ja = (Attribute) object;
 			String defaultValue = ja.getDefault();
 			if (defaultValue != null) {
 				defaults.put(ja.getName(), defaultValue);
@@ -158,8 +158,8 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 				s = o.toString();
 			}
 			flat.put(p.getName(), s);
-		} else if (value instanceof JobAttribute) {
-			JobAttribute ja = (JobAttribute) value;
+		} else if (value instanceof Attribute) {
+			Attribute ja = (Attribute) value;
 			Object o = ja.getValue();
 			String s = null;
 			if (o != null) {

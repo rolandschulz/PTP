@@ -40,6 +40,9 @@ public abstract class RMLaunchConfigurationDynamicTabWidgetListener extends Widg
 		maybeFireContentsChanged();
 	}
 
+	/**
+	 * @since 2.0
+	 */
 	protected void maybeFireContentsChanged() {
 		if (isEnabled()) {
 			dynamicTab.fireContentsChanged();

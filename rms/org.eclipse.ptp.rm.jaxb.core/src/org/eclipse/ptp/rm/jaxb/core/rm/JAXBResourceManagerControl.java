@@ -31,9 +31,9 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
-import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
@@ -221,7 +221,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
 		try {
 			Property p = new Property();
-			p.setConfigurable(false);
+			p.setVisible(false);
 			RMVariableMap.getActiveInstance().getVariables().put(jobId, p);
 
 			Command job = controlData.getGetJobStatus();
@@ -302,7 +302,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		String uuid = UUID.randomUUID().toString();
 		Property p = new Property();
-		p.setConfigurable(false);
+		p.setVisible(false);
 		RMVariableMap.getActiveInstance().getVariables().put(uuid, p);
 
 		/*
@@ -434,7 +434,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private CommandJob doJobSubmitCommand(String uuid, String mode) throws CoreException {
 
-		List<JAXBElement<Command>> commands = controlData.getSubmitInteractiveOrSubmitBatchOrSubmitDebug();
+		List<JAXBElement<Command>> commands = controlData.getSubmitInteractiveOrSubmitBatchOrSubmitDebugInteractive();
 		if (commands.isEmpty()) {
 			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError, null);
 		}
@@ -494,7 +494,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		Property p = new Property();
 		p.setName(name);
 		p.setValue(value);
-		p.setConfigurable(configurable);
+		p.setVisible(configurable);
 		env.put(name, p);
 	}
 
@@ -666,8 +666,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				} else {
 					p.setValue(value.toString());
 				}
-			} else if (target instanceof JobAttribute) {
-				JobAttribute ja = (JobAttribute) target;
+			} else if (target instanceof Attribute) {
+				Attribute ja = (Attribute) target;
 				if (selected != null && !selected.containsKey(ja.getName())) {
 					ja.setValue(null);
 					ja.setSelected(false);

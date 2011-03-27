@@ -42,4 +42,10 @@ public class AndImpl implements IMatchable {
 		}
 		return matched;
 	}
+
+	public void postProcess() throws Throwable {
+		for (IMatchable t : matchTargets) {
+			t.postProcess();
+		}
+	}
 }

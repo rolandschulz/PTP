@@ -13,5 +13,7 @@ public interface IAssign {
 
 	void assign(String[] values) throws Throwable;
 
+	int getIndex();
+
 	void setTarget(Object target);
 }

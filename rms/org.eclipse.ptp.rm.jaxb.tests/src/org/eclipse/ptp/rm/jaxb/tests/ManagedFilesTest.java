@@ -16,8 +16,8 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
-import org.eclipse.ptp.rm.jaxb.core.data.JobAttribute;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
@@ -121,14 +121,12 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 			String value = key + "_TEST_VALUE"; //$NON-NLS-1$
 			if (target instanceof Property) {
 				((Property) target).setValue(value);
-			} else if (target instanceof JobAttribute) {
-				((JobAttribute) target).setValue(value);
+			} else if (target instanceof Attribute) {
+				((Attribute) target).setValue(value);
 			}
 		}
 		putValue(CONTROL_USER_VAR, "fooUser"); //$NON-NLS-1$
-		putValue(MONITOR_USER_VAR, "fooUser"); //$NON-NLS-1$
 		putValue(CONTROL_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
-		putValue(MONITOR_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
 		putValue(DIRECTORY, "/u/ncsa/arossi/test"); //$NON-NLS-1$ 
 		putValue(MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
 		putValue(MPI_ARGS, "-np 8"); //$NON-NLS-1$ 

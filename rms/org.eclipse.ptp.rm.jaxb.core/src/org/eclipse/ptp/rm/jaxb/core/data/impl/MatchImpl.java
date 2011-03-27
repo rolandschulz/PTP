@@ -42,7 +42,7 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 
 	public synchronized void clear() throws Throwable {
 		if (target != null) {
-			target.clear();
+			target.postProcess();
 		}
 	}
 

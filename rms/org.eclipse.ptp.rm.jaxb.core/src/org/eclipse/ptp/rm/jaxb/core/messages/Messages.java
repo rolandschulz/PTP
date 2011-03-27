@@ -51,6 +51,8 @@ public class Messages extends NLS {
 	public static String IllegalVariableValueType;
 	public static String RemoteConnectionError;
 	public static String LocalConnectionError;
+	public static String StreamParserNamelessPropertyWarning;
+	public static String StreamParserNamelessAttributeWarning;
 
 	static {
 		// initialize resource bundle
