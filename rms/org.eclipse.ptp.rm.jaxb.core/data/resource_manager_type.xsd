@@ -294,8 +294,6 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="or" type="rm:or"/>
-				<xs:element name="and" type="rm:and"/>
 				<xs:element name="target" type="rm:target"/>
 			</xs:choice>
 		</xs:sequence>
@@ -304,6 +302,14 @@
 		<xs:attribute name="maxMatchLen" type="xs:int" default="0"/>
 		<xs:attribute name="all" type="xs:boolean" default="false"/>
 		<xs:attribute name="save" type="xs:int" default="0"/>
+		<xs:attribute name="applyToAll" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Means take the unmatched part of the read stream and pass it to the next target, even if there was a previous
+					match; this allows you to capture more than one regex pattern per delimited stream segment.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="tab-folder-descriptor">
 		<xs:sequence>
@@ -331,20 +337,6 @@
 				<xs:element name="viewer" type="rm:attribute-viewer"/>
 			</xs:choice>
 		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="or">
-		<xs:choice maxOccurs="unbounded">
-			<xs:element name="or" minOccurs="0" type="rm:or"/>
-         <xs:element name="and" minOccurs="0" type="rm:and"/>
-         <xs:element name="target" minOccurs="0" type="rm:target"/>
-		</xs:choice>
-	</xs:complexType>
-	<xs:complexType name="and">
-		<xs:choice maxOccurs="unbounded">
-			<xs:element name="or" minOccurs="0" type="rm:or"/>
-			<xs:element name="and" minOccurs="0" type="rm:and"/>
-			<xs:element name="target" minOccurs="0" type="rm:target"/>
-		</xs:choice>
 	</xs:complexType>
 	<xs:complexType name="tab-item-descriptor">
 		<xs:sequence>
@@ -409,9 +401,9 @@
 					</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
-				  <xs:sequence>
-				     <xs:element name="arg" maxOccurs="unbounded" type="rm:arg"/>
-				  </xs:sequence>
+					<xs:sequence>
+						<xs:element name="arg" maxOccurs="unbounded" type="rm:arg"/>
+					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
@@ -504,6 +496,14 @@
 					<xs:enumeration value="attribute"/>
 				</xs:restriction>
 			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="matchAll" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Means do not reapply an already matched expression until all the others are matched; this allows us to use, for
+					instance, .* repeatedly but set different fields of the object with the resulting match.
+				</xs:documentation>
+			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="match">

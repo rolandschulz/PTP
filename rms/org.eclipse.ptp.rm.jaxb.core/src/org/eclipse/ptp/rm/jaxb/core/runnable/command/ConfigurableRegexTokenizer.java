@@ -20,12 +20,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IMatchable;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
-import org.eclipse.ptp.rm.jaxb.core.data.And;
-import org.eclipse.ptp.rm.jaxb.core.data.Or;
 import org.eclipse.ptp.rm.jaxb.core.data.Target;
 import org.eclipse.ptp.rm.jaxb.core.data.Tokenizer;
-import org.eclipse.ptp.rm.jaxb.core.data.impl.AndImpl;
-import org.eclipse.ptp.rm.jaxb.core.data.impl.OrImpl;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.TargetImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
@@ -83,16 +79,6 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 		Target target = t.getTarget();
 		if (target != null) {
 			toMatch = new TargetImpl(uuid, target);
-		} else {
-			Or o = t.getOr();
-			if (o != null) {
-				toMatch = new OrImpl(uuid, o);
-			} else {
-				And a = t.getAnd();
-				if (a != null) {
-					toMatch = new AndImpl(uuid, a);
-				}
-			}
 		}
 	}
 
