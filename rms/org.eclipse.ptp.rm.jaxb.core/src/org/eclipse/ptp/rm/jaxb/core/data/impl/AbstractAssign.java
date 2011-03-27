@@ -28,10 +28,23 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	protected String uuid;
 	protected String field;
 	protected Object target;
+	protected int index;
+
+	protected AbstractAssign() {
+		uuid = null;
+		field = null;
+		target = null;
+		index = 0;
+	}
 
 	public void assign(String[] values) throws Throwable {
 		Object previous = get(target, field);
 		set(target, field, getValue(previous, values));
+		index++; // assumption is one-to-one IAssign to field
+	}
+
+	public int getIndex() {
+		return index;
 	}
 
 	public void setTarget(Object target) {
