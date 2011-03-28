@@ -32,12 +32,21 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	private static final String TAG_REMOTE_SERVICES_ID = "remoteServicesID"; //$NON-NLS-1$
 
 	private IServiceProvider fServiceProvider = null;
-	private String fNamespace = ""; //$NON-NLS-1$
+	private String fNamespace = BASE;
 
 	public AbstractResourceManagerConfiguration() {
 	}
 
 	public AbstractResourceManagerConfiguration(String namespace, IServiceProvider provider) {
+		/*
+		 * Only allow one level of nesting
+		 */
+		if (provider instanceof AbstractResourceManagerConfiguration) {
+			IServiceProvider baseProvider = ((AbstractResourceManagerConfiguration) provider).getServiceProvider();
+			if (baseProvider != null) {
+				provider = baseProvider;
+			}
+		}
 		fServiceProvider = provider;
 		fNamespace = namespace;
 		setDescriptor(provider.getDescriptor());
@@ -350,6 +359,10 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 		} else {
 			super.putString(namespace + key, value);
 		}
+	}
+
+	protected IServiceProvider getServiceProvider() {
+		return fServiceProvider;
 	}
 
 }
