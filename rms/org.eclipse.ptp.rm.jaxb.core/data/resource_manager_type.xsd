@@ -516,6 +516,7 @@
 				<xs:element name="set" type="rm:set"/>
 			</xs:choice>
 		</xs:sequence>
+		<xs:attribute name="moveToTop" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="column-data">
 		<xs:sequence>

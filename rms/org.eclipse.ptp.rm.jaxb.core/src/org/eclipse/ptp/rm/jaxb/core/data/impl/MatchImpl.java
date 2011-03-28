@@ -22,10 +22,12 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	private RegexImpl regex;
 	private final TargetImpl target;
 	private List<IAssign> assign;
+	private final boolean moveToTop;
 	private boolean matched;
 
 	public MatchImpl(String uuid, Match match, TargetImpl target) {
 		this.target = target;
+		this.moveToTop = match.isMoveToTop();
 		this.matched = false;
 
 		Regex r = match.getExpression();
@@ -80,6 +82,10 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 
 	public boolean getMatched() {
 		return matched;
+	}
+
+	public boolean getMoveToTop() {
+		return moveToTop;
 	}
 
 	public RegexImpl getRegex() {

@@ -34,7 +34,9 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	private final List<MatchImpl> matches;
 	private final List<TestImpl> tests;
 	private final List<Object> targets;
+	private Object refTarget;
 	private final boolean matchAll;
+	private boolean selected;
 
 	public TargetImpl(String uuid, Target target) {
 		this.uuid = uuid;
@@ -52,32 +54,27 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 			tests.add(new TestImpl(uuid, t));
 		}
 		targets = new ArrayList<Object>();
+		selected = false;
 	}
 
 	public synchronized boolean doMatch(StringBuffer segment) throws Throwable {
 		int matched = 0;
 		boolean match = false;
 
-		int i = 0;
 		for (MatchImpl m : matches) {
 			if (matchAll && m.getMatched()) {
 				matched++;
-				i++;
 				continue;
 			}
-			System.out.println("trying to match " + i + ", " + segment);
 			int tail = m.doMatch(segment.toString());
 			match = m.getMatched();
 			if (match) {
 				segment.delete(0, tail);
 				matched++;
+				selected = m.getMoveToTop();
 				break;
 			}
-			i++;
 		}
-
-		System.out.println("found " + matched + " matches out of " + matches.size());
-
 		if (!matchAll || matched == matches.size()) {
 			for (MatchImpl m : matches) {
 				m.clear();
@@ -88,6 +85,9 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	}
 
 	public Object getTarget(IAssign assign) throws CoreException {
+		if (refTarget != null) {
+			return refTarget;
+		}
 		Object target = null;
 		if (ref != null) {
 			RMVariableMap vmap = RMVariableMap.getActiveInstance();
@@ -96,6 +96,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 			if (target == null) {
 				throw CoreExceptionUtils.newException(Messages.StreamParserNoSuchVariableError + name, null);
 			}
+			refTarget = target;
 		} else {
 			int i = assign.getIndex();
 			if (i < targets.size()) {
@@ -119,30 +120,41 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		return target;
 	}
 
+	public boolean isSelected() {
+		return selected;
+	}
+
 	public synchronized void postProcess() throws Throwable {
-		if (ref == null) {
+		if (refTarget == null) {
 			if (PROPERTY.equals(type)) {
 				partitionProperties(targets);
 			} else if (ATTRIBUTE.equals(type)) {
 				partitionAttributes(targets);
 			}
-		}
-
-		Map<String, Object> dmap = RMVariableMap.getActiveInstance().getDiscovered();
-
-		for (Object t : targets) {
+			Map<String, Object> dmap = RMVariableMap.getActiveInstance().getDiscovered();
+			for (Object t : targets) {
+				for (TestImpl test : tests) {
+					test.setTarget(t);
+					test.doTest();
+				}
+				if (PROPERTY.equals(type)) {
+					dmap.put(((Property) t).getName(), t);
+				} else if (ATTRIBUTE.equals(type)) {
+					dmap.put(((Attribute) t).getName(), t);
+				}
+			}
+			targets.clear();
+		} else {
 			for (TestImpl test : tests) {
-				test.setTarget(t);
+				test.setTarget(refTarget);
 				test.doTest();
 			}
-			if (PROPERTY.equals(type)) {
-				dmap.put(((Property) t).getName(), t);
-			} else if (ATTRIBUTE.equals(type)) {
-				dmap.put(((Attribute) t).getName(), t);
-			}
+			refTarget = null;
 		}
+	}
 
-		targets.clear();
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
 
 	private void mergeAttributes(List<?>[] fields) throws Throwable {
@@ -292,7 +304,6 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		i++;
 		for (; i < fields.length; i++) {
 			if (fields[i] != null) {
-				System.out.println(fields[i]);
 				if (sz != fields[i].size()) {
 					return false;
 				}
