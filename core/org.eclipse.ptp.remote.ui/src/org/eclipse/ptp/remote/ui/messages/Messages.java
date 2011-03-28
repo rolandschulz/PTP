@@ -25,6 +25,12 @@ public class Messages extends NLS {
 	public static String PTPRemoteUIPlugin_2;
 	public static String PTPRemoteUIPlugin_3;
 	public static String PTPRemoteUIPlugin_4;
+	public static String RemoteConnectionWidget_connectionName;
+
+	public static String RemoteConnectionWidget_new;
+
+	public static String RemoteConnectionWidget_remoteServiceProvider;
+
 	public static String RemoteDirectoryWidget_0;
 	public static String RemoteDirectoryWidget_1;
 	public static String RemoteDirectoryWidget_2;
