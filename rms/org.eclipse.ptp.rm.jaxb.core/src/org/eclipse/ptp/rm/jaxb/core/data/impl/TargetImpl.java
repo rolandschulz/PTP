@@ -10,6 +10,8 @@
 package org.eclipse.ptp.rm.jaxb.core.data.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -127,9 +129,9 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	public synchronized void postProcess() throws Throwable {
 		if (refTarget == null) {
 			if (PROPERTY.equals(type)) {
-				partitionProperties(targets);
+				mergeProperties(targets);
 			} else if (ATTRIBUTE.equals(type)) {
-				partitionAttributes(targets);
+				mergeAttributes(targets);
 			}
 			Map<String, Object> dmap = RMVariableMap.getActiveInstance().getDiscovered();
 			for (Object t : targets) {
@@ -157,184 +159,146 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		this.selected = selected;
 	}
 
-	private void mergeAttributes(List<?>[] fields) throws Throwable {
-		if (!checkFields(fields)) {
-			throw new Throwable(Messages.StreamParserInconsistentAttributeWarning);
+	private void merge(Attribute previous, Attribute current) throws Throwable {
+		Object v0 = previous.getValue();
+		Object v1 = current.getValue();
+		if (v0 == null) {
+			previous.setValue(v1);
+		} else if (v1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + CM + SP + v1);
 		}
-		targets.clear();
-		int numAttributes = fields[4].size();
-		for (int i = 0; i < numAttributes; i++) {
-			Attribute a = new Attribute();
-			if (fields[0] != null && fields[0].size() > i) {
-				a.setValue(fields[0].get(i));
+
+		String s0 = previous.getDefault();
+		String s1 = current.getDefault();
+		if (s0 == null) {
+			previous.setDefault(s1);
+		} else if (s1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+		}
+
+		s0 = previous.getType();
+		s1 = current.getType();
+		if (s0 == null) {
+			previous.setType(s1);
+		} else if (s1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+		}
+
+		s0 = previous.getStatus();
+		s1 = current.getStatus();
+		if (s0 == null) {
+			previous.setStatus(s1);
+		} else if (s1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+		}
+
+		boolean b0 = previous.isReadOnly();
+		boolean b1 = current.isReadOnly();
+		if (!b0) {
+			previous.setReadOnly(b1);
+		}
+
+		b0 = previous.isVisible();
+		b1 = current.isVisible();
+		if (!b0) {
+			previous.setVisible(b1);
+		}
+
+		Integer i0 = previous.getMax();
+		Integer i1 = current.getMax();
+		if (i0 == null) {
+			previous.setMax(i1);
+		} else if (i1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + CM + SP + i1);
+		}
+
+		i0 = previous.getMin();
+		i1 = current.getMin();
+		if (i0 == null) {
+			previous.setMin(i1);
+		} else if (i1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + CM + SP + i1);
+		}
+
+		s0 = previous.getDescription();
+		s1 = current.getDescription();
+		if (s0 == null) {
+			previous.setDescription(s1);
+		} else if (s1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+		}
+
+		s0 = previous.getChoice();
+		s1 = current.getChoice();
+		if (s0 == null) {
+			previous.setChoice(s1);
+		} else if (s1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+		}
+
+		s0 = previous.getTooltip();
+		s1 = current.getTooltip();
+		if (s0 == null) {
+			previous.setTooltip(s1);
+		} else if (s1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+		}
+	}
+
+	private void merge(Property previous, Property current) throws Throwable {
+		Object v0 = previous.getValue();
+		Object v1 = current.getValue();
+		if (v0 == null) {
+			previous.setValue(v1);
+		} else if (v1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + CM + SP + v1);
+		}
+
+		String s0 = previous.getDefault();
+		String s1 = current.getDefault();
+		if (s0 == null) {
+			previous.setDefault(s1);
+		} else if (s1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+		}
+	}
+
+	private void mergeAttributes(List<Object> targets) throws Throwable {
+		Map<String, Attribute> hash = new HashMap<String, Attribute>();
+		for (Iterator<Object> i = targets.iterator(); i.hasNext();) {
+			Attribute current = (Attribute) i.next();
+			String name = current.getName();
+			if (current.getName() == null) {
+				// may be an artifact of end-of-stream; just throw it out
+				i.remove();
+				continue;
 			}
-			if (fields[1] != null && fields[1].size() > i) {
-				a.setChoice((String) fields[1].get(i));
-			}
-			if (fields[2] != null && fields[2].size() > i) {
-				a.setDefault((String) fields[2].get(i));
-			}
-			if (fields[3] != null && fields[3].size() > i) {
-				a.setDescription((String) fields[3].get(i));
-			}
-			if (fields[4] != null && fields[4].size() > i) {
-				a.setName((String) fields[4].get(i));
-			}
-			if (fields[5] != null && fields[5].size() > i) {
-				a.setStatus((String) fields[5].get(i));
-			}
-			if (fields[6] != null && fields[6].size() > i) {
-				a.setTooltip((String) fields[6].get(i));
-			}
-			if (fields[7] != null && fields[7].size() > i) {
-				a.setType((String) fields[7].get(i));
-			}
-			if (fields[8] != null && fields[8].size() > i) {
-				a.setMax((Integer) fields[8].get(i));
-			}
-			if (fields[9] != null && fields[9].size() > i) {
-				a.setMin((Integer) fields[9].get(i));
-			}
-			if (fields[10] != null && fields[10].size() > i) {
-				a.setReadOnly((Boolean) fields[10].get(i));
-			}
-			if (fields[11] != null && fields[11].size() > i) {
-				a.setVisible((Boolean) fields[11].get(i));
-			}
-			String name = a.getName();
-			if (name != null && !ZEROSTR.equals(name)) {
-				targets.add(a);
+			Attribute previous = hash.get(name);
+			if (previous != null) {
+				merge(previous, current);
+				i.remove();
+			} else {
+				hash.put(name, current);
 			}
 		}
 	}
 
-	private void mergeProperties(List<?>[] fields) throws Throwable {
-		if (!checkFields(fields)) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning);
-		}
-		targets.clear();
-		int numProperties = fields[1].size();
-
-		for (int i = 0; i < numProperties; i++) {
-			Property p = new Property();
-			if (fields[0] != null && fields[0].size() > i) {
-				p.setValue(fields[0].get(i));
+	private void mergeProperties(List<Object> targets) throws Throwable {
+		Map<String, Property> hash = new HashMap<String, Property>();
+		for (Iterator<Object> i = targets.iterator(); i.hasNext();) {
+			Property current = (Property) i.next();
+			String name = current.getName();
+			if (current.getName() == null) {
+				// may be an artifact of end-of-stream; just throw it out
+				i.remove();
+				continue;
 			}
-			if (fields[1] != null && fields[1].size() > i) {
-				p.setName((String) fields[1].get(i));
-			}
-			if (fields[2] != null && fields[2].size() > i) {
-				p.setDefault((String) fields[2].get(i));
-			}
-			String name = p.getName();
-			if (name != null && !ZEROSTR.equals(name)) {
-				targets.add(p);
-			}
-		}
-	}
-
-	private void partitionAttributes(List<Object> targets) throws Throwable {
-		List<?>[] fields = new ArrayList<?>[12];
-		initializeFields(fields);
-
-		for (Object o : targets) {
-			Attribute a = (Attribute) o;
-			Object[] values = new Object[] { a.getValue(), a.getChoice(), a.getDefault(), a.getDescription(), a.getName(),
-					a.getStatus(), a.getTooltip(), a.getType(), a.getMax(), a.getMin(), a.isReadOnly(), a.isVisible() };
-			addToFields(fields, values);
-		}
-
-		mergeAttributes(fields);
-	}
-
-	private void partitionProperties(List<Object> targets) throws Throwable {
-		List<?>[] fields = new ArrayList<?>[3];
-		initializeFields(fields);
-
-		for (Object o : targets) {
-			Property p = (Property) o;
-			Object[] values = new Object[] { p.getValue(), p.getName(), p.getDefault() };
-			addToFields(fields, values);
-		}
-
-		mergeProperties(fields);
-	}
-
-	@SuppressWarnings("unchecked")
-	private static void addToFields(List<?>[] fields, Object[] values) {
-		for (int i = 0; i < values.length; i++) {
-			switch (i) {
-			case 0:
-				List<Object> l2 = (List<Object>) fields[i];
-				l2.add(values[i]);
-				break;
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-			case 6:
-			case 7:
-				List<String> l1 = (List<String>) fields[i];
-				l1.add((String) values[i]);
-				break;
-			case 8:
-			case 9:
-				List<Integer> l3 = (List<Integer>) fields[i];
-				l3.add((Integer) values[i]);
-				break;
-			case 10:
-			case 11:
-				List<Boolean> l4 = (List<Boolean>) fields[i];
-				l4.add((Boolean) values[i]);
-				break;
-			}
-		}
-	}
-
-	private static boolean checkFields(List<?>[] fields) {
-		int i = 0;
-		int sz = 0;
-		for (; i < fields.length; i++) {
-			if (fields[i] != null) {
-				sz = fields[i].size();
-				break;
-			}
-		}
-		i++;
-		for (; i < fields.length; i++) {
-			if (fields[i] != null) {
-				if (sz != fields[i].size()) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	private static void initializeFields(List<?>[] fields) {
-		for (int i = 0; i < fields.length; i++) {
-			switch (i) {
-			case 0:
-				fields[i] = new ArrayList<Object>();
-				break;
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-			case 6:
-			case 7:
-				fields[i] = new ArrayList<String>();
-				break;
-			case 8:
-			case 9:
-				fields[i] = new ArrayList<Integer>();
-				break;
-			case 10:
-			case 11:
-				fields[i] = new ArrayList<Boolean>();
-				break;
+			Property previous = hash.get(name);
+			if (previous != null) {
+				merge(previous, current);
+				i.remove();
+			} else {
+				hash.put(name, current);
 			}
 		}
 	}

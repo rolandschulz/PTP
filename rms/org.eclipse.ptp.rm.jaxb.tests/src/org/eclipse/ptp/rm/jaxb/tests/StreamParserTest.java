@@ -326,7 +326,51 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		}
 	}
 
-	public void test10GetStatus() {
+	public void test09Merged() {
+		target = PROPERTY;
+		runTokenizer(startup.get(9).getStdoutParser(), getMergedOrdering());
+		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		for (Object o : d.values()) {
+			Property p = (Property) o;
+			if (verbose) {
+				System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+				System.out.println("name " + p.getName()); //$NON-NLS-1$
+				System.out.println("value " + p.getValue()); //$NON-NLS-1$
+				System.out.println("default " + p.getDefault()); //$NON-NLS-1$
+				System.out.println("*********************************"); //$NON-NLS-1$
+			}
+		}
+	}
+
+	public void test10ExitOn() {
+		target = "jobStates"; //$NON-NLS-1$
+		Property p = new Property();
+		p.setName(target);
+		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		runTokenizer(startup.get(10).getStdoutParser(), getJobStates());
+		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
+		assertNotNull(p);
+		assertNotNull(p.getValue());
+		if (verbose) {
+			System.out.println(target + " = " + p.getValue()); //$NON-NLS-1$
+		}
+	}
+
+	public void test11ExitAfter() {
+		target = "jobStates"; //$NON-NLS-1$
+		Property p = new Property();
+		p.setName(target);
+		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		runTokenizer(startup.get(11).getStdoutParser(), getJobStates());
+		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
+		assertNotNull(p);
+		assertNotNull(p.getValue());
+		if (verbose) {
+			System.out.println(target + " = " + p.getValue()); //$NON-NLS-1$
+		}
+	}
+
+	public void test12GetStatus() {
 		target = "42226";//$NON-NLS-1$
 		uuid = target;
 		Property p = new Property();
@@ -381,7 +425,8 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	private static InputStream getImplicitOrdering() {
 		String content = "jobAttribute_1" + LINE_SEP + "java.lang.String" + LINE_SEP + LINE_SEP + LINE_SEP + "value_1" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ "jobAttribute_2" + LINE_SEP + "java.lang.String" + LINE_SEP + "meaingless attribute" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ "ignore this attribute" + LINE_SEP + "value_2" + LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$
+				+ "ignore this attribute" + LINE_SEP + "value_2" //$NON-NLS-1$ //$NON-NLS-2$
+				+ LINE_SEP;
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
@@ -396,7 +441,13 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 				+ "<job>304823:RUNNING</job>fooblah blah xxxx\n  blah blah xxxx blah blah xxxx blah " //$NON-NLS-1$
 				+ " blah x\nx<job>312042:DONE</job>blah xxxx blah blah xxxx blah b" //$NON-NLS-1$
 				+ "blah blah xxxx foobarfoobr 231028388 <job>338831:SUSPENDED" //$NON-NLS-1$
-				+ "</job>fooroiq\npoiewmr<job>318388:QUEUED</job>blah blah xxxx"; //$NON-NLS-1$
+				+ "</job>fooroiqEXIT\npoiewmr<job>318388:QUEUED</job>blah blah xxxx"; //$NON-NLS-1$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getMergedOrdering() {
+		String content = "name:foo0;value:bar0" + LINE_SEP + "name:foo1;value:bar1" + LINE_SEP + "name:foo0;default:baz0" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ LINE_SEP;
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
@@ -458,7 +509,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	private static InputStream getStaggered() {
-		String content = "value:1" + LINE_SEP + "name:1" + LINE_SEP + "name:2" + LINE_SEP + "name:3" + LINE_SEP + "value:2" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		String content = "value:1" + LINE_SEP + "value:2" + LINE_SEP + "name:1" + LINE_SEP + "name:2" + LINE_SEP + "name:3" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				+ "name:4" + LINE_SEP + "value:3" + LINE_SEP + "value:4" + LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return new ByteArrayInputStream(content.getBytes());
 	}
