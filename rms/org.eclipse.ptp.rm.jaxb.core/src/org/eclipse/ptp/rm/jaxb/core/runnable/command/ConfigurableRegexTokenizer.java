@@ -23,8 +23,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IMatchable;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
+import org.eclipse.ptp.rm.jaxb.core.data.Regex;
 import org.eclipse.ptp.rm.jaxb.core.data.Target;
 import org.eclipse.ptp.rm.jaxb.core.data.Tokenizer;
+import org.eclipse.ptp.rm.jaxb.core.data.impl.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.TargetImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
@@ -40,6 +42,8 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	private boolean includeDelim;
 	private boolean applyToAll;
 	private List<IMatchable> toMatch;
+	private RegexImpl exitOn;
+	private RegexImpl exitAfter;
 
 	private Throwable error;
 	private InputStream in;
@@ -86,6 +90,15 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 			toMatch.add(new TargetImpl(uuid, target));
 		}
 
+		Regex reg = t.getExitOn();
+		if (reg != null) {
+			exitOn = new RegexImpl(reg);
+		}
+		reg = t.getExitAfter();
+		if (reg != null) {
+			exitAfter = new RegexImpl(reg);
+		}
+
 		segment = new StringBuffer();
 	}
 
@@ -106,6 +119,15 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 
 	public void setInputStream(InputStream stream) {
 		in = stream;
+	}
+
+	private boolean checkExit(RegexImpl regex) {
+		if (regex != null) {
+			if (null != regex.getMatched(segment.toString())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void findNextSegment(BufferedReader in) throws CoreException {
@@ -171,8 +193,19 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	}
 
 	private void read(BufferedReader in) throws Throwable {
-		while (true) {
+		boolean exit = false;
+
+		while (!exit) {
 			findNextSegment(in);
+
+			if (checkExit(exitOn)) {
+				break;
+			}
+
+			if (checkExit(exitAfter)) {
+				exit = true;
+			}
+
 			if (all) {
 				if (save != null) {
 					if (segment.length() > 0) {

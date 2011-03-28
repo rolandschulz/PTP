@@ -143,7 +143,7 @@
 			<stdout-parser delim="\n">
 				<target type="attribute" matchAll="true">
 					<match>
-						<expression>.*</expression>
+						<expression>.+</expression>
 						<set field="name">
 							<entry valueGroup="0"/>
 						</set>
@@ -277,10 +277,66 @@
 				</target>
 			</stdout-parser>
 		</start-up-command>
+		<!-- EXAMPLE 10: forced merge -->
+		<start-up-command name="test09Merged">
+			<arg/>
+			<stdout-parser delim="\n">
+				<target type="property">
+					<match>
+						<expression>name:(.+);value:(.+)</expression>
+						<set field="name">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="value">
+							<entry valueGroup="2"/>
+						</set>
+					</match>
+					<match>
+						<expression>name:(.+);default:(.+)</expression>
+						<set field="name">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="default">
+							<entry valueGroup="2"/>
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+		</start-up-command>
+		<!-- EXAMPLE 11: exit-on -->
+		<start-up-command name="test10ExitOn">
+			<arg/>
+			<stdout-parser maxMatchLen="32">
+				<target ref="jobStates">
+					<match>
+						<expression flags="DOTALL">.*&lt;job&gt;([\d]*):([\w]*)&lt;/job&gt;.*</expression>
+						<put field="value">
+							<entry keyGroup="1" valueGroup="2"/>
+						</put>
+					</match>
+				</target>
+				<exit-on flags="DOTALL">.*EXIT.*</exit-on>
+			</stdout-parser>
+		</start-up-command>
+		<!-- EXAMPLE 12: exit-after -->
+      <start-up-command name="test11ExitAfter">
+         <arg/>
+         <stdout-parser maxMatchLen="32">
+            <target ref="jobStates">
+               <match>
+                  <expression flags="DOTALL">.*&lt;job&gt;([\d]*):([\w]*)&lt;/job&gt;.*</expression>
+                  <put field="value">
+                     <entry keyGroup="1" valueGroup="2"/>
+                  </put>
+               </match>
+            </target>
+            <exit-after flags="DOTALL">.*EXIT.*</exit-after>
+         </stdout-parser>
+      </start-up-command>
 		<submit-interactive name="empty">
 			<arg/>
 		</submit-interactive>
-		<get-job-status name="test10GetStatus">
+		<get-job-status name="test12GetStatus">
 			<arg/>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">

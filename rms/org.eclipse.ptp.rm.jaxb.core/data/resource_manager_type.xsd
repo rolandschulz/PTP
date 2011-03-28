@@ -296,6 +296,8 @@
 				</xs:element>
 				<xs:element name="target" maxOccurs="unbounded" type="rm:target"/>
 			</xs:choice>
+			<xs:element name="exit-on" minOccurs="0" type="rm:regex"/>
+			<xs:element name="exit-after" minOccurs="0" type="rm:regex"/>
 		</xs:sequence>
 		<xs:attribute name="delim" type="xs:string"/>
 		<xs:attribute name="includeDelim" type="xs:boolean" default="false"/>
