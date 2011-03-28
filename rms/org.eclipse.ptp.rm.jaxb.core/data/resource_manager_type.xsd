@@ -294,7 +294,7 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="target" type="rm:target"/>
+				<xs:element name="target" maxOccurs="unbounded" type="rm:target"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="delim" type="xs:string"/>
@@ -443,7 +443,7 @@
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="column-data" minOccurs="0" type="rm:column-data"/>
 			<xs:element name="items" type="rm:viewer-items"/>
-			<xs:element name="value" type="rm:template"/>
+			<xs:element name="value"  minOccurs="0" type="rm:template"/>
 		</xs:sequence>
 		<xs:attribute name="type" default="table">
 			<xs:simpleType>
@@ -453,7 +453,7 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="name" use="required" type="xs:string"/>
+		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="sort" type="xs:boolean" default="true"/>
 	</xs:complexType>
 	<xs:complexType name="viewer-items">

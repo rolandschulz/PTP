@@ -14,7 +14,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
@@ -35,7 +37,8 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	private Integer save;
 	private boolean all;
 	private boolean includeDelim;
-	private IMatchable toMatch;
+	private boolean applyToAll;
+	private List<IMatchable> toMatch;
 
 	private Throwable error;
 	private InputStream in;
@@ -75,11 +78,15 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 		}
 
 		all = t.isAll();
+		applyToAll = t.isApplyToAll();
 
-		Target target = t.getTarget();
-		if (target != null) {
-			toMatch = new TargetImpl(uuid, target);
+		toMatch = new ArrayList<IMatchable>();
+		List<Target> targets = t.getTarget();
+		for (Target target : targets) {
+			toMatch.add(new TargetImpl(uuid, target));
 		}
+
+		segment = new StringBuffer();
 	}
 
 	public Throwable getInternalError() {
@@ -90,12 +97,7 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new InputStreamReader(in));
-			boolean endOfStream = false;
-			while (!endOfStream) {
-				if (read(br)) {
-					break;
-				}
-			}
+			read(br);
 		} catch (Throwable t) {
 			error = t;
 			// we do not close the out here because it probably is stdout
@@ -140,7 +142,21 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 		}
 	}
 
-	private boolean read(BufferedReader in) throws Throwable {
+	private void matchTargets() throws Throwable {
+		for (IMatchable m : toMatch) {
+			if (m.doMatch(segment) && !applyToAll) {
+				break;
+			}
+		}
+	}
+
+	private void postProcessTargets() throws Throwable {
+		for (IMatchable m : toMatch) {
+			m.postProcess();
+		}
+	}
+
+	private void read(BufferedReader in) throws Throwable {
 		while (true) {
 			findNextSegment(in);
 			if (all) {
@@ -161,24 +177,23 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 				continue;
 			}
 
-			toMatch.doMatch(segment);
+			matchTargets();
 			reset();
 
 			if (endOfStream) {
-				return true;
+				break;
 			}
 		}
 
 		if (all) {
 			while (!saved.isEmpty()) {
 				segment.append(saved.removeFirst());
-				toMatch.doMatch(segment);
+				matchTargets();
 				reset();
 			}
 		}
 
-		toMatch.postProcess();
-		return endOfStream || all;
+		postProcessTargets();
 	}
 
 	private void reset() {

@@ -82,10 +82,10 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 			Object o = e.getValue();
 			if (o instanceof Attribute) {
 				Attribute ja = (Attribute) o;
-				buffer.append(LT).append(GTLT).append(ja.getName()).append(GTLT).append(ja.getType()).append(GTLT)
-						.append(ja.getDefault()).append(GTLT).append(ja.getChoice()).append(GTLT).append(ja.getMax()).append(GTLT)
-						.append(ja.getMin()).append(GTLT).append(ja.getValidator()).append(GTLT).append(ja.getDescription())
-						.append(GTLT).append(ja.getTooltip()).append(ja.getValue()).append(GT).append(LINE_SEP);
+				buffer.append(LT).append(ja.getName()).append(GTLT).append(ja.getType()).append(GTLT).append(ja.getDefault())
+						.append(GTLT).append(ja.getChoice()).append(GTLT).append(ja.getMax()).append(GTLT).append(ja.getMin())
+						.append(GTLT).append(ja.getValidator()).append(GTLT).append(ja.getDescription()).append(GTLT)
+						.append(ja.getTooltip()).append(ja.getValue()).append(GT).append(LINE_SEP);
 			} else if (o instanceof Property) {
 				Property p = (Property) o;
 				buffer.append(LT).append(p.getName()).append(GTLT).append(p.getValue()).append(GT).append(LINE_SEP);

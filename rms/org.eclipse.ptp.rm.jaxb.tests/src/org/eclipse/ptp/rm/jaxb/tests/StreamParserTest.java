@@ -347,6 +347,11 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			thr.join();
 		} catch (InterruptedException ignored) {
 		}
+		Throwable throwable = t.getInternalError();
+		if (throwable != null) {
+			throwable.printStackTrace();
+		}
+		assertNull(throwable);
 	}
 
 	private static InputStream getImplicitOrdering() {

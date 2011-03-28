@@ -41,7 +41,7 @@
 			<description>The type of inter-job dependencies specified by the job owner.</description>
 			<tooltip>Format: "type:jobid[,jobid...]"; default value: no dependencies.</tooltip>
 		</attribute>
-		<attribute name="destination" type="string" basic="true">
+		<attribute name="destination" type="string">
 			<description>Designation of the queue to which to submit the job.</description>
 			<tooltip>Format: queue[@server].</tooltip>
 		</attribute>
@@ -83,7 +83,7 @@
 			</tooltip>
 			<choice>,u,s,o</choice>
 		</attribute>
-		<attribute name="Job_Name" type="string" basic="true">
+		<attribute name="Job_Name" type="string">
 			<description>The name assigned to the job by the qsub or qalter command.</description>
 			<tooltip>Format: string up to 15 characters, first character must be alphabetic; default value: the base name of the job script or
 				STDIN.
@@ -289,7 +289,6 @@
 				<target ref="available_queues">
 					<match>
 						<expression>[^\s]+</expression>
-						<target ref="available_queues"/>
 						<add field="value">
 							<entry valueGroup="0"/>
 						</add>
@@ -328,42 +327,42 @@
 						</set>
 					</match>
 					<test op="EQ">
-						<value>this.value</value>
+						<value>#value</value>
 						<value>Q</value>
 						<set field="value">
 							<entry value="QUEUED_ACTIVE"/>
 						</set>
 					</test>
 					<test op="EQ">
-						<value>this.value</value>
+						<value>#value</value>
 						<value>R</value>
 						<set field="value">
 							<entry value="RUNNING"/>
 						</set>
 					</test>
 					<test op="EQ">
-						<value>this.value</value>
+						<value>#value</value>
 						<value>S</value>
 						<set field="value">
 							<entry value="SUSPENDED"/>
 						</set>
 					</test>
 					<test op="EQ">
-						<value>this.value</value>
+						<value>#value</value>
 						<value>C</value>
 						<set field="value">
 							<entry value="COMPLETED"/>
 						</set>
 					</test>
 					<test op="EQ">
-						<value>this.value</value>
+						<value>#value</value>
 						<value>E</value>
 						<set field="value">
 							<entry value="COMPLETED"/>
 						</set>
 					</test>
 					<test op="EQ">
-						<value>this.value</value>
+						<value>#value</value>
 						<value>H</value>
 						<set field="value">
 							<entry value="SYSTEM_ON_HOLD"/>

@@ -22,9 +22,11 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	private RegexImpl regex;
 	private final TargetImpl target;
 	private List<IAssign> assign;
+	private boolean matched;
 
 	public MatchImpl(String uuid, Match match, TargetImpl target) {
 		this.target = target;
+		this.matched = false;
 
 		Regex r = match.getExpression();
 		if (r != null) {
@@ -40,10 +42,8 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 		}
 	}
 
-	public synchronized void clear() throws Throwable {
-		if (target != null) {
-			target.postProcess();
-		}
+	public void clear() {
+		matched = false;
 	}
 
 	public synchronized int doMatch(String sequence) throws Throwable {
@@ -51,6 +51,7 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 		String[] tokens = null;
 
 		if (regex == null) {
+			matched = true;
 			return sequence.length();
 		} else {
 			tokens = regex.getMatched(sequence);
@@ -60,6 +61,7 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 			/*
 			 * return pos of the unmatched remainder
 			 */
+			matched = true;
 			end = regex.getLastChar();
 		}
 
@@ -74,6 +76,10 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 		}
 
 		return end;
+	}
+
+	public boolean getMatched() {
+		return matched;
 	}
 
 	public RegexImpl getRegex() {
