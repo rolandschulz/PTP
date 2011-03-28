@@ -27,7 +27,7 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public final class Preferences {
 
-	private static final IScopeContext[] contexts = new IScopeContext[] { new DefaultScope(), new InstanceScope() };
+	private static final IScopeContext[] contexts = new IScopeContext[] { DefaultScope.INSTANCE, InstanceScope.INSTANCE };
 
 	private static final int DEFAULT_CONTEXT = 0;
 	private static final int INSTANCE_CONTEXT = 1;
