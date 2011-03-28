@@ -286,15 +286,15 @@
 			-->
 			<arg>/Users/arossi/qstatF</arg>
 			<stdout-parser delim="\n">
-				<target ref="available_queues">
-					<match>
-						<expression>[^\s]+</expression>
-						<add field="value">
-							<entry valueGroup="0"/>
-						</add>
-					</match>
-				</target>
-			</stdout-parser>
+            <target ref="available_queues">
+               <match>
+                  <expression>[^\s]+</expression>
+                  <append field="value" separator=",">
+                     <entry valueGroup="0"/>
+                  </append>
+               </match>
+            </target>
+         </stdout-parser>
 		</start-up-command>
 		<!-- ********************** FOR TESTING ********************** -->
 		<submit-interactive name="submit-interactive" waitForId="true">

@@ -302,6 +302,30 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		}
 	}
 
+	public void test08Staggered() {
+		runTokenizer(startup.get(8).getStdoutParser(), getStaggered());
+		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		for (Object o : d.values()) {
+			if (o instanceof Property) {
+				Property p = (Property) o;
+				if (verbose) {
+					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+					System.out.println("name " + p.getName()); //$NON-NLS-1$
+					System.out.println("value " + p.getValue()); //$NON-NLS-1$
+					System.out.println("*********************************"); //$NON-NLS-1$
+				}
+			} else if (o instanceof Attribute) {
+				Attribute ja = (Attribute) o;
+				if (verbose) {
+					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+					System.out.println("name " + ja.getName()); //$NON-NLS-1$
+					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
+					System.out.println("*********************************"); //$NON-NLS-1$
+				}
+			}
+		}
+	}
+
 	public void test10GetStatus() {
 		target = "42226";//$NON-NLS-1$
 		uuid = target;
@@ -430,6 +454,12 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 				+ LINE_SEP + "lincoln_debug" + LINE_SEP + "long" + LINE_SEP + "iacat" + LINE_SEP + "industrial" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				+ "lincoln" + LINE_SEP + "wide" + LINE_SEP + "nomss" + LINE_SEP + "debug" + LINE_SEP + "iacat3" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				+ "lincoln_cuda3.2" + LINE_SEP + "fernsler" + LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getStaggered() {
+		String content = "value:1" + LINE_SEP + "name:1" + LINE_SEP + "name:2" + LINE_SEP + "name:3" + LINE_SEP + "value:2" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				+ "name:4" + LINE_SEP + "value:3" + LINE_SEP + "value:4" + LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return new ByteArrayInputStream(content.getBytes());
 	}
 }

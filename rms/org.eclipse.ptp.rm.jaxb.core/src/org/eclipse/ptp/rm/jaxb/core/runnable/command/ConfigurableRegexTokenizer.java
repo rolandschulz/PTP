@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,8 +65,7 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 
 		maxLen = t.getMaxMatchLen();
 		if (maxLen != 0) {
-			maxLen = maxLen * 2;
-			chars = new char[maxLen];
+			chars = new char[2 * maxLen];
 		} else {
 			chars = new char[1];
 		}
@@ -111,7 +111,6 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	private void findNextSegment(BufferedReader in) throws CoreException {
 		endOfStream = false;
 		int len = chars.length == 1 ? 1 : chars.length - segment.length();
-
 		while (true) {
 			int read = 0;
 			try {
@@ -143,10 +142,25 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	}
 
 	private void matchTargets() throws Throwable {
+		IMatchable selected = null;
 		for (IMatchable m : toMatch) {
 			if (m.doMatch(segment) && !applyToAll) {
+				if (m.isSelected()) {
+					selected = m;
+				}
 				break;
 			}
+		}
+
+		if (selected != null) {
+			for (Iterator<IMatchable> i = toMatch.iterator(); i.hasNext();) {
+				IMatchable m = i.next();
+				m.setSelected(false);
+				if (m == selected) {
+					i.remove();
+				}
+			}
+			toMatch.add(0, selected);
 		}
 	}
 
@@ -199,6 +213,8 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	private void reset() {
 		if (chars.length == 1) {
 			this.segment.setLength(0);
+		} else if (segment.length() == chars.length) {
+			segment.delete(0, maxLen);
 		}
 	}
 
