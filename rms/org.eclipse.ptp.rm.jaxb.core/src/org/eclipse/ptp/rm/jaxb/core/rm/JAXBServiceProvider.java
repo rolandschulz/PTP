@@ -188,7 +188,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 	 */
 	public String getRMInstanceXMLLocation() {
 		String loc = getString(RM_XSD_PATH, ZEROSTR);
-
 		if (ZEROSTR.equals(loc)) {
 			Bundle bundle = JAXBCorePlugin.getDefault().getBundle();
 			URL uri = FileLocator.find(bundle, new Path(DATA + DEFAULT_PBS), null);
@@ -197,9 +196,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 				putString(RM_XSD_PATH, loc);
 			}
 		}
-
-		System.out.println(loc);
-
 		return loc;
 	}
 

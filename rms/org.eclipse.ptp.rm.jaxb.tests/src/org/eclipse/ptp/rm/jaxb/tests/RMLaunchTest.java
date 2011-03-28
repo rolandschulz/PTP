@@ -246,6 +246,7 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 			String jobId = rm.submitJob(launchConfig, ILaunchManager.RUN_MODE, new NullProgressMonitor());
 			System.out.println("SUBMITTED: " + jobId); //$NON-NLS-1$
 			IJobStatus status = rm.getJobStatus(jobId);
+			System.out.println("STATUS: " + status.getState()); //$NON-NLS-1$
 			if (status != null) {
 				status.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener() {
 					public void streamAppended(String text, IStreamMonitor monitor) {

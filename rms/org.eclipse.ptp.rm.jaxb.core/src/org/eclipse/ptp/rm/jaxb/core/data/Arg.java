@@ -95,4 +95,9 @@ public class Arg {
 		this.isUndefinedIfEquals = value;
 	}
 
+	@Override
+	public String toString() {
+		return content;
+	}
+
 }

@@ -71,10 +71,14 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		}
 		SubMonitor progress = SubMonitor.convert(monitor, len);
 		StringBuffer buffer = new StringBuffer();
+		String s = null;
 		int i = 0;
 		String firstLine = new ArgImpl(uuid, line.get(0), map).getResolved();
 		for (; i < envBegin; i++) {
-			buffer.append(new ArgImpl(uuid, line.get(i), map).getResolved()).append(REMOTE_LINE_SEP);
+			s = new ArgImpl(uuid, line.get(i), map).getResolved();
+			if (!ZEROSTR.equals(s)) {
+				buffer.append(s).append(REMOTE_LINE_SEP);
+			}
 			progress.worked(1);
 		}
 
@@ -84,7 +88,10 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			}
 		}
 		for (; i < envEnd; i++) {
-			buffer.append(new ArgImpl(uuid, line.get(i), map).getResolved()).append(REMOTE_LINE_SEP);
+			s = new ArgImpl(uuid, line.get(i), map).getResolved();
+			if (!ZEROSTR.equals(s)) {
+				buffer.append(s).append(REMOTE_LINE_SEP);
+			}
 			progress.worked(1);
 		}
 		if (appendEnv) {
@@ -93,7 +100,10 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			}
 		}
 		for (; i < len; i++) {
-			buffer.append(new ArgImpl(uuid, line.get(i), map).getResolved()).append(REMOTE_LINE_SEP);
+			s = new ArgImpl(uuid, line.get(i), map).getResolved();
+			if (!ZEROSTR.equals(s)) {
+				buffer.append(s).append(REMOTE_LINE_SEP);
+			}
 			progress.worked(1);
 		}
 		progress.done();
