@@ -32,7 +32,7 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	private static final String TAG_REMOTE_SERVICES_ID = "remoteServicesID"; //$NON-NLS-1$
 
 	private IServiceProvider fServiceProvider = null;
-	private String fNamespace = BASE;
+	private String fNamespace = ""; //$NON-NLS-1$
 
 	public AbstractResourceManagerConfiguration() {
 	}
