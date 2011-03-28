@@ -96,6 +96,9 @@ public class Messages extends NLS {
 	public static String RemoteConnectionSelection;
 	public static String JAXBRMConnectionChoiceTitle;
 	public static String ErrorOnCopyFromFields;
+	public static String WriteToFileCanceled;
+	public static String RenameFile;
+	public static String RenameFileTitle;
 
 	static {
 		// initialize resource bundle

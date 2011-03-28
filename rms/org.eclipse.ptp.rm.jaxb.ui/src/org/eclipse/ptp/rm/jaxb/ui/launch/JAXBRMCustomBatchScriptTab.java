@@ -10,7 +10,6 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -25,7 +24,6 @@ import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.util.ConfigUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
@@ -53,22 +51,20 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 
 	private class JAXBBatchScriptDataSource extends RMLaunchConfigurationDynamicTabDataSource {
 
+		private boolean modifyText;
+
 		protected JAXBBatchScriptDataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
+			modifyText = false;
 		}
 
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			/*
-			 * this will call copyToFields if there is a change
-			 */
-			try {
-				maybeWriteToFile();
-			} catch (Throwable t1) {
-				throw new ValidationException(t1.getMessage());
+			if (modifyText) {
+				return;
 			}
 			String uriStr = choice.getText();
-			if (!ZEROSTR.equals(selected)) {
+			if (selected != null) {
 				try {
 					selected = new URI(uriStr);
 				} catch (URISyntaxException t) {
@@ -94,6 +90,16 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 
 		@Override
 		protected void copyToStorage() {
+			if (modifyText) {
+				return;
+			}
+
+			try {
+				maybeWriteToFile();
+			} catch (Throwable t1) {
+				JAXBUIPlugin.log(t1);
+			}
+
 			ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
 			if (config == null) {
 				JAXBUIPlugin.log(Messages.MissingLaunchConfigurationError);
@@ -126,7 +132,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			}
 			try {
 				String uriStr = config.getAttribute(SCRIPT_PATH, ZEROSTR);
-				if (!ZEROSTR.equals(selected)) {
+				if (!ZEROSTR.equals(uriStr)) {
 					selected = new URI(uriStr);
 				}
 				contents = config.getAttribute(SCRIPT, ZEROSTR);
@@ -163,6 +169,13 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 		}
 
 		@Override
+		public void modifyText(ModifyEvent e) {
+			dataSource.modifyText = true;
+			super.modifyText(e);
+			dataSource.modifyText = false;
+		}
+
+		@Override
 		protected void doModifyText(ModifyEvent e) {
 			if (loading) {
 				return;
@@ -172,7 +185,6 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 				fileDirty = true;
 				updateControls();
 			}
-			super.doModifyText(e);
 		}
 
 		@Override
@@ -239,7 +251,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 		if (!fileDirty) {
 			return rmv;
 		}
-		return new RMLaunchValidation(false, Messages.FileContentsDirty);
+		return new RMLaunchValidation(true, Messages.FileContentsDirty);
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
@@ -292,12 +304,16 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 		if (!fileDirty) {
 			return;
 		}
-
-		URI newPath = RemoteUIServicesUtils.writeContentsToFile(control.getShell(), contents, selected);
+		URI newPath = RemoteUIServicesUtils.writeContentsToFile(control.getShell(), contents, selected, delegate);
 		if (newPath != null) {
 			selected = newPath;
-			updateContents();
+			listener.disable();
+			choice.setText(selected.toString());
+			listener.enable();
+		} else {
+			throw new Throwable(Messages.WriteToFileCanceled);
 		}
+		fileDirty = false;
 	}
 
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
@@ -331,12 +347,12 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 
 	private void updateContents() throws Throwable {
 		if (null != selected) {
-			contents = ConfigUtils.getFileContents(new File(selected));
+			contents = RemoteUIServicesUtils.getFileContents(selected, delegate);
 		} else {
 			contents = ZEROSTR;
 		}
-		dataSource.copyToFields();
 		fileDirty = false;
+		dataSource.copyToFields();
 		updateControls();
 	}
 }

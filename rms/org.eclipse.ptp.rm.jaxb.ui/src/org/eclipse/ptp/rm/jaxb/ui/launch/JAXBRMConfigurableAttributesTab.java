@@ -407,10 +407,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	}
 
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		/*
-		 * See dataSource loadDefaults
-		 */
-		return null;
+		return new RMLaunchValidation(true, null);
 	}
 
 	@Override
