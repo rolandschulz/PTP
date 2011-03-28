@@ -23,6 +23,15 @@ public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
 	private static final String ATTR_SCHEME = "scheme"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
+	private static final String ATTR_NEWCONNECTIONS = "newConnections"; //$NON-NLS-1$
+
+	private static boolean getAttribute(IConfigurationElement configElement, String name, boolean defaultValue) {
+		String attr = configElement.getAttribute(name);
+		if (attr != null) {
+			return Boolean.parseBoolean(attr);
+		}
+		return defaultValue;
+	}
 
 	private static String getAttribute(IConfigurationElement configElement, String name, String defaultValue) {
 		String value = configElement.getAttribute(name);
@@ -36,19 +45,33 @@ public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 	}
 
 	private final IConfigurationElement fConfigElement;
+
 	private final String fId;
 	private final String fName;
 	private final String fScheme;
+	private final boolean fNewConnections;
 	private IRemoteServicesFactory fFactory;
 	private IRemoteServices fDelegate = null;
 
 	public RemoteServicesProxy(IConfigurationElement configElement) {
 		fConfigElement = configElement;
 		fId = getAttribute(configElement, ATTR_ID, null);
-		fName = getAttribute(configElement, ATTR_NAME, this.fId);
+		fName = getAttribute(configElement, ATTR_NAME, fId);
 		fScheme = getAttribute(configElement, ATTR_SCHEME, null);
+		fNewConnections = getAttribute(configElement, ATTR_NEWCONNECTIONS, false);
 		getAttribute(configElement, ATTR_CLASS, null);
 		fFactory = null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#canCreateConnections
+	 * ()
+	 */
+	public boolean canCreateConnections() {
+		return fNewConnections;
 	}
 
 	/**

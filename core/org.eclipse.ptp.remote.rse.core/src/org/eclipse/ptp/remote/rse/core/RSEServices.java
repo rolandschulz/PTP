@@ -12,50 +12,29 @@ package org.eclipse.ptp.remote.rse.core;
 
 import java.util.List;
 
+import org.eclipse.ptp.remote.core.AbstractRemoteServices;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.IRemoteServicesDescriptor;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.ISystemRegistry;
 
-
-public class RSEServices implements IRemoteServices {
+public class RSEServices extends AbstractRemoteServices {
 	private ISystemRegistry fRegistry = null;
 	private IRemoteConnectionManager fConnMgr = null;
-	
-	private final IRemoteServicesDescriptor fDescriptor;
 	private boolean fInitialized;
-	
+
 	public RSEServices(IRemoteServicesDescriptor descriptor) {
-		fDescriptor = descriptor;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getId()
-	 */
-	public String getId() {
-		return fDescriptor.getId();
+		super(descriptor);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getName()
-	 */
-	public String getName() {
-		return fDescriptor.getName();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getScheme()
-	 */
-	public String getScheme() {
-		return fDescriptor.getScheme();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getConnectionManager()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.IRemoteServicesDelegate#getConnectionManager()
 	 */
 	public IRemoteConnectionManager getConnectionManager() {
 		if (!isInitialized()) {
@@ -66,44 +45,58 @@ public class RSEServices implements IRemoteServices {
 		}
 		return fConnMgr;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getFileManager(org.eclipse.ptp.remote.IRemoteConnection)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.IRemoteServicesDelegate#getFileManager(org.eclipse
+	 * .ptp.remote.IRemoteConnection)
 	 */
 	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
 		if (!isInitialized()) {
 			return null;
 		}
-		
+
 		if (!(conn instanceof RSEConnection)) {
 			return null;
 		}
-		return new RSEFileManager((RSEConnection)conn);
+		return new RSEFileManager((RSEConnection) conn);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.util.List)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.
+	 * eclipse.ptp.remote.IRemoteConnection, java.util.List)
 	 */
-	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command) {
+	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String> command) {
 		if (!isInitialized()) {
 			return null;
 		}
-		
+
 		return new RSEProcessBuilder(conn, getFileManager(conn), command);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.lang.String[])
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.
+	 * eclipse.ptp.remote.IRemoteConnection, java.lang.String[])
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command) {
 		if (!isInitialized()) {
 			return null;
 		}
-		
+
 		return new RSEProcessBuilder(conn, getFileManager(conn), command);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#initialize()
 	 */
 	public void initialize() {
@@ -136,9 +129,12 @@ public class RSEServices implements IRemoteServices {
 		}
 		fInitialized = true;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#isInitialized()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#isInitialized()
 	 */
 	public boolean isInitialized() {
 		return fInitialized;

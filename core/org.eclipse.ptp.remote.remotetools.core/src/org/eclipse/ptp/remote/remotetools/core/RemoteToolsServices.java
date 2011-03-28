@@ -14,21 +14,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.ptp.remote.core.AbstractRemoteServices;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.IRemoteServicesDescriptor;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 
-public class RemoteToolsServices implements IRemoteServices {
+public class RemoteToolsServices extends AbstractRemoteServices {
 	private static final String TARGET_ELEMENT_NAME = "Remote Host"; //$NON-NLS-1$
 	private static final String REMOTE_TOOLS_ID = "org.eclipse.ptp.remote.RemoteTools"; //$NON-NLS-1$
-
 	private static RemoteToolsServices instance = null;
 
 	/**
@@ -63,10 +62,9 @@ public class RemoteToolsServices implements IRemoteServices {
 
 	private final RemoteToolsConnectionManager connMgr = new RemoteToolsConnectionManager(this);
 	private final Map<String, RemoteToolsFileManager> fileMgrs = new HashMap<String, RemoteToolsFileManager>();
-	private final IRemoteServicesDescriptor fDescriptor;
 
 	public RemoteToolsServices(IRemoteServicesDescriptor descriptor) {
-		fDescriptor = descriptor;
+		super(descriptor);
 	}
 
 	/*
@@ -99,24 +97,6 @@ public class RemoteToolsServices implements IRemoteServices {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getId()
-	 */
-	public String getId() {
-		return fDescriptor.getId();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getName()
-	 */
-	public String getName() {
-		return fDescriptor.getName();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getProcessBuilder
 	 * (org.eclipse.ptp.remote.core.IRemoteConnection, java.util.List)
@@ -134,15 +114,6 @@ public class RemoteToolsServices implements IRemoteServices {
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command) {
 		return new RemoteToolsProcessBuilder((RemoteToolsConnection) conn, (RemoteToolsFileManager) getFileManager(conn), command);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getScheme()
-	 */
-	public String getScheme() {
-		return fDescriptor.getScheme();
 	}
 
 	/*

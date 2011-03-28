@@ -12,19 +12,27 @@ package org.eclipse.ptp.remote.core;
 
 public interface IRemoteServicesDescriptor {
 	/**
+	 * Test if this provider can create connections.
+	 * 
+	 * @return true if new connections can be created
+	 * @since 5.0
+	 */
+	public boolean canCreateConnections();
+
+	/**
 	 * Get unique ID of this service. Can be used as a lookup key.
 	 * 
 	 * @return unique ID
 	 */
 	public String getId();
-	
+
 	/**
 	 * Get display name of this service.
 	 * 
 	 * @return display name
 	 */
 	public String getName();
-	
+
 	/**
 	 * Get the EFS scheme provided by this service.
 	 * 
