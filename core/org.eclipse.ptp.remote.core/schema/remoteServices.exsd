@@ -88,6 +88,13 @@
                </appInfo>
             </annotation>
          </attribute>
+         <attribute name="newConnections" type="boolean" use="required">
+            <annotation>
+               <documentation>
+                  Indicates if this service supports the creation of new connections.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
