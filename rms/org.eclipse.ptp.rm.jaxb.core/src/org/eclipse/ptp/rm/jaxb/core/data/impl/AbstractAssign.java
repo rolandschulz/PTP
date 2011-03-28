@@ -131,11 +131,11 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	}
 
 	static Object normalizedValue(Object target, String uuid, String expression, boolean convert) throws Throwable {
-		if (expression.startsWith(THIS)) {
+		if (expression.startsWith(PD)) {
 			if (target == null) {
 				return null;
 			}
-			String field = expression.substring(5);
+			String field = expression.substring(1);
 			return AbstractAssign.get(target, field);
 		} else if (expression.indexOf(OPENV) >= 0) {
 			expression = RMVariableMap.getActiveInstance().getString(uuid, expression);
