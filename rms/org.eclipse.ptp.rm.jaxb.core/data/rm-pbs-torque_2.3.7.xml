@@ -231,11 +231,11 @@
 				<contents>${rm:script#value}</contents>
 			</file>
 		</managed-files>
-		<script>
+		<script envBegin="36">
 			<line>#!/bin/bash</line>
 			<line isUndefinedIfEquals="# @ PBS -A"># @ PBS -A ${rm:Account_Name#value}</line>
 			<line isUndefinedIfEquals="# @ PBS -c"># @ PBS -c ${rm:Checkpoint#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -W"># @ PBS -W depend=${rm:depend#value}</line>
+			<line isUndefinedIfEquals="# @ PBS -W depend="># @ PBS -W depend=${rm:depend#value}</line>
 			<line isUndefinedIfEquals="# @ PBS -q"># @ PBS -q ${rm:destination#value}</line>
 			<line isUndefinedIfEquals="# @ PBS -C"># @ PBS -C ${rm:line#value}</line>
 			<line isUndefinedIfEquals="# @ PBS -e"># @ PBS -e ${rm:Error_Path#value}</line>
@@ -269,12 +269,8 @@
 			<line isUndefinedIfEquals="# @ PBS -u"># @ PBS -u ${rm:User_List#value}</line>
 			<line isUndefinedIfEquals="# @ PBS -v"># @ PBS -v ${rm:Variable_List#value}</line>
 			<line isUndefinedIfEquals="cd">cd ${rm:directory#value}</line>
-			<line>${rm:mpiCommand#value}</line>
-			<line>${rm:mpiArgs#value}</line>
-			<line>${rm:executablePath#value}</line>
-			<line>${rm:progArgs#value}</line>
-			<line>touch</line>
-			<line>DONE</line>
+			<line isUndefinedIfEquals=".* -np [^\d].*">${rm:mpiCommand#value} ${rm:mpiArgs#value} ${rm:executablePath#value} ${rm:progArgs#value}</line>
+			<line>touch DONE</line>
 		</script>
 		<!-- ********************** FOR TESTING ********************** -->
 		<start-up-command name="get-queues">
@@ -289,9 +285,9 @@
             <target ref="available_queues">
                <match>
                   <expression>[^\s]+</expression>
-                  <append field="value" separator=",">
+                  <add field="value">
                      <entry valueGroup="0"/>
-                  </append>
+                  </add>
                </match>
             </target>
          </stdout-parser>

@@ -198,7 +198,16 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 		try {
 			resetEnv();
+			Property p = new Property();
+			p.setVisible(false);
+			p.setName(jobId);
+			p.setValue(jobId);
+			RMVariableMap.getActiveInstance().getVariables().put(jobId, p);
 			doControlCommand(jobId, operation);
+			RMVariableMap.getActiveInstance().getVariables().remove(jobId);
+			if (TERMINATE_OPERATION.equals(operation)) {
+				jobStatusMap.removeJobStatus(jobId);
+			}
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
 			throw ce;
@@ -222,12 +231,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		try {
 			Property p = new Property();
 			p.setVisible(false);
+			p.setName(jobId);
+			p.setValue(jobId);
 			RMVariableMap.getActiveInstance().getVariables().put(jobId, p);
 
 			Command job = controlData.getGetJobStatus();
 			if (job == null) {
 				throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + JOBSTATUS, null);
 			}
+
 			runCommand(jobId, job, false, true);
 
 			p = (Property) RMVariableMap.getActiveInstance().getVariables().remove(jobId);

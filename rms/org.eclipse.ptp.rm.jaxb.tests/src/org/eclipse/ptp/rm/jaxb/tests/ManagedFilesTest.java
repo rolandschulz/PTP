@@ -71,7 +71,10 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	public void testManagedFiles() {
 		composeScript();
 		if (verbose) {
-			System.out.println(env.get(SCRIPT));
+			Property contents = (Property) env.get(SCRIPT);
+			if (contents != null) {
+				System.out.println(contents.getValue());
+			}
 		}
 		ManagedFiles files = controlData.getManagedFiles();
 		assertNotNull(files);
@@ -99,9 +102,10 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 		} catch (InterruptedException t) {
 			t.printStackTrace();
 		}
-		Object contents = env.get(SCRIPT);
-		System.out.println(contents);
+
+		Property contents = (Property) env.get(SCRIPT);
 		assertNotNull(contents);
+		System.out.println(contents.getValue());
 	}
 
 	private void initializeConnections() {

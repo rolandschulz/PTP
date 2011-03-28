@@ -56,6 +56,9 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 			if (undefined.equals(dereferenced)) {
 				return ZEROSTR;
 			}
+			if (dereferenced != null && dereferenced.matches(undefined)) {
+				return ZEROSTR;
+			}
 		}
 		return dereferenced;
 	}
