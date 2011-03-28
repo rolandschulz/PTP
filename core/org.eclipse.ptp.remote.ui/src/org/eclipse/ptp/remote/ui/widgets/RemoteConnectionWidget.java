@@ -79,9 +79,6 @@ public class RemoteConnectionWidget extends Composite {
 				} else if (source == connectionCombo) {
 					handleConnectionSelected();
 				}
-				Event evt = new Event();
-				evt.widget = RemoteConnectionWidget.this;
-				notifyListeners(new SelectionEvent(evt));
 			}
 		}
 
@@ -266,9 +263,8 @@ public class RemoteConnectionWidget extends Composite {
 	}
 
 	private IRemoteUIConnectionManager getUIConnectionManager() {
-		if (fSelectedConnection != null) {
-			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedConnection.getRemoteServices())
-					.getUIConnectionManager();
+		if (fSelectedServices != null) {
+			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedServices).getUIConnectionManager();
 		}
 		return null;
 	}
@@ -314,6 +310,9 @@ public class RemoteConnectionWidget extends Composite {
 			String connectionName = connectionCombo.getItem(currentSelection);
 			fSelectedConnection = getRemoteConnection(fSelectedServices, connectionName);
 		}
+		Event evt = new Event();
+		evt.widget = this;
+		notifyListeners(new SelectionEvent(evt));
 		fWidgetListener.setEnabled(enabled);
 	}
 
@@ -351,6 +350,7 @@ public class RemoteConnectionWidget extends Composite {
 				for (int index = 0; index < fRemoteServices.length; index++) {
 					if (fRemoteServices[index].getId().equals(services.getId())) {
 						remoteCombo.select(index);
+						break;
 					}
 				}
 			}
@@ -377,10 +377,10 @@ public class RemoteConnectionWidget extends Composite {
 
 			if (connections.length > 0) {
 				connectionCombo.select(selected);
-				/*
-				 * Events are disabled so call selection handler here
-				 */
 			}
+			/*
+			 * Events are disabled so call selection handler here
+			 */
 			handleConnectionSelected();
 
 			/*
