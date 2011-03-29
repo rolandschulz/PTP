@@ -185,23 +185,43 @@ public class WorkbenchSelectionInfo
         return result;
     }
 
-    public boolean someFilesAreSelected()
+    /**
+     * Returns true if there is at least one file selected.
+     * <p>
+     * If the <code>canGuess</code> parameter is <code>true</code>, folders and projects will not be
+     * traversed recursively; instead, the method will optimistically return true iff the project is
+     * refactorable. The caller must then test whether {@link #getAllFilesInSelectedResources()} is
+     * empty. This can be used to improve performance.
+     * <p>
+     * If the <code>canGuess</code> parameter is <code>false<c/ode>, then this method returns true
+     * iff {@link #getAllFilesInSelectedResources()} is non-empty.
+     * 
+     * @since 3.0
+     */
+    public boolean someFilesAreSelected(boolean canGuess)
     {
         if (someFilesAreSelected == null)
-            someFilesAreSelected = internalSomeFilesAreSelected();
+            someFilesAreSelected = internalSomeFilesAreSelected(canGuess);
         
         return someFilesAreSelected;
     }
 
-    private boolean internalSomeFilesAreSelected()
+    public boolean someFilesAreSelected()
+    {
+        return someFilesAreSelected(false);
+    }
+
+    private boolean internalSomeFilesAreSelected(boolean canGuess)
     {
         if (allFilesInSelectedResources != null)
             return !allFilesInSelectedResources.isEmpty();
         else
-            return internalSomeFilesAreSelected(selectedResources.toArray(new IResource[selectedResources.size()]));
+            return internalSomeFilesAreSelected(
+                selectedResources.toArray(new IResource[selectedResources.size()]),
+                canGuess);
     }
 
-    private boolean internalSomeFilesAreSelected(IResource[] resources)
+    private boolean internalSomeFilesAreSelected(IResource[] resources, boolean canGuess)
     {
         for (IResource r : resources)
         {
@@ -215,14 +235,22 @@ public class WorkbenchSelectionInfo
                 {
                     if (r.isAccessible())
                     {
-                        try
+                        if (canGuess)
                         {
-                            if (internalSomeFilesAreSelected(((IContainer)r).members()))
-                                return true;;
+                            // Guess that there are resources iff the project is refactorable
+                            return resourceFilter.shouldProcess(r.getProject());
                         }
-                        catch (CoreException e)
+                        else
                         {
-                            e.printStackTrace();
+                            try
+                            {
+                                if (internalSomeFilesAreSelected(((IContainer)r).members(), canGuess))
+                                    return true;
+                            }
+                            catch (CoreException e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }

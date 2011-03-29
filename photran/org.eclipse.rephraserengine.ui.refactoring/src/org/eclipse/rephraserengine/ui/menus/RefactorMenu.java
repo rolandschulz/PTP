@@ -11,6 +11,7 @@
 package org.eclipse.rephraserengine.ui.menus;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -20,6 +21,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring;
 import org.eclipse.rephraserengine.core.refactorings.IResourceRefactoring;
@@ -160,7 +162,7 @@ public final class RefactorMenu extends CompoundContributionItem
     private void addResourceRefactoring(IConfigurationElement elt,
         LinkedList<IContributionItem> result) throws CoreException
     {
-        if (selection.someFilesAreSelected())
+        if (selection.someFilesAreSelected(true))
         {
             if (elt.getAttribute("class") != null && environmentOK(elt)) //$NON-NLS-1$
             {
@@ -282,7 +284,7 @@ public final class RefactorMenu extends CompoundContributionItem
             this.selection = selection;
         }
 
-        @Override public void fill(Menu parent, int index)
+        @Override public void fill(final Menu parent, int index)
         {
             MenuItem menuItem = new MenuItem(parent, SWT.NONE, index);
             menuItem.setText(label);
@@ -291,8 +293,17 @@ public final class RefactorMenu extends CompoundContributionItem
                 @SuppressWarnings("unchecked")
                 @Override public void widgetSelected(SelectionEvent e)
                 {
-                    refactoring.initialize(selection.getAllFilesInSelectedResources());
-                    new RefactoringAction(refactoring, customInputPage).run();
+                    List<IFile> selectedFiles = selection.getAllFilesInSelectedResources();
+                    if (selectedFiles.isEmpty())
+                    {
+                        MessageDialog.openError(parent.getShell(), "Error", //$NON-NLS-1$
+                            Messages.RefactorMenu_NoSelectedFilesAreRefactorable);
+                    }
+                    else
+                    {
+                        refactoring.initialize(selectedFiles);
+                        new RefactoringAction(refactoring, customInputPage).run();
+                    }
                 }
             });
         }

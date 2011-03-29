@@ -22,6 +22,10 @@ public class Messages extends NLS
     private static final String BUNDLE_NAME = "org.eclipse.rephraserengine.ui.menus.messages"; //$NON-NLS-1$
 
     public static String RefactorMenu_NoRefactoringsAvailable;
+
+    /** @since 3.0 */
+    public static String RefactorMenu_NoSelectedFilesAreRefactorable;
+    
     static
     {
         // initialize resource bundle

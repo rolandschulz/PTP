@@ -10,7 +10,11 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.editor;
 
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.jface.text.source.IVerticalRuler;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
+import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
@@ -34,7 +38,8 @@ import org.eclipse.swt.widgets.Composite;
  * 
  * @see FortranSourceViewer#createControl(Composite, int)
  */
-public final class HorizontalRuler extends Composite implements PaintListener, CaretListener, SelectionListener, ControlListener
+@SuppressWarnings("deprecation")
+public final class HorizontalRuler extends Composite implements PaintListener, CaretListener, SelectionListener, ControlListener, IPropertyChangeListener
 {
     private IVerticalRuler verticalRuler = null;
     private StyledText styledText = null;
@@ -50,6 +55,8 @@ public final class HorizontalRuler extends Composite implements PaintListener, C
         setLayout(layout);
         
         addPaintListener(this);
+
+        FortranCorePlugin.getDefault().getPluginPreferences().addPropertyChangeListener(this);
     }
 
     public void configure(IVerticalRuler verticalRuler, StyledText styledText)
@@ -66,7 +73,7 @@ public final class HorizontalRuler extends Composite implements PaintListener, C
         if (verticalRuler != null && styledText != null && !styledText.isDisposed())
             new RulerPainter().paint(e.gc);
     }
-    
+
     private final class RulerPainter
     {
         private int height = getSize().y;
@@ -75,13 +82,25 @@ public final class HorizontalRuler extends Composite implements PaintListener, C
         private int verticalRulerWidth = verticalRuler.getWidth();
         private int scrollBarWidth = styledText.getVerticalBar().getSize().x;
 
+        private int characterWidth;
+        private int numCharsScrolled;
+        private int rulerWidth;
+
         public void paint(GC gc)
         {
             gc.setFont(styledText.getFont());
 
+            characterWidth = gc.getFontMetrics().getAverageCharWidth();
+            numCharsScrolled = styledText.getHorizontalIndex();
+            rulerWidth = controlWidth - scrollBarWidth - left + numCharsScrolled*characterWidth;
+
             drawBackground(gc);
-            drawTicks(gc);
-            drawNumbers(gc);
+            if (isFixedWidthFont(gc))
+            {
+                drawTicks(gc);
+                drawTabs(gc);
+                drawNumbers(gc);
+            }
             drawCursorPosition(gc);
         }
 
@@ -94,15 +113,16 @@ public final class HorizontalRuler extends Composite implements PaintListener, C
             gc.fillGradientRectangle(0, 0, controlWidth, height*2, true);
         }
 
+        private boolean isFixedWidthFont(GC gc)
+        {
+            return gc.getCharWidth('i') == gc.getCharWidth('w');
+        }
+
         private void drawTicks(GC gc)
         {
             gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY));
 
-            int characterWidth = gc.getFontMetrics().getAverageCharWidth();
-            int numCharsScrolled = styledText.getHorizontalIndex();
-            int rulerWidth = controlWidth - scrollBarWidth - left + numCharsScrolled*characterWidth;
-
-            for (int i = 0; i < rulerWidth/characterWidth; i++)
+            for (int i = 0; i <= rulerWidth/characterWidth; i++)
             {
                 int x = left + i*characterWidth - characterWidth/2 + 1;
                 
@@ -124,15 +144,35 @@ public final class HorizontalRuler extends Composite implements PaintListener, C
             }
         }
 
+        private void drawTabs(GC gc)
+        {
+            gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_GRAY));
+            
+            int tabSize = FortranPreferences.TAB_WIDTH.getValue();
+
+            for (int i = tabSize+1; i <= rulerWidth/characterWidth; i += tabSize)
+            {
+                int x = left + i*characterWidth - characterWidth/2 + 1;
+                int y = height-1;
+                if (x >= verticalRulerWidth)
+                {
+                    gc.fillPolygon(new int[]
+                        {
+                            x, y-3,
+                            x-3, y,
+                            x+3, y
+                        });
+                }
+            }
+        }
+
         private void drawNumbers(GC gc)
         {
             gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_DARK_GRAY));
 
             Font origFont = gc.getFont();
-            int characterWidth = gc.getFontMetrics().getAverageCharWidth();
-
             gc.setFont(gc.getDevice().getSystemFont());
-            for (int i = 10; i < controlWidth/characterWidth; i += 10)
+            for (int i = 10; i <= rulerWidth/characterWidth; i += 10)
             {
                 String string = Integer.toString(i/10);
                 string = string.substring(string.length()-1);
@@ -142,7 +182,6 @@ public final class HorizontalRuler extends Composite implements PaintListener, C
                 if (x >= verticalRulerWidth)
                     gc.drawText(string, x, y, true);
             }
-            
             gc.setFont(origFont);
         }
 
@@ -151,10 +190,13 @@ public final class HorizontalRuler extends Composite implements PaintListener, C
             gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_GRAY));
 
             Point caretLocation = styledText.getCaret().getLocation();
+            int rectWidth = isFixedWidthFont(gc)
+                ? gc.getFontMetrics().getAverageCharWidth()
+                : styledText.getCaret().getSize().x;
             gc.drawRectangle(
                 verticalRulerWidth+caretLocation.x,
                 0,
-                gc.getFontMetrics().getAverageCharWidth(),
+                rectWidth,
                 height-1);
         }
     }
@@ -182,5 +224,17 @@ public final class HorizontalRuler extends Composite implements PaintListener, C
     public void controlResized(ControlEvent e)
     {
         redraw();
+    }
+
+    public void propertyChange(PropertyChangeEvent event)
+    {
+        redraw();
+    }
+    
+    @Override
+    public void dispose()
+    {
+        FortranCorePlugin.getDefault().getPluginPreferences().removePropertyChangeListener(this);
+        super.dispose();
     }
 }

@@ -22,6 +22,7 @@ public class RefactorableResourcePropertyTester extends PropertyTester
 {
     public boolean test(Object receiver, String property, Object[] args, Object expectedValue)
     {
+        // This is run every time the workbench selection changes, so it needs to be very fast
         return !new RefactorMenu().isEmpty();
     }
 }

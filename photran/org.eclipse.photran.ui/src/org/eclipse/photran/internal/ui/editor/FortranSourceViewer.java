@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Composite;
 @SuppressWarnings("restriction")
 public class FortranSourceViewer extends ProjectionViewer
 {
-    private static final int TAB_WIDTH = 4;
+    //private static final int TAB_WIDTH = 4;
     
     public FortranSourceViewer(
         Composite parent,
@@ -91,7 +91,7 @@ public class FortranSourceViewer extends ProjectionViewer
     @Override
     protected void shift(boolean useDefaultPrefixes, boolean right, boolean ignoreWhitespace) {
         if (!useDefaultPrefixes && FortranPreferences.CONVERT_TABS_TO_SPACES.getValue())
-            adjustIndent(right, TAB_WIDTH, true);
+            adjustIndent(right, FortranPreferences.TAB_WIDTH.getValue(), true);
         else
             super.shift(useDefaultPrefixes, right, ignoreWhitespace);
     }

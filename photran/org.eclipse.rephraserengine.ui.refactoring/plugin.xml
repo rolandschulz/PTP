@@ -10,6 +10,26 @@
    <!--===============-->
    <!-- Refactor Menu -->
    <!--===============-->
+   <extension point="org.eclipse.core.expressions.definitions">
+      <definition id="org.eclipse.rephraserengine.ui.refactoring.isRefactorableResource">
+           <with variable="selection">
+               <iterate operator="or" ifEmpty="false">
+                 <or>
+                   <adapt type="org.eclipse.core.resources.IResource">
+                     <test
+                        property="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"
+                        forcePluginActivation="true" />
+                   </adapt>
+                   <adapt type="org.eclipse.jface.text.ITextSelection">
+                     <test
+                        property="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"
+                        forcePluginActivation="true" />
+                   </adapt>
+                 </or>
+               </iterate>
+            </with>
+      </definition>
+   </extension>
    <extension point="org.eclipse.ui.menus">
 
       <!-- Refactor menu in the menu bar -->
@@ -22,22 +42,14 @@
          <menu
                label="%menu.label"
                id="org.eclipse.jdt.ui.refactoring.menu">
+            <!-- http://wiki.eclipse.org/Command_Core_Expressions -->
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="org.eclipse.rephraserengine.ui.refactoring.isRefactorableResource" />
+            </visibleWhen>
             <dynamic
                   class="org.eclipse.rephraserengine.ui.menus.RefactorMenu"
                   id="org.eclipse.rephraserengine.ui.menus.refactor">
             </dynamic>
-            <visibleWhen checkEnabled="false">
-               <iterate operator="or">
-                 <or>
-                   <adapt type="org.eclipse.core.resources.IResource">
-                     <test property="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"/>
-                   </adapt>
-                   <adapt type="org.eclipse.jface.text.ITextSelection">
-                     <test property="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"/>
-                   </adapt>
-                 </or>
-               </iterate>
-            </visibleWhen>
          </menu>
       </menuContribution>
 
@@ -50,22 +62,14 @@
          <menu
                label="%menu.label.0"
                id="org.eclipse.jdt.ui.refactoring.menu">
+            <!-- http://wiki.eclipse.org/Command_Core_Expressions -->
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="org.eclipse.rephraserengine.ui.refactoring.isRefactorableResource" />
+            </visibleWhen>
             <dynamic
                   class="org.eclipse.rephraserengine.ui.menus.RefactorMenu"
                   id="org.eclipse.rephraserengine.ui.menus.refactor">
             </dynamic>
-            <visibleWhen checkEnabled="false">
-               <iterate operator="or">
-                 <or>
-                   <adapt type="org.eclipse.core.resources.IResource">
-                     <test property="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"/>
-                   </adapt>
-                   <adapt type="org.eclipse.jface.text.ITextSelection">
-                     <test property="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"/>
-                   </adapt>
-                 </or>
-               </iterate>
-            </visibleWhen>
          </menu>
       </menuContribution>
 
@@ -77,7 +81,7 @@
   <extension
         point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-           id="org.eclipse.rephraserengine.ui.refactoring.isRefactorablePropertyTester"
+           id="org.eclipse.rephraserengine.ui.refactoring.isRefactorable"
            class="org.eclipse.rephraserengine.internal.ui.menus.RefactorableResourcePropertyTester"
            namespace="org.eclipse.rephraserengine.ui.refactoring"
            properties="isRefactorable"
