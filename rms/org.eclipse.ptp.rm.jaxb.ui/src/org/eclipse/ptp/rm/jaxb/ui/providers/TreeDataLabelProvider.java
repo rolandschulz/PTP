@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
-import org.eclipse.ptp.rm.jaxb.ui.data.RowData;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 
@@ -34,12 +34,12 @@ public class TreeDataLabelProvider implements IBaseLabelProvider, IJAXBUINonNLSC
 	}
 
 	public Image getColumnImage(Object element, int columnIndex) {
-		RowData row = (RowData) element;
+		AttributeViewerRowData row = (AttributeViewerRowData) element;
 		return row.getColumnImage(getColumnName(columnIndex));
 	}
 
 	public String getColumnText(Object element, int columnIndex) {
-		RowData row = (RowData) element;
+		AttributeViewerRowData row = (AttributeViewerRowData) element;
 		String displayText = row.getColumnDisplayValue(getColumnName(columnIndex));
 		return displayText != null ? displayText : ZEROSTR;
 	}

@@ -94,8 +94,10 @@
 			<xs:element name="value" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="type" use="required" type="xs:string"/>
 		<xs:attribute name="selected" type="xs:boolean" default="true"/>
 		<xs:attribute name="visible" type="xs:boolean" default="true"/>
+		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="attribute">
 		<xs:sequence>
@@ -343,6 +345,8 @@
 	<xs:complexType name="tab-item-descriptor">
 		<xs:sequence>
 			<xs:element name="title" type="xs:string"/>
+			<xs:element name="style" minOccurs="0" type="rm:style"/>
+			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="group" type="rm:group-descriptor"/>
 				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
@@ -394,8 +398,7 @@
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
-			<xs:element name="value" minOccurs="0" type="xs:string"/>
-			<xs:element name="displayValue" minOccurs="0">
+			<xs:element name="valueArgs" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
 						The text of this element will be parsed for references to the environment; e.g., ${a},
@@ -417,17 +420,14 @@
 					<xs:enumeration value="checkbox"/>
 					<xs:enumeration value="spinner"/>
 					<xs:enumeration value="combo"/>
-					<xs:enumeration value="pushButton"/>
 					<xs:enumeration value="radioButton"/>
-					<xs:enumeration value="browseDirectoryButton"/>
-					<xs:enumeration value="browseExistingFileButton"/>
-					<xs:enumeration value="browseOrCreateFileButton"/>
+					<xs:enumeration value="browseLocal"/>
+					<xs:enumeration value="browseRemote"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
-		<xs:attribute name="valueFrom" type="xs:string"/>
-		<xs:attribute name="saveAs" type="xs:string"/>
+		<xs:attribute name="saveValueTo" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="attribute-viewer">
 		<xs:annotation>

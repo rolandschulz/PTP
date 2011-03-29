@@ -1,42 +1,38 @@
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
 import java.util.List;
-import java.util.Map;
 
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.GridDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.GridLayoutDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.GroupDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.TabItemDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
-import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBRMConfigurableAttributesTab;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Tree;
 
 public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 
-	private final TabController tabController;
+	private final JAXBRMConfigurableAttributesTab tab;
 
-	private final Map<Control, Widget> valueWidgets;
-	private final Map<String, Boolean> selected;
-	private final RMVariableMap rmVars;
-
-	public LaunchTabBuilder(TabController tabController, RMVariableMap rmVars, Map<Control, Widget> valueWidgets,
-			Map<String, Boolean> selected) {
-		this.tabController = tabController;
-		this.valueWidgets = valueWidgets;
-		this.selected = selected;
-		this.rmVars = rmVars;
+	public LaunchTabBuilder(JAXBRMConfigurableAttributesTab tab) {
+		this.tab = tab;
 	}
 
 	public void build(Composite parent) throws Throwable {
-		List<Object> top = tabController.getTabFolderOrGroupDescriptor();
+		List<Object> top = tab.getController().getTabFolderOrGroupDescriptor();
 		for (Object o : top) {
 			if (o instanceof GroupDescriptor) {
 				addGroup((GroupDescriptor) o, parent);
@@ -46,11 +42,40 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		}
 	}
 
+	/*
+	 * For viewers and widgets, the listeners need to be set. Notes for
+	 * construction. we always construct a checkbutton for toggling full and
+	 * selected. Need a way to associated the template? that's just on update,
+	 * should be in the descriptor.
+	 */
+	private void addAttributeViewer(AttributeViewer descriptor, Composite parent) {
+		GridData data = addGridData(descriptor.getGridData());
+		GridLayout layout = addGridLayout(descriptor.getGridLayout());
+		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
+		Group group = WidgetBuilderUtils.createGroup(parent, style, layout, data, descriptor.getLabel());
+		if (TABLE.equals(descriptor.getType())) {
+			addCheckboxTableViewer(group, data, layout, style, descriptor);
+		} else if (TREE.equals(descriptor.getType())) {
+			addCheckboxTreeViewer(group, data, layout, style, descriptor);
+		}
+	}
+
+	private void addCheckboxTableViewer(Composite parent, GridData data, GridLayout layout, int style, AttributeViewer descriptor) {
+		Table t = WidgetBuilderUtils.createTable(parent, style, data);
+		new CheckboxTableViewer(t);
+	}
+
+	private void addCheckboxTreeViewer(Composite parent, GridData data, GridLayout layout, int style, AttributeViewer descriptor) {
+		Tree t = WidgetBuilderUtils.createTree(parent, style, data);
+		new CheckboxTreeViewer(t);
+	}
+
 	private void addFolder(TabFolderDescriptor fd, Composite parent) {
 		TabFolder folder = new TabFolder(parent, WidgetBuilderUtils.getStyle(fd.getStyle()));
 		List<TabItemDescriptor> items = fd.getItem();
+		int index = 0;
 		for (TabItemDescriptor i : items) {
-			addItem(folder, i);
+			addItem(folder, i, index++);
 		}
 	}
 
@@ -68,7 +93,6 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 				gridLayout.getHorizontalSpacing(), gridLayout.getVerticalSpacing(), gridLayout.getMarginWidth(),
 				gridLayout.getMarginHeight(), gridLayout.getMarginLeft(), gridLayout.getMarginRight(), gridLayout.getMarginTop(),
 				gridLayout.getMarginBottom());
-
 	}
 
 	private void addGroup(GroupDescriptor grp, Composite parent) {
@@ -84,16 +108,32 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 				addGroup((GroupDescriptor) o, group);
 			} else if (o instanceof Widget) {
 				addWidget((Widget) o, group);
+			} else if (o instanceof AttributeViewer) {
+				addAttributeViewer((AttributeViewer) o, group);
 			}
 		}
 	}
 
-	private void addItem(TabFolder folder, TabItemDescriptor i) {
+	private void addItem(TabFolder folder, TabItemDescriptor descriptor, int index) {
+		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
+		TabItem item = WidgetBuilderUtils.createTabItem(folder, style, descriptor.getTitle(), descriptor.getTooltip(), index);
+		Composite control = WidgetBuilderUtils.createComposite(folder, 1);
+		item.setControl(control);
+		List<Object> children = descriptor.getGroupOrTabFolder();
+		for (Object o : children) {
+			if (o instanceof TabFolderDescriptor) {
+				addFolder((TabFolderDescriptor) o, control);
+			} else if (o instanceof GroupDescriptor) {
+				addGroup((GroupDescriptor) o, control);
+			}
+		}
+	}
+
+	private void addRows(ColumnViewer viewer, AttributeViewer descriptor) {
 
 	}
 
-	private void addWidget(Widget o, Group group) {
+	private void addWidget(Widget o, Composite parent) {
 
 	}
-
 }

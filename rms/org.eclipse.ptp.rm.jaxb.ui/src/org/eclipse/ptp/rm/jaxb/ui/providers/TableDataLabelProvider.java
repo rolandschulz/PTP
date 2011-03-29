@@ -15,8 +15,8 @@ import java.util.List;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
 import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
-import org.eclipse.ptp.rm.jaxb.ui.data.RowData;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 
@@ -34,12 +34,12 @@ public class TableDataLabelProvider implements ITableLabelProvider, IJAXBUINonNL
 	}
 
 	public Image getColumnImage(Object element, int columnIndex) {
-		RowData row = (RowData) element;
+		AttributeViewerRowData row = (AttributeViewerRowData) element;
 		return row.getColumnImage(getColumnName(columnIndex));
 	}
 
 	public String getColumnText(Object element, int columnIndex) {
-		RowData row = (RowData) element;
+		AttributeViewerRowData row = (AttributeViewerRowData) element;
 		String displayText = row.getColumnDisplayValue(getColumnName(columnIndex));
 		return displayText != null ? displayText : ZEROSTR;
 	}
@@ -55,7 +55,6 @@ public class TableDataLabelProvider implements ITableLabelProvider, IJAXBUINonNL
 		if (columnIndex >= columnDescriptors.size()) {
 			throw new ArrayIndexOutOfBoundsException(Messages.TableDataLabelProviderColumnError + columnIndex);
 		}
-
 		return columnDescriptors.get(columnIndex).getColumnName();
 	}
 }

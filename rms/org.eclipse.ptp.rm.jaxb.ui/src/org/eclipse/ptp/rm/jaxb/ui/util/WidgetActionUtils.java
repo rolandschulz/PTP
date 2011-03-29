@@ -193,22 +193,34 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	}
 
 	/**
-	 * If the text is empty and there is a default value, resets the widget
-	 * value to its default.
-	 */
-	public static void validate(Control c, String defaultV) {
-		String value = getValueString(c);
-		if (value == null && defaultV != null) {
-			setValue(c, defaultV);
-		}
-	}
-
-	/**
 	 * If validation fails, resets the widget value to its default and throws an
 	 * exception.
 	 */
-	public static void validate(Control c, Validator v, String defaultV, IRemoteFileManager fileManager) throws Exception {
+	public static String validate(Control c, Validator v, IRemoteFileManager fileManager) throws Exception {
 		String value = getValueString(c);
+		Regex reg = v.getRegex();
+		String error = v.getErrorMessage();
+
+		if (error == null) {
+			error = ZEROSTR;
+		}
+
+		if (reg != null && new RegexImpl(reg).getMatched(value) == null) {
+			throw new UnsatisfiedMatchException(error + CO + SP + reg.getExpression() + CM + SP + value);
+		} else {
+			FileMatch match = v.getFileInfo();
+			try {
+				if (match != null && !validate(match, value, fileManager)) {
+					throw new UnsatisfiedMatchException(error + CO + SP + value);
+				}
+			} catch (CoreException ce) {
+				throw new UnsatisfiedMatchException(ce);
+			}
+		}
+		return value;
+	}
+
+	public static void validate(String value, Validator v, IRemoteFileManager fileManager) throws Exception {
 		Regex reg = v.getRegex();
 		String error = v.getErrorMessage();
 

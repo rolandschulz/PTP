@@ -6,30 +6,37 @@
  * 	
  * Contributors: 
  * 	Albert L. Rossi - modifications
- *  M Venkataramana - original code: http://eclipse.dzone.com/users/venkat_r_m
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.swt.widgets.Control;
+public class AttributeViewerData {
 
-public class ViewerData {
+	private final List<AttributeViewerRowData> rows;
+	private final List<AttributeViewerRowData> selected;
 
-	private final List<RowData> rows;
-
-	public ViewerData(Map<Object, Control> data) {
-
-		rows = new ArrayList<RowData>();
-
-		for (Object o : data.keySet()) {
-			rows.add(new RowData(o, data.get(o)));
-		}
+	public AttributeViewerData() {
+		rows = new ArrayList<AttributeViewerRowData>();
+		selected = new ArrayList<AttributeViewerRowData>();
 	}
 
-	public List<RowData> getRows() {
+	public void addRow(AttributeViewerRowData data) {
+		rows.add(data);
+	}
+
+	public List<AttributeViewerRowData> getAllRows() {
 		return rows;
+	}
+
+	public List<AttributeViewerRowData> getSelectedRows() {
+		selected.clear();
+		for (AttributeViewerRowData row : rows) {
+			if (row.isVisible()) {
+				selected.add(row);
+			}
+		}
+		return selected;
 	}
 }

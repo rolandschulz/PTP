@@ -104,6 +104,13 @@ public interface IJAXBNonNLSConstants {
 	String NAME_TAG = AMP + NAME;
 	String VALUE_TAG = AMP + VALUE;
 
+	/* TYPE MATCHING */
+	String NT = "nt";//$NON-NLS-1$
+	String BOOL = "bool";//$NON-NLS-1$
+	String ET = "et";//$NON-NLS-1$
+	String IST = "ist";//$NON-NLS-1$
+	String ECTOR = "ector";//$NON-NLS-1$
+
 	/* STANDARD PROPERTIES */
 	String ID = "id";//$NON-NLS-1$
 	String JAVA_USER_HOME = "user.home";//$NON-NLS-1$
