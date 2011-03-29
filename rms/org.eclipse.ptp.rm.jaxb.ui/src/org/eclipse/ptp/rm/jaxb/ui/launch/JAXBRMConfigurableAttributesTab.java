@@ -10,7 +10,7 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,25 +20,16 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
-import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.data.Arg;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
-import org.eclipse.ptp.rm.jaxb.core.data.Validator;
-import org.eclipse.ptp.rm.jaxb.core.data.Widget;
-import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.ILaunchTabValueHandler;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
-import org.eclipse.ptp.rm.jaxb.ui.data.RowData;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
@@ -46,10 +37,11 @@ import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
+import org.eclipse.ptp.rm.ui.utils.DataSource.ValidationException;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -66,76 +58,42 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	private class JAXBUniversalDataSource extends RMLaunchConfigurationDynamicTabDataSource {
 
+		private boolean contentsChanged;
+
 		protected JAXBUniversalDataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
+			contentsChanged = false;
 		}
 
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			Map<String, String> vars = LTVariableMap.getActiveInstance().getVariables();
-			Map<String, String> disc = LTVariableMap.getActiveInstance().getDiscovered();
-			for (Control c : valueWidgets.keySet()) {
-				Widget w = valueWidgets.get(c);
-				String name = w.getSaveAs();
-				if (name == null) {
-					continue;
-				}
-				String value = WidgetActionUtils.getValueString(c);
-				if (vars.containsKey(name)) {
-					vars.put(name, value);
-				} else {
-					disc.put(name, value);
-				}
+			/*
+			 * write to store ONLY when the user clicks Apply.
+			 */
+			if (contentsChanged) {
+				return;
+			}
+			for (ILaunchTabValueHandler h : handlers) {
+				h.setValuesOnMap(LTVariableMap.getActiveInstance());
 			}
 		}
 
 		@Override
 		protected void copyToFields() {
-			IVariableMap map = LTVariableMap.getActiveInstance();
-			Map<String, ?> vars = map.getVariables();
-			Map<String, ?> disc = map.getDiscovered();
-			StringBuffer b = new StringBuffer();
-			for (Control c : valueWidgets.keySet()) {
-				Object value = null;
-				Widget w = valueWidgets.get(c);
-				String ref = w.getValueFrom();
-				if (ref != null) {
-					Object o = vars.get(ref);
-					if (o == null) {
-						o = disc.get(ref);
-					}
-					if (o instanceof Property) {
-						value = ((Property) o).getValue();
-					} else if (o instanceof Attribute) {
-						value = ((Attribute) o).getValue();
-					}
-				} else {
-					Widget.DisplayValue dv = w.getDisplayValue();
-					if (dv != null) {
-						List<Arg> arglist = dv.getArg();
-						if (arglist != null) {
-							b.setLength(0);
-							ArgImpl.toString(null, arglist, map, b);
-							value = b.toString();
-						}
-					}
-				}
-
-				if (value == null) {
-					value = w.getValue();
-				}
-
-				if (value == null) {
-					WidgetActionUtils.setValue(c, null);
-				} else {
-					WidgetActionUtils.setValue(c, value.toString());
-				}
+			for (ILaunchTabValueHandler h : handlers) {
+				h.getValuesFromMap(LTVariableMap.getActiveInstance());
 			}
 		}
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		protected void copyToStorage() {
+			/*
+			 * write to store ONLY when the user clicks Apply.
+			 */
+			if (contentsChanged) {
+				return;
+			}
 			try {
 				ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
 				if (config == null) {
@@ -158,42 +116,10 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			}
 		}
 
-		/*
-		 * Defaults are recorded in the Property or JobAttribute definitions and
-		 * are accessed via the RMVariableMap.
-		 * 
-		 * Only widgets whose value is a reference may have a valid default; the
-		 * default value does not overwrite a non-null value.
-		 */
 		@Override
 		protected void loadDefault() {
-			Map<String, Object> vars = RMVariableMap.getActiveInstance().getVariables();
-			Map<String, Object> disc = RMVariableMap.getActiveInstance().getDiscovered();
-			for (Control c : valueWidgets.keySet()) {
-				Widget w = valueWidgets.get(c);
-				String value = w.getValue();
-				if (value != null) {
-					continue;
-				}
-
-				String name = w.getValueFrom();
-				if (name == null) {
-					continue;
-				}
-
-				Object o = vars.get(name);
-				String defaultValue = null;
-				if (o == null) {
-					o = disc.get(name);
-				}
-				if (o instanceof Property) {
-					defaultValue = ((Property) o).getDefault();
-				} else if (o instanceof Attribute) {
-					defaultValue = ((Attribute) o).getDefault();
-				}
-				if (defaultValue != null) {
-					w.setValue(defaultValue);
-				}
+			for (ILaunchTabValueHandler h : handlers) {
+				h.setDefaultValuesOnControl(RMVariableMap.getActiveInstance());
 			}
 		}
 
@@ -229,31 +155,12 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 		@Override
 		protected void validateLocal() throws ValidationException {
-			Map<String, Object> vars = RMVariableMap.getActiveInstance().getVariables();
-			/*
-			 * If there are validators, run them against the value
-			 */
-			for (Control c : valueWidgets.keySet()) {
-				Widget w = valueWidgets.get(c);
-				String name = w.getValueFrom();
-				if (name == null) {
-					continue;
+			try {
+				for (ILaunchTabValueHandler h : handlers) {
+					h.validateControlValues(RMVariableMap.getActiveInstance(), delegate.getRemoteFileManager());
 				}
-				Object o = vars.get(name);
-				if (o instanceof Attribute) {
-					Attribute ja = (Attribute) o;
-					Validator v = ja.getValidator();
-					if (v != null) {
-						try {
-							WidgetActionUtils.validate(c, v, ja.getDefault(), delegate.getRemoteFileManager());
-						} catch (Throwable t) {
-							throw new ValidationException(t.getMessage());
-						}
-					}
-				} else if (o instanceof Property) {
-					Property p = (Property) o;
-					WidgetActionUtils.validate(c, p.getDefault());
-				}
+			} catch (Throwable t) {
+				throw new ValidationException(t.getMessage());
 			}
 		}
 	}
@@ -277,9 +184,15 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			super(dynamicTab);
 		}
 
+		@Override
+		public void modifyText(ModifyEvent e) {
+			dataSource.contentsChanged = true;
+			super.modifyText(e);
+			dataSource.contentsChanged = false;
+		}
+
 		/*
-		 * This reconstructs the content string for the viewer and overwrites
-		 * the associated environment entry.
+		 * This controls the checking and unchecking of the viewer rows.
 		 * 
 		 * (non-Javadoc)
 		 * 
@@ -289,69 +202,66 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		 */
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (isEnabled()) {
-				Object o = event.getSource();
-				AttributeViewer av = viewers.get(o);
-				String pattern = ZEROSTR;
-				String separator = SP;
-				if (av != null) {
-					// Template template = av.getTemplate();
-					// if (template == null) return;
-					// pattern = template.getPattern();
-					// separator = template.getSeparator();
-					StringBuffer sb = new StringBuffer();
-					Viewer viewer = (Viewer) o;
-
-					RowData[] rows = (RowData[]) viewer.getInput();
-					if (rows.length != 0) {
-						sb.append(rows[0].getReplaced(pattern));
-					}
-
-					for (int i = 1; i < rows.length; i++) {
-						if (separator != null) {
-							sb.append(separator);
-							sb.append(rows[i].getReplaced(pattern));
-						}
-					}
-
-					// Map<String, String> vars =
-					// LTVariableMap.getActiveInstance().getVariables();
-					// vars.put(av.getName(), sb.toString());
-
+				disable();
+				boolean b = dataSource.contentsChanged;
+				dataSource.contentsChanged = false;
+				try {
+					dataSource.copyFromFields();
+				} catch (ValidationException t) {
+					JAXBUIPlugin.log(t);
+					dataSource.contentsChanged = b;
+					enable();
+					return;
 				}
-				maybeFireContentsChanged();
+				dataSource.copyToFields();
+				dataSource.contentsChanged = b;
+				enable();
 			}
 		}
-	}
 
-	private class SelectAttributesListener implements SelectionListener {
-
+		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {
-			widgetSelected(e);
+			dataSource.contentsChanged = true;
+			super.widgetDefaultSelected(e);
+			dataSource.contentsChanged = false;
 		}
 
-		public synchronized void widgetSelected(SelectionEvent e) {
-			try {
-				Object source = e.getSource();
-				if (source == viewScript) {
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			dataSource.contentsChanged = true;
+			super.widgetSelected(e);
+			dataSource.contentsChanged = false;
+		}
 
-				}
-			} catch (Throwable t) {
-				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.WidgetSelectedError,
-						Messages.WidgetSelectedErrorTitle, false);
+		/*
+		 * Overrides to implement display script, if present, and restore
+		 * defaults (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.rm.ui.utils.WidgetListener#doWidgetSelected(org.eclipse
+		 * .swt.events.SelectionEvent)
+		 */
+		@Override
+		protected void doWidgetSelected(SelectionEvent e) {
+			if (e.getSource() == viewScript) {
+				// do the display like in PBS
+			} else if (e.getSource() == restoreDefaults) {
+				dataSource.loadDefault();
+			} else {
+				super.doWidgetSelected(e);
 			}
 		}
 	}
 
 	private final RemoteServicesDelegate delegate;
-	private final JAXBRMLaunchConfigurationDynamicTab pTab;
+	private final JAXBRMLaunchConfigurationDynamicTab parentTab;
 	private final TabController controller;
-	private final Map<Control, Widget> valueWidgets;
-	private final Map<Viewer, AttributeViewer> viewers;
+	private final List<ILaunchTabValueHandler> handlers;
 
-	private Composite dynamicControl;
 	private Composite control;
 	private final String title;
 	private Button viewScript;
+	private Button restoreDefaults;
 
 	private JAXBUniversalWidgetListener universalListener;
 	private JAXBUniversalDataSource dataSource;
@@ -360,15 +270,14 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			TabController controller, JAXBRMLaunchConfigurationDynamicTab pTab) {
 		super(dialog);
 		delegate = rm.getRemoteServicesDelegate();
-		this.pTab = pTab;
+		this.parentTab = pTab;
 		this.controller = controller;
 		String t = controller.getTitle();
 		if (t == null) {
 			t = Messages.DefaultDynamicTab_title;
 		}
 		this.title = t;
-		valueWidgets = new HashMap<Control, Widget>();
-		viewers = new HashMap<Viewer, AttributeViewer>();
+		handlers = new ArrayList<ILaunchTabValueHandler>();
 		createListener();
 		createDataSource();
 		try {
@@ -381,12 +290,15 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetBuilderUtils.createComposite(parent, 1);
-
-		if (pTab.hasScript()) {
-			createViewScriptGroup(control);
-		}
 		try {
-			// buildMain(updateVisibleAttributes(false));
+			universalListener.disable();
+			LaunchTabBuilder builder = new LaunchTabBuilder(this);
+			builder.build(control);
+			createViewScriptGroup(control);
+			parentTab.resize(control);
+			dataSource.loadAndUpdate();
+			updateControls();
+			universalListener.enable();
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 		}
@@ -396,14 +308,35 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		return control;
 	}
 
+	public TabController getController() {
+		return controller;
+	}
+
+	@Override
+	public JAXBUniversalDataSource getDataSource() {
+		return (JAXBUniversalDataSource) createDataSource();
+	}
+
+	public List<ILaunchTabValueHandler> getHandlers() {
+		return handlers;
+	}
+
 	@Override
 	public Image getImage() {
 		return null;
 	}
 
+	public JAXBRMLaunchConfigurationDynamicTab getParentTab() {
+		return parentTab;
+	}
+
 	@Override
 	public String getText() {
 		return title;
+	}
+
+	public JAXBUniversalWidgetListener getUniversalListener() {
+		return (JAXBUniversalWidgetListener) createListener();
 	}
 
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
@@ -434,80 +367,15 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		return universalListener;
 	}
 
-	private void buildMain(Map<String, Boolean> checked) {
-		universalListener.disable();
-		dataSource.storeAndValidate();
-
-		if (dynamicControl != null) {
-			dynamicControl.dispose();
-			valueWidgets.clear();
-		}
-
-		if (control.isDisposed()) {
-			return;
-		}
-
-		dynamicControl = WidgetBuilderUtils.createComposite(control, 1);
-		LaunchTabBuilder builder = new LaunchTabBuilder(controller, RMVariableMap.getActiveInstance(), valueWidgets, checked);
-		try {
-			builder.build(dynamicControl);
-		} catch (Throwable t) {
-			JAXBUIPlugin.log(t);
-		}
-
-		/*
-		 * We need to repeat this here (the ResourcesTab does it when it
-		 * initially builds the control).
-		 */
-		pTab.resize(control);
-
-		dataSource.loadAndUpdate();
-		updateControls();
-		universalListener.enable();
-	}
-
 	private void createViewScriptGroup(Composite control) {
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true);
-		GridData gd = WidgetBuilderUtils.createGridDataFillH(2);
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(6, true);
+		GridData gd = WidgetBuilderUtils.createGridDataFillH(6);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
-		WidgetBuilderUtils.createLabel(grp, Messages.ViewValuesReplaced, SWT.RIGHT, 1);
-		viewScript = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, new SelectAttributesListener());
+		if (parentTab.hasScript()) {
+			WidgetBuilderUtils.createLabel(grp, Messages.ViewValuesReplaced, SWT.RIGHT, 1);
+			viewScript = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, universalListener);
+		}
+		WidgetBuilderUtils.createLabel(grp, Messages.RestoreDefaultValues, SWT.RIGHT, 1);
+		restoreDefaults = WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, universalListener);
 	}
-
-	// private Map<String, Boolean> updateVisibleAttributes(boolean showDialog)
-	// throws Throwable {
-	// Map<String, Boolean> checked = null;
-	// selectionDialog.clearChecked();
-	// Map<String, String> selected =
-	// pTab.getRmConfig().getSelectedAttributeSet();
-	// selectionDialog.setCurrentlyVisible(selected);
-	// if (!showDialog || Window.OK == selectionDialog.open()) {
-	// checked = selectionDialog.getChecked();
-	// if (selected == null) {
-	// selected = new TreeMap<String, String>();
-	// } else {
-	// selected.clear();
-	// }
-	//
-	// Iterator<String> k = checked.keySet().iterator();
-	// if (k.hasNext()) {
-	// String key = k.next();
-	// if (checked.get(key)) {
-	// selected.put(key, key);
-	// } else {
-	// k.remove();
-	// }
-	// }
-	// while (k.hasNext()) {
-	// String key = k.next();
-	// if (checked.get(key)) {
-	// selected.put(key, key);
-	// } else {
-	// k.remove();
-	// }
-	// }
-	// pTab.getRmConfig().setSelectedAttributeSet(selected);
-	// }
-	// return checked;
-	// }
 }

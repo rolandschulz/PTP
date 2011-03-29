@@ -17,16 +17,18 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.ui.data.RowData;
-import org.eclipse.ptp.rm.jaxb.ui.data.ViewerData;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerData;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
 
 public class TreeDataContentProvider implements ITreeContentProvider {
+	private boolean selected = true;
+
 	public void dispose() {
 	}
 
 	public Object[] getChildren(Object parentElement) {
 		List<Object> children = new ArrayList<Object>();
-		RowData rowData = (RowData) parentElement;
+		AttributeViewerRowData rowData = (AttributeViewerRowData) parentElement;
 		Object data = rowData.getData();
 		if (data instanceof Property) {
 			Property p = (Property) data;
@@ -47,7 +49,11 @@ public class TreeDataContentProvider implements ITreeContentProvider {
 	}
 
 	public Object[] getElements(Object inputElement) {
-		return ((ViewerData) inputElement).getRows().toArray();
+		if (selected) {
+			return ((AttributeViewerData) inputElement).getSelectedRows().toArray();
+		} else {
+			return ((AttributeViewerData) inputElement).getAllRows().toArray();
+		}
 	}
 
 	public Object getParent(Object element) {
@@ -55,7 +61,7 @@ public class TreeDataContentProvider implements ITreeContentProvider {
 	}
 
 	public boolean hasChildren(Object element) {
-		RowData rowData = (RowData) element;
+		AttributeViewerRowData rowData = (AttributeViewerRowData) element;
 		Object data = rowData.getData();
 		return (data instanceof Property) || (data instanceof Attribute);
 	}
@@ -63,4 +69,7 @@ public class TreeDataContentProvider implements ITreeContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 	}
 
+	public void setSelectedOnly(boolean selected) {
+		this.selected = selected;
+	}
 }

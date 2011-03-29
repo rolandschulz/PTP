@@ -14,16 +14,13 @@ import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 
 public class ColumnDescriptor implements IJAXBUINonNLSConstants {
-	public static char TEXT = 't';
-	public static char COMBO = 'c';
-	public static char BUTTON = 'b';
-
 	private static Integer DEFAULT_OPTION = -1;
 
 	private final char type;
 	private String columnName;
 	private int width = -1;
 	private String[] options = new String[0];
+	private boolean sorted = false;
 
 	public ColumnDescriptor(char type, String columnName) {
 		this.type = type;
@@ -90,16 +87,8 @@ public class ColumnDescriptor implements IJAXBUINonNLSConstants {
 		return width;
 	}
 
-	public boolean isButton() {
-		return type == BUTTON;
-	}
-
-	public boolean isCombo() {
-		return type == COMBO;
-	}
-
-	public boolean isText() {
-		return type == TEXT;
+	public boolean isSorted() {
+		return sorted;
 	}
 
 	public boolean isWidthSpecified() {
@@ -108,6 +97,10 @@ public class ColumnDescriptor implements IJAXBUINonNLSConstants {
 
 	public void setColumnName(String columnName) {
 		this.columnName = columnName;
+	}
+
+	public void setSorted(boolean sorted) {
+		this.sorted = sorted;
 	}
 
 	public void setWidth(int width) {

@@ -99,6 +99,8 @@ public class Messages extends NLS {
 	public static String WriteToFileCanceled;
 	public static String RenameFile;
 	public static String RenameFileTitle;
+	public static String RestoreDefaultValues;
+	public static String DefaultValues;
 
 	static {
 		// initialize resource bundle

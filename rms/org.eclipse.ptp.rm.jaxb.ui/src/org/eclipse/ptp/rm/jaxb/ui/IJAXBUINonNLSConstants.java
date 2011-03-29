@@ -23,6 +23,9 @@ public interface IJAXBUINonNLSConstants extends IJAXBNonNLSConstants {
 	String COLUMN_TOOLTIP = "Tooltip";//$NON-NLS-1$
 	String COLUMN_TYPE = "Type";//$NON-NLS-1$
 
+	String TABLE = "table";//$NON-NLS-1$
+	String TREE = "tree";//$NON-NLS-1$
+
 	// SWT
 	String ALL = "ALL";//$NON-NLS-1$
 	String ARROW = "ARROW";//$NON-NLS-1$
