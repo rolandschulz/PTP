@@ -10,11 +10,13 @@
 package org.eclipse.ptp.rm.jaxb.core.variables;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
@@ -103,6 +105,40 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 
 	public boolean isInitialized() {
 		return initialized;
+	}
+
+	public void maybeAddProperty(String name, Object value, boolean visible) {
+		if (value == null) {
+			return;
+		}
+		Property p = new Property();
+		p.setName(name);
+		p.setValue(value);
+		p.setVisible(visible);
+		variables.put(name, p);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public void maybeOverwrite(String key1, String key2, ILaunchConfiguration configuration) throws CoreException {
+		Object value = null;
+		Property p = (Property) variables.get(key1);
+		if (p != null) {
+			value = p.getValue();
+		}
+
+		if (value instanceof Integer) {
+			value = configuration.getAttribute(key2, (Integer) value);
+		} else if (value instanceof Boolean) {
+			value = configuration.getAttribute(key2, (Boolean) value);
+		} else if (value instanceof String) {
+			value = configuration.getAttribute(key2, (String) value);
+		} else if (value instanceof List) {
+			value = configuration.getAttribute(key2, (List) value);
+		} else if (value instanceof Map) {
+			value = configuration.getAttribute(key2, (Map) value);
+		}
+
+		maybeAddProperty(key1, value, false);
 	}
 
 	public void setInitialized(boolean initialized) {

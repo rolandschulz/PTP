@@ -195,10 +195,10 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			Object source = e.getSource();
 			try {
 				if (source == browseLocal) {
-					selected = RemoteUIServicesUtils.browse(control.getShell(), selected, delegate, false);
+					selected = RemoteUIServicesUtils.browse(control.getShell(), selected, delegate, false, true);
 					updateContents();
 				} else if (source == browseRemote) {
-					selected = RemoteUIServicesUtils.browse(control.getShell(), selected, delegate, true);
+					selected = RemoteUIServicesUtils.browse(control.getShell(), selected, delegate, true, true);
 					updateContents();
 				} else if (source == clear) {
 					selected = null;

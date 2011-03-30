@@ -499,17 +499,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		runCommands(null, onStartUp, STARTUP);
 	}
 
-	private void maybeAddProperty(String name, Object value, boolean configurable, Map<String, Object> env) {
-		if (value == null) {
-			return;
-		}
-		Property p = new Property();
-		p.setName(name);
-		p.setValue(value);
-		p.setVisible(configurable);
-		env.put(name, p);
-	}
-
 	/*
 	 * Write content to file if indicated, and stage to host.
 	 */
@@ -535,7 +524,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (script == null) {
 			return;
 		}
-		ScriptHandler job = new ScriptHandler(uuid, script, dynSystemEnv, appendSysEnv);
+		ScriptHandler job = new ScriptHandler(uuid, script, RMVariableMap.getActiveInstance(), dynSystemEnv, appendSysEnv);
 		job.schedule();
 		try {
 			job.join();
@@ -553,30 +542,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		return false;
 	}
 
-	@SuppressWarnings("rawtypes")
-	private void maybeOverwrite(String key1, String key2, ILaunchConfiguration configuration, Map<String, Object> env)
-			throws CoreException {
-		Object value = null;
-		Property p = (Property) env.get(key1);
-		if (p != null) {
-			value = p.getValue();
-		}
-
-		if (value instanceof Integer) {
-			value = configuration.getAttribute(key2, (Integer) value);
-		} else if (value instanceof Boolean) {
-			value = configuration.getAttribute(key2, (Boolean) value);
-		} else if (value instanceof String) {
-			value = configuration.getAttribute(key2, (String) value);
-		} else if (value instanceof List) {
-			value = configuration.getAttribute(key2, (List) value);
-		} else if (value instanceof Map) {
-			value = configuration.getAttribute(key2, (Map) value);
-		}
-
-		maybeAddProperty(key1, value, false, env);
-	}
-
 	/*
 	 * Ensure that the RM has its own environement. Add the fixed properties
 	 * again, clear dynamic env from the tab.
@@ -588,8 +553,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			JAXBCorePlugin.log(t);
 			return;
 		}
-		Map<String, Object> env = RMVariableMap.getActiveInstance().getVariables();
-		setFixedConfigurationProperties(env);
+		setFixedConfigurationProperties();
 		dynSystemEnv.clear();
 		appendSysEnv = true;
 	}
@@ -648,10 +612,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * From the user runtime choices.
 	 */
-	private void setFixedConfigurationProperties(Map<String, Object> env) {
+	private void setFixedConfigurationProperties() {
 		IRemoteConnection rc = delegate.getRemoteConnection();
-		maybeAddProperty(CONTROL_USER_VAR, rc.getUsername(), false, env);
-		maybeAddProperty(CONTROL_ADDRESS_VAR, rc.getAddress(), false, env);
+		RMVariableMap.getActiveInstance().maybeAddProperty(CONTROL_USER_VAR, rc.getUsername(), false);
+		RMVariableMap.getActiveInstance().maybeAddProperty(CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 	}
 
 	/*
@@ -660,7 +624,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	@SuppressWarnings("unchecked")
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
-		Map<String, Object> env = RMVariableMap.getActiveInstance().getVariables();
+		RMVariableMap map = RMVariableMap.getActiveInstance();
+		Map<String, Object> env = map.getVariables();
 		env.remove(SCRIPT); // to ensure the most recent script is used
 
 		Map<String, String> selected = config.getSelectedAttributeSet();
@@ -691,8 +656,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		dynSystemEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, dynSystemEnv));
 		appendSysEnv = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, appendSysEnv);
-		maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration, env);
-		maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration, env);
-		maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration, env);
+
+		map.maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
+		map.maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
+		map.maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
 	}
 }

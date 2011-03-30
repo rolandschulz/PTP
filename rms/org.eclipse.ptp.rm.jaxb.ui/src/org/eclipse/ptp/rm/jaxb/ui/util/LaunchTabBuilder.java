@@ -103,7 +103,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		GridLayout layout = addGridLayout(cd.getGridLayout());
 		int style = WidgetBuilderUtils.getStyle(cd.getStyle());
 		Composite composite = null;
-		if (cd.isIsGroup()) {
+		if (cd.isGroup()) {
 			composite = WidgetBuilderUtils.createGroup(parent, style, layout, data, cd.getTitle());
 		} else {
 			composite = WidgetBuilderUtils.createComposite(parent, style, layout, data);

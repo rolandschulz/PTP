@@ -95,7 +95,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	private void composeScript() {
 		Script script = controlData.getScript();
 		assertNotNull(script);
-		ScriptHandler job = new ScriptHandler(null, script, live, appendEnv);
+		ScriptHandler job = new ScriptHandler(null, script, RMVariableMap.getActiveInstance(), live, appendEnv);
 		job.schedule();
 		try {
 			job.join();

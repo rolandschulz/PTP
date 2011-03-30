@@ -102,6 +102,10 @@ public class Messages extends NLS {
 	public static String RestoreDefaultValues;
 	public static String DefaultValues;
 	public static String ToggleVisibleAttributes;
+	public static String DialogClose;
+	public static String DisplayScript;
+	public static String DisplayScriptError;
+	public static String DisplayScriptErrorTitle;
 
 	static {
 		// initialize resource bundle

@@ -18,39 +18,52 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.Arg;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
+import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 
 	private final String uuid;
-	private final RMVariableMap map;
+	private final IVariableMap map;
 	private final Map<String, String> live;
 	private final boolean appendEnv;
-	private final Script script;
+	private Script script;
+	private String scriptValue;
 
-	public ScriptHandler(String uuid, Script script, Map<String, String> live, boolean appendEnv) {
+	public ScriptHandler(String uuid, Script script, IVariableMap map, Map<String, String> live, boolean appendEnv) {
 		super(Messages.ScriptHandlerJob);
 		this.uuid = uuid;
 		this.script = script;
 		this.live = live;
 		this.appendEnv = appendEnv;
-		map = RMVariableMap.getActiveInstance();
+		this.map = map;
+		if (map instanceof LTVariableMap) {
+			convertScript();
+		}
+	}
+
+	public String getScriptValue() {
+		return scriptValue;
 	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
-		String script = composeScript(monitor);
-		Property p = new Property();
-		p.setName(SCRIPT);
-		p.setValue(script);
-		map.getVariables().put(SCRIPT, p);
+		scriptValue = composeScript(monitor);
+		if (map instanceof RMVariableMap) {
+			RMVariableMap rmMap = (RMVariableMap) map;
+			Property p = new Property();
+			p.setName(SCRIPT);
+			p.setValue(scriptValue);
+			rmMap.getVariables().put(SCRIPT, p);
+		}
 		progress.done();
 		return Status.OK_STATUS;
 	}
@@ -108,5 +121,19 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		}
 		progress.done();
 		return buffer.toString();
+	}
+
+	private void convertScript() {
+		Script ltScript = new Script();
+		ltScript.setEnvBegin(script.getEnvBegin());
+		ltScript.setEnvEnd(script.getEnvEnd());
+		List<Arg> lines = ltScript.getLine();
+		for (Arg a : script.getLine()) {
+			Arg newA = new Arg();
+			newA.setIsUndefinedIfMatches(a.getIsUndefinedIfMatches());
+			newA.setContent(a.getContent().replaceAll(OPENVRM, OPENVLT));
+			lines.add(newA);
+		}
+		script = ltScript;
 	}
 }
