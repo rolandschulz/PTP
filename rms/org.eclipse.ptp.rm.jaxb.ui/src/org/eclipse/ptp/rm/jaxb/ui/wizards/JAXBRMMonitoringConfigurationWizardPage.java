@@ -15,6 +15,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
+import org.eclipse.swt.widgets.Composite;
 
 /**
  * Generic Wizard for the JAXB Resource Manager Monitoring.
@@ -52,16 +53,15 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 	 * 
 	 * @see org.eclipse.ptp.rm.ui.wizards.
 	 * AbstractRemoteResourceManagerConfigurationWizardPage
-	 * #handleNewRemoteConnectionSelected()
+	 * #doCreateContents(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	protected void handleNewRemoteConnectionSelected() {
-		if (getRemoteUIConnectionManager() != null) {
-			String[] hints = new String[] { IRemoteUIConnectionManager.CONNECTION_ADDRESS_HINT,
-					IRemoteUIConnectionManager.CONNECTION_PORT_HINT };
-			String[] defaults = new String[] { getConfiguration().getDefaultMonitorHost(),
-					getConfiguration().getDefaultMonitorPort() };
-			handleRemoteServiceSelected(getRemoteUIConnectionManager().newConnection(getShell(), hints, defaults));
-		}
+	protected Composite doCreateContents(Composite parent) {
+		Composite comp = super.doCreateContents(parent);
+		String[] hints = new String[] { IRemoteUIConnectionManager.CONNECTION_ADDRESS_HINT,
+				IRemoteUIConnectionManager.CONNECTION_PORT_HINT };
+		String[] defaults = new String[] { getConfiguration().getDefaultMonitorHost(), getConfiguration().getDefaultMonitorPort() };
+		connectionWidget.setHints(hints, defaults);
+		return comp;
 	}
 }
