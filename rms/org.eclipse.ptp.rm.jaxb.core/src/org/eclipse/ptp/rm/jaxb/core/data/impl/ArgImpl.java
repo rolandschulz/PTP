@@ -49,13 +49,10 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 		if (dereferenced != null) {
 			dereferenced = dereferenced.trim();
 		}
-		String undefined = arg.getIsUndefinedIfEquals();
+		String undefined = arg.getIsUndefinedIfMatches();
 		if (undefined != null) {
 			undefined = undefined.trim();
 			undefined = map.getString(uuid, undefined);
-			if (undefined.equals(dereferenced)) {
-				return ZEROSTR;
-			}
 			if (dereferenced != null && dereferenced.matches(undefined)) {
 				return ZEROSTR;
 			}

@@ -23,12 +23,14 @@ import org.eclipse.swt.widgets.Shell;
 
 public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 
-	public static URI browse(Shell shell, URI current, RemoteServicesDelegate delegate, boolean remote) throws URISyntaxException {
+	public static URI browse(Shell shell, URI current, RemoteServicesDelegate delegate, boolean remote, boolean readOnly)
+			throws URISyntaxException {
 		IRemoteUIServices uIServices = null;
 		IRemoteUIFileManager uiFileManager = null;
 		IRemoteConnection conn = null;
 		URI home = null;
 		String path = null;
+		int type = readOnly ? IRemoteUIConstants.OPEN : IRemoteUIConstants.SAVE;
 
 		if (!remote) {
 			uIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(delegate.getLocalServices());
@@ -47,8 +49,7 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 		try {
 			uiFileManager.setConnection(conn);
 			uiFileManager.showConnections(remote);
-			path = uiFileManager
-					.browseFile(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, IRemoteUIConstants.OPEN);
+			path = uiFileManager.browseFile(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, type);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}

@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
@@ -69,6 +70,16 @@ public class LTVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 
 	public boolean isInitialized() {
 		return initialized;
+	}
+
+	public void maybeOverwrite(String key1, String key2, ILaunchConfiguration configuration) throws CoreException {
+		String value = null;
+		String p = variables.get(key1);
+		if (p != null) {
+			value = p;
+		}
+		value = configuration.getAttribute(key2, value);
+		variables.put(key1, value);
 	}
 
 	public void setInitialized(boolean initialized) {

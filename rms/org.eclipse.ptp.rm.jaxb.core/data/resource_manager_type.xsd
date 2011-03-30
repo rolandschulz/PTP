@@ -269,11 +269,11 @@
 				The text of the argument will be parsed for references to the resource manager environment.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:attribute name="isUndefinedIfEquals" type="xs:string">
+		<xs:attribute name="isUndefinedIfMatches" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
-					If this is defined, an equality check on the arg will be run and if satisfied the arg will be eliminated from the
-					list (the default behavior is not to include null or zero-length args).
+					If this regex is defined, an equality check on the arg will be run and if satisfied the arg will be eliminated
+					from the list (the default behavior is not to include null or zero-length args).
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -341,7 +341,7 @@
 				<xs:element name="viewer" type="rm:attribute-viewer"/>
 			</xs:choice>
 		</xs:sequence>
-		<xs:attribute name="isGroup" type="xs:boolean" default="false"/>
+		<xs:attribute name="group" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="tab-item-descriptor">
 		<xs:sequence>

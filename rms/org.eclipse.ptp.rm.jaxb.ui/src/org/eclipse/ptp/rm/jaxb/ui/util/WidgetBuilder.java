@@ -1,5 +1,7 @@
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
+import java.io.File;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 
@@ -9,6 +11,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBRMConfigurableAttributesTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -17,6 +20,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
@@ -24,16 +28,17 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 
 	private final JAXBRMConfigurableAttributesTab tab;
 	private final GridData data;
+	private final boolean readOnly;
+	private final String title;
+	private final String type;
+
 	private Object value;
 	private String initialValue;
 	private String choice;
-	private final String title;
-	private final String tooltip;
+	private String tooltip;
 	private Integer min;
 	private Integer max;
 	private int style;
-	private final boolean readOnly;
-	private final String type;
 
 	public WidgetBuilder(Widget widget, RMVariableMap rmMap, JAXBRMConfigurableAttributesTab tab) {
 		this.tab = tab;
@@ -47,6 +52,9 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 		}
 		type = widget.getType();
 		tooltip = widget.getTooltip();
+		if (tooltip == null) {
+			tooltip = ZEROSTR;
+		}
 		Map<String, Object> vars = rmMap.getVariables();
 		Object data = vars.get(widget.getSaveValueTo());
 		if (data != null) {
@@ -55,7 +63,7 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Control createControl(Composite parent) {
+	public Control createControl(final Composite parent) {
 		Control c = null;
 
 		if (LABEL.equals(type)) {
@@ -90,35 +98,59 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 			cc.addModifyListener(tab.getWidgetListener());
 			c = cc;
 		} else if (BROWSELOCAL.equals(type)) {
-			// need both a read-only text field and a button;
-			// the field needs to be associated with the widget == that would be
-			// the 'c'
-
-			// create a text field,
-			// create the button
-			// rely on the data /layout to put them where they need to be
-
-			c = WidgetBuilderUtils.createButton(parent, data, title, style, new SelectionListener() {
+			final Text t = WidgetBuilderUtils.createText(parent, style, data, readOnly, initialValue);
+			t.addModifyListener(tab.getWidgetListener());
+			t.addSelectionListener(tab.getWidgetListener());
+			c = t;
+			c.setToolTipText(tooltip);
+			WidgetBuilderUtils.createButton(parent, data, title, style, new SelectionListener() {
 
 				public void widgetDefaultSelected(SelectionEvent e) {
 					widgetSelected(e);
 				}
 
 				public void widgetSelected(SelectionEvent e) {
-
+					try {
+						URI uri = new URI(t.getText());
+						int type = readOnly ? SWT.OPEN : SWT.SAVE;
+						FileDialog d = new FileDialog(parent.getShell(), type);
+						d.setFileName(uri.getPath());
+						String f = d.open();
+						if (f != null) {
+							t.setText(new File(f).toURI().toString());
+						} else {
+							t.setText(ZEROSTR);
+						}
+					} catch (Throwable t) {
+						JAXBUIPlugin.log(t);
+					}
 				}
 			});
 			c.setToolTipText(tooltip);
 		} else if (BROWSEREMOTE.equals(type)) {
-			c = WidgetBuilderUtils.createButton(parent, data, title, style, new SelectionListener() {
+			final Text t = WidgetBuilderUtils.createText(parent, style, data, readOnly, initialValue);
+			t.addModifyListener(tab.getWidgetListener());
+			t.addSelectionListener(tab.getWidgetListener());
+			c = t;
+			c.setToolTipText(tooltip);
+			WidgetBuilderUtils.createButton(parent, data, title, style, new SelectionListener() {
 
 				public void widgetDefaultSelected(SelectionEvent e) {
 					widgetSelected(e);
 				}
 
 				public void widgetSelected(SelectionEvent e) {
-					// TODO Auto-generated method stub
-
+					try {
+						URI uri = new URI(t.getText());
+						uri = RemoteUIServicesUtils.browse(parent.getShell(), uri, tab.getDelegate(), true, readOnly);
+						if (uri != null) {
+							t.setText(uri.toString());
+						} else {
+							t.setText(ZEROSTR);
+						}
+					} catch (Throwable t) {
+						JAXBUIPlugin.log(t);
+					}
 				}
 			});
 			c.setToolTipText(tooltip);

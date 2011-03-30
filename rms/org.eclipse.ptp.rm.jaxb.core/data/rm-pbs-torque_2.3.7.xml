@@ -63,17 +63,22 @@
 			</description>
 			<default>true</default>
 		</attribute>
-		<attribute name="group-descriptor_list" type="string">
-			<description>A list of group-descriptor_names@hosts which determines the group-descriptor under which the job is run on a given
+		<attribute name="group_list" type="string">
+			<description>A list of composite-descriptor group="true"_names@hosts which determines the composite-descriptor group="true" under
+				which the job is run on a given
 				host.
 			</description>
-			<tooltip>Format: group-descriptor_name[@host][,group-descriptor_name[@host]...]. When a job is to be placed into execution, the
-				server will select a group-descriptor
-				name according to the following ordered set of rules: 1) Select the group-descriptor name from
+			<tooltip>Format: composite-descriptor group="true"_name[@host][,composite-descriptor group="true"_name[@host]...]. When a job is to
+				be placed into execution, the
+				server will select a composite-descriptor group="true"
+				name according to the following ordered set of
+				rules: 1) Select the composite-descriptor group="true" name from
 				the list for which the associated host name
-				matches the name of the execution host; 2) Select the group-descriptor name which has no
-				associated host name, the wildcard name; 3) Use the
-				login group-descriptor for the username under which the job will be run.
+				matches the name of the
+				execution host; 2) Select the composite-descriptor group="true" name which has no
+				associated host name, the wildcard name; 3) Use
+				the
+				login composite-descriptor group="true" for the username under which the job will be run.
 			</tooltip>
 		</attribute>
 		<attribute name="Hold_Types" type="choice">
@@ -233,43 +238,51 @@
 		</managed-files>
 		<script envBegin="36">
 			<line>#!/bin/bash</line>
-			<line isUndefinedIfEquals="# @ PBS -A"># @ PBS -A ${rm:Account_Name#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -c"># @ PBS -c ${rm:Checkpoint#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -W depend="># @ PBS -W depend=${rm:depend#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -q"># @ PBS -q ${rm:destination#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -C"># @ PBS -C ${rm:line#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -e"># @ PBS -e ${rm:Error_Path#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -V"># @ PBS -V ${rm:export_all#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -W group_list="># @ PBS -W group_list=${rm:group_list#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -h"># @ PBS -h ${rm:Hold_Types#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -N"># @ PBS -N ${rm:Job_Name#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -j"># @ PBS -j ${rm:Join_Path#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -k"># @ PBS -k ${rm:Keep_Files#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -m"># @ PBS -m ${rm:Mail_Points#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -M"># @ PBS -M ${rm:Mail_Users#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -o"># @ PBS -o ${rm:Output_Path#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -p"># @ PBS -p ${rm:Priority#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -r"># @ PBS -r ${rm:Rerunnable#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l arch="># @ PBS -l arch=${rm:Resource_List.arch#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l cput="># @ PBS -l cput=${rm:Resource_List.cput#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l file="># @ PBS -l file=${rm:Resource_List.file#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l host="># @ PBS -l host=${rm:Resource_List.host#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l mem="># @ PBS -l mem=${rm:Resource_List.mem#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l nice="># @ PBS -l nice=${rm:Resource_List.nice#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l nodes="># @ PBS -l nodes=${rm:Resource_List.nodes#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l ompthreads="># @ PBS -l ompthreads=${rm:Resource_List.ompthreads#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l pcput="># @ PBS -l pcput=${rm:Resource_List.pcput#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l pmem="># @ PBS -l pmem=${rm:Resource_List.pmem#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l pvmem="># @ PBS -l pvmem=${rm:Resource_List.pvmem#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l vmem="># @ PBS -l vmem=${rm:Resource_List.vmem#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -l walltime="># @ PBS -l walltime=${rm:Resource_List.walltime#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -S"># @ PBS -S ${rm:Shell_Path_List#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -W stagein="># @ PBS -W stagein=${rm:stagein#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -W stageout="># @ PBS -W stageout=${rm:stageout#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -u"># @ PBS -u ${rm:User_List#value}</line>
-			<line isUndefinedIfEquals="# @ PBS -v"># @ PBS -v ${rm:Variable_List#value}</line>
-			<line isUndefinedIfEquals="cd">cd ${rm:directory#value}</line>
-			<line isUndefinedIfEquals=".* -np [^\d].*">${rm:mpiCommand#value} ${rm:mpiArgs#value} ${rm:executablePath#value} ${rm:progArgs#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -A"># @ PBS -A ${rm:Account_Name#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -c"># @ PBS -c ${rm:Checkpoint#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -W depend="># @ PBS -W depend=${rm:depend#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -q"># @ PBS -q ${rm:destination#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -C"># @ PBS -C ${rm:line#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -e"># @ PBS -e ${rm:Error_Path#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -V"># @ PBS -V ${rm:export_all#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -W group_list="># @ PBS -W group_list=${rm:group_list#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -h"># @ PBS -h ${rm:Hold_Types#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -N"># @ PBS -N ${rm:Job_Name#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -j"># @ PBS -j ${rm:Join_Path#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -k"># @ PBS -k ${rm:Keep_Files#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -m"># @ PBS -m ${rm:Mail_Points#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -M"># @ PBS -M ${rm:Mail_Users#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -o"># @ PBS -o ${rm:Output_Path#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -p"># @ PBS -p ${rm:Priority#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -r"># @ PBS -r ${rm:Rerunnable#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l arch="># @ PBS -l arch=${rm:Resource_List.arch#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l cput="># @ PBS -l cput=${rm:Resource_List.cput#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l file="># @ PBS -l file=${rm:Resource_List.file#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l host="># @ PBS -l host=${rm:Resource_List.host#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l mem="># @ PBS -l mem=${rm:Resource_List.mem#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l nice="># @ PBS -l nice=${rm:Resource_List.nice#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l nodes="># @ PBS -l nodes=${rm:Resource_List.nodes#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l ompthreads="># @ PBS -l ompthreads=${rm:Resource_List.ompthreads#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l pcput="># @ PBS -l pcput=${rm:Resource_List.pcput#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l pmem="># @ PBS -l pmem=${rm:Resource_List.pmem#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l pvmem="># @ PBS -l pvmem=${rm:Resource_List.pvmem#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l vmem="># @ PBS -l vmem=${rm:Resource_List.vmem#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -l walltime="># @ PBS -l walltime=${rm:Resource_List.walltime#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -S"># @ PBS -S ${rm:Shell_Path_List#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -W stagein="># @ PBS -W stagein=${rm:stagein#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -W stageout="># @ PBS -W stageout=${rm:stageout#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -u"># @ PBS -u ${rm:User_List#value}</line>
+			<line isUndefinedIfMatches="# @ PBS -v"># @ PBS -v ${rm:Variable_List#value}</line>
+			<line>MPI_ARGS=${rm:mpiArgs#value}</line>
+			<line>if [ "-np" == "${MPI_ARGS}" ] ; then</line>
+			<line>   MPI_ARGS=</line>
+			<line>fi</line>
+			<line>MPI_COMMAND=${rm:mpiCommand#value}</line>
+			<line>if [ -n "${MPI_COMMAND}" ] ; then</line>
+         <line>   MPI_COMMAND=${MPI_COMMAND} ${MPI_ARGS}</line>
+         <line>fi</line>
+			<line isUndefinedIfMatches="cd">cd ${rm:directory#value}</line>
+			<line>${MPI_COMMAND} ${rm:executablePath#value} ${rm:progArgs#value}</line>
 			<line>touch DONE</line>
 		</script>
 		<!-- ********************** FOR TESTING ********************** -->
@@ -282,15 +295,15 @@
 			-->
 			<arg>/Users/arossi/qstatF</arg>
 			<stdout-parser delim="\n">
-            <target ref="available_queues">
-               <match>
-                  <expression>[^\s]+</expression>
-                  <add field="value">
-                     <entry valueGroup="0"/>
-                  </add>
-               </match>
-            </target>
-         </stdout-parser>
+				<target ref="available_queues">
+					<match>
+						<expression>[^\s]+</expression>
+						<add field="value">
+							<entry valueGroup="0"/>
+						</add>
+					</match>
+				</target>
+			</stdout-parser>
 		</start-up-command>
 		<!-- ********************** FOR TESTING ********************** -->
 		<submit-interactive name="submit-interactive" waitForId="true">
@@ -376,7 +389,7 @@
 		<launch-tab>
 			<basic>
 				<title>Basic PBS Settings</title>
-				<group-descriptor>
+				<composite-descriptor group="true">
 					<grid-layout numColumns="3"/>
 					<!-- row 1 -->
 					<widget type="text" valueFrom="Job_Name" saveAs="Job_Name">
@@ -436,19 +449,21 @@
 							<arg>${rm:mpiCores#description}</arg>
 						</displayValue>
 					</widget>
-				</group-descriptor>
+				</composite-descriptor>
 			</basic>
 			<advanced dynamic="true">
 				<title>Advanced PBS Settings</title>
-				<group-descriptor>
-					<grid-layout numColumns="3"/>
+				<composite-descriptor>
 					<!-- iterates through all registered attributes, one to a row -->
-					<viewer sort="true" type="table">
-						<items>
-							<include headers="true" name="true" tooltip="true" description="true" allPredefined="true"/>
-						</items>
+					<viewer name="allAttributes" sort="true" tooltipOnName="true" type="table">
+						<column-data name="Name" width="100"/>
+						<column-data name="Type" width="50"/>
+						<column-data name="Value" width="200"/>
+						<column-data name="Description" width="400"/>
+						<items allPredefined="true"/>
+						<value pattern="@name='@value'"/>
 					</viewer>
-				</group-descriptor>
+				</composite-descriptor>
 			</advanced>
 			<custom-controller>Import PBS Script</custom-controller>
 		</launch-tab>

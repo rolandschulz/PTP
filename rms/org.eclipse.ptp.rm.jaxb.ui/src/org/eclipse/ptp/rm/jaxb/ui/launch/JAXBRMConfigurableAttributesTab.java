@@ -17,19 +17,24 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
+import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.ILaunchTabValueHandler;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
+import org.eclipse.ptp.rm.jaxb.ui.dialogs.ScrollingEditableMessageDialog;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
@@ -163,6 +168,28 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 				throw new ValidationException(t.getMessage());
 			}
 		}
+
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		private String realizeScript() throws Throwable {
+			String value = ZEROSTR;
+			if (script != null) {
+				ILaunchConfiguration configuration = getConfiguration();
+				LTVariableMap map = LTVariableMap.getActiveInstance();
+				map.maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
+				map.maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
+				map.maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
+				boolean append = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);
+				Map env = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
+				ScriptHandler job = new ScriptHandler(null, script, map, env, append);
+				job.schedule();
+				try {
+					job.join();
+				} catch (InterruptedException ignored) {
+				}
+				value = job.getScriptValue();
+			}
+			return value;
+		}
 	}
 
 	/*
@@ -244,7 +271,13 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		@Override
 		protected void doWidgetSelected(SelectionEvent e) {
 			if (e.getSource() == viewScript) {
-				// do the display like in PBS
+				try {
+					String text = dataSource.realizeScript();
+					new ScrollingEditableMessageDialog(control.getShell(), Messages.DisplayScript, text, true).open();
+				} catch (Throwable t) {
+					WidgetActionUtils.errorMessage(control.getShell(), t, Messages.DisplayScriptError,
+							Messages.DisplayScriptErrorTitle, false);
+				}
 			} else if (e.getSource() == restoreDefaults) {
 				dataSource.loadDefault();
 			} else {
@@ -253,10 +286,11 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 	}
 
-	private final RemoteServicesDelegate delegate;
 	private final JAXBRMLaunchConfigurationDynamicTab parentTab;
+	private final RemoteServicesDelegate delegate;
 	private final TabController controller;
 	private final List<ILaunchTabValueHandler> handlers;
+	private final Script script;
 
 	private Composite control;
 	private final String title;
@@ -278,6 +312,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 		this.title = t;
 		handlers = new ArrayList<ILaunchTabValueHandler>();
+		this.script = rm.getJAXBRMConfiguration().getResourceManagerData().getControlData().getScript();
 		createListener();
 		createDataSource();
 		try {
@@ -315,6 +350,10 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	@Override
 	public JAXBUniversalDataSource getDataSource() {
 		return (JAXBUniversalDataSource) createDataSource();
+	}
+
+	public RemoteServicesDelegate getDelegate() {
+		return delegate;
 	}
 
 	public List<ILaunchTabValueHandler> getHandlers() {
@@ -385,5 +424,12 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 		WidgetBuilderUtils.createLabel(grp, Messages.RestoreDefaultValues, SWT.RIGHT, 1);
 		restoreDefaults = WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, universalListener);
+	}
+
+	/*
+	 * For viewing the script realized from the provided values.
+	 */
+	private void openReadOnly(String script) {
+
 	}
 }
