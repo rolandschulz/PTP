@@ -330,6 +330,10 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		return parentTab;
 	}
 
+	public ISelectionChangedListener getSelectionChangedListener() {
+		return (ISelectionChangedListener) createListener();
+	}
+
 	@Override
 	public String getText() {
 		return title;
