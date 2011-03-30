@@ -71,7 +71,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	private WidgetBuilderUtils() {
 	}
 
-	public static TableColumn addTableColumn(final TableViewer viewer, final String columnName, int style, SelectionListener l) {
+	public static TableColumn addTableColumn(final TableViewer viewer, final String columnName, Integer style, SelectionListener l) {
 		Table t = viewer.getTable();
 
 		TableColumn c = new TableColumn(t, style);
@@ -100,7 +100,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		}
 	}
 
-	public static Button createButton(Composite parent, GridData data, String label, int type, SelectionListener listener) {
+	public static Button createButton(Composite parent, GridData data, String label, Integer type, SelectionListener listener) {
 		Button button = new Button(parent, type);
 		button.setText(label);
 		if (data == null) {
@@ -113,11 +113,11 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return button;
 	}
 
-	public static Button createButton(Composite parent, String label, int type) {
+	public static Button createButton(Composite parent, String label, Integer type) {
 		return createButton(parent, null, label, type, null);
 	}
 
-	public static Button createButton(Composite parent, String label, int type, SelectionListener listener) {
+	public static Button createButton(Composite parent, String label, Integer type, SelectionListener listener) {
 		return createButton(parent, null, label, type, listener);
 	}
 
@@ -125,11 +125,11 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return createButton(parent, label, SWT.CHECK | SWT.LEFT, listener);
 	}
 
-	public static Combo createCombo(Composite parent, int style, GridData data, Object listener) {
+	public static Combo createCombo(Composite parent, Integer style, GridData data, Object listener) {
 		return createCombo(parent, style, data, new String[0], null, null, null, listener);
 	}
 
-	public static Combo createCombo(Composite parent, int style, GridData data, String[] items, String initial, String label,
+	public static Combo createCombo(Composite parent, Integer style, GridData data, String[] items, String initial, String label,
 			String tooltip, Object listener) {
 		if (label != null) {
 			Label comboLabel = createLabel(parent, label, SWT.RIGHT, 1);
@@ -153,18 +153,18 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return combo;
 	}
 
-	public static Combo createCombo(Composite parent, int cols, String[] items, String initial, String labelString, String tooltip,
-			Object listener) {
+	public static Combo createCombo(Composite parent, Integer cols, String[] items, String initial, String labelString,
+			String tooltip, Object listener) {
 		GridData data = createGridData(GridData.FILL_HORIZONTAL, true, false, 100, DEFAULT, cols, DEFAULT);
 		return createCombo(parent, SWT.BORDER, data, items, initial, labelString, tooltip, listener);
 	}
 
-	public static Composite createComposite(Composite parent, int columns) {
+	public static Composite createComposite(Composite parent, Integer columns) {
 		GridLayout layout = createGridLayout(columns, false, DEFAULT, 1, DEFAULT, DEFAULT);
 		return createComposite(parent, SWT.NONE, layout, null);
 	}
 
-	public static Composite createComposite(Composite parent, int style, GridLayout layout, GridData data) {
+	public static Composite createComposite(Composite parent, Integer style, GridLayout layout, GridData data) {
 		Composite composite = new Composite(parent, style);
 		composite.setLayout(layout);
 		if (data != null) {
@@ -173,109 +173,113 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return composite;
 	}
 
-	public static GridData createGridData(int style, boolean grabH, boolean grabV, int wHint, int hHint, int hSpan, int vSpan) {
+	public static GridData createGridData(Integer style, Boolean grabH, Boolean grabV, Integer wHint, Integer hHint, Integer hSpan,
+			Integer vSpan) {
 		return createGridData(style, grabH, grabV, wHint, hHint, DEFAULT, DEFAULT, hSpan, vSpan, DEFAULT, DEFAULT);
 	}
 
-	public static GridData createGridData(int style, boolean grabH, boolean grabV, int wHint, int hHint, int minW, int minH,
-			int hSpan, int vSpan, int hAlign, int vAlign) {
+	public static GridData createGridData(Integer style, Boolean grabH, Boolean grabV, Integer wHint, Integer hHint, Integer minW,
+			Integer minH, Integer hSpan, Integer vSpan, Integer hAlign, Integer vAlign) {
 		GridData data = new GridData();
 
-		if (style == DEFAULT) {
-			data = new GridData();
-		} else {
-			data = new GridData(style);
+		if (null != style) {
+			if (style == DEFAULT) {
+				data = new GridData();
+			} else {
+				data = new GridData(style);
+			}
 		}
 		data.grabExcessHorizontalSpace = grabH;
 		data.grabExcessVerticalSpace = grabV;
-		if (wHint != DEFAULT) {
+		if (null != wHint && wHint != DEFAULT) {
 			data.widthHint = wHint;
 		}
-		if (hHint != DEFAULT) {
+		if (null != hHint && hHint != DEFAULT) {
 			data.heightHint = hHint;
 		}
-		if (minW != DEFAULT) {
+		if (null != minW && minW != DEFAULT) {
 			data.minimumWidth = minW;
 		}
-		if (minH != DEFAULT) {
+		if (null != minH && minH != DEFAULT) {
 			data.minimumHeight = minH;
 		}
-		if (hSpan != DEFAULT) {
+		if (null != hSpan && hSpan != DEFAULT) {
 			data.horizontalSpan = hSpan;
 		}
-		if (vSpan != DEFAULT) {
+		if (null != vSpan && vSpan != DEFAULT) {
 			data.verticalSpan = vSpan;
 		}
-		if (hAlign != DEFAULT) {
+		if (null != hAlign && hAlign != DEFAULT) {
 			data.horizontalAlignment = hAlign;
 		}
-		if (vAlign != DEFAULT) {
+		if (null != vAlign && vAlign != DEFAULT) {
 			data.verticalAlignment = vAlign;
 		}
 		return data;
 	}
 
-	public static GridData createGridData(int style, int cols) {
+	public static GridData createGridData(Integer style, Integer cols) {
 		return createGridData(style, false, false, DEFAULT, DEFAULT, cols, DEFAULT);
 	}
 
-	public static GridData createGridDataFill(int wHint, int hHint, int cols) {
+	public static GridData createGridDataFill(Integer wHint, Integer hHint, Integer cols) {
 		return createGridData(GridData.FILL_BOTH, true, true, wHint, hHint, cols, DEFAULT);
 	}
 
-	public static GridData createGridDataFillH(int cols) {
+	public static GridData createGridDataFillH(Integer cols) {
 		return createGridData(GridData.FILL_HORIZONTAL, true, false, DEFAULT, DEFAULT, cols, DEFAULT);
 	}
 
-	public static GridLayout createGridLayout(int columns, boolean equal) {
+	public static GridLayout createGridLayout(Integer columns, Boolean equal) {
 		return createGridLayout(columns, equal, DEFAULT, DEFAULT, DEFAULT, DEFAULT);
 	}
 
-	public static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+	public static GridLayout createGridLayout(Integer columns, Boolean isEqual, Integer mh, Integer mw) {
 		return createGridLayout(columns, isEqual, mh, mw, DEFAULT, DEFAULT);
 	}
 
-	public static GridLayout createGridLayout(int columns, boolean isEqual, int hSpace, int vSpace, int mw, int mh) {
+	public static GridLayout createGridLayout(Integer columns, Boolean isEqual, Integer hSpace, Integer vSpace, Integer mw,
+			Integer mh) {
 		return createGridLayout(columns, isEqual, hSpace, vSpace, mw, mh, DEFAULT, DEFAULT, DEFAULT, DEFAULT);
 	}
 
-	public static GridLayout createGridLayout(int columns, boolean isEqual, int hSpace, int vSpace, int mw, int mh, int mL, int mR,
-			int mT, int mB) {
+	public static GridLayout createGridLayout(Integer columns, Boolean isEqual, Integer hSpace, Integer vSpace, Integer mw,
+			Integer mh, Integer mL, Integer mR, Integer mT, Integer mB) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
-		if (hSpace != DEFAULT) {
+		if (null != hSpace && hSpace != DEFAULT) {
 			gridLayout.horizontalSpacing = hSpace;
 		}
-		if (vSpace != DEFAULT) {
+		if (null != vSpace && vSpace != DEFAULT) {
 			gridLayout.verticalSpacing = vSpace;
 		}
-		if (mw != DEFAULT) {
+		if (null != mw && mw != DEFAULT) {
 			gridLayout.marginWidth = mw;
 		}
-		if (mh != DEFAULT) {
+		if (null != mh && mh != DEFAULT) {
 			gridLayout.marginHeight = mh;
 		}
-		if (mL != DEFAULT) {
+		if (null != mL && mL != DEFAULT) {
 			gridLayout.marginLeft = mL;
 		}
-		if (mR != DEFAULT) {
+		if (null != mR && mR != DEFAULT) {
 			gridLayout.marginRight = mR;
 		}
-		if (mT != DEFAULT) {
+		if (null != mT && mT != DEFAULT) {
 			gridLayout.marginTop = mT;
 		}
-		if (mB != DEFAULT) {
+		if (null != mB && mB != DEFAULT) {
 			gridLayout.marginBottom = mB;
 		}
 		return gridLayout;
 	}
 
-	public static Group createGroup(Composite parent, int style, GridLayout layout, GridData data) {
+	public static Group createGroup(Composite parent, Integer style, GridLayout layout, GridData data) {
 		return createGroup(parent, style, layout, data, null);
 	}
 
-	public static Group createGroup(Composite parent, int style, GridLayout layout, GridData data, String text) {
+	public static Group createGroup(Composite parent, Integer style, GridLayout layout, GridData data, String text) {
 		Group group = new Group(parent, style);
 		group.setLayout(layout);
 		group.setLayoutData(data);
@@ -285,7 +289,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return group;
 	}
 
-	public static Label createLabel(Composite container, String text, int style, GridData data) {
+	public static Label createLabel(Composite container, String text, Integer style, GridData data) {
 		Label label = new Label(container, style);
 		if (text == null) {
 			text = ZEROSTR;
@@ -298,7 +302,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return label;
 	}
 
-	public static Label createLabel(Composite container, String text, int style, int colSpan) {
+	public static Label createLabel(Composite container, String text, Integer style, Integer colSpan) {
 		GridData data = createGridData(DEFAULT, colSpan);
 		return createLabel(container, text, style, data);
 	}
@@ -319,7 +323,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return button;
 	}
 
-	public static Spinner createSpinner(Composite parent, GridData data, String label, int min, int max, int initial,
+	public static Spinner createSpinner(Composite parent, GridData data, String label, Integer min, Integer max, Integer initial,
 			ModifyListener listener) {
 		if (label != null) {
 			createLabel(parent, label, SWT.RIGHT, 1);
@@ -336,20 +340,24 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return s;
 	}
 
-	public static TabItem createTabItem(TabFolder folder, int style, String text, String tooltip, int index) {
+	public static TabItem createTabItem(TabFolder folder, Integer style, String text, String tooltip, Integer index) {
 		TabItem item = new TabItem(folder, style, index);
 		item.setText(text);
 		item.setToolTipText(tooltip);
 		return item;
 	}
 
-	public static Table createTable(Composite parent, int style, GridData data) {
-		int cols = data.horizontalSpan;
-		int wHint = data.widthHint;
+	public static Table createTable(Composite parent, Integer style, GridData data) {
+		Integer cols = 1;
+		Integer wHint = 50;
+		if (data != null) {
+			cols = data.horizontalSpan;
+			wHint = data.widthHint;
+		}
 		return createTable(parent, style, cols, wHint, data);
 	}
 
-	public static Table createTable(Composite parent, int style, int cols, int wHint, GridData data) {
+	public static Table createTable(Composite parent, Integer style, Integer cols, Integer wHint, GridData data) {
 		Table t = new Table(parent, style);
 		t.setLayoutData(data);
 		t.setHeaderVisible(true);
@@ -363,11 +371,11 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return t;
 	}
 
-	public static Text createText(Composite parent, int options, GridData data, boolean readOnly, String initialContents) {
+	public static Text createText(Composite parent, Integer options, GridData data, Boolean readOnly, String initialContents) {
 		return createText(parent, options, data, readOnly, initialContents, null, null);
 	}
 
-	public static Text createText(Composite parent, int options, GridData data, boolean readOnly, String initialContents,
+	public static Text createText(Composite parent, Integer options, GridData data, Boolean readOnly, String initialContents,
 			ModifyListener listener, Color color) {
 		Text text = new Text(parent, options);
 		text.setLayoutData(data);
@@ -385,19 +393,19 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return text;
 	}
 
-	public static Text createText(Composite parent, String initialValue, boolean fill, boolean readOnly, ModifyListener listener,
+	public static Text createText(Composite parent, String initialValue, Boolean fill, Boolean readOnly, ModifyListener listener,
 			Color color) {
 		GridData data = createGridData(fill ? GridData.FILL_HORIZONTAL : DEFAULT, true, false, DEFAULT, DEFAULT, DEFAULT, DEFAULT);
 		return createText(parent, SWT.BORDER, data, readOnly, initialValue, listener, color);
 	}
 
-	public static Tree createTree(Composite parent, int style, GridData data) {
-		int cols = data.horizontalSpan;
-		int wHint = data.widthHint;
+	public static Tree createTree(Composite parent, Integer style, GridData data) {
+		Integer cols = data.horizontalSpan;
+		Integer wHint = data.widthHint;
 		return createTree(parent, style, cols, wHint, data);
 	}
 
-	public static Tree createTree(Composite parent, int style, int cols, int wHint, GridData data) {
+	public static Tree createTree(Composite parent, Integer style, Integer cols, Integer wHint, GridData data) {
 		Tree t = new Tree(parent, style);
 		t.setLayoutData(data);
 		t.setHeaderVisible(true);
@@ -479,13 +487,13 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors,
-			ISelectionChangedListener listener, boolean sortName) {
+			ISelectionChangedListener listener, Boolean sortName) {
 		setupSpecific(viewer, columnDescriptors, sortName);
 		setupCommon(viewer, columnDescriptors, listener);
 	}
 
 	public static void setupAttributeTree(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors,
-			ISelectionChangedListener listener, boolean sortName) {
+			ISelectionChangedListener listener, Boolean sortName) {
 		setupSpecific(viewer, columnDescriptors, sortName);
 		setupCommon(viewer, columnDescriptors, listener);
 	}
@@ -753,7 +761,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		viewer.addSelectionChangedListener(listener);
 	}
 
-	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors, boolean sortName) {
+	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName) {
 		for (int i = 0; i < columnDescriptors.size(); i++) {
 			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
 			TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
@@ -798,7 +806,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		viewer.getTable().setHeaderVisible(true);
 	}
 
-	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors, boolean sortName) {
+	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName) {
 		for (int i = 0; i < columnDescriptors.size(); i++) {
 			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
 			TreeViewerColumn viewerColumn = new TreeViewerColumn(viewer, SWT.NONE);

@@ -15,6 +15,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -105,15 +106,9 @@ public class ScrollingEditableMessageDialog extends MessageDialog implements IJA
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Control c = super.createDialogArea(parent);
-		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
-		data.grabExcessHorizontalSpace = true;
-		data.grabExcessVerticalSpace = true;
-		data.heightHint = 550;
-		data.widthHint = convertWidthInCharsToPixels(160);
-
-		scrollable = new Text(parent, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrollable.setLayoutData(data);
-		scrollable.setEditable(!readOnly);
+		GridData data = WidgetBuilderUtils.createGridDataFill(convertWidthInCharsToPixels(160), 550, 1);
+		scrollable = WidgetBuilderUtils.createText(parent, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL, data,
+				readOnly, null);
 		Display d = Display.getCurrent();
 		// three fonts for Mac, Linux, Windows ...
 		FontData[][] f = { d.getFontList(COURIER, true), d.getFontList(COURIER, false), d.getFontList(COURIER, true),
