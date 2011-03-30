@@ -232,58 +232,153 @@
 		</attribute>
 		<managed-files>
 			<file-staging-location>.eclipsesettings</file-staging-location>
-			<file name="pbs_script" uniqueIdPrefix="true" deleteAfterUse="true">
+			<file name="pbs_script" uniqueIdPrefix="true" deleteAfterUse="true" resolveContents="false">
 				<contents>${rm:script#value}</contents>
 			</file>
 		</managed-files>
 		<script envBegin="36">
-			<line>#!/bin/bash</line>
-			<line isUndefinedIfMatches="# @ PBS -A"># @ PBS -A ${rm:Account_Name#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -c"># @ PBS -c ${rm:Checkpoint#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -W depend="># @ PBS -W depend=${rm:depend#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -q"># @ PBS -q ${rm:destination#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -C"># @ PBS -C ${rm:line#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -e"># @ PBS -e ${rm:Error_Path#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -V"># @ PBS -V ${rm:export_all#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -W group_list="># @ PBS -W group_list=${rm:group_list#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -h"># @ PBS -h ${rm:Hold_Types#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -N"># @ PBS -N ${rm:Job_Name#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -j"># @ PBS -j ${rm:Join_Path#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -k"># @ PBS -k ${rm:Keep_Files#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -m"># @ PBS -m ${rm:Mail_Points#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -M"># @ PBS -M ${rm:Mail_Users#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -o"># @ PBS -o ${rm:Output_Path#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -p"># @ PBS -p ${rm:Priority#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -r"># @ PBS -r ${rm:Rerunnable#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l arch="># @ PBS -l arch=${rm:Resource_List.arch#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l cput="># @ PBS -l cput=${rm:Resource_List.cput#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l file="># @ PBS -l file=${rm:Resource_List.file#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l host="># @ PBS -l host=${rm:Resource_List.host#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l mem="># @ PBS -l mem=${rm:Resource_List.mem#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l nice="># @ PBS -l nice=${rm:Resource_List.nice#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l nodes="># @ PBS -l nodes=${rm:Resource_List.nodes#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l ompthreads="># @ PBS -l ompthreads=${rm:Resource_List.ompthreads#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l pcput="># @ PBS -l pcput=${rm:Resource_List.pcput#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l pmem="># @ PBS -l pmem=${rm:Resource_List.pmem#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l pvmem="># @ PBS -l pvmem=${rm:Resource_List.pvmem#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l vmem="># @ PBS -l vmem=${rm:Resource_List.vmem#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -l walltime="># @ PBS -l walltime=${rm:Resource_List.walltime#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -S"># @ PBS -S ${rm:Shell_Path_List#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -W stagein="># @ PBS -W stagein=${rm:stagein#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -W stageout="># @ PBS -W stageout=${rm:stageout#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -u"># @ PBS -u ${rm:User_List#value}</line>
-			<line isUndefinedIfMatches="# @ PBS -v"># @ PBS -v ${rm:Variable_List#value}</line>
-			<line>MPI_ARGS="${rm:mpiArgs#value}"</line>
-			<line>if [ "-np" == "$MPI_ARGS" ] ; then</line>
-			<line> MPI_ARGS=</line>
-			<line>fi</line>
-			<line>MPI_COMMAND=${rm:mpiCommand#value}</line>
-			<line>if [ -n "$MPI_COMMAND" ] ; then</line>
-			<line> MPI_COMMAND="$MPI_COMMAND $MPI_ARGS"</line>
-			<line>fi</line>
-			<line isUndefinedIfMatches="cd">cd ${rm:directory#value}</line>
-			<line>$MPI_COMMAND ${rm:executablePath#value} ${rm:progArgs#value}</line>
-			<line>touch DONE</line>
+			<line>
+				<arg>#!/bin/bash</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -A"># @ PBS -A ${rm:Account_Name#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -c"># @ PBS -c ${rm:Checkpoint#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -W depend="># @ PBS -W depend=${rm:depend#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -q"># @ PBS -q ${rm:destination#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -C"># @ PBS -C ${rm:line#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -e"># @ PBS -e ${rm:Error_Path#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -V"># @ PBS -V ${rm:export_all#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -W group_list="># @ PBS -W group_list=${rm:group_list#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -h"># @ PBS -h ${rm:Hold_Types#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -N"># @ PBS -N ${rm:Job_Name#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -j"># @ PBS -j ${rm:Join_Path#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -k"># @ PBS -k ${rm:Keep_Files#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -m"># @ PBS -m ${rm:Mail_Points#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -M"># @ PBS -M ${rm:Mail_Users#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -o"># @ PBS -o ${rm:Output_Path#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -p"># @ PBS -p ${rm:Priority#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -r"># @ PBS -r ${rm:Rerunnable#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l arch="># @ PBS -l arch=${rm:Resource_List.arch#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l cput="># @ PBS -l cput=${rm:Resource_List.cput#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l file="># @ PBS -l file=${rm:Resource_List.file#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l host="># @ PBS -l host=${rm:Resource_List.host#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l mem="># @ PBS -l mem=${rm:Resource_List.mem#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l nice="># @ PBS -l nice=${rm:Resource_List.nice#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l nodes="># @ PBS -l nodes=${rm:Resource_List.nodes#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l ompthreads="># @ PBS -l ompthreads=${rm:Resource_List.ompthreads#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l pcput="># @ PBS -l pcput=${rm:Resource_List.pcput#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l pmem="># @ PBS -l pmem=${rm:Resource_List.pmem#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l pvmem="># @ PBS -l pvmem=${rm:Resource_List.pvmem#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l vmem="># @ PBS -l vmem=${rm:Resource_List.vmem#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -l walltime="># @ PBS -l walltime=${rm:Resource_List.walltime#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -S"># @ PBS -S ${rm:Shell_Path_List#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -W stagein="># @ PBS -W stagein=${rm:stagein#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -W stageout="># @ PBS -W stageout=${rm:stageout#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -u"># @ PBS -u ${rm:User_List#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ PBS -v"># @ PBS -v ${rm:Variable_List#value}</arg>
+			</line>
+			<line>
+				<arg>MPI_ARGS="${rm:mpiArgs#value}"</arg>
+			</line>
+			<line>
+				<arg resolve="false">if [ "-np" == "$MPI_ARGS" ] ; then</arg>
+			</line>
+			<line>
+				<arg resolve="false">MPI_ARGS=</arg>
+			</line>
+			<line>
+				<arg resolve="false">fi</arg>
+			</line>
+			<line>
+				<arg>MPI_COMMAND=${rm:mpiCommand#value}</arg>
+			</line>
+			<line>
+				<arg resolve="false">if [ -n "${MPI_COMMAND}" ] ; then</arg>
+			</line>
+			<line>
+				<arg resolve="false"> MPI_COMMAND="${MPI_COMMAND} ${MPI_ARGS}"</arg>
+			</line>
+			<line>
+				<arg resolve="false">fi</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="cd">cd ${rm:directory#value}</arg>
+			</line>
+			<line>
+				<arg resolve="false">${MPI_COMMAND} </arg>
+				<arg>${rm:executablePath#value} ${rm:progArgs#value}</arg>
+			</line>
+			<line>
+				<arg resolve="false">touch DONE</arg>
+			</line>
 		</script>
 		<!-- ********************** FOR TESTING ********************** -->
 		<start-up-command name="get-queues">

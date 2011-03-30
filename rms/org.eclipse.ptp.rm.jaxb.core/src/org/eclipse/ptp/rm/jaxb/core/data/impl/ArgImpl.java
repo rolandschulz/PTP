@@ -54,6 +54,9 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 		if (arg == null) {
 			return ZEROSTR;
 		}
+		if (!arg.isResolve()) {
+			return arg.getContent();
+		}
 		String dereferenced = map.getString(uuid, arg.getContent());
 		if (dereferenced != null) {
 			dereferenced = dereferenced.trim();

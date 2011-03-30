@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
@@ -141,7 +142,30 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 				if (file.isUniqueIdPrefix()) {
 					localFile = new File(sourceDir, UUID.randomUUID() + name);
 				}
-				contents = RMVariableMap.getActiveInstance().getString(uuid, contents);
+				if (file.isResolveContents()) {
+					contents = RMVariableMap.getActiveInstance().getString(uuid, contents);
+				} else {
+					/*
+					 * magic to avoid attempted resolution of unknown shell
+					 * variables
+					 */
+					int start = contents.indexOf(OPENVRM);
+					int end = contents.length();
+					if (start >= 0) {
+						start += OPENVRM.length();
+						end = contents.indexOf(PD);
+						if (end < 0) {
+							end = contents.indexOf(CLOSV);
+						}
+						String key = contents.substring(start, end);
+						Object o = RMVariableMap.getActiveInstance().getVariables().get(key);
+						if (o instanceof Property) {
+							contents = String.valueOf(((Property) o).getValue());
+						} else if (o instanceof Attribute) {
+							contents = String.valueOf(((Attribute) o).getValue());
+						}
+					}
+				}
 				fw = new FileWriter(localFile, false);
 				fw.write(contents);
 				fw.flush();

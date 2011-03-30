@@ -137,10 +137,15 @@
 	</xs:complexType>
 	<xs:complexType name="script">
 		<xs:sequence>
-			<xs:element name="line" minOccurs="0" maxOccurs="unbounded" type="rm:arg"/>
+			<xs:element name="line" maxOccurs="unbounded" type="rm:line"/>
 		</xs:sequence>
 		<xs:attribute name="envBegin" type="xs:int" default="-1"/>
 		<xs:attribute name="envEnd" type="xs:int" default="-1"/>
+	</xs:complexType>
+	<xs:complexType name="line">
+	  <xs:sequence>
+         <xs:element name="arg" minOccurs="0" maxOccurs="unbounded" type="rm:arg"/>
+      </xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="command">
 		<xs:sequence>
@@ -207,6 +212,7 @@
 		</xs:sequence>
 		<xs:attribute name="name" use="required"/>
 		<xs:attribute name="uniqueIdPrefix" type="xs:boolean" default="false"/>
+		<xs:attribute name="resolveContents" type="xs:boolean" default="true"/>
 		<xs:attribute name="deleteAfterUse" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="file-match">
@@ -277,6 +283,7 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="resolve" type="xs:boolean" default="true"/>
 	</xs:complexType>
 	<xs:complexType name="tokenizer">
 		<xs:annotation>
