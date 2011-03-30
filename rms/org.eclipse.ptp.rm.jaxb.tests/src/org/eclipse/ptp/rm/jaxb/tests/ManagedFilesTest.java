@@ -105,7 +105,6 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 
 		Property contents = (Property) env.get(SCRIPT);
 		assertNotNull(contents);
-		System.out.println(contents.getValue());
 	}
 
 	private void initializeConnections() {

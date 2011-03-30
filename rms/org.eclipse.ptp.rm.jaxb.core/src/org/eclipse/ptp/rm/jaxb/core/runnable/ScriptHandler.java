@@ -20,9 +20,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.Arg;
+import org.eclipse.ptp.rm.jaxb.core.data.Line;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
-import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
+import org.eclipse.ptp.rm.jaxb.core.data.impl.LineImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
@@ -69,7 +70,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private String composeScript(IProgressMonitor monitor) {
-		List<Arg> line = script.getLine();
+		List<Line> line = script.getLine();
 		int len = line.size();
 		if (len == 0) {
 			return ZEROSTR;
@@ -86,9 +87,9 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		StringBuffer buffer = new StringBuffer();
 		String s = null;
 		int i = 0;
-		String firstLine = new ArgImpl(uuid, line.get(0), map).getResolved();
+		String firstLine = new LineImpl(uuid, line.get(0), map).getResolved();
 		for (; i < envBegin; i++) {
-			s = new ArgImpl(uuid, line.get(i), map).getResolved();
+			s = new LineImpl(uuid, line.get(i), map).getResolved();
 			if (!ZEROSTR.equals(s)) {
 				buffer.append(s).append(REMOTE_LINE_SEP);
 			}
@@ -101,7 +102,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			}
 		}
 		for (; i < envEnd; i++) {
-			s = new ArgImpl(uuid, line.get(i), map).getResolved();
+			s = new LineImpl(uuid, line.get(i), map).getResolved();
 			if (!ZEROSTR.equals(s)) {
 				buffer.append(s).append(REMOTE_LINE_SEP);
 			}
@@ -113,7 +114,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			}
 		}
 		for (; i < len; i++) {
-			s = new ArgImpl(uuid, line.get(i), map).getResolved();
+			s = new LineImpl(uuid, line.get(i), map).getResolved();
 			if (!ZEROSTR.equals(s)) {
 				buffer.append(s).append(REMOTE_LINE_SEP);
 			}
@@ -127,12 +128,18 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		Script ltScript = new Script();
 		ltScript.setEnvBegin(script.getEnvBegin());
 		ltScript.setEnvEnd(script.getEnvEnd());
-		List<Arg> lines = ltScript.getLine();
-		for (Arg a : script.getLine()) {
-			Arg newA = new Arg();
-			newA.setIsUndefinedIfMatches(a.getIsUndefinedIfMatches());
-			newA.setContent(a.getContent().replaceAll(OPENVRM, OPENVLT));
-			lines.add(newA);
+		List<Line> lines = ltScript.getLine();
+		List<Arg> args = null;
+		for (Line line : script.getLine()) {
+			Line newLine = new Line();
+			args = newLine.getArg();
+			for (Arg a : line.getArg()) {
+				Arg newA = new Arg();
+				newA.setIsUndefinedIfMatches(a.getIsUndefinedIfMatches());
+				newA.setContent(a.getContent().replaceAll(OPENVRM, OPENVLT));
+				args.add(newA);
+			}
+			lines.add(newLine);
 		}
 		script = ltScript;
 	}
