@@ -43,7 +43,7 @@ public class WidgetMap implements ILaunchTabValueHandler {
 		for (Control c : map.keySet()) {
 			Object value = null;
 			Widget w = map.get(c);
-			String ref = w.getValueFrom();
+			String ref = w.getSaveValueTo();
 			if (ref != null) {
 				Object o = vars.get(ref);
 				if (o == null) {
@@ -55,19 +55,15 @@ public class WidgetMap implements ILaunchTabValueHandler {
 					value = ((Attribute) o).getValue();
 				}
 			} else {
-				Widget.DisplayValue dv = w.getDisplayValue();
-				if (dv != null) {
-					List<Arg> arglist = dv.getArg();
+				Widget.ValueArgs va = w.getValueArgs();
+				if (va != null) {
+					List<Arg> arglist = va.getArg();
 					if (arglist != null) {
 						b.setLength(0);
 						ArgImpl.toString(null, arglist, ltMap, b);
 						value = b.toString();
 					}
 				}
-			}
-
-			if (value == null) {
-				value = w.getValue();
 			}
 
 			if (value == null) {
@@ -93,12 +89,8 @@ public class WidgetMap implements ILaunchTabValueHandler {
 		Map<String, Object> disc = rmMap.getDiscovered();
 		for (Control c : map.keySet()) {
 			Widget w = map.get(c);
-			String value = w.getValue();
-			if (value != null) {
-				continue;
-			}
 
-			String name = w.getValueFrom();
+			String name = w.getSaveValueTo();
 			if (name == null) {
 				continue;
 			}
@@ -114,7 +106,7 @@ public class WidgetMap implements ILaunchTabValueHandler {
 				defaultValue = ((Attribute) o).getDefault();
 			}
 			if (defaultValue != null) {
-				w.setValue(defaultValue);
+				WidgetActionUtils.setValue(c, defaultValue);
 			}
 		}
 	}
@@ -124,7 +116,7 @@ public class WidgetMap implements ILaunchTabValueHandler {
 		Map<String, String> disc = ltMap.getDiscovered();
 		for (Control c : map.keySet()) {
 			Widget w = map.get(c);
-			String name = w.getSaveAs();
+			String name = w.getSaveValueTo();
 			if (name == null) {
 				continue;
 			}
@@ -144,7 +136,7 @@ public class WidgetMap implements ILaunchTabValueHandler {
 		 */
 		for (Control c : map.keySet()) {
 			Widget w = map.get(c);
-			String name = w.getValueFrom();
+			String name = w.getSaveValueTo();
 			if (name == null) {
 				continue;
 			}
@@ -165,7 +157,7 @@ public class WidgetMap implements ILaunchTabValueHandler {
 					defaultV = ((Attribute) o).getDefault();
 				}
 				if (defaultV != null) {
-					w.setValue(defaultV);
+					WidgetActionUtils.setValue(c, defaultV);
 				}
 			}
 		}
