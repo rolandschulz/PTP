@@ -331,7 +331,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	}
 
 	public ISelectionChangedListener getSelectionChangedListener() {
-		return (ISelectionChangedListener) createListener();
+		return getUniversalListener();
 	}
 
 	@Override
@@ -341,6 +341,10 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	public JAXBUniversalWidgetListener getUniversalListener() {
 		return (JAXBUniversalWidgetListener) createListener();
+	}
+
+	public RMLaunchConfigurationDynamicTabWidgetListener getWidgetListener() {
+		return getUniversalListener();
 	}
 
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {

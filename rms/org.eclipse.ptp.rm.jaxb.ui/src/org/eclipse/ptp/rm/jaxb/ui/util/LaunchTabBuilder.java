@@ -132,16 +132,10 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		}
 	}
 
-	private GridData addGridData(GridDataDescriptor gridData) {
-		int style = WidgetBuilderUtils.getStyle(gridData.getStyle());
-		int hAlign = WidgetBuilderUtils.getStyle(gridData.getHorizontalAlign());
-		int vAlign = WidgetBuilderUtils.getStyle(gridData.getVerticalAlign());
-		return WidgetBuilderUtils.createGridData(style, gridData.isGrabExcessHorizontal(), gridData.isGrabExcessVertical(),
-				gridData.getWidthHint(), gridData.getHeightHint(), gridData.getMinWidth(), gridData.getMinHeight(),
-				gridData.getHorizontalSpan(), gridData.getVerticalSpan(), hAlign, vAlign);
-	}
-
 	private GridLayout addGridLayout(GridLayoutDescriptor gridLayout) {
+		if (gridLayout == null) {
+			return null;
+		}
 		return WidgetBuilderUtils.createGridLayout(gridLayout.getNumColumns(), gridLayout.isMakeColumnsEqualWidth(),
 				gridLayout.getHorizontalSpacing(), gridLayout.getVerticalSpacing(), gridLayout.getMarginWidth(),
 				gridLayout.getMarginHeight(), gridLayout.getMarginLeft(), gridLayout.getMarginRight(), gridLayout.getMarginTop(),
@@ -153,12 +147,14 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		TabItem item = WidgetBuilderUtils.createTabItem(folder, style, descriptor.getTitle(), descriptor.getTooltip(), index);
 		Composite control = WidgetBuilderUtils.createComposite(folder, 1);
 		item.setControl(control);
-		List<Object> children = descriptor.getCompositeOrTabFolder();
+		List<Object> children = descriptor.getCompositeOrTabFolderOrWidget();
 		for (Object o : children) {
 			if (o instanceof TabFolderDescriptor) {
 				addFolder((TabFolderDescriptor) o, control);
 			} else if (o instanceof CompositeDescriptor) {
 				addComposite((CompositeDescriptor) o, control);
+			} else if (o instanceof Widget) {
+				addWidget((Widget) o, control);
 			}
 		}
 	}
@@ -224,9 +220,21 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		widgetMap.add(control, widget);
 	}
 
-	private void addWidget(Widget widget, Composite parent) {
-		Control c = null;
+	private Control addWidget(Widget widget, Composite parent) {
+		Control control = new WidgetBuilder(widget, RMVariableMap.getActiveInstance(), tab).createControl(parent);
+		addToWidgetMap(control, widget);
+		return control;
+	}
 
-		addToWidgetMap(c, widget);
+	static GridData addGridData(GridDataDescriptor gridData) {
+		if (gridData == null) {
+			return null;
+		}
+		int style = WidgetBuilderUtils.getStyle(gridData.getStyle());
+		int hAlign = WidgetBuilderUtils.getStyle(gridData.getHorizontalAlign());
+		int vAlign = WidgetBuilderUtils.getStyle(gridData.getVerticalAlign());
+		return WidgetBuilderUtils.createGridData(style, gridData.isGrabExcessHorizontal(), gridData.isGrabExcessVertical(),
+				gridData.getWidthHint(), gridData.getHeightHint(), gridData.getMinWidth(), gridData.getMinHeight(),
+				gridData.getHorizontalSpan(), gridData.getVerticalSpan(), hAlign, vAlign);
 	}
 }
