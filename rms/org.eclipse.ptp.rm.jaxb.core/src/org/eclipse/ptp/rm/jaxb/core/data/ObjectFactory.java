@@ -384,14 +384,6 @@ public class ObjectFactory {
 	}
 
 	/**
-	 * Create an instance of {@link ViewerItems.Include }
-	 * 
-	 */
-	public ViewerItems.Include createViewerItemsInclude() {
-		return new ViewerItems.Include();
-	}
-
-	/**
 	 * Create an instance of {@link Widget }
 	 * 
 	 */

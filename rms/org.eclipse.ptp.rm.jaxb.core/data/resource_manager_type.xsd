@@ -253,7 +253,7 @@
 			<xs:element name="title" type="xs:string"/>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
-				<xs:element name="group-descriptor" type="rm:group-descriptor"/>
+				<xs:element name="composite-descriptor" type="rm:composite-descriptor"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
@@ -321,7 +321,7 @@
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="group-descriptor">
+	<xs:complexType name="composite-descriptor">
 		<xs:annotation>
 			<xs:documentation>
 				Dynamic means this group gets rebuilt; in that case, a
@@ -336,11 +336,12 @@
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
-				<xs:element name="group" type="rm:group-descriptor"/>
+				<xs:element name="composite" type="rm:composite-descriptor"/>
 				<xs:element name="widget" type="rm:widget"/>
 				<xs:element name="viewer" type="rm:attribute-viewer"/>
 			</xs:choice>
 		</xs:sequence>
+		<xs:attribute name="isGroup" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="tab-item-descriptor">
 		<xs:sequence>
@@ -348,7 +349,7 @@
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element name="group" type="rm:group-descriptor"/>
+				<xs:element name="composite" type="rm:composite-descriptor"/>
 				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
 			</xs:choice>
 		</xs:sequence>
@@ -443,9 +444,9 @@
 			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout-descriptor"/>
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
-			<xs:element name="column-data" minOccurs="0" type="rm:column-data"/>
+			<xs:element name="column-data" minOccurs="0" maxOccurs="7" type="rm:column-data"/>
 			<xs:element name="items" type="rm:viewer-items"/>
-			<xs:element name="value"  minOccurs="0" type="rm:template"/>
+			<xs:element name="value" minOccurs="0" type="rm:template"/>
 		</xs:sequence>
 		<xs:attribute name="type" default="table">
 			<xs:simpleType>
@@ -457,21 +458,14 @@
 		</xs:attribute>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="sort" type="xs:boolean" default="true"/>
+		<xs:attribute name="tooltipOnName" type="xs:boolean" default="true"/>
 	</xs:complexType>
 	<xs:complexType name="viewer-items">
 		<xs:sequence>
-			<xs:element name="include">
-				<xs:complexType>
-					<xs:attribute name="headers" type="xs:boolean" default="true"/>
-					<xs:attribute name="name" type="xs:boolean" default="true"/>
-					<xs:attribute name="tooltip" type="xs:boolean" default="true"/>
-					<xs:attribute name="description" type="xs:boolean" default="true"/>
-					<xs:attribute name="allPredefined" type="xs:boolean" default="false"/>
-					<xs:attribute name="allDiscovered" type="xs:boolean" default="false"/>
-				</xs:complexType>
-			</xs:element>
 			<xs:element name="ref" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 		</xs:sequence>
+		<xs:attribute name="allPredefined" type="xs:boolean" default="false"/>
+		<xs:attribute name="allDiscovered" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="template">
 		<xs:attribute name="pattern" type="xs:string">
@@ -522,10 +516,10 @@
 	</xs:complexType>
 	<xs:complexType name="column-data">
 		<xs:sequence>
-			<xs:element name="style" type="rm:style"/>
+			<xs:element name="option" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="width" type="xs:string"/>
+		<xs:attribute name="width" type="xs:int" default="-1"/>
 	</xs:complexType>
 	<xs:complexType name="set">
 		<xs:sequence>
