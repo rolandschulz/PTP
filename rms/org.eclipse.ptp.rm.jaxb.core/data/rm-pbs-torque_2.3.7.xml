@@ -273,16 +273,16 @@
 			<line isUndefinedIfMatches="# @ PBS -W stageout="># @ PBS -W stageout=${rm:stageout#value}</line>
 			<line isUndefinedIfMatches="# @ PBS -u"># @ PBS -u ${rm:User_List#value}</line>
 			<line isUndefinedIfMatches="# @ PBS -v"># @ PBS -v ${rm:Variable_List#value}</line>
-			<line>MPI_ARGS=${rm:mpiArgs#value}</line>
-			<line>if [ "-np" == "${MPI_ARGS}" ] ; then</line>
-			<line>   MPI_ARGS=</line>
+			<line>MPI_ARGS="${rm:mpiArgs#value}"</line>
+			<line>if [ "-np" == "$MPI_ARGS" ] ; then</line>
+			<line> MPI_ARGS=</line>
 			<line>fi</line>
 			<line>MPI_COMMAND=${rm:mpiCommand#value}</line>
-			<line>if [ -n "${MPI_COMMAND}" ] ; then</line>
-         <line>   MPI_COMMAND=${MPI_COMMAND} ${MPI_ARGS}</line>
-         <line>fi</line>
+			<line>if [ -n "$MPI_COMMAND" ] ; then</line>
+			<line> MPI_COMMAND="$MPI_COMMAND $MPI_ARGS"</line>
+			<line>fi</line>
 			<line isUndefinedIfMatches="cd">cd ${rm:directory#value}</line>
-			<line>${MPI_COMMAND} ${rm:executablePath#value} ${rm:progArgs#value}</line>
+			<line>$MPI_COMMAND ${rm:executablePath#value} ${rm:progArgs#value}</line>
 			<line>touch DONE</line>
 		</script>
 		<!-- ********************** FOR TESTING ********************** -->
@@ -392,62 +392,62 @@
 				<composite-descriptor group="true">
 					<grid-layout numColumns="3"/>
 					<!-- row 1 -->
-					<widget type="text" valueFrom="Job_Name" saveAs="Job_Name">
+					<widget type="text" saveValueTo="Job_Name">
 						<label>Job Name: </label>
 						<tooltip>${rm:Job_Name#tooltip}</tooltip>
 					</widget>
 					<widget type="label">
-						<displayValue>
+						<value>
 							<arg>${rm:Job_Name#description}</arg>
-						</displayValue>
+						</value>
 					</widget>
 					<!-- row 2 -->
-					<widget type="combo" readOnly="true" valueFrom="available_queues" saveAs="destination">
+					<widget type="combo" readOnly="true" saveValueTo="destination">
 						<label>Queue: </label>
 						<tooltip>${rm:destination#tooltip}</tooltip>
 					</widget>
 					<widget type="label">
-						<displayValue>
+						<value>
 							<arg>${rm:destination#description}</arg>
-						</displayValue>
+						</value>
 					</widget>
 					<!-- row 3 -->
-					<widget type="text" valueFrom="Resource_List.nodes" saveAs="Resource_List.nodes">
+					<widget type="text" saveValueTo="Resource_List.nodes">
 						<label>Nodes: </label>
 						<tooltip>${rm:Resource_List.nodes#tooltip}</tooltip>
 					</widget>
 					<widget type="label">
-						<displayValue>
+						<value>
 							<arg>${rm:Resource_List.nodes#description}</arg>
-						</displayValue>
+						</value>
 					</widget>
 					<!-- row 4 -->
-					<widget type="text" valueFrom="Resource_List.walltime" saveAs="Resource_List.walltime">
+					<widget type="text" saveValueTo="Resource_List.walltime">
 						<label>Wallclock Time</label>
 						<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
 					</widget>
 					<widget type="label">
-						<displayValue>
+						<value>
 							<arg>${rm:Resource_List.walltime#description}</arg>
-						</displayValue>
+						</value>
 					</widget>
 					<!-- row 5 -->
-					<widget type="combo" readOnly="true" valueFrom="mpiCommand" saveAs="mpiCommand">
+					<widget type="combo" readOnly="true" saveValueTo="mpiCommand">
 						<label>MPI Command: </label>
 					</widget>
 					<widget type="label">
-						<displayValue>
+						<value>
 							<arg>${rm:mpiCommand#description}</arg>
-						</displayValue>
+						</value>
 					</widget>
 					<!-- row 6 -->
-					<widget type="spinner" readOnly="true" valueFrom="mpiCores" saveAs="mpiCores">
+					<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
 						<label>MPI Number of Cores: </label>
 					</widget>
 					<widget type="label">
-						<displayValue>
+						<value>
 							<arg>${rm:mpiCores#description}</arg>
-						</displayValue>
+						</value>
 					</widget>
 				</composite-descriptor>
 			</basic>
