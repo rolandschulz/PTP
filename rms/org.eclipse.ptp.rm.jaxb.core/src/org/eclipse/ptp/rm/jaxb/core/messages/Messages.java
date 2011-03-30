@@ -20,7 +20,6 @@ public class Messages extends NLS {
 	public static String Copy_Operation_NullTargetFileManager;
 	public static String Copy_Operation_NullSource;
 	public static String Copy_Operation_NullTarget;
-	public static String Copy_Operation_cancelled_by_user;
 	public static String Copy_Operation_Local_resource_does_not_exist;
 	public static String StreamParserNoSuchVariableError;
 	public static String StreamParserMissingTargetType;
@@ -40,10 +39,8 @@ public class Messages extends NLS {
 	public static String ProcessExitValueError;
 	public static String CannotCompleteSubmitFailedStaging;
 	public static String ReadSegmentError;
-	public static String IllegalFailedMatch;
 	public static String StreamTokenizerInstantiationError;
 	public static String MalformedExpressionError;
-	public static String ReadClearError;
 	public static String UnsupportedWriteException;
 	public static String ProcessRunError;
 	public static String CommandJobStreamMonitor_label;
@@ -52,7 +49,6 @@ public class Messages extends NLS {
 	public static String RemoteConnectionError;
 	public static String LocalConnectionError;
 	public static String StreamParserInconsistentPropertyWarning;
-	public static String StreamParserInconsistentAttributeWarning;
 	public static String Write_Operation_NullSourceFileManager;
 	public static String Write_Operation_NullPath;
 	public static String Read_Operation_NullSourceFileManager;
