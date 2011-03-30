@@ -34,6 +34,7 @@ public abstract class AbstractConfigurationWizardPage extends RMConfigurationWiz
 	@Override
 	public void createControl(Composite parent) {
 		listener.disable();
+		dataSource.setConfiguration(getConfiguration());
 		Composite composite = doCreateContents(parent);
 		setControl(composite);
 		listener.enable();
@@ -48,7 +49,6 @@ public abstract class AbstractConfigurationWizardPage extends RMConfigurationWiz
 		if (visible) {
 			resetErrorMessages();
 			listener.disable();
-			dataSource.setConfiguration(getConfiguration());
 			dataSource.loadAndUpdate();
 			listener.enable();
 			updateControls();
@@ -56,7 +56,7 @@ public abstract class AbstractConfigurationWizardPage extends RMConfigurationWiz
 		super.setVisible(visible);
 	}
 
-	abstract public void updateControls();
+	public abstract void updateControls();
 
 	/**
 	 * Convenience method for creating a button widget.
