@@ -124,8 +124,11 @@ public class RemoteConnectionWidget extends Composite {
 	private IRemoteConnection fSelectedConnection;
 	private IRemoteServices fSelectedServices;
 	private IRunnableContext fContext;
-	private final ListenerList fSelectionListeners = new ListenerList();
 
+	private String[] fAttrHints;
+	private String[] fAttrHintValues;
+
+	private final ListenerList fSelectionListeners = new ListenerList();
 	private final WidgetListener fWidgetListener = new WidgetListener();
 
 	public RemoteConnectionWidget(Composite parent, int style, String title) {
@@ -280,6 +283,17 @@ public class RemoteConnectionWidget extends Composite {
 		newConnectionButton.setEnabled(enabled);
 	}
 
+	/**
+	 * Set hints to use when creating a new connection.
+	 * 
+	 * @param attrHints
+	 * @param attrHintValues
+	 */
+	public void setHints(String[] attrHints, String[] attrHintValues) {
+		fAttrHints = attrHints;
+		fAttrHintValues = attrHintValues;
+	}
+
 	private IRemoteUIConnectionManager getUIConnectionManager() {
 		if (fSelectedServices != null) {
 			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedServices).getUIConnectionManager();
@@ -343,7 +357,7 @@ public class RemoteConnectionWidget extends Composite {
 	 */
 	protected void handleNewRemoteConnectionSelected() {
 		if (getUIConnectionManager() != null) {
-			handleRemoteServiceSelected(getUIConnectionManager().newConnection(getShell()));
+			handleRemoteServiceSelected(getUIConnectionManager().newConnection(getShell(), fAttrHints, fAttrHintValues));
 		}
 	}
 
