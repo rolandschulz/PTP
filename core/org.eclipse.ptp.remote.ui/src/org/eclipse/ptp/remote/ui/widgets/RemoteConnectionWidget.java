@@ -19,6 +19,8 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.PreferenceConstants;
+import org.eclipse.ptp.remote.core.Preferences;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.remote.ui.messages.Messages;
@@ -114,7 +116,7 @@ public class RemoteConnectionWidget extends Composite {
 
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-	private final Combo remoteCombo;
+	private Combo remoteCombo = null;
 	private final Combo connectionCombo;
 	private final Button newConnectionButton;
 
@@ -158,25 +160,39 @@ public class RemoteConnectionWidget extends Composite {
 		remoteComp.setLayoutData(gd);
 
 		/*
-		 * Remote provider
+		 * Check if we need a remote services combo, or we should just use the
+		 * default provider
 		 */
-		Label label = new Label(remoteComp, SWT.NONE);
-		label.setText(Messages.RemoteConnectionWidget_remoteServiceProvider);
-		gd = new GridData();
-		gd.horizontalSpan = 1;
-		label.setLayoutData(gd);
+		String id = Preferences
+				.getString(PTPRemoteCorePlugin.getUniqueIdentifier(), PreferenceConstants.DEFAULT_REMOTE_SERVICES_ID);
+		if (id != null) {
+			fSelectedServices = getRemoteServices(id);
+		}
+		if (fSelectedServices == null) {
+			fSelectedServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+		}
+		if (id == null) {
+			/*
+			 * Remote provider
+			 */
+			Label label = new Label(remoteComp, SWT.NONE);
+			label.setText(Messages.RemoteConnectionWidget_remoteServiceProvider);
+			gd = new GridData();
+			gd.horizontalSpan = 1;
+			label.setLayoutData(gd);
 
-		remoteCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 3;
-		remoteCombo.setLayoutData(gd);
-		remoteCombo.addModifyListener(fWidgetListener);
-		remoteCombo.setFocus();
+			remoteCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 3;
+			remoteCombo.setLayoutData(gd);
+			remoteCombo.addModifyListener(fWidgetListener);
+			remoteCombo.setFocus();
+		}
 
 		/*
-		 * Remote location
+		 * Remote connection
 		 */
-		label = new Label(remoteComp, SWT.NONE);
+		Label label = new Label(remoteComp, SWT.NONE);
 		label.setText(Messages.RemoteConnectionWidget_connectionName);
 		gd = new GridData();
 		gd.horizontalSpan = 1;
@@ -187,6 +203,9 @@ public class RemoteConnectionWidget extends Composite {
 		gd.horizontalSpan = 2;
 		connectionCombo.setLayoutData(gd);
 		connectionCombo.addModifyListener(fWidgetListener);
+		if (id != null) {
+			connectionCombo.setFocus();
+		}
 
 		newConnectionButton = new Button(remoteComp, SWT.PUSH);
 		newConnectionButton.setText(Messages.RemoteConnectionWidget_new);
@@ -194,7 +213,10 @@ public class RemoteConnectionWidget extends Composite {
 		newConnectionButton.setLayoutData(data);
 		newConnectionButton.addSelectionListener(fWidgetListener);
 
-		initializeRemoteServicesCombo(null);
+		if (remoteCombo != null) {
+			initializeRemoteServicesCombo(null);
+		}
+		handleRemoteServiceSelected(null);
 	}
 
 	/**
@@ -254,12 +276,8 @@ public class RemoteConnectionWidget extends Composite {
 		if (remoteCombo != null) {
 			remoteCombo.setEnabled(enabled);
 		}
-		if (connectionCombo != null) {
-			connectionCombo.setEnabled(enabled);
-		}
-		if (newConnectionButton != null) {
-			newConnectionButton.setEnabled(enabled);
-		}
+		connectionCombo.setEnabled(enabled);
+		newConnectionButton.setEnabled(enabled);
 	}
 
 	private IRemoteUIConnectionManager getUIConnectionManager() {
@@ -344,50 +362,65 @@ public class RemoteConnectionWidget extends Composite {
 		final boolean enabled = fWidgetListener.isEnabled();
 		fWidgetListener.disable();
 
-		if (conn != null) {
-			IRemoteServices services = conn.getRemoteServices();
-			if (fRemoteServices != null) {
-				for (int index = 0; index < fRemoteServices.length; index++) {
-					if (fRemoteServices[index].getId().equals(services.getId())) {
-						remoteCombo.select(index);
-						break;
+		if (remoteCombo != null) {
+			/*
+			 * If a connection was supplied, set its remote service provider in
+			 * the combo
+			 */
+			if (conn != null) {
+				IRemoteServices services = conn.getRemoteServices();
+				if (fRemoteServices != null) {
+					for (int index = 0; index < fRemoteServices.length; index++) {
+						if (fRemoteServices[index].getId().equals(services.getId())) {
+							remoteCombo.select(index);
+							break;
+						}
 					}
 				}
 			}
-		}
-
-		int selectionIndex = remoteCombo.getSelectionIndex();
-		if (fRemoteServices != null && fRemoteServices.length > 0 && selectionIndex >= 0) {
-			fSelectedServices = fRemoteServices[selectionIndex];
-			IRemoteConnectionManager connectionManager = fSelectedServices.getConnectionManager();
-			IRemoteConnection[] connections = connectionManager.getConnections();
-			Arrays.sort(connections, new Comparator<IRemoteConnection>() {
-				public int compare(IRemoteConnection c1, IRemoteConnection c2) {
-					return c1.getName().compareToIgnoreCase(c2.getName());
-				}
-			});
-			connectionCombo.removeAll();
-			int selected = 0;
-			for (int i = 0; i < connections.length; i++) {
-				connectionCombo.add(connections[i].getName());
-				if (conn != null && connections[i].equals(conn)) {
-					selected = i;
-				}
-			}
-
-			if (connections.length > 0) {
-				connectionCombo.select(selected);
-			}
-			/*
-			 * Events are disabled so call selection handler here
-			 */
-			handleConnectionSelected();
 
 			/*
-			 * Enable 'new' button if new connections are supported
+			 * Get the currently selected services
 			 */
-			newConnectionButton.setEnabled(fSelectedServices.canCreateConnections());
+			int selectionIndex = remoteCombo.getSelectionIndex();
+			if (fRemoteServices != null && fRemoteServices.length > 0 && selectionIndex >= 0) {
+				fSelectedServices = fRemoteServices[selectionIndex];
+			}
 		}
+
+		/*
+		 * Populate the connection combo and select the connection
+		 */
+		IRemoteConnectionManager connectionManager = fSelectedServices.getConnectionManager();
+		IRemoteConnection[] connections = connectionManager.getConnections();
+		Arrays.sort(connections, new Comparator<IRemoteConnection>() {
+			public int compare(IRemoteConnection c1, IRemoteConnection c2) {
+				return c1.getName().compareToIgnoreCase(c2.getName());
+			}
+		});
+		connectionCombo.removeAll();
+		int selected = 0;
+		for (int i = 0; i < connections.length; i++) {
+			connectionCombo.add(connections[i].getName());
+			if (conn != null && connections[i].equals(conn)) {
+				selected = i;
+			}
+		}
+
+		if (connections.length > 0) {
+			connectionCombo.select(selected);
+		}
+
+		/*
+		 * A connection is always going to be selected when a remote service
+		 * provider is selected, so make sure the handlers get notified
+		 */
+		handleConnectionSelected();
+
+		/*
+		 * Enable 'new' button if new connections are supported
+		 */
+		newConnectionButton.setEnabled(fSelectedServices.canCreateConnections());
 
 		fWidgetListener.setEnabled(enabled);
 	}
@@ -424,7 +457,6 @@ public class RemoteConnectionWidget extends Composite {
 			remoteCombo.select(defIndex);
 		}
 		fWidgetListener.setEnabled(enabled);
-		handleRemoteServiceSelected(null);
 		return defServices.getId();
 	}
 
