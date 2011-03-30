@@ -351,6 +351,7 @@
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="composite" type="rm:composite-descriptor"/>
 				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
+				<xs:element name="widget" type="rm:widget"/>
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>

@@ -25,6 +25,14 @@ public interface IJAXBUINonNLSConstants extends IJAXBNonNLSConstants {
 
 	String TABLE = "table";//$NON-NLS-1$
 	String TREE = "tree";//$NON-NLS-1$
+	String LABEL = "label";//$NON-NLS-1$
+	String TEXT = "text";//$NON-NLS-1$
+	String CHECKBOX = "checkbox";//$NON-NLS-1$
+	String SPINNER = "spinner";//$NON-NLS-1$
+	String COMBO = "combo";//$NON-NLS-1$
+	String RADIOBUTTON = "radioButton";//$NON-NLS-1$
+	String BROWSELOCAL = "browseLocal";//$NON-NLS-1$
+	String BROWSEREMOTE = "browseRemote";//$NON-NLS-1$
 
 	// SWT
 	String ALL = "ALL";//$NON-NLS-1$
