@@ -392,11 +392,11 @@ public class ObjectFactory {
 	}
 
 	/**
-	 * Create an instance of {@link Widget.ValueArgs }
+	 * Create an instance of {@link Widget.Value }
 	 * 
 	 */
-	public Widget.ValueArgs createWidgetValueArgs() {
-		return new Widget.ValueArgs();
+	public Widget.Value createWidgetValue() {
+		return new Widget.Value();
 	}
 
 }

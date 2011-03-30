@@ -94,7 +94,7 @@
 			<xs:element name="value" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="type" use="required" type="xs:string"/>
+		<xs:attribute name="type" type="xs:string" default="java.lang.String"/>
 		<xs:attribute name="selected" type="xs:boolean" default="true"/>
 		<xs:attribute name="visible" type="xs:boolean" default="true"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
@@ -400,7 +400,7 @@
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
 			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
-			<xs:element name="valueArgs" minOccurs="0">
+			<xs:element name="value" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
 						The text of this element will be parsed for references to the environment; e.g., ${a},
