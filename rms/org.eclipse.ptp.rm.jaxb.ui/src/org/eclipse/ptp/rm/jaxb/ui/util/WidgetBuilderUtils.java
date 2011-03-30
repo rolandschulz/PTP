@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -28,6 +29,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.core.data.Style;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
@@ -454,8 +456,12 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static List<ColumnDescriptor> getColumnDescriptors(AttributeViewer descriptor) {
-
-		return null; // TODO
+		List<ColumnData> data = descriptor.getColumnData();
+		List<ColumnDescriptor> desc = new ArrayList<ColumnDescriptor>();
+		for (ColumnData d : data) {
+			desc.add(new ColumnDescriptor(d));
+		}
+		return desc;
 	}
 
 	public static int getStyle(String style) {

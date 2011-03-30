@@ -101,6 +101,7 @@ public class Messages extends NLS {
 	public static String RenameFileTitle;
 	public static String RestoreDefaultValues;
 	public static String DefaultValues;
+	public static String ToggleVisibleAttributes;
 
 	static {
 		// initialize resource bundle

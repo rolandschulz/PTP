@@ -10,40 +10,21 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.data;
 
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 
 public class ColumnDescriptor implements IJAXBUINonNLSConstants {
 	private static Integer DEFAULT_OPTION = -1;
 
-	private final char type;
-	private String columnName;
-	private int width = -1;
-	private String[] options = new String[0];
-	private boolean sorted = false;
+	private final String columnName;
+	private final int width;
+	private final String[] options;
 
-	public ColumnDescriptor(char type, String columnName) {
-		this.type = type;
-		this.columnName = columnName;
-	}
-
-	public ColumnDescriptor(char type, String columnName, int width) {
-		this.type = type;
-		this.columnName = columnName;
-		this.width = width;
-	}
-
-	public ColumnDescriptor(char type, String columnName, String[] options) {
-		this.type = type;
-		this.columnName = columnName;
-		this.options = options;
-	}
-
-	public ColumnDescriptor(char type, String columnName, String[] options, int width) {
-		this.type = type;
-		this.columnName = columnName;
-		this.options = options;
-		this.width = width;
+	public ColumnDescriptor(ColumnData data) {
+		columnName = data.getName();
+		width = data.getWidth();
+		options = data.getOption().toArray(new String[0]);
 	}
 
 	public String getColumnName() {
@@ -79,31 +60,11 @@ public class ColumnDescriptor implements IJAXBUINonNLSConstants {
 		return options;
 	}
 
-	public char getType() {
-		return type;
-	}
-
 	public int getWidth() {
 		return width;
 	}
 
-	public boolean isSorted() {
-		return sorted;
-	}
-
 	public boolean isWidthSpecified() {
 		return width != -1;
-	}
-
-	public void setColumnName(String columnName) {
-		this.columnName = columnName;
-	}
-
-	public void setSorted(boolean sorted) {
-		this.sorted = sorted;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
 	}
 }
