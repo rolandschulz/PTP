@@ -20,8 +20,10 @@ package org.eclipse.ptp.ui.wizards;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
@@ -205,7 +207,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	private class SelectServiceProviderPage extends WizardPage {
 
 		private List fServiceProviderList;
-		private IServiceProviderDescriptor[] fProviders;
+		private final ArrayList<ProviderInfo> fProviders = new ArrayList<ProviderInfo>();
 
 		public SelectServiceProviderPage(String pageName) {
 			super(pageName);
@@ -232,18 +234,53 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			setControl(composite);
 		}
 
+		private class ProviderInfo implements Comparable<ProviderInfo> {
+			public final String name;
+			public final IServiceProviderDescriptor descriptor;
+			public final RMConfigurationSelectionFactory factory;
+
+			public ProviderInfo(String name, IServiceProviderDescriptor descriptor,
+					RMConfigurationSelectionFactory factory) {
+				this.name = name;
+				this.descriptor = descriptor;
+				this.factory = factory;
+			}
+
+			public int compareTo(ProviderInfo o) {
+				return name.compareTo(o.name);
+			}
+		}
+
 		private void createServiceProviderChoiceControl(Composite container) {
 			/*
-			 * Locate all service providers
+			 * Locate all service providers. The initial list of providers comes
+			 * from the launch service. Providers can also register an extension
+			 * factory to allow for more complex behaviors.
 			 * 
 			 * TODO: This assumes all LAUNCH_SERVICE providers implement
 			 * IResourceManagerConfiguration Probably better to create an
 			 * RM_LAUNCH_SERVICE instead.
 			 */
-			fProviders = fLaunchService.getProvidersByPriority().toArray(new IServiceProviderDescriptor[0]);
-			String[] providerNames = new String[fProviders.length];
-			for (int i = 0; i < fProviders.length; ++i) {
-				providerNames[i] = fProviders[i].getName();
+			Set<IServiceProviderDescriptor> providers = fLaunchService.getProvidersByPriority();
+			fProviders.clear();
+			for (IServiceProviderDescriptor desc : providers) {
+				/*
+				 * Check if this provider has an extension
+				 */
+				RMConfigurationSelectionFactory factory = RMProviderContributor.getRMConfigurationSelectionFactory(desc
+						.getId());
+				if (factory != null) {
+					for (String name : factory.getProviderNames()) {
+						fProviders.add(new ProviderInfo(name, desc, factory));
+					}
+				} else {
+					fProviders.add(new ProviderInfo(desc.getName(), desc, null));
+				}
+			}
+			Collections.sort(fProviders);
+			String[] providerNames = new String[fProviders.size()];
+			for (int i = 0; i < fProviders.size(); i++) {
+				providerNames[i] = fProviders.get(i).name;
 			}
 
 			Label label = new Label(container, SWT.NONE);
@@ -251,7 +288,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			fServiceProviderList = new List(container, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
 			fServiceProviderList.setLayoutData(new GridData(GridData.FILL_BOTH));
 			fServiceProviderList.setItems(providerNames);
-			fServiceProviderList.setEnabled(fProviders.length > 0);
+			fServiceProviderList.setEnabled(fProviders.size() > 0);
 			fServiceProviderList.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -261,7 +298,11 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		}
 
 		private void handleProviderSelection() {
-			IServiceProvider provider = fModelManager.getServiceProvider(fProviders[fServiceProviderList.getSelectionIndex()]);
+			ProviderInfo providerInfo = fProviders.get(fServiceProviderList.getSelectionIndex());
+			if (providerInfo.factory != null) {
+				providerInfo.factory.setProvider(providerInfo.name);
+			}
+			IServiceProvider provider = fModelManager.getServiceProvider(providerInfo.descriptor);
 			fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(provider);
 			setServiceProvider(provider);
 			setPageComplete(true);

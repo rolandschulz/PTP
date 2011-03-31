@@ -2,7 +2,7 @@
 <?eclipse version="3.0"?>
 <plugin>
 	<extension-point id="rmConfigurationWizards" name="Resource Manager Configuration Wizards" schema="schema/rmConfigurationWizards.exsd"/>
- <extension-point id="rmConfigurationWizardExtensions" name="Resource Manager Configuration Wizard Extensions" schema="schema/rmConfigurationWizardExtensions.exsd"/>
+ <extension-point id="rmConfigurationSelections" name="Resource Manager Selection Extensions" schema="schema/rmConfigurationSelections.exsd"/>
  <extension-point id="runtimeModelPresentations" name="Runtime Model Presentations" schema="schema/runtimeModelPresentations.exsd"/>
 	<extension
 		point="org.eclipse.ui.views">
