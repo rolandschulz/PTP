@@ -2,6 +2,14 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="streamParserTokenizer" name="StreamParserTokenizer" schema="schema/streamParserTokenizer.exsd"/>
+   <extension-point id="JAXBResourceManagers" name="JAXBResourceManagers" schema="schema/JAXBResourceManagers.exsd"/>
+   <extension
+         point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagers">
+      <JAXBResourceManager
+            configuration="data/rm-pbs-torque_2.3.7.xml"
+            name="PBS Torque">
+      </JAXBResourceManager>
+   </extension>
    <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
