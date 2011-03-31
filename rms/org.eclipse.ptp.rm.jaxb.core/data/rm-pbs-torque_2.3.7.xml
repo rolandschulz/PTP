@@ -484,100 +484,120 @@
 		<launch-tab>
 			<basic>
 				<title>Basic PBS Settings</title>
-				<composite-descriptor group="false">
-					<grid-layout numColumns="5"/>
-					<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" widthHint="700" horizontalSpan="5"/>
-					<!-- row 1 -->
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<fixed-value>Job Name: </fixed-value>
-						<tooltip>${rm:Job_Name#tooltip}</tooltip>
-					</widget>
-					<widget style="SWT.BORDER" type="text" saveValueTo="Job_Name">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-					</widget>
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<fixed-value>${rm:Job_Name#description}</fixed-value>
-					</widget>
-					<!-- row 2 -->
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<fixed-value>Queue: </fixed-value>
-						<tooltip>${rm:destination#tooltip}</tooltip>
-					</widget>
-					<widget type="combo" readOnly="true" saveValueTo="destination">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-					</widget>
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<fixed-value>${rm:destination#description}</fixed-value>
-					</widget>
-					<!-- row 3 -->
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<fixed-value>Nodes: </fixed-value>
-						<tooltip>${rm:Resource_List.nodes#tooltip}</tooltip>
-					</widget>
-					<widget type="text" saveValueTo="Resource_List.nodes">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-					</widget>
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<fixed-value>${rm:Resource_List.nodes#description}</fixed-value>
-					</widget>
-					<!-- row 4 -->
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<fixed-value>Wallclock Time: </fixed-value>
-						<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
-					</widget>
-					<widget type="text" saveValueTo="Resource_List.walltime">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-					</widget>
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<fixed-value>${rm:Resource_List.walltime#description}</fixed-value>
-					</widget>
-					<!-- row 5 -->
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<fixed-value>MPI Command: </fixed-value>
-					</widget>
-					<widget type="combo" readOnly="true" saveValueTo="mpiCommand">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-					</widget>
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<fixed-value>${rm:mpiCommand#description}</fixed-value>
-					</widget>
-					<!-- row 6 -->
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<fixed-value>MPI Number of Cores: </fixed-value>
-					</widget>
-					<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-					</widget>
-					<widget type="label">
-						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<fixed-value>${rm:mpiCores#description}</fixed-value>
-					</widget>
-				</composite-descriptor>
+				<composite group="false">
+					<grid-layout numColumns="1"/>
+					<grid-data widthHint="700"/>
+					<composite group="false">
+						<grid-layout numColumns="3" horizontalSpacing="5" verticalSpacing="15"/>
+						<grid-data horizontalSpan="3"/>
+						<!-- HEADER -->
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>Name</fixed-value>
+						</widget>
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>Value</fixed-value>
+						</widget>
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>Description</fixed-value>
+						</widget>
+						<!-- row 1 -->
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>Job Name: </fixed-value>
+							<tooltip>${rm:Job_Name#tooltip}</tooltip>
+						</widget>
+						<widget type="text" style="SWT.BORDER" saveValueTo="Job_Name">
+							<grid-data style="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="1"/>
+						</widget>
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>${rm:Job_Name#description}</fixed-value>
+						</widget>
+						<!-- row 2 -->
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>Queue: </fixed-value>
+							<tooltip>${rm:destination#tooltip}</tooltip>
+						</widget>
+						<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+							<grid-data style="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="1"/>
+						</widget>
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>${rm:destination#description}</fixed-value>
+						</widget>
+						<!-- row 3 -->
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>Nodes: </fixed-value>
+							<tooltip>${rm:Resource_List.nodes#tooltip}</tooltip>
+						</widget>
+						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.nodes">
+							<grid-data style="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="1"/>
+						</widget>
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>${rm:Resource_List.nodes#description}</fixed-value>
+						</widget>
+						<!-- row 4 -->
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>Wallclock Time: </fixed-value>
+							<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
+						</widget>
+						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
+							<grid-data style="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="1"/>
+						</widget>
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>${rm:Resource_List.walltime#description}</fixed-value>
+						</widget>
+						<!-- row 5 -->
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>MPI Command: </fixed-value>
+						</widget>
+						<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCommand">
+							<grid-data style="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="1"/>
+						</widget>
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>${rm:mpiCommand#description}</fixed-value>
+						</widget>
+						<!-- row 6 -->
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>MPI Number of Cores: </fixed-value>
+						</widget>
+						<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
+							<grid-data horizontalSpan="1"/>
+						</widget>
+						<widget type="label" style="SWT.LEFT">
+							<grid-data horizontalSpan="1"/>
+							<fixed-value>${rm:mpiCores#description}</fixed-value>
+						</widget>
+					</composite>
+				</composite>
 			</basic>
 			<advanced dynamic="true">
 				<title>Advanced PBS Settings</title>
-				<composite-descriptor>
+				<composite>
+				   <grid-layout numColumns="1"/>
 					<!-- iterates through all registered attributes, one to a row -->
-					<viewer name="allAttributes" sort="true" tooltipOnName="true" type="table">
-						<column-data name="Name" width="100"/>
+					<viewer name="allAttributes" style="SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI" sort="true" type="table">
+						<grid-data widthHint="900" horizontalSpan="5"/>
+						<column-data name="Name" width="290"/>
 						<column-data name="Type" width="50"/>
+						<column-data name="Tooltip" width="60"/>
 						<column-data name="Value" width="200"/>
-						<column-data name="Description" width="400"/>
+						<column-data name="Description" width="500"/>
 						<items allPredefined="true"/>
 						<value pattern="@name='@value'"/>
 					</viewer>
-				</composite-descriptor>
+				</composite>
 			</advanced>
 			<custom-controller>Import PBS Script</custom-controller>
 		</launch-tab>

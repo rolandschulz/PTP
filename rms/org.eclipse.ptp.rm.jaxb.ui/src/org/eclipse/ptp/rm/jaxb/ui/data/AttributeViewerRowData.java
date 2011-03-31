@@ -22,6 +22,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.cell.CheckboxCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.cell.SpinnerCellEditor;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
@@ -200,6 +201,9 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 				value = ja.getType();
 			} else if (COLUMN_TOOLTIP.equals(columnName)) {
 				value = ja.getTooltip();
+				if (value != null) {
+					value = WidgetBuilderUtils.fitToLineLength(60, value);
+				}
 			} else if (COLUMN_STATUS.equals(columnName)) {
 				value = ja.getStatus();
 			} else if (COLUMN_VALUE.equals(columnName)) {
@@ -232,6 +236,10 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 			result = result.replaceAll(VALUE_TAG, name);
 		}
 		return result;
+	}
+
+	public String getTooltip() {
+		return getColumnDisplayValue(COLUMN_TOOLTIP);
 	}
 
 	public Object getValue() {

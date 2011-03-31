@@ -80,6 +80,7 @@ public class Messages extends NLS {
 	public static String DisplayScript;
 	public static String DisplayScriptError;
 	public static String DisplayScriptErrorTitle;
+	public static String Tooltip;
 
 	static {
 		// initialize resource bundle

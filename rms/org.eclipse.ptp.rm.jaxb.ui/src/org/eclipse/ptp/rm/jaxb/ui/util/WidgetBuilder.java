@@ -167,25 +167,7 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 			});
 			c.setToolTipText(tooltip);
 		}
-		printWidget(c);
 		return c;
-	}
-
-	private void printWidget(Control c) {
-		System.out.println("type: " + type);
-		System.out.println("style: " + style);
-		System.out.println("title: " + title);
-		System.out.println("readOnly: " + readOnly);
-		System.out.println("fixed: " + fixed);
-		System.out.println("choice: " + choice);
-		System.out.println("min: " + min);
-		System.out.println("max: " + max);
-		System.out.println("initialValue: " + initialValue);
-		System.out.println("value: " + value);
-		System.out.println("GridData: " + data);
-		System.out.println("tooltip: " + tooltip);
-		System.out.println("CONTROL " + c);
-		System.out.println("**********************************************");
 	}
 
 	private void setData(Object data) {
