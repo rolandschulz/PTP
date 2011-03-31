@@ -188,12 +188,18 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	private static void getFlattened(String key, Object value, Map<String, String> flat) throws ArrayStoreException {
 		if (value instanceof Property) {
 			Property p = (Property) value;
+			String name = p.getName();
 			Object o = p.getValue();
 			String s = null;
 			if (o != null) {
 				s = o.toString();
 			}
-			flat.put(p.getName(), s);
+			flat.put(name, s);
+			flat.put(name + PD + VALUE, s);
+			s = p.getDefault();
+			if (s != null) {
+				flat.put(name + PD + sDEFAULT, s);
+			}
 		} else if (value instanceof Attribute) {
 			Attribute ja = (Attribute) value;
 			Object o = ja.getValue();
@@ -203,16 +209,16 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 			}
 			String name = ja.getName();
 			flat.put(name, s);
-			s = ja.getDescription();
+			flat.put(name + PD + VALUE, s);
+			s = ja.getType();
 			if (s != null) {
-				flat.put(name + PD + DESC, s);
+				flat.put(name + PD + sDEFAULT, s);
 			}
-			s = ja.getTooltip();
+			s = ja.getStatus();
 			if (s != null) {
-				flat.put(name + PD + TOOLTIP, s);
+				flat.put(name + PD + STATUS, s);
 			}
-		} else if (value == null) {
-			flat.put(key, null);
+			o = ja.isReadOnly();
 		} else {
 			throw new ArrayStoreException(Messages.IllegalVariableValueType + value.getClass());
 		}

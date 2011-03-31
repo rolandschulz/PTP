@@ -178,10 +178,8 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	private final TabController controller;
 	private final List<ILaunchTabValueHandler> handlers;
 	private final Script script;
-
-	private Composite control;
 	private final String title;
-
+	private Composite control;
 	private JAXBUniversalDataSource dataSource;
 
 	public JAXBRMConfigurableAttributesTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog,
@@ -207,7 +205,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			LaunchTabBuilder builder = new LaunchTabBuilder(this);
 			builder.build(control);
 			createViewScriptGroup(control);
-			parentTab.resize(control);
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 		}

@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -529,7 +530,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		if (style == null) {
 			return SWT.NONE;
 		}
-		return getStyle(style.split(PIP));
+		return getStyle(style.split(OPENSQ + PIP + CLOSSQ));
 	}
 
 	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors,
@@ -561,6 +562,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	}
 
 	private static int getStyle(String[] style) {
+		System.out.println("getStyle: " + Arrays.asList(style));
 		int swt = 0;
 
 		for (String s : style) {
@@ -800,7 +802,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 				swt |= SWT.YES;
 			}
 		}
-
+		System.out.println("getStyle, result: " + swt);
 		return swt;
 	}
 

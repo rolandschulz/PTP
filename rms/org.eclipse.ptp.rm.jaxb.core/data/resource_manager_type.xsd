@@ -396,13 +396,18 @@
 	<xs:complexType name="widget">
 		<xs:sequence>
 			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data-descriptor"/>
-			<xs:element name="label" minOccurs="0" type="xs:string"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
-			<xs:element name="value" minOccurs="0">
+			<xs:element name="fixed-value" minOccurs="0" type="xs:string">
+			   <xs:annotation>
+               <xs:documentation>
+                  The text of this element will be set once from the environment on loading; e.g, ${rm:Job_Name#description}.
+               </xs:documentation>
+            </xs:annotation>
+			</xs:element>
+			<xs:element name="value-from-env" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
-						The text of this element will be parsed for references to the environment; e.g., ${a},
-						version-${b}.
+						The args will be refreshed against the environment.
 					</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
@@ -426,6 +431,7 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="title" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 		<xs:attribute name="saveValueTo" type="xs:string"/>

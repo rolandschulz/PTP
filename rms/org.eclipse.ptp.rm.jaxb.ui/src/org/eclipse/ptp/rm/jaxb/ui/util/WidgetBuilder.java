@@ -18,7 +18,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.GridDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
-import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
@@ -43,7 +42,7 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 	private final String type;
 
 	private Object value;
-	private String display;
+	private String fixed;
 	private String initialValue;
 	private String choice;
 	private String tooltip;
@@ -53,7 +52,7 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 
 	public WidgetBuilder(Widget widget, RMVariableMap rmMap, JAXBRMConfigurableAttributesTab tab) {
 		this.tab = tab;
-		title = widget.getLabel();
+		title = widget.getTitle();
 		GridDataDescriptor gdd = widget.getGridData();
 		this.data = LaunchTabBuilder.addGridData(gdd);
 		style = WidgetBuilderUtils.getStyle(widget.getStyle());
@@ -65,6 +64,8 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 		tooltip = rmMap.getString(widget.getTooltip());
 		if (tooltip == null) {
 			tooltip = ZEROSTR;
+		} else {
+			tooltip = WidgetBuilderUtils.fitToLineLength(64, tooltip);
 		}
 		Map<String, Object> vars = rmMap.getVariables();
 		String ref = widget.getSaveValueTo();
@@ -74,13 +75,9 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 				setData(data);
 			}
 		}
-		Widget.Value v = widget.getValue();
-		if (v != null) {
-			StringBuffer buffer = new StringBuffer();
-			ArgImpl.toString(null, v.getArg(), rmMap, buffer);
-			display = buffer.toString();
-		} else {
-			display = ZEROSTR;
+		fixed = widget.getFixedValue();
+		if (fixed != null) {
+			fixed = rmMap.getString(fixed);
 		}
 	}
 
@@ -88,11 +85,11 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 	public Control createControl(final Composite parent) {
 		Control c = null;
 		if (LABEL.equals(type)) {
-			c = WidgetBuilderUtils.createLabel(parent, display, style, data);
+			c = WidgetBuilderUtils.createLabel(parent, fixed, style, data);
 			c.setToolTipText(tooltip);
 		} else if (TEXT.equals(type)) {
-			if (!ZEROSTR.equals(display)) {
-				initialValue = display;
+			if (!ZEROSTR.equals(fixed)) {
+				initialValue = fixed;
 			}
 			Text t = WidgetBuilderUtils.createText(parent, style, data, readOnly, initialValue);
 			c = t;
@@ -170,28 +167,38 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 			});
 			c.setToolTipText(tooltip);
 		}
+		printWidget(c);
 		return c;
+	}
+
+	private void printWidget(Control c) {
+		System.out.println("type: " + type);
+		System.out.println("style: " + style);
+		System.out.println("title: " + title);
+		System.out.println("readOnly: " + readOnly);
+		System.out.println("fixed: " + fixed);
+		System.out.println("choice: " + choice);
+		System.out.println("min: " + min);
+		System.out.println("max: " + max);
+		System.out.println("initialValue: " + initialValue);
+		System.out.println("value: " + value);
+		System.out.println("GridData: " + data);
+		System.out.println("tooltip: " + tooltip);
+		System.out.println("CONTROL " + c);
+		System.out.println("**********************************************");
 	}
 
 	private void setData(Object data) {
 		if (data instanceof Attribute) {
 			Attribute a = (Attribute) data;
 			value = a.getValue();
-			if (!(value instanceof Collection) && !(value instanceof Map)) {
-				initialValue = String.valueOf(value);
-			}
-			if (initialValue == null) {
-				initialValue = a.getDefault();
-			}
+			initialValue = a.getDefault();
 			choice = a.getChoice();
 			min = a.getMin();
 			max = a.getMax();
 		} else {
 			Property p = (Property) data;
 			value = p.getValue();
-			if (!(value instanceof Collection) && !(value instanceof Map)) {
-				initialValue = String.valueOf(value);
-			}
 			if (initialValue == null) {
 				initialValue = p.getDefault();
 			}

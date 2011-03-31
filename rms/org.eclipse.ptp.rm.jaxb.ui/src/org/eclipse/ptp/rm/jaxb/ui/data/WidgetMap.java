@@ -52,6 +52,9 @@ public class WidgetMap implements ILaunchTabValueHandler {
 		for (Control c : map.keySet()) {
 			Object value = null;
 			Widget w = map.get(c);
+			if (w.getFixedValue() != null) {
+				continue;
+			}
 			String ref = w.getSaveValueTo();
 			if (ref != null) {
 				Object o = vars.get(ref);
@@ -64,7 +67,7 @@ public class WidgetMap implements ILaunchTabValueHandler {
 					value = ((Attribute) o).getValue();
 				}
 			} else {
-				Widget.Value va = w.getValue();
+				Widget.ValueFromEnv va = w.getValueFromEnv();
 				if (va != null) {
 					List<Arg> arglist = va.getArg();
 					if (arglist != null) {
@@ -98,12 +101,13 @@ public class WidgetMap implements ILaunchTabValueHandler {
 		Map<String, Object> disc = rmMap.getDiscovered();
 		for (Control c : map.keySet()) {
 			Widget w = map.get(c);
-
+			if (w.getFixedValue() != null) {
+				continue;
+			}
 			String name = w.getSaveValueTo();
 			if (name == null) {
 				continue;
 			}
-
 			Object o = vars.get(name);
 			String defaultValue = null;
 			if (o == null) {
