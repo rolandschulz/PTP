@@ -96,7 +96,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			progress.worked(1);
 		}
 
-		if (!appendEnv) {
+		if (live != null && !appendEnv) {
 			for (String var : live.keySet()) {
 				EnvironmentVariableUtils.addVariable(var, live.get(var), firstLine, buffer);
 			}
@@ -108,7 +108,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			}
 			progress.worked(1);
 		}
-		if (appendEnv) {
+		if (live != null && appendEnv) {
 			for (String var : live.keySet()) {
 				EnvironmentVariableUtils.addVariable(var, live.get(var), firstLine, buffer);
 			}
@@ -136,7 +136,8 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			for (Arg a : line.getArg()) {
 				Arg newA = new Arg();
 				newA.setIsUndefinedIfMatches(a.getIsUndefinedIfMatches());
-				newA.setContent(a.getContent().replaceAll(OPENVRM, OPENVLT));
+				newA.setContent(a.getContent().replaceAll(VRM, VLT));
+				newA.setResolve(a.isResolve());
 				args.add(newA);
 			}
 			lines.add(newLine);

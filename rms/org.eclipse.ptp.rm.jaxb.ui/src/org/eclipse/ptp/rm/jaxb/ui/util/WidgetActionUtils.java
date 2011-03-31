@@ -24,9 +24,12 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.rm.jaxb.core.data.FileMatch;
@@ -36,6 +39,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.impl.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedMatchException;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -142,6 +146,15 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		return null;
 	}
 
+	public static void refreshViewer(final Viewer viewer) {
+		ISafeRunnable safeRunnable = new SafeRunnable() {
+			public void run() throws Exception {
+				viewer.refresh();
+			}
+		};
+		UIUtils.safeRunAsyncInUIThread(safeRunnable);
+	}
+
 	public static String select(Combo combo, String name) {
 		String[] items = combo.getItems();
 		if (items.length == 0) {
@@ -181,13 +194,17 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		}
 		if (uiElement instanceof Spinner) {
 			Spinner c = (Spinner) uiElement;
-			c.setSelection(Integer.parseInt(value));
+			if (!ZEROSTR.equals(value)) {
+				c.setSelection(Integer.parseInt(value));
+			}
 		}
 		if (uiElement instanceof Button) {
 			Button c = (Button) uiElement;
 			int style = c.getStyle();
 			if ((style == (style | SWT.CHECK)) || (style == (style | SWT.RADIO))) {
-				c.setSelection(Boolean.parseBoolean(value));
+				if (!ZEROSTR.equals(value)) {
+					c.setSelection(Boolean.parseBoolean(value));
+				}
 			}
 		}
 	}

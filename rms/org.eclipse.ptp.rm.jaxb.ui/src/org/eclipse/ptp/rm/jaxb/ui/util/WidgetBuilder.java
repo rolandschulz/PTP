@@ -18,6 +18,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.GridDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
+import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
@@ -42,6 +43,7 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 	private final String type;
 
 	private Object value;
+	private String display;
 	private String initialValue;
 	private String choice;
 	private String tooltip;
@@ -60,39 +62,49 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 			style |= SWT.READ_ONLY;
 		}
 		type = widget.getType();
-		tooltip = widget.getTooltip();
+		tooltip = rmMap.getString(widget.getTooltip());
 		if (tooltip == null) {
 			tooltip = ZEROSTR;
 		}
 		Map<String, Object> vars = rmMap.getVariables();
-		Object data = vars.get(widget.getSaveValueTo());
-		if (data != null) {
-			setData(data);
+		String ref = widget.getSaveValueTo();
+		if (ref != null) {
+			Object data = vars.get(ref);
+			if (data != null) {
+				setData(data);
+			}
+		}
+		Widget.Value v = widget.getValue();
+		if (v != null) {
+			StringBuffer buffer = new StringBuffer();
+			ArgImpl.toString(null, v.getArg(), rmMap, buffer);
+			display = buffer.toString();
+		} else {
+			display = ZEROSTR;
 		}
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Control createControl(final Composite parent) {
 		Control c = null;
-
 		if (LABEL.equals(type)) {
-			c = WidgetBuilderUtils.createLabel(parent, title, style, data);
+			c = WidgetBuilderUtils.createLabel(parent, display, style, data);
 			c.setToolTipText(tooltip);
 		} else if (TEXT.equals(type)) {
+			if (!ZEROSTR.equals(display)) {
+				initialValue = display;
+			}
 			Text t = WidgetBuilderUtils.createText(parent, style, data, readOnly, initialValue);
-			t.addModifyListener(tab.getWidgetListener());
-			t.addSelectionListener(tab.getWidgetListener());
 			c = t;
 			c.setToolTipText(tooltip);
 		} else if (RADIOBUTTON.equals(type)) {
-			c = WidgetBuilderUtils.createRadioButton(parent, title, initialValue, tab.getWidgetListener());
+			c = WidgetBuilderUtils.createRadioButton(parent, title, initialValue, null);
 			c.setToolTipText(tooltip);
 		} else if (CHECKBOX.equals(type)) {
-			c = WidgetBuilderUtils.createCheckButton(parent, title, tab.getWidgetListener());
+			c = WidgetBuilderUtils.createCheckButton(parent, title, null);
 			c.setToolTipText(tooltip);
 		} else if (SPINNER.equals(type)) {
-			Spinner s = WidgetBuilderUtils.createSpinner(parent, data, title, min, max, min, tab.getWidgetListener());
-			s.addSelectionListener(tab.getWidgetListener());
+			Spinner s = WidgetBuilderUtils.createSpinner(parent, data, title, min, max, min, null);
 			c = s;
 			c.setToolTipText(tooltip);
 		} else if (COMBO.equals(type)) {
@@ -102,14 +114,10 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 			} else if (value instanceof Collection) {
 				items = (String[]) ((Collection) value).toArray(new String[0]);
 			}
-			Combo cc = WidgetBuilderUtils.createCombo(parent, style, data, items, initialValue, title, tooltip,
-					tab.getWidgetListener());
-			cc.addModifyListener(tab.getWidgetListener());
+			Combo cc = WidgetBuilderUtils.createCombo(parent, style, data, items, initialValue, title, tooltip, null);
 			c = cc;
 		} else if (BROWSELOCAL.equals(type)) {
 			final Text t = WidgetBuilderUtils.createText(parent, style, data, readOnly, initialValue);
-			t.addModifyListener(tab.getWidgetListener());
-			t.addSelectionListener(tab.getWidgetListener());
 			c = t;
 			c.setToolTipText(tooltip);
 			WidgetBuilderUtils.createButton(parent, data, title, style, new SelectionListener() {
@@ -138,8 +146,6 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 			c.setToolTipText(tooltip);
 		} else if (BROWSEREMOTE.equals(type)) {
 			final Text t = WidgetBuilderUtils.createText(parent, style, data, readOnly, initialValue);
-			t.addModifyListener(tab.getWidgetListener());
-			t.addSelectionListener(tab.getWidgetListener());
 			c = t;
 			c.setToolTipText(tooltip);
 			WidgetBuilderUtils.createButton(parent, data, title, style, new SelectionListener() {

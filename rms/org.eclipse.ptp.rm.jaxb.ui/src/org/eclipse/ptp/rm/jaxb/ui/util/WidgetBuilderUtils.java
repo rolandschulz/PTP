@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
-import org.eclipse.ptp.rm.jaxb.core.data.Style;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
@@ -104,7 +103,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		Button button = new Button(parent, type);
 		button.setText(label);
 		if (data == null) {
-			data = createGridData(GridData.FILL_HORIZONTAL, DEFAULT);
+			data = createGridData(DEFAULT, 1);
 		}
 		button.setLayoutData(data);
 		if (null != listener) {
@@ -138,7 +137,12 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			}
 		}
 		Combo combo = new Combo(parent, style);
-		combo.setItems(items);
+		if (items != null) {
+			combo.setItems(items);
+		}
+		if (data == null) {
+			data = createGridData(DEFAULT, 1);
+		}
 		combo.setLayoutData(data);
 		if (initial != null) {
 			combo.setText(initial);
@@ -166,10 +170,13 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 
 	public static Composite createComposite(Composite parent, Integer style, GridLayout layout, GridData data) {
 		Composite composite = new Composite(parent, style);
-		composite.setLayout(layout);
-		if (data != null) {
-			composite.setData(data);
+		if (layout != null) {
+			composite.setLayout(layout);
 		}
+		if (data == null) {
+			data = createGridData(DEFAULT, 1);
+		}
+		composite.setData(data);
 		return composite;
 	}
 
@@ -189,8 +196,12 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 				data = new GridData(style);
 			}
 		}
-		data.grabExcessHorizontalSpace = grabH;
-		data.grabExcessVerticalSpace = grabV;
+		if (grabH != null) {
+			data.grabExcessHorizontalSpace = grabH;
+		}
+		if (grabV != null) {
+			data.grabExcessVerticalSpace = grabV;
+		}
 		if (null != wHint && wHint != DEFAULT) {
 			data.widthHint = wHint;
 		}
@@ -246,8 +257,12 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	public static GridLayout createGridLayout(Integer columns, Boolean isEqual, Integer hSpace, Integer vSpace, Integer mw,
 			Integer mh, Integer mL, Integer mR, Integer mT, Integer mB) {
 		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
+		if (columns != null) {
+			gridLayout.numColumns = columns;
+		}
+		if (isEqual != null) {
+			gridLayout.makeColumnsEqualWidth = isEqual;
+		}
 		if (null != hSpace && hSpace != DEFAULT) {
 			gridLayout.horizontalSpacing = hSpace;
 		}
@@ -281,7 +296,12 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 
 	public static Group createGroup(Composite parent, Integer style, GridLayout layout, GridData data, String text) {
 		Group group = new Group(parent, style);
-		group.setLayout(layout);
+		if (layout != null) {
+			group.setLayout(layout);
+		}
+		if (data == null) {
+			data = createGridData(DEFAULT, 1);
+		}
 		group.setLayoutData(data);
 		if (text != null) {
 			group.setText(text);
@@ -298,7 +318,9 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		if (data == null) {
 			data = createGridData(DEFAULT, 1);
 		}
-		label.setLayoutData(data);
+		if (data != null) {
+			label.setLayoutData(data);
+		}
 		return label;
 	}
 
@@ -330,9 +352,18 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		}
 
 		Spinner s = new Spinner(parent, SWT.NONE);
-		s.setMaximum(max);
-		s.setMinimum(min);
-		s.setSelection(initial);
+		if (max != null) {
+			s.setMaximum(max);
+		}
+		if (min != null) {
+			s.setMinimum(min);
+		}
+		if (initial != null) {
+			s.setSelection(initial);
+		}
+		if (data == null) {
+			data = createGridData(DEFAULT, 1);
+		}
 		s.setLayoutData(data);
 		if (listener != null) {
 			s.addModifyListener(listener);
@@ -358,14 +389,24 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static Table createTable(Composite parent, Integer style, Integer cols, Integer wHint, GridData data) {
+		if (style == null) {
+			style = SWT.None;
+		}
+		if (cols == null) {
+			cols = 1;
+		}
 		Table t = new Table(parent, style);
+		if (data == null) {
+			data = createGridData(DEFAULT, cols);
+		}
 		t.setLayoutData(data);
 		t.setHeaderVisible(true);
 		t.setLinesVisible(true);
-		t.setLayoutData(data);
 		TableLayout layout = new TableLayout();
-		for (int i = 0; i < cols; i++) {
-			layout.addColumnData(new ColumnPixelData(wHint / cols));
+		if (wHint != null) {
+			for (int i = 0; i < cols; i++) {
+				layout.addColumnData(new ColumnPixelData(wHint / cols));
+			}
 		}
 		t.setLayout(layout);
 		return t;
@@ -378,12 +419,16 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	public static Text createText(Composite parent, Integer options, GridData data, Boolean readOnly, String initialContents,
 			ModifyListener listener, Color color) {
 		Text text = new Text(parent, options);
+		if (data == null) {
+			data = createGridData(DEFAULT, 1);
+		}
 		text.setLayoutData(data);
-		text.setEditable(!readOnly);
+		if (readOnly != null) {
+			text.setEditable(!readOnly);
+		}
 		if (color != null) {
 			text.setBackground(color);
 		}
-		text.setLayoutData(data);
 		if (initialContents != null) {
 			text.setText(initialContents);
 		}
@@ -407,13 +452,21 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 
 	public static Tree createTree(Composite parent, Integer style, Integer cols, Integer wHint, GridData data) {
 		Tree t = new Tree(parent, style);
+		if (cols == null) {
+			cols = 1;
+		}
+		if (data == null) {
+			data = createGridData(DEFAULT, cols);
+		}
 		t.setLayoutData(data);
 		t.setHeaderVisible(true);
 		t.setLinesVisible(true);
-		t.setLayoutData(data);
 		TableLayout layout = new TableLayout();
-		for (int i = 0; i < cols; i++) {
-			layout.addColumnData(new ColumnPixelData(wHint / cols));
+		if (wHint != null) {
+
+			for (int i = 0; i < cols; i++) {
+				layout.addColumnData(new ColumnPixelData(wHint / cols));
+			}
 		}
 		t.setLayout(layout);
 		return t;
@@ -479,13 +532,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return getStyle(style.split(PIP));
 	}
 
-	public static int getStyle(Style style) {
-		if (style == null) {
-			return SWT.NONE;
-		}
-		return getStyle(style.getTag().toArray(new String[0]));
-	}
-
 	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors,
 			ISelectionChangedListener listener, Boolean sortName) {
 		setupSpecific(viewer, columnDescriptors, sortName);
@@ -519,7 +565,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 
 		for (String s : style) {
 			s = s.trim();
-
 			if (ARROW.equals(s)) {
 				swt |= SWT.ARROW;
 			}
@@ -571,8 +616,17 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			if (FILL.equals(s)) {
 				swt |= SWT.FILL;
 			}
+			if (FILL_BOTH.equals(s)) {
+				swt |= GridData.FILL_BOTH;
+			}
 			if (FILL_EVEN_ODD.equals(s)) {
 				swt |= SWT.FILL_EVEN_ODD;
+			}
+			if (FILL_HORIZONTAL.equals(s)) {
+				swt |= GridData.FILL_HORIZONTAL;
+			}
+			if (FILL_VERTICAL.equals(s)) {
+				swt |= GridData.FILL_VERTICAL;
 			}
 			if (FILL_WINDING.equals(s)) {
 				swt |= SWT.FILL_WINDING;
@@ -758,7 +812,9 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			columnProperties[i] = columnDescriptor.getColumnName();
 		}
 		viewer.setColumnProperties(columnProperties);
-		viewer.addSelectionChangedListener(listener);
+		if (listener != null) {
+			viewer.addSelectionChangedListener(listener);
+		}
 	}
 
 	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName) {
@@ -772,8 +828,11 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 				column.setWidth(columnDescriptor.getWidth());
 			}
 			if (COLUMN_NAME.equals(name)) {
-				column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
-
+				if (sortName != null) {
+					if (sortName) {
+						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
+					}
+				}
 			}
 			if (COLUMN_VALUE.equals(columnDescriptor.getColumnName())) {
 				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
@@ -804,6 +863,8 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			}
 		});
 		viewer.getTable().setHeaderVisible(true);
+		viewer.getTable().setLinesVisible(true);
+
 	}
 
 	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName) {
@@ -817,8 +878,11 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 				column.setWidth(columnDescriptor.getWidth());
 			}
 			if (COLUMN_NAME.equals(name)) {
-				column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
-
+				if (sortName != null) {
+					if (sortName) {
+						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
+					}
+				}
 			}
 			if (COLUMN_VALUE.equals(columnDescriptor.getColumnName())) {
 				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
@@ -849,5 +913,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			}
 		});
 		viewer.getTree().setHeaderVisible(true);
+		viewer.getTree().setLinesVisible(true);
 	}
 }
