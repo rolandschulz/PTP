@@ -201,6 +201,8 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private final Map<IProject, Map<String, IServiceConfiguration>> fProjectConfigurations = new HashMap<IProject, Map<String, IServiceConfiguration>>();
 	private final Map<IProject, IServiceConfiguration> fActiveConfigurations = new HashMap<IProject, IServiceConfiguration>();
 	private final Map<IProject, Set<IService>> fProjectServices = new HashMap<IProject, Set<IService>>();
+	private final Map<IProject, Map<String, BuildScenario>> fProjectBuildConfigIdToBuildScenarioMap = 
+																			new HashMap<IProject, Map<String,BuildScenario>>();
 	private final Map<IProject, Map<BuildScenario, IServiceConfiguration>> fProjectBuildScenarioToSConfigMap =
 													 		new HashMap<IProject, Map<BuildScenario, IServiceConfiguration>>();
 	private Map<String, Service> fServices = null;
@@ -241,7 +243,6 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			 confs = new HashMap<BuildScenario, IServiceConfiguration>();
 			 fProjectBuildScenarioToSConfigMap.put(project, confs);
 		}
-		
 		confs.put(buildScenario, sConfig);
 		
 		// Update service model manager data structures
@@ -416,6 +417,24 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	public Set<IServiceCategory> getCategories() {
 		checkAndLoadModel();
 		return new HashSet<IServiceCategory>(fCategories.values());
+	}
+	
+
+	/**
+	 * Return the build scenario for the passed configuration.
+	 * 
+	 * @param project
+	 * @param configId
+	 * @return build scenario
+	 * @since 2.1
+	 */
+	public BuildScenario getBuildScenarioForBuildConfigurationId(IProject project, String configId) {
+		checkAndLoadModel();
+		Map<String, BuildScenario> idMap = fProjectBuildConfigIdToBuildScenarioMap.get(project);
+		if (idMap == null) {
+			throw new RuntimeException("Project not found: " + project.getName());
+		}
+		return idMap.get(configId);
 	}
 
 	/*
@@ -1244,5 +1263,23 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Associate the given configuration id with the given build scenario
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @since 2.1
+	 */
+	public void setBuildScenarioForBuildConfigurationId(IProject project, BuildScenario bs, String id) {
+		checkAndLoadModel();
+		Map<String, BuildScenario> idMap = fProjectBuildConfigIdToBuildScenarioMap.get(project);
+		if (idMap == null) {
+			idMap = new HashMap<String, BuildScenario>();
+			fProjectBuildConfigIdToBuildScenarioMap.put(project, idMap);
+			
+		}
+		idMap.put(id, bs);
 	}
 }

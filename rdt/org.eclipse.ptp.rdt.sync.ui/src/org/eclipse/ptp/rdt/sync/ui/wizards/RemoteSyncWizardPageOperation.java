@@ -14,31 +14,18 @@ package org.eclipse.ptp.rdt.sync.ui.wizards;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import javax.management.RuntimeErrorException;
-
 import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
-import org.eclipse.cdt.managedbuilder.core.BuildException;
-import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
-import org.eclipse.cdt.managedbuilder.core.IFolderInfo;
-import org.eclipse.cdt.managedbuilder.core.IHoldsOptions;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
-import org.eclipse.cdt.managedbuilder.core.IOption;
-import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
-import org.eclipse.cdt.managedbuilder.internal.core.Builder;
-import org.eclipse.cdt.managedbuilder.internal.core.HoldsOptions;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
-import org.eclipse.ptp.rdt.sync.core.CDTWrapper;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
@@ -117,13 +104,8 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			buildInfo.setDefaultConfiguration(configName);
 			IConfiguration config = buildInfo.getDefaultConfiguration();
 
-			try {
-				CDTWrapper.setRemoteInformationForConfiguration(buildScenario, config);
-			} catch (BuildException e) {
-				throw new InvocationTargetException(e);
-			}
+			ServiceModelManager.getInstance().setBuildScenarioForBuildConfigurationId(project, buildScenario, config.getId());
 		}
-		CDTWrapper.saveRemoteInformation(project);
 		buildInfo.setDefaultConfiguration(defaultConfig);
 		monitor.done();
 	}
