@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="configurationWizardExtension"/>
+            <element ref="configurationSelection"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,17 +47,15 @@
       </complexType>
    </element>
 
-   <element name="configurationWizardExtension">
+   <element name="configurationSelection">
       <complexType>
-         <sequence minOccurs="1" maxOccurs="unbounded">
-         </sequence>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  a fully qualified name of the Java class extending &lt;samp&gt;org.eclipse.ptp.ui.wizards.RMConfigurationExtensionWizardPageFactory&lt;/samp&gt;.
+                  a fully qualified name of the Java class extending &lt;samp&gt;org.eclipse.ptp.ui.wizards.RMConfigurationSelectionFactory&lt;/samp&gt;.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.ptp.ui.wizards.RMConfigurationExtensionWizardPageFactory:"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.ptp.ui.wizards.RMConfigurationSelectionFactory:"/>
                </appinfo>
             </annotation>
          </attribute>

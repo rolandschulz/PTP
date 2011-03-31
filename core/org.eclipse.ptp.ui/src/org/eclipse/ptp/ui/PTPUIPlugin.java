@@ -19,9 +19,7 @@
 
 package org.eclipse.ptp.ui;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -31,13 +29,10 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.managers.MachineManager;
 import org.eclipse.ptp.ui.managers.RMManager;
 import org.eclipse.ptp.ui.utils.DebugUtil;
-import org.eclipse.ptp.ui.wizards.RMConfigurationExtensionWizardPageFactory;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -102,8 +97,9 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 * @return unique identifier
 	 */
 	public static String getUniqueIdentifier() {
-		if (getDefault() == null)
+		if (getDefault() == null) {
 			return PLUGIN_ID;
+		}
 
 		return getDefault().getBundle().getSymbolicName();
 	}
@@ -139,8 +135,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}
 
 	// Resource bundle.
-	private final HashMap<String, RMConfigurationWizardPageFactory> configurationWizardPageFactories = new HashMap<String, RMConfigurationWizardPageFactory>();
-	private final HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>> extensionWizardPageFactories = new HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>>();
 	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations = new HashMap<String, IRuntimeModelPresentation>();
 	private IMachineManager machineManager = null;
 	private IJobManager jobManager = null;
@@ -167,35 +161,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 */
 	public IMachineManager getMachineManager() {
 		return machineManager;
-	}
-
-	/**
-	 * Get the extension wizard page factories associated with a resource
-	 * manager factory
-	 * 
-	 * @param factory
-	 *            resource manager factory
-	 * @return factories for creating extended wizard pages for this resource
-	 *         manager
-	 */
-	public RMConfigurationExtensionWizardPageFactory[] getRMConfigurationExtensionWizardPageFactories(
-			IResourceManagerFactory factory) {
-		List<RMConfigurationExtensionWizardPageFactory> list = extensionWizardPageFactories.get(factory.getClass().getName());
-		if (list != null) {
-			return list.toArray(new RMConfigurationExtensionWizardPageFactory[list.size()]);
-		}
-		return new RMConfigurationExtensionWizardPageFactory[0];
-	}
-
-	/**
-	 * Get the wizard page factory associated with a resource manager factory
-	 * 
-	 * @param factory
-	 *            resource manager factory
-	 * @return factory for creating wizard pages for this resource manager
-	 */
-	public RMConfigurationWizardPageFactory getRMConfigurationWizardPageFactory(IResourceManagerFactory factory) {
-		return configurationWizardPageFactories.get(factory.getClass().getName());
 	}
 
 	/**
