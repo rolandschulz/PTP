@@ -1,10 +1,12 @@
 package org.eclipse.ptp.rdt.sync.ui.properties;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.cdt.core.settings.model.ICResourceDescription;
+import org.eclipse.cdt.managedbuilder.core.BuildException;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
@@ -16,6 +18,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.rdt.sync.core.CDTWrapper;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -26,6 +29,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.services.core.BuildScenario;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -206,16 +210,13 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 		ServiceModelManager.getInstance().addBuildScenario(project, buildScenario);
 		
 		// Store to build configuration
-		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-		if (buildInfo == null) {
-			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
+		try {
+			CDTWrapper.setRemoteInformationForConfiguration(buildScenario, getCfg());
+		} catch (BuildException e) {
+			// TODO: Figure out what to do here.
 		}
-				
-		getCfg().createFileInfo(project.getFullPath(), "remoteSyncProvider", fSelectedProvider.getName()); //$NON-NLS-1$ 
-		getCfg().createFileInfo(project.getFullPath(), "remoteConnection", fSelectedConnection.getName()); //$NON-NLS-1$ 
-		getCfg().createFileInfo(project.getFullPath(), "remoteLocation", fLocationText.getText()); //$NON-NLS-1$ 
-		ManagedBuildManager.saveBuildInfo(project, true);
-		
+		CDTWrapper.saveRemoteInformation(project);
+
 		return true;
 	}
 
@@ -338,13 +339,10 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 
 	@Override
 	public void updateData(ICResourceDescription cfg) {
-		IConfiguration config= getCfg(cfg.getConfiguration());
-		String provider = config.getBuildProperties().getProperty("remoteSyncProvider").getValue().getName(); //$NON-NLS-1$
-		String conn = config.getBuildProperties().getProperty("remoteConnection").getValue().getName(); //$NON-NLS-1$
-		String location = config.getBuildProperties().getProperty("remoteLocation").getValue().getName(); //$NON-NLS-1$
-		fProviderCombo.select(fComboRemoteServicesProviderToIndexMap.get(provider));
-		fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(conn));
-		fLocationText.setText(location);
+		BuildScenario buildScenario = CDTWrapper.getRemoteInformationForConfiguration(getCfg());
+		fProviderCombo.select(fComboRemoteServicesProviderToIndexMap.get(buildScenario.getSyncProvider()));
+		fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(buildScenario.getRemoteConnectionName()));
+		fLocationText.setText(buildScenario.getLocation());
 	}
 
 	@Override
