@@ -486,30 +486,24 @@
 				<title>Basic PBS Settings</title>
 				<composite-descriptor group="false">
 					<grid-layout numColumns="5"/>
-					<grid-data style="GridData.FILL_HORIZONTAL" widthHint="700" horizontalSpan="5"/>
+					<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" widthHint="700" horizontalSpan="5"/>
 					<!-- row 1 -->
 					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<value>
-							<arg>Job Name: </arg>
-						</value>
+						<fixed-value>Job Name: </fixed-value>
 						<tooltip>${rm:Job_Name#tooltip}</tooltip>
 					</widget>
-					<widget style="BORDER" type="text" saveValueTo="Job_Name">
+					<widget style="SWT.BORDER" type="text" saveValueTo="Job_Name">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
 					</widget>
-					<widget type="text">
+					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<value>
-							<arg>${rm:Job_Name#description}</arg>
-						</value>
+						<fixed-value>${rm:Job_Name#description}</fixed-value>
 					</widget>
 					<!-- row 2 -->
 					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<value>
-							<arg>Queue: </arg>
-						</value>
+						<fixed-value>Queue: </fixed-value>
 						<tooltip>${rm:destination#tooltip}</tooltip>
 					</widget>
 					<widget type="combo" readOnly="true" saveValueTo="destination">
@@ -517,16 +511,12 @@
 					</widget>
 					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<value>
-							<arg>${rm:destination#description}</arg>
-						</value>
+						<fixed-value>${rm:destination#description}</fixed-value>
 					</widget>
 					<!-- row 3 -->
 					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<value>
-							<arg>Nodes: </arg>
-						</value>
+						<fixed-value>Nodes: </fixed-value>
 						<tooltip>${rm:Resource_List.nodes#tooltip}</tooltip>
 					</widget>
 					<widget type="text" saveValueTo="Resource_List.nodes">
@@ -534,16 +524,12 @@
 					</widget>
 					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<value>
-							<arg>${rm:Resource_List.nodes#description}</arg>
-						</value>
+						<fixed-value>${rm:Resource_List.nodes#description}</fixed-value>
 					</widget>
 					<!-- row 4 -->
 					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<value>
-							<arg>Wallclock Time: </arg>
-						</value>
+						<fixed-value>Wallclock Time: </fixed-value>
 						<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
 					</widget>
 					<widget type="text" saveValueTo="Resource_List.walltime">
@@ -551,41 +537,31 @@
 					</widget>
 					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<value>
-							<arg>${rm:Resource_List.walltime#description}</arg>
-						</value>
+						<fixed-value>${rm:Resource_List.walltime#description}</fixed-value>
 					</widget>
 					<!-- row 5 -->
 					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<value>
-							<arg>MPI Command: </arg>
-						</value>
+						<fixed-value>MPI Command: </fixed-value>
 					</widget>
 					<widget type="combo" readOnly="true" saveValueTo="mpiCommand">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
 					</widget>
 					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<value>
-							<arg>${rm:mpiCommand#description}</arg>
-						</value>
+						<fixed-value>${rm:mpiCommand#description}</fixed-value>
 					</widget>
 					<!-- row 6 -->
 					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="1"/>
-						<value>
-							<arg>MPI Number of Cores: </arg>
-						</value>
+						<fixed-value>MPI Number of Cores: </fixed-value>
 					</widget>
 					<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
 					</widget>
 					<widget type="label">
 						<grid-data style="GridData.FILL_HORIZONTAL" grabExcessHorizontal="true" horizontalSpan="2"/>
-						<value>
-							<arg>${rm:mpiCores#description}</arg>
-						</value>
+						<fixed-value>${rm:mpiCores#description}</fixed-value>
 					</widget>
 				</composite-descriptor>
 			</basic>
