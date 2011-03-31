@@ -259,7 +259,7 @@
 			<xs:element name="title" type="xs:string"/>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
-				<xs:element name="composite-descriptor" type="rm:composite-descriptor"/>
+				<xs:element name="composite" type="rm:composite-descriptor"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
@@ -463,7 +463,7 @@
 		</xs:attribute>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="sort" type="xs:boolean" default="true"/>
-		<xs:attribute name="tooltipOnName" type="xs:boolean" default="true"/>
+		<xs:attribute name="tooltip" type="xs:boolean" default="true"/>
 		<xs:attribute name="style" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="viewer-items">

@@ -34,6 +34,7 @@ import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBRMConfigurableAttributesTab;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -57,7 +58,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	}
 
 	public void build(Composite parent) throws Throwable {
-		List<Object> top = tab.getController().getTabFolderOrCompositeDescriptor();
+		List<Object> top = tab.getController().getTabFolderOrComposite();
 		for (Object o : top) {
 			if (o instanceof CompositeDescriptor) {
 				addComposite((CompositeDescriptor) o, parent);
@@ -71,39 +72,34 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		GridData data = addGridData(descriptor.getGridData());
 		GridLayout layout = addGridLayout(descriptor.getGridLayout());
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
-		String title = descriptor.getLabel();
-		Composite composite = null;
-		if (title == null) {
-			composite = WidgetBuilderUtils.createComposite(parent, style, layout, data);
-		} else {
-			composite = WidgetBuilderUtils.createGroup(parent, style, layout, data, descriptor.getLabel());
-		}
 		ColumnViewer viewer = null;
 		if (TABLE.equals(descriptor.getType())) {
-			viewer = addCheckboxTableViewer(composite, data, layout, style, descriptor);
+			viewer = addCheckboxTableViewer(parent, data, layout, style, descriptor);
 		} else if (TREE.equals(descriptor.getType())) {
-			viewer = addCheckboxTreeViewer(composite, data, layout, style, descriptor);
+			viewer = addCheckboxTreeViewer(parent, data, layout, style, descriptor);
 		}
-		addToggleVisible(composite, viewer);
+		addToggleVisible(parent, viewer);
 		addRows(viewer, descriptor);
 		addToViewerMap(viewer, descriptor);
 	}
 
 	private ColumnViewer addCheckboxTableViewer(Composite parent, GridData data, GridLayout layout, int style,
 			AttributeViewer descriptor) {
+		style |= SWT.CHECK;
 		Table t = WidgetBuilderUtils.createTable(parent, style, data);
 		CheckboxTableViewer viewer = new CheckboxTableViewer(t);
 		WidgetBuilderUtils.setupAttributeTable(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor), null,
-				descriptor.isSort());
+				descriptor.isSort(), descriptor.isTooltipOnName());
 		return viewer;
 	}
 
 	private ColumnViewer addCheckboxTreeViewer(Composite parent, GridData data, GridLayout layout, int style,
 			AttributeViewer descriptor) {
+		style |= SWT.CHECK;
 		Tree t = WidgetBuilderUtils.createTree(parent, style, data);
 		CheckboxTreeViewer viewer = new CheckboxTreeViewer(t);
 		WidgetBuilderUtils.setupAttributeTree(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor), null,
-				descriptor.isSort());
+				descriptor.isSort(), descriptor.isTooltipOnName());
 		return viewer;
 	}
 
@@ -124,7 +120,6 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			} else if (o instanceof CompositeDescriptor) {
 				addComposite((CompositeDescriptor) o, composite);
 			} else if (o instanceof Widget) {
-				System.out.println("Adding widget: " + o + ", type: " + ((Widget) o).getType());
 				addWidget((Widget) o, composite);
 			} else if (o instanceof AttributeViewer) {
 				addAttributeViewer((AttributeViewer) o, composite);
@@ -133,13 +128,14 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return composite;
 	}
 
-	private void addFolder(TabFolderDescriptor fd, Composite parent) {
+	private TabFolder addFolder(TabFolderDescriptor fd, Composite parent) {
 		TabFolder folder = new TabFolder(parent, WidgetBuilderUtils.getStyle(fd.getStyle()));
 		List<TabItemDescriptor> items = fd.getItem();
 		int index = 0;
 		for (TabItemDescriptor i : items) {
 			addItem(folder, i, index++);
 		}
+		return folder;
 	}
 
 	private GridLayout addGridLayout(GridLayoutDescriptor gridLayout) {

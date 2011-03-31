@@ -11,10 +11,10 @@
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -35,6 +35,7 @@ import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
 import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
+import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataLabelProvider;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
@@ -534,15 +535,15 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors,
-			ISelectionChangedListener listener, Boolean sortName) {
+			ISelectionChangedListener listener, Boolean sortName, boolean tooltip) {
 		setupSpecific(viewer, columnDescriptors, sortName);
-		setupCommon(viewer, columnDescriptors, listener);
+		setupCommon(viewer, columnDescriptors, listener, tooltip);
 	}
 
 	public static void setupAttributeTree(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors,
-			ISelectionChangedListener listener, Boolean sortName) {
+			ISelectionChangedListener listener, Boolean sortName, boolean tooltip) {
 		setupSpecific(viewer, columnDescriptors, sortName);
-		setupCommon(viewer, columnDescriptors, listener);
+		setupCommon(viewer, columnDescriptors, listener, tooltip);
 	}
 
 	private static SelectionAdapter getAttributeViewerSelectionAdapter(final ColumnViewer viewer) {
@@ -562,7 +563,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	}
 
 	private static int getStyle(String[] style) {
-		System.out.println("getStyle: " + Arrays.asList(style));
 		int swt = 0;
 
 		for (String s : style) {
@@ -802,18 +802,34 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 				swt |= SWT.YES;
 			}
 		}
-		System.out.println("getStyle, result: " + swt);
 		return swt;
 	}
 
 	private static void setupCommon(final ColumnViewer viewer, List<ColumnDescriptor> columnDescriptors,
-			ISelectionChangedListener listener) {
+			ISelectionChangedListener listener, boolean tooltip) {
 		String[] columnProperties = new String[columnDescriptors.size()];
 		for (int i = 0; i < columnDescriptors.size(); i++) {
 			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
 			columnProperties[i] = columnDescriptor.getColumnName();
 		}
 		viewer.setColumnProperties(columnProperties);
+		if (tooltip) {
+			viewer.addDoubleClickListener(new IDoubleClickListener() {
+				public void doubleClick(DoubleClickEvent event) {
+					try {
+						IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+						AttributeViewerRowData row = (AttributeViewerRowData) selection.getFirstElement();
+						String tooltip = row.getTooltip();
+						if (tooltip != null) {
+							MessageDialog.openInformation(viewer.getControl().getShell(), Messages.Tooltip, tooltip);
+						}
+					} catch (Throwable t) {
+						t.printStackTrace();
+					}
+				}
+			});
+		}
+
 		if (listener != null) {
 			viewer.addSelectionChangedListener(listener);
 		}
@@ -842,31 +858,20 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		}
 		viewer.setContentProvider(new TableDataContentProvider());
 		viewer.setLabelProvider(new TableDataLabelProvider(columnDescriptors));
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				try {
-					IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-					List<?> selected = selection.toList();
-					for (Object o : selected) {
-						AttributeViewerRowData row = (AttributeViewerRowData) o;
-						boolean checked = row.isVisible();
-						viewer.setChecked(row, !checked);
-						row.setVisible(!checked);
-					}
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-			}
-		});
 		viewer.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(CheckStateChangedEvent event) {
-				AttributeViewerRowData row = (AttributeViewerRowData) event.getElement();
-				row.setVisible(event.getChecked());
+				IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+				List<?> selected = selection.toList();
+				for (Object o : selected) {
+					AttributeViewerRowData row = (AttributeViewerRowData) o;
+					boolean checked = row.isVisible();
+					viewer.setChecked(row, !checked);
+					row.setVisible(!checked);
+				}
 			}
 		});
 		viewer.getTable().setHeaderVisible(true);
 		viewer.getTable().setLinesVisible(true);
-
 	}
 
 	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName) {
@@ -892,26 +897,16 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		}
 		viewer.setContentProvider(new TreeDataContentProvider());
 		viewer.setLabelProvider(new TreeDataLabelProvider(columnDescriptors));
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				try {
-					IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-					List<?> selected = selection.toList();
-					for (Object o : selected) {
-						AttributeViewerRowData row = (AttributeViewerRowData) o;
-						boolean checked = row.isVisible();
-						viewer.setChecked(row, !checked);
-						row.setVisible(!checked);
-					}
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-			}
-		});
 		viewer.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(CheckStateChangedEvent event) {
-				AttributeViewerRowData row = (AttributeViewerRowData) event.getElement();
-				row.setVisible(event.getChecked());
+				IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+				List<?> selected = selection.toList();
+				for (Object o : selected) {
+					AttributeViewerRowData row = (AttributeViewerRowData) o;
+					boolean checked = row.isVisible();
+					viewer.setChecked(row, !checked);
+					row.setVisible(!checked);
+				}
 			}
 		});
 		viewer.getTree().setHeaderVisible(true);
