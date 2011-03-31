@@ -143,9 +143,9 @@
 		<xs:attribute name="envEnd" type="xs:int" default="-1"/>
 	</xs:complexType>
 	<xs:complexType name="line">
-	  <xs:sequence>
-         <xs:element name="arg" minOccurs="0" maxOccurs="unbounded" type="rm:arg"/>
-      </xs:sequence>
+		<xs:sequence>
+			<xs:element name="arg" minOccurs="0" maxOccurs="unbounded" type="rm:arg"/>
+		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="command">
 		<xs:sequence>
@@ -325,8 +325,14 @@
 	<xs:complexType name="tab-folder-descriptor">
 		<xs:sequence>
 			<xs:element name="item" maxOccurs="unbounded" type="rm:tab-item-descriptor"/>
-			<xs:element name="style" minOccurs="0" type="rm:style"/>
 		</xs:sequence>
+		<xs:attribute name="style" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					The style attribute on the UI parts is a string which looks like the OR'd integer specification; e.g., "SWT.BORDER | SWT.LEFT".
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="composite-descriptor">
 		<xs:annotation>
@@ -340,7 +346,6 @@
 			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data-descriptor"/>
 			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout-descriptor"/>
 			<xs:element name="title" minOccurs="0" type="xs:string"/>
-			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
 				<xs:element name="composite" type="rm:composite-descriptor"/>
@@ -349,11 +354,11 @@
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="group" type="xs:boolean" default="false"/>
+		<xs:attribute name="style" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="tab-item-descriptor">
 		<xs:sequence>
 			<xs:element name="title" type="xs:string"/>
-			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="composite" type="rm:composite-descriptor"/>
@@ -361,11 +366,10 @@
 				<xs:element name="widget" type="rm:widget"/>
 			</xs:choice>
 		</xs:sequence>
+		<xs:attribute name="style" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="grid-data-descriptor">
-		<xs:sequence>
-			<xs:element name="style" minOccurs="0" type="rm:style"/>
-		</xs:sequence>
+		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="horizontalAlign" type="xs:string"/>
 		<xs:attribute name="verticalAlign" type="xs:string"/>
 		<xs:attribute name="grabExcessHorizontal" type="xs:boolean" default="true"/>
@@ -389,23 +393,10 @@
 		<xs:attribute name="marginWidth" type="xs:int"/>
 		<xs:attribute name="verticalSpacing" type="xs:int"/>
 	</xs:complexType>
-	<xs:complexType name="style">
-		<xs:sequence>
-			<xs:element name="tag" type="xs:string" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>
-						The strings will be converted into their integer values;
-						e.g., "SWT.NONE". They will then be 'or'd' ( | ).
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
 	<xs:complexType name="widget">
 		<xs:sequence>
 			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data-descriptor"/>
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
-			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="value" minOccurs="0">
 				<xs:annotation>
@@ -435,6 +426,7 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 		<xs:attribute name="saveValueTo" type="xs:string"/>
 	</xs:complexType>
@@ -451,7 +443,6 @@
 			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data-descriptor"/>
 			<xs:element name="grid-layout" minOccurs="0" type="rm:grid-layout-descriptor"/>
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
-			<xs:element name="style" minOccurs="0" type="rm:style"/>
 			<xs:element name="column-data" minOccurs="0" maxOccurs="7" type="rm:column-data"/>
 			<xs:element name="items" type="rm:viewer-items"/>
 			<xs:element name="value" minOccurs="0" type="rm:template"/>
@@ -467,6 +458,7 @@
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="sort" type="xs:boolean" default="true"/>
 		<xs:attribute name="tooltipOnName" type="xs:boolean" default="true"/>
+		<xs:attribute name="style" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="viewer-items">
 		<xs:sequence>

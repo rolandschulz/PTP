@@ -48,6 +48,9 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 		Map<String, ?> disc = ltMap.getDiscovered();
 		for (ColumnViewer viewer : map.keySet()) {
 			AttributeViewerData data = (AttributeViewerData) viewer.getInput();
+			if (data == null) {
+				continue;
+			}
 			List<AttributeViewerRowData> rows = data.getAllRows();
 			for (AttributeViewerRowData row : rows) {
 				String name = row.getColumnDisplayValue(COLUMN_NAME);
@@ -63,7 +66,7 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 				}
 				row.setValue(value);
 			}
-			viewer.refresh();
+			WidgetActionUtils.refreshViewer(viewer);
 		}
 	}
 
@@ -82,6 +85,9 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 		Map<String, Object> disc = rmMap.getDiscovered();
 		for (ColumnViewer viewer : map.keySet()) {
 			AttributeViewerData data = (AttributeViewerData) viewer.getInput();
+			if (data == null) {
+				continue;
+			}
 			List<AttributeViewerRowData> rows = data.getAllRows();
 			for (AttributeViewerRowData row : rows) {
 				String name = row.getColumnDisplayValue(COLUMN_NAME);
@@ -102,7 +108,7 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 					row.setValueFromString(defaultValue);
 				}
 			}
-			viewer.refresh();
+			WidgetActionUtils.refreshViewer(viewer);
 		}
 	}
 
@@ -117,6 +123,9 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 			String pattern = template.getPattern();
 			String separator = template.getSeparator();
 			AttributeViewerData data = (AttributeViewerData) viewer.getInput();
+			if (data == null) {
+				continue;
+			}
 			List<AttributeViewerRowData> rows = data.getAllRows();
 			String name = null;
 			Object value = null;
@@ -173,6 +182,9 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 		 */
 		for (ColumnViewer viewer : map.keySet()) {
 			AttributeViewerData vdata = (AttributeViewerData) viewer.getInput();
+			if (vdata == null) {
+				continue;
+			}
 			List<AttributeViewerRowData> rows = vdata.getAllRows();
 			for (AttributeViewerRowData row : rows) {
 				Object data = row.getData();

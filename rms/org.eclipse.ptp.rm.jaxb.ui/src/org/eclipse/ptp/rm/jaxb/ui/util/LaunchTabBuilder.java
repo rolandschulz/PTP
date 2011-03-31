@@ -93,8 +93,8 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			AttributeViewer descriptor) {
 		Table t = WidgetBuilderUtils.createTable(parent, style, data);
 		CheckboxTableViewer viewer = new CheckboxTableViewer(t);
-		WidgetBuilderUtils.setupAttributeTable(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor),
-				tab.getSelectionChangedListener(), descriptor.isSort());
+		WidgetBuilderUtils.setupAttributeTable(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor), null,
+				descriptor.isSort());
 		return viewer;
 	}
 
@@ -102,8 +102,8 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			AttributeViewer descriptor) {
 		Tree t = WidgetBuilderUtils.createTree(parent, style, data);
 		CheckboxTreeViewer viewer = new CheckboxTreeViewer(t);
-		WidgetBuilderUtils.setupAttributeTree(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor),
-				tab.getSelectionChangedListener(), descriptor.isSort());
+		WidgetBuilderUtils.setupAttributeTree(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor), null,
+				descriptor.isSort());
 		return viewer;
 	}
 

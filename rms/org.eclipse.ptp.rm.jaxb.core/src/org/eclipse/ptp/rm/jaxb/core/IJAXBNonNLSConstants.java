@@ -50,6 +50,8 @@ public interface IJAXBNonNLSConstants {
 	String OPENV = "${";//$NON-NLS-1$
 	String OPENVRM = "${rm:";//$NON-NLS-1$
 	String OPENVLT = "${lt:";//$NON-NLS-1$
+	String VRM = "rm:";//$NON-NLS-1$
+	String VLT = "lt:";//$NON-NLS-1$
 	String CLOSSQ = "]";//$NON-NLS-1$
 	String CLOSV = "}";//$NON-NLS-1$
 	String CLOSVAL = "#value}";//$NON-NLS-1$

@@ -19,8 +19,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
@@ -42,15 +40,13 @@ import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
-import org.eclipse.ptp.rm.ui.utils.DataSource.ValidationException;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -63,21 +59,12 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	private class JAXBUniversalDataSource extends RMLaunchConfigurationDynamicTabDataSource {
 
-		private boolean contentsChanged;
-
 		protected JAXBUniversalDataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
-			contentsChanged = false;
 		}
 
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			/*
-			 * write to store ONLY when the user clicks Apply.
-			 */
-			if (contentsChanged) {
-				return;
-			}
 			for (ILaunchTabValueHandler h : handlers) {
 				h.setValuesOnMap(LTVariableMap.getActiveInstance());
 			}
@@ -93,12 +80,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		protected void copyToStorage() {
-			/*
-			 * write to store ONLY when the user clicks Apply.
-			 */
-			if (contentsChanged) {
-				return;
-			}
 			try {
 				ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
 				if (config == null) {
@@ -192,100 +173,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 	}
 
-	/*
-	 * The list of listeners will always include the ContentsChangedListener of
-	 * the Resources Tab, which bottoms out in an updateButtons call enabling
-	 * the "Apply" button.
-	 * 
-	 * The performApply() method of the ResourcesTab calls performApply() on the
-	 * BaseRMLaunchConfigurationDynamicTab which in turn calls the
-	 * storeAndValidate() method of the DataSource.
-	 * 
-	 * The methods loadAndUpdate() and justUpdate() on the DataSource can be
-	 * used to refresh. The former is called on RM initialization, which takes
-	 * place when the RM becomes visible.
-	 */
-	private class JAXBUniversalWidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener implements
-			ISelectionChangedListener {
-		public JAXBUniversalWidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
-			super(dynamicTab);
-		}
-
-		@Override
-		public void modifyText(ModifyEvent e) {
-			dataSource.contentsChanged = true;
-			super.modifyText(e);
-			dataSource.contentsChanged = false;
-		}
-
-		/*
-		 * This controls the checking and unchecking of the viewer rows.
-		 * 
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged
-		 * (org.eclipse.jface.viewers.SelectionChangedEvent)
-		 */
-		public void selectionChanged(SelectionChangedEvent event) {
-			if (isEnabled()) {
-				disable();
-				boolean b = dataSource.contentsChanged;
-				dataSource.contentsChanged = false;
-				try {
-					dataSource.copyFromFields();
-				} catch (ValidationException t) {
-					JAXBUIPlugin.log(t);
-					dataSource.contentsChanged = b;
-					enable();
-					return;
-				}
-				dataSource.copyToFields();
-				dataSource.contentsChanged = b;
-				enable();
-			}
-		}
-
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {
-			dataSource.contentsChanged = true;
-			super.widgetDefaultSelected(e);
-			dataSource.contentsChanged = false;
-		}
-
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			dataSource.contentsChanged = true;
-			super.widgetSelected(e);
-			dataSource.contentsChanged = false;
-		}
-
-		/*
-		 * Overrides to implement display script, if present, and restore
-		 * defaults (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.rm.ui.utils.WidgetListener#doWidgetSelected(org.eclipse
-		 * .swt.events.SelectionEvent)
-		 */
-		@Override
-		protected void doWidgetSelected(SelectionEvent e) {
-			if (e.getSource() == viewScript) {
-				try {
-					String text = dataSource.realizeScript();
-					new ScrollingEditableMessageDialog(control.getShell(), Messages.DisplayScript, text, true).open();
-				} catch (Throwable t) {
-					WidgetActionUtils.errorMessage(control.getShell(), t, Messages.DisplayScriptError,
-							Messages.DisplayScriptErrorTitle, false);
-				}
-			} else if (e.getSource() == restoreDefaults) {
-				dataSource.loadDefault();
-			} else {
-				super.doWidgetSelected(e);
-			}
-		}
-	}
-
 	private final JAXBRMLaunchConfigurationDynamicTab parentTab;
 	private final RemoteServicesDelegate delegate;
 	private final TabController controller;
@@ -294,10 +181,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	private Composite control;
 	private final String title;
-	private Button viewScript;
-	private Button restoreDefaults;
 
-	private JAXBUniversalWidgetListener universalListener;
 	private JAXBUniversalDataSource dataSource;
 
 	public JAXBRMConfigurableAttributesTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog,
@@ -313,27 +197,17 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		this.title = t;
 		handlers = new ArrayList<ILaunchTabValueHandler>();
 		this.script = rm.getJAXBRMConfiguration().getResourceManagerData().getControlData().getScript();
-		createListener();
+		resetEnv();
 		createDataSource();
-		try {
-			pTab.getRmConfig().setActive();
-			LTVariableMap.setActiveInstance(RMVariableMap.getActiveInstance());
-		} catch (Throwable t1) {
-			JAXBUIPlugin.log(t1);
-		}
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetBuilderUtils.createComposite(parent, 1);
 		try {
-			universalListener.disable();
 			LaunchTabBuilder builder = new LaunchTabBuilder(this);
 			builder.build(control);
 			createViewScriptGroup(control);
 			parentTab.resize(control);
-			dataSource.loadAndUpdate();
-			updateControls();
-			universalListener.enable();
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 		}
@@ -369,21 +243,15 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		return parentTab;
 	}
 
-	public ISelectionChangedListener getSelectionChangedListener() {
-		return getUniversalListener();
-	}
-
 	@Override
 	public String getText() {
 		return title;
 	}
 
-	public JAXBUniversalWidgetListener getUniversalListener() {
-		return (JAXBUniversalWidgetListener) createListener();
-	}
-
-	public RMLaunchConfigurationDynamicTabWidgetListener getWidgetListener() {
-		return getUniversalListener();
+	@Override
+	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+		resetEnv();
+		return super.initializeFrom(control, rm, queue, configuration);
 	}
 
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
@@ -408,28 +276,49 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	@Override
 	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
-		if (universalListener == null) {
-			universalListener = new JAXBUniversalWidgetListener(this);
-		}
-		return universalListener;
+		return new RMLaunchConfigurationDynamicTabWidgetListener(this) {
+		};
 	}
 
-	private void createViewScriptGroup(Composite control) {
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(6, true);
-		GridData gd = WidgetBuilderUtils.createGridDataFillH(6);
+	private void createViewScriptGroup(final Composite control) {
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true);
+		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 2);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
 		if (parentTab.hasScript()) {
-			WidgetBuilderUtils.createLabel(grp, Messages.ViewValuesReplaced, SWT.RIGHT, 1);
-			viewScript = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, universalListener);
+			WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, new SelectionListener() {
+				public void widgetDefaultSelected(SelectionEvent e) {
+					widgetSelected(e);
+				}
+
+				public void widgetSelected(SelectionEvent e) {
+					try {
+						dataSource.copyFromFields();
+						String text = dataSource.realizeScript();
+						new ScrollingEditableMessageDialog(control.getShell(), Messages.DisplayScript, text, true).open();
+					} catch (Throwable t) {
+						WidgetActionUtils.errorMessage(control.getShell(), t, Messages.DisplayScriptError,
+								Messages.DisplayScriptErrorTitle, false);
+					}
+				}
+			});
 		}
-		WidgetBuilderUtils.createLabel(grp, Messages.RestoreDefaultValues, SWT.RIGHT, 1);
-		restoreDefaults = WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, universalListener);
+		WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				dataSource.loadDefault();
+			}
+		});
 	}
 
-	/*
-	 * For viewing the script realized from the provided values.
-	 */
-	private void openReadOnly(String script) {
-
+	private void resetEnv() {
+		try {
+			parentTab.getRmConfig().setActive();
+			LTVariableMap.setActiveInstance(RMVariableMap.getActiveInstance());
+		} catch (Throwable t1) {
+			JAXBUIPlugin.log(t1);
+		}
 	}
 }

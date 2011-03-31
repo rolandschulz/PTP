@@ -52,7 +52,7 @@ public class LTVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 */
 	public String getString(String value) {
 		try {
-			value = value.replaceAll(OPENVRM, OPENVLT);
+			value = value.replaceAll(VRM, VLT);
 			return dereference(value);
 		} catch (CoreException t) {
 			JAXBCorePlugin.log(t);

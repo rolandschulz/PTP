@@ -47,14 +47,16 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 			if (controller != null) {
 				addDynamicTab(new JAXBRMConfigurableAttributesTab(rm, dialog, controller, this));
 			}
-			controller = launchTabData.getAdvanced();
-			if (controller != null) {
-				addDynamicTab(new JAXBRMConfigurableAttributesTab(rm, dialog, controller, this));
-			}
-			String title = launchTabData.getCustomController();
-			if (title != null) {
-				addDynamicTab(new JAXBRMCustomBatchScriptTab(rm, dialog, title, this));
-			}
+			// controller = launchTabData.getAdvanced();
+			// if (controller != null) {
+			// addDynamicTab(new JAXBRMConfigurableAttributesTab(rm, dialog,
+			// controller, this));
+			// }
+			// String title = launchTabData.getCustomController();
+			// if (title != null) {
+			// addDynamicTab(new JAXBRMCustomBatchScriptTab(rm, dialog, title,
+			// this));
+			// }
 		}
 	}
 
