@@ -17,14 +17,11 @@ import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -109,20 +106,7 @@ public class ScrollingEditableMessageDialog extends MessageDialog implements IJA
 		GridData data = WidgetBuilderUtils.createGridDataFill(convertWidthInCharsToPixels(160), 550, 1);
 		scrollable = WidgetBuilderUtils.createText(parent, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL, data,
 				readOnly, null);
-		Display d = Display.getCurrent();
-		// three fonts for Mac, Linux, Windows ...
-		FontData[][] f = { d.getFontList(COURIER, true), d.getFontList(COURIER, false), d.getFontList(COURIER, true),
-				d.getFontList(COURIER, false), d.getFontList(COURIER, true), d.getFontList(COURIER, false) };
-		int i = 0;
-		for (; i < f.length; i++) {
-			if (f[i].length > 0) {
-				scrollable.setFont(new Font(d, f[i]));
-				break;
-			}
-		}
-		if (i == f.length) {
-			applyDialogFont(scrollable);
-		}
+		WidgetBuilderUtils.applyMonospace(scrollable);
 		return c;
 	}
 }

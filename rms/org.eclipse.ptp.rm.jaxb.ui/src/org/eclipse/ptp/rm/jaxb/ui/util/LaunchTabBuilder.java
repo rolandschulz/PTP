@@ -124,6 +124,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			} else if (o instanceof CompositeDescriptor) {
 				addComposite((CompositeDescriptor) o, composite);
 			} else if (o instanceof Widget) {
+				System.out.println("Adding widget: " + o + ", type: " + ((Widget) o).getType());
 				addWidget((Widget) o, composite);
 			} else if (o instanceof AttributeViewer) {
 				addAttributeViewer((AttributeViewer) o, composite);

@@ -67,7 +67,7 @@ public class WidgetMap implements ILaunchTabValueHandler {
 					value = ((Attribute) o).getValue();
 				}
 			} else {
-				Widget.ValueFromEnv va = w.getValueFromEnv();
+				Widget.DynamicValue va = w.getDynamicValue();
 				if (va != null) {
 					List<Arg> arglist = va.getArg();
 					if (arglist != null) {
