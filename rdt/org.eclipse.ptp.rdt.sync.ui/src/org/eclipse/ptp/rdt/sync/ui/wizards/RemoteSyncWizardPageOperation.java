@@ -75,6 +75,9 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			}
 			
 			smm.addConfiguration(project, config);
+			if (smm.getBuildSystemTemplateConfiguration() == null) {
+				smm.setBuildSystemTemplateConfiguration(config);
+			}
 
 			try {
 				smm.saveModelConfiguration();

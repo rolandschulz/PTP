@@ -212,6 +212,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private final ServiceModelEventManager fEventManager = new ServiceModelEventManager();
 	private boolean fModelLoaded = false;
 	private boolean fEventsEnabled = true;
+	private IServiceConfiguration fBuildSystemTemplateConfiguration = null;
 
 	private static ServiceModelManager fInstance;
 
@@ -240,13 +241,17 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		fBuildScenarioToSConfigMap.put(buildScenario, sConfig);
 		
 		// Update service model manager data structures
-		// TODO: Since we no longer input the project,we cannot do "addConfiguration(project, sConfig)", so some data is missing.
+		// TODO: Since we no longer input the project, we cannot do "addConfiguration(project, sConfig)", so some data is missing.
 		this.addConfiguration(sConfig);
 	}
 	
 	private IServiceConfiguration copyActiveServiceConfiguration() {
+		checkAndLoadModel();
 		IServiceConfiguration newConfig = newServiceConfiguration("");
-		IServiceConfiguration oldConfig = fBuildScenarioToSConfigMap.values().iterator().next();
+		IServiceConfiguration oldConfig = fBuildSystemTemplateConfiguration;
+		if (oldConfig == null) {
+			throw new RuntimeException("No template service configuration set for build system");
+		}
 		
 		for (IService service : oldConfig.getServices()) {
 			ServiceProvider oldProvider = (ServiceProvider) oldConfig.getServiceProvider(service);
@@ -1284,5 +1289,13 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		 }
 		 
 		 return conf;
+	}
+
+	public IServiceConfiguration getBuildSystemTemplateConfiguration() {
+		return fBuildSystemTemplateConfiguration;
+	}
+
+	public void setBuildSystemTemplateConfiguration(IServiceConfiguration config) {
+		fBuildSystemTemplateConfiguration = config;
 	}
 }
