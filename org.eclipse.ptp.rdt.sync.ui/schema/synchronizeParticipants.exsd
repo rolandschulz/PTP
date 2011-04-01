@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.rdt.sync.core.ISynchronizeProvider"/>
                </appInfo>
             </annotation>
          </attribute>
