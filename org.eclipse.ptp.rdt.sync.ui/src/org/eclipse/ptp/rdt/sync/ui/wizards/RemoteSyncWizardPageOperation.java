@@ -103,7 +103,7 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			buildInfo.setDefaultConfiguration(configName);
 			IConfiguration config = buildInfo.getDefaultConfiguration();
 
-			ServiceModelManager.getInstance().setBuildScenarioForBuildConfigurationId(project, buildScenario, config.getId());
+			ServiceModelManager.getInstance().setBuildScenarioForBuildConfigurationId(buildScenario, config.getId());
 		}
 		buildInfo.setDefaultConfiguration(defaultConfig);
 		monitor.done();
