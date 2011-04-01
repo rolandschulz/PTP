@@ -12,26 +12,78 @@ package org.eclipse.ptp.rm.jaxb.ui.data;
 
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 
 public class ColumnDescriptor implements IJAXBUINonNLSConstants {
 
 	private final String columnName;
-	private final int width;
+	private final Integer width;
+	private final String alignment;
+	private final Boolean resizable;
+	private final Boolean moveable;
+	private final String tooltip;
+	private final String foreground;
+	private final String background;
 
 	public ColumnDescriptor(ColumnData data) {
 		columnName = data.getName();
 		width = data.getWidth();
+		alignment = data.getAlignment();
+		resizable = data.isResizable();
+		moveable = data.isMoveable();
+		tooltip = data.getTooltip();
+		foreground = data.getForeground();
+		background = data.getBackground();
+	}
+
+	public int getAlignment() {
+		return WidgetBuilderUtils.getStyle(alignment);
+	}
+
+	public String getBackground() {
+		return background;
 	}
 
 	public String getColumnName() {
 		return columnName;
 	}
 
+	public String getForeground() {
+		return foreground;
+	}
+
+	public String getTooltip() {
+		if (tooltip == null) {
+			return ZEROSTR;
+		}
+		return tooltip;
+	}
+
 	public int getWidth() {
 		return width;
 	}
 
+	public boolean isAlignSpecified() {
+		return alignment != null;
+	}
+
+	public boolean isBackgroundSpecified() {
+		return background != null;
+	}
+
+	public boolean isForegroundSpecified() {
+		return foreground != null;
+	}
+
+	public boolean isMoveable() {
+		return moveable != null && moveable;
+	}
+
+	public boolean isResizable() {
+		return resizable == null || resizable;
+	}
+
 	public boolean isWidthSpecified() {
-		return width != -1;
+		return width != null;
 	}
 }

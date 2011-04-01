@@ -48,8 +48,8 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 	private String tooltip;
 	private Integer min;
 	private Integer max;
-	private String background;
-	private String foreground;
+	private final String background;
+	private final String foreground;
 	private int style;
 
 	public WidgetBuilder(Widget widget, RMVariableMap rmMap, JAXBRMConfigurableAttributesTab tab) {
@@ -81,6 +81,8 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 		if (fixed != null) {
 			fixed = rmMap.getString(fixed);
 		}
+		background = widget.getBackground();
+		foreground = widget.getForeground();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -169,6 +171,16 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 			});
 			c.setToolTipText(tooltip);
 		}
+
+		if (c != null) {
+			if (foreground != null) {
+				c.setForeground(WidgetBuilderUtils.getColor(foreground));
+			}
+			if (background != null) {
+				c.setBackground(WidgetBuilderUtils.getColor(background));
+			}
+		}
+
 		return c;
 	}
 

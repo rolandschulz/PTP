@@ -487,15 +487,15 @@
 				<composite>
 					<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
 					<!-- HEADER -->
-					<widget type="label" style="SWT.LEFT">
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 					   <grid-data horizontalAlign="SWT.BEGINNING"/>
 						<fixed-value>Name</fixed-value>
 					</widget>
-					<widget type="label" style="SWT.LEFT">
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 					   <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="true" horizontalSpan="2"/>
 						<fixed-value>Value</fixed-value>
 					</widget>
-					<widget type="label" style="SWT.LEFT">
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 					   <grid-data horizontalAlign="SWT.BEGINNING"/>
 						<fixed-value>Description</fixed-value>
 					</widget>

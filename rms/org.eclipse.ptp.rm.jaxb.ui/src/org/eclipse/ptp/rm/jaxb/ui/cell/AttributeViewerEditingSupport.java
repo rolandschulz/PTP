@@ -15,15 +15,18 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
+import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 
 public class AttributeViewerEditingSupport extends EditingSupport {
 
 	private final ColumnViewer viewer;
+	private final ColumnDescriptor descriptor;
 
-	public AttributeViewerEditingSupport(ColumnViewer viewer) {
+	public AttributeViewerEditingSupport(ColumnViewer viewer, ColumnDescriptor descriptor) {
 		super(viewer);
 		this.viewer = viewer;
+		this.descriptor = descriptor;
 	}
 
 	@Override
@@ -34,9 +37,9 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 		if (viewer instanceof TableViewer) {
-			return ((AttributeViewerRowData) element).getCellEditor((TableViewer) viewer);
+			return ((AttributeViewerRowData) element).getCellEditor((TableViewer) viewer, descriptor);
 		} else {
-			return ((AttributeViewerRowData) element).getCellEditor((TreeViewer) viewer);
+			return ((AttributeViewerRowData) element).getCellEditor((TreeViewer) viewer, descriptor);
 		}
 	}
 
