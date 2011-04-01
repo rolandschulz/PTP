@@ -239,8 +239,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			public final IServiceProviderDescriptor descriptor;
 			public final RMConfigurationSelectionFactory factory;
 
-			public ProviderInfo(String name, IServiceProviderDescriptor descriptor,
-					RMConfigurationSelectionFactory factory) {
+			public ProviderInfo(String name, IServiceProviderDescriptor descriptor, RMConfigurationSelectionFactory factory) {
 				this.name = name;
 				this.descriptor = descriptor;
 				this.factory = factory;
@@ -267,10 +266,9 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 				/*
 				 * Check if this provider has an extension
 				 */
-				RMConfigurationSelectionFactory factory = RMProviderContributor.getRMConfigurationSelectionFactory(desc
-						.getId());
+				RMConfigurationSelectionFactory factory = RMProviderContributor.getRMConfigurationSelectionFactory(desc.getId());
 				if (factory != null) {
-					for (String name : factory.getProviderNames()) {
+					for (String name : factory.getConfigurationNames()) {
 						fProviders.add(new ProviderInfo(name, desc, factory));
 					}
 				} else {
@@ -299,11 +297,11 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 
 		private void handleProviderSelection() {
 			ProviderInfo providerInfo = fProviders.get(fServiceProviderList.getSelectionIndex());
-			if (providerInfo.factory != null) {
-				providerInfo.factory.setProvider(providerInfo.name);
-			}
 			IServiceProvider provider = fModelManager.getServiceProvider(providerInfo.descriptor);
 			fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(provider);
+			if (providerInfo.factory != null) {
+				providerInfo.factory.setConfigurationName(providerInfo.name, fBaseConfiguration);
+			}
 			setServiceProvider(provider);
 			setPageComplete(true);
 		}

@@ -70,6 +70,7 @@ public class RMProviderContributor implements IServiceProviderContributor {
 							try {
 								RMConfigurationSelectionFactory factory = (RMConfigurationSelectionFactory) ce
 										.createExecutableExtension(CLASS_ATTRIBUTE);
+								factory.setId(id);
 								fRMConfigurationSelectionFactories.put(id, factory);
 							} catch (Exception e) {
 								PTPCorePlugin.log(e);

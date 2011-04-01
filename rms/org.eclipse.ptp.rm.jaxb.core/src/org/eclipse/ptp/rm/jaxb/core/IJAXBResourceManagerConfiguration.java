@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+import java.net.URL;
 import java.util.Map;
 
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -60,7 +61,7 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	/**
 	 * @since 5.0
 	 */
-	String getRMInstanceXMLLocation();
+	ResourceManagerData getResourceManagerData();
 
 	/**
 	 * @since 5.0
@@ -95,11 +96,6 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	/**
 	 * @since 5.0
 	 */
-	ResourceManagerData getResourceManagerData();
-
-	/**
-	 * @since 5.0
-	 */
 	void setActive() throws Throwable;
 
 	/**
@@ -110,7 +106,7 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	/**
 	 * @since 5.0
 	 */
-	void setRMInstanceXMLLocation(String location);
+	void setRMConfigurationURL(URL location);
 
 	/**
 	 * @since 5.0

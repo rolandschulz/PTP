@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -199,6 +200,18 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		return loc;
 	}
 
+	public URL getRMConfigurationURL() {
+		String loc = getString(RM_XSD_URL, ZEROSTR);
+		if (ZEROSTR.equals(loc)) {
+			return null;
+		}
+		try {
+			return new URL(loc);
+		} catch (MalformedURLException e) {
+			return null;
+		}
+	}
+
 	public Map<String, String> getSelectedAttributeSet() {
 		String serialized = getString(SELECTED_ATTRIBUTES, null);
 		if (serialized != null && !ZEROSTR.equals(serialized)) {
@@ -221,8 +234,8 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 	}
 
 	public void realizeRMDataFromXML() throws Throwable {
-		String location = getRMInstanceXMLLocation();
-		if (ZEROSTR.equals(location)) {
+		URL location = getRMConfigurationURL();
+		if (location == null) {
 			rmdata = null;
 		} else {
 			rmdata = JAXBInitializationUtils.initializeRMData(location);
@@ -248,7 +261,10 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 	}
 
 	public void setDefaultNameAndDesc() {
-		String name = JAXB;
+		String name = getName();
+		if (name == null) {
+			name = JAXB;
+		}
 		String conn = getConnectionName();
 		if (conn != null && !conn.equals(ZEROSTR)) {
 			name += AMP + conn;
@@ -273,6 +289,14 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		String current = getRMInstanceXMLLocation();
 		if (!current.equals(location)) {
 			putString(RM_XSD_PATH, location);
+			clearRMData();
+		}
+	}
+
+	public void setRMConfigurationURL(URL location) {
+		URL current = getRMConfigurationURL();
+		if (location != null && current != location) {
+			putString(RM_XSD_URL, location.toExternalForm());
 			clearRMData();
 		}
 	}

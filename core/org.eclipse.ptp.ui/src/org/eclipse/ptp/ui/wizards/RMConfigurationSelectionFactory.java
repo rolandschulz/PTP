@@ -11,26 +11,39 @@
  */
 package org.eclipse.ptp.ui.wizards;
 
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+
 /**
  * Abstract class that is the extension point for contributing additional RM
- * configuration types for selection in the RM configuration wizard.
+ * configurations for selection in the RM configuration wizard.
  * 
  * @since 5.0
  */
 public abstract class RMConfigurationSelectionFactory {
 
-	/**
-	 * Retrieves the names of addition providers to display in the wizard.
-	 * 
-	 * @return array of providers
-	 * @since 5.0
-	 */
-	public abstract String[] getProviderNames();
+	private String fId;
 
 	/**
-	 * Set the provider that has been selected in the wizard.
+	 * Retrieves the names of addition resource managers to display in the
+	 * wizard.
+	 * 
+	 * @return array of provider types
+	 * @since 5.0
+	 */
+	public abstract String[] getConfigurationNames();
+
+	public String getId() {
+		return fId;
+	}
+
+	/**
+	 * Set the resource manager name that has been selected in the wizard.
 	 * 
 	 * @since 5.0
 	 */
-	public abstract void setProvider(String name);
+	public abstract void setConfigurationName(String name, IResourceManagerConfiguration configuration);
+
+	public void setId(String id) {
+		fId = id;
+	}
 }
