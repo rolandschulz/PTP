@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 The University of Tennessee and others.
+ * Copyright (c) 2011 Oak Ridge National Laboratory and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
-import org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider;
 import org.eclipse.ptp.rdt.sync.git.ui.messages.Messages;
+import org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -64,9 +64,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
 	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
 
-	// private Control fDialogControl;
-	// private Point fDialogSize;
-	// private Text fNameText;
+//	private Control fDialogControl;
+//	private Point fDialogSize;
+//	private Text fNameText;
 	private Button fBrowseButton;
 	private Button fNewConnectionButton;
 	private Combo fProviderCombo;
@@ -252,7 +252,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * @return String
 	 */
 	private String getDefaultPathDisplayString() {
-		//		String projectName = ""; //$NON-NLS-1$
+//		String projectName = ""; //$NON-NLS-1$
 		// IWizardPage page = getWizard().getStartingPage();
 		// if (page instanceof CDTMainWizardPage) {
 		// projectName = ((CDTMainWizardPage) page).getProjectName();
