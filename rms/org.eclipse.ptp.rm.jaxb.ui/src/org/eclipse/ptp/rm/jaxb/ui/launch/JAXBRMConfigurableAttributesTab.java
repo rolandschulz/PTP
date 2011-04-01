@@ -22,7 +22,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
@@ -182,10 +182,10 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	private Composite control;
 	private JAXBUniversalDataSource dataSource;
 
-	public JAXBRMConfigurableAttributesTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog,
-			TabController controller, JAXBRMLaunchConfigurationDynamicTab pTab) {
+	public JAXBRMConfigurableAttributesTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, TabController controller,
+			JAXBRMLaunchConfigurationDynamicTab pTab) {
 		super(dialog);
-		delegate = rm.getRemoteServicesDelegate();
+		delegate = rm.getControl().getRemoteServicesDelegate();
 		this.parentTab = pTab;
 		this.controller = controller;
 		String t = controller.getTitle();
@@ -194,7 +194,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 		this.title = t;
 		handlers = new ArrayList<ILaunchTabValueHandler>();
-		this.script = rm.getJAXBRMConfiguration().getResourceManagerData().getControlData().getScript();
+		this.script = pTab.getRmConfig().getResourceManagerData().getControlData().getScript();
 		resetEnv();
 		createDataSource();
 	}

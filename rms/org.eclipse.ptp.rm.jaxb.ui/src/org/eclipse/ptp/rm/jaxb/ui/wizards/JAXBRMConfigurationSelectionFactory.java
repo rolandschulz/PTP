@@ -21,49 +21,14 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.wizards.RMConfigurationSelectionFactory;
 import org.osgi.framework.Bundle;
 
-public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectionFactory {
-	private static String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
-	private static String NAME_ATTRIBUTE = "name"; //$NON-NLS-1$
-	private static String CONFIGURATION_FILE_ATTRIBUTE = "configurationFile"; //$NON-NLS-1$
-	private static String EXTENSION_POINT = "org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations"; //$NON-NLS-1$
+public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectionFactory implements IJAXBUINonNLSConstants {
 
 	private static Map<String, Map<String, URL>> fRMJAXBResourceManagers = null;
-
-	private static void loadJAXBResourceManagers() {
-		if (fRMJAXBResourceManagers == null) {
-			fRMJAXBResourceManagers = new HashMap<String, Map<String, URL>>();
-
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry.getExtensionPoint(EXTENSION_POINT);
-
-			if (extensionPoint != null) {
-				for (IExtension ext : extensionPoint.getExtensions()) {
-					for (IConfigurationElement ce : ext.getConfigurationElements()) {
-						String id = ce.getAttribute(ID_ATTRIBUTE);
-						Map<String, URL> info = fRMJAXBResourceManagers.get(id);
-						if (info == null) {
-							info = new HashMap<String, URL>();
-							fRMJAXBResourceManagers.put(id, info);
-						}
-						String name = ce.getAttribute(NAME_ATTRIBUTE);
-						String configurationFile = ce.getAttribute(CONFIGURATION_FILE_ATTRIBUTE);
-						String bundleId = ce.getDeclaringExtension().getContributor().getName();
-						Bundle bundle = Platform.getBundle(bundleId);
-						if (bundle != null) {
-							URL url = bundle.getEntry(configurationFile);
-							if (url != null) {
-								info.put(name, url);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -107,5 +72,37 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 			return info.keySet().toArray(new String[0]);
 		}
 		return new String[0];
+	}
+
+	private static void loadJAXBResourceManagers() {
+		if (fRMJAXBResourceManagers == null) {
+			fRMJAXBResourceManagers = new HashMap<String, Map<String, URL>>();
+
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry.getExtensionPoint(RM_CONFIG_EXTENSION_POINT);
+
+			if (extensionPoint != null) {
+				for (IExtension ext : extensionPoint.getExtensions()) {
+					for (IConfigurationElement ce : ext.getConfigurationElements()) {
+						String id = ce.getAttribute(ID);
+						Map<String, URL> info = fRMJAXBResourceManagers.get(id);
+						if (info == null) {
+							info = new HashMap<String, URL>();
+							fRMJAXBResourceManagers.put(id, info);
+						}
+						String name = ce.getAttribute(NAME);
+						String configurationFile = ce.getAttribute(CONFIGURATION_FILE_ATTRIBUTE);
+						String bundleId = ce.getDeclaringExtension().getContributor().getName();
+						Bundle bundle = Platform.getBundle(bundleId);
+						if (bundle != null) {
+							URL url = bundle.getEntry(configurationFile);
+							if (url != null) {
+								info.put(name, url);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

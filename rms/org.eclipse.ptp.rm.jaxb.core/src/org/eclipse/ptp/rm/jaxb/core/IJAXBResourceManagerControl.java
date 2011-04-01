@@ -25,8 +25,6 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 
 	boolean getAppendSysEnv();
 
-	IJAXBResourceManagerConfiguration getConfig();
-
 	Map<String, String> getDynSystemEnv();
 
 	IJAXBResourceManagerConfiguration getJAXBRMConfiguration();

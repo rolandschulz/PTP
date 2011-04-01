@@ -14,4 +14,6 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public interface IJAXBResourceManager extends IResourceManager {
 	JAXBResourceManagerControl getControl();
+
+	IJAXBResourceManagerConfiguration getJAXBConfiguration();
 }

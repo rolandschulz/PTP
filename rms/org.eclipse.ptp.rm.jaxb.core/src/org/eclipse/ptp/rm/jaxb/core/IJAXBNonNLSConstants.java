@@ -192,6 +192,8 @@ public interface IJAXBNonNLSConstants {
 	String TOKENIZER_EXT_PT = "streamParserTokenizer";//$NON-NLS-1$
 	String TAIL = "tail";//$NON-NLS-1$
 	String MINUS_F = "-f";//$NON-NLS-1$
+	String CONFIGURATION_FILE_ATTRIBUTE = "configurationFile"; //$NON-NLS-1$
+	String RM_CONFIG_EXTENSION_POINT = "org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations"; //$NON-NLS-1$
 
 	/*
 	 * EFS Attributes
