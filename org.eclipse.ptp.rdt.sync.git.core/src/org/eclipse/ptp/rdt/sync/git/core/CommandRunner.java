@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 The University of Tennessee and others.
+ * Copyright (c) 2011 Oak Ridge National Laboratory and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,10 +21,12 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 // Static class for running system-level commands. This includes local and remote directory operations and also running arbitrary
 // commands on remote machines.
@@ -125,7 +127,7 @@ public class CommandRunner {
 	 * This function creates the local directory if it does not exist.
 	 * 
 	 * @return whether the directory was already PRESENT
-	 * @TODO: Handle false return from mkdir
+	 * TODO: Handle false return from mkdir
 	 */
 	public static DirectoryStatus createLocalDirectory(String localDirectory) {
 		final DirectoryStatus directoryStatus = checkLocalDirectory(localDirectory);
@@ -141,7 +143,7 @@ public class CommandRunner {
 	 * This function creates the remote directory if it does not exist. Parent directories are also created if necessary. Note that
 	 * this command does not overwrite if the requested remote directory exists but is not a directory.
 	 * 
-	 * @TODO: Check that this also holds true for creating parent directories. For example, if remoteDir =
+	 * TODO: Check that this also holds true for creating parent directories. For example, if remoteDir =
 	 *        "/home/user/project/project1/" and "/home/user/project" is a file will it be deleted?
 	 * @param conn
 	 * @param remoteDir
@@ -181,14 +183,30 @@ public class CommandRunner {
 	 *             in several cases if there is a problem communicating with the remote host.
 	 * @throws InterruptedException
 	 *             if execution of remote command is interrupted.
-	 * @TODO: Expand to work with multiple platforms (assumes UNIX \n line endings.)
+	 * @throws RemoteConnectionException
+	 * 			   if connection closed and cannot be opened. 
+	 * TODO: Expand to work with multiple platforms (assumes UNIX \n line endings.)
+	 * TODO: Make robust against buffer overflows - use threads.
 	 */
-	public static CommandResults executeRemoteCommand(IRemoteConnection conn, String command) throws IOException,
-			InterruptedException {
+	public static CommandResults executeRemoteCommand(IRemoteConnection conn, String command, String remoteDirectory,
+														IProgressMonitor monitor) throws 
+																IOException, InterruptedException, RemoteConnectionException {
+		if (!conn.isOpen()) {
+			try {
+				conn.open(monitor);
+			} catch (RemoteConnectionException e) {
+				throw e;
+			}
+		}
+
 		final CommandResults commandResults = new CommandResults();
 		// Run the command and wait for it to complete.
 		final List<String> commandStrings = Arrays.asList(command.split("\\s+")); //$NON-NLS-1$
 		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandStrings);
+		final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
+		if (rfm != null) {
+			rpb.directory(rfm.getResource(remoteDirectory));
+		}
 
 		IRemoteProcess rp = null;
 		try {
@@ -196,14 +214,6 @@ public class CommandRunner {
 		} catch (final IOException e) {
 			throw e;
 		}
-
-		int exitCode;
-		try {
-			exitCode = rp.waitFor();
-		} catch (final InterruptedException e) {
-			throw e;
-		}
-		commandResults.setExitCode(exitCode);
 
 		// Read and store stdout and stderr.
 		BufferedReader commandOutputReader = null;
@@ -236,6 +246,14 @@ public class CommandRunner {
 		} finally {
 			commandErrorReader.close();
 		}
+		
+		int exitCode;
+		try {
+			exitCode = rp.waitFor();
+		} catch (final InterruptedException e) {
+			throw e;
+		}
+		commandResults.setExitCode(exitCode);
 
 		commandResults.setStdout(output);
 		commandResults.setStderr(error);
@@ -244,6 +262,6 @@ public class CommandRunner {
 
 	// Enforce as static
 	private CommandRunner() {
-		throw new AssertionError();
+		throw new AssertionError("Cannot create instances of static class CommandRunner"); //$NON-NLS-1$
 	}
 }
