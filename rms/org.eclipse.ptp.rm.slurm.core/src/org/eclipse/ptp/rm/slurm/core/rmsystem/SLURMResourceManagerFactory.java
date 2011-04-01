@@ -22,7 +22,6 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  * @since 5.0
  */
 public class SLURMResourceManagerFactory extends AbstractResourceManagerFactory {
-	private SLURMResourceManagerConfiguration fConfiguration;
 
 	/*
 	 * (non-Javadoc)
@@ -49,7 +48,7 @@ public class SLURMResourceManagerFactory extends AbstractResourceManagerFactory 
 	 */
 	@Override
 	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
+		return new SLURMResourceManagerConfiguration(SLURMResourceManagerConfiguration.BASE, provider);
 	}
 
 	/*
@@ -73,7 +72,7 @@ public class SLURMResourceManagerFactory extends AbstractResourceManagerFactory 
 	 */
 	@Override
 	public IResourceManagerComponentConfiguration createControlConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
+		return new SLURMResourceManagerConfiguration(SLURMResourceManagerConfiguration.BASE, provider);
 	}
 
 	/*
@@ -97,13 +96,6 @@ public class SLURMResourceManagerFactory extends AbstractResourceManagerFactory 
 	 */
 	@Override
 	public IResourceManagerComponentConfiguration createMonitorConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
-	}
-
-	private SLURMResourceManagerConfiguration createCommonConfiguration(IServiceProvider provider) {
-		if (fConfiguration == null) {
-			fConfiguration = new SLURMResourceManagerConfiguration(SLURMResourceManagerConfiguration.BASE, provider);
-		}
-		return fConfiguration;
+		return new SLURMResourceManagerConfiguration(SLURMResourceManagerConfiguration.BASE, provider);
 	}
 }

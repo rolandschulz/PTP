@@ -25,44 +25,6 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  * @since 5.0
  */
 public class IBMLLResourceManagerFactory extends AbstractResourceManagerFactory {
-	private IBMLLResourceManagerConfiguration fConfiguration;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createConfiguration
-	 * (org.eclipse.ptp.services.core.IServiceProvider)
-	 */
-	@Override
-	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#
-	 * createControlConfiguration
-	 * (org.eclipse.ptp.services.core.IServiceProvider)
-	 */
-	@Override
-	public IResourceManagerComponentConfiguration createControlConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#
-	 * createMonitorConfiguration
-	 * (org.eclipse.ptp.services.core.IServiceProvider)
-	 */
-	@Override
-	public IResourceManagerComponentConfiguration createMonitorConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -83,12 +45,36 @@ public class IBMLLResourceManagerFactory extends AbstractResourceManagerFactory 
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createConfiguration
+	 * (org.eclipse.ptp.services.core.IServiceProvider)
+	 */
+	@Override
+	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider) {
+		return new IBMLLResourceManagerConfiguration(IBMLLResourceManagerConfiguration.BASE, provider);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createControl
 	 * (org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration)
 	 */
 	@Override
 	public IResourceManagerControl createControl(IResourceManagerComponentConfiguration configuration) {
 		return new IBMLLResourceManagerControl((AbstractResourceManagerConfiguration) configuration);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#
+	 * createControlConfiguration
+	 * (org.eclipse.ptp.services.core.IServiceProvider)
+	 */
+	@Override
+	public IResourceManagerComponentConfiguration createControlConfiguration(IServiceProvider provider) {
+		return new IBMLLResourceManagerConfiguration(IBMLLResourceManagerConfiguration.BASE, provider);
 	}
 
 	/*
@@ -103,10 +89,15 @@ public class IBMLLResourceManagerFactory extends AbstractResourceManagerFactory 
 		return new IBMLLResourceManagerMonitor((AbstractResourceManagerConfiguration) configuration);
 	}
 
-	private IBMLLResourceManagerConfiguration createCommonConfiguration(IServiceProvider provider) {
-		if (fConfiguration == null) {
-			fConfiguration = new IBMLLResourceManagerConfiguration(IBMLLResourceManagerConfiguration.BASE, provider);
-		}
-		return fConfiguration;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#
+	 * createMonitorConfiguration
+	 * (org.eclipse.ptp.services.core.IServiceProvider)
+	 */
+	@Override
+	public IResourceManagerComponentConfiguration createMonitorConfiguration(IServiceProvider provider) {
+		return new IBMLLResourceManagerConfiguration(IBMLLResourceManagerConfiguration.BASE, provider);
 	}
 }
