@@ -293,7 +293,7 @@ public class ModelManager implements IModelManager {
 	}
 
 	/**
-	 * Create a base configuration from the give service provider
+	 * Create a base configuration from the given service provider
 	 * 
 	 * @param provider
 	 *            service provider
@@ -308,7 +308,7 @@ public class ModelManager implements IModelManager {
 	}
 
 	/**
-	 * Create a control configuration from the give service provider
+	 * Create a control configuration from the given service provider
 	 * 
 	 * @param provider
 	 *            service provider
@@ -326,7 +326,7 @@ public class ModelManager implements IModelManager {
 	}
 
 	/**
-	 * Create a monitor configuration from the give service provider
+	 * Create a monitor configuration from the given service provider
 	 * 
 	 * @param provider
 	 *            service provider
