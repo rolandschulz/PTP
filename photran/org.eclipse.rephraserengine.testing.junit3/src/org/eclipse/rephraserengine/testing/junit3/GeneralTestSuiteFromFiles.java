@@ -180,7 +180,8 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
             for (String line = r.readLine(); line != null; line = r.readLine())
             {
                 line = line.trim();
-                if (!line.equals("")) result.add(line); //$NON-NLS-1$
+                if (!line.equals("") && !line.startsWith("#")) //$NON-NLS-1$ //$NON-NLS-2$
+                    result.add(line);
             }
 
             return result;
