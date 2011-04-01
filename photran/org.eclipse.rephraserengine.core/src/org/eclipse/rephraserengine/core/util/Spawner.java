@@ -27,6 +27,14 @@ import java.util.List;
  */
 public final class Spawner
 {
+    /**
+     * If the spawner exits with an error status, this determines whether the output will be dumped
+     * to standard error before an exception is thrown.
+     * 
+     * @since 3.0
+     */
+    public static boolean SHOW_OUTPUT_ON_ERROR = true;
+    
     private Spawner() {}
 
     /**
@@ -77,7 +85,8 @@ public final class Spawner
             int exitCode = process.waitFor();
             if (exitCode != 0)
             {
-                System.err.println(output.toString());
+                if (SHOW_OUTPUT_ON_ERROR)
+                    System.err.println(output.toString());
                 throw new Exception(
                     Messages.bind(Messages.Spawner_ProcessExitedAbnormally,
                                   exitCode,
