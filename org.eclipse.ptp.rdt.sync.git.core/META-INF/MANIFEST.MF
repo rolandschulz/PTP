@@ -19,6 +19,7 @@ Bundle-Vendor: %plugin.provider
 Bundle-Localization: plugin
 Import-Package: com.jcraft.jsch,
  org.eclipse.core.filesystem,
+ org.eclipse.core.internal.filesystem.local,
  org.eclipse.jgit.api,
  org.eclipse.jgit.api.errors,
  org.eclipse.jgit.errors,
