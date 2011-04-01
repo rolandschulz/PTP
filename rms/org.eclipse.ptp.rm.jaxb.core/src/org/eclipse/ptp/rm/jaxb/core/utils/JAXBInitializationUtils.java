@@ -64,10 +64,8 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 		instance.setInitialized(true);
 	}
 
-	public static ResourceManagerData initializeRMData(String xml) throws IOException, SAXException, URISyntaxException,
-			JAXBException {
-		URL instance = getURL(xml);
-		return unmarshalResourceManagerData(instance);
+	public static ResourceManagerData initializeRMData(URL xml) throws IOException, SAXException, URISyntaxException, JAXBException {
+		return unmarshalResourceManagerData(xml);
 	}
 
 	public static void validate(String xml) throws SAXException, IOException, URISyntaxException {

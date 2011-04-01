@@ -36,7 +36,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
@@ -145,7 +144,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	private final IJAXBResourceManagerConfiguration config;
-	private final Control controlData;
+	private Control controlData;
 	private final Map<String, String> dynSystemEnv;
 	private final JobStatusMap jobStatusMap;
 	private final RemoteServicesDelegate delegate;
@@ -155,20 +154,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
 		delegate = new RemoteServicesDelegate(config.getRemoteServicesId(), config.getConnectionName());
-		ResourceManagerData d = null;
-
-		try {
-			config.realizeRMDataFromXML();
-			d = config.getResourceManagerData();
-		} catch (Throwable t) {
-			JAXBCorePlugin.log(t);
-		}
-
-		if (d != null) {
-			controlData = d.getControlData();
-		} else {
-			controlData = null;
-		}
 		dynSystemEnv = new TreeMap<String, String>();
 		jobStatusMap = new JobStatusMap();
 		jobStatusMap.start();
@@ -277,7 +262,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			resetEnv();
 			doOnShutdown();
 			doDisconnect();
-			config.clearReferences();
+			((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences();
 			jobStatusMap.halt();
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
@@ -377,11 +362,17 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException {
 		IRemoteConnection conn = delegate.getLocalConnection();
 		if (!conn.isOpen()) {
-			throw new RemoteConnectionException(Messages.LocalConnectionError);
+			conn.open(monitor);
+			if (!conn.isOpen()) {
+				throw new RemoteConnectionException(Messages.LocalConnectionError);
+			}
 		}
 		conn = delegate.getRemoteConnection();
 		if (!conn.isOpen()) {
-			throw new RemoteConnectionException(Messages.RemoteConnectionError + conn.getAddress());
+			conn.open(monitor);
+			if (!conn.isOpen()) {
+				throw new RemoteConnectionException(Messages.RemoteConnectionError + conn.getAddress());
+			}
 		}
 	}
 
@@ -548,7 +539,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void resetEnv() {
 		try {
+			/*
+			 * Use the base configuration which contains the config file
+			 * information
+			 */
+			IJAXBResourceManagerConfiguration config = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
 			config.setActive();
+			controlData = config.getResourceManagerData().getControlData();
 		} catch (Throwable t) {
 			JAXBCorePlugin.log(t);
 			return;

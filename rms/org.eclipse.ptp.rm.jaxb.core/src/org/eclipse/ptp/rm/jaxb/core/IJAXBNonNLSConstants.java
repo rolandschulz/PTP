@@ -125,6 +125,7 @@ public interface IJAXBNonNLSConstants {
 	String JAXB_CONTEXT = "org.eclipse.ptp.rm.jaxb.core.data";//$NON-NLS-1$
 	String RM_CONFIG_PROPS = "rm_configurations.properties";//$NON-NLS-1$
 	String RM_XSD_PATH = "rm_schema_path";//$NON-NLS-1$
+	String RM_XSD_URL = "rm_schema_url";//$NON-NLS-1$
 	String PREV_RM_XSD_PATH = "prev_rm_schema_path";//$NON-NLS-1$
 	String EXTERNAL_RM_XSD_PATHS = "external_rm_schema_paths";//$NON-NLS-1$
 	String SELECTED_ATTRIBUTES = "selected_attributes";//$NON-NLS-1$
