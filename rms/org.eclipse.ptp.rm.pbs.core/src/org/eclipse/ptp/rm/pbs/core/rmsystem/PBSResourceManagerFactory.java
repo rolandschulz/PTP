@@ -22,7 +22,6 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  * @since 5.0
  */
 public class PBSResourceManagerFactory extends AbstractResourceManagerFactory {
-	private PBSResourceManagerConfiguration fConfiguration;
 
 	/*
 	 * (non-Javadoc)
@@ -50,7 +49,7 @@ public class PBSResourceManagerFactory extends AbstractResourceManagerFactory {
 	 */
 	@Override
 	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
+		return new PBSResourceManagerConfiguration(PBSResourceManagerConfiguration.BASE, provider);
 	}
 
 	/*
@@ -75,7 +74,7 @@ public class PBSResourceManagerFactory extends AbstractResourceManagerFactory {
 	 */
 	@Override
 	public IResourceManagerComponentConfiguration createControlConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
+		return new PBSResourceManagerConfiguration(PBSResourceManagerConfiguration.BASE, provider);
 	}
 
 	/*
@@ -100,13 +99,6 @@ public class PBSResourceManagerFactory extends AbstractResourceManagerFactory {
 	 */
 	@Override
 	public IResourceManagerComponentConfiguration createMonitorConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
-	}
-
-	private PBSResourceManagerConfiguration createCommonConfiguration(IServiceProvider provider) {
-		if (fConfiguration == null) {
-			fConfiguration = new PBSResourceManagerConfiguration(PBSResourceManagerConfiguration.BASE, provider);
-		}
-		return fConfiguration;
+		return new PBSResourceManagerConfiguration(PBSResourceManagerConfiguration.BASE, provider);
 	}
 }

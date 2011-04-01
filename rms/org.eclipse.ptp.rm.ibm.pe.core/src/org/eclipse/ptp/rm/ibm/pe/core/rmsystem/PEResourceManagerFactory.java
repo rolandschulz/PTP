@@ -22,7 +22,6 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  * @since 5.0
  */
 public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
-	private PEResourceManagerConfiguration fConfiguration;
 
 	/*
 	 * (non-Javadoc)
@@ -49,7 +48,7 @@ public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
 	 */
 	@Override
 	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
+		return new PEResourceManagerConfiguration(PEResourceManagerConfiguration.BASE, provider);
 	}
 
 	/*
@@ -73,7 +72,7 @@ public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
 	 */
 	@Override
 	public IResourceManagerComponentConfiguration createControlConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
+		return new PEResourceManagerConfiguration(PEResourceManagerConfiguration.BASE, provider);
 	}
 
 	/*
@@ -97,13 +96,6 @@ public class PEResourceManagerFactory extends AbstractResourceManagerFactory {
 	 */
 	@Override
 	public IResourceManagerComponentConfiguration createMonitorConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
-	}
-
-	private PEResourceManagerConfiguration createCommonConfiguration(IServiceProvider provider) {
-		if (fConfiguration == null) {
-			fConfiguration = new PEResourceManagerConfiguration(PEResourceManagerConfiguration.BASE, provider);
-		}
-		return fConfiguration;
+		return new PEResourceManagerConfiguration(PEResourceManagerConfiguration.BASE, provider);
 	}
 }
