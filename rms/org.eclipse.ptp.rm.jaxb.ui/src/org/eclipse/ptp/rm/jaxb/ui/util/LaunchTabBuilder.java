@@ -69,8 +69,8 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	}
 
 	private void addAttributeViewer(AttributeViewer descriptor, Composite parent) {
-		GridData data = addGridData(descriptor.getGridData());
-		GridLayout layout = addGridLayout(descriptor.getGridLayout());
+		GridData data = createGridData(descriptor.getGridData());
+		GridLayout layout = createGridLayout(descriptor.getGridLayout());
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
 		ColumnViewer viewer = null;
 		if (TABLE.equals(descriptor.getType())) {
@@ -85,27 +85,27 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 
 	private ColumnViewer addCheckboxTableViewer(Composite parent, GridData data, GridLayout layout, int style,
 			AttributeViewer descriptor) {
-		style |= SWT.CHECK;
+		style |= (SWT.CHECK | SWT.FULL_SELECTION);
 		Table t = WidgetBuilderUtils.createTable(parent, style, data);
 		CheckboxTableViewer viewer = new CheckboxTableViewer(t);
 		WidgetBuilderUtils.setupAttributeTable(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor), null,
-				descriptor.isSort(), descriptor.isTooltipOnName());
+				descriptor.isSort(), descriptor.isTooltip());
 		return viewer;
 	}
 
 	private ColumnViewer addCheckboxTreeViewer(Composite parent, GridData data, GridLayout layout, int style,
 			AttributeViewer descriptor) {
-		style |= SWT.CHECK;
+		style |= (SWT.CHECK | SWT.FULL_SELECTION);
 		Tree t = WidgetBuilderUtils.createTree(parent, style, data);
 		CheckboxTreeViewer viewer = new CheckboxTreeViewer(t);
 		WidgetBuilderUtils.setupAttributeTree(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor), null,
-				descriptor.isSort(), descriptor.isTooltipOnName());
+				descriptor.isSort(), descriptor.isTooltip());
 		return viewer;
 	}
 
 	private Composite addComposite(CompositeDescriptor cd, Composite parent) {
-		GridData data = addGridData(cd.getGridData());
-		GridLayout layout = addGridLayout(cd.getGridLayout());
+		GridData data = createGridData(cd.getGridData());
+		GridLayout layout = createGridLayout(cd.getGridLayout());
 		int style = WidgetBuilderUtils.getStyle(cd.getStyle());
 		Composite composite = null;
 		if (cd.isGroup()) {
@@ -136,16 +136,6 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			addItem(folder, i, index++);
 		}
 		return folder;
-	}
-
-	private GridLayout addGridLayout(GridLayoutDescriptor gridLayout) {
-		if (gridLayout == null) {
-			return null;
-		}
-		return WidgetBuilderUtils.createGridLayout(gridLayout.getNumColumns(), gridLayout.isMakeColumnsEqualWidth(),
-				gridLayout.getHorizontalSpacing(), gridLayout.getVerticalSpacing(), gridLayout.getMarginWidth(),
-				gridLayout.getMarginHeight(), gridLayout.getMarginLeft(), gridLayout.getMarginRight(), gridLayout.getMarginTop(),
-				gridLayout.getMarginBottom());
 	}
 
 	private void addItem(TabFolder folder, TabItemDescriptor descriptor, int index) {
@@ -232,7 +222,17 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return control;
 	}
 
-	static GridData addGridData(GridDataDescriptor gridData) {
+	private GridLayout createGridLayout(GridLayoutDescriptor gridLayout) {
+		if (gridLayout == null) {
+			return null;
+		}
+		return WidgetBuilderUtils.createGridLayout(gridLayout.getNumColumns(), gridLayout.isMakeColumnsEqualWidth(),
+				gridLayout.getHorizontalSpacing(), gridLayout.getVerticalSpacing(), gridLayout.getMarginWidth(),
+				gridLayout.getMarginHeight(), gridLayout.getMarginLeft(), gridLayout.getMarginRight(), gridLayout.getMarginTop(),
+				gridLayout.getMarginBottom());
+	}
+
+	static GridData createGridData(GridDataDescriptor gridData) {
 		if (gridData == null) {
 			return null;
 		}

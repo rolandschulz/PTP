@@ -135,7 +135,7 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 				row = i.next();
 				name = row.getColumnDisplayValue(COLUMN_NAME);
 				value = row.getValue();
-				if (value != null && row.isVisible()) {
+				if (value != null && row.isSelected()) {
 					if (row.isDiscovered()) {
 						disc.put(name, String.valueOf(value));
 					} else {
@@ -154,7 +154,7 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 				row = i.next();
 				name = row.getColumnDisplayValue(COLUMN_NAME);
 				value = row.getValue();
-				if (value != null && row.isVisible()) {
+				if (value != null && row.isSelected()) {
 					if (row.isDiscovered()) {
 						disc.put(name, String.valueOf(value));
 					} else {

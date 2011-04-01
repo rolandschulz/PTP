@@ -12,57 +12,60 @@ package org.eclipse.ptp.rm.jaxb.ui.cell;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Spinner;
 
-public class SpinnerCellEditor extends CellEditor {
+public class JAXBCheckboxCellEditor extends CellEditor {
 
-	private Spinner spinner;
+	private Button checkbox;
 
 	private static final int defaultStyle = SWT.NONE;
 
-	public SpinnerCellEditor() {
+	public JAXBCheckboxCellEditor() {
 		setStyle(defaultStyle);
 	}
 
-	public SpinnerCellEditor(Composite parent) {
+	public JAXBCheckboxCellEditor(Composite parent) {
 		this(parent, defaultStyle);
 	}
 
-	public SpinnerCellEditor(Composite parent, int style) {
-		this(parent, style, null, null);
+	public JAXBCheckboxCellEditor(Composite parent, boolean initialValue) {
+		this(parent, defaultStyle, initialValue);
 	}
 
-	public SpinnerCellEditor(Composite parent, int style, Integer min, Integer max) {
+	public JAXBCheckboxCellEditor(Composite parent, int style) {
+		this(parent, style, false);
+	}
+
+	public JAXBCheckboxCellEditor(Composite parent, int style, boolean initialValue) {
 		super(parent, style);
-		spinner.setMinimum(min);
-		spinner.setMaximum(max);
+		checkbox.setSelection(initialValue);
 	}
 
-	public SpinnerCellEditor(Composite parent, Integer min, Integer max) {
-		this(parent, defaultStyle, min, max);
+	public Button getCheckbox() {
+		return checkbox;
 	}
 
 	@Override
 	protected Control createControl(Composite parent) {
-		spinner = new Spinner(parent, getStyle());
-		return spinner;
+		checkbox = new Button(parent, SWT.CHECK | SWT.LEFT);
+		return checkbox;
 	}
 
 	@Override
 	protected Object doGetValue() {
-		return spinner.getSelection();
+		return checkbox.getSelection();
 	}
 
 	@Override
 	protected void doSetFocus() {
-		spinner.setFocus();
+		checkbox.setFocus();
 	}
 
 	@Override
 	protected void doSetValue(Object value) {
-		Assert.isTrue(value instanceof Integer);
-		spinner.setSelection((Integer) value);
+		Assert.isTrue(value instanceof Boolean);
+		checkbox.setSelection((Boolean) value);
 	}
 }
