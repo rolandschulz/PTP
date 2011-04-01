@@ -8,6 +8,7 @@ import org.eclipse.cdt.core.settings.model.ICResourceDescription;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractCBuildPropertyTab;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.PreferencePage;
@@ -201,7 +202,6 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 		BuildScenario buildScenario = new BuildScenario("Git", fSelectedConnection.getName(), fLocationText.getText()); //$NON-NLS-1$
 //		BuildScenario buildScenario = new BuildScenario(fSelectedProvider.getName(), fSelectedConnection.getName(),
 //																										fLocationText.getText());
-		ServiceModelManager.getInstance().addBuildScenario(project, buildScenario);
 		ServiceModelManager.getInstance().setBuildScenarioForBuildConfigurationId(project, buildScenario, getCfg().getId());
 
 		return true;

@@ -234,7 +234,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @param buildScenario
 	 * @since 2.1
 	 */
-	public void addBuildScenario(IProject project, BuildScenario buildScenario) {
+	private void addBuildScenario(IProject project, BuildScenario buildScenario) {
 		checkAndLoadModel();
 		IServiceConfiguration sConfig = this.copyActiveServiceConfiguration(project);
 		this.modifyServiceConfigurationForBuildScenario(sConfig, buildScenario);
@@ -1281,5 +1281,43 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			
 		}
 		idMap.put(id, bs);
+		addBuildScenario(project, bs);
+	}
+
+	/**
+	 * Returns the build scenario set for the given configuration, or null if it is unavailable (either the project or the id
+	 * could be "bad" in this case).
+	 * 
+	 * @param project
+	 * @param id
+	 * 			ID of the build configuration
+	 * @return build scenario for the configuration
+	 * @throws RuntimeException if the build scenario cannot be mapped to a service configuration. This should never happen as it
+	 * is an invariant enforced by this class. (We return null in the other cases as they could be the result of bad user input.)
+	 * @since 2.1
+	 */
+	public IServiceConfiguration getConfigurationForBuildConfiguration(IProject project, String id) {
+		checkAndLoadModel();
+		Map<String, BuildScenario> idMap = fProjectBuildConfigIdToBuildScenarioMap.get(project);
+		if (idMap == null) {
+			return null;
+		}
+		
+		 BuildScenario bs = idMap.get(id);
+		 if (bs == null) {
+			 return null;
+		 }
+		 
+		 Map<BuildScenario, IServiceConfiguration> confs = fProjectBuildScenarioToSConfigMap.get(project);
+		 if (confs == null) {
+			 throw new RuntimeException("Unable to find a service configuration map for the project");
+		 }
+		 
+		 IServiceConfiguration conf = confs.get(bs);
+		 if (conf == null) {
+			 throw new RuntimeException("Unable to find a service configuration for the build scenario");
+		 }
+		 
+		 return conf;
 	}
 }

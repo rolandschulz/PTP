@@ -136,13 +136,6 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		}
 	}
 	
-	private BuildScenario getBuildScenarioForConfiguration(IConfiguration config) {
-		String provider = config.getBuildProperties().getProperty("remoteSyncProvider").getValue().getName(); //$NON-NLS-1$
-		String conn = config.getBuildProperties().getProperty("remoteConnection").getValue().getName(); //$NON-NLS-1$
-		String location = config.getBuildProperties().getProperty("remoteLocation").getValue().getName(); //$NON-NLS-1$
-		return new BuildScenario(provider, conn, location);
-	}
-	
 	public static final String REMOTE_MAKE_BUILDER_ID = "org.eclipse.ptp.rdt.core.remoteMakeBuilder"; //$NON-NLS-1$
 	
 	/* (non-Javadoc)
@@ -316,12 +309,11 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				ServiceModelManager smm = ServiceModelManager.getInstance();
 				
 				try{
-					BuildScenario buildScenario = this.getBuildScenarioForConfiguration(configuration);
-					IServiceConfiguration serviceConfig = smm.getConfigurationForBuildScenario(getProject(), buildScenario);
+					IServiceConfiguration serviceConfig = ServiceModelManager.getInstance().
+													getConfigurationForBuildConfiguration(getProject(), configuration.getId());
 					if (serviceConfig == null) {
-						throw new RuntimeException("Cannot find service configuration for build scenario"); //$NON-NLS-1$
+						throw new RuntimeException("Cannot find service configuration for build configuration"); //$NON-NLS-1$
 					}
-					// IServiceConfiguration serviceConfig = smm.getActiveConfiguration(getProject());
 					IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
 					IServiceProvider provider = serviceConfig.getServiceProvider(buildService);
 					IRemoteExecutionServiceProvider executionProvider = null;

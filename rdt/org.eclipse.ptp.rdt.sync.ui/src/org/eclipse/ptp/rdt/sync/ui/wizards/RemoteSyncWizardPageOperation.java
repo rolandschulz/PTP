@@ -87,7 +87,6 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		ISyncServiceProvider provider = participant.getProvider(project);
 		BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection().getName(),
 																										provider.getLocation());
-		ServiceModelManager.getInstance().addBuildScenario(project, buildScenario);
 
 		// Add information about remote location to the initial build configurations (.cproject file)
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
