@@ -140,7 +140,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		} else {
 			try {
 				JAXBInitializationUtils.validate(tokxml);
-				ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(tokxml);
+				ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(JAXBInitializationUtils.getURL(tokxml));
 				if (rmdata != null) {
 					Control cd = rmdata.getControlData();
 					startup = cd.getStartUpCommand();

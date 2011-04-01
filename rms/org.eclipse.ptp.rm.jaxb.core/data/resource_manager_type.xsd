@@ -327,6 +327,7 @@
 			<xs:element name="layout" minOccurs="0" type="rm:layout-descriptor"/>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
 			<xs:element name="item" maxOccurs="unbounded" type="rm:tab-item-descriptor"/>
+			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string">
 			<xs:annotation>

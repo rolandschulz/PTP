@@ -152,6 +152,10 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		if (data != null) {
 			folder.setLayoutData(data);
 		}
+		String tt = descriptor.getTooltip();
+		if (tt != null) {
+			folder.setToolTipText(tt);
+		}
 		List<TabItemDescriptor> items = descriptor.getItem();
 		int index = 0;
 		for (TabItemDescriptor i : items) {
@@ -258,70 +262,74 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	}
 
 	private Layout createLayout(LayoutDescriptor layout) {
-		if (layout.getFillLayout() != null) {
-			FillLayoutDescriptor fillLayout = layout.getFillLayout();
-			return WidgetBuilderUtils.createFillLayout(fillLayout.getType(), fillLayout.getMarginHeight(),
-					fillLayout.getMarginWidth(), fillLayout.getSpacing());
-		} else if (layout.getRowLayout() != null) {
-			RowLayoutDescriptor rowLayout = layout.getRowLayout();
-			return WidgetBuilderUtils.createRowLayout(rowLayout.isCenter(), rowLayout.isFill(), rowLayout.isJustify(),
-					rowLayout.isPack(), rowLayout.getMarginHeight(), rowLayout.getMarginWidth(), rowLayout.getMarginTop(),
-					rowLayout.getMarginBottom(), rowLayout.getMarginLeft(), rowLayout.getMarginRight(), rowLayout.getSpacing());
-		} else if (layout.getGridLayout() != null) {
-			GridLayoutDescriptor gridLayout = layout.getGridLayout();
-			return WidgetBuilderUtils.createGridLayout(gridLayout.getNumColumns(), gridLayout.isMakeColumnsEqualWidth(),
-					gridLayout.getHorizontalSpacing(), gridLayout.getVerticalSpacing(), gridLayout.getMarginWidth(),
-					gridLayout.getMarginHeight(), gridLayout.getMarginLeft(), gridLayout.getMarginRight(),
-					gridLayout.getMarginTop(), gridLayout.getMarginBottom());
-		} else if (layout.getFormLayout() != null) {
-			FormLayoutDescriptor formLayout = layout.getFormLayout();
-			return WidgetBuilderUtils.createFormLayout(formLayout.getMarginHeight(), formLayout.getMarginWidth(),
-					formLayout.getMarginTop(), formLayout.getMarginBottom(), formLayout.getMarginLeft(),
-					formLayout.getMarginRight(), formLayout.getSpacing());
+		if (layout != null) {
+			if (layout.getFillLayout() != null) {
+				FillLayoutDescriptor fillLayout = layout.getFillLayout();
+				return WidgetBuilderUtils.createFillLayout(fillLayout.getType(), fillLayout.getMarginHeight(),
+						fillLayout.getMarginWidth(), fillLayout.getSpacing());
+			} else if (layout.getRowLayout() != null) {
+				RowLayoutDescriptor rowLayout = layout.getRowLayout();
+				return WidgetBuilderUtils.createRowLayout(rowLayout.isCenter(), rowLayout.isFill(), rowLayout.isJustify(),
+						rowLayout.isPack(), rowLayout.getMarginHeight(), rowLayout.getMarginWidth(), rowLayout.getMarginTop(),
+						rowLayout.getMarginBottom(), rowLayout.getMarginLeft(), rowLayout.getMarginRight(), rowLayout.getSpacing());
+			} else if (layout.getGridLayout() != null) {
+				GridLayoutDescriptor gridLayout = layout.getGridLayout();
+				return WidgetBuilderUtils.createGridLayout(gridLayout.getNumColumns(), gridLayout.isMakeColumnsEqualWidth(),
+						gridLayout.getHorizontalSpacing(), gridLayout.getVerticalSpacing(), gridLayout.getMarginWidth(),
+						gridLayout.getMarginHeight(), gridLayout.getMarginLeft(), gridLayout.getMarginRight(),
+						gridLayout.getMarginTop(), gridLayout.getMarginBottom());
+			} else if (layout.getFormLayout() != null) {
+				FormLayoutDescriptor formLayout = layout.getFormLayout();
+				return WidgetBuilderUtils.createFormLayout(formLayout.getMarginHeight(), formLayout.getMarginWidth(),
+						formLayout.getMarginTop(), formLayout.getMarginBottom(), formLayout.getMarginLeft(),
+						formLayout.getMarginRight(), formLayout.getSpacing());
+			}
 		}
 		return null;
 	}
 
 	static Object createLayoutData(LayoutDataDescriptor layoutData) {
-		if (layoutData.getRowData() != null) {
-			RowDataDescriptor rowData = layoutData.getRowData();
-			return WidgetBuilderUtils.createRowData(rowData.getHeight(), rowData.getWidth(), rowData.isExclude());
-		} else if (layoutData.getGridData() != null) {
-			GridDataDescriptor gridData = layoutData.getGridData();
-			int style = WidgetBuilderUtils.getStyle(gridData.getStyle());
-			int hAlign = WidgetBuilderUtils.getStyle(gridData.getHorizontalAlign());
-			int vAlign = WidgetBuilderUtils.getStyle(gridData.getVerticalAlign());
-			return WidgetBuilderUtils.createGridData(style, gridData.isGrabExcessHorizontal(), gridData.isGrabExcessVertical(),
-					gridData.getWidthHint(), gridData.getHeightHint(), gridData.getMinWidth(), gridData.getMinHeight(),
-					gridData.getHorizontalSpan(), gridData.getVerticalSpan(), hAlign, vAlign);
+		if (layoutData != null) {
+			if (layoutData.getRowData() != null) {
+				RowDataDescriptor rowData = layoutData.getRowData();
+				return WidgetBuilderUtils.createRowData(rowData.getHeight(), rowData.getWidth(), rowData.isExclude());
+			} else if (layoutData.getGridData() != null) {
+				GridDataDescriptor gridData = layoutData.getGridData();
+				int style = WidgetBuilderUtils.getStyle(gridData.getStyle());
+				int hAlign = WidgetBuilderUtils.getStyle(gridData.getHorizontalAlign());
+				int vAlign = WidgetBuilderUtils.getStyle(gridData.getVerticalAlign());
+				return WidgetBuilderUtils.createGridData(style, gridData.isGrabExcessHorizontal(), gridData.isGrabExcessVertical(),
+						gridData.getWidthHint(), gridData.getHeightHint(), gridData.getMinWidth(), gridData.getMinHeight(),
+						gridData.getHorizontalSpan(), gridData.getVerticalSpan(), hAlign, vAlign);
 
-		} else if (layoutData.getFormData() != null) {
-			FormDataDescriptor formData = layoutData.getFormData();
-			FormAttachment top = null;
-			FormAttachment bottom = null;
-			FormAttachment left = null;
-			FormAttachment right = null;
-			FormAttachmentDescriptor fad = formData.getTop();
-			if (fad != null) {
-				top = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
-						fad.getOffset());
+			} else if (layoutData.getFormData() != null) {
+				FormDataDescriptor formData = layoutData.getFormData();
+				FormAttachment top = null;
+				FormAttachment bottom = null;
+				FormAttachment left = null;
+				FormAttachment right = null;
+				FormAttachmentDescriptor fad = formData.getTop();
+				if (fad != null) {
+					top = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+							fad.getOffset());
+				}
+				fad = formData.getBottom();
+				if (fad != null) {
+					bottom = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+							fad.getOffset());
+				}
+				fad = formData.getLeft();
+				if (fad != null) {
+					left = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+							fad.getOffset());
+				}
+				fad = formData.getRight();
+				if (fad != null) {
+					right = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+							fad.getOffset());
+				}
+				return WidgetBuilderUtils.createFormData(formData.getHeight(), formData.getWidth(), top, bottom, left, right);
 			}
-			fad = formData.getBottom();
-			if (fad != null) {
-				bottom = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
-						fad.getOffset());
-			}
-			fad = formData.getLeft();
-			if (fad != null) {
-				left = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
-						fad.getOffset());
-			}
-			fad = formData.getRight();
-			if (fad != null) {
-				right = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
-						fad.getOffset());
-			}
-			return WidgetBuilderUtils.createFormData(formData.getHeight(), formData.getWidth(), top, bottom, left, right);
 		}
 		return null;
 	}
