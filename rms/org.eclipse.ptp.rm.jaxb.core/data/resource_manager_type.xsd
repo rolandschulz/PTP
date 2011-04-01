@@ -324,8 +324,8 @@
 	</xs:complexType>
 	<xs:complexType name="tab-folder-descriptor">
 		<xs:sequence>
-		   <xs:element name="layout" minOccurs="0" type="rm:layout-descriptor"/>
-         <xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
+			<xs:element name="layout" minOccurs="0" type="rm:layout-descriptor"/>
+			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
 			<xs:element name="item" maxOccurs="unbounded" type="rm:tab-item-descriptor"/>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string">
@@ -377,40 +377,65 @@
 		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
-   <xs:complexType name="layout-descriptor">
-      <xs:choice>
-         <xs:element name="fill-layout" type="rm:fill-layout-descriptor"/>
-         <xs:element name="row-layout" type="rm:row-layout-descriptor"/>
-         <xs:element name="grid-layout" type="rm:grid-layout-descriptor"/>
-         <xs:element name="form-layout" type="rm:form-layout-descriptor"/>
-      </xs:choice>
-   </xs:complexType>
-   <xs:complexType name="layout-data-descriptor">
-      <xs:choice>
-         <xs:element name="row-data" type="rm:row-data-descriptor"/>
-         <xs:element name="grid-data" type="rm:grid-data-descriptor"/>
-         <xs:element name="form-data" type="rm:form-data-descriptor"/>
-      </xs:choice>
-   </xs:complexType>
-   <xs:complexType name="fill-layout-descriptor">
-   </xs:complexType>
-   <xs:complexType name="row-layout-descriptor">
-   </xs:complexType>
-   <xs:complexType name="grid-layout-descriptor">
-      <xs:attribute name="numColumns" type="xs:int"/>
-      <xs:attribute name="horizontalSpacing" type="xs:int"/>
-      <xs:attribute name="makeColumnsEqualWidth" type="xs:boolean" default="true"/>
-      <xs:attribute name="marginBottom" type="xs:int"/>
-      <xs:attribute name="marginHeight" type="xs:int"/>
+	<xs:complexType name="layout-descriptor">
+		<xs:choice>
+			<xs:element name="fill-layout" type="rm:fill-layout-descriptor"/>
+			<xs:element name="row-layout" type="rm:row-layout-descriptor"/>
+			<xs:element name="grid-layout" type="rm:grid-layout-descriptor"/>
+			<xs:element name="form-layout" type="rm:form-layout-descriptor"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="layout-data-descriptor">
+		<xs:choice>
+			<xs:element name="row-data" type="rm:row-data-descriptor"/>
+			<xs:element name="grid-data" type="rm:grid-data-descriptor"/>
+			<xs:element name="form-data" type="rm:form-data-descriptor"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="fill-layout-descriptor">
+	  <xs:attribute name="type" type="xs:string"/>
+	  <xs:attribute name="marginHeight" type="xs:int"/>
+	  <xs:attribute name="marginWidth" type="xs:int"/>
+	  <xs:attribute name="spacing" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="row-layout-descriptor">
+	   <xs:attribute name="center" type="xs:boolean" default="false"/>
+	   <xs:attribute name="justify" type="xs:boolean" default="false"/>
+	   <xs:attribute name="fill" type="xs:boolean" default="false"/>
+	   <xs:attribute name="pack" type="xs:boolean" default="false"/>
+	   <xs:attribute name="marginHeight" type="xs:int"/>
+	   <xs:attribute name="marginWidth" type="xs:int"/>
+	   <xs:attribute name="marginTop" type="xs:int"/>
+	   <xs:attribute name="marginBottom" type="xs:int"/>
       <xs:attribute name="marginLeft" type="xs:int"/>
       <xs:attribute name="marginRight" type="xs:int"/>
-      <xs:attribute name="marginTop" type="xs:int"/>
+      <xs:attribute name="spacing" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="grid-layout-descriptor">
+		<xs:attribute name="numColumns" type="xs:int"/>
+		<xs:attribute name="makeColumnsEqualWidth" type="xs:boolean" default="true"/>
+		<xs:attribute name="marginHeight" type="xs:int"/>
       <xs:attribute name="marginWidth" type="xs:int"/>
-      <xs:attribute name="verticalSpacing" type="xs:int"/>
-   </xs:complexType>
-   <xs:complexType name="form-layout-descriptor">
-   </xs:complexType>
+      <xs:attribute name="marginTop" type="xs:int"/>
+      <xs:attribute name="marginBottom" type="xs:int"/>
+      <xs:attribute name="marginLeft" type="xs:int"/>
+      <xs:attribute name="marginRight" type="xs:int"/>
+      <xs:attribute name="horizontalSpacing" type="xs:int"/>
+		<xs:attribute name="verticalSpacing" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="form-layout-descriptor">
+	   <xs:attribute name="marginHeight" type="xs:int"/>
+      <xs:attribute name="marginWidth" type="xs:int"/>
+      <xs:attribute name="marginTop" type="xs:int"/>
+      <xs:attribute name="marginBottom" type="xs:int"/>
+      <xs:attribute name="marginLeft" type="xs:int"/>
+      <xs:attribute name="marginRight" type="xs:int"/>
+      <xs:attribute name="spacing" type="xs:int"/>
+	</xs:complexType>
 	<xs:complexType name="row-data-descriptor">
+		<xs:attribute name="height" type="xs:int"/>
+		<xs:attribute name="width" type="xs:int"/>
+		<xs:attribute name="exclude" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="grid-data-descriptor">
 		<xs:attribute name="style" type="xs:string"/>
@@ -426,7 +451,21 @@
 		<xs:attribute name="widthHint" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="form-data-descriptor">
-   </xs:complexType>
+		<xs:sequence>
+			<xs:element name="top" minOccurs="0" type="rm:form-attachment-descriptor"/>
+			<xs:element name="bottom" minOccurs="0" type="rm:form-attachment-descriptor"/>
+			<xs:element name="left" minOccurs="0" type="rm:form-attachment-descriptor"/>
+			<xs:element name="right" minOccurs="0" type="rm:form-attachment-descriptor"/>
+		</xs:sequence>
+		<xs:attribute name="height" type="xs:int"/>
+		<xs:attribute name="width" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="form-attachment-descriptor">
+		<xs:attribute name="alignment" type="xs:string"/>
+		<xs:attribute name="numerator" type="xs:int"/>
+		<xs:attribute name="denominator" type="xs:int"/>
+		<xs:attribute name="offset" type="xs:int"/>
+	</xs:complexType>
 	<xs:complexType name="widget">
 		<xs:sequence>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>

@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.GridDataDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -25,7 +25,6 @@ import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBRMConfigurableAttributesTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -36,7 +35,7 @@ import org.eclipse.swt.widgets.Text;
 public class WidgetBuilder implements IJAXBUINonNLSConstants {
 
 	private final JAXBRMConfigurableAttributesTab tab;
-	private final GridData gridData;
+	private final Object gridData;
 	private final boolean readOnly;
 	private final String title;
 	private final String type;
@@ -55,8 +54,8 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 	public WidgetBuilder(Widget widget, RMVariableMap rmMap, JAXBRMConfigurableAttributesTab tab) {
 		this.tab = tab;
 		title = widget.getTitle();
-		GridDataDescriptor gdd = widget.getGridData();
-		gridData = LaunchTabBuilder.createGridData(gdd);
+		LayoutDataDescriptor descriptor = widget.getLayoutData();
+		gridData = LaunchTabBuilder.createLayoutData(descriptor);
 		style = WidgetBuilderUtils.getStyle(widget.getStyle());
 		readOnly = widget.isReadOnly();
 		if (readOnly) {

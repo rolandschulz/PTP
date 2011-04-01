@@ -18,8 +18,16 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.CompositeDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.FillLayoutDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.FormAttachmentDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.FormDataDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.FormLayoutDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.GridDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.GridLayoutDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.LayoutDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.RowDataDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.RowLayoutDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.TabItemDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.ViewerItems;
@@ -37,11 +45,11 @@ import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
@@ -69,8 +77,8 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	}
 
 	private void addAttributeViewer(AttributeViewer descriptor, Composite parent) {
-		GridData data = createGridData(descriptor.getGridData());
-		GridLayout layout = createGridLayout(descriptor.getGridLayout());
+		Layout layout = createLayout(descriptor.getLayout());
+		Object data = createLayoutData(descriptor.getLayoutData());
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
 		ColumnViewer viewer = null;
 		if (TABLE.equals(descriptor.getType())) {
@@ -83,8 +91,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		addToViewerMap(viewer, descriptor);
 	}
 
-	private ColumnViewer addCheckboxTableViewer(Composite parent, GridData data, GridLayout layout, int style,
-			AttributeViewer descriptor) {
+	private ColumnViewer addCheckboxTableViewer(Composite parent, Object data, Layout layout, int style, AttributeViewer descriptor) {
 		style |= (SWT.CHECK | SWT.FULL_SELECTION);
 		Table t = WidgetBuilderUtils.createTable(parent, style, data);
 		CheckboxTableViewer viewer = new CheckboxTableViewer(t);
@@ -93,8 +100,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return viewer;
 	}
 
-	private ColumnViewer addCheckboxTreeViewer(Composite parent, GridData data, GridLayout layout, int style,
-			AttributeViewer descriptor) {
+	private ColumnViewer addCheckboxTreeViewer(Composite parent, Object data, Layout layout, int style, AttributeViewer descriptor) {
 		style |= (SWT.CHECK | SWT.FULL_SELECTION);
 		Tree t = WidgetBuilderUtils.createTree(parent, style, data);
 		CheckboxTreeViewer viewer = new CheckboxTreeViewer(t);
@@ -103,17 +109,17 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return viewer;
 	}
 
-	private Composite addComposite(CompositeDescriptor cd, Composite parent) {
-		GridData data = createGridData(cd.getGridData());
-		GridLayout layout = createGridLayout(cd.getGridLayout());
-		int style = WidgetBuilderUtils.getStyle(cd.getStyle());
+	private Composite addComposite(CompositeDescriptor descriptor, Composite parent) {
+		Layout layout = createLayout(descriptor.getLayout());
+		Object data = createLayoutData(descriptor.getLayoutData());
+		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
 		Composite composite = null;
-		if (cd.isGroup()) {
-			composite = WidgetBuilderUtils.createGroup(parent, style, layout, data, cd.getTitle());
+		if (descriptor.isGroup()) {
+			composite = WidgetBuilderUtils.createGroup(parent, style, layout, data, descriptor.getTitle());
 		} else {
 			composite = WidgetBuilderUtils.createComposite(parent, style, layout, data);
 		}
-		List<Object> widget = cd.getTabFolderOrCompositeOrWidget();
+		List<Object> widget = descriptor.getTabFolderOrCompositeOrWidget();
 		for (Object o : widget) {
 			if (o instanceof TabFolderDescriptor) {
 				addFolder((TabFolderDescriptor) o, composite);
@@ -125,29 +131,38 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 				addAttributeViewer((AttributeViewer) o, composite);
 			}
 		}
-		String color = cd.getBackground();
+		String color = descriptor.getBackground();
 		if (color != null) {
 			composite.setBackground(WidgetBuilderUtils.getColor(color));
 		}
-		color = cd.getForeground();
+		color = descriptor.getForeground();
 		if (color != null) {
 			composite.setBackground(WidgetBuilderUtils.getColor(color));
 		}
 		return composite;
 	}
 
-	private TabFolder addFolder(TabFolderDescriptor fd, Composite parent) {
-		TabFolder folder = new TabFolder(parent, WidgetBuilderUtils.getStyle(fd.getStyle()));
-		List<TabItemDescriptor> items = fd.getItem();
+	private TabFolder addFolder(TabFolderDescriptor descriptor, Composite parent) {
+		TabFolder folder = new TabFolder(parent, WidgetBuilderUtils.getStyle(descriptor.getStyle()));
+		Layout layout = createLayout(descriptor.getLayout());
+		if (layout != null) {
+			folder.setLayout(layout);
+		}
+		Object data = createLayoutData(descriptor.getLayoutData());
+		if (data != null) {
+			folder.setLayoutData(data);
+		}
+		List<TabItemDescriptor> items = descriptor.getItem();
 		int index = 0;
 		for (TabItemDescriptor i : items) {
 			addItem(folder, i, index++);
 		}
-		String color = fd.getBackground();
+
+		String color = descriptor.getBackground();
 		if (color != null) {
 			folder.setBackground(WidgetBuilderUtils.getColor(color));
 		}
-		color = fd.getForeground();
+		color = descriptor.getForeground();
 		if (color != null) {
 			folder.setBackground(WidgetBuilderUtils.getColor(color));
 		}
@@ -159,6 +174,10 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		TabItem item = WidgetBuilderUtils.createTabItem(folder, style, descriptor.getTitle(), descriptor.getTooltip(), index);
 		Composite control = WidgetBuilderUtils.createComposite(folder, 1);
 		item.setControl(control);
+		String tt = descriptor.getTooltip();
+		if (tt != null) {
+			item.setToolTipText(tt);
+		}
 		List<Object> children = descriptor.getCompositeOrTabFolderOrWidget();
 		for (Object o : children) {
 			if (o instanceof TabFolderDescriptor) {
@@ -238,25 +257,72 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return control;
 	}
 
-	private GridLayout createGridLayout(GridLayoutDescriptor gridLayout) {
-		if (gridLayout == null) {
-			return null;
+	private Layout createLayout(LayoutDescriptor layout) {
+		if (layout.getFillLayout() != null) {
+			FillLayoutDescriptor fillLayout = layout.getFillLayout();
+			return WidgetBuilderUtils.createFillLayout(fillLayout.getType(), fillLayout.getMarginHeight(),
+					fillLayout.getMarginWidth(), fillLayout.getSpacing());
+		} else if (layout.getRowLayout() != null) {
+			RowLayoutDescriptor rowLayout = layout.getRowLayout();
+			return WidgetBuilderUtils.createRowLayout(rowLayout.isCenter(), rowLayout.isFill(), rowLayout.isJustify(),
+					rowLayout.isPack(), rowLayout.getMarginHeight(), rowLayout.getMarginWidth(), rowLayout.getMarginTop(),
+					rowLayout.getMarginBottom(), rowLayout.getMarginLeft(), rowLayout.getMarginRight(), rowLayout.getSpacing());
+		} else if (layout.getGridLayout() != null) {
+			GridLayoutDescriptor gridLayout = layout.getGridLayout();
+			return WidgetBuilderUtils.createGridLayout(gridLayout.getNumColumns(), gridLayout.isMakeColumnsEqualWidth(),
+					gridLayout.getHorizontalSpacing(), gridLayout.getVerticalSpacing(), gridLayout.getMarginWidth(),
+					gridLayout.getMarginHeight(), gridLayout.getMarginLeft(), gridLayout.getMarginRight(),
+					gridLayout.getMarginTop(), gridLayout.getMarginBottom());
+		} else if (layout.getFormLayout() != null) {
+			FormLayoutDescriptor formLayout = layout.getFormLayout();
+			return WidgetBuilderUtils.createFormLayout(formLayout.getMarginHeight(), formLayout.getMarginWidth(),
+					formLayout.getMarginTop(), formLayout.getMarginBottom(), formLayout.getMarginLeft(),
+					formLayout.getMarginRight(), formLayout.getSpacing());
 		}
-		return WidgetBuilderUtils.createGridLayout(gridLayout.getNumColumns(), gridLayout.isMakeColumnsEqualWidth(),
-				gridLayout.getHorizontalSpacing(), gridLayout.getVerticalSpacing(), gridLayout.getMarginWidth(),
-				gridLayout.getMarginHeight(), gridLayout.getMarginLeft(), gridLayout.getMarginRight(), gridLayout.getMarginTop(),
-				gridLayout.getMarginBottom());
+		return null;
 	}
 
-	static GridData createGridData(GridDataDescriptor gridData) {
-		if (gridData == null) {
-			return null;
+	static Object createLayoutData(LayoutDataDescriptor layoutData) {
+		if (layoutData.getRowData() != null) {
+			RowDataDescriptor rowData = layoutData.getRowData();
+			return WidgetBuilderUtils.createRowData(rowData.getHeight(), rowData.getWidth(), rowData.isExclude());
+		} else if (layoutData.getGridData() != null) {
+			GridDataDescriptor gridData = layoutData.getGridData();
+			int style = WidgetBuilderUtils.getStyle(gridData.getStyle());
+			int hAlign = WidgetBuilderUtils.getStyle(gridData.getHorizontalAlign());
+			int vAlign = WidgetBuilderUtils.getStyle(gridData.getVerticalAlign());
+			return WidgetBuilderUtils.createGridData(style, gridData.isGrabExcessHorizontal(), gridData.isGrabExcessVertical(),
+					gridData.getWidthHint(), gridData.getHeightHint(), gridData.getMinWidth(), gridData.getMinHeight(),
+					gridData.getHorizontalSpan(), gridData.getVerticalSpan(), hAlign, vAlign);
+
+		} else if (layoutData.getFormData() != null) {
+			FormDataDescriptor formData = layoutData.getFormData();
+			FormAttachment top = null;
+			FormAttachment bottom = null;
+			FormAttachment left = null;
+			FormAttachment right = null;
+			FormAttachmentDescriptor fad = formData.getTop();
+			if (fad != null) {
+				top = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+						fad.getOffset());
+			}
+			fad = formData.getBottom();
+			if (fad != null) {
+				bottom = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+						fad.getOffset());
+			}
+			fad = formData.getLeft();
+			if (fad != null) {
+				left = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+						fad.getOffset());
+			}
+			fad = formData.getRight();
+			if (fad != null) {
+				right = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+						fad.getOffset());
+			}
+			return WidgetBuilderUtils.createFormData(formData.getHeight(), formData.getWidth(), top, bottom, left, right);
 		}
-		int style = WidgetBuilderUtils.getStyle(gridData.getStyle());
-		int hAlign = WidgetBuilderUtils.getStyle(gridData.getHorizontalAlign());
-		int vAlign = WidgetBuilderUtils.getStyle(gridData.getVerticalAlign());
-		return WidgetBuilderUtils.createGridData(style, gridData.isGrabExcessHorizontal(), gridData.isGrabExcessVertical(),
-				gridData.getWidthHint(), gridData.getHeightHint(), gridData.getMinWidth(), gridData.getMinHeight(),
-				gridData.getHorizontalSpan(), gridData.getVerticalSpan(), hAlign, vAlign);
+		return null;
 	}
 }
