@@ -193,16 +193,11 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 	 * @throws RuntimeException on problems retrieving the project or its build information.
 	 */
 	public boolean performOk() {
-		IProject project = getCurrentProject();
-		if (project == null) {
-			throw new RuntimeException("Current project not found."); //$NON-NLS-1$
-		}
-		
 		// Register with service model manager
 		BuildScenario buildScenario = new BuildScenario("Git", fSelectedConnection.getName(), fLocationText.getText()); //$NON-NLS-1$
 //		BuildScenario buildScenario = new BuildScenario(fSelectedProvider.getName(), fSelectedConnection.getName(),
 //																										fLocationText.getText());
-		ServiceModelManager.getInstance().setBuildScenarioForBuildConfigurationId(project, buildScenario, getCfg().getId());
+		ServiceModelManager.getInstance().setBuildScenarioForBuildConfigurationId(buildScenario, getCfg().getId());
 
 		return true;
 	}
@@ -297,20 +292,6 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 		button.setEnabled(connectionManager != null);
 	}
 
-	private IProject getCurrentProject() {
-		ISelectionService selectionService = PTPRemoteUIPlugin.getActiveWorkbenchWindow().getSelectionService();
-		ISelection selection = selectionService.getSelection();
-
-		if (selection instanceof IStructuredSelection) {
-			Object element = ((IStructuredSelection)selection).getFirstElement();
-			if (element instanceof IResource) {
-				return ((IResource)element).getProject();
-			}
-		}
-		
-		return null;
-	}
-
 	@Override
 	public void performApply(ICResourceDescription src,
 			ICResourceDescription dst) {
@@ -326,9 +307,8 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 
 	@Override
 	public void updateData(ICResourceDescription cfg) {
-		IProject project = getCurrentProject();
 		BuildScenario buildScenario = ServiceModelManager.getInstance().
-																getBuildScenarioForBuildConfigurationId(project, getCfg().getId());
+																	getBuildScenarioForBuildConfigurationId(getCfg().getId());
 		// fProviderCombo.select(fComboRemoteServicesProviderToIndexMap.get(buildScenario.getSyncProvider()));
 		fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(buildScenario.getRemoteConnectionName()));
 		fLocationText.setText(buildScenario.getLocation());

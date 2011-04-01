@@ -201,10 +201,9 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private final Map<IProject, Map<String, IServiceConfiguration>> fProjectConfigurations = new HashMap<IProject, Map<String, IServiceConfiguration>>();
 	private final Map<IProject, IServiceConfiguration> fActiveConfigurations = new HashMap<IProject, IServiceConfiguration>();
 	private final Map<IProject, Set<IService>> fProjectServices = new HashMap<IProject, Set<IService>>();
-	private final Map<IProject, Map<String, BuildScenario>> fProjectBuildConfigIdToBuildScenarioMap = 
-																			new HashMap<IProject, Map<String,BuildScenario>>();
-	private final Map<IProject, Map<BuildScenario, IServiceConfiguration>> fProjectBuildScenarioToSConfigMap =
-													 		new HashMap<IProject, Map<BuildScenario, IServiceConfiguration>>();
+	private final Map<String, BuildScenario> fBuildConfigIdToBuildScenarioMap = new HashMap<String,BuildScenario>();
+	private final Map<BuildScenario, IServiceConfiguration> fBuildScenarioToSConfigMap =
+																			new HashMap<BuildScenario, IServiceConfiguration>();
 	private Map<String, Service> fServices = null;
 	private Map<String, ServiceCategory> fCategories;
 	private Set<IService> fServiceSet = null;
@@ -234,30 +233,20 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @param buildScenario
 	 * @since 2.1
 	 */
-	private void addBuildScenario(IProject project, BuildScenario buildScenario) {
+	private void addBuildScenario(BuildScenario buildScenario) {
 		checkAndLoadModel();
-		IServiceConfiguration sConfig = this.copyActiveServiceConfiguration(project);
+		IServiceConfiguration sConfig = this.copyActiveServiceConfiguration();
 		this.modifyServiceConfigurationForBuildScenario(sConfig, buildScenario);
-		Map<BuildScenario, IServiceConfiguration> confs = fProjectBuildScenarioToSConfigMap.get(project);
-		if (confs == null) {
-			 confs = new HashMap<BuildScenario, IServiceConfiguration>();
-			 fProjectBuildScenarioToSConfigMap.put(project, confs);
-		}
-		confs.put(buildScenario, sConfig);
+		fBuildScenarioToSConfigMap.put(buildScenario, sConfig);
 		
 		// Update service model manager data structures
-		// We do not want to change the active configuration, so we store it and reset it after updating data structures. This is
-		// necessary according to the interface documentation but not necessary for this implementation, which does not change
-		// the active configuration.
-		IServiceConfiguration activeConfig = this.getActiveConfiguration(project);
+		// TODO: Since we no longer input the project,we cannot do "addConfiguration(project, sConfig)", so some data is missing.
 		this.addConfiguration(sConfig);
-		this.addConfiguration(project, sConfig);
-		this.setActiveConfiguration(project, activeConfig);
 	}
 	
-	private IServiceConfiguration copyActiveServiceConfiguration(IProject project) {
+	private IServiceConfiguration copyActiveServiceConfiguration() {
 		IServiceConfiguration newConfig = newServiceConfiguration("");
-		IServiceConfiguration oldConfig = getActiveConfiguration(project);
+		IServiceConfiguration oldConfig = fBuildScenarioToSConfigMap.values().iterator().next();
 		
 		for (IService service : oldConfig.getServices()) {
 			ServiceProvider oldProvider = (ServiceProvider) oldConfig.getServiceProvider(service);
@@ -421,20 +410,16 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	
 
 	/**
-	 * Return the build scenario for the passed configuration.
+	 * Return the build scenario for the passed configuration. Returns null if configuration not found.
 	 * 
 	 * @param project
 	 * @param configId
 	 * @return build scenario
 	 * @since 2.1
 	 */
-	public BuildScenario getBuildScenarioForBuildConfigurationId(IProject project, String configId) {
+	public BuildScenario getBuildScenarioForBuildConfigurationId(String configId) {
 		checkAndLoadModel();
-		Map<String, BuildScenario> idMap = fProjectBuildConfigIdToBuildScenarioMap.get(project);
-		if (idMap == null) {
-			throw new RuntimeException("Project not found: " + project.getName());
-		}
-		return idMap.get(configId);
+		return fBuildConfigIdToBuildScenarioMap.get(configId);
 	}
 
 	/*
@@ -468,20 +453,16 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	}
 	
 	/**
-	 * Return the service configuration that should be used for a given project and build scenario
+	 * Return the service configuration that should be used for a given build scenario or null if none found.
 	 * 
 	 * @param project
 	 * @param buildScenario
 	 * @return service configuration
 	 * @since 2.1
 	 */
-	public IServiceConfiguration getConfigurationForBuildScenario(IProject project, BuildScenario buildScenario) {
+	public IServiceConfiguration getConfigurationForBuildScenario(BuildScenario buildScenario) {
 		checkAndLoadModel();
-		Map<BuildScenario, IServiceConfiguration> buildMap = fProjectBuildScenarioToSConfigMap.get(project);
-		if (buildMap == null) {
-			throw new RuntimeException("Project not found: " + project.getName());
-		}
-		return buildMap.get(buildScenario);
+		return fBuildScenarioToSConfigMap.get(buildScenario);
 	}
 
 	/*
@@ -1272,16 +1253,10 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * @param buildScenario
 	 * @since 2.1
 	 */
-	public void setBuildScenarioForBuildConfigurationId(IProject project, BuildScenario bs, String id) {
+	public void setBuildScenarioForBuildConfigurationId(BuildScenario bs, String id) {
 		checkAndLoadModel();
-		Map<String, BuildScenario> idMap = fProjectBuildConfigIdToBuildScenarioMap.get(project);
-		if (idMap == null) {
-			idMap = new HashMap<String, BuildScenario>();
-			fProjectBuildConfigIdToBuildScenarioMap.put(project, idMap);
-			
-		}
-		idMap.put(id, bs);
-		addBuildScenario(project, bs);
+		fBuildConfigIdToBuildScenarioMap.put(id, bs);
+		addBuildScenario(bs);
 	}
 
 	/**
@@ -1296,24 +1271,14 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	 * is an invariant enforced by this class. (We return null in the other cases as they could be the result of bad user input.)
 	 * @since 2.1
 	 */
-	public IServiceConfiguration getConfigurationForBuildConfiguration(IProject project, String id) {
+	public IServiceConfiguration getConfigurationForBuildConfiguration(String id) {
 		checkAndLoadModel();
-		Map<String, BuildScenario> idMap = fProjectBuildConfigIdToBuildScenarioMap.get(project);
-		if (idMap == null) {
-			return null;
-		}
-		
-		 BuildScenario bs = idMap.get(id);
+		 BuildScenario bs = fBuildConfigIdToBuildScenarioMap.get(id);
 		 if (bs == null) {
 			 return null;
 		 }
 		 
-		 Map<BuildScenario, IServiceConfiguration> confs = fProjectBuildScenarioToSConfigMap.get(project);
-		 if (confs == null) {
-			 throw new RuntimeException("Unable to find a service configuration map for the project");
-		 }
-		 
-		 IServiceConfiguration conf = confs.get(bs);
+		 IServiceConfiguration conf = fBuildScenarioToSConfigMap.get(bs);
 		 if (conf == null) {
 			 throw new RuntimeException("Unable to find a service configuration for the build scenario");
 		 }
