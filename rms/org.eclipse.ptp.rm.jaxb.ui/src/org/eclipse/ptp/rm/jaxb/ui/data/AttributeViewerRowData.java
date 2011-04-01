@@ -97,8 +97,6 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 	private String choice = null;
 	private Integer min = null;
 	private Integer max = null;
-	private String foreground;
-	private String background;
 	private CellEditor editor;
 	private boolean discovered;
 
@@ -119,16 +117,16 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 		return false;
 	}
 
-	public synchronized CellEditor getCellEditor(TableViewer viewer) {
+	public synchronized CellEditor getCellEditor(TableViewer viewer, ColumnDescriptor d) {
 		if (editor == null) {
-			createEditor(viewer.getTable());
+			createEditor(viewer.getTable(), d);
 		}
 		return editor;
 	}
 
-	public synchronized CellEditor getCellEditor(TreeViewer viewer) {
+	public synchronized CellEditor getCellEditor(TreeViewer viewer, ColumnDescriptor d) {
 		if (editor == null) {
-			createEditor(viewer.getTree());
+			createEditor(viewer.getTree(), d);
 		}
 		return editor;
 	}
@@ -262,7 +260,7 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private CellEditor createEditor(Composite parent) {
+	private CellEditor createEditor(Composite parent, ColumnDescriptor d) {
 		CellEditorType type = CellEditorType.getType(data);
 		if (type == CellEditorType.TEXT) {
 			JAXBTextCellEditor e = new JAXBTextCellEditor(parent);
@@ -270,11 +268,11 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 			if (initialValue != null) {
 				e.setValue(initialValue);
 			}
-			if (foreground != null) {
-				e.getText().setForeground(WidgetBuilderUtils.getColor(foreground));
+			if (d.isForegroundSpecified()) {
+				e.getText().setForeground(WidgetBuilderUtils.getColor(d.getForeground()));
 			}
-			if (background != null) {
-				e.getText().setBackground(WidgetBuilderUtils.getColor(background));
+			if (d.isBackgroundSpecified()) {
+				e.getText().setBackground(WidgetBuilderUtils.getColor(d.getBackground()));
 			}
 		} else if (type == CellEditorType.CHECK) {
 			JAXBCheckboxCellEditor e = new JAXBCheckboxCellEditor(parent);
@@ -282,11 +280,12 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 			if (initialValue != null) {
 				e.setValue(Boolean.valueOf(String.valueOf(initialValue)));
 			}
-			if (foreground != null) {
-				e.getCheckbox().setForeground(WidgetBuilderUtils.getColor(foreground));
+			if (d.isForegroundSpecified()) {
+				e.getCheckbox().setForeground(WidgetBuilderUtils.getColor(d.getForeground()));
 			}
-			if (background != null) {
-				e.getCheckbox().setBackground(WidgetBuilderUtils.getColor(background));
+			if (d.isBackgroundSpecified()) {
+				e.getCheckbox().setBackground(WidgetBuilderUtils.getColor(d.getBackground()));
+				;
 			}
 		} else if (type == CellEditorType.SPINNER) {
 			JAXBSpinnerCellEditor e = new JAXBSpinnerCellEditor(parent, min, max);
@@ -294,11 +293,11 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 			if (initialValue != null) {
 				e.setValue(Integer.valueOf(String.valueOf(initialValue)));
 			}
-			if (foreground != null) {
-				e.getSpinner().setForeground(WidgetBuilderUtils.getColor(foreground));
+			if (d.isForegroundSpecified()) {
+				e.getSpinner().setForeground(WidgetBuilderUtils.getColor(d.getForeground()));
 			}
-			if (background != null) {
-				e.getSpinner().setBackground(WidgetBuilderUtils.getColor(background));
+			if (d.isBackgroundSpecified()) {
+				e.getSpinner().setBackground(WidgetBuilderUtils.getColor(d.getBackground()));
 			}
 		} else if (type == CellEditorType.COMBO) {
 
@@ -317,11 +316,11 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 			if (initialValue != null) {
 				e.setValue(initialValue);
 			}
-			if (foreground != null) {
-				e.getComboBox().setForeground(WidgetBuilderUtils.getColor(foreground));
+			if (d.isForegroundSpecified()) {
+				e.getComboBox().setForeground(WidgetBuilderUtils.getColor(d.getForeground()));
 			}
-			if (background != null) {
-				e.getComboBox().setBackground(WidgetBuilderUtils.getColor(background));
+			if (d.isBackgroundSpecified()) {
+				e.getComboBox().setBackground(WidgetBuilderUtils.getColor(d.getBackground()));
 			}
 		}
 		return editor;

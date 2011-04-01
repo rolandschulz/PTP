@@ -988,8 +988,13 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			TableColumn column = viewerColumn.getColumn();
 			String name = columnDescriptor.getColumnName();
 			column.setText(name);
+			column.setMoveable(columnDescriptor.isMoveable());
+			column.setResizable(columnDescriptor.isResizable());
 			if (columnDescriptor.isWidthSpecified()) {
 				column.setWidth(columnDescriptor.getWidth());
+			}
+			if (columnDescriptor.isAlignSpecified()) {
+				column.setAlignment(columnDescriptor.getAlignment());
 			}
 
 			// if (COLUMN_NAME.equals(name)) {
@@ -1000,7 +1005,8 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			// }
 			// }
 			if (COLUMN_VALUE.equals(columnDescriptor.getColumnName())) {
-				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
+				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer, columnDescriptor));
+
 			}
 		}
 		viewer.setContentProvider(new TableDataContentProvider());
@@ -1041,18 +1047,18 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			TreeColumn column = viewerColumn.getColumn();
 			String name = columnDescriptor.getColumnName();
 			column.setText(name);
+			column.setMoveable(columnDescriptor.isMoveable());
+			column.setResizable(columnDescriptor.isResizable());
 			if (columnDescriptor.isWidthSpecified()) {
 				column.setWidth(columnDescriptor.getWidth());
 			}
-			if (COLUMN_NAME.equals(name)) {
-				if (sortName != null) {
-					if (sortName) {
-						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
-					}
-				}
+			if (columnDescriptor.isAlignSpecified()) {
+				column.setAlignment(columnDescriptor.getAlignment());
 			}
+
 			if (COLUMN_VALUE.equals(columnDescriptor.getColumnName())) {
-				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
+				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer, columnDescriptor));
+
 			}
 		}
 		viewer.setContentProvider(new TreeDataContentProvider());

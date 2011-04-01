@@ -125,6 +125,14 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 				addAttributeViewer((AttributeViewer) o, composite);
 			}
 		}
+		String color = cd.getBackground();
+		if (color != null) {
+			composite.setBackground(WidgetBuilderUtils.getColor(color));
+		}
+		color = cd.getForeground();
+		if (color != null) {
+			composite.setBackground(WidgetBuilderUtils.getColor(color));
+		}
 		return composite;
 	}
 
@@ -134,6 +142,14 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		int index = 0;
 		for (TabItemDescriptor i : items) {
 			addItem(folder, i, index++);
+		}
+		String color = fd.getBackground();
+		if (color != null) {
+			folder.setBackground(WidgetBuilderUtils.getColor(color));
+		}
+		color = fd.getForeground();
+		if (color != null) {
+			folder.setBackground(WidgetBuilderUtils.getColor(color));
 		}
 		return folder;
 	}
