@@ -19,7 +19,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
@@ -234,7 +234,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 	/**
 	 * @param dialog
 	 */
-	public JAXBRMCustomBatchScriptTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog, String title,
+	public JAXBRMCustomBatchScriptTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, String title,
 			JAXBRMLaunchConfigurationDynamicTab pTab) {
 		super(dialog);
 		this.pTab = pTab;
@@ -242,7 +242,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			title = Messages.CustomBatchScriptTab_title;
 		}
 		this.title = title;
-		this.delegate = rm.getRemoteServicesDelegate();
+		this.delegate = rm.getControl().getRemoteServicesDelegate();
 	}
 
 	@Override

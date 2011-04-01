@@ -11,6 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core.rm;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
@@ -27,4 +28,9 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	public JAXBResourceManagerControl getControl() {
 		return (JAXBResourceManagerControl) super.getControl();
 	}
+
+	public IJAXBResourceManagerConfiguration getJAXBConfiguration() {
+		return (IJAXBResourceManagerConfiguration) getConfiguration();
+	}
+
 }

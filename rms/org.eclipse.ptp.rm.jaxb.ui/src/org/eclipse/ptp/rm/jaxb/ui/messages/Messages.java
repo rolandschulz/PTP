@@ -60,6 +60,7 @@ public class Messages extends NLS {
 	public static String WidgetSelectedError;
 	public static String WidgetSelectedErrorTitle;
 	public static String MissingLaunchConfigurationError;
+	public static String JAXBRMLaunchConfigurationFactory_wrongRMType;
 	public static String JAXBRMLaunchConfigurationFactory_doCreateError;
 
 	public static String FileContentsDirty;

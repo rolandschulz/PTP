@@ -31,33 +31,22 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
  */
 public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory implements IJAXBUINonNLSConstants {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #getResourceManagerClass()
-	 */
 	@Override
 	public Class<? extends IResourceManager> getResourceManagerClass() {
 		return JAXBResourceManager.class;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #doCreate(org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.debug.ui.ILaunchConfigurationDialog)
-	 */
 	@Override
 	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
 		if (!(rm instanceof IJAXBResourceManager)) {
-			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_doCreateError + rm, null);
+			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_wrongRMType + rm, null);
 		}
-		return new JAXBRMLaunchConfigurationDynamicTab(((IJAXBResourceManager) rm).getControl(), dialog);
+		try {
+			return new JAXBRMLaunchConfigurationDynamicTab((IJAXBResourceManager) rm, dialog);
+		} catch (Throwable t) {
+			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_doCreateError + rm, t);
+		}
 	}
 
 	static LaunchTab getLaunchTab(IJAXBResourceManagerConfiguration config) {

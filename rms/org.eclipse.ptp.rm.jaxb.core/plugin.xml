@@ -8,7 +8,7 @@
       <JAXBResourceManagerConfiguration
             configurationFile="data/rm-pbs-torque_2.3.7.xml"
             id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"
-            name="PBS Torque">
+            name="PBS Torque 2.3.7">
       </JAXBResourceManagerConfiguration>
    </extension>
    <extension

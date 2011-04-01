@@ -13,8 +13,8 @@ package org.eclipse.ptp.rm.jaxb.ui.launch;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTab;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
@@ -37,9 +37,10 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 	private final boolean hasScript;
 	private ScrolledComposite scrolledParent;
 
-	public JAXBRMLaunchConfigurationDynamicTab(IJAXBResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
+	public JAXBRMLaunchConfigurationDynamicTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
 		super(dialog);
-		rmConfig = rm.getJAXBRMConfiguration();
+		rmConfig = rm.getJAXBConfiguration();
+		rmConfig.setActive();
 		launchTabData = JAXBRMLaunchConfigurationFactory.getLaunchTab(rmConfig);
 		hasScript = JAXBRMLaunchConfigurationFactory.hasScript(rmConfig);
 		if (launchTabData != null) {

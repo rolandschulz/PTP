@@ -17,8 +17,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
@@ -30,12 +28,9 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.services.core.IServiceProvider;
-import org.osgi.framework.Bundle;
 
 public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfiguration implements IJAXBResourceManagerConfiguration,
 		IJAXBNonNLSConstants {
-
-	private static final String DEFAULT_PBS = "rm-pbs-torque_2.3.7.xml"; //$NON-NLS-1$
 
 	private ResourceManagerData rmdata;
 	private RMVariableMap map;
@@ -183,23 +178,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		return getId();
 	}
 
-	/*
-	 * FOR TESTING ONLY: DEFAULT XML SET WHEN THE CONFIGURATION MANAGEMENT IS IN
-	 * PLACE, REMOVE XXX
-	 */
-	public String getRMInstanceXMLLocation() {
-		String loc = getString(RM_XSD_PATH, ZEROSTR);
-		if (ZEROSTR.equals(loc)) {
-			Bundle bundle = JAXBCorePlugin.getDefault().getBundle();
-			URL uri = FileLocator.find(bundle, new Path(DATA + DEFAULT_PBS), null);
-			if (uri != null) {
-				loc = uri.getPath();
-				putString(RM_XSD_PATH, loc);
-			}
-		}
-		return loc;
-	}
-
 	public URL getRMConfigurationURL() {
 		String loc = getString(RM_XSD_URL, ZEROSTR);
 		if (ZEROSTR.equals(loc)) {
@@ -256,7 +234,11 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 			if (rmdata == null) {
 				realizeRMDataFromXML();
 			}
+			if (rmdata == null) {
+				throw new InstantiationError(Messages.FailedToCreateRmData);
+			}
 			JAXBInitializationUtils.initializeMap(rmdata, map);
+
 		}
 	}
 
@@ -285,18 +267,11 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		}
 	}
 
-	public void setRMInstanceXMLLocation(String location) {
-		String current = getRMInstanceXMLLocation();
-		if (!current.equals(location)) {
-			putString(RM_XSD_PATH, location);
-			clearRMData();
-		}
-	}
-
 	public void setRMConfigurationURL(URL location) {
 		URL current = getRMConfigurationURL();
 		if (location != null && current != location) {
-			putString(RM_XSD_URL, location.toExternalForm());
+			String url = location.toExternalForm();
+			putString(RM_XSD_URL, url);
 			clearRMData();
 		}
 	}
