@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Text;
 public class WidgetBuilder implements IJAXBUINonNLSConstants {
 
 	private final JAXBRMConfigurableAttributesTab tab;
-	private final GridData data;
+	private final GridData gridData;
 	private final boolean readOnly;
 	private final String title;
 	private final String type;
@@ -48,13 +48,15 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 	private String tooltip;
 	private Integer min;
 	private Integer max;
+	private String background;
+	private String foreground;
 	private int style;
 
 	public WidgetBuilder(Widget widget, RMVariableMap rmMap, JAXBRMConfigurableAttributesTab tab) {
 		this.tab = tab;
 		title = widget.getTitle();
 		GridDataDescriptor gdd = widget.getGridData();
-		this.data = LaunchTabBuilder.addGridData(gdd);
+		gridData = LaunchTabBuilder.createGridData(gdd);
 		style = WidgetBuilderUtils.getStyle(widget.getStyle());
 		readOnly = widget.isReadOnly();
 		if (readOnly) {
@@ -85,13 +87,13 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 	public Control createControl(final Composite parent) {
 		Control c = null;
 		if (LABEL.equals(type)) {
-			c = WidgetBuilderUtils.createLabel(parent, fixed, style, data);
+			c = WidgetBuilderUtils.createLabel(parent, fixed, style, gridData);
 			c.setToolTipText(tooltip);
 		} else if (TEXT.equals(type)) {
 			if (!ZEROSTR.equals(fixed)) {
 				initialValue = fixed;
 			}
-			Text t = WidgetBuilderUtils.createText(parent, style, data, readOnly, initialValue);
+			Text t = WidgetBuilderUtils.createText(parent, style, gridData, readOnly, initialValue);
 			c = t;
 			c.setToolTipText(tooltip);
 		} else if (RADIOBUTTON.equals(type)) {
@@ -101,7 +103,7 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 			c = WidgetBuilderUtils.createCheckButton(parent, title, null);
 			c.setToolTipText(tooltip);
 		} else if (SPINNER.equals(type)) {
-			Spinner s = WidgetBuilderUtils.createSpinner(parent, data, title, min, max, min, null);
+			Spinner s = WidgetBuilderUtils.createSpinner(parent, gridData, title, min, max, min, null);
 			c = s;
 			c.setToolTipText(tooltip);
 		} else if (COMBO.equals(type)) {
@@ -111,13 +113,13 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 			} else if (value instanceof Collection) {
 				items = (String[]) ((Collection) value).toArray(new String[0]);
 			}
-			Combo cc = WidgetBuilderUtils.createCombo(parent, style, data, items, initialValue, title, tooltip, null);
+			Combo cc = WidgetBuilderUtils.createCombo(parent, style, gridData, items, initialValue, title, tooltip, null);
 			c = cc;
 		} else if (BROWSELOCAL.equals(type)) {
-			final Text t = WidgetBuilderUtils.createText(parent, style, data, readOnly, initialValue);
+			final Text t = WidgetBuilderUtils.createText(parent, style, gridData, readOnly, initialValue);
 			c = t;
 			c.setToolTipText(tooltip);
-			WidgetBuilderUtils.createButton(parent, data, title, style, new SelectionListener() {
+			WidgetBuilderUtils.createButton(parent, gridData, title, style, new SelectionListener() {
 
 				public void widgetDefaultSelected(SelectionEvent e) {
 					widgetSelected(e);
@@ -142,10 +144,10 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 			});
 			c.setToolTipText(tooltip);
 		} else if (BROWSEREMOTE.equals(type)) {
-			final Text t = WidgetBuilderUtils.createText(parent, style, data, readOnly, initialValue);
+			final Text t = WidgetBuilderUtils.createText(parent, style, gridData, readOnly, initialValue);
 			c = t;
 			c.setToolTipText(tooltip);
-			WidgetBuilderUtils.createButton(parent, data, title, style, new SelectionListener() {
+			WidgetBuilderUtils.createButton(parent, gridData, title, style, new SelectionListener() {
 
 				public void widgetDefaultSelected(SelectionEvent e) {
 					widgetSelected(e);

@@ -14,20 +14,20 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ComboBoxCellEditor;
-import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.ui.cell.CheckboxCellEditor;
-import org.eclipse.ptp.rm.jaxb.ui.cell.SpinnerCellEditor;
+import org.eclipse.ptp.rm.jaxb.ui.cell.JAXBCheckboxCellEditor;
+import org.eclipse.ptp.rm.jaxb.ui.cell.JAXBComboCellEditor;
+import org.eclipse.ptp.rm.jaxb.ui.cell.JAXBSpinnerCellEditor;
+import org.eclipse.ptp.rm.jaxb.ui.cell.JAXBTextCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
-
 	/*
 	 * Maps are not supported.
 	 */
@@ -93,87 +93,42 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 
 	private final Object data;
 	private Object value;
+	private String initialValue = null;
+	private String choice = null;
+	private Integer min = null;
+	private Integer max = null;
+	private String foreground;
+	private String background;
 	private CellEditor editor;
-	private final CellEditorType type;
 	private boolean discovered;
 
 	public AttributeViewerRowData(Object data) {
 		this.data = data;
-		type = CellEditorType.getType(data);
 		discovered = false;
+		initialize();
 	}
 
 	public boolean canEdit() {
 		if (data instanceof Property) {
-			return !((Property) data).isReadOnly();
+			Property p = (Property) data;
+			return !p.isReadOnly() && p.isSelected();
 		} else if (data instanceof Attribute) {
-			return !((Attribute) data).isReadOnly();
+			Attribute a = (Attribute) data;
+			return !a.isReadOnly() && a.isSelected();
 		}
 		return false;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public CellEditor getCellEditor(ColumnViewer viewer) {
+	public synchronized CellEditor getCellEditor(TableViewer viewer) {
 		if (editor == null) {
-			Composite parent = (Composite) viewer.getControl();
-			Object value = null;
-			String initialValue = null;
-			String choice = null;
-			Integer min = null;
-			Integer max = null;
-			if (data instanceof Attribute) {
-				Attribute a = (Attribute) data;
-				value = a.getValue();
-				if (!(value instanceof Collection) && !(value instanceof Map)) {
-					initialValue = String.valueOf(value);
-				}
-				if (initialValue == null) {
-					initialValue = a.getDefault();
-				}
-				choice = a.getChoice();
-				min = a.getMin();
-				max = a.getMax();
-			} else {
-				Property p = (Property) data;
-				value = p.getValue();
-				if (!(value instanceof Collection) && !(value instanceof Map)) {
-					initialValue = String.valueOf(value);
-				}
-				if (initialValue == null) {
-					initialValue = p.getDefault();
-				}
-			}
-			if (type == CellEditorType.TEXT) {
-				editor = new TextCellEditor(parent);
-				if (initialValue != null) {
-					editor.setValue(initialValue);
-				}
-			} else if (type == CellEditorType.CHECK) {
-				editor = new CheckboxCellEditor(parent);
-				if (initialValue != null) {
-					editor.setValue(Boolean.valueOf(initialValue));
-				}
-			} else if (type == CellEditorType.SPINNER) {
-				editor = new SpinnerCellEditor(parent, min, max);
-				if (initialValue != null) {
-					editor.setValue(Integer.valueOf(initialValue));
-				}
-			} else if (type == CellEditorType.COMBO) {
-				String[] items = null;
-				if (data instanceof Attribute) {
-					if (choice != null) {
-						items = choice.split(CM);
-					}
-				} else if (value instanceof Collection) {
-					items = (String[]) ((Collection) value).toArray(new String[0]);
-				} else {
-					items = new String[0];
-				}
-				editor = new ComboBoxCellEditor(parent, items);
-				if (initialValue != null) {
-					editor.setValue(initialValue);
-				}
-			}
+			createEditor(viewer.getTable());
+		}
+		return editor;
+	}
+
+	public synchronized CellEditor getCellEditor(TreeViewer viewer) {
+		if (editor == null) {
+			createEditor(viewer.getTree());
 		}
 		return editor;
 	}
@@ -185,7 +140,9 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 			if (COLUMN_NAME.equals(columnName)) {
 				value = p.getName();
 			} else if (COLUMN_VALUE.equals(columnName)) {
-				value = String.valueOf(value);
+				if (this.value != null && !(this.value instanceof Collection) && !(this.value instanceof Map)) {
+					value = String.valueOf(this.value);
+				}
 			} else if (COLUMN_DEFAULT.equals(columnName)) {
 				value = p.getDefault();
 			}
@@ -207,7 +164,9 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 			} else if (COLUMN_STATUS.equals(columnName)) {
 				value = ja.getStatus();
 			} else if (COLUMN_VALUE.equals(columnName)) {
-				value = String.valueOf(value);
+				if (this.value != null && !(this.value instanceof Collection) && !(this.value instanceof Map)) {
+					value = String.valueOf(this.value);
+				}
 			}
 		}
 
@@ -250,6 +209,15 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 		return discovered;
 	}
 
+	public boolean isSelected() {
+		if (data instanceof Property) {
+			return ((Property) data).isSelected();
+		} else if (data instanceof Attribute) {
+			return ((Attribute) data).isSelected();
+		}
+		return false;
+	}
+
 	public boolean isVisible() {
 		if (data instanceof Property) {
 			return ((Property) data).isVisible();
@@ -263,14 +231,22 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 		this.discovered = discovered;
 	}
 
+	public void setSelected(boolean selected) {
+		if (data instanceof Property) {
+			((Property) data).setSelected(selected);
+		} else if (data instanceof Attribute) {
+			((Attribute) data).setSelected(selected);
+		}
+	}
+
 	public void setValue(Object value) {
 		this.value = value;
 	}
 
 	public void setValueFromString(String value) {
-		if (type == CellEditorType.CHECK) {
+		if (editor instanceof JAXBCheckboxCellEditor) {
 			this.value = Boolean.valueOf(value);
-		} else if (type == CellEditorType.CHECK) {
+		} else if (editor instanceof JAXBSpinnerCellEditor) {
 			this.value = Integer.valueOf(value);
 		} else {
 			this.value = value;
@@ -282,6 +258,97 @@ public class AttributeViewerRowData implements IJAXBUINonNLSConstants {
 			((Property) data).setVisible(visible);
 		} else if (data instanceof Attribute) {
 			((Attribute) data).setVisible(visible);
+		}
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private CellEditor createEditor(Composite parent) {
+		CellEditorType type = CellEditorType.getType(data);
+		if (type == CellEditorType.TEXT) {
+			JAXBTextCellEditor e = new JAXBTextCellEditor(parent);
+			editor = e;
+			if (initialValue != null) {
+				e.setValue(initialValue);
+			}
+			if (foreground != null) {
+				e.getText().setForeground(WidgetBuilderUtils.getColor(foreground));
+			}
+			if (background != null) {
+				e.getText().setBackground(WidgetBuilderUtils.getColor(background));
+			}
+		} else if (type == CellEditorType.CHECK) {
+			JAXBCheckboxCellEditor e = new JAXBCheckboxCellEditor(parent);
+			editor = e;
+			if (initialValue != null) {
+				e.setValue(Boolean.valueOf(String.valueOf(initialValue)));
+			}
+			if (foreground != null) {
+				e.getCheckbox().setForeground(WidgetBuilderUtils.getColor(foreground));
+			}
+			if (background != null) {
+				e.getCheckbox().setBackground(WidgetBuilderUtils.getColor(background));
+			}
+		} else if (type == CellEditorType.SPINNER) {
+			JAXBSpinnerCellEditor e = new JAXBSpinnerCellEditor(parent, min, max);
+			editor = e;
+			if (initialValue != null) {
+				e.setValue(Integer.valueOf(String.valueOf(initialValue)));
+			}
+			if (foreground != null) {
+				e.getSpinner().setForeground(WidgetBuilderUtils.getColor(foreground));
+			}
+			if (background != null) {
+				e.getSpinner().setBackground(WidgetBuilderUtils.getColor(background));
+			}
+		} else if (type == CellEditorType.COMBO) {
+
+			String[] items = null;
+			if (data instanceof Attribute) {
+				if (choice != null) {
+					items = choice.split(CM);
+				}
+			} else if (value instanceof Collection) {
+				items = (String[]) ((Collection) value).toArray(new String[0]);
+			} else {
+				items = new String[0];
+			}
+			JAXBComboCellEditor e = new JAXBComboCellEditor(parent, items);
+			editor = e;
+			if (initialValue != null) {
+				e.setValue(initialValue);
+			}
+			if (foreground != null) {
+				e.getComboBox().setForeground(WidgetBuilderUtils.getColor(foreground));
+			}
+			if (background != null) {
+				e.getComboBox().setBackground(WidgetBuilderUtils.getColor(background));
+			}
+		}
+		return editor;
+	}
+
+	private void initialize() {
+		if (data instanceof Attribute) {
+			Attribute a = (Attribute) data;
+			value = a.getValue();
+			if (!(value instanceof Collection) && !(value instanceof Map)) {
+				initialValue = String.valueOf(value);
+			}
+			if (initialValue == null) {
+				initialValue = a.getDefault();
+			}
+			choice = a.getChoice();
+			min = a.getMin();
+			max = a.getMax();
+		} else {
+			Property p = (Property) data;
+			value = p.getValue();
+			if (!(value instanceof Collection) && !(value instanceof Map)) {
+				initialValue = String.valueOf(value);
+			}
+			if (initialValue == null) {
+				initialValue = p.getDefault();
+			}
 		}
 	}
 }

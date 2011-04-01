@@ -14,28 +14,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
+import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TableViewerEditor;
+import org.eclipse.jface.viewers.TableViewerFocusCellManager;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.jface.viewers.TreeViewerEditor;
+import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
 import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
-import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataLabelProvider;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
@@ -114,6 +119,18 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return button;
 	}
 
+	public static Button createButton(Composite parent, GridData data, String label, Integer type, SelectionListener listener,
+			String bg, String fg) {
+		Button b = createButton(parent, data, label, type, listener);
+		if (bg != null) {
+			b.setBackground(getColor(bg));
+		}
+		if (fg != null) {
+			b.setBackground(getColor(fg));
+		}
+		return b;
+	}
+
 	public static Button createButton(Composite parent, String label, Integer type) {
 		return createButton(parent, null, label, type, null);
 	}
@@ -189,15 +206,17 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 
 	public static GridData createGridData(Integer style, Boolean grabH, Boolean grabV, Integer wHint, Integer hHint, Integer minW,
 			Integer minH, Integer hSpan, Integer vSpan, Integer hAlign, Integer vAlign) {
-		GridData data = new GridData();
-
+		GridData data = null;
 		if (null != style) {
 			if (style == DEFAULT) {
 				data = new GridData();
 			} else {
 				data = new GridData(style);
 			}
+		} else {
+			data = new GridData();
 		}
+
 		if (grabH != null) {
 			data.grabExcessHorizontalSpace = grabH;
 		}
@@ -323,6 +342,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		if (data != null) {
 			label.setLayoutData(data);
 		}
+
 		return label;
 	}
 
@@ -518,6 +538,82 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return newLine.toString();
 	}
 
+	public static Color getColor(String color) {
+		int swtColor = SWT.COLOR_BLACK;
+		if (COLOR_BLACK.equals(color)) {
+			swtColor = SWT.COLOR_BLACK;
+		} else if (COLOR_WHITE.equals(color)) {
+			swtColor = SWT.COLOR_WHITE;
+		} else if (COLOR_RED.equals(color)) {
+			swtColor = SWT.COLOR_RED;
+		} else if (COLOR_DARK_RED.equals(color)) {
+			swtColor = SWT.COLOR_DARK_RED;
+		} else if (COLOR_GREEN.equals(color)) {
+			swtColor = SWT.COLOR_GREEN;
+		} else if (COLOR_DARK_GREEN.equals(color)) {
+			swtColor = SWT.COLOR_DARK_GREEN;
+		} else if (COLOR_YELLOW.equals(color)) {
+			swtColor = SWT.COLOR_YELLOW;
+		} else if (COLOR_DARK_YELLOW.equals(color)) {
+			swtColor = SWT.COLOR_DARK_YELLOW;
+		} else if (COLOR_BLUE.equals(color)) {
+			swtColor = SWT.COLOR_BLUE;
+		} else if (COLOR_DARK_BLUE.equals(color)) {
+			swtColor = SWT.COLOR_DARK_BLUE;
+		} else if (COLOR_MAGENTA.equals(color)) {
+			swtColor = SWT.COLOR_MAGENTA;
+		} else if (COLOR_DARK_MAGENTA.equals(color)) {
+			swtColor = SWT.COLOR_DARK_MAGENTA;
+		} else if (COLOR_CYAN.equals(color)) {
+			swtColor = SWT.COLOR_CYAN;
+		} else if (COLOR_DARK_CYAN.equals(color)) {
+			swtColor = SWT.COLOR_DARK_CYAN;
+		} else if (COLOR_GRAY.equals(color)) {
+			swtColor = SWT.COLOR_GRAY;
+		} else if (COLOR_DARK_GRAY.equals(color)) {
+			swtColor = SWT.COLOR_DARK_GRAY;
+		} else if (COLOR_INFO_BACKGROUND.equals(color)) {
+			swtColor = SWT.COLOR_INFO_BACKGROUND;
+		} else if (COLOR_INFO_FOREGROUND.equals(color)) {
+			swtColor = SWT.COLOR_INFO_FOREGROUND;
+		} else if (COLOR_LIST_BACKGROUND.equals(color)) {
+			swtColor = SWT.COLOR_LIST_BACKGROUND;
+		} else if (COLOR_LIST_FOREGROUND.equals(color)) {
+			swtColor = SWT.COLOR_LIST_FOREGROUND;
+		} else if (COLOR_LIST_SELECTION.equals(color)) {
+			swtColor = SWT.COLOR_LIST_SELECTION;
+		} else if (COLOR_LIST_SELECTION_TEXT.equals(color)) {
+			swtColor = SWT.COLOR_LIST_SELECTION_TEXT;
+		} else if (COLOR_TITLE_BACKGROUND.equals(color)) {
+			swtColor = SWT.COLOR_TITLE_BACKGROUND;
+		} else if (COLOR_TITLE_BACKGROUND_GRADIENT.equals(color)) {
+			swtColor = SWT.COLOR_TITLE_BACKGROUND_GRADIENT;
+		} else if (COLOR_TITLE_FOREGROUND.equals(color)) {
+			swtColor = SWT.COLOR_TITLE_FOREGROUND;
+		} else if (COLOR_TITLE_INACTIVE_BACKGROUND.equals(color)) {
+			swtColor = SWT.COLOR_TITLE_INACTIVE_BACKGROUND;
+		} else if (COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT.equals(color)) {
+			swtColor = SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT;
+		} else if (COLOR_TITLE_INACTIVE_FOREGROUND.equals(color)) {
+			swtColor = SWT.COLOR_TITLE_INACTIVE_FOREGROUND;
+		} else if (COLOR_WIDGET_BACKGROUND.equals(color)) {
+			swtColor = SWT.COLOR_WIDGET_BACKGROUND;
+		} else if (COLOR_WIDGET_BORDER.equals(color)) {
+			swtColor = SWT.COLOR_WIDGET_BORDER;
+		} else if (COLOR_WIDGET_DARK_SHADOW.equals(color)) {
+			swtColor = SWT.COLOR_WIDGET_DARK_SHADOW;
+		} else if (COLOR_WIDGET_FOREGROUND.equals(color)) {
+			swtColor = SWT.COLOR_WIDGET_FOREGROUND;
+		} else if (COLOR_WIDGET_HIGHLIGHT_SHADOW.equals(color)) {
+			swtColor = SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW;
+		} else if (COLOR_WIDGET_LIGHT_SHADOW.equals(color)) {
+			swtColor = SWT.COLOR_WIDGET_LIGHT_SHADOW;
+		} else if (COLOR_WIDGET_NORMAL_SHADOW.equals(color)) {
+			swtColor = SWT.COLOR_WIDGET_NORMAL_SHADOW;
+		}
+		return Display.getDefault().getSystemColor(swtColor);
+	}
+
 	public static List<ColumnDescriptor> getColumnDescriptors(AttributeViewer descriptor) {
 		List<ColumnData> data = descriptor.getColumnData();
 		List<ColumnDescriptor> desc = new ArrayList<ColumnDescriptor>();
@@ -528,7 +624,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static int getStyle(String style) {
-		if (style == null) {
+		if (style == null || ZEROSTR.equals(style)) {
 			return SWT.NONE;
 		}
 		return getStyle(style.split(OPENSQ + PIP + CLOSSQ));
@@ -538,12 +634,52 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			ISelectionChangedListener listener, Boolean sortName, boolean tooltip) {
 		setupSpecific(viewer, columnDescriptors, sortName);
 		setupCommon(viewer, columnDescriptors, listener, tooltip);
+		// if (true) {
+		// enableCursorKeys(viewer);
+		// }
 	}
 
 	public static void setupAttributeTree(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors,
 			ISelectionChangedListener listener, Boolean sortName, boolean tooltip) {
 		setupSpecific(viewer, columnDescriptors, sortName);
 		setupCommon(viewer, columnDescriptors, listener, tooltip);
+		if (true) {
+			enableCursorKeys(viewer);
+		}
+	}
+
+	private static void enableCursorKeys(TableViewer viewer) {
+		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(viewer, new FocusCellOwnerDrawHighlighter(
+				viewer));
+		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
+			@Override
+			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
+				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
+						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
+						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
+						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
+			}
+		};
+		TableViewerEditor.create(viewer, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
+				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL
+				| ColumnViewerEditor.KEYBOARD_ACTIVATION);
+	}
+
+	private static void enableCursorKeys(TreeViewer viewer) {
+		TreeViewerFocusCellManager focusCellManager = new TreeViewerFocusCellManager(viewer, new FocusCellOwnerDrawHighlighter(
+				viewer));
+		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
+			@Override
+			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
+				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
+						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
+						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
+						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
+			}
+		};
+		TreeViewerEditor.create(viewer, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
+				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL
+				| ColumnViewerEditor.KEYBOARD_ACTIVATION);
 	}
 
 	private static SelectionAdapter getAttributeViewerSelectionAdapter(final ColumnViewer viewer) {
@@ -813,26 +949,36 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			columnProperties[i] = columnDescriptor.getColumnName();
 		}
 		viewer.setColumnProperties(columnProperties);
-		if (tooltip) {
-			viewer.addDoubleClickListener(new IDoubleClickListener() {
-				public void doubleClick(DoubleClickEvent event) {
-					try {
-						IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-						AttributeViewerRowData row = (AttributeViewerRowData) selection.getFirstElement();
-						String tooltip = row.getTooltip();
-						if (tooltip != null) {
-							MessageDialog.openInformation(viewer.getControl().getShell(), Messages.Tooltip, tooltip);
-						}
-					} catch (Throwable t) {
-						t.printStackTrace();
-					}
-				}
-			});
-		}
+		// if (tooltip) {
+		// viewer.addDoubleClickListener(new IDoubleClickListener() {
+		// boolean displaying = false;
+		//
+		// public void doubleClick(DoubleClickEvent event) {
+		// if (displaying) {
+		// return;
+		// }
+		// displaying = true;
+		// try {
+		// IStructuredSelection selection = (IStructuredSelection)
+		// viewer.getSelection();
+		// AttributeViewerRowData row = (AttributeViewerRowData)
+		// selection.getFirstElement();
+		// String tooltip = row.getTooltip();
+		// if (tooltip != null) {
+		// MessageDialog.openInformation(viewer.getControl().getShell(),
+		// Messages.Tooltip, tooltip);
+		// }
+		// } catch (Throwable t) {
+		// t.printStackTrace();
+		// }
+		// displaying = false;
+		// }
+		// });
+		// }
 
-		if (listener != null) {
-			viewer.addSelectionChangedListener(listener);
-		}
+		// if (listener != null) {
+		// viewer.addSelectionChangedListener(listener);
+		// }
 	}
 
 	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName) {
@@ -845,31 +991,45 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			if (columnDescriptor.isWidthSpecified()) {
 				column.setWidth(columnDescriptor.getWidth());
 			}
-			if (COLUMN_NAME.equals(name)) {
-				if (sortName != null) {
-					if (sortName) {
-						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
-					}
-				}
-			}
+
+			// if (COLUMN_NAME.equals(name)) {
+			// if (sortName != null) {
+			// if (sortName) {
+			// column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
+			// }
+			// }
+			// }
 			if (COLUMN_VALUE.equals(columnDescriptor.getColumnName())) {
 				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
 			}
 		}
 		viewer.setContentProvider(new TableDataContentProvider());
 		viewer.setLabelProvider(new TableDataLabelProvider(columnDescriptors));
-		viewer.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(CheckStateChangedEvent event) {
-				IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-				List<?> selected = selection.toList();
-				for (Object o : selected) {
-					AttributeViewerRowData row = (AttributeViewerRowData) o;
-					boolean checked = row.isVisible();
-					viewer.setChecked(row, !checked);
-					row.setVisible(!checked);
-				}
-			}
-		});
+		// viewer.addCheckStateListener(new ICheckStateListener() {
+		// boolean checking = false;
+		//
+		// public void checkStateChanged(CheckStateChangedEvent event) {
+		// if (checking) {
+		// return;
+		// }
+		// Object target = event.getElement();
+		// checking = true;
+		// IStructuredSelection selection = (IStructuredSelection)
+		// viewer.getSelection();
+		// List<?> selected = selection.toList();
+		// for (Object o : selected) {
+		// if (o == target) {
+		// continue;
+		// }
+		// AttributeViewerRowData row = (AttributeViewerRowData) o;
+		// boolean checked = viewer.getChecked(row);
+		// viewer.setChecked(row, !checked);
+		// row.setSelected(!checked);
+		// }
+		// checking = false;
+		// }
+		// });
+
 		viewer.getTable().setHeaderVisible(true);
 		viewer.getTable().setLinesVisible(true);
 	}
@@ -898,17 +1058,25 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		viewer.setContentProvider(new TreeDataContentProvider());
 		viewer.setLabelProvider(new TreeDataLabelProvider(columnDescriptors));
 		viewer.addCheckStateListener(new ICheckStateListener() {
+			boolean checking = false;
+
 			public void checkStateChanged(CheckStateChangedEvent event) {
+				if (checking) {
+					return;
+				}
+				checking = true;
 				IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 				List<?> selected = selection.toList();
 				for (Object o : selected) {
 					AttributeViewerRowData row = (AttributeViewerRowData) o;
-					boolean checked = row.isVisible();
+					boolean checked = viewer.getChecked(row);
 					viewer.setChecked(row, !checked);
 					row.setVisible(!checked);
 				}
+				checking = false;
 			}
 		});
+
 		viewer.getTree().setHeaderVisible(true);
 		viewer.getTree().setLinesVisible(true);
 	}

@@ -329,10 +329,13 @@
 		<xs:attribute name="style" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
-					The style attribute on the UI parts is a string which looks like the OR'd integer specification; e.g., "SWT.BORDER | SWT.LEFT".
+					The style attribute on the UI parts is a string which looks like the OR'd integer specification; e.g.,
+					"SWT.BORDER | SWT.LEFT".
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="foreground" type="xs:string"/>
+		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="composite-descriptor">
 		<xs:annotation>
@@ -355,6 +358,8 @@
 		</xs:sequence>
 		<xs:attribute name="group" type="xs:boolean" default="false"/>
 		<xs:attribute name="style" type="xs:string"/>
+		<xs:attribute name="foreground" type="xs:string"/>
+		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="tab-item-descriptor">
 		<xs:sequence>
@@ -367,6 +372,8 @@
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string"/>
+		<xs:attribute name="foreground" type="xs:string"/>
+		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="grid-data-descriptor">
 		<xs:attribute name="style" type="xs:string"/>
@@ -398,11 +405,11 @@
 			<xs:element name="grid-data" minOccurs="0" type="rm:grid-data-descriptor"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="fixed-value" minOccurs="0" type="xs:string">
-			   <xs:annotation>
-               <xs:documentation>
-                  The text of this element will be set once from the environment on loading; e.g, ${rm:Job_Name#description}.
-               </xs:documentation>
-            </xs:annotation>
+				<xs:annotation>
+					<xs:documentation>
+						The text of this element will be set once from the environment on loading; e.g, ${rm:Job_Name#description}.
+					</xs:documentation>
+				</xs:annotation>
 			</xs:element>
 			<xs:element name="dynamic-value" minOccurs="0">
 				<xs:annotation>
@@ -435,6 +442,8 @@
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 		<xs:attribute name="saveValueTo" type="xs:string"/>
+		<xs:attribute name="foreground" type="xs:string"/>
+		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="attribute-viewer">
 		<xs:annotation>
@@ -522,10 +531,15 @@
 	</xs:complexType>
 	<xs:complexType name="column-data">
 		<xs:sequence>
-			<xs:element name="option" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="width" type="xs:int" default="-1"/>
+		<xs:attribute name="alignment" type="xs:string"/>
+		<xs:attribute name="resizable" type="xs:boolean" default="true"/>
+		<xs:attribute name="moveable" type="xs:boolean" default="false"/>
+		<xs:attribute name="foreground" type="xs:string"/>
+		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="set">
 		<xs:sequence>

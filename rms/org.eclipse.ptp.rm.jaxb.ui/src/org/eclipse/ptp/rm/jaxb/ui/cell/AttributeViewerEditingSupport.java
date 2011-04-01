@@ -12,14 +12,18 @@ package org.eclipse.ptp.rm.jaxb.ui.cell;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 
 public class AttributeViewerEditingSupport extends EditingSupport {
 
-	private ColumnViewer viewer;
+	private final ColumnViewer viewer;
 
 	public AttributeViewerEditingSupport(ColumnViewer viewer) {
 		super(viewer);
+		this.viewer = viewer;
 	}
 
 	@Override
@@ -29,17 +33,22 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		return ((AttributeViewerRowData) element).getCellEditor(viewer);
+		if (viewer instanceof TableViewer) {
+			return ((AttributeViewerRowData) element).getCellEditor((TableViewer) viewer);
+		} else {
+			return ((AttributeViewerRowData) element).getCellEditor((TreeViewer) viewer);
+		}
 	}
 
 	@Override
 	protected Object getValue(Object element) {
-		return ((AttributeViewerRowData) element).getValue();
+		Object o = ((AttributeViewerRowData) element).getValue();
+		return o;
 	}
 
 	@Override
 	protected void setValue(Object element, Object value) {
 		((AttributeViewerRowData) element).setValue(value);
-		viewer.refresh();
+		WidgetActionUtils.refreshViewer(viewer);
 	}
 }
