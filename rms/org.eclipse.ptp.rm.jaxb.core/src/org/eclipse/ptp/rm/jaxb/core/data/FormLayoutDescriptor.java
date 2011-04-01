@@ -14,26 +14,23 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>
- * Java class for grid-layout-descriptor complex type.
+ * Java class for form-layout-descriptor complex type.
  * 
  * <p>
  * The following schema fragment specifies the expected content contained within
  * this class.
  * 
  * <pre>
- * &lt;complexType name="grid-layout-descriptor">
+ * &lt;complexType name="form-layout-descriptor">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="horizontalSpacing" type="{http://www.w3.org/2001/XMLSchema}int" />
- *       &lt;attribute name="makeColumnsEqualWidth" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" />
  *       &lt;attribute name="marginBottom" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="marginHeight" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="marginLeft" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="marginRight" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="marginTop" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="marginWidth" type="{http://www.w3.org/2001/XMLSchema}int" />
- *       &lt;attribute name="numColumns" type="{http://www.w3.org/2001/XMLSchema}int" />
- *       &lt;attribute name="verticalSpacing" type="{http://www.w3.org/2001/XMLSchema}int" />
+ *       &lt;attribute name="spacing" type="{http://www.w3.org/2001/XMLSchema}int" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -42,13 +39,9 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "grid-layout-descriptor")
-public class GridLayoutDescriptor {
+@XmlType(name = "form-layout-descriptor")
+public class FormLayoutDescriptor {
 
-	@XmlAttribute
-	protected Integer horizontalSpacing;
-	@XmlAttribute
-	protected Boolean makeColumnsEqualWidth;
 	@XmlAttribute
 	protected Integer marginBottom;
 	@XmlAttribute
@@ -62,19 +55,7 @@ public class GridLayoutDescriptor {
 	@XmlAttribute
 	protected Integer marginWidth;
 	@XmlAttribute
-	protected Integer numColumns;
-	@XmlAttribute
-	protected Integer verticalSpacing;
-
-	/**
-	 * Gets the value of the horizontalSpacing property.
-	 * 
-	 * @return possible object is {@link Integer }
-	 * 
-	 */
-	public Integer getHorizontalSpacing() {
-		return horizontalSpacing;
-	}
+	protected Integer spacing;
 
 	/**
 	 * Gets the value of the marginBottom property.
@@ -137,59 +118,13 @@ public class GridLayoutDescriptor {
 	}
 
 	/**
-	 * Gets the value of the numColumns property.
+	 * Gets the value of the spacing property.
 	 * 
 	 * @return possible object is {@link Integer }
 	 * 
 	 */
-	public Integer getNumColumns() {
-		return numColumns;
-	}
-
-	/**
-	 * Gets the value of the verticalSpacing property.
-	 * 
-	 * @return possible object is {@link Integer }
-	 * 
-	 */
-	public Integer getVerticalSpacing() {
-		return verticalSpacing;
-	}
-
-	/**
-	 * Gets the value of the makeColumnsEqualWidth property.
-	 * 
-	 * @return possible object is {@link Boolean }
-	 * 
-	 */
-	public boolean isMakeColumnsEqualWidth() {
-		if (makeColumnsEqualWidth == null) {
-			return true;
-		} else {
-			return makeColumnsEqualWidth;
-		}
-	}
-
-	/**
-	 * Sets the value of the horizontalSpacing property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link Integer }
-	 * 
-	 */
-	public void setHorizontalSpacing(Integer value) {
-		this.horizontalSpacing = value;
-	}
-
-	/**
-	 * Sets the value of the makeColumnsEqualWidth property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link Boolean }
-	 * 
-	 */
-	public void setMakeColumnsEqualWidth(Boolean value) {
-		this.makeColumnsEqualWidth = value;
+	public Integer getSpacing() {
+		return spacing;
 	}
 
 	/**
@@ -259,25 +194,14 @@ public class GridLayoutDescriptor {
 	}
 
 	/**
-	 * Sets the value of the numColumns property.
+	 * Sets the value of the spacing property.
 	 * 
 	 * @param value
 	 *            allowed object is {@link Integer }
 	 * 
 	 */
-	public void setNumColumns(Integer value) {
-		this.numColumns = value;
-	}
-
-	/**
-	 * Sets the value of the verticalSpacing property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link Integer }
-	 * 
-	 */
-	public void setVerticalSpacing(Integer value) {
-		this.verticalSpacing = value;
+	public void setSpacing(Integer value) {
+		this.spacing = value;
 	}
 
 }
