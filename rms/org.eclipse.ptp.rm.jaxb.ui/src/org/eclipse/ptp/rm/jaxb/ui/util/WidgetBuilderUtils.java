@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -29,6 +30,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
+import org.eclipse.ptp.rm.jaxb.core.data.FontDescriptor;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
@@ -73,6 +75,8 @@ import org.eclipse.swt.widgets.TreeColumn;
 
 public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 
+	private static final FontRegistry fonts = new FontRegistry();
+
 	private WidgetBuilderUtils() {
 	}
 
@@ -89,18 +93,14 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static void applyMonospace(Text text) {
-		Display d = Display.getCurrent();
-		// three fonts for Mac, Linux, Windows ...
-		FontData[][] f = { d.getFontList(COURIER, true), d.getFontList(COURIER, false), d.getFontList(COURIER, true),
-				d.getFontList(COURIER, false), d.getFontList(COURIER, true), d.getFontList(COURIER, false) };
-		int i = 0;
-		for (; i < f.length; i++) {
-			if (f[i].length > 0) {
-				text.setFont(new Font(d, f[i]));
-				break;
-			}
-		}
-		if (i == f.length) {
+		// Courier exists on Mac, Linux, Windows ...
+		FontDescriptor fd = new FontDescriptor();
+		fd.setName(COURIER);
+		fd.setSize(14);
+		fd.setStyle(NORMAL);
+		Font font = getFont(fd);
+		if (font != null) {
+			text.setFont(font);
 			Dialog.applyDialogFont(text);
 		}
 	}
@@ -743,6 +743,16 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		 * don't have to deallocate, as these are system colors
 		 */
 		return Display.getDefault().getSystemColor(swtColor);
+	}
+
+	public static Font getFont(FontDescriptor fd) {
+		String key = fd.getName() + fd.getSize() + fd.getStyle();
+		FontData[] data = fonts.getFontData(key);
+		if (data == null) {
+			data = new FontData[] { new FontData(fd.getName(), fd.getSize(), getStyle(fd.getStyle())) };
+			fonts.put(key, data);
+		}
+		return fonts.get(key);
 	}
 
 	public static int getStyle(String style) {

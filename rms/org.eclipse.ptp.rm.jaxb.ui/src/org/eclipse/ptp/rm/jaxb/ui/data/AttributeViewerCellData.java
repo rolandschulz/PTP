@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
+import org.eclipse.ptp.rm.jaxb.core.data.FontDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.ui.IAttributeViewerColumnLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -125,17 +126,23 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 		background = new Color[cols];
 		font = new Font[cols];
 		for (int i = 0; i < columnData.size(); i++) {
-			String color = columnData.get(i).getForeground();
-			if (color != null) {
-				foreground[i] = WidgetBuilderUtils.getColor(color);
+			String attr = columnData.get(i).getForeground();
+			if (attr != null) {
+				foreground[i] = WidgetBuilderUtils.getColor(attr);
 			} else {
 				foreground[i] = null;
 			}
-			color = columnData.get(i).getBackground();
-			if (color != null) {
-				background[i] = WidgetBuilderUtils.getColor(color);
+			attr = columnData.get(i).getBackground();
+			if (attr != null) {
+				background[i] = WidgetBuilderUtils.getColor(attr);
 			} else {
 				background[i] = null;
+			}
+			FontDescriptor fd = columnData.get(i).getFont();
+			if (fd != null) {
+				font[i] = WidgetBuilderUtils.getFont(fd);
+			} else {
+				font[i] = null;
 			}
 		}
 	}
@@ -157,6 +164,10 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 
 	public Object getData() {
 		return data;
+	}
+
+	public Font getFont(Object element, int columnIndex) {
+		return font[columnIndex];
 	}
 
 	public Color getForeground(Object element, int columnIndex) {

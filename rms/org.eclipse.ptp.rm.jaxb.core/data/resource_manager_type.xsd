@@ -328,6 +328,7 @@
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
 			<xs:element name="item" maxOccurs="unbounded" type="rm:tab-item-descriptor"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string">
 			<xs:annotation>
@@ -337,7 +338,6 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="composite-descriptor">
@@ -351,6 +351,7 @@
 		<xs:sequence>
 			<xs:element name="layout" minOccurs="0" type="rm:layout-descriptor"/>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
 			<xs:element name="title" minOccurs="0" type="xs:string"/>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
@@ -361,13 +362,13 @@
 		</xs:sequence>
 		<xs:attribute name="group" type="xs:boolean" default="false"/>
 		<xs:attribute name="style" type="xs:string"/>
-		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="tab-item-descriptor">
 		<xs:sequence>
 			<xs:element name="title" type="xs:string"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="composite" type="rm:composite-descriptor"/>
 				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
@@ -375,7 +376,6 @@
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string"/>
-		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="layout-descriptor">
@@ -394,44 +394,44 @@
 		</xs:choice>
 	</xs:complexType>
 	<xs:complexType name="fill-layout-descriptor">
-	  <xs:attribute name="type" type="xs:string"/>
-	  <xs:attribute name="marginHeight" type="xs:int"/>
-	  <xs:attribute name="marginWidth" type="xs:int"/>
-	  <xs:attribute name="spacing" type="xs:int"/>
+		<xs:attribute name="type" type="xs:string"/>
+		<xs:attribute name="marginHeight" type="xs:int"/>
+		<xs:attribute name="marginWidth" type="xs:int"/>
+		<xs:attribute name="spacing" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="row-layout-descriptor">
-	   <xs:attribute name="center" type="xs:boolean" default="false"/>
-	   <xs:attribute name="justify" type="xs:boolean" default="false"/>
-	   <xs:attribute name="fill" type="xs:boolean" default="false"/>
-	   <xs:attribute name="pack" type="xs:boolean" default="false"/>
-	   <xs:attribute name="marginHeight" type="xs:int"/>
-	   <xs:attribute name="marginWidth" type="xs:int"/>
-	   <xs:attribute name="marginTop" type="xs:int"/>
-	   <xs:attribute name="marginBottom" type="xs:int"/>
-      <xs:attribute name="marginLeft" type="xs:int"/>
-      <xs:attribute name="marginRight" type="xs:int"/>
-      <xs:attribute name="spacing" type="xs:int"/>
+		<xs:attribute name="center" type="xs:boolean" default="false"/>
+		<xs:attribute name="justify" type="xs:boolean" default="false"/>
+		<xs:attribute name="fill" type="xs:boolean" default="false"/>
+		<xs:attribute name="pack" type="xs:boolean" default="false"/>
+		<xs:attribute name="marginHeight" type="xs:int"/>
+		<xs:attribute name="marginWidth" type="xs:int"/>
+		<xs:attribute name="marginTop" type="xs:int"/>
+		<xs:attribute name="marginBottom" type="xs:int"/>
+		<xs:attribute name="marginLeft" type="xs:int"/>
+		<xs:attribute name="marginRight" type="xs:int"/>
+		<xs:attribute name="spacing" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="grid-layout-descriptor">
 		<xs:attribute name="numColumns" type="xs:int"/>
 		<xs:attribute name="makeColumnsEqualWidth" type="xs:boolean" default="true"/>
 		<xs:attribute name="marginHeight" type="xs:int"/>
-      <xs:attribute name="marginWidth" type="xs:int"/>
-      <xs:attribute name="marginTop" type="xs:int"/>
-      <xs:attribute name="marginBottom" type="xs:int"/>
-      <xs:attribute name="marginLeft" type="xs:int"/>
-      <xs:attribute name="marginRight" type="xs:int"/>
-      <xs:attribute name="horizontalSpacing" type="xs:int"/>
+		<xs:attribute name="marginWidth" type="xs:int"/>
+		<xs:attribute name="marginTop" type="xs:int"/>
+		<xs:attribute name="marginBottom" type="xs:int"/>
+		<xs:attribute name="marginLeft" type="xs:int"/>
+		<xs:attribute name="marginRight" type="xs:int"/>
+		<xs:attribute name="horizontalSpacing" type="xs:int"/>
 		<xs:attribute name="verticalSpacing" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="form-layout-descriptor">
-	   <xs:attribute name="marginHeight" type="xs:int"/>
-      <xs:attribute name="marginWidth" type="xs:int"/>
-      <xs:attribute name="marginTop" type="xs:int"/>
-      <xs:attribute name="marginBottom" type="xs:int"/>
-      <xs:attribute name="marginLeft" type="xs:int"/>
-      <xs:attribute name="marginRight" type="xs:int"/>
-      <xs:attribute name="spacing" type="xs:int"/>
+		<xs:attribute name="marginHeight" type="xs:int"/>
+		<xs:attribute name="marginWidth" type="xs:int"/>
+		<xs:attribute name="marginTop" type="xs:int"/>
+		<xs:attribute name="marginBottom" type="xs:int"/>
+		<xs:attribute name="marginLeft" type="xs:int"/>
+		<xs:attribute name="marginRight" type="xs:int"/>
+		<xs:attribute name="spacing" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="row-data-descriptor">
 		<xs:attribute name="height" type="xs:int"/>
@@ -470,6 +470,7 @@
 	<xs:complexType name="widget">
 		<xs:sequence>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="fixed-value" minOccurs="0" type="xs:string">
 				<xs:annotation>
@@ -551,6 +552,19 @@
 		<xs:attribute name="allPredefined" type="xs:boolean" default="false"/>
 		<xs:attribute name="allDiscovered" type="xs:boolean" default="false"/>
 	</xs:complexType>
+	<xs:complexType name="font-descriptor">
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="size" type="xs:int" default="9"/>
+		<xs:attribute name="style" default="normal">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="normal"/>
+					<xs:enumeration value="bold"/>
+					<xs:enumeration value="italic"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
 	<xs:complexType name="template">
 		<xs:attribute name="pattern" type="xs:string">
 			<xs:annotation>
@@ -600,6 +614,7 @@
 	</xs:complexType>
 	<xs:complexType name="column-data">
 		<xs:sequence>
+		   <xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
