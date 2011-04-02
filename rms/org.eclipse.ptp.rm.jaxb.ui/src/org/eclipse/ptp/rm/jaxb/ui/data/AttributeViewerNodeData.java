@@ -20,7 +20,7 @@ public class AttributeViewerNodeData extends AttributeViewerCellData {
 		generateChildren(inValueCol);
 	}
 
-	public synchronized CellEditor getCellEditor(TreeViewer viewer, ColumnDescriptor d) {
+	public synchronized CellEditor getCellEditor(TreeViewer viewer, ColumnData d) {
 		if (editor == null) {
 			createEditor(viewer.getTree(), d);
 		}

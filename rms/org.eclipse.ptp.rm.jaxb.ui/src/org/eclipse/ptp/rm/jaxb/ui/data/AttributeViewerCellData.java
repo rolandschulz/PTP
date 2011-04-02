@@ -308,7 +308,7 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected CellEditor createEditor(Composite parent, ColumnDescriptor d) {
+	protected CellEditor createEditor(Composite parent, ColumnData d) {
 		CellEditorType type = CellEditorType.getType(data);
 		if (type == CellEditorType.TEXT) {
 			editor = new JAXBTextCellEditor(parent);

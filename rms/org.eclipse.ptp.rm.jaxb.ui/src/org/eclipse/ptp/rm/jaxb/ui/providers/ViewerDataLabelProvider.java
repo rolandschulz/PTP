@@ -15,18 +15,18 @@ import java.util.List;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.ui.IAttributeViewerColumnLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
 public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColorProvider, IJAXBUINonNLSConstants {
-	private final List<ColumnDescriptor> columnDescriptors;
+	private final List<ColumnData> columnData;
 
-	public ViewerDataLabelProvider(List<ColumnDescriptor> columnDescriptors) {
-		this.columnDescriptors = columnDescriptors;
+	public ViewerDataLabelProvider(List<ColumnData> columnData) {
+		this.columnData = columnData;
 	}
 
 	public void addListener(ILabelProviderListener listener) {
@@ -76,9 +76,9 @@ public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColor
 	}
 
 	private String getColumnName(int columnIndex) {
-		if (columnIndex >= columnDescriptors.size()) {
+		if (columnIndex >= columnData.size()) {
 			throw new ArrayIndexOutOfBoundsException(Messages.ViewerLabelProviderColumnError + columnIndex);
 		}
-		return columnDescriptors.get(columnIndex).getColumnName();
+		return columnData.get(columnIndex).getName();
 	}
 }

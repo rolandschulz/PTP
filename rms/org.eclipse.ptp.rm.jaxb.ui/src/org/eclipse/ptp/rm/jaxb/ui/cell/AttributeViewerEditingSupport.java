@@ -14,21 +14,21 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerCellData;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerNodeData;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
-import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 
 public class AttributeViewerEditingSupport extends EditingSupport {
 
 	private final ColumnViewer viewer;
-	private final ColumnDescriptor descriptor;
+	private final ColumnData data;
 
-	public AttributeViewerEditingSupport(ColumnViewer viewer, ColumnDescriptor descriptor) {
+	public AttributeViewerEditingSupport(ColumnViewer viewer, ColumnData data) {
 		super(viewer);
 		this.viewer = viewer;
-		this.descriptor = descriptor;
+		this.data = data;
 	}
 
 	@Override
@@ -42,9 +42,9 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 		if (element instanceof AttributeViewerRowData) {
-			return ((AttributeViewerRowData) element).getCellEditor((TableViewer) viewer, descriptor);
+			return ((AttributeViewerRowData) element).getCellEditor((TableViewer) viewer, data);
 		} else if (element instanceof AttributeViewerNodeData) {
-			return ((AttributeViewerNodeData) element).getCellEditor((TreeViewer) viewer, descriptor);
+			return ((AttributeViewerNodeData) element).getCellEditor((TreeViewer) viewer, data);
 		}
 		return null;
 	}

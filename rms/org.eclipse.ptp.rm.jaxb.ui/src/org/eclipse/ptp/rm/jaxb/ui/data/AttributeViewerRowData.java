@@ -25,7 +25,7 @@ public class AttributeViewerRowData extends AttributeViewerCellData {
 		super(data, columnData);
 	}
 
-	public synchronized CellEditor getCellEditor(TableViewer viewer, ColumnDescriptor d) {
+	public synchronized CellEditor getCellEditor(TableViewer viewer, ColumnData d) {
 		if (editor == null) {
 			createEditor(viewer.getTable(), d);
 		}

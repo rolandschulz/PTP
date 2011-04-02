@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -29,13 +28,11 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerCellData;
-import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
@@ -748,15 +745,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return Display.getDefault().getSystemColor(swtColor);
 	}
 
-	public static List<ColumnDescriptor> getColumnDescriptors(AttributeViewer descriptor) {
-		List<ColumnData> data = descriptor.getColumnData();
-		List<ColumnDescriptor> desc = new ArrayList<ColumnDescriptor>();
-		for (ColumnData d : data) {
-			desc.add(new ColumnDescriptor(d));
-		}
-		return desc;
-	}
-
 	public static int getStyle(String style) {
 		if (style == null || ZEROSTR.equals(style)) {
 			return SWT.NONE;
@@ -764,13 +752,13 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return getStyle(style.split(OPENSQ + PIP + CLOSSQ));
 	}
 
-	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors,
+	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnData> columnDescriptors,
 			ISelectionChangedListener listener, boolean sortName, boolean tooltip, boolean header, boolean lines) {
 		setupSpecific(viewer, columnDescriptors, sortName, header, lines);
 		setupCommon(viewer, columnDescriptors, listener, tooltip);
 	}
 
-	public static void setupAttributeTree(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors,
+	public static void setupAttributeTree(final CheckboxTreeViewer viewer, List<ColumnData> columnDescriptors,
 			ISelectionChangedListener listener, boolean sortName, boolean tooltip, boolean header, boolean lines) {
 		setupSpecific(viewer, columnDescriptors, sortName, header, lines);
 		setupCommon(viewer, columnDescriptors, listener, tooltip);
@@ -1090,12 +1078,12 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return swt;
 	}
 
-	private static void setupCommon(final ColumnViewer viewer, List<ColumnDescriptor> columnDescriptors,
-			ISelectionChangedListener listener, boolean tooltip) {
-		String[] columnProperties = new String[columnDescriptors.size()];
-		for (int i = 0; i < columnDescriptors.size(); i++) {
-			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
-			columnProperties[i] = columnDescriptor.getColumnName();
+	private static void setupCommon(final ColumnViewer viewer, List<ColumnData> columnData, ISelectionChangedListener listener,
+			boolean tooltip) {
+		String[] columnProperties = new String[columnData.size()];
+		for (int i = 0; i < columnData.size(); i++) {
+			ColumnData columnDescriptor = columnData.get(i);
+			columnProperties[i] = columnDescriptor.getName();
 		}
 		viewer.setColumnProperties(columnProperties);
 		if (tooltip) {
@@ -1105,18 +1093,18 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		if (listener != null) {
 			viewer.addSelectionChangedListener(listener);
 		}
-		viewer.setLabelProvider(new ViewerDataLabelProvider(columnDescriptors));
+		viewer.setLabelProvider(new ViewerDataLabelProvider(columnData));
 		ICheckable checkable = (ICheckable) viewer;
 		checkable.addCheckStateListener(getCheckStateListener(checkable));
 	}
 
-	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName,
+	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnData> columnData, Boolean sortName,
 			boolean header, boolean lines) {
-		for (int i = 0; i < columnDescriptors.size(); i++) {
-			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
+		for (int i = 0; i < columnData.size(); i++) {
+			ColumnData columnDescriptor = columnData.get(i);
 			TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 			TableColumn column = viewerColumn.getColumn();
-			String name = columnDescriptor.getColumnName();
+			String name = columnDescriptor.getName();
 			column.setText(name);
 			column.setMoveable(columnDescriptor.isMoveable());
 			column.setResizable(columnDescriptor.isResizable());
@@ -1124,11 +1112,11 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			if (tt != null) {
 				column.setToolTipText(tt);
 			}
-			if (columnDescriptor.isWidthSpecified()) {
+			if (UNDEFINED != columnDescriptor.getWidth()) {
 				column.setWidth(columnDescriptor.getWidth());
 			}
-			if (columnDescriptor.isAlignSpecified()) {
-				column.setAlignment(columnDescriptor.getAlignment());
+			if (null != columnDescriptor.getAlignment()) {
+				column.setAlignment(getStyle(columnDescriptor.getAlignment()));
 			}
 			if (COLUMN_NAME.equals(name)) {
 				if (sortName != null) {
@@ -1137,7 +1125,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 					}
 				}
 			}
-			if (COLUMN_VALUE.equals(columnDescriptor.getColumnName())) {
+			if (COLUMN_VALUE.equals(columnDescriptor.getName())) {
 				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer, columnDescriptor));
 			}
 		}
@@ -1146,13 +1134,13 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		viewer.getTable().setLinesVisible(lines);
 	}
 
-	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName,
+	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnData> columnData, Boolean sortName,
 			boolean header, boolean lines) {
-		for (int i = 0; i < columnDescriptors.size(); i++) {
-			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
+		for (int i = 0; i < columnData.size(); i++) {
+			ColumnData columnDescriptor = columnData.get(i);
 			TreeViewerColumn viewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
 			TreeColumn column = viewerColumn.getColumn();
-			String name = columnDescriptor.getColumnName();
+			String name = columnDescriptor.getName();
 			column.setText(name);
 			column.setMoveable(columnDescriptor.isMoveable());
 			column.setResizable(columnDescriptor.isResizable());
@@ -1160,11 +1148,11 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			if (tt != null) {
 				column.setToolTipText(tt);
 			}
-			if (columnDescriptor.isWidthSpecified()) {
+			if (UNDEFINED != columnDescriptor.getWidth()) {
 				column.setWidth(columnDescriptor.getWidth());
 			}
-			if (columnDescriptor.isAlignSpecified()) {
-				column.setAlignment(columnDescriptor.getAlignment());
+			if (null != columnDescriptor.getAlignment()) {
+				column.setAlignment(getStyle(columnDescriptor.getAlignment()));
 			}
 			if (COLUMN_NAME.equals(name)) {
 				if (sortName != null) {
@@ -1173,7 +1161,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 					}
 				}
 			}
-			if (COLUMN_VALUE.equals(columnDescriptor.getColumnName())) {
+			if (COLUMN_VALUE.equals(columnDescriptor.getName())) {
 				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer, columnDescriptor));
 			}
 		}
