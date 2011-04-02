@@ -10,16 +10,19 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.data;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.swt.graphics.Image;
 
 public class AttributeViewerRowData extends AttributeViewerCellData {
 
-	public AttributeViewerRowData(Object data) {
-		super(data);
+	public AttributeViewerRowData(Object data, List<ColumnData> columnData) {
+		super(data, columnData);
 	}
 
 	public synchronized CellEditor getCellEditor(TableViewer viewer, ColumnDescriptor d) {

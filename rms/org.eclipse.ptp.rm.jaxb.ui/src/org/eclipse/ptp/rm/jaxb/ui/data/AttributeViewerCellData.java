@@ -1,9 +1,11 @@
 package org.eclipse.ptp.rm.jaxb.ui.data;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.ui.IAttributeViewerColumnLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -12,6 +14,8 @@ import org.eclipse.ptp.rm.jaxb.ui.cell.JAXBComboCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.cell.JAXBSpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.cell.JAXBTextCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 
 public abstract class AttributeViewerCellData implements IAttributeViewerColumnLabelSupport, IJAXBUINonNLSConstants {
@@ -92,11 +96,15 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 	protected boolean checked;
 	protected int count;
 
+	protected Color[] foreground;
+	protected Color[] background;
+	protected Font[] font;
+
 	protected AttributeViewerCellData() {
 		data = null;
 	}
 
-	protected AttributeViewerCellData(Object data) {
+	protected AttributeViewerCellData(Object data, List<ColumnData> columnData) {
 		this.data = data;
 		discovered = false;
 		text = ZEROSTR;
@@ -112,6 +120,24 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 			name = ((Property) data).getName();
 		}
 		count = min == null ? 0 : min;
+		int cols = columnData.size();
+		foreground = new Color[cols];
+		background = new Color[cols];
+		font = new Font[cols];
+		for (int i = 0; i < columnData.size(); i++) {
+			String color = columnData.get(i).getForeground();
+			if (color != null) {
+				foreground[i] = WidgetBuilderUtils.getColor(color);
+			} else {
+				foreground[i] = null;
+			}
+			color = columnData.get(i).getBackground();
+			if (color != null) {
+				background[i] = WidgetBuilderUtils.getColor(color);
+			} else {
+				background[i] = null;
+			}
+		}
 	}
 
 	public boolean canEdit() {
@@ -125,8 +151,16 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 		return false;
 	}
 
+	public Color getBackground(Object element, int columnIndex) {
+		return background[columnIndex];
+	}
+
 	public Object getData() {
 		return data;
+	}
+
+	public Color getForeground(Object element, int columnIndex) {
+		return foreground[columnIndex];
 	}
 
 	public String getReplaced(String pattern) {
@@ -258,6 +292,9 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 			} else {
 				selected = (Integer) value;
 			}
+			/*
+			 * have to take care of writing in here
+			 */
 			text = items[selected];
 		}
 	}
@@ -274,32 +311,11 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 	protected CellEditor createEditor(Composite parent, ColumnDescriptor d) {
 		CellEditorType type = CellEditorType.getType(data);
 		if (type == CellEditorType.TEXT) {
-			JAXBTextCellEditor e = new JAXBTextCellEditor(parent);
-			editor = e;
-			if (d.isForegroundSpecified()) {
-				e.getText().setForeground(WidgetBuilderUtils.getColor(d.getForeground()));
-			}
-			if (d.isBackgroundSpecified()) {
-				e.getText().setBackground(WidgetBuilderUtils.getColor(d.getBackground()));
-			}
+			editor = new JAXBTextCellEditor(parent);
 		} else if (type == CellEditorType.CHECK) {
-			JAXBCheckboxCellEditor e = new JAXBCheckboxCellEditor(parent);
-			editor = e;
-			if (d.isForegroundSpecified()) {
-				e.getCheckbox().setForeground(WidgetBuilderUtils.getColor(d.getForeground()));
-			}
-			if (d.isBackgroundSpecified()) {
-				e.getCheckbox().setBackground(WidgetBuilderUtils.getColor(d.getBackground()));
-			}
+			editor = new JAXBCheckboxCellEditor(parent);
 		} else if (type == CellEditorType.SPINNER) {
-			JAXBSpinnerCellEditor e = new JAXBSpinnerCellEditor(parent, min, max);
-			editor = e;
-			if (d.isForegroundSpecified()) {
-				e.getSpinner().setForeground(WidgetBuilderUtils.getColor(d.getForeground()));
-			}
-			if (d.isBackgroundSpecified()) {
-				e.getSpinner().setBackground(WidgetBuilderUtils.getColor(d.getBackground()));
-			}
+			editor = new JAXBSpinnerCellEditor(parent, min, max);
 		} else if (type == CellEditorType.COMBO) {
 			Object o = null;
 			if (data instanceof Attribute) {
@@ -318,14 +334,7 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 					items = new String[0];
 				}
 			}
-			JAXBComboCellEditor e = new JAXBComboCellEditor(parent, items);
-			editor = e;
-			if (d.isForegroundSpecified()) {
-				e.getComboBox().setForeground(WidgetBuilderUtils.getColor(d.getForeground()));
-			}
-			if (d.isBackgroundSpecified()) {
-				e.getComboBox().setBackground(WidgetBuilderUtils.getColor(d.getBackground()));
-			}
+			editor = new JAXBComboCellEditor(parent, items);
 		}
 		return editor;
 	}
@@ -342,4 +351,5 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 		}
 		return ZEROSTR;
 	}
+
 }

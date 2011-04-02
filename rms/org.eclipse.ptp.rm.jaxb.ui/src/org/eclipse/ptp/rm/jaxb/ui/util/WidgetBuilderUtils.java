@@ -742,6 +742,9 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		} else if (COLOR_WIDGET_NORMAL_SHADOW.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_NORMAL_SHADOW;
 		}
+		/*
+		 * don't have to deallocate, as these are system colors
+		 */
 		return Display.getDefault().getSystemColor(swtColor);
 	}
 
@@ -762,14 +765,14 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors,
-			ISelectionChangedListener listener, Boolean sortName, boolean tooltip) {
-		setupSpecific(viewer, columnDescriptors, sortName);
+			ISelectionChangedListener listener, boolean sortName, boolean tooltip, boolean header, boolean lines) {
+		setupSpecific(viewer, columnDescriptors, sortName, header, lines);
 		setupCommon(viewer, columnDescriptors, listener, tooltip);
 	}
 
 	public static void setupAttributeTree(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors,
-			ISelectionChangedListener listener, Boolean sortName, boolean tooltip) {
-		setupSpecific(viewer, columnDescriptors, sortName);
+			ISelectionChangedListener listener, boolean sortName, boolean tooltip, boolean header, boolean lines) {
+		setupSpecific(viewer, columnDescriptors, sortName, header, lines);
 		setupCommon(viewer, columnDescriptors, listener, tooltip);
 	}
 
@@ -818,6 +821,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 				} catch (Throwable t) {
 					JAXBUIPlugin.log(t);
 				}
+				WidgetActionUtils.refreshViewer((Viewer) viewer);
 			}
 		};
 	}
@@ -1106,7 +1110,8 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		checkable.addCheckStateListener(getCheckStateListener(checkable));
 	}
 
-	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName) {
+	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName,
+			boolean header, boolean lines) {
 		for (int i = 0; i < columnDescriptors.size(); i++) {
 			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
 			TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
@@ -1137,11 +1142,12 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			}
 		}
 		viewer.setContentProvider(new TableDataContentProvider());
-		viewer.getTable().setHeaderVisible(true);
-		viewer.getTable().setLinesVisible(true);
+		viewer.getTable().setHeaderVisible(header);
+		viewer.getTable().setLinesVisible(lines);
 	}
 
-	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName) {
+	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName,
+			boolean header, boolean lines) {
 		for (int i = 0; i < columnDescriptors.size(); i++) {
 			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
 			TreeViewerColumn viewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
@@ -1172,7 +1178,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			}
 		}
 		viewer.setContentProvider(new TreeDataContentProvider());
-		viewer.getTree().setHeaderVisible(true);
-		viewer.getTree().setLinesVisible(true);
+		viewer.getTree().setHeaderVisible(header);
+		viewer.getTree().setLinesVisible(lines);
 	}
 }

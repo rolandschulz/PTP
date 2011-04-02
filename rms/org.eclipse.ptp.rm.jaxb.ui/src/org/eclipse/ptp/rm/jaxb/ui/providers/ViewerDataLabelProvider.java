@@ -13,14 +13,16 @@ package org.eclipse.ptp.rm.jaxb.ui.providers;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.ptp.rm.jaxb.ui.IAttributeViewerColumnLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
-public class ViewerDataLabelProvider implements ITableLabelProvider, IJAXBUINonNLSConstants {
+public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColorProvider, IJAXBUINonNLSConstants {
 	private final List<ColumnDescriptor> columnDescriptors;
 
 	public ViewerDataLabelProvider(List<ColumnDescriptor> columnDescriptors) {
@@ -31,6 +33,14 @@ public class ViewerDataLabelProvider implements ITableLabelProvider, IJAXBUINonN
 	}
 
 	public void dispose() {
+	}
+
+	public Color getBackground(Object element, int columnIndex) {
+		if (element instanceof IAttributeViewerColumnLabelSupport) {
+			IAttributeViewerColumnLabelSupport support = (IAttributeViewerColumnLabelSupport) element;
+			return support.getBackground(element, columnIndex);
+		}
+		return null;
 	}
 
 	public Image getColumnImage(Object element, int columnIndex) {
@@ -47,6 +57,15 @@ public class ViewerDataLabelProvider implements ITableLabelProvider, IJAXBUINonN
 			return support.getDisplayValue(getColumnName(columnIndex));
 		}
 		return ZEROSTR;
+	}
+
+	public Color getForeground(Object element, int columnIndex) {
+		Color color = null;
+		if (element instanceof IAttributeViewerColumnLabelSupport) {
+			IAttributeViewerColumnLabelSupport support = (IAttributeViewerColumnLabelSupport) element;
+			color = support.getForeground(element, columnIndex);
+		}
+		return color;
 	}
 
 	public boolean isLabelProperty(Object element, String property) {
