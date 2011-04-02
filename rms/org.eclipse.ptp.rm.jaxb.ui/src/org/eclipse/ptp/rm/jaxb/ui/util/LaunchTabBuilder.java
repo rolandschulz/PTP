@@ -14,8 +14,10 @@ import java.util.List;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.CompositeDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.FillLayoutDescriptor;
@@ -34,14 +36,15 @@ import org.eclipse.ptp.rm.jaxb.core.data.ViewerItems;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerCellData;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerChildNodeData;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerData;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerMap;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerNodeData;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
 import org.eclipse.ptp.rm.jaxb.ui.data.WidgetMap;
 import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBRMConfigurableAttributesTab;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
-import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -80,14 +83,15 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		Layout layout = createLayout(descriptor.getLayout());
 		Object data = createLayoutData(descriptor.getLayoutData());
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
+		Button showHide = WidgetBuilderUtils.createCheckButton(parent, Messages.ToggleShowHideSelectedAttributes, null);
 		ColumnViewer viewer = null;
 		if (TABLE.equals(descriptor.getType())) {
 			viewer = addCheckboxTableViewer(parent, data, layout, style, descriptor);
 		} else if (TREE.equals(descriptor.getType())) {
 			viewer = addCheckboxTreeViewer(parent, data, layout, style, descriptor);
 		}
-		addToggleVisible(parent, viewer);
 		addRows(viewer, descriptor);
+		addToggleShowHideSelected(showHide, viewer);
 		addToViewerMap(viewer, descriptor);
 	}
 
@@ -198,29 +202,55 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		RMVariableMap rmMap = RMVariableMap.getActiveInstance();
 		AttributeViewerData data = new AttributeViewerData();
 		ViewerItems items = descriptor.getItems();
+		AttributeViewerCellData row = null;
 		if (items.isAllPredefined()) {
 			for (Object o : rmMap.getVariables().values()) {
-				data.addRow(new AttributeViewerRowData(o));
+				row = getCellViewer(viewer, o);
+				if (row.isVisible()) {
+					data.addRow(row);
+				}
 			}
 		} else {
 			List<String> refs = items.getRef();
 			for (String ref : refs) {
 				Object o = rmMap.getVariables().get(ref);
 				if (o != null) {
-					data.addRow(new AttributeViewerRowData(o));
+					row = getCellViewer(viewer, o);
+					if (row.isVisible()) {
+						data.addRow(row);
+					}
 				}
 			}
 		}
 		if (items.isAllDiscovered()) {
 			for (Object o : rmMap.getDiscovered().values()) {
-				data.addRow(new AttributeViewerRowData(o));
+				row = getCellViewer(viewer, o);
+				if (row.isVisible()) {
+					data.addRow(row);
+				}
 			}
 		}
 		viewer.setInput(data);
+		ICheckable checkable = (ICheckable) viewer;
+		for (AttributeViewerCellData rd : data.getRows()) {
+			checkable.setChecked(rd, rd.isSelected());
+		}
 	}
 
-	private void addToggleVisible(Composite parent, final ColumnViewer viewer) {
-		WidgetBuilderUtils.createCheckButton(parent, Messages.ToggleVisibleAttributes, new SelectionListener() {
+	private void addToggleShowHideSelected(Button checkbutton, final ColumnViewer viewer) {
+		checkbutton.addSelectionListener(new SelectionListener() {
+			private final ViewerFilter filter = new ViewerFilter() {
+				@Override
+				public boolean select(Viewer viewer, Object parentElement, Object element) {
+					if (element instanceof AttributeViewerCellData) {
+						return ((ICheckable) viewer).getChecked(element);
+					} else if (element instanceof AttributeViewerChildNodeData) {
+						Object parent = ((AttributeViewerChildNodeData) element).getParent();
+						return ((ICheckable) viewer).getChecked(parent);
+					}
+					return false;
+				}
+			};
 
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
@@ -228,15 +258,15 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 
 			public void widgetSelected(SelectionEvent e) {
 				Button b = (Button) e.getSource();
-				if (viewer instanceof TableViewer) {
-					TableDataContentProvider p = (TableDataContentProvider) viewer.getContentProvider();
-					p.setSelectedOnly(!b.getSelection());
-				} else if (viewer instanceof TreeViewer) {
-					TreeDataContentProvider p = (TreeDataContentProvider) viewer.getContentProvider();
-					p.setSelectedOnly(!b.getSelection());
+				if (!b.getSelection()) {
+					viewer.addFilter(filter);
+				} else {
+					viewer.removeFilter(filter);
 				}
+				WidgetActionUtils.refreshViewer(viewer);
 			}
 		});
+		checkbutton.setSelection(true);
 	}
 
 	private void addToViewerMap(ColumnViewer viewer, AttributeViewer descriptor) {
@@ -286,6 +316,15 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			}
 		}
 		return null;
+	}
+
+	private AttributeViewerCellData getCellViewer(ColumnViewer viewer, Object data) {
+		if (viewer instanceof TreeViewer) {
+			Object[] properties = viewer.getColumnProperties();
+			return new AttributeViewerNodeData(data, properties.length == 2);
+		} else {
+			return new AttributeViewerRowData(data);
+		}
 	}
 
 	static Object createLayoutData(LayoutDataDescriptor layoutData) {

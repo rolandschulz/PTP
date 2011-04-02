@@ -51,9 +51,9 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 			if (data == null) {
 				continue;
 			}
-			List<AttributeViewerRowData> rows = data.getAllRows();
-			for (AttributeViewerRowData row : rows) {
-				String name = row.getColumnDisplayValue(COLUMN_NAME);
+			List<AttributeViewerCellData> rows = data.getRows();
+			for (AttributeViewerCellData row : rows) {
+				String name = row.getDisplayValue(COLUMN_NAME);
 				Object value = vars.get(name);
 				if (name == null) {
 					continue;
@@ -88,9 +88,9 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 			if (data == null) {
 				continue;
 			}
-			List<AttributeViewerRowData> rows = data.getAllRows();
-			for (AttributeViewerRowData row : rows) {
-				String name = row.getColumnDisplayValue(COLUMN_NAME);
+			List<AttributeViewerCellData> rows = data.getRows();
+			for (AttributeViewerCellData row : rows) {
+				String name = row.getDisplayValue(COLUMN_NAME);
 				if (name == null) {
 					continue;
 				}
@@ -105,7 +105,7 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 					defaultValue = ((Attribute) o).getDefault();
 				}
 				if (defaultValue != null) {
-					row.setValueFromString(defaultValue);
+					row.setValue(defaultValue);
 				}
 			}
 			WidgetActionUtils.refreshViewer(viewer);
@@ -126,20 +126,20 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 			if (data == null) {
 				continue;
 			}
-			List<AttributeViewerRowData> rows = data.getAllRows();
+			List<AttributeViewerCellData> rows = data.getRows();
 			String name = null;
-			Object value = null;
-			Iterator<AttributeViewerRowData> i = rows.iterator();
-			AttributeViewerRowData row = null;
+			String value = null;
+			Iterator<AttributeViewerCellData> i = rows.iterator();
+			AttributeViewerCellData row = null;
 			if (i.hasNext()) {
 				row = i.next();
-				name = row.getColumnDisplayValue(COLUMN_NAME);
-				value = row.getValue();
+				name = row.getDisplayValue(COLUMN_NAME);
+				value = row.getDisplayValue(COLUMN_VALUE);
 				if (value != null && row.isSelected()) {
 					if (row.isDiscovered()) {
-						disc.put(name, String.valueOf(value));
+						disc.put(name, value);
 					} else {
-						vars.put(name, String.valueOf(value));
+						vars.put(name, value);
 					}
 					buffer.append(row.getReplaced(pattern));
 				} else {
@@ -152,13 +152,13 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 			}
 			while (i.hasNext()) {
 				row = i.next();
-				name = row.getColumnDisplayValue(COLUMN_NAME);
-				value = row.getValue();
+				name = row.getDisplayValue(COLUMN_NAME);
+				value = row.getDisplayValue(COLUMN_VALUE);
 				if (value != null && row.isSelected()) {
 					if (row.isDiscovered()) {
-						disc.put(name, String.valueOf(value));
+						disc.put(name, value);
 					} else {
-						vars.put(name, String.valueOf(value));
+						vars.put(name, value);
 					}
 					buffer.append(separator).append(row.getReplaced(pattern));
 				} else {
@@ -185,10 +185,10 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 			if (vdata == null) {
 				continue;
 			}
-			List<AttributeViewerRowData> rows = vdata.getAllRows();
-			for (AttributeViewerRowData row : rows) {
+			List<AttributeViewerCellData> rows = vdata.getRows();
+			for (AttributeViewerCellData row : rows) {
 				Object data = row.getData();
-				String value = String.valueOf(row.getValue());
+				String value = row.getDisplayValue(COLUMN_VALUE);
 				if (value == null) {
 					String defaultV = null;
 					if (data instanceof Property) {
@@ -197,7 +197,7 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 						defaultV = ((Attribute) data).getDefault();
 					}
 					if (defaultV != null) {
-						row.setValueFromString(defaultV);
+						row.setValue(defaultV);
 					}
 				} else if (data instanceof Attribute) {
 					Attribute ja = (Attribute) data;

@@ -15,6 +15,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.jaxb.ui.messages.messages"; //$NON-NLS-1$
 
+	public static String ViewerTooltipActivation;
+
 	public static String JAXBUIPlugin_Exception_InternalError;
 	public static String JAXBConnectionWizardPage_Description;
 	public static String JAXBRMControlConfigurationWizardPage_Title;
@@ -76,12 +78,13 @@ public class Messages extends NLS {
 	public static String RenameFileTitle;
 	public static String RestoreDefaultValues;
 	public static String DefaultValues;
-	public static String ToggleVisibleAttributes;
+	public static String ToggleShowHideSelectedAttributes;
 	public static String DialogClose;
 	public static String DisplayScript;
 	public static String DisplayScriptError;
 	public static String DisplayScriptErrorTitle;
 	public static String Tooltip;
+	public static String ViewerLabelProviderColumnError;
 
 	static {
 		// initialize resource bundle

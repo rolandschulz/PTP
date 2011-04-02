@@ -31,7 +31,7 @@
 			<description>Determines when checkpointing (if supported) will be performed by PBS on behalf of the job.</description>
 			<tooltip>Format: the strings "n" (no checkpointing), "s" (to be performed only when the server executing the job is shutdown), "c"s
 				(to be performed at the default minimum time for thes servers executing the job), "c=mmmm" (to be performed at an intervals ofs
-				minutess whichs is the integer number of minutes of CPUs time used bys the job; values must be greater than zero); defaults value:
+				minutes which is the integer number of minutes of CPUs time used bys the job; values must be greater than zero); defaults value:
 				"u", whichs iss unspecified.
 			</tooltip>
 			<choice>,u,n,s,c,c=????</choice>
@@ -538,6 +538,7 @@
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
 						</layout-data>
+						<!-- HOW DO WE HANDLE THE LIST HERE? xxxTODO -->
 					</widget>
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -628,14 +629,16 @@
 						<grid-layout numColumns="1"/>
 					</layout>
 					<!-- iterates through all registered attributes, one to a row -->
-					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="table">
+					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="tree">
 						<layout-data>
-							<grid-data widthHint="900" horizontalSpan="4"/>
+							<grid-data widthHint="600" horizontalSpan="2"/>
 						</layout-data>
-						<column-data name="Name" width="300"/>
-						<column-data name="Type" width="50"/>
-						<column-data name="Value" width="200"/>
-						<column-data name="Description" width="500"/>
+						<column-data name="Name" width="175">
+							<tooltip>Select-click on checkboxes toggles their value.</tooltip>
+						</column-data>
+						<column-data name="Value" width="400" foreground="SWT.DARK_MAGENTA">
+							<tooltip>Click to activate value widget.</tooltip>
+						</column-data>
 						<items allPredefined="true"/>
 						<value pattern="@name='@value'"/>
 					</viewer>

@@ -12,18 +12,18 @@ package org.eclipse.ptp.rm.jaxb.ui.providers;
 
 import java.util.List;
 
-import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.ptp.rm.jaxb.ui.IAttributeViewerColumnLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 
-public class TreeDataLabelProvider implements IBaseLabelProvider, IJAXBUINonNLSConstants {
+public class ViewerDataLabelProvider implements ITableLabelProvider, IJAXBUINonNLSConstants {
 	private final List<ColumnDescriptor> columnDescriptors;
 
-	public TreeDataLabelProvider(List<ColumnDescriptor> columnDescriptors) {
+	public ViewerDataLabelProvider(List<ColumnDescriptor> columnDescriptors) {
 		this.columnDescriptors = columnDescriptors;
 	}
 
@@ -34,14 +34,19 @@ public class TreeDataLabelProvider implements IBaseLabelProvider, IJAXBUINonNLSC
 	}
 
 	public Image getColumnImage(Object element, int columnIndex) {
-		AttributeViewerRowData row = (AttributeViewerRowData) element;
-		return row.getColumnImage(getColumnName(columnIndex));
+		if (element instanceof IAttributeViewerColumnLabelSupport) {
+			IAttributeViewerColumnLabelSupport support = (IAttributeViewerColumnLabelSupport) element;
+			return support.getColumnImage(getColumnName(columnIndex));
+		}
+		return null;
 	}
 
 	public String getColumnText(Object element, int columnIndex) {
-		AttributeViewerRowData row = (AttributeViewerRowData) element;
-		String displayText = row.getColumnDisplayValue(getColumnName(columnIndex));
-		return displayText != null ? displayText : ZEROSTR;
+		if (element instanceof IAttributeViewerColumnLabelSupport) {
+			IAttributeViewerColumnLabelSupport support = (IAttributeViewerColumnLabelSupport) element;
+			return support.getDisplayValue(getColumnName(columnIndex));
+		}
+		return ZEROSTR;
 	}
 
 	public boolean isLabelProperty(Object element, String property) {
@@ -53,9 +58,8 @@ public class TreeDataLabelProvider implements IBaseLabelProvider, IJAXBUINonNLSC
 
 	private String getColumnName(int columnIndex) {
 		if (columnIndex >= columnDescriptors.size()) {
-			throw new ArrayIndexOutOfBoundsException(Messages.TreeDataLabelProviderColumnError + columnIndex);
+			throw new ArrayIndexOutOfBoundsException(Messages.ViewerLabelProviderColumnError + columnIndex);
 		}
-
 		return columnDescriptors.get(columnIndex).getColumnName();
 	}
 }

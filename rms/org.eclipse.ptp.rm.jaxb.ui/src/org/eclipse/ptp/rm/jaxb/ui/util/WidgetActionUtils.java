@@ -179,7 +179,9 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		if (value == null) {
 			value = ZEROSTR;
 		}
-
+		if (uiElement.isDisposed()) {
+			return;
+		}
 		if (uiElement instanceof Label) {
 			Label c = (Label) uiElement;
 			c.setText(value);

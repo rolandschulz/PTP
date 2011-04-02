@@ -10,50 +10,24 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.providers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerData;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerNodeData;
 
 public class TreeDataContentProvider implements ITreeContentProvider {
-	private boolean selected = true;
-
 	public void dispose() {
 	}
 
 	public Object[] getChildren(Object parentElement) {
-		List<Object> children = new ArrayList<Object>();
-		AttributeViewerRowData rowData = (AttributeViewerRowData) parentElement;
-		Object data = rowData.getData();
-		if (data instanceof Property) {
-			Property p = (Property) data;
-			children.add(p.getName());
-			children.add(p.getDefault());
-			children.add(p.getValue());
-		} else if (data instanceof Attribute) {
-			Attribute ja = (Attribute) data;
-			children.add(ja.getName());
-			children.add(ja.getDefault());
-			children.add(ja.getValue());
-			children.add(ja.getType());
-			children.add(ja.getDescription());
-			children.add(ja.getTooltip());
-			children.add(ja.getStatus());
+		if (parentElement instanceof AttributeViewerNodeData) {
+			return ((AttributeViewerNodeData) parentElement).getChildren().toArray();
 		}
-		return children.toArray();
+		return new Object[0];
 	}
 
 	public Object[] getElements(Object inputElement) {
-		if (selected) {
-			return ((AttributeViewerData) inputElement).getSelectedRows().toArray();
-		} else {
-			return ((AttributeViewerData) inputElement).getAllRows().toArray();
-		}
+		return ((AttributeViewerData) inputElement).getRows().toArray();
 	}
 
 	public Object getParent(Object element) {
@@ -61,15 +35,9 @@ public class TreeDataContentProvider implements ITreeContentProvider {
 	}
 
 	public boolean hasChildren(Object element) {
-		AttributeViewerRowData rowData = (AttributeViewerRowData) element;
-		Object data = rowData.getData();
-		return (data instanceof Property) || (data instanceof Attribute);
+		return (element instanceof AttributeViewerNodeData);
 	}
 
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-	}
-
-	public void setSelectedOnly(boolean selected) {
-		this.selected = selected;
 	}
 }

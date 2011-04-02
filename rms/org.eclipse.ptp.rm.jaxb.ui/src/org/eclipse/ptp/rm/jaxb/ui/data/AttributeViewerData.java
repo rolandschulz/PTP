@@ -14,29 +14,17 @@ import java.util.List;
 
 public class AttributeViewerData {
 
-	private final List<AttributeViewerRowData> rows;
-	private final List<AttributeViewerRowData> selected;
+	private final List<AttributeViewerCellData> rows;
 
 	public AttributeViewerData() {
-		rows = new ArrayList<AttributeViewerRowData>();
-		selected = new ArrayList<AttributeViewerRowData>();
+		rows = new ArrayList<AttributeViewerCellData>();
 	}
 
-	public void addRow(AttributeViewerRowData data) {
+	public void addRow(AttributeViewerCellData data) {
 		rows.add(data);
 	}
 
-	public List<AttributeViewerRowData> getAllRows() {
+	public List<AttributeViewerCellData> getRows() {
 		return rows;
-	}
-
-	public List<AttributeViewerRowData> getSelectedRows() {
-		selected.clear();
-		for (AttributeViewerRowData row : rows) {
-			if (row.isVisible()) {
-				selected.add(row);
-			}
-		}
-		return selected;
 	}
 }
