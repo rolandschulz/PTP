@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.core.data.CompositeDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.FillLayoutDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.FormAttachmentDescriptor;
@@ -100,7 +101,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		Table t = WidgetBuilderUtils.createTable(parent, style, data);
 		CheckboxTableViewer viewer = new CheckboxTableViewer(t);
 		WidgetBuilderUtils.setupAttributeTable(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor), null,
-				descriptor.isSort(), descriptor.isTooltip());
+				descriptor.isSort(), descriptor.isTooltip(), descriptor.isHeaderVisible(), descriptor.isLinesVisible());
 		return viewer;
 	}
 
@@ -109,7 +110,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		Tree t = WidgetBuilderUtils.createTree(parent, style, data);
 		CheckboxTreeViewer viewer = new CheckboxTreeViewer(t);
 		WidgetBuilderUtils.setupAttributeTree(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor), null,
-				descriptor.isSort(), descriptor.isTooltip());
+				descriptor.isSort(), descriptor.isTooltip(), descriptor.isHeaderVisible(), descriptor.isLinesVisible());
 		return viewer;
 	}
 
@@ -202,10 +203,11 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		RMVariableMap rmMap = RMVariableMap.getActiveInstance();
 		AttributeViewerData data = new AttributeViewerData();
 		ViewerItems items = descriptor.getItems();
+		List<ColumnData> columnData = descriptor.getColumnData();
 		AttributeViewerCellData row = null;
 		if (items.isAllPredefined()) {
 			for (Object o : rmMap.getVariables().values()) {
-				row = getCellViewer(viewer, o);
+				row = getCellViewerData(viewer, o, columnData);
 				if (row.isVisible()) {
 					data.addRow(row);
 				}
@@ -215,7 +217,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			for (String ref : refs) {
 				Object o = rmMap.getVariables().get(ref);
 				if (o != null) {
-					row = getCellViewer(viewer, o);
+					row = getCellViewerData(viewer, o, columnData);
 					if (row.isVisible()) {
 						data.addRow(row);
 					}
@@ -224,7 +226,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		}
 		if (items.isAllDiscovered()) {
 			for (Object o : rmMap.getDiscovered().values()) {
-				row = getCellViewer(viewer, o);
+				row = getCellViewerData(viewer, o, columnData);
 				if (row.isVisible()) {
 					data.addRow(row);
 				}
@@ -318,12 +320,12 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return null;
 	}
 
-	private AttributeViewerCellData getCellViewer(ColumnViewer viewer, Object data) {
+	private AttributeViewerCellData getCellViewerData(ColumnViewer viewer, Object data, List<ColumnData> columnData) {
 		if (viewer instanceof TreeViewer) {
 			Object[] properties = viewer.getColumnProperties();
-			return new AttributeViewerNodeData(data, properties.length == 2);
+			return new AttributeViewerNodeData(data, properties.length == 2, columnData);
 		} else {
-			return new AttributeViewerRowData(data);
+			return new AttributeViewerRowData(data, columnData);
 		}
 	}
 

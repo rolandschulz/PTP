@@ -4,6 +4,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.ui.IAttributeViewerColumnLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
 public class AttributeViewerChildNodeData implements IAttributeViewerColumnLabelSupport, IJAXBUINonNLSConstants {
@@ -20,6 +21,10 @@ public class AttributeViewerChildNodeData implements IAttributeViewerColumnLabel
 		} else {
 			this.displayCol = id;
 		}
+	}
+
+	public Color getBackground(Object element, int columnIndex) {
+		return parent.getBackground(element, columnIndex);
 	}
 
 	public Image getColumnImage(String columnName) {
@@ -50,6 +55,10 @@ public class AttributeViewerChildNodeData implements IAttributeViewerColumnLabel
 			}
 		}
 		return ZEROSTR;
+	}
+
+	public Color getForeground(Object element, int columnIndex) {
+		return parent.getForeground(element, columnIndex);
 	}
 
 	public AttributeViewerNodeData getParent() {

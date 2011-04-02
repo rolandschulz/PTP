@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.swt.graphics.Image;
 
@@ -13,8 +14,8 @@ public class AttributeViewerNodeData extends AttributeViewerCellData {
 
 	private final List<AttributeViewerChildNodeData> children;
 
-	public AttributeViewerNodeData(Object data, boolean inValueCol) {
-		super(data);
+	public AttributeViewerNodeData(Object data, boolean inValueCol, List<ColumnData> columnData) {
+		super(data, columnData);
 		children = new ArrayList<AttributeViewerChildNodeData>();
 		generateChildren(inValueCol);
 	}

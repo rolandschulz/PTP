@@ -93,6 +93,9 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static String getSelected(Combo combo) {
+		if (combo.isDisposed()) {
+			return ZEROSTR;
+		}
 		if (combo.getItemCount() == 0) {
 			return combo.getText();
 		}
@@ -105,6 +108,9 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 
 	public static String getValueString(Control uiElement) {
 		assert uiElement != null;
+		if (uiElement.isDisposed()) {
+			return null;
+		}
 		String s = null;
 
 		if (uiElement instanceof Label) {
@@ -156,6 +162,9 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static String select(Combo combo, String name) {
+		if (combo.isDisposed()) {
+			return ZEROSTR;
+		}
 		String[] items = combo.getItems();
 		if (items.length == 0) {
 			return ZEROSTR;
@@ -176,11 +185,11 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 
 	public static void setValue(Control uiElement, String value) {
 		assert uiElement != null;
-		if (value == null) {
-			value = ZEROSTR;
-		}
 		if (uiElement.isDisposed()) {
 			return;
+		}
+		if (value == null) {
+			value = ZEROSTR;
 		}
 		if (uiElement instanceof Label) {
 			Label c = (Label) uiElement;
@@ -216,6 +225,9 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	 * exception.
 	 */
 	public static String validate(Control c, Validator v, IRemoteFileManager fileManager) throws Exception {
+		if (c.isDisposed()) {
+			return null;
+		}
 		String value = getValueString(c);
 		Regex reg = v.getRegex();
 		String error = v.getErrorMessage();

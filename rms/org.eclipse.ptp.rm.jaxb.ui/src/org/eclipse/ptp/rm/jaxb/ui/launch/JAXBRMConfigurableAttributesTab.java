@@ -173,7 +173,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		}
 	}
 
-	private final JAXBRMLaunchConfigurationDynamicTab parentTab;
+	private final JAXBRMLaunchConfigurationDynamicTab pTab;
 	private final RemoteServicesDelegate delegate;
 	private final TabController controller;
 	private final List<ILaunchTabValueHandler> handlers;
@@ -186,7 +186,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			JAXBRMLaunchConfigurationDynamicTab pTab) {
 		super(dialog);
 		delegate = rm.getControl().getRemoteServicesDelegate();
-		this.parentTab = pTab;
+		this.pTab = pTab;
 		this.controller = controller;
 		String t = controller.getTitle();
 		if (t == null) {
@@ -205,6 +205,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			LaunchTabBuilder builder = new LaunchTabBuilder(this);
 			builder.build(control);
 			createViewScriptGroup(control);
+			pTab.resize(control);
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 		}
@@ -237,7 +238,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 	}
 
 	public JAXBRMLaunchConfigurationDynamicTab getParentTab() {
-		return parentTab;
+		return pTab;
 	}
 
 	@Override
@@ -281,7 +282,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true);
 		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 2);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
-		if (parentTab.hasScript()) {
+		if (pTab.hasScript()) {
 			WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, new SelectionListener() {
 				public void widgetDefaultSelected(SelectionEvent e) {
 					widgetSelected(e);
@@ -312,7 +313,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	private void resetEnv() {
 		try {
-			parentTab.getRmConfig().setActive();
+			pTab.getRmConfig().setActive();
 			LTVariableMap.setActiveInstance(RMVariableMap.getActiveInstance());
 		} catch (Throwable t1) {
 			JAXBUIPlugin.log(t1);

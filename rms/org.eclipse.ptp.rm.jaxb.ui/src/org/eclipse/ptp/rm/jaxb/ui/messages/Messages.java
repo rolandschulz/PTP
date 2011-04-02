@@ -56,7 +56,6 @@ public class Messages extends NLS {
 	public static String BatchScriptPath;
 	public static String DefaultDynamicTab_title;
 	public static String ViewScript;
-	public static String ViewValuesReplaced;
 	public static String ErrorOnLoadTitle;
 	public static String ErrorOnLoadFromStore;
 	public static String WidgetSelectedError;
@@ -68,15 +67,10 @@ public class Messages extends NLS {
 	public static String FileContentsDirty;
 	public static String ErrorOnCopyToStorageTitle;
 	public static String ErrorOnCopyToStorage;
-	public static String InvalidOptionIndex;
-	public static String InvalidOption;
-	public static String TreeDataLabelProviderColumnError;
-	public static String TableDataLabelProviderColumnError;
 	public static String ErrorOnCopyFromFields;
 	public static String WriteToFileCanceled;
 	public static String RenameFile;
 	public static String RenameFileTitle;
-	public static String RestoreDefaultValues;
 	public static String DefaultValues;
 	public static String ToggleShowHideSelectedAttributes;
 	public static String DialogClose;

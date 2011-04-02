@@ -520,7 +520,7 @@
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
 						</layout-data>
 					</widget>
-					<widget type="label" style="SWT.LEFT">
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
@@ -540,7 +540,7 @@
 						</layout-data>
 						<!-- HOW DO WE HANDLE THE LIST HERE? xxxTODO -->
 					</widget>
-					<widget type="label" style="SWT.LEFT">
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
@@ -559,7 +559,7 @@
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
 						</layout-data>
 					</widget>
-					<widget type="label" style="SWT.LEFT">
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
@@ -578,7 +578,7 @@
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
 						</layout-data>
 					</widget>
-					<widget type="label" style="SWT.LEFT">
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
@@ -596,7 +596,7 @@
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
 						</layout-data>
 					</widget>
-					<widget type="label" style="SWT.LEFT">
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
@@ -614,7 +614,7 @@
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
 					</widget>
-					<widget type="label" style="SWT.LEFT">
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
@@ -629,14 +629,14 @@
 						<grid-layout numColumns="1"/>
 					</layout>
 					<!-- iterates through all registered attributes, one to a row -->
-					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="tree">
+					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="table">
 						<layout-data>
 							<grid-data widthHint="600" horizontalSpan="2"/>
 						</layout-data>
 						<column-data name="Name" width="175">
 							<tooltip>Select-click on checkboxes toggles their value.</tooltip>
 						</column-data>
-						<column-data name="Value" width="400" foreground="SWT.DARK_MAGENTA">
+						<column-data name="Value" width="400" foreground="SWT.COLOR_DARK_MAGENTA">
 							<tooltip>Click to activate value widget.</tooltip>
 						</column-data>
 						<items allPredefined="true"/>
