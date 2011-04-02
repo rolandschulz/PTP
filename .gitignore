@@ -1,0 +1,16 @@
+*.class
+bin
+*~
+build
+*.jar
+*.log
+*.o
+*.a
+config.h
+config.status
+stamp-h1
+.deps
+Makefile
+core/org.eclipse.ptp.utils/args_test
+core/org.eclipse.ptp.utils/bitset_test
+core/org.eclipse.ptp.utils/rangeset_test
