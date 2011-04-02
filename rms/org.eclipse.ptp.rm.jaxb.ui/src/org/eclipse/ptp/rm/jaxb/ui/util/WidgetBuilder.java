@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
+import org.eclipse.ptp.rm.jaxb.core.data.FontDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
@@ -49,6 +50,7 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 	private Integer max;
 	private final String background;
 	private final String foreground;
+	private final FontDescriptor font;
 	private int style;
 
 	public WidgetBuilder(Widget widget, RMVariableMap rmMap, JAXBRMConfigurableAttributesTab tab) {
@@ -82,6 +84,7 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 		}
 		background = widget.getBackground();
 		foreground = widget.getForeground();
+		font = widget.getFont();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -177,6 +180,9 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 			}
 			if (background != null) {
 				c.setBackground(WidgetBuilderUtils.getColor(background));
+			}
+			if (font != null) {
+				c.setFont(WidgetBuilderUtils.getFont(font));
 			}
 		}
 

@@ -22,6 +22,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.core.data.CompositeDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.FillLayoutDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.FontDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.FormAttachmentDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.FormDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.FormLayoutDescriptor;
@@ -136,13 +137,13 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 				addAttributeViewer((AttributeViewer) o, composite);
 			}
 		}
-		String color = descriptor.getBackground();
-		if (color != null) {
-			composite.setBackground(WidgetBuilderUtils.getColor(color));
+		String attr = descriptor.getBackground();
+		if (attr != null) {
+			composite.setBackground(WidgetBuilderUtils.getColor(attr));
 		}
-		color = descriptor.getForeground();
-		if (color != null) {
-			composite.setBackground(WidgetBuilderUtils.getColor(color));
+		FontDescriptor fd = descriptor.getFont();
+		if (fd != null) {
+			composite.setFont(WidgetBuilderUtils.getFont(fd));
 		}
 		return composite;
 	}
@@ -166,14 +167,13 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		for (TabItemDescriptor i : items) {
 			addItem(folder, i, index++);
 		}
-
-		String color = descriptor.getBackground();
-		if (color != null) {
-			folder.setBackground(WidgetBuilderUtils.getColor(color));
+		String attr = descriptor.getBackground();
+		if (attr != null) {
+			folder.setBackground(WidgetBuilderUtils.getColor(attr));
 		}
-		color = descriptor.getForeground();
-		if (color != null) {
-			folder.setBackground(WidgetBuilderUtils.getColor(color));
+		FontDescriptor fd = descriptor.getFont();
+		if (fd != null) {
+			folder.setFont(WidgetBuilderUtils.getFont(fd));
 		}
 		return folder;
 	}
@@ -187,6 +187,15 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		if (tt != null) {
 			item.setToolTipText(tt);
 		}
+		String attr = descriptor.getBackground();
+		if (attr != null) {
+			control.setBackground(WidgetBuilderUtils.getColor(attr));
+		}
+		FontDescriptor fd = descriptor.getFont();
+		if (fd != null) {
+			control.setFont(WidgetBuilderUtils.getFont(fd));
+		}
+
 		List<Object> children = descriptor.getCompositeOrTabFolderOrWidget();
 		for (Object o : children) {
 			if (o instanceof TabFolderDescriptor) {

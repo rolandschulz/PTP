@@ -14,15 +14,18 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableColorProvider;
+import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.ui.IAttributeViewerColumnLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
-public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColorProvider, IJAXBUINonNLSConstants {
+public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColorProvider, ITableFontProvider,
+		IJAXBUINonNLSConstants {
 	private final List<ColumnData> columnData;
 
 	public ViewerDataLabelProvider(List<ColumnData> columnData) {
@@ -57,6 +60,14 @@ public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColor
 			return support.getDisplayValue(getColumnName(columnIndex));
 		}
 		return ZEROSTR;
+	}
+
+	public Font getFont(Object element, int columnIndex) {
+		if (element instanceof IAttributeViewerColumnLabelSupport) {
+			IAttributeViewerColumnLabelSupport support = (IAttributeViewerColumnLabelSupport) element;
+			return support.getFont(element, columnIndex);
+		}
+		return null;
 	}
 
 	public Color getForeground(Object element, int columnIndex) {
