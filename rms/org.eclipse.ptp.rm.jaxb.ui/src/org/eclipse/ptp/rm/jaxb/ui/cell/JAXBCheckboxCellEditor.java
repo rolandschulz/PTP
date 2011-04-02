@@ -11,12 +11,13 @@ package org.eclipse.ptp.rm.jaxb.ui.cell;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-public class JAXBCheckboxCellEditor extends CellEditor {
+public class JAXBCheckboxCellEditor extends CellEditor implements IJAXBUINonNLSConstants {
 
 	private Button checkbox;
 

@@ -14,6 +14,8 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerCellData;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerNodeData;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
 import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
@@ -31,27 +33,35 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 
 	@Override
 	protected boolean canEdit(Object element) {
-		return ((AttributeViewerRowData) element).canEdit();
+		if (element instanceof AttributeViewerCellData) {
+			return ((AttributeViewerCellData) element).canEdit();
+		}
+		return false;
 	}
 
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		if (viewer instanceof TableViewer) {
+		if (element instanceof AttributeViewerRowData) {
 			return ((AttributeViewerRowData) element).getCellEditor((TableViewer) viewer, descriptor);
-		} else {
-			return ((AttributeViewerRowData) element).getCellEditor((TreeViewer) viewer, descriptor);
+		} else if (element instanceof AttributeViewerNodeData) {
+			return ((AttributeViewerNodeData) element).getCellEditor((TreeViewer) viewer, descriptor);
 		}
+		return null;
 	}
 
 	@Override
 	protected Object getValue(Object element) {
-		Object o = ((AttributeViewerRowData) element).getValue();
-		return o;
+		if (element instanceof AttributeViewerCellData) {
+			return ((AttributeViewerCellData) element).getValueForEditor();
+		}
+		return null;
 	}
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		((AttributeViewerRowData) element).setValue(value);
-		WidgetActionUtils.refreshViewer(viewer);
+		if (element instanceof AttributeViewerCellData) {
+			((AttributeViewerCellData) element).setValueFromEditor(value);
+			WidgetActionUtils.refreshViewer(viewer);
+		}
 	}
 }

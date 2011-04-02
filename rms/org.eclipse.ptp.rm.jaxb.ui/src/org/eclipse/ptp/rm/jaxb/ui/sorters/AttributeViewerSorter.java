@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.jaxb.ui.sorters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerCellData;
 
 /*
  * Sorts only on name.
@@ -24,11 +24,11 @@ public class AttributeViewerSorter extends ViewerSorter implements IJAXBUINonNLS
 	public int compare(Viewer viewer, Object o1, Object o2) {
 		int result = 0;
 
-		if (o1 instanceof AttributeViewerRowData && o2 instanceof AttributeViewerRowData) {
-			AttributeViewerRowData r1 = (AttributeViewerRowData) o1;
-			AttributeViewerRowData r2 = (AttributeViewerRowData) o2;
-			String name1 = r1.getColumnDisplayValue(COLUMN_NAME);
-			String name2 = r2.getColumnDisplayValue(COLUMN_NAME);
+		if (o1 instanceof AttributeViewerCellData && o2 instanceof AttributeViewerCellData) {
+			AttributeViewerCellData c1 = (AttributeViewerCellData) o1;
+			AttributeViewerCellData c2 = (AttributeViewerCellData) o2;
+			String name1 = c1.getDisplayValue(COLUMN_NAME);
+			String name2 = c2.getDisplayValue(COLUMN_NAME);
 			result = name1.compareTo(name2);
 		}
 
@@ -38,5 +38,4 @@ public class AttributeViewerSorter extends ViewerSorter implements IJAXBUINonNLS
 	public void toggle() {
 		toggle *= -1;
 	}
-
 }

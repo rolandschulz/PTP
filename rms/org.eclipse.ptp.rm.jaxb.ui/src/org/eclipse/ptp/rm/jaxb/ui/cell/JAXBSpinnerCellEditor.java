@@ -36,8 +36,23 @@ public class JAXBSpinnerCellEditor extends CellEditor {
 
 	public JAXBSpinnerCellEditor(Composite parent, int style, Integer min, Integer max) {
 		super(parent, style);
-		spinner.setMinimum(min);
-		spinner.setMaximum(max);
+
+		if (min != null) {
+			if (max == null) {
+				max = Integer.MAX_VALUE;
+			}
+		}
+
+		if (max != null) {
+			if (min == null) {
+				min = Integer.MIN_VALUE;
+			}
+		}
+
+		if (min != null && max != null) {
+			spinner.setMinimum(min);
+			spinner.setMaximum(max);
+		}
 	}
 
 	public JAXBSpinnerCellEditor(Composite parent, Integer min, Integer max) {

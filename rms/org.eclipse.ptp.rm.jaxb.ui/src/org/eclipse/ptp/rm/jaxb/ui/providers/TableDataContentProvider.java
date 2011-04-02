@@ -16,23 +16,13 @@ import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerData;
 
 public class TableDataContentProvider implements IStructuredContentProvider {
 
-	private boolean selected = true;
-
 	public void dispose() {
 	}
 
 	public Object[] getElements(Object inputElement) {
-		if (selected) {
-			return ((AttributeViewerData) inputElement).getSelectedRows().toArray();
-		} else {
-			return ((AttributeViewerData) inputElement).getAllRows().toArray();
-		}
+		return ((AttributeViewerData) inputElement).getRows().toArray();
 	}
 
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-	}
-
-	public void setSelectedOnly(boolean selected) {
-		this.selected = selected;
 	}
 }
