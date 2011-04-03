@@ -166,6 +166,9 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 		if (!ZEROSTR.equals(label)) {
 			initialValue = label;
 		}
+		if (readOnly && label != null) {
+			initialValue = label;
+		}
 		Control c = WidgetBuilderUtils.createText(parent, style, gridData, readOnly, initialValue);
 		return c;
 	}
