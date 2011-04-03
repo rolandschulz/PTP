@@ -48,11 +48,11 @@ public class WidgetMap implements ILaunchTabValueHandler {
 	public void getValuesFromMap(LTVariableMap ltMap) {
 		Map<String, ?> vars = ltMap.getVariables();
 		Map<String, ?> disc = ltMap.getDiscovered();
-		StringBuffer b = new StringBuffer();
+		new StringBuffer();
 		for (Control c : map.keySet()) {
 			Object value = null;
 			Widget w = map.get(c);
-			if (w.getFixedValue() != null) {
+			if (w.getFixedText() != null) {
 				continue;
 			}
 			String ref = w.getSaveValueTo();
@@ -67,17 +67,14 @@ public class WidgetMap implements ILaunchTabValueHandler {
 					value = ((Attribute) o).getValue();
 				}
 			} else {
-				Widget.DynamicValue va = w.getDynamicValue();
+				Widget.DynamicText va = w.getDynamicText();
 				if (va != null) {
 					List<Arg> arglist = va.getArg();
 					if (arglist != null) {
-						b.setLength(0);
-						ArgImpl.toString(null, arglist, ltMap, b);
-						value = b.toString();
+						value = ArgImpl.toString(null, arglist, ltMap);
 					}
 				}
 			}
-
 			if (value == null) {
 				WidgetActionUtils.setValue(c, null);
 			} else {
@@ -101,7 +98,7 @@ public class WidgetMap implements ILaunchTabValueHandler {
 		Map<String, Object> disc = rmMap.getDiscovered();
 		for (Control c : map.keySet()) {
 			Widget w = map.get(c);
-			if (w.getFixedValue() != null) {
+			if (w.getFixedText() != null) {
 				continue;
 			}
 			String name = w.getSaveValueTo();

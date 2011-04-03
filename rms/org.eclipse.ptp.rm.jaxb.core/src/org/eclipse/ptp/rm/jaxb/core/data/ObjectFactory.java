@@ -464,11 +464,11 @@ public class ObjectFactory {
 	}
 
 	/**
-	 * Create an instance of {@link Widget.DynamicValue }
+	 * Create an instance of {@link Widget.DynamicText }
 	 * 
 	 */
-	public Widget.DynamicValue createWidgetDynamicValue() {
-		return new Widget.DynamicValue();
+	public Widget.DynamicText createWidgetDynamicText() {
+		return new Widget.DynamicText();
 	}
 
 }

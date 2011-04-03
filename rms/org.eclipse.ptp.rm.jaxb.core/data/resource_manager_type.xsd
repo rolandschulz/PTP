@@ -470,18 +470,24 @@
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
 			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
-			<xs:element name="value-list-from" minOccurs="0" type="xs:string"/>
+			<xs:element name="value-list-from" minOccurs="0" type="xs:string">
+			   <xs:annotation>
+               <xs:documentation>
+                 Combo elements taken from the value of an attribute or property.
+               </xs:documentation>
+            </xs:annotation>
+			</xs:element>
 			<xs:element name="fixed-text" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						The text of this element will be set once from the environment on loading; e.g, ${rm:Job_Name#description}.
+						The text of a label set once from the environment on loading; e.g, ${rm:Job_Name#description}.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="dynamic-text" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
-						The args will be refreshed against the environment.
+						Changing label text; the args will be refreshed against the environment.
 					</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
