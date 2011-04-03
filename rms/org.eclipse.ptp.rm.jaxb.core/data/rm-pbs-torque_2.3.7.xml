@@ -77,8 +77,7 @@
 				matches the name of the
 				execution host; 2) Select the composite-descriptor group="true" name which has no
 				associated host name, the wildcard name; 3) Use
-				the
-				login composite-descriptor group="true" for the username under which the job will be run.
+				the login composite-descriptor group="true" for the username under which the job will be run.
 			</tooltip>
 		</attribute>
 		<attribute name="Hold_Types" type="choice">
@@ -381,25 +380,25 @@
 			</line>
 		</script>
 		<!-- ********************** FOR TESTING ********************** -->
-<!-- 		<start-up-command name="get-queues"> -->
-			<!--
-				<arg>qstat -Q -f</arg>
-				<arg>| grep Queue:</arg>
-				<arg>| cut -d ' ' -f 2</arg>
-				<arg>| tr '\n' ' '</arg>
-			-->
-<!-- 			<arg>/Users/arossi/qstatF</arg> -->
-<!-- 			<stdout-parser delim="\n"> -->
-<!-- 				<target ref="destination"> -->
-<!-- 					<match> -->
-<!-- 						<expression>[^\s]+</expression> -->
-<!-- 						<add field="value"> -->
-<!-- 							<entry valueGroup="0"/> -->
-<!-- 						</add> -->
-<!-- 					</match> -->
-<!-- 				</target> -->
-<!-- 			</stdout-parser> -->
-<!-- 		</start-up-command> -->
+		<!-- <start-up-command name="get-queues"> -->
+		<!--
+			<arg>qstat -Q -f</arg>
+			<arg>| grep Queue:</arg>
+			<arg>| cut -d ' ' -f 2</arg>
+			<arg>| tr '\n' ' '</arg>
+		-->
+		<!-- <arg>/Users/arossi/qstatF</arg> -->
+		<!-- <stdout-parser delim="\n"> -->
+		<!-- <target ref="destination"> -->
+		<!-- <match> -->
+		<!-- <expression>[^\s]+</expression> -->
+		<!-- <add field="value"> -->
+		<!-- <entry valueGroup="0"/> -->
+		<!-- </add> -->
+		<!-- </match> -->
+		<!-- </target> -->
+		<!-- </stdout-parser> -->
+		<!-- </start-up-command> -->
 		<!-- ********************** FOR TESTING ********************** -->
 		<submit-interactive name="submit-interactive" waitForId="true">
 			<arg>/Users/arossi/qsub</arg>
@@ -538,7 +537,7 @@
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
 						</layout-data>
-<!-- 					<value-list-from>destination</value-list-from> -->
+						<!-- <value-list-from>destination</value-list-from> -->
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
@@ -643,7 +642,7 @@
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
 							</layout-data>
-							<value-list-from>available_queues</value-list-from>
+<!-- 							<value-list-from>available_queues</value-list-from> -->
 						</widget>
 					</composite>
 					<!-- iterates through all registered attributes, one to a row -->
@@ -657,7 +656,9 @@
 						<column-data name="Value" width="400" foreground="SWT.COLOR_DARK_MAGENTA">
 							<tooltip>Click to activate value widget.</tooltip>
 						</column-data>
-						<items allPredefined="true"/>
+						<items allPredefined="true">
+							<exclude>destination</exclude>
+						</items>
 						<value pattern="@name='@value'"/>
 					</viewer>
 				</composite>

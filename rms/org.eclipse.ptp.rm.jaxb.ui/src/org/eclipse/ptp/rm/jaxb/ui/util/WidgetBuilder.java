@@ -170,7 +170,6 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 		return c;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void setMapDependentData(Widget widget, RMVariableMap rmMap) {
 		tooltip = rmMap.getString(widget.getTooltip());
 		if (tooltip == null) {

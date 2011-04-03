@@ -10,6 +10,8 @@
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -217,32 +219,48 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		ViewerItems items = descriptor.getItems();
 		List<ColumnData> columnData = descriptor.getColumnData();
 		AttributeViewerCellData row = null;
+		Map<String, AttributeViewerCellData> hash = new TreeMap<String, AttributeViewerCellData>();
+		Map<String, Object> vars = null;
 		if (items.isAllPredefined()) {
-			for (Object o : rmMap.getVariables().values()) {
+			vars = rmMap.getVariables();
+			for (String key : vars.keySet()) {
+				Object o = vars.get(key);
 				row = getCellViewerData(viewer, o, columnData);
 				if (row.isVisible()) {
-					data.addRow(row);
-				}
-			}
-		} else {
-			List<String> refs = items.getRef();
-			for (String ref : refs) {
-				Object o = rmMap.getVariables().get(ref);
-				if (o != null) {
-					row = getCellViewerData(viewer, o, columnData);
-					if (row.isVisible()) {
-						data.addRow(row);
-					}
+					hash.put(key, row);
 				}
 			}
 		}
 		if (items.isAllDiscovered()) {
-			for (Object o : rmMap.getDiscovered().values()) {
+			vars = rmMap.getDiscovered();
+			for (String key : vars.keySet()) {
+				Object o = vars.get(key);
 				row = getCellViewerData(viewer, o, columnData);
 				if (row.isVisible()) {
-					data.addRow(row);
+					hash.put(key, row);
 				}
 			}
+		}
+		for (String key : items.getInclude()) {
+			if (hash.containsKey(key)) {
+				continue;
+			}
+			Object o = rmMap.getVariables().get(key);
+			if (o == null) {
+				o = rmMap.getDiscovered().get(key);
+			}
+			if (o != null) {
+				row = getCellViewerData(viewer, o, columnData);
+				if (row.isVisible()) {
+					hash.put(key, row);
+				}
+			}
+		}
+		for (String key : items.getExclude()) {
+			hash.remove(key);
+		}
+		for (AttributeViewerCellData cd : hash.values()) {
+			data.addRow(cd);
 		}
 		viewer.setInput(data);
 		ICheckable checkable = (ICheckable) viewer;
