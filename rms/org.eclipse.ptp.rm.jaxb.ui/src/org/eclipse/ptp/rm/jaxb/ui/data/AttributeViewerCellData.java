@@ -92,6 +92,7 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 	protected CellEditor editor;
 	protected boolean discovered;
 	protected boolean selected;
+	protected boolean readOnly;
 
 	protected String stringValue;
 	protected int index;
@@ -114,15 +115,18 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 		index = UNDEFINED;
 		booleanValue = false;
 		selected = false;
+		readOnly = false;
 		if (data instanceof Attribute) {
 			Attribute a = (Attribute) data;
 			name = a.getName();
 			choice = a.getChoice();
 			min = a.getMin();
 			max = a.getMax();
+			readOnly = a.isReadOnly();
 		} else if (data instanceof Property) {
 			Property p = (Property) data;
 			name = p.getName();
+			readOnly = p.isReadOnly();
 		}
 		integerValue = min == null ? 0 : min;
 		int cols = columnData.size();
@@ -153,10 +157,11 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 
 	/*
 	 * The combo cell editor does not allow write-ins. So effectively the only
-	 * editable widget is text. We just return true here.
+	 * widget which can be "read-only" is a text box. We must allow edit on the
+	 * others for them to appear.
 	 */
 	public boolean canEdit() {
-		return true;
+		return !(editor instanceof JAXBTextCellEditor) || !readOnly;
 	}
 
 	public Color getBackground(Object element, int columnIndex) {
@@ -241,6 +246,8 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 		} else if (editor instanceof JAXBCheckboxCellEditor) {
 			if (value == null) {
 				booleanValue = false;
+			} else if (value instanceof String) {
+				booleanValue = Boolean.parseBoolean((String) value);
 			} else {
 				booleanValue = (Boolean) value;
 			}
@@ -251,6 +258,8 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 				} else {
 					integerValue = min;
 				}
+			} else if (value instanceof String) {
+				integerValue = Integer.parseInt((String) value);
 			} else {
 				integerValue = (Integer) value;
 			}
@@ -265,6 +274,10 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 						index = i;
 						break;
 					}
+				}
+				if (index == items.length) {
+					index = UNDEFINED;
+					stringValue = ZEROSTR;
 				}
 			}
 		}
@@ -300,6 +313,10 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 		}
 	}
 
+	public void setValueFromString(String value) {
+
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected CellEditor createEditor(Composite parent, ColumnData d) {
 		CellEditorType type = CellEditorType.getType(data);
@@ -313,6 +330,7 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 			Object o = null;
 			if (data instanceof Attribute) {
 				if (choice != null) {
+					choice = choice.trim();
 					items = choice.split(CM);
 				} else {
 					o = ((Attribute) data).getValue();

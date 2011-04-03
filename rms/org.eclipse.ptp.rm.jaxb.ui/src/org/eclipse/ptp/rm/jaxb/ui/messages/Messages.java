@@ -78,6 +78,7 @@ public class Messages extends NLS {
 	public static String DisplayScriptError;
 	public static String DisplayScriptErrorTitle;
 	public static String Tooltip;
+	public static String AttributeInfo;
 	public static String ViewerLabelProviderColumnError;
 
 	static {

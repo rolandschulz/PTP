@@ -32,6 +32,15 @@ public class AttributeViewerChildNodeData implements IAttributeViewerColumnLabel
 		return null;
 	}
 
+	public String getDescription() {
+		Object data = parent.getData();
+		if (data instanceof Attribute) {
+			Attribute ja = (Attribute) data;
+			return ja.getDescription();
+		}
+		return ZEROSTR;
+	}
+
 	public String getDisplayValue(String columnName) {
 		if (COLUMN_NAME.equals(columnName)) {
 			return id;
