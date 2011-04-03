@@ -27,7 +27,7 @@
 			<description>Account to which to charge this job.</description>
 			<tooltip>Format: string</tooltip>
 		</attribute>
-		<attribute name="Checkpoint" type="choice">
+		<attribute name="Checkpoint" type="choice" readOnly="false">
 			<description>Determines when checkpointing (if supported) will be performed by PBS on behalf of the job.</description>
 			<tooltip>Format: the strings "n" (no checkpointing), "s" (to be performed only when the server executing the job is shutdown), "c"s
 				(to be performed at the default minimum time for thes servers executing the job), "c=mmmm" (to be performed at an intervals ofs
@@ -629,7 +629,7 @@
 						<grid-layout numColumns="1"/>
 					</layout>
 					<!-- iterates through all registered attributes, one to a row -->
-					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="table">
+					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="tree">
 						<layout-data>
 							<grid-data widthHint="600" horizontalSpan="2"/>
 						</layout-data>
