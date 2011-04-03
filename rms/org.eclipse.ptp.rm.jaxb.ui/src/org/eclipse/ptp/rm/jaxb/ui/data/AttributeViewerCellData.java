@@ -15,6 +15,7 @@ import org.eclipse.ptp.rm.jaxb.ui.cell.JAXBComboCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.cell.JAXBSpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.cell.JAXBTextCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
@@ -109,7 +110,7 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 		this.data = data;
 		discovered = false;
 		text = ZEROSTR;
-		selected = 0;
+		selected = UNDEFINED;
 		checked = false;
 		if (data instanceof Attribute) {
 			Attribute a = (Attribute) data;
@@ -147,15 +148,12 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 		}
 	}
 
+	/*
+	 * The combo cell editor does not allow write-ins. So effectively the only
+	 * editable widget is text. We just return true here.
+	 */
 	public boolean canEdit() {
-		if (data instanceof Property) {
-			Property p = (Property) data;
-			return !p.isReadOnly() && p.isSelected();
-		} else if (data instanceof Attribute) {
-			Attribute a = (Attribute) data;
-			return !a.isReadOnly() && a.isSelected();
-		}
-		return false;
+		return true;
 	}
 
 	public Color getBackground(Object element, int columnIndex) {
@@ -264,7 +262,7 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 			}
 		} else if (editor instanceof JAXBComboCellEditor) {
 			if (value == null) {
-				selected = 0;
+				selected = UNDEFINED;
 				text = ZEROSTR;
 			} else {
 				text = (String) value;
@@ -298,15 +296,13 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 				count = (Integer) value;
 			}
 		} else if (editor instanceof JAXBComboCellEditor) {
-			if (value == null) {
-				selected = 0;
+			if (value == null || ((Integer) value) == UNDEFINED) {
+				selected = UNDEFINED;
+				text = ZEROSTR;
 			} else {
 				selected = (Integer) value;
+				text = items[selected];
 			}
-			/*
-			 * have to take care of writing in here
-			 */
-			text = items[selected];
 		}
 	}
 
@@ -345,7 +341,7 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 					items = new String[0];
 				}
 			}
-			editor = new JAXBComboCellEditor(parent, items);
+			editor = new JAXBComboCellEditor(parent, items, SWT.READ_ONLY);
 		}
 		return editor;
 	}
