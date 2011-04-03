@@ -35,6 +35,7 @@ import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
 import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerCellData;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerChildNodeData;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
@@ -834,8 +835,14 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 					if (first instanceof AttributeViewerCellData) {
 						AttributeViewerCellData row = (AttributeViewerCellData) first;
 						String tooltip = row.getTooltip();
-						if (tooltip != null) {
+						if (!ZEROSTR.equals(tooltip)) {
 							MessageDialog.openInformation(viewer.getControl().getShell(), Messages.Tooltip, tooltip);
+						}
+					} else if (first instanceof AttributeViewerChildNodeData) {
+						AttributeViewerChildNodeData row = (AttributeViewerChildNodeData) first;
+						String description = row.getDescription();
+						if (!ZEROSTR.equals(description)) {
+							MessageDialog.openInformation(viewer.getControl().getShell(), Messages.AttributeInfo, description);
 						}
 					}
 				} catch (Throwable t) {

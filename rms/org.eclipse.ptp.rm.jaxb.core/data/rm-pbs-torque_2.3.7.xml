@@ -26,7 +26,7 @@
 			<description>Account to which to charge this job.</description>
 			<tooltip>Format: string</tooltip>
 		</attribute>
-		<attribute name="Checkpoint" type="choice" readOnly="false">
+		<attribute name="Checkpoint" type="choice">
 			<description>Determines when checkpointing (if supported) will be performed by PBS on behalf of the job.</description>
 			<tooltip>Format: the strings "n" (no checkpointing), "s" (to be performed only when the server executing the job is shutdown), "c"s
 				(to be performed at the default minimum time for thes servers executing the job), "c=mmmm" (to be performed at an intervals ofs
@@ -40,7 +40,7 @@
 			<description>The type of inter-job dependencies specified by the job owner.</description>
 			<tooltip>Format: "type:jobid[,jobid...]"; default value: no dependencies.</tooltip>
 		</attribute>
-		<attribute name="destination" readOnly="true" type="choice">
+		<attribute name="destination" type="choice">
 			<description>Designation of the queue to which to submit the job.</description>
 			<tooltip>Format: queue[@server].</tooltip>
 			<choice>normal,iacat2,indprio,lincoln_nomss,cap1,lincoln_debug,long,iacat,industrial,lincoln,wide,nomss,debug,iacat3,lincoln_cuda3,fernsler
@@ -364,7 +364,7 @@
 				<arg resolve="false">if [ -n "${MPI_COMMAND}" ] ; then</arg>
 			</line>
 			<line>
-				<arg resolve="false"> MPI_COMMAND="${MPI_COMMAND} ${MPI_ARGS}"</arg>
+				<arg resolve="false">MPI_COMMAND="${MPI_COMMAND} ${MPI_ARGS}"</arg>
 			</line>
 			<line>
 				<arg resolve="false">fi</arg>
@@ -655,7 +655,6 @@
 							<fixed-text>${rm:allAttributes}</fixed-text>
 						</widget>
 					</composite>
-					<!-- iterates through all registered attributes, one to a row -->
 					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="tree">
 						<layout-data>
 							<grid-data widthHint="600" horizontalSpan="2"/>

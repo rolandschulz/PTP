@@ -60,7 +60,7 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 			List<AttributeViewerCellData> rows = data.getRows();
 			for (AttributeViewerCellData row : rows) {
 				String name = row.getDisplayValue(COLUMN_NAME);
-				Object value = vars.get(name);
+				String value = vars.get(name);
 				if (name == null) {
 					continue;
 				}
