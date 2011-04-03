@@ -91,12 +91,13 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 	protected Integer max;
 	protected CellEditor editor;
 	protected boolean discovered;
+	protected boolean selected;
 
-	protected String text;
-	protected int selected;
+	protected String stringValue;
+	protected int index;
 	protected String[] items;
-	protected boolean checked;
-	protected int count;
+	protected boolean booleanValue;
+	protected int integerValue;
 
 	protected Color[] foreground;
 	protected Color[] background;
@@ -109,9 +110,10 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 	protected AttributeViewerCellData(Object data, List<ColumnData> columnData) {
 		this.data = data;
 		discovered = false;
-		text = ZEROSTR;
-		selected = UNDEFINED;
-		checked = false;
+		stringValue = ZEROSTR;
+		index = UNDEFINED;
+		booleanValue = false;
+		selected = false;
 		if (data instanceof Attribute) {
 			Attribute a = (Attribute) data;
 			name = a.getName();
@@ -119,9 +121,10 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 			min = a.getMin();
 			max = a.getMax();
 		} else if (data instanceof Property) {
-			name = ((Property) data).getName();
+			Property p = (Property) data;
+			name = p.getName();
 		}
-		count = min == null ? 0 : min;
+		integerValue = min == null ? 0 : min;
 		int cols = columnData.size();
 		foreground = new Color[cols];
 		background = new Color[cols];
@@ -196,13 +199,13 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 
 	public Object getValueForEditor() {
 		if (editor instanceof JAXBTextCellEditor) {
-			return text;
+			return stringValue;
 		} else if (editor instanceof JAXBCheckboxCellEditor) {
-			return checked;
+			return booleanValue;
 		} else if (editor instanceof JAXBSpinnerCellEditor) {
-			return count;
+			return integerValue;
 		} else if (editor instanceof JAXBComboCellEditor) {
-			return selected;
+			return index;
 		}
 		return null;
 	}
@@ -212,12 +215,7 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 	}
 
 	public boolean isSelected() {
-		if (data instanceof Property) {
-			return ((Property) data).isSelected();
-		} else if (data instanceof Attribute) {
-			return ((Attribute) data).isSelected();
-		}
-		return false;
+		return selected;
 	}
 
 	public boolean isVisible() {
@@ -234,41 +232,37 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 	}
 
 	public void setSelected(boolean selected) {
-		if (data instanceof Property) {
-			((Property) data).setSelected(selected);
-		} else if (data instanceof Attribute) {
-			((Attribute) data).setSelected(selected);
-		}
+		this.selected = selected;
 	}
 
 	public void setValue(Object value) {
 		if (editor instanceof JAXBTextCellEditor) {
-			text = (String) value;
+			stringValue = (String) value;
 		} else if (editor instanceof JAXBCheckboxCellEditor) {
 			if (value == null) {
-				checked = false;
+				booleanValue = false;
 			} else {
-				checked = (Boolean) value;
+				booleanValue = (Boolean) value;
 			}
 		} else if (editor instanceof JAXBSpinnerCellEditor) {
 			if (value == null) {
 				if (min == null) {
-					count = 0;
+					integerValue = 0;
 				} else {
-					count = min;
+					integerValue = min;
 				}
 			} else {
-				count = (Integer) value;
+				integerValue = (Integer) value;
 			}
 		} else if (editor instanceof JAXBComboCellEditor) {
 			if (value == null) {
-				selected = UNDEFINED;
-				text = ZEROSTR;
+				index = UNDEFINED;
+				stringValue = ZEROSTR;
 			} else {
-				text = (String) value;
+				stringValue = (String) value;
 				for (int i = 0; i < items.length; i++) {
-					if (items[i].equals(text)) {
-						selected = i;
+					if (items[i].equals(stringValue)) {
+						index = i;
 						break;
 					}
 				}
@@ -278,39 +272,31 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 
 	public void setValueFromEditor(Object value) {
 		if (editor instanceof JAXBTextCellEditor) {
-			text = (String) value;
+			stringValue = (String) value;
 		} else if (editor instanceof JAXBCheckboxCellEditor) {
 			if (value == null) {
-				checked = false;
+				booleanValue = false;
 			} else {
-				checked = (Boolean) value;
+				booleanValue = (Boolean) value;
 			}
 		} else if (editor instanceof JAXBSpinnerCellEditor) {
 			if (value == null) {
 				if (min == null) {
-					count = 0;
+					integerValue = 0;
 				} else {
-					count = min;
+					integerValue = min;
 				}
 			} else {
-				count = (Integer) value;
+				integerValue = (Integer) value;
 			}
 		} else if (editor instanceof JAXBComboCellEditor) {
 			if (value == null || ((Integer) value) == UNDEFINED) {
-				selected = UNDEFINED;
-				text = ZEROSTR;
+				index = UNDEFINED;
+				stringValue = ZEROSTR;
 			} else {
-				selected = (Integer) value;
-				text = items[selected];
+				index = (Integer) value;
+				stringValue = items[index];
 			}
-		}
-	}
-
-	public void setVisible(boolean visible) {
-		if (data instanceof Property) {
-			((Property) data).setVisible(visible);
-		} else if (data instanceof Attribute) {
-			((Attribute) data).setVisible(visible);
 		}
 	}
 
@@ -348,13 +334,13 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 
 	protected String getActualValueAsString() {
 		if (editor instanceof JAXBTextCellEditor || editor instanceof JAXBComboCellEditor) {
-			if (text != null) {
-				return text;
+			if (stringValue != null) {
+				return stringValue;
 			}
 		} else if (editor instanceof JAXBCheckboxCellEditor) {
-			return String.valueOf(checked);
+			return String.valueOf(booleanValue);
 		} else if (editor instanceof JAXBSpinnerCellEditor) {
-			return String.valueOf(count);
+			return String.valueOf(integerValue);
 		}
 		return ZEROSTR;
 	}

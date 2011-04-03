@@ -625,7 +625,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		Map<String, Object> env = map.getVariables();
 		env.remove(SCRIPT); // to ensure the most recent script is used
 
-		Map<String, String> selected = config.getSelectedAttributeSet();
+		Map<String, String> selectedMap = null;
+		String selected = configuration.getAttribute(SELECTED_ATTRIBUTES, ZEROSTR);
+		if (selected != null) {
+			selectedMap = new HashMap<String, String>();
+			String[] names = selected.split(SP);
+			for (String s : names) {
+				selectedMap.put(s, s);
+			}
+		}
 
 		@SuppressWarnings("rawtypes")
 		Map lcattr = configuration.getAttributes();
@@ -634,17 +642,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			Object target = env.get(key.toString());
 			if (target instanceof Property) {
 				Property p = (Property) target;
-				if (selected != null && !selected.containsKey(p.getName())) {
+				if (selectedMap != null && !selectedMap.containsKey(p.getName())) {
 					p.setValue(null);
-					p.setSelected(false);
 				} else {
 					p.setValue(value.toString());
 				}
 			} else if (target instanceof Attribute) {
 				Attribute ja = (Attribute) target;
-				if (selected != null && !selected.containsKey(ja.getName())) {
+				if (selectedMap != null && !selectedMap.containsKey(ja.getName())) {
 					ja.setValue(null);
-					ja.setSelected(false);
 				} else {
 					ja.setValue(value);
 				}

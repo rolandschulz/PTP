@@ -68,6 +68,8 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 
 	public LaunchTabBuilder(JAXBRMConfigurableAttributesTab tab) {
 		this.tab = tab;
+		viewerMap = null;
+		widgetMap = null;
 	}
 
 	public void build(Composite parent) throws Throwable {
@@ -94,7 +96,8 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		}
 		addRows(viewer, descriptor);
 		addToggleShowHideSelected(showHide, viewer);
-		addToViewerMap(viewer, descriptor);
+		addToViewerMap(viewer, descriptor, showHide);
+
 	}
 
 	private ColumnViewer addCheckboxTableViewer(Composite parent, Object data, Layout layout, int style, AttributeViewer descriptor) {
@@ -280,12 +283,12 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		checkbutton.setSelection(true);
 	}
 
-	private void addToViewerMap(ColumnViewer viewer, AttributeViewer descriptor) {
+	private void addToViewerMap(ColumnViewer viewer, AttributeViewer descriptor, Button toggle) {
 		if (viewerMap == null) {
 			viewerMap = new AttributeViewerMap();
 			tab.getHandlers().add(viewerMap);
 		}
-		viewerMap.add(viewer, descriptor);
+		viewerMap.add(viewer, descriptor, toggle);
 	}
 
 	private void addToWidgetMap(Control control, Widget widget) {
