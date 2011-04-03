@@ -26,17 +26,22 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.ILaunchTabValueHandler;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
+import org.eclipse.swt.widgets.Button;
 
 public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLSConstants {
+
+	private final Map<ColumnViewer, Button> showHide;
 
 	private final Map<ColumnViewer, AttributeViewer> map;
 
 	public AttributeViewerMap() {
 		map = new HashMap<ColumnViewer, AttributeViewer>();
+		showHide = new HashMap<ColumnViewer, Button>();
 	}
 
-	public void add(ColumnViewer viewer, AttributeViewer descriptor) {
+	public void add(ColumnViewer viewer, AttributeViewer descriptor, Button toggle) {
 		map.put(viewer, descriptor);
+		showHide.put(viewer, toggle);
 	}
 
 	public AttributeViewer get(ColumnViewer viewer) {
@@ -44,8 +49,9 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 	}
 
 	public void getValuesFromMap(LTVariableMap ltMap) {
-		Map<String, ?> vars = ltMap.getVariables();
-		Map<String, ?> disc = ltMap.getDiscovered();
+		Map<String, String> vars = ltMap.getVariables();
+		Map<String, String> disc = ltMap.getDiscovered();
+		Map<String, String> selected = getSelected(ltMap);
 		for (ColumnViewer viewer : map.keySet()) {
 			AttributeViewerData data = (AttributeViewerData) viewer.getInput();
 			if (data == null) {
@@ -65,8 +71,17 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 					}
 				}
 				row.setValue(value);
+				if (selected.containsKey(name)) {
+					row.setSelected(true);
+				} else {
+					row.setSelected(false);
+				}
 			}
 			WidgetActionUtils.refreshViewer(viewer);
+
+			Button toggle = showHide.get(viewer);
+			String b = vars.get(SHOW_ALL);
+			toggle.setSelection(Boolean.parseBoolean(b));
 		}
 	}
 
@@ -115,6 +130,7 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 	public void setValuesOnMap(LTVariableMap ltMap) {
 		Map<String, String> vars = ltMap.getVariables();
 		Map<String, String> disc = ltMap.getDiscovered();
+		Map<String, String> selected = new HashMap<String, String>();
 		StringBuffer buffer = new StringBuffer();
 		for (ColumnViewer viewer : map.keySet()) {
 			buffer.setLength(0);
@@ -141,6 +157,7 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 					} else {
 						vars.put(name, value);
 					}
+					selected.put(name, name);
 					buffer.append(row.getReplaced(pattern));
 				} else {
 					if (row.isDiscovered()) {
@@ -160,6 +177,7 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 					} else {
 						vars.put(name, value);
 					}
+					selected.put(name, name);
 					buffer.append(separator).append(row.getReplaced(pattern));
 				} else {
 					if (row.isDiscovered()) {
@@ -173,6 +191,10 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 			if (tName != null) {
 				vars.put(tName, buffer.toString());
 			}
+			setSelected(selected, ltMap);
+
+			Button toggle = showHide.get(viewer);
+			vars.put(SHOW_ALL, String.valueOf(toggle.getSelection()));
 		}
 	}
 
@@ -208,5 +230,25 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 				}
 			}
 		}
+	}
+
+	public static Map<String, String> getSelected(LTVariableMap ltMap) {
+		Map<String, String> map = new HashMap<String, String>();
+		String selected = ltMap.getVariables().get(SELECTED_ATTRIBUTES);
+		if (selected != null) {
+			String[] attr = selected.split(SP);
+			for (String s : attr) {
+				map.put(s, s);
+			}
+		}
+		return map;
+	}
+
+	public static void setSelected(Map<String, String> map, LTVariableMap ltMap) {
+		StringBuffer buffer = new StringBuffer();
+		for (String s : map.keySet()) {
+			buffer.append(s).append(SP);
+		}
+		ltMap.getVariables().put(SELECTED_ATTRIBUTES, buffer.toString().trim());
 	}
 }

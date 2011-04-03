@@ -96,6 +96,19 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 					}
 				}
 				config.setAttributes(attrMap);
+
+				String selected = ltmap.getVariables().get(SELECTED_ATTRIBUTES);
+				if (selected != null) {
+					config.setAttribute(SELECTED_ATTRIBUTES, selected);
+				}
+
+				String showAll = ltmap.getVariables().get(SHOW_ALL);
+				if (showAll != null) {
+					config.setAttribute(SHOW_ALL, Boolean.valueOf(showAll));
+				} else {
+					config.setAttribute(SHOW_ALL, true);
+				}
+
 			} catch (Throwable t) {
 				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnCopyToStorage,
 						Messages.ErrorOnCopyToStorageTitle, false);
@@ -133,6 +146,14 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 						disc.put((String) k, (String) attrMap.get(k));
 					}
 				}
+
+				String selected = config.getAttribute(SELECTED_ATTRIBUTES, ZEROSTR);
+				if (selected != null) {
+					vars.put(SELECTED_ATTRIBUTES, selected);
+				}
+
+				boolean showAll = config.getAttribute(SHOW_ALL, true);
+				vars.put(SHOW_ALL, String.valueOf(showAll));
 			} catch (Throwable t) {
 				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnLoadFromStore, Messages.ErrorOnLoadTitle,
 						false);

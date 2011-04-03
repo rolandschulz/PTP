@@ -10,7 +10,6 @@
 package org.eclipse.ptp.rm.jaxb.core;
 
 import java.net.URL;
-import java.util.Map;
 
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
@@ -66,32 +65,12 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	/**
 	 * @since 5.0
 	 */
-	Map<String, String> getSelectedAttributeSet();
-
-	/**
-	 * @since 5.0
-	 */
 	IRemoteServices getService();
 
 	/**
 	 * @since 5.0
 	 */
-	String getValidAttributeSet();
-
-	/**
-	 * @since 5.0
-	 */
 	void realizeRMDataFromXML() throws Throwable;
-
-	/**
-	 * @since 5.0
-	 */
-	void removeSelectedAttributeSet();
-
-	/**
-	 * @since 5.0
-	 */
-	void removeValidAttributeSet();
 
 	/**
 	 * @since 5.0
@@ -111,15 +90,5 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	/**
 	 * @since 5.0
 	 */
-	void setSelectedAttributeSet(Map<String, String> map);
-
-	/**
-	 * @since 5.0
-	 */
 	void setService(IRemoteServices service);
-
-	/**
-	 * @since 5.0
-	 */
-	void setValidAttributeSet(String serialized);
 }

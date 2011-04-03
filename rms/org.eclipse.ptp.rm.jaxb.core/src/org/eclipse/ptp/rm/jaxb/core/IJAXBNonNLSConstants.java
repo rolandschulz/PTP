@@ -129,7 +129,7 @@ public interface IJAXBNonNLSConstants {
 	String PREV_RM_XSD_PATH = "prev_rm_schema_path";//$NON-NLS-1$
 	String EXTERNAL_RM_XSD_PATHS = "external_rm_schema_paths";//$NON-NLS-1$
 	String SELECTED_ATTRIBUTES = "selected_attributes";//$NON-NLS-1$
-	String VALID_ATTRIBUTES = "valid_attributes"; //$NON-NLS-1$
+	String SHOW_ALL = "show_all";//$NON-NLS-1$
 	String IS_PRESET = "is_preset";//$NON-NLS-1$
 	String SCRIPT_PATH = "script_path";//$NON-NLS-1$
 	String SCRIPT = "script";//$NON-NLS-1$

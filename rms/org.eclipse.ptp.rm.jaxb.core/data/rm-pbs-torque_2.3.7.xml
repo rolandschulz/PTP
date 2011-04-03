@@ -538,7 +538,7 @@
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
 						</layout-data>
-						<!-- HOW DO WE HANDLE THE LIST HERE? xxxTODO -->
+						<fixed-value>${rm:available_queues#value}</fixed-value>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
