@@ -20,8 +20,6 @@ public class LineImpl implements IJAXBNonNLSConstants {
 	}
 
 	public String getResolved() {
-		StringBuffer buffer = new StringBuffer();
-		ArgImpl.toString(uuid, args, map, buffer);
-		return buffer.toString();
+		return ArgImpl.toString(uuid, args, map);
 	}
 }

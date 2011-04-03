@@ -40,14 +40,16 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 		return resolved.toArray(new String[0]);
 	}
 
-	public static void toString(String uuid, List<Arg> args, IVariableMap map, StringBuffer b) {
+	public static String toString(String uuid, List<Arg> args, IVariableMap map) {
 		if (args.isEmpty()) {
-			return;
+			return ZEROSTR;
 		}
+		StringBuffer b = new StringBuffer();
 		b.append(getResolved(uuid, args.get(0), map));
 		for (int i = 1; i < args.size(); i++) {
 			b.append(SP).append(getResolved(uuid, args.get(0), map));
 		}
+		return b.toString();
 	}
 
 	private static String getResolved(String uuid, Arg arg, IVariableMap map) {

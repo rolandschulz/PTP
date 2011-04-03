@@ -5,7 +5,6 @@
 		<control-connection>ssh://abe.ncsa.uiuc.edu/usr/local/bin/qsub</control-connection>
 	</site-data>
 	<control-data>
-		<property name="available_queues" visible="false"/>
 		<property name="stdout">
 			<value>${rm:Output_Path#value}</value>
 		</property><!-- property needed for forwarding stdout in batch -->
@@ -41,9 +40,10 @@
 			<description>The type of inter-job dependencies specified by the job owner.</description>
 			<tooltip>Format: "type:jobid[,jobid...]"; default value: no dependencies.</tooltip>
 		</attribute>
-		<attribute name="destination" type="string">
+		<attribute name="destination" readOnly="true" type="choice">
 			<description>Designation of the queue to which to submit the job.</description>
 			<tooltip>Format: queue[@server].</tooltip>
+			<choice>normal,iacat2,indprio,lincoln_nomss,cap1,lincoln_debug,long,iacat,industrial,lincoln,wide,nomss,debug,iacat3,lincoln_cuda3,fernsler</choice>
 		</attribute>
 		<attribute name="directive" type="string">
 			<description>Defines the prefix that declares a directive to the qsub command within the script file.</description>
@@ -381,25 +381,25 @@
 			</line>
 		</script>
 		<!-- ********************** FOR TESTING ********************** -->
-		<start-up-command name="get-queues">
+<!-- 		<start-up-command name="get-queues"> -->
 			<!--
 				<arg>qstat -Q -f</arg>
 				<arg>| grep Queue:</arg>
 				<arg>| cut -d ' ' -f 2</arg>
 				<arg>| tr '\n' ' '</arg>
 			-->
-			<arg>/Users/arossi/qstatF</arg>
-			<stdout-parser delim="\n">
-				<target ref="available_queues">
-					<match>
-						<expression>[^\s]+</expression>
-						<add field="value">
-							<entry valueGroup="0"/>
-						</add>
-					</match>
-				</target>
-			</stdout-parser>
-		</start-up-command>
+<!-- 			<arg>/Users/arossi/qstatF</arg> -->
+<!-- 			<stdout-parser delim="\n"> -->
+<!-- 				<target ref="destination"> -->
+<!-- 					<match> -->
+<!-- 						<expression>[^\s]+</expression> -->
+<!-- 						<add field="value"> -->
+<!-- 							<entry valueGroup="0"/> -->
+<!-- 						</add> -->
+<!-- 					</match> -->
+<!-- 				</target> -->
+<!-- 			</stdout-parser> -->
+<!-- 		</start-up-command> -->
 		<!-- ********************** FOR TESTING ********************** -->
 		<submit-interactive name="submit-interactive" waitForId="true">
 			<arg>/Users/arossi/qsub</arg>
@@ -493,19 +493,19 @@
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
-						<fixed-value>Name</fixed-value>
+						<fixed-text>Name</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="true" horizontalSpan="2"/>
 						</layout-data>
-						<fixed-value>Value</fixed-value>
+						<fixed-text>Value</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
-						<fixed-value>Description</fixed-value>
+						<fixed-text>Description</fixed-text>
 					</widget>
 					<!-- row 1 -->
 					<widget type="label" style="SWT.LEFT">
@@ -513,7 +513,7 @@
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
 						<tooltip>${rm:Job_Name#tooltip}</tooltip>
-						<fixed-value>Job Name: </fixed-value>
+						<fixed-text>Job Name: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" saveValueTo="Job_Name">
 						<layout-data>
@@ -524,7 +524,7 @@
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
-						<fixed-value>${rm:Job_Name#description}</fixed-value>
+						<fixed-text>${rm:Job_Name#description}</fixed-text>
 					</widget>
 					<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
@@ -532,19 +532,19 @@
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
 						<tooltip>${rm:destination#tooltip}</tooltip>
-						<fixed-value>Queue: </fixed-value>
+						<fixed-text>Queue: </fixed-text>
 					</widget>
 					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
 						</layout-data>
-						<fixed-value>${rm:available_queues#value}</fixed-value>
+<!-- 					<value-list-from>destination</value-list-from> -->
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
-						<fixed-value>${rm:destination#description}</fixed-value>
+						<fixed-text>${rm:destination#description}</fixed-text>
 					</widget>
 					<!-- row 3 -->
 					<widget type="label" style="SWT.LEFT">
@@ -552,7 +552,7 @@
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
 						<tooltip>${rm:Resource_List.nodes#tooltip}</tooltip>
-						<fixed-value>Nodes: </fixed-value>
+						<fixed-text>Nodes: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.nodes">
 						<layout-data>
@@ -563,7 +563,7 @@
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
-						<fixed-value>${rm:Resource_List.nodes#description}</fixed-value>
+						<fixed-text>${rm:Resource_List.nodes#description}</fixed-text>
 					</widget>
 					<!-- row 4 -->
 					<widget type="label" style="SWT.LEFT">
@@ -571,7 +571,7 @@
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
 						<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
-						<fixed-value>Wallclock Time: </fixed-value>
+						<fixed-text>Wallclock Time: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
 						<layout-data>
@@ -582,14 +582,14 @@
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
-						<fixed-value>${rm:Resource_List.walltime#description}</fixed-value>
+						<fixed-text>${rm:Resource_List.walltime#description}</fixed-text>
 					</widget>
 					<!-- row 5 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
-						<fixed-value>MPI Command: </fixed-value>
+						<fixed-text>MPI Command: </fixed-text>
 					</widget>
 					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCommand">
 						<layout-data>
@@ -600,14 +600,14 @@
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
-						<fixed-value>${rm:mpiCommand#description}</fixed-value>
+						<fixed-text>${rm:mpiCommand#description}</fixed-text>
 					</widget>
 					<!-- row 6 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
-						<fixed-value>MPI Number of Cores: </fixed-value>
+						<fixed-text>MPI Number of Cores: </fixed-text>
 					</widget>
 					<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
 						<layout-data>
@@ -618,7 +618,7 @@
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
-						<fixed-value>${rm:mpiCores#description}</fixed-value>
+						<fixed-text>${rm:mpiCores#description}</fixed-text>
 					</widget>
 				</composite>
 			</basic>
@@ -628,6 +628,24 @@
 					<layout>
 						<grid-layout numColumns="1"/>
 					</layout>
+					<composite>
+						<layout>
+							<grid-layout numColumns="3"/>
+						</layout>
+						<widget type="label" style="SWT.LEFT">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.BEGINNING"/>
+							</layout-data>
+							<tooltip>${rm:destination#tooltip}</tooltip>
+							<fixed-text>Queue: </fixed-text>
+						</widget>
+						<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
+							</layout-data>
+							<value-list-from>available_queues</value-list-from>
+						</widget>
+					</composite>
 					<!-- iterates through all registered attributes, one to a row -->
 					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="tree">
 						<layout-data>
