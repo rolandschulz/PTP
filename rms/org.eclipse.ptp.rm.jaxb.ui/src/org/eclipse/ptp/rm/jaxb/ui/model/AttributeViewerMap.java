@@ -67,15 +67,15 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 				if (selected.containsKey(name)) {
 					row.setSelected(true);
 					checkT.setChecked(row, true);
-					row.setValue(value); // set through editor FIXME
+					row.setValue(value);
 				} else {
 					row.setSelected(false);
 					checkT.setChecked(row, false);
-					row.setValue(null); // set through editor FIXME
+					row.setValue(null);
 				}
-
-				// need to set checked on the viewer
 			}
+
+			WidgetActionUtils.refreshViewer(viewer);
 
 			Button toggle = showHide.get(viewer);
 			String b = vars.get(SHOW_ALL);

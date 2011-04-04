@@ -92,7 +92,6 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 	protected Integer max;
 	protected CellEditor editor;
 	protected IWidgetListener listener;
-	protected boolean discovered;
 	protected boolean selected;
 	protected boolean readOnly;
 
@@ -112,7 +111,6 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 
 	protected AttributeViewerCellData(Object data, List<ColumnData> columnData) {
 		this.data = data;
-		discovered = false;
 		stringValue = ZEROSTR;
 		index = UNDEFINED;
 		booleanValue = false;
@@ -226,9 +224,6 @@ public abstract class AttributeViewerCellData implements IAttributeViewerColumnL
 			return ((Attribute) data).isVisible();
 		}
 		return false;
-	}
-
-	public void removeListener(IWidgetListener listener) {
 	}
 
 	public void setListener(IWidgetListener listener) {

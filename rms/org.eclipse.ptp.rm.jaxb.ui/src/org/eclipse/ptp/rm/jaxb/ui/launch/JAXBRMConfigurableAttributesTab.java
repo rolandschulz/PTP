@@ -65,6 +65,168 @@ import org.eclipse.swt.widgets.Group;
  */
 public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDynamicTab implements IJAXBUINonNLSConstants {
 
+	class JAXBUniversalDataSource extends RMLaunchConfigurationDynamicTabDataSource {
+
+		private boolean initializing = false;
+
+		protected JAXBUniversalDataSource(BaseRMLaunchConfigurationDynamicTab page) {
+			super(page);
+		}
+
+		@Override
+		protected void copyFromFields() throws ValidationException {
+			for (ILaunchTabValueHandler h : handlers) {
+				h.setValuesOnMap(pTab.getLocalMap());
+			}
+		}
+
+		@Override
+		protected void copyToFields() {
+			for (ILaunchTabValueHandler h : handlers) {
+				h.getValuesFromMap(pTab.getLocalMap(), dataSource.initializing);
+			}
+		}
+
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		@Override
+		protected void copyToStorage() {
+			try {
+				ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
+				if (config == null) {
+					return;
+				}
+
+				Map attrMap = config.getAttributes(); // makes a copy
+				Map<String, String> vars = pTab.getLocalMap().getVariables();
+				for (String key : vars.keySet()) {
+					String value = vars.get(key);
+					if (SHOW_ALL.equals(key)) {
+						if (ZEROSTR.equals(value)) {
+							value = TRUE;
+						}
+						attrMap.put(key, Boolean.parseBoolean(value));
+					} else {
+						attrMap.put(key, value);
+					}
+				}
+				config.setAttributes(attrMap);
+			} catch (Throwable t) {
+				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnCopyToStorage,
+						Messages.ErrorOnCopyToStorageTitle, false);
+			}
+		}
+
+		/*
+		 * Set the default values on the map.
+		 * 
+		 * The restore default button should then do loadDefault, copyToFields
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rm.ui.utils.DataSource#loadDefault()
+		 */
+		@Override
+		protected void loadDefault() {
+			getListener().disable();
+			dataSource.initializing = true;
+			RMVariableMap.getActiveInstance().forceDefaults(pTab.getLocalMap());
+			copyToFields();
+			dataSource.initializing = false;
+			getListener().enable();
+		}
+
+		/*
+		 * The LTVariableMap is initialized from the active instance of the
+		 * RMVariableMap once. Its values are updated from the most recent
+		 * LaunchConfiguration here.
+		 */
+		@Override
+		protected void loadFromStorage() {
+			try {
+				ILaunchConfiguration config = getConfiguration();
+				if (config == null) {
+					return;
+				}
+
+				String selected = null;
+				String showAll = null;
+
+				Map<?, ?> attrMap = config.getAttributes();
+				Map<String, String> vars = pTab.getLocalMap().getVariables();
+				for (Iterator<String> s = vars.keySet().iterator(); s.hasNext();) {
+					String key = s.next();
+					if (SELECTED_ATTRIBUTES.equals(key)) {
+						selected = vars.get(key);
+					} else if (SHOW_ALL.equals(key)) {
+						showAll = vars.get(key);
+					} else if (!attrMap.containsKey(key)) {
+						s.remove();
+					}
+				}
+
+				for (Object o : attrMap.keySet()) {
+					String key = (String) o;
+					if (SELECTED_ATTRIBUTES.equals(key)) {
+						selected = (String) attrMap.get(key);
+					} else if (SHOW_ALL.equals(key)) {
+						showAll = String.valueOf(attrMap.get(key));
+					} else {
+						Object attrV = attrMap.get(key);
+						if (attrV != null) {
+							String value = String.valueOf(attrV);
+							if (!ZEROSTR.equals(value)) {
+								vars.put(key, value);
+							}
+						}
+					}
+				}
+
+				if (selected != null && !ZEROSTR.equals(selected)) {
+					vars.put(SELECTED_ATTRIBUTES, selected);
+				}
+
+				if (showAll != null && !ZEROSTR.equals(showAll)) {
+					vars.put(SHOW_ALL, showAll);
+				}
+			} catch (Throwable t) {
+				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnLoadFromStore, Messages.ErrorOnLoadTitle,
+						false);
+			}
+		}
+
+		@Override
+		protected void validateLocal() throws ValidationException {
+			try {
+				for (ILaunchTabValueHandler h : handlers) {
+					h.validateControlValues(RMVariableMap.getActiveInstance(), delegate.getRemoteFileManager());
+				}
+			} catch (Throwable t) {
+				throw new ValidationException(t.getMessage());
+			}
+		}
+
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		private String realizeScript() throws Throwable {
+			String value = ZEROSTR;
+			if (script != null) {
+				ILaunchConfiguration configuration = getConfiguration();
+				LTVariableMap map = pTab.getLocalMap();
+				map.maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
+				map.maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
+				map.maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
+				boolean append = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);
+				Map env = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
+				ScriptHandler job = new ScriptHandler(null, script, map, env, append);
+				job.schedule();
+				try {
+					job.join();
+				} catch (InterruptedException ignored) {
+				}
+				value = job.getScriptValue();
+			}
+			return value;
+		}
+	}
+
 	private class JAXBRMConfigurableAttributeWidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener implements
 			IWidgetListener {
 
@@ -123,181 +285,6 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 				JAXBUIPlugin.log(t);
 			}
 			processingChange = false;
-		}
-	}
-
-	private class JAXBUniversalDataSource extends RMLaunchConfigurationDynamicTabDataSource {
-
-		private boolean initializing = false;
-
-		protected JAXBUniversalDataSource(BaseRMLaunchConfigurationDynamicTab page) {
-			super(page);
-		}
-
-		@Override
-		protected void copyFromFields() throws ValidationException {
-			for (ILaunchTabValueHandler h : handlers) {
-				h.setValuesOnMap(pTab.getLocalMap());
-			}
-			System.out.println("*************** copyToFields");
-			System.out.println(pTab.getLocalMap());
-		}
-
-		@Override
-		protected void copyToFields() {
-			System.out.println("*************** copyToFields");
-			System.out.println(pTab.getLocalMap());
-			for (ILaunchTabValueHandler h : handlers) {
-				h.getValuesFromMap(pTab.getLocalMap(), initializing);
-			}
-		}
-
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		@Override
-		protected void copyToStorage() {
-			try {
-				System.out.println("*************** copyToStorage");
-				System.out.println(pTab.getLocalMap());
-				ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
-				if (config == null) {
-					return;
-				}
-
-				Map attrMap = config.getAttributes(); // makes a copy
-				Map<String, String> vars = pTab.getLocalMap().getVariables();
-				for (String key : vars.keySet()) {
-					String value = vars.get(key);
-					if (SHOW_ALL.equals(key)) {
-						if (ZEROSTR.equals(value)) {
-							value = TRUE;
-						}
-						attrMap.put(key, Boolean.parseBoolean(value));
-					} else {
-						attrMap.put(key, value);
-					}
-				}
-				config.setAttributes(attrMap);
-			} catch (Throwable t) {
-				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnCopyToStorage,
-						Messages.ErrorOnCopyToStorageTitle, false);
-			}
-		}
-
-		/*
-		 * Set the default values on the map.
-		 * 
-		 * The restore default button should then do loadDefault, copyToFields
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.rm.ui.utils.DataSource#loadDefault()
-		 */
-		@Override
-		protected void loadDefault() {
-			System.out.println("BEFORE loadDefault");
-			System.out.println(pTab.getLocalMap());
-			getListener().disable();
-			initializing = true;
-			RMVariableMap.getActiveInstance().forceDefaults(pTab.getLocalMap());
-			copyToFields();
-			initializing = false;
-			getListener().enable();
-			System.out.println("AFTER loadDefault");
-			System.out.println(pTab.getLocalMap());
-		}
-
-		/*
-		 * The LTVariableMap is initialized from the active instance of the
-		 * RMVariableMap once. Its values are updated from the most recent
-		 * LaunchConfiguration here.
-		 */
-		@Override
-		protected void loadFromStorage() {
-			System.out.println("*************** loadFromStorage");
-			try {
-				ILaunchConfiguration config = getConfiguration();
-				if (config == null) {
-					return;
-				}
-
-				String selected = null;
-				String showAll = null;
-
-				Map<?, ?> attrMap = config.getAttributes();
-				Map<String, String> vars = pTab.getLocalMap().getVariables();
-				for (Iterator<String> s = vars.keySet().iterator(); s.hasNext();) {
-					String key = s.next();
-					if (SELECTED_ATTRIBUTES.equals(key)) {
-						selected = vars.get(key);
-					} else if (SHOW_ALL.equals(key)) {
-						showAll = vars.get(key);
-					} else if (!attrMap.containsKey(key)) {
-						s.remove();
-					}
-				}
-
-				for (Object o : attrMap.keySet()) {
-					String key = (String) o;
-					if (SELECTED_ATTRIBUTES.equals(key)) {
-						selected = (String) attrMap.get(key);
-					} else if (SHOW_ALL.equals(key)) {
-						showAll = String.valueOf(attrMap.get(key));
-					} else {
-						Object attrV = attrMap.get(key);
-						if (attrV != null) {
-							String value = String.valueOf(attrV);
-							if (!ZEROSTR.equals(value)) {
-								vars.put(key, value);
-							}
-						}
-					}
-				}
-
-				if (selected != null && !ZEROSTR.equals(selected)) {
-					vars.put(SELECTED_ATTRIBUTES, selected);
-				}
-
-				if (showAll != null && !ZEROSTR.equals(showAll)) {
-					vars.put(SHOW_ALL, showAll);
-				}
-			} catch (Throwable t) {
-				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnLoadFromStore, Messages.ErrorOnLoadTitle,
-						false);
-			}
-
-			System.out.println(pTab.getLocalMap());
-		}
-
-		@Override
-		protected void validateLocal() throws ValidationException {
-			try {
-				for (ILaunchTabValueHandler h : handlers) {
-					h.validateControlValues(RMVariableMap.getActiveInstance(), delegate.getRemoteFileManager());
-				}
-			} catch (Throwable t) {
-				throw new ValidationException(t.getMessage());
-			}
-		}
-
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		private String realizeScript() throws Throwable {
-			String value = ZEROSTR;
-			if (script != null) {
-				ILaunchConfiguration configuration = getConfiguration();
-				LTVariableMap map = pTab.getLocalMap();
-				map.maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
-				map.maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
-				map.maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
-				boolean append = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);
-				Map env = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
-				ScriptHandler job = new ScriptHandler(null, script, map, env, append);
-				job.schedule();
-				try {
-					job.join();
-				} catch (InterruptedException ignored) {
-				}
-				value = job.getScriptValue();
-			}
-			return value;
 		}
 	}
 
