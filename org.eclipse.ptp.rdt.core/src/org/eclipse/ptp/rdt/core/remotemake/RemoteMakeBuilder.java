@@ -69,6 +69,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.internal.rdt.core.remotemake.ResourceRefreshJob;
+import org.eclipse.ptp.rdt.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.activator.Activator;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
@@ -78,7 +79,6 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.services.core.BuildScenario;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -309,8 +309,8 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				ServiceModelManager smm = ServiceModelManager.getInstance();
 				
 				try{
-					IServiceConfiguration serviceConfig = ServiceModelManager.getInstance().
-																	getConfigurationForBuildConfiguration(configuration.getId());
+					IServiceConfiguration serviceConfig = BuildConfigurationManager.
+																			getConfigurationForBuildConfiguration(configuration);
 					if (serviceConfig == null) {
 						throw new RuntimeException("Cannot find service configuration for build configuration"); //$NON-NLS-1$
 					}
