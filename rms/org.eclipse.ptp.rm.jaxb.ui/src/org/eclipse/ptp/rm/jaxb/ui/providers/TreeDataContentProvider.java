@@ -12,8 +12,8 @@ package org.eclipse.ptp.rm.jaxb.ui.providers;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerData;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerNodeData;
+import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerData;
+import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerNodeData;
 
 public class TreeDataContentProvider implements ITreeContentProvider {
 	public void dispose() {

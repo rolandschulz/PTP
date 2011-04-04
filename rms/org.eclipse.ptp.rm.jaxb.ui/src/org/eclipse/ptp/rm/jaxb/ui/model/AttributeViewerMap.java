@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.ui.data;
+package org.eclipse.ptp.rm.jaxb.ui.model;
 
 import java.util.HashMap;
 import java.util.List;

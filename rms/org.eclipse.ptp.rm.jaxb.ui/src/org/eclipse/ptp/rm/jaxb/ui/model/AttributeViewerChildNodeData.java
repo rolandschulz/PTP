@@ -1,4 +1,4 @@
-package org.eclipse.ptp.rm.jaxb.ui.data;
+package org.eclipse.ptp.rm.jaxb.ui.model;
 
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;

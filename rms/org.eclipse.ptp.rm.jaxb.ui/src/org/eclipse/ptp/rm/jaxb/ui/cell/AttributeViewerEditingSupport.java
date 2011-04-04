@@ -15,9 +15,9 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerCellData;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerNodeData;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
+import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerCellData;
+import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerNodeData;
+import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerRowData;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 
 public class AttributeViewerEditingSupport extends EditingSupport {

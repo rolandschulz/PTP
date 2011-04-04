@@ -8,7 +8,7 @@
  * 	Albert L. Rossi - modifications
  *  M Venkataramana - original code: http://eclipse.dzone.com/users/venkat_r_m
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.ui.data;
+package org.eclipse.ptp.rm.jaxb.ui.model;
 
 import java.util.List;
 

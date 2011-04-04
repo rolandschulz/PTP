@@ -1,4 +1,4 @@
-package org.eclipse.ptp.rm.jaxb.ui.data;
+package org.eclipse.ptp.rm.jaxb.ui.model;
 
 import java.util.Collection;
 import java.util.List;

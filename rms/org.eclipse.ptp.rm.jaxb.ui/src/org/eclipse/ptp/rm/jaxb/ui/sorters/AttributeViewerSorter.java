@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.jaxb.ui.sorters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerCellData;
+import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerCellData;
 
 /*
  * Sorts only on name.
