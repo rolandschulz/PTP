@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,10 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.ICheckable;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
@@ -31,7 +36,9 @@ import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.ILaunchTabValueHandler;
+import org.eclipse.ptp.rm.jaxb.ui.IWidgetListener;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
+import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerCellData;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.ScrollingEditableMessageDialog;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.LaunchTabBuilder;
@@ -40,6 +47,7 @@ import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
+import org.eclipse.ptp.rm.ui.utils.DataSource.ValidationException;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -57,7 +65,70 @@ import org.eclipse.swt.widgets.Group;
  */
 public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDynamicTab implements IJAXBUINonNLSConstants {
 
+	private class JAXBRMConfigurableAttributeWidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener implements
+			IWidgetListener {
+
+		private boolean processingChange = false;
+
+		public JAXBRMConfigurableAttributeWidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
+			super(dynamicTab);
+		}
+
+		public void checkStateChanged(CheckStateChangedEvent event) {
+			Object target = event.getElement();
+			ICheckable viewer = event.getCheckable();
+			try {
+				boolean checked = viewer.getChecked(target);
+				IStructuredSelection selection = (IStructuredSelection) ((Viewer) viewer).getSelection();
+				List<?> selected = selection.toList();
+				if (selected.isEmpty()) {
+					if (target instanceof AttributeViewerCellData) {
+						AttributeViewerCellData data = (AttributeViewerCellData) target;
+						data.setSelected(checked);
+					} else {
+						viewer.setChecked(target, false);
+					}
+				} else {
+					for (Object o : selected) {
+						if (o instanceof AttributeViewerCellData) {
+							AttributeViewerCellData data = (AttributeViewerCellData) o;
+							data.setSelected(checked);
+							viewer.setChecked(data, checked);
+						} else {
+							viewer.setChecked(o, false);
+						}
+					}
+				}
+			} catch (Throwable t) {
+				JAXBUIPlugin.log(t);
+			}
+			WidgetActionUtils.refreshViewer((Viewer) viewer);
+			maybeFireContentsChanged();
+		}
+
+		public void valueChanged() {
+			maybeFireContentsChanged();
+		}
+
+		@Override
+		protected synchronized void maybeFireContentsChanged() {
+			if (dataSource.initializing || processingChange) {
+				return;
+			}
+			processingChange = true;
+			try {
+				dataSource.copyFromFields();
+				dataSource.copyToFields();
+			} catch (ValidationException t) {
+				JAXBUIPlugin.log(t);
+			}
+			processingChange = false;
+		}
+	}
+
 	private class JAXBUniversalDataSource extends RMLaunchConfigurationDynamicTabDataSource {
+
+		private boolean initializing = false;
 
 		protected JAXBUniversalDataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
@@ -66,14 +137,18 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		@Override
 		protected void copyFromFields() throws ValidationException {
 			for (ILaunchTabValueHandler h : handlers) {
-				h.setValuesOnMap(LTVariableMap.getActiveInstance());
+				h.setValuesOnMap(pTab.getLocalMap());
 			}
+			System.out.println("*************** copyToFields");
+			System.out.println(pTab.getLocalMap());
 		}
 
 		@Override
 		protected void copyToFields() {
+			System.out.println("*************** copyToFields");
+			System.out.println(pTab.getLocalMap());
 			for (ILaunchTabValueHandler h : handlers) {
-				h.getValuesFromMap(LTVariableMap.getActiveInstance());
+				h.getValuesFromMap(pTab.getLocalMap(), initializing);
 			}
 		}
 
@@ -81,45 +156,53 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		@Override
 		protected void copyToStorage() {
 			try {
+				System.out.println("*************** copyToStorage");
+				System.out.println(pTab.getLocalMap());
 				ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
 				if (config == null) {
 					return;
 				}
 
-				Map attrMap = config.getAttributes();
-				LTVariableMap ltmap = LTVariableMap.getActiveInstance();
-				Map<?, ?>[] m = new Map<?, ?>[] { ltmap.getVariables(), ltmap.getDiscovered() };
-				for (int i = 0; i < m.length; i++) {
-					for (Object k : m[i].keySet()) {
-						Object v = m[i].get(k);
-						attrMap.put(k, v);
+				Map attrMap = config.getAttributes(); // makes a copy
+				Map<String, String> vars = pTab.getLocalMap().getVariables();
+				for (String key : vars.keySet()) {
+					String value = vars.get(key);
+					if (SHOW_ALL.equals(key)) {
+						if (ZEROSTR.equals(value)) {
+							value = TRUE;
+						}
+						attrMap.put(key, Boolean.parseBoolean(value));
+					} else {
+						attrMap.put(key, value);
 					}
 				}
 				config.setAttributes(attrMap);
-
-				String selected = ltmap.getVariables().get(SELECTED_ATTRIBUTES);
-				if (selected != null) {
-					config.setAttribute(SELECTED_ATTRIBUTES, selected);
-				}
-
-				String showAll = ltmap.getVariables().get(SHOW_ALL);
-				if (showAll != null) {
-					config.setAttribute(SHOW_ALL, Boolean.valueOf(showAll));
-				} else {
-					config.setAttribute(SHOW_ALL, true);
-				}
-
 			} catch (Throwable t) {
 				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnCopyToStorage,
 						Messages.ErrorOnCopyToStorageTitle, false);
 			}
 		}
 
+		/*
+		 * Set the default values on the map.
+		 * 
+		 * The restore default button should then do loadDefault, copyToFields
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rm.ui.utils.DataSource#loadDefault()
+		 */
 		@Override
 		protected void loadDefault() {
-			for (ILaunchTabValueHandler h : handlers) {
-				h.setDefaultValuesOnControl(RMVariableMap.getActiveInstance());
-			}
+			System.out.println("BEFORE loadDefault");
+			System.out.println(pTab.getLocalMap());
+			getListener().disable();
+			initializing = true;
+			RMVariableMap.getActiveInstance().forceDefaults(pTab.getLocalMap());
+			copyToFields();
+			initializing = false;
+			getListener().enable();
+			System.out.println("AFTER loadDefault");
+			System.out.println(pTab.getLocalMap());
 		}
 
 		/*
@@ -129,35 +212,59 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		 */
 		@Override
 		protected void loadFromStorage() {
+			System.out.println("*************** loadFromStorage");
 			try {
 				ILaunchConfiguration config = getConfiguration();
 				if (config == null) {
 					return;
 				}
 
+				String selected = null;
+				String showAll = null;
+
 				Map<?, ?> attrMap = config.getAttributes();
-				LTVariableMap ltmap = LTVariableMap.getActiveInstance();
-				Map<String, String> vars = ltmap.getVariables();
-				Map<String, String> disc = ltmap.getDiscovered();
-				for (Object k : attrMap.keySet()) {
-					if (vars.containsKey(k)) {
-						vars.put((String) k, (String) attrMap.get(k));
-					} else if (disc.containsKey(k)) {
-						disc.put((String) k, (String) attrMap.get(k));
+				Map<String, String> vars = pTab.getLocalMap().getVariables();
+				for (Iterator<String> s = vars.keySet().iterator(); s.hasNext();) {
+					String key = s.next();
+					if (SELECTED_ATTRIBUTES.equals(key)) {
+						selected = vars.get(key);
+					} else if (SHOW_ALL.equals(key)) {
+						showAll = vars.get(key);
+					} else if (!attrMap.containsKey(key)) {
+						s.remove();
 					}
 				}
 
-				String selected = config.getAttribute(SELECTED_ATTRIBUTES, ZEROSTR);
-				if (selected != null) {
+				for (Object o : attrMap.keySet()) {
+					String key = (String) o;
+					if (SELECTED_ATTRIBUTES.equals(key)) {
+						selected = (String) attrMap.get(key);
+					} else if (SHOW_ALL.equals(key)) {
+						showAll = String.valueOf(attrMap.get(key));
+					} else {
+						Object attrV = attrMap.get(key);
+						if (attrV != null) {
+							String value = String.valueOf(attrV);
+							if (!ZEROSTR.equals(value)) {
+								vars.put(key, value);
+							}
+						}
+					}
+				}
+
+				if (selected != null && !ZEROSTR.equals(selected)) {
 					vars.put(SELECTED_ATTRIBUTES, selected);
 				}
 
-				boolean showAll = config.getAttribute(SHOW_ALL, true);
-				vars.put(SHOW_ALL, String.valueOf(showAll));
+				if (showAll != null && !ZEROSTR.equals(showAll)) {
+					vars.put(SHOW_ALL, showAll);
+				}
 			} catch (Throwable t) {
 				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnLoadFromStore, Messages.ErrorOnLoadTitle,
 						false);
 			}
+
+			System.out.println(pTab.getLocalMap());
 		}
 
 		@Override
@@ -176,7 +283,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			String value = ZEROSTR;
 			if (script != null) {
 				ILaunchConfiguration configuration = getConfiguration();
-				LTVariableMap map = LTVariableMap.getActiveInstance();
+				LTVariableMap map = pTab.getLocalMap();
 				map.maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
 				map.maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
 				map.maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
@@ -216,11 +323,12 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		this.title = t;
 		handlers = new ArrayList<ILaunchTabValueHandler>();
 		this.script = pTab.getRmConfig().getResourceManagerData().getControlData().getScript();
-		resetEnv();
+		pTab.getLocalMap();
 		createDataSource();
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
+		dataSource.initializing = true;
 		control = WidgetBuilderUtils.createComposite(parent, 1);
 		try {
 			LaunchTabBuilder builder = new LaunchTabBuilder(this);
@@ -267,9 +375,13 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 		return title;
 	}
 
+	public IWidgetListener getWidgetListener() {
+		return (IWidgetListener) getListener();
+	}
+
 	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
-		resetEnv();
+		pTab.getLocalMap();
 		return super.initializeFrom(control, rm, queue, configuration);
 	}
 
@@ -279,6 +391,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	@Override
 	public void updateControls() {
+		dataSource.initializing = false;
 		/*
 		 * This controls the visible and enabled settings of the widgets. For
 		 * this tab, these are not configurable, so this is a NOP
@@ -295,8 +408,7 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 
 	@Override
 	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
-		return new RMLaunchConfigurationDynamicTabWidgetListener(this) {
-		};
+		return new JAXBRMConfigurableAttributeWidgetListener(this);
 	}
 
 	private void createViewScriptGroup(final Composite control) {
@@ -327,17 +439,10 @@ public class JAXBRMConfigurableAttributesTab extends BaseRMLaunchConfigurationDy
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+
 				dataSource.loadDefault();
+
 			}
 		});
-	}
-
-	private void resetEnv() {
-		try {
-			pTab.getRmConfig().setActive();
-			LTVariableMap.setActiveInstance(RMVariableMap.getActiveInstance());
-		} catch (Throwable t1) {
-			JAXBUIPlugin.log(t1);
-		}
 	}
 }

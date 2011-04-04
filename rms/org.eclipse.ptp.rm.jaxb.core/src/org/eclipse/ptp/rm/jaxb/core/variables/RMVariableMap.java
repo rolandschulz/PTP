@@ -43,26 +43,19 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		initialized = false;
 	}
 
+	public void forceDefaults(LTVariableMap activeInstance) {
+		Map<String, String> flat = activeInstance.getVariables();
+		flat.clear();
+		for (String s : variables.keySet()) {
+			getFlattened(s, variables.get(s), flat, true);
+		}
+		for (String s : discovered.keySet()) {
+			getFlattened(s, discovered.get(s), flat, true);
+		}
+	}
+
 	public Map<String, Object> getDiscovered() {
 		return discovered;
-	}
-
-	public void getFlattenedDefaults(Map<String, String> defaults) {
-		for (String s : variables.keySet()) {
-			getDefault(s, variables.get(s), defaults);
-		}
-
-	}
-
-	/**
-	 * A flat name=value map of only the configurable attributes and properties.
-	 * 
-	 * @param flat
-	 */
-	public void getFlattenedDiscovered(Map<String, String> flat) {
-		for (String s : discovered.keySet()) {
-			getFlattened(s, discovered.get(s), flat);
-		}
 	}
 
 	/**
@@ -72,7 +65,10 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 */
 	public void getFlattenedVariables(Map<String, String> flat) {
 		for (String s : variables.keySet()) {
-			getFlattened(s, variables.get(s), flat);
+			getFlattened(s, variables.get(s), flat, false);
+		}
+		for (String s : discovered.keySet()) {
+			getFlattened(s, discovered.get(s), flat, false);
 		}
 	}
 
@@ -152,22 +148,6 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
 	}
 
-	private void getDefault(String s, Object object, Map<String, String> defaults) {
-		if (object instanceof Attribute) {
-			Attribute ja = (Attribute) object;
-			String defaultValue = ja.getDefault();
-			if (defaultValue != null) {
-				defaults.put(ja.getName(), defaultValue);
-			}
-		} else if (object instanceof Property) {
-			Property p = (Property) object;
-			String defaultValue = p.getDefault();
-			if (defaultValue != null) {
-				defaults.put(p.getName(), defaultValue);
-			}
-		}
-	}
-
 	public synchronized static RMVariableMap getActiveInstance() {
 		return active;
 	}
@@ -183,42 +163,49 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	/*
 	 * It is assumed that the caller of the flattened map does not need
 	 * properties or attributes with complex values like lists or maps. Hence we
-	 * simply cast the value to a string.
+	 * simply ask for the toString value.
 	 */
-	private static void getFlattened(String key, Object value, Map<String, String> flat) throws ArrayStoreException {
+	private static void getFlattened(String key, Object value, Map<String, String> flat, boolean forceDefault)
+			throws ArrayStoreException {
 		if (value instanceof Property) {
 			Property p = (Property) value;
 			String name = p.getName();
 			Object o = p.getValue();
-			String s = null;
+			String strVal = null;
 			if (o != null) {
-				s = o.toString();
+				strVal = String.valueOf(o);
 			}
-			flat.put(name, s);
-			flat.put(name + PD + VALUE, s);
-			s = p.getDefault();
-			if (s != null) {
-				flat.put(name + PD + sDEFAULT, s);
+			String defVal = p.getDefault();
+			System.out.println(name + ", " + strVal + ", " + defVal);
+			if (forceDefault || strVal == null || ZEROSTR.equals(strVal)) {
+				strVal = defVal;
+			}
+			if (strVal != null && !ZEROSTR.equals(strVal)) {
+				System.out.println("putting: " + name + ", " + strVal);
+				flat.put(name, strVal);
 			}
 		} else if (value instanceof Attribute) {
 			Attribute ja = (Attribute) value;
-			Object o = ja.getValue();
-			String s = null;
-			if (o != null) {
-				s = o.toString();
-			}
 			String name = ja.getName();
-			flat.put(name, s);
-			flat.put(name + PD + VALUE, s);
-			s = ja.getType();
-			if (s != null) {
-				flat.put(name + PD + sDEFAULT, s);
+			Object o = ja.getValue();
+			String strVal = null;
+			if (o != null) {
+
+				strVal = String.valueOf(o);
 			}
-			s = ja.getStatus();
-			if (s != null) {
-				flat.put(name + PD + STATUS, s);
+			String defVal = ja.getDefault();
+			System.out.println(name + ", " + strVal + ", " + defVal);
+			if (forceDefault || strVal == null || ZEROSTR.equals(strVal)) {
+				strVal = defVal;
 			}
-			o = ja.isReadOnly();
+			if (strVal != null && !ZEROSTR.equals(strVal)) {
+				System.out.println("putting: " + name + ", " + strVal);
+				flat.put(name, strVal);
+			}
+			String status = ja.getStatus();
+			if (status != null && !ZEROSTR.equals(status)) {
+				flat.put(name + PD + STATUS, status);
+			}
 		} else {
 			throw new ArrayStoreException(Messages.IllegalVariableValueType + value.getClass());
 		}

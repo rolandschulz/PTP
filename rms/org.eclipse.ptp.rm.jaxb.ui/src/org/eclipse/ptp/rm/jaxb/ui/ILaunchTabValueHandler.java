@@ -15,9 +15,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public interface ILaunchTabValueHandler {
 
-	void getValuesFromMap(LTVariableMap ltMap);
-
-	void setDefaultValuesOnControl(RMVariableMap rmMap);
+	void getValuesFromMap(LTVariableMap ltMap, boolean initializing);
 
 	void setValuesOnMap(LTVariableMap ltMap);
 

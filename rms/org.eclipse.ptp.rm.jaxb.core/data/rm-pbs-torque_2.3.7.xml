@@ -652,7 +652,10 @@
 							<layout-data>
 								<grid-data heightHint="75" horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="8"/>
 							</layout-data>
-							<fixed-text>${rm:allAttributes}</fixed-text>
+							<dynamic-text>
+								<arg>${rm:allAttributes#value}</arg>
+								<arg isUndefinedIfMatches=" destination=''"> destination='${rm:destination#value}'</arg>
+							</dynamic-text>
 						</widget>
 					</composite>
 					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="tree">

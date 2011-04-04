@@ -22,11 +22,13 @@ import org.eclipse.ptp.rm.jaxb.core.data.Widget;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.IWidgetListener;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBRMConfigurableAttributesTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
@@ -61,22 +63,32 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 	@SuppressWarnings({})
 	public Control createControl(final Composite parent) {
 		Control c = null;
+		IWidgetListener listener = tab.getWidgetListener();
 		if (LABEL.equals(type)) {
 			c = WidgetBuilderUtils.createLabel(parent, label, style, gridData);
 		} else if (TEXT.equals(type)) {
-			c = createText(parent);
+			Text t = createText(parent);
+			t.addModifyListener(listener);
+			c = t;
 		} else if (RADIOBUTTON.equals(type)) {
-			c = WidgetBuilderUtils.createRadioButton(parent, title, initialValue, null);
+			c = WidgetBuilderUtils.createRadioButton(parent, title, initialValue, listener);
 		} else if (CHECKBOX.equals(type)) {
-			c = WidgetBuilderUtils.createCheckButton(parent, title, null);
+			c = WidgetBuilderUtils.createCheckButton(parent, title, listener);
 		} else if (SPINNER.equals(type)) {
-			c = WidgetBuilderUtils.createSpinner(parent, gridData, title, min, max, min, null);
+			c = WidgetBuilderUtils.createSpinner(parent, gridData, title, min, max, min, listener);
 		} else if (COMBO.equals(type)) {
-			c = createCombo(parent);
+			Combo cb = createCombo(parent);
+			cb.addModifyListener(listener);
+			cb.addSelectionListener(listener);
+			c = cb;
 		} else if (BROWSELOCAL.equals(type)) {
-			c = createBrowseLocal(parent);
+			Text t = createBrowseLocal(parent);
+			t.addModifyListener(listener);
+			c = t;
 		} else if (BROWSEREMOTE.equals(type)) {
-			c = createBrowseRemote(parent);
+			Text t = createBrowseRemote(parent);
+			t.addModifyListener(listener);
+			c = t;
 		}
 
 		if (c != null) {
@@ -96,8 +108,8 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 		return c;
 	}
 
-	private Control createBrowseLocal(final Composite parent) {
-		final Text t = WidgetBuilderUtils.createText(parent, style, gridData, readOnly, initialValue);
+	private Text createBrowseLocal(final Composite parent) {
+		final Text t = WidgetBuilderUtils.createText(parent, SWT.BORDER, gridData, true, initialValue);
 		WidgetBuilderUtils.createButton(parent, gridData, title, style, new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -124,8 +136,8 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 		return t;
 	}
 
-	private Control createBrowseRemote(final Composite parent) {
-		final Text t = WidgetBuilderUtils.createText(parent, style, gridData, readOnly, initialValue);
+	private Text createBrowseRemote(final Composite parent) {
+		final Text t = WidgetBuilderUtils.createText(parent, SWT.BORDER, gridData, true, initialValue);
 		WidgetBuilderUtils.createButton(parent, gridData, title, style, new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -149,7 +161,7 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 		return t;
 	}
 
-	private Control createCombo(Composite parent) {
+	private Combo createCombo(Composite parent) {
 		String[] items = null;
 		if (valueList != null) {
 			items = valueList.toArray(new String[0]);
@@ -162,15 +174,14 @@ public class WidgetBuilder implements IJAXBUINonNLSConstants {
 		return WidgetBuilderUtils.createCombo(parent, style, gridData, items, initialValue, title, tooltip, null);
 	}
 
-	private Control createText(final Composite parent) {
+	private Text createText(final Composite parent) {
 		if (!ZEROSTR.equals(label)) {
 			initialValue = label;
 		}
 		if (readOnly && label != null) {
 			initialValue = label;
 		}
-		Control c = WidgetBuilderUtils.createText(parent, style, gridData, readOnly, initialValue);
-		return c;
+		return WidgetBuilderUtils.createText(parent, style, gridData, readOnly, initialValue);
 	}
 
 	private void setMapDependentData(Widget widget, RMVariableMap rmMap) {

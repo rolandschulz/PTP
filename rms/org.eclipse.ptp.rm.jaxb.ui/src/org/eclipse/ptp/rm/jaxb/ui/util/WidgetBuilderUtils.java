@@ -15,13 +15,10 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.FontRegistry;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -791,43 +788,8 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		};
 	}
 
-	private static ICheckStateListener getCheckStateListener(final ICheckable viewer) {
-		return new ICheckStateListener() {
-			public synchronized void checkStateChanged(CheckStateChangedEvent event) {
-				try {
-					Object target = event.getElement();
-					boolean checked = viewer.getChecked(target);
-					IStructuredSelection selection = (IStructuredSelection) ((Viewer) viewer).getSelection();
-					List<?> selected = selection.toList();
-					if (selected.isEmpty()) {
-						if (target instanceof AttributeViewerCellData) {
-							AttributeViewerCellData data = (AttributeViewerCellData) target;
-							data.setSelected(checked);
-						} else {
-							viewer.setChecked(target, false);
-						}
-					} else {
-						for (Object o : selected) {
-							if (o instanceof AttributeViewerCellData) {
-								AttributeViewerCellData data = (AttributeViewerCellData) o;
-								data.setSelected(checked);
-								viewer.setChecked(data, checked);
-							} else {
-								viewer.setChecked(o, false);
-							}
-						}
-					}
-				} catch (Throwable t) {
-					JAXBUIPlugin.log(t);
-				}
-				WidgetActionUtils.refreshViewer((Viewer) viewer);
-			}
-		};
-	}
-
 	private static IDoubleClickListener getDoubleClickListener(final Viewer viewer) {
 		return new IDoubleClickListener() {
-
 			public void doubleClick(DoubleClickEvent event) {
 				try {
 					IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
@@ -1111,8 +1073,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			viewer.addSelectionChangedListener(listener);
 		}
 		viewer.setLabelProvider(new ViewerDataLabelProvider(columnData));
-		ICheckable checkable = (ICheckable) viewer;
-		checkable.addCheckStateListener(getCheckStateListener(checkable));
 	}
 
 	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnData> columnData, Boolean sortName,

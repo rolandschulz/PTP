@@ -10,11 +10,11 @@
 package org.eclipse.ptp.rm.jaxb.ui.data;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
@@ -44,19 +44,19 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 		showHide.put(viewer, toggle);
 	}
 
-	public AttributeViewer get(ColumnViewer viewer) {
-		return map.get(viewer);
-	}
-
-	public void getValuesFromMap(LTVariableMap ltMap) {
+	public void getValuesFromMap(LTVariableMap ltMap, boolean initializing) {
+		if (!initializing) {
+			return;
+		}
 		Map<String, String> vars = ltMap.getVariables();
-		Map<String, String> disc = ltMap.getDiscovered();
-		Map<String, String> selected = getSelected(ltMap);
+		Map<String, String> selected = ltMap.getSelected();
+
 		for (ColumnViewer viewer : map.keySet()) {
 			AttributeViewerData data = (AttributeViewerData) viewer.getInput();
 			if (data == null) {
 				continue;
 			}
+			ICheckable checkT = (ICheckable) viewer;
 			List<AttributeViewerCellData> rows = data.getRows();
 			for (AttributeViewerCellData row : rows) {
 				String name = row.getDisplayValue(COLUMN_NAME);
@@ -64,20 +64,18 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 				if (name == null) {
 					continue;
 				}
-				if (value == null) {
-					value = disc.get(name);
-					if (value != null) {
-						row.setDiscovered(true);
-					}
-				}
-				row.setValue(value);
 				if (selected.containsKey(name)) {
 					row.setSelected(true);
+					checkT.setChecked(row, true);
+					row.setValue(value); // set through editor FIXME
 				} else {
 					row.setSelected(false);
+					checkT.setChecked(row, false);
+					row.setValue(null); // set through editor FIXME
 				}
+
+				// need to set checked on the viewer
 			}
-			WidgetActionUtils.refreshViewer(viewer);
 
 			Button toggle = showHide.get(viewer);
 			String b = vars.get(SHOW_ALL);
@@ -85,51 +83,8 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 		}
 	}
 
-	public ColumnViewer[] getViewers() {
-		return map.keySet().toArray(new ColumnViewer[0]);
-	}
-
-	/*
-	 * Defaults are recorded in the Property or JobAttribute definitions and are
-	 * accessed via the RMVariableMap.
-	 * 
-	 * The default value does not overwrite a non-null value.
-	 */
-	public void setDefaultValuesOnControl(RMVariableMap rmMap) {
-		Map<String, Object> vars = rmMap.getVariables();
-		Map<String, Object> disc = rmMap.getDiscovered();
-		for (ColumnViewer viewer : map.keySet()) {
-			AttributeViewerData data = (AttributeViewerData) viewer.getInput();
-			if (data == null) {
-				continue;
-			}
-			List<AttributeViewerCellData> rows = data.getRows();
-			for (AttributeViewerCellData row : rows) {
-				String name = row.getDisplayValue(COLUMN_NAME);
-				if (name == null) {
-					continue;
-				}
-				Object o = vars.get(name);
-				String defaultValue = null;
-				if (o == null) {
-					o = disc.get(name);
-				}
-				if (o instanceof Property) {
-					defaultValue = ((Property) o).getDefault();
-				} else if (o instanceof Attribute) {
-					defaultValue = ((Attribute) o).getDefault();
-				}
-				if (defaultValue != null) {
-					row.setValue(defaultValue);
-				}
-			}
-			WidgetActionUtils.refreshViewer(viewer);
-		}
-	}
-
 	public void setValuesOnMap(LTVariableMap ltMap) {
 		Map<String, String> vars = ltMap.getVariables();
-		Map<String, String> disc = ltMap.getDiscovered();
 		Map<String, String> selected = new HashMap<String, String>();
 		StringBuffer buffer = new StringBuffer();
 		for (ColumnViewer viewer : map.keySet()) {
@@ -145,53 +100,28 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 			List<AttributeViewerCellData> rows = data.getRows();
 			String name = null;
 			String value = null;
-			Iterator<AttributeViewerCellData> i = rows.iterator();
-			AttributeViewerCellData row = null;
-			if (i.hasNext()) {
-				row = i.next();
+			for (AttributeViewerCellData row : rows) {
 				name = row.getDisplayValue(COLUMN_NAME);
 				value = row.getDisplayValue(COLUMN_VALUE);
-				if (value != null && row.isSelected()) {
-					if (row.isDiscovered()) {
-						disc.put(name, value);
-					} else {
-						vars.put(name, value);
-					}
+				if (row.isSelected()) {
 					selected.put(name, name);
-					buffer.append(row.getReplaced(pattern));
-				} else {
-					if (row.isDiscovered()) {
-						disc.remove(name);
-					} else {
-						vars.remove(name);
+				}
+				if (!ZEROSTR.equals(value)) {
+					vars.put(name, value);
+					value = row.getReplaced(pattern);
+					if (!ZEROSTR.equals(value)) {
+						buffer.append(separator).append(value);
 					}
+				} else {
+					vars.remove(name);
 				}
 			}
-			while (i.hasNext()) {
-				row = i.next();
-				name = row.getDisplayValue(COLUMN_NAME);
-				value = row.getDisplayValue(COLUMN_VALUE);
-				if (value != null && row.isSelected()) {
-					if (row.isDiscovered()) {
-						disc.put(name, value);
-					} else {
-						vars.put(name, value);
-					}
-					selected.put(name, name);
-					buffer.append(separator).append(row.getReplaced(pattern));
-				} else {
-					if (row.isDiscovered()) {
-						disc.remove(name);
-					} else {
-						vars.remove(name);
-					}
-				}
-			}
+			buffer.delete(0, separator.length());
 			String tName = descriptor.getName();
 			if (tName != null) {
 				vars.put(tName, buffer.toString());
 			}
-			setSelected(selected, ltMap);
+			ltMap.setAllSelected(selected);
 
 			Button toggle = showHide.get(viewer);
 			vars.put(SHOW_ALL, String.valueOf(toggle.getSelection()));
@@ -230,25 +160,5 @@ public class AttributeViewerMap implements ILaunchTabValueHandler, IJAXBUINonNLS
 				}
 			}
 		}
-	}
-
-	public static Map<String, String> getSelected(LTVariableMap ltMap) {
-		Map<String, String> map = new HashMap<String, String>();
-		String selected = ltMap.getVariables().get(SELECTED_ATTRIBUTES);
-		if (selected != null) {
-			String[] attr = selected.split(SP);
-			for (String s : attr) {
-				map.put(s, s);
-			}
-		}
-		return map;
-	}
-
-	public static void setSelected(Map<String, String> map, LTVariableMap ltMap) {
-		StringBuffer buffer = new StringBuffer();
-		for (String s : map.keySet()) {
-			buffer.append(s).append(SP);
-		}
-		ltMap.getVariables().put(SELECTED_ATTRIBUTES, buffer.toString().trim());
 	}
 }

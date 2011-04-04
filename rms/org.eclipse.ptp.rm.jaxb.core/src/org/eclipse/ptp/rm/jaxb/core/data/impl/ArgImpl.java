@@ -28,6 +28,9 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 		this.map = map;
 	}
 
+	/**
+	 * Will not return <code>null</code>.
+	 */
 	public String getResolved() {
 		return getResolved(uuid, arg, map);
 	}
@@ -45,9 +48,15 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 			return ZEROSTR;
 		}
 		StringBuffer b = new StringBuffer();
-		b.append(getResolved(uuid, args.get(0), map));
+		String resolved = getResolved(uuid, args.get(0), map);
+		if (!ZEROSTR.equals(resolved)) {
+			b.append(resolved);
+		}
 		for (int i = 1; i < args.size(); i++) {
-			b.append(SP).append(getResolved(uuid, args.get(0), map));
+			resolved = getResolved(uuid, args.get(i), map);
+			if (!ZEROSTR.equals(resolved)) {
+				b.append(SP).append(resolved);
+			}
 		}
 		return b.toString();
 	}
