@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
-import org.eclipse.ptp.rm.jaxb.ui.IAttributeViewerColumnLabelSupport;
+import org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.graphics.Color;
@@ -39,32 +39,32 @@ public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColor
 	}
 
 	public Color getBackground(Object element, int columnIndex) {
-		if (element instanceof IAttributeViewerColumnLabelSupport) {
-			IAttributeViewerColumnLabelSupport support = (IAttributeViewerColumnLabelSupport) element;
+		if (element instanceof IColumnViewerLabelSupport) {
+			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
 			return support.getBackground(element, columnIndex);
 		}
 		return null;
 	}
 
 	public Image getColumnImage(Object element, int columnIndex) {
-		if (element instanceof IAttributeViewerColumnLabelSupport) {
-			IAttributeViewerColumnLabelSupport support = (IAttributeViewerColumnLabelSupport) element;
+		if (element instanceof IColumnViewerLabelSupport) {
+			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
 			return support.getColumnImage(getColumnName(columnIndex));
 		}
 		return null;
 	}
 
 	public String getColumnText(Object element, int columnIndex) {
-		if (element instanceof IAttributeViewerColumnLabelSupport) {
-			IAttributeViewerColumnLabelSupport support = (IAttributeViewerColumnLabelSupport) element;
+		if (element instanceof IColumnViewerLabelSupport) {
+			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
 			return support.getDisplayValue(getColumnName(columnIndex));
 		}
 		return ZEROSTR;
 	}
 
 	public Font getFont(Object element, int columnIndex) {
-		if (element instanceof IAttributeViewerColumnLabelSupport) {
-			IAttributeViewerColumnLabelSupport support = (IAttributeViewerColumnLabelSupport) element;
+		if (element instanceof IColumnViewerLabelSupport) {
+			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
 			return support.getFont(element, columnIndex);
 		}
 		return null;
@@ -72,8 +72,8 @@ public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColor
 
 	public Color getForeground(Object element, int columnIndex) {
 		Color color = null;
-		if (element instanceof IAttributeViewerColumnLabelSupport) {
-			IAttributeViewerColumnLabelSupport support = (IAttributeViewerColumnLabelSupport) element;
+		if (element instanceof IColumnViewerLabelSupport) {
+			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
 			color = support.getForeground(element, columnIndex);
 		}
 		return color;
