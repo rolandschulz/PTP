@@ -17,6 +17,9 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTab;
 import org.eclipse.ptp.rm.jaxb.core.data.TabController;
+import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
@@ -32,9 +35,12 @@ import org.eclipse.swt.widgets.Control;
  */
 public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfigurationDynamicTab {
 
+	private LTVariableMap ltMap;
+
 	private final IJAXBResourceManagerConfiguration rmConfig;
 	private final LaunchTab launchTabData;
 	private final boolean hasScript;
+
 	private ScrolledComposite scrolledParent;
 
 	public JAXBRMLaunchConfigurationDynamicTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
@@ -42,6 +48,7 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 		rmConfig = rm.getJAXBConfiguration();
 		rmConfig.setActive();
 		launchTabData = JAXBRMLaunchConfigurationFactory.getLaunchTab(rmConfig);
+
 		hasScript = JAXBRMLaunchConfigurationFactory.hasScript(rmConfig);
 		if (launchTabData != null) {
 			TabController controller = launchTabData.getBasic();
@@ -69,6 +76,19 @@ public class JAXBRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfi
 
 	public LaunchTab getLaunchTabData() {
 		return launchTabData;
+	}
+
+	public LTVariableMap getLocalMap() {
+		if (ltMap == null) {
+			try {
+				getRmConfig().setActive();
+			} catch (Throwable t) {
+				JAXBUIPlugin.log(t);
+			}
+			ltMap = LTVariableMap.createInstance(RMVariableMap.getActiveInstance());
+			LTVariableMap.setActiveInstance(ltMap);
+		}
+		return ltMap;
 	}
 
 	public IJAXBResourceManagerConfiguration getRmConfig() {

@@ -10,6 +10,7 @@
 package org.eclipse.ptp.rm.jaxb.core.variables;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,23 +25,32 @@ public class LTVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	private static LTVariableMap active;
 
 	private final Map<String, String> variables;
-	private final Map<String, String> discovered;
 	private boolean initialized;
 
 	private LTVariableMap() {
 		variables = Collections.synchronizedMap(new TreeMap<String, String>());
-		discovered = Collections.synchronizedMap(new TreeMap<String, String>());
 		initialized = false;
 	}
 
 	public void clear() {
 		variables.clear();
-		discovered.clear();
 		initialized = false;
 	}
 
 	public Map<String, String> getDiscovered() {
-		return discovered;
+		throw new UnsupportedOperationException();
+	}
+
+	public Map<String, String> getSelected() {
+		Map<String, String> map = new HashMap<String, String>();
+		String selected = variables.get(SELECTED_ATTRIBUTES);
+		if (selected != null && !ZEROSTR.equals(selected)) {
+			String[] attr = selected.split(SP);
+			for (String s : attr) {
+				map.put(s, s);
+			}
+		}
+		return map;
 	}
 
 	/**
@@ -82,8 +92,26 @@ public class LTVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		variables.put(key1, value);
 	}
 
+	public void setAllSelected(Map<String, String> map) {
+		StringBuffer buffer = new StringBuffer();
+		for (String s : map.keySet()) {
+			buffer.append(s).append(SP);
+		}
+		variables.put(SELECTED_ATTRIBUTES, buffer.toString().trim());
+		System.out.println(SELECTED_ATTRIBUTES + SP + buffer.toString().trim());
+	}
+
 	public void setInitialized(boolean initialized) {
 		this.initialized = initialized;
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		for (String key : variables.keySet()) {
+			buffer.append(key).append(EQ).append(variables.get(key)).append(LINE_SEP);
+		}
+		return buffer.toString();
 	}
 
 	private String dereference(String expression) throws CoreException {
@@ -93,14 +121,21 @@ public class LTVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
 	}
 
+	public static LTVariableMap createInstance(RMVariableMap rmVars) {
+		LTVariableMap ltMap = new LTVariableMap();
+		rmVars.getFlattenedVariables(ltMap.variables);
+		String selected = ltMap.getVariables().get(SELECTED_ATTRIBUTES);
+		if (selected == null || ZEROSTR.equals(selected.trim())) {
+			ltMap.setAllSelected(ltMap.variables);
+		}
+		return ltMap;
+	}
+
 	public synchronized static LTVariableMap getActiveInstance() {
 		return active;
 	}
 
-	public synchronized static LTVariableMap setActiveInstance(RMVariableMap rmVars) {
-		LTVariableMap.active = new LTVariableMap();
-		rmVars.getFlattenedVariables(active.variables);
-		rmVars.getFlattenedDiscovered(active.discovered);
-		return LTVariableMap.active;
+	public synchronized static void setActiveInstance(LTVariableMap instance) {
+		active = instance;
 	}
 }

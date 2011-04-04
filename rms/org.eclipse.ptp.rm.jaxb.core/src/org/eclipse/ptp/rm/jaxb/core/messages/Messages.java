@@ -56,6 +56,7 @@ public class Messages extends NLS {
 	public static String Write_OperationFailed;
 	public static String Read_OperationFailed;
 	public static String FailedToCreateRmData;
+	public static Object GetDiscoveredNotSupported;
 
 	static {
 		// initialize resource bundle

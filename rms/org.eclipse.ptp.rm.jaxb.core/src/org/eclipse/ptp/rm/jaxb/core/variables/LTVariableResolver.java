@@ -21,7 +21,9 @@ public class LTVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 		if (m != null) {
 			String[] split = argument.split(PDRX);
 			if (split.length > 1) {
-				argument = split[0];
+				if (split[1].equals(VALUE)) {
+					argument = split[0];
+				}
 			}
 			return m.getVariables().get(argument);
 		}

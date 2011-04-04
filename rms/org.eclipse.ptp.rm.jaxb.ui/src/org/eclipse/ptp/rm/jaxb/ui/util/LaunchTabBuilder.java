@@ -99,7 +99,6 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		addRows(viewer, descriptor);
 		addToggleShowHideSelected(showHide, viewer);
 		addToViewerMap(viewer, descriptor, showHide);
-
 	}
 
 	private ColumnViewer addCheckboxTableViewer(Composite parent, Object data, Layout layout, int style, AttributeViewer descriptor) {
@@ -108,6 +107,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		CheckboxTableViewer viewer = new CheckboxTableViewer(t);
 		WidgetBuilderUtils.setupAttributeTable(viewer, descriptor.getColumnData(), null, descriptor.isSort(),
 				descriptor.isTooltip(), descriptor.isHeaderVisible(), descriptor.isLinesVisible());
+		((ICheckable) viewer).addCheckStateListener(tab.getWidgetListener());
 		return viewer;
 	}
 
@@ -117,6 +117,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		CheckboxTreeViewer viewer = new CheckboxTreeViewer(t);
 		WidgetBuilderUtils.setupAttributeTree(viewer, descriptor.getColumnData(), null, descriptor.isSort(),
 				descriptor.isTooltip(), descriptor.isHeaderVisible(), descriptor.isLinesVisible());
+		((ICheckable) viewer).addCheckStateListener(tab.getWidgetListener());
 		return viewer;
 	}
 
@@ -260,6 +261,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			hash.remove(key);
 		}
 		for (AttributeViewerCellData cd : hash.values()) {
+			cd.setListener(tab.getWidgetListener());
 			data.addRow(cd);
 		}
 		viewer.setInput(data);

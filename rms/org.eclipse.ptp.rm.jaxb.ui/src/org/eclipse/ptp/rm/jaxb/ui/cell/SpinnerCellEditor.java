@@ -16,25 +16,25 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Spinner;
 
-public class JAXBSpinnerCellEditor extends CellEditor {
+public class SpinnerCellEditor extends CellEditor {
 
 	private Spinner spinner;
 
 	private static final int defaultStyle = SWT.NONE;
 
-	public JAXBSpinnerCellEditor() {
+	public SpinnerCellEditor() {
 		setStyle(defaultStyle);
 	}
 
-	public JAXBSpinnerCellEditor(Composite parent) {
+	public SpinnerCellEditor(Composite parent) {
 		this(parent, defaultStyle);
 	}
 
-	public JAXBSpinnerCellEditor(Composite parent, int style) {
+	public SpinnerCellEditor(Composite parent, int style) {
 		this(parent, style, null, null);
 	}
 
-	public JAXBSpinnerCellEditor(Composite parent, int style, Integer min, Integer max) {
+	public SpinnerCellEditor(Composite parent, int style, Integer min, Integer max) {
 		super(parent, style);
 
 		if (min != null) {
@@ -55,7 +55,7 @@ public class JAXBSpinnerCellEditor extends CellEditor {
 		}
 	}
 
-	public JAXBSpinnerCellEditor(Composite parent, Integer min, Integer max) {
+	public SpinnerCellEditor(Composite parent, Integer min, Integer max) {
 		this(parent, defaultStyle, min, max);
 	}
 
