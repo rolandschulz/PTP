@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - modifications
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.ui.data;
+package org.eclipse.ptp.rm.jaxb.ui.model;
 
 import java.util.ArrayList;
 import java.util.List;

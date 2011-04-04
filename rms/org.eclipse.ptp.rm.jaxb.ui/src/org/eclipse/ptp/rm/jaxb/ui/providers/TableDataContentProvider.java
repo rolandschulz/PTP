@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.jaxb.ui.providers;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerData;
+import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerData;
 
 public class TableDataContentProvider implements IStructuredContentProvider {
 
