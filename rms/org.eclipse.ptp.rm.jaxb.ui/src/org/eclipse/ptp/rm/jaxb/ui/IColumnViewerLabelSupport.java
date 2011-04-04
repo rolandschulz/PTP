@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.swt.graphics.Image;
 
-public interface IAttributeViewerColumnLabelSupport extends ITableColorProvider, ITableFontProvider {
+public interface IColumnViewerLabelSupport extends ITableColorProvider, ITableFontProvider {
 
 	Image getColumnImage(String columnName);
 

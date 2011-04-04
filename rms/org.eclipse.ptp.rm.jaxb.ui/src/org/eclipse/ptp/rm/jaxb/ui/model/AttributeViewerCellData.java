@@ -11,7 +11,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.core.data.FontDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.ui.IAttributeViewerColumnLabelSupport;
+import org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.IWidgetListener;
 import org.eclipse.ptp.rm.jaxb.ui.cell.SpinnerCellEditor;
@@ -21,7 +21,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 
-public abstract class AttributeViewerCellData implements IAttributeViewerColumnLabelSupport, IJAXBUINonNLSConstants {
+public abstract class AttributeViewerCellData implements IColumnViewerLabelSupport, IJAXBUINonNLSConstants {
 	/*
 	 * Maps are not supported.
 	 */
