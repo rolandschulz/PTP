@@ -6,14 +6,11 @@ import java.util.Map;
 
 import org.eclipse.cdt.core.settings.model.ICResourceDescription;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractCBuildPropertyTab;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.rdt.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -23,8 +20,6 @@ import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.services.core.BuildScenario;
-import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -37,7 +32,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.ISelectionService;
 
 public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 	public BuildRemotePropertiesPage() {
@@ -197,7 +191,7 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 		BuildScenario buildScenario = new BuildScenario("Git", fSelectedConnection.getName(), fLocationText.getText()); //$NON-NLS-1$
 //		BuildScenario buildScenario = new BuildScenario(fSelectedProvider.getName(), fSelectedConnection.getName(),
 //																										fLocationText.getText());
-		ServiceModelManager.getInstance().setBuildScenarioForBuildConfigurationId(buildScenario, getCfg().getId());
+		BuildConfigurationManager.setBuildScenarioForBuildConfiguration(buildScenario, getCfg());
 
 		return true;
 	}
@@ -307,8 +301,7 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 
 	@Override
 	public void updateData(ICResourceDescription cfg) {
-		BuildScenario buildScenario = ServiceModelManager.getInstance().
-																	getBuildScenarioForBuildConfigurationId(getCfg().getId());
+		BuildScenario buildScenario = BuildConfigurationManager.getBuildScenarioForBuildConfiguration(getCfg());
 		// fProviderCombo.select(fComboRemoteServicesProviderToIndexMap.get(buildScenario.getSyncProvider()));
 		fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(buildScenario.getRemoteConnectionName()));
 		fLocationText.setText(buildScenario.getLocation());

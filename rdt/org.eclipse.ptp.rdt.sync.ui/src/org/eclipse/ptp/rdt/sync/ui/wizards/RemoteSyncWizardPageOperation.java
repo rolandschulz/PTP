@@ -25,6 +25,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.ptp.rdt.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.core.BuildScenario;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
@@ -32,7 +34,6 @@ import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.services.core.BuildScenario;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
@@ -75,8 +76,8 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			}
 			
 			smm.addConfiguration(project, config);
-			if (smm.getBuildSystemTemplateConfiguration() == null) {
-				smm.setBuildSystemTemplateConfiguration(config);
+			if (BuildConfigurationManager.getBuildSystemTemplateConfiguration() == null) {
+				BuildConfigurationManager.setBuildSystemTemplateConfiguration(config);
 			}
 
 			try {
@@ -106,7 +107,7 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			buildInfo.setDefaultConfiguration(configName);
 			IConfiguration config = buildInfo.getDefaultConfiguration();
 
-			ServiceModelManager.getInstance().setBuildScenarioForBuildConfigurationId(buildScenario, config.getId());
+			BuildConfigurationManager.setBuildScenarioForBuildConfiguration(buildScenario, config);
 		}
 		buildInfo.setDefaultConfiguration(defaultConfig);
 		monitor.done();

@@ -41,3 +41,5 @@ Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.rdt.core.activator.Activator
 Bundle-Vendor: %providerName
+Import-Package: org.eclipse.ptp.rdt.sync.core,
+ org.eclipse.ui

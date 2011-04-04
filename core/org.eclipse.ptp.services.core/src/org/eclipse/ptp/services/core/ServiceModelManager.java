@@ -201,9 +201,6 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private final Map<IProject, Map<String, IServiceConfiguration>> fProjectConfigurations = new HashMap<IProject, Map<String, IServiceConfiguration>>();
 	private final Map<IProject, IServiceConfiguration> fActiveConfigurations = new HashMap<IProject, IServiceConfiguration>();
 	private final Map<IProject, Set<IService>> fProjectServices = new HashMap<IProject, Set<IService>>();
-	private final Map<String, BuildScenario> fBuildConfigIdToBuildScenarioMap = new HashMap<String,BuildScenario>();
-	private final Map<BuildScenario, IServiceConfiguration> fBuildScenarioToSConfigMap =
-																			new HashMap<BuildScenario, IServiceConfiguration>();
 	private Map<String, Service> fServices = null;
 	private Map<String, ServiceCategory> fCategories;
 	private Set<IService> fServiceSet = null;
@@ -212,7 +209,6 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private final ServiceModelEventManager fEventManager = new ServiceModelEventManager();
 	private boolean fModelLoaded = false;
 	private boolean fEventsEnabled = true;
-	private IServiceConfiguration fBuildSystemTemplateConfiguration = null;
 
 	private static ServiceModelManager fInstance;
 
@@ -225,61 +221,6 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 
 	private ServiceModelManager() {
 		defaultSaveFile = ServicesCorePlugin.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
-	}
-	
-	/**
-	 * Add a new build scenario to the project, creating a new service configuration for that scenario if necessary.
-	 *
-	 * @param project
-	 * @param buildScenario
-	 * @since 2.1
-	 */
-	private void addBuildScenario(BuildScenario buildScenario) {
-		checkAndLoadModel();
-		IServiceConfiguration sConfig = this.copyActiveServiceConfiguration();
-		this.modifyServiceConfigurationForBuildScenario(sConfig, buildScenario);
-		fBuildScenarioToSConfigMap.put(buildScenario, sConfig);
-		
-		// Update service model manager data structures
-		// TODO: Since we no longer input the project, we cannot do "addConfiguration(project, sConfig)", so some data is missing.
-		this.addConfiguration(sConfig);
-	}
-	
-	private IServiceConfiguration copyActiveServiceConfiguration() {
-		checkAndLoadModel();
-		IServiceConfiguration newConfig = newServiceConfiguration("");
-		IServiceConfiguration oldConfig = fBuildSystemTemplateConfiguration;
-		if (oldConfig == null) {
-			throw new RuntimeException("No template service configuration set for build system");
-		}
-		
-		for (IService service : oldConfig.getServices()) {
-			ServiceProvider oldProvider = (ServiceProvider) oldConfig.getServiceProvider(service);
-			try {
-				// The memento creation methods seem the most robust way to copy state. It is more robust than getProperties() and
-				// setProperties(), which saveState() and restoreState() use by default but which can be overriden by subclasses.
-				ServiceProvider newProvider = oldProvider.getClass().newInstance();
-				XMLMemento oldProviderState = XMLMemento.createWriteRoot(PROVIDER_ELEMENT_NAME);
-				oldProvider.saveState(oldProviderState);
-				newProvider.restoreState(oldProviderState);
-				newConfig.setServiceProvider(service, newProvider);
-			} catch (InstantiationException e) {
-				throw new RuntimeException("Cannot instantiate provider class: " + oldProvider.getClass());
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException("Cannot instantiate provider class: " + oldProvider.getClass());
-			}
-		}
-		
-		return newConfig;
-	}
-	
-	private void modifyServiceConfigurationForBuildScenario(IServiceConfiguration sConfig, BuildScenario bs) {
-		for (IService service : sConfig.getServices()) {
-			ServiceProvider provider = (ServiceProvider) sConfig.getServiceProvider(service);
-			if (provider instanceof IRemoteServiceProvider) {
-				((IRemoteServiceProvider) provider).changeRemoteInformation(bs.getRemoteConnectionName(), bs.getLocation());
-			}
-		}
 	}
 
 	/*
@@ -412,20 +353,6 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		checkAndLoadModel();
 		return new HashSet<IServiceCategory>(fCategories.values());
 	}
-	
-
-	/**
-	 * Return the build scenario for the passed configuration. Returns null if configuration not found.
-	 * 
-	 * @param project
-	 * @param configId
-	 * @return build scenario
-	 * @since 2.1
-	 */
-	public BuildScenario getBuildScenarioForBuildConfigurationId(String configId) {
-		checkAndLoadModel();
-		return fBuildConfigIdToBuildScenarioMap.get(configId);
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -455,19 +382,6 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	public IServiceConfiguration getConfiguration(String id) {
 		checkAndLoadModel();
 		return fConfigurations.get(id);
-	}
-	
-	/**
-	 * Return the service configuration that should be used for a given build scenario or null if none found.
-	 * 
-	 * @param project
-	 * @param buildScenario
-	 * @return service configuration
-	 * @since 2.1
-	 */
-	public IServiceConfiguration getConfigurationForBuildScenario(BuildScenario buildScenario) {
-		checkAndLoadModel();
-		return fBuildScenarioToSConfigMap.get(buildScenario);
 	}
 
 	/*
@@ -1249,53 +1163,5 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 			return false;
 		}
 		return true;
-	}
-	
-	/**
-	 * Associate the given configuration id with the given build scenario
-	 *
-	 * @param project
-	 * @param buildScenario
-	 * @since 2.1
-	 */
-	public void setBuildScenarioForBuildConfigurationId(BuildScenario bs, String id) {
-		checkAndLoadModel();
-		fBuildConfigIdToBuildScenarioMap.put(id, bs);
-		addBuildScenario(bs);
-	}
-
-	/**
-	 * Returns the build scenario set for the given configuration, or null if it is unavailable (either the project or the id
-	 * could be "bad" in this case).
-	 * 
-	 * @param project
-	 * @param id
-	 * 			ID of the build configuration
-	 * @return build scenario for the configuration
-	 * @throws RuntimeException if the build scenario cannot be mapped to a service configuration. This should never happen as it
-	 * is an invariant enforced by this class. (We return null in the other cases as they could be the result of bad user input.)
-	 * @since 2.1
-	 */
-	public IServiceConfiguration getConfigurationForBuildConfiguration(String id) {
-		checkAndLoadModel();
-		 BuildScenario bs = fBuildConfigIdToBuildScenarioMap.get(id);
-		 if (bs == null) {
-			 return null;
-		 }
-		 
-		 IServiceConfiguration conf = fBuildScenarioToSConfigMap.get(bs);
-		 if (conf == null) {
-			 throw new RuntimeException("Unable to find a service configuration for the build scenario");
-		 }
-		 
-		 return conf;
-	}
-
-	public IServiceConfiguration getBuildSystemTemplateConfiguration() {
-		return fBuildSystemTemplateConfiguration;
-	}
-
-	public void setBuildSystemTemplateConfiguration(IServiceConfiguration config) {
-		fBuildSystemTemplateConfiguration = config;
 	}
 }
