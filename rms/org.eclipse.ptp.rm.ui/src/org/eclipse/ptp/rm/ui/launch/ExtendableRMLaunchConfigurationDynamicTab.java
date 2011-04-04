@@ -230,4 +230,11 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 		tabControllers.add(tabController);
 		tabController.addContentsChangedListener(this);
 	}
+
+	/**
+	 * @since 2.0
+	 */
+	protected List<BaseRMLaunchConfigurationDynamicTab> getControllers() {
+		return tabControllers;
+	}
 }
