@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.ptp.services.core.IRemoteServiceProvider;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
@@ -49,6 +52,7 @@ public class BuildConfigurationManager {
 	 * @since 2.1
 	 */
 	public static BuildScenario getBuildScenarioForBuildConfiguration(IConfiguration bconf) {
+		updateConfigurations(bconf.getOwner().getProject(), null);
 		BuildScenario buildScenario = fBuildConfigToBuildScenarioMap.get(bconf.getId());
 		while (buildScenario == null) {
 			bconf = bconf.getParent();
@@ -59,7 +63,8 @@ public class BuildConfigurationManager {
 	}
 	
 	/**
-	 * Associate the given configuration with the given build scenario
+	 * Associate the given configuration with the given build scenario. It is very important that we update configurations first,
+	 * so that children of the changed configuration will be properly set to use the prior build scenario. 
 	 *
 	 * @param buildScenario
 	 * @param bconf
@@ -67,6 +72,7 @@ public class BuildConfigurationManager {
 	 * @since 2.1
 	 */
 	public static void setBuildScenarioForBuildConfiguration(BuildScenario bs, IConfiguration bconf) {
+		updateConfigurations(bconf.getOwner().getProject(), null);
 		fBuildConfigToBuildScenarioMap.put(bconf.getId(), bs);
 		addBuildScenario(bs);
 	}
@@ -83,6 +89,7 @@ public class BuildConfigurationManager {
 	 * @since 2.1
 	 */
 	public static IServiceConfiguration getConfigurationForBuildConfiguration(IConfiguration bconf) {
+		updateConfigurations(bconf.getOwner().getProject(), null);
 		 BuildScenario bs = fBuildConfigToBuildScenarioMap.get(bconf.getId());
 		 if (bs == null) {
 			 return null;
@@ -155,5 +162,71 @@ public class BuildConfigurationManager {
 	 */
 	public static IServiceConfiguration getConfigurationForBuildScenario(BuildScenario buildScenario) {
 		return fBuildScenarioToSConfigMap.get(buildScenario);
+	}
+	
+	/**
+	 * Set all configurations for this project to use the passed build scenario. This is meant to be used by clients to initialize
+	 * the build configurations. 
+	 *
+	 * @param project
+	 * @param bs
+	 * 			The build scenario
+	 */
+	public static void setBuildScenarioForAllConfigurations(IProject project, BuildScenario bs) {
+		if (bs == null) {
+			throw new NullPointerException();
+		}
+		updateConfigurations(project, bs);
+	}
+
+	// If build scenario is not null, then set all configurations to use that build scenario (client interface). If null, set all
+	// configurations to the build scenario of their nearest ancestor (for internal use only).
+	private static void updateConfigurations(IProject project, BuildScenario bs) {
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
+		}
+		
+		// The only way to retrieve all configurations is by name, and there is no function for mapping names to configurations.
+		// Thus, in the loop we set each configuration to the default and then use "getDefaultConfiguration" to retrieve it. Before
+		// starting, we store the current default and restore it after the loop.
+		IConfiguration defaultConfig = buildInfo.getDefaultConfiguration();
+		String[] allConfigNames = buildInfo.getConfigurationNames();
+		for (String configName : allConfigNames) {
+			buildInfo.setDefaultConfiguration(configName);
+			IConfiguration config = buildInfo.getDefaultConfiguration();
+
+			if (bs == null) {
+				String parentConfig = findAncestorConfig(config.getId());
+				if (parentConfig == null) {
+					throw new RuntimeException("Failed to find an ancestor for build configuration " + config.getId()); //$NON-NLS-1$
+				}
+				setBuildScenarioForBuildConfiguration(fBuildConfigToBuildScenarioMap.get(parentConfig), config);
+			} else {
+				setBuildScenarioForBuildConfiguration(bs, config);
+			}
+		}
+		buildInfo.setDefaultConfiguration(defaultConfig);
+	}
+	
+	// Find the closest ancestor of the configuration that we have recorded.
+	private static String findAncestorConfig(String configId) {
+		while ((configId = getParentId(configId)) != null) {
+			if (fBuildConfigToBuildScenarioMap.containsKey(configId)) {
+				return configId;
+			}
+		}
+		return null;
+	}
+	
+	// Each new configuration id appends a number to the parent id. So we strip off the last id number to get the parent. We assume
+	// the configuration does not have a parent and return null if the result does not end with a number.
+	private static String getParentId(String configId) {
+		String idPattern = "\\.\\d+$"; //$NON-NLS-1$
+		String parentConfigId = configId.replaceFirst(idPattern, ""); //$NON-NLS-1$
+		if (!(parentConfigId.matches(idPattern))) {
+			return null;
+		}
+		return parentConfigId;
 	}
 }
