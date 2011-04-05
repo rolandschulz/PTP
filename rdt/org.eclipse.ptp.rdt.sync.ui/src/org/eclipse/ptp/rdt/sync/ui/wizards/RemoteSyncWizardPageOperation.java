@@ -93,23 +93,7 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 																										provider.getLocation());
 
 		// Add information about remote location to the initial build configurations (.cproject file)
-		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-		if (buildInfo == null) {
-			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
-		}
-		
-		// The only way to retrieve all configurations is by name, and there is no function for mapping names to configurations.
-		// Thus, in the loop we set each configuration to the default and then use "getDefaultConfiguration" to retrieve it. Before
-		// starting, we store the current default and restore it after the loop.
-		IConfiguration defaultConfig = buildInfo.getDefaultConfiguration();
-		String[] allConfigNames = buildInfo.getConfigurationNames();
-		for (String configName : allConfigNames) {
-			buildInfo.setDefaultConfiguration(configName);
-			IConfiguration config = buildInfo.getDefaultConfiguration();
-
-			BuildConfigurationManager.setBuildScenarioForBuildConfiguration(buildScenario, config);
-		}
-		buildInfo.setDefaultConfiguration(defaultConfig);
+		BuildConfigurationManager.setBuildScenarioForAllConfigurations(project, buildScenario);
 		monitor.done();
 	}
 
