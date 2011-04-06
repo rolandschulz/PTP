@@ -25,7 +25,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.remote.remotetools.core.RemoteToolsServices;
 import org.eclipse.ptp.services.core.IRemoteServiceProvider;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
@@ -244,11 +243,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 
-	// @TODO: Change so that it is not specific to RemoteTools
 	@Override
-	public void changeRemoteInformation(String remoteConnectionName, String location) {
-		fConnection = RemoteToolsServices.getInstance().getConnectionManager().getConnection(remoteConnectionName);
-		putString(GIT_CONNECTION_NAME, remoteConnectionName);
+	public void changeRemoteInformation(IRemoteConnection remoteConnection, String location) {
+		fConnection = remoteConnection;
+		putString(GIT_CONNECTION_NAME, remoteConnection.getName());
 		fLocation = location;
 		putString(GIT_LOCATION, location);
 	}

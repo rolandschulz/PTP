@@ -1,5 +1,7 @@
 package org.eclipse.ptp.rdt.core;
 
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+
 /**
  * Class for build information that will be mapped to a specific service configuration. Utility methods for reading and writing
  * the information to an IConfiguration (a .cproject file) are also provided.
@@ -7,7 +9,7 @@ package org.eclipse.ptp.rdt.core;
  */
 public class BuildScenario {
 	final String syncProvider;
-	final String remoteConnectionName;
+	final IRemoteConnection remoteConnection;
 	final String location;
 	
 	/**
@@ -20,9 +22,9 @@ public class BuildScenario {
 	 * @param l
 	 * 			 Location (directory) on remote host
 	 */
-	public BuildScenario(String sp, String rcn, String l) {
+	public BuildScenario(String sp, IRemoteConnection rc, String l) {
 		syncProvider = sp;
-		remoteConnectionName = rcn;
+		remoteConnection = rc;
 		location = l;
 	}
 
@@ -30,8 +32,8 @@ public class BuildScenario {
 		return syncProvider;
 	}
 
-	public String getRemoteConnectionName() {
-		return remoteConnectionName;
+	public IRemoteConnection getRemoteConnection() {
+		return remoteConnection;
 	}
 
 	public String getLocation() {

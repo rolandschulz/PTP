@@ -1,7 +1,9 @@
 package org.eclipse.ptp.rdt.core;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
@@ -24,6 +26,7 @@ public class BuildConfigurationManager {
 																							new HashMap<String,BuildScenario>();
 	private static final Map<BuildScenario, IServiceConfiguration> fBuildScenarioToSConfigMap =
 																			new HashMap<BuildScenario, IServiceConfiguration>();
+	private static final Set<IProject> initializedProjects = new HashSet<IProject>();
 	
 	
 	/**
@@ -32,19 +35,19 @@ public class BuildConfigurationManager {
 	 * @param buildScenario
 	 * @since 2.1
 	 */
-	private static void addBuildScenario(BuildScenario buildScenario) {
+	private static void addBuildScenario(IProject project, BuildScenario buildScenario) {
 		IServiceConfiguration sConfig =copyTemplateServiceConfiguration();
 		modifyServiceConfigurationForBuildScenario(sConfig, buildScenario);
 		fBuildScenarioToSConfigMap.put(buildScenario, sConfig);
 		
 		// Update service model manager data structures
-		// TODO: Since we no longer input the project, we cannot do "addConfiguration(project, sConfig)", so some data is missing.
 		ServiceModelManager.getInstance().addConfiguration(sConfig);
+		ServiceModelManager.getInstance().addConfiguration(project, sConfig);
 	}
 	
 	/**
-	 * Return the build scenario for the passed configuration. If not present, use the build scenario for the nearest ancestor
-	 * configuration. If still not found, return null.
+	 * Return the build scenario for the passed configuration. Any newly created configurations should be recorded by the call to
+	 * "updateConfigurations".
 	 * 
 	 * @param bconf
 	 * 				The build configuration
@@ -52,19 +55,17 @@ public class BuildConfigurationManager {
 	 * @since 2.1
 	 */
 	public static BuildScenario getBuildScenarioForBuildConfiguration(IConfiguration bconf) {
-		updateConfigurations(bconf.getOwner().getProject(), null);
-		BuildScenario buildScenario = fBuildConfigToBuildScenarioMap.get(bconf.getId());
-		while (buildScenario == null) {
-			bconf = bconf.getParent();
-			buildScenario = fBuildConfigToBuildScenarioMap.get(bconf.getId());
+		if (!(initializedProjects.contains(bconf.getOwner().getProject()))) {
+			throw new RuntimeException("Project configurations not yet initialized."); //$NON-NLS-1$
 		}
-		
-		return buildScenario;
+		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
+		return fBuildConfigToBuildScenarioMap.get(bconf.getId());
 	}
 	
 	/**
 	 * Associate the given configuration with the given build scenario. It is very important that we update configurations first,
-	 * so that children of the changed configuration will be properly set to use the prior build scenario. 
+	 * so that children of the changed configuration will be properly set to use the prior build scenario. This is not possible,
+	 * though, until the project has been initialized (root configurations have been inserted).
 	 *
 	 * @param buildScenario
 	 * @param bconf
@@ -72,28 +73,37 @@ public class BuildConfigurationManager {
 	 * @since 2.1
 	 */
 	public static void setBuildScenarioForBuildConfiguration(BuildScenario bs, IConfiguration bconf) {
-		updateConfigurations(bconf.getOwner().getProject(), null);
+		if (!(initializedProjects.contains(bconf.getOwner().getProject()))) {
+			throw new RuntimeException("Project configurations not yet initialized."); //$NON-NLS-1$
+		}
+		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
+		setBuildScenarioForBuildConfigurationInternal(bs, bconf);
+	}
+	
+	// Actual internal code for setting a build scenario
+	private static void setBuildScenarioForBuildConfigurationInternal(BuildScenario bs, IConfiguration bconf) {
 		fBuildConfigToBuildScenarioMap.put(bconf.getId(), bs);
-		addBuildScenario(bs);
+		addBuildScenario(bconf.getOwner().getProject(), bs);
 	}
 
 	/**
-	 * Returns the build scenario set for the given configuration, or null if it is unavailable (either the project or the
-	 * configuration could be "bad" in this case).
+	 * Returns the build scenario set for the given configuration, or null if it is unavailable.
 	 * 
 	 * @param bconf
 	 * 			The build configuration
 	 * @return build scenario for the configuration
-	 * @throws RuntimeException if the build scenario cannot be mapped to a service configuration. This should never happen as it
-	 * is an invariant enforced by this class. (We return null in the other cases as they could be the result of bad user input.)
+	 * @throws RuntimeException if the build scenario cannot be mapped to a service configuration. This should never happen.
 	 * @since 2.1
 	 */
 	public static IServiceConfiguration getConfigurationForBuildConfiguration(IConfiguration bconf) {
-		updateConfigurations(bconf.getOwner().getProject(), null);
-		 BuildScenario bs = fBuildConfigToBuildScenarioMap.get(bconf.getId());
-		 if (bs == null) {
-			 return null;
-		 }
+		if (!(initializedProjects.contains(bconf.getOwner().getProject()))) {
+			throw new RuntimeException("Project configurations not yet initialized."); //$NON-NLS-1$
+		}
+		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
+		BuildScenario bs = fBuildConfigToBuildScenarioMap.get(bconf.getId());
+		if (bs == null) {
+			return null;
+		}
 		 
 		 IServiceConfiguration conf = fBuildScenarioToSConfigMap.get(bs);
 		 if (conf == null) {
@@ -122,7 +132,7 @@ public class BuildConfigurationManager {
 		for (IService service : sConfig.getServices()) {
 			ServiceProvider provider = (ServiceProvider) sConfig.getServiceProvider(service);
 			if (provider instanceof IRemoteServiceProvider) {
-				((IRemoteServiceProvider) provider).changeRemoteInformation(bs.getRemoteConnectionName(), bs.getLocation());
+				((IRemoteServiceProvider) provider).changeRemoteInformation(bs.getRemoteConnection(), bs.getLocation());
 			}
 		}
 	}
@@ -154,34 +164,24 @@ public class BuildConfigurationManager {
 	}
 	
 	/**
-	 * Return the service configuration that should be used for a given build scenario or null if none found.
-	 * 
-	 * @param buildScenario
-	 * @return service configuration
-	 * @since 2.1
-	 */
-	public static IServiceConfiguration getConfigurationForBuildScenario(BuildScenario buildScenario) {
-		return fBuildScenarioToSConfigMap.get(buildScenario);
-	}
-	
-	/**
-	 * Set all configurations for this project to use the passed build scenario. This is meant to be used by clients to initialize
-	 * the build configurations. 
+	 * Set all configurations for this project to use the passed build scenario. This is to be used by clients to initialize
+	 * the build configurations and must be called before any calls to other set or get methods for build configurations.
 	 *
 	 * @param project
 	 * @param bs
 	 * 			The build scenario
 	 */
-	public static void setBuildScenarioForAllConfigurations(IProject project, BuildScenario bs) {
+	public static void setInitialBuildScenarioForAllConfigurations(IProject project, BuildScenario bs) {
 		if (bs == null) {
 			throw new NullPointerException();
 		}
-		updateConfigurations(project, bs);
+		initializeOrUpdateConfigurations(project, bs);
+		initializedProjects.add(project);
 	}
 
-	// If build scenario is not null, then set all configurations to use that build scenario (client interface). If null, set all
-	// configurations to the build scenario of their nearest ancestor (for internal use only).
-	private static void updateConfigurations(IProject project, BuildScenario bs) {
+	// If build scenario is not null, then set all configurations to use that build scenario (initialize). If null, set all
+	// configurations to the build scenario of their nearest ancestor (update).
+	private static void initializeOrUpdateConfigurations(IProject project, BuildScenario bs) {
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
@@ -196,14 +196,18 @@ public class BuildConfigurationManager {
 			buildInfo.setDefaultConfiguration(configName);
 			IConfiguration config = buildInfo.getDefaultConfiguration();
 
+			// Update
 			if (bs == null) {
-				String parentConfig = findAncestorConfig(config.getId());
-				if (parentConfig == null) {
-					throw new RuntimeException("Failed to find an ancestor for build configuration " + config.getId()); //$NON-NLS-1$
+				if (!(fBuildConfigToBuildScenarioMap.containsKey(config.getId()))) {
+					String parentConfig = findAncestorConfig(config.getId());
+					if (parentConfig == null) {
+						throw new RuntimeException("Failed to find an ancestor for build configuration " + config.getId()); //$NON-NLS-1$
+					}
+					setBuildScenarioForBuildConfigurationInternal(fBuildConfigToBuildScenarioMap.get(parentConfig), config);
 				}
-				setBuildScenarioForBuildConfiguration(fBuildConfigToBuildScenarioMap.get(parentConfig), config);
+			// Initialize
 			} else {
-				setBuildScenarioForBuildConfiguration(bs, config);
+				setBuildScenarioForBuildConfigurationInternal(bs, config);
 			}
 		}
 		buildInfo.setDefaultConfiguration(defaultConfig);

@@ -39,4 +39,5 @@ Bundle-Vendor: %providerName
 Import-Package: org.eclipse.ptp.rdt.core,
  org.eclipse.ptp.rdt.core.services,
  org.eclipse.ptp.rdt.ui.serviceproviders,
+ org.eclipse.ptp.remote.remotetools.core,
  org.eclipse.rse.files.ui.dialogs

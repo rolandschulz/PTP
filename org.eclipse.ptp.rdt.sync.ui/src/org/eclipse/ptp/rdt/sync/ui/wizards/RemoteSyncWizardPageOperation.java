@@ -17,9 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
-import org.eclipse.cdt.managedbuilder.core.IConfiguration;
-import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -89,11 +86,11 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		
 		// Register this initial build scenario with the service model manager
 		ISyncServiceProvider provider = participant.getProvider(project);
-		BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection().getName(),
+		BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
 																										provider.getLocation());
 
 		// Add information about remote location to the initial build configurations (.cproject file)
-		BuildConfigurationManager.setBuildScenarioForAllConfigurations(project, buildScenario);
+		BuildConfigurationManager.setInitialBuildScenarioForAllConfigurations(project, buildScenario);
 		monitor.done();
 	}
 
