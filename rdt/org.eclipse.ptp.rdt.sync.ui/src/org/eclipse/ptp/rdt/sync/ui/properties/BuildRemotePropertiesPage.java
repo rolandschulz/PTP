@@ -6,15 +6,14 @@ import java.util.Map;
 
 import org.eclipse.cdt.core.settings.model.ICResourceDescription;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractCBuildPropertyTab;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.ptp.rdt.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.core.BuildScenario;
-import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.remotetools.core.RemoteToolsServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
@@ -38,20 +37,15 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 		super();
 	}
 
-	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
-
 	private IRemoteConnection fSelectedConnection;
-	private IRemoteServices fSelectedProvider;
-	private final String fProjectName = ""; //$NON-NLS-1$
+	// TODO: Support other providers
+	private IRemoteServices fSelectedProvider = RemoteToolsServices.getInstance();
 
-	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
 	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
-	private final Map<IRemoteServices, Integer> fComboRemoteServicesProviderToIndexMap = new HashMap<IRemoteServices, Integer>();
 	private final Map<IRemoteConnection, Integer> fComboRemoteConnectionToIndexMap = new HashMap<IRemoteConnection, Integer>();
 
 	private Button fBrowseButton;
 	private Button fNewConnectionButton;
-	private Combo fProviderCombo;
 	private Combo fConnectionCombo;
 	private Text fLocationText;
 
@@ -66,40 +60,6 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 		usercomp.setLayout(layout);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		usercomp.setLayoutData(gd);
-
-		// Label for "Provider:"
-		Label providerLabel = new Label(usercomp, SWT.LEFT);
-		providerLabel.setText(Messages.RemoteServicesProviderSelectionDialog_1);
-
-		// combo for providers
-		fProviderCombo = new Combo(usercomp, SWT.DROP_DOWN | SWT.READ_ONLY);
-		gd = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
-		gd.horizontalSpan = 2;
-		fProviderCombo.setLayoutData(gd);
-		fProviderCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleServicesSelected();
-			}
-		});
-
-		// attempt to restore settings from saved state
-		// IRemoteServices providerSelected = fProvider.getRemoteServices();
-
-		// populate the combo with a list of providers
-		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(null);
-		int toSelect = 0;
-
-		for (int k = 0; k < providers.length; k++) {
-			fProviderCombo.add(providers[k].getName(), k);
-			fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
-			fComboRemoteServicesProviderToIndexMap.put(providers[k], k);
-		}
-
-		// set selected host to be the first one if we're not restoring from
-		// settings
-		fProviderCombo.select(toSelect);
-		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(toSelect);
 
 		// connection combo
 		// Label for "Connection:"
@@ -186,14 +146,10 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 	 * 
 	 * @throws RuntimeException on problems retrieving the project or its build information.
 	 */
-	public boolean performOk() {
-		// Register with service model manager
-		BuildScenario buildScenario = new BuildScenario("Git", fSelectedConnection.getName(), fLocationText.getText()); //$NON-NLS-1$
-//		BuildScenario buildScenario = new BuildScenario(fSelectedProvider.getName(), fSelectedConnection.getName(),
-//																										fLocationText.getText());
+	public void performOK() {
+		// Register with build configuration manager
+		BuildScenario buildScenario = new BuildScenario("Git", fSelectedConnection, fLocationText.getText()); //$NON-NLS-1$
 		BuildConfigurationManager.setBuildScenarioForBuildConfiguration(buildScenario, getCfg());
-
-		return true;
 	}
 
 	private void checkConnection() {
@@ -202,34 +158,7 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), null, fSelectedConnection);
 		}
 	}
-
-	/**
-	 * Return the path we are going to display. If it is a file URI then remove
-	 * the file prefix.
-	 * 
-	 * Only do this if the connection is open. Otherwise we will attempt to
-	 * connect to the first machine in the list, which is annoying.
-	 * 
-	 * @return String
-	 */
-	private String getDefaultPathDisplayString() {
-		if (fSelectedConnection != null && fSelectedConnection.isOpen()) {
-			IRemoteFileManager fileMgr = fSelectedProvider.getFileManager(fSelectedConnection);
-			URI defaultURI = fileMgr.toURI(fSelectedConnection.getWorkingDirectory());
-
-			// Handle files specially. Assume a file if there is no project to
-			// query
-			if (defaultURI != null && defaultURI.getScheme().equals(FILE_SCHEME)) {
-				return Platform.getLocation().append(fProjectName).toOSString();
-			}
-			if (defaultURI == null) {
-				return ""; //$NON-NLS-1$
-			}
-			return new Path(defaultURI.getPath()).append(fProjectName).toOSString();
-		}
-		return ""; //$NON-NLS-1$
-	}
-
+	
 	/**
 	 * @return
 	 */
@@ -246,18 +175,6 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 		int selectionIndex = fConnectionCombo.getSelectionIndex();
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
-		fLocationText.setText(getDefaultPathDisplayString());
-	}
-
-	/**
-	 * Handle new remote services selected
-	 */
-	private void handleServicesSelected() {
-		int selectionIndex = fProviderCombo.getSelectionIndex();
-		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
-		populateConnectionCombo(fConnectionCombo);
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
-		handleConnectionSelected();
 	}
 
 	/**
@@ -289,8 +206,7 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 	@Override
 	public void performApply(ICResourceDescription src,
 			ICResourceDescription dst) {
-		// TODO Auto-generated method stub
-		
+		performOK();
 	}
 
 	@Override
@@ -301,10 +217,13 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 
 	@Override
 	public void updateData(ICResourceDescription cfg) {
+		populateConnectionCombo(fConnectionCombo);
 		BuildScenario buildScenario = BuildConfigurationManager.getBuildScenarioForBuildConfiguration(getCfg());
-		// fProviderCombo.select(fComboRemoteServicesProviderToIndexMap.get(buildScenario.getSyncProvider()));
-		fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(buildScenario.getRemoteConnectionName()));
-		fLocationText.setText(buildScenario.getLocation());
+		if (buildScenario != null) {
+			fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(buildScenario.getRemoteConnection()));
+			handleConnectionSelected();
+			fLocationText.setText(buildScenario.getLocation());
+		}
 	}
 
 	@Override
