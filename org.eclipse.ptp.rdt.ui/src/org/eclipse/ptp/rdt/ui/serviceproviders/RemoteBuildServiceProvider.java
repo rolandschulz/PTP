@@ -217,5 +217,4 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 		putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, remoteConnection.getName());
 		fRemoteConnection = getConnection();
 	}
-
 }
