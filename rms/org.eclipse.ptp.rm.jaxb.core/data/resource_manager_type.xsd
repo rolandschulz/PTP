@@ -547,7 +547,7 @@
 		<xs:attribute name="sort" type="xs:boolean" default="true"/>
 		<xs:attribute name="headerVisible" type="xs:boolean" default="true"/>
 		<xs:attribute name="linesVisible" type="xs:boolean" default="true"/>
-		<xs:attribute name="tooltip" type="xs:boolean" default="true"/>
+		<xs:attribute name="tooltipEnabled" type="xs:boolean" default="true"/>
 		<xs:attribute name="style" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="viewer-items">

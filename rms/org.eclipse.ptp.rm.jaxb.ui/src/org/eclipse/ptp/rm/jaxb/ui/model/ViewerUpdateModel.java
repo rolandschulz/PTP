@@ -31,7 +31,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	private final String separator;
 	private final ICheckable viewer;
 	private final ColumnViewer columnViewer;
-	private Button showAll;
+	private Button showOnlySelected;
 
 	private final ViewerFilter filter = new ViewerFilter() {
 		@Override
@@ -119,11 +119,14 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 			}
 		}
 
-		Boolean b = (Boolean) lcMap.get(name + SHOW_ALL);
+		Boolean b = (Boolean) lcMap.get(name + SHOW_ONLY_SELECTED);
 		if (b == null) {
-			b = true;
+			b = false;
 		}
-		showAll.setSelection(b);
+		showOnlySelected.setSelection(b);
+		if (b) {
+			columnViewer.addFilter(filter);
+		}
 	}
 
 	public void refreshValueFromMap() {
@@ -132,8 +135,8 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		refreshing = false;
 	}
 
-	public void setShowAll(Button showAll) {
-		this.showAll = showAll;
+	public void setShowAll(Button showOnlySelected) {
+		this.showOnlySelected = showOnlySelected;
 	}
 
 	/*
@@ -180,7 +183,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	}
 
 	public void widgetSelected(SelectionEvent e) {
-		if (!showAll.getSelection()) {
+		if (showOnlySelected.getSelection()) {
 			columnViewer.addFilter(filter);
 		} else {
 			columnViewer.removeFilter(filter);
@@ -188,6 +191,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		/*
 		 * a memento for between sessions
 		 */
-		lcMap.put(name + SHOW_ALL, showAll.getSelection());
+		lcMap.put(name + SHOW_ONLY_SELECTED, showOnlySelected.getSelection());
 	}
 }
