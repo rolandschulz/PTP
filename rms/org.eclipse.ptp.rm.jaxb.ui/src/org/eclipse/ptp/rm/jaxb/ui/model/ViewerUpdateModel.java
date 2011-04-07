@@ -1,5 +1,6 @@
 package org.eclipse.ptp.rm.jaxb.ui.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -7,8 +8,10 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckable;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -21,7 +24,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 
-public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStateListener, SelectionListener {
+public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStateListener, IDoubleClickListener, SelectionListener {
 	private final StringBuffer checked;
 	private final StringBuffer templatedValue;
 	private final String pattern;
@@ -53,38 +56,44 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		checked = new StringBuffer();
 		templatedValue = new StringBuffer();
 		viewer.addCheckStateListener(this);
+		columnViewer.addDoubleClickListener(this);
 	}
 
 	public void checkStateChanged(CheckStateChangedEvent event) {
 		Object target = event.getElement();
+		boolean checked = viewer.getChecked(target);
+		if (target instanceof ICellEditorUpdateModel) {
+			ICellEditorUpdateModel model = (ICellEditorUpdateModel) target;
+			model.setSelected(checked);
+		}
+		WidgetActionUtils.refreshViewer(columnViewer);
+		storeValue();
+		handleUpdate(null);
+	}
+
+	public void doubleClick(DoubleClickEvent event) {
+		List<CheckStateChangedEvent> csEvents = new ArrayList<CheckStateChangedEvent>();
 		try {
-			boolean checked = viewer.getChecked(target);
-			IStructuredSelection selection = (IStructuredSelection) ((Viewer) viewer).getSelection();
+			IStructuredSelection selection = (IStructuredSelection) ((ColumnViewer) viewer).getSelection();
 			List<?> selected = selection.toList();
-			if (selected.isEmpty()) {
-				if (target instanceof ICellEditorUpdateModel) {
-					ICellEditorUpdateModel model = (ICellEditorUpdateModel) target;
-					model.setSelected(checked);
-				} else {
-					viewer.setChecked(target, false);
-				}
-			} else {
+			if (!selected.isEmpty()) {
 				for (Object o : selected) {
+					boolean checked = viewer.getChecked(o);
 					if (o instanceof ICellEditorUpdateModel) {
 						ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
-						model.setSelected(checked);
-						viewer.setChecked(model, checked);
+						viewer.setChecked(model, !checked);
 					} else {
 						viewer.setChecked(o, false);
 					}
+					csEvents.add(new CheckStateChangedEvent(viewer, o, !checked));
 				}
 			}
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 		}
-		WidgetActionUtils.refreshViewer(columnViewer);
-		storeValue();
-		handleUpdate(null);
+		for (CheckStateChangedEvent e : csEvents) {
+			checkStateChanged(e);
+		}
 	}
 
 	@Override

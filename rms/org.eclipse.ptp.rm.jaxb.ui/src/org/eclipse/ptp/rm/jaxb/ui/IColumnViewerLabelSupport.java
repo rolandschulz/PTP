@@ -11,4 +11,6 @@ public interface IColumnViewerLabelSupport extends ITableColorProvider, ITableFo
 	String getDescription();
 
 	String getDisplayValue(String columnName);
+
+	String getTooltip();
 }

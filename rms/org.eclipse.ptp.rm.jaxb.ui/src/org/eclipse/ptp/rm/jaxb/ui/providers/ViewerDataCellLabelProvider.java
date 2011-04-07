@@ -12,10 +12,8 @@ package org.eclipse.ptp.rm.jaxb.ui.providers;
 
 import java.util.List;
 
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ITableColorProvider;
-import org.eclipse.jface.viewers.ITableFontProvider;
-import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -24,21 +22,56 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
-public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColorProvider, ITableFontProvider,
-		IJAXBUINonNLSConstants {
+public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJAXBUINonNLSConstants {
 	private final List<ColumnData> columnData;
 
-	public ViewerDataLabelProvider(List<ColumnData> columnData) {
+	public ViewerDataCellLabelProvider(List<ColumnData> columnData) {
 		this.columnData = columnData;
 	}
 
-	public void addListener(ILabelProviderListener listener) {
+	@Override
+	public int getToolTipDisplayDelayTime(Object object) {
+		return 1000;
 	}
 
-	public void dispose() {
+	@Override
+	public String getToolTipText(Object element) {
+		if (element instanceof IColumnViewerLabelSupport) {
+			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
+			return support.getTooltip();
+		}
+		return super.getToolTipText(element);
 	}
 
-	public Color getBackground(Object element, int columnIndex) {
+	@Override
+	public int getToolTipTimeDisplayed(Object object) {
+		return 5000;
+	}
+
+	@Override
+	public void update(ViewerCell cell) {
+		int index = cell.getColumnIndex();
+		Object element = cell.getElement();
+		Color color = getBackground(element, index);
+		if (color != null) {
+			cell.setBackground(color);
+		}
+		color = getForeground(element, index);
+		if (color != null) {
+			cell.setBackground(color);
+		}
+		Font font = getFont(element, index);
+		if (font != null) {
+			cell.setFont(font);
+		}
+		Image img = getColumnImage(element, index);
+		if (img != null) {
+			cell.setImage(img);
+		}
+		cell.setText(getColumnText(element, index));
+	}
+
+	private Color getBackground(Object element, int columnIndex) {
 		if (element instanceof IColumnViewerLabelSupport) {
 			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
 			return support.getBackground(element, columnIndex);
@@ -46,7 +79,7 @@ public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColor
 		return null;
 	}
 
-	public Image getColumnImage(Object element, int columnIndex) {
+	private Image getColumnImage(Object element, int columnIndex) {
 		if (element instanceof IColumnViewerLabelSupport) {
 			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
 			return support.getColumnImage(getColumnName(columnIndex));
@@ -54,7 +87,14 @@ public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColor
 		return null;
 	}
 
-	public String getColumnText(Object element, int columnIndex) {
+	private String getColumnName(int columnIndex) {
+		if (columnIndex >= columnData.size()) {
+			throw new ArrayIndexOutOfBoundsException(Messages.ViewerLabelProviderColumnError + columnIndex);
+		}
+		return columnData.get(columnIndex).getName();
+	}
+
+	private String getColumnText(Object element, int columnIndex) {
 		if (element instanceof IColumnViewerLabelSupport) {
 			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
 			return support.getDisplayValue(getColumnName(columnIndex));
@@ -62,7 +102,7 @@ public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColor
 		return ZEROSTR;
 	}
 
-	public Font getFont(Object element, int columnIndex) {
+	private Font getFont(Object element, int columnIndex) {
 		if (element instanceof IColumnViewerLabelSupport) {
 			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
 			return support.getFont(element, columnIndex);
@@ -70,26 +110,12 @@ public class ViewerDataLabelProvider implements ITableLabelProvider, ITableColor
 		return null;
 	}
 
-	public Color getForeground(Object element, int columnIndex) {
+	private Color getForeground(Object element, int columnIndex) {
 		Color color = null;
 		if (element instanceof IColumnViewerLabelSupport) {
 			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
 			color = support.getForeground(element, columnIndex);
 		}
 		return color;
-	}
-
-	public boolean isLabelProperty(Object element, String property) {
-		return false;
-	}
-
-	public void removeListener(ILabelProviderListener listener) {
-	}
-
-	private String getColumnName(int columnIndex) {
-		if (columnIndex >= columnData.size()) {
-			throw new ArrayIndexOutOfBoundsException(Messages.ViewerLabelProviderColumnError + columnIndex);
-		}
-		return columnData.get(columnIndex).getName();
 	}
 }
