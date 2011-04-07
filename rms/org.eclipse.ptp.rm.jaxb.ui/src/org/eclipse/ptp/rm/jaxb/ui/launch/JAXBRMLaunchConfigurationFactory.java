@@ -15,10 +15,6 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.data.Control;
-import org.eclipse.ptp.rm.jaxb.core.data.LaunchTab;
-import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -43,31 +39,9 @@ public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurat
 			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_wrongRMType + rm, null);
 		}
 		try {
-			return new JAXBRMLaunchConfigurationDynamicTab((IJAXBResourceManager) rm, dialog);
+			return new JAXBLaunchConfigurationDynamicTab((IJAXBResourceManager) rm, dialog);
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_doCreateError + rm, t);
 		}
-	}
-
-	static LaunchTab getLaunchTab(IJAXBResourceManagerConfiguration config) {
-		ResourceManagerData data = config.getResourceManagerData();
-		if (data != null) {
-			Control control = data.getControlData();
-			if (control != null) {
-				return control.getLaunchTab();
-			}
-		}
-		return null;
-	}
-
-	static boolean hasScript(IJAXBResourceManagerConfiguration config) {
-		ResourceManagerData data = config.getResourceManagerData();
-		if (data != null) {
-			Control control = data.getControlData();
-			if (control != null) {
-				return control.getScript() != null;
-			}
-		}
-		return false;
 	}
 }

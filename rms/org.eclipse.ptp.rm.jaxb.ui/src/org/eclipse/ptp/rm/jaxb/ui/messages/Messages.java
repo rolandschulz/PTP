@@ -64,6 +64,7 @@ public class Messages extends NLS {
 	public static String JAXBRMLaunchConfigurationFactory_wrongRMType;
 	public static String JAXBRMLaunchConfigurationFactory_doCreateError;
 
+	public static String TabDirty;
 	public static String FileContentsDirty;
 	public static String ErrorOnCopyToStorageTitle;
 	public static String ErrorOnCopyToStorage;
@@ -80,6 +81,9 @@ public class Messages extends NLS {
 	public static String Tooltip;
 	public static String AttributeInfo;
 	public static String ViewerLabelProviderColumnError;
+	public static String ScriptNotSupportedWarning;
+	public static String ScriptNotSupportedWarning_title;
+	public static String CreateControlConfigurableError;
 
 	static {
 		// initialize resource bundle

@@ -51,7 +51,7 @@ public interface IJAXBNonNLSConstants {
 	String OPENVRM = "${rm:";//$NON-NLS-1$
 	String OPENVLT = "${lt:";//$NON-NLS-1$
 	String VRM = "rm:";//$NON-NLS-1$
-	String VLT = "lt:";//$NON-NLS-1$
+	String VLC = "lc:";//$NON-NLS-1$
 	String CLOSSQ = "]";//$NON-NLS-1$
 	String CLOSV = "}";//$NON-NLS-1$
 	String CLOSVAL = "#value}";//$NON-NLS-1$
@@ -87,6 +87,7 @@ public interface IJAXBNonNLSConstants {
 	String SET = "set";//$NON-NLS-1$
 	String IS = "is";//$NON-NLS-1$
 	String CLASS = "class";//$NON-NLS-1$
+	String STRING = "string";//$NON-NLS-1$
 	String NAME = "name";//$NON-NLS-1$
 	String VALUE = "value";//$NON-NLS-1$
 	String BASIC = "basic";//$NON-NLS-1$

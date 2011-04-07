@@ -1,4 +1,4 @@
-package org.eclipse.ptp.rm.jaxb.ui.listeners;
+package org.eclipse.ptp.rm.jaxb.ui.handlers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,16 +7,17 @@ import java.util.Map;
 
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.IValueUpdateHandler;
-import org.eclipse.ptp.rm.jaxb.ui.model.ViewerUpdateModel;
 import org.eclipse.ptp.rm.ui.utils.WidgetListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Widget;
 
 public class ValueUpdateHandler implements IValueUpdateHandler {
 
 	private final Map<Object, IUpdateModel> controlToModelMap;
 	private final List<WidgetListener> listeners;
+	private Widget proxy;
 
 	public ValueUpdateHandler() {
 		controlToModelMap = new HashMap<Object, IUpdateModel>();
@@ -28,6 +29,9 @@ public class ValueUpdateHandler implements IValueUpdateHandler {
 	}
 
 	public void addUpdateModelEntry(Object control, IUpdateModel model) {
+		if (proxy == null && control instanceof Widget) {
+			proxy = (Widget) control;
+		}
 		controlToModelMap.put(control, model);
 	}
 
@@ -40,36 +44,22 @@ public class ValueUpdateHandler implements IValueUpdateHandler {
 	 * @param source
 	 *            the control which has been modified
 	 * @param value
-	 *            the new value (if any) produced
+	 *            the new value (if any) produced (unused here)
 	 */
 	public void handleUpdate(Object source, Object value) {
-		List<IUpdateModel> delayed = new ArrayList<IUpdateModel>();
-		/*
-		 * First we invoke refresh on the viewers, because they produce two data
-		 * strings which may be accessed by the other widgets.
-		 */
-		for (IUpdateModel model : controlToModelMap.values()) {
-			if (model == source) {
+		for (Object control : controlToModelMap.keySet()) {
+			if (control == source) {
 				continue;
 			}
-			if (model instanceof ViewerUpdateModel) {
-				model.refreshValue();
-			} else {
-				delayed.add(model);
-			}
-		}
-
-		for (IUpdateModel model : delayed) {
-			model.refreshValue();
+			controlToModelMap.get(control).refreshValueFromMap();
 		}
 
 		/*
-		 * we send three empty events to the WidgetListener so as to trigger any
+		 * we send empty events to the WidgetListener so as to trigger any
 		 * necessary updates which will set the "dirty" flag.
 		 */
 		fireModifyEvent();
 		fireWidgetSelectedEvent();
-		fireWidgetDefaultSelectedEvent();
 	}
 
 	/*
@@ -78,6 +68,7 @@ public class ValueUpdateHandler implements IValueUpdateHandler {
 	 */
 	protected void fireModifyEvent() {
 		Event e = new Event();
+		e.widget = proxy;
 		ModifyEvent me = new ModifyEvent(e);
 		for (WidgetListener l : listeners) {
 			l.modifyText(me);
@@ -88,20 +79,9 @@ public class ValueUpdateHandler implements IValueUpdateHandler {
 	 * It is understood that the listeners will not need the source data of the
 	 * event.
 	 */
-	protected void fireWidgetDefaultSelectedEvent() {
-		Event e = new Event();
-		SelectionEvent se = new SelectionEvent(e);
-		for (WidgetListener l : listeners) {
-			l.widgetDefaultSelected(se);
-		}
-	}
-
-	/*
-	 * It is understood that the listeners will not need the source data of the
-	 * event.
-	 */
 	protected void fireWidgetSelectedEvent() {
 		Event e = new Event();
+		e.widget = proxy;
 		SelectionEvent se = new SelectionEvent(e);
 		for (WidgetListener l : listeners) {
 			l.widgetSelected(se);

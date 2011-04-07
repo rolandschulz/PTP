@@ -10,17 +10,24 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.providers;
 
+import java.util.Collection;
+
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerData;
+import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 
 public class TableDataContentProvider implements IStructuredContentProvider {
 
 	public void dispose() {
 	}
 
+	@SuppressWarnings("unchecked")
 	public Object[] getElements(Object inputElement) {
-		return ((AttributeViewerData) inputElement).getRows().toArray();
+		if (inputElement instanceof Collection<?>) {
+			Collection<ICellEditorUpdateModel> list = (Collection<ICellEditorUpdateModel>) inputElement;
+			return list.toArray();
+		}
+		return new Object[0];
 	}
 
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {

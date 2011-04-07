@@ -8,5 +8,7 @@ public interface IColumnViewerLabelSupport extends ITableColorProvider, ITableFo
 
 	Image getColumnImage(String columnName);
 
+	String getDescription();
+
 	String getDisplayValue(String columnName);
 }

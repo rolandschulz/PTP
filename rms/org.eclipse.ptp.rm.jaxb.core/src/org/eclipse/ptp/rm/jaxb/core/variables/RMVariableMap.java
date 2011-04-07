@@ -43,15 +43,12 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		initialized = false;
 	}
 
-	public void forceDefaults(LTVariableMap activeInstance) {
-		Map<String, String> flat = activeInstance.getVariables();
-		flat.clear();
-		for (String s : variables.keySet()) {
-			getFlattened(s, variables.get(s), flat, true);
+	public Object get(String name) {
+		Object o = variables.get(name);
+		if (o == null) {
+			o = discovered.get(name);
 		}
-		for (String s : discovered.keySet()) {
-			getFlattened(s, discovered.get(s), flat, true);
-		}
+		return o;
 	}
 
 	public Map<String, Object> getDiscovered() {
@@ -137,6 +134,10 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		maybeAddProperty(key1, value, false);
 	}
 
+	public void put(String name, Object value) {
+		variables.put(name, value);
+	}
+
 	public void setInitialized(boolean initialized) {
 		this.initialized = initialized;
 	}
@@ -176,12 +177,10 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 				strVal = String.valueOf(o);
 			}
 			String defVal = p.getDefault();
-			System.out.println(name + ", " + strVal + ", " + defVal);
 			if (forceDefault || strVal == null || ZEROSTR.equals(strVal)) {
 				strVal = defVal;
 			}
 			if (strVal != null && !ZEROSTR.equals(strVal)) {
-				System.out.println("putting: " + name + ", " + strVal);
 				flat.put(name, strVal);
 			}
 		} else if (value instanceof Attribute) {
@@ -194,12 +193,10 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 				strVal = String.valueOf(o);
 			}
 			String defVal = ja.getDefault();
-			System.out.println(name + ", " + strVal + ", " + defVal);
 			if (forceDefault || strVal == null || ZEROSTR.equals(strVal)) {
 				strVal = defVal;
 			}
 			if (strVal != null && !ZEROSTR.equals(strVal)) {
-				System.out.println("putting: " + name + ", " + strVal);
 				flat.put(name, strVal);
 			}
 			String status = ja.getStatus();

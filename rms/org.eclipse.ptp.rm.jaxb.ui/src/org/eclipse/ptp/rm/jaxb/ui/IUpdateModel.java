@@ -1,14 +1,22 @@
 package org.eclipse.ptp.rm.jaxb.ui;
 
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.rm.jaxb.core.data.Validator;
+import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
+
 public interface IUpdateModel extends IJAXBUINonNLSConstants {
 
-	Object getValue();
+	Object getControl();
 
-	String getValueAsString();
+	String getName();
 
-	void refreshValue();
+	Object getValueFromControl();
 
-	void setValue(Object value);
+	void initialize(LCVariableMap lcMap);
 
-	void setValueAsString(String value);
+	void refreshValueFromMap();
+
+	void restoreDefault();
+
+	void setValidator(Validator validator, IRemoteFileManager remoteFileManager);
 }

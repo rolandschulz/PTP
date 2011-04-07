@@ -538,7 +538,6 @@
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
 						</layout-data>
-						<!-- <value-list-from>destination</value-list-from> -->
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
@@ -627,6 +626,7 @@
 				<composite>
 					<layout>
 						<grid-layout numColumns="1"/>
+						<grid-data widthHint="600" heightHint="600" horizontalSpan="1"/>
 					</layout>
 					<composite>
 						<layout>
@@ -658,9 +658,27 @@
 							</dynamic-text>
 						</widget>
 					</composite>
-					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="tree">
+					<viewer name="allAttributesTable" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="table">
 						<layout-data>
-							<grid-data widthHint="600" horizontalSpan="2"/>
+							<grid-data widthHint="600" heightHint="400" horizontalSpan="2"/>
+						</layout-data>
+						<column-data name="Name" width="175">
+							<tooltip>Select-click on checkboxes toggles their value.</tooltip>
+						</column-data>
+						<column-data name="Value" width="200" foreground="SWT.COLOR_DARK_MAGENTA">
+							<tooltip>Click to activate value widget.</tooltip>
+						</column-data>
+						<column-data name="Description" width="200">
+                     <tooltip>Select-click on checkboxes toggles their value.</tooltip>
+                  </column-data>
+						<items allPredefined="true">
+							<exclude>destination</exclude>
+						</items>
+						<value pattern="@name='@value'"/>
+					</viewer>
+					<viewer name="allAttributesTree" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="tree">
+						<layout-data>
+							<grid-data widthHint="600" heightHint="400" horizontalSpan="2"/>
 						</layout-data>
 						<column-data name="Name" width="175">
 							<tooltip>Select-click on checkboxes toggles their value.</tooltip>
