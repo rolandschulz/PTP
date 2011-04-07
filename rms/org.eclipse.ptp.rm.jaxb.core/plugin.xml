@@ -39,6 +39,11 @@
             name="lt"
             resolver="org.eclipse.ptp.rm.jaxb.core.variables.LTVariableResolver">
       </variable>
+      <variable
+            description="Dynamic variable backed by LaunchConfiguration"
+            name="lc"
+            resolver="org.eclipse.ptp.rm.jaxb.core.variables.LCVariableResolver">
+      </variable>
    </extension>
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer">

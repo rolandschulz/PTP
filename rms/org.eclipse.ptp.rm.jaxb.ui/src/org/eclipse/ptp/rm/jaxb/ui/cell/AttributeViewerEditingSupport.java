@@ -12,55 +12,49 @@ package org.eclipse.ptp.rm.jaxb.ui.cell;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
-import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerCellData;
-import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerNodeData;
-import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerRowData;
+import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 
 public class AttributeViewerEditingSupport extends EditingSupport {
 
 	private final ColumnViewer viewer;
-	private final ColumnData data;
 
-	public AttributeViewerEditingSupport(ColumnViewer viewer, ColumnData data) {
+	public AttributeViewerEditingSupport(ColumnViewer viewer) {
 		super(viewer);
 		this.viewer = viewer;
-		this.data = data;
 	}
 
 	@Override
 	protected boolean canEdit(Object element) {
-		if (element instanceof AttributeViewerCellData) {
-			return ((AttributeViewerCellData) element).canEdit();
+		if (element instanceof ICellEditorUpdateModel) {
+			boolean b = ((ICellEditorUpdateModel) element).canEdit();
+			return b;
 		}
 		return false;
 	}
 
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		if (element instanceof AttributeViewerRowData) {
-			return ((AttributeViewerRowData) element).getCellEditor((TableViewer) viewer, data);
-		} else if (element instanceof AttributeViewerNodeData) {
-			return ((AttributeViewerNodeData) element).getCellEditor((TreeViewer) viewer, data);
+		if (element instanceof ICellEditorUpdateModel) {
+			CellEditor editor = ((ICellEditorUpdateModel) element).getCellEditor();
+			return editor;
 		}
 		return null;
 	}
 
 	@Override
 	protected Object getValue(Object element) {
-		if (element instanceof AttributeViewerCellData) {
-			return ((AttributeViewerCellData) element).getValueForEditor();
+		if (element instanceof ICellEditorUpdateModel) {
+			Object value = ((ICellEditorUpdateModel) element).getValueForEditor();
+			return value;
 		}
 		return null;
 	}
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		if (element instanceof AttributeViewerCellData) {
-			((AttributeViewerCellData) element).setValueFromEditor(value);
+		if (element instanceof ICellEditorUpdateModel) {
+			((ICellEditorUpdateModel) element).setValueFromEditor(value);
 			WidgetActionUtils.refreshViewer(viewer);
 		}
 	}

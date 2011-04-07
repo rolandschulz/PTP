@@ -59,6 +59,10 @@ public class SpinnerCellEditor extends CellEditor {
 		this(parent, defaultStyle, min, max);
 	}
 
+	public int getMin() {
+		return spinner.getMinimum();
+	}
+
 	public Spinner getSpinner() {
 		return spinner;
 	}

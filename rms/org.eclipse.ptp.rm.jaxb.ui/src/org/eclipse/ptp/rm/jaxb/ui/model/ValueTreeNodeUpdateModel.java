@@ -1,35 +1,59 @@
 package org.eclipse.ptp.rm.jaxb.ui.model;
 
-import org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ValueTreeNodeUpdateModel extends CellUpdateModel implements IColumnViewerLabelSupport {
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
+import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 
-	public Color getBackground(Object element, int columnIndex) {
-		// TODO Auto-generated method stub
-		return null;
+public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
+
+	private final List<InfoTreeNodeModel> children;
+
+	public ValueTreeNodeUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
+			boolean inValueCol) {
+		super(name, handler, editor, items, readOnly, ZEROSTR, ZEROSTR, ZEROSTR);
+		children = new ArrayList<InfoTreeNodeModel>();
+		generateChildren(inValueCol);
 	}
 
-	public Image getColumnImage(String columnName) {
-		// TODO Auto-generated method stub
-		return null;
+	public ValueTreeNodeUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
+			boolean inValueCol, Attribute data) {
+		super(name, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus());
+		children = new ArrayList<InfoTreeNodeModel>();
+		generateChildren(inValueCol);
+	}
+
+	public List<InfoTreeNodeModel> getChildren() {
+		return children;
+	}
+
+	public String getDefault() {
+		return defaultValue;
 	}
 
 	public String getDisplayValue(String columnName) {
-		// TODO Auto-generated method stub
-		return null;
+		String displayValue = null;
+		if (COLUMN_NAME.equals(columnName)) {
+			displayValue = name;
+		} else if (selected && COLUMN_VALUE.equals(columnName)) {
+			displayValue = getValueAsString();
+		}
+		if (displayValue == null) {
+			return ZEROSTR;
+		}
+		return displayValue;
 	}
 
-	public Font getFont(Object element, int columnIndex) {
-		// TODO Auto-generated method stub
-		return null;
+	public String getStatus() {
+		return status;
 	}
 
-	public Color getForeground(Object element, int columnIndex) {
-		// TODO Auto-generated method stub
-		return null;
+	private void generateChildren(boolean inValueCol) {
+		children.add(new InfoTreeNodeModel(this, COLUMN_DEFAULT, inValueCol));
+		children.add(new InfoTreeNodeModel(this, COLUMN_TYPE, inValueCol));
+		children.add(new InfoTreeNodeModel(this, COLUMN_STATUS, inValueCol));
+		children.add(new InfoTreeNodeModel(this, COLUMN_DESC, inValueCol));
 	}
-
 }

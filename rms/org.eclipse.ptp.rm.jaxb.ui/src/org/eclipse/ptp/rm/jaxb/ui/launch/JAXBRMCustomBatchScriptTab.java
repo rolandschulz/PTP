@@ -212,7 +212,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 		}
 	}
 
-	private final JAXBRMLaunchConfigurationDynamicTab pTab;
+	private final JAXBLaunchConfigurationDynamicTab pTab;
 	private final RemoteServicesDelegate delegate;
 	private final String title;
 
@@ -235,7 +235,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 	 * @param dialog
 	 */
 	public JAXBRMCustomBatchScriptTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, String title,
-			JAXBRMLaunchConfigurationDynamicTab pTab) {
+			JAXBLaunchConfigurationDynamicTab pTab) {
 		super(dialog);
 		this.pTab = pTab;
 		if (title == null) {

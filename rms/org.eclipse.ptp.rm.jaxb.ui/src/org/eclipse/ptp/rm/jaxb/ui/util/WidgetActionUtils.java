@@ -16,7 +16,9 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -41,13 +43,8 @@ import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
@@ -106,44 +103,6 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		return combo.getItem(i);
 	}
 
-	public static String getValueString(Control uiElement) {
-		assert uiElement != null;
-		if (uiElement.isDisposed()) {
-			return null;
-		}
-		String s = null;
-
-		if (uiElement instanceof Label) {
-			Label c = (Label) uiElement;
-			s = c.getText();
-		}
-		if (uiElement instanceof Text) {
-			Text c = (Text) uiElement;
-			s = c.getText();
-		}
-		if (uiElement instanceof Combo) {
-			Combo c = (Combo) uiElement;
-			s = getSelected(c);
-		}
-		if (uiElement instanceof Spinner) {
-			Spinner c = (Spinner) uiElement;
-			s = ZEROSTR + c.getSelection();
-		}
-		if (uiElement instanceof Button) {
-			Button c = (Button) uiElement;
-			int style = c.getStyle();
-			if ((style == (style | SWT.CHECK)) || (style == (style | SWT.RADIO))) {
-				s = ZEROSTR + c.getSelection();
-			}
-		}
-
-		if (s != null) {
-			s = s.trim();
-			return (s.length() == 0 ? null : s);
-		}
-		return null;
-	}
-
 	public static String openInputDialog(Shell shell, String message, String title, String original) {
 		InputDialog nameDialog = new InputDialog(shell, message, title, original, null);
 		if (nameDialog.open() != Window.CANCEL) {
@@ -165,90 +124,38 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		if (combo.isDisposed()) {
 			return ZEROSTR;
 		}
+		int style = combo.getStyle();
+		boolean readOnly = style == (style | SWT.READ_ONLY);
 		String[] items = combo.getItems();
 		if (items.length == 0) {
 			return ZEROSTR;
 		}
 		int i = 0;
+		if (name == null) {
+			name = ZEROSTR;
+		}
 		for (; i < items.length; i++) {
 			if (items[i].equals(name)) {
 				combo.select(i);
 				break;
 			}
 		}
+
 		if (i == items.length) {
-			i = 0;
-			combo.select(i);
+			if (readOnly) {
+				i = 0;
+			} else {
+				List<String> newItems = new ArrayList<String>();
+				for (String item : items) {
+					newItems.add(item.trim());
+				}
+				newItems.add(name.trim());
+				combo.setItems(newItems.toArray(new String[0]));
+				i = newItems.size() - 1;
+			}
 		}
+		combo.select(i);
 		return combo.getItem(i);
-	}
-
-	public static void setValue(Control uiElement, String value) {
-		assert uiElement != null;
-		if (uiElement.isDisposed()) {
-			return;
-		}
-		if (value == null) {
-			value = ZEROSTR;
-		}
-		if (uiElement instanceof Label) {
-			Label c = (Label) uiElement;
-			c.setText(value);
-		}
-		if (uiElement instanceof Text) {
-			Text c = (Text) uiElement;
-			c.setText(value);
-		}
-		if (uiElement instanceof Combo) {
-			Combo c = (Combo) uiElement;
-			select(c, value);
-		}
-		if (uiElement instanceof Spinner) {
-			Spinner c = (Spinner) uiElement;
-			if (!ZEROSTR.equals(value)) {
-				c.setSelection(Integer.parseInt(value));
-			}
-		}
-		if (uiElement instanceof Button) {
-			Button c = (Button) uiElement;
-			int style = c.getStyle();
-			if ((style == (style | SWT.CHECK)) || (style == (style | SWT.RADIO))) {
-				if (!ZEROSTR.equals(value)) {
-					c.setSelection(Boolean.parseBoolean(value));
-				}
-			}
-		}
-	}
-
-	/**
-	 * If validation fails, resets the widget value to its default and throws an
-	 * exception.
-	 */
-	public static String validate(Control c, Validator v, IRemoteFileManager fileManager) throws Exception {
-		if (c.isDisposed()) {
-			return null;
-		}
-		String value = getValueString(c);
-		Regex reg = v.getRegex();
-		String error = v.getErrorMessage();
-
-		if (error == null) {
-			error = ZEROSTR;
-		}
-
-		if (reg != null && new RegexImpl(reg).getMatched(value) == null) {
-			throw new UnsatisfiedMatchException(error + CO + SP + reg.getExpression() + CM + SP + value);
-		} else {
-			FileMatch match = v.getFileInfo();
-			try {
-				if (match != null && !validate(match, value, fileManager)) {
-					throw new UnsatisfiedMatchException(error + CO + SP + value);
-				}
-			} catch (CoreException ce) {
-				throw new UnsatisfiedMatchException(ce);
-			}
-		}
-		return value;
 	}
 
 	public static void validate(String value, Validator v, IRemoteFileManager fileManager) throws Exception {
@@ -271,6 +178,10 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 				throw new UnsatisfiedMatchException(ce);
 			}
 		}
+	}
+
+	public static void warningMessage(Shell s, String message, String title) {
+		MessageDialog.openWarning(s, title, message + LINE_SEP);
 	}
 
 	private static int getEfsAttributeValue(String efsAttrStr) {

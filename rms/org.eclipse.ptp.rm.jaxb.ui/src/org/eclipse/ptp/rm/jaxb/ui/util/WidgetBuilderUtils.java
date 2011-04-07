@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -28,12 +31,12 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.core.data.FontDescriptor;
+import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
+import org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerCellData;
-import org.eclipse.ptp.rm.jaxb.ui.model.AttributeViewerChildNodeData;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
 import org.eclipse.ptp.rm.jaxb.ui.providers.ViewerDataLabelProvider;
@@ -760,6 +763,23 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return getStyle(style.split(OPENSQ + PIP + CLOSSQ));
 	}
 
+	/*
+	 * For consistency in treating null or undefined defaults on loading, we
+	 * should always make sure the first element of the combo is a ZEROSTR.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static String[] normalizeComboItems(String[] items) {
+		List<String> list = new ArrayList(Arrays.asList(items));
+		for (Iterator<String> s = list.iterator(); s.hasNext();) {
+			String item = s.next().trim();
+			if (ZEROSTR.equals(item) || LINE_SEP.equals(item)) {
+				s.remove();
+			}
+		}
+		list.add(0, ZEROSTR);
+		return list.toArray(new String[0]);
+	}
+
 	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnData> columnDescriptors,
 			ISelectionChangedListener listener, boolean sortName, boolean tooltip, boolean header, boolean lines) {
 		setupSpecific(viewer, columnDescriptors, sortName, header, lines);
@@ -794,15 +814,15 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 				try {
 					IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 					Object first = selection.getFirstElement();
-					if (first instanceof AttributeViewerCellData) {
-						AttributeViewerCellData row = (AttributeViewerCellData) first;
-						String tooltip = row.getTooltip();
+					if (first instanceof ICellEditorUpdateModel) {
+						ICellEditorUpdateModel model = (ICellEditorUpdateModel) first;
+						String tooltip = model.getTooltip();
 						if (!ZEROSTR.equals(tooltip)) {
 							MessageDialog.openInformation(viewer.getControl().getShell(), Messages.Tooltip, tooltip);
 						}
-					} else if (first instanceof AttributeViewerChildNodeData) {
-						AttributeViewerChildNodeData row = (AttributeViewerChildNodeData) first;
-						String description = row.getDescription();
+					} else if (first instanceof IColumnViewerLabelSupport) {
+						IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) first;
+						String description = support.getDescription();
 						if (!ZEROSTR.equals(description)) {
 							MessageDialog.openInformation(viewer.getControl().getShell(), Messages.AttributeInfo, description);
 						}
@@ -1103,7 +1123,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 				}
 			}
 			if (COLUMN_VALUE.equals(columnDescriptor.getName())) {
-				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer, columnDescriptor));
+				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
 			}
 		}
 		viewer.setContentProvider(new TableDataContentProvider());
@@ -1139,7 +1159,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 				}
 			}
 			if (COLUMN_VALUE.equals(columnDescriptor.getName())) {
-				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer, columnDescriptor));
+				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
 			}
 		}
 		viewer.setContentProvider(new TreeDataContentProvider());
