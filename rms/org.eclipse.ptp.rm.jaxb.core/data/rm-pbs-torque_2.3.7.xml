@@ -658,7 +658,7 @@
 							</dynamic-text>
 						</widget>
 					</composite>
-					<viewer name="allAttributesTable" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="table">
+					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="table">
 						<layout-data>
 							<grid-data widthHint="600" heightHint="400" horizontalSpan="2"/>
 						</layout-data>
@@ -676,7 +676,7 @@
 						</items>
 						<value pattern="@name='@value'"/>
 					</viewer>
-					<viewer name="allAttributesTree" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="tree">
+					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" tooltip="true" sort="true" type="tree">
 						<layout-data>
 							<grid-data widthHint="600" heightHint="400" horizontalSpan="2"/>
 						</layout-data>
