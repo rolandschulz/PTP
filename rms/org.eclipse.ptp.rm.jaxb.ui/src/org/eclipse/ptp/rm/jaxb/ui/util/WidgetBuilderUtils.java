@@ -1051,7 +1051,9 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			columnProperties[i] = columnDescriptor.getName();
 		}
 		viewer.setColumnProperties(columnProperties);
-		ColumnViewerToolTipSupport.enableFor(viewer);
+		if (tooltip) {
+			ColumnViewerToolTipSupport.enableFor(viewer);
+		}
 		if (listener != null) {
 			viewer.addSelectionChangedListener(listener);
 		}
