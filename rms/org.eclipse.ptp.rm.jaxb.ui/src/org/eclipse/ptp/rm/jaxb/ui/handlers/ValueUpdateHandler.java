@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.IValueUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rm.ui.utils.WidgetListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -54,12 +56,18 @@ public class ValueUpdateHandler implements IValueUpdateHandler {
 			controlToModelMap.get(control).refreshValueFromMap();
 		}
 
+		for (Object control : controlToModelMap.keySet()) {
+			if (control instanceof Viewer) {
+				WidgetActionUtils.refreshViewer((Viewer) control);
+			}
+		}
+
 		/*
-		 * we send empty events to the WidgetListener so as to trigger any
+		 * we send an empty event to the WidgetListener so as to trigger any
 		 * necessary updates which will set the "dirty" flag.
 		 */
 		fireModifyEvent();
-		fireWidgetSelectedEvent();
+		// fireWidgetSelectedEvent();
 	}
 
 	/*
