@@ -69,4 +69,14 @@ public class InfoTreeNodeModel implements IColumnViewerLabelSupport, IJAXBUINonN
 	public ValueTreeNodeUpdateModel getParent() {
 		return parent;
 	}
+
+	public String getTooltip() {
+		String ttip = null;
+		if (COLUMN_NAME.equals(id)) {
+			ttip = parent.getTooltip();
+		} else if (COLUMN_DESC.equals(id)) {
+			ttip = parent.getDescription();
+		}
+		return ttip;
+	}
 }

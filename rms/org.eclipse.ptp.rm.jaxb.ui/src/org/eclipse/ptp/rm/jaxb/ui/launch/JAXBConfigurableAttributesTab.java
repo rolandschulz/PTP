@@ -164,7 +164,8 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 					String name = value.getName();
 					localMap.put(name, lcMap.get(name));
 					if (key instanceof Viewer) {
-						viewers.add((Viewer) key);
+						Viewer viewer = (Viewer) key;
+						viewers.add(viewer);
 					}
 				}
 				parentTab.getLCMap().swapVariables(localMap);

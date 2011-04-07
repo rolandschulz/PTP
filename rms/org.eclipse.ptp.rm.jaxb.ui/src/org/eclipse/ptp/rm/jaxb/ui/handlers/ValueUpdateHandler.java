@@ -11,7 +11,6 @@ import org.eclipse.ptp.rm.jaxb.ui.IValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rm.ui.utils.WidgetListener;
 import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Widget;
 
@@ -67,7 +66,6 @@ public class ValueUpdateHandler implements IValueUpdateHandler {
 		 * necessary updates which will set the "dirty" flag.
 		 */
 		fireModifyEvent();
-		// fireWidgetSelectedEvent();
 	}
 
 	/*
@@ -80,19 +78,6 @@ public class ValueUpdateHandler implements IValueUpdateHandler {
 		ModifyEvent me = new ModifyEvent(e);
 		for (WidgetListener l : listeners) {
 			l.modifyText(me);
-		}
-	}
-
-	/*
-	 * It is understood that the listeners will not need the source data of the
-	 * event.
-	 */
-	protected void fireWidgetSelectedEvent() {
-		Event e = new Event();
-		e.widget = proxy;
-		SelectionEvent se = new SelectionEvent(e);
-		for (WidgetListener l : listeners) {
-			l.widgetSelected(se);
 		}
 	}
 }
