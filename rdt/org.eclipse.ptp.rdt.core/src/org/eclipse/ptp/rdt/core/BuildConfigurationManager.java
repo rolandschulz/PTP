@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
@@ -221,16 +222,20 @@ public class BuildConfigurationManager {
 			}
 		}
 		return null;
+		
 	}
 	
 	// Each new configuration id appends a number to the parent id. So we strip off the last id number to get the parent. We assume
 	// the configuration does not have a parent and return null if the result does not end with a number.
 	private static String getParentId(String configId) {
-		String idPattern = "\\.\\d+$"; //$NON-NLS-1$
-		String parentConfigId = configId.replaceFirst(idPattern, ""); //$NON-NLS-1$
-		if (!(parentConfigId.matches(idPattern))) {
+		String idRegEx = "\\.\\d+$"; //$NON-NLS-1$
+		Pattern idPattern = Pattern.compile(idRegEx);
+		String parentConfigId = configId.replaceFirst(idRegEx, ""); //$NON-NLS-1$
+		
+		if (idPattern.matcher(parentConfigId).find()) {
+			return parentConfigId;
+		} else {
 			return null;
 		}
-		return parentConfigId;
 	}
 }

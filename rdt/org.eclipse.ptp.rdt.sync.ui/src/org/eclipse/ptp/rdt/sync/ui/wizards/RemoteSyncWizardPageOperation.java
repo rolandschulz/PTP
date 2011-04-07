@@ -17,6 +17,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -91,7 +94,30 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 
 		// Add information about remote location to the initial build configurations (.cproject file)
 		BuildConfigurationManager.setInitialBuildScenarioForAllConfigurations(project, buildScenario);
+		
+		// TODO: Either uncomment and use or delete
+/*		
+		// For each build configuration, set the build directory appropriately.
+		
+		// The only way to retrieve all configurations is by name, and there is no function for mapping names to configurations.
+		// Thus, in the loop we set each configuration to the default and then use "getDefaultConfiguration" to retrieve it. Before
+		// starting, we store the current default and restore it after the loop.
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
+		}
+		IConfiguration defaultConfig = buildInfo.getDefaultConfiguration();
+		String[] allConfigNames = buildInfo.getConfigurationNames();
+		for (String configName : allConfigNames) {
+			buildInfo.setDefaultConfiguration(configName);
+			IConfiguration config = buildInfo.getDefaultConfiguration();
+			String buildPath = buildScenario.getLocation() + "/" + config.getName(); //$NON-NLS-1$
+			config.getToolChain().getBuilder().setBuildPath(buildPath);
+		}
+		buildInfo.setDefaultConfiguration(defaultConfig);
+		ManagedBuildManager.saveBuildInfo(project, true);
 		monitor.done();
+	*/
 	}
 
 	private static Object getMBSProperty(String propertyId) {
