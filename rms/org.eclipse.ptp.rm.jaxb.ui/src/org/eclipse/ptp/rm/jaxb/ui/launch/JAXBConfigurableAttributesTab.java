@@ -20,6 +20,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
+import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
@@ -151,27 +152,22 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 					viewScript.addSelectionListener(createViewScriptListener(configuration));
 				}
 
-				LCVariableMap lcMap = parentTab.getLCMap();
-				lcMap.restoreGlobal();
-
-				localMap.clear();
 				viewers.clear();
-
 				for (Map.Entry<Object, IUpdateModel> e : localWidgets.entrySet()) {
 					Object key = e.getKey();
-					IUpdateModel value = e.getValue();
-					value.initialize(lcMap);
-					String name = value.getName();
-					localMap.put(name, lcMap.get(name));
 					if (key instanceof Viewer) {
 						Viewer viewer = (Viewer) key;
 						viewers.add(viewer);
 					}
 				}
-				parentTab.getLCMap().swapVariables(localMap);
+
+				LCVariableMap lcMap = parentTab.getLCMap();
+				lcMap.restoreGlobal();
+				// refreshLocal();
+				// parentTab.getLCMap().swapVariables(localMap);
 
 				for (IUpdateModel m : localWidgets.values()) {
-					m.refreshValueFromMap();
+					m.initialize(lcMap);
 				}
 
 				for (IUpdateModel m : localWidgets.values()) {
@@ -195,13 +191,15 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 
 	@Override
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		LCVariableMap lcMap = parentTab.getLCMap();
-		try {
-			lcMap.swapVariables(localMap);
-			lcMap.saveToConfiguration(configuration);
-		} catch (CoreException t) {
-			JAXBUIPlugin.log(t);
-		}
+		parentTab.getLCMap();
+		// try {
+		// refreshLocal();
+		// Map<String,Object> current = lcMap.swapVariables(localMap);
+		// lcMap.saveToConfiguration(configuration);
+		// } catch (CoreException t) {
+		// JAXBUIPlugin.log(t);
+		// }
+		// lcMap.swapVariables(current);
 		return super.performApply(configuration, rm, queue);
 	}
 
@@ -276,28 +274,52 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private synchronized String realizeLocalScript(ILaunchConfiguration config) throws Throwable {
 		String value = ZEROSTR;
-		parentTab.getLCMap();
+		refreshLocal();
 		localMap.put(DIRECTORY, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, ZEROSTR));
 		localMap.put(EXEC_PATH, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, ZEROSTR));
 		localMap.put(PROG_ARGS, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, ZEROSTR));
+
+		LCVariableMap lcMap = parentTab.getLCMap();
+		Map<String, Object> current = lcMap.swapVariables(localMap);
+
 		Boolean append = config.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);
 		if (append == null) {
 			append = true;
 		}
 		Map env = config.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
-		ScriptHandler job = new ScriptHandler(null, parentTab.getScript(), LCVariableMap.getActiveInstance(), env, append);
+		ScriptHandler job = new ScriptHandler(null, parentTab.getScript(), lcMap, env, append);
 		job.schedule();
 		try {
 			job.join();
 		} catch (InterruptedException ignored) {
 		}
 		value = job.getScriptValue();
+		lcMap.swapVariables(current);
 		return value;
+	}
+
+	private void refreshLocal() {
+		localMap.clear();
+		for (IUpdateModel m : localWidgets.values()) {
+			if (m instanceof ICellEditorUpdateModel) {
+				if (((ICellEditorUpdateModel) m).isSelected()) {
+					localMap.put(m.getName(), m.getValueFromControl());
+				}
+			} else {
+				localMap.put(m.getName(), m.getValueFromControl());
+			}
+		}
 	}
 
 	private synchronized void resetDefaults() {
 		for (IUpdateModel m : localWidgets.values()) {
-			m.restoreDefault();
+			if (m instanceof ICellEditorUpdateModel) {
+				if (((ICellEditorUpdateModel) m).isSelected()) {
+					m.restoreDefault();
+				}
+			} else {
+				m.restoreDefault();
+			}
 		}
 		for (IUpdateModel m : localWidgets.values()) {
 			if (m instanceof ViewerUpdateModel) {

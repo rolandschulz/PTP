@@ -45,10 +45,6 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		return defaultValues.get(name);
 	}
 
-	public Map<String, String> getSelected() {
-		return selected;
-	}
-
 	/**
 	 * The rm: prefix points to the RMVariableResolver, lc: to the
 	 * LCVariableResolver, so we substitute the latter and pass it off.
@@ -72,6 +68,10 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 
 	public boolean isInitialized() {
 		return initialized;
+	}
+
+	public boolean isSelected(String name) {
+		return selected.containsKey(name);
 	}
 
 	public void put(String name, Object value) {
@@ -118,55 +118,44 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
 	}
 
-	/*
-	 * It is assumed that the caller of the flattened map does not need
-	 * properties or attributes with complex values like lists or maps. Hence we
-	 * simply ask for the toString value.
-	 */
-	private void getFlattened(String key, Object value) throws Throwable {
+	private void loadValues(RMVariableMap rmVars) throws Throwable {
+		for (String s : rmVars.getVariables().keySet()) {
+			loadValues(s, rmVars.getVariables().get(s));
+		}
+		for (String s : rmVars.getDiscovered().keySet()) {
+			loadValues(s, rmVars.getDiscovered().get(s));
+		}
+		globalValues = values;
+	}
+
+	private void loadValues(String key, Object value) throws Throwable {
+		String name = null;
+		String defVal = null;
+		String strVal = null;
+		Object o = null;
 		if (value instanceof Property) {
 			Property p = (Property) value;
-			String name = p.getName();
-			Object o = p.getValue();
-			String strVal = null;
-			if (o != null) {
-				strVal = String.valueOf(o);
-			}
-			String defVal = p.getDefault();
-			defaultValues.put(name, defVal);
-			if (strVal == null) {
-				strVal = defVal;
-			}
-			put(name, strVal);
+			name = p.getName();
+			defVal = p.getDefault();
+			o = p.getValue();
 		} else if (value instanceof Attribute) {
 			Attribute ja = (Attribute) value;
-			String name = ja.getName();
-			Object o = ja.getValue();
-			String strVal = null;
-			if (o != null) {
-				strVal = String.valueOf(o);
-			}
-			String defVal = ja.getDefault();
-			defaultValues.put(name, defVal);
-			if (strVal == null) {
-				strVal = defVal;
-			}
-			put(name, strVal);
+			name = ja.getName();
+			defVal = ja.getDefault();
+			o = ja.getValue();
 			String status = ja.getStatus();
 			put(name + PD + STATUS, status);
 		} else {
 			throw new ArrayStoreException(Messages.IllegalVariableValueType + value.getClass());
 		}
-	}
-
-	private void loadValues(RMVariableMap rmVars) throws Throwable {
-		for (String s : rmVars.getVariables().keySet()) {
-			getFlattened(s, rmVars.getVariables().get(s));
+		defaultValues.put(name, defVal);
+		if (o != null) {
+			strVal = String.valueOf(o);
 		}
-		for (String s : rmVars.getDiscovered().keySet()) {
-			getFlattened(s, rmVars.getDiscovered().get(s));
+		if (strVal == null) {
+			strVal = defVal;
 		}
-		globalValues = values;
+		put(name, strVal);
 	}
 
 	private void setSelected() throws CoreException {
@@ -182,8 +171,8 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 
 	public static LCVariableMap createInstance(RMVariableMap rmVars) throws Throwable {
 		LCVariableMap lcMap = new LCVariableMap();
-		lcMap.loadValues(rmVars);
 		lcMap.setSelected();
+		lcMap.loadValues(rmVars);
 		return lcMap;
 	}
 

@@ -3,7 +3,6 @@ package org.eclipse.ptp.rm.jaxb.ui.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -107,14 +106,12 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 
 	@SuppressWarnings("unchecked")
 	public void initializeSelected() throws CoreException {
-		Map<String, String> checked = lcMap.getSelected();
 		Collection<Object> input = (Collection<Object>) ((Viewer) viewer).getInput();
-		boolean selected = false;
 		for (Object o : input) {
+			boolean selected = false;
 			if (o instanceof ICellEditorUpdateModel) {
 				ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
-				selected = checked.containsKey(model.getName());
-				model.setSelected(selected);
+				selected = model.isSelected();
 				viewer.setChecked(model, selected);
 			}
 		}

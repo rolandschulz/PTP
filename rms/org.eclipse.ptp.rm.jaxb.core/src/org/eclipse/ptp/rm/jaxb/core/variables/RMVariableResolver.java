@@ -34,7 +34,7 @@ public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 					throw CoreExceptionUtils.newException(Messages.RMVariableResolver_derefError, t);
 				}
 			} else {
-				return value.toString();
+				return String.valueOf(value);
 			}
 		}
 		return null;
@@ -48,7 +48,7 @@ public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 		if (result == null) {
 			return null;
 		}
-		return result.toString();
+		return String.valueOf(result);
 	}
 
 	public static void invokeSetter(Object target, String string, Object value) throws SecurityException, NoSuchMethodException,

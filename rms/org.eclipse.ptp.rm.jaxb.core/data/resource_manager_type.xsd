@@ -260,7 +260,6 @@
 				<xs:element name="composite" type="rm:composite-descriptor"/>
 			</xs:choice>
 		</xs:sequence>
-		<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="regex" mixed="true">
 		<xs:attribute name="flags" type="xs:string"/>

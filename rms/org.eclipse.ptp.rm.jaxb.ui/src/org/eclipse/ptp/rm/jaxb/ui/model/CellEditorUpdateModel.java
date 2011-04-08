@@ -4,6 +4,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.cell.SpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
@@ -94,7 +95,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 
 	/**
 	 * For generating a templated string using all the names and values in the
-	 * viewer rows.
+	 * viewer rows. Skips non-selected items.
 	 */
 	public String getReplacedValue(String pattern) {
 		if (!selected) {
@@ -142,10 +143,16 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#getValueFromControl()
 	 */
 	public Object getValueFromControl() {
-		if (!selected) {
-			return null;
-		}
 		return mapValue;
+	}
+
+	@Override
+	public void initialize(LCVariableMap lcMap) {
+		this.lcMap = lcMap;
+		if (name != null) {
+			selected = lcMap.isSelected(name);
+		}
+		super.initialize(lcMap);
 	}
 
 	public boolean isSelected() {

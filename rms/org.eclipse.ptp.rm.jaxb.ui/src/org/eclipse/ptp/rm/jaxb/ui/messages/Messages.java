@@ -15,8 +15,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.jaxb.ui.messages.messages"; //$NON-NLS-1$
 
-	public static String ViewerTooltipActivation;
-
 	public static String JAXBUIPlugin_Exception_InternalError;
 	public static String JAXBConnectionWizardPage_Description;
 	public static String JAXBRMControlConfigurationWizardPage_Title;
@@ -64,10 +62,7 @@ public class Messages extends NLS {
 	public static String JAXBRMLaunchConfigurationFactory_wrongRMType;
 	public static String JAXBRMLaunchConfigurationFactory_doCreateError;
 
-	public static String TabDirty;
 	public static String FileContentsDirty;
-	public static String ErrorOnCopyToStorageTitle;
-	public static String ErrorOnCopyToStorage;
 	public static String ErrorOnCopyFromFields;
 	public static String WriteToFileCanceled;
 	public static String RenameFile;
@@ -78,8 +73,6 @@ public class Messages extends NLS {
 	public static String DisplayScript;
 	public static String DisplayScriptError;
 	public static String DisplayScriptErrorTitle;
-	public static String Tooltip;
-	public static String AttributeInfo;
 	public static String ViewerLabelProviderColumnError;
 	public static String ScriptNotSupportedWarning;
 	public static String ScriptNotSupportedWarning_title;
