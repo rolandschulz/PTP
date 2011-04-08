@@ -1,16 +1,40 @@
 package org.eclipse.ptp.rm.jaxb.ui.model;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.progress.UIJob;
 
 public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSConstants {
 
+	/*
+	 * Used with ModifyListeners so as to avoid a save on every keystroke.
+	 * 
+	 * @author arossi
+	 */
+	protected class ValidateJob extends UIJob {
+		public ValidateJob() {
+			super("ValidateJob"); //$NON-NLS-1$
+		}
+
+		@Override
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+			storeValue();
+			return Status.OK_STATUS;
+		}
+	}
+
+	protected final Job validateJob;
 	protected boolean canSave;
 	protected String name;
 	protected LCVariableMap lcMap;
@@ -26,6 +50,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 		canSave = (name != null && !ZEROSTR.equals(name));
 		this.handler = handler;
 		refreshing = false;
+		validateJob = new ValidateJob();
 	}
 
 	public abstract Object getControl();
@@ -48,7 +73,6 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 
 	public void restoreDefault() {
 		lcMap.put(name, defaultValue);
-
 	}
 
 	public void setValidator(Validator validator, IRemoteFileManager remoteFileManager) {
@@ -66,7 +90,8 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 			try {
 				WidgetActionUtils.validate(String.valueOf(value), validator, remoteFileManager);
 			} catch (Exception t) {
-				JAXBUIPlugin.log(t);
+				WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.ValidationError,
+						Messages.ValidationError_title, false);
 				refreshValueFromMap();
 				return;
 			}

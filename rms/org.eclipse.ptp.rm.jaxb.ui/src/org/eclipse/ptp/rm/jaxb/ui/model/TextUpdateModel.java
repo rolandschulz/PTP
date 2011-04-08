@@ -37,7 +37,8 @@ public class TextUpdateModel extends DynamicControlUpdateModel implements Modify
 		if (refreshing) {
 			return;
 		}
-		storeValue();
+		validateJob.cancel();
+		validateJob.schedule(VALIDATE_TIMER);
 	}
 
 	public void refreshValueFromMap() {

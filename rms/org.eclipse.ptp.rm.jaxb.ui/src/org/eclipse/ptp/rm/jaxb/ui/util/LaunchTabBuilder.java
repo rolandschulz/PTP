@@ -33,7 +33,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.LayoutDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.RowDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.RowLayoutDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.TabItemDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.ViewerItems;
@@ -42,8 +41,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
-import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBConfigurableAttributesTab;
-import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBLaunchConfigurationDynamicTab;
+import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBDynamicLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.model.ViewerUpdateModel;
 import org.eclipse.swt.SWT;
@@ -58,29 +56,22 @@ import org.eclipse.swt.widgets.Tree;
 
 public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 
-	private final JAXBLaunchConfigurationDynamicTab parentTab;
-	private final TabController controller;;
+	private final JAXBDynamicLaunchConfigurationTab tab;
 	private final Map<Object, IUpdateModel> localWidgets;
 
-	public LaunchTabBuilder(JAXBConfigurableAttributesTab tab) {
-		parentTab = tab.getParent();
-		controller = tab.getController();
-		localWidgets = tab.getLocalWidgets();
+	public LaunchTabBuilder(JAXBDynamicLaunchConfigurationTab tab) {
+		this.tab = tab;
+		this.localWidgets = tab.getLocalWidgets();
 	}
 
 	public void build(Composite parent) throws Throwable {
-		List<Object> top = controller.getTabFolderOrComposite();
-
+		List<Object> top = tab.getController().getTabFolderOrComposite();
 		for (Object o : top) {
 			if (o instanceof CompositeDescriptor) {
 				addComposite((CompositeDescriptor) o, parent);
 			} else if (o instanceof TabFolderDescriptor) {
 				addFolder((TabFolderDescriptor) o, parent);
 			}
-		}
-
-		for (Object o : localWidgets.keySet()) {
-			parentTab.getUpdateHandler().addUpdateModelEntry(o, localWidgets.get(o));
 		}
 	}
 
@@ -96,7 +87,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			viewer = addCheckboxTreeViewer(parent, data, layout, style, descriptor);
 		}
 		Collection<ICellEditorUpdateModel> rows = addRows(viewer, descriptor);
-		ViewerUpdateModel model = UpdateModelFactory.createModel(viewer, descriptor, parentTab);
+		ViewerUpdateModel model = UpdateModelFactory.createModel(viewer, descriptor, tab);
 		for (ICellEditorUpdateModel row : rows) {
 			row.setViewer(model);
 		}
@@ -230,7 +221,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 				if (!isVisible(o)) {
 					continue;
 				}
-				model = UpdateModelFactory.createModel(o, viewer, columnData, parentTab);
+				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
 				hash.put(key, model);
 			}
 		}
@@ -241,7 +232,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 				if (!isVisible(o)) {
 					continue;
 				}
-				model = UpdateModelFactory.createModel(o, viewer, columnData, parentTab);
+				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
 				hash.put(key, model);
 			}
 		}
@@ -257,7 +248,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 				o = rmMap.getDiscovered().get(key);
 			}
 			if (o != null) {
-				model = UpdateModelFactory.createModel(o, viewer, columnData, parentTab);
+				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
 				hash.put(key, model);
 			}
 		}
@@ -265,15 +256,17 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			hash.remove(key);
 		}
 		viewer.setInput(hash.values());
-
-		for (ICellEditorUpdateModel cm : hash.values()) {
-			localWidgets.put(cm.getCellEditor(), cm);
+		for (ICellEditorUpdateModel m : hash.values()) {
+			localWidgets.put(m.getControl(), m);
 		}
 		return hash.values();
 	}
 
 	private void addWidget(Composite control, Widget widget) {
-		IUpdateModel model = UpdateModelFactory.createModel(control, widget, parentTab);
+		IUpdateModel model = UpdateModelFactory.createModel(control, widget, tab);
+		/*
+		 * Label models are not returned, since they cannot be updated
+		 */
 		if (model != null) {
 			localWidgets.put(model.getControl(), model);
 		}

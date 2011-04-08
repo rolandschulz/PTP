@@ -39,7 +39,7 @@ public class JAXBRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurat
 			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_wrongRMType + rm, null);
 		}
 		try {
-			return new JAXBLaunchConfigurationDynamicTab((IJAXBResourceManager) rm, dialog);
+			return new JAXBControllerLaunchConfigurationTab((IJAXBResourceManager) rm, dialog);
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(Messages.JAXBRMLaunchConfigurationFactory_doCreateError + rm, t);
 		}

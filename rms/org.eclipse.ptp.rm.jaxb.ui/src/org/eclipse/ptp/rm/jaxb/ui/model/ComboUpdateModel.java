@@ -32,7 +32,8 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 		if (refreshing) {
 			return;
 		}
-		storeValue();
+		validateJob.cancel();
+		validateJob.schedule(VALIDATE_TIMER);
 	}
 
 	public void refreshValueFromMap() {

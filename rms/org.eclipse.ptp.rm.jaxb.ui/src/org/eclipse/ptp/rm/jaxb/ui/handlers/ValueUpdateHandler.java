@@ -1,38 +1,25 @@
 package org.eclipse.ptp.rm.jaxb.ui.handlers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.rm.jaxb.ui.IFireContentsChangedEnabled;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.IValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
-import org.eclipse.ptp.rm.ui.utils.WidgetListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Widget;
 
 public class ValueUpdateHandler implements IValueUpdateHandler {
 
 	private final Map<Object, IUpdateModel> controlToModelMap;
-	private final List<WidgetListener> listeners;
-	private Widget proxy;
+	private final IFireContentsChangedEnabled tab;
 
-	public ValueUpdateHandler() {
+	public ValueUpdateHandler(IFireContentsChangedEnabled tab) {
 		controlToModelMap = new HashMap<Object, IUpdateModel>();
-		listeners = new ArrayList<WidgetListener>();
-	}
-
-	public void addListener(WidgetListener listener) {
-		listeners.add(listener);
+		this.tab = tab;
 	}
 
 	public void addUpdateModelEntry(Object control, IUpdateModel model) {
-		if (proxy == null && control instanceof Widget) {
-			proxy = (Widget) control;
-		}
 		controlToModelMap.put(control, model);
 	}
 
@@ -66,22 +53,8 @@ public class ValueUpdateHandler implements IValueUpdateHandler {
 		}
 
 		/*
-		 * we send an empty event to the WidgetListener so as to trigger any
-		 * necessary updates which will set the "dirty" flag.
+		 * notify the parent tab about the update
 		 */
-		fireModifyEvent();
-	}
-
-	/*
-	 * It is understood that the listeners will not need the source data of the
-	 * event.
-	 */
-	protected void fireModifyEvent() {
-		Event e = new Event();
-		e.widget = proxy;
-		ModifyEvent me = new ModifyEvent(e);
-		for (WidgetListener l : listeners) {
-			l.modifyText(me);
-		}
+		tab.fireContentsChanged();
 	}
 }
