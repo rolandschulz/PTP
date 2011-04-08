@@ -16,8 +16,11 @@ public class LCVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 					argument = split[0];
 				}
 			}
-			return (String) m.get(argument);
+			Object value = m.get(argument);
+			if (value != null) {
+				return String.valueOf(value);
+			}
 		}
-		return null;
+		return ZEROSTR;
 	}
 }

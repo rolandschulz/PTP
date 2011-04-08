@@ -39,10 +39,16 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 		if (name != null) {
 			defaultValue = lcMap.getDefault(name);
 		}
+		refreshValueFromMap();
+		if (mapValue == null) {
+			restoreDefault();
+			refreshValueFromMap();
+		}
 	}
 
 	public void restoreDefault() {
 		lcMap.put(name, defaultValue);
+
 	}
 
 	public void setValidator(Validator validator, IRemoteFileManager remoteFileManager) {
