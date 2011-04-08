@@ -482,7 +482,8 @@
 			</terminate-job>
 		-->
 		<launch-tab>
-			<basic>
+		   <basic>
+<!-- 			<basic sharedEnvironment="true"> -->
 				<title>Basic PBS Settings</title>
 				<composite>
 					<layout>

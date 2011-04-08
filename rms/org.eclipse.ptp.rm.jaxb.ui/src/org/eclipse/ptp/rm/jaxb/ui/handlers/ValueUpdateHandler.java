@@ -36,6 +36,10 @@ public class ValueUpdateHandler implements IValueUpdateHandler {
 		controlToModelMap.put(control, model);
 	}
 
+	public Map<Object, IUpdateModel> getControlToModelMap() {
+		return controlToModelMap;
+	}
+
 	/**
 	 * Broadcasts update request to all other controls by invoking refresh on
 	 * their model objects.

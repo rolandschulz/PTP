@@ -1,6 +1,7 @@
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +85,7 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 	private final List<Viewer> viewers;
 	private final Map<String, Object> localMap;
 	private final String title;
+	private final boolean shared;
 
 	private boolean initialized;
 
@@ -95,6 +97,7 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 		super(dialog);
 		this.parentTab = parentTab;
 		this.controller = controller;
+		shared = controller.isSharedEnvironment();
 		String t = controller.getTitle();
 		if (t == null) {
 			t = Messages.DefaultDynamicTab_title;
@@ -275,6 +278,7 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 	private synchronized String realizeLocalScript(ILaunchConfiguration config) throws Throwable {
 		String value = ZEROSTR;
 		refreshLocal();
+
 		localMap.put(DIRECTORY, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, ZEROSTR));
 		localMap.put(EXEC_PATH, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, ZEROSTR));
 		localMap.put(PROG_ARGS, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, ZEROSTR));
@@ -300,7 +304,13 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 
 	private void refreshLocal() {
 		localMap.clear();
-		for (IUpdateModel m : localWidgets.values()) {
+		Collection<IUpdateModel> models = null;
+		if (shared) {
+			models = parentTab.getUpdateHandler().getControlToModelMap().values();
+		} else {
+			models = localWidgets.values();
+		}
+		for (IUpdateModel m : models) {
 			if (m instanceof ICellEditorUpdateModel) {
 				if (((ICellEditorUpdateModel) m).isSelected()) {
 					localMap.put(m.getName(), m.getValueFromControl());
