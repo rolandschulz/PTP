@@ -13,48 +13,47 @@ import org.eclipse.ptp.rm.jaxb.core.data.TabController;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.ptp.rm.jaxb.ui.IFireContentsChangedEnabled;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
-import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-public class JAXBLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfigurationDynamicTab {
+public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IFireContentsChangedEnabled {
 
 	private final RemoteServicesDelegate delegate;
 	private final IJAXBResourceManagerConfiguration rmConfig;
 	private final LaunchTab launchTabData;
-	private final ValueUpdateHandler updateHandler;
 	private final Script script;
+	private final ValueUpdateHandler updateHandler;
 
 	private ScrolledComposite scrolledParent;
 	private LCVariableMap lcMap;
 	private boolean initialized;
 
-	public JAXBLaunchConfigurationDynamicTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
+	public JAXBControllerLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
 		super(dialog);
 		rmConfig = rm.getJAXBConfiguration();
 		rmConfig.setActive();
 		script = rmConfig.getResourceManagerData().getControlData().getScript();
 		launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
 		delegate = rm.getControl().getRemoteServicesDelegate();
-		updateHandler = new ValueUpdateHandler();
-		lcMap = null;
+		updateHandler = new ValueUpdateHandler(this);
 		if (launchTabData != null) {
 			TabController controller = launchTabData.getBasic();
 			if (controller != null) {
-				addDynamicTab(new JAXBConfigurableAttributesTab(rm, dialog, controller, this));
+				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
 			}
 			controller = launchTabData.getAdvanced();
 			if (controller != null) {
-				addDynamicTab(new JAXBConfigurableAttributesTab(rm, dialog, controller, this));
+				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
 			}
 			String title = launchTabData.getCustomController();
 			if (title != null) {
-				addDynamicTab(new JAXBRMCustomBatchScriptTab(rm, dialog, title, this));
+				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this));
 			}
 		}
 		initialized = false;
@@ -66,6 +65,11 @@ public class JAXBLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfigu
 			scrolledParent = (ScrolledComposite) parent;
 		}
 		super.createControl(parent, rm, queue);
+	}
+
+	@Override
+	public void fireContentsChanged() {
+		super.fireContentsChanged();
 	}
 
 	public RemoteServicesDelegate getDelegate() {
@@ -111,6 +115,7 @@ public class JAXBLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfigu
 				}
 			} catch (Throwable t) {
 				JAXBUIPlugin.log(t);
+				return new RMLaunchValidation(false, t.getMessage());
 			}
 			initialized = true;
 		}

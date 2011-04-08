@@ -84,6 +84,9 @@ public class Messages extends NLS {
 	public static String CreateControlConfigurableError;
 	public static String ReadOnlyWarning;
 
+	public static String ValidationError;
+	public static String ValidationError_title;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

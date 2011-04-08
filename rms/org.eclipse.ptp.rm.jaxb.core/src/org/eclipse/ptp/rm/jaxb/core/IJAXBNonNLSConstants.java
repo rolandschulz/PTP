@@ -22,6 +22,7 @@ public interface IJAXBNonNLSConstants {
 	int STREAM_BUFFER_SIZE = 8 * 1024;
 	int EOF = -1;
 	long MINUTE_IN_MS = 60 * 60 * 1000;
+	long VALIDATE_TIMER = 500;
 
 	/* CHARACTERS */
 	String LEN = "N";//$NON-NLS-1$

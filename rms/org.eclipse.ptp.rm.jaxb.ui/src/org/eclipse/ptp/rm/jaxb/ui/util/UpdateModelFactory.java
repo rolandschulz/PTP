@@ -30,7 +30,7 @@ import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.cell.SpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
-import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBLaunchConfigurationDynamicTab;
+import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBDynamicLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.ui.model.ButtonUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.model.ComboUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.model.SpinnerUpdateModel;
@@ -270,15 +270,15 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	}
 
 	public static ViewerUpdateModel createModel(ColumnViewer viewer, AttributeViewer descriptor,
-			JAXBLaunchConfigurationDynamicTab tab) {
+			JAXBDynamicLaunchConfigurationTab tab) {
 		String name = descriptor.getName();
 		Template template = descriptor.getValue();
-		ValueUpdateHandler handler = tab.getUpdateHandler();
+		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		ViewerUpdateModel model = new ViewerUpdateModel(name, handler, (ICheckable) viewer, template);
 		return model;
 	}
 
-	public static IUpdateModel createModel(Composite parent, Widget widget, JAXBLaunchConfigurationDynamicTab tab) {
+	public static IUpdateModel createModel(Composite parent, Widget widget, JAXBDynamicLaunchConfigurationTab tab) {
 		Control control = createControl(parent, widget, tab);
 		if (control instanceof Label) {
 			return null;
@@ -292,7 +292,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			dynamic = dt.getArg();
 		}
 
-		ValueUpdateHandler handler = tab.getUpdateHandler();
+		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		IUpdateModel model = null;
 		if (control instanceof Text) {
 			if (name != null && !ZEROSTR.equals(name)) {
@@ -312,8 +312,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	}
 
 	public static ICellEditorUpdateModel createModel(Object data, ColumnViewer viewer, List<ColumnData> columnData,
-			JAXBLaunchConfigurationDynamicTab tab) {
-		tab.getUpdateHandler();
+			JAXBDynamicLaunchConfigurationTab tab) {
 		ICellEditorUpdateModel model = null;
 		if (viewer instanceof TableViewer) {
 			model = createModel(data, (TableViewer) viewer, columnData, tab);
@@ -352,7 +351,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	}
 
 	private static Text createBrowseRemote(final Composite parent, final ControlDescriptor cd,
-			final JAXBLaunchConfigurationDynamicTab tab) {
+			final JAXBDynamicLaunchConfigurationTab tab) {
 		final Text t = WidgetBuilderUtils.createText(parent, SWT.BORDER, cd.layoutData, true, ZEROSTR);
 		WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, cd.style, new SelectionListener() {
 
@@ -363,7 +362,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					URI uri = new URI(t.getText());
-					uri = RemoteUIServicesUtils.browse(parent.getShell(), uri, tab.getDelegate(), true, cd.readOnly);
+					uri = RemoteUIServicesUtils.browse(parent.getShell(), uri, tab.getParent().getDelegate(), true, cd.readOnly);
 					if (uri != null) {
 						t.setText(uri.toString());
 					} else {
@@ -394,7 +393,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		return WidgetBuilderUtils.createCombo(parent, cd.style, cd.layoutData, items, ZEROSTR, cd.title, cd.tooltip, null);
 	}
 
-	private static Control createControl(final Composite parent, Widget widget, JAXBLaunchConfigurationDynamicTab tab) {
+	private static Control createControl(final Composite parent, Widget widget, JAXBDynamicLaunchConfigurationTab tab) {
 		ControlDescriptor cd = new ControlDescriptor(widget, RMVariableMap.getActiveInstance());
 		String type = widget.getType();
 
@@ -468,10 +467,10 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	}
 
 	private static ICellEditorUpdateModel createModel(Object data, TableViewer viewer, List<ColumnData> columnData,
-			JAXBLaunchConfigurationDynamicTab tab) {
+			JAXBDynamicLaunchConfigurationTab tab) {
 		CellDescriptor cd = new CellDescriptor(data, columnData);
 		CellEditor editor = createEditor(cd, data, viewer.getTable());
-		ValueUpdateHandler handler = tab.getUpdateHandler();
+		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		ICellEditorUpdateModel model = null;
 		if (data instanceof Attribute) {
 			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, (Attribute) data);
@@ -482,10 +481,10 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	}
 
 	private static ICellEditorUpdateModel createModel(Object data, TreeViewer viewer, List<ColumnData> columnData,
-			JAXBLaunchConfigurationDynamicTab tab) {
+			JAXBDynamicLaunchConfigurationTab tab) {
 		CellDescriptor cd = new CellDescriptor(data, columnData);
 		CellEditor editor = createEditor(cd, data, viewer.getTree());
-		ValueUpdateHandler handler = tab.getUpdateHandler();
+		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		ICellEditorUpdateModel model = null;
 		Object[] properties = viewer.getColumnProperties();
 		boolean inValueCol = properties.length == 2;

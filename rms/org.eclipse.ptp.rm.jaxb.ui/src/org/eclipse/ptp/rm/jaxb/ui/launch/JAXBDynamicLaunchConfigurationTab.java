@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -13,7 +12,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
@@ -22,18 +20,16 @@ import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.IFireContentsChangedEnabled;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.ScrollingEditableMessageDialog;
+import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.model.ViewerUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.util.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
-import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
-import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -46,67 +42,38 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 
-public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDynamicTab implements IJAXBUINonNLSConstants {
+public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements IFireContentsChangedEnabled {
 
-	private class JAXBUpdateOnlyDataSource extends RMLaunchConfigurationDynamicTabDataSource {
-
-		protected JAXBUpdateOnlyDataSource(JAXBConfigurableAttributesTab tab) {
-			super(tab);
-		}
-
-		@Override
-		protected void copyFromFields() throws ValidationException {
-		}
-
-		@Override
-		protected void copyToFields() {
-		}
-
-		@Override
-		protected void copyToStorage() {
-		}
-
-		@Override
-		protected void loadDefault() {
-		}
-
-		@Override
-		protected void loadFromStorage() {
-		}
-
-		@Override
-		protected void validateLocal() throws ValidationException {
-		}
-	}
-
-	private final JAXBLaunchConfigurationDynamicTab parentTab;
 	private final TabController controller;
-	private final Map<Object, IUpdateModel> localWidgets;
+	private final ValueUpdateHandler updateHandler;
 	private final List<Viewer> viewers;
-	private final Map<String, Object> localMap;
-	private final String title;
+	private final Map<Object, IUpdateModel> localWidgets;
 	private final boolean shared;
-
 	private boolean initialized;
 
 	private Composite control;
 	private Button viewScript;
 
-	public JAXBConfigurableAttributesTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, TabController controller,
-			JAXBLaunchConfigurationDynamicTab parentTab) {
-		super(dialog);
-		this.parentTab = parentTab;
+	public JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, TabController controller,
+			JAXBControllerLaunchConfigurationTab parentTab) {
+		super(parentTab, dialog);
 		this.controller = controller;
 		shared = controller.isSharedEnvironment();
-		String t = controller.getTitle();
-		if (t == null) {
-			t = Messages.DefaultDynamicTab_title;
+		String title = controller.getTitle();
+		if (title != null) {
+			this.title = title;
 		}
-		this.title = t;
+		updateHandler = parentTab.getUpdateHandler();
 		localWidgets = new HashMap<Object, IUpdateModel>();
-		localMap = new TreeMap<String, Object>();
 		viewers = new ArrayList<Viewer>();
 		initialized = false;
+	}
+
+	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
+		/*
+		 * Value validation is now handled up front
+		 */
+		return new RMLaunchValidation(true, null);
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
@@ -121,10 +88,20 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 		parentTab.resize(this.control);
 	}
 
+	@Override
+	public void fireContentsChanged() {
+		super.fireContentsChanged();
+	}
+
 	public Control getControl() {
 		return control;
 	}
 
+	/**
+	 * Used by the LaunchTabBuilder
+	 * 
+	 * @return the JAXB data element used to build the control
+	 */
 	public TabController getController() {
 		return controller;
 	}
@@ -138,7 +115,12 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 		return localWidgets;
 	}
 
-	public JAXBLaunchConfigurationDynamicTab getParent() {
+	/**
+	 * Used by the LaunchTabBuilder
+	 * 
+	 * @return the main controller tab
+	 */
+	public JAXBControllerLaunchConfigurationTab getParent() {
 		return parentTab;
 	}
 
@@ -147,7 +129,6 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 		return title;
 	}
 
-	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		if (!initialized) {
 			try {
@@ -155,13 +136,16 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 					viewScript.addSelectionListener(createViewScriptListener(configuration));
 				}
 
+				ValueUpdateHandler handler = getParent().getUpdateHandler();
 				viewers.clear();
 				for (Map.Entry<Object, IUpdateModel> e : localWidgets.entrySet()) {
 					Object key = e.getKey();
+					System.out.println("key: " + key);
 					if (key instanceof Viewer) {
 						Viewer viewer = (Viewer) key;
 						viewers.add(viewer);
 					}
+					handler.addUpdateModelEntry(key, e.getValue());
 				}
 
 				LCVariableMap lcMap = parentTab.getLCMap();
@@ -180,67 +164,40 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 				for (Viewer v : viewers) {
 					WidgetActionUtils.refreshViewer(v);
 				}
-
-				parentTab.getUpdateHandler().addListener(getListener());
 				initialized = true;
 			} catch (Throwable t) {
 				JAXBUIPlugin.log(t);
+				return new RMLaunchValidation(false, t.getMessage());
 			}
 		}
-		return super.initializeFrom(control, rm, queue, configuration);
+		return new RMLaunchValidation(true, null);
 	}
 
-	@Override
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		parentTab.getLCMap();
-		// try {
-		// refreshLocal();
-		// Map<String,Object> current = lcMap.swapVariables(localMap);
-		// lcMap.saveToConfiguration(configuration);
-		// } catch (CoreException t) {
-		// JAXBUIPlugin.log(t);
-		// }
-		// lcMap.swapVariables(current);
-		return super.performApply(configuration, rm, queue);
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
+		/*
+		 * Value validation is now handled up front
+		 */
+		return new RMLaunchValidation(true, null);
 	}
 
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+		/*
+		 * taken care of by the load method on the LCVariableMap
+		 */
 		return new RMLaunchValidation(true, null);
 	}
 
 	@Override
-	public void updateControls() {
-		/*
-		 * This controls the visible and enabled settings of the widgets. For
-		 * this tab, these are not configurable, so this is a NOP
-		 */
-	}
-
-	@Override
-	protected RMLaunchConfigurationDynamicTabDataSource createDataSource() {
-		return new JAXBUpdateOnlyDataSource(this);
-	};
-
-	/*
-	 * The list of listeners will always include the ContentsChangedListener of
-	 * the Resources Tab, which bottoms out in an updateButtons call which
-	 * enables the "Apply" button.
-	 * 
-	 * The performApply of the ResourcesTab calls the performApply of the
-	 * BaseRMLaunchConfigurationDynamicTab which calls the storeAndValidate
-	 * method of the DataSource.
-	 * 
-	 * The methods loadAndUpdate() and justUpdate() on the DataSource can be
-	 * used to refresh. The former is called on RM initialization, which takes
-	 * place when the RM becomes visible.
-	 */
-	@Override
-	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
-		return new RMLaunchConfigurationDynamicTabWidgetListener(this) {
-			@Override
-			protected void maybeFireContentsChanged() {
+	protected void doRefreshLocal() {
+		for (IUpdateModel m : getModels()) {
+			if (m instanceof ICellEditorUpdateModel) {
+				if (((ICellEditorUpdateModel) m).isSelected()) {
+					localMap.put(m.getName(), m.getValueFromControl());
+				}
+			} else {
+				localMap.put(m.getName(), m.getValueFromControl());
 			}
-		};
+		}
 	}
 
 	private void createViewScriptGroup(final Composite control) {
@@ -285,15 +242,20 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 		};
 	}
 
+	private Collection<IUpdateModel> getModels() {
+		Collection<IUpdateModel> models = null;
+		if (shared) {
+			models = updateHandler.getControlToModelMap().values();
+		} else {
+			models = localWidgets.values();
+		}
+		return models;
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private synchronized String realizeLocalScript(ILaunchConfiguration config) throws Throwable {
 		String value = ZEROSTR;
-		refreshLocal();
-
-		localMap.put(DIRECTORY, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, ZEROSTR));
-		localMap.put(EXEC_PATH, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, ZEROSTR));
-		localMap.put(PROG_ARGS, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, ZEROSTR));
-
+		refreshLocal(config);
 		LCVariableMap lcMap = parentTab.getLCMap();
 		Map<String, Object> current = lcMap.swapVariables(localMap);
 
@@ -313,27 +275,9 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 		return value;
 	}
 
-	private void refreshLocal() {
-		localMap.clear();
-		Collection<IUpdateModel> models = null;
-		if (shared) {
-			models = parentTab.getUpdateHandler().getControlToModelMap().values();
-		} else {
-			models = localWidgets.values();
-		}
-		for (IUpdateModel m : models) {
-			if (m instanceof ICellEditorUpdateModel) {
-				if (((ICellEditorUpdateModel) m).isSelected()) {
-					localMap.put(m.getName(), m.getValueFromControl());
-				}
-			} else {
-				localMap.put(m.getName(), m.getValueFromControl());
-			}
-		}
-	}
-
 	private synchronized void resetDefaults() {
-		for (IUpdateModel m : localWidgets.values()) {
+		Collection<IUpdateModel> models = getModels();
+		for (IUpdateModel m : models) {
 			if (m instanceof ICellEditorUpdateModel) {
 				if (((ICellEditorUpdateModel) m).isSelected()) {
 					m.restoreDefault();
@@ -342,12 +286,12 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 				m.restoreDefault();
 			}
 		}
-		for (IUpdateModel m : localWidgets.values()) {
+		for (IUpdateModel m : models) {
 			if (m instanceof ViewerUpdateModel) {
 				((ViewerUpdateModel) m).storeValue();
 			}
 		}
-		parentTab.getUpdateHandler().handleUpdate(null, null);
+		updateHandler.handleUpdate(null, null);
 		for (Viewer v : viewers) {
 			WidgetActionUtils.refreshViewer(v);
 		}
