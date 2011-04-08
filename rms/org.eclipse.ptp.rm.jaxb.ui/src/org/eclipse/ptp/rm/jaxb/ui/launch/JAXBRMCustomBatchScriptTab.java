@@ -10,8 +10,10 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.BufferedReader;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileReader;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -20,11 +22,9 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
-import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.util.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
@@ -60,44 +60,24 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 
 		@Override
 		protected void copyFromFields() throws ValidationException {
-			if (modifyText) {
-				return;
-			}
-			String uriStr = choice.getText();
-			if (selected != null) {
-				try {
-					selected = new URI(uriStr);
-				} catch (URISyntaxException t) {
-					throw new ValidationException(Messages.ErrorOnCopyFromFields);
-				}
-			}
-			contents = editor.getText();
 		}
 
 		@Override
 		protected void copyToFields() {
 			if (selected != null) {
-				choice.setText(selected.toString());
+				choice.setText(selected);
 			} else {
 				choice.setText(ZEROSTR);
 			}
-			if (contents != null) {
-				listener.toContents = true;
-				editor.setText(contents);
-				listener.toContents = false;
-			}
+			listener.toContents = true;
+			editor.setText(contents.toString());
+			listener.toContents = false;
 		}
 
 		@Override
 		protected void copyToStorage() {
 			if (modifyText) {
 				return;
-			}
-
-			try {
-				maybeWriteToFile();
-			} catch (Throwable t1) {
-				JAXBUIPlugin.log(t1);
 			}
 
 			ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
@@ -115,7 +95,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			if (ZEROSTR.equals(contents)) {
 				config.removeAttribute(SCRIPT);
 			} else {
-				config.setAttribute(SCRIPT, contents);
+				config.setAttribute(SCRIPT, contents.toString());
 			}
 		}
 
@@ -133,9 +113,10 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			try {
 				String uriStr = config.getAttribute(SCRIPT_PATH, ZEROSTR);
 				if (!ZEROSTR.equals(uriStr)) {
-					selected = new URI(uriStr);
+					selected = ZEROSTR;
 				}
-				contents = config.getAttribute(SCRIPT, ZEROSTR);
+				contents.setLength(0);
+				contents.append(config.getAttribute(SCRIPT, ZEROSTR));
 			} catch (Throwable t) {
 				WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnLoadFromStore, Messages.ErrorOnLoadTitle,
 						false);
@@ -147,19 +128,6 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 		}
 	}
 
-	/*
-	 * The list of listeners will always include the ContentsChangedListener of
-	 * the Resources Tab, which bottoms out in an updateButtons call which
-	 * enables the "Apply" button.
-	 * 
-	 * The performApply of the ResourcesTab calls the performApply of the
-	 * BaseRMLaunchConfigurationDynamicTab which calls the storeAndValidate
-	 * method of the DataSource.
-	 * 
-	 * The methods loadAndUpdate() and justUpdate() on the DataSource can be
-	 * used to refresh. The former is called on RM initialization, which takes
-	 * place when the RM becomes visible.
-	 */
 	private class JAXBBatchScriptWidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
 
 		private boolean toContents = false;
@@ -182,7 +150,6 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			}
 			Object source = e.getSource();
 			if (source == editor && !toContents) {
-				fileDirty = true;
 				updateControls();
 			}
 		}
@@ -194,11 +161,8 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			}
 			Object source = e.getSource();
 			try {
-				if (source == browseLocal) {
-					selected = RemoteUIServicesUtils.browse(control.getShell(), selected, delegate, false, true);
-					updateContents();
-				} else if (source == browseRemote) {
-					selected = RemoteUIServicesUtils.browse(control.getShell(), selected, delegate, true, true);
+				if (source == browseWorkspace) {
+					selected = WidgetActionUtils.browseWorkspace(control.getShell());
 					updateContents();
 				} else if (source == clear) {
 					selected = null;
@@ -213,22 +177,19 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 	}
 
 	private final JAXBLaunchConfigurationDynamicTab pTab;
-	private final RemoteServicesDelegate delegate;
 	private final String title;
 
 	private Composite control;
 	private Text choice;
 	private Text editor;
-	private Button browseLocal;
-	private Button browseRemote;
+	private Button browseWorkspace;
 	private Button clear;
 
 	private JAXBBatchScriptDataSource dataSource;
 	private JAXBBatchScriptWidgetListener listener;
 
-	private URI selected;
-	private String contents;
-	private boolean fileDirty;
+	private String selected;
+	private final StringBuffer contents;
 	private boolean loading;
 
 	/**
@@ -242,16 +203,7 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 			title = Messages.CustomBatchScriptTab_title;
 		}
 		this.title = title;
-		this.delegate = rm.getControl().getRemoteServicesDelegate();
-	}
-
-	@Override
-	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
-		RMLaunchValidation rmv = super.canSave(control, rm, queue);
-		if (!fileDirty) {
-			return rmv;
-		}
-		return new RMLaunchValidation(true, Messages.FileContentsDirty);
+		contents = new StringBuffer();
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
@@ -264,24 +216,20 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 		GridData gdsub = WidgetBuilderUtils.createGridDataFillH(3);
 		String s = selected == null ? ZEROSTR : selected.toString();
 		choice = WidgetBuilderUtils.createText(comp, SWT.BORDER, gdsub, true, s);
-		browseLocal = WidgetBuilderUtils.createPushButton(comp, Messages.JAXBRMConfigurationSelectionWizardPage_1, listener);
-		browseRemote = WidgetBuilderUtils.createPushButton(comp, Messages.JAXBRMConfigurationSelectionWizardPage_2, listener);
+		browseWorkspace = WidgetBuilderUtils.createPushButton(comp, Messages.JAXBRMConfigurationSelectionWizardPage_1, listener);
+		clear = WidgetBuilderUtils.createPushButton(comp, Messages.ClearScript, listener);
 
 		layout = WidgetBuilderUtils.createGridLayout(1, true);
 		gd = WidgetBuilderUtils.createGridData(GridData.FILL_BOTH, true, true, 130, 300, 1, DEFAULT);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
 		int style = SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL;
 		gdsub = WidgetBuilderUtils.createGridDataFill(DEFAULT, DEFAULT, 1);
-		editor = WidgetBuilderUtils.createText(grp, style, gdsub, false, ZEROSTR, listener, null);
+		editor = WidgetBuilderUtils.createText(grp, style, gdsub, true, ZEROSTR, listener, null);
 		WidgetBuilderUtils.applyMonospace(editor);
+		editor.setToolTipText(Messages.ReadOnlyWarning);
 
-		layout = WidgetBuilderUtils.createGridLayout(6, true);
-		gd = WidgetBuilderUtils.createGridDataFillH(6);
-		comp = WidgetBuilderUtils.createComposite(control, SWT.NONE, layout, gd);
-		clear = WidgetBuilderUtils.createPushButton(comp, Messages.ClearScript, listener);
 		selected = null;
 		pTab.resize(control);
-		fileDirty = false;
 		updateControls();
 		loading = false;
 	}
@@ -298,22 +246,6 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 	@Override
 	public String getText() {
 		return title;
-	}
-
-	public void maybeWriteToFile() throws Throwable {
-		if (!fileDirty) {
-			return;
-		}
-		URI newPath = RemoteUIServicesUtils.writeContentsToFile(control.getShell(), contents, selected, delegate);
-		if (newPath != null) {
-			selected = newPath;
-			listener.disable();
-			choice.setText(selected.toString());
-			listener.enable();
-		} else {
-			throw new Throwable(Messages.WriteToFileCanceled);
-		}
-		fileDirty = false;
 	}
 
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
@@ -346,12 +278,21 @@ public class JAXBRMCustomBatchScriptTab extends BaseRMLaunchConfigurationDynamic
 	}
 
 	private void updateContents() throws Throwable {
+		contents.setLength(0);
 		if (null != selected) {
-			contents = RemoteUIServicesUtils.getFileContents(selected, delegate);
-		} else {
-			contents = ZEROSTR;
+			BufferedReader br = new BufferedReader(new FileReader(new File(selected)));
+			while (true) {
+				try {
+					String line = br.readLine();
+					if (line == null) {
+						break;
+					}
+					contents.append(line).append(LINE_SEP);
+				} catch (EOFException eof) {
+					break;
+				}
+			}
 		}
-		fileDirty = false;
 		dataSource.copyToFields();
 		updateControls();
 	}

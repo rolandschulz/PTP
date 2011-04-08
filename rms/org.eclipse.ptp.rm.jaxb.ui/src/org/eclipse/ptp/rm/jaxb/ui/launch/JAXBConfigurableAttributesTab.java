@@ -166,8 +166,6 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 
 				LCVariableMap lcMap = parentTab.getLCMap();
 				lcMap.restoreGlobal();
-				// refreshLocal();
-				// parentTab.getLCMap().swapVariables(localMap);
 
 				for (IUpdateModel m : localWidgets.values()) {
 					m.initialize(lcMap);
@@ -223,6 +221,19 @@ public class JAXBConfigurableAttributesTab extends BaseRMLaunchConfigurationDyna
 		return new JAXBUpdateOnlyDataSource(this);
 	};
 
+	/*
+	 * The list of listeners will always include the ContentsChangedListener of
+	 * the Resources Tab, which bottoms out in an updateButtons call which
+	 * enables the "Apply" button.
+	 * 
+	 * The performApply of the ResourcesTab calls the performApply of the
+	 * BaseRMLaunchConfigurationDynamicTab which calls the storeAndValidate
+	 * method of the DataSource.
+	 * 
+	 * The methods loadAndUpdate() and justUpdate() on the DataSource can be
+	 * used to refresh. The former is called on RM initialization, which takes
+	 * place when the RM becomes visible.
+	 */
 	@Override
 	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
 		return new RMLaunchConfigurationDynamicTabWidgetListener(this) {
