@@ -22,7 +22,6 @@ public class Messages extends NLS {
 
 	public static String JAXBRMConfigurationSelectionWizardPage_0;
 	public static String JAXBRMConfigurationSelectionWizardPage_1;
-	public static String JAXBRMConfigurationSelectionWizardPage_2;
 	public static String JAXBRMConfigurationSelectionWizardPage_Project_Selection_Title;
 	public static String JAXBRMConfigurationSelectionWizardPage_Project_Selection_Message;
 
@@ -45,6 +44,12 @@ public class Messages extends NLS {
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_15;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_16;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_17;
+
+	public static String Project_required;
+	public static String Enter_project_before_browsing_for_program;
+	public static String Program_selection;
+	public static String Choose_program_to_run_from_NAME;
+	public static String Selection_must_be_file;
 
 	public static String CustomBatchScriptTab_title;
 	public static String MXGroupTitle;
@@ -77,6 +82,7 @@ public class Messages extends NLS {
 	public static String ScriptNotSupportedWarning;
 	public static String ScriptNotSupportedWarning_title;
 	public static String CreateControlConfigurableError;
+	public static String ReadOnlyWarning;
 
 	static {
 		// initialize resource bundle

@@ -12,7 +12,6 @@ package org.eclipse.ptp.rm.jaxb.ui.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,9 +22,9 @@ import java.util.List;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -40,13 +39,11 @@ import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedMatchException;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.dialogs.ElementListSelectionDialog;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 
@@ -54,22 +51,15 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	}
 
 	/**
-	 * Open a dialog that allows the user to choose a project.
+	 * Create a dialog that allows the user to select a file in the workspace.
 	 * 
-	 * @return selected project
+	 * @return selected file
 	 */
-	public static URI chooseProject(Shell shell) {
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(shell, labelProvider);
-		dialog.setTitle(Messages.JAXBRMConfigurationSelectionWizardPage_Project_Selection_Title);
-		dialog.setMessage(Messages.JAXBRMConfigurationSelectionWizardPage_Project_Selection_Message);
-		dialog.setElements(projects);
-		if (dialog.open() == Window.OK) {
-			IProject p = (IProject) dialog.getFirstResult();
-			return p.getLocationURI();
-		}
-		return null;
+	public static String browseWorkspace(Shell shell) {
+		IPath path = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+		FileDialog dialog = new FileDialog(shell);
+		dialog.setFileName(path.toFile().getAbsolutePath());
+		return dialog.open();
 	}
 
 	public static void errorMessage(Shell s, Throwable e, String message, String title, boolean causeTrace) {
