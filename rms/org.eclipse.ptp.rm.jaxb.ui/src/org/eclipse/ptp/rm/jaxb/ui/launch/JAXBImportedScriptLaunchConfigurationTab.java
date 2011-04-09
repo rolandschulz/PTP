@@ -142,10 +142,6 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	protected void doRefreshLocal() {
 		if (selected != null) {
 			localMap.put(SCRIPT_PATH, selected);
-			String s = contents.toString();
-			if (!ZEROSTR.equals(s)) {
-				localMap.put(SCRIPT, s);
-			}
 		}
 	}
 

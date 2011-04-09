@@ -56,11 +56,10 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 
 	public static void initializeMap(ResourceManagerData rmData, RMVariableMap instance) {
 		Control control = rmData.getControlData();
+		instance.clear();
 		Map<String, Object> env = instance.getVariables();
-		env.clear();
 		addProperties(env, control);
 		addAttributes(env, control);
-		instance.getDiscovered().clear();
 		instance.setInitialized(true);
 	}
 
@@ -69,7 +68,10 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	}
 
 	public static void validate(String xml) throws SAXException, IOException, URISyntaxException {
-		URL instance = getURL(xml);
+		validate(getURL(xml));
+	}
+
+	public static void validate(URL instance) throws SAXException, IOException, URISyntaxException {
 		URL xsd = JAXBCorePlugin.getResource(RM_XSD);
 		SchemaFactory factory = SchemaFactory.newInstance(XMLSchema);
 		Schema schema = factory.newSchema(xsd);
@@ -93,7 +95,9 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 		}
 	}
 
-	private static ResourceManagerData unmarshalResourceManagerData(URL xml) throws JAXBException, IOException {
+	private static ResourceManagerData unmarshalResourceManagerData(URL xml) throws JAXBException, IOException, SAXException,
+			URISyntaxException {
+		validate(xml);
 		JAXBContext jc = JAXBContext.newInstance(JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
 		Unmarshaller u = jc.createUnmarshaller();
 		JAXBElement<?> o = (JAXBElement<?>) u.unmarshal(xml.openStream());

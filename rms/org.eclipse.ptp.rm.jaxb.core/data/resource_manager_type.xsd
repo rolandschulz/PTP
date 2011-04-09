@@ -128,7 +128,6 @@
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="file-source-location" minOccurs="0" type="xs:string"/>
 			<xs:element name="file-staging-location" minOccurs="0" type="xs:string"/>
 			<xs:element name="file" maxOccurs="unbounded" type="rm:managed-file"/>
 		</xs:sequence>
@@ -205,9 +204,10 @@
 				If 'contents' is present, the file is written.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="contents" minOccurs="0" type="xs:string"/>
-		</xs:sequence>
+		<xs:choice>
+			<xs:element name="contents" type="xs:string"/>
+			<xs:element name="path" type="xs:string"/>
+		</xs:choice>
 		<xs:attribute name="name" use="required"/>
 		<xs:attribute name="uniqueIdPrefix" type="xs:boolean" default="false"/>
 		<xs:attribute name="resolveContents" type="xs:boolean" default="true"/>

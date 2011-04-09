@@ -20,9 +20,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
 public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	private static RMVariableMap active;
@@ -53,20 +51,6 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 
 	public Map<String, Object> getDiscovered() {
 		return discovered;
-	}
-
-	/**
-	 * A flat name=value map of only the configurable attributes and properties.
-	 * 
-	 * @param flat
-	 */
-	public void getFlattenedVariables(Map<String, String> flat) {
-		for (String s : variables.keySet()) {
-			getFlattened(s, variables.get(s), flat, false);
-		}
-		for (String s : discovered.keySet()) {
-			getFlattened(s, discovered.get(s), flat, false);
-		}
 	}
 
 	public String getString(String value) {
@@ -138,6 +122,14 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		variables.put(name, value);
 	}
 
+	public Object remove(String name) {
+		Object o = variables.remove(name);
+		if (o == null) {
+			o = discovered.remove(name);
+		}
+		return o;
+	}
+
 	public void setInitialized(boolean initialized) {
 		this.initialized = initialized;
 	}
@@ -159,52 +151,5 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		}
 		RMVariableMap.active = instance;
 		return RMVariableMap.active;
-	}
-
-	/*
-	 * It is assumed that the caller of the flattened map does not need
-	 * properties or attributes with complex values like lists or maps. Hence we
-	 * simply ask for the toString value.
-	 */
-	private static void getFlattened(String key, Object value, Map<String, String> flat, boolean forceDefault)
-			throws ArrayStoreException {
-		if (value instanceof Property) {
-			Property p = (Property) value;
-			String name = p.getName();
-			Object o = p.getValue();
-			String strVal = null;
-			if (o != null) {
-				strVal = String.valueOf(o);
-			}
-			String defVal = p.getDefault();
-			if (forceDefault || strVal == null || ZEROSTR.equals(strVal)) {
-				strVal = defVal;
-			}
-			if (strVal != null && !ZEROSTR.equals(strVal)) {
-				flat.put(name, strVal);
-			}
-		} else if (value instanceof Attribute) {
-			Attribute ja = (Attribute) value;
-			String name = ja.getName();
-			Object o = ja.getValue();
-			String strVal = null;
-			if (o != null) {
-
-				strVal = String.valueOf(o);
-			}
-			String defVal = ja.getDefault();
-			if (forceDefault || strVal == null || ZEROSTR.equals(strVal)) {
-				strVal = defVal;
-			}
-			if (strVal != null && !ZEROSTR.equals(strVal)) {
-				flat.put(name, strVal);
-			}
-			String status = ja.getStatus();
-			if (status != null && !ZEROSTR.equals(status)) {
-				flat.put(name + PD + STATUS, status);
-			}
-		} else {
-			throw new ArrayStoreException(Messages.IllegalVariableValueType + value.getClass());
-		}
 	}
 }

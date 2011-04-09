@@ -42,7 +42,8 @@ public class FileUtils implements IJAXBNonNLSConstants {
 
 		IFileStore lres = from.getResource(source);
 		if (!lres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
-			throw CoreExceptionUtils.newException(Messages.Copy_Operation_Local_resource_does_not_exist, null);
+			throw CoreExceptionUtils.newException(Messages.Copy_Operation_Local_resource_does_not_exist + CO + SP + lres.getName(),
+					null);
 		}
 		IFileStore rres = to.getResource(target);
 		lres.copy(rres, EFS.OVERWRITE, progress.newChild(5));

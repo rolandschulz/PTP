@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rm.jaxb.tests;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -18,6 +19,7 @@ import junit.framework.TestCase;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
+import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
@@ -77,6 +79,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 			}
 		}
 		ManagedFiles files = controlData.getManagedFiles();
+		files = maybeAddManagedFileForScript(files);
 		assertNotNull(files);
 		try {
 			ManagedFilesJob job = new ManagedFilesJob(null, files, delegate);
@@ -109,6 +112,42 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 
 	private void initializeConnections() {
 		delegate = new RemoteServicesDelegate(null, null);
+	}
+
+	private ManagedFiles maybeAddManagedFileForScript(ManagedFiles files) {
+		Property scriptVar = (Property) RMVariableMap.getActiveInstance().get(SCRIPT);
+		Property scriptPathVar = (Property) RMVariableMap.getActiveInstance().get(SCRIPT_PATH);
+		if (scriptVar != null || scriptPathVar != null) {
+			if (files == null) {
+				files = new ManagedFiles();
+				files.setFileStagingLocation(ECLIPSESETTINGS);
+			}
+			List<ManagedFile> fileList = files.getFile();
+			ManagedFile scriptFile = null;
+			if (!fileList.isEmpty()) {
+				for (ManagedFile f : fileList) {
+					if (f.getName().equals(SCRIPT_FILE)) {
+						scriptFile = f;
+						break;
+					}
+				}
+			}
+			if (scriptFile == null) {
+				scriptFile = new ManagedFile();
+				scriptFile.setName(SCRIPT_FILE);
+				fileList.add(scriptFile);
+			}
+			scriptFile.setResolveContents(false);
+			scriptFile.setUniqueIdPrefix(true);
+			if (scriptPathVar != null) {
+				scriptFile.setPath(String.valueOf(scriptPathVar.getValue()));
+				scriptFile.setDeleteAfterUse(false);
+			} else {
+				scriptFile.setContents(OPENVRM + SCRIPT + PD + VALUE + CLOSV);
+				scriptFile.setDeleteAfterUse(true);
+			}
+		}
+		return files;
 	}
 
 	private void putValue(String name, String value) {
