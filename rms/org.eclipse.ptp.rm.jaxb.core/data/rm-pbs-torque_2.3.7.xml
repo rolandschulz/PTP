@@ -5,10 +5,10 @@
 		<control-connection>ssh://abe.ncsa.uiuc.edu/usr/local/bin/qsub</control-connection>
 	</site-data>
 	<control-data>
-		<property name="stdout">
+		<property name="stdout" visible="false">
 			<value>${rm:Output_Path#value}</value>
 		</property><!-- property needed for forwarding stdout in batch -->
-		<property name="stderr">
+		<property name="stderr" visible="false">
 			<value>${rm:Error_Path#value}</value>
 		</property><!-- property needed for forwarding stderr in batch -->
 		<attribute name="mpiCommand" type="choice">
@@ -231,10 +231,10 @@
 			<description>This is the list of environment variables passed with the Queue Job batch request.</description>
 		</attribute>
 		<managed-files>
-			<file-staging-location>.eclipsesettings</file-staging-location>
-			<file name="pbs_script" uniqueIdPrefix="true" deleteAfterUse="true" resolveContents="false">
-				<contents>${rm:script#value}</contents>
-			</file>
+		 <file-staging-location>.eclipsesettings</file-staging-location>
+		 <file name="toStage">
+		    <path>/Users/arossi/toStage.sh</path>
+		 </file>
 		</managed-files>
 		<script envBegin="36">
 			<line>
@@ -482,8 +482,8 @@
 			</terminate-job>
 		-->
 		<launch-tab>
-		   <basic>
-<!-- 			<basic sharedEnvironment="true"> -->
+			<basic>
+				<!-- <basic sharedEnvironment="true"> -->
 				<title>Basic PBS Settings</title>
 				<composite>
 					<layout>
@@ -622,13 +622,15 @@
 					</widget>
 				</composite>
 			</basic>
-			<advanced dynamic="true">
+			<advanced>
 				<title>Advanced PBS Settings</title>
 				<composite>
 					<layout>
 						<grid-layout numColumns="1"/>
-						<grid-data widthHint="600" heightHint="600" horizontalSpan="1"/>
 					</layout>
+					<layout-data>
+						<grid-data widthHint="600" heightHint="600" horizontalSpan="1"/>
+					</layout-data>
 					<composite>
 						<layout>
 							<grid-layout numColumns="3"/>
@@ -642,16 +644,13 @@
 						</widget>
 						<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
 							<layout-data>
-								<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2"/>
+								<grid-data grabExcessHorizontal="false" horizontalSpan="2"/>
 							</layout-data>
 							<!-- <value-list-from>available_queues</value-list-from> -->
 						</widget>
-						<layout>
-							<grid-layout numColumns="9"/>
-						</layout>
-						<widget type="text" readOnly="true" style="SWT.LEFT | SWT.BORDER | SWT.WRAP">
+						<widget type="text" readOnly="true" style="SWT.LEFT | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
 							<layout-data>
-								<grid-data heightHint="75" horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="8"/>
+								<grid-data widthHint="600" heightHint="75" horizontalSpan="3"/>
 							</layout-data>
 							<dynamic-text>
 								<arg>${rm:allAttributes#value}</arg>
@@ -670,8 +669,8 @@
 							<tooltip>Click to activate value widget.</tooltip>
 						</column-data>
 						<column-data name="Description" width="200">
-                     <tooltip>Double-click on selected rows toggles their checked value.</tooltip>
-                  </column-data>
+							<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
+						</column-data>
 						<items allPredefined="true">
 							<exclude>destination</exclude>
 						</items>

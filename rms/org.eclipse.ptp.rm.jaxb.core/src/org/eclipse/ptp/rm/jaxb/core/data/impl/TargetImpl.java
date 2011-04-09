@@ -94,7 +94,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (ref != null) {
 			RMVariableMap vmap = RMVariableMap.getActiveInstance();
 			String name = vmap.getString(uuid, ref);
-			target = vmap.getVariables().get(name);
+			target = vmap.get(name);
 			if (target == null) {
 				throw CoreExceptionUtils.newException(Messages.StreamParserNoSuchVariableError + name, null);
 			}

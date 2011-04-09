@@ -135,6 +135,7 @@ public interface IJAXBNonNLSConstants {
 	String IS_PRESET = "is_preset";//$NON-NLS-1$
 	String SCRIPT_PATH = "script_path";//$NON-NLS-1$
 	String SCRIPT = "script";//$NON-NLS-1$
+	String SCRIPT_FILE = "managed_file_for_script";//$NON-NLS-1$
 	String CSH = "csh";//$NON-NLS-1$
 	String SH = ".sh";//$NON-NLS-1$
 	String SETENV = "setenv";//$NON-NLS-1$
@@ -164,6 +165,7 @@ public interface IJAXBNonNLSConstants {
 	String MONITOR_USER_VAR = "monitor.user.name";//$NON-NLS-1$
 	String MONITOR_ADDRESS_VAR = "monitor.address";//$NON-NLS-1$
 	String ARPA = ".in-addr.arpa";//$NON-NLS-1$
+	String ECLIPSESETTINGS = ".eclipsesettings";//$NON-NLS-1$
 
 	String STARTUP = "OnStartUp";//$NON-NLS-1$
 	String SHUTDOWN = "OnShutDown";//$NON-NLS-1$

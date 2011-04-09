@@ -44,23 +44,18 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 
 	private final String uuid;
-	private final String sourceDir;
 	private final String stagingDir;
 	private final List<ManagedFile> files;
 	private final RemoteServicesDelegate delegate;
+	private final RMVariableMap rmVarMap;
 	private boolean success;
 
 	public ManagedFilesJob(String uuid, ManagedFiles files, RemoteServicesDelegate delegate) throws CoreException {
 		super(Messages.ManagedFilesJob);
 		this.uuid = uuid;
 		this.delegate = delegate;
-		String key = files.getFileSourceLocation();
-		if (key == null) {
-			sourceDir = System.getProperty(JAVA_TMP_DIR);
-		} else {
-			sourceDir = RMVariableMap.getActiveInstance().getString(uuid, key);
-		}
-		stagingDir = RMVariableMap.getActiveInstance().getString(uuid, files.getFileStagingLocation());
+		rmVarMap = RMVariableMap.getActiveInstance();
+		stagingDir = rmVarMap.getString(uuid, files.getFileStagingLocation());
 		this.files = files.getFile();
 	}
 
@@ -70,6 +65,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		boolean localTarget = delegate.getLocalFileManager() == delegate.getRemoteFileManager();
 		success = false;
 		SubMonitor progress = SubMonitor.convert(monitor, files.size() * 10);
 		/*
@@ -79,22 +75,27 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 			try {
 				File localFile = maybeWriteFile(file);
 				progress.worked(5);
-				/**
+				/*
 				 * no support for Windows as target ...
 				 */
-				String target = stagingDir + REMOTE_PATH_SEP + localFile.getName();
+				String fileName = localFile.getName();
+				if (file.isUniqueIdPrefix()) {
+					fileName = UUID.randomUUID() + fileName;
+				}
+				String pathSep = localTarget ? PATH_SEP : REMOTE_PATH_SEP;
+				String target = stagingDir + pathSep + fileName;
 				copyFileToRemoteHost(localFile.getAbsolutePath(), target, progress);
 				if (file.isDeleteAfterUse()) {
 					localFile.delete();
 				}
 				Property p = new Property();
 				p.setName(file.getName());
-				if (delegate.getLocalFileManager() == delegate.getRemoteFileManager()) {
+				if (localTarget) {
 					p.setValue(new File(System.getProperty(JAVA_USER_HOME), target).getAbsolutePath());
 				} else {
 					p.setValue(target);
 				}
-				RMVariableMap.getActiveInstance().getVariables().put(p.getName(), p);
+				rmVarMap.put(p.getName(), p);
 			} catch (Throwable t) {
 				progress.done();
 				return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
@@ -129,7 +130,12 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private File maybeWriteFile(ManagedFile file) throws IOException, CoreException {
-		String name = RMVariableMap.getActiveInstance().getString(uuid, file.getName());
+		String path = file.getPath();
+		if (path != null) {
+			return new File(path);
+		}
+		String name = rmVarMap.getString(uuid, file.getName());
+		File sourceDir = new File(System.getProperty(JAVA_TMP_DIR));
 		File localFile = new File(sourceDir, name);
 		String contents = file.getContents();
 		FileWriter fw = null;
@@ -139,11 +145,8 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 					throw new FileNotFoundException(localFile.getAbsolutePath());
 				}
 			} else {
-				if (file.isUniqueIdPrefix()) {
-					localFile = new File(sourceDir, UUID.randomUUID() + name);
-				}
 				if (file.isResolveContents()) {
-					contents = RMVariableMap.getActiveInstance().getString(uuid, contents);
+					contents = rmVarMap.getString(uuid, contents);
 				} else {
 					/*
 					 * magic to avoid attempted resolution of unknown shell
@@ -158,7 +161,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 							end = contents.indexOf(CLOSV);
 						}
 						String key = contents.substring(start, end);
-						Object o = RMVariableMap.getActiveInstance().getVariables().get(key);
+						Object o = rmVarMap.get(key);
 						if (o instanceof Property) {
 							contents = String.valueOf(((Property) o).getValue());
 						} else if (o instanceof Attribute) {

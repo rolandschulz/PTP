@@ -25,17 +25,20 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private String state;
 	private ICommandJobStreamsProxy proxy;
 	private IRemoteProcess process;
+	private final RMVariableMap rmVarMap;
 	private boolean waitEnabled;
 
 	public CommandJobStatus() {
 		jobId = null;
 		state = IJobStatus.UNDETERMINED;
+		rmVarMap = RMVariableMap.getActiveInstance();
 		waitEnabled = true;
 	}
 
 	public CommandJobStatus(String jobId, String state) {
 		this.jobId = jobId;
 		this.state = state;
+		rmVarMap = RMVariableMap.getActiveInstance();
 		waitEnabled = false;
 	}
 
@@ -108,7 +111,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 					wait(1000);
 				} catch (InterruptedException ignored) {
 				}
-				Property p = (Property) RMVariableMap.getActiveInstance().getVariables().get(uuid);
+				Property p = (Property) rmVarMap.get(uuid);
 				if (p != null) {
 					jobId = p.getName();
 					String v = (String) p.getValue();

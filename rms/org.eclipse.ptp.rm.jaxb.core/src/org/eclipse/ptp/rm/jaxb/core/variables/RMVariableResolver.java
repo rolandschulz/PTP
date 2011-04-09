@@ -11,7 +11,6 @@ package org.eclipse.ptp.rm.jaxb.core.variables;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IDynamicVariable;
@@ -23,9 +22,8 @@ import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
 
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
-		Map<String, Object> variables = RMVariableMap.getActiveInstance().getVariables();
 		String[] parts = argument.split(PDRX);
-		Object value = variables.get(parts[0]);
+		Object value = RMVariableMap.getActiveInstance().get(parts[0]);
 		if (value != null) {
 			if (parts.length == 2) {
 				try {
