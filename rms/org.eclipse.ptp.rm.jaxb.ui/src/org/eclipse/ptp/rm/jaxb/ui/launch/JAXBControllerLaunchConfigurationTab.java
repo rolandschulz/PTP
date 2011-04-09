@@ -33,7 +33,6 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 
 	private ScrolledComposite scrolledParent;
 	private LCVariableMap lcMap;
-	private boolean initialized;
 
 	public JAXBControllerLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
 		super(dialog);
@@ -58,7 +57,6 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this, i));
 			}
 		}
-		initialized = false;
 	}
 
 	@Override
@@ -112,18 +110,14 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 
 	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
-		if (!initialized) {
-			try {
-				((IJAXBResourceManagerConfiguration) rm.getConfiguration()).setActive();
-				if (lcMap == null) {
-					lcMap = LCVariableMap.createInstance(RMVariableMap.getActiveInstance());
-					LCVariableMap.setActiveInstance(lcMap);
-				}
-			} catch (Throwable t) {
-				JAXBUIPlugin.log(t);
-				return new RMLaunchValidation(false, t.getMessage());
-			}
-			initialized = true;
+		try {
+			((IJAXBResourceManagerConfiguration) rm.getConfiguration()).setActive();
+			lcMap = LCVariableMap.createInstance(RMVariableMap.getActiveInstance());
+			LCVariableMap.setActiveInstance(lcMap);
+			updateHandler.getControlToModelMap().clear();
+		} catch (Throwable t) {
+			JAXBUIPlugin.log(t);
+			return new RMLaunchValidation(false, t.getMessage());
 		}
 		return super.initializeFrom(control, rm, queue, configuration);
 	}

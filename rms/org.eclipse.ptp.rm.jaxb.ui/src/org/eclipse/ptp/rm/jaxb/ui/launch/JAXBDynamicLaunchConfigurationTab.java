@@ -48,7 +48,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	private final List<Viewer> viewers;
 	private final Map<Object, IUpdateModel> localWidgets;
 	private final boolean shared;
-	private boolean initialized;
 
 	private Button viewScript;
 
@@ -64,12 +63,11 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		updateHandler = parentTab.getUpdateHandler();
 		localWidgets = new HashMap<Object, IUpdateModel>();
 		viewers = new ArrayList<Viewer>();
-		initialized = false;
 	}
 
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
 		/*
-		 * Value validation is now handled up front
+		 * Value validation is handled up front
 		 */
 		return new RMLaunchValidation(true, null);
 	}
@@ -123,44 +121,41 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
-		if (!initialized) {
-			try {
-				if (viewScript != null) {
-					viewScript.addSelectionListener(createViewScriptListener(configuration));
-				}
-
-				ValueUpdateHandler handler = getParent().getUpdateHandler();
-				viewers.clear();
-				for (Map.Entry<Object, IUpdateModel> e : localWidgets.entrySet()) {
-					Object key = e.getKey();
-					if (key instanceof Viewer) {
-						Viewer viewer = (Viewer) key;
-						viewers.add(viewer);
-					}
-					handler.addUpdateModelEntry(key, e.getValue());
-				}
-
-				LCVariableMap lcMap = parentTab.getLCMap();
-				lcMap.restoreGlobal();
-
-				for (IUpdateModel m : localWidgets.values()) {
-					m.initialize(lcMap);
-				}
-
-				for (IUpdateModel m : localWidgets.values()) {
-					if (m instanceof ViewerUpdateModel) {
-						((ViewerUpdateModel) m).initializeSelected();
-					}
-				}
-
-				for (Viewer v : viewers) {
-					WidgetActionUtils.refreshViewer(v);
-				}
-				initialized = true;
-			} catch (Throwable t) {
-				JAXBUIPlugin.log(t);
-				return new RMLaunchValidation(false, t.getMessage());
+		try {
+			if (viewScript != null) {
+				viewScript.addSelectionListener(createViewScriptListener(configuration));
 			}
+
+			ValueUpdateHandler handler = getParent().getUpdateHandler();
+			viewers.clear();
+			for (Map.Entry<Object, IUpdateModel> e : localWidgets.entrySet()) {
+				Object key = e.getKey();
+				if (key instanceof Viewer) {
+					Viewer viewer = (Viewer) key;
+					viewers.add(viewer);
+				}
+				handler.addUpdateModelEntry(key, e.getValue());
+			}
+
+			LCVariableMap lcMap = parentTab.getLCMap();
+			lcMap.restoreGlobal();
+
+			for (IUpdateModel m : localWidgets.values()) {
+				m.initialize(lcMap);
+			}
+
+			for (IUpdateModel m : localWidgets.values()) {
+				if (m instanceof ViewerUpdateModel) {
+					((ViewerUpdateModel) m).initializeSelected();
+				}
+			}
+
+			for (Viewer v : viewers) {
+				WidgetActionUtils.refreshViewer(v);
+			}
+		} catch (Throwable t) {
+			JAXBUIPlugin.log(t);
+			return new RMLaunchValidation(false, t.getMessage());
 		}
 		return new RMLaunchValidation(true, null);
 	}
