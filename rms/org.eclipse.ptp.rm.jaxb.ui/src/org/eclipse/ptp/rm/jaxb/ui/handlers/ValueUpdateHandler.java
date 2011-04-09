@@ -23,6 +23,10 @@ public class ValueUpdateHandler implements IValueUpdateHandler {
 		controlToModelMap.put(control, model);
 	}
 
+	public void clear() {
+		controlToModelMap.clear();
+	}
+
 	public Map<Object, IUpdateModel> getControlToModelMap() {
 		return controlToModelMap;
 	}

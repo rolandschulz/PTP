@@ -61,6 +61,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 
 	@Override
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
+		updateHandler.clear();
 		if (parent instanceof ScrolledComposite) {
 			scrolledParent = (ScrolledComposite) parent;
 		}

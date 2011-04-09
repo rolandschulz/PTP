@@ -18,10 +18,6 @@
 		<attribute name="mpiCores" min="1" type="integer">
 			<description>the '-np' value</description>
 		</attribute>
-		<attribute name="mpiArgs" type="string" visible="false">
-			<description>Which mpi options to use.</description>
-			<default>-machinefile $PBS_NODEFILE -np ${rm:mpiCores}</default>
-		</attribute>
 		<attribute name="Account_Name" type="string">
 			<description>Account to which to charge this job.</description>
 			<tooltip>Format: string</tooltip>
@@ -346,10 +342,10 @@
 				<arg isUndefinedIfMatches="# @ PBS -v"># @ PBS -v ${rm:Variable_List#value}</arg>
 			</line>
 			<line>
-				<arg>MPI_ARGS="${rm:mpiArgs#value}"</arg>
+				<arg>MPI_ARGS="-machinefile $PBS_NODEFILE -np ${rm:mpiCores}"</arg>
 			</line>
 			<line>
-				<arg resolve="false">if [ "-np" == "$MPI_ARGS" ] ; then</arg>
+				<arg resolve="false">if [ "-machinefile $PBS_NODEFILE -np" == "$MPI_ARGS" ] ; then</arg>
 			</line>
 			<line>
 				<arg resolve="false">MPI_ARGS=</arg>
