@@ -62,6 +62,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	public LaunchTabBuilder(JAXBDynamicLaunchConfigurationTab tab) {
 		this.tab = tab;
 		this.localWidgets = tab.getLocalWidgets();
+		this.localWidgets.clear();
 	}
 
 	public void build(Composite parent) throws Throwable {

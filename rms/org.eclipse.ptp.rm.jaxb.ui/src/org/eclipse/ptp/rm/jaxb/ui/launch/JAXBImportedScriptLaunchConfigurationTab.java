@@ -100,10 +100,11 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 		try {
 			String uriStr = configuration.getAttribute(SCRIPT_PATH, ZEROSTR);
 			if (!ZEROSTR.equals(uriStr)) {
-				selected = ZEROSTR;
+				selected = uriStr;
+			} else {
+				selected = null;
 			}
-			contents.setLength(0);
-			contents.append(configuration.getAttribute(SCRIPT, ZEROSTR));
+			uploadScript();
 		} catch (Throwable t) {
 			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnLoadFromStore, Messages.ErrorOnLoadTitle, false);
 		}
@@ -146,6 +147,25 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	}
 
 	private void updateContents() throws Throwable {
+		uploadScript();
+		fireContentsChanged();
+	}
+
+	private void updateControls() {
+		if (selected != null) {
+			choice.setText(selected);
+		} else {
+			choice.setText(ZEROSTR);
+		}
+		editor.setText(contents.toString());
+		if (ZEROSTR.equals(contents)) {
+			clear.setEnabled(false);
+		} else {
+			clear.setEnabled(true);
+		}
+	}
+
+	private void uploadScript() throws Throwable {
 		contents.setLength(0);
 		if (null != selected) {
 			BufferedReader br = new BufferedReader(new FileReader(new File(selected)));
@@ -161,21 +181,6 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 				}
 			}
 		}
-		if (selected != null) {
-			choice.setText(selected);
-		} else {
-			choice.setText(ZEROSTR);
-		}
-		editor.setText(contents.toString());
 		updateControls();
-		fireContentsChanged();
-	}
-
-	private void updateControls() {
-		if (ZEROSTR.equals(contents)) {
-			clear.setEnabled(false);
-		} else {
-			clear.setEnabled(true);
-		}
 	}
 }

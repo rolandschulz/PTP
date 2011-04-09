@@ -39,9 +39,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Shell;
 
-public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab {
+public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener {
 
 	private final TabController controller;
 	private final ValueUpdateHandler updateHandler;
@@ -50,6 +52,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	private final boolean shared;
 
 	private Button viewScript;
+	private ILaunchConfiguration listenerConfiguration;
 
 	public JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, TabController controller,
 			JAXBControllerLaunchConfigurationTab parentTab, int tabIndex) {
@@ -122,11 +125,12 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		try {
+			ValueUpdateHandler handler = getParent().getUpdateHandler();
+			listenerConfiguration = configuration;
 			if (viewScript != null) {
-				viewScript.addSelectionListener(createViewScriptListener(configuration));
+				viewScript.addSelectionListener(this);
 			}
 
-			ValueUpdateHandler handler = getParent().getUpdateHandler();
 			viewers.clear();
 			for (Map.Entry<Object, IUpdateModel> e : localWidgets.entrySet()) {
 				Object key = e.getKey();
@@ -174,6 +178,25 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		return new RMLaunchValidation(true, null);
 	}
 
+	public void widgetDefaultSelected(SelectionEvent e) {
+		widgetSelected(e);
+	}
+
+	public void widgetSelected(SelectionEvent e) {
+		Shell shell = Display.getDefault().getActiveShell();
+		try {
+			if (!parentTab.hasScript()) {
+				WidgetActionUtils.warningMessage(shell, Messages.ScriptNotSupportedWarning,
+						Messages.ScriptNotSupportedWarning_title);
+				return;
+			}
+			String text = realizeLocalScript(listenerConfiguration);
+			new ScrollingEditableMessageDialog(shell, Messages.DisplayScript, text, true).open();
+		} catch (Throwable t) {
+			WidgetActionUtils.errorMessage(shell, t, Messages.DisplayScriptError, Messages.DisplayScriptErrorTitle, false);
+		}
+	}
+
 	@Override
 	protected void doRefreshLocal() {
 		for (IUpdateModel m : getModels()) {
@@ -204,29 +227,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				resetDefaults();
 			}
 		});
-	}
-
-	private SelectionListener createViewScriptListener(final ILaunchConfiguration configuration) {
-		return new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				try {
-					if (!parentTab.hasScript()) {
-						WidgetActionUtils.warningMessage(control.getShell(), Messages.ScriptNotSupportedWarning,
-								Messages.ScriptNotSupportedWarning_title);
-						return;
-					}
-					String text = realizeLocalScript(configuration);
-					new ScrollingEditableMessageDialog(control.getShell(), Messages.DisplayScript, text, true).open();
-				} catch (Throwable t) {
-					WidgetActionUtils.errorMessage(control.getShell(), t, Messages.DisplayScriptError,
-							Messages.DisplayScriptErrorTitle, false);
-				}
-			}
-		};
 	}
 
 	private Collection<IUpdateModel> getModels() {
