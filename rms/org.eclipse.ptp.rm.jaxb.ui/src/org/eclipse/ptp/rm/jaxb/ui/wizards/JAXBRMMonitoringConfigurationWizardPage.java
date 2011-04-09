@@ -10,9 +10,12 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
-import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.data.Site;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.widgets.Composite;
@@ -23,7 +26,10 @@ import org.eclipse.swt.widgets.Composite;
  * @author arossi
  * 
  */
-public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage {
+public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage implements
+		IJAXBUINonNLSConstants {
+
+	private final IJAXBResourceManagerConfiguration baseConfiguration;
 
 	public JAXBRMMonitoringConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		this(wizard, Messages.JAXBRMMonitoringConfigurationWizardPage_Title);
@@ -31,21 +37,11 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 
 	public JAXBRMMonitoringConfigurationWizardPage(IRMConfigurationWizard wizard, String pageName) {
 		super(wizard, pageName);
+		baseConfiguration = (IJAXBResourceManagerConfiguration) wizard.getBaseConfiguration();
 		setPageComplete(false);
 		setTitle(Messages.JAXBRMMonitoringConfigurationWizardPage_Title);
 		setDescription(Messages.JAXBConnectionWizardPage_Description);
 		setEnableUseDefault(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3b);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#getConfiguration()
-	 */
-	@Override
-	protected IJAXBResourceManagerConfiguration getConfiguration() {
-		return (IJAXBResourceManagerConfiguration) super.getConfiguration();
 	}
 
 	/*
@@ -58,10 +54,25 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 	@Override
 	protected Composite doCreateContents(Composite parent) {
 		Composite comp = super.doCreateContents(parent);
-		String[] hints = new String[] { IRemoteUIConnectionManager.CONNECTION_ADDRESS_HINT,
-				IRemoteUIConnectionManager.CONNECTION_PORT_HINT };
-		String[] defaults = new String[] { getConfiguration().getDefaultMonitorHost(), getConfiguration().getDefaultMonitorPort() };
-		connectionWidget.setHints(hints, defaults);
+		Site site = baseConfiguration.getResourceManagerData().getSiteData();
+		try {
+			String host = getConfiguration().getDefaultMonitorHost();
+			String port = getConfiguration().getDefaultMonitorPort();
+			RemoteUIServicesUtils.setConnectionHints(connectionWidget, host, port, site.getMonitorServerInstall());
+		} catch (Throwable t) {
+			JAXBUIPlugin.log(t);
+		}
 		return comp;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#getConfiguration()
+	 */
+	@Override
+	protected IJAXBResourceManagerConfiguration getConfiguration() {
+		return (IJAXBResourceManagerConfiguration) super.getConfiguration();
 	}
 }

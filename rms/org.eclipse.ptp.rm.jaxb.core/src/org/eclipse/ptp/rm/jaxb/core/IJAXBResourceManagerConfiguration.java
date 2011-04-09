@@ -55,8 +55,6 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	 * @since 5.0
 	 */
 
-	String[] getExternalRMInstanceXMLLocations();
-
 	/**
 	 * @since 5.0
 	 */
@@ -76,11 +74,6 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	 * @since 5.0
 	 */
 	void setActive() throws Throwable;
-
-	/**
-	 * @since 5.0
-	 */
-	void setExternalRMInstanceXMLLocations(String[] location);
 
 	/**
 	 * @since 5.0

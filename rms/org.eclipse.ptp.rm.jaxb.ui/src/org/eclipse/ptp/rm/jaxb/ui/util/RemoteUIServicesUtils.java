@@ -14,16 +14,20 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.rm.jaxb.core.utils.FileUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -92,6 +96,43 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 
 	public static URI getUserHome() {
 		return new File(System.getProperty(JAVA_USER_HOME)).toURI();
+	}
+
+	public static void setConnectionHints(RemoteConnectionWidget connectionWidget, String defaultHost, String defaultPort,
+			String connection) throws URISyntaxException {
+		String host = null;
+		String port = null;
+		if (connection != null) {
+			if (connection != null) {
+				URI uri = new URI(connection);
+				host = uri.getHost();
+				int p = uri.getPort();
+				if (p != UNDEFINED) {
+					port = String.valueOf(p);
+				}
+			}
+		}
+		if (host == null) {
+			host = defaultHost;
+		}
+		if (port == null) {
+			port = defaultPort;
+		}
+		Map<String, String> result = new HashMap<String, String>();
+		if (host != null && !ZEROSTR.equals(host)) {
+			result.put(IRemoteUIConnectionManager.CONNECTION_ADDRESS_HINT, host);
+		}
+		if (port != null && !ZEROSTR.equals(port)) {
+			result.put(IRemoteUIConnectionManager.CONNECTION_PORT_HINT, port);
+		}
+		String[] hints = new String[result.size()];
+		String[] defaults = new String[hints.length];
+		int i = 0;
+		for (String s : result.keySet()) {
+			hints[i] = s;
+			defaults[i++] = result.get(s);
+		}
+		connectionWidget.setHints(hints, defaults);
 	}
 
 	public static URI writeContentsToFile(Shell shell, String contents, URI file, RemoteServicesDelegate delegate) throws Throwable {

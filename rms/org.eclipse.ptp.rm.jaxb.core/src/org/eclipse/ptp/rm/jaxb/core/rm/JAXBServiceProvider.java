@@ -161,11 +161,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		return ZEROSTR;
 	}
 
-	public String[] getExternalRMInstanceXMLLocations() {
-		String list = getString(EXTERNAL_RM_XSD_PATHS, ZEROSTR);
-		return list.split(CM);
-	}
-
 	public ResourceManagerData getResourceManagerData() {
 		return rmdata;
 	}
@@ -210,7 +205,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 				throw new InstantiationError(Messages.FailedToCreateRmData);
 			}
 			JAXBInitializationUtils.initializeMap(rmdata, map);
-
 		}
 	}
 
@@ -225,18 +219,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		}
 		setName(name);
 		setDescription(Messages.JAXBServiceProvider_defaultDescription);
-	}
-
-	public void setExternalRMInstanceXMLLocations(String[] locations) {
-		if (locations == null || locations.length == 0) {
-			putString(EXTERNAL_RM_XSD_PATHS, ZEROSTR);
-		} else {
-			StringBuffer list = new StringBuffer(locations[0]);
-			for (int i = 1; i < locations.length; i++) {
-				list.append(CM).append(locations[i]);
-			}
-			putString(EXTERNAL_RM_XSD_PATHS, list.toString());
-		}
 	}
 
 	public void setRMConfigurationURL(URL location) {

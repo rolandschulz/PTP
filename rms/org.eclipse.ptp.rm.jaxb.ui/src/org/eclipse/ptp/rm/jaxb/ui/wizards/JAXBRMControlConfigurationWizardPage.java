@@ -10,9 +10,12 @@
 
 package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
-import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.data.Site;
+import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.widgets.Composite;
@@ -23,24 +26,17 @@ import org.eclipse.swt.widgets.Composite;
  * @author arossi
  * 
  */
-public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage {
+public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage implements
+		IJAXBUINonNLSConstants {
+
+	private final IJAXBResourceManagerConfiguration baseConfiguration;
 
 	public JAXBRMControlConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.JAXBRMControlConfigurationWizardPage_Title);
+		baseConfiguration = (IJAXBResourceManagerConfiguration) wizard.getBaseConfiguration();
 		setPageComplete(false);
 		setTitle(Messages.JAXBRMControlConfigurationWizardPage_Title);
 		setDescription(Messages.JAXBConnectionWizardPage_Description);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#getConfiguration()
-	 */
-	@Override
-	protected IJAXBResourceManagerConfiguration getConfiguration() {
-		return (IJAXBResourceManagerConfiguration) super.getConfiguration();
 	}
 
 	/*
@@ -53,10 +49,26 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 	@Override
 	protected Composite doCreateContents(Composite parent) {
 		Composite comp = super.doCreateContents(parent);
-		String[] hints = new String[] { IRemoteUIConnectionManager.CONNECTION_ADDRESS_HINT,
-				IRemoteUIConnectionManager.CONNECTION_PORT_HINT };
-		String[] defaults = new String[] { getConfiguration().getDefaultMonitorHost(), getConfiguration().getDefaultMonitorPort() };
-		connectionWidget.setHints(hints, defaults);
+		Site site = baseConfiguration.getResourceManagerData().getSiteData();
+		try {
+			String host = getConfiguration().getDefaultControlHost();
+			String port = getConfiguration().getDefaultControlPort();
+			RemoteUIServicesUtils.setConnectionHints(connectionWidget, host, port, site.getControlConnection());
+
+		} catch (Throwable t) {
+			JAXBUIPlugin.log(t);
+		}
 		return comp;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#getConfiguration()
+	 */
+	@Override
+	protected IJAXBResourceManagerConfiguration getConfiguration() {
+		return (IJAXBResourceManagerConfiguration) super.getConfiguration();
 	}
 }
