@@ -18,6 +18,7 @@ import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
 
 public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunchConfigurationDynamicTab implements
 		IJAXBUINonNLSConstants {
@@ -25,8 +26,10 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	protected final JAXBControllerLaunchConfigurationTab parentTab;
 	protected final Map<String, Object> localMap;
 	protected String title;
+	protected Composite control;
 
-	protected AbstractJAXBLaunchConfigurationTab(JAXBControllerLaunchConfigurationTab parentTab, ILaunchConfigurationDialog dialog) {
+	protected AbstractJAXBLaunchConfigurationTab(JAXBControllerLaunchConfigurationTab parentTab, ILaunchConfigurationDialog dialog,
+			int tabIndex) {
 		super(dialog);
 		this.parentTab = parentTab;
 		this.title = Messages.DefaultDynamicTab_title;
@@ -38,21 +41,23 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	public abstract String getText();
 
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		Map<String, Object> current = null;
-		LCVariableMap lcMap = parentTab.getLCMap();
-		try {
-			refreshLocal(configuration);
-			current = lcMap.swapVariables(localMap);
-			lcMap.saveToConfiguration(configuration);
-		} catch (CoreException t) {
-			JAXBUIPlugin.log(t);
-			return new RMLaunchValidation(false, t.getMessage());
-		} finally {
+		if (control.isVisible()) {
+			Map<String, Object> current = null;
+			LCVariableMap lcMap = parentTab.getLCMap();
 			try {
-				lcMap.swapVariables(current);
+				refreshLocal(configuration);
+				current = lcMap.swapVariables(localMap);
+				lcMap.writeToConfiguration(configuration);
 			} catch (CoreException t) {
 				JAXBUIPlugin.log(t);
 				return new RMLaunchValidation(false, t.getMessage());
+			} finally {
+				try {
+					lcMap.swapVariables(current);
+				} catch (CoreException t) {
+					JAXBUIPlugin.log(t);
+					return new RMLaunchValidation(false, t.getMessage());
+				}
 			}
 		}
 		return new RMLaunchValidation(true, null);

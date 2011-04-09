@@ -29,6 +29,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	private final LaunchTab launchTabData;
 	private final Script script;
 	private final ValueUpdateHandler updateHandler;
+	private int saveIndex;
 
 	private ScrolledComposite scrolledParent;
 	private LCVariableMap lcMap;
@@ -42,18 +43,19 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
 		delegate = rm.getControl().getRemoteServicesDelegate();
 		updateHandler = new ValueUpdateHandler(this);
+		int i = 0;
 		if (launchTabData != null) {
 			TabController controller = launchTabData.getBasic();
 			if (controller != null) {
-				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
+				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this, i++));
 			}
 			controller = launchTabData.getAdvanced();
 			if (controller != null) {
-				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
+				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this, i++));
 			}
 			String title = launchTabData.getCustomController();
 			if (title != null) {
-				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this));
+				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this, i));
 			}
 		}
 		initialized = false;
@@ -86,6 +88,10 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 
 	public IJAXBResourceManagerConfiguration getRmConfig() {
 		return rmConfig;
+	}
+
+	public int getSaveIndex() {
+		return saveIndex;
 	}
 
 	public Script getScript() {
@@ -126,5 +132,9 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		if (scrolledParent != null) {
 			scrolledParent.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		}
+	}
+
+	public void setSaveIndex(int saveIndex) {
+		this.saveIndex = saveIndex;
 	}
 }

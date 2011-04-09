@@ -30,7 +30,6 @@ import org.eclipse.swt.widgets.Text;
 
 public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener {
 
-	private Composite control;
 	private Text choice;
 	private Text editor;
 	private Button browseWorkspace;
@@ -40,8 +39,8 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	private final StringBuffer contents;
 
 	public JAXBImportedScriptLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, String title,
-			JAXBControllerLaunchConfigurationTab parentTab) {
-		super(parentTab, dialog);
+			JAXBControllerLaunchConfigurationTab parentTab, int tabIndex) {
+		super(parentTab, dialog, tabIndex);
 		if (title != null) {
 			this.title = title;
 		}
