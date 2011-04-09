@@ -86,6 +86,8 @@ public class Messages extends NLS {
 
 	public static String ValidationError;
 	public static String ValidationError_title;
+	public static String InvalidConfiguration;
+	public static String InvalidConfiguration_title;
 
 	static {
 		// initialize resource bundle
