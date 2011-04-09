@@ -26,10 +26,14 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
+import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.wizards.RMConfigurationSelectionFactory;
+import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 
 public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectionFactory implements IJAXBUINonNLSConstants {
@@ -122,7 +126,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 
 		/*
 		 * Also search the workspace for managers. By convention these should
-		 * all go in a directory called "resourceManagers"
+		 * all go in a directory called "resourceManagers". Loads only valid XML
 		 */
 		Map<String, URL> info = fRMJAXBResourceManagers.get(JAXB_SERVICE_PROVIDER_EXTPT);
 		if (info == null) {
@@ -137,6 +141,14 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 				try {
 					String name = rm.getName();
 					name = name.substring(0, name.length() - 4);
+					URL url = rm.toURL();
+					try {
+						JAXBInitializationUtils.validate(url);
+					} catch (Throwable t) {
+						WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.InvalidConfiguration
+								+ name, Messages.InvalidConfiguration_title, false);
+						continue;
+					}
 					info.put(name, rm.toURL());
 				} catch (MalformedURLException t) {
 					JAXBUIPlugin.log(t);
