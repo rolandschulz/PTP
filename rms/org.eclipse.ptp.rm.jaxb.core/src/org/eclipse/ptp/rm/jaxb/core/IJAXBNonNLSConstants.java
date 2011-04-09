@@ -143,6 +143,8 @@ public interface IJAXBNonNLSConstants {
 	String STDERR = "stderr";//$NON-NLS-1$
 	String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";//$NON-NLS-1$
 
+	String RESOURCE_MANAGERS = "resourceManagers";//$NON-NLS-1$
+	String CUSTOM = "custom";//$NON-NLS-1$
 	String CONTROL_USER_NAME = "controlUserName";//$NON-NLS-1$
 	String MONITOR_USER_NAME = "monitorUserName";//$NON-NLS-1$
 	String CONTROL_CONNECTION_NAME = "controlConnectionName";//$NON-NLS-1$
@@ -191,12 +193,13 @@ public interface IJAXBNonNLSConstants {
 	String LITERAL = "LITERAL";//$NON-NLS-1$
 	String COMMENTS = "COMMENTS";//$NON-NLS-1$
 
+	String DOT_XML = ".xml";//$NON-NLS-1$
 	String TOKENIZER_EXT_PT = "streamParserTokenizer";//$NON-NLS-1$
 	String TAIL = "tail";//$NON-NLS-1$
 	String MINUS_F = "-f";//$NON-NLS-1$
 	String CONFIGURATION_FILE_ATTRIBUTE = "configurationFile"; //$NON-NLS-1$
 	String RM_CONFIG_EXTENSION_POINT = "org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations"; //$NON-NLS-1$
-
+	String JAXB_SERVICE_PROVIDER_EXTPT = "org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"; //$NON-NLS-1$
 	/*
 	 * EFS Attributes
 	 */
