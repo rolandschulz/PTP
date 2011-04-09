@@ -20,7 +20,6 @@ import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
-import org.eclipse.ptp.rm.jaxb.ui.IFireContentsChangedEnabled;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.ScrollingEditableMessageDialog;
@@ -42,7 +41,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 
-public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements IFireContentsChangedEnabled {
+public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab {
 
 	private final TabController controller;
 	private final ValueUpdateHandler updateHandler;
@@ -51,12 +50,11 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	private final boolean shared;
 	private boolean initialized;
 
-	private Composite control;
 	private Button viewScript;
 
 	public JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, TabController controller,
-			JAXBControllerLaunchConfigurationTab parentTab) {
-		super(parentTab, dialog);
+			JAXBControllerLaunchConfigurationTab parentTab, int tabIndex) {
+		super(parentTab, dialog, tabIndex);
 		this.controller = controller;
 		shared = controller.isSharedEnvironment();
 		String title = controller.getTitle();
@@ -86,11 +84,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		}
 		createViewScriptGroup(control);
 		parentTab.resize(this.control);
-	}
-
-	@Override
-	public void fireContentsChanged() {
-		super.fireContentsChanged();
 	}
 
 	public Control getControl() {
@@ -140,7 +133,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				viewers.clear();
 				for (Map.Entry<Object, IUpdateModel> e : localWidgets.entrySet()) {
 					Object key = e.getKey();
-					System.out.println("key: " + key);
 					if (key instanceof Viewer) {
 						Viewer viewer = (Viewer) key;
 						viewers.add(viewer);

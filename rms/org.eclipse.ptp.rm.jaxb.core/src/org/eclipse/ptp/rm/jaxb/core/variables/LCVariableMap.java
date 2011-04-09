@@ -23,7 +23,6 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 
 	private static LCVariableMap active;
-	private static boolean verbose = true;
 
 	private Map<String, Object> globalValues;
 	private Map<String, Object> values;
@@ -87,17 +86,6 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		values = globalValues;
 	}
 
-	public void saveToConfiguration(ILaunchConfigurationWorkingCopy configuration) throws CoreException {
-		configuration.setAttributes(values);
-		// configuration.doSave();
-		if (verbose) {
-			Map m = configuration.getAttributes();
-			for (Object key : m.keySet()) {
-				System.out.println(key + ", '" + m.get(key) + "'");
-			}
-		}
-	}
-
 	public Map<String, Object> selectVariables(List<String> keys) {
 		Map<String, Object> m = new HashMap<String, Object>();
 		for (String k : keys) {
@@ -116,6 +104,10 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		Map<String, Object> oldV = values;
 		values = newV;
 		return oldV;
+	}
+
+	public void writeToConfiguration(ILaunchConfigurationWorkingCopy configuration) throws CoreException {
+		configuration.setAttributes(values);
 	}
 
 	private String dereference(String expression) throws CoreException {

@@ -35,6 +35,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 	}
 
 	protected final Job validateJob;
+
 	protected boolean canSave;
 	protected String name;
 	protected LCVariableMap lcMap;
