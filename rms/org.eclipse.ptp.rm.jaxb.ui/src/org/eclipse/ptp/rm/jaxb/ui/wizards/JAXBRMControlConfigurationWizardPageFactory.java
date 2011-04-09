@@ -32,5 +32,4 @@ public class JAXBRMControlConfigurationWizardPageFactory extends RMConfiguration
 		pages.add(new JAXBRMControlConfigurationWizardPage(wizard));
 		return pages.toArray(new RMConfigurationWizardPage[0]);
 	}
-
 }

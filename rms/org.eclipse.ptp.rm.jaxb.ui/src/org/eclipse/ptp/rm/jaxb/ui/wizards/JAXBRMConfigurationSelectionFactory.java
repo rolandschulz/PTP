@@ -68,13 +68,26 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	@Override
 	public void setConfigurationName(String name, IResourceManagerConfiguration configuration) {
 		if (configuration instanceof IJAXBResourceManagerConfiguration) {
-			((IJAXBResourceManagerConfiguration) configuration).setRMConfigurationURL(getJAXBResourceManagerConfiguration(name));
-			configuration.setName(name);
+			IJAXBResourceManagerConfiguration jaxbConfiguration = (IJAXBResourceManagerConfiguration) configuration;
+			jaxbConfiguration.setRMConfigurationURL(getJAXBResourceManagerConfiguration(name));
+			/*
+			 * In order to make the Site information available to the wizards,
+			 * we need to realize the data object here, since the URL is set on
+			 * the base configuration, but the wizards access the component
+			 * configurations.
+			 */
+			try {
+				jaxbConfiguration.realizeRMDataFromXML();
+			} catch (Throwable t) {
+				WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.InvalidConfiguration + name,
+						Messages.InvalidConfiguration_title, false);
+			}
 		}
+		configuration.setName(name);
 	}
 
 	private URL getJAXBResourceManagerConfiguration(String name) {
-		loadJAXBResourceManagers();
+		loadJAXBResourceManagers(false);
 		Map<String, URL> info = fRMJAXBResourceManagers.get(getId());
 		if (info != null) {
 			return info.get(name);
@@ -83,7 +96,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	}
 
 	private String[] getJAXBResourceManagerNames() {
-		loadJAXBResourceManagers();
+		loadJAXBResourceManagers(true);
 		Map<String, URL> info = fRMJAXBResourceManagers.get(getId());
 		if (info != null) {
 			return info.keySet().toArray(new String[0]);
@@ -91,7 +104,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 		return new String[0];
 	}
 
-	private static void loadJAXBResourceManagers() {
+	private static void loadJAXBResourceManagers(boolean initial) {
 		if (fRMJAXBResourceManagers == null) {
 			fRMJAXBResourceManagers = new HashMap<String, Map<String, URL>>();
 		} else {
@@ -145,8 +158,10 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 					try {
 						JAXBInitializationUtils.validate(url);
 					} catch (Throwable t) {
-						WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.InvalidConfiguration
-								+ name, Messages.InvalidConfiguration_title, false);
+						if (initial) {
+							WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.InvalidConfiguration
+									+ name, Messages.InvalidConfiguration_title, false);
+						}
 						continue;
 					}
 					info.put(name, rm.toURL());
