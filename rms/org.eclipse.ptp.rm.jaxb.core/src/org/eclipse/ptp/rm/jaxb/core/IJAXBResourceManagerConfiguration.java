@@ -23,10 +23,6 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	/**
 	 * @since 5.0
 	 */
-
-	/**
-	 * @since 5.0
-	 */
 	ResourceManagerData getResourceManagerData();
 
 	/**

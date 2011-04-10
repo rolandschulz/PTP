@@ -42,7 +42,7 @@ public interface IJAXBNonNLSConstants {
 	String GT = ">";//$NON-NLS-1$
 	String GTLT = "><";//$NON-NLS-1$
 	String HYPH = "-";//$NON-NLS-1$
-	String AMP = "@";//$NON-NLS-1$
+	String AT = "@";//$NON-NLS-1$
 	String DOL = "$";//$NON-NLS-1$
 	String PIP = "|";//$NON-NLS-1$
 	String DOT = ".";//$NON-NLS-1$
@@ -105,8 +105,8 @@ public interface IJAXBNonNLSConstants {
 	String SELECTED = "visible";//$NON-NLS-1$
 	String LOCAL = "local";//$NON-NLS-1$
 	String JOB_ID_TAG = "@jobId";//$NON-NLS-1$
-	String NAME_TAG = AMP + NAME;
-	String VALUE_TAG = AMP + VALUE;
+	String NAME_TAG = AT + NAME;
+	String VALUE_TAG = AT + VALUE;
 
 	/* TYPE MATCHING */
 	String NT = "nt";//$NON-NLS-1$
