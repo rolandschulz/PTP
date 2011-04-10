@@ -9,10 +9,32 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+/**
+ * High-level interface for resolver environments.
+ * 
+ * Implementations:
+ * 
+ * @see org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap
+ * @see org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap
+ * 
+ * @author arossi
+ * 
+ */
 public interface IVariableMap {
 
+	/**
+	 * @param value
+	 *            expression to resolve.
+	 * @return resolved expression
+	 */
 	String getString(String value);
 
-	String getString(String jobId, String value);
-
+	/**
+	 * @param uuid
+	 *            internal identifier associate with a job submission
+	 * @param value
+	 *            expression to resolve.
+	 * @return resolved expression
+	 */
+	String getString(String uuid, String value);
 }

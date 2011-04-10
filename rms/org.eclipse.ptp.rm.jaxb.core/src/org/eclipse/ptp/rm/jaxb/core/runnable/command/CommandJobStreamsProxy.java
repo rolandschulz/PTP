@@ -17,6 +17,17 @@ import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
+/**
+ * Implementation of (@see org.eclipse.debug.core.model.IStreamsProxy, @see
+ * org.eclipse.debug.core.model.IStreamsProxy2) adapted to resource manager
+ * command jobs.<br>
+ * <br>
+ * 
+ * Note that for batch submissions the stream monitors will be attached to a
+ * tail -f stream rather than the stream from the actual running process.
+ * 
+ * @author arossi
+ */
 public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 
 	private ICommandJobStreamMonitor out;
@@ -25,6 +36,9 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 	private boolean fClosed = false;
 	private boolean fStarted = false;
 
+	/**
+	 * Closes both monitors.
+	 */
 	public synchronized void close() {
 		if (!fClosed) {
 			if (out != null) {
@@ -37,26 +51,48 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 		}
 	}
 
+	/**
+	 * At present we do not allow writing to the process. May be supported in
+	 * the future.
+	 */
 	public void closeInputStream() throws IOException {
 		JAXBCorePlugin.log(new IOException(Messages.UnsupportedWriteException));
 	}
 
+	/**
+	 * @return monitor for error stream
+	 */
 	public IStreamMonitor getErrorStreamMonitor() {
 		return err;
 	}
 
+	/**
+	 * @return monitor for output stream
+	 */
 	public IStreamMonitor getOutputStreamMonitor() {
 		return out;
 	}
 
+	/**
+	 * @param err
+	 *            monitor for error stream
+	 */
 	public void setErrMonitor(ICommandJobStreamMonitor err) {
 		this.err = err;
 	}
 
+	/**
+	 * @param out
+	 *            monitor for output stream
+	 */
 	public void setOutMonitor(ICommandJobStreamMonitor out) {
 		this.out = out;
 	}
 
+	/**
+	 * Called via the call to start the stream proxy for batch submissions
+	 * (startProxy) or directly during the command for interactive.
+	 */
 	public synchronized void startMonitors() {
 		if (!fClosed && !fStarted) {
 			if (out != null) {
@@ -69,6 +105,10 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 		}
 	}
 
+	/**
+	 * At present we do not allow writing to the process. May be supported in
+	 * the future.
+	 */
 	public void write(String input) throws IOException {
 		JAXBCorePlugin.log(new IOException(Messages.UnsupportedWriteException));
 	}

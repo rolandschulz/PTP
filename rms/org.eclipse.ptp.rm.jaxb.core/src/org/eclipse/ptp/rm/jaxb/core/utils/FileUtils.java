@@ -23,8 +23,29 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
+/**
+ * Convenience utilities associated with remote file operations.
+ * 
+ * @see org.eclipse.ptp.remote.core.IRemoteFileManager
+ * @see org.eclipse.core.filesystem.IFileStore
+ * 
+ * @author arossi
+ * 
+ */
 public class FileUtils implements IJAXBNonNLSConstants {
 
+	/**
+	 * @param from
+	 *            manager for source resource
+	 * @param source
+	 *            file to copy
+	 * @param to
+	 *            manager for target resource
+	 * @param target
+	 *            destination file
+	 * @param progress
+	 * @throws CoreException
+	 */
 	public static void copy(IRemoteFileManager from, String source, IRemoteFileManager to, String target, SubMonitor progress)
 			throws CoreException {
 		if (from == null) {
@@ -49,6 +70,15 @@ public class FileUtils implements IJAXBNonNLSConstants {
 		lres.copy(rres, EFS.OVERWRITE, progress.newChild(5));
 	}
 
+	/**
+	 * @param manager
+	 *            for resource where file is located
+	 * @param path
+	 *            of file
+	 * @param progress
+	 * @return contents of file
+	 * @throws CoreException
+	 */
 	public static String read(IRemoteFileManager manager, String path, SubMonitor progress) throws CoreException {
 		if (manager == null) {
 			throw CoreExceptionUtils.newException(Messages.Read_Operation_NullSourceFileManager, null);
@@ -88,6 +118,16 @@ public class FileUtils implements IJAXBNonNLSConstants {
 		return sb.toString();
 	}
 
+	/**
+	 * @param manager
+	 *            for resource where file is to be written
+	 * @param path
+	 *            of file to write
+	 * @param contents
+	 *            to write to file
+	 * @param progress
+	 * @throws CoreException
+	 */
 	public static void write(IRemoteFileManager manager, String path, String contents, SubMonitor progress) throws CoreException {
 		if (contents == null) {
 			return;

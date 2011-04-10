@@ -45,13 +45,37 @@ import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
+/**
+ * Implementation of runnable Job for executing external processes. Uses the
+ * IRemoteProcessBuilder with the IRemoteConnection for the resource manager's
+ * target.
+ * 
+ * @author arossi
+ * 
+ */
 public class CommandJob extends Job implements IJAXBNonNLSConstants {
 
+	/**
+	 * Internal class used for multiplexing output streams between two different
+	 * endpoints, usually a tokenizer on the one hand and the stream proxy
+	 * passed back to the caller on the other.
+	 * 
+	 * @author arossi
+	 */
 	private class StreamSplitter extends Thread {
 		private final InputStream in;
 		private final PipedOutputStream[] pout;
 		private final BufferedOutputStream[] bout;
 
+		/**
+		 * @param in
+		 *            the stream to be multiplexed
+		 * @param pipe1
+		 *            sink's stream from which it will read
+		 * @param pipe2
+		 *            sink's stream from which it will read
+		 * @throws IOException
+		 */
 		private StreamSplitter(InputStream in, PipedInputStream pipe1, PipedInputStream pipe2) throws IOException {
 			this.in = in;
 			assert (pipe1 != null && pipe2 != null);
@@ -60,6 +84,9 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 					new BufferedOutputStream(pout[1], STREAM_BUFFER_SIZE) };
 		}
 
+		/**
+		 * Reads from input and writes to the piped streams.
+		 */
 		@Override
 		public void run() {
 			BufferedInputStream bin = new BufferedInputStream(in);
@@ -111,6 +138,16 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private boolean active;
 	private final boolean batch;
 
+	/**
+	 * @param jobUUID
+	 *            either internal or resource specific identifier
+	 * @param command
+	 *            JAXB data element
+	 * @param batch
+	 *            whether submission is batch or interactive
+	 * @param rm
+	 *            the calling resource manager
+	 */
 	public CommandJob(String jobUUID, Command command, boolean batch, IJAXBResourceManagerControl rm) {
 		super(command.getName());
 		this.command = command;
@@ -121,14 +158,23 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		this.waitForId = command.isWaitForId();
 	}
 
+	/**
+	 * @return the process wrapper
+	 */
 	public IRemoteProcess getProcess() {
 		return process;
 	}
 
+	/**
+	 * @return object wrapping stream monitors.
+	 */
 	public ICommandJobStreamsProxy getProxy() {
 		return proxy;
 	}
 
+	/**
+	 * @return if job is active
+	 */
 	public boolean isActive() {
 		boolean b = false;
 		synchronized (this) {
@@ -137,22 +183,51 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		return b;
 	}
 
+	/**
+	 * @return if job is batch
+	 */
 	public boolean isBatch() {
 		return batch;
 	}
 
+	/**
+	 * Used by stream proxy to read stderr from file if submission is batch.
+	 * 
+	 * @param remoteErrPath
+	 *            for stream redirection (batch submissions)
+	 */
 	public void setRemoteErrPath(String remoteErrPath) {
 		this.remoteErrPath = remoteErrPath;
 	}
 
+	/**
+	 * Used by stream proxy to read stdout from file if submission is batch.
+	 * 
+	 * @param remoteOutPath
+	 */
 	public void setRemoteOutPath(String remoteOutPath) {
 		this.remoteOutPath = remoteOutPath;
 	}
 
+	/**
+	 * The resource manager should wait for the job id on the stream (parsed by
+	 * an apposite tokenizer) before returning the status object to the caller.
+	 * 
+	 * @return whether to wait
+	 */
 	public boolean waitForId() {
 		return waitForId;
 	}
 
+	/**
+	 * Uses the IRemoteProcessBuilder to set up the command and environment.
+	 * After start, the tokenizers (if any) are handled, and stream redirection
+	 * managed. Waits for the process, then joins on the consumers.<br>
+	 * <br>
+	 * Note: the resource manager does not join on this thread, but retrieves
+	 * the status object from the job, potentially while it is still running, in
+	 * order to hand it off to the caller for stream processing.
+	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		try {
@@ -200,6 +275,11 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		return Status.OK_STATUS;
 	}
 
+	/**
+	 * Wait for any stream consumer threads to exit.
+	 * 
+	 * @throws CoreException
+	 */
 	private void joinConsumers() throws CoreException {
 		Throwable t = null;
 
@@ -238,6 +318,17 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * Checks to see what tokenizers are configured for this resource manager.
+	 * If the two streams have been joined, it will prefer the redirect parser
+	 * if it exists; otherwise the joined streams will be parsed by the stdout
+	 * parser.<br>
+	 * <br>
+	 * If there is a custom extension tokenizer, it will be instantiated here.
+	 * 
+	 * @param builder
+	 * @throws CoreException
+	 */
 	private void maybeInitializeTokenizers(IRemoteProcessBuilder builder) throws CoreException {
 		Tokenizer t = null;
 
@@ -277,6 +368,13 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * Resolves the command arguments against the current environment, then gets
+	 * the process builder from the remote connection.
+	 * 
+	 * @return the process builder
+	 * @throws CoreException
+	 */
 	private IRemoteProcessBuilder prepareCommand() throws CoreException {
 		List<Arg> args = command.getArg();
 		if (args == null) {
@@ -288,6 +386,14 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		return delegate.getRemoteServices().getProcessBuilder(delegate.getRemoteConnection(), cmdArgs);
 	}
 
+	/**
+	 * Either appends to or replaces the process builder's environment with the
+	 * Launch Configuration environment variables. Also sets redirectErrorStream
+	 * on the builder.
+	 * 
+	 * @param builder
+	 * @throws CoreException
+	 */
 	private void prepareEnv(IRemoteProcessBuilder builder) throws CoreException {
 		if (!rm.getAppendEnv()) {
 			builder.environment().clear();
@@ -317,6 +423,18 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		builder.redirectErrorStream(command.isRedirectStderr());
 	}
 
+	/**
+	 * Configures handling of the error stream. If there is a tokenizer, it
+	 * first checks to see if there will be redirection from a remote file, and
+	 * if not, splits the stream between the proxy and the tokenizer; if there
+	 * is a remote file, that stream is given to the proxy and the tokenizer
+	 * gets the stderr of the submission process. If there is no tokenizer, then
+	 * the proxy gets either stderr of the submission process or redirection
+	 * from the remote file, accordingly.
+	 * 
+	 * @param process
+	 * @throws IOException
+	 */
 	private void setErrStreamRedirection(IRemoteProcess process) throws IOException {
 		if (stderrTokenizer != null) {
 			if (remoteErrPath == null) {
@@ -336,6 +454,18 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * Configures handling of the stdout stream. If there is a tokenizer, it
+	 * first checks to see if there will be redirection from a remote file, and
+	 * if not, splits the stream between the proxy and the tokenizer; if there
+	 * is a remote file, that stream is given to the proxy and the tokenizer
+	 * gets the stdout of the submission process. If there is no tokenizer, then
+	 * the proxy gets either stdout of the submission process or redirection
+	 * from the remote file, accordingly.
+	 * 
+	 * @param process
+	 * @throws IOException
+	 */
 	private void setOutStreamRedirection(IRemoteProcess process) throws IOException {
 		if (stdoutTokenizer != null) {
 			if (remoteOutPath == null) {
@@ -355,6 +485,12 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * Initiates stream reading on all consumers.
+	 * 
+	 * @param process
+	 * @throws CoreException
+	 */
 	private void startConsumers(IRemoteProcess process) throws CoreException {
 		if (outSplitter != null) {
 			outSplitter.start();
@@ -388,6 +524,14 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * Extension-based instantiation for custom tokenizer.
+	 * 
+	 * @param type
+	 *            extension name
+	 * @return the tokenizer instance
+	 * @throws CoreException
+	 */
 	public static IStreamParserTokenizer getTokenizer(String type) throws CoreException {
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBCorePlugin.PLUGIN_ID,
 				TOKENIZER_EXT_PT);

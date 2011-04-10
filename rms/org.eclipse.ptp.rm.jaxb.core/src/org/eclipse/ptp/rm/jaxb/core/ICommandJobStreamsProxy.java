@@ -12,13 +12,37 @@ package org.eclipse.ptp.rm.jaxb.core;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.debug.core.model.IStreamsProxy2;
 
+/**
+ * CommandJob-specific extension of the stream proxy.
+ * 
+ * @see org.eclipse.debug.core.model.IStreamsProxy
+ * @see org.eclipse.debug.core.model.IStreamsProxy2
+ * 
+ * @author arossi
+ * 
+ */
 public interface ICommandJobStreamsProxy extends IStreamsProxy, IStreamsProxy2 {
 
+	/**
+	 * Manually close the proxy.
+	 */
 	void close();
 
+	/**
+	 * @param err
+	 *            monitor for error stream
+	 */
 	void setErrMonitor(ICommandJobStreamMonitor err);
 
+	/**
+	 * 
+	 * @param out
+	 *            monitor for out stream
+	 */
 	void setOutMonitor(ICommandJobStreamMonitor out);
 
+	/**
+	 * Attaches monitor to stream and begins reading.
+	 */
 	void startMonitors();
 }
