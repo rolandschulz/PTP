@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- ****************************************************************************** -->
 <xs:schema targetNamespace="http://org.eclipse.ptp/rm" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rm="http://org.eclipse.ptp/rm"
 	elementFormDefault="qualified">
 	<xs:element name="resource-manager-builder" type="rm:resource-manager-data"/>
@@ -95,7 +104,6 @@
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="type" type="xs:string" default="java.lang.String"/>
-		<xs:attribute name="selected" type="xs:boolean" default="true"/>
 		<xs:attribute name="visible" type="xs:boolean" default="true"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 	</xs:complexType>
@@ -117,7 +125,6 @@
 		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="type" use="required" type="xs:string"/>
 		<xs:attribute name="visible" type="xs:boolean" default="true"/>
-		<xs:attribute name="selected" type="xs:boolean" default="true"/>
 		<xs:attribute name="status" type="xs:string"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 		<xs:attribute name="min" type="xs:int"/>
@@ -130,7 +137,6 @@
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="file-source-location" minOccurs="0" type="xs:string"/>
 			<xs:element name="file-staging-location" minOccurs="0" type="xs:string"/>
 			<xs:element name="file" maxOccurs="unbounded" type="rm:managed-file"/>
 		</xs:sequence>
@@ -207,9 +213,10 @@
 				If 'contents' is present, the file is written.
 			</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="contents" minOccurs="0" type="xs:string"/>
-		</xs:sequence>
+		<xs:choice>
+			<xs:element name="contents" type="xs:string"/>
+			<xs:element name="path" type="xs:string"/>
+		</xs:choice>
 		<xs:attribute name="name" use="required"/>
 		<xs:attribute name="uniqueIdPrefix" type="xs:boolean" default="false"/>
 		<xs:attribute name="resolveContents" type="xs:boolean" default="true"/>
@@ -262,7 +269,17 @@
 				<xs:element name="composite" type="rm:composite-descriptor"/>
 			</xs:choice>
 		</xs:sequence>
-		<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
+		<xs:attribute name="sharedEnvironment" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					The default means that each tab is a separate view or selection into the global env, and it is this subset which
+					will be passed on
+					the launch command. Setting this property to true means that the tab will pass the selected elements of the
+					entire shared
+					enviroment to the resource manager at launch.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="regex" mixed="true">
 		<xs:attribute name="flags" type="xs:string"/>
@@ -328,6 +345,7 @@
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
 			<xs:element name="item" maxOccurs="unbounded" type="rm:tab-item-descriptor"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string">
 			<xs:annotation>
@@ -337,7 +355,6 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="composite-descriptor">
@@ -351,6 +368,7 @@
 		<xs:sequence>
 			<xs:element name="layout" minOccurs="0" type="rm:layout-descriptor"/>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
 			<xs:element name="title" minOccurs="0" type="xs:string"/>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
@@ -361,13 +379,13 @@
 		</xs:sequence>
 		<xs:attribute name="group" type="xs:boolean" default="false"/>
 		<xs:attribute name="style" type="xs:string"/>
-		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="tab-item-descriptor">
 		<xs:sequence>
 			<xs:element name="title" type="xs:string"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="composite" type="rm:composite-descriptor"/>
 				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
@@ -375,7 +393,6 @@
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string"/>
-		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="layout-descriptor">
@@ -394,44 +411,44 @@
 		</xs:choice>
 	</xs:complexType>
 	<xs:complexType name="fill-layout-descriptor">
-	  <xs:attribute name="type" type="xs:string"/>
-	  <xs:attribute name="marginHeight" type="xs:int"/>
-	  <xs:attribute name="marginWidth" type="xs:int"/>
-	  <xs:attribute name="spacing" type="xs:int"/>
+		<xs:attribute name="type" type="xs:string"/>
+		<xs:attribute name="marginHeight" type="xs:int"/>
+		<xs:attribute name="marginWidth" type="xs:int"/>
+		<xs:attribute name="spacing" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="row-layout-descriptor">
-	   <xs:attribute name="center" type="xs:boolean" default="false"/>
-	   <xs:attribute name="justify" type="xs:boolean" default="false"/>
-	   <xs:attribute name="fill" type="xs:boolean" default="false"/>
-	   <xs:attribute name="pack" type="xs:boolean" default="false"/>
-	   <xs:attribute name="marginHeight" type="xs:int"/>
-	   <xs:attribute name="marginWidth" type="xs:int"/>
-	   <xs:attribute name="marginTop" type="xs:int"/>
-	   <xs:attribute name="marginBottom" type="xs:int"/>
-      <xs:attribute name="marginLeft" type="xs:int"/>
-      <xs:attribute name="marginRight" type="xs:int"/>
-      <xs:attribute name="spacing" type="xs:int"/>
+		<xs:attribute name="center" type="xs:boolean" default="false"/>
+		<xs:attribute name="justify" type="xs:boolean" default="false"/>
+		<xs:attribute name="fill" type="xs:boolean" default="false"/>
+		<xs:attribute name="pack" type="xs:boolean" default="false"/>
+		<xs:attribute name="marginHeight" type="xs:int"/>
+		<xs:attribute name="marginWidth" type="xs:int"/>
+		<xs:attribute name="marginTop" type="xs:int"/>
+		<xs:attribute name="marginBottom" type="xs:int"/>
+		<xs:attribute name="marginLeft" type="xs:int"/>
+		<xs:attribute name="marginRight" type="xs:int"/>
+		<xs:attribute name="spacing" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="grid-layout-descriptor">
 		<xs:attribute name="numColumns" type="xs:int"/>
 		<xs:attribute name="makeColumnsEqualWidth" type="xs:boolean" default="true"/>
 		<xs:attribute name="marginHeight" type="xs:int"/>
-      <xs:attribute name="marginWidth" type="xs:int"/>
-      <xs:attribute name="marginTop" type="xs:int"/>
-      <xs:attribute name="marginBottom" type="xs:int"/>
-      <xs:attribute name="marginLeft" type="xs:int"/>
-      <xs:attribute name="marginRight" type="xs:int"/>
-      <xs:attribute name="horizontalSpacing" type="xs:int"/>
+		<xs:attribute name="marginWidth" type="xs:int"/>
+		<xs:attribute name="marginTop" type="xs:int"/>
+		<xs:attribute name="marginBottom" type="xs:int"/>
+		<xs:attribute name="marginLeft" type="xs:int"/>
+		<xs:attribute name="marginRight" type="xs:int"/>
+		<xs:attribute name="horizontalSpacing" type="xs:int"/>
 		<xs:attribute name="verticalSpacing" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="form-layout-descriptor">
-	   <xs:attribute name="marginHeight" type="xs:int"/>
-      <xs:attribute name="marginWidth" type="xs:int"/>
-      <xs:attribute name="marginTop" type="xs:int"/>
-      <xs:attribute name="marginBottom" type="xs:int"/>
-      <xs:attribute name="marginLeft" type="xs:int"/>
-      <xs:attribute name="marginRight" type="xs:int"/>
-      <xs:attribute name="spacing" type="xs:int"/>
+		<xs:attribute name="marginHeight" type="xs:int"/>
+		<xs:attribute name="marginWidth" type="xs:int"/>
+		<xs:attribute name="marginTop" type="xs:int"/>
+		<xs:attribute name="marginBottom" type="xs:int"/>
+		<xs:attribute name="marginLeft" type="xs:int"/>
+		<xs:attribute name="marginRight" type="xs:int"/>
+		<xs:attribute name="spacing" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="row-data-descriptor">
 		<xs:attribute name="height" type="xs:int"/>
@@ -470,18 +487,26 @@
 	<xs:complexType name="widget">
 		<xs:sequence>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
-			<xs:element name="fixed-value" minOccurs="0" type="xs:string">
+			<xs:element name="value-list-from" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						The text of this element will be set once from the environment on loading; e.g, ${rm:Job_Name#description}.
+						Combo elements taken from the value of an attribute or property.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="dynamic-value" minOccurs="0">
+			<xs:element name="fixed-text" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						The args will be refreshed against the environment.
+						The text of a label set once from the environment on loading; e.g, ${rm:Job_Name#description}.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dynamic-text" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Changing label text; the args will be refreshed against the environment.
 					</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
@@ -539,15 +564,31 @@
 		</xs:attribute>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="sort" type="xs:boolean" default="true"/>
-		<xs:attribute name="tooltip" type="xs:boolean" default="true"/>
+		<xs:attribute name="headerVisible" type="xs:boolean" default="true"/>
+		<xs:attribute name="linesVisible" type="xs:boolean" default="true"/>
+		<xs:attribute name="tooltipEnabled" type="xs:boolean" default="true"/>
 		<xs:attribute name="style" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="viewer-items">
 		<xs:sequence>
-			<xs:element name="ref" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+			<xs:element name="include" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+			<xs:element name="exclude" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 		</xs:sequence>
 		<xs:attribute name="allPredefined" type="xs:boolean" default="false"/>
 		<xs:attribute name="allDiscovered" type="xs:boolean" default="false"/>
+	</xs:complexType>
+	<xs:complexType name="font-descriptor">
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="size" type="xs:int" default="9"/>
+		<xs:attribute name="style" default="normal">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="normal"/>
+					<xs:enumeration value="bold"/>
+					<xs:enumeration value="italic"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="template">
 		<xs:attribute name="pattern" type="xs:string">
@@ -598,6 +639,7 @@
 	</xs:complexType>
 	<xs:complexType name="column-data">
 		<xs:sequence>
+			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>

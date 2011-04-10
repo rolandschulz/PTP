@@ -42,8 +42,8 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 	public void testJAXBRMInstantiation() {
 		ResourceManagerData rmdata = null;
 		try {
-			JAXBInitializationUtils.validate(rmxml);
-			rmdata = JAXBInitializationUtils.initializeRMData(JAXBInitializationUtils.getURL(rmxml));
+			JAXBTestsPlugin.validate(rmxml);
+			rmdata = JAXBInitializationUtils.initializeRMData(JAXBTestsPlugin.getURL(rmxml));
 			if (rmdata != null) {
 				RMVariableMap map = RMVariableMap.setActiveInstance(null);
 				JAXBInitializationUtils.initializeMap(rmdata, map);
@@ -61,8 +61,8 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 	public void testJAXBTokenizerInstantiation() {
 		ResourceManagerData rmdata = null;
 		try {
-			JAXBInitializationUtils.validate(tokxml);
-			rmdata = JAXBInitializationUtils.initializeRMData(JAXBInitializationUtils.getURL(tokxml));
+			JAXBTestsPlugin.validate(tokxml);
+			rmdata = JAXBInitializationUtils.initializeRMData(JAXBTestsPlugin.getURL(tokxml));
 			if (rmdata != null) {
 				List<Command> cmds = rmdata.getControlData().getStartUpCommand();
 				for (Command cmd : cmds) {

@@ -79,7 +79,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		}
 		if (!matchAll || matched == matches.size()) {
 			for (MatchImpl m : matches) {
-				m.clear();
+				m.reset();
 			}
 		}
 
@@ -94,7 +94,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (ref != null) {
 			RMVariableMap vmap = RMVariableMap.getActiveInstance();
 			String name = vmap.getString(uuid, ref);
-			target = vmap.getVariables().get(name);
+			target = vmap.get(name);
 			if (target == null) {
 				throw CoreExceptionUtils.newException(Messages.StreamParserNoSuchVariableError + name, null);
 			}
@@ -102,7 +102,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		} else {
 			int i = assign.getIndex();
 			if (i < targets.size()) {
-				target = targets.get(assign.getIndex());
+				target = targets.get(i);
 			}
 			if (target == null) {
 				if (PROPERTY.equals(type)) {
@@ -260,6 +260,26 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 			previous.setDefault(s1);
 		} else if (s1 != null) {
 			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+		}
+
+		s0 = previous.getType();
+		s1 = current.getType();
+		if (s0 == null) {
+			previous.setType(s1);
+		} else if (s1 != null) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+		}
+
+		boolean b0 = previous.isReadOnly();
+		boolean b1 = current.isReadOnly();
+		if (!b0) {
+			previous.setReadOnly(b1);
+		}
+
+		b0 = previous.isVisible();
+		b1 = current.isVisible();
+		if (!b0) {
+			previous.setVisible(b1);
 		}
 	}
 

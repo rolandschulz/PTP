@@ -22,7 +22,6 @@ public class Messages extends NLS {
 
 	public static String JAXBRMConfigurationSelectionWizardPage_0;
 	public static String JAXBRMConfigurationSelectionWizardPage_1;
-	public static String JAXBRMConfigurationSelectionWizardPage_2;
 	public static String JAXBRMConfigurationSelectionWizardPage_Project_Selection_Title;
 	public static String JAXBRMConfigurationSelectionWizardPage_Project_Selection_Message;
 
@@ -46,6 +45,12 @@ public class Messages extends NLS {
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_16;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_17;
 
+	public static String Project_required;
+	public static String Enter_project_before_browsing_for_program;
+	public static String Program_selection;
+	public static String Choose_program_to_run_from_NAME;
+	public static String Selection_must_be_file;
+
 	public static String CustomBatchScriptTab_title;
 	public static String MXGroupTitle;
 	public static String ManualLaunch;
@@ -54,7 +59,6 @@ public class Messages extends NLS {
 	public static String BatchScriptPath;
 	public static String DefaultDynamicTab_title;
 	public static String ViewScript;
-	public static String ViewValuesReplaced;
 	public static String ErrorOnLoadTitle;
 	public static String ErrorOnLoadFromStore;
 	public static String WidgetSelectedError;
@@ -64,24 +68,26 @@ public class Messages extends NLS {
 	public static String JAXBRMLaunchConfigurationFactory_doCreateError;
 
 	public static String FileContentsDirty;
-	public static String ErrorOnCopyToStorageTitle;
-	public static String ErrorOnCopyToStorage;
-	public static String InvalidOptionIndex;
-	public static String InvalidOption;
-	public static String TreeDataLabelProviderColumnError;
-	public static String TableDataLabelProviderColumnError;
 	public static String ErrorOnCopyFromFields;
 	public static String WriteToFileCanceled;
 	public static String RenameFile;
 	public static String RenameFileTitle;
-	public static String RestoreDefaultValues;
 	public static String DefaultValues;
-	public static String ToggleVisibleAttributes;
+	public static String ToggleShowHideSelectedAttributes;
 	public static String DialogClose;
 	public static String DisplayScript;
 	public static String DisplayScriptError;
 	public static String DisplayScriptErrorTitle;
-	public static String Tooltip;
+	public static String ViewerLabelProviderColumnError;
+	public static String ScriptNotSupportedWarning;
+	public static String ScriptNotSupportedWarning_title;
+	public static String CreateControlConfigurableError;
+	public static String ReadOnlyWarning;
+
+	public static String ValidationError;
+	public static String ValidationError_title;
+	public static String InvalidConfiguration;
+	public static String InvalidConfiguration_title;
 
 	static {
 		// initialize resource bundle

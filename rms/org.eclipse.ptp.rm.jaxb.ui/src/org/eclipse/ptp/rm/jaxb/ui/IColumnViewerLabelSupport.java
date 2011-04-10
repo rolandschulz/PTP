@@ -9,18 +9,17 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui;
 
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.jface.viewers.ITableColorProvider;
+import org.eclipse.jface.viewers.ITableFontProvider;
+import org.eclipse.swt.graphics.Image;
 
-public interface ILaunchTabValueHandler {
+public interface IColumnViewerLabelSupport extends ITableColorProvider, ITableFontProvider {
 
-	void getValuesFromMap(LTVariableMap ltMap);
+	Image getColumnImage(String columnName);
 
-	void setDefaultValuesOnControl(RMVariableMap rmMap);
+	String getDescription();
 
-	void setValuesOnMap(LTVariableMap ltMap);
+	String getDisplayValue(String columnName);
 
-	void validateControlValues(RMVariableMap rmMap, IRemoteFileManager manager) throws Throwable;
-
+	String getTooltip();
 }

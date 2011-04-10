@@ -20,9 +20,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
 public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	private static RMVariableMap active;
@@ -43,37 +41,16 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		initialized = false;
 	}
 
+	public Object get(String name) {
+		Object o = variables.get(name);
+		if (o == null) {
+			o = discovered.get(name);
+		}
+		return o;
+	}
+
 	public Map<String, Object> getDiscovered() {
 		return discovered;
-	}
-
-	public void getFlattenedDefaults(Map<String, String> defaults) {
-		for (String s : variables.keySet()) {
-			getDefault(s, variables.get(s), defaults);
-		}
-
-	}
-
-	/**
-	 * A flat name=value map of only the configurable attributes and properties.
-	 * 
-	 * @param flat
-	 */
-	public void getFlattenedDiscovered(Map<String, String> flat) {
-		for (String s : discovered.keySet()) {
-			getFlattened(s, discovered.get(s), flat);
-		}
-	}
-
-	/**
-	 * A flat name=value map of only the configurable attributes and properties.
-	 * 
-	 * @param flat
-	 */
-	public void getFlattenedVariables(Map<String, String> flat) {
-		for (String s : variables.keySet()) {
-			getFlattened(s, variables.get(s), flat);
-		}
 	}
 
 	public String getString(String value) {
@@ -141,6 +118,18 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		maybeAddProperty(key1, value, false);
 	}
 
+	public void put(String name, Object value) {
+		variables.put(name, value);
+	}
+
+	public Object remove(String name) {
+		Object o = variables.remove(name);
+		if (o == null) {
+			o = discovered.remove(name);
+		}
+		return o;
+	}
+
 	public void setInitialized(boolean initialized) {
 		this.initialized = initialized;
 	}
@@ -150,22 +139,6 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 			return null;
 		}
 		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
-	}
-
-	private void getDefault(String s, Object object, Map<String, String> defaults) {
-		if (object instanceof Attribute) {
-			Attribute ja = (Attribute) object;
-			String defaultValue = ja.getDefault();
-			if (defaultValue != null) {
-				defaults.put(ja.getName(), defaultValue);
-			}
-		} else if (object instanceof Property) {
-			Property p = (Property) object;
-			String defaultValue = p.getDefault();
-			if (defaultValue != null) {
-				defaults.put(p.getName(), defaultValue);
-			}
-		}
 	}
 
 	public synchronized static RMVariableMap getActiveInstance() {
@@ -178,49 +151,5 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		}
 		RMVariableMap.active = instance;
 		return RMVariableMap.active;
-	}
-
-	/*
-	 * It is assumed that the caller of the flattened map does not need
-	 * properties or attributes with complex values like lists or maps. Hence we
-	 * simply cast the value to a string.
-	 */
-	private static void getFlattened(String key, Object value, Map<String, String> flat) throws ArrayStoreException {
-		if (value instanceof Property) {
-			Property p = (Property) value;
-			String name = p.getName();
-			Object o = p.getValue();
-			String s = null;
-			if (o != null) {
-				s = o.toString();
-			}
-			flat.put(name, s);
-			flat.put(name + PD + VALUE, s);
-			s = p.getDefault();
-			if (s != null) {
-				flat.put(name + PD + sDEFAULT, s);
-			}
-		} else if (value instanceof Attribute) {
-			Attribute ja = (Attribute) value;
-			Object o = ja.getValue();
-			String s = null;
-			if (o != null) {
-				s = o.toString();
-			}
-			String name = ja.getName();
-			flat.put(name, s);
-			flat.put(name + PD + VALUE, s);
-			s = ja.getType();
-			if (s != null) {
-				flat.put(name + PD + sDEFAULT, s);
-			}
-			s = ja.getStatus();
-			if (s != null) {
-				flat.put(name + PD + STATUS, s);
-			}
-			o = ja.isReadOnly();
-		} else {
-			throw new ArrayStoreException(Messages.IllegalVariableValueType + value.getClass());
-		}
 	}
 }

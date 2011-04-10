@@ -9,16 +9,20 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
 import org.eclipse.ptp.rm.jaxb.core.data.CompositeDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.FillLayoutDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.FontDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.FormAttachmentDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.FormDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.FormLayoutDescriptor;
@@ -26,6 +30,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.GridDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.GridLayoutDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.RowDataDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.RowLayoutDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor;
@@ -33,22 +38,16 @@ import org.eclipse.ptp.rm.jaxb.core.data.TabItemDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.data.ViewerItems;
 import org.eclipse.ptp.rm.jaxb.core.data.Widget;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerData;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerMap;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
-import org.eclipse.ptp.rm.jaxb.ui.data.WidgetMap;
-import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBRMConfigurableAttributesTab;
+import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
+import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBDynamicLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
-import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
+import org.eclipse.ptp.rm.jaxb.ui.model.ViewerUpdateModel;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -57,12 +56,13 @@ import org.eclipse.swt.widgets.Tree;
 
 public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 
-	private final JAXBRMConfigurableAttributesTab tab;
-	private WidgetMap widgetMap;
-	private AttributeViewerMap viewerMap;
+	private final JAXBDynamicLaunchConfigurationTab tab;
+	private final Map<Object, IUpdateModel> localWidgets;
 
-	public LaunchTabBuilder(JAXBRMConfigurableAttributesTab tab) {
+	public LaunchTabBuilder(JAXBDynamicLaunchConfigurationTab tab) {
 		this.tab = tab;
+		this.localWidgets = tab.getLocalWidgets();
+		this.localWidgets.clear();
 	}
 
 	public void build(Composite parent) throws Throwable {
@@ -80,23 +80,29 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		Layout layout = createLayout(descriptor.getLayout());
 		Object data = createLayoutData(descriptor.getLayoutData());
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
+		Button showHide = WidgetBuilderUtils.createCheckButton(parent, Messages.ToggleShowHideSelectedAttributes, null);
 		ColumnViewer viewer = null;
 		if (TABLE.equals(descriptor.getType())) {
 			viewer = addCheckboxTableViewer(parent, data, layout, style, descriptor);
 		} else if (TREE.equals(descriptor.getType())) {
 			viewer = addCheckboxTreeViewer(parent, data, layout, style, descriptor);
 		}
-		addToggleVisible(parent, viewer);
-		addRows(viewer, descriptor);
-		addToViewerMap(viewer, descriptor);
+		Collection<ICellEditorUpdateModel> rows = addRows(viewer, descriptor);
+		ViewerUpdateModel model = UpdateModelFactory.createModel(viewer, descriptor, tab);
+		for (ICellEditorUpdateModel row : rows) {
+			row.setViewer(model);
+		}
+		showHide.addSelectionListener(model);
+		model.setShowAll(showHide);
+		localWidgets.put(viewer, model);
 	}
 
 	private ColumnViewer addCheckboxTableViewer(Composite parent, Object data, Layout layout, int style, AttributeViewer descriptor) {
 		style |= (SWT.CHECK | SWT.FULL_SELECTION);
 		Table t = WidgetBuilderUtils.createTable(parent, style, data);
 		CheckboxTableViewer viewer = new CheckboxTableViewer(t);
-		WidgetBuilderUtils.setupAttributeTable(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor), null,
-				descriptor.isSort(), descriptor.isTooltip());
+		WidgetBuilderUtils.setupAttributeTable(viewer, descriptor.getColumnData(), null, descriptor.isSort(),
+				descriptor.isTooltipEnabled(), descriptor.isHeaderVisible(), descriptor.isLinesVisible());
 		return viewer;
 	}
 
@@ -104,8 +110,8 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		style |= (SWT.CHECK | SWT.FULL_SELECTION);
 		Tree t = WidgetBuilderUtils.createTree(parent, style, data);
 		CheckboxTreeViewer viewer = new CheckboxTreeViewer(t);
-		WidgetBuilderUtils.setupAttributeTree(viewer, WidgetBuilderUtils.getColumnDescriptors(descriptor), null,
-				descriptor.isSort(), descriptor.isTooltip());
+		WidgetBuilderUtils.setupAttributeTree(viewer, descriptor.getColumnData(), null, descriptor.isSort(),
+				descriptor.isTooltipEnabled(), descriptor.isHeaderVisible(), descriptor.isLinesVisible());
 		return viewer;
 	}
 
@@ -126,18 +132,18 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			} else if (o instanceof CompositeDescriptor) {
 				addComposite((CompositeDescriptor) o, composite);
 			} else if (o instanceof Widget) {
-				addWidget((Widget) o, composite);
+				addWidget(composite, (Widget) o);
 			} else if (o instanceof AttributeViewer) {
 				addAttributeViewer((AttributeViewer) o, composite);
 			}
 		}
-		String color = descriptor.getBackground();
-		if (color != null) {
-			composite.setBackground(WidgetBuilderUtils.getColor(color));
+		String attr = descriptor.getBackground();
+		if (attr != null) {
+			composite.setBackground(WidgetBuilderUtils.getColor(attr));
 		}
-		color = descriptor.getForeground();
-		if (color != null) {
-			composite.setBackground(WidgetBuilderUtils.getColor(color));
+		FontDescriptor fd = descriptor.getFont();
+		if (fd != null) {
+			composite.setFont(WidgetBuilderUtils.getFont(fd));
 		}
 		return composite;
 	}
@@ -161,14 +167,13 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		for (TabItemDescriptor i : items) {
 			addItem(folder, i, index++);
 		}
-
-		String color = descriptor.getBackground();
-		if (color != null) {
-			folder.setBackground(WidgetBuilderUtils.getColor(color));
+		String attr = descriptor.getBackground();
+		if (attr != null) {
+			folder.setBackground(WidgetBuilderUtils.getColor(attr));
 		}
-		color = descriptor.getForeground();
-		if (color != null) {
-			folder.setBackground(WidgetBuilderUtils.getColor(color));
+		FontDescriptor fd = descriptor.getFont();
+		if (fd != null) {
+			folder.setFont(WidgetBuilderUtils.getFont(fd));
 		}
 		return folder;
 	}
@@ -182,6 +187,15 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		if (tt != null) {
 			item.setToolTipText(tt);
 		}
+		String attr = descriptor.getBackground();
+		if (attr != null) {
+			control.setBackground(WidgetBuilderUtils.getColor(attr));
+		}
+		FontDescriptor fd = descriptor.getFont();
+		if (fd != null) {
+			control.setFont(WidgetBuilderUtils.getFont(fd));
+		}
+
 		List<Object> children = descriptor.getCompositeOrTabFolderOrWidget();
 		for (Object o : children) {
 			if (o instanceof TabFolderDescriptor) {
@@ -189,76 +203,74 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			} else if (o instanceof CompositeDescriptor) {
 				addComposite((CompositeDescriptor) o, control);
 			} else if (o instanceof Widget) {
-				addWidget((Widget) o, control);
+				addWidget(control, (Widget) o);
 			}
 		}
 	}
 
-	private void addRows(ColumnViewer viewer, AttributeViewer descriptor) {
+	private Collection<ICellEditorUpdateModel> addRows(ColumnViewer viewer, AttributeViewer descriptor) {
 		RMVariableMap rmMap = RMVariableMap.getActiveInstance();
-		AttributeViewerData data = new AttributeViewerData();
 		ViewerItems items = descriptor.getItems();
+		List<ColumnData> columnData = descriptor.getColumnData();
+		ICellEditorUpdateModel model = null;
+		Map<String, ICellEditorUpdateModel> hash = new TreeMap<String, ICellEditorUpdateModel>();
+		Map<String, Object> vars = null;
 		if (items.isAllPredefined()) {
-			for (Object o : rmMap.getVariables().values()) {
-				data.addRow(new AttributeViewerRowData(o));
-			}
-		} else {
-			List<String> refs = items.getRef();
-			for (String ref : refs) {
-				Object o = rmMap.getVariables().get(ref);
-				if (o != null) {
-					data.addRow(new AttributeViewerRowData(o));
+			vars = rmMap.getVariables();
+			for (String key : vars.keySet()) {
+				Object o = vars.get(key);
+				if (!isVisible(o)) {
+					continue;
 				}
+				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
+				hash.put(key, model);
 			}
 		}
 		if (items.isAllDiscovered()) {
-			for (Object o : rmMap.getDiscovered().values()) {
-				data.addRow(new AttributeViewerRowData(o));
-			}
-		}
-		viewer.setInput(data);
-	}
-
-	private void addToggleVisible(Composite parent, final ColumnViewer viewer) {
-		WidgetBuilderUtils.createCheckButton(parent, Messages.ToggleVisibleAttributes, new SelectionListener() {
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				Button b = (Button) e.getSource();
-				if (viewer instanceof TableViewer) {
-					TableDataContentProvider p = (TableDataContentProvider) viewer.getContentProvider();
-					p.setSelectedOnly(!b.getSelection());
-				} else if (viewer instanceof TreeViewer) {
-					TreeDataContentProvider p = (TreeDataContentProvider) viewer.getContentProvider();
-					p.setSelectedOnly(!b.getSelection());
+			vars = rmMap.getDiscovered();
+			for (String key : vars.keySet()) {
+				Object o = vars.get(key);
+				if (!isVisible(o)) {
+					continue;
 				}
+				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
+				hash.put(key, model);
 			}
-		});
-	}
-
-	private void addToViewerMap(ColumnViewer viewer, AttributeViewer descriptor) {
-		if (viewerMap == null) {
-			viewerMap = new AttributeViewerMap();
-			tab.getHandlers().add(viewerMap);
 		}
-		viewerMap.add(viewer, descriptor);
-	}
-
-	private void addToWidgetMap(Control control, Widget widget) {
-		if (widgetMap == null) {
-			widgetMap = new WidgetMap();
-			tab.getHandlers().add(widgetMap);
+		for (String key : items.getInclude()) {
+			if (hash.containsKey(key)) {
+				continue;
+			}
+			Object o = rmMap.getVariables().get(key);
+			if (!isVisible(o)) {
+				continue;
+			}
+			if (o == null) {
+				o = rmMap.getDiscovered().get(key);
+			}
+			if (o != null) {
+				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
+				hash.put(key, model);
+			}
 		}
-		widgetMap.add(control, widget);
+		for (String key : items.getExclude()) {
+			hash.remove(key);
+		}
+		viewer.setInput(hash.values());
+		for (ICellEditorUpdateModel m : hash.values()) {
+			localWidgets.put(m.getControl(), m);
+		}
+		return hash.values();
 	}
 
-	private Control addWidget(Widget widget, Composite parent) {
-		Control control = new WidgetBuilder(widget, RMVariableMap.getActiveInstance(), tab).createControl(parent);
-		addToWidgetMap(control, widget);
-		return control;
+	private void addWidget(Composite control, Widget widget) {
+		IUpdateModel model = UpdateModelFactory.createModel(control, widget, tab);
+		/*
+		 * Label models are not returned, since they cannot be updated
+		 */
+		if (model != null) {
+			localWidgets.put(model.getControl(), model);
+		}
 	}
 
 	private Layout createLayout(LayoutDescriptor layout) {
@@ -332,5 +344,14 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			}
 		}
 		return null;
+	}
+
+	private static boolean isVisible(Object data) {
+		if (data instanceof Attribute) {
+			return ((Attribute) data).isVisible();
+		} else if (data instanceof Property) {
+			return ((Property) data).isVisible();
+		}
+		return false;
 	}
 }

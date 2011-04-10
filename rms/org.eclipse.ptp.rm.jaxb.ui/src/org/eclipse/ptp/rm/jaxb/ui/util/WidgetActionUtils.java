@@ -12,18 +12,19 @@ package org.eclipse.ptp.rm.jaxb.ui.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -38,18 +39,11 @@ import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedMatchException;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.ElementListSelectionDialog;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 
@@ -57,22 +51,15 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	}
 
 	/**
-	 * Open a dialog that allows the user to choose a project.
+	 * Create a dialog that allows the user to select a file in the workspace.
 	 * 
-	 * @return selected project
+	 * @return selected file
 	 */
-	public static URI chooseProject(Shell shell) {
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(shell, labelProvider);
-		dialog.setTitle(Messages.JAXBRMConfigurationSelectionWizardPage_Project_Selection_Title);
-		dialog.setMessage(Messages.JAXBRMConfigurationSelectionWizardPage_Project_Selection_Message);
-		dialog.setElements(projects);
-		if (dialog.open() == Window.OK) {
-			IProject p = (IProject) dialog.getFirstResult();
-			return p.getLocationURI();
-		}
-		return null;
+	public static String browseWorkspace(Shell shell) {
+		IPath path = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+		FileDialog dialog = new FileDialog(shell);
+		dialog.setFileName(path.toFile().getAbsolutePath());
+		return dialog.open();
 	}
 
 	public static void errorMessage(Shell s, Throwable e, String message, String title, boolean causeTrace) {
@@ -93,6 +80,9 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static String getSelected(Combo combo) {
+		if (combo.isDisposed()) {
+			return ZEROSTR;
+		}
 		if (combo.getItemCount() == 0) {
 			return combo.getText();
 		}
@@ -101,41 +91,6 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 			return combo.getText();
 		}
 		return combo.getItem(i);
-	}
-
-	public static String getValueString(Control uiElement) {
-		assert uiElement != null;
-		String s = null;
-
-		if (uiElement instanceof Label) {
-			Label c = (Label) uiElement;
-			s = c.getText();
-		}
-		if (uiElement instanceof Text) {
-			Text c = (Text) uiElement;
-			s = c.getText();
-		}
-		if (uiElement instanceof Combo) {
-			Combo c = (Combo) uiElement;
-			s = getSelected(c);
-		}
-		if (uiElement instanceof Spinner) {
-			Spinner c = (Spinner) uiElement;
-			s = ZEROSTR + c.getSelection();
-		}
-		if (uiElement instanceof Button) {
-			Button c = (Button) uiElement;
-			int style = c.getStyle();
-			if ((style == (style | SWT.CHECK)) || (style == (style | SWT.RADIO))) {
-				s = ZEROSTR + c.getSelection();
-			}
-		}
-
-		if (s != null) {
-			s = s.trim();
-			return (s.length() == 0 ? null : s);
-		}
-		return null;
 	}
 
 	public static String openInputDialog(Shell shell, String message, String title, String original) {
@@ -156,85 +111,41 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static String select(Combo combo, String name) {
+		if (combo.isDisposed()) {
+			return ZEROSTR;
+		}
+		int style = combo.getStyle();
+		boolean readOnly = style == (style | SWT.READ_ONLY);
 		String[] items = combo.getItems();
 		if (items.length == 0) {
 			return ZEROSTR;
 		}
 		int i = 0;
+		if (name == null) {
+			name = ZEROSTR;
+		}
 		for (; i < items.length; i++) {
 			if (items[i].equals(name)) {
 				combo.select(i);
 				break;
 			}
 		}
+
 		if (i == items.length) {
-			i = 0;
-			combo.select(i);
+			if (readOnly) {
+				i = 0;
+			} else {
+				List<String> newItems = new ArrayList<String>();
+				for (String item : items) {
+					newItems.add(item.trim());
+				}
+				newItems.add(name.trim());
+				combo.setItems(newItems.toArray(new String[0]));
+				i = newItems.size() - 1;
+			}
 		}
+		combo.select(i);
 		return combo.getItem(i);
-	}
-
-	public static void setValue(Control uiElement, String value) {
-		assert uiElement != null;
-		if (value == null) {
-			value = ZEROSTR;
-		}
-
-		if (uiElement instanceof Label) {
-			Label c = (Label) uiElement;
-			c.setText(value);
-		}
-		if (uiElement instanceof Text) {
-			Text c = (Text) uiElement;
-			c.setText(value);
-		}
-		if (uiElement instanceof Combo) {
-			Combo c = (Combo) uiElement;
-			select(c, value);
-		}
-		if (uiElement instanceof Spinner) {
-			Spinner c = (Spinner) uiElement;
-			if (!ZEROSTR.equals(value)) {
-				c.setSelection(Integer.parseInt(value));
-			}
-		}
-		if (uiElement instanceof Button) {
-			Button c = (Button) uiElement;
-			int style = c.getStyle();
-			if ((style == (style | SWT.CHECK)) || (style == (style | SWT.RADIO))) {
-				if (!ZEROSTR.equals(value)) {
-					c.setSelection(Boolean.parseBoolean(value));
-				}
-			}
-		}
-	}
-
-	/**
-	 * If validation fails, resets the widget value to its default and throws an
-	 * exception.
-	 */
-	public static String validate(Control c, Validator v, IRemoteFileManager fileManager) throws Exception {
-		String value = getValueString(c);
-		Regex reg = v.getRegex();
-		String error = v.getErrorMessage();
-
-		if (error == null) {
-			error = ZEROSTR;
-		}
-
-		if (reg != null && new RegexImpl(reg).getMatched(value) == null) {
-			throw new UnsatisfiedMatchException(error + CO + SP + reg.getExpression() + CM + SP + value);
-		} else {
-			FileMatch match = v.getFileInfo();
-			try {
-				if (match != null && !validate(match, value, fileManager)) {
-					throw new UnsatisfiedMatchException(error + CO + SP + value);
-				}
-			} catch (CoreException ce) {
-				throw new UnsatisfiedMatchException(ce);
-			}
-		}
-		return value;
 	}
 
 	public static void validate(String value, Validator v, IRemoteFileManager fileManager) throws Exception {
@@ -257,6 +168,10 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 				throw new UnsatisfiedMatchException(ce);
 			}
 		}
+	}
+
+	public static void warningMessage(Shell s, String message, String title) {
+		MessageDialog.openWarning(s, title, message + LINE_SEP);
 	}
 
 	private static int getEfsAttributeValue(String efsAttrStr) {

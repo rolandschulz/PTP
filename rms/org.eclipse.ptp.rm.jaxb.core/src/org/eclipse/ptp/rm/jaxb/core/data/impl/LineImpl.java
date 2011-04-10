@@ -7,21 +7,39 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.Arg;
 import org.eclipse.ptp.rm.jaxb.core.data.Line;
 
+/**
+ * Wrapper implementation.
+ * 
+ * @author arossi
+ * 
+ */
 public class LineImpl implements IJAXBNonNLSConstants {
 
 	private final String uuid;
 	private final IVariableMap map;
 	private final List<Arg> args;
 
+	/**
+	 * @param uuid
+	 *            unique id associated with this resource manager operation (can
+	 *            be <code>null</code>).
+	 * @param line
+	 *            JAXB data element
+	 * @param map
+	 *            environment in which to resolve content of the line
+	 */
 	public LineImpl(String uuid, Line line, IVariableMap map) {
 		this.uuid = uuid;
 		this.map = map;
 		args = line.getArg();
 	}
 
+	/**
+	 * Will not return <code>null</code>.
+	 * 
+	 * @return argument resolved in the provided environment
+	 */
 	public String getResolved() {
-		StringBuffer buffer = new StringBuffer();
-		ArgImpl.toString(uuid, args, map, buffer);
-		return buffer.toString();
+		return ArgImpl.toString(uuid, args, map);
 	}
 }

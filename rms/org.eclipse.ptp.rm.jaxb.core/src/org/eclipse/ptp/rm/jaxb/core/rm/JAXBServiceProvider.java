@@ -13,9 +13,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
@@ -164,11 +161,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		return ZEROSTR;
 	}
 
-	public String[] getExternalRMInstanceXMLLocations() {
-		String list = getString(EXTERNAL_RM_XSD_PATHS, ZEROSTR);
-		return list.split(CM);
-	}
-
 	public ResourceManagerData getResourceManagerData() {
 		return rmdata;
 	}
@@ -190,25 +182,8 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		}
 	}
 
-	public Map<String, String> getSelectedAttributeSet() {
-		String serialized = getString(SELECTED_ATTRIBUTES, null);
-		if (serialized != null && !ZEROSTR.equals(serialized)) {
-			String[] keys = serialized.split(CM);
-			Map<String, String> m = new TreeMap<String, String>();
-			for (String k : keys) {
-				m.put(k, k);
-			}
-			return m;
-		}
-		return null;
-	}
-
 	public IRemoteServices getService() {
 		return service;
-	}
-
-	public String getValidAttributeSet() {
-		return getString(VALID_ATTRIBUTES, null);
 	}
 
 	public void realizeRMDataFromXML() throws Throwable {
@@ -218,14 +193,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		} else {
 			rmdata = JAXBInitializationUtils.initializeRMData(location);
 		}
-	}
-
-	public void removeSelectedAttributeSet() {
-		keySet().remove(SELECTED_ATTRIBUTES);
-	}
-
-	public void removeValidAttributeSet() {
-		keySet().remove(VALID_ATTRIBUTES);
 	}
 
 	public void setActive() throws Throwable {
@@ -238,7 +205,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 				throw new InstantiationError(Messages.FailedToCreateRmData);
 			}
 			JAXBInitializationUtils.initializeMap(rmdata, map);
-
 		}
 	}
 
@@ -255,18 +221,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		setDescription(Messages.JAXBServiceProvider_defaultDescription);
 	}
 
-	public void setExternalRMInstanceXMLLocations(String[] locations) {
-		if (locations == null || locations.length == 0) {
-			putString(EXTERNAL_RM_XSD_PATHS, ZEROSTR);
-		} else {
-			StringBuffer list = new StringBuffer(locations[0]);
-			for (int i = 1; i < locations.length; i++) {
-				list.append(CM).append(locations[i]);
-			}
-			putString(EXTERNAL_RM_XSD_PATHS, list.toString());
-		}
-	}
-
 	public void setRMConfigurationURL(URL location) {
 		URL current = getRMConfigurationURL();
 		if (location != null && current != location) {
@@ -276,24 +230,8 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		}
 	}
 
-	public void setSelectedAttributeSet(Map<String, String> map) {
-		StringBuffer sb = new StringBuffer();
-		Iterator<String> s = map.keySet().iterator();
-		if (s.hasNext()) {
-			sb.append(s.next());
-		}
-		while (s.hasNext()) {
-			sb.append(CM).append(s.next());
-		}
-		putString(SELECTED_ATTRIBUTES, sb.toString());
-	}
-
 	public void setService(IRemoteServices service) {
 		this.service = service;
-	}
-
-	public void setValidAttributeSet(String serialized) {
-		putString(VALID_ATTRIBUTES, serialized);
 	}
 
 	// @Override

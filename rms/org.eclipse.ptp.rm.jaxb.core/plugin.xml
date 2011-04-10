@@ -6,7 +6,7 @@
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
-            configurationFile="data/rm-pbs-torque_2.3.7.xml"
+            configurationFile="data/pbs-torque_2.3.7.xml"
             id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"
             name="PBS Torque 2.3.7">
       </JAXBResourceManagerConfiguration>
@@ -38,6 +38,11 @@
             description="Dynamic launch tab configuration variable"
             name="lt"
             resolver="org.eclipse.ptp.rm.jaxb.core.variables.LTVariableResolver">
+      </variable>
+      <variable
+            description="Dynamic variable backed by LaunchConfiguration"
+            name="lc"
+            resolver="org.eclipse.ptp.rm.jaxb.core.variables.LCVariableResolver">
       </variable>
    </extension>
    <extension

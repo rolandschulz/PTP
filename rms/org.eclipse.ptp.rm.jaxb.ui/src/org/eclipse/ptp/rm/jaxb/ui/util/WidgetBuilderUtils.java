@@ -11,40 +11,27 @@
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ColumnViewerEditor;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
-import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
-import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TableViewerEditor;
-import org.eclipse.jface.viewers.TableViewerFocusCellManager;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
-import org.eclipse.jface.viewers.TreeViewerEditor;
-import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
-import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
+import org.eclipse.ptp.rm.jaxb.core.data.FontDescriptor;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
-import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
-import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataLabelProvider;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
-import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataLabelProvider;
+import org.eclipse.ptp.rm.jaxb.ui.providers.ViewerDataCellLabelProvider;
 import org.eclipse.ptp.rm.jaxb.ui.sorters.AttributeViewerSorter;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
@@ -81,6 +68,8 @@ import org.eclipse.swt.widgets.TreeColumn;
 
 public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 
+	private static final FontRegistry fonts = new FontRegistry();
+
 	private WidgetBuilderUtils() {
 	}
 
@@ -97,18 +86,14 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	}
 
 	public static void applyMonospace(Text text) {
-		Display d = Display.getCurrent();
-		// three fonts for Mac, Linux, Windows ...
-		FontData[][] f = { d.getFontList(COURIER, true), d.getFontList(COURIER, false), d.getFontList(COURIER, true),
-				d.getFontList(COURIER, false), d.getFontList(COURIER, true), d.getFontList(COURIER, false) };
-		int i = 0;
-		for (; i < f.length; i++) {
-			if (f[i].length > 0) {
-				text.setFont(new Font(d, f[i]));
-				break;
-			}
-		}
-		if (i == f.length) {
+		// Courier exists on Mac, Linux, Windows ...
+		FontDescriptor fd = new FontDescriptor();
+		fd.setName(COURIER);
+		fd.setSize(14);
+		fd.setStyle(NORMAL);
+		Font font = getFont(fd);
+		if (font != null) {
+			text.setFont(font);
 			Dialog.applyDialogFont(text);
 		}
 	}
@@ -559,13 +544,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		t.setLayoutData(data);
 		t.setHeaderVisible(true);
 		t.setLinesVisible(true);
-		TableLayout layout = new TableLayout();
-		if (wHint != null) {
-			for (int i = 0; i < cols; i++) {
-				layout.addColumnData(new ColumnPixelData(wHint / cols));
-			}
-		}
-		t.setLayout(layout);
 		return t;
 	}
 
@@ -623,14 +601,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		t.setLayoutData(data);
 		t.setHeaderVisible(true);
 		t.setLinesVisible(true);
-		TableLayout layout = new TableLayout();
-		if (wHint != null) {
-
-			for (int i = 0; i < cols; i++) {
-				layout.addColumnData(new ColumnPixelData(wHint / cols));
-			}
-		}
-		t.setLayout(layout);
 		return t;
 	}
 
@@ -762,16 +732,20 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		} else if (COLOR_WIDGET_NORMAL_SHADOW.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_NORMAL_SHADOW;
 		}
+		/*
+		 * don't have to deallocate, as these are system colors
+		 */
 		return Display.getDefault().getSystemColor(swtColor);
 	}
 
-	public static List<ColumnDescriptor> getColumnDescriptors(AttributeViewer descriptor) {
-		List<ColumnData> data = descriptor.getColumnData();
-		List<ColumnDescriptor> desc = new ArrayList<ColumnDescriptor>();
-		for (ColumnData d : data) {
-			desc.add(new ColumnDescriptor(d));
+	public static Font getFont(FontDescriptor fd) {
+		String key = fd.getName() + fd.getSize() + fd.getStyle();
+		FontData[] data = fonts.getFontData(key);
+		if (data == null) {
+			data = new FontData[] { new FontData(fd.getName(), fd.getSize(), getStyle(fd.getStyle())) };
+			fonts.put(key, data);
 		}
-		return desc;
+		return fonts.get(key);
 	}
 
 	public static int getStyle(String style) {
@@ -781,56 +755,33 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return getStyle(style.split(OPENSQ + PIP + CLOSSQ));
 	}
 
-	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors,
-			ISelectionChangedListener listener, Boolean sortName, boolean tooltip) {
-		setupSpecific(viewer, columnDescriptors, sortName);
-		setupCommon(viewer, columnDescriptors, listener, tooltip);
-		// if (true) {
-		// enableCursorKeys(viewer);
-		// }
-	}
-
-	public static void setupAttributeTree(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors,
-			ISelectionChangedListener listener, Boolean sortName, boolean tooltip) {
-		setupSpecific(viewer, columnDescriptors, sortName);
-		setupCommon(viewer, columnDescriptors, listener, tooltip);
-		if (true) {
-			enableCursorKeys(viewer);
+	/*
+	 * For consistency in treating null or undefined defaults on loading, we
+	 * should always make sure the first element of the combo is a ZEROSTR.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static String[] normalizeComboItems(String[] items) {
+		List<String> list = new ArrayList(Arrays.asList(items));
+		for (Iterator<String> s = list.iterator(); s.hasNext();) {
+			String item = s.next().trim();
+			if (ZEROSTR.equals(item) || LINE_SEP.equals(item)) {
+				s.remove();
+			}
 		}
+		list.add(0, ZEROSTR);
+		return list.toArray(new String[0]);
 	}
 
-	private static void enableCursorKeys(TableViewer viewer) {
-		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(viewer, new FocusCellOwnerDrawHighlighter(
-				viewer));
-		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
-			@Override
-			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
-				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
-						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
-						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
-						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
-			}
-		};
-		TableViewerEditor.create(viewer, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
-				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL
-				| ColumnViewerEditor.KEYBOARD_ACTIVATION);
+	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnData> columnDescriptors,
+			ISelectionChangedListener listener, boolean sortName, boolean tooltip, boolean header, boolean lines) {
+		setupSpecific(viewer, columnDescriptors, sortName, header, lines);
+		setupCommon(viewer, columnDescriptors, listener, tooltip);
 	}
 
-	private static void enableCursorKeys(TreeViewer viewer) {
-		TreeViewerFocusCellManager focusCellManager = new TreeViewerFocusCellManager(viewer, new FocusCellOwnerDrawHighlighter(
-				viewer));
-		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
-			@Override
-			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
-				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
-						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
-						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
-						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
-			}
-		};
-		TreeViewerEditor.create(viewer, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
-				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL
-				| ColumnViewerEditor.KEYBOARD_ACTIVATION);
+	public static void setupAttributeTree(final CheckboxTreeViewer viewer, List<ColumnData> columnDescriptors,
+			ISelectionChangedListener listener, boolean sortName, boolean tooltip, boolean header, boolean lines) {
+		setupSpecific(viewer, columnDescriptors, sortName, header, lines);
+		setupCommon(viewer, columnDescriptors, listener, tooltip);
 	}
 
 	private static SelectionAdapter getAttributeViewerSelectionAdapter(final ColumnViewer viewer) {
@@ -1092,149 +1043,92 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return swt;
 	}
 
-	private static void setupCommon(final ColumnViewer viewer, List<ColumnDescriptor> columnDescriptors,
-			ISelectionChangedListener listener, boolean tooltip) {
-		String[] columnProperties = new String[columnDescriptors.size()];
-		for (int i = 0; i < columnDescriptors.size(); i++) {
-			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
-			columnProperties[i] = columnDescriptor.getColumnName();
+	private static void setupCommon(final ColumnViewer viewer, List<ColumnData> columnData, ISelectionChangedListener listener,
+			boolean tooltip) {
+		String[] columnProperties = new String[columnData.size()];
+		for (int i = 0; i < columnData.size(); i++) {
+			ColumnData columnDescriptor = columnData.get(i);
+			columnProperties[i] = columnDescriptor.getName();
 		}
 		viewer.setColumnProperties(columnProperties);
-		// if (tooltip) {
-		// viewer.addDoubleClickListener(new IDoubleClickListener() {
-		// boolean displaying = false;
-		//
-		// public void doubleClick(DoubleClickEvent event) {
-		// if (displaying) {
-		// return;
-		// }
-		// displaying = true;
-		// try {
-		// IStructuredSelection selection = (IStructuredSelection)
-		// viewer.getSelection();
-		// AttributeViewerRowData row = (AttributeViewerRowData)
-		// selection.getFirstElement();
-		// String tooltip = row.getTooltip();
-		// if (tooltip != null) {
-		// MessageDialog.openInformation(viewer.getControl().getShell(),
-		// Messages.Tooltip, tooltip);
-		// }
-		// } catch (Throwable t) {
-		// t.printStackTrace();
-		// }
-		// displaying = false;
-		// }
-		// });
-		// }
-
-		// if (listener != null) {
-		// viewer.addSelectionChangedListener(listener);
-		// }
+		if (tooltip) {
+			ColumnViewerToolTipSupport.enableFor(viewer);
+		}
+		if (listener != null) {
+			viewer.addSelectionChangedListener(listener);
+		}
+		viewer.setLabelProvider(new ViewerDataCellLabelProvider(columnData));
 	}
 
-	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName) {
-		for (int i = 0; i < columnDescriptors.size(); i++) {
-			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
+	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnData> columnData, Boolean sortName,
+			boolean header, boolean lines) {
+		for (int i = 0; i < columnData.size(); i++) {
+			ColumnData columnDescriptor = columnData.get(i);
 			TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 			TableColumn column = viewerColumn.getColumn();
-			String name = columnDescriptor.getColumnName();
+			String name = columnDescriptor.getName();
 			column.setText(name);
 			column.setMoveable(columnDescriptor.isMoveable());
 			column.setResizable(columnDescriptor.isResizable());
-			if (columnDescriptor.isWidthSpecified()) {
+			String tt = columnDescriptor.getTooltip();
+			if (tt != null) {
+				column.setToolTipText(tt);
+			}
+			if (UNDEFINED != columnDescriptor.getWidth()) {
 				column.setWidth(columnDescriptor.getWidth());
 			}
-			if (columnDescriptor.isAlignSpecified()) {
-				column.setAlignment(columnDescriptor.getAlignment());
+			if (null != columnDescriptor.getAlignment()) {
+				column.setAlignment(getStyle(columnDescriptor.getAlignment()));
 			}
-
-			// if (COLUMN_NAME.equals(name)) {
-			// if (sortName != null) {
-			// if (sortName) {
-			// column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
-			// }
-			// }
-			// }
-			if (COLUMN_VALUE.equals(columnDescriptor.getColumnName())) {
-				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer, columnDescriptor));
-
+			if (COLUMN_NAME.equals(name)) {
+				if (sortName != null) {
+					if (sortName) {
+						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
+					}
+				}
+			}
+			if (COLUMN_VALUE.equals(columnDescriptor.getName())) {
+				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
 			}
 		}
 		viewer.setContentProvider(new TableDataContentProvider());
-		viewer.setLabelProvider(new TableDataLabelProvider(columnDescriptors));
-		// viewer.addCheckStateListener(new ICheckStateListener() {
-		// boolean checking = false;
-		//
-		// public void checkStateChanged(CheckStateChangedEvent event) {
-		// if (checking) {
-		// return;
-		// }
-		// Object target = event.getElement();
-		// checking = true;
-		// IStructuredSelection selection = (IStructuredSelection)
-		// viewer.getSelection();
-		// List<?> selected = selection.toList();
-		// for (Object o : selected) {
-		// if (o == target) {
-		// continue;
-		// }
-		// AttributeViewerRowData row = (AttributeViewerRowData) o;
-		// boolean checked = viewer.getChecked(row);
-		// viewer.setChecked(row, !checked);
-		// row.setSelected(!checked);
-		// }
-		// checking = false;
-		// }
-		// });
-
-		viewer.getTable().setHeaderVisible(true);
-		viewer.getTable().setLinesVisible(true);
+		viewer.getTable().setHeaderVisible(header);
+		viewer.getTable().setLinesVisible(lines);
 	}
 
-	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnDescriptor> columnDescriptors, Boolean sortName) {
-		for (int i = 0; i < columnDescriptors.size(); i++) {
-			ColumnDescriptor columnDescriptor = columnDescriptors.get(i);
+	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnData> columnData, Boolean sortName,
+			boolean header, boolean lines) {
+		for (int i = 0; i < columnData.size(); i++) {
+			ColumnData columnDescriptor = columnData.get(i);
 			TreeViewerColumn viewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
 			TreeColumn column = viewerColumn.getColumn();
-			String name = columnDescriptor.getColumnName();
+			String name = columnDescriptor.getName();
 			column.setText(name);
 			column.setMoveable(columnDescriptor.isMoveable());
 			column.setResizable(columnDescriptor.isResizable());
-			if (columnDescriptor.isWidthSpecified()) {
+			String tt = columnDescriptor.getTooltip();
+			if (tt != null) {
+				column.setToolTipText(tt);
+			}
+			if (UNDEFINED != columnDescriptor.getWidth()) {
 				column.setWidth(columnDescriptor.getWidth());
 			}
-			if (columnDescriptor.isAlignSpecified()) {
-				column.setAlignment(columnDescriptor.getAlignment());
+			if (null != columnDescriptor.getAlignment()) {
+				column.setAlignment(getStyle(columnDescriptor.getAlignment()));
 			}
-
-			if (COLUMN_VALUE.equals(columnDescriptor.getColumnName())) {
-				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer, columnDescriptor));
-
+			if (COLUMN_NAME.equals(name)) {
+				if (sortName != null) {
+					if (sortName) {
+						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
+					}
+				}
+			}
+			if (COLUMN_VALUE.equals(columnDescriptor.getName())) {
+				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
 			}
 		}
 		viewer.setContentProvider(new TreeDataContentProvider());
-		viewer.setLabelProvider(new TreeDataLabelProvider(columnDescriptors));
-		viewer.addCheckStateListener(new ICheckStateListener() {
-			boolean checking = false;
-
-			public void checkStateChanged(CheckStateChangedEvent event) {
-				if (checking) {
-					return;
-				}
-				checking = true;
-				IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-				List<?> selected = selection.toList();
-				for (Object o : selected) {
-					AttributeViewerRowData row = (AttributeViewerRowData) o;
-					boolean checked = viewer.getChecked(row);
-					viewer.setChecked(row, !checked);
-					row.setVisible(!checked);
-				}
-				checking = false;
-			}
-		});
-
-		viewer.getTree().setHeaderVisible(true);
-		viewer.getTree().setLinesVisible(true);
+		viewer.getTree().setHeaderVisible(header);
+		viewer.getTree().setLinesVisible(lines);
 	}
 }

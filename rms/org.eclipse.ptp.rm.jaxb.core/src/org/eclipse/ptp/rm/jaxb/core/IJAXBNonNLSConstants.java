@@ -22,6 +22,7 @@ public interface IJAXBNonNLSConstants {
 	int STREAM_BUFFER_SIZE = 8 * 1024;
 	int EOF = -1;
 	long MINUTE_IN_MS = 60 * 60 * 1000;
+	long VALIDATE_TIMER = 500;
 
 	/* CHARACTERS */
 	String LEN = "N";//$NON-NLS-1$
@@ -51,7 +52,7 @@ public interface IJAXBNonNLSConstants {
 	String OPENVRM = "${rm:";//$NON-NLS-1$
 	String OPENVLT = "${lt:";//$NON-NLS-1$
 	String VRM = "rm:";//$NON-NLS-1$
-	String VLT = "lt:";//$NON-NLS-1$
+	String VLC = "lc:";//$NON-NLS-1$
 	String CLOSSQ = "]";//$NON-NLS-1$
 	String CLOSV = "}";//$NON-NLS-1$
 	String CLOSVAL = "#value}";//$NON-NLS-1$
@@ -87,6 +88,7 @@ public interface IJAXBNonNLSConstants {
 	String SET = "set";//$NON-NLS-1$
 	String IS = "is";//$NON-NLS-1$
 	String CLASS = "class";//$NON-NLS-1$
+	String STRING = "string";//$NON-NLS-1$
 	String NAME = "name";//$NON-NLS-1$
 	String VALUE = "value";//$NON-NLS-1$
 	String BASIC = "basic";//$NON-NLS-1$
@@ -129,10 +131,11 @@ public interface IJAXBNonNLSConstants {
 	String PREV_RM_XSD_PATH = "prev_rm_schema_path";//$NON-NLS-1$
 	String EXTERNAL_RM_XSD_PATHS = "external_rm_schema_paths";//$NON-NLS-1$
 	String SELECTED_ATTRIBUTES = "selected_attributes";//$NON-NLS-1$
-	String VALID_ATTRIBUTES = "valid_attributes"; //$NON-NLS-1$
+	String SHOW_ONLY_SELECTED = "show_only_selected";//$NON-NLS-1$
 	String IS_PRESET = "is_preset";//$NON-NLS-1$
 	String SCRIPT_PATH = "script_path";//$NON-NLS-1$
 	String SCRIPT = "script";//$NON-NLS-1$
+	String SCRIPT_FILE = "managed_file_for_script";//$NON-NLS-1$
 	String CSH = "csh";//$NON-NLS-1$
 	String SH = ".sh";//$NON-NLS-1$
 	String SETENV = "setenv";//$NON-NLS-1$
@@ -141,6 +144,8 @@ public interface IJAXBNonNLSConstants {
 	String STDERR = "stderr";//$NON-NLS-1$
 	String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";//$NON-NLS-1$
 
+	String RESOURCE_MANAGERS = "resourceManagers";//$NON-NLS-1$
+	String CUSTOM = "custom";//$NON-NLS-1$
 	String CONTROL_USER_NAME = "controlUserName";//$NON-NLS-1$
 	String MONITOR_USER_NAME = "monitorUserName";//$NON-NLS-1$
 	String CONTROL_CONNECTION_NAME = "controlConnectionName";//$NON-NLS-1$
@@ -160,6 +165,7 @@ public interface IJAXBNonNLSConstants {
 	String MONITOR_USER_VAR = "monitor.user.name";//$NON-NLS-1$
 	String MONITOR_ADDRESS_VAR = "monitor.address";//$NON-NLS-1$
 	String ARPA = ".in-addr.arpa";//$NON-NLS-1$
+	String ECLIPSESETTINGS = ".eclipsesettings";//$NON-NLS-1$
 
 	String STARTUP = "OnStartUp";//$NON-NLS-1$
 	String SHUTDOWN = "OnShutDown";//$NON-NLS-1$
@@ -189,12 +195,13 @@ public interface IJAXBNonNLSConstants {
 	String LITERAL = "LITERAL";//$NON-NLS-1$
 	String COMMENTS = "COMMENTS";//$NON-NLS-1$
 
+	String DOT_XML = ".xml";//$NON-NLS-1$
 	String TOKENIZER_EXT_PT = "streamParserTokenizer";//$NON-NLS-1$
 	String TAIL = "tail";//$NON-NLS-1$
 	String MINUS_F = "-f";//$NON-NLS-1$
 	String CONFIGURATION_FILE_ATTRIBUTE = "configurationFile"; //$NON-NLS-1$
 	String RM_CONFIG_EXTENSION_POINT = "org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations"; //$NON-NLS-1$
-
+	String JAXB_SERVICE_PROVIDER_EXTPT = "org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"; //$NON-NLS-1$
 	/*
 	 * EFS Attributes
 	 */

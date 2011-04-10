@@ -12,10 +12,23 @@ package org.eclipse.ptp.rm.jaxb.core.data.impl;
 import org.eclipse.ptp.rm.jaxb.core.data.Entry;
 import org.eclipse.ptp.rm.jaxb.core.data.Set;
 
+/**
+ * Wrapper implementation.
+ * 
+ * @author arossi
+ * 
+ */
 public class SetImpl extends AbstractAssign {
 
 	private final Entry entry;
 
+	/**
+	 * @param uuid
+	 *            unique id associated with this resource manager operation (can
+	 *            be <code>null</code>).
+	 * @param set
+	 *            JAXB data element
+	 */
 	public SetImpl(String uuid, Set set) {
 		this.uuid = uuid;
 		field = set.getField();

@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.utils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -41,26 +39,12 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	private JAXBInitializationUtils() {
 	}
 
-	public static URL getURL(String name) throws IOException {
-		URL instance = JAXBCorePlugin.getResource(name);
-		if (instance == null) {
-			File f = new File(name);
-			if (f.exists() && f.isFile()) {
-				instance = f.toURL();
-			} else {
-				throw new FileNotFoundException(name);
-			}
-		}
-		return instance;
-	}
-
 	public static void initializeMap(ResourceManagerData rmData, RMVariableMap instance) {
 		Control control = rmData.getControlData();
+		instance.clear();
 		Map<String, Object> env = instance.getVariables();
-		env.clear();
 		addProperties(env, control);
 		addAttributes(env, control);
-		instance.getDiscovered().clear();
 		instance.setInitialized(true);
 	}
 
@@ -68,8 +52,7 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 		return unmarshalResourceManagerData(xml);
 	}
 
-	public static void validate(String xml) throws SAXException, IOException, URISyntaxException {
-		URL instance = getURL(xml);
+	public static void validate(URL instance) throws SAXException, IOException, URISyntaxException {
 		URL xsd = JAXBCorePlugin.getResource(RM_XSD);
 		SchemaFactory factory = SchemaFactory.newInstance(XMLSchema);
 		Schema schema = factory.newSchema(xsd);
@@ -93,7 +76,9 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 		}
 	}
 
-	private static ResourceManagerData unmarshalResourceManagerData(URL xml) throws JAXBException, IOException {
+	private static ResourceManagerData unmarshalResourceManagerData(URL xml) throws JAXBException, IOException, SAXException,
+			URISyntaxException {
+		validate(xml);
 		JAXBContext jc = JAXBContext.newInstance(JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
 		Unmarshaller u = jc.createUnmarshaller();
 		JAXBElement<?> o = (JAXBElement<?>) u.unmarshal(xml.openStream());

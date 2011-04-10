@@ -17,10 +17,23 @@ import org.eclipse.ptp.rm.jaxb.core.data.Entry;
 import org.eclipse.ptp.rm.jaxb.core.data.Put;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
+/**
+ * Wrapper implementation.
+ * 
+ * @author arossi
+ * 
+ */
 public class PutImpl extends AbstractAssign {
 
 	private final List<Entry> entries;
 
+	/**
+	 * @param uuid
+	 *            unique id associated with this resource manager operation (can
+	 *            be <code>null</code>).
+	 * @param put
+	 *            JAXB data element
+	 */
 	public PutImpl(String uuid, Put put) {
 		this.uuid = uuid;
 		field = put.getField();

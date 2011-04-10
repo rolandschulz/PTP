@@ -12,46 +12,50 @@ package org.eclipse.ptp.rm.jaxb.ui.cell;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ptp.rm.jaxb.ui.data.AttributeViewerRowData;
-import org.eclipse.ptp.rm.jaxb.ui.data.ColumnDescriptor;
+import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 
 public class AttributeViewerEditingSupport extends EditingSupport {
 
 	private final ColumnViewer viewer;
-	private final ColumnDescriptor descriptor;
 
-	public AttributeViewerEditingSupport(ColumnViewer viewer, ColumnDescriptor descriptor) {
+	public AttributeViewerEditingSupport(ColumnViewer viewer) {
 		super(viewer);
 		this.viewer = viewer;
-		this.descriptor = descriptor;
 	}
 
 	@Override
 	protected boolean canEdit(Object element) {
-		return ((AttributeViewerRowData) element).canEdit();
+		if (element instanceof ICellEditorUpdateModel) {
+			boolean b = ((ICellEditorUpdateModel) element).canEdit();
+			return b;
+		}
+		return false;
 	}
 
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		if (viewer instanceof TableViewer) {
-			return ((AttributeViewerRowData) element).getCellEditor((TableViewer) viewer, descriptor);
-		} else {
-			return ((AttributeViewerRowData) element).getCellEditor((TreeViewer) viewer, descriptor);
+		if (element instanceof ICellEditorUpdateModel) {
+			CellEditor editor = ((ICellEditorUpdateModel) element).getCellEditor();
+			return editor;
 		}
+		return null;
 	}
 
 	@Override
 	protected Object getValue(Object element) {
-		Object o = ((AttributeViewerRowData) element).getValue();
-		return o;
+		if (element instanceof ICellEditorUpdateModel) {
+			Object value = ((ICellEditorUpdateModel) element).getValueForEditor();
+			return value;
+		}
+		return null;
 	}
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		((AttributeViewerRowData) element).setValue(value);
-		WidgetActionUtils.refreshViewer(viewer);
+		if (element instanceof ICellEditorUpdateModel) {
+			((ICellEditorUpdateModel) element).setValueFromEditor(value);
+			WidgetActionUtils.refreshViewer(viewer);
+		}
 	}
 }

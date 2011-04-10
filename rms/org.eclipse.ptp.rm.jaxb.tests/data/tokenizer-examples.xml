@@ -1,3 +1,12 @@
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- ****************************************************************************** -->
 <?xml version="1.0" encoding="UTF-8"?>
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="test-parsers">
@@ -10,9 +19,12 @@
 				<target ref="available_queues">
 					<match>
 						<expression>[^\s]+</expression>
-						<append field="value" separator=",">
+						<!-- <append field="value" separator=","> -->
+						<!-- <entry valueGroup="0"/> -->
+						<!-- </append> -->
+						<add field="value">
 							<entry valueGroup="0"/>
-						</append>
+						</add>
 					</match>
 				</target>
 			</stdout-parser>
@@ -319,20 +331,20 @@
 			</stdout-parser>
 		</start-up-command>
 		<!-- EXAMPLE 12: exit-after -->
-      <start-up-command name="test11ExitAfter">
-         <arg/>
-         <stdout-parser maxMatchLen="32">
-            <target ref="jobStates">
-               <match>
-                  <expression flags="DOTALL">.*&lt;job&gt;([\d]*):([\w]*)&lt;/job&gt;.*</expression>
-                  <put field="value">
-                     <entry keyGroup="1" valueGroup="2"/>
-                  </put>
-               </match>
-            </target>
-            <exit-after flags="DOTALL">.*EXIT.*</exit-after>
-         </stdout-parser>
-      </start-up-command>
+		<start-up-command name="test11ExitAfter">
+			<arg/>
+			<stdout-parser maxMatchLen="32">
+				<target ref="jobStates">
+					<match>
+						<expression flags="DOTALL">.*&lt;job&gt;([\d]*):([\w]*)&lt;/job&gt;.*</expression>
+						<put field="value">
+							<entry keyGroup="1" valueGroup="2"/>
+						</put>
+					</match>
+				</target>
+				<exit-after flags="DOTALL">.*EXIT.*</exit-after>
+			</stdout-parser>
+		</start-up-command>
 		<submit-interactive name="empty">
 			<arg/>
 		</submit-interactive>

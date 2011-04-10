@@ -15,6 +15,12 @@ import java.util.regex.Pattern;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Regex;
 
+/**
+ * Wrapper implementation.
+ * 
+ * @author arossi
+ * 
+ */
 public class RegexImpl implements IJAXBNonNLSConstants {
 
 	private static final String FLAG_SEP = OPENSQ + PIP + CLOSSQ;
@@ -24,6 +30,12 @@ public class RegexImpl implements IJAXBNonNLSConstants {
 	private final Pattern pattern;
 	private int lastChar;
 
+	/**
+	 * Wraps the Java implementation of regular expressions.
+	 * 
+	 * @param regex
+	 *            JAXB data element
+	 */
 	public RegexImpl(Regex regex) {
 		expression = regex.getExpression();
 		if (expression == null) {
@@ -33,14 +45,26 @@ public class RegexImpl implements IJAXBNonNLSConstants {
 		pattern = Pattern.compile(expression, getFlags(regex.getFlags()));
 	}
 
+	/**
+	 * @return the regex pattern
+	 */
 	public String getExpression() {
 		return expression;
 	}
 
+	/**
+	 * @return the index of the last character in the match
+	 */
 	public int getLastChar() {
 		return lastChar;
 	}
 
+	/**
+	 * @param sequence
+	 *            the segment to match
+	 * @return array of substrings either from a split using the regex, or the
+	 *         regex groups (including group 0).
+	 */
 	public String[] getMatched(String sequence) {
 		String[] result = null;
 		if (split) {
@@ -59,6 +83,15 @@ public class RegexImpl implements IJAXBNonNLSConstants {
 		return result;
 	}
 
+	/**
+	 * Translates the string representation of the flags into the corresponding
+	 * Java int value. String can represent an or'd set, e.g.,
+	 * "CASE_INSENTIVE | DOTALL".
+	 * 
+	 * @param flags
+	 *            string representing the or'd flags.
+	 * @return corresponding internal value
+	 */
 	private int getFlags(String flags) {
 		if (flags == null) {
 			return 0;

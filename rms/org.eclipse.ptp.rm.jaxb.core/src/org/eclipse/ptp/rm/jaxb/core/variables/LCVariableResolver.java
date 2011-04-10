@@ -14,17 +14,22 @@ import org.eclipse.core.variables.IDynamicVariable;
 import org.eclipse.core.variables.IDynamicVariableResolver;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 
-public class LTVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
+public class LCVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
 
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
-		LTVariableMap m = LTVariableMap.getActiveInstance();
+		LCVariableMap m = LCVariableMap.getActiveInstance();
 		if (m != null) {
 			String[] split = argument.split(PDRX);
 			if (split.length > 1) {
-				argument = split[0];
+				if (split[1].equals(VALUE)) {
+					argument = split[0];
+				}
 			}
-			return m.getVariables().get(argument);
+			Object value = m.get(argument);
+			if (value != null) {
+				return String.valueOf(value);
+			}
 		}
-		return null;
+		return ZEROSTR;
 	}
 }

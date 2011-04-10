@@ -34,6 +34,7 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.Command;
 import org.eclipse.ptp.rm.jaxb.core.data.Control;
+import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.data.Script;
@@ -144,6 +145,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	private final IJAXBResourceManagerConfiguration config;
+	private RMVariableMap rmVarMap;
 	private Control controlData;
 	private final Map<String, String> dynSystemEnv;
 	private final JobStatusMap jobStatusMap;
@@ -187,9 +189,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			p.setVisible(false);
 			p.setName(jobId);
 			p.setValue(jobId);
-			RMVariableMap.getActiveInstance().getVariables().put(jobId, p);
+			rmVarMap.put(jobId, p);
 			doControlCommand(jobId, operation);
-			RMVariableMap.getActiveInstance().getVariables().remove(jobId);
+			rmVarMap.remove(jobId);
 			if (TERMINATE_OPERATION.equals(operation)) {
 				jobStatusMap.removeJobStatus(jobId);
 			}
@@ -218,7 +220,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			p.setVisible(false);
 			p.setName(jobId);
 			p.setValue(jobId);
-			RMVariableMap.getActiveInstance().getVariables().put(jobId, p);
+			rmVarMap.put(jobId, p);
 
 			Command job = controlData.getGetJobStatus();
 			if (job == null) {
@@ -227,7 +229,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			runCommand(jobId, job, false, true);
 
-			p = (Property) RMVariableMap.getActiveInstance().getVariables().remove(jobId);
+			p = (Property) rmVarMap.remove(jobId);
 			String state = IJobStatus.UNDETERMINED;
 			if (p != null) {
 				state = (String) p.getValue();
@@ -300,7 +302,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		String uuid = UUID.randomUUID().toString();
 		Property p = new Property();
 		p.setVisible(false);
-		RMVariableMap.getActiveInstance().getVariables().put(uuid, p);
+		rmVarMap.put(uuid, p);
 
 		/*
 		 * overwrite property/attribute values based on user choices
@@ -315,11 +317,16 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		maybeHandleScript(uuid, controlData.getScript());
 
+		ManagedFiles files = controlData.getManagedFiles();
+
 		/*
-		 * if the script is to be staged, a managed file pointing to
-		 * ${rm:script#value} as its content must exist.
+		 * if the script is to be staged, a managed file pointing to either its
+		 * as its content (${rm:script#value}), or to its path (SCRIPT_PATH)
+		 * must exist.
 		 */
-		if (!maybeHandleManagedFiles(uuid, controlData.getManagedFiles())) {
+		files = maybeAddManagedFileForScript(files);
+
+		if (!maybeHandleManagedFiles(uuid, files)) {
 			throw CoreExceptionUtils.newException(Messages.CannotCompleteSubmitFailedStaging, null);
 		}
 
@@ -343,7 +350,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * property containing actual jobId as name was accessed in the wait
 		 * call
 		 */
-		RMVariableMap.getActiveInstance().getVariables().remove(uuid);
+		rmVarMap.remove(uuid);
 		ICommandJobStreamsProxy proxy = job.getProxy();
 		status.setProxy(proxy);
 		jobStatusMap.addJobStatus(status.getJobId(), status);
@@ -490,10 +497,49 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		runCommands(null, onStartUp, STARTUP);
 	}
 
+	private ManagedFiles maybeAddManagedFileForScript(ManagedFiles files) {
+		Property scriptVar = (Property) RMVariableMap.getActiveInstance().get(SCRIPT);
+		Property scriptPathVar = (Property) RMVariableMap.getActiveInstance().get(SCRIPT_PATH);
+		if (scriptVar != null || scriptPathVar != null) {
+			if (files == null) {
+				files = new ManagedFiles();
+				files.setFileStagingLocation(ECLIPSESETTINGS);
+			}
+			List<ManagedFile> fileList = files.getFile();
+			ManagedFile scriptFile = null;
+			if (!fileList.isEmpty()) {
+				for (ManagedFile f : fileList) {
+					if (f.getName().equals(SCRIPT_FILE)) {
+						scriptFile = f;
+						break;
+					}
+				}
+			}
+			if (scriptFile == null) {
+				scriptFile = new ManagedFile();
+				scriptFile.setName(SCRIPT_FILE);
+				fileList.add(scriptFile);
+			}
+			scriptFile.setResolveContents(false);
+			scriptFile.setUniqueIdPrefix(true);
+			if (scriptPathVar != null) {
+				scriptFile.setPath(String.valueOf(scriptPathVar.getValue()));
+				scriptFile.setDeleteAfterUse(false);
+			} else {
+				scriptFile.setContents(OPENVRM + SCRIPT + PD + VALUE + CLOSV);
+				scriptFile.setDeleteAfterUse(true);
+			}
+		}
+		return files;
+	}
+
 	/*
 	 * Write content to file if indicated, and stage to host.
 	 */
 	private boolean maybeHandleManagedFiles(String uuid, ManagedFiles files) throws CoreException {
+		if (files == null || files.getFile().isEmpty()) {
+			return true;
+		}
 		ManagedFilesJob job = new ManagedFilesJob(uuid, files, delegate);
 		job.schedule();
 		try {
@@ -505,17 +551,17 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	/*
 	 * Serialize script content if necessary. We first check to see if there is
-	 * a custom script loaded through the launch configuration tab.
+	 * a custom script.
 	 */
 	private void maybeHandleScript(String uuid, Script script) {
-		Property p = (Property) RMVariableMap.getActiveInstance().getVariables().get(SCRIPT);
+		Property p = (Property) rmVarMap.get(SCRIPT);
 		if (p != null && p.getValue() != null) {
 			return;
 		}
 		if (script == null) {
 			return;
 		}
-		ScriptHandler job = new ScriptHandler(uuid, script, RMVariableMap.getActiveInstance(), dynSystemEnv, appendSysEnv);
+		ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, dynSystemEnv, appendSysEnv);
 		job.schedule();
 		try {
 			job.join();
@@ -545,6 +591,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 */
 			IJAXBResourceManagerConfiguration config = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
 			config.setActive();
+			rmVarMap = RMVariableMap.getActiveInstance();
 			controlData = config.getResourceManagerData().getControlData();
 		} catch (Throwable t) {
 			JAXBCorePlugin.log(t);
@@ -565,11 +612,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		CommandJob job = new CommandJob(uuid, command, batch, this);
 		if (batch) {
-			Property p = (Property) RMVariableMap.getActiveInstance().getVariables().get(STDOUT);
+			Property p = (Property) rmVarMap.get(STDOUT);
 			if (p != null) {
 				job.setRemoteOutPath((String) p.getValue());
 			}
-			p = (Property) RMVariableMap.getActiveInstance().getVariables().get(STDERR);
+			p = (Property) rmVarMap.get(STDERR);
 			if (p != null) {
 				job.setRemoteErrPath((String) p.getValue());
 			}
@@ -611,40 +658,51 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void setFixedConfigurationProperties() {
 		IRemoteConnection rc = delegate.getRemoteConnection();
-		RMVariableMap.getActiveInstance().maybeAddProperty(CONTROL_USER_VAR, rc.getUsername(), false);
-		RMVariableMap.getActiveInstance().maybeAddProperty(CONTROL_ADDRESS_VAR, rc.getAddress(), false);
+		rmVarMap.maybeAddProperty(CONTROL_USER_VAR, rc.getUsername(), false);
+		rmVarMap.maybeAddProperty(CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 	}
 
 	/*
-	 * Updates selection: if not selected, value is nulled out. Transfers the
-	 * values from the configuration to the live map.
+	 * Transfers the values from the configuration to the live map.
 	 */
 	@SuppressWarnings("unchecked")
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
-		RMVariableMap map = RMVariableMap.getActiveInstance();
-		Map<String, Object> env = map.getVariables();
-		env.remove(SCRIPT); // to ensure the most recent script is used
+		/*
+		 * to ensure the most recent script is used
+		 */
+		rmVarMap.remove(SCRIPT);
 
-		Map<String, String> selected = config.getSelectedAttributeSet();
+		/*
+		 * The non-selected variables have already been excluded from the launch
+		 * configuration for consistency; but we need to null them out in the RM
+		 * env as well
+		 */
+		Map<String, String> selectedMap = null;
+		String selected = configuration.getAttribute(SELECTED_ATTRIBUTES, ZEROSTR);
+		if (selected != null) {
+			selectedMap = new HashMap<String, String>();
+			String[] names = selected.split(SP);
+			for (String s : names) {
+				selectedMap.put(s, s);
+			}
+		}
 
 		@SuppressWarnings("rawtypes")
 		Map lcattr = configuration.getAttributes();
 		for (Object key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
-			Object target = env.get(key.toString());
+			Object target = rmVarMap.get(key.toString());
 			if (target instanceof Property) {
 				Property p = (Property) target;
-				if (selected != null && !selected.containsKey(p.getName())) {
+				if (selectedMap != null && !selectedMap.containsKey(p.getName())) {
 					p.setValue(null);
-					p.setSelected(false);
 				} else {
 					p.setValue(value.toString());
 				}
 			} else if (target instanceof Attribute) {
 				Attribute ja = (Attribute) target;
-				if (selected != null && !selected.containsKey(ja.getName())) {
+				if (selectedMap != null && !selectedMap.containsKey(ja.getName())) {
 					ja.setValue(null);
-					ja.setSelected(false);
 				} else {
 					ja.setValue(value);
 				}
@@ -654,8 +712,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		dynSystemEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, dynSystemEnv));
 		appendSysEnv = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, appendSysEnv);
 
-		map.maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
-		map.maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
-		map.maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
+		rmVarMap.maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
+		rmVarMap.maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
+		rmVarMap.maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
 	}
 }

@@ -26,7 +26,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Script;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.LineImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
-import org.eclipse.ptp.rm.jaxb.core.variables.LTVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
@@ -45,7 +45,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		this.live = live;
 		this.appendEnv = appendEnv;
 		this.map = map;
-		if (map instanceof LTVariableMap) {
+		if (map instanceof LCVariableMap) {
 			convertScript();
 		}
 	}
@@ -63,7 +63,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			Property p = new Property();
 			p.setName(SCRIPT);
 			p.setValue(scriptValue);
-			rmMap.getVariables().put(SCRIPT, p);
+			rmMap.put(SCRIPT, p);
 		}
 		progress.done();
 		return Status.OK_STATUS;
@@ -136,7 +136,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			for (Arg a : line.getArg()) {
 				Arg newA = new Arg();
 				newA.setIsUndefinedIfMatches(a.getIsUndefinedIfMatches());
-				newA.setContent(a.getContent().replaceAll(VRM, VLT));
+				newA.setContent(a.getContent().replaceAll(VRM, VLC));
 				newA.setResolve(a.isResolve());
 				args.add(newA);
 			}
