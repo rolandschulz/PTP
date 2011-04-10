@@ -232,7 +232,7 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	 *            to be compared
 	 * @param string2
 	 *            to be compared
-	 * @return
+	 * @return whether the two values are equal
 	 * @throws Throwable
 	 */
 	private boolean evaluateEquals(String string1, String string2) throws Throwable {

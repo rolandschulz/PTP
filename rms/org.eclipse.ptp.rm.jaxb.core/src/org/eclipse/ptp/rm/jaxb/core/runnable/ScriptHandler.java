@@ -107,7 +107,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	 * passed in as the <code>launchEnv</code> if there are any.
 	 * 
 	 * @param monitor
-	 * @return
+	 * @return the generated script string
 	 */
 	private String composeScript(IProgressMonitor monitor) {
 		List<Line> line = script.getLine();

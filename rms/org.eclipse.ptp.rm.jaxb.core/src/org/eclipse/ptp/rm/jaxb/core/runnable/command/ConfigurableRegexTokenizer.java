@@ -58,7 +58,7 @@ import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
  * @see org.eclipse.ptp.rm.jaxb.core.data.impl.AppendImpl
  * @see org.eclipse.ptp.rm.jaxb.core.data.impl.PutImpl
  * @see org.eclipse.ptp.rm.jaxb.core.data.impl.SetImpl
- * @see org.eclipse.ptp.rm.jaxb.core.data.impl.Testmpl
+ * @see org.eclipse.ptp.rm.jaxb.core.data.impl.TestImpl
  * 
  * @author arossi
  * 
@@ -90,7 +90,7 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	}
 
 	/**
-	 * @param unique
+	 * @param uuid
 	 *            id associated with this resource manager operation (can be
 	 *            <code>null</code>).
 	 * @param tokenizer
@@ -358,7 +358,7 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	 * Compensation for escaping.
 	 * 
 	 * @param delim
-	 * @return
+	 * @return the non-escaped char
 	 */
 	private static char getChar(String delim) {
 		if (delim.indexOf(RTESC) >= 0 || delim.indexOf(LNESC) >= 0) {

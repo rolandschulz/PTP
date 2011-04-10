@@ -117,8 +117,7 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	 * Flag for prioritizing the target bound to this match by promoting it to
 	 * the head of the ordered list of targets held by the tokenizer.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.runnable.command.
-	 *      ConfigurableRegexTokenizer
+	 * @see org.eclipse.ptp.rm.jaxb.core.runnable.command.ConfigurableRegexTokenizer
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.impl.TargetImpl
 	 * 
 	 * @return whether to set this match as the "selected" one when matched

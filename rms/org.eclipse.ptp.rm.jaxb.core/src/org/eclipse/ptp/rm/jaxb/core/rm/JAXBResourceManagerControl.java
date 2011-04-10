@@ -720,7 +720,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * 
 	 * @param jobId
 	 *            either process id or internal identifier.
-	 * @return
+	 * @return whether job has been canceled
 	 */
 	private boolean maybeKillInteractive(String jobId) {
 		ICommandJobStatus status = jobStatusMap.getStatus(jobId);
@@ -806,8 +806,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * to ensure seriality. If a job in the sequence fails, the subsequent
 	 * commands will not run.
 	 * 
-	 * @param uuid
-	 *            temporary internal id for as yet unsubmitted job
 	 * @param cmds
 	 *            configuration objects containing the command arguments and
 	 *            tokenizers

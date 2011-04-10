@@ -202,7 +202,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	/**
 	 * Tune the monitor's buffer size
 	 * 
-	 * @param limit
+	 * @param bufferLimit
 	 *            in chars
 	 * 
 	 */
