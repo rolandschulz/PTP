@@ -410,7 +410,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 		<!-- ********************** FOR TESTING ********************** -->
 		<submit-interactive name="submit-interactive" waitForId="true">
 			<arg>/Users/arossi/qsub</arg>
-			<arg>${rm:pbs_script#value}</arg>
+			<arg>${rm:managed_file_for_script#value}</arg>
 			<stdout-parser delim="\n" all="true" save="1">
 				<target ref="@jobId">
 					<match>

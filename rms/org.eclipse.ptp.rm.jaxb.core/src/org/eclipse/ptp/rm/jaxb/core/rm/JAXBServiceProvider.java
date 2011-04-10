@@ -10,155 +10,57 @@
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
-import org.eclipse.ptp.rm.jaxb.core.data.Site;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.services.core.IServiceProvider;
 
+/**
+ * Configuration object used for persisting values between sessions. Also
+ * contains (in memory) the JAXB data object tree and the active instance of the
+ * environment map.<br>
+ * <br>
+ * There are actually three such providers associated with a JAXB resource
+ * manager instance: the base configuration, and the control and monitor
+ * configurations. The latter two contain references to their parent base
+ * provider.
+ * 
+ * @author arossi
+ * 
+ */
 public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfiguration implements IJAXBResourceManagerConfiguration,
 		IJAXBNonNLSConstants {
 
 	private ResourceManagerData rmdata;
 	private RMVariableMap map;
-	private IRemoteServices service;
 
 	public JAXBServiceProvider() {
 	}
 
+	/**
+	 * @param namespace
+	 *            base, control or monitor
+	 * @param provider
+	 *            base provider configuration
+	 */
 	public JAXBServiceProvider(String namespace, IServiceProvider provider) {
 		super(namespace, provider);
 		setDescription(Messages.JAXBServiceProvider_defaultDescription);
 	}
 
+	/**
+	 * clears in-memory objects
+	 */
 	public void clearReferences() {
 		map.clear();
 		map = null;
 		rmdata = null;
-		service = null;
-	}
-
-	public String getDefaultControlHost() {
-		if (rmdata != null) {
-			Site site = rmdata.getSiteData();
-			URI defaultURI = null;
-			if (site != null) {
-				try {
-					defaultURI = new URI(site.getControlConnection());
-					if (defaultURI != null) {
-						return defaultURI.getHost();
-					}
-				} catch (URISyntaxException t) {
-					JAXBCorePlugin.log(t);
-				}
-			}
-		}
-		return ZEROSTR;
-	}
-
-	public String getDefaultControlPath() {
-		if (rmdata != null) {
-			Site site = rmdata.getSiteData();
-			URI defaultURI = null;
-			if (site != null) {
-				try {
-					defaultURI = new URI(site.getControlConnection());
-					if (defaultURI != null) {
-						return defaultURI.getPath();
-					}
-				} catch (URISyntaxException t) {
-					JAXBCorePlugin.log(t);
-				}
-			}
-		}
-		return ZEROSTR;
-	}
-
-	public String getDefaultControlPort() {
-		if (rmdata != null) {
-			Site site = rmdata.getSiteData();
-			URI defaultURI = null;
-			if (site != null) {
-				try {
-					defaultURI = new URI(site.getControlConnection());
-					if (defaultURI != null) {
-						int p = defaultURI.getPort();
-						if (p != -1) {
-							return ZEROSTR + p;
-						}
-					}
-				} catch (URISyntaxException t) {
-					JAXBCorePlugin.log(t);
-				}
-			}
-		}
-		return ZEROSTR;
-	}
-
-	public String getDefaultMonitorHost() {
-		if (rmdata != null) {
-			Site site = rmdata.getSiteData();
-			URI defaultURI = null;
-			if (site != null) {
-				try {
-					defaultURI = new URI(site.getMonitorServerInstall());
-					if (defaultURI != null) {
-						return defaultURI.getHost();
-					}
-				} catch (URISyntaxException t) {
-					JAXBCorePlugin.log(t);
-				}
-			}
-		}
-		return ZEROSTR;
-	}
-
-	public String getDefaultMonitorPath() {
-		if (rmdata != null) {
-			Site site = rmdata.getSiteData();
-			URI defaultURI = null;
-			if (site != null) {
-				try {
-					String uri = site.getMonitorServerInstall();
-					if (uri != null && uri.length() > 0) {
-						defaultURI = new URI(site.getMonitorServerInstall());
-						return defaultURI.getPath();
-					}
-				} catch (URISyntaxException t) {
-					JAXBCorePlugin.log(t);
-				}
-			}
-		}
-		return ZEROSTR;
-	}
-
-	public String getDefaultMonitorPort() {
-		if (rmdata != null) {
-			Site site = rmdata.getSiteData();
-			URI defaultURI = null;
-			if (site != null) {
-				try {
-					defaultURI = new URI(site.getMonitorServerInstall());
-					int p = defaultURI.getPort();
-					if (p != -1) {
-						return ZEROSTR + p;
-					}
-				} catch (URISyntaxException t) {
-					JAXBCorePlugin.log(t);
-				}
-			}
-		}
-		return ZEROSTR;
 	}
 
 	public ResourceManagerData getResourceManagerData() {
@@ -180,10 +82,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		} catch (MalformedURLException e) {
 			return null;
 		}
-	}
-
-	public IRemoteServices getService() {
-		return service;
 	}
 
 	public void realizeRMDataFromXML() throws Throwable {
@@ -228,10 +126,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 			putString(RM_XSD_URL, url);
 			clearRMData();
 		}
-	}
-
-	public void setService(IRemoteServices service) {
-		this.service = service;
 	}
 
 	// @Override

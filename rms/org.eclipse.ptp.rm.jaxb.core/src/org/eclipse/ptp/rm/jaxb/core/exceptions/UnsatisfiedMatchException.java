@@ -9,6 +9,12 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.exceptions;
 
+/**
+ * Exception raised when a widget validator using a regular expression fails
+ * 
+ * @author arossi
+ * 
+ */
 public class UnsatisfiedMatchException extends Exception {
 
 	private static final long serialVersionUID = 4521238998263940220L;

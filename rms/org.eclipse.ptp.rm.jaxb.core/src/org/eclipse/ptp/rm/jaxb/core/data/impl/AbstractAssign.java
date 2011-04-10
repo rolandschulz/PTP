@@ -46,6 +46,8 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	}
 
 	/**
+	 * Applies the assignment.
+	 * 
 	 * @param values
 	 *            from the expression parsing (groups or segments)
 	 * @throws Throwable
@@ -53,13 +55,15 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	public void assign(String[] values) throws Throwable {
 		Object previous = get(target, field);
 		set(target, field, getValue(previous, values));
-		/*
-		 * assumption is one-to-one IAssign to field
-		 */
 		index++;
 	}
 
 	/**
+	 * Used in the case of references to targets constructed in connection with
+	 * the tokenization. The assumption is that an Assign action will be applied
+	 * only once to any given target, in the order of their construction; this
+	 * index keeps track of where this particular assign action is in the list.
+	 * 
 	 * @return the index of the current target
 	 */
 	public int getIndex() {

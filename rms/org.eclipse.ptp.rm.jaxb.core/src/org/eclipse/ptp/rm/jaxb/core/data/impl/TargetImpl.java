@@ -28,6 +28,26 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
+/**
+ * Wrapper implementation. A target contains any number of matches, with their
+ * associated actions, along with tests for conditional actions based on values
+ * of the target fields. <br>
+ * <br>
+ * There are two modes to matching. The default is to treat the matches as
+ * logically OR'd (like a SAT; <code>matchAll</code> = false). When the latter
+ * is set to true, the matches are taken as logically ANDed.<br>
+ * <br>
+ * The target can be a reference to a pre-existent Property or Attribute in the
+ * resource manager environment, or can be constructed when the match occurs.
+ * Dynamically constructed targets are added to a list during the tokenization,
+ * and then upon termination are merged according to property or attribute name,
+ * which is treated as a unique identifier. <br>
+ * <br>
+ * Tests are applied at the end of the tokenization. <br>
+ * 
+ * @author arossi
+ * 
+ */
 public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 
 	private final String uuid;
@@ -40,6 +60,15 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	private final boolean matchAll;
 	private boolean selected;
 
+	/**
+	 * Wraps the Property or Attribute to be acted upon.
+	 * 
+	 * @param uuid
+	 *            unique id associated with this resource manager operation (can
+	 *            be <code>null</code>).
+	 * @param target
+	 *            JAXB data element
+	 */
 	public TargetImpl(String uuid, Target target) {
 		this.uuid = uuid;
 		ref = target.getRef();
@@ -59,6 +88,19 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		selected = false;
 	}
 
+	/**
+	 * Applies the matches in order. If <code>matchAll</code> is in effect,
+	 * already matched expressions are skipped until they are reset; the first
+	 * match causes a return of this method.<br>
+	 * <br>
+	 * Upon match, the head of the segment up to the last character of the match
+	 * is deleted.
+	 * 
+	 * @param segment
+	 *            the current part of the stream to match
+	 * @return whether a successful match was found on this target
+	 * @throws CoreException
+	 */
 	public synchronized boolean doMatch(StringBuffer segment) throws Throwable {
 		int matched = 0;
 		boolean match = false;
@@ -86,6 +128,23 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		return match;
 	}
 
+	/**
+	 * Get the target object for the given assign task.<br>
+	 * <br>
+	 * This method is called by the Match on its target parent. If the target is
+	 * a reference to an existing object in the environment, this is then
+	 * returned; else, the index counter for the assign task is retrieved,
+	 * indicating where in the list of constructed targets it last was (the
+	 * assumption is that an assign action is applied once to any given Property
+	 * or Attribute), and this object is returned if it exists; in the case that
+	 * the index is equal to or greater than the size of the list, a new target
+	 * object is constructed and added to the list.
+	 * 
+	 * @param assign
+	 *            action to be applied to target
+	 * @return the appropriate target for this action
+	 * @throws CoreException
+	 */
 	public Object getTarget(IAssign assign) throws CoreException {
 		if (refTarget != null) {
 			return refTarget;
@@ -122,10 +181,22 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		return target;
 	}
 
+	/**
+	 * @return whether this target has been selected for promotion to the head
+	 *         of the list
+	 */
 	public boolean isSelected() {
 		return selected;
 	}
 
+	/**
+	 * Called upon completion of tokenization.<br>
+	 * <br>
+	 * First merges any constructed targets, then applies the tests to all
+	 * targets.
+	 * 
+	 * @throws Throwable
+	 */
 	public synchronized void postProcess() throws Throwable {
 		if (refTarget == null) {
 			if (PROPERTY.equals(type)) {
@@ -155,10 +226,26 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * @param selected
+	 *            whether this target should be promoted to the head of the list
+	 */
 	public void setSelected(boolean selected) {
 		this.selected = selected;
 	}
 
+	/**
+	 * Takes two attributes with the same name and merges the rest of their
+	 * fields, such that non-<code>null</code> values replace <code>null</code>.
+	 * An attempt to merge two non-<code>null</code> fields implies that there
+	 * was an error in the tokenization logic, and an exception is thrown.
+	 * 
+	 * @param previous
+	 *            Attribute
+	 * @param current
+	 *            Attribute
+	 * @throws Throwable
+	 */
 	private void merge(Attribute previous, Attribute current) throws Throwable {
 		Object v0 = previous.getValue();
 		Object v1 = current.getValue();
@@ -245,6 +332,18 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * Takes two properties with the same name and merges the rest of their
+	 * fields, such that non-<code>null</code> values replace <code>null</code>.
+	 * An attempt to merge two non-<code>null</code> fields implies that there
+	 * was an error in the tokenization logic, and an exception is thrown.
+	 * 
+	 * @param previous
+	 *            Property
+	 * @param current
+	 *            Property
+	 * @throws Throwable
+	 */
 	private void merge(Property previous, Property current) throws Throwable {
 		Object v0 = previous.getValue();
 		Object v1 = current.getValue();
@@ -283,13 +382,24 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * Attributes are hashed against their name; attributes with the same name
+	 * are merged into a single object. Nameless attributes may occur from an
+	 * empty line at the end of the stream, and are simply discarded.
+	 * 
+	 * @param targets
+	 *            list of targets constructed during tokenization
+	 * @throws Throwable
+	 */
 	private void mergeAttributes(List<Object> targets) throws Throwable {
 		Map<String, Attribute> hash = new HashMap<String, Attribute>();
 		for (Iterator<Object> i = targets.iterator(); i.hasNext();) {
 			Attribute current = (Attribute) i.next();
 			String name = current.getName();
 			if (current.getName() == null) {
-				// may be an artifact of end-of-stream; just throw it out
+				/*
+				 * may be an artifact of end-of-stream; just throw it out
+				 */
 				i.remove();
 				continue;
 			}
@@ -303,13 +413,24 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * Properties are hashed against their name; properties with the same name
+	 * are merged into a single object. Nameless properties may occur from an
+	 * empty line at the end of the stream, and are simply discarded.
+	 * 
+	 * @param targets
+	 *            list of targets constructed during tokenization
+	 * @throws Throwable
+	 */
 	private void mergeProperties(List<Object> targets) throws Throwable {
 		Map<String, Property> hash = new HashMap<String, Property>();
 		for (Iterator<Object> i = targets.iterator(); i.hasNext();) {
 			Property current = (Property) i.next();
 			String name = current.getName();
 			if (current.getName() == null) {
-				// may be an artifact of end-of-stream; just throw it out
+				/*
+				 * may be an artifact of end-of-stream; just throw it out
+				 */
 				i.remove();
 				continue;
 			}

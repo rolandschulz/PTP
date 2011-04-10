@@ -15,7 +15,7 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
 
 /**
- * JAXB resource manager monitor used for testing
+ * JAXB resource manager monitor used for testing. Currently unimplemented
  */
 public class JAXBResourceManagerMonitor extends AbstractResourceManagerMonitor {
 

@@ -289,9 +289,9 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private void prepareEnv(IRemoteProcessBuilder builder) throws CoreException {
-		if (!rm.getAppendSysEnv()) {
+		if (!rm.getAppendEnv()) {
 			builder.environment().clear();
-			Map<String, String> live = rm.getDynSystemEnv();
+			Map<String, String> live = rm.getLaunchEnv();
 			for (String var : live.keySet()) {
 				builder.environment().put(var, live.get(var));
 			}
@@ -308,7 +308,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), map);
 			}
 
-			Map<String, String> live = rm.getDynSystemEnv();
+			Map<String, String> live = rm.getLaunchEnv();
 			for (String var : live.keySet()) {
 				builder.environment().put(var, live.get(var));
 			}

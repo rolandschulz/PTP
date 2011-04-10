@@ -17,7 +17,10 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.Arg;
 
 /**
- * Wrapper implementation.
+ * Wrapper implementation. An argument is a part of a string sequence which can
+ * be resolved in an environment, and then tested to see if the result matches a
+ * pattern indicating that the argument is equivalent to being undefined (and
+ * thus should be eliminated).
  * 
  * @author arossi
  * 
