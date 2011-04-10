@@ -1,12 +1,3 @@
-<!-- ******************************************************************************* -->
-<!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
-<!-- * and the accompanying materials are made available under the terms of the -->
-<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
-<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
-<!-- * -->
-<!-- * Contributors: -->
-<!-- * Albert L. Rossi - design and implementation -->
-<!-- ****************************************************************************** -->
 <?xml version="1.0" encoding="UTF-8"?>
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-torque_2.3.7">
@@ -33,11 +24,14 @@
 		</attribute>
 		<attribute name="Checkpoint" type="choice">
 			<description>Determines when checkpointing (if supported) will be performed by PBS on behalf of the job.</description>
-			<tooltip>Format: the strings "n" (no checkpointing), "s" (to be performed only when the server executing the job is shutdown), "c"s
-				(to be performed at the default minimum time for thes servers executing the job), "c=mmmm" (to be performed at an intervals ofs
-				minutes which is the integer number of minutes of CPUs time used bys the job; values must be greater than zero); defaults value:
-				"u", whichs iss unspecified.
-			</tooltip>
+			<tooltip><![CDATA[Format: the strings "n" (no checkpointing), 
+"s" (to be performed only when the server executing 
+the job is shutdown), "c"s (to be performed at the 
+default minimum time for thes servers executing the 
+job), "c=mmmm" (to be performed at an intervals 
+of minutes which is the integer number of minutes of CPUs 
+time used bys the job; values must be greater than zero); 
+defaults value: "u", which is unspecified.]]></tooltip>
 			<choice>,u,n,s,c,c=????</choice>
 			<default>u</default>
 		</attribute>
@@ -48,73 +42,74 @@
 		<attribute name="destination" type="choice">
 			<description>Designation of the queue to which to submit the job.</description>
 			<tooltip>Format: queue[@server].</tooltip>
-			<choice>normal,iacat2,indprio,lincoln_nomss,cap1,lincoln_debug,long,iacat,industrial,lincoln,wide,nomss,debug,iacat3,lincoln_cuda3,fernsler
-			</choice>
+			<choice><![CDATA[normal,iacat2,indprio,lincoln_nomss,cap1,lincoln_debug,long,iacat,industrial,lincoln,wide,nomss,debug,iacat3,lincoln_cuda3,fernsler]]></choice>
 		</attribute>
 		<attribute name="directive" type="string">
 			<description>Defines the prefix that declares a directive to the qsub command within the script file.</description>
-			<tooltip>See the paragraph on script directives in the Extended Description section. If the option is presented with a
-				directive_prefix argument that is the null string, qsub will not scan the script file for directives.
-			</tooltip>
+			<tooltip><![CDATA[See the paragraph on script directives in the 
+Extended Description section. If the option is presented with a
+directive_prefix argument that is the null string, qsub will 
+not scan the script file for directives.]]></tooltip>
 		</attribute>
 		<attribute name="Error_Path" type="string">
 			<description>The final path name for the file containing the job's standard error stream.</description>
-			<tooltip>Format: "[hostname:]pathname". If the option is not specified, the default file name for the standard error stream will be
-				used. The default name has the following form: job_name.eSeq_num where job_name is the name of the job, see -N option, and Seq_num
-				is the job number assigned when the job is submitted; default value: (job_name).e(job_number).
-			</tooltip>
+			<tooltip><![CDATA[Format: "[hostname:]pathname". If 
+the option is not specified, the default file name for the 
+standard error stream will be used. The default name has 
+the following form: job_name.eSeq_num where job_name is 
+the name of the job, see -N option, and Seq_num
+is the job number assigned when the job is submitted; 
+default value: (job_name).e(job_number).]]></tooltip>
 		</attribute>
 		<attribute name="export_all" type="boolean">
-			<description>Declares that all environment variables in the qsub command's environment are to be exported to the batch job.
-			</description>
+			<description><![CDATA[Declares that all environment variables in the qsub command's environment are to be exported to the batch job.]]></description>
 			<default>true</default>
 		</attribute>
 		<attribute name="group_list" type="string">
-			<description>A list of composite-descriptor group="true"_names@hosts which determines the composite-descriptor group="true" under
-				which the job is run on a given
-				host.
-			</description>
-			<tooltip>Format: composite-descriptor group="true"_name[@host][,composite-descriptor group="true"_name[@host]...]. When a job is to
-				be placed into execution, the
-				server will select a composite-descriptor group="true"
-				name according to the following ordered set of
-				rules: 1) Select the composite-descriptor group="true" name from
-				the list for which the associated host name
-				matches the name of the
-				execution host; 2) Select the composite-descriptor group="true" name which has no
-				associated host name, the wildcard name; 3) Use
-				the login composite-descriptor group="true" for the username under which the job will be run.
-			</tooltip>
+			<description><![CDATA[A list of composite-descriptor group="true"_names@hosts which determines the composite-descriptor group="true" under which the job is run on a given host.]]></description>
+			<tooltip><![CDATA[Format: composite-descriptor 
+group="true"_name[@host][,composite-descriptor group="true"_name[@host]...].
+When a job is to be placed into execution, the server will select a 
+composite-descriptor group="true" name according to the following ordered set 
+of rules: 1) Select the composite-descriptor group="true" name from
+the list for which the associated host name matches the name of the
+execution host; 2) Select the composite-descriptor group="true" name 
+which has no associated host name, the wildcard name; 3) Use
+the login composite-descriptor group="true" for the username under 
+which the job will be run.]]></tooltip>
 		</attribute>
 		<attribute name="Hold_Types" type="choice">
 			<description>The set of holds currently applied to the job.</description>
-			<tooltip>If the set is not null, the job will not be scheduled for execution and is said to be in the hold state. Note, the hold
-				state takes precedence over the wait state. Format: string made up of the letters 'u', 's', 'o'; default value: no hold.
-			</tooltip>
+			<tooltip><![CDATA[If the set is not null, the job will not be scheduled
+for execution and is said to be in the hold state. Note, the hold
+state takes precedence over the wait state. Format: string made up 
+of the letters 'u', 's', 'o'; default value: no hold.]]></tooltip>
 			<choice>,u,s,o</choice>
 		</attribute>
 		<attribute name="Job_Name" type="string">
 			<description>The name assigned to the job by the qsub or qalter command.</description>
-			<tooltip>Format: string up to 15 characters, first character must be alphabetic; default value: the base name of the job script or
-				STDIN.
-			</tooltip>
+			<tooltip><![CDATA[Format: string up to 15 characters, 
+first character must be alphabetic; default value: 
+the base name of the job script or STDIN.]]></tooltip>
 		</attribute>
 		<attribute name="Join_Path" type="boolean">
 			<description>Merge stdout and stderr into stdout.</description>
-			<tooltip>Format: boolean, values accepted are "True", "TRUE", "true", "Y", "y", "1", "False", "FALSE", "false", "N", "n", "0";
-				default value: false.
-			</tooltip>
+			<tooltip><![CDATA[Format: boolean, values accepted are "True", "TRUE",
+"true", "Y", "y", "1", "False", "FALSE", "false", "N", "n", "0";
+default value: false.]]></tooltip>
 			<default>false</default>
 		</attribute>
 		<attribute name="Keep_Files" type="choice">
 			<description>Retain these streams on the execution host upon job termination.</description>
-			<tooltip>Format: "o", "e", "oe" or "eo"; default value: no keep, return files to submission host.</tooltip>
+			<tooltip><![CDATA[Format: "o", "e", "oe" or "eo"; default value:
+no keep, return files to submission host.]]></tooltip>
 			<choice>,o,e,oe,eo</choice>
 		</attribute>
 		<attribute name="Mail_Points" type="choice">
 			<description>Identifies at which state changes the server will send mail about the job.</description>
-			<tooltip>Format: string made up of the letters 'a' for abort, 'b' for beginning, and default value: 'a', send on job abort.
-			</tooltip>
+			<tooltip><![CDATA[Format: string made up of the letters
+'a' for abort, 'b' for beginning, and default value:
+ a', send on job abort.]]></tooltip>
 			<choice>,a,b</choice>
 			<default>a</default>
 		</attribute>
@@ -124,10 +119,12 @@
 		</attribute>
 		<attribute name="Output_Path" type="string">
 			<description>The final path name for the file containing the job's standard output stream.</description>
-			<tooltip>Format: "[hostname:]pathname". If the option is not specified, the default file name for the standard error stream will be
-				used. The default name has the following form: job_name.oSeq_num where job_name is the name of the job, see -N option, and Seq_num
-				is the job number assigned when the job is submitted; default value: (job_name).o(job_number).
-			</tooltip>
+			<tooltip><![CDATA[Format: "[hostname:]pathname". If the option
+is not specified, the default file name for the standard error stream 
+will be used. The default name has the following form: job_name.oSeq_num
+where job_name is the name of the job, see -N option, and Seq_num
+is the job number assigned when the job is submitted; 
+default value: (job_name).o(job_number).]]></tooltip>
 		</attribute>
 		<attribute name="Priority" type="string">
 			<description>The job scheduling priority assigned by the user.</description>
@@ -149,18 +146,18 @@
 		</attribute>
 		<attribute name="Resource_List.file" type="string">
 			<description>The largest size of any single file that may be created by the job.</description>
-			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
-				(kilo), mb/mw (mega), gb/bw (giga).
-			</tooltip>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier 
+in bytes or words (word size of the host): b (bytes), 
+w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		</attribute>
 		<attribute name="Resource_List.host" type="string">
 			<description>Name of host on which job should be run.</description>
 		</attribute>
 		<attribute name="Resource_List.mem" type="string">
 			<description>Maximum amount of memory used by all concurrent processes in the job.</description>
-			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
-				(kilo), mb/mw (mega), gb/bw (giga).
-			</tooltip>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier 
+in bytes or words (word size of the host): b (bytes), 
+w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		</attribute>
 		<attribute name="Resource_List.nice" type="integer" min="0" max="10">
 			<description>The nice value under which the job is to be run.</description>
@@ -169,13 +166,17 @@
 		</attribute>
 		<attribute name="Resource_List.nodes" type="string">
 			<description>Number and/or type of nodes to be reserved for exclusive use by the job.</description>
-			<tooltip>The value is one or more node_specs joined with the '+' character, "node_spec[+node_spec...]. Each node_spec is a number of
-				nodes required of the type declared in the node_spec and a name or one or more properity or properities desired for the nodes. The
-				number, the name, and each properity in the node_spec are separated by a colon ':'. If no number is specified, one (1) is assumed.
-				Units: string. The name of a node is its hostname. The properties of nodes are: ppn=# requested; defaults to 1; or an arbitrary
-				string defined by system administrator. Example: To ask for 2 processors on each of two blue nodes and three processors on one red
-				node: -l nodes=2:blue:ppn=2+red:ppn=3.
-			</tooltip>
+			<tooltip><![CDATA[The value is one or more node_specs joined with 
+the '+' character, "node_spec[+node_spec...]. Each node_spec is
+a number of nodes required of the type declared in the node_spec
+and a name or one or more properity or properities desired for 
+the nodes. The number, the name, and each properity in the 
+node_spec are separated by a colon ':'. If no number is specified, 
+one (1) is assumed. Units: string. The name of a node is its 
+hostname. The properties of nodes are: ppn=# requested; defaults 
+to 1; or an arbitrary string defined by system administrator. 
+Example: To ask for 2 processors on each of two blue nodes and 
+three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 			<default>1</default>
 		</attribute>
 		<attribute name="Resource_List.ompthreads" type="integer" min="1">
@@ -188,21 +189,21 @@
 		</attribute>
 		<attribute name="Resource_List.pmem" type="string">
 			<description>Maximum amount of physical memory (workingset) used by any single process of the job.</description>
-			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
-				(kilo), mb/mw (mega), gb/bw (giga).
-			</tooltip>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier
+in bytes or words (word size of the host): b (bytes), w (words), kb/kw
+(kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		</attribute>
 		<attribute name="Resource_List.pvmem" type="string">
 			<description>Maximum amount of virtual memory used by any single process in the job.</description>
-			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
-				(kilo), mb/mw (mega), gb/bw (giga).
-			</tooltip>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier
+in bytes or words (word size of the host): b (bytes), w (words), kb/kw
+(kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		</attribute>
 		<attribute name="Resource_List.vmem" type="string">
 			<description>Maximum amount of virtual memory used by all concurrent processes in the job.</description>
-			<tooltip>Format: integer[suffix]; the suffix is a multiplier in bytes or words (word size of the host): b (bytes), w (words), kb/kw
-				(kilo), mb/mw (mega), gb/bw (giga).
-			</tooltip>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier 
+in bytes or words (word size of the host): b (bytes), w (words), kb/kw
+(kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		</attribute>
 		<attribute name="Resource_List.walltime" type="string">
 			<description>Maximum amount of real time during which the job can be in the running state.</description>
@@ -211,9 +212,9 @@
 		</attribute>
 		<attribute name="Shell_Path_List" type="string">
 			<description>A set of absolute paths of the program to process the job's script file.</description>
-			<tooltip>Format: path[@host][,path[@host]...]. If this is null, then the user's login shell on the host of execution will be used.
-				Default value: null, login shell.
-			</tooltip>
+			<tooltip><![CDATA[Format: path[@host][,path[@host]...]. 
+If this is null, then the user's login shell on the host 
+of execution will be used. Default value: null, login shell.]]></tooltip>
 		</attribute>
 		<attribute name="stagein" type="string">
 			<description>The list of files to be staged in prior to job execution.</description>
@@ -225,21 +226,22 @@
 		</attribute>
 		<attribute name="User_List" type="string">
 			<description>The list of user@hosts which determines the user name under which the job is run on a given host.</description>
-			<tooltip>When a job is to be placed into execution, the server will select a user name from the list according to the following
-				ordered set of rules: 1) Select the user name from the list for which the associated host name matches the name of the execution
-				host; 2) Select the user name which has no associated host name, the wild card name; 3) Use the Job_Owner as the user name.
-				Default
-				value: job owner name.
-			</tooltip>
+			<tooltip><![CDATA[When a job is to be placed into execution, 
+the server will select a user name from the list according
+to the following ordered set of rules: 1) Select the user 
+name from the list for which the associated host name matches
+the name of the execution host; 2) Select the user name which 
+has no associated host name, the wild card name; 3) Use the 
+Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 		</attribute>
 		<attribute name="Variable_List" type="string">
 			<description>This is the list of environment variables passed with the Queue Job batch request.</description>
 		</attribute>
 		<managed-files>
-		 <file-staging-location>.eclipsesettings</file-staging-location>
-		 <file name="toStage">
-		    <path>/Users/arossi/toStage.sh</path>
-		 </file>
+			<file-staging-location>.eclipsesettings</file-staging-location>
+			<file name="toStage">
+				<path>/Users/arossi/toStage.sh</path>
+			</file>
 		</managed-files>
 		<script envBegin="36">
 			<line>
