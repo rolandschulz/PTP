@@ -221,15 +221,16 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			foreground = widget.getForeground();
 			font = widget.getFont();
 			tooltip = widget.getTooltip();
-			if (tooltip == null) {
-				tooltip = ZEROSTR;
-			} else {
-				tooltip = WidgetBuilderUtils.fitToLineLength(64, tooltip);
-			}
 			fixedText = widget.getFixedText();
 		}
 
 		private void setMapDependentData(Widget widget, RMVariableMap rmMap) {
+			if (tooltip == null) {
+				tooltip = ZEROSTR;
+			} else {
+				tooltip = WidgetBuilderUtils.fitToLineLength(64, rmMap.getString(tooltip));
+			}
+
 			if (fixedText != null) {
 				fixedText = rmMap.getString(fixedText);
 			}
