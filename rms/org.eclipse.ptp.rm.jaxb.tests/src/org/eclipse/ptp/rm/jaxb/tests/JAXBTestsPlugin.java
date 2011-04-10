@@ -7,10 +7,12 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.core;
+package org.eclipse.ptp.rm.jaxb.tests;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.eclipse.core.resources.ISaveContext;
@@ -24,22 +26,24 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.xml.sax.SAXException;
 
-public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
-
+public class JAXBTestsPlugin extends Plugin implements IJAXBNonNLSConstants {
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.jaxb.core"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.jaxb.tests"; //$NON-NLS-1$
 
 	// The shared instance
-	private static JAXBCorePlugin fPlugin;
+	private static JAXBTestsPlugin fPlugin;
 
 	/**
 	 * The constructor
 	 */
-	public JAXBCorePlugin() {
+	public JAXBTestsPlugin() {
 		fPlugin = this;
 	}
 
@@ -114,11 +118,11 @@ public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
 	 * 
 	 * @return the shared instance
 	 */
-	public static JAXBCorePlugin getDefault() {
+	public static JAXBTestsPlugin getDefault() {
 		return fPlugin;
 	}
 
-	public static JAXBCorePlugin getfPlugin() {
+	public static JAXBTestsPlugin getfPlugin() {
 		return fPlugin;
 	}
 
@@ -143,6 +147,19 @@ public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
 			return PLUGIN_ID;
 		}
 		return getDefault().getBundle().getSymbolicName();
+	}
+
+	public static URL getURL(String name) throws IOException {
+		URL instance = JAXBTestsPlugin.getResource(name);
+		if (instance == null) {
+			File f = new File(name);
+			if (f.exists() && f.isFile()) {
+				instance = f.toURL();
+			} else {
+				throw new FileNotFoundException(name);
+			}
+		}
+		return instance;
 	}
 
 	/**
@@ -170,5 +187,9 @@ public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
 	 */
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, Messages.JAXBCorePlugin_Exception_InternalError, e));
+	}
+
+	public static void validate(String xml) throws SAXException, IOException, URISyntaxException {
+		JAXBInitializationUtils.validate(getURL(xml));
 	}
 }

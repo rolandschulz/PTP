@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2011 University of Illinois All rights reserved. This program
+ * and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html 
+ * 	
+ * Contributors: 
+ * 	Albert L. Rossi - design and implementation
+ ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.handlers;
 
 import java.util.HashMap;
@@ -6,10 +15,9 @@ import java.util.Map;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.jaxb.ui.IFireContentsChangedEnabled;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
-import org.eclipse.ptp.rm.jaxb.ui.IValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 
-public class ValueUpdateHandler implements IValueUpdateHandler {
+public class ValueUpdateHandler {
 
 	private final Map<Object, IUpdateModel> controlToModelMap;
 	private final IFireContentsChangedEnabled tab;

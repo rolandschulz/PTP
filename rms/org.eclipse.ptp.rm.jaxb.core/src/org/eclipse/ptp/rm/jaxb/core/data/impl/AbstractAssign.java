@@ -23,6 +23,14 @@ import org.eclipse.ptp.rm.jaxb.core.data.Put;
 import org.eclipse.ptp.rm.jaxb.core.data.Set;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
+/**
+ * Base class for the wrappers around the data objects providing information as
+ * to the operations on a target property to be undertaken when there is a
+ * match.
+ * 
+ * @author arossi
+ * 
+ */
 public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 
 	protected String uuid;
@@ -37,20 +45,43 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		index = 0;
 	}
 
+	/**
+	 * @param values
+	 *            from the expression parsing (groups or segments)
+	 * @throws Throwable
+	 */
 	public void assign(String[] values) throws Throwable {
 		Object previous = get(target, field);
 		set(target, field, getValue(previous, values));
-		index++; // assumption is one-to-one IAssign to field
+		/*
+		 * assumption is one-to-one IAssign to field
+		 */
+		index++;
 	}
 
+	/**
+	 * @return the index of the current target
+	 */
 	public int getIndex() {
 		return index;
 	}
 
+	/**
+	 * @param target
+	 *            the current property or attribute
+	 */
 	public void setTarget(Object target) {
 		this.target = target;
 	}
 
+	/**
+	 * Decides whether the index of the map key is a segment (from
+	 * regex.split()) or a regex group number.
+	 * 
+	 * @param entry
+	 *            from the target map
+	 * @return the key index
+	 */
 	protected int determineKeyIndex(Entry entry) {
 		int index = entry.getKeyIndex();
 		int group = entry.getKeyGroup();
@@ -60,6 +91,15 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		return index;
 	}
 
+	/**
+	 * Decides whether the index of the map value is a segment (from
+	 * regex.split()) or a regex group number.
+	 * 
+	 * @param entry
+	 *            carries the key and value indices
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.Entry
+	 * @return the value index
+	 */
 	protected int determineValueIndex(Entry entry) {
 		int index = entry.getValueIndex();
 		int group = entry.getValueGroup();
@@ -69,6 +109,17 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		return index;
 	}
 
+	/**
+	 * Find the map key
+	 * 
+	 * @param entry
+	 *            carries the key and value indices
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.Entry
+	 * @param values
+	 *            the parsed result of the expression match
+	 * @return key
+	 * @throws Throwable
+	 */
 	protected String getKey(Entry e, String[] values) throws Throwable {
 		String k = e.getKey();
 		if (k != null) {
@@ -81,6 +132,17 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		return null;
 	}
 
+	/**
+	 * Find the map value
+	 * 
+	 * @param entry
+	 *            carries the key and value indices
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.Entry
+	 * @param values
+	 *            the parsed result of the expression match
+	 * @return value
+	 * @throws Throwable
+	 */
 	protected Object getValue(Entry e, String[] values) throws Throwable {
 		String v = e.getValue();
 		if (v != null) {
@@ -93,8 +155,31 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		return null;
 	}
 
+	/**
+	 * Method specific to the assign type for retrieving the values from the
+	 * matched expression.
+	 * 
+	 * @param previous
+	 *            the value currently assigned to the field of the target in
+	 *            question.
+	 * @param values
+	 *            the parsed result of the expression match
+	 * @return the value(s) retrieved from the parsed result
+	 * @throws Throwable
+	 */
 	protected abstract Object[] getValue(Object previous, String[] values) throws Throwable;
 
+	/**
+	 * Auxiliary for adding a wrapper implementation.
+	 * 
+	 * @param uuid
+	 *            unique id associated with this resource manager operation (can
+	 *            be <code>null</code>).
+	 * @param assign
+	 *            the JAXB element class.
+	 * @param list
+	 *            the list of wrappers
+	 */
 	static void add(String uuid, Object assign, List<IAssign> list) {
 		if (assign instanceof Add) {
 			Add add = (Add) assign;
@@ -118,6 +203,16 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * Auxiliary using Java reflection to perform a get on the target.
+	 * 
+	 * @param target
+	 *            Property or Attribute
+	 * @param field
+	 *            on the target from which to retrieve the value.
+	 * @return value of the field
+	 * @throws Throwable
+	 */
 	static Object get(Object target, String field) throws Throwable {
 		String name = GET + field.substring(0, 1).toUpperCase() + field.substring(1);
 		Method method = null;
@@ -130,6 +225,23 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		return method.invoke(target, (Object[]) null);
 	}
 
+	/**
+	 * Deteermines whether the input represents an object field or a resolvable
+	 * expression. Also converts string to int or boolean, if applicable,
+	 * 
+	 * @param target
+	 *            on which to apply the getter.
+	 * @param uuid
+	 *            unique id associated with this resource manager operation (can
+	 *            be <code>null</code>).
+	 * @param expression
+	 *            input to be interpreted
+	 * @param convert
+	 *            expression to boolean or int, if applicable.
+	 * 
+	 * @return
+	 * @throws Throwable
+	 */
 	static Object normalizedValue(Object target, String uuid, String expression, boolean convert) throws Throwable {
 		if (expression.startsWith(PD)) {
 			if (target == null) {
@@ -159,6 +271,18 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 		return expression;
 	}
 
+	/**
+	 * Auxiliary using Java reflection to perform a set on the target.
+	 * 
+	 * @param target
+	 *            Property or Attribute
+	 * @param field
+	 *            on the target on which to set the value.
+	 * @param values
+	 *            corresonding to the parameter(s) of the set method (usually a
+	 *            single one)
+	 * @throws Throwable
+	 */
 	static void set(Object target, String field, Object[] values) throws Throwable {
 		String name = SET + field.substring(0, 1).toUpperCase() + field.substring(1);
 		Method[] methods = target.getClass().getMethods();

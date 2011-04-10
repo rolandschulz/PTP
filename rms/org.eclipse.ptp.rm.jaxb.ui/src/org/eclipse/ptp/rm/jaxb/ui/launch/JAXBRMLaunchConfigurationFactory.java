@@ -7,7 +7,6 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
