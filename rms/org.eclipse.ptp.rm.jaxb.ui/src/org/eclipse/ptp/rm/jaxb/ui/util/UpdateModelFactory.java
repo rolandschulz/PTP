@@ -90,7 +90,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 				if (tooltip == null) {
 					tooltip = ZEROSTR;
 				} else {
-					tooltip = WidgetBuilderUtils.fitToLineLength(64, tooltip);
+					tooltip = WidgetBuilderUtils.removeTabOrLineBreak(tooltip);
 				}
 				description = a.getDescription();
 			} else if (data instanceof Property) {
@@ -228,7 +228,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			if (tooltip == null) {
 				tooltip = ZEROSTR;
 			} else {
-				tooltip = WidgetBuilderUtils.fitToLineLength(64, rmMap.getString(tooltip));
+				tooltip = WidgetBuilderUtils.removeTabOrLineBreak(rmMap.getString(tooltip));
 			}
 
 			if (fixedText != null) {

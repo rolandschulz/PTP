@@ -18,7 +18,13 @@ import org.eclipse.ptp.rm.jaxb.core.data.Match;
 import org.eclipse.ptp.rm.jaxb.core.data.Regex;
 
 /**
- * Wrapper implementation.
+ * Wrapper implementation. Consists of a Regular Expression and a reference to a
+ * target (Property or Attribute). When the regex is satisfied, the match
+ * applies the list of assign actions to its target.<br>
+ * <br>
+ * A match can also be set to force its target to the front of the list of
+ * targets held by the tokenizer (<code>moveToTop</code>) when the match is
+ * successful.
  * 
  * @author arossi
  * 
@@ -60,7 +66,8 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Executes the regular expression match on the provided segment.
+	 * Executes the regular expression match on the provided segment and applies
+	 * the assign actions if match is positive.
 	 * 
 	 * @param sequence
 	 *            string segment to match.
@@ -107,7 +114,8 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Set by the constructor.
+	 * Flag for prioritizing the target bound to this match by promoting it to
+	 * the head of the ordered list of targets held by the tokenizer.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.runnable.command.
 	 *      ConfigurableRegexTokenizer

@@ -615,50 +615,6 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		return createTree(parent, style, cols, wHint, data);
 	}
 
-	/**
-	 * Normalizes text for display to fit into lines of the given length,
-	 * without further tabs or breaks. This is useful for labels and read-only
-	 * text messages.
-	 * 
-	 * @param length
-	 * @param text
-	 */
-	public static String fitToLineLength(int length, String text) {
-		if (text == null) {
-			return null;
-		}
-		if (length < 1) {
-			length = Integer.MAX_VALUE;
-		}
-		StringBuffer newLine = new StringBuffer();
-		int strln = text.length();
-		int current = 0;
-		char lastChar = 0;
-		for (int i = 0; i < strln; i++) {
-			char c = text.charAt(i);
-			switch (c) {
-			case '\t':
-			case ' ':
-			case '\n':
-			case '\r':
-				if (current >= length) {
-					newLine.append(LINE_SEP);
-					current = 0;
-				} else if (lastChar != SP.charAt(0)) {
-					newLine.append(SP);
-					current++;
-					lastChar = SP.charAt(0);
-				}
-				break;
-			default:
-				newLine.append(c);
-				current++;
-				lastChar = c;
-			}
-		}
-		return newLine.toString();
-	}
-
 	public static Color getColor(String color) {
 		int swtColor = SWT.COLOR_BLACK;
 		if (COLOR_BLACK.equals(color)) {
@@ -770,6 +726,35 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		}
 		list.add(0, ZEROSTR);
 		return list.toArray(new String[0]);
+	}
+
+	public static String removeTabOrLineBreak(String text) {
+		if (text == null) {
+			return null;
+		}
+		if (ZEROSTR.equals(text)) {
+			return ZEROSTR;
+		}
+		StringBuffer newLine = new StringBuffer();
+		int strln = text.length();
+		char lastChar = 0;
+		for (int i = 0; i < strln; i++) {
+			char c = text.charAt(i);
+			switch (c) {
+			case '\t':
+			case '\n':
+			case '\r':
+				if (lastChar != SP.charAt(0)) {
+					newLine.append(SP);
+					lastChar = SP.charAt(0);
+				}
+				break;
+			default:
+				newLine.append(c);
+				lastChar = c;
+			}
+		}
+		return newLine.toString();
 	}
 
 	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnData> columnDescriptors,

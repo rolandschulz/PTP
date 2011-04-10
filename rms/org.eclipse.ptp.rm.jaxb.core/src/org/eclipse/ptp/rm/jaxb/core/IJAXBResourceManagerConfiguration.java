@@ -11,7 +11,6 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.net.URL;
 
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
@@ -24,46 +23,11 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	/**
 	 * @since 5.0
 	 */
-	String getDefaultControlHost();
-
-	/**
-	 * @since 5.0
-	 */
-	String getDefaultControlPath();
-
-	/**
-	 * @since 5.0
-	 */
-	String getDefaultControlPort();
-
-	/**
-	 * @since 5.0
-	 */
-	String getDefaultMonitorHost();
-
-	/**
-	 * @since 5.0
-	 */
-	String getDefaultMonitorPath();
-
-	/**
-	 * @since 5.0
-	 */
-	String getDefaultMonitorPort();
-
-	/**
-	 * @since 5.0
-	 */
 
 	/**
 	 * @since 5.0
 	 */
 	ResourceManagerData getResourceManagerData();
-
-	/**
-	 * @since 5.0
-	 */
-	IRemoteServices getService();
 
 	/**
 	 * @since 5.0
@@ -79,9 +43,4 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	 * @since 5.0
 	 */
 	void setRMConfigurationURL(URL location);
-
-	/**
-	 * @since 5.0
-	 */
-	void setService(IRemoteServices service);
 }

@@ -98,8 +98,7 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 		return new File(System.getProperty(JAVA_USER_HOME)).toURI();
 	}
 
-	public static void setConnectionHints(RemoteConnectionWidget connectionWidget, String defaultHost, String defaultPort,
-			String connection) throws URISyntaxException {
+	public static void setConnectionHints(RemoteConnectionWidget connectionWidget, String connection) throws URISyntaxException {
 		String host = null;
 		String port = null;
 		if (connection != null) {
@@ -111,12 +110,6 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 					port = String.valueOf(p);
 				}
 			}
-		}
-		if (host == null) {
-			host = defaultHost;
-		}
-		if (port == null) {
-			port = defaultPort;
 		}
 		Map<String, String> result = new HashMap<String, String>();
 		if (host != null && !ZEROSTR.equals(host)) {

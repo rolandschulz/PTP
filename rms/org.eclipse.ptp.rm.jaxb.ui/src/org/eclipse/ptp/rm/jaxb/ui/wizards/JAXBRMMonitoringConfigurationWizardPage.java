@@ -55,9 +55,7 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 		Composite comp = super.doCreateContents(parent);
 		Site site = baseConfiguration.getResourceManagerData().getSiteData();
 		try {
-			String host = getConfiguration().getDefaultMonitorHost();
-			String port = getConfiguration().getDefaultMonitorPort();
-			RemoteUIServicesUtils.setConnectionHints(connectionWidget, host, port, site.getMonitorServerInstall());
+			RemoteUIServicesUtils.setConnectionHints(connectionWidget, site.getMonitorServerInstall());
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 		}

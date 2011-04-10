@@ -51,9 +51,7 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 		Composite comp = super.doCreateContents(parent);
 		Site site = baseConfiguration.getResourceManagerData().getSiteData();
 		try {
-			String host = getConfiguration().getDefaultControlHost();
-			String port = getConfiguration().getDefaultControlPort();
-			RemoteUIServicesUtils.setConnectionHints(connectionWidget, host, port, site.getControlConnection());
+			RemoteUIServicesUtils.setConnectionHints(connectionWidget, site.getControlConnection());
 
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);

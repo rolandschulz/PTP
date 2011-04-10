@@ -23,9 +23,9 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  */
 public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 
-	boolean getAppendSysEnv();
+	boolean getAppendEnv();
 
-	Map<String, String> getDynSystemEnv();
+	Map<String, String> getLaunchEnv();
 
 	IJAXBResourceManagerConfiguration getJAXBRMConfiguration();
 
