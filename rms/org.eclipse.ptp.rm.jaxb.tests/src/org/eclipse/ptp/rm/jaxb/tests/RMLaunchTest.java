@@ -44,7 +44,6 @@ import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerMonitor;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBServiceProvider;
-import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
@@ -269,7 +268,7 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		rmConfig = new JAXBServiceProvider();
 		// JAXBRMConfigurationSelectionWizardPage
 		rmConfig.setUniqueName("test-pbs-rm"); //$NON-NLS-1$
-		rmConfig.setRMConfigurationURL(JAXBInitializationUtils.getURL(xml));
+		rmConfig.setRMConfigurationURL(JAXBTestsPlugin.getURL(xml));
 		// JAXBRMControlConfigurationWizardPage
 		rmConfig.realizeRMDataFromXML();
 		// use remote = local

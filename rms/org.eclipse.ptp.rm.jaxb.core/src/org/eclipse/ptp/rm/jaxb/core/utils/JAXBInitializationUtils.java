@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.utils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -41,19 +39,6 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	private JAXBInitializationUtils() {
 	}
 
-	public static URL getURL(String name) throws IOException {
-		URL instance = JAXBCorePlugin.getResource(name);
-		if (instance == null) {
-			File f = new File(name);
-			if (f.exists() && f.isFile()) {
-				instance = f.toURL();
-			} else {
-				throw new FileNotFoundException(name);
-			}
-		}
-		return instance;
-	}
-
 	public static void initializeMap(ResourceManagerData rmData, RMVariableMap instance) {
 		Control control = rmData.getControlData();
 		instance.clear();
@@ -65,10 +50,6 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 
 	public static ResourceManagerData initializeRMData(URL xml) throws IOException, SAXException, URISyntaxException, JAXBException {
 		return unmarshalResourceManagerData(xml);
-	}
-
-	public static void validate(String xml) throws SAXException, IOException, URISyntaxException {
-		validate(getURL(xml));
 	}
 
 	public static void validate(URL instance) throws SAXException, IOException, URISyntaxException {

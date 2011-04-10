@@ -14,11 +14,24 @@ import java.util.List;
 import org.eclipse.ptp.rm.jaxb.core.data.Append;
 import org.eclipse.ptp.rm.jaxb.core.data.Entry;
 
+/**
+ * Wrapper implementation.
+ * 
+ * @author arossi
+ * 
+ */
 public class AppendImpl extends AbstractAssign {
 
 	private final String separator;
 	private final List<Entry> entries;
 
+	/**
+	 * @param uuid
+	 *            unique id associated with this resource manager operation (can
+	 *            be <code>null</code>).
+	 * @param append
+	 *            JAXB data element
+	 */
 	public AppendImpl(String uuid, Append append) {
 		this.uuid = uuid;
 		this.field = append.getField();

@@ -17,6 +17,12 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.Match;
 import org.eclipse.ptp.rm.jaxb.core.data.Regex;
 
+/**
+ * Wrapper implementation.
+ * 
+ * @author arossi
+ * 
+ */
 public class MatchImpl implements IJAXBNonNLSConstants {
 
 	private RegexImpl regex;
@@ -25,6 +31,15 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	private final boolean moveToTop;
 	private boolean matched;
 
+	/**
+	 * @param uuid
+	 *            unique id associated with this resource manager operation (can
+	 *            be <code>null</code>).
+	 * @param match
+	 *            JAXB data element
+	 * @param target
+	 *            Wrapper for the target to which this match is bound
+	 */
 	public MatchImpl(String uuid, Match match, TargetImpl target) {
 		this.target = target;
 		this.moveToTop = match.isMoveToTop();
@@ -44,10 +59,14 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 		}
 	}
 
-	public void clear() {
-		matched = false;
-	}
-
+	/**
+	 * Executes the regular expression match on the provided segment.
+	 * 
+	 * @param sequence
+	 *            string segment to match.
+	 * @return index of the last character in the match
+	 * @throws Throwable
+	 */
 	public synchronized int doMatch(String sequence) throws Throwable {
 		int end = 0;
 		String[] tokens = null;
@@ -80,15 +99,37 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 		return end;
 	}
 
+	/**
+	 * @return whether the match succeeded
+	 */
 	public boolean getMatched() {
 		return matched;
 	}
 
+	/**
+	 * Set by the constructor.
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.runnable.command.
+	 *      ConfigurableRegexTokenizer
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.impl.TargetImpl
+	 * 
+	 * @return whether to set this match as the "selected" one when matched
+	 */
 	public boolean getMoveToTop() {
 		return moveToTop;
 	}
 
+	/**
+	 * @return the regex wrapper for this match
+	 */
 	public RegexImpl getRegex() {
 		return regex;
+	}
+
+	/**
+	 * Clears the matched flag.
+	 */
+	public void reset() {
+		matched = false;
 	}
 }

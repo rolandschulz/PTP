@@ -79,7 +79,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		}
 		if (!matchAll || matched == matches.size()) {
 			for (MatchImpl m : matches) {
-				m.clear();
+				m.reset();
 			}
 		}
 
@@ -102,7 +102,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		} else {
 			int i = assign.getIndex();
 			if (i < targets.size()) {
-				target = targets.get(assign.getIndex());
+				target = targets.get(i);
 			}
 			if (target == null) {
 				if (PROPERTY.equals(type)) {

@@ -139,8 +139,8 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			values = new String[oracle.length];
 		} else {
 			try {
-				JAXBInitializationUtils.validate(tokxml);
-				ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(JAXBInitializationUtils.getURL(tokxml));
+				JAXBTestsPlugin.validate(tokxml);
+				ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(JAXBTestsPlugin.getURL(tokxml));
 				if (rmdata != null) {
 					Control cd = rmdata.getControlData();
 					startup = cd.getStartUpCommand();

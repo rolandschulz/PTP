@@ -15,10 +15,23 @@ import java.util.List;
 import org.eclipse.ptp.rm.jaxb.core.data.Add;
 import org.eclipse.ptp.rm.jaxb.core.data.Entry;
 
+/**
+ * Wrapper implementation.
+ * 
+ * @author arossi
+ * 
+ */
 public class AddImpl extends AbstractAssign {
 
 	private final List<Entry> entries;
 
+	/**
+	 * @param uuid
+	 *            unique id associated with this resource manager operation (can
+	 *            be <code>null</code>).
+	 * @param add
+	 *            JAXB data element
+	 */
 	public AddImpl(String uuid, Add add) {
 		this.uuid = uuid;
 		field = add.getField();

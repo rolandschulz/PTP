@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- ****************************************************************************** -->
 <xs:schema targetNamespace="http://org.eclipse.ptp/rm" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rm="http://org.eclipse.ptp/rm"
 	elementFormDefault="qualified">
 	<xs:element name="resource-manager-builder" type="rm:resource-manager-data"/>
@@ -263,8 +272,10 @@
 		<xs:attribute name="sharedEnvironment" type="xs:boolean" default="false">
 			<xs:annotation>
 				<xs:documentation>
-					The default means that each tab is a separate view or selection into the global env, and it is this subset which will be passed on
-					the launch command. Setting this property to true means that the tab will pass the selected elements of the entire shared
+					The default means that each tab is a separate view or selection into the global env, and it is this subset which
+					will be passed on
+					the launch command. Setting this property to true means that the tab will pass the selected elements of the
+					entire shared
 					enviroment to the resource manager at launch.
 				</xs:documentation>
 			</xs:annotation>

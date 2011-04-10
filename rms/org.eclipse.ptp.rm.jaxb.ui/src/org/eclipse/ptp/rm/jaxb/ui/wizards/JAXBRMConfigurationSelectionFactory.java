@@ -104,13 +104,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 		return new String[0];
 	}
 
-	private static void loadJAXBResourceManagers(boolean initial) {
-		if (fRMJAXBResourceManagers == null) {
-			fRMJAXBResourceManagers = new HashMap<String, Map<String, URL>>();
-		} else {
-			fRMJAXBResourceManagers.clear();
-		}
-
+	private static void loadExtensions() {
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(RM_CONFIG_EXTENSION_POINT);
 
@@ -136,11 +130,9 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 				}
 			}
 		}
+	}
 
-		/*
-		 * Also search the workspace for managers. By convention these should
-		 * all go in a directory called "resourceManagers". Loads only valid XML
-		 */
+	private static void loadExternal(boolean showError) {
 		Map<String, URL> info = fRMJAXBResourceManagers.get(JAXB_SERVICE_PROVIDER_EXTPT);
 		if (info == null) {
 			info = new HashMap<String, URL>();
@@ -158,7 +150,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 					try {
 						JAXBInitializationUtils.validate(url);
 					} catch (Throwable t) {
-						if (initial) {
+						if (showError) {
 							WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.InvalidConfiguration
 									+ name, Messages.InvalidConfiguration_title, false);
 						}
@@ -170,5 +162,21 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 				}
 			}
 		}
+	}
+
+	private static void loadJAXBResourceManagers(boolean showError) {
+		if (fRMJAXBResourceManagers == null) {
+			fRMJAXBResourceManagers = new HashMap<String, Map<String, URL>>();
+		} else {
+			fRMJAXBResourceManagers.clear();
+		}
+
+		loadExtensions();
+
+		/*
+		 * Also search the workspace for managers. By convention these should
+		 * all go in a directory called "resourceManagers". Loads only valid XML
+		 */
+		loadExternal(showError);
 	}
 }

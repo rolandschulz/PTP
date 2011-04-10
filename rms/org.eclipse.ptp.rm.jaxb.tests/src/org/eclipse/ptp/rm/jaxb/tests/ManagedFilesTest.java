@@ -44,8 +44,8 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	@Override
 	public void setUp() {
 		try {
-			JAXBInitializationUtils.validate(xml);
-			ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(JAXBInitializationUtils.getURL(xml));
+			JAXBTestsPlugin.validate(xml);
+			ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(JAXBTestsPlugin.getURL(xml));
 			controlData = rmdata.getControlData();
 			RMVariableMap map = RMVariableMap.setActiveInstance(null);
 			JAXBInitializationUtils.initializeMap(rmdata, map);
