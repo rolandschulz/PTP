@@ -36,7 +36,9 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
  * A managed file is a client-side file which needs to be moved to the resource
- * to which the job will be submitted.
+ * to which the job will be submitted. This class wraps the Job runnable for
+ * staging these files. All files in the list are copied serially to the target
+ * resource.
  * 
  * @author arossi
  * 
@@ -50,6 +52,17 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	private final RMVariableMap rmVarMap;
 	private boolean success;
 
+	/**
+	 * 
+	 * @param uuid
+	 *            internal job identifier (the job has not yet been submitted)
+	 * @param files
+	 *            JAXB data element
+	 * @param delegate
+	 *            wrapper containing remote service, connection and file manager
+	 *            information
+	 * @throws CoreException
+	 */
 	public ManagedFilesJob(String uuid, ManagedFiles files, RemoteServicesDelegate delegate) throws CoreException {
 		super(Messages.ManagedFilesJob);
 		this.uuid = uuid;
@@ -59,25 +72,32 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 		this.files = files.getFile();
 	}
 
+	/**
+	 * @return whether the staging succeeded
+	 */
 	public boolean getSuccess() {
 		return success;
 	}
 
+	/**
+	 * First checks to see if the file references in-memory content, and if so,
+	 * writes out a temporary source file. It then copies the file and places a
+	 * property in the environment mapping the name of the ManagedFile object
+	 * against its target path.
+	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		boolean localTarget = delegate.getLocalFileManager() == delegate.getRemoteFileManager();
 		success = false;
 		SubMonitor progress = SubMonitor.convert(monitor, files.size() * 10);
 		/*
-		 * for now we handle the files serially
+		 * for now we handle the files serially. NOTE: no support for Windows as
+		 * target ...
 		 */
 		for (ManagedFile file : files) {
 			try {
 				File localFile = maybeWriteFile(file);
 				progress.worked(5);
-				/*
-				 * no support for Windows as target ...
-				 */
 				String fileName = localFile.getName();
 				if (file.isUniqueIdPrefix()) {
 					fileName = UUID.randomUUID() + fileName;
@@ -107,16 +127,14 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 		return Status.OK_STATUS;
 	}
 
-	/*
-	 * Copy local data from a path (can be a file or directory) from the local
-	 * host to the remote host.
+	/**
+	 * Copy local data from the local host to the remote host.
 	 * 
 	 * @param localPath
-	 * 
+	 *            source file
 	 * @param remotePath
-	 * 
-	 * @param configuration
-	 * 
+	 *            target file
+	 * @param monitor
 	 * @throws CoreException
 	 */
 	private void copyFileToRemoteHost(String localPath, String remotePath, IProgressMonitor monitor) throws CoreException {
@@ -129,6 +147,21 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * If there is already a path defined for this file, this is return. Else a
+	 * temporary source file is created to be deleted on completion. If the file
+	 * contents is a reference to a string in the environment, the normal
+	 * VariableResolver can be bypassed by setting <code>resolveContents</code>
+	 * to false; this avoids recursive resolution which might falsely interpret
+	 * shell symbols (${...}) as referring to the Eclipse default string
+	 * resolver.
+	 * 
+	 * @param file
+	 *            JAXB data element
+	 * @return
+	 * @throws IOException
+	 * @throws CoreException
+	 */
 	private File maybeWriteFile(ManagedFile file) throws IOException, CoreException {
 		String path = file.getPath();
 		if (path != null) {

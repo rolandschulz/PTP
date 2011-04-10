@@ -11,9 +11,29 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.io.InputStream;
 
+/**
+ * Interface for tokenizer (parser) attached to process streams. These can be
+ * custom implementations of the extension point. The reference implementation
+ * is directly configurable from the ResourceManager XML.<br>
+ * <br>
+ * Extension point: org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer<br>
+ * <br>
+ * 
+ * @see org.eclipse.ptp.rm.jaxb.core.runnable.command.ConfigurableRegexTokenizer
+ * 
+ * @author arossi
+ * 
+ */
 public interface IStreamParserTokenizer extends Runnable {
 
+	/**
+	 * @return any fatal exception raised during parsing
+	 */
 	Throwable getInternalError();
 
+	/**
+	 * @param stream
+	 *            to be parsed
+	 */
 	void setInputStream(InputStream stream);
 }

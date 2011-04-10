@@ -11,7 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 /**
  * Gathers all internal, unmodifiable string constants into a single place for
- * convenience and code clarity.
+ * convenience and the interest of uncluttered code.
  * 
  * @since 5.0
  */

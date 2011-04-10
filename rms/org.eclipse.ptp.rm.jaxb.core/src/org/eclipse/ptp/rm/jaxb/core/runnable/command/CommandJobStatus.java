@@ -18,6 +18,12 @@ import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
+/**
+ * Extension of the IJobStatus class to handle resource manager command jobs.
+ * 
+ * @author arossi
+ * 
+ */
 public class CommandJobStatus implements ICommandJobStatus {
 
 	private String jobId;
@@ -35,6 +41,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 		waitEnabled = true;
 	}
 
+	/**
+	 * @param jobId
+	 *            either internal UUID or resource-specific id
+	 * @param state
+	 */
 	public CommandJobStatus(String jobId, String state) {
 		this.jobId = jobId;
 		this.state = state;
@@ -42,6 +53,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 		waitEnabled = false;
 	}
 
+	/**
+	 * Closes the proxy and calls destroy on the process. Used for interactive
+	 * jobs cancellation.
+	 */
 	public synchronized void cancel() {
 		if (proxy != null) {
 			proxy.close();
@@ -51,6 +66,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
+	/**
+	 * Notifies all callers of <code>waitForId</code> to exit wait.
+	 */
 	public void cancelWait() {
 		synchronized (this) {
 			waitEnabled = false;
@@ -58,52 +76,103 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
+	/**
+	 * @return jobId either internal UUID or resource-specific id
+	 */
 	public synchronized String getJobId() {
 		return jobId;
 	}
 
+	/**
+	 * @return configuration used for this submission.
+	 */
 	public ILaunchConfiguration getLaunchConfiguration() {
 		return launchConfig;
 	}
 
+	/**
+	 * @return state of the job (not of the submission process).
+	 */
 	public synchronized String getState() {
 		return state;
 	}
 
+	/**
+	 * @return more specific state identifier.
+	 */
 	public synchronized String getStateDetail() {
 		return state;
 	}
 
+	/**
+	 * Wrapper containing monitoring functionality for the associated output and
+	 * error streams.
+	 */
 	public IStreamsProxy getStreamsProxy() {
 		return proxy;
 	}
 
+	/**
+	 * @return whether a process object has been attached to this status object
+	 *         (in which case the submission is not through an asynchronous job
+	 *         scheduler).
+	 */
 	public boolean isInteractive() {
 		return process != null;
 	}
 
+	/**
+	 * @param launchConfig
+	 *            configuration used for this submission.
+	 */
 	public void setLaunchConfig(ILaunchConfiguration launchConfig) {
 		this.launchConfig = launchConfig;
 	}
 
+	/**
+	 * @param remote
+	 *            process object (used for interactive cancellation)
+	 */
 	public void setProcess(IRemoteProcess process) {
 		this.process = process;
 	}
 
+	/**
+	 * @param proxy
+	 *            Wrapper containing monitoring functionality for the associated
+	 *            output and error streams.
+	 */
 	public void setProxy(ICommandJobStreamsProxy proxy) {
 		this.proxy = proxy;
 	}
 
+	/**
+	 * @param state
+	 *            of the job (not of the submission process).
+	 */
 	public synchronized void setState(String state) {
 		this.state = state;
 	}
 
+	/**
+	 * Called by the resource manager when the (batch) job state changes to
+	 * RUNNING.
+	 */
 	public synchronized void startProxy() {
 		if (proxy != null) {
 			proxy.startMonitors();
 		}
 	}
 
+	/**
+	 * Wait until the jobId has been set on the job id property in the
+	 * environment.
+	 * 
+	 * @param uuid
+	 *            key for the property containing as its name the
+	 *            resource-specific jobId and as its value its initial state
+	 *            (SUBMITTED)
+	 */
 	public void waitForJobId(String uuid) {
 		synchronized (this) {
 			while (waitEnabled && jobId == null) {

@@ -225,13 +225,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * @return the configuration for this control
-	 */
-	public IJAXBResourceManagerConfiguration getJAXBRMConfiguration() {
-		return config;
-	}
-
-	/**
 	 * @return any environment variables passed in through the
 	 *         LaunchConfiguration
 	 */
@@ -852,41 +845,35 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 *            passed in from Launch Tab when the "run" command is chosen.
 	 * @throws CoreException
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
-		/*
-		 * The non-selected variables have already been excluded from the launch
-		 * configuration for consistency; but we need to null them out in the RM
-		 * env as well
-		 */
-		Map<String, String> selectedMap = null;
-		String selected = configuration.getAttribute(SELECTED_ATTRIBUTES, ZEROSTR);
-		if (selected != null) {
-			selectedMap = new HashMap<String, String>();
-			String[] names = selected.split(SP);
-			for (String s : names) {
-				selectedMap.put(s, s);
-			}
-		}
-
-		@SuppressWarnings("rawtypes")
 		Map lcattr = configuration.getAttributes();
 		for (Object key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
 			Object target = rmVarMap.get(key.toString());
 			if (target instanceof Property) {
 				Property p = (Property) target;
-				if (selectedMap != null && !selectedMap.containsKey(p.getName())) {
-					p.setValue(null);
-				} else {
-					p.setValue(value.toString());
-				}
+				p.setValue(value.toString());
 			} else if (target instanceof Attribute) {
 				Attribute ja = (Attribute) target;
-				if (selectedMap != null && !selectedMap.containsKey(ja.getName())) {
+				ja.setValue(value);
+			}
+		}
+
+		/*
+		 * The non-selected variables have been excluded from the launch
+		 * configuration; but we need to null out the superset values here that
+		 * are undefined.
+		 */
+		for (String key : rmVarMap.getVariables().keySet()) {
+			if (!lcattr.containsKey(key)) {
+				Object target = rmVarMap.get(key.toString());
+				if (target instanceof Property) {
+					Property p = (Property) target;
+					p.setValue(null);
+				} else if (target instanceof Attribute) {
+					Attribute ja = (Attribute) target;
 					ja.setValue(null);
-				} else {
-					ja.setValue(value);
 				}
 			}
 		}

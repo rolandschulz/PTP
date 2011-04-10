@@ -14,8 +14,20 @@ import org.eclipse.core.variables.IDynamicVariable;
 import org.eclipse.core.variables.IDynamicVariableResolver;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 
+/**
+ * Resolver for the LCVariableMap (tag: ${lc:).
+ * 
+ * @author arossi
+ * 
+ */
 public class LCVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
 
+	/**
+	 * Only looks the the first element of the reference. This is because
+	 * ${rm:name#field} gets replace to become ${lc:name#field}, but the LC map
+	 * itself is flattened from the RC name=Attribute or name=Property to
+	 * name=primitive value.
+	 */
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
 		LCVariableMap m = LCVariableMap.getActiveInstance();
 		if (m != null) {

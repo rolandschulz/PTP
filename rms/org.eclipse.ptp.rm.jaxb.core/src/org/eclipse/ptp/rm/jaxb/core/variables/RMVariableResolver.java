@@ -19,8 +19,23 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 
+/**
+ * Resolver for the RMVariableMap (tag: ${rm:). See further
+ * {@link #RMVariableResolver()}
+ * 
+ * @author arossi
+ * 
+ */
 public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
 
+	/**
+	 * The ${rm: tag can contain a name with a suffix, "#field", denoting the
+	 * field of the retrieved object to access. Hence, ${rm:arch} would yield a
+	 * string value for the Attribute object associated with the name 'arch',
+	 * but ${rm:arch#description} would return the description string for that
+	 * attribute. In most cases, ${rm:arch#value} will be the form the argument
+	 * takes.
+	 */
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
 		String[] parts = argument.split(PDRX);
 		Object value = RMVariableMap.getActiveInstance().get(parts[0]);
@@ -38,7 +53,23 @@ public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 		return null;
 	}
 
-	public static String invokeGetter(Object target, String string) throws SecurityException, NoSuchMethodException,
+	/**
+	 * Auxiliary reflection method for retrieving the field value of the object
+	 * corresponding to the resolved name.
+	 * 
+	 * @param target
+	 *            Property or Attribute corresponding to the resolved name
+	 * @param string
+	 *            name of the field
+	 * @return string value of the value returned by invoking "get[field]()" on
+	 *         the target
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 */
+	private static String invokeGetter(Object target, String string) throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		String name = GET + string.substring(0, 1).toUpperCase() + string.substring(1);
 		Method getter = target.getClass().getDeclaredMethod(name, (Class[]) null);
@@ -47,12 +78,5 @@ public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 			return null;
 		}
 		return String.valueOf(result);
-	}
-
-	public static void invokeSetter(Object target, String string, Object value) throws SecurityException, NoSuchMethodException,
-			IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-		String name = SET + string.substring(0, 1).toUpperCase() + string.substring(1);
-		Method setter = value.getClass().getDeclaredMethod(name, new Class[] { value.getClass() });
-		setter.invoke(value, new Object[] { value });
 	}
 }

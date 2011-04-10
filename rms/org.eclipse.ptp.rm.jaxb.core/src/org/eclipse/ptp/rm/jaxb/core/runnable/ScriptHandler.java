@@ -29,20 +29,41 @@ import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
+/**
+ * Extension of the Job runnable to handle the generation of the script by
+ * resolving the Script object contents against the active environment.
+ * 
+ * @author arossi
+ * 
+ */
 public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 
 	private final String uuid;
 	private final IVariableMap map;
-	private final Map<String, String> live;
+	private final Map<String, String> launchEnv;
 	private final boolean appendEnv;
 	private Script script;
 	private String scriptValue;
 
-	public ScriptHandler(String uuid, Script script, IVariableMap map, Map<String, String> live, boolean appendEnv) {
+	/**
+	 * @param uuid
+	 *            internal job identifier (the job has not yet been submitted)
+	 * @param script
+	 *            JAXB data element
+	 * @param map
+	 *            the active resource manager or launch tab environment map
+	 * @param launchEnv
+	 *            any special application environment variables set by the user
+	 *            in the Launch Tab
+	 * @param appendEnv
+	 *            whether the launchEnv should be appended to or replace the
+	 *            process environment
+	 */
+	public ScriptHandler(String uuid, Script script, IVariableMap map, Map<String, String> launchEnv, boolean appendEnv) {
 		super(Messages.ScriptHandlerJob);
 		this.uuid = uuid;
 		this.script = script;
-		this.live = live;
+		this.launchEnv = launchEnv;
 		this.appendEnv = appendEnv;
 		this.map = map;
 		if (map instanceof LCVariableMap) {
@@ -50,10 +71,18 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * @return the generated script string
+	 */
 	public String getScriptValue() {
 		return scriptValue;
 	}
 
+	/**
+	 * Composes script. If the variable map is the resource manager's
+	 * environment, then the SCRIPT property is added to it, with it value set
+	 * to the script string that has been generated.
+	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
@@ -69,6 +98,17 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		return Status.OK_STATUS;
 	}
 
+	/**
+	 * Reads from the data object line by line, resolving its arguments and
+	 * eliminating lines whose resolved arguments qualify as undefined.<br>
+	 * <br>
+	 * The <code>envBegin</code> and <code>envEnd</code> tell the script
+	 * generator between which lines to insert the special environment variables
+	 * passed in as the <code>launchEnv</code> if there are any.
+	 * 
+	 * @param monitor
+	 * @return
+	 */
 	private String composeScript(IProgressMonitor monitor) {
 		List<Line> line = script.getLine();
 		int len = line.size();
@@ -96,9 +136,9 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			progress.worked(1);
 		}
 
-		if (live != null && !appendEnv) {
-			for (String var : live.keySet()) {
-				EnvironmentVariableUtils.addVariable(var, live.get(var), firstLine, buffer);
+		if (launchEnv != null && !appendEnv) {
+			for (String var : launchEnv.keySet()) {
+				EnvironmentVariableUtils.addVariable(var, launchEnv.get(var), firstLine, buffer);
 			}
 		}
 		for (; i < envEnd; i++) {
@@ -108,9 +148,9 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			}
 			progress.worked(1);
 		}
-		if (live != null && appendEnv) {
-			for (String var : live.keySet()) {
-				EnvironmentVariableUtils.addVariable(var, live.get(var), firstLine, buffer);
+		if (launchEnv != null && appendEnv) {
+			for (String var : launchEnv.keySet()) {
+				EnvironmentVariableUtils.addVariable(var, launchEnv.get(var), firstLine, buffer);
 			}
 		}
 		for (; i < len; i++) {
@@ -124,6 +164,11 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		return buffer.toString();
 	}
 
+	/**
+	 * An auxiliary used in the case of the LaunchTab calling this handler. A
+	 * temporary replacement Script is created, with the resolver tags changed
+	 * from ${rm:...} to ${lc:...} (the user never sees the latter).
+	 */
 	private void convertScript() {
 		Script ltScript = new Script();
 		ltScript.setEnvBegin(script.getEnvBegin());

@@ -34,9 +34,16 @@ import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 
 /**
  * Monitors the output stream of a system process and notifies listeners of
- * additions to the stream.
+ * additions to the stream.<br>
+ * <br>
+ * The output stream monitor reads system out (or err) via an input stream.<br>
+ * <br>
+ * This class has been adapted from
+ * <code>org.eclipse.debug.internal.core.OutputStreamMonitor</code> (internal,
+ * discouraged access).
  * 
- * The output stream monitor reads system out (or err) via and input stream.
+ * @author arossi
+ * 
  */
 public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBNonNLSConstants {
 	class ContentNotifier implements ISafeRunnable {
@@ -84,6 +91,15 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	private final IRemoteProcessBuilder fBuilder;
 	private IRemoteProcess process;
 
+	/**
+	 * Registers a process which can be started to monitor a remote file via
+	 * tail -f.
+	 * 
+	 * @param rm
+	 *            resource manager providing remote service
+	 * @param remoteFilePath
+	 *            of the file to be monitored
+	 */
 	public CommandJobStreamMonitor(IJAXBResourceManagerControl rm, String remoteFilePath) {
 		this(rm, remoteFilePath, null);
 	}
@@ -129,6 +145,10 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 		bufferLimit = UNDEFINED;
 	}
 
+	/**
+	 * @param listener
+	 *            from client
+	 */
 	public synchronized void addListener(IStreamListener listener) {
 		listener.streamAppended(fContents.toString(), CommandJobStreamMonitor.this);
 		fListeners.add(listener);
@@ -179,6 +199,13 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 		fListeners.remove(listener);
 	}
 
+	/**
+	 * Tune the monitor's buffer size
+	 * 
+	 * @param limit
+	 *            in chars
+	 * 
+	 */
 	public void setBufferLimit(int bufferLimit) {
 		this.bufferLimit = bufferLimit;
 	}

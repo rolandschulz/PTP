@@ -15,20 +15,28 @@ import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
- * Allows the JAXB Launch (Resource) Tab access to the Resource Manager's
- * internal data.
+ * Allows sharing of control-specific data among (internal) elements.
  * 
  * @author arossi
  * 
  */
 public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 
+	/**
+	 * 
+	 * @return whether the launch environment should be appended to (or replace)
+	 *         the environment for a given command execution.
+	 */
 	boolean getAppendEnv();
 
+	/**
+	 * @return the user-defined environment (from the Environment Tab)
+	 */
 	Map<String, String> getLaunchEnv();
 
-	IJAXBResourceManagerConfiguration getJAXBRMConfiguration();
-
+	/**
+	 * @return connection information for this resource manager
+	 */
 	RemoteServicesDelegate getRemoteServicesDelegate();
 
 }

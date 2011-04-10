@@ -12,18 +12,52 @@ package org.eclipse.ptp.rm.jaxb.core;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
+/**
+ * CommandJob-specific extension to IJobStatus.
+ * 
+ * @see org.eclipse.ptp.rmsystem.IJobStatus
+ * @author arossi
+ * 
+ */
 public interface ICommandJobStatus extends IJobStatus {
+
+	/**
+	 * Cancel the Job process (if interactive).
+	 */
 	void cancel();
 
+	/**
+	 * Notify all waiting on the job id of its arrival.
+	 */
 	void cancelWait();
 
+	/**
+	 * @return whether the associated Job was launched interactively or not.
+	 */
 	boolean isInteractive();
 
+	/**
+	 * @param process
+	 *            if the Job is interactive.
+	 */
 	void setProcess(IRemoteProcess process);
 
+	/**
+	 * @param state
+	 *            of the launched Job, not of the submission call.
+	 */
 	void setState(String state);
 
+	/**
+	 * Starts the stream proxy monitors.
+	 */
 	void startProxy();
 
+	/**
+	 * Do a monitor wait until the job id arrives.
+	 * 
+	 * @param uuid
+	 *            internal id which the job id will be mapped to.
+	 */
 	void waitForJobId(String uuid);
 }

@@ -14,28 +14,45 @@ import java.net.URL;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
+/**
+ * JAXB-specific service provider (configuration) interface.
+ * 
+ * @author arossi
+ * 
+ */
 public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManagerConfiguration {
 	/**
+	 * Resets internal (in-memory) data objects.
+	 * 
 	 * @since 5.0
 	 */
 	void clearReferences();
 
 	/**
+	 * @return the JAXB resource manager data element tree.
+	 * 
 	 * @since 5.0
 	 */
 	ResourceManagerData getResourceManagerData();
 
 	/**
+	 * Unmarshal the XML into the JAXB resource manager data element tree.
+	 * 
 	 * @since 5.0
 	 */
 	void realizeRMDataFromXML() throws Throwable;
 
 	/**
+	 * Export the resource manager environment as the currently active one.
+	 * 
 	 * @since 5.0
 	 */
 	void setActive() throws Throwable;
 
 	/**
+	 * @param the
+	 *            location of the XML configuration for this resource manager.
+	 * 
 	 * @since 5.0
 	 */
 	void setRMConfigurationURL(URL location);
