@@ -60,9 +60,12 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 	public void clearReferences() {
 		map.clear();
 		map = null;
-		rmdata = null;
+		clearRMData();
 	}
 
+	/**
+	 * @return The JAXB element tree.
+	 */
 	public ResourceManagerData getResourceManagerData() {
 		return rmdata;
 	}
@@ -72,6 +75,10 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		return getId();
 	}
 
+	/**
+	 * @return the location of the configuration XML used to construct the data
+	 *         tree.
+	 */
 	public URL getRMConfigurationURL() {
 		String loc = getString(RM_XSD_URL, ZEROSTR);
 		if (ZEROSTR.equals(loc)) {
@@ -84,6 +91,12 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		}
 	}
 
+	/**
+	 * Unmarshals the XML into the JAXB data tree.
+	 * 
+	 * @throws unmarshaling
+	 *             exceptions
+	 */
 	public void realizeRMDataFromXML() throws Throwable {
 		URL location = getRMConfigurationURL();
 		if (location == null) {
@@ -93,6 +106,12 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		}
 	}
 
+	/**
+	 * Tells the RMVariableMap static instance variable to point to this
+	 * configuration's environment map. If that map has not been initialized,
+	 * takes care of it here. This also entails building the data tree if it
+	 * does not yet exist.
+	 */
 	public void setActive() throws Throwable {
 		map = RMVariableMap.setActiveInstance(map);
 		if (!map.isInitialized()) {
@@ -106,6 +125,9 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		}
 	}
 
+	/**
+	 * Sets JAXB@connection as the default service provider description.
+	 */
 	public void setDefaultNameAndDesc() {
 		String name = getName();
 		if (name == null) {
@@ -113,12 +135,18 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		}
 		String conn = getConnectionName();
 		if (conn != null && !conn.equals(ZEROSTR)) {
-			name += AMP + conn;
+			name += AT + conn;
 		}
 		setName(name);
 		setDescription(Messages.JAXBServiceProvider_defaultDescription);
 	}
 
+	/**
+	 * Called by the service selector.
+	 * 
+	 * @param location
+	 *            of the configuration XML.
+	 */
 	public void setRMConfigurationURL(URL location) {
 		URL current = getRMConfigurationURL();
 		if (location != null && current != location) {
@@ -128,7 +156,9 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		}
 	}
 
-	// @Override
+	/**
+	 * Nulls out the tree as well as related service ids.
+	 */
 	protected void clearRMData() {
 		rmdata = null;
 		setRemoteServicesId(null);
