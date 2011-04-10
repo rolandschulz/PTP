@@ -50,8 +50,8 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	void setActive() throws Throwable;
 
 	/**
-	 * @param the
-	 *            location of the XML configuration for this resource manager.
+	 * @param location
+	 *            of the XML configuration for this resource manager.
 	 * 
 	 * @since 5.0
 	 */

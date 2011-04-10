@@ -158,7 +158,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	 * 
 	 * @param file
 	 *            JAXB data element
-	 * @return
+	 * @return the written or the pre-existent file
 	 * @throws IOException
 	 * @throws CoreException
 	 */

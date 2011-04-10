@@ -27,7 +27,7 @@ public class CoreExceptionUtils {
 	/**
 	 * @param message
 	 * @param t
-	 * @return
+	 * @return error status object
 	 */
 	public static IStatus getErrorStatus(String message, Throwable t) {
 		if (t != null) {
@@ -39,7 +39,7 @@ public class CoreExceptionUtils {
 	/**
 	 * @param message
 	 * @param t
-	 * @return
+	 * @return exception
 	 */
 	public static CoreException newException(String message, Throwable t) {
 		return new CoreException(getErrorStatus(message, t));

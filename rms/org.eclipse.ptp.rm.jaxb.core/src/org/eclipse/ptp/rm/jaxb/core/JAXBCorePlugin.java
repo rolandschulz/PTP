@@ -92,7 +92,7 @@ public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
 	 * Raise core exception.
 	 * 
 	 * @param message
-	 * @return
+	 * @return exception
 	 */
 	public static CoreException coreErrorException(String message) {
 		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message));
@@ -103,7 +103,7 @@ public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
 	 * 
 	 * @param message
 	 * @param t
-	 * @return
+	 * @return exception
 	 */
 	public static CoreException coreErrorException(String message, Throwable t) {
 		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message, t));

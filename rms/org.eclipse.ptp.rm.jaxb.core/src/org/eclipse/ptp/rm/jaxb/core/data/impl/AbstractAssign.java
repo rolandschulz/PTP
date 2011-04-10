@@ -124,12 +124,12 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 * @return key
 	 * @throws Throwable
 	 */
-	protected String getKey(Entry e, String[] values) throws Throwable {
-		String k = e.getKey();
+	protected String getKey(Entry entry, String[] values) throws Throwable {
+		String k = entry.getKey();
 		if (k != null) {
 			return (String) normalizedValue(target, uuid, k, false);
 		}
-		int index = determineKeyIndex(e);
+		int index = determineKeyIndex(entry);
 		if (values != null) {
 			return values[index];
 		}
@@ -147,12 +147,12 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 * @return value
 	 * @throws Throwable
 	 */
-	protected Object getValue(Entry e, String[] values) throws Throwable {
-		String v = e.getValue();
+	protected Object getValue(Entry entry, String[] values) throws Throwable {
+		String v = entry.getValue();
 		if (v != null) {
 			return normalizedValue(target, uuid, v, true);
 		}
-		int index = determineValueIndex(e);
+		int index = determineValueIndex(entry);
 		if (values != null) {
 			return values[index];
 		}
@@ -243,7 +243,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 * @param convert
 	 *            expression to boolean or int, if applicable.
 	 * 
-	 * @return
+	 * @return value after dereferencing or normalization
 	 * @throws Throwable
 	 */
 	static Object normalizedValue(Object target, String uuid, String expression, boolean convert) throws Throwable {

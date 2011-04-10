@@ -130,8 +130,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
-	 * @param remote
-	 *            process object (used for interactive cancellation)
+	 * @param process
+	 *            object (used for interactive cancellation)
 	 */
 	public void setProcess(IRemoteProcess process) {
 		this.process = process;

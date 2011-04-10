@@ -40,8 +40,6 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	 *            the environment map to which to add the pair
 	 * @param map
 	 *            resource manager active environment map
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.runnable.command.CommandJob#prepareEnv(RemoteProcessBuilder)
 	 */
 	public static void addVariable(String uuid, NameValuePair var, Map<String, String> env, RMVariableMap map) {
 		String key = var.getName();
