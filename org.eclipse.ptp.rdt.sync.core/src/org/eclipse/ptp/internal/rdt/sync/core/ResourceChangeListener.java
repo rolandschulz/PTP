@@ -32,7 +32,6 @@ import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
 
 public class ResourceChangeListener {
 	private static final IServiceModelManager fServiceModel = ServiceModelManager.getInstance();
@@ -85,15 +84,10 @@ public class ResourceChangeListener {
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
 				IProject project = delta.getResource().getProject();
 				if (project != null && RemoteSyncNature.hasNature(project)) {
-				//TODO: make sure that exception is handeled if service/build configuration isn't configured yet
-					IServiceConfiguration config = null;
-					try {
-						config = fServiceModel.getActiveConfiguration(project);
-					} catch (ProjectNotConfiguredException ex) {
-						//can be ignored because should only happen when project was just created
-					}
-					if (config != null) {
-						ISyncServiceProvider provider = (ISyncServiceProvider) config.getServiceProvider(fSyncService);
+					IConfiguration buildConfig = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
+					IServiceConfiguration serviceConfig = BuildConfigurationManager.getConfigurationForBuildConfiguration(buildConfig);
+					if (serviceConfig != null) {
+						ISyncServiceProvider provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(fSyncService);
 						if (provider != null) {
 							SynchronizeJob job = new SynchronizeJob(event.getDelta(), provider);
 							job.schedule();
