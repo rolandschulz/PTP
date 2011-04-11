@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rtsystem;
 
-import java.io.IOException;
-import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,12 +25,9 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.IStreamListener;
-import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.AbstractJobSubmission;
@@ -40,16 +35,10 @@ import org.eclipse.ptp.core.AbstractJobSubmission.JobSubStatus;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
-import org.eclipse.ptp.core.elements.events.INewProcessEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
-import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
@@ -80,7 +69,6 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
-import org.eclipse.ptp.utils.core.BitSetIterable;
 import org.eclipse.ptp.utils.core.RangeSet;
 
 /**
@@ -94,7 +82,6 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		private IPJob fJob = null;
 		private final String fJobId;
 		private final ILaunchConfiguration fConfig;
-		private IStreamsProxy fProxy = null;
 
 		public JobStatus(String jobId, ILaunchConfiguration config) {
 			fJobId = jobId;
@@ -163,13 +150,9 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getStreamsProxy()
 		 */
 		public IStreamsProxy getStreamsProxy() {
-			if (fProxy == null) {
-				IPJob job = getJob();
-				if (job != null) {
-					fProxy = new StreamsProxy(job);
-				}
-			}
-			return fProxy;
+			AbstractRuntimeResourceManagerMonitor monitor = (AbstractRuntimeResourceManagerMonitor) getResourceManager()
+					.getMonitor();
+			return monitor.getProxy(fJobId);
 		}
 
 		private IPJob getJob() {
@@ -204,151 +187,6 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		public void setJobId(String jobId) {
 			fJobStatus = new JobStatus(jobId, fConfiguration);
 		}
-	}
-
-	private class StreamMonitor implements IStreamMonitor, IJobChildListener {
-		private final ListenerList fListeners = new ListenerList();
-		private final StringBuffer fContents = new StringBuffer();
-		private final IPJob fJob;
-		private final StringAttributeDefinition fAttrDef;
-		private final boolean fPrefix;
-
-		public StreamMonitor(IPJob job, StringAttributeDefinition attrDef, boolean prefix) {
-			fJob = job;
-			fAttrDef = attrDef;
-			fPrefix = prefix;
-			job.addChildListener(this);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.debug.core.model.IStreamMonitor#addListener(org.eclipse
-		 * .debug.core.IStreamListener)
-		 */
-		public synchronized void addListener(IStreamListener listener) {
-			fListeners.add(listener);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.debug.core.model.IStreamMonitor#getContents()
-		 */
-		public synchronized String getContents() {
-			return fContents.toString();
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
-		 */
-		public void handleEvent(IChangedProcessEvent e) {
-			final boolean hasOutput = e.getAttributes().getAttribute(fAttrDef) != null;
-			if (hasOutput) {
-				final BitSet indices = e.getProcesses();
-				for (Integer index : new BitSetIterable(indices)) {
-					StringAttribute stdout = fJob.getProcessAttribute(fAttrDef, index);
-					if (stdout != null) {
-						String text = ""; //$NON-NLS-1$
-						if (fPrefix) {
-							text = "[" + index + "] "; //$NON-NLS-1$ //$NON-NLS-2$
-						}
-						text += stdout.getValueAsString() + "\n"; //$NON-NLS-1$
-						fContents.append(text);
-						fireStreamAppended(text);
-					}
-				}
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.INewProcessEvent)
-		 */
-		public void handleEvent(INewProcessEvent e) {
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
-		 */
-		public void handleEvent(IRemoveProcessEvent e) {
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.debug.core.model.IStreamMonitor#removeListener(org.eclipse
-		 * .debug.core.IStreamListener)
-		 */
-		public synchronized void removeListener(IStreamListener listener) {
-			fListeners.remove(listener);
-		}
-
-		private void fireStreamAppended(String text) {
-			for (Object listener : fListeners.getListeners()) {
-				((IStreamListener) listener).streamAppended(text, this);
-			}
-		}
-
-	}
-
-	private class StreamsProxy implements IStreamsProxy {
-		private final IStreamMonitor fErrorStreamMonitor;
-		private final IStreamMonitor fOutputStreamMonitor;
-
-		/*
-		 * TODO: obtain prefix flag from launch configuration
-		 */
-		private final boolean fPrefix = false;
-
-		public StreamsProxy(IPJob job) {
-			fErrorStreamMonitor = new StreamMonitor(job, ProcessAttributes.getStderrAttributeDefinition(), fPrefix);
-			fOutputStreamMonitor = new StreamMonitor(job, ProcessAttributes.getStdoutAttributeDefinition(), fPrefix);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.debug.core.model.IStreamsProxy#getErrorStreamMonitor()
-		 */
-		public IStreamMonitor getErrorStreamMonitor() {
-			return fErrorStreamMonitor;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.debug.core.model.IStreamsProxy#getOutputStreamMonitor()
-		 */
-		public IStreamMonitor getOutputStreamMonitor() {
-			return fOutputStreamMonitor;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.debug.core.model.IStreamsProxy#write(java.lang.String)
-		 */
-		public void write(String input) throws IOException {
-			// Not supported yet
-		}
-
 	}
 
 	private final Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
