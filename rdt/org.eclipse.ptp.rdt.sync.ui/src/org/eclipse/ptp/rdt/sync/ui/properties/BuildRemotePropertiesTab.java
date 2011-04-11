@@ -1,17 +1,16 @@
 package org.eclipse.ptp.rdt.sync.ui.properties;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.cdt.core.settings.model.ICResourceDescription;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractCBuildPropertyTab;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.internal.events.BuildManager;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.ptp.rdt.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.core.BuildScenario;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
@@ -32,8 +31,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
-	public BuildRemotePropertiesPage() {
+public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
+	public BuildRemotePropertiesTab() {
 		super();
 	}
 
@@ -47,7 +46,8 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 	private Button fBrowseButton;
 	private Button fNewConnectionButton;
 	private Combo fConnectionCombo;
-	private Text fLocationText;
+	private Text fRootLocationText;
+	private Text fBuildLocationText;
 
 	/**
 	 * @see PreferencePage#createContents(Composite)
@@ -96,21 +96,22 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 			}
 		});
 
-		Label locationLabel = new Label(usercomp, SWT.LEFT);
-		locationLabel.setText("Location:"); //$NON-NLS-1$
+		Label rootLocationLabel = new Label(usercomp, SWT.LEFT);
+		rootLocationLabel.setText("Root Location:"); //$NON-NLS-1$
 
-		fLocationText = new Text(usercomp, SWT.SINGLE | SWT.BORDER);
+		fRootLocationText = new Text(usercomp, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		gd.grabExcessHorizontalSpace = true;
 		gd.widthHint = 250;
-		fLocationText.setLayoutData(gd);
-		fLocationText.addModifyListener(new ModifyListener() {
+		fRootLocationText.setLayoutData(gd);
+		fRootLocationText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,
 				// PATH_PROPERTY, fLocationText.getText());
 			}
 		});
+			
 
 		// new connection button
 		fBrowseButton = new Button(usercomp, SWT.PUSH);
@@ -126,17 +127,34 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 							IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 							if (fileMgr != null) {
 								fileMgr.setConnection(fSelectedConnection);
-								String correctPath = fLocationText.getText();
+								String correctPath = fRootLocationText.getText();
 								String selectedPath = fileMgr.browseDirectory(
-										fLocationText.getShell(),
+										fRootLocationText.getShell(),
 										"Project Location (" + fSelectedConnection.getName() + ")", correctPath, IRemoteUIConstants.NONE); //$NON-NLS-1$ //$NON-NLS-2$
 								if (selectedPath != null) {
-									fLocationText.setText(selectedPath);
+									fRootLocationText.setText(selectedPath);
 								}
 							}
 						}
 					}
 				}
+			}
+		});
+		
+		// Build subdirectory label and text box
+		Label buildLocationLabel = new Label(usercomp, SWT.LEFT);
+		buildLocationLabel.setText("Build Subdirectory:"); //$NON-NLS-1$
+
+		fBuildLocationText = new Text(usercomp, SWT.SINGLE | SWT.BORDER);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 1;
+		gd.grabExcessHorizontalSpace = true;
+		gd.widthHint = 250;
+		fBuildLocationText.setLayoutData(gd);
+		fBuildLocationText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,
+				// PATH_PROPERTY, fLocationText.getText());
 			}
 		});
 	}
@@ -148,8 +166,19 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 	 */
 	public void performOK() {
 		// Register with build configuration manager
-		BuildScenario buildScenario = new BuildScenario("Git", fSelectedConnection, fLocationText.getText()); //$NON-NLS-1$
+		BuildScenario buildScenario = new BuildScenario("Git", fSelectedConnection, fRootLocationText.getText()); //$NON-NLS-1$
 		BuildConfigurationManager.setBuildScenarioForBuildConfiguration(buildScenario, getCfg());
+		String buildPath = fRootLocationText.getText();
+		if (buildPath.endsWith("/")) { //$NON-NLS-1$
+			buildPath = buildPath.substring(0, buildPath.length() - 1);
+		}
+		if (fBuildLocationText.getText().startsWith("/")) { //$NON-NLS-1$
+			buildPath = buildPath + fBuildLocationText.getText();
+		} else {
+			buildPath = buildPath + "/" + fBuildLocationText.getText(); //$NON-NLS-1$
+		}
+		getCfg().getToolChain().getBuilder().setBuildPath(buildPath);
+		ManagedBuildManager.saveBuildInfo(getCfg().getOwner().getProject(), true);
 	}
 
 	private void checkConnection() {
@@ -222,7 +251,7 @@ public class BuildRemotePropertiesPage extends AbstractCBuildPropertyTab {
 		if (buildScenario != null) {
 			fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(buildScenario.getRemoteConnection()));
 			handleConnectionSelected();
-			fLocationText.setText(buildScenario.getLocation());
+			fRootLocationText.setText(buildScenario.getLocation());
 		}
 	}
 
