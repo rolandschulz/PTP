@@ -17,6 +17,9 @@ import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 
+/**
+ * Adds control configuration page.
+ */
 public class JAXBRMControlConfigurationWizardPageFactory extends RMConfigurationWizardPageFactory {
 
 	/*
