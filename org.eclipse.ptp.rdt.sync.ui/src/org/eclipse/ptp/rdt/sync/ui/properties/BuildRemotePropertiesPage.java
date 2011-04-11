@@ -37,25 +37,20 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.dialogs.PropertyPage;
 
-public class SetRemoteForBuild extends PropertyPage {
-	public SetRemoteForBuild() {
+public class BuildRemotePropertiesPage extends PropertyPage {
+	public BuildRemotePropertiesPage() {
 		super();
 	}
 
 	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
 
-	// private IServiceConfiguration fConfig;
 	private IRemoteConnection fSelectedConnection;
 	private IRemoteServices fSelectedProvider;
-	// private final IRunnableContext fContext;
 	private final String fProjectName = ""; //$NON-NLS-1$
 
 	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
 	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
 
-//	private Control fDialogControl;
-//	private Point fDialogSize;
-//	private Text fNameText;
 	private Button fBrowseButton;
 	private Button fNewConnectionButton;
 	private Combo fProviderCombo;
@@ -190,13 +185,24 @@ public class SetRemoteForBuild extends PropertyPage {
 	}
 	
 	@Override
+	/**
+	 * Store remote location information into the .cproject file for the current project. Note that the information is relative
+	 * to the current (default) build configuration.
+	 * 
+	 * @throws RuntimeException on problems retrieving the project or its build information.
+	 */
 	public boolean performOk() {
 		IProject project = getCurrentProject();
 		if (project == null) {
-			return false;
+			throw new RuntimeException("Current project not found."); //$NON-NLS-1$
 		}
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-		buildInfo.getDefaultConfiguration().createFileInfo(project.getFullPath(), "remoteLocation", "dummy"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (buildInfo == null) {
+			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
+		}
+		buildInfo.getSelectedConfiguration().createFileInfo(project.getFullPath(), "remoteSyncProvider", fSelectedProvider.getName()); //$NON-NLS-1$ 
+		buildInfo.getSelectedConfiguration().createFileInfo(project.getFullPath(), "remoteConnection", fSelectedConnection.getName()); //$NON-NLS-1$ 
+		buildInfo.getSelectedConfiguration().createFileInfo(project.getFullPath(), "remoteLocation", fLocationText.getText()); //$NON-NLS-1$ 
 		ManagedBuildManager.saveBuildInfo(project, true);
 		
 		return true;
@@ -207,10 +213,6 @@ public class SetRemoteForBuild extends PropertyPage {
 		if (mgr != null) {
 			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), null, fSelectedConnection);
 		}
-	}
-	
-	private String buildRemoteLocation(IRemoteConnection conn, String location) {
-		return (conn.getName() + ":" + location); //$NON-NLS-1$
 	}
 
 	/**
