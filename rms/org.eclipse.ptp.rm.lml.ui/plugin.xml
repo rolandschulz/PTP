@@ -8,11 +8,13 @@
             name="%ParallelViewCategory.name">
       </category>
       <view
+            allowMultiple="true"
             category="org.eclipse.ptp.rm.lml.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.NodesView"
             icon="icons/parallel_perspective.gif"
             id="org.eclipse.ptp.rm.lml.ui.views.NodesView"
-            name="%NodesView.name">
+            name="%NodesView.name"
+            restorable="false">
       </view>
       <view
             category="org.eclipse.ptp.rm.lml.ui.views"
@@ -22,11 +24,13 @@
             name="%LMLView.name">
       </view>
       <view
+            allowMultiple="true"
             category="org.eclipse.ptp.rm.lml.ui.views"
-            class="org.eclipse.ptp.rm.lml.ui.views.JobsListView"
+            class="org.eclipse.ptp.rm.lml.ui.views.TableView"
             icon="icons/parallel_perspective.gif"
-            id="org.eclipse.ptp.rm.lml.ui.views.JobsListView"
-            name="%JobListView.name">
+            id="org.eclipse.ptp.rm.lml.ui.views.TableView"
+            name="org.eclipse.ptp.rm.lml.ui.views.TableView"
+            restorable="false">
       </view>
    </extension>
    <extension

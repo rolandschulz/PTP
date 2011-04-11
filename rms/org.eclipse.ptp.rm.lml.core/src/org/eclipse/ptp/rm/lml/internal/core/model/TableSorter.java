@@ -1,15 +1,25 @@
-package org.eclipse.ptp.rm.lml.internal.core.elements;
+/**
+ * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ * 		Claudia Knobloch, FZ Juelich
+ */
+
+package org.eclipse.ptp.rm.lml.internal.core.model;
 
 import java.text.ParseException;
 import java.util.Comparator;
 import java.util.Date;
 
 import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
+import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
 
 /**
  * Comparator for an array of elements of RowType.
- * 
- * @author Claudia Knobloch
  *
  */
 public class TableSorter implements Comparator<RowType>{

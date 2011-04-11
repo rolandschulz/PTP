@@ -1,4 +1,5 @@
 /*******************************************************************************
+
  * Copyright (c) 2005, 2006, 2007 Los Alamos National Security, LLC.
  * This material was produced under U.S. Government contract DE-AC52-06NA25396
  * for Los Alamos National Laboratory (LANL), which is operated by the Los Alamos
@@ -20,8 +21,8 @@
 package org.eclipse.ptp.rm.lml.internal.core.events;
 
 import org.eclipse.ptp.rm.lml.core.ILMLManager;
-import org.eclipse.ptp.rm.lml.core.elements.ILguiItem;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
+import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
 /**
  * Class of the interface ILguiAddedEvent.
@@ -55,7 +56,7 @@ public class LguiAddedEvent implements ILguiAddedEvent{
 	 * @see
 	 * org.eclipse.ptp.rm.lml.core.elements.ILguiAddedEvent#getLgui()
 	 */
-	public ILguiItem getLgui() {
+	public ILguiItem getLguiItem() {
 		return lguiItem;
 	}
 	

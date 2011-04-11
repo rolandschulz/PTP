@@ -20,8 +20,8 @@
 package org.eclipse.ptp.rm.lml.internal.core.events;
 
 import org.eclipse.ptp.rm.lml.core.ILMLManager;
-import org.eclipse.ptp.rm.lml.core.elements.ILguiItem;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
+import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
 /**
  * Class of the interface ILguiRemovedEvent.
@@ -55,7 +55,7 @@ public class LguiRemovedEvent implements ILguiRemovedEvent{
 	 * @see
 	 * org.eclipse.ptp.rm.lml.core.elements.ILguiRemovedEvent#getLgui()
 	 */
-	public ILguiItem getLgui() {
+	public ILguiItem getLguiItem() {
 		return lguiItem;
 	}
 	

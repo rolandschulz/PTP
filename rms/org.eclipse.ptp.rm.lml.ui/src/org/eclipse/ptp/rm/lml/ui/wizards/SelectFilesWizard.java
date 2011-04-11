@@ -21,25 +21,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.ui.wizards;
 
-import java.awt.Container;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -52,13 +42,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
-import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
-import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectsType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
-
-import org.xml.sax.SAXException;
 
 public class SelectFilesWizard extends Wizard {
 	
@@ -185,7 +168,6 @@ public class SelectFilesWizard extends Wizard {
 
 	}
 
-	private final ArrayList<IWizardPage> fWizardPages = new ArrayList<IWizardPage>();
 	private final SelectFilesWizardPage fSelectFilesPage = new SelectFilesWizardPage();
 
 	private URL xmlFile = null;
@@ -226,12 +208,4 @@ public class SelectFilesWizard extends Wizard {
 		}
 		return existingLgui;
 	}
-
-	/**
-	 * @return
-	 */
-	private int getNumPages() {
-		return fWizardPages.size();
-	}
-
 }

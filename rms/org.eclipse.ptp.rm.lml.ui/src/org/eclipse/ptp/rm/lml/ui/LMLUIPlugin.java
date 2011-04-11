@@ -21,13 +21,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.ui;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.lml.core.util.DebugUtil;
-import org.eclipse.ptp.rm.lml.ui.managers.LguiManager;
+import org.eclipse.ptp.rm.lml.ui.managers.ViewManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -127,11 +126,12 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 
 	// Resource bundle.
 	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations = new HashMap<String, IRuntimeModelPresentation>();
-	private LguiManager lguiManager = null;
+	private ViewManager lguiManager = null;
 
 	public LMLUIPlugin() {
 		super();		
 		plugin = this;
+		
 	}
 
 	/**
@@ -139,10 +139,10 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 	 * 
 	 * @return RM manager
 	 */
-	public LguiManager getLguiManager() {
+	public ViewManager getLguiManager() {
 		return lguiManager;
 	}
-
+	
 	/**
 	 * Get the runtime model presentation for the given resource manager
 	 * 
@@ -165,6 +165,7 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		DebugUtil.configurePluginDebugOptions();
+		lguiManager = new ViewManager();
 	}
 
 	/*
@@ -177,6 +178,8 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
+		lguiManager.shutdown();
+		lguiManager = null;
 		plugin = null;
 	}
 

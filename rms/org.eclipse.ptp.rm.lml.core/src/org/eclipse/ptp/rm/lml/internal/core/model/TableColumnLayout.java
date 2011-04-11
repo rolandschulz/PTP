@@ -1,10 +1,21 @@
-package org.eclipse.ptp.rm.lml.internal.core.elements;
+/**
+ * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ * 		Claudia Knobloch, FZ Juelich
+ */
 
-import org.eclipse.ptp.rm.lml.core.elements.ITableColumnLayout;
+
+package org.eclipse.ptp.rm.lml.internal.core.model;
+
+import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
 
 /**
  * Class of the interface ITableColumnLayout
- * @author Claudia Knobloch
  */
 public class TableColumnLayout implements ITableColumnLayout {
 	
