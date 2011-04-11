@@ -85,18 +85,6 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 		if (configuration instanceof IJAXBResourceManagerConfiguration) {
 			IJAXBResourceManagerConfiguration jaxbConfiguration = (IJAXBResourceManagerConfiguration) configuration;
 			jaxbConfiguration.setRMConfigurationURL(getJAXBResourceManagerConfiguration(name));
-			/*
-			 * in order to make the Site information available to the wizards,
-			 * we need to realize the data object here, since the URL is set on
-			 * the base configuration, but the wizards access the component
-			 * configurations.
-			 */
-			try {
-				jaxbConfiguration.realizeRMDataFromXML();
-			} catch (Throwable t) {
-				WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.InvalidConfiguration + name,
-						Messages.InvalidConfiguration_title, false);
-			}
 		}
 		configuration.setName(name);
 	}

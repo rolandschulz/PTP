@@ -16,9 +16,11 @@ import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.RemoteUIServicesUtils;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Generic Wizard for the JAXB Resource Manager Control. Provides connection
@@ -41,6 +43,18 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 		setPageComplete(false);
 		setTitle(Messages.JAXBRMControlConfigurationWizardPage_Title);
 		setDescription(Messages.JAXBConnectionWizardPage_Description);
+		/*
+		 * in order to make the Site information available to the wizard, we
+		 * need to realize the data object here.
+		 */
+		try {
+			if (baseConfiguration.getResourceManagerData() == null) {
+				baseConfiguration.realizeRMDataFromXML();
+			}
+		} catch (Throwable t) {
+			WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.InvalidConfiguration
+					+ baseConfiguration.getName(), Messages.InvalidConfiguration_title, false);
+		}
 	}
 
 	/*
@@ -55,11 +69,13 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 	protected Composite doCreateContents(Composite parent) {
 		Composite comp = super.doCreateContents(parent);
 		Site site = baseConfiguration.getResourceManagerData().getSiteData();
-		try {
-			RemoteUIServicesUtils.setConnectionHints(connectionWidget, site.getControlConnection());
+		if (site != null) {
+			try {
+				RemoteUIServicesUtils.setConnectionHints(connectionWidget, site.getControlConnection());
 
-		} catch (Throwable t) {
-			JAXBUIPlugin.log(t);
+			} catch (Throwable t) {
+				JAXBUIPlugin.log(t);
+			}
 		}
 		return comp;
 	}
