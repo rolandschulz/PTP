@@ -76,7 +76,6 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	public LaunchTabBuilder(JAXBDynamicLaunchConfigurationTab tab) {
 		this.tab = tab;
 		this.localWidgets = tab.getLocalWidgets();
-		this.localWidgets.clear();
 	}
 
 	/**
@@ -92,6 +91,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * @throws Throwable
 	 */
 	public void build(Composite parent) throws Throwable {
+		this.localWidgets.clear();
 		List<Object> top = tab.getController().getTabFolderOrComposite();
 		for (Object o : top) {
 			if (o instanceof CompositeDescriptor) {

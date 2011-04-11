@@ -181,7 +181,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 			rmConfig.setActive();
 			lcMap = LCVariableMap.createInstance(RMVariableMap.getActiveInstance());
 			LCVariableMap.setActiveInstance(lcMap);
-			updateHandler.getControlToModelMap().clear();
+			updateHandler.clear();
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 			return new RMLaunchValidation(false, t.getMessage());
