@@ -85,7 +85,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private final static String PROVIDER_CONFIGURATION_ELEMENT_NAME = "provider-configuration"; //$NON-NLS-1$
 	private final static String ATTR_PROVIDER_ID = "provider-id"; //$NON-NLS-1$
 	private final static String DEFAULT_SAVE_FILE_NAME = "service_model.xml"; //$NON-NLS-1$
-
+	
 	private static <T> T getConf(Map<IProject, T> map, IProject project) {
 		if (project == null) {
 			throw new NullPointerException();
@@ -201,6 +201,8 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private final Map<IProject, Map<String, IServiceConfiguration>> fProjectConfigurations = new HashMap<IProject, Map<String, IServiceConfiguration>>();
 	private final Map<IProject, IServiceConfiguration> fActiveConfigurations = new HashMap<IProject, IServiceConfiguration>();
 	private final Map<IProject, Set<IService>> fProjectServices = new HashMap<IProject, Set<IService>>();
+	private final Map<IProject, Map<BuildScenario, IServiceConfiguration>> fProjectBuildScenarioToSConfigMap =
+													 		new HashMap<IProject, Map<BuildScenario, IServiceConfiguration>>();
 	private Map<String, Service> fServices = null;
 	private Map<String, ServiceCategory> fCategories;
 	private Set<IService> fServiceSet = null;
@@ -221,6 +223,50 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 
 	private ServiceModelManager() {
 		defaultSaveFile = ServicesCorePlugin.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
+	}
+	
+	/**
+	 * Add a new build scenario to the project, creating a new service configuration for that scenario if necessary.
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @since 2.1
+	 */
+	public void addBuildScenario(IProject project, BuildScenario buildScenario) {
+		IServiceConfiguration sConfig = this.copyActiveServiceConfiguration(project);
+		this.modifyServiceConfigurationForBuildScenario(sConfig, buildScenario);
+		fProjectBuildScenarioToSConfigMap.get(project).put(buildScenario, sConfig);
+	}
+	
+	private IServiceConfiguration copyActiveServiceConfiguration(IProject project) {
+		IServiceConfiguration newConfig = newServiceConfiguration("");
+		IServiceConfiguration oldConfig = getActiveConfiguration(project);
+		
+		for (IService service : oldConfig.getServices()) {
+			ServiceProvider oldProvider = (ServiceProvider) oldConfig.getServiceProvider(service);
+			try {
+				ServiceProvider newProvider = oldProvider.getClass().newInstance();
+				XMLMemento oldProviderState = XMLMemento.createWriteRoot(PROVIDER_ELEMENT_NAME);
+				oldProvider.saveState(oldProviderState);
+				newProvider.restoreState(oldProviderState);
+				newConfig.setServiceProvider(service, newProvider);
+			} catch (InstantiationException e) {
+				throw new RuntimeException("Cannot instantiate provider class: " + oldProvider.getClass());
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException("Cannot instantiate provider class: " + oldProvider.getClass());
+			}
+		}
+		
+		return null;
+	}
+	
+	private void modifyServiceConfigurationForBuildScenario(IServiceConfiguration sConfig, BuildScenario bs) {
+		for (IService service : sConfig.getServices()) {
+			ServiceProvider provider = (ServiceProvider) sConfig.getServiceProvider(service);
+			if (provider instanceof IRemoteServiceProvider) {
+				((IRemoteServiceProvider) provider).changeRemoteInformation(bs.getRemoteConnectionName(), bs.getLocation());
+			}
+		}
 	}
 
 	/*

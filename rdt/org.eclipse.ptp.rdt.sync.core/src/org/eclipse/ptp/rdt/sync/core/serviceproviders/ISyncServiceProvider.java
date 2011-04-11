@@ -40,4 +40,6 @@ public interface ISyncServiceProvider extends IServiceProvider {
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 
 	public IRemoteConnection getRemoteConnection();
+	
+	public String getLocation();
 }

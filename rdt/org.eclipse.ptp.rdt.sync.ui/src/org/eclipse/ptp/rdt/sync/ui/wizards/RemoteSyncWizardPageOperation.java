@@ -18,11 +18,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
@@ -32,6 +34,7 @@ import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.internal.core.ServiceConfiguration;
 
 /**
  * An operation which handles configuring the remote portions of the Remote
@@ -68,6 +71,14 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 				rbsp.setRemoteToolsConnection(remoteConnection);
 				config.setServiceProvider(buildService, rbsp);
 			}
+			
+			/* START HERE March 22, 2011 */
+			if (config instanceof ServiceConfiguration) {
+			ServiceConfiguration sconfig = (ServiceConfiguration) config;
+			ISyncServiceProvider provider = participant.getProvider(project);
+			sconfig.createFileInfo(project.getFullPath(), "remoteSyncProvider", provider.getName()); //$NON-NLS-1$ 
+			sconfig.createFileInfo(project.getFullPath(), "remoteConnection", provider.getRemoteConnection()); //$NON-NLS-1$ 
+			sconfig.createFileInfo(project.getFullPath(), "remoteLocation", provider.getLocation()); //$NON-NLS-1$ 
 			
 			smm.addConfiguration(project, config);
 
