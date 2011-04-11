@@ -61,8 +61,21 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * Utilities for creating update models for control widgets, cell editors and
+ * viewers.
+ * 
+ * @author arossi
+ * 
+ */
 public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 
+	/**
+	 * Internal data object for configuration convenience.
+	 * 
+	 * @author arossi
+	 * 
+	 */
 	private static class CellDescriptor {
 		private String name;
 		private String tooltip;
@@ -77,6 +90,12 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		protected Color[] background;
 		protected Font[] font;
 
+		/**
+		 * @param data
+		 *            Property or Attribute
+		 * @param columnData
+		 *            list of JAXB data elements describing the viewer columns
+		 */
 		private CellDescriptor(Object data, List<ColumnData> columnData) {
 			type = CellEditorType.getType(data);
 			if (data instanceof Attribute) {
@@ -128,9 +147,23 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		}
 	}
 
+	/**
+	 * Mapping of Property or Attribute type to appropriate cell editor.
+	 * 
+	 * @author arossi
+	 * 
+	 */
 	private enum CellEditorType {
 		TEXT, COMBO, SPINNER, CHECK;
 
+		/**
+		 * Determine the CellEditor from the Property or Attribute type or
+		 * value.
+		 * 
+		 * @param object
+		 *            Property or Attribute
+		 * @return enum value for editor
+		 */
 		public static CellEditorType getType(Object object) {
 			if (object instanceof Property) {
 				Property p = (Property) object;
@@ -168,6 +201,14 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			}
 		}
 
+		/**
+		 * If the Property or Attribute carries an explicit type name, determine
+		 * CellEditor type from it.
+		 * 
+		 * @param clzz
+		 *            type name
+		 * @return enum value for editor
+		 */
 		private static CellEditorType getTypeFromClass(String clzz) {
 			if (clzz.indexOf(NT) > 0) {
 				return SPINNER;
@@ -188,6 +229,12 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		}
 	}
 
+	/**
+	 * Internal data object for configuration convenience.
+	 * 
+	 * @author arossi
+	 * 
+	 */
 	private static class ControlDescriptor {
 		private String title;
 		private Object layoutData;
@@ -203,11 +250,24 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		private String fixedText;
 		private List<String> valueList;
 
+		/**
+		 * @param widget
+		 *            JAXB data element describing widget
+		 * @param rmMap
+		 *            used to retrieve data object info
+		 */
 		private ControlDescriptor(Widget widget, RMVariableMap rmMap) {
 			setControlData(widget);
 			setMapDependentData(widget, rmMap);
 		}
 
+		/**
+		 * Configure the fields which do not depend on the underlying data
+		 * object.
+		 * 
+		 * @param widget
+		 *            JAXB data element describing widget
+		 */
 		private void setControlData(Widget widget) {
 			title = widget.getTitle();
 			LayoutDataDescriptor layout = widget.getLayoutData();
@@ -224,6 +284,29 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			fixedText = widget.getFixedText();
 		}
 
+		/**
+		 * Get the choice (Combo), min and max (Spinner) settings.
+		 * 
+		 * @param data
+		 *            Attribute
+		 */
+		private void setData(Object data) {
+			if (data instanceof Attribute) {
+				Attribute a = (Attribute) data;
+				choice = a.getChoice();
+				min = a.getMin();
+				max = a.getMax();
+			}
+		}
+
+		/**
+		 * Configure the fields which depend on the underlying data object.
+		 * 
+		 * @param widget
+		 *            JAXB data element describing widget
+		 * @param rmMap
+		 *            used to retrieve data object info
+		 */
 		private void setMapDependentData(Widget widget, RMVariableMap rmMap) {
 			if (tooltip == null) {
 				tooltip = ZEROSTR;
@@ -240,7 +323,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			if (s != null) {
 				Object data = vars.get(s);
 				if (data != null) {
-					setPropertyData(data);
+					setData(data);
 				}
 			}
 			s = widget.getValueListFrom();
@@ -252,15 +335,13 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			}
 		}
 
-		private void setPropertyData(Object data) {
-			if (data instanceof Attribute) {
-				Attribute a = (Attribute) data;
-				choice = a.getChoice();
-				min = a.getMin();
-				max = a.getMax();
-			}
-		}
-
+		/**
+		 * Get Combo items from a reference to another Attribute or Property
+		 * with a List as its value.
+		 * 
+		 * @param data
+		 *            Property or Attribute
+		 */
 		@SuppressWarnings("unchecked")
 		private void setValueListData(Object data) {
 			if (data instanceof Attribute) {
@@ -279,6 +360,20 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		}
 	}
 
+	/**
+	 * Constructs the viewer update model.
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.ViewerUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler
+	 * 
+	 * @param viewer
+	 *            SWT object to which this model is bound
+	 * @param descriptor
+	 *            JAXB data element describing the viewer
+	 * @param tab
+	 *            launch tab being built (accessed for value handler)
+	 * @return
+	 */
 	public static ViewerUpdateModel createModel(ColumnViewer viewer, AttributeViewer descriptor,
 			JAXBDynamicLaunchConfigurationTab tab) {
 		String name = descriptor.getName();
@@ -288,6 +383,18 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		return model;
 	}
 
+	/**
+	 * Constructs the widget and its update model.
+	 * 
+	 * @param parent
+	 *            control to which the widget belongs
+	 * @param widget
+	 *            JAXB data object describing the widget to which this model is
+	 *            bound
+	 * @param tab
+	 *            launch tab being built
+	 * @return
+	 */
 	public static IUpdateModel createModel(Composite parent, Widget widget, JAXBDynamicLaunchConfigurationTab tab) {
 		Control control = createControl(parent, widget, tab);
 		if (control instanceof Label) {
@@ -321,6 +428,23 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		return model;
 	}
 
+	/**
+	 * Constructs the cell editor and its update model. Calls
+	 * {@link #createModel(Object, TableViewer, List, JAXBDynamicLaunchConfigurationTab)}
+	 * or
+	 * {@link #createModel(Object, TreeViewer, List, JAXBDynamicLaunchConfigurationTab)}
+	 * .
+	 * 
+	 * @param data
+	 *            Property or Attribute for this viewer row.
+	 * @param viewer
+	 *            CheckboxTableViewer or CheckboxTreeViewer
+	 * @param columnData
+	 *            list of JAXB data elements describing the viewer columns
+	 * @param tab
+	 *            launch tab being built
+	 * @return
+	 */
 	public static ICellEditorUpdateModel createModel(Object data, ColumnViewer viewer, List<ColumnData> columnData,
 			JAXBDynamicLaunchConfigurationTab tab) {
 		ICellEditorUpdateModel model = null;
@@ -332,6 +456,22 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		return model;
 	}
 
+	/**
+	 * Creates a read-only Text area and adjacent browse button using local
+	 * connection information. The update model will be attached to the returned
+	 * text widget, as its text value will trigger updates.
+	 * 
+	 * @see org.eclipse.swt.widgets.Text
+	 * @see org.eclipse.swt.widgets.Button
+	 * 
+	 * @param parent
+	 *            to which the control belongs
+	 * @param cd
+	 *            internal data object carrying model description info
+	 * @param tab
+	 *            launch tab being built
+	 * @return the text widget carrying the browse selection
+	 */
 	private static Text createBrowseLocal(final Composite parent, final ControlDescriptor cd) {
 		final Text t = WidgetBuilderUtils.createText(parent, SWT.BORDER, cd.layoutData, true, ZEROSTR);
 		WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, cd.style, new SelectionListener() {
@@ -360,6 +500,22 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		return t;
 	}
 
+	/**
+	 * Creates a read-only Text area and adjacent browse button using remote
+	 * connection information. The update model will be attached to the returned
+	 * text widget, as its text value will trigger updates.
+	 * 
+	 * @see org.eclipse.swt.widgets.Text
+	 * @see org.eclipse.swt.widgets.Button
+	 * 
+	 * @param parent
+	 *            to which the control belongs
+	 * @param cd
+	 *            internal data object carrying model description info
+	 * @param tab
+	 *            launch tab being built
+	 * @return the text widget carrying the browse selection
+	 */
 	private static Text createBrowseRemote(final Composite parent, final ControlDescriptor cd,
 			final JAXBDynamicLaunchConfigurationTab tab) {
 		final Text t = WidgetBuilderUtils.createText(parent, SWT.BORDER, cd.layoutData, true, ZEROSTR);
@@ -386,6 +542,15 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		return t;
 	}
 
+	/**
+	 * @see org.eclipse.swt.widgets.Combo
+	 * 
+	 * @param parent
+	 *            to which the control belongs
+	 * @param cd
+	 *            internal data object carrying model description info
+	 * @return the Combo widget
+	 */
 	private static Combo createCombo(Composite parent, final ControlDescriptor cd) {
 		String[] items = null;
 		if (cd.valueList != null) {
@@ -403,6 +568,27 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		return WidgetBuilderUtils.createCombo(parent, cd.style, cd.layoutData, items, ZEROSTR, cd.title, cd.tooltip, null);
 	}
 
+	/**
+	 * Calls: {@link #createCombo(Composite, ControlDescriptor)},
+	 * {@link #createBrowseLocal(Composite, ControlDescriptor)},
+	 * {@link #createBrowseRemote(Composite, ControlDescriptor, JAXBDynamicLaunchConfigurationTab)}
+	 * ,
+	 * {@link WidgetBuilderUtils#createLabel(Composite, String, Integer, Object)}
+	 * ,
+	 * {@link WidgetBuilderUtils#createRadioButton(Composite, String, String, SelectionListener)}
+	 * , {@link WidgetBuilderUtils#createButton(Composite, String, Integer)},
+	 * {@link WidgetBuilderUtils#createSpinner(Composite, Object, String, Integer, Integer, Integer, org.eclipse.swt.events.ModifyListener)}
+	 * .
+	 * 
+	 * @param parent
+	 *            to which the control belongs
+	 * @param widget
+	 *            JAXB data element describing the widget
+	 * @param tab
+	 *            launch tab being built
+	 * @return the resulting control (<code>null</code> if the widget is a
+	 *         Label).
+	 */
 	private static Control createControl(final Composite parent, Widget widget, JAXBDynamicLaunchConfigurationTab tab) {
 		ControlDescriptor cd = new ControlDescriptor(widget, RMVariableMap.getActiveInstance());
 		String type = widget.getType();
@@ -443,6 +629,22 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		return c;
 	}
 
+	/**
+	 * Constructs the editor of appropriate type.
+	 * 
+	 * @see org.eclipse.jface.viewers.TextCellEditor
+	 * @see org.eclipse.jface.viewers.CheckboxCellEditor
+	 * @see org.eclipse.jface.viewers.ComboBoxCellEditor
+	 * @see org.eclipse.ptp.rm.jaxb.ui.cell.SpinnerCellEditor
+	 * 
+	 * @param cd
+	 *            internal object holding model description
+	 * @param data
+	 *            Property or Attribute
+	 * @param parent
+	 *            Table or Tree to which the editor belongs
+	 * @return the editor of appropriate type
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static CellEditor createEditor(CellDescriptor cd, Object data, Composite parent) {
 		CellEditor editor = null;
@@ -476,6 +678,24 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		return editor;
 	}
 
+	/**
+	 * Constructs CellEditor and model for table row. Calls
+	 * {@link #createEditor(CellDescriptor, Object, Composite)}.
+	 * 
+	 * @see org.eclipse.jface.viewers.CellEditor
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.TableRowUpdateModel
+	 * 
+	 * @param data
+	 *            Property or Attribute
+	 * @param viewer
+	 *            to which this row belongs
+	 * @param columnData
+	 *            list of JAXB data elements describing table columns
+	 * @param tab
+	 *            launch tab being built
+	 * @return the cell editor update model, which contains a reference to the
+	 *         CellEditor
+	 */
 	private static ICellEditorUpdateModel createModel(Object data, TableViewer viewer, List<ColumnData> columnData,
 			JAXBDynamicLaunchConfigurationTab tab) {
 		CellDescriptor cd = new CellDescriptor(data, columnData);
@@ -495,6 +715,24 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		return model;
 	}
 
+	/**
+	 * Constructs CellEditor and model for tree node. Calls
+	 * {@link #createEditor(CellDescriptor, Object, Composite)}.
+	 * 
+	 * @see org.eclipse.jface.viewers.CellEditor
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.ValueTreeNodeUpdateModel
+	 * 
+	 * @param data
+	 *            Property or Attribute
+	 * @param viewer
+	 *            to which this row belongs
+	 * @param columnData
+	 *            list of JAXB data elements describing table columns
+	 * @param tab
+	 *            launch tab being built
+	 * @return the cell editor update model, which contains a reference to the
+	 *         CellEditor
+	 */
 	private static ICellEditorUpdateModel createModel(Object data, TreeViewer viewer, List<ColumnData> columnData,
 			JAXBDynamicLaunchConfigurationTab tab) {
 		CellDescriptor cd = new CellDescriptor(data, columnData);
@@ -516,6 +754,15 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		return model;
 	}
 
+	/**
+	 * @see org.eclipse.swt.widgets.Text
+	 * 
+	 * @param parent
+	 *            control to which widget belongs
+	 * @param cd
+	 *            internal data object describing the widget model
+	 * @return SWT text widget
+	 */
 	private static Text createText(final Composite parent, final ControlDescriptor cd) {
 		return WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, ZEROSTR);
 	}

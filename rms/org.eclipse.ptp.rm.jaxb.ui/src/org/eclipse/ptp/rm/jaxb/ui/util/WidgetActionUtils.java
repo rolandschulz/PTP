@@ -41,6 +41,12 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Convenience methods for certain types of actions involving widgets.
+ * 
+ * @author arossi
+ * 
+ */
 public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 
 	private WidgetActionUtils() {
@@ -49,7 +55,8 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	/**
 	 * Create a dialog that allows the user to select a file in the workspace.
 	 * 
-	 * @return selected file
+	 * @param shell
+	 * @return the selected file
 	 */
 	public static String browseWorkspace(Shell shell) {
 		IPath path = ResourcesPlugin.getWorkspace().getRoot().getLocation();
@@ -58,9 +65,18 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		return dialog.open();
 	}
 
-	public static void errorMessage(Shell s, Throwable e, String message, String title, boolean causeTrace) {
-		String append = e == null ? ZEROSTR : e.getMessage();
-		Throwable t = e == null ? null : e.getCause();
+	/**
+	 * Open error message dialog.
+	 * 
+	 * @param shell
+	 * @param throwable
+	 * @param message
+	 * @param title
+	 * @param causeTrace
+	 */
+	public static void errorMessage(Shell shell, Throwable throwable, String message, String title, boolean causeTrace) {
+		String append = throwable == null ? ZEROSTR : throwable.getMessage();
+		Throwable t = throwable == null ? null : throwable.getCause();
 		String lineSep = LINE_SEP;
 		if (causeTrace) {
 			StringWriter sw = new StringWriter();
@@ -72,9 +88,16 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		} else if (t != null) {
 			append = t.getMessage();
 		}
-		MessageDialog.openError(s, title, message + lineSep + lineSep + append);
+		MessageDialog.openError(shell, title, message + lineSep + lineSep + append);
 	}
 
+	/**
+	 * Get the selected item from the combo.
+	 * 
+	 * @param combo
+	 * @return if there are no items or the selection index is not set, return
+	 *         the text field; else the indexed item
+	 */
 	public static String getSelected(Combo combo) {
 		if (combo.isDisposed()) {
 			return ZEROSTR;
@@ -89,15 +112,35 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		return combo.getItem(i);
 	}
 
-	public static String openInputDialog(Shell shell, String message, String title, String original) {
-		InputDialog nameDialog = new InputDialog(shell, message, title, original, null);
+	/**
+	 * Get input from input dialog.
+	 * 
+	 * @param shell
+	 * @param message
+	 * @param title
+	 * @param initial
+	 *            value of text to display
+	 * @return the entered text
+	 */
+	public static String openInputDialog(Shell shell, String message, String title, String initial) {
+		InputDialog nameDialog = new InputDialog(shell, message, title, initial, null);
 		if (nameDialog.open() != Window.CANCEL) {
 			return nameDialog.getValue();
 		}
 		return null;
 	}
 
-	public static String select(Combo combo, String name) {
+	/**
+	 * Searches for the text among the choices; if not found, and the Combo is
+	 * editable, it adds the new text to the choices and selects it; if
+	 * read-only, the empty string is returned. Otherwise the corresponding item
+	 * is selected in the Combo.
+	 * 
+	 * @param combo
+	 * @param text
+	 * @return
+	 */
+	public static String select(Combo combo, String text) {
 		if (combo.isDisposed()) {
 			return ZEROSTR;
 		}
@@ -108,11 +151,11 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 			return ZEROSTR;
 		}
 		int i = 0;
-		if (name == null) {
-			name = ZEROSTR;
+		if (text == null) {
+			text = ZEROSTR;
 		}
 		for (; i < items.length; i++) {
-			if (items[i].equals(name)) {
+			if (items[i].equals(text)) {
 				combo.select(i);
 				break;
 			}
@@ -120,13 +163,13 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 
 		if (i == items.length) {
 			if (readOnly) {
-				i = 0;
+				return ZEROSTR;
 			} else {
 				List<String> newItems = new ArrayList<String>();
 				for (String item : items) {
 					newItems.add(item.trim());
 				}
-				newItems.add(name.trim());
+				newItems.add(text.trim());
 				combo.setItems(newItems.toArray(new String[0]));
 				i = newItems.size() - 1;
 			}
@@ -135,9 +178,23 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		return combo.getItem(i);
 	}
 
-	public static void validate(String value, Validator v, IRemoteFileManager fileManager) throws Exception {
-		Regex reg = v.getRegex();
-		String error = v.getErrorMessage();
+	/**
+	 * Runs a validator (either regex or file info) on a value entered by user.
+	 * 
+	 * @param value
+	 *            to be validated
+	 * @param validator
+	 *            JAXB data element describing the validator (either a regex or
+	 *            EFS file validator).
+	 * @param fileManager
+	 *            local or remote manager from the remote services delegate of
+	 *            resource manager
+	 * @throws Exception
+	 *             if validation fails
+	 */
+	public static void validate(String value, Validator validator, IRemoteFileManager fileManager) throws Exception {
+		Regex reg = validator.getRegex();
+		String error = validator.getErrorMessage();
 
 		if (error == null) {
 			error = ZEROSTR;
@@ -146,7 +203,7 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		if (reg != null && new RegexImpl(reg).getMatched(value) == null) {
 			throw new UnsatisfiedMatchException(error + CO + SP + reg.getExpression() + CM + SP + value);
 		} else {
-			FileMatch match = v.getFileInfo();
+			FileMatch match = validator.getFileInfo();
 			try {
 				if (match != null && !validate(match, value, fileManager)) {
 					throw new UnsatisfiedMatchException(error + CO + SP + value);
@@ -157,10 +214,23 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		}
 	}
 
-	public static void warningMessage(Shell s, String message, String title) {
-		MessageDialog.openWarning(s, title, message + LINE_SEP);
+	/**
+	 * @param shell
+	 * @param message
+	 * @param title
+	 */
+	public static void warningMessage(Shell shell, String message, String title) {
+		MessageDialog.openWarning(shell, title, message + LINE_SEP);
 	}
 
+	/**
+	 * Converts string representation of OR'd EFS attributes into the Java int
+	 * value.
+	 * 
+	 * @param efsAttrStr
+	 *            string representation of OR'd values.
+	 * @return EFS code
+	 */
 	private static int getEfsAttributeValue(String efsAttrStr) {
 		int attributes = 0;
 		String[] split = efsAttrStr.split(PIP);
@@ -203,6 +273,13 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		return attributes;
 	}
 
+	/**
+	 * Convert formatted string to long time in milliseconds.
+	 * 
+	 * @param dateTime
+	 *            format is: "yyyy/MM/dd HH:mm:ss"
+	 * @return milliseconds
+	 */
 	private static Long getTimeInMillis(String dateTime) {
 		DateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 		try {
@@ -213,6 +290,24 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		}
 	}
 
+	/**
+	 * Checks EFS attributes of returned file info. Calls
+	 * {@link #getEfsAttributeValue(String)}.
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.FileMatch
+	 * @see org.eclipse.core.filesystem.IFileStore
+	 * @see org.eclipse.core.filesystem.IFileInfo
+	 * 
+	 * @param match
+	 *            JAXB data element describing what attributes to match
+	 * @param value
+	 *            the file path
+	 * @param fileManager
+	 *            local or remote manager from the remote services delegate of
+	 *            resource manager
+	 * @return whether validation succeeded
+	 * @throws CoreException
+	 */
 	private static boolean validate(FileMatch match, String value, IRemoteFileManager fileManager) throws CoreException {
 		if (fileManager == null) {
 			return false;

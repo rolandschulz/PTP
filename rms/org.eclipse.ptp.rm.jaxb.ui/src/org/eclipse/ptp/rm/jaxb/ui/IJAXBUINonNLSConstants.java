@@ -11,6 +11,12 @@ package org.eclipse.ptp.rm.jaxb.ui;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 
+/**
+ * Gathers all internal, unmodifiable string constants into a single place for
+ * convenience and the interest of uncluttered code.
+ * 
+ * @since 5.0
+ */
 public interface IJAXBUINonNLSConstants extends IJAXBNonNLSConstants {
 
 	int DEFAULT = UNDEFINED;

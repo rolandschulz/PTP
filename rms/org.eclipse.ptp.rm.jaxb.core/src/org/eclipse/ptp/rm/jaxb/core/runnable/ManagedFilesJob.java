@@ -148,9 +148,9 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * If there is already a path defined for this file, this is return. Else a
-	 * temporary source file is created to be deleted on completion. If the file
-	 * contents is a reference to a string in the environment, the normal
+	 * If there is already a path defined for this file, this is returned. Else
+	 * a temporary source file is created to be deleted on completion. If the
+	 * file contents is a reference to a string in the environment, the normal
 	 * VariableResolver can be bypassed by setting <code>resolveContents</code>
 	 * to false; this avoids recursive resolution which might falsely interpret
 	 * shell symbols (${...}) as referring to the Eclipse default string

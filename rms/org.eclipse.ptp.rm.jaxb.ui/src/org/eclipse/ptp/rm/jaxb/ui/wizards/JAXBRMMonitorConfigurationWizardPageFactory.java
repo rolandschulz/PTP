@@ -17,6 +17,9 @@ import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 
+/**
+ * Adds monitor configuration page.
+ */
 public class JAXBRMMonitorConfigurationWizardPageFactory extends RMConfigurationWizardPageFactory {
 
 	/*
@@ -32,5 +35,4 @@ public class JAXBRMMonitorConfigurationWizardPageFactory extends RMConfiguration
 		pages.add(new JAXBRMMonitoringConfigurationWizardPage(wizard));
 		return pages.toArray(new RMConfigurationWizardPage[0]);
 	}
-
 }

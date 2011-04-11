@@ -20,7 +20,8 @@ import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Generic Wizard for the JAXB Resource Manager Monitoring.
+ * Generic Wizard for the JAXB Resource Manager Monitoring. Provides connection
+ * configuration.
  * 
  * @author arossi
  * 
@@ -34,6 +35,10 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 		this(wizard, Messages.JAXBRMMonitoringConfigurationWizardPage_Title);
 	}
 
+	/**
+	 * @param wizard
+	 * @param pageName
+	 */
 	public JAXBRMMonitoringConfigurationWizardPage(IRMConfigurationWizard wizard, String pageName) {
 		super(wizard, pageName);
 		baseConfiguration = (IJAXBResourceManagerConfiguration) wizard.getBaseConfiguration();
@@ -44,7 +49,8 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * Exports as default remote connection information whatever is set in the
+	 * Site subtree of the JAXB data tree. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.ui.wizards.
 	 * AbstractRemoteResourceManagerConfigurationWizardPage

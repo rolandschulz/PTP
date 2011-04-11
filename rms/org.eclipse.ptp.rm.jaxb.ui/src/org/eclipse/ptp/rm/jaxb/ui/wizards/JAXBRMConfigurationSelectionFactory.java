@@ -7,7 +7,9 @@
  * 
  * Contributors:
  *     IBM Corporation - Initial Implementation
- *
+ *     Albert L. Rossi - modifications to support loading external XML; 
+ *                       also included the unmarshaling call here so the 
+ *                       data is available to the other wizard pages.
  */
 package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
@@ -38,8 +40,19 @@ import org.eclipse.ptp.ui.wizards.RMConfigurationSelectionFactory;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 
+/**
+ * For retrieving and loading configurations for the JAXB class of resource
+ * managers. Looks for configurations in two ways: by accessing extension
+ * providers, and by searching in the workspace for a project called
+ * "resourceManagers". The latter allows the user to import custom XML
+ * configurations.
+ * 
+ */
 public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectionFactory implements IJAXBUINonNLSConstants {
 
+	/**
+	 * For searching the "resourceManagers" project for .xml files.
+	 */
 	private static final FilenameFilter xmlFilter = new FilenameFilter() {
 		public boolean accept(File dir, String name) {
 			File f = new File(dir, name);
@@ -73,7 +86,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 			IJAXBResourceManagerConfiguration jaxbConfiguration = (IJAXBResourceManagerConfiguration) configuration;
 			jaxbConfiguration.setRMConfigurationURL(getJAXBResourceManagerConfiguration(name));
 			/*
-			 * In order to make the Site information available to the wizards,
+			 * in order to make the Site information available to the wizards,
 			 * we need to realize the data object here, since the URL is set on
 			 * the base configuration, but the wizards access the component
 			 * configurations.
@@ -88,6 +101,13 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 		configuration.setName(name);
 	}
 
+	/**
+	 * Looks up the configuration; called when the user selects a name from the
+	 * wizard list.
+	 * 
+	 * @param name
+	 * @return location of the configuration
+	 */
 	private URL getJAXBResourceManagerConfiguration(String name) {
 		loadJAXBResourceManagers(false);
 		Map<String, URL> info = fRMJAXBResourceManagers.get(getId());
@@ -97,6 +117,13 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 		return null;
 	}
 
+	/**
+	 * Gathers together the names of all the available JAXB resource manager
+	 * configurations from both plugins providing extensions to the extension
+	 * point as well as from the user's workspace.
+	 * 
+	 * @return array of names to display in wizard table
+	 */
 	private String[] getJAXBResourceManagerNames() {
 		loadJAXBResourceManagers(true);
 		Map<String, URL> info = fRMJAXBResourceManagers.get(getId());
@@ -106,6 +133,11 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 		return new String[0];
 	}
 
+	/**
+	 * Gets all extensions to the
+	 * org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations extension
+	 * point and loads their names and locations.
+	 */
 	private static void loadExtensions() {
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(RM_CONFIG_EXTENSION_POINT);
@@ -134,6 +166,16 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 		}
 	}
 
+	/**
+	 * Searches for .xml files contained in the user's workspace under the
+	 * project named "resourceManagers". Validates each one found and on failed
+	 * validation displays an error message (if so indicated).
+	 * 
+	 * @param showError
+	 *            display an error message if any configuration is invalid
+	 *            (against the internal XSD). Only true when loading the widget
+	 *            the first time.
+	 */
 	private static void loadExternal(boolean showError) {
 		Map<String, URL> info = fRMJAXBResourceManagers.get(JAXB_SERVICE_PROVIDER_EXTPT);
 		if (info == null) {
@@ -170,6 +212,10 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 		}
 	}
 
+	/**
+	 * Wrapper method. Calls {@link #loadExtensions()} and
+	 * {@link #loadExternal(boolean)}.
+	 */
 	private static void loadJAXBResourceManagers(boolean showError) {
 		if (fRMJAXBResourceManagers == null) {
 			fRMJAXBResourceManagers = new HashMap<String, Map<String, URL>>();

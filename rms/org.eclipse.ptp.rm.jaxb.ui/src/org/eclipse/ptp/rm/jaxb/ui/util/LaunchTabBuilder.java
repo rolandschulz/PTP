@@ -54,17 +54,43 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
 
+/**
+ * Object responsible for constructing the configurable JAXB Launch
+ * Configuration Tab, as well as building and registering the related model
+ * objects and listeners.
+ * 
+ * @see org.eclipse.ptp.rm.jaxb.ui.launch.JAXBDynamicLaunchConfigurationTab
+ * 
+ * @author arossi
+ * 
+ */
 public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 
 	private final JAXBDynamicLaunchConfigurationTab tab;
 	private final Map<Object, IUpdateModel> localWidgets;
 
+	/**
+	 * @param tab
+	 *            whose control is configurable from the JAXB data tree
+	 */
 	public LaunchTabBuilder(JAXBDynamicLaunchConfigurationTab tab) {
 		this.tab = tab;
 		this.localWidgets = tab.getLocalWidgets();
 		this.localWidgets.clear();
 	}
 
+	/**
+	 * Root call to build the SWT widget tree. Calls
+	 * {@link #addComposite(CompositeDescriptor, Composite)} or
+	 * {@link #addFolder(TabFolderDescriptor, Composite)}.
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.CompositeDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor
+	 * 
+	 * @param parent
+	 *            root control of the configurable launch tab
+	 * @throws Throwable
+	 */
 	public void build(Composite parent) throws Throwable {
 		List<Object> top = tab.getController().getTabFolderOrComposite();
 		for (Object o : top) {
@@ -76,6 +102,24 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		}
 	}
 
+	/**
+	 * Constructs the viewer, its row items and their update models, and add it
+	 * to the tree. Calls
+	 * {@link UpdateModelFactory#createModel(ColumnViewer, AttributeViewer, JAXBDynamicLaunchConfigurationTab)}
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer
+	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.ViewerUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.ui.util.UpdateModelFactory#createModel(ColumnViewer,
+	 *      AttributeViewer, JAXBDynamicLaunchConfigurationTab)
+	 * 
+	 * @param descriptor
+	 *            JAXB data element describing CheckboxTableViewer or
+	 *            CheckboxTreeViewer for displaying a subset of the resource
+	 *            manager properties and attributes
+	 * @param parent
+	 *            control to which to add the viewer
+	 */
 	private void addAttributeViewer(AttributeViewer descriptor, Composite parent) {
 		Layout layout = createLayout(descriptor.getLayout());
 		Object data = createLayoutData(descriptor.getLayoutData());
@@ -97,7 +141,29 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		localWidgets.put(viewer, model);
 	}
 
-	private ColumnViewer addCheckboxTableViewer(Composite parent, Object data, Layout layout, int style, AttributeViewer descriptor) {
+	/**
+	 * Constructs and configures the SWT TableViewer. Calls
+	 * {@link WidgetBuilderUtils#createTable(Composite, Integer, Object)},
+	 * {@link WidgetBuilderUtils#setupAttributeTable(CheckboxTableViewer, List, org.eclipse.jface.viewers.ISelectionChangedListener, boolean, boolean, boolean, boolean)}
+	 * 
+	 * @see org.eclipse.jface.viewers.CheckboxTableViewer
+	 * 
+	 * @param parent
+	 *            control to which to add the viewer
+	 * @param data
+	 *            underlying data object (Property or Attribute)
+	 * @param layout
+	 *            SWT layout applicable to the viewer
+	 * @param style
+	 *            of the viewer
+	 * @param descriptor
+	 *            JAXB data element describing CheckboxTableViewer or
+	 *            CheckboxTreeViewer for displaying a subset of the resource
+	 *            manager properties and attributes
+	 * @return the viewer
+	 */
+	private CheckboxTableViewer addCheckboxTableViewer(Composite parent, Object data, Layout layout, int style,
+			AttributeViewer descriptor) {
 		style |= (SWT.CHECK | SWT.FULL_SELECTION);
 		Table t = WidgetBuilderUtils.createTable(parent, style, data);
 		CheckboxTableViewer viewer = new CheckboxTableViewer(t);
@@ -106,7 +172,29 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return viewer;
 	}
 
-	private ColumnViewer addCheckboxTreeViewer(Composite parent, Object data, Layout layout, int style, AttributeViewer descriptor) {
+	/**
+	 * Constructs and configures the SWT TreeViewer. Calls
+	 * {@link WidgetBuilderUtils#createTree(Composite, Integer, Object)},
+	 * {@link WidgetBuilderUtils#setupAttributeTree(CheckboxTreeViewer, List, org.eclipse.jface.viewers.ISelectionChangedListener, boolean, boolean, boolean, boolean)}
+	 * 
+	 * @see org.eclipse.jface.viewers.CheckboxTreeViewer
+	 * 
+	 * @param parent
+	 *            control to which to add the viewer
+	 * @param data
+	 *            underlying data object (Property or Attribute)
+	 * @param layout
+	 *            SWT layout applicable to the viewer
+	 * @param style
+	 *            of the viewer
+	 * @param descriptor
+	 *            JAXB data element describing CheckboxTableViewer or
+	 *            CheckboxTreeViewer for displaying a subset of the resource
+	 *            manager properties and attributes
+	 * @return the viewer
+	 */
+	private CheckboxTreeViewer addCheckboxTreeViewer(Composite parent, Object data, Layout layout, int style,
+			AttributeViewer descriptor) {
 		style |= (SWT.CHECK | SWT.FULL_SELECTION);
 		Tree t = WidgetBuilderUtils.createTree(parent, style, data);
 		CheckboxTreeViewer viewer = new CheckboxTreeViewer(t);
@@ -115,6 +203,30 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return viewer;
 	}
 
+	/**
+	 * Adds an SWT Composite widget. Calls
+	 * {@link WidgetBuilderUtils#createComposite(Composite, Integer, Layout, Object)}
+	 * ,
+	 * {@link WidgetBuilderUtils#createGroup(Composite, Integer, Layout, Object, String)}
+	 * , {@link #addFolder(TabFolderDescriptor, Composite)},
+	 * {@link #addComposite(CompositeDescriptor, Composite)},
+	 * {@link #addWidget(Composite, Widget)}, or
+	 * {@link #addAttributeViewer(AttributeViewer, Composite)}.
+	 * 
+	 * @see org.eclipse.swt.widgets.Composite
+	 * @see org.eclipse.swt.widgets.Group
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.CompositeDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.Widget
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer
+	 * 
+	 * @param descriptor
+	 *            JAXB data element describing the contents and layout of the
+	 *            composite
+	 * @param parent
+	 *            control to which to add the composite
+	 * @return the SWT Composite
+	 */
 	private Composite addComposite(CompositeDescriptor descriptor, Composite parent) {
 		Layout layout = createLayout(descriptor.getLayout());
 		Object data = createLayoutData(descriptor.getLayoutData());
@@ -148,6 +260,20 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return composite;
 	}
 
+	/**
+	 * Constructs and configures an SWT TabFolder and its TabItems. Calls
+	 * {@link #addItem(TabFolder, TabItemDescriptor, int)}.
+	 * 
+	 * @see org.eclipse.swt.widgets.TabFolder
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabItemDescriptor
+	 * 
+	 * @param descriptor
+	 *            JAXB data element describing the folder contents and layout
+	 * @param parent
+	 *            control to which to add the folder
+	 * @return the SWT TabFolder
+	 */
 	private TabFolder addFolder(TabFolderDescriptor descriptor, Composite parent) {
 		TabFolder folder = new TabFolder(parent, WidgetBuilderUtils.getStyle(descriptor.getStyle()));
 		Layout layout = createLayout(descriptor.getLayout());
@@ -178,6 +304,25 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return folder;
 	}
 
+	/**
+	 * Adds an SWT TabItem to a TabFolder. Calls
+	 * {@link WidgetBuilderUtils#createTabItem(TabFolder, Integer, String, String, Integer)}
+	 * , {@link WidgetBuilderUtils#createComposite(Composite, Integer)},
+	 * {@link #addFolder(TabFolderDescriptor, Composite)},
+	 * {@link #addComposite(CompositeDescriptor, Composite)} or
+	 * {@link #addWidget(Composite, Widget)}.
+	 * 
+	 * @see org.eclipse.swt.widgets.TabFolder
+	 * @see org.eclipse.swt.widgets.TabItem
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabItemDescriptor
+	 * 
+	 * @param folder
+	 *            to which to add the item
+	 * @param descriptor
+	 *            JAXB data element describing content and layout of the item
+	 * @param index
+	 *            of the tab in the folder
+	 */
 	private void addItem(TabFolder folder, TabItemDescriptor descriptor, int index) {
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
 		TabItem item = WidgetBuilderUtils.createTabItem(folder, style, descriptor.getTitle(), descriptor.getTooltip(), index);
@@ -208,6 +353,27 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		}
 	}
 
+	/**
+	 * Adds the row items to the table. The row item model is both a CellEditor
+	 * update model/listener, as well as the underlying data model for the
+	 * viewer provider. Calls
+	 * {@link UpdateModelFactory#createModel(Object, ColumnViewer, List, JAXBDynamicLaunchConfigurationTab)}
+	 * . Adds the cell editor-to-model mappings to the local widget map of the
+	 * LaunchTab being built.
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.CellEditorUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.TableRowUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.ValueTreeNodeUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.InfoTreeNodeModel
+	 * 
+	 * @param viewer
+	 *            to which to add the rows
+	 * @param descriptor
+	 *            describing the content of the viewer's rows
+	 * @return list of models for the added items
+	 */
 	private Collection<ICellEditorUpdateModel> addRows(ColumnViewer viewer, AttributeViewer descriptor) {
 		RMVariableMap rmMap = RMVariableMap.getActiveInstance();
 		ViewerItems items = descriptor.getItems();
@@ -263,6 +429,19 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return hash.values();
 	}
 
+	/**
+	 * Constructs the widget and creates its update model. Adds the
+	 * widget-to-model mapping to the local widget map of the LaunchTab being
+	 * built. Calls
+	 * {@link UpdateModelFactory#createModel(Composite, Widget, JAXBDynamicLaunchConfigurationTab)}
+	 * .
+	 * 
+	 * @param control
+	 *            to which to add the widget
+	 * @param widget
+	 *            JAXB data element describing type, style and layout data of
+	 *            widget
+	 */
 	private void addWidget(Composite control, Widget widget) {
 		IUpdateModel model = UpdateModelFactory.createModel(control, widget, tab);
 		/*
@@ -273,6 +452,28 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		}
 	}
 
+	/**
+	 * Creates the SWT layout. Calls
+	 * {@link WidgetBuilderUtils#createFillLayout(String, Integer, Integer, Integer)}
+	 * ,
+	 * {@link WidgetBuilderUtils#createRowLayout(Boolean, Boolean, Boolean, Boolean, Integer, Integer, Integer, Integer, Integer, Integer, Integer)}
+	 * ,
+	 * {@link WidgetBuilderUtils#createGridLayout(Integer, Boolean, Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer)}
+	 * or
+	 * {@link WidgetBuilderUtils#createFormLayout(Integer, Integer, Integer, Integer, Integer, Integer, Integer)}
+	 * .
+	 * 
+	 * @see org.eclipse.swt.widgets.Layout
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.LayoutDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.FillLayoutDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.RowLayoutDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.GridLayoutDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.FormLayoutDescriptor
+	 * 
+	 * @param layout
+	 *            JAXB data element describing the layout
+	 * @return the created SWT layout
+	 */
 	private Layout createLayout(LayoutDescriptor layout) {
 		if (layout != null) {
 			if (layout.getFillLayout() != null) {
@@ -300,6 +501,20 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return null;
 	}
 
+	/**
+	 * Create the layout data object. Calls
+	 * {@link WidgetBuilderUtils#createRowData(Integer, Integer, Boolean)},
+	 * {@link WidgetBuilderUtils#createGridData(Integer, Boolean, Boolean, Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer)}
+	 * , or
+	 * {@link WidgetBuilderUtils#createFormAttachment(String, Integer, Integer, Integer)}
+	 * and
+	 * {@link WidgetBuilderUtils#createFormData(Integer, Integer, FormAttachment, FormAttachment, FormAttachment, FormAttachment)}
+	 * .
+	 * 
+	 * @param layoutData
+	 *            JAXB data element describing the layout data object
+	 * @return the data object
+	 */
 	static Object createLayoutData(LayoutDataDescriptor layoutData) {
 		if (layoutData != null) {
 			if (layoutData.getRowData() != null) {
@@ -346,6 +561,12 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		return null;
 	}
 
+	/**
+	 * @param data
+	 *            Attribute or Property
+	 * @return whether it is visible to the user (and thus used to generate a
+	 *         widget and update model)
+	 */
 	private static boolean isVisible(Object data) {
 		if (data instanceof Attribute) {
 			return ((Attribute) data).isVisible();
