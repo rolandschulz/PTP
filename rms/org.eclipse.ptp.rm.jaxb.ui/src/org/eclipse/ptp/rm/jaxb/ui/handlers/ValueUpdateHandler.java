@@ -15,7 +15,6 @@ import java.util.Map;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.jaxb.ui.IFireContentsChangedEnabled;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
-import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 
 /**
  * When a widget or cell editor commits a change, this handler is called to
@@ -87,7 +86,7 @@ public class ValueUpdateHandler {
 
 		for (Object control : controlToModelMap.keySet()) {
 			if (control instanceof Viewer) {
-				WidgetActionUtils.refreshViewer((Viewer) control);
+				((Viewer) control).refresh();
 			}
 		}
 

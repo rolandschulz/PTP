@@ -13,7 +13,6 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
-import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 
 /**
  * Editing support for the checkbox attribute viewers.
@@ -88,7 +87,7 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 	protected void setValue(Object element, Object value) {
 		if (element instanceof ICellEditorUpdateModel) {
 			((ICellEditorUpdateModel) element).setValueFromEditor(value);
-			WidgetActionUtils.refreshViewer(viewer);
+			viewer.refresh();
 		}
 	}
 }

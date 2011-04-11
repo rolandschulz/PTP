@@ -236,7 +236,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			}
 
 			for (Viewer v : viewers) {
-				WidgetActionUtils.refreshViewer(v);
+				v.refresh();
 			}
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
@@ -421,7 +421,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		}
 		updateHandler.handleUpdate(null, null);
 		for (Viewer v : viewers) {
-			WidgetActionUtils.refreshViewer(v);
+			v.refresh();
 		}
 	}
 }

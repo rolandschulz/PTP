@@ -27,7 +27,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.Template;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
-import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
@@ -110,8 +109,9 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		if (target instanceof ICellEditorUpdateModel) {
 			ICellEditorUpdateModel model = (ICellEditorUpdateModel) target;
 			model.setChecked(checked);
+		} else {
+			viewer.setChecked(target, false);
 		}
-		WidgetActionUtils.refreshViewer(columnViewer);
 		storeValue();
 		handleUpdate(null);
 	}
@@ -187,6 +187,8 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 				ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
 				selected = model.isChecked();
 				viewer.setChecked(model, selected);
+			} else {
+				viewer.setChecked(o, false);
 			}
 		}
 
