@@ -17,10 +17,26 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Combo;
 
+/**
+ * Update Model for Combo widgets.
+ * 
+ * @author arossi
+ * 
+ */
 public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListener, SelectionListener {
 
 	private final Combo combo;
 
+	/**
+	 * @param name
+	 *            name of the model, which will correspond to the name of a
+	 *            Property or Attribute if the widget value is to be saved.
+	 * @param handler
+	 *            the handler for notifying other widgets to refresh their
+	 *            values
+	 * @param combo
+	 *            the widget to which this model corresponds
+	 */
 	public ComboUpdateModel(String name, ValueUpdateHandler handler, Combo combo) {
 		super(name, handler);
 		this.combo = combo;
@@ -33,10 +49,24 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 		return combo;
 	}
 
+	/*
+	 * @return value of the selection (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#getValueFromControl()
+	 */
 	public Object getValueFromControl() {
 		return WidgetActionUtils.getSelected(combo);
 	}
 
+	/*
+	 * Model serves as widget modify listener; uses the ValidateJob to delay
+	 * processing of text. Sets refreshing flag to block further updates being
+	 * triggered during the refresh. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events
+	 * .ModifyEvent)
+	 */
 	public void modifyText(ModifyEvent e) {
 		if (refreshing) {
 			return;
@@ -45,6 +75,12 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 		validateJob.schedule(VALIDATE_TIMER);
 	}
 
+	/*
+	 * Sets the map value one the combo. Sets refreshing flag to block further
+	 * updates being triggered during the refresh. (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#refreshValueFromMap()
+	 */
 	public void refreshValueFromMap() {
 		refreshing = true;
 		mapValue = lcMap.get(name);
@@ -56,6 +92,15 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 		refreshing = false;
 	}
 
+	/*
+	 * Model serves as widget selection listener; calls {@link #storeValue()}
+	 * Sets refreshing flag to block further updates being triggered during the
+	 * refresh. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
+	 * .swt.events.SelectionEvent)
+	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
 		if (refreshing) {
 			return;
@@ -63,6 +108,15 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 		storeValue();
 	}
 
+	/*
+	 * Model serves as widget selection listener; calls {@link #storeValue()}
+	 * Sets refreshing flag to block further updates being triggered during the
+	 * refresh. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
+	 * .swt.events.SelectionEvent)
+	 */
 	public void widgetSelected(SelectionEvent e) {
 		if (refreshing) {
 			return;

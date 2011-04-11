@@ -24,16 +24,23 @@ import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
 
+/**
+ * Base class for implementations of the IUpdateModel controlling the data
+ * associated with a widget or cell editor.
+ * 
+ * @author arossi
+ * 
+ */
 public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSConstants {
 
-	/*
+	/**
 	 * Used with ModifyListeners so as to avoid a save on every keystroke.
 	 * 
 	 * @author arossi
 	 */
 	protected class ValidateJob extends UIJob {
 		public ValidateJob() {
-			super("ValidateJob"); //$NON-NLS-1$
+			super(VALIDATE);
 		}
 
 		@Override
@@ -55,6 +62,14 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 	protected String defaultValue;
 	protected Object mapValue;
 
+	/**
+	 * @param name
+	 *            name of the model, which will correspond to the name of a
+	 *            Property or Attribute if the widget value is to be saved.
+	 * @param handler
+	 *            the handler for notifying other widgets to refresh their
+	 *            values
+	 */
 	protected AbstractUpdateModel(String name, ValueUpdateHandler handler) {
 		this.name = name;
 		canSave = (name != null && !ZEROSTR.equals(name));
@@ -63,12 +78,25 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 		validateJob = new ValidateJob();
 	}
 
+	/**
+	 * @return The widget or cell editor.
+	 */
 	public abstract Object getControl();
 
+	/**
+	 * @return name of the model, which will correspond to the name of a
+	 *         Property or Attribute if the widget value is to be saved.
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * If this widget saves its value to a Property of Attribute, then the
+	 * default value here is retrieved. The widget value is then refreshed from
+	 * the map, and if the value is <code>null</code>, the default value is
+	 * restored to the map and another refresh is called on the actual value.
+	 */
 	public void initialize(LCVariableMap lcMap) {
 		this.lcMap = lcMap;
 		if (name != null) {
@@ -81,19 +109,42 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 		}
 	}
 
+	/**
+	 * Sets the actual value in the current environment to the default value.
+	 */
 	public void restoreDefault() {
 		lcMap.put(name, defaultValue);
 	}
 
+	/**
+	 * @validator JAXB data element describing either regex or efs validation
+	 *            for the widget value.
+	 * @remoteFileManager provided in case the validation is to be done on a
+	 *                    file path.
+	 */
 	public void setValidator(Validator validator, IRemoteFileManager remoteFileManager) {
 		this.validator = validator;
 		this.remoteFileManager = remoteFileManager;
 	}
 
+	/**
+	 * Delegates to the handler update method.
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler#handleUpdate(Object,
+	 *      Object)
+	 * 
+	 * @param value
+	 *            updated value (currently unused)
+	 */
 	protected void handleUpdate(Object value) {
 		handler.handleUpdate(getControl(), value);
 	}
 
+	/**
+	 * Retrieves the value from the control, validates if there is a validator
+	 * set, then writes to the current environment map and calls the update
+	 * handler.
+	 */
 	protected void storeValue() {
 		Object value = getValueFromControl();
 		if (validator != null) {

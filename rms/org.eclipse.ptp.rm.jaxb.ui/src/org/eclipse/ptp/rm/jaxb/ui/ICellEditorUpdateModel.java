@@ -11,6 +11,8 @@ package org.eclipse.ptp.rm.jaxb.ui;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.model.ViewerUpdateModel;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 
 public interface ICellEditorUpdateModel extends IUpdateModel, IColumnViewerLabelSupport {
 
@@ -24,9 +26,15 @@ public interface ICellEditorUpdateModel extends IUpdateModel, IColumnViewerLabel
 
 	Object getValueForEditor();
 
-	boolean isSelected();
+	boolean isChecked();
 
-	void setSelected(boolean selected);
+	void setBackground(Color[] background);
+
+	void setChecked(boolean checked);
+
+	void setFont(Font[] font);
+
+	void setForeground(Color[] foreground);
 
 	void setValueFromEditor(Object value);
 

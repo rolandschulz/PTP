@@ -21,6 +21,8 @@ import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
+ * JAXB implementation. Provides the controller tab.
+ * 
  * @author arossi
  * 
  */
