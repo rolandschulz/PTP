@@ -24,23 +24,25 @@ package org.eclipse.ptp.rm.lml.ui.views;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ListViewer;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.lml.core.ILMLManager;
 import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
-import org.eclipse.ptp.rm.lml.core.elements.ILguiItem;
-import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
-import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
+import org.eclipse.ptp.rm.lml.core.events.ILguiSelectedEvent;
+import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
+import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.ui.actions.AddLguiAction;
+import org.eclipse.ptp.rm.lml.ui.actions.RemoveLguiAction;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLListLabelProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.ViewPart;
@@ -51,8 +53,7 @@ import org.eclipse.ui.part.ViewPart;
  * 
  */
 public class LMLView extends ViewPart {
-
-	private final class LMLListener implements ILguiListener {
+	private final class LMLViewListener implements IViewListener {
 
 		/*
 		 * (non-Javadoc)
@@ -62,13 +63,10 @@ public class LMLView extends ViewPart {
 		 */
 		@Override
 		public synchronized void handleEvent(ILguiAddedEvent e) {
-			viewer.getList().setRedraw(false);
-			try {
-				fSelected = e.getLgui();
-				viewer.add(fSelected);
-			} finally {
-				viewer.getList().setRedraw(true);
-			}
+			// viewer.getList().setRedraw(false);
+
+			fSelected = e.getLguiItem();
+			createList();
 		}
 
 		/*
@@ -79,18 +77,32 @@ public class LMLView extends ViewPart {
 		 */
 		@Override
 		public synchronized void handleEvent(ILguiRemovedEvent e) {
-			viewer.getList().setRedraw(false);
-			try {
-				viewer.remove(e.getLgui());
-			} finally {
-				viewer.getList().setRedraw(true);
-			}
+			fSelected = e.getLguiItem();
+			createList();
 		}
 
 		@Override
-		public void handleEvent(IJobListSortedEvent e) {
+		public void handleEvent(ILguiSelectedEvent e) {
+			fSelected = e.getLguiItem();
+			createList();
 
 		}
+
+	}
+
+	public final class ListSelectionListener implements SelectionListener {
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			int selectedItem = list.getSelectionIndex();
+			lmlManager.selectLgui(selectedItem);
+		}
+
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e) {
+			lmlManager.selectLgui(0);
+		}
+
 	}
 
 	/**
@@ -98,9 +110,12 @@ public class LMLView extends ViewPart {
 	 */
 	public ListViewer viewer;
 	private AddLguiAction addLguiAction;
+	private RemoveLguiAction removeLguiAction;
 	private ILguiItem fSelected = null;
 	private final ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager();
-	private final LMLListener lmlListener = new LMLListener();
+	private LMLViewListener lmlViewListener = null;
+	private List list = null;
+	private final ListSelectionListener listListener = new ListSelectionListener();
 
 	public LMLView() {
 
@@ -108,7 +123,7 @@ public class LMLView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		viewer = new ListViewer(parent, SWT.MULTI);
+		viewer = new ListViewer(parent, SWT.SINGLE);
 		viewer.setLabelProvider(new LMLListLabelProvider());
 		viewer.setContentProvider(new IStructuredContentProvider() {
 
@@ -125,20 +140,30 @@ public class LMLView extends ViewPart {
 				return null;
 			}
 		});
-		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
+		lmlViewListener = (LMLViewListener) lmlManager.getListener(this.getClass().getName());
+		if (lmlViewListener == null) {
+			lmlViewListener = new LMLViewListener();
+			lmlManager.addListener(lmlViewListener, this.getClass().getName());
+		}
 
-			}
-		});
-		viewer.setInput(fSelected);
+		fSelected = lmlManager.getSelectedLguiItem();
+		createList();
+	}
+
+	private void createList() {
+		list = viewer.getList();
+		list.removeAll();
+		list.removeSelectionListener(listListener);
+
 		createContextMenu();
-
-		getSite().setSelectionProvider(viewer);
-
-		ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager();
-		lmlManager.addListener(lmlListener);
+		if (fSelected != null) {
+			for (String lgui : lmlManager.getLguis()) {
+				viewer.add(lgui);
+			}
+			list.setSelection(lmlManager.getSelectedLguiIndex(fSelected.toString()));
+		}
+		list.addSelectionListener(listListener);
 	}
 
 	@Override
@@ -148,12 +173,12 @@ public class LMLView extends ViewPart {
 
 	@Override
 	public void dispose() {
-		super.dispose();
 	}
 
 	private void createContextMenu() {
 		final Shell shell = getSite().getShell();
 		addLguiAction = new AddLguiAction(shell);
+		removeLguiAction = new RemoveLguiAction(shell);
 
 		MenuManager menuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuManager.setRemoveAllWhenShown(true);
@@ -172,6 +197,10 @@ public class LMLView extends ViewPart {
 	private void fillContextMenu(IMenuManager manager) {
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		manager.add(addLguiAction);
+		boolean inContextForLgui = selection.size() > 0;
+		boolean inContextForRemoveLgui = inContextForLgui;
+		manager.add(removeLguiAction);
+		removeLguiAction.setEnabled(inContextForRemoveLgui);
 	}
 
 }
