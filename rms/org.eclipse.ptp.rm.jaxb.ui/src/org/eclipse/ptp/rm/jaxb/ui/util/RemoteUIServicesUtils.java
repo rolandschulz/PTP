@@ -9,33 +9,55 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
-import org.eclipse.ptp.rm.jaxb.core.utils.FileUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Convenience methods for handling various actions involving IRemoteUIServices.
+ * 
+ * @see org.eclipse.ptp.remote.ui.IRemoteUIServices
+ * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager
+ * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager
+ * @see org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate
+ * 
+ * @author arossi
+ * 
+ */
 public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 
+	/**
+	 * Opens a browse dialog using the indicated remote or local service and
+	 * connection.
+	 * 
+	 * @param shell
+	 *            for the dialog
+	 * @param current
+	 *            initial uri to display
+	 * @param delegate
+	 *            containing remote services data
+	 * @param remote
+	 *            whether to use the remote or the local connection and service
+	 *            provided by the delegate
+	 * @param readOnly
+	 *            whether to disallow the user to type in a path (default is
+	 *            <code>true</code>)
+	 * @return the selected file path as URI
+	 * @throws URISyntaxException
+	 */
 	public static URI browse(Shell shell, URI current, RemoteServicesDelegate delegate, boolean remote, boolean readOnly)
 			throws URISyntaxException {
 		IRemoteUIServices uIServices = null;
@@ -75,31 +97,19 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 				home.getFragment());
 	}
 
-	public static IRemoteServices[] getAvailableServices() {
-		IRemoteServices[] remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(null);
-		Arrays.sort(remoteServices, new Comparator<IRemoteServices>() {
-			public int compare(IRemoteServices c1, IRemoteServices c2) {
-				return c1.getName().compareToIgnoreCase(c2.getName());
-			}
-		});
-		return remoteServices;
-	}
-
-	public static String getFileContents(URI file, RemoteServicesDelegate delegate) throws Throwable {
-		SubMonitor progress = SubMonitor.convert(new NullProgressMonitor(), 100);
-		if (FILE_SCHEME.equals(file.getScheme())) {
-			return FileUtils.read(delegate.getLocalFileManager(), file.getPath(), progress);
-		} else {
-			return FileUtils.read(delegate.getRemoteFileManager(), file.getPath(), progress);
-		}
-	}
-
-	public static URI getUserHome() {
-		return new File(System.getProperty(JAVA_USER_HOME)).toURI();
-	}
-
-	public static void setConnectionHints(RemoteConnectionWidget connectionWidget, String defaultHost, String defaultPort,
-			String connection) throws URISyntaxException {
+	/**
+	 * Used to configure the default host and port in the wizard used for
+	 * choosing a resource manager connection.
+	 * 
+	 * @see org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget
+	 * 
+	 * @param connectionWidget
+	 *            the widget allowing the user to choose the connection
+	 * @param connection
+	 *            name of the connection
+	 * @throws URISyntaxException
+	 */
+	public static void setConnectionHints(RemoteConnectionWidget connectionWidget, String connection) throws URISyntaxException {
 		String host = null;
 		String port = null;
 		if (connection != null) {
@@ -111,12 +121,6 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 					port = String.valueOf(p);
 				}
 			}
-		}
-		if (host == null) {
-			host = defaultHost;
-		}
-		if (port == null) {
-			port = defaultPort;
 		}
 		Map<String, String> result = new HashMap<String, String>();
 		if (host != null && !ZEROSTR.equals(host)) {
@@ -133,28 +137,5 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 			defaults[i++] = result.get(s);
 		}
 		connectionWidget.setHints(hints, defaults);
-	}
-
-	public static URI writeContentsToFile(Shell shell, String contents, URI file, RemoteServicesDelegate delegate) throws Throwable {
-		IRemoteFileManager manager = null;
-		String path = file.getPath();
-
-		path = WidgetActionUtils.openInputDialog(shell, Messages.RenameFile, Messages.RenameFileTitle, path);
-
-		if (path == null) {
-			return null;
-		}
-
-		if (FILE_SCHEME.equals(file.getScheme())) {
-			manager = delegate.getLocalFileManager();
-		} else {
-			manager = delegate.getRemoteFileManager();
-		}
-
-		SubMonitor progress = SubMonitor.convert(new NullProgressMonitor(), 100);
-		FileUtils.write(manager, path, contents, progress);
-
-		return new URI(file.getScheme(), file.getUserInfo(), file.getHost(), file.getPort(), path, file.getQuery(),
-				file.getFragment());
 	}
 }

@@ -51,13 +51,42 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
+/**
+ * The part of the JAXB resource manager responsible for handling job
+ * submission, termination, suspension and resumption. Also provides on-demand
+ * job status checking. <br>
+ * <br>
+ * The state maintained by the control is volatile (in-memory only). The control
+ * is responsible for handing off to the caller status objects containing job
+ * state, as well as means of acessing the process (if interactive) and the
+ * standard out and error streams. When the job completes, these are eliminated
+ * from its internal map.<br>
+ * <br>
+ * The logic of this manager is generic; the specific commands used, files
+ * staged, and script constructed (if any) are all configured via the resource
+ * manager XML.
+ * 
+ * @author arossi
+ * 
+ */
 public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl,
 		IJAXBNonNLSConstants {
 
+	/**
+	 * Internal class for handling status of submitted jobs.
+	 * 
+	 * @author arossi
+	 * 
+	 */
 	private class JobStatusMap extends Thread {
 		private final Map<String, ICommandJobStatus> map = new HashMap<String, ICommandJobStatus>();
 		private boolean running = false;
 
+		/**
+		 * Thread daemon for cleanup on the map. Eliminates stray completed
+		 * state information, and also starts the stream proxies on jobs which
+		 * have been submitted to a scheduler and have become active.
+		 */
 		@Override
 		public void run() {
 			Map<String, String> toPrune = new HashMap<String, String>();
@@ -108,12 +137,24 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 		}
 
+		/**
+		 * @param jobId
+		 *            either internal UUID or scheduler id for the job.
+		 * @param status
+		 *            object containing status info and stream proxy
+		 */
 		private void addJobStatus(String jobId, ICommandJobStatus status) {
 			synchronized (map) {
 				map.put(jobId, status);
 			}
 		}
 
+		/**
+		 * 
+		 * @param jobId
+		 *            either internal UUID or scheduler id for the job.
+		 * @return object containing status info and stream proxy
+		 */
 		private ICommandJobStatus getStatus(String jobId) {
 			ICommandJobStatus status = null;
 			synchronized (map) {
@@ -122,6 +163,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			return status;
 		}
 
+		/**
+		 * shuts down the daemon
+		 */
 		private void halt() {
 			synchronized (map) {
 				running = false;
@@ -129,6 +173,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			this.interrupt();
 		}
 
+		/**
+		 * @return whether the daemon is running
+		 */
 		private boolean isRunning() {
 			boolean b = false;
 			synchronized (map) {
@@ -137,6 +184,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			return b;
 		}
 
+		/**
+		 * @param jobId
+		 *            either internal UUID or scheduler id for the job.
+		 */
 		private void removeJobStatus(String jobId) {
 			synchronized (map) {
 				map.remove(jobId);
@@ -147,40 +198,57 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private final IJAXBResourceManagerConfiguration config;
 	private RMVariableMap rmVarMap;
 	private Control controlData;
-	private final Map<String, String> dynSystemEnv;
+	private final Map<String, String> launchEnv;
 	private final JobStatusMap jobStatusMap;
 	private final RemoteServicesDelegate delegate;
-	private boolean appendSysEnv;
+	private boolean appendLaunchEnv;
 
+	/**
+	 * @param jaxbServiceProvider
+	 *            the configuration object containing resource manager specifics
+	 */
 	public JAXBResourceManagerControl(AbstractResourceManagerConfiguration jaxbServiceProvider) {
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
 		delegate = new RemoteServicesDelegate(config.getRemoteServicesId(), config.getConnectionName());
-		dynSystemEnv = new TreeMap<String, String>();
+		launchEnv = new TreeMap<String, String>();
 		jobStatusMap = new JobStatusMap();
 		jobStatusMap.start();
 	}
 
-	public boolean getAppendSysEnv() {
-		return appendSysEnv;
+	/**
+	 * @return whether to append (true) the env passed in through the
+	 *         LaunchConfiguration, or replace the current env with it.
+	 */
+	public boolean getAppendEnv() {
+		return appendLaunchEnv;
 	}
 
-	public IJAXBResourceManagerConfiguration getConfig() {
-		return config;
+	/**
+	 * @return any environment variables passed in through the
+	 *         LaunchConfiguration
+	 */
+	public Map<String, String> getLaunchEnv() {
+		return launchEnv;
 	}
 
-	public Map<String, String> getDynSystemEnv() {
-		return dynSystemEnv;
-	}
-
-	public IJAXBResourceManagerConfiguration getJAXBRMConfiguration() {
-		return config;
-	}
-
+	/**
+	 * @return wrapper object for remote services, connections and file managers
+	 */
 	public RemoteServicesDelegate getRemoteServicesDelegate() {
 		return delegate;
 	}
 
+	/*
+	 * For termination, pause, hold, suspension and resume requests. Resets the
+	 * environment, generates a uuid property; if the control request is
+	 * termination, calls remove on the state map. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doControlJob(
+	 * java.lang.String, java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 		try {
@@ -207,7 +275,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * Used by the client to refresh status on demand. (non-Javadoc) Generates a
+	 * jobId property; if the returned state is RUNNING, starts the proxy (a
+	 * rentrant call to a started proxy does nothing); if COMPLETED, the status
+	 * is removed from the map.
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doGetJobStatus
@@ -257,6 +328,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 	}
 
+	/*
+	 * Resets the env and executes any shutdown commands, then disconnects.
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doShutdown()
+	 */
 	@Override
 	protected void doShutdown() throws CoreException {
 		getResourceManager().setState(IResourceManager.TERMINATE_OPERATION);
@@ -273,6 +350,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		getResourceManager().setState(IResourceManager.STOPPED_STATE);
 	}
 
+	/*
+	 * Connects, resets the env and executes any startup commands. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doStartup(org
+	 * .eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
 		getResourceManager().setState(IResourceManager.STARTING_STATE);
@@ -291,8 +375,20 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		getResourceManager().setState(IResourceManager.STARTED_STATE);
 	}
 
+	/*
+	 * The main command for job submission. (non-Javadoc) The environment is
+	 * reset on each call; a uuid tag is generated for the submission until a
+	 * resource-specific identifier is returned (there should be a stream
+	 * tokenizer associated with the job command in this case which sets the
+	 * uuid property).
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doSubmitJob(org
+	 * .eclipse.debug.core.ILaunchConfiguration, java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
-	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
+	protected synchronized IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
 		resetEnv();
 		/*
@@ -311,9 +407,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		/*
 		 * create the script if necessary; adds the contents to env as
-		 * "${rm:script}" (property, cleared during #updatePropertyValuesFromTab
-		 * and possibly reset from custom script contents passed in through the
-		 * launch configuration; if so, the following returns immediately)
+		 * "${rm:script}". If a custom script has been selected for use, the
+		 * SCRIPT_PATH property will have been passed in with the launch
+		 * configuration; if so, the following returns immediately.
 		 */
 		maybeHandleScript(uuid, controlData.getScript());
 
@@ -358,13 +454,23 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (!job.isBatch()) {
 			status.setProcess(job.getProcess());
 		}
+
+		/*
+		 * to ensure the most recent script is used at the next call
+		 */
+		rmVarMap.remove(SCRIPT_PATH);
+		rmVarMap.remove(SCRIPT);
+
 		return status;
 	}
 
-	/*
+	/**
 	 * If there are special server connections to open, those need to be taken
 	 * care of by a command to be run on start-up; here we just check for open
 	 * connections.
+	 * 
+	 * @param monitor
+	 * @throws RemoteConnectionException
 	 */
 	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException {
 		IRemoteConnection conn = delegate.getLocalConnection();
@@ -383,8 +489,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 	}
 
-	/*
-	 * If the command is not supported, throw exception
+	/**
+	 * @param jobId
+	 *            resource-specific id
+	 * @param operation
+	 *            terminate, hold, suspend, release, resume.
+	 * @throws CoreException
+	 *             If the command is not supported
 	 */
 	private void doControlCommand(String jobId, String operation) throws CoreException {
 		CoreException ce = CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + operation, null);
@@ -422,7 +533,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		runCommand(jobId, job, false, true);
 	}
 
-	/*
+	/**
 	 * Close the connections.
 	 */
 	private void doDisconnect() {
@@ -436,14 +547,21 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 	}
 
-	/*
-	 * Run either in interactive, batch or debug mode right now,
-	 * ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the two
-	 * choices, meaning a single configuration cannot support both batch and
-	 * interactive.
+	/**
+	 * Run either interactive or batch job for run or debug modes.
+	 * ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the
+	 * corresponding LaunchConfiguration modes; batch/interactive are currently
+	 * determined by the configuration (the configuration cannot implement
+	 * both). This may need to be modified.
+	 * 
+	 * @param uuid
+	 *            temporary internal id for as yet unsubmitted job
+	 * @param mode
+	 *            either ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE
+	 * @return job wrapper object
+	 * @throws CoreException
 	 */
 	private CommandJob doJobSubmitCommand(String uuid, String mode) throws CoreException {
-
 		List<JAXBElement<Command>> commands = controlData.getSubmitInteractiveOrSubmitBatchOrSubmitDebugInteractive();
 		if (commands.isEmpty()) {
 			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError, null);
@@ -481,22 +599,36 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		return runCommand(uuid, command, batch, false);
 	}
 
-	/*
+	/**
 	 * Run the shut down commands, if any
+	 * 
+	 * @throws CoreException
 	 */
 	private void doOnShutdown() throws CoreException {
 		List<Command> onShutDown = controlData.getShutDownCommand();
-		runCommands(null, onShutDown, SHUTDOWN);
+		runCommands(onShutDown);
 	}
 
-	/*
+	/**
 	 * Run the start up commands, if any
+	 * 
+	 * @param monitor
+	 * @throws CoreException
 	 */
 	private void doOnStartUp(IProgressMonitor monitor) throws CoreException {
 		List<Command> onStartUp = controlData.getStartUpCommand();
-		runCommands(null, onStartUp, STARTUP);
+		runCommands(onStartUp);
 	}
 
+	/**
+	 * Checks for existence of either internally generated script or custom
+	 * script path. In either case, either replaces contents of the
+	 * corresponding managed file object or creates one.
+	 * 
+	 * @param files
+	 *            the set of managed files for this submission
+	 * @return the set of managed files, possibly with the script file added
+	 */
 	private ManagedFiles maybeAddManagedFileForScript(ManagedFiles files) {
 		Property scriptVar = (Property) RMVariableMap.getActiveInstance().get(SCRIPT);
 		Property scriptPathVar = (Property) RMVariableMap.getActiveInstance().get(SCRIPT_PATH);
@@ -533,8 +665,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		return files;
 	}
 
-	/*
+	/**
 	 * Write content to file if indicated, and stage to host.
+	 * 
+	 * @param uuid
+	 *            temporary internal id for as yet unsubmitted job
+	 * @param files
+	 *            the set of managed files for this submission
+	 * @return whether the necessary staging completed without error
+	 * @throws CoreException
 	 */
 	private boolean maybeHandleManagedFiles(String uuid, ManagedFiles files) throws CoreException {
 		if (files == null || files.getFile().isEmpty()) {
@@ -549,19 +688,25 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		return job.getSuccess();
 	}
 
-	/*
+	/**
 	 * Serialize script content if necessary. We first check to see if there is
-	 * a custom script.
+	 * a custom script (path).
+	 * 
+	 * @param uuid
+	 *            temporary internal id for as yet unsubmitted job
+	 * @param script
+	 *            configuration object describing how to construct the script
+	 *            from the environment
 	 */
 	private void maybeHandleScript(String uuid, Script script) {
-		Property p = (Property) rmVarMap.get(SCRIPT);
+		Property p = (Property) rmVarMap.get(SCRIPT_PATH);
 		if (p != null && p.getValue() != null) {
 			return;
 		}
 		if (script == null) {
 			return;
 		}
-		ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, dynSystemEnv, appendSysEnv);
+		ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv, appendLaunchEnv);
 		job.schedule();
 		try {
 			job.join();
@@ -569,6 +714,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 	}
 
+	/**
+	 * If job is interactive, kill the process directly rather than issuing a
+	 * remote command.
+	 * 
+	 * @param jobId
+	 *            either process id or internal identifier.
+	 * @return whether job has been canceled
+	 */
 	private boolean maybeKillInteractive(String jobId) {
 		ICommandJobStatus status = jobStatusMap.getStatus(jobId);
 		if (status != null && status.isInteractive()) {
@@ -579,9 +732,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		return false;
 	}
 
-	/*
-	 * Ensure that the RM has its own environement. Add the fixed properties
-	 * again, clear dynamic env from the tab.
+	/**
+	 * Ensure that this manager has its own environement. Add the fixed
+	 * properties again, clear environment from the tab.
 	 */
 	private void resetEnv() {
 		try {
@@ -598,12 +751,25 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			return;
 		}
 		setFixedConfigurationProperties();
-		dynSystemEnv.clear();
-		appendSysEnv = true;
+		launchEnv.clear();
+		appendLaunchEnv = true;
 	}
 
-	/*
-	 * Create command job, and schedule.
+	/**
+	 * Create command job, and schedule. Used for job-specific commands
+	 * directly.
+	 * 
+	 * @param uuid
+	 *            temporary internal id for as yet unsubmitted job
+	 * @param command
+	 *            configuration object containing the command arguments and
+	 *            tokenizers
+	 * @param batch
+	 *            whether batch or interactive
+	 * @param join
+	 *            whether to launch serially or not
+	 * @return the runnable job object
+	 * @throws CoreException
 	 */
 	private CommandJob runCommand(String uuid, Command command, boolean batch, boolean join) throws CoreException {
 		if (command == null) {
@@ -634,13 +800,20 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		return job;
 	}
 
-	/*
-	 * Run command sequence. Here we join to insure seriality. If a job in the
-	 * sequence fails, the subsequent commands will not run.
+	/**
+	 * Run command sequence. Invoked by startup or shutdown commands. Delegates
+	 * to {@link #runCommand(String, Command, boolean, boolean)}. Here we join
+	 * to ensure seriality. If a job in the sequence fails, the subsequent
+	 * commands will not run.
+	 * 
+	 * @param cmds
+	 *            configuration objects containing the command arguments and
+	 *            tokenizers
+	 * @throws CoreException
 	 */
-	private void runCommands(String uuid, List<Command> cmds, String operation) throws CoreException {
+	private void runCommands(List<Command> cmds) throws CoreException {
 		for (Command cmd : cmds) {
-			CommandJob job = runCommand(uuid, cmd, false, false);
+			CommandJob job = runCommand(null, cmd, false, false);
 
 			if (!job.isActive()) {
 				return;
@@ -653,8 +826,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 	}
 
-	/*
-	 * From the user runtime choices.
+	/**
+	 * User name and service address. Set in case the script needs these
+	 * variables.
 	 */
 	private void setFixedConfigurationProperties() {
 		IRemoteConnection rc = delegate.getRemoteConnection();
@@ -662,58 +836,53 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.maybeAddProperty(CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 	}
 
-	/*
+	/**
 	 * Transfers the values from the configuration to the live map.
+	 * 
+	 * @param configuration
+	 *            passed in from Launch Tab when the "run" command is chosen.
+	 * @throws CoreException
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
-		/*
-		 * to ensure the most recent script is used
-		 */
-		rmVarMap.remove(SCRIPT);
-
-		/*
-		 * The non-selected variables have already been excluded from the launch
-		 * configuration for consistency; but we need to null them out in the RM
-		 * env as well
-		 */
-		Map<String, String> selectedMap = null;
-		String selected = configuration.getAttribute(SELECTED_ATTRIBUTES, ZEROSTR);
-		if (selected != null) {
-			selectedMap = new HashMap<String, String>();
-			String[] names = selected.split(SP);
-			for (String s : names) {
-				selectedMap.put(s, s);
-			}
-		}
-
-		@SuppressWarnings("rawtypes")
 		Map lcattr = configuration.getAttributes();
 		for (Object key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
 			Object target = rmVarMap.get(key.toString());
 			if (target instanceof Property) {
 				Property p = (Property) target;
-				if (selectedMap != null && !selectedMap.containsKey(p.getName())) {
-					p.setValue(null);
-				} else {
-					p.setValue(value.toString());
-				}
+				p.setValue(value.toString());
 			} else if (target instanceof Attribute) {
 				Attribute ja = (Attribute) target;
-				if (selectedMap != null && !selectedMap.containsKey(ja.getName())) {
+				ja.setValue(value);
+			}
+		}
+
+		/*
+		 * The non-selected variables have been excluded from the launch
+		 * configuration; but we need to null out the superset values here that
+		 * are undefined.
+		 */
+		for (String key : rmVarMap.getVariables().keySet()) {
+			if (!lcattr.containsKey(key)) {
+				Object target = rmVarMap.get(key.toString());
+				if (target instanceof Property) {
+					Property p = (Property) target;
+					p.setValue(null);
+				} else if (target instanceof Attribute) {
+					Attribute ja = (Attribute) target;
 					ja.setValue(null);
-				} else {
-					ja.setValue(value);
 				}
 			}
 		}
 
-		dynSystemEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, dynSystemEnv));
-		appendSysEnv = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, appendSysEnv);
-
+		rmVarMap.maybeOverwrite(SCRIPT_PATH, SCRIPT_PATH, configuration);
 		rmVarMap.maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
 		rmVarMap.maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
 		rmVarMap.maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
+
+		launchEnv.clear();
+		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));
+		appendLaunchEnv = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, appendLaunchEnv);
 	}
 }

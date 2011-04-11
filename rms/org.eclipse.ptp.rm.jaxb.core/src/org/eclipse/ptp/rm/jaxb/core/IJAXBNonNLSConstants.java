@@ -11,7 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 /**
  * Gathers all internal, unmodifiable string constants into a single place for
- * convenience and code clarity.
+ * convenience and the interest of uncluttered code.
  * 
  * @since 5.0
  */
@@ -42,7 +42,7 @@ public interface IJAXBNonNLSConstants {
 	String GT = ">";//$NON-NLS-1$
 	String GTLT = "><";//$NON-NLS-1$
 	String HYPH = "-";//$NON-NLS-1$
-	String AMP = "@";//$NON-NLS-1$
+	String AT = "@";//$NON-NLS-1$
 	String DOL = "$";//$NON-NLS-1$
 	String PIP = "|";//$NON-NLS-1$
 	String DOT = ".";//$NON-NLS-1$
@@ -105,8 +105,8 @@ public interface IJAXBNonNLSConstants {
 	String SELECTED = "visible";//$NON-NLS-1$
 	String LOCAL = "local";//$NON-NLS-1$
 	String JOB_ID_TAG = "@jobId";//$NON-NLS-1$
-	String NAME_TAG = AMP + NAME;
-	String VALUE_TAG = AMP + VALUE;
+	String NAME_TAG = AT + NAME;
+	String VALUE_TAG = AT + VALUE;
 
 	/* TYPE MATCHING */
 	String NT = "nt";//$NON-NLS-1$
@@ -130,8 +130,8 @@ public interface IJAXBNonNLSConstants {
 	String RM_XSD_URL = "rm_schema_url";//$NON-NLS-1$
 	String PREV_RM_XSD_PATH = "prev_rm_schema_path";//$NON-NLS-1$
 	String EXTERNAL_RM_XSD_PATHS = "external_rm_schema_paths";//$NON-NLS-1$
-	String SELECTED_ATTRIBUTES = "selected_attributes";//$NON-NLS-1$
-	String SHOW_ONLY_SELECTED = "show_only_selected";//$NON-NLS-1$
+	String CHECKED_ATTRIBUTES = "checked_attributes";//$NON-NLS-1$
+	String SHOW_ONLY_CHECKED = "show_only_checked";//$NON-NLS-1$
 	String IS_PRESET = "is_preset";//$NON-NLS-1$
 	String SCRIPT_PATH = "script_path";//$NON-NLS-1$
 	String SCRIPT = "script";//$NON-NLS-1$
@@ -175,6 +175,7 @@ public interface IJAXBNonNLSConstants {
 	String SUBMIT_BATCH = "submit-batch";//$NON-NLS-1$
 	String SUBMIT_DEBUG_INTERACTIVE = "submit-debug-interactive";//$NON-NLS-1$
 	String SUBMIT_DEBUG_BATCH = "submit-debug-batch";//$NON-NLS-1$
+	String VALIDATE = "ValidateJob";//$NON-NLS-1$
 
 	String JOB_ATTRIBUTE = "jobAttribute";//$NON-NLS-1$
 	String ATTRIBUTE = "attribute";//$NON-NLS-1$

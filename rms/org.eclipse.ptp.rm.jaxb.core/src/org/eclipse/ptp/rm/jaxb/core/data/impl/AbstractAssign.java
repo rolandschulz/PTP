@@ -46,6 +46,8 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	}
 
 	/**
+	 * Applies the assignment.
+	 * 
 	 * @param values
 	 *            from the expression parsing (groups or segments)
 	 * @throws Throwable
@@ -53,13 +55,15 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	public void assign(String[] values) throws Throwable {
 		Object previous = get(target, field);
 		set(target, field, getValue(previous, values));
-		/*
-		 * assumption is one-to-one IAssign to field
-		 */
 		index++;
 	}
 
 	/**
+	 * Used in the case of references to targets constructed in connection with
+	 * the tokenization. The assumption is that an Assign action will be applied
+	 * only once to any given target, in the order of their construction; this
+	 * index keeps track of where this particular assign action is in the list.
+	 * 
 	 * @return the index of the current target
 	 */
 	public int getIndex() {
@@ -120,12 +124,12 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 * @return key
 	 * @throws Throwable
 	 */
-	protected String getKey(Entry e, String[] values) throws Throwable {
-		String k = e.getKey();
+	protected String getKey(Entry entry, String[] values) throws Throwable {
+		String k = entry.getKey();
 		if (k != null) {
 			return (String) normalizedValue(target, uuid, k, false);
 		}
-		int index = determineKeyIndex(e);
+		int index = determineKeyIndex(entry);
 		if (values != null) {
 			return values[index];
 		}
@@ -143,12 +147,12 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 * @return value
 	 * @throws Throwable
 	 */
-	protected Object getValue(Entry e, String[] values) throws Throwable {
-		String v = e.getValue();
+	protected Object getValue(Entry entry, String[] values) throws Throwable {
+		String v = entry.getValue();
 		if (v != null) {
 			return normalizedValue(target, uuid, v, true);
 		}
-		int index = determineValueIndex(e);
+		int index = determineValueIndex(entry);
 		if (values != null) {
 			return values[index];
 		}
@@ -226,7 +230,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Deteermines whether the input represents an object field or a resolvable
+	 * Determines whether the input represents an object field or a resolvable
 	 * expression. Also converts string to int or boolean, if applicable,
 	 * 
 	 * @param target
@@ -239,7 +243,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 * @param convert
 	 *            expression to boolean or int, if applicable.
 	 * 
-	 * @return
+	 * @return value after dereferencing or normalization
 	 * @throws Throwable
 	 */
 	static Object normalizedValue(Object target, String uuid, String expression, boolean convert) throws Throwable {

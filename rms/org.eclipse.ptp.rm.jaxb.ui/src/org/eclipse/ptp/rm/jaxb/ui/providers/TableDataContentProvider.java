@@ -14,17 +14,31 @@ import java.util.Collection;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
+import org.eclipse.ptp.rm.jaxb.ui.model.TableRowUpdateModel;
 
+/**
+ * For Attribute Table Viewer.
+ * 
+ * @author arossi
+ * 
+ */
 public class TableDataContentProvider implements IStructuredContentProvider {
 
 	public void dispose() {
 	}
 
+	/*
+	 * TableRowUpdateModel serves as the data model for the viewer.
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java
+	 * .lang.Object)
+	 */
 	@SuppressWarnings("unchecked")
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof Collection<?>) {
-			Collection<ICellEditorUpdateModel> list = (Collection<ICellEditorUpdateModel>) inputElement;
+			Collection<TableRowUpdateModel> list = (Collection<TableRowUpdateModel>) inputElement;
 			return list.toArray();
 		}
 		return new Object[0];

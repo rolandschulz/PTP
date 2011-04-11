@@ -13,13 +13,36 @@ import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.swt.graphics.Image;
 
+/**
+ * Interface implemented by cell editor update models to support cell label
+ * providers.
+ * 
+ * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel
+ * 
+ * @author arossi
+ * 
+ */
 public interface IColumnViewerLabelSupport extends ITableColorProvider, ITableFontProvider {
 
+	/**
+	 * @param columnName
+	 * @return image
+	 */
 	Image getColumnImage(String columnName);
 
+	/**
+	 * @return description (only Attributes)
+	 */
 	String getDescription();
 
+	/**
+	 * @param columnName
+	 * @return the text label for the given column
+	 */
 	String getDisplayValue(String columnName);
 
+	/**
+	 * @return tooltip (only Attributes)
+	 */
 	String getTooltip();
 }

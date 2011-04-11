@@ -12,6 +12,7 @@
  * Modified by:
  * 		Claudia Knobloch, Forschungszentrum Juelich GmbH
  */
+
 package org.eclipse.ptp.rm.lml.internal.ui;
 
 import java.io.File;
@@ -140,7 +141,6 @@ public class LguiSelectionPersistence {
 		final LMLUIPlugin plugin;
 
 		plugin = LMLUIPlugin.getDefault();
-//		System.out.println().
 		return plugin.getStateLocation().append(MEMENTO_FILE).toFile();
 	}
 }

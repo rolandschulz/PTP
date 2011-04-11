@@ -45,13 +45,37 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Launch Tab which builds its control from the JAXB data elements. The number,
+ * type and disposition of widgets connected to Properties or Attributes is
+ * almost entirely configurable via the XML.<br>
+ * <br>
+ * Aside from being registered with the update handler, the widgets specific to
+ * this tab are also maintained in a local map so that their values (and only
+ * theirs) will appear in the environment when performApply() is called. A list
+ * of viewers is also kept so that refresh can be called on them when the tab is
+ * (re-)initialized or the defaults are reset. <br>
+ * <br>
+ * If different widgets on different tabs reference the same Property or
+ * Attribute, its value will change everywhere. However, if the
+ * <code>shared</code> property is set to true, then the local map is populated
+ * by values produced from all tabs and defaults are likewise reset on all
+ * widgets in the update handler. This shared option is motivated by a scenario
+ * in which the attributes are partitioned (empty intersection) between the
+ * various tabs, but all of them are necessary to the definition of the job
+ * submission. The default (not shared) implies that the tabs have intersecting
+ * subsets of the whole attribute set, any one of which is sufficient to
+ * configure a launch.
+ * 
+ * @author arossi
+ * 
+ */
 public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener {
 
 	private final TabController controller;
@@ -60,12 +84,22 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	private final Map<Object, IUpdateModel> localWidgets;
 	private final boolean shared;
 
-	private Button viewScript;
 	private ILaunchConfiguration listenerConfiguration;
 
+	/**
+	 * @param rm
+	 *            the resource manager
+	 * @param dialog
+	 *            the ancestor main launch dialog
+	 * @param controller
+	 *            the JAXB data element from which this tab's control will be
+	 *            built
+	 * @param parentTab
+	 *            the parent controller tab
+	 */
 	public JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, TabController controller,
-			JAXBControllerLaunchConfigurationTab parentTab, int tabIndex) {
-		super(parentTab, dialog, tabIndex);
+			JAXBControllerLaunchConfigurationTab parentTab) {
+		super(parentTab, dialog);
 		this.controller = controller;
 		shared = controller.isSharedEnvironment();
 		String title = controller.getTitle();
@@ -77,13 +111,30 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		viewers = new ArrayList<Viewer>();
 	}
 
+	/*
+	 * Value validation is handled up front, so this just return true.
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #canSave(org.eclipse.swt.widgets.Control,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
-		/*
-		 * Value validation is handled up front
-		 */
 		return new RMLaunchValidation(true, null);
 	}
 
+	/*
+	 * Maintains the top-level control element on which to rehang the rest of
+	 * the controls when rebuilt. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetBuilderUtils.createComposite(parent, 1);
 		LaunchTabBuilder builder = new LaunchTabBuilder(this);
@@ -96,12 +147,15 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		parentTab.resize(this.control);
 	}
 
+	/**
+	 * The top-level control.
+	 */
 	public Control getControl() {
 		return control;
 	}
 
 	/**
-	 * Used by the LaunchTabBuilder
+	 * Used by the LaunchTabBuilder.
 	 * 
 	 * @return the JAXB data element used to build the control
 	 */
@@ -114,6 +168,11 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		return null;
 	}
 
+	/**
+	 * Used by the LaunchTabBuilder.
+	 * 
+	 * @return the map of widgets specific to this tab.
+	 */
 	public Map<Object, IUpdateModel> getLocalWidgets() {
 		return localWidgets;
 	}
@@ -127,18 +186,31 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		return parentTab;
 	}
 
+	/**
+	 * @return title of tab.
+	 */
 	@Override
 	public String getText() {
 		return title;
 	}
 
+	/*
+	 * 1. resets the configuation. 2. clears viewers and repopulate that list.
+	 * 3. repopulates the handler with local widgets. 4. initializes the (new)
+	 * widgets from the original global map. 5. initializes the checked state on
+	 * any checkbox viewers and then refreshes them. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.swt.widgets.Control,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		try {
 			ValueUpdateHandler handler = getParent().getUpdateHandler();
 			listenerConfiguration = configuration;
-			if (viewScript != null) {
-				viewScript.addSelectionListener(this);
-			}
 
 			viewers.clear();
 			for (Map.Entry<Object, IUpdateModel> e : localWidgets.entrySet()) {
@@ -159,12 +231,12 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 
 			for (IUpdateModel m : localWidgets.values()) {
 				if (m instanceof ViewerUpdateModel) {
-					((ViewerUpdateModel) m).initializeSelected();
+					((ViewerUpdateModel) m).initializeChecked();
 				}
 			}
 
 			for (Viewer v : viewers) {
-				WidgetActionUtils.refreshViewer(v);
+				v.refresh();
 			}
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
@@ -173,24 +245,55 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		return new RMLaunchValidation(true, null);
 	}
 
+	/*
+	 * Value validation is now handled up front, so this just returns true.
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
 	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
-		/*
-		 * Value validation is now handled up front
-		 */
 		return new RMLaunchValidation(true, null);
 	}
 
+	/*
+	 * Defaults are taken care of by the load method on the LCVariableMap
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		/*
-		 * taken care of by the load method on the LCVariableMap
-		 */
 		return new RMLaunchValidation(true, null);
 	}
 
+	/*
+	 * Tab acts a listener for viewScript button. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
+	 * .swt.events.SelectionEvent)
+	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
 		widgetSelected(e);
 	}
 
+	/*
+	 * Tab acts a listener for viewScript button. If the resource manager does
+	 * not use a script, this call returns immediately; else it calls
+	 * #realizeLocalScript(ILaunchConfiguration), then displays the result in a
+	 * read-only dialog. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
+	 * .events.SelectionEvent)
+	 */
 	public void widgetSelected(SelectionEvent e) {
 		Shell shell = Display.getDefault().getActiveShell();
 		try {
@@ -206,11 +309,19 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		}
 	}
 
+	/*
+	 * Writes values of local widgets or cell editors (if the viewer row is
+	 * selected) to the local map. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab#
+	 * doRefreshLocal()
+	 */
 	@Override
 	protected void doRefreshLocal() {
 		for (IUpdateModel m : getModels()) {
 			if (m instanceof ICellEditorUpdateModel) {
-				if (((ICellEditorUpdateModel) m).isSelected()) {
+				if (((ICellEditorUpdateModel) m).isChecked()) {
 					localMap.put(m.getName(), m.getValueFromControl());
 				}
 			} else {
@@ -219,12 +330,16 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		}
 	}
 
+	/*
+	 * Adds the View Script and Restore Defaults buttons to the bottom of the
+	 * control pane.
+	 */
 	private void createViewScriptGroup(final Composite control) {
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true);
 		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 2);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
 		if (parentTab.hasScript()) {
-			viewScript = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, null);
+			WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, this);
 		}
 
 		WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, new SelectionListener() {
@@ -238,6 +353,11 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		});
 	}
 
+	/*
+	 * Determines whether the set of widgets is local or global.
+	 * 
+	 * @return the set of widgets to be accessed for values.
+	 */
 	private Collection<IUpdateModel> getModels() {
 		Collection<IUpdateModel> models = null;
 		if (shared) {
@@ -248,6 +368,12 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		return models;
 	}
 
+	/*
+	 * After refreshing the local map, it swaps in the map to be the active
+	 * environment, adds any environment variables from the Environment Tab,
+	 * then schedules a script handler job. Swaps the previous map back into the
+	 * active environement when the handler returns.
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private synchronized String realizeLocalScript(ILaunchConfiguration config) throws Throwable {
 		String value = ZEROSTR;
@@ -271,11 +397,17 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		return value;
 	}
 
+	/*
+	 * First resets default values from the LCVariableMap on widgets and
+	 * selected rows in the viewers, then has the viewers rewrite their
+	 * templated strings. The update handler is called to refresh all the
+	 * widgets from the map, and then the viewers are refreshed.
+	 */
 	private synchronized void resetDefaults() {
 		Collection<IUpdateModel> models = getModels();
 		for (IUpdateModel m : models) {
 			if (m instanceof ICellEditorUpdateModel) {
-				if (((ICellEditorUpdateModel) m).isSelected()) {
+				if (((ICellEditorUpdateModel) m).isChecked()) {
 					m.restoreDefault();
 				}
 			} else {
@@ -289,7 +421,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		}
 		updateHandler.handleUpdate(null, null);
 		for (Viewer v : viewers) {
-			WidgetActionUtils.refreshViewer(v);
+			v.refresh();
 		}
 	}
 }

@@ -31,6 +31,17 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+/**
+ * Implementation of the parent tab. It displays the children inside the tab
+ * folder, and relays updates to them.<br>
+ * <br>
+ * The JAXB data subtree for building tabs, remote services delegate, Script (if
+ * any), update handler and launch configuration variable map (environment built
+ * from the resource manager environment) are held by the parent and accessed by
+ * the child tabs.
+ * 
+ * @author arossi
+ */
 public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IFireContentsChangedEnabled {
 
 	private final RemoteServicesDelegate delegate;
@@ -38,11 +49,17 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	private final LaunchTab launchTabData;
 	private final Script script;
 	private final ValueUpdateHandler updateHandler;
-	private int saveIndex;
 
 	private ScrolledComposite scrolledParent;
 	private LCVariableMap lcMap;
 
+	/**
+	 * @param rm
+	 *            the resource manager
+	 * @param dialog
+	 *            the launch dialog parent
+	 * @throws Throwable
+	 */
 	public JAXBControllerLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
 		super(dialog);
 		rmConfig = rm.getJAXBConfiguration();
@@ -51,23 +68,31 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
 		delegate = rm.getControl().getRemoteServicesDelegate();
 		updateHandler = new ValueUpdateHandler(this);
-		int i = 0;
 		if (launchTabData != null) {
 			TabController controller = launchTabData.getBasic();
 			if (controller != null) {
-				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this, i++));
+				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
 			}
 			controller = launchTabData.getAdvanced();
 			if (controller != null) {
-				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this, i++));
+				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
 			}
 			String title = launchTabData.getCustomController();
 			if (title != null) {
-				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this, i));
+				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this));
 			}
 		}
 	}
 
+	/*
+	 * No composites or controls are specific to the parent. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#createControl
+	 * (org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
 	@Override
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		updateHandler.clear();
@@ -77,51 +102,83 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		super.createControl(parent, rm, queue);
 	}
 
+	/*
+	 * Delegates to all registered listeners, which then call
+	 * handleContentsChanged. The ResourceTab ContentsChangedListener is always
+	 * included here, and this triggers its updateButtons and performApply
+	 * methods, which then propagates down to the child tabs. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab
+	 * #fireContentsChanged()
+	 */
 	@Override
 	public void fireContentsChanged() {
 		super.fireContentsChanged();
 	}
 
+	/**
+	 * @return remote services info
+	 */
 	public RemoteServicesDelegate getDelegate() {
 		return delegate;
 	}
 
+	/**
+	 * @return JAXB elements for building the launch tab controls
+	 */
 	public LaunchTab getLaunchTabData() {
 		return launchTabData;
 	}
 
+	/**
+	 * @return launch tab environment map (built from the resource manager
+	 *         environment)
+	 */
 	public LCVariableMap getLCMap() {
 		return lcMap;
 	}
 
-	public IJAXBResourceManagerConfiguration getRmConfig() {
-		return rmConfig;
-	}
-
-	public int getSaveIndex() {
-		return saveIndex;
-	}
-
+	/**
+	 * @return JAXB data element for resource manager script
+	 */
 	public Script getScript() {
 		return script;
 	}
 
-	public ScrolledComposite getScrolledParent() {
-		return scrolledParent;
-	}
-
+	/**
+	 * @return handler responsible for notifying all widgets to refresh their
+	 *         values from the launch tab environment map
+	 */
 	public ValueUpdateHandler getUpdateHandler() {
 		return updateHandler;
 	}
 
+	/**
+	 * @return whether this resource manager uses a script
+	 */
 	public boolean hasScript() {
 		return script != null;
 	}
 
+	/*
+	 * resets the resource manager environment to active, rebuilds the launch
+	 * tab environment map, and clears the controls registered with the update
+	 * handler. This is necessary because on calls to this method subsequent to
+	 * the first, the widgets it contained will have been disposed.
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#initializeFrom
+	 * (org.eclipse.swt.widgets.Control,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		try {
-			((IJAXBResourceManagerConfiguration) rm.getConfiguration()).setActive();
+			rmConfig.setActive();
 			lcMap = LCVariableMap.createInstance(RMVariableMap.getActiveInstance());
 			LCVariableMap.setActiveInstance(lcMap);
 			updateHandler.getControlToModelMap().clear();
@@ -132,13 +189,12 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		return super.initializeFrom(control, rm, queue, configuration);
 	}
 
+	/*
+	 * Attempt to suggest resizing to scrolled ResourcesTab composite.
+	 */
 	public void resize(Control control) {
 		if (scrolledParent != null) {
 			scrolledParent.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		}
-	}
-
-	public void setSaveIndex(int saveIndex) {
-		this.saveIndex = saveIndex;
 	}
 }

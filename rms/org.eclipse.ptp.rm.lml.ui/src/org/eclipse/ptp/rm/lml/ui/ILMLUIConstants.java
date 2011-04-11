@@ -26,8 +26,9 @@ public interface ILMLUIConstants {
 	public static final String PREFIX = PLUGIN_ID + "."; //$NON-NLS-1$
 	
 	public static final String VIEW_PARALLELNODES = PREFIX + "views.NodesView"; //$NON-NLS-1$
+	public static final String VIEW_PARALLELNODES2 = PREFIX + "views.NodedisplayView";//$NON-NLS-1$
 	public static final String VIEW_PARALLELJOBS = PREFIX + "views.parallelJobsView"; //$NON-NLS-1$
-	public static final String VIEW_JOBSLIST = PREFIX + "views.JobsListView"; //$NON-NLS-1$
+	public static final String VIEW_TABLE = PREFIX + "views.TableView"; //$NON-NLS-1$
 	public static final String VIEW_PARALLELProcess = PREFIX + "views.parallelProcessView"; //$NON-NLS-1$
 	public static final String VIEW_LML = PREFIX + "views.LMLView"; //$NON-NLS-1$
 

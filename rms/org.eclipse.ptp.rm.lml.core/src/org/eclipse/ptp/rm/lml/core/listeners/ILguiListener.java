@@ -8,32 +8,15 @@
 
 package org.eclipse.ptp.rm.lml.core.listeners;
 
-import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
-import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
-import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
+import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 
 /**
  * This interface manages the handling of different events.
  * @author Claudia Knobloch
  */
-public interface ILguiListener {
+public interface ILguiListener extends IListener {
 	
-	/**
-	 * Handles an ILguiAddedEvent.
-	 * @param e an ILguiAddedEvent
-	 */
-	public void handleEvent(ILguiAddedEvent e);
-	
-	/**
-	 * Handles an IlguiRemovedEvent.
-	 * @param e an ILguiRemovedEvent
-	 */
-	public void handleEvent(ILguiRemovedEvent e);
-	
-	/**
-	 * Handles an IJobListSortedEevnt.
-	 * @param e an IJobListSortedEvent
-	 */
-	public void handleEvent(IJobListSortedEvent e);
+	public void handleEvent(ILguiUpdatedEvent e);
 
 }
+

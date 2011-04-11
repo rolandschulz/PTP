@@ -9,12 +9,41 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+/**
+ * Defines object for tokenizer to call to process matches against.
+ * 
+ * @author arossi
+ * 
+ */
 public interface IMatchable {
+
+	/**
+	 * Match against the current stream segment.
+	 * 
+	 * @param segment
+	 *            passed in from the tokenizer
+	 * @return whether there was a successful match
+	 * @throws Throwable
+	 */
 	boolean doMatch(StringBuffer segment) throws Throwable;
 
+	/**
+	 * @return whether the tokenizer should promote this object to first in its
+	 *         list.
+	 */
 	boolean isSelected();
 
+	/**
+	 * Run post-processing operations on the object.
+	 * 
+	 * @throws Throwable
+	 */
 	void postProcess() throws Throwable;
 
+	/**
+	 * @param selected
+	 *            whether the tokenizer should promote this object to first in
+	 *            its list.
+	 */
 	void setSelected(boolean selected);
 }

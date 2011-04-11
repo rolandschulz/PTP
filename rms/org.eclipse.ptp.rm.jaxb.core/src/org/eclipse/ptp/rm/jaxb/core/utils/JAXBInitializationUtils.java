@@ -34,11 +34,26 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.xml.sax.SAXException;
 
+/**
+ * Convenience methods for validating and unmarshaling XML using JAXB.
+ * 
+ * @author arossi
+ * 
+ */
 public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 
 	private JAXBInitializationUtils() {
 	}
 
+	/**
+	 * Retrieves Property and Attribute definitions from the data tree and adds
+	 * them to the environment map.
+	 * 
+	 * @param rmData
+	 *            the JAXB data tree
+	 * @param instance
+	 *            the active instance of the resource manager environment map
+	 */
 	public static void initializeMap(ResourceManagerData rmData, RMVariableMap instance) {
 		Control control = rmData.getControlData();
 		instance.clear();
@@ -48,10 +63,31 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 		instance.setInitialized(true);
 	}
 
+	/**
+	 * Delegates to {@link #unmarshalResourceManagerData(URL)}
+	 * 
+	 * @param xml
+	 *            location of the configuration file.
+	 * @return the constructed data tree
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws URISyntaxException
+	 * @throws JAXBException
+	 */
 	public static ResourceManagerData initializeRMData(URL xml) throws IOException, SAXException, URISyntaxException, JAXBException {
 		return unmarshalResourceManagerData(xml);
 	}
 
+	/**
+	 * Validates the XML against the internal XSD for JAXB resource managers.
+	 * 
+	 * @param instance
+	 *            location of the configuration file.
+	 * @throws SAXException
+	 *             if invalid
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	public static void validate(URL instance) throws SAXException, IOException, URISyntaxException {
 		URL xsd = JAXBCorePlugin.getResource(RM_XSD);
 		SchemaFactory factory = SchemaFactory.newInstance(XMLSchema);
@@ -61,6 +97,14 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 		validator.validate(source);
 	}
 
+	/**
+	 * Adds the attributes.
+	 * 
+	 * @param env
+	 *            the active instance of the resource manager environment map
+	 * @param control
+	 *            JAXB data subtree for control part of resource manager
+	 */
 	private static void addAttributes(Map<String, Object> env, Control control) {
 		List<Attribute> jobAttributes = control.getAttribute();
 		for (Attribute jobAttribute : jobAttributes) {
@@ -69,6 +113,14 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * Adds the properties.
+	 * 
+	 * @param env
+	 *            the active instance of the resource manager environment map
+	 * @param control
+	 *            JAXB data subtree for control part of resource manager
+	 */
 	private static void addProperties(Map<String, Object> env, Control control) {
 		List<Property> properties = control.getProperty();
 		for (Property property : properties) {
@@ -76,6 +128,20 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 		}
 	}
 
+	/**
+	 * First validates the xml, then gets the JAXB context and calls the JAXB
+	 * unmarshaller from it.
+	 * 
+	 * @param xml
+	 *            location of the configuration file.
+	 * @return the constructed data tree
+	 * @throws JAXBException
+	 *             problem encountered during unmarshaling
+	 * @throws IOException
+	 * @throws SAXException
+	 *             validation error
+	 * @throws URISyntaxException
+	 */
 	private static ResourceManagerData unmarshalResourceManagerData(URL xml) throws JAXBException, IOException, SAXException,
 			URISyntaxException {
 		validate(xml);

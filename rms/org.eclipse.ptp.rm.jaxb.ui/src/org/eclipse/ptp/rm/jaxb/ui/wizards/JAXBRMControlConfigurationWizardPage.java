@@ -21,7 +21,8 @@ import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Generic Wizard for the JAXB Resource Manager Control.
+ * Generic Wizard for the JAXB Resource Manager Control. Provides connection
+ * configuration.
  * 
  * @author arossi
  * 
@@ -31,6 +32,9 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 
 	private final IJAXBResourceManagerConfiguration baseConfiguration;
 
+	/**
+	 * @param wizard
+	 */
 	public JAXBRMControlConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.JAXBRMControlConfigurationWizardPage_Title);
 		baseConfiguration = (IJAXBResourceManagerConfiguration) wizard.getBaseConfiguration();
@@ -40,7 +44,8 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * Exports as default remote connection information whatever is set in the
+	 * Site subtree of the JAXB data tree. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.ui.wizards.
 	 * AbstractRemoteResourceManagerConfigurationWizardPage
@@ -51,9 +56,7 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 		Composite comp = super.doCreateContents(parent);
 		Site site = baseConfiguration.getResourceManagerData().getSiteData();
 		try {
-			String host = getConfiguration().getDefaultControlHost();
-			String port = getConfiguration().getDefaultControlPort();
-			RemoteUIServicesUtils.setConnectionHints(connectionWidget, host, port, site.getControlConnection());
+			RemoteUIServicesUtils.setConnectionHints(connectionWidget, site.getControlConnection());
 
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);

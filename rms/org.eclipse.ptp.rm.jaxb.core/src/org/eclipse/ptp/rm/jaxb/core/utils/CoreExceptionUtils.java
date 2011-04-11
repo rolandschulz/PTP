@@ -14,11 +14,21 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 
+/**
+ * Convenience methods for handling CoreExceptions and Status.ERROR.
+ * 
+ * @author arossi
+ */
 public class CoreExceptionUtils {
 
 	private CoreExceptionUtils() {
 	}
 
+	/**
+	 * @param message
+	 * @param t
+	 * @return error status object
+	 */
 	public static IStatus getErrorStatus(String message, Throwable t) {
 		if (t != null) {
 			JAXBCorePlugin.log(t);
@@ -26,6 +36,11 @@ public class CoreExceptionUtils {
 		return new Status(Status.ERROR, JAXBCorePlugin.getUniqueIdentifier(), Status.ERROR, message, t);
 	}
 
+	/**
+	 * @param message
+	 * @param t
+	 * @return exception
+	 */
 	public static CoreException newException(String message, Throwable t) {
 		return new CoreException(getErrorStatus(message, t));
 	}

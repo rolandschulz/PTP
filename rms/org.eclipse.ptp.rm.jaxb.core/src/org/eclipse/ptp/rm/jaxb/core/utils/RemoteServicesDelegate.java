@@ -19,6 +19,12 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 
+/**
+ * A wrapper for holding initialized remote services information.
+ * 
+ * @author arossi
+ * 
+ */
 public class RemoteServicesDelegate implements IJAXBNonNLSConstants {
 	private final IRemoteServices remoteServices;
 	private final IRemoteServices localServices;
@@ -31,6 +37,16 @@ public class RemoteServicesDelegate implements IJAXBNonNLSConstants {
 	private final URI localHome;
 	private final URI remoteHome;
 
+	/**
+	 * On the basis of the passed in identifiers, constructs the local and
+	 * remote services, connection manager, connection, file manager and home
+	 * URIs.
+	 * 
+	 * @param remoteServicesId
+	 *            e.g., "local", "remotetools", "rse"
+	 * @param remoteConnectionName
+	 *            e.g., "ember.ncsa.illinois.edu"
+	 */
 	public RemoteServicesDelegate(String remoteServicesId, String remoteConnectionName) {
 		localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		assert (localServices != null);

@@ -11,11 +11,31 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import org.eclipse.debug.core.model.IStreamMonitor;
 
+/**
+ * CommandJob-specific extension of the stream monitor.
+ * 
+ * @see org.eclipse.debug.core.model.IStreamMonitor
+ * @author arossi
+ * 
+ */
 public interface ICommandJobStreamMonitor extends IStreamMonitor {
 
+	/**
+	 * Manually close the monitor/streams.
+	 */
 	public void close();
 
+	/**
+	 * Tune the monitor's buffer size
+	 * 
+	 * @param limit
+	 *            in chars
+	 * 
+	 */
 	public void setBufferLimit(int limit);
 
+	/**
+	 * Starts the reading from the stream.
+	 */
 	public void startMonitoring();
 }

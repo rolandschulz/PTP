@@ -15,7 +15,7 @@
 package org.eclipse.ptp.rm.lml.core.events;
 
 import org.eclipse.ptp.rm.lml.core.ILMLManager;
-import org.eclipse.ptp.rm.lml.core.elements.ILguiItem;
+import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
 /**
  * Interface to manage the event that an LguiItem has been removed.
@@ -27,7 +27,7 @@ public interface ILguiRemovedEvent {
 	 * Getting the involved IlguiItem.
 	 * @return the involved ILguiItem
 	 */
-	public ILguiItem getLgui();
+	public ILguiItem getLguiItem();
 
 	/**
 	 * Getting the involved LMLManager.

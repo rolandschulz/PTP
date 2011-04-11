@@ -36,7 +36,7 @@ public class AddLguiAction extends Action {
 	private final Shell shell;
 
 	public AddLguiAction(Shell shell) {
-		super(Messages.AddLMLAction_0);
+		super(Messages.AddLguiAction);
 		this.shell = shell;
 	}
 

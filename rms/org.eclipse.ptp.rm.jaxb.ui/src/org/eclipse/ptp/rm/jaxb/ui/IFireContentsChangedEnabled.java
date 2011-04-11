@@ -9,6 +9,19 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui;
 
+/**
+ * Exports tab update call.
+ * 
+ * @see org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler
+ * @sse 
+ *      org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab
+ *      #fireContentsChanged()
+ * @author arossi
+ * 
+ */
 public interface IFireContentsChangedEnabled {
+	/**
+	 * Used to delegate to the internal contents changed method of the tab
+	 */
 	void fireContentsChanged();
 }

@@ -13,17 +13,32 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
-import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 
+/**
+ * Editing support for the checkbox attribute viewers.
+ * 
+ * @author arossi
+ * 
+ */
 public class AttributeViewerEditingSupport extends EditingSupport {
 
 	private final ColumnViewer viewer;
 
+	/**
+	 * @param viewer
+	 * @see org.eclipse.jface.viewers.CheckboxTableViewer
+	 * @see org.eclipse.jface.viewers.CheckboxTreeViewer
+	 */
 	public AttributeViewerEditingSupport(ColumnViewer viewer) {
 		super(viewer);
 		this.viewer = viewer;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.EditingSupport#canEdit(java.lang.Object)
+	 */
 	@Override
 	protected boolean canEdit(Object element) {
 		if (element instanceof ICellEditorUpdateModel) {
@@ -33,6 +48,12 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.EditingSupport#getCellEditor(java.lang.Object)
+	 */
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 		if (element instanceof ICellEditorUpdateModel) {
@@ -42,6 +63,11 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.EditingSupport#getValue(java.lang.Object)
+	 */
 	@Override
 	protected Object getValue(Object element) {
 		if (element instanceof ICellEditorUpdateModel) {
@@ -51,11 +77,17 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.EditingSupport#setValue(java.lang.Object,
+	 * java.lang.Object)
+	 */
 	@Override
 	protected void setValue(Object element, Object value) {
 		if (element instanceof ICellEditorUpdateModel) {
 			((ICellEditorUpdateModel) element).setValueFromEditor(value);
-			WidgetActionUtils.refreshViewer(viewer);
+			viewer.refresh();
 		}
 	}
 }

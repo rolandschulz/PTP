@@ -10,8 +10,6 @@
 package org.eclipse.ptp.rm.jaxb.core.variables;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -27,7 +25,35 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
 /**
  * A wrapper for the LaunchConfiguration accessed through the IVariableMap
- * interface.
+ * interface.<br>
+ * <br>
+ * Note that this map is <b>not</b> tightly coupled to a given launch
+ * configuration instance. When the map is flushed to the configuration, its
+ * internal map simply replaces the attribute map on the configuration working
+ * copy. <br>
+ * <br>
+ * Unlike the RMVariableMap, the internal map here is largely flat in the sense
+ * that it holds only name-value primitive wrappers or strings instead of the
+ * Property or Attribute objects (an exception is the "environment" Map passed
+ * in to the configuration by the Environment Tab).<br>
+ * <br>
+ * When this map is loaded from its RMVariableMap parent (see
+ * {@link #loadValues(RMVariableMap)}), the full set of Properties and
+ * Attributes are maintained in a global map, which remains unaltered; a second,
+ * volatile map can be swapped in and out by the caller (usually subsets of the
+ * global map based on the specific tab doing the calling).<br>
+ * <br>
+ * This object also maintains the default values defined from the parent in a
+ * separate map. Finally, it also searches for and parses into an index the
+ * currently checked values (from checkbox tables or trees). This index is used
+ * when determining whether to null out the current value of a Property or
+ * Attribute in the current (non-global) variable map.
+ * 
+ * @see org.eclipse.debug.core.ILaunchConfigurationWorkingCopy
+ * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap
+ * @see org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap
+ * 
+ * @author arossi
  */
 public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 
@@ -36,30 +62,43 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	private Map<String, Object> globalValues;
 	private Map<String, Object> values;
 	private final Map<String, String> defaultValues;
-	private final Map<String, String> selected;
-	private boolean initialized;
+	private final Map<String, String> checked;
+	private final boolean initialized;
 
 	private LCVariableMap() {
 		this.values = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.defaultValues = Collections.synchronizedMap(new TreeMap<String, String>());
-		this.selected = Collections.synchronizedMap(new TreeMap<String, String>());
+		this.checked = Collections.synchronizedMap(new TreeMap<String, String>());
 		this.initialized = false;
 	}
 
+	/**
+	 * @param name
+	 *            of widget, bound to a Property or Attribute
+	 * @return value of the Property or Attribute, or <code>null</code> if none
+	 */
 	public Object get(String name) {
 		return values.get(name);
 	}
 
+	/**
+	 * @param name
+	 *            of widget, bound to a Property or Attribute
+	 * @return default value of the Property or Attribute, or <code>null</code>
+	 *         if none
+	 */
 	public String getDefault(String name) {
 		return defaultValues.get(name);
 	}
 
 	/**
-	 * The rm: prefix points to the RMVariableResolver, lc: to the
-	 * LCVariableResolver, so we substitute the latter and pass it off.
+	 * The ${rm: prefix points to the RMVariableResolver, ${lc: to the
+	 * LCVariableResolver, so we substitute the latter and pass off the
+	 * substitution to the resolver for resolution.
 	 * 
-	 * @param expression
-	 * @return
+	 * @param value
+	 *            expression to be resolved
+	 * @return resolved expression
 	 */
 	public String getString(String value) {
 		try {
@@ -71,54 +110,96 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		return value;
 	}
 
+	/**
+	 * Interface method. Only called by {@link #getString(String)}.
+	 * 
+	 * @param jobId
+	 *            is irrelevant
+	 * @param value
+	 *            expression to be resolved
+	 * @return resolved expression
+	 */
 	public String getString(String jobId, String value) {
 		return getString(value);
 	}
 
+	/**
+	 * @param name
+	 *            of widget, bound to a Property or Attribute
+	 * @return if this is a checkbox element, whether it is checked
+	 */
+	public boolean isChecked(String name) {
+		return checked.containsKey(name);
+	}
+
+	/**
+	 * @return whether the internal maps have been loaded
+	 */
 	public boolean isInitialized() {
 		return initialized;
 	}
 
-	public boolean isSelected(String name) {
-		return selected.containsKey(name);
-	}
-
+	/**
+	 * @param name
+	 *            of widget, bound to a Property or Attribute
+	 * @param value
+	 *            of Property or Attribute
+	 */
 	public void put(String name, Object value) {
 		values.put(name, value);
 	}
 
+	/**
+	 * 
+	 * @param name
+	 *            of widget, bound to a Property or Attribute
+	 * @return value of Property or Attribute
+	 */
 	public Object remove(String name) {
 		return values.remove(name);
 	}
 
+	/**
+	 * Set the volatile map to the original global map.
+	 */
 	public void restoreGlobal() {
 		values = globalValues;
 	}
 
-	public Map<String, Object> selectVariables(List<String> keys) {
-		Map<String, Object> m = new HashMap<String, Object>();
-		for (String k : keys) {
-			if (values.containsKey(k)) {
-				m.put(k, values.get(k));
-			}
-		}
-		return m;
-	}
-
-	public void setInitialized(boolean initialized) {
-		this.initialized = initialized;
-	}
-
+	/**
+	 * Exchange the current volatile map for the one passed in.
+	 * 
+	 * @param newV
+	 *            map to replace current
+	 * @return current map
+	 * @throws CoreException
+	 */
 	public Map<String, Object> swapVariables(Map<String, Object> newV) throws CoreException {
 		Map<String, Object> oldV = values;
 		values = newV;
 		return oldV;
 	}
 
+	/**
+	 * Replace the attribute map on the configuration with the current
+	 * (volatile) map.
+	 * 
+	 * @param configuration
+	 *            working copy of Launch Tab's current configuration
+	 * @throws CoreException
+	 */
 	public void writeToConfiguration(ILaunchConfigurationWorkingCopy configuration) throws CoreException {
 		configuration.setAttributes(values);
 	}
 
+	/**
+	 * Calls the string substitution method on the variable manager.
+	 * 
+	 * @param expression
+	 *            to be resolved (recursively dereferenced from the map).
+	 * @return the resolved expression
+	 * @throws CoreException
+	 */
 	private String dereference(String expression) throws CoreException {
 		if (expression == null) {
 			return null;
@@ -126,6 +207,13 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
 	}
 
+	/**
+	 * Initialize this map from the resource manager environment instance.
+	 * 
+	 * @param rmVars
+	 *            resource manager environment map
+	 * @throws Throwable
+	 */
 	private void loadValues(RMVariableMap rmVars) throws Throwable {
 		for (String s : rmVars.getVariables().keySet()) {
 			loadValues(s, rmVars.getVariables().get(s));
@@ -134,8 +222,22 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 			loadValues(s, rmVars.getDiscovered().get(s));
 		}
 		globalValues = values;
+		/*
+		 * this map will be set from the tab's local map
+		 */
+		values = null;
 	}
 
+	/**
+	 * If the value of the Property or Attribute is <code>null</code> and it has
+	 * a defined default, the value is set to the default.
+	 * 
+	 * @param key
+	 *            from the original RMVariableMap
+	 * @param value
+	 *            the Property or Attribute
+	 * @throws Throwable
+	 */
 	private void loadValues(String key, Object value) throws Throwable {
 		String name = null;
 		String defVal = null;
@@ -166,28 +268,49 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		put(name, strVal);
 	}
 
-	private void setSelected() throws CoreException {
-		String selected = (String) get(SELECTED_ATTRIBUTES);
-		if (selected == null || ZEROSTR.equals(selected)) {
+	/**
+	 * The selected index is created from the SELECTED_ATTRIBUTES property, if
+	 * it is defined.
+	 * 
+	 * @throws CoreException
+	 */
+	private void setChecked() throws CoreException {
+		String checked = (String) get(CHECKED_ATTRIBUTES);
+		if (checked == null || ZEROSTR.equals(checked)) {
 			StringBuffer buffer = new StringBuffer();
 			for (Object s : values.keySet()) {
 				buffer.append(s).append(SP);
 			}
-			values.put(SELECTED_ATTRIBUTES, buffer.toString().trim());
+			values.put(CHECKED_ATTRIBUTES, buffer.toString().trim());
 		}
 	}
 
+	/**
+	 * Creates an instance to be associated with a given Launch Tab.
+	 * 
+	 * @param rmVars
+	 *            environement map for the associated resource manager
+	 * @return the LaunchTab environment map
+	 * @throws Throwable
+	 */
 	public static LCVariableMap createInstance(RMVariableMap rmVars) throws Throwable {
 		LCVariableMap lcMap = new LCVariableMap();
-		lcMap.setSelected();
+		lcMap.setChecked();
 		lcMap.loadValues(rmVars);
 		return lcMap;
 	}
 
+	/**
+	 * @return the currently active map
+	 */
 	public synchronized static LCVariableMap getActiveInstance() {
 		return active;
 	}
 
+	/**
+	 * @param instance
+	 *            to be exported as the currently active map
+	 */
 	public synchronized static void setActiveInstance(LCVariableMap instance) {
 		active = instance;
 	}

@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Displays text contents for editing/saving. Note: the font used is fixed to be
+ * Displays text contents for editing/saving. Note: the font hint used is
  * Courier, which should be available on Mac, Windows and Linux platforms. More
  * lightweight than a full-blown text editor.
  * 
@@ -42,15 +42,43 @@ public class ScrollingEditableMessageDialog extends MessageDialog implements IJA
 	protected String title;
 	protected String value;
 
+	/**
+	 * @param parentShell
+	 * @param name
+	 *            message label for text
+	 * @param value
+	 *            initial text value
+	 */
 	public ScrollingEditableMessageDialog(Shell parentShell, String name, String value) {
 		this(parentShell, name, value, false);
 	}
 
+	/**
+	 * @param parentShell
+	 * @param name
+	 *            message label for text
+	 * @param value
+	 *            initial text value
+	 * @param readOnly
+	 *            if the text box if read only
+	 */
 	public ScrollingEditableMessageDialog(Shell parentShell, String name, String value, boolean readOnly) {
 		this(parentShell, name, value, name, null, MessageDialog.NONE, DEFAULT_LABELS, DEFAULT_INDEX);
 		this.readOnly = readOnly;
 	}
 
+	/**
+	 * @param parentShell
+	 * @param name
+	 *            message label for text
+	 * @param value
+	 *            initial text value
+	 * @param dialogTitle
+	 * @param dialogTitleImage
+	 * @param dialogImageType
+	 * @param dialogButtonLabels
+	 * @param defaultIndex
+	 */
 	public ScrollingEditableMessageDialog(Shell parentShell, String name, String value, String dialogTitle, Image dialogTitleImage,
 			int dialogImageType, String[] dialogButtonLabels, int defaultIndex) {
 		super(parentShell, dialogTitle, dialogTitleImage, name, dialogImageType, dialogButtonLabels, defaultIndex);
@@ -58,16 +86,29 @@ public class ScrollingEditableMessageDialog extends MessageDialog implements IJA
 		readOnly = false;
 	}
 
+	/**
+	 * The entered value.
+	 */
 	public String getValue() {
 		return value;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.MessageDialog#open()
+	 */
 	@Override
 	public int open() {
 		createDialogArea(getParentShell());
 		return super.open();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.MessageDialog#buttonPressed(int)
+	 */
 	@Override
 	protected void buttonPressed(int buttonId) {
 		if (buttonId == IDialogConstants.OK_ID) {
@@ -78,6 +119,13 @@ public class ScrollingEditableMessageDialog extends MessageDialog implements IJA
 		super.buttonPressed(buttonId);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.MessageDialog#configureShell(org.eclipse.swt
+	 * .widgets.Shell)
+	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
@@ -86,6 +134,13 @@ public class ScrollingEditableMessageDialog extends MessageDialog implements IJA
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.MessageDialog#createButtonsForButtonBar(org
+	 * .eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		// create OK and Cancel buttons by default
@@ -100,6 +155,13 @@ public class ScrollingEditableMessageDialog extends MessageDialog implements IJA
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.MessageDialog#createDialogArea(org.eclipse.
+	 * swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Control c = super.createDialogArea(parent);
