@@ -26,7 +26,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 
-	private static final String rmxml = DATA + "rm-pbs-torque_2.3.7.xml"; //$NON-NLS-1$
+	private static final String rmxml = DATA + "test-pbs.xml"; //$NON-NLS-1$
 	private static final String tokxml = DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
 
 	@Override

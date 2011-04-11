@@ -32,7 +32,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 
-	private static final String xml = DATA + "rm-pbs-torque_2.3.7.xml"; //$NON-NLS-1$
+	private static final String xml = DATA + "test-pbs.xml"; //$NON-NLS-1$
 	private static Control controlData;
 	private static Map<String, Object> env;
 	private static Map<String, String> live;

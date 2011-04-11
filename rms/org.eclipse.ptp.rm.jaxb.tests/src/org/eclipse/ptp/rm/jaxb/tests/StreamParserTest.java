@@ -200,7 +200,6 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 				System.out.println("value " + ja.getValue()); //$NON-NLS-1$
 				System.out.println("tooltip " + ja.getTooltip()); //$NON-NLS-1$
 				System.out.println("status " + ja.getStatus()); //$NON-NLS-1$
-				System.out.println("selected " + ja.isSelected()); //$NON-NLS-1$
 				System.out.println("readOnly " + ja.isReadOnly()); //$NON-NLS-1$
 				System.out.println("*********************************"); //$NON-NLS-1$
 			}
