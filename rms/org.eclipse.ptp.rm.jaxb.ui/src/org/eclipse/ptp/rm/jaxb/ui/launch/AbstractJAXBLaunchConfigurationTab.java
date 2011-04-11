@@ -29,6 +29,22 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * Base class for the JAXB LaunchConfiguration tabs which provide views of
+ * editable widgets. Up to three such tabs can be configured as children of the
+ * controller tab.<br>
+ * <br>
+ * 
+ * Each tab maintains its own local map of values which are set from its
+ * widgets, and this swapped into the environment active map when configuration
+ * changes are needed.
+ * 
+ * @see org.eclipse.ptp.rm.jaxb.ui.launch.JAXBDynamicLaunchConfigurationTab
+ * @see org.eclipse.ptp.rm.jaxb.ui.launch.JAXBImportedScriptLaunchConfigurationTab
+ * 
+ * @author arossi
+ * 
+ */
 public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunchConfigurationDynamicTab implements
 		IJAXBUINonNLSConstants {
 
@@ -37,18 +53,47 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	protected String title;
 	protected Composite control;
 
-	protected AbstractJAXBLaunchConfigurationTab(JAXBControllerLaunchConfigurationTab parentTab, ILaunchConfigurationDialog dialog,
-			int tabIndex) {
+	/**
+	 * @param parentTab
+	 *            the controller
+	 * @param dialog
+	 *            the dialog to which this tab belongs
+	 * @param tabIndex
+	 *            child index for the parent
+	 */
+	protected AbstractJAXBLaunchConfigurationTab(JAXBControllerLaunchConfigurationTab parentTab, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		this.parentTab = parentTab;
 		this.title = Messages.DefaultDynamicTab_title;
 		localMap = new TreeMap<String, Object>();
 	}
 
+	/**
+	 * @return image to display in the folder tab for this LaunchTab
+	 */
 	public abstract Image getImage();
 
+	/**
+	 * @return text to display in the folder tab for this LaunchTab
+	 */
 	public abstract String getText();
 
+	/**
+	 * This performApply is triggered whenever there is an update on the
+	 * controller. We do not want the values of the tab to be flushed to the
+	 * configuration unless this tab is the origin of the change; hence we check
+	 * to see if the tab is visible.<br>
+	 * <br>
+	 * If write to configuration is indicated, the the local map is refreshed,
+	 * swapped in to the active map, and then flushed to the configuration.
+	 * 
+	 * @param configuration
+	 *            working copy of current launch configuration
+	 * @param current
+	 *            resource manager
+	 * @param queue
+	 *            (unused)
+	 */
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		if (control.isVisible()) {
 			Map<String, Object> current = null;
@@ -72,10 +117,16 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 		return new RMLaunchValidation(true, null);
 	}
 
+	/**
+	 * Tab-specific handling of local variable map.
+	 */
 	protected abstract void doRefreshLocal();
 
-	/*
-	 * Subclasses should call this method, but implement doRefreshLocal()
+	/**
+	 * Subclasses should call this method, but implement doRefreshLocal().
+	 * 
+	 * @param current
+	 *            configuration
 	 */
 	@SuppressWarnings("rawtypes")
 	protected void refreshLocal(ILaunchConfiguration config) throws CoreException {

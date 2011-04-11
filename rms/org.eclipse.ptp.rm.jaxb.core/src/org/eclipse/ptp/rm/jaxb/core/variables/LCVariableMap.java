@@ -45,7 +45,7 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
  * <br>
  * This object also maintains the default values defined from the parent in a
  * separate map. Finally, it also searches for and parses into an index the
- * currently selected values (from checkbox tables or trees). This index is used
+ * currently checked values (from checkbox tables or trees). This index is used
  * when determining whether to null out the current value of a Property or
  * Attribute in the current (non-global) variable map.
  * 
@@ -62,13 +62,13 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	private Map<String, Object> globalValues;
 	private Map<String, Object> values;
 	private final Map<String, String> defaultValues;
-	private final Map<String, String> selected;
+	private final Map<String, String> checked;
 	private final boolean initialized;
 
 	private LCVariableMap() {
 		this.values = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.defaultValues = Collections.synchronizedMap(new TreeMap<String, String>());
-		this.selected = Collections.synchronizedMap(new TreeMap<String, String>());
+		this.checked = Collections.synchronizedMap(new TreeMap<String, String>());
 		this.initialized = false;
 	}
 
@@ -124,19 +124,19 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
+	 * @param name
+	 *            of widget, bound to a Property or Attribute
+	 * @return if this is a checkbox element, whether it is checked
+	 */
+	public boolean isChecked(String name) {
+		return checked.containsKey(name);
+	}
+
+	/**
 	 * @return whether the internal maps have been loaded
 	 */
 	public boolean isInitialized() {
 		return initialized;
-	}
-
-	/**
-	 * @param name
-	 *            of widget, bound to a Property or Attribute
-	 * @return if this is a checkbox element, whether it is selected
-	 */
-	public boolean isSelected(String name) {
-		return selected.containsKey(name);
 	}
 
 	/**
@@ -274,14 +274,14 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 * 
 	 * @throws CoreException
 	 */
-	private void setSelected() throws CoreException {
-		String selected = (String) get(SELECTED_ATTRIBUTES);
-		if (selected == null || ZEROSTR.equals(selected)) {
+	private void setChecked() throws CoreException {
+		String checked = (String) get(CHECKED_ATTRIBUTES);
+		if (checked == null || ZEROSTR.equals(checked)) {
 			StringBuffer buffer = new StringBuffer();
 			for (Object s : values.keySet()) {
 				buffer.append(s).append(SP);
 			}
-			values.put(SELECTED_ATTRIBUTES, buffer.toString().trim());
+			values.put(CHECKED_ATTRIBUTES, buffer.toString().trim());
 		}
 	}
 
@@ -295,7 +295,7 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 */
 	public static LCVariableMap createInstance(RMVariableMap rmVars) throws Throwable {
 		LCVariableMap lcMap = new LCVariableMap();
-		lcMap.setSelected();
+		lcMap.setChecked();
 		lcMap.loadValues(rmVars);
 		return lcMap;
 	}

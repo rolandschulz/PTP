@@ -672,7 +672,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<column-data name="Name" width="175">
 							<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
 						</column-data>
-						<column-data name="Value" width="200" foreground="SWT.COLOR_DARK_MAGENTA">
+						<column-data name="Value" width="200">
 							<tooltip>Click to activate value widget.</tooltip>
 						</column-data>
 						<column-data name="Description" width="200">
@@ -690,7 +690,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<column-data name="Name" width="175">
 							<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
 						</column-data>
-						<column-data name="Value" width="400" foreground="SWT.COLOR_DARK_MAGENTA">
+						<column-data name="Value" width="400">
 							<tooltip>Click to activate value widget.</tooltip>
 						</column-data>
 						<items allPredefined="true">

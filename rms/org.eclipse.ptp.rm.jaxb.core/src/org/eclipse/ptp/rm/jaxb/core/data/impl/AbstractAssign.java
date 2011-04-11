@@ -230,7 +230,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Deteermines whether the input represents an object field or a resolvable
+	 * Determines whether the input represents an object field or a resolvable
 	 * expression. Also converts string to int or boolean, if applicable,
 	 * 
 	 * @param target

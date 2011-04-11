@@ -13,22 +13,71 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 
+/**
+ * Cell editor for Table Viewer.
+ * 
+ * @author arossi
+ * 
+ */
 public class TableRowUpdateModel extends CellEditorUpdateModel {
 
+	/**
+	 * Cell editor model for Table row with underlying Property data.
+	 * 
+	 * @param name
+	 *            of the model, which will correspond to the name of a Property
+	 *            or Attribute the value is to be saved to
+	 * @param handler
+	 *            the handler for notifying other widgets to refresh their
+	 *            values
+	 * @param editor
+	 *            the cell editor for the value cell
+	 * @param items
+	 *            if this is a combo editor, the selection items
+	 * @param readOnly
+	 *            if this is a text box, whether it is editable
+	 */
 	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly) {
 		super(name, handler, editor, items, readOnly, ZEROSTR, ZEROSTR, ZEROSTR);
 	}
 
+	/**
+	 * * Cell editor model for Table row with underlying Attribute data.
+	 * 
+	 * @param name
+	 *            of the model, which will correspond to the name of a Property
+	 *            or Attribute the value is to be saved to
+	 * @param handler
+	 *            the handler for notifying other widgets to refresh their
+	 *            values
+	 * @param editor
+	 *            the cell editor for the value cell
+	 * @param items
+	 *            if this is a combo editor, the selection items
+	 * @param readOnly
+	 *            if this is a text box, whether it is editable
+	 * @param data
+	 *            the Attribute object
+	 */
 	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
 			Attribute data) {
 		super(name, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus());
 	}
 
+	/*
+	 * For a table row, the field to access on the model corresponds to the
+	 * column name. If the item is not checked, an empty string is
+	 * returned.(non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport#getDisplayValue(
+	 * java.lang.String)
+	 */
 	public String getDisplayValue(String columnName) {
 		String displayValue = null;
 		if (COLUMN_NAME.equals(columnName)) {
 			displayValue = name;
-		} else if (selected) {
+		} else if (checked) {
 			if (COLUMN_DESC.equals(columnName)) {
 				displayValue = description;
 			} else if (COLUMN_DEFAULT.equals(columnName)) {

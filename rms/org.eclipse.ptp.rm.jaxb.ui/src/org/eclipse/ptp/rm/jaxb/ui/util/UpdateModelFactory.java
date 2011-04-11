@@ -487,6 +487,11 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		} else if (data instanceof Property) {
 			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly);
 		}
+		if (model != null) {
+			model.setBackground(cd.background);
+			model.setFont(cd.font);
+			model.setForeground(cd.foreground);
+		}
 		return model;
 	}
 
@@ -502,6 +507,11 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, inValueCol, (Attribute) data);
 		} else if (data instanceof Property) {
 			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, inValueCol);
+		}
+		if (model != null) {
+			model.setBackground(cd.background);
+			model.setFont(cd.font);
+			model.setForeground(cd.foreground);
 		}
 		return model;
 	}
