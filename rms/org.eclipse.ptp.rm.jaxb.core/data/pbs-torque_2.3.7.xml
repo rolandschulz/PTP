@@ -492,7 +492,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<basic>
 				<!-- <basic sharedEnvironment="true"> -->
 				<title>Basic PBS Settings</title>
-				<composite>
+				<composite group="true">
 					<layout>
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
 					</layout>

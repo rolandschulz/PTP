@@ -14,13 +14,25 @@ import java.util.Collection;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.model.ValueTreeNodeUpdateModel;
 
+/**
+ * For Attribute Tree Viewer.
+ * 
+ * @author arossi
+ * 
+ */
 public class TreeDataContentProvider implements ITreeContentProvider {
 	public void dispose() {
 	}
 
+	/*
+	 * Only Value nodes have children. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.
+	 * Object)
+	 */
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof ValueTreeNodeUpdateModel) {
 			return ((ValueTreeNodeUpdateModel) parentElement).getChildren().toArray();
@@ -28,10 +40,18 @@ public class TreeDataContentProvider implements ITreeContentProvider {
 		return new Object[0];
 	}
 
+	/*
+	 * ValueTreeNodeUpdateModel serves as the main data model for the viewer,
+	 * with its children being InfoTreeNodeModel objects. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java
+	 * .lang.Object)
+	 */
 	@SuppressWarnings("unchecked")
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof Collection<?>) {
-			Collection<ICellEditorUpdateModel> list = (Collection<ICellEditorUpdateModel>) inputElement;
+			Collection<ValueTreeNodeUpdateModel> list = (Collection<ValueTreeNodeUpdateModel>) inputElement;
 			return list.toArray();
 		}
 		return new Object[0];
@@ -41,6 +61,13 @@ public class TreeDataContentProvider implements ITreeContentProvider {
 		return null;
 	}
 
+	/*
+	 * Only Value nodes have children. (non-Javadoc) (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.
+	 * Object)
+	 */
 	public boolean hasChildren(Object element) {
 		return (element instanceof ValueTreeNodeUpdateModel);
 	}

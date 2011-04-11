@@ -25,12 +25,9 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.rm.jaxb.core.data.FileMatch;
@@ -39,7 +36,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.Validator;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedMatchException;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
-import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.FileDialog;
@@ -99,15 +95,6 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 			return nameDialog.getValue();
 		}
 		return null;
-	}
-
-	public static void refreshViewer(final Viewer viewer) {
-		ISafeRunnable safeRunnable = new SafeRunnable() {
-			public void run() throws Exception {
-				viewer.refresh();
-			}
-		};
-		UIUtils.safeRunAsyncInUIThread(safeRunnable);
 	}
 
 	public static String select(Combo combo, String name) {

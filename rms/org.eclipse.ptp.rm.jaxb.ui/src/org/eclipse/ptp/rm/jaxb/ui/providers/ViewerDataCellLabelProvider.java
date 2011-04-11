@@ -22,18 +22,46 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
+/**
+ * Cell label provider for the viewers allows for tooltip text display.
+ * 
+ * @author arossi
+ * 
+ */
 public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJAXBUINonNLSConstants {
 	private final List<ColumnData> columnData;
 
+	/**
+	 * @param columnData
+	 *            info on name, colors and font for a given column.
+	 */
 	public ViewerDataCellLabelProvider(List<ColumnData> columnData) {
 		this.columnData = columnData;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.CellLabelProvider#getToolTipDisplayDelayTime
+	 * (java.lang.Object)
+	 */
 	@Override
 	public int getToolTipDisplayDelayTime(Object object) {
-		return 1000;
+		return 500;
 	}
 
+	/*
+	 * Gets the tooltip related to underlying model type. (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.ValueTreeNodeUpdateModel
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.InfoTreeNodeModel
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.CellLabelProvider#getToolTipText(java.lang.
+	 * Object)
+	 */
 	@Override
 	public String getToolTipText(Object element) {
 		if (element instanceof IColumnViewerLabelSupport) {
@@ -43,11 +71,26 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJ
 		return super.getToolTipText(element);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.CellLabelProvider#getToolTipTimeDisplayed(java
+	 * .lang.Object)
+	 */
 	@Override
 	public int getToolTipTimeDisplayed(Object object) {
-		return 5000;
+		return 3000;
 	}
 
+	/*
+	 * Provides cell text, colors and font based on its column index.
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.CellLabelProvider#update(org.eclipse.jface.
+	 * viewers.ViewerCell)
+	 */
 	@Override
 	public void update(ViewerCell cell) {
 		int index = cell.getColumnIndex();
@@ -71,6 +114,15 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJ
 		cell.setText(getColumnText(element, index));
 	}
 
+	/**
+	 * Delegates to the
+	 * {@link IColumnViewerLabelSupport#getBackground(Object, int)} method.
+	 * 
+	 * @param element
+	 *            model object
+	 * @param columnIndex
+	 * @return column background color, if any
+	 */
 	private Color getBackground(Object element, int columnIndex) {
 		if (element instanceof IColumnViewerLabelSupport) {
 			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
@@ -79,6 +131,15 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJ
 		return null;
 	}
 
+	/**
+	 * Delegates to the {@link IColumnViewerLabelSupport#getColumnImage(String)}
+	 * method.
+	 * 
+	 * @param element
+	 *            model object
+	 * @param columnIndex
+	 * @return column image, if any
+	 */
 	private Image getColumnImage(Object element, int columnIndex) {
 		if (element instanceof IColumnViewerLabelSupport) {
 			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
@@ -87,6 +148,14 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJ
 		return null;
 	}
 
+	/**
+	 * Accesses name from the ColumnData element at given index.
+	 * 
+	 * @param element
+	 *            model object
+	 * @param columnIndex
+	 * @return column name
+	 */
 	private String getColumnName(int columnIndex) {
 		if (columnIndex >= columnData.size()) {
 			throw new ArrayIndexOutOfBoundsException(Messages.ViewerLabelProviderColumnError + columnIndex);
@@ -94,6 +163,15 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJ
 		return columnData.get(columnIndex).getName();
 	}
 
+	/**
+	 * Delegates to the
+	 * {@link IColumnViewerLabelSupport#getDisplayValue(String)} method.
+	 * 
+	 * @param element
+	 *            model object
+	 * @param columnIndex
+	 * @return column text
+	 */
 	private String getColumnText(Object element, int columnIndex) {
 		if (element instanceof IColumnViewerLabelSupport) {
 			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
@@ -102,6 +180,15 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJ
 		return ZEROSTR;
 	}
 
+	/**
+	 * Delegates to the {@link IColumnViewerLabelSupport#getFont(Object, int)}
+	 * method.
+	 * 
+	 * @param element
+	 *            model object
+	 * @param columnIndex
+	 * @return column font, if any
+	 */
 	private Font getFont(Object element, int columnIndex) {
 		if (element instanceof IColumnViewerLabelSupport) {
 			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
@@ -110,6 +197,15 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJ
 		return null;
 	}
 
+	/**
+	 * Delegates to the
+	 * {@link IColumnViewerLabelSupport#getForeground(Object, int)} method.
+	 * 
+	 * @param element
+	 *            model object
+	 * @param columnIndex
+	 * @return column foreground color, if any
+	 */
 	private Color getForeground(Object element, int columnIndex) {
 		Color color = null;
 		if (element instanceof IColumnViewerLabelSupport) {

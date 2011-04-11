@@ -14,12 +14,23 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 
-/*
- * Sorts only on name.
+/**
+ * Sorts the viewer on the name column. Clicking a second time on the column
+ * reverses the direction of the sort.
+ * 
+ * @author arossi
+ * 
  */
 public class AttributeViewerSorter extends ViewerSorter implements IJAXBUINonNLSConstants {
 	protected int toggle = 1;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.
+	 * viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
 	@Override
 	public int compare(Viewer viewer, Object o1, Object o2) {
 		int result = 0;
