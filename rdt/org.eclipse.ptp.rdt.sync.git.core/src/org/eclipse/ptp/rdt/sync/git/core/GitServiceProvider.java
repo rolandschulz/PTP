@@ -249,5 +249,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		putString(GIT_CONNECTION_NAME, remoteConnection.getName());
 		fLocation = location;
 		putString(GIT_LOCATION, location);
+		try {
+			fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation().toString(),
+																											this.getLocation());
+		} catch (final RemoteSyncException e) {
+			// TODO: What can we do here? Throwing an exception is not allowed.
+			e.printStackTrace();
+		}
 	}
 }
