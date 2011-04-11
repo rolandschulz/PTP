@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.core;
 
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -20,6 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ptp.rdt.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
@@ -82,6 +85,7 @@ public class ResourceChangeListener {
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
 				IProject project = delta.getResource().getProject();
 				if (project != null && RemoteSyncNature.hasNature(project)) {
+				//TODO: make sure that exception is handeled if service/build configuration isn't configured yet
 					IServiceConfiguration config = null;
 					try {
 						config = fServiceModel.getActiveConfiguration(project);

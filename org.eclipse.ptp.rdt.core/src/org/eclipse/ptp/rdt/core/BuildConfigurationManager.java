@@ -88,11 +88,11 @@ public class BuildConfigurationManager {
 	}
 
 	/**
-	 * Returns the build scenario set for the given configuration, or null if it is unavailable.
+	 * Returns the service configuration set for the given build configuration, or null if it is unavailable.
 	 * 
 	 * @param bconf
 	 * 			The build configuration
-	 * @return build scenario for the configuration
+	 * @return service configuration for the build configuration
 	 * @throws RuntimeException if the build scenario cannot be mapped to a service configuration. This should never happen.
 	 * @since 2.1
 	 */
@@ -188,15 +188,8 @@ public class BuildConfigurationManager {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 		}
 		
-		// The only way to retrieve all configurations is by name, and there is no function for mapping names to configurations.
-		// Thus, in the loop we set each configuration to the default and then use "getDefaultConfiguration" to retrieve it. Before
-		// starting, we store the current default and restore it after the loop.
-		IConfiguration defaultConfig = buildInfo.getDefaultConfiguration();
-		String[] allConfigNames = buildInfo.getConfigurationNames();
-		for (String configName : allConfigNames) {
-			buildInfo.setDefaultConfiguration(configName);
-			IConfiguration config = buildInfo.getDefaultConfiguration();
-
+		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
+		for (IConfiguration config : allConfigs) {
 			// Update
 			if (bs == null) {
 				if (!(fBuildConfigToBuildScenarioMap.containsKey(config.getId()))) {
@@ -211,7 +204,6 @@ public class BuildConfigurationManager {
 				setBuildScenarioForBuildConfigurationInternal(bs, config);
 			}
 		}
-		buildInfo.setDefaultConfiguration(defaultConfig);
 	}
 	
 	// Find the closest ancestor of the configuration that we have recorded.
