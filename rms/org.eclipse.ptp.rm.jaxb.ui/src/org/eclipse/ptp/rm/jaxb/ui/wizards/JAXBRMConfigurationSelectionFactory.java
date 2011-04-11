@@ -14,6 +14,7 @@ package org.eclipse.ptp.rm.jaxb.ui.wizards;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
@@ -140,25 +142,29 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 		}
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(RESOURCE_MANAGERS);
 		if (project != null) {
-			File dir = project.getLocation().toFile();
-			File[] custom = dir.listFiles(xmlFilter);
-			for (File rm : custom) {
-				try {
-					String name = rm.getName();
-					name = name.substring(0, name.length() - 4);
-					URL url = rm.toURL();
+			IPath path = project.getLocation();
+			if (path != null) {
+				File dir = path.toFile();
+				File[] custom = dir.listFiles(xmlFilter);
+				for (File rm : custom) {
 					try {
-						JAXBInitializationUtils.validate(url);
-					} catch (Throwable t) {
-						if (showError) {
-							WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.InvalidConfiguration
-									+ name, Messages.InvalidConfiguration_title, false);
+						String name = rm.getName();
+						name = name.substring(0, name.length() - 4);
+						URI uri = rm.toURI();
+						URL url = uri.toURL();
+						try {
+							JAXBInitializationUtils.validate(url);
+						} catch (Throwable t) {
+							if (showError) {
+								WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t,
+										Messages.InvalidConfiguration + name, Messages.InvalidConfiguration_title, false);
+							}
+							continue;
 						}
-						continue;
+						info.put(name, url);
+					} catch (MalformedURLException t) {
+						JAXBUIPlugin.log(t);
 					}
-					info.put(name, rm.toURL());
-				} catch (MalformedURLException t) {
-					JAXBUIPlugin.log(t);
 				}
 			}
 		}
