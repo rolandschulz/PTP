@@ -115,7 +115,7 @@
      <extension
            point="org.eclipse.cdt.ui.cPropertyTab">
         <tab
-              class="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesPage"
+              class="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesTab"
               name="Remote Location"
               parent="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
               weight="Remote Location">
