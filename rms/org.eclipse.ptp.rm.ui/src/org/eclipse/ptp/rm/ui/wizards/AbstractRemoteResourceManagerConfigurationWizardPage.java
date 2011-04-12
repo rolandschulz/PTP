@@ -295,22 +295,28 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	public void updateControls() {
 		final boolean enabled = getWidgetListener().isEnabled();
 		getWidgetListener().disable();
-		final boolean portFwd = getDataSource().getPortForward();
-		boolean supportsPortForwarding = false;
-		IRemoteConnection conn = getDataSource().getConnection();
-		setPageComplete(conn != null);
-		if (conn != null) {
-			supportsPortForwarding = conn.supportsTCPPortForwarding();
-		}
-		if (localAddrCombo != null) {
-			localAddrCombo.setEnabled(!portFwd);
-		}
-		if (portForwardingButton != null) {
-			portForwardingButton.setEnabled(supportsPortForwarding);
-			portForwardingButton.setSelection(supportsPortForwarding ? portFwd : false);
-		}
-		if (noneButton != null) {
-			noneButton.setSelection(supportsPortForwarding ? !portFwd : true);
+		boolean useDefault = getDataSource().getUseDefault();
+		connectionWidget.setEnabled(!useDefault);
+		advancedOptions.setExpanded(advancedOptions.isExpanded() & !useDefault);
+		advancedOptions.setEnabled(!useDefault);
+		if (!useDefault) {
+			final boolean portFwd = getDataSource().getPortForward();
+			boolean supportsPortForwarding = false;
+			IRemoteConnection conn = getDataSource().getConnection();
+			setPageComplete(conn != null);
+			if (conn != null) {
+				supportsPortForwarding = conn.supportsTCPPortForwarding();
+			}
+			if (localAddrCombo != null) {
+				localAddrCombo.setEnabled(!portFwd);
+			}
+			if (portForwardingButton != null) {
+				portForwardingButton.setEnabled(supportsPortForwarding);
+				portForwardingButton.setSelection(supportsPortForwarding ? portFwd : false);
+			}
+			if (noneButton != null) {
+				noneButton.setSelection(supportsPortForwarding ? !portFwd : true);
+			}
 		}
 		getWidgetListener().setEnabled(enabled);
 	}
