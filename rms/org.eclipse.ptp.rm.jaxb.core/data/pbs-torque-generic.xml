@@ -235,12 +235,6 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
       <attribute name="Variable_List" type="string">
          <description>This is the list of environment variables passed with the Queue Job batch request.</description>
       </attribute>
-      <managed-files>
-         <file-staging-location>.eclipsesettings</file-staging-location>
-         <file name="toStage">
-            <path>/Users/arossi/toStage.sh</path>
-         </file>
-      </managed-files>
       <script envBegin="36">
          <line>
             <arg>#!/bin/bash</arg>
@@ -351,7 +345,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
             <arg isUndefinedIfMatches="# @ PBS -v"># @ PBS -v ${rm:Variable_List#value}</arg>
          </line>
          <line>
-            <arg>MPI_ARGS="-machinefile $PBS_NODEFILE -np ${rm:mpiCores}"</arg>
+            <arg>MPI_ARGS="-machinefile $PBS_NODEFILE -np ${rm:mpiCores#value}"</arg>
          </line>
          <line>
             <arg resolve="false">if [ "-machinefile $PBS_NODEFILE -np" == "$MPI_ARGS" ] ; then</arg>
@@ -401,12 +395,12 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
          </stdout-parser>
       </start-up-command>
       <submit-batch name="submit-batch" waitForId="true">
-         <arg>qsub</arg>
+         <arg>/usr/local/torque/bin/qsub</arg>
          <arg>${rm:managed_file_for_script#value}</arg>
          <stdout-parser delim="\n" all="true" save="1">
             <target ref="@jobId">
                <match>
-                  <expression>([\d]*)[.].*</expression>
+                  <expression>([\d]+)[.].*</expression>
                   <set field="name">
                      <entry valueGroup="1"/>
                   </set>
@@ -417,7 +411,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
             </target>
          </stdout-parser>
       </submit-batch>
-      <get-job-status name="get-job-status">
+      <get-job-status name="get-job-status" ignoreExitStatus="true">
          <arg>qstat</arg>
          <arg>${rm:@jobId#value}</arg>
          <stdout-parser delim="\n">
@@ -427,6 +421,9 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                   <set field="value">
                      <entry valueGroup="1"/>
                   </set>
+               </match>
+               <match>
+                  <expression>.*</expression>
                </match>
                <test op="EQ">
                   <value>#value</value>
@@ -472,6 +469,16 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                </test>
             </target>
          </stdout-parser>
+         <stderr-parser delim="\n">
+            <target ref="@jobId">
+               <match>
+                  <expression>.*</expression>
+                  <set field="value">
+                     <entry value="COMPLETED"/>
+                  </set>
+               </match>
+            </target>
+         </stderr-parser>
       </get-job-status>
       <terminate-job name="cancel">
          <arg>qdel</arg>

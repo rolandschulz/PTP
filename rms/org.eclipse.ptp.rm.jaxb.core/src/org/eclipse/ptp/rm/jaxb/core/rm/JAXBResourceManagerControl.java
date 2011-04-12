@@ -253,6 +253,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 		try {
+			if (!resourceManagerIsActive()) {
+				return;
+			}
 			resetEnv();
 			Property p = new Property();
 			p.setVisible(false);
@@ -288,6 +291,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
 		try {
+			if (!resourceManagerIsActive()) {
+				return new CommandJobStatus(jobId, IJobStatus.UNDETERMINED);
+			}
+
 			/*
 			 * first check to see when the last call was made; throttle requests
 			 * coming in intervals less than
@@ -348,7 +355,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.startProxy();
 			}
 
-			System.out.println("refreshed status for " + jobId + ", " + status.getState());
+			System.out.println(Messages.RefreshedJobStatusMessage + jobId + CM + SP + status.getState());
 			return status;
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
@@ -364,7 +371,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	@Override
 	protected void doShutdown() throws CoreException {
-		getResourceManager().setState(IResourceManager.TERMINATE_OPERATION);
 		try {
 			resetEnv();
 			doOnShutdown();
@@ -418,7 +424,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected synchronized IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
+		if (!resourceManagerIsActive()) {
+			return new CommandJobStatus(UUID.randomUUID().toString(), IJobStatus.UNDETERMINED);
+		}
+
 		resetEnv();
+
 		/*
 		 * give submission a unique id which will in most cases be replaced by
 		 * the resource-generated id for the job/process
@@ -599,29 +610,30 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		boolean batch = false;
 		for (JAXBElement<Command> job : commands) {
 			command = job.getValue();
-			if (job.getName().equals(SUBMIT_INTERACTIVE)) {
+			if (command == null) {
+				throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + mode, null);
+			}
+
+			if (command.getName().equals(SUBMIT_INTERACTIVE)) {
 				if (ILaunchManager.RUN_MODE.equals(mode)) {
 					break;
 				}
-			} else if (job.getName().equals(SUBMIT_BATCH)) {
+			} else if (command.getName().equals(SUBMIT_BATCH)) {
+				System.out.println("submit-batch, mode: " + mode);
 				if (ILaunchManager.RUN_MODE.equals(mode)) {
 					batch = true;
 					break;
 				}
-			} else if (job.getName().equals(SUBMIT_DEBUG_INTERACTIVE)) {
+			} else if (command.getName().equals(SUBMIT_DEBUG_INTERACTIVE)) {
 				if (ILaunchManager.DEBUG_MODE.equals(mode)) {
 					break;
 				}
-			} else if (job.getName().equals(SUBMIT_DEBUG_BATCH)) {
+			} else if (command.getName().equals(SUBMIT_DEBUG_BATCH)) {
 				if (ILaunchManager.DEBUG_MODE.equals(mode)) {
 					batch = true;
 					break;
 				}
 			}
-		}
-
-		if (command == null) {
-			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + mode, null);
 		}
 
 		return runCommand(uuid, command, batch, false);
@@ -781,6 +793,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		setFixedConfigurationProperties();
 		launchEnv.clear();
 		appendLaunchEnv = true;
+	}
+
+	private boolean resourceManagerIsActive() {
+		IResourceManager rm = getResourceManager();
+		if (rm != null) {
+			String rmState = rm.getState();
+			return !rmState.equals(IResourceManager.STOPPED_STATE);
+		}
+		return false;
 	}
 
 	/**
