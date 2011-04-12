@@ -223,7 +223,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			}
 
 			LCVariableMap lcMap = parentTab.getLCMap();
-			lcMap.restoreGlobal();
+			lcMap.updateGlobal(localMap);
 
 			for (IUpdateModel m : localWidgets.values()) {
 				m.initialize(lcMap);

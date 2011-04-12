@@ -160,13 +160,6 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Set the volatile map to the original global map.
-	 */
-	public void restoreGlobal() {
-		values = globalValues;
-	}
-
-	/**
 	 * Exchange the current volatile map for the one passed in.
 	 * 
 	 * @param newV
@@ -178,6 +171,17 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		Map<String, Object> oldV = values;
 		values = newV;
 		return oldV;
+	}
+
+	/**
+	 * Set the volatile map to the original global map, but first updates the
+	 * latter with the most recent values from the passed in map.
+	 */
+	public void updateGlobal(Map<String, Object> local) {
+		for (String s : local.keySet()) {
+			globalValues.put(s, local.get(s));
+		}
+		values = globalValues;
 	}
 
 	/**
