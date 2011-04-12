@@ -20,6 +20,10 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
  * 
  */
 public interface ICommandJobStatus extends IJobStatus {
+	/**
+	 * for throttling requests which may trigger remote calls
+	 */
+	final long UPDATE_REQUEST_INTERVAL = 30 * 1000;
 
 	/**
 	 * Cancel the Job process (if interactive).
@@ -30,6 +34,13 @@ public interface ICommandJobStatus extends IJobStatus {
 	 * Notify all waiting on the job id of its arrival.
 	 */
 	void cancelWait();
+
+	/**
+	 * timestamp of last update request issued to remote resource
+	 * 
+	 * @return update in milliseconds
+	 */
+	long getLastUpdateRequest();
 
 	/**
 	 * @return whether the associated Job was launched interactively or not.
@@ -47,6 +58,13 @@ public interface ICommandJobStatus extends IJobStatus {
 	 *            of the launched Job, not of the submission call.
 	 */
 	void setState(String state);
+
+	/**
+	 * @param time
+	 *            in milliseconds of last update request issued to remote
+	 *            resource
+	 */
+	void setUpdateRequestTime(long update);
 
 	/**
 	 * Starts the stream proxy monitors.

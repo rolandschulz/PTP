@@ -176,12 +176,16 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Set the volatile map to the original global map, but first updates the
-	 * latter with the most recent values from the passed in map.
+	 * Set the volatile map to the original global map, but first update the
+	 * latter with the most recent values from the configuration.
+	 * 
+	 * @throws CoreException
 	 */
-	public void updateGlobal(Map<String, Object> local) {
-		for (String s : local.keySet()) {
-			globalValues.put(s, local.get(s));
+	@SuppressWarnings("rawtypes")
+	public void updateGlobal(ILaunchConfiguration configuration) throws CoreException {
+		Map attr = configuration.getAttributes();
+		for (Object k : attr.keySet()) {
+			globalValues.put((String) k, attr.get(k));
 		}
 		values = globalValues;
 	}

@@ -166,7 +166,8 @@
 		<xs:attribute name="redirectStderr" type="xs:boolean" default="false"/>
 		<xs:attribute name="streamBufferLimit" type="xs:int" default="-1"/>
 		<xs:attribute name="replaceEnvironment" type="xs:boolean" default="false"/>
-		<xs:attribute name="waitForId" type="xs:boolean" default="false"/>
+		<xs:attribute name="waitForId" type="xs:boolean" default="true"/>
+		<xs:attribute name="ignoreExitStatus" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="launch-tab">
 		<xs:annotation>

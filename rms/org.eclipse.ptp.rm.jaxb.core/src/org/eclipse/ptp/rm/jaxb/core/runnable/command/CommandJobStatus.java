@@ -34,12 +34,14 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private IRemoteProcess process;
 	private final RMVariableMap rmVarMap;
 	private boolean waitEnabled;
+	private long lastUpdateRequest;
 
 	public CommandJobStatus() {
 		jobId = null;
 		state = IJobStatus.UNDETERMINED;
 		rmVarMap = RMVariableMap.getActiveInstance();
 		waitEnabled = true;
+		lastUpdateRequest = 0;
 	}
 
 	/**
@@ -82,6 +84,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public synchronized String getJobId() {
 		return jobId;
+	}
+
+	public synchronized long getLastUpdateRequest() {
+		return lastUpdateRequest;
 	}
 
 	/**
@@ -192,6 +198,15 @@ public class CommandJobStatus implements ICommandJobStatus {
 			this.state = COMPLETED;
 			stateDetail = FAILED;
 		}
+	}
+
+	/**
+	 * @param time
+	 *            in milliseconds of last update request issued to remote
+	 *            resource
+	 */
+	public synchronized void setUpdateRequestTime(long update) {
+		lastUpdateRequest = update;
 	}
 
 	/**
