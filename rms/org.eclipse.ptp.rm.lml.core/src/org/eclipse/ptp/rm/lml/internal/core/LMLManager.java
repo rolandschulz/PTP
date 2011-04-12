@@ -40,11 +40,6 @@ public class LMLManager implements ILMLManager{
 	protected final Map<String, ILguiItem> LGUIS = new HashMap<String, ILguiItem>();
 	
 	/*
-	 * Source of the xmlFile 
-	 */
-	private URL xmlFile;
-	
-	/*
 	 * The current considered ILguiItem
 	 */
 	private ILguiItem fSelectedLguiItem = null;
@@ -84,17 +79,15 @@ public class LMLManager implements ILMLManager{
 	 * org.eclipse.ptp.rm.lml.core.ILMLManager#addLgui(URL xmlFile)
 	 */
 	public boolean addLgui(URL xmlFile) {
-		this.xmlFile = xmlFile;
 		if (!LGUIS.containsKey(xmlFile.getPath())) {
 			fSelectedLguiItem = new LguiItem(xmlFile);
 			synchronized (LGUIS){
 				LGUIS.put(xmlFile.getPath(), fSelectedLguiItem);
 			}
 			fireNewLgui();
-			return true;
-		} else {
-			//TODO load another ILguiItem
 			return false;
+		} else {
+			return true;
 		}	
 	}
 	
@@ -157,6 +150,11 @@ public class LMLManager implements ILMLManager{
 	
 	public void selectLgui(int index) {
 		fSelectedLguiItem = LGUIS.get(getSelectedLguiTitle(index));
+		fireSelectedLgui();
+	}
+	
+	public void selectLgui(URL xmlFile) {
+		fSelectedLguiItem = LGUIS.get(xmlFile.getPath());
 		fireSelectedLgui();
 	}
 

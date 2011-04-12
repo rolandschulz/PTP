@@ -12,12 +12,9 @@
 package org.eclipse.ptp.rm.lml.internal.ui;
 
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
-import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
-import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-import org.eclipse.ui.console.IConsoleConstants;
 
 public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 
