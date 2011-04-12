@@ -123,6 +123,8 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private final IJAXBResourceManagerControl rm;
 	private final ICommandJobStreamsProxy proxy;
 	private final boolean waitForId;
+	private final boolean ignoreExitStatus;
+	private final boolean batch;
 
 	private IRemoteProcess process;
 	private IStreamParserTokenizer stdoutTokenizer;
@@ -136,8 +138,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private String remoteOutPath;
 	private String remoteErrPath;
 	private boolean active;
-	private final boolean ignoreExitStatus;
-	private final boolean batch;
 
 	/**
 	 * @param jobUUID
@@ -428,18 +428,22 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	/**
 	 * Configures handling of the error stream. If there is a tokenizer, it
 	 * first checks to see if there will be redirection from a remote file, and
-	 * if not, splits the stream between the proxy and the tokenizer; if there
-	 * is a remote file, that stream is given to the proxy and the tokenizer
-	 * gets the stderr of the submission process. If there is no tokenizer, then
-	 * the proxy gets either stderr of the submission process or redirection
-	 * from the remote file, accordingly.
+	 * if not, splits the stream between the proxy and the tokenizer in the case
+	 * of an interactive job; if there is a remote file, that stream is given to
+	 * the proxy and the tokenizer gets the stderr of the submission process. If
+	 * there is no tokenizer, then the proxy gets either stderr of the
+	 * submission process if interactive, or redirection from the remote file,
+	 * accordingly.
 	 * 
 	 * @param process
 	 * @throws IOException
 	 */
 	private void setErrStreamRedirection(IRemoteProcess process) throws IOException {
-		if (stderrTokenizer != null) {
-			if (remoteErrPath == null) {
+		if (stdoutTokenizer != null) {
+			if (remoteErrPath != null) {
+				tokenizerErr = process.getErrorStream();
+				proxy.setErrMonitor(new CommandJobStreamMonitor(rm, remoteErrPath));
+			} else if (!batch) {
 				PipedInputStream tokenizerErr = new PipedInputStream();
 				this.tokenizerErr = tokenizerErr;
 				PipedInputStream monitorErr = new PipedInputStream();
@@ -447,30 +451,35 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				proxy.setErrMonitor(new CommandJobStreamMonitor(monitorErr));
 			} else {
 				tokenizerErr = process.getErrorStream();
-				proxy.setErrMonitor(new CommandJobStreamMonitor(rm, remoteErrPath));
 			}
-		} else if (remoteErrPath == null) {
-			proxy.setErrMonitor(new CommandJobStreamMonitor(process.getErrorStream()));
-		} else {
+		} else if (remoteErrPath != null) {
 			proxy.setErrMonitor(new CommandJobStreamMonitor(rm, remoteErrPath));
+		} else if (!batch) {
+			proxy.setErrMonitor(new CommandJobStreamMonitor(process.getErrorStream()));
 		}
+
+		System.out.println("PROXY STDERR MONITOR for " + command.getName() + ": " + proxy.getErrorStreamMonitor());
 	}
 
 	/**
 	 * Configures handling of the stdout stream. If there is a tokenizer, it
 	 * first checks to see if there will be redirection from a remote file, and
-	 * if not, splits the stream between the proxy and the tokenizer; if there
-	 * is a remote file, that stream is given to the proxy and the tokenizer
-	 * gets the stdout of the submission process. If there is no tokenizer, then
-	 * the proxy gets either stdout of the submission process or redirection
-	 * from the remote file, accordingly.
+	 * if not, splits the stream between the proxy and the tokenizer in the case
+	 * of an interactive job; if there is a remote file, that stream is given to
+	 * the proxy and the tokenizer gets the stdout of the submission process. If
+	 * there is no tokenizer, then the proxy gets either stdout of the
+	 * submission process if interactive, or redirection from the remote file,
+	 * accordingly.
 	 * 
 	 * @param process
 	 * @throws IOException
 	 */
 	private void setOutStreamRedirection(IRemoteProcess process) throws IOException {
 		if (stdoutTokenizer != null) {
-			if (remoteOutPath == null) {
+			if (remoteOutPath != null) {
+				tokenizerOut = process.getInputStream();
+				proxy.setOutMonitor(new CommandJobStreamMonitor(rm, remoteOutPath));
+			} else if (!batch) {
 				PipedInputStream tokenizerOut = new PipedInputStream();
 				this.tokenizerOut = tokenizerOut;
 				PipedInputStream monitorOut = new PipedInputStream();
@@ -478,13 +487,15 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				proxy.setOutMonitor(new CommandJobStreamMonitor(monitorOut));
 			} else {
 				tokenizerOut = process.getInputStream();
-				proxy.setOutMonitor(new CommandJobStreamMonitor(rm, remoteOutPath));
 			}
-		} else if (remoteOutPath == null) {
-			proxy.setOutMonitor(new CommandJobStreamMonitor(process.getInputStream()));
-		} else {
+		} else if (remoteOutPath != null) {
 			proxy.setOutMonitor(new CommandJobStreamMonitor(rm, remoteOutPath));
+		} else if (!batch) {
+			proxy.setOutMonitor(new CommandJobStreamMonitor(process.getInputStream()));
 		}
+		System.out.println("Settings for " + command.getName() + ": tokenizer " + stdoutTokenizer + ", remoteOutPath "
+				+ remoteOutPath + ", batch " + batch);
+		System.out.println("PROXY STDOUT MONITOR for " + command.getName() + ": " + proxy.getOutputStreamMonitor());
 	}
 
 	/**
