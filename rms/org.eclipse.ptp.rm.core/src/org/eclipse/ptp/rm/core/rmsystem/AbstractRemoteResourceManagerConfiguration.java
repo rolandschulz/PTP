@@ -117,7 +117,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	 * getUseDefault()
 	 */
 	public boolean getUseDefault() {
-		return getBoolean(TAG_USE_DEFAULT, true);
+		return getBoolean(TAG_USE_DEFAULT, false);
 	}
 
 	/**
