@@ -21,6 +21,7 @@ public class Messages extends NLS {
 	public static String UIUtils_2;
 	public static String UIUtils_3;
 	public static String UIUtils_4;
+	public static String UpdateLguiAction_0;
 	
 	static {
 		// initialize resource bundle

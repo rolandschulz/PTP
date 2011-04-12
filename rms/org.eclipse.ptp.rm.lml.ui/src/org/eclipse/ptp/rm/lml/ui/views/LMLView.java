@@ -24,6 +24,7 @@ package org.eclipse.ptp.rm.lml.ui.views;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ListViewer;
@@ -37,6 +38,7 @@ import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.ui.actions.AddLguiAction;
 import org.eclipse.ptp.rm.lml.ui.actions.RemoveLguiAction;
+import org.eclipse.ptp.rm.lml.ui.actions.UpdateLguiAction;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLListLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -47,24 +49,19 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.ViewPart;
 
-/**
- * 
- * @author Claudia Knobloch
- * 
- */
 public class LMLView extends ViewPart {
 	private final class LMLViewListener implements IViewListener {
 
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILguiListener# handleEvent
+		 * @see
+		 * org.eclipse.ptp.rm.lml.core.listeners.ILguiListener#
+		 * handleEvent
 		 * (org.eclipse.ptp.core.events.ILguiAddedEvent)
 		 */
 		@Override
 		public synchronized void handleEvent(ILguiAddedEvent e) {
-			// viewer.getList().setRedraw(false);
-
 			fSelected = e.getLguiItem();
 			createList();
 		}
@@ -72,7 +69,9 @@ public class LMLView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILguiListener# handleEvent
+		 * @see
+		 * org.eclipse.ptp.rm.lml.core.listeners.ILguiListener#
+		 * handleEvent
 		 * (org.eclipse.ptp.core.events.ILguiRemovedEvent)
 		 */
 		@Override
@@ -85,11 +84,11 @@ public class LMLView extends ViewPart {
 		public void handleEvent(ILguiSelectedEvent e) {
 			fSelected = e.getLguiItem();
 			createList();
-
+			
 		}
 
 	}
-
+	
 	public final class ListSelectionListener implements SelectionListener {
 
 		@Override
@@ -111,6 +110,7 @@ public class LMLView extends ViewPart {
 	public ListViewer viewer;
 	private AddLguiAction addLguiAction;
 	private RemoveLguiAction removeLguiAction;
+	private UpdateLguiAction updateLguiAction;
 	private ILguiItem fSelected = null;
 	private final ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager();
 	private LMLViewListener lmlViewListener = null;
@@ -140,17 +140,17 @@ public class LMLView extends ViewPart {
 				return null;
 			}
 		});
-
+		
 		lmlViewListener = (LMLViewListener) lmlManager.getListener(this.getClass().getName());
 		if (lmlViewListener == null) {
 			lmlViewListener = new LMLViewListener();
 			lmlManager.addListener(lmlViewListener, this.getClass().getName());
 		}
-
+		
 		fSelected = lmlManager.getSelectedLguiItem();
 		createList();
 	}
-
+	
 	private void createList() {
 		list = viewer.getList();
 		list.removeAll();
@@ -174,11 +174,12 @@ public class LMLView extends ViewPart {
 	@Override
 	public void dispose() {
 	}
-
-	private void createContextMenu() {
+	
+	private void createContextMenu(){
 		final Shell shell = getSite().getShell();
 		addLguiAction = new AddLguiAction(shell);
 		removeLguiAction = new RemoveLguiAction(shell);
+		updateLguiAction = new UpdateLguiAction(shell);
 
 		MenuManager menuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuManager.setRemoveAllWhenShown(true);
@@ -193,14 +194,18 @@ public class LMLView extends ViewPart {
 		viewer.getControl().setMenu(menu);
 		getSite().registerContextMenu(menuManager, viewer);
 	}
-
+	
 	private void fillContextMenu(IMenuManager manager) {
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		manager.add(addLguiAction);
 		boolean inContextForLgui = selection.size() > 0;
 		boolean inContextForRemoveLgui = inContextForLgui;
+		boolean inContextForUpdateLgui = inContextForLgui;
 		manager.add(removeLguiAction);
 		removeLguiAction.setEnabled(inContextForRemoveLgui);
+		manager.add(new Separator());
+		manager.add(updateLguiAction);
+		updateLguiAction.setEnabled(inContextForUpdateLgui);
 	}
 
 }
