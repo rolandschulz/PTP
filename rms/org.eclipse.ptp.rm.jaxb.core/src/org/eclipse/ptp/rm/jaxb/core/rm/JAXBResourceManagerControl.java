@@ -98,7 +98,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			while (isRunning()) {
 				synchronized (map) {
 					try {
-						map.wait(5 * MINUTE_IN_MS);
+						map.wait(2 * MINUTE_IN_MS);
 					} catch (InterruptedException ignored) {
 					}
 
@@ -288,6 +288,30 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
 		try {
+			/*
+			 * first check to see when the last call was made; throttle requests
+			 * coming in intervals less than
+			 * ICommandJobStatus.UPDATE_REQUEST_INTERVAL
+			 */
+			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
+			if (status != null) {
+				if (IJobStatus.COMPLETED.equals(status.getState())) {
+					status.cancel();
+					/*
+					 * leave the status in the map in case there are further
+					 * calls; it will be pruned by the daemon
+					 */
+					return status;
+				}
+
+				long now = System.currentTimeMillis();
+				long lapse = now - status.getLastUpdateRequest();
+				if (lapse < ICommandJobStatus.UPDATE_REQUEST_INTERVAL) {
+					return status;
+				}
+				status.setUpdateRequestTime(now);
+			}
+
 			Property p = new Property();
 			p.setVisible(false);
 			p.setName(jobId);
@@ -307,7 +331,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				state = (String) p.getValue();
 			}
 
-			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
 			if (status == null) {
 				status = new CommandJobStatus(jobId, state);
 				jobStatusMap.addJobStatus(jobId, status);
@@ -316,12 +339,16 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 
 			if (IJobStatus.COMPLETED.equals(state)) {
+				/*
+				 * leave the status in the map in case there are further calls;
+				 * it will be pruned by the daemon
+				 */
 				status.cancel();
-				jobStatusMap.removeJobStatus(jobId);
 			} else if (IJobStatus.RUNNING.equals(state)) {
 				status.startProxy();
 			}
 
+			System.out.println("refreshed status for " + jobId + ", " + status.getState());
 			return status;
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
@@ -579,10 +606,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			} else if (job.getName().equals(SUBMIT_BATCH)) {
 				if (ILaunchManager.RUN_MODE.equals(mode)) {
 					batch = true;
-					/*
-					 * override
-					 */
-					command.setWaitForId(true);
 					break;
 				}
 			} else if (job.getName().equals(SUBMIT_DEBUG_INTERACTIVE)) {
@@ -592,10 +615,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			} else if (job.getName().equals(SUBMIT_DEBUG_BATCH)) {
 				if (ILaunchManager.DEBUG_MODE.equals(mode)) {
 					batch = true;
-					/*
-					 * override
-					 */
-					command.setWaitForId(true);
 					break;
 				}
 			}

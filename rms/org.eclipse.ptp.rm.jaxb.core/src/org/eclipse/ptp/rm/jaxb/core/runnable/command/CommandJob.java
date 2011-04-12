@@ -136,6 +136,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private String remoteOutPath;
 	private String remoteErrPath;
 	private boolean active;
+	private final boolean ignoreExitStatus;
 	private final boolean batch;
 
 	/**
@@ -156,6 +157,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		this.uuid = jobUUID;
 		this.proxy = new CommandJobStreamsProxy();
 		this.waitForId = command.isWaitForId();
+		this.ignoreExitStatus = command.isIgnoreExitStatus();
 	}
 
 	/**
@@ -259,7 +261,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			} catch (InterruptedException ignored) {
 			}
 
-			if (exit != 0) {
+			if (exit != 0 && !ignoreExitStatus) {
 				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (ZEROSTR + exit), null);
 			}
 

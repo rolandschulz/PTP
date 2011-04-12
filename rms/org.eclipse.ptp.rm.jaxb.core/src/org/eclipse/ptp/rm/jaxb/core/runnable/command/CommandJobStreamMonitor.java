@@ -270,6 +270,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 			JAXBCorePlugin.log(CoreExceptionUtils.getErrorStatus(Messages.CommandJobNullMonitorStreamError, null));
 			return;
 		}
+
 		lastSleep = System.currentTimeMillis();
 		long currentTime = lastSleep;
 		byte[] bytes = new byte[STREAM_BUFFER_SIZE];
