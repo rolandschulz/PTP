@@ -782,9 +782,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		String rmUniqueName = getResourceManagerUniqueName(configuration);
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
-			return rm;
+		if (rmUniqueName != null) {
+			return PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
 		}
 		return null;
 	}
