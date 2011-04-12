@@ -52,6 +52,8 @@ public interface ILMLManager{
 	
 	public void selectLgui(int index);
 	
+	public void selectLgui(URL xmlFile);
+	
 	/**
 	 * Getting the current considered ILguiItem.
 	 * @return the current considered ILguiItem

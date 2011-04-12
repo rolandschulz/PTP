@@ -21,6 +21,7 @@ import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
+import org.eclipse.ptp.rm.lml.ui.actions.TableViewPullDownMenuAction;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -132,6 +133,7 @@ public class TableView extends LMLViewPart {
 				oldColumns[i].dispose();
 			}
 		}
+		this.getViewSite().getActionBars().getMenuManager().removeAll();
 	}
 	
 	private void createTable() {
@@ -200,13 +202,10 @@ public class TableView extends LMLViewPart {
 		}; 
 		for (int i = 0; i < tableColumns.length; i++) {
 			tableColumns[i].addListener(SWT.Selection, sortListener);
-			// TODO ColumnChange
-//			tableColumns[i].addControlListener(new ControlAdapter() {
-//
-//				public void controlMoved(ControlEvent e) {
-//					System.out.println(e.getSource());
-//				}
-//			});
+		}
+		String[] tableColumnNonActive = fSelectedLguiItem.getTableHandler().getTableColumnNonActive(tableType);
+		for (int i = 0; i < tableColumnNonActive.length; i++) {
+			this.getViewSite().getActionBars().getMenuManager().add(new TableViewPullDownMenuAction(tableColumnNonActive[i]));
 		}
 
 	}
