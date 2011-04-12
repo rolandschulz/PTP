@@ -96,15 +96,16 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 
 			while (isRunning()) {
-				try {
-					Thread.sleep(5 * MINUTE_IN_MS);
-				} catch (InterruptedException ignored) {
-				}
 				synchronized (map) {
+					try {
+						map.wait(5 * MINUTE_IN_MS);
+					} catch (InterruptedException ignored) {
+					}
+
 					for (String jobId : map.keySet()) {
 						IJobStatus status = getJobStatus(jobId);
 						String state = status.getState();
-						if (IJobStatus.COMPLETED.equals(state) || IJobStatus.FAILED.equals(state)) {
+						if (IJobStatus.COMPLETED.equals(state)) {
 							toPrune.put(jobId, jobId);
 						} else if (IJobStatus.RUNNING.equals(state)) {
 							ICommandJobStatus commandJobStatus = map.get(jobId);
@@ -169,8 +170,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		private void halt() {
 			synchronized (map) {
 				running = false;
+				map.notifyAll();
 			}
-			this.interrupt();
 		}
 
 		/**
@@ -314,11 +315,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.setState(state);
 			}
 
-			if (IJobStatus.RUNNING.equals(state)) {
-				status.startProxy();
-			} else if (IJobStatus.FAILED.equals(state) || IJobStatus.COMPLETED.equals(state)) {
+			if (IJobStatus.COMPLETED.equals(state)) {
 				status.cancel();
 				jobStatusMap.removeJobStatus(jobId);
+			} else if (IJobStatus.RUNNING.equals(state)) {
+				status.startProxy();
 			}
 
 			return status;
@@ -578,6 +579,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			} else if (job.getName().equals(SUBMIT_BATCH)) {
 				if (ILaunchManager.RUN_MODE.equals(mode)) {
 					batch = true;
+					/*
+					 * override
+					 */
+					command.setWaitForId(true);
 					break;
 				}
 			} else if (job.getName().equals(SUBMIT_DEBUG_INTERACTIVE)) {
@@ -587,6 +592,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			} else if (job.getName().equals(SUBMIT_DEBUG_BATCH)) {
 				if (ILaunchManager.DEBUG_MODE.equals(mode)) {
 					batch = true;
+					/*
+					 * override
+					 */
+					command.setWaitForId(true);
 					break;
 				}
 			}
@@ -876,10 +885,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 		}
 
+		/*
+		 * pull these out of the configuration; they are needed for the script
+		 */
 		rmVarMap.maybeOverwrite(SCRIPT_PATH, SCRIPT_PATH, configuration);
 		rmVarMap.maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
 		rmVarMap.maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
 		rmVarMap.maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
+		setFixedConfigurationProperties();
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));

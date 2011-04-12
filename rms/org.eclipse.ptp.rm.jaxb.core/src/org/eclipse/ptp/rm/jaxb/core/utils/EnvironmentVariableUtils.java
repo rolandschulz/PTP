@@ -13,7 +13,9 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
 import org.eclipse.ptp.rm.jaxb.core.data.NameValuePair;
+import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
@@ -72,6 +74,27 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 				export(name, value, buffer);
 			}
 		}
+	}
+
+	/**
+	 * For debugging purposes.
+	 * 
+	 * @param map
+	 * @return string of n=v lines
+	 */
+	public static String toString(RMVariableMap map) {
+		StringBuffer b = new StringBuffer();
+		for (Object o : map.getVariables().values()) {
+			if (o instanceof Property) {
+				Property p = (Property) o;
+				b.append(p.getName()).append(EQ).append(p.getValue()).append(LINE_SEP);
+			} else if (o instanceof Attribute) {
+				Attribute a = (Attribute) o;
+				b.append(a.getName()).append(EQ).append(a.getValue()).append(LINE_SEP);
+			}
+		}
+
+		return b.toString();
 	}
 
 	/**

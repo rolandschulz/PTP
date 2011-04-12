@@ -15,7 +15,9 @@ import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
@@ -309,6 +311,30 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 */
 	public synchronized static LCVariableMap getActiveInstance() {
 		return active;
+	}
+
+	/**
+	 * Ensures that non-JAXB-spacific attributes remain in the configuration
+	 * during replace/refresh.
+	 * 
+	 * @param configuration
+	 *            current launch settings
+	 * @return map of org.eclipse.debug and org.eclipse.ptp attributes
+	 * @throws CoreException
+	 */
+	public static Map<String, Object> getStandardConfigurationProperties(ILaunchConfiguration configuration) throws CoreException {
+		Map<String, Object> standard = new TreeMap<String, Object>();
+		Map<?, ?> attributes = configuration.getAttributes();
+		for (Object o : attributes.keySet()) {
+			String key = (String) o;
+			if (key.startsWith(DEBUG_PACKAGE) || key.startsWith(PTP_PACKAGE)) {
+				standard.put(key, attributes.get(key));
+			}
+		}
+		standard.put(DIRECTORY, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, ZEROSTR));
+		standard.put(EXEC_PATH, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, ZEROSTR));
+		standard.put(PROG_ARGS, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, ZEROSTR));
+		return standard;
 	}
 
 	/**
