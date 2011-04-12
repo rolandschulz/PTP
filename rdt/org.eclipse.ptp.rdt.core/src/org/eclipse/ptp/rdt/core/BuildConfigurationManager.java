@@ -47,6 +47,23 @@ public class BuildConfigurationManager {
 	}
 	
 	/**
+	 * Delete a build scenario, also handling removal of unneeded service configurations
+	 * @param project
+	 * @param buildScenario
+	 */
+	private static void deleteBuildScenario(IProject project, BuildScenario buildScenario) {
+		IServiceConfiguration oldConfig = fBuildScenarioToSConfigMap.get(buildScenario);
+		if (oldConfig == null) {
+			throw new RuntimeException("Unable to find service configuration for build scenario"); //$NON-NLS-1$
+		}
+		fBuildScenarioToSConfigMap.remove(buildScenario);
+		if (!(fBuildScenarioToSConfigMap.containsValue(oldConfig))) {
+			ServiceModelManager.getInstance().remove(oldConfig);
+			ServiceModelManager.getInstance().removeConfiguration(project, oldConfig);
+		}
+	}
+	
+	/**
 	 * Return the build scenario for the passed configuration. Any newly created configurations should be recorded by the call to
 	 * "updateConfigurations".
 	 * 
@@ -83,7 +100,13 @@ public class BuildConfigurationManager {
 	
 	// Actual internal code for setting a build scenario
 	private static void setBuildScenarioForBuildConfigurationInternal(BuildScenario bs, IConfiguration bconf) {
+		BuildScenario oldbs = fBuildConfigToBuildScenarioMap.get(bconf.getId());
 		fBuildConfigToBuildScenarioMap.put(bconf.getId(), bs);
+		// Remove build scenarios no longer referenced. This ensures that, at least, there are no more build scenarios than there
+		// are build configurations.
+		if ((oldbs != null) && (!(fBuildConfigToBuildScenarioMap.containsValue(oldbs)))) {
+			deleteBuildScenario(bconf.getOwner().getProject(), oldbs);
+		}
 		addBuildScenario(bconf.getOwner().getProject(), bs);
 	}
 
@@ -229,5 +252,14 @@ public class BuildConfigurationManager {
 		} else {
 			return null;
 		}
+	}
+
+	/*
+	 * Indicate if the project has yet been initialized.
+	 * 
+	 * @return whether or not the project has been initialized
+	 */
+	public static boolean isInitialized(IProject project) {
+		return initializedProjects.contains(project);
 	}
 }

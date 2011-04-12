@@ -84,8 +84,12 @@ public class ResourceChangeListener {
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
 				IProject project = delta.getResource().getProject();
 				if (project != null && RemoteSyncNature.hasNature(project)) {
+					if (!(BuildConfigurationManager.isInitialized(project))) {
+						return;
+					}
 					IConfiguration buildConfig = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
 					IServiceConfiguration serviceConfig = BuildConfigurationManager.getConfigurationForBuildConfiguration(buildConfig);
+					// TODO: serviceConfig should never be null. We should log if this ever happens...
 					if (serviceConfig != null) {
 						ISyncServiceProvider provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(fSyncService);
 						if (provider != null) {

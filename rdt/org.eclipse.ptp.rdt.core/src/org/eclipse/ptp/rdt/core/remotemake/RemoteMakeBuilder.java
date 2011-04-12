@@ -304,8 +304,8 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				consoleOut = (currentStdOut == null ? stdout : currentStdOut);
 				consoleErr = (currentStdErr == null ? stderr : currentStdErr);
 				
-				// Determine the service model for this configuration, and use the provider of the build
-				// service to execute the build command.
+				// Determine the service model for this configuration and then use the provider of the build service to execute the
+				// build command.
 				ServiceModelManager smm = ServiceModelManager.getInstance();
 				
 				try{
