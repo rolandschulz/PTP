@@ -81,7 +81,9 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	/**
 	 * Root call to build the SWT widget tree. Calls
 	 * {@link #addComposite(CompositeDescriptor, Composite)} or
-	 * {@link #addFolder(TabFolderDescriptor, Composite)}.
+	 * {@link #addFolder(TabFolderDescriptor, Composite)}. <br>
+	 * <br>
+	 * Clears the widgets map, in the case or reinitializaton.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.CompositeDescriptor
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor
@@ -91,7 +93,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * @throws Throwable
 	 */
 	public void build(Composite parent) throws Throwable {
-		this.localWidgets.clear();
+		localWidgets.clear();
 		List<Object> top = tab.getController().getTabFolderOrComposite();
 		for (Object o : top) {
 			if (o instanceof CompositeDescriptor) {
