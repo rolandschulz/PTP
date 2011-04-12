@@ -166,6 +166,8 @@ public interface IJAXBNonNLSConstants {
 	String MONITOR_ADDRESS_VAR = "monitor.address";//$NON-NLS-1$
 	String ARPA = ".in-addr.arpa";//$NON-NLS-1$
 	String ECLIPSESETTINGS = ".eclipsesettings";//$NON-NLS-1$
+	String DEBUG_PACKAGE = "org.eclipse.debug";//$NON-NLS-1$
+	String PTP_PACKAGE = "org.eclipse.ptp";//$NON-NLS-1$
 
 	String STARTUP = "OnStartUp";//$NON-NLS-1$
 	String SHUTDOWN = "OnShutDown";//$NON-NLS-1$

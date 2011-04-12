@@ -29,6 +29,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private String jobId;
 	private ILaunchConfiguration launchConfig;
 	private String state;
+	private String stateDetail;
 	private ICommandJobStreamsProxy proxy;
 	private IRemoteProcess process;
 	private final RMVariableMap rmVarMap;
@@ -48,7 +49,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public CommandJobStatus(String jobId, String state) {
 		this.jobId = jobId;
-		this.state = state;
+		setState(state);
 		rmVarMap = RMVariableMap.getActiveInstance();
 		waitEnabled = false;
 	}
@@ -101,7 +102,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @return more specific state identifier.
 	 */
 	public synchronized String getStateDetail() {
-		return state;
+		return stateDetail;
 	}
 
 	/**
@@ -151,7 +152,46 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 *            of the job (not of the submission process).
 	 */
 	public synchronized void setState(String state) {
-		this.state = state;
+		if (UNDETERMINED.equals(state)) {
+			this.state = UNDETERMINED;
+			stateDetail = UNDETERMINED;
+		} else if (SUBMITTED.equals(state)) {
+			this.state = SUBMITTED;
+			stateDetail = SUBMITTED;
+		} else if (RUNNING.equals(state)) {
+			this.state = RUNNING;
+			stateDetail = RUNNING;
+		} else if (SUSPENDED.equals(state)) {
+			this.state = SUSPENDED;
+			stateDetail = SUSPENDED;
+		} else if (COMPLETED.equals(state)) {
+			this.state = COMPLETED;
+			stateDetail = COMPLETED;
+		} else if (QUEUED_ACTIVE.equals(state)) {
+			this.state = SUBMITTED;
+			stateDetail = QUEUED_ACTIVE;
+		} else if (SYSTEM_ON_HOLD.equals(state)) {
+			this.state = SUBMITTED;
+			stateDetail = SYSTEM_ON_HOLD;
+		} else if (USER_ON_HOLD.equals(state)) {
+			this.state = SUBMITTED;
+			stateDetail = USER_ON_HOLD;
+		} else if (USER_SYSTEM_ON_HOLD.equals(state)) {
+			this.state = SUBMITTED;
+			stateDetail = USER_SYSTEM_ON_HOLD;
+		} else if (SYSTEM_SUSPENDED.equals(state)) {
+			this.state = SUSPENDED;
+			stateDetail = SYSTEM_SUSPENDED;
+		} else if (USER_SUSPENDED.equals(state)) {
+			this.state = SUSPENDED;
+			stateDetail = USER_SUSPENDED;
+		} else if (USER_SYSTEM_SUSPENDED.equals(state)) {
+			this.state = SUSPENDED;
+			stateDetail = USER_SYSTEM_SUSPENDED;
+		} else if (FAILED.equals(state)) {
+			this.state = COMPLETED;
+			stateDetail = FAILED;
+		}
 	}
 
 	/**

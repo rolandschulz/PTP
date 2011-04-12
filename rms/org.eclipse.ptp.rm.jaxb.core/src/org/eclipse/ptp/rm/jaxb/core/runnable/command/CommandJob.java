@@ -27,8 +27,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.IStreamListener;
-import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
@@ -454,13 +452,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		} else {
 			proxy.setErrMonitor(new CommandJobStreamMonitor(rm, remoteErrPath));
 		}
-		proxy.getErrorStreamMonitor().addListener(new IStreamListener() {
-			public void streamAppended(String text, IStreamMonitor monitor) {
-				if (!text.trim().equals(ZEROSTR)) {
-					JAXBCorePlugin.log(text);
-				}
-			}
-		});
 	}
 
 	/**

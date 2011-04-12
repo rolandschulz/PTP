@@ -15,9 +15,7 @@ import java.util.TreeMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
@@ -128,16 +126,9 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 * @param current
 	 *            configuration
 	 */
-	@SuppressWarnings("rawtypes")
 	protected void refreshLocal(ILaunchConfiguration config) throws CoreException {
 		localMap.clear();
-		localMap.put(DIRECTORY, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, ZEROSTR));
-		localMap.put(EXEC_PATH, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, ZEROSTR));
-		localMap.put(PROG_ARGS, config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, ZEROSTR));
-		localMap.put(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES,
-				config.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true));
-		localMap.put(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,
-				config.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null));
+		localMap.putAll(LCVariableMap.getStandardConfigurationProperties(config));
 		doRefreshLocal();
 	}
 }

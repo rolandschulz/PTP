@@ -100,7 +100,7 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 				}
 
 				public String getStateDetail() {
-					return getState();
+					return UNDETERMINED;
 				}
 
 				public IStreamsProxy getStreamsProxy() {
