@@ -92,9 +92,6 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
 																										provider.getLocation());
 
-		// Add information about remote location to the initial build configurations (.cproject file)
-		BuildConfigurationManager.setInitialBuildScenarioForAllConfigurations(project, buildScenario);
-		
 		// For each build configuration, set the build directory appropriately.
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
@@ -106,6 +103,11 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			config.getToolChain().getBuilder().setBuildPath(buildPath);
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
+
+		// Add information about remote location to the initial build configurations
+		// Do this last so that project is not flagged as initialized prematurely.
+		BuildConfigurationManager.setInitialBuildScenarioForAllConfigurations(project, buildScenario);
+		
 		monitor.done();
 	}
 

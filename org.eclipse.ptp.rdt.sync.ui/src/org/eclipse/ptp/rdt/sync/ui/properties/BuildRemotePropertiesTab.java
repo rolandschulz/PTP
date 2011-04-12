@@ -6,7 +6,6 @@ import java.util.Map;
 import org.eclipse.cdt.core.settings.model.ICResourceDescription;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractCBuildPropertyTab;
-import org.eclipse.core.internal.events.BuildManager;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.ptp.rdt.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.core.BuildScenario;
@@ -157,12 +156,12 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 				// PATH_PROPERTY, fLocationText.getText());
 			}
 		});
+		
+		this.setValues();
 	}
 	
 	/**
-	 * Store remote location information both to the service model manager and to the selected build configuration (.cproject file)
-	 * 
-	 * @throws RuntimeException on problems retrieving the project or its build information.
+	 * Store remote location information for the selected build configuration
 	 */
 	public void performOK() {
 		// Register with build configuration manager
@@ -233,8 +232,7 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 	}
 
 	@Override
-	public void performApply(ICResourceDescription src,
-			ICResourceDescription dst) {
+	public void performApply(ICResourceDescription src, ICResourceDescription dst) {
 		performOK();
 	}
 
@@ -246,12 +244,20 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 
 	@Override
 	public void updateData(ICResourceDescription cfg) {
+		this.setValues();
+	}
+	
+	private void setValues() {
 		populateConnectionCombo(fConnectionCombo);
 		BuildScenario buildScenario = BuildConfigurationManager.getBuildScenarioForBuildConfiguration(getCfg());
 		if (buildScenario != null) {
 			fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(buildScenario.getRemoteConnection()));
 			handleConnectionSelected();
 			fRootLocationText.setText(buildScenario.getLocation());
+			String buildSubDir = getCfg().getToolChain().getBuilder().getBuildPath();
+			// TODO: Check that it really is a subdirectory, but it is not clear what to do if it is not.
+			buildSubDir = buildSubDir.substring(buildScenario.getLocation().length());
+			fBuildLocationText.setText(buildSubDir);
 		}
 	}
 
