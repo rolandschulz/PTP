@@ -355,6 +355,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.startProxy();
 			}
 
+			// XXX eliminate when monitoring is in place
 			System.out.println(Messages.RefreshedJobStatusMessage + jobId + CM + SP + status.getState());
 			return status;
 		} catch (CoreException ce) {

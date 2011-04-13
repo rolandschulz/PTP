@@ -125,8 +125,11 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	 * Gets all extensions to the
 	 * org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations extension
 	 * point and loads their names and locations.
+	 * 
+	 * @param resourceManagers
+	 *            map of extId to map(name, URL)
 	 */
-	private static void loadExtensions() {
+	static void loadExtensions(Map<String, Map<String, URL>> resourceManagers) {
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(RM_CONFIG_EXTENSION_POINT);
 
@@ -134,10 +137,10 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 			for (IExtension ext : extensionPoint.getExtensions()) {
 				for (IConfigurationElement ce : ext.getConfigurationElements()) {
 					String id = ce.getAttribute(ID);
-					Map<String, URL> info = fRMJAXBResourceManagers.get(id);
+					Map<String, URL> info = resourceManagers.get(id);
 					if (info == null) {
 						info = new HashMap<String, URL>();
-						fRMJAXBResourceManagers.put(id, info);
+						resourceManagers.put(id, info);
 					}
 					String name = ce.getAttribute(NAME);
 					String configurationFile = ce.getAttribute(CONFIGURATION_FILE_ATTRIBUTE);
@@ -211,7 +214,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 			fRMJAXBResourceManagers.clear();
 		}
 
-		loadExtensions();
+		loadExtensions(fRMJAXBResourceManagers);
 
 		/*
 		 * Also search the workspace for managers. By convention these should

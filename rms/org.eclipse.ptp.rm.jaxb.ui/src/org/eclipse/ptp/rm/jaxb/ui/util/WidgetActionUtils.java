@@ -61,7 +61,7 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	public static String browseWorkspace(Shell shell) {
 		IPath path = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 		FileDialog dialog = new FileDialog(shell);
-		dialog.setFileName(path.toFile().getAbsolutePath());
+		dialog.setFilterPath(path.toFile().getAbsolutePath());
 		return dialog.open();
 	}
 

@@ -60,7 +60,6 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 
 		public void notifyAppend(String text) {
 			if (text == null) {
-				fText = ZEROSTR;
 				return;
 			}
 			fText = text;

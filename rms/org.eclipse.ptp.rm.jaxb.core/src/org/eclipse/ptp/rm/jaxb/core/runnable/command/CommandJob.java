@@ -457,8 +457,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		} else if (!batch) {
 			proxy.setErrMonitor(new CommandJobStreamMonitor(process.getErrorStream()));
 		}
-
-		System.out.println("PROXY STDERR MONITOR for " + command.getName() + ": " + proxy.getErrorStreamMonitor());
 	}
 
 	/**
@@ -493,9 +491,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		} else if (!batch) {
 			proxy.setOutMonitor(new CommandJobStreamMonitor(process.getInputStream()));
 		}
-		System.out.println("Settings for " + command.getName() + ": tokenizer " + stdoutTokenizer + ", remoteOutPath "
-				+ remoteOutPath + ", batch " + batch);
-		System.out.println("PROXY STDOUT MONITOR for " + command.getName() + ": " + proxy.getOutputStreamMonitor());
 	}
 
 	/**
