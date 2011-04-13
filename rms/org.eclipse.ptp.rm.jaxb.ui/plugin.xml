@@ -33,5 +33,22 @@
             id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider">
       </configurationSelection>
    </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="org.eclipse.ptp.rm.jaxb.ui.wizards.ResourceManagerXML"
+            name="JAXB Resource Manager (Plugin) XML Import">
+      </category>
+      <wizard
+            category="org.eclipse.ptp.rm.jaxb.ui.wizards.ResourceManagerXML"
+            class="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMConfigurationImportWizard"
+            icon="icons/sample.gif"
+            id="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMConfigurationImportWizard"
+            name="Import JAXB Resource Manager XML">
+         <description>
+            Import XML configurations for the JAXB Resource Managers from plugins to the workspace
+         </description>
+      </wizard>
+   </extension>
 
 </plugin>

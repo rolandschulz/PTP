@@ -89,6 +89,12 @@ public class Messages extends NLS {
 	public static String InvalidConfiguration;
 	public static String InvalidConfiguration_title;
 
+	public static String ConfigurationImportWizardTitle;
+	public static String ConfigurationImportWizardPageTitle;
+	public static String ConfigurationImportWizardPageDescription;
+	public static String ConfigurationImportWizardPageTooltip;
+	public static String ConfigurationImportWizardPageLabel;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
