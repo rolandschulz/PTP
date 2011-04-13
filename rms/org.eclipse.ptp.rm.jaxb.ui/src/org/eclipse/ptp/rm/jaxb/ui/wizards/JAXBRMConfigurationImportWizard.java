@@ -18,8 +18,12 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -75,9 +79,10 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 	@Override
 	public boolean performFinish() {
 		URL selection = mainPage.getSelectedConfiguration();
+		File newConfig = null;
 		if (selection != null) {
 			String name = mainPage.getSelectedName();
-			File newConfig = new File(resourceManagersDir(), name + DOT_XML);
+			newConfig = new File(resourceManagersDir(), name + DOT_XML);
 			BufferedReader br = null;
 			FileWriter fw = null;
 			try {
@@ -109,6 +114,15 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 					}
 				} catch (IOException io) {
 				}
+			}
+		}
+		if (newConfig != null) {
+			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			IProject project = workspace.getRoot().getProject(RESOURCE_MANAGERS);
+			try {
+				project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+			} catch (CoreException t) {
+				JAXBUIPlugin.log(t);
 			}
 		}
 		return true;
