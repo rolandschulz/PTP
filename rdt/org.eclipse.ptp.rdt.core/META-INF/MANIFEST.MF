@@ -42,4 +42,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.rdt.core.activator.Activator
 Bundle-Vendor: %providerName
 Import-Package: org.eclipse.ptp.rdt.sync.core,
+ org.eclipse.ptp.rdt.sync.core.serviceproviders,
  org.eclipse.ui

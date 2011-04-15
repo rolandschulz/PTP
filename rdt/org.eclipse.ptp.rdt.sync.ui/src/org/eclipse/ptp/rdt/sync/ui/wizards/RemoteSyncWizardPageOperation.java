@@ -16,12 +16,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
+import org.eclipse.cdt.core.settings.model.ICProjectDescription;
+import org.eclipse.cdt.core.settings.model.WriteAccessException;
+import org.eclipse.cdt.core.settings.model.extension.CConfigurationData;
 import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
+import org.eclipse.cdt.managedbuilder.internal.core.ManagedProject;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
@@ -34,6 +42,8 @@ import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
@@ -87,7 +97,6 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			}
 		}
 		
-		// Register this initial build scenario with the service model manager
 		ISyncServiceProvider provider = participant.getProvider(project);
 		BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
 																										provider.getLocation());
@@ -105,9 +114,58 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		ManagedBuildManager.saveBuildInfo(project, true);
 
 		// Add information about remote location to the initial build configurations
-		// Do this last so that project is not flagged as initialized prematurely.
+		// Do this last (except for adding local configuration) so that project is not flagged as initialized prematurely.
 		BuildConfigurationManager.setInitialBuildScenarioForAllConfigurations(project, buildScenario);
-		
+
+		// Create a local build configuration. The corresponding build scenario has no sync provider and points to the project's
+		// working directory. We take a conservative approach. Failure at any point (null return) means we abort the attempt to
+		// create a local configuration.
+		ManagedProject managedProject = (ManagedProject) buildInfo.getManagedProject();
+		Configuration localConfigParent = (Configuration) buildInfo.getDefaultConfiguration();
+		String localConfigId = ManagedBuildManager.calculateChildId(localConfigParent.getId(), null);
+		Configuration localConfig = new Configuration(managedProject, localConfigParent, localConfigId, true, false);
+		if (localConfig != null) {
+			CConfigurationData localConfigData = localConfig.getConfigurationData();
+			ICProjectDescription projectDes = CoreModel.getDefault().getProjectDescription(project);
+			ICConfigurationDescription localConfigDes = null;
+			try {
+				localConfigDes = projectDes.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, localConfigData);
+			} catch (WriteAccessException e) {
+				// Nothing to do
+			} catch (CoreException e) {
+				// Nothing to do
+			}
+
+			if (localConfigDes != null) {
+				boolean configAdded = false;
+				localConfig.setConfigurationDescription(localConfigDes);
+				localConfigDes.setName("Workspace"); //$NON-NLS-1$
+				localConfigDes.setDescription("Build inside Eclipse workspace"); //$NON-NLS-1$
+				localConfig.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
+				IRemoteServices localService = PTPRemoteCorePlugin.getDefault().
+				getRemoteServices("org.eclipse.ptp.remote.LocalServices", null); //$NON-NLS-1$
+				if (localService != null) {
+					IRemoteConnection localConnection = localService.getConnectionManager().getConnection("local"); //$NON-NLS-1$
+					if (localConnection != null) {
+						BuildScenario localBuildScenario = new BuildScenario(null, localConnection, project.getLocation().toString());
+						BuildConfigurationManager.setBuildScenarioForBuildConfiguration(localBuildScenario, localConfig);
+						configAdded = true;
+					}
+				}
+				if (!configAdded) {
+					projectDes.removeConfiguration(localConfigDes);
+				} else {
+					try {
+						// ManagedBuildManager.resetConfiguration(project, localConfig);
+						CoreModel.getDefault().setProjectDescription(project, projectDes, true, null);
+						// ManagedBuildManager.addExtensionConfiguration(localConfig);
+						// ManagedBuildManager.saveBuildInfo(project, true);
+					} catch (CoreException e) {
+						projectDes.removeConfiguration(localConfigDes);
+					}
+				}
+			}
+		}
 		monitor.done();
 	}
 
