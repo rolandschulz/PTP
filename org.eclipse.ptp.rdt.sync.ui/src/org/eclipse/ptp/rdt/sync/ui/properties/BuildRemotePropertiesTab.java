@@ -37,13 +37,16 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 
 	private IRemoteConnection fSelectedConnection;
 	// TODO: Support other providers
-	private IRemoteServices fSelectedProvider = RemoteToolsServices.getInstance();
+	private IRemoteServices fSelectedProvider;
 
+	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
+	private final Map<IRemoteServices, Integer> fComboRemoteServicesProviderToIndexMap = new HashMap<IRemoteServices, Integer>();
 	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
 	private final Map<IRemoteConnection, Integer> fComboRemoteConnectionToIndexMap = new HashMap<IRemoteConnection, Integer>();
 
 	private Button fBrowseButton;
 	private Button fNewConnectionButton;
+	private Combo fProviderCombo;
 	private Combo fConnectionCombo;
 	private Text fRootLocationText;
 	private Text fBuildLocationText;
@@ -59,6 +62,22 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 		usercomp.setLayout(layout);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		usercomp.setLayoutData(gd);
+
+		// Label for "Provider:"
+		Label providerLabel = new Label(usercomp, SWT.LEFT);
+		providerLabel.setText("Remote Provider:"); //$NON-NLS-1$
+
+		// combo for providers
+		fProviderCombo = new Combo(usercomp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		gd = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
+		gd.horizontalSpan = 2;
+		fProviderCombo.setLayoutData(gd);
+		fProviderCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				handleServicesSelected();
+			}
+		});
 
 		// connection combo
 		// Label for "Connection:"
@@ -76,13 +95,10 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 			}
 		});
 
-		// populate the combo with a list of providers
-		populateConnectionCombo(fConnectionCombo);
-
 		// new connection button
 		fNewConnectionButton = new Button(usercomp, SWT.PUSH);
 		fNewConnectionButton.setText("Connection: "); //$NON-NLS-1$
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
+		fNewConnectionButton.setEnabled(false);
 		fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -204,23 +220,38 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 	}
+	
+	/**
+	 * Handle new remote services selected
+	 */
+	private void handleServicesSelected() {
+		int selectionIndex = fProviderCombo.getSelectionIndex();
+		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
+		populateConnectionCombo(fConnectionCombo);
+		updateNewConnectionButtonEnabled(fNewConnectionButton);
+	}
 
 	/**
 	 * @param connectionCombo
 	 */
 	private void populateConnectionCombo(final Combo connectionCombo) {
 		connectionCombo.removeAll();
-
 		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
-
 		for (int k = 0; k < connections.length; k++) {
 			connectionCombo.add(connections[k].getName(), k);
 			fComboIndexToRemoteConnectionMap.put(k, connections[k]);
 			fComboRemoteConnectionToIndexMap.put(connections[k], k);
 		}
-
-		connectionCombo.select(0);
-		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(0);
+	}
+	
+	private void populateRemoteProviderCombo(final Combo providerCombo) {
+		providerCombo.removeAll();
+		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(null);
+		for (int k = 0; k < providers.length; k++) {
+			providerCombo.add(providers[k].getName(), k);
+			fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
+			fComboRemoteServicesProviderToIndexMap.put(providers[k], k);
+		}
 	}
 
 	/**
@@ -248,17 +279,37 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 	}
 	
 	private void setValues() {
-		populateConnectionCombo(fConnectionCombo);
+		populateRemoteProviderCombo(fProviderCombo);
 		BuildScenario buildScenario = BuildConfigurationManager.getBuildScenarioForBuildConfiguration(getCfg());
+		
+		// Note that provider selection populates the local connection map variables as well as the connection combo. Thus, the
+		// provider must be selected first. (Calling select invokes the "handle" listeners for each combo.)
 		if (buildScenario != null) {
-			fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(buildScenario.getRemoteConnection()));
+			Integer providerSelection = fComboRemoteServicesProviderToIndexMap.get(buildScenario.getRemoteConnection().getRemoteServices());
+			if (providerSelection == null) {
+				providerSelection = new Integer(0);
+			}
+			fProviderCombo.select(providerSelection.intValue());
+			handleServicesSelected();
+
+			Integer connectionSelection = fComboRemoteConnectionToIndexMap.get(buildScenario.getRemoteConnection());
+			if (connectionSelection == null) {
+				connectionSelection = new Integer(0);
+			}
+			fConnectionCombo.select(connectionSelection);
 			handleConnectionSelected();
+
 			fRootLocationText.setText(buildScenario.getLocation());
-			String buildSubDir = getCfg().getToolChain().getBuilder().getBuildPath();
-			// TODO: Check that it really is a subdirectory, but it is not clear what to do if it is not.
-			buildSubDir = buildSubDir.substring(buildScenario.getLocation().length());
-			fBuildLocationText.setText(buildSubDir);
+		} else {
+			fProviderCombo.select(0);
+			fConnectionCombo.select(0);
+			fRootLocationText.setText(""); //$NON-NLS-1$
 		}
+		
+		String buildSubDir = getCfg().getToolChain().getBuilder().getBuildPath();
+		// TODO: Check that it really is a subdirectory, but it is not clear what to do if it is not.
+		buildSubDir = buildSubDir.substring(buildScenario.getLocation().length());
+		fBuildLocationText.setText(buildSubDir);
 	}
 
 	@Override

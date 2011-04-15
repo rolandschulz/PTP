@@ -14,7 +14,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
@@ -201,8 +201,13 @@ public class CommandRunner {
 
 		final CommandResults commandResults = new CommandResults();
 		// Run the command and wait for it to complete.
-		final List<String> commandStrings = Arrays.asList(command.split("\\s+")); //$NON-NLS-1$
-		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandStrings);
+		// final List<String> commandStrings = Arrays.asList(command.split("\\s+")); //$NON-NLS-1$
+		final List<String> commandList = new LinkedList<String>();
+		commandList.add("sh"); //$NON-NLS-1$
+		commandList.add("-c"); //$NON-NLS-1$
+		commandList.add(command);
+
+		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandList);
 		final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
 		if (rfm != null) {
 			rpb.directory(rfm.getResource(remoteDirectory));
