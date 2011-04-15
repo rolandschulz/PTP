@@ -58,7 +58,9 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		/**
 		 * @since 5.0
 		 */
-		STOPPED, STARTING, RUNNING
+		STOPPED,
+		STARTING,
+		RUNNING
 	}
 
 	private final boolean DEBUG = true;
@@ -313,7 +315,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				// Check if the valid java version is installed on the server
 				if ((getVerifyCommand() != null && getVerifyCommand().length() != 0) && !isValidVersionInstalled(subMon)) {
 					if (getVerifyFailMessage() != null && getVerifyFailMessage().length() != 0) {
-						throw new IOException(getVerifyFailMessage());
+						throw new IOException(NLS.bind(getVerifyFailMessage(),
+								new Object[] { fServerName, fRemoteConnection.getName() }));
 					}
 					throw new IOException(Messages.AbstractRemoteServerRunner_12);
 				}
