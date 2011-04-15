@@ -10,7 +10,7 @@
               name="%RemoteToolsDStoreServer.name"
               payload="rdt-server.jar"
               verifyCommand="java -version"
-              verifyFailMessage="Invalid java version or java not installed"
+              verifyFailMessage="{0}: Invalid java version or java not installed on &quot;{1}&quot;"
               verifyPattern="^(java version )(.)(1\.[5-9]|[2-9]\.).*$">
         </remoteServer>
      </extension>
