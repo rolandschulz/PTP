@@ -13,6 +13,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -145,12 +146,24 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
+	 * We also immediately dereference any paths associated withthe proxy
+	 * monitors by calling intialize, as the jobId property may not be in the
+	 * environment when they are started.
+	 * 
 	 * @param proxy
 	 *            Wrapper containing monitoring functionality for the associated
 	 *            output and error streams.
 	 */
 	public void setProxy(ICommandJobStreamsProxy proxy) {
 		this.proxy = proxy;
+		ICommandJobStreamMonitor m = (ICommandJobStreamMonitor) proxy.getOutputStreamMonitor();
+		if (m != null) {
+			m.initializeFilePath(jobId);
+		}
+		m = (ICommandJobStreamMonitor) proxy.getErrorStreamMonitor();
+		if (m != null) {
+			m.initializeFilePath(jobId);
+		}
 	}
 
 	/**
@@ -242,6 +255,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 					if (v != null) {
 						state = v;
 					}
+
 				}
 			}
 		}

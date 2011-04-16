@@ -23,6 +23,7 @@ public interface IJAXBNonNLSConstants {
 	int EOF = -1;
 	long MINUTE_IN_MS = 60 * 60 * 1000;
 	long VALIDATE_TIMER = 500;
+	long TAILF_PAUSE = 10 * 1000;
 
 	/* CHARACTERS */
 	String LEN = "N";//$NON-NLS-1$

@@ -23,7 +23,15 @@ public interface ICommandJobStreamMonitor extends IStreamMonitor {
 	/**
 	 * Manually close the monitor/streams.
 	 */
-	public void close();
+	void close();
+
+	/**
+	 * Initialize file path from current env.
+	 * 
+	 * @param jobId
+	 *            from status
+	 */
+	void initializeFilePath(String jobId);
 
 	/**
 	 * Tune the monitor's buffer size
@@ -32,10 +40,10 @@ public interface ICommandJobStreamMonitor extends IStreamMonitor {
 	 *            in chars
 	 * 
 	 */
-	public void setBufferLimit(int limit);
+	void setBufferLimit(int limit);
 
 	/**
 	 * Starts the reading from the stream.
 	 */
-	public void startMonitoring();
+	void startMonitoring();
 }
