@@ -11,9 +11,11 @@ package org.eclipse.ptp.rm.jaxb.core.runnable.command;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.List;
@@ -137,6 +139,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private StreamSplitter errSplitter;
 	private String remoteOutPath;
 	private String remoteErrPath;
+	private final StringBuffer error;
 	private boolean active;
 
 	/**
@@ -158,6 +161,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		this.proxy = new CommandJobStreamsProxy();
 		this.waitForId = command.isWaitForId();
 		this.ignoreExitStatus = command.isIgnoreExitStatus();
+		this.error = new StringBuffer();
 	}
 
 	/**
@@ -262,7 +266,9 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			}
 
 			if (exit != 0 && !ignoreExitStatus) {
-				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (ZEROSTR + exit), null);
+				String t = error.toString();
+				error.setLength(0);
+				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (ZEROSTR + exit) + SP + CO + t, null);
 			}
 
 			joinConsumers();
@@ -275,6 +281,29 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			active = false;
 		}
 		return Status.OK_STATUS;
+	}
+
+	private void errorStreamReader(final InputStream err) {
+		new Thread() {
+			@Override
+			public void run() {
+				BufferedReader br = new BufferedReader(new InputStreamReader(err));
+				while (true) {
+					try {
+						String line = br.readLine();
+						if (line == null) {
+							break;
+						}
+						error.append(line).append(LINE_SEP);
+					} catch (EOFException eof) {
+						break;
+					} catch (IOException io) {
+						JAXBCorePlugin.log(io);
+						break;
+					}
+				}
+			}
+		}.start();
 	}
 
 	/**
@@ -439,10 +468,10 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 * @throws IOException
 	 */
 	private void setErrStreamRedirection(IRemoteProcess process) throws IOException {
-		if (stdoutTokenizer != null) {
+		if (stderrTokenizer != null) {
 			if (remoteErrPath != null) {
 				tokenizerErr = process.getErrorStream();
-				proxy.setErrMonitor(new CommandJobStreamMonitor(rm, remoteErrPath));
+				proxy.setErrMonitor(new CommandJobStreamTailFMonitor(rm, remoteErrPath));
 			} else if (!batch) {
 				PipedInputStream tokenizerErr = new PipedInputStream();
 				this.tokenizerErr = tokenizerErr;
@@ -453,7 +482,11 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				tokenizerErr = process.getErrorStream();
 			}
 		} else if (remoteErrPath != null) {
-			proxy.setErrMonitor(new CommandJobStreamMonitor(rm, remoteErrPath));
+			proxy.setErrMonitor(new CommandJobStreamTailFMonitor(rm, remoteErrPath));
+			/*
+			 * grab error stream for error reporting
+			 */
+			errorStreamReader(process.getErrorStream());
 		} else if (!batch) {
 			proxy.setErrMonitor(new CommandJobStreamMonitor(process.getErrorStream()));
 		}
@@ -476,7 +509,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		if (stdoutTokenizer != null) {
 			if (remoteOutPath != null) {
 				tokenizerOut = process.getInputStream();
-				proxy.setOutMonitor(new CommandJobStreamMonitor(rm, remoteOutPath));
+				proxy.setOutMonitor(new CommandJobStreamTailFMonitor(rm, remoteOutPath));
 			} else if (!batch) {
 				PipedInputStream tokenizerOut = new PipedInputStream();
 				this.tokenizerOut = tokenizerOut;
@@ -487,7 +520,8 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				tokenizerOut = process.getInputStream();
 			}
 		} else if (remoteOutPath != null) {
-			proxy.setOutMonitor(new CommandJobStreamMonitor(rm, remoteOutPath));
+			proxy.setOutMonitor(new CommandJobStreamTailFMonitor(rm, remoteOutPath));
+			errorStreamReader(process.getInputStream());
 		} else if (!batch) {
 			proxy.setOutMonitor(new CommandJobStreamMonitor(process.getInputStream()));
 		}

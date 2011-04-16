@@ -185,7 +185,10 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	public void updateGlobal(ILaunchConfiguration configuration) throws CoreException {
 		Map attr = configuration.getAttributes();
 		for (Object k : attr.keySet()) {
-			globalValues.put((String) k, attr.get(k));
+			Object val = attr.get(k);
+			if (val != null) {
+				globalValues.put((String) k, attr.get(k));
+			}
 		}
 		values = globalValues;
 	}

@@ -98,7 +98,8 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Adds the attributes.
+	 * Adds the attributes. If the attribute value is <code>null</code>,
+	 * overwrites it with the default.
 	 * 
 	 * @param env
 	 *            the active instance of the resource manager environment map
@@ -108,13 +109,16 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	private static void addAttributes(Map<String, Object> env, Control control) {
 		List<Attribute> jobAttributes = control.getAttribute();
 		for (Attribute jobAttribute : jobAttributes) {
-			String name = jobAttribute.getName();
-			env.put(name, jobAttribute);
+			env.put(jobAttribute.getName(), jobAttribute);
+			if (jobAttribute.getValue() == null) {
+				jobAttribute.setValue(jobAttribute.getDefault());
+			}
 		}
 	}
 
 	/**
-	 * Adds the properties.
+	 * Adds the properties. If the property value is <code>null</code>,
+	 * overwrites it with the default.
 	 * 
 	 * @param env
 	 *            the active instance of the resource manager environment map
@@ -125,6 +129,9 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 		List<Property> properties = control.getProperty();
 		for (Property property : properties) {
 			env.put(property.getName(), property);
+			if (property.getValue() == null) {
+				property.setValue(property.getDefault());
+			}
 		}
 	}
 

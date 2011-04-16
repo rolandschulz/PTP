@@ -260,7 +260,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			Property p = new Property();
 			p.setVisible(false);
 			p.setName(jobId);
-			p.setValue(jobId);
 			rmVarMap.put(jobId, p);
 			doControlCommand(jobId, operation);
 			rmVarMap.remove(jobId);
@@ -322,7 +321,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			Property p = new Property();
 			p.setVisible(false);
 			p.setName(jobId);
-			p.setValue(jobId);
 			rmVarMap.put(jobId, p);
 
 			Command job = controlData.getGetJobStatus();
@@ -483,10 +481,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		/*
-		 * property containing actual jobId as name was accessed in the wait
-		 * call
+		 * property containing actual jobId as name was set in the wait call; we
+		 * may need the new jobId mapping momentarily to resolve proxy-specific
+		 * info
 		 */
 		rmVarMap.remove(uuid);
+		rmVarMap.put(p.getName(), p);
+
 		ICommandJobStreamsProxy proxy = job.getProxy();
 		status.setProxy(proxy);
 		jobStatusMap.addJobStatus(status.getJobId(), status);
@@ -498,6 +499,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * to ensure the most recent script is used at the next call
 		 */
+		rmVarMap.remove(p.getName());
 		rmVarMap.remove(SCRIPT_PATH);
 		rmVarMap.remove(SCRIPT);
 
@@ -620,7 +622,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					break;
 				}
 			} else if (command.getName().equals(SUBMIT_BATCH)) {
-				System.out.println("submit-batch, mode: " + mode);
 				if (ILaunchManager.RUN_MODE.equals(mode)) {
 					batch = true;
 					break;
@@ -828,13 +829,21 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		CommandJob job = new CommandJob(uuid, command, batch, this);
 		if (batch) {
-			Property p = (Property) rmVarMap.get(STDOUT);
-			if (p != null) {
-				job.setRemoteOutPath((String) p.getValue());
+			Object o = rmVarMap.get(STDOUT);
+			if (o != null) {
+				if (o instanceof Property) {
+					job.setRemoteOutPath((String) ((Property) o).getValue());
+				} else if (o instanceof Attribute) {
+					job.setRemoteOutPath((String) ((Attribute) o).getValue());
+				}
 			}
-			p = (Property) rmVarMap.get(STDERR);
-			if (p != null) {
-				job.setRemoteErrPath((String) p.getValue());
+			o = rmVarMap.get(STDERR);
+			if (o != null) {
+				if (o instanceof Property) {
+					job.setRemoteErrPath((String) ((Property) o).getValue());
+				} else if (o instanceof Attribute) {
+					job.setRemoteErrPath((String) ((Attribute) o).getValue());
+				}
 			}
 		}
 
@@ -918,10 +927,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				Object target = rmVarMap.get(key.toString());
 				if (target instanceof Property) {
 					Property p = (Property) target;
-					p.setValue(null);
+					if (p.isVisible()) {
+						p.setValue(null);
+					}
 				} else if (target instanceof Attribute) {
 					Attribute ja = (Attribute) target;
-					ja.setValue(null);
+					if (ja.isVisible()) {
+						ja.setValue(null);
+					}
 				}
 			}
 		}
