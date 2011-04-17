@@ -531,7 +531,8 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 				int vAlign = WidgetBuilderUtils.getStyle(gridData.getVerticalAlign());
 				return WidgetBuilderUtils.createGridData(style, gridData.isGrabExcessHorizontal(), gridData.isGrabExcessVertical(),
 						gridData.getWidthHint(), gridData.getHeightHint(), gridData.getMinWidth(), gridData.getMinHeight(),
-						gridData.getHorizontalSpan(), gridData.getVerticalSpan(), hAlign, vAlign);
+						gridData.getHorizontalSpan(), gridData.getVerticalSpan(), hAlign, vAlign, gridData.getHorizontalIndent(),
+						gridData.getVerticalIndent());
 
 			} else if (layoutData.getFormData() != null) {
 				FormDataDescriptor formData = layoutData.getFormData();
