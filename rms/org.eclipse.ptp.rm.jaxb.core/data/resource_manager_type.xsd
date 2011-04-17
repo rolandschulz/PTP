@@ -464,6 +464,8 @@
 		<xs:attribute name="grabExcessVertical" type="xs:boolean" default="false"/>
 		<xs:attribute name="horizontalSpan" type="xs:int"/>
 		<xs:attribute name="verticalSpan" type="xs:int"/>
+		<xs:attribute name="horizontalIndent" type="xs:int"/>
+      <xs:attribute name="verticalIndent" type="xs:int"/>
 		<xs:attribute name="minHeight" type="xs:int"/>
 		<xs:attribute name="minWidth" type="xs:int"/>
 		<xs:attribute name="heightHint" type="xs:int"/>

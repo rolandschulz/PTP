@@ -350,7 +350,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	public static GridData createGridData(Integer style, Boolean grabExcessHorizontal, Boolean grabExcessVertical,
 			Integer widthHint, Integer heightHint, Integer horizontalSpan, Integer verticalSpan) {
 		return createGridData(style, grabExcessHorizontal, grabExcessVertical, widthHint, heightHint, DEFAULT, DEFAULT,
-				horizontalSpan, verticalSpan, DEFAULT, DEFAULT);
+				horizontalSpan, verticalSpan, DEFAULT, DEFAULT, DEFAULT, DEFAULT);
 	}
 
 	/**
@@ -365,11 +365,13 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @param verticalSpan
 	 * @param horizonalAlign
 	 * @param verticalAlign
+	 * @param horizontalIndent
+	 * @param verticalIndent
 	 * @return grid data
 	 */
 	public static GridData createGridData(Integer style, Boolean grabExcessHorizontal, Boolean grabExcessVertical,
 			Integer widthHint, Integer heightHint, Integer minimumWidth, Integer minimumHeight, Integer horizontalSpan,
-			Integer verticalSpan, Integer horizonalAlign, Integer verticalAlign) {
+			Integer verticalSpan, Integer horizonalAlign, Integer verticalAlign, Integer horizontalIndent, Integer verticalIndent) {
 		GridData data = null;
 		if (null != style) {
 			if (style == DEFAULT) {
@@ -410,6 +412,12 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		}
 		if (null != verticalAlign && verticalAlign != DEFAULT) {
 			data.verticalAlignment = verticalAlign;
+		}
+		if (null != horizontalIndent && horizontalIndent != DEFAULT) {
+			data.horizontalIndent = horizontalIndent;
+		}
+		if (null != verticalIndent && verticalIndent != DEFAULT) {
+			data.verticalIndent = verticalIndent;
 		}
 		return data;
 	}
