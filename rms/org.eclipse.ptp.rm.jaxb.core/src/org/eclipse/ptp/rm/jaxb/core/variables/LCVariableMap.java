@@ -10,6 +10,7 @@
 package org.eclipse.ptp.rm.jaxb.core.variables;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -64,13 +65,11 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	private Map<String, Object> globalValues;
 	private Map<String, Object> values;
 	private final Map<String, String> defaultValues;
-	private final Map<String, String> checked;
 	private final boolean initialized;
 
 	private LCVariableMap() {
 		this.values = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.defaultValues = Collections.synchronizedMap(new TreeMap<String, String>());
-		this.checked = Collections.synchronizedMap(new TreeMap<String, String>());
 		this.initialized = false;
 	}
 
@@ -81,6 +80,23 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 */
 	public Object get(String name) {
 		return values.get(name);
+	}
+
+	/**
+	 * @param viewerName
+	 *            of viewer for which to find checked rows
+	 * @return map of checked row model names
+	 */
+	public Map<String, String> getChecked(String viewerName) {
+		Map<String, String> m = new HashMap<String, String>();
+		String checked = (String) values.get(CHECKED_ATTRIBUTES + viewerName);
+		if (checked != null) {
+			String[] split = checked.split(SP);
+			for (String s : split) {
+				m.put(s, s);
+			}
+		}
+		return m;
 	}
 
 	/**
@@ -123,15 +139,6 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 */
 	public String getString(String jobId, String value) {
 		return getString(value);
-	}
-
-	/**
-	 * @param name
-	 *            of widget, bound to a Property or Attribute
-	 * @return if this is a checkbox element, whether it is checked
-	 */
-	public boolean isChecked(String name) {
-		return checked.containsKey(name);
 	}
 
 	/**
@@ -282,23 +289,6 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * The selected index is created from the SELECTED_ATTRIBUTES property, if
-	 * it is defined.
-	 * 
-	 * @throws CoreException
-	 */
-	private void setChecked() throws CoreException {
-		String checked = (String) get(CHECKED_ATTRIBUTES);
-		if (checked == null || ZEROSTR.equals(checked)) {
-			StringBuffer buffer = new StringBuffer();
-			for (Object s : values.keySet()) {
-				buffer.append(s).append(SP);
-			}
-			values.put(CHECKED_ATTRIBUTES, buffer.toString().trim());
-		}
-	}
-
-	/**
 	 * Creates an instance to be associated with a given Launch Tab.
 	 * 
 	 * @param rmVars
@@ -308,7 +298,6 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 */
 	public static LCVariableMap createInstance(RMVariableMap rmVars) throws Throwable {
 		LCVariableMap lcMap = new LCVariableMap();
-		lcMap.setChecked();
 		lcMap.loadValues(rmVars);
 		return lcMap;
 	}

@@ -326,6 +326,9 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				}
 			} else {
 				localMap.put(m.getName(), m.getValueFromControl());
+				if (m instanceof ViewerUpdateModel) {
+					((ViewerUpdateModel) m).putCheckedSettings(localMap);
+				}
 			}
 		}
 	}

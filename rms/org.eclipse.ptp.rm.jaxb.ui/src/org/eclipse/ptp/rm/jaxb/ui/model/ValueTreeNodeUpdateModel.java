@@ -108,7 +108,7 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 		String displayValue = null;
 		if (COLUMN_NAME.equals(columnName)) {
 			displayValue = name;
-		} else if (checked && COLUMN_VALUE.equals(columnName)) {
+		} else if (isChecked() && COLUMN_VALUE.equals(columnName)) {
 			displayValue = getValueAsString();
 		}
 		if (displayValue == null) {
