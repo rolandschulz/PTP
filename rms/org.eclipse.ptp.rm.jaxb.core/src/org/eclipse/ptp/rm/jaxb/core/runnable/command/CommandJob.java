@@ -471,7 +471,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		if (stderrTokenizer != null) {
 			if (remoteErrPath != null) {
 				tokenizerErr = process.getErrorStream();
-				proxy.setErrMonitor(new CommandJobStreamTailF2Monitor(rm, remoteErrPath));
+				proxy.setErrMonitor(new CommandJobStreamTailFMonitor(rm, remoteErrPath));
 			} else if (!batch) {
 				PipedInputStream tokenizerErr = new PipedInputStream();
 				this.tokenizerErr = tokenizerErr;
@@ -482,7 +482,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				tokenizerErr = process.getErrorStream();
 			}
 		} else if (remoteErrPath != null) {
-			proxy.setErrMonitor(new CommandJobStreamTailF2Monitor(rm, remoteErrPath));
+			proxy.setErrMonitor(new CommandJobStreamTailFMonitor(rm, remoteErrPath));
 			/*
 			 * grab error stream for error reporting
 			 */
@@ -509,7 +509,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		if (stdoutTokenizer != null) {
 			if (remoteOutPath != null) {
 				tokenizerOut = process.getInputStream();
-				proxy.setOutMonitor(new CommandJobStreamTailF2Monitor(rm, remoteOutPath));
+				proxy.setOutMonitor(new CommandJobStreamTailFMonitor(rm, remoteOutPath));
 			} else if (!batch) {
 				PipedInputStream tokenizerOut = new PipedInputStream();
 				this.tokenizerOut = tokenizerOut;
@@ -520,7 +520,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				tokenizerOut = process.getInputStream();
 			}
 		} else if (remoteOutPath != null) {
-			proxy.setOutMonitor(new CommandJobStreamTailF2Monitor(rm, remoteOutPath));
+			proxy.setOutMonitor(new CommandJobStreamTailFMonitor(rm, remoteOutPath));
 			errorStreamReader(process.getInputStream());
 		} else if (!batch) {
 			proxy.setOutMonitor(new CommandJobStreamMonitor(process.getInputStream()));
