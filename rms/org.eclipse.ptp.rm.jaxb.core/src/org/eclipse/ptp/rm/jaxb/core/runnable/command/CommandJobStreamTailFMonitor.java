@@ -29,7 +29,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  * @author arossi
  * 
  */
-public class CommandJobStreamTailF2Monitor extends CommandJobStreamMonitor {
+public class CommandJobStreamTailFMonitor extends CommandJobStreamMonitor {
 
 	private final RemoteServicesDelegate delegate;
 	private String remoteFilePath;
@@ -43,7 +43,7 @@ public class CommandJobStreamTailF2Monitor extends CommandJobStreamMonitor {
 	 * @param remoteFilePath
 	 *            of the file to be monitored
 	 */
-	public CommandJobStreamTailF2Monitor(IJAXBResourceManagerControl rm, String remoteFilePath) {
+	public CommandJobStreamTailFMonitor(IJAXBResourceManagerControl rm, String remoteFilePath) {
 		this(rm, remoteFilePath, null);
 	}
 
@@ -57,7 +57,7 @@ public class CommandJobStreamTailF2Monitor extends CommandJobStreamMonitor {
 	 * @param encoding
 	 *            stream encoding or <code>null</code> for system default
 	 */
-	public CommandJobStreamTailF2Monitor(IJAXBResourceManagerControl rm, String remoteFilePath, String encoding) {
+	public CommandJobStreamTailFMonitor(IJAXBResourceManagerControl rm, String remoteFilePath, String encoding) {
 		this.remoteFilePath = remoteFilePath;
 		delegate = rm.getRemoteServicesDelegate();
 		bufferLimit = UNDEFINED;
