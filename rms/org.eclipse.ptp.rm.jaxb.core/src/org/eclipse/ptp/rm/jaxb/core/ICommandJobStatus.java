@@ -67,11 +67,6 @@ public interface ICommandJobStatus extends IJobStatus {
 	void setUpdateRequestTime(long update);
 
 	/**
-	 * Starts the stream proxy monitors.
-	 */
-	void startProxy();
-
-	/**
 	 * Do a monitor wait until the job id arrives.
 	 * 
 	 * @param uuid

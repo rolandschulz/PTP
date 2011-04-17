@@ -148,7 +148,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	/**
 	 * We also immediately dereference any paths associated withthe proxy
 	 * monitors by calling intialize, as the jobId property may not be in the
-	 * environment when they are started.
+	 * environment after this initial call returns. We also start the monitors
+	 * here, as tail -F will retry until the file appears.
 	 * 
 	 * @param proxy
 	 *            Wrapper containing monitoring functionality for the associated
@@ -159,10 +160,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 		ICommandJobStreamMonitor m = (ICommandJobStreamMonitor) proxy.getOutputStreamMonitor();
 		if (m != null) {
 			m.initializeFilePath(jobId);
+			m.startMonitoring();
 		}
 		m = (ICommandJobStreamMonitor) proxy.getErrorStreamMonitor();
 		if (m != null) {
 			m.initializeFilePath(jobId);
+			m.startMonitoring();
 		}
 	}
 
@@ -220,16 +223,6 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public synchronized void setUpdateRequestTime(long update) {
 		lastUpdateRequest = update;
-	}
-
-	/**
-	 * Called by the resource manager when the (batch) job state changes to
-	 * RUNNING.
-	 */
-	public synchronized void startProxy() {
-		if (proxy != null) {
-			proxy.startMonitors();
-		}
 	}
 
 	/**

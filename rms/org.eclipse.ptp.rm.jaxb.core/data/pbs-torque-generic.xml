@@ -342,10 +342,10 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<arg isUndefinedIfMatches="#PBS -v">#PBS -v ${rm:Variable_List#value}</arg>
 			</line>
 			<line>
-				<arg>MPI_ARGS="-machinefile $PBS_NODEFILE -np ${rm:mpiCores#value}"</arg>
+				<arg>MPI_ARGS="-np ${rm:mpiCores#value}"</arg>
 			</line>
 			<line>
-				<arg resolve="false">if [ "-machinefile $PBS_NODEFILE -np" == "$MPI_ARGS" ] ; then</arg>
+				<arg resolve="false">if [ "-np" == "$MPI_ARGS" ] ; then</arg>
 			</line>
 			<line>
 				<arg resolve="false"> MPI_ARGS=</arg>
