@@ -133,14 +133,17 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		} else if (TREE.equals(descriptor.getType())) {
 			viewer = addCheckboxTreeViewer(parent, data, layout, style, descriptor);
 		}
-		Collection<ICellEditorUpdateModel> rows = addRows(viewer, descriptor);
-		ViewerUpdateModel model = UpdateModelFactory.createModel(viewer, descriptor, tab);
-		for (ICellEditorUpdateModel row : rows) {
-			row.setViewer(model);
+		if (viewer != null) {
+			Collection<ICellEditorUpdateModel> rows = addRows(viewer, descriptor);
+			ViewerUpdateModel model = UpdateModelFactory.createModel(viewer, descriptor, tab);
+			for (ICellEditorUpdateModel row : rows) {
+				row.setViewer(model);
+			}
+			viewer.setInput(rows);
+			showHide.addSelectionListener(model);
+			model.setShowAll(showHide);
+			localWidgets.put(viewer, model);
 		}
-		showHide.addSelectionListener(model);
-		model.setShowAll(showHide);
-		localWidgets.put(viewer, model);
 	}
 
 	/**
@@ -424,7 +427,6 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		for (String key : items.getExclude()) {
 			hash.remove(key);
 		}
-		viewer.setInput(hash.values());
 		for (ICellEditorUpdateModel m : hash.values()) {
 			localWidgets.put(m.getControl(), m);
 		}

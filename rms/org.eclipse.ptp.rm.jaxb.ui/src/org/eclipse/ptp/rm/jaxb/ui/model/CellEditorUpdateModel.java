@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.jaxb.ui.model;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
+import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
@@ -29,7 +30,6 @@ import org.eclipse.swt.graphics.Image;
  */
 public abstract class CellEditorUpdateModel extends AbstractUpdateModel implements ICellEditorUpdateModel {
 
-	protected boolean checked;
 	protected boolean readOnly;
 	protected String tooltip;
 	protected String description;
@@ -85,7 +85,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#canEdit()
 	 */
 	public boolean canEdit() {
-		return checked && !((editor instanceof TextCellEditor) && readOnly);
+		return isChecked() && !((editor instanceof TextCellEditor) && readOnly);
 	}
 
 	/*
@@ -172,7 +172,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * .lang.String)
 	 */
 	public String getReplacedValue(String pattern) {
-		if (!checked) {
+		if (!isChecked()) {
 			return ZEROSTR;
 		}
 		String value = getValueAsString();
@@ -245,11 +245,8 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 */
 	@Override
 	public void initialize(LCVariableMap lcMap) {
-		this.lcMap = lcMap;
-		if (name != null) {
-			checked = lcMap.isChecked(name);
-		}
 		super.initialize(lcMap);
+		this.lcMap = lcMap;
 	}
 
 	/*
@@ -258,7 +255,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#isChecked()
 	 */
 	public boolean isChecked() {
-		return checked;
+		return ((ICheckable) viewer.getControl()).getChecked(this);
 	}
 
 	/*
@@ -325,16 +322,6 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 */
 	public void setBackground(Color[] background) {
 		this.background = background;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setChecked(boolean)
-	 */
-	public void setChecked(boolean checked) {
-		this.checked = checked;
 	}
 
 	/*

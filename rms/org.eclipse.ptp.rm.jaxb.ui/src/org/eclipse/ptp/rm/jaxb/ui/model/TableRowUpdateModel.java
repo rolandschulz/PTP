@@ -77,7 +77,7 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 		String displayValue = null;
 		if (COLUMN_NAME.equals(columnName)) {
 			displayValue = name;
-		} else if (checked) {
+		} else if (isChecked()) {
 			if (COLUMN_DESC.equals(columnName)) {
 				displayValue = description;
 			} else if (COLUMN_DEFAULT.equals(columnName)) {
