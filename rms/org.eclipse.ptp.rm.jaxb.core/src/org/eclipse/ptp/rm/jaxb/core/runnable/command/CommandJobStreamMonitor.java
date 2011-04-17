@@ -82,7 +82,6 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	protected Thread fThread;
 	protected boolean fKilled = false;
 	protected int bufferLimit;
-
 	private final InputStream fStream;
 	private long lastSleep;
 
@@ -129,6 +128,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 			Thread thread = fThread;
 			fThread = null;
 			try {
+				thread.interrupt();
 				thread.join();
 			} catch (InterruptedException ie) {
 			}

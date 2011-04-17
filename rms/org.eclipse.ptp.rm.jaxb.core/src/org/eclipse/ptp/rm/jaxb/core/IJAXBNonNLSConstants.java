@@ -23,7 +23,7 @@ public interface IJAXBNonNLSConstants {
 	int EOF = -1;
 	long MINUTE_IN_MS = 60 * 60 * 1000;
 	long VALIDATE_TIMER = 500;
-	long TAILF_PAUSE = 10 * 1000;
+	long TAILF_PAUSE = 1000;
 
 	/* CHARACTERS */
 	String LEN = "N";//$NON-NLS-1$
@@ -202,7 +202,7 @@ public interface IJAXBNonNLSConstants {
 	String DOT_XML = ".xml";//$NON-NLS-1$
 	String TOKENIZER_EXT_PT = "streamParserTokenizer";//$NON-NLS-1$
 	String TAIL = "tail";//$NON-NLS-1$
-	String MINUS_F = "-f";//$NON-NLS-1$
+	String MINUS_F = "-F";//$NON-NLS-1$
 	String CONFIGURATION_FILE_ATTRIBUTE = "configurationFile"; //$NON-NLS-1$
 	String RM_CONFIG_EXTENSION_POINT = "org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations"; //$NON-NLS-1$
 	String JAXB_SERVICE_PROVIDER_EXTPT = "org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"; //$NON-NLS-1$

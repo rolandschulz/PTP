@@ -107,11 +107,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 						String state = status.getState();
 						if (IJobStatus.COMPLETED.equals(state)) {
 							toPrune.put(jobId, jobId);
-						} else if (IJobStatus.RUNNING.equals(state)) {
-							ICommandJobStatus commandJobStatus = map.get(jobId);
-							if (commandJobStatus != null) {
-								commandJobStatus.startProxy();
-							}
 						}
 					}
 					for (Iterator<Map.Entry<String, ICommandJobStatus>> i = map.entrySet().iterator(); i.hasNext();) {
@@ -349,8 +344,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				 * it will be pruned by the daemon
 				 */
 				status.cancel();
-			} else if (IJobStatus.RUNNING.equals(state)) {
-				status.startProxy();
 			}
 
 			// XXX eliminate when monitoring is in place
