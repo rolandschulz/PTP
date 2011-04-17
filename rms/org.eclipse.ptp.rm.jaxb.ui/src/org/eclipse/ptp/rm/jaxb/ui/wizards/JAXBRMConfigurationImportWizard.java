@@ -23,14 +23,20 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * For importing XML configurations from the installed plugins to the workspace
@@ -59,6 +65,8 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 	}
 
 	/*
+	 * Loads available configurations.
+	 * 
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench,
@@ -72,59 +80,70 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * Copies file to resourceManagers project and refreshes it. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
 	@Override
 	public boolean performFinish() {
-		URL selection = mainPage.getSelectedConfiguration();
-		File newConfig = null;
-		if (selection != null) {
-			String name = mainPage.getSelectedName();
-			newConfig = new File(resourceManagersDir(), name + DOT_XML);
-			BufferedReader br = null;
-			FileWriter fw = null;
-			try {
-				fw = new FileWriter(newConfig, false);
-				br = new BufferedReader(new InputStreamReader(selection.openStream()));
-				while (true) {
+		new UIJob(SP) {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				URL selection = mainPage.getSelectedConfiguration();
+				File newConfig = null;
+				if (selection != null) {
+					String name = mainPage.getSelectedName();
+					File dir = resourceManagersDir();
+					if (dir == null) {
+						return Status.OK_STATUS;
+					}
+
+					newConfig = new File(dir, name + DOT_XML);
+					BufferedReader br = null;
+					FileWriter fw = null;
 					try {
-						String line = br.readLine();
-						if (null == line) {
-							break;
+						fw = new FileWriter(newConfig, false);
+						br = new BufferedReader(new InputStreamReader(selection.openStream()));
+						while (true) {
+							try {
+								String line = br.readLine();
+								if (null == line) {
+									break;
+								}
+								fw.write(line);
+								fw.write(LINE_SEP);
+							} catch (EOFException eof) {
+								break;
+							} finally {
+								fw.flush();
+							}
 						}
-						fw.write(line);
-						fw.write(LINE_SEP);
-					} catch (EOFException eof) {
-						break;
+					} catch (IOException io) {
+						JAXBUIPlugin.log(io);
 					} finally {
-						fw.flush();
+						try {
+							if (fw != null) {
+								fw.close();
+							}
+							if (br != null) {
+								br.close();
+							}
+						} catch (IOException io) {
+						}
 					}
 				}
-			} catch (IOException io) {
-				JAXBUIPlugin.log(io);
-			} finally {
-				try {
-					if (fw != null) {
-						fw.close();
+				if (newConfig != null) {
+					IWorkspace workspace = ResourcesPlugin.getWorkspace();
+					IProject project = workspace.getRoot().getProject(RESOURCE_MANAGERS);
+					try {
+						project.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
+					} catch (CoreException t) {
+						JAXBUIPlugin.log(t);
 					}
-					if (br != null) {
-						br.close();
-					}
-				} catch (IOException io) {
 				}
+				return Status.OK_STATUS;
 			}
-		}
-		if (newConfig != null) {
-			IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			IProject project = workspace.getRoot().getProject(RESOURCE_MANAGERS);
-			try {
-				project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-			} catch (CoreException t) {
-				JAXBUIPlugin.log(t);
-			}
-		}
+		}.schedule();
 		return true;
 	}
 
@@ -143,6 +162,8 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 				return dir;
 			}
 		}
+		WidgetActionUtils.warningMessage(Display.getDefault().getActiveShell(), Messages.ResourceManagersNotExist,
+				Messages.ResourceManagersNotExist_title);
 		return null;
 	}
 }
