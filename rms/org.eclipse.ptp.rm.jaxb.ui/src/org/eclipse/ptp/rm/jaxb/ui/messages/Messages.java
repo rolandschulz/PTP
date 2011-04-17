@@ -94,6 +94,8 @@ public class Messages extends NLS {
 	public static String ConfigurationImportWizardPageDescription;
 	public static String ConfigurationImportWizardPageTooltip;
 	public static String ConfigurationImportWizardPageLabel;
+	public static String ResourceManagersNotExist;
+	public static String ResourceManagersNotExist_title;
 
 	static {
 		// initialize resource bundle

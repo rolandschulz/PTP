@@ -174,6 +174,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 			fRMJAXBResourceManagers.put(JAXB_SERVICE_PROVIDER_EXTPT, info);
 		}
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(RESOURCE_MANAGERS);
+		StringBuffer invalid = new StringBuffer();
 		if (project != null) {
 			IPath path = project.getLocation();
 			if (path != null) {
@@ -188,10 +189,8 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 						try {
 							JAXBInitializationUtils.validate(url);
 						} catch (Throwable t) {
-							if (showError) {
-								WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t,
-										Messages.InvalidConfiguration + name, Messages.InvalidConfiguration_title, false);
-							}
+							invalid.append(LINE_SEP).append(name);
+							JAXBUIPlugin.log(t.getMessage());
 							continue;
 						}
 						info.put(name, url);
@@ -200,6 +199,10 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 					}
 				}
 			}
+		}
+		if (showError && invalid.length() > 0) {
+			WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), null,
+					Messages.InvalidConfiguration + invalid.toString(), Messages.InvalidConfiguration_title, false);
 		}
 	}
 
