@@ -39,6 +39,7 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 	public JAXBRMControlConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.JAXBRMControlConfigurationWizardPage_Title);
 		baseConfiguration = (IJAXBResourceManagerConfiguration) wizard.getBaseConfiguration();
+
 		setPageComplete(false);
 		setTitle(Messages.JAXBRMControlConfigurationWizardPage_Title);
 		setDescription(Messages.JAXBConnectionWizardPage_Description);
@@ -71,7 +72,6 @@ public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteRe
 		if (site != null) {
 			try {
 				RemoteUIServicesUtils.setConnectionHints(connectionWidget, site.getControlConnection());
-
 			} catch (Throwable t) {
 				JAXBUIPlugin.log(t);
 			}
