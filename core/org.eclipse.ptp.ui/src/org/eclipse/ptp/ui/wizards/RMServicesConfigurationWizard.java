@@ -206,7 +206,24 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	 */
 	private class SelectServiceProviderPage extends WizardPage {
 
+		private class ProviderInfo implements Comparable<ProviderInfo> {
+			public final String name;
+			public final IServiceProviderDescriptor descriptor;
+			public final RMConfigurationSelectionFactory factory;
+
+			public ProviderInfo(String name, IServiceProviderDescriptor descriptor, RMConfigurationSelectionFactory factory) {
+				this.name = name;
+				this.descriptor = descriptor;
+				this.factory = factory;
+			}
+
+			public int compareTo(ProviderInfo o) {
+				return name.compareTo(o.name);
+			}
+		}
+
 		private List fServiceProviderList;
+
 		private final ArrayList<ProviderInfo> fProviders = new ArrayList<ProviderInfo>();
 
 		public SelectServiceProviderPage(String pageName) {
@@ -232,22 +249,6 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			});
 
 			setControl(composite);
-		}
-
-		private class ProviderInfo implements Comparable<ProviderInfo> {
-			public final String name;
-			public final IServiceProviderDescriptor descriptor;
-			public final RMConfigurationSelectionFactory factory;
-
-			public ProviderInfo(String name, IServiceProviderDescriptor descriptor, RMConfigurationSelectionFactory factory) {
-				this.name = name;
-				this.descriptor = descriptor;
-				this.factory = factory;
-			}
-
-			public int compareTo(ProviderInfo o) {
-				return name.compareTo(o.name);
-			}
 		}
 
 		private void createServiceProviderChoiceControl(Composite container) {
@@ -459,14 +460,25 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	 */
 	@Override
 	public boolean performFinish() {
-		if (fUseDefaultNameAndDesc) {
-			getBaseConfiguration().setDefaultNameAndDesc();
-		}
-		fServiceProvider.save();
+		// if (fUseDefaultNameAndDesc) {
+		// getBaseConfiguration().setDefaultNameAndDesc();
+		// }
+		fServiceProvider.save(); // does not have name YET
 		if (!fEditMode) {
 			IServiceConfiguration config = fModelManager.newServiceConfiguration(fResourceManagerPage.getRMName());
 			config.setServiceProvider(fLaunchService, fServiceProvider.getOriginal());
 			fModelManager.addConfiguration(config);
+		}
+		/*
+		 * moved this after the service provider save: that call overwrites the
+		 * config properties with those of the service provider, which were not
+		 * changed via the widgets
+		 */
+		if (fUseDefaultNameAndDesc) {
+			getBaseConfiguration().setDefaultNameAndDesc();
+		} else {
+			getBaseConfiguration().setName(fResourceManagerPage.getRMName());
+			getBaseConfiguration().setDescription(fResourceManagerPage.getRMDesc());
 		}
 		return true;
 	}
