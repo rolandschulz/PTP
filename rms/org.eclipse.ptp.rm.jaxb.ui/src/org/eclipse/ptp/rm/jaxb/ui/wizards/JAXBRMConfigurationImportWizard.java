@@ -80,7 +80,7 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 	 */
 	@Override
 	public boolean performFinish() {
-		new UIJob(SP) {
+		new UIJob(RESOURCE_MANAGERS) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				SubMonitor subMon = SubMonitor.convert(monitor);
@@ -97,7 +97,7 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 							IFile newConfig = project.getFile(name + DOT_XML);
 							int createTry = 1;
 							while (newConfig.exists()) {
-								newConfig = project.getFile(name + " (" + createTry++ + ")" + DOT_XML); //$NON-NLS-1$//$NON-NLS-2$
+								newConfig = project.getFile(name + SP + OPENP + createTry++ + CLOSP + DOT_XML);
 							}
 							newConfig.create(selection.openStream(), IResource.NONE, subMon.newChild(10));
 						} catch (CoreException io) {

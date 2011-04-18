@@ -215,15 +215,6 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	}
 
 	/**
-	 * @param shell
-	 * @param message
-	 * @param title
-	 */
-	public static void warningMessage(Shell shell, String message, String title) {
-		MessageDialog.openWarning(shell, title, message + LINE_SEP);
-	}
-
-	/**
 	 * Converts string representation of OR'd EFS attributes into the Java int
 	 * value.
 	 * 
