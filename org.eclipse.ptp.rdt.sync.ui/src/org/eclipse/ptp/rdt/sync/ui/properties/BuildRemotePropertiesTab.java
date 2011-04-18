@@ -1,5 +1,6 @@
 package org.eclipse.ptp.rdt.sync.ui.properties;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -180,9 +181,7 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 	 * Store remote location information for the selected build configuration
 	 */
 	public void performOK() {
-		// Register with build configuration manager
-		BuildScenario buildScenario = new BuildScenario("Git", fSelectedConnection, fRootLocationText.getText()); //$NON-NLS-1$
-		BuildConfigurationManager.setBuildScenarioForBuildConfiguration(buildScenario, getCfg());
+		// Change build path and save new configuration
 		String buildPath = fRootLocationText.getText();
 		if (buildPath.endsWith("/")) { //$NON-NLS-1$
 			buildPath = buildPath.substring(0, buildPath.length() - 1);
@@ -194,6 +193,16 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 		}
 		getCfg().getToolChain().getBuilder().setBuildPath(buildPath);
 		ManagedBuildManager.saveBuildInfo(getCfg().getOwner().getProject(), true);
+		
+		// Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
+		// the BuildConfigurationManager relies on the data being up-to-date.
+		BuildScenario buildScenario = new BuildScenario("Git", fSelectedConnection, fRootLocationText.getText()); //$NON-NLS-1$
+		BuildConfigurationManager.setBuildScenarioForBuildConfiguration(buildScenario, getCfg());
+		try {
+			BuildConfigurationManager.saveConfigurationData();
+		} catch (IOException e) {
+			// TODO What to do in this case?
+		}
 	}
 
 	private void checkConnection() {
