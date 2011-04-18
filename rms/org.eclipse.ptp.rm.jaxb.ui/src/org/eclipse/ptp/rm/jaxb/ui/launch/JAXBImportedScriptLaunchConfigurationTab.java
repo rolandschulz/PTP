@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
@@ -26,6 +27,8 @@ import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -99,26 +102,35 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 * org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
-	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
+	public void createControl(final Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetBuilderUtils.createComposite(parent, 1);
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(6, true);
-		GridData gd = WidgetBuilderUtils.createGridDataFillH(6);
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(5, true);
+		GridData gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 700, DEFAULT, 5, DEFAULT);
 		Composite comp = WidgetBuilderUtils.createComposite(control, SWT.NONE, layout, gd);
 		WidgetBuilderUtils.createLabel(comp, Messages.BatchScriptPath, SWT.LEFT, 1);
-		GridData gdsub = WidgetBuilderUtils.createGridDataFillH(3);
+		GridData gdsub = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 275, DEFAULT, 2, DEFAULT);
 		String s = selected == null ? ZEROSTR : selected.toString();
 		choice = WidgetBuilderUtils.createText(comp, SWT.BORDER, gdsub, true, s);
 		browseWorkspace = WidgetBuilderUtils.createPushButton(comp, Messages.JAXBRMConfigurationSelectionWizardPage_1, this);
 		clear = WidgetBuilderUtils.createPushButton(comp, Messages.ClearScript, this);
-
-		layout = WidgetBuilderUtils.createGridLayout(1, true);
-		gd = WidgetBuilderUtils.createGridData(GridData.FILL_BOTH, true, true, 130, 300, 1, DEFAULT);
-		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
-		int style = SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL;
-		gdsub = WidgetBuilderUtils.createGridDataFill(DEFAULT, DEFAULT, 1);
+		layout = WidgetBuilderUtils.createGridLayout(5, true);
+		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, null);
+		int style = SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL;
+		gdsub = WidgetBuilderUtils.createGridDataFill(700, 700, 5);
 		editor = WidgetBuilderUtils.createText(grp, style, gdsub, true, ZEROSTR, null, null);
 		WidgetBuilderUtils.applyMonospace(editor);
-		editor.setToolTipText(Messages.ReadOnlyWarning);
+		editor.addMouseListener(new MouseListener() {
+			public void mouseDoubleClick(MouseEvent e) {
+
+			}
+
+			public void mouseDown(MouseEvent e) {
+			}
+
+			public void mouseUp(MouseEvent e) {
+				MessageDialog.openWarning(parent.getShell(), Messages.ReadOnlyWarning_title, Messages.ReadOnlyWarning);
+			}
+		});
 
 		selected = null;
 		parentTab.resize(control);

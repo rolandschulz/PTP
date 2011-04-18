@@ -85,6 +85,7 @@ public class Messages extends NLS {
 	public static String ScriptNotSupportedWarning_title;
 	public static String CreateControlConfigurableError;
 	public static String ReadOnlyWarning;
+	public static String ReadOnlyWarning_title;
 
 	public static String ValidationError;
 	public static String ValidationError_title;
