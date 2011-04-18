@@ -549,6 +549,44 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<fixed-text>${rm:destination#description}</fixed-text>
 					</widget>
 					<!-- row 3 -->
+               <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <tooltip>${rm:Resource_List.nodes#tooltip}</tooltip>
+                  <fixed-text>Number of nodes: </fixed-text>
+               </widget>
+               <widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.nodes">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"  widthHint="150"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>${rm:Resource_List.nodes#description}</fixed-text>
+               </widget>
+					<!-- row 4 -->
+               <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <tooltip>${rm:Resource_List.mem#tooltip}</tooltip>
+                  <fixed-text>Total Memory Needed: </fixed-text>
+               </widget>
+               <widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"  widthHint="150"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>${rm:Resource_List.mem#description}</fixed-text>
+               </widget>
+					<!-- row 5 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -567,7 +605,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>${rm:Resource_List.walltime#description}</fixed-text>
 					</widget>
-					<!-- row 4 -->
+					<!-- row 6 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -585,7 +623,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>${rm:mpiCommand#description}</fixed-text>
 					</widget>
-					<!-- row 5 -->
+					<!-- row 7 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
