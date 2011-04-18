@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>The PTP Configurable Resource Manager</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<h1>The PTP Configurable Resource Manager</h1>
+	<h2>
+		<a name="Introduction">Introduction</a>
+	</h2>
+	<p>
+		The JAXB Eclipse plug-ins, part of the <a
+			href="../../org.eclipse.ptp.help/html/PLUGINS_ROOT/org.eclipse.ptp.help/html/toc.html">
+			Parallel Tools Platform</a> (PTP), allow you to launch and monitor
+		applications on local or remote resources using resource managers
+		which are configured from an XML file via JAXB (
+		<code>javax.xml.bind</code>
+		) technology.<br>
+	</p>
+	<p>
+		JAXB resource managers consist of two components, a "control" and a
+		"monitor". In most cases, the monitor will be a pre-built type
+		provided by the PTP distribution, either a standard interactive
+		monitor or the batch-system monitor implemented using <a
+			href="http://www2.fz-juelich.de/jsc/llview">LLView</a>. Adding a new
+		resource manager type will thus normally entail only the specific
+		configuration of its control part.
+	</p>
+	<h2>
+		<a name="Requirements">Requirements</a>
+	</h2>
+	<p>In addition to having Eclipse and PTP installed, you need to
+		have the following software dependencies installed.</p>
+	<ul>
+		<li>CDT for Indigo, available from the Eclipse download site or
+			as part of the pre-built PTP package;</li>
+		<li>RSE for Indigo, available from the Eclipse download site or
+			as part of the pre-built PTP package.</li>
+	</ul>
+	<p>If the monitor of any JAXB resource manager uses LLView, an
+		LLView server must be set up separately or an installation must be
+		available to point the client monitoring component to.</p>
+	<p>
+		<b>There are two main sections to the help pages which follow. The
+			first concerns creating or modifying a resource manager
+			configuration; the second are some general guidelines for using the
+			JAXB resource managers. For those interested only in using the JAXB
+			resource managers already provided with the PTP distribution, the
+			first section may be skipped.</b></p>
+	<h2>
+		<a name="Configuring">Configuring the Resource Manager</a>
+	</h2>
+
+	<h2>
+		<a name="Using">Using the Resource Manager</a>
+	</h2>
+	<p>
+		<a href="toc.html">Back to Table of Contents</a>
+	</p>
+</body>
+</html>
