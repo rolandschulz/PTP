@@ -20,6 +20,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
@@ -298,8 +299,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		Shell shell = Display.getDefault().getActiveShell();
 		try {
 			if (!parentTab.hasScript()) {
-				WidgetActionUtils.warningMessage(shell, Messages.ScriptNotSupportedWarning,
-						Messages.ScriptNotSupportedWarning_title);
+				MessageDialog.openWarning(shell, Messages.ScriptNotSupportedWarning_title, Messages.ScriptNotSupportedWarning
+						+ LINE_SEP);
 				return;
 			}
 			String text = realizeLocalScript(listenerConfiguration);

@@ -48,12 +48,14 @@ public interface IJAXBNonNLSConstants {
 	String PIP = "|";//$NON-NLS-1$
 	String DOT = ".";//$NON-NLS-1$
 	String Z3 = "000";//$NON-NLS-1$
+	String OPENP = "(";//$NON-NLS-1$
 	String OPENSQ = "[";//$NON-NLS-1$
 	String OPENV = "${";//$NON-NLS-1$
 	String OPENVRM = "${rm:";//$NON-NLS-1$
 	String OPENVLT = "${lt:";//$NON-NLS-1$
 	String VRM = "rm:";//$NON-NLS-1$
 	String VLC = "lc:";//$NON-NLS-1$
+	String CLOSP = ")";//$NON-NLS-1$
 	String CLOSSQ = "]";//$NON-NLS-1$
 	String CLOSV = "}";//$NON-NLS-1$
 	String CLOSVAL = "#value}";//$NON-NLS-1$
