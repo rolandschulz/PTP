@@ -20,6 +20,8 @@ public class Messages extends NLS {
 	public static String JAXBRMControlConfigurationWizardPage_Title;
 	public static String JAXBRMMonitoringConfigurationWizardPage_Title;
 
+	public static String JAXBRMConfigurationImportWizard_createResourceManagersProject;
+
 	public static String JAXBRMConfigurationSelectionWizardPage_0;
 	public static String JAXBRMConfigurationSelectionWizardPage_1;
 	public static String JAXBRMConfigurationSelectionWizardPage_Project_Selection_Title;

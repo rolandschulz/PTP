@@ -9,30 +9,24 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
-import java.io.BufferedReader;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
@@ -89,59 +83,35 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 		new UIJob(SP) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				URL selection = mainPage.getSelectedConfiguration();
-				File newConfig = null;
-				if (selection != null) {
-					String name = mainPage.getSelectedName();
-					File dir = resourceManagersDir();
-					if (dir == null) {
-						return Status.OK_STATUS;
-					}
-
-					newConfig = new File(dir, name + DOT_XML);
-					BufferedReader br = null;
-					FileWriter fw = null;
-					try {
-						fw = new FileWriter(newConfig, false);
-						br = new BufferedReader(new InputStreamReader(selection.openStream()));
-						while (true) {
-							try {
-								String line = br.readLine();
-								if (null == line) {
-									break;
-								}
-								fw.write(line);
-								fw.write(LINE_SEP);
-							} catch (EOFException eof) {
-								break;
-							} finally {
-								fw.flush();
-							}
-						}
-					} catch (IOException io) {
-						JAXBUIPlugin.log(io);
-					} finally {
+				SubMonitor subMon = SubMonitor.convert(monitor);
+				try {
+					URL selection = mainPage.getSelectedConfiguration();
+					if (selection != null) {
 						try {
-							if (fw != null) {
-								fw.close();
+							String name = mainPage.getSelectedName();
+							IProject project = checkResourceManagersProject(subMon.newChild(10));
+							if (project == null) {
+								return Status.OK_STATUS;
 							}
-							if (br != null) {
-								br.close();
+
+							IFile newConfig = project.getFile(name + DOT_XML);
+							int createTry = 1;
+							while (newConfig.exists()) {
+								newConfig = project.getFile(name + " (" + createTry++ + ")" + DOT_XML); //$NON-NLS-1$//$NON-NLS-2$
 							}
+							newConfig.create(selection.openStream(), IResource.NONE, subMon.newChild(10));
+						} catch (CoreException io) {
+							JAXBUIPlugin.log(io);
 						} catch (IOException io) {
+							JAXBUIPlugin.log(io);
 						}
 					}
-				}
-				if (newConfig != null) {
-					IWorkspace workspace = ResourcesPlugin.getWorkspace();
-					IProject project = workspace.getRoot().getProject(RESOURCE_MANAGERS);
-					try {
-						project.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
-					} catch (CoreException t) {
-						JAXBUIPlugin.log(t);
+					return Status.OK_STATUS;
+				} finally {
+					if (monitor != null) {
+						monitor.done();
 					}
 				}
-				return Status.OK_STATUS;
 			}
 		}.schedule();
 		return true;
@@ -150,20 +120,27 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 	/*
 	 * By convention, "resourceManagers" project in the user's workspace.
 	 */
-	private static File resourceManagersDir() {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(RESOURCE_MANAGERS);
-		if (project != null) {
-			IPath path = project.getLocation();
-			if (path != null) {
-				File dir = path.toFile();
-				if (!dir.exists()) {
-					dir.mkdirs();
+	private static IProject checkResourceManagersProject(IProgressMonitor monitor) throws CoreException {
+		SubMonitor subMon = SubMonitor.convert(monitor);
+		try {
+			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(RESOURCE_MANAGERS);
+			if (!project.exists()) {
+				boolean create = MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
+						Messages.ResourceManagersNotExist_title,
+						Messages.JAXBRMConfigurationImportWizard_createResourceManagersProject);
+				if (!create) {
+					return null;
 				}
-				return dir;
+				project.create(subMon.newChild(10));
+				if (!project.isOpen()) {
+					project.open(subMon.newChild(10));
+				}
+			}
+			return project;
+		} finally {
+			if (monitor != null) {
+				monitor.done();
 			}
 		}
-		WidgetActionUtils.warningMessage(Display.getDefault().getActiveShell(), Messages.ResourceManagersNotExist,
-				Messages.ResourceManagersNotExist_title);
-		return null;
 	}
 }
