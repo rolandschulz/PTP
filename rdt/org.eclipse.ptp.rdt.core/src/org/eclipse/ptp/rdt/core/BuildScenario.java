@@ -54,7 +54,9 @@ public class BuildScenario {
 	 * @param memento
 	 */
 	public void saveScenario(IMemento memento) {
-		memento.putString(ATTR_SYNC_PROVIDER, syncProvider);
+		if (syncProvider != null) {
+			memento.putString(ATTR_SYNC_PROVIDER, syncProvider);
+		}
 		memento.putString(ATTR_REMOTE_CONNECTION_ID, remoteConnection.getName());
 		memento.putString(ATTR_LOCATION, location);
 		memento.putString(ATTR_REMOTE_SERVICES_ID, remoteConnection.getRemoteServices().getId());
@@ -72,7 +74,7 @@ public class BuildScenario {
 		String rc = memento.getString(ATTR_REMOTE_CONNECTION_ID);
 		String l = memento.getString(ATTR_LOCATION);
 		String rs = memento.getString(ATTR_REMOTE_SERVICES_ID);
-		if ((sp == null) || (rc == null) || (l == null) || (rs == null)) {
+		if (rc == null || l == null || rs == null) {
 			return null;
 		}
 		

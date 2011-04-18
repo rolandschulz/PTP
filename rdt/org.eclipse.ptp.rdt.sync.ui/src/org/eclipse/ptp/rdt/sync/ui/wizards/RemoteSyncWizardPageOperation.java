@@ -69,37 +69,38 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		IProject project = ((ICDTCommonProjectWizard) wizard).getLastProject();
 
 		ISynchronizeParticipant participant = (ISynchronizeParticipant) getMBSProperty(NewRemoteSyncProjectWizardPage.SERVICE_PROVIDER_PROPERTY);
-		if (participant != null) {
-			ServiceModelManager smm = ServiceModelManager.getInstance();
-			IServiceConfiguration config = smm.newServiceConfiguration(getConfigName(project.getName()));
-			IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-			config.setServiceProvider(syncService, participant.getProvider(project));
-			
-			IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
-			IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
-			RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
-			if (rbsp != null) {
-				IRemoteConnection remoteConnection = participant.getProvider(project).getRemoteConnection();
-				rbsp.setRemoteToolsProviderID(remoteConnection.getRemoteServices().getId());
-				rbsp.setRemoteToolsConnection(remoteConnection);
-				config.setServiceProvider(buildService, rbsp);
-			}
-			
-			smm.addConfiguration(project, config);
-			if (BuildConfigurationManager.getBuildSystemTemplateConfiguration() == null) {
-				BuildConfigurationManager.setBuildSystemTemplateConfiguration(config);
-			}
-
-			try {
-				smm.saveModelConfiguration();
-			} catch (IOException e) {
-				RDTSyncUIPlugin.log(e.toString(), e);
-			}
+		if (participant == null) {
+			monitor.done();
+			return;
 		}
-		
+
+		// BUild the service configuration
+		ServiceModelManager smm = ServiceModelManager.getInstance();
+		IServiceConfiguration serviceConfig = smm.newServiceConfiguration(getConfigName(project.getName()));
+		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
+		serviceConfig.setServiceProvider(syncService, participant.getProvider(project));
+
+		IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
+		IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
+		RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
+		if (rbsp != null) {
+			IRemoteConnection remoteConnection = participant.getProvider(project).getRemoteConnection();
+			rbsp.setRemoteToolsProviderID(remoteConnection.getRemoteServices().getId());
+			rbsp.setRemoteToolsConnection(remoteConnection);
+			serviceConfig.setServiceProvider(buildService, rbsp);
+		}
+
+		smm.addConfiguration(project, serviceConfig);
+		try {
+			smm.saveModelConfiguration();
+		} catch (IOException e) {
+			RDTSyncUIPlugin.log(e.toString(), e);
+		}
+
+		// Create build scenario based on initial remote location information
 		ISyncServiceProvider provider = participant.getProvider(project);
 		BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
-																										provider.getLocation());
+				provider.getLocation());
 
 		// For each build configuration, set the build directory appropriately.
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
@@ -113,58 +114,63 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
 
-		// Add information about remote location to the initial build configurations
+		// Add information about remote location to the initial build configurations.
 		// Do this last (except for adding local configuration) so that project is not flagged as initialized prematurely.
-		BuildConfigurationManager.setInitialBuildScenarioForAllConfigurations(project, buildScenario);
+		BuildConfigurationManager.initProject(project, serviceConfig, buildScenario);
 
 		// Create a local build configuration. The corresponding build scenario has no sync provider and points to the project's
 		// working directory. We take a conservative approach. Failure at any point (null return) means we abort the attempt to
 		// create a local configuration.
-		ManagedProject managedProject = (ManagedProject) buildInfo.getManagedProject();
-		Configuration localConfigParent = (Configuration) buildInfo.getDefaultConfiguration();
-		String localConfigId = ManagedBuildManager.calculateChildId(localConfigParent.getId(), null);
-		Configuration localConfig = new Configuration(managedProject, localConfigParent, localConfigId, true, false);
-		if (localConfig != null) {
-			CConfigurationData localConfigData = localConfig.getConfigurationData();
-			ICProjectDescription projectDes = CoreModel.getDefault().getProjectDescription(project);
-			ICConfigurationDescription localConfigDes = null;
-			try {
-				localConfigDes = projectDes.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, localConfigData);
-			} catch (WriteAccessException e) {
-				// Nothing to do
-			} catch (CoreException e) {
-				// Nothing to do
-			}
-
-			if (localConfigDes != null) {
-				boolean configAdded = false;
-				localConfig.setConfigurationDescription(localConfigDes);
-				localConfigDes.setName("Workspace"); //$NON-NLS-1$
-				localConfigDes.setDescription("Build inside Eclipse workspace"); //$NON-NLS-1$
-				localConfig.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
-				IRemoteServices localService = PTPRemoteCorePlugin.getDefault().
-				getRemoteServices("org.eclipse.ptp.remote.LocalServices", null); //$NON-NLS-1$
-				if (localService != null) {
-					IRemoteConnection localConnection = localService.getConnectionManager().getConnection("local"); //$NON-NLS-1$
-					if (localConnection != null) {
-						BuildScenario localBuildScenario = new BuildScenario(null, localConnection, project.getLocation().toString());
-						BuildConfigurationManager.setBuildScenarioForBuildConfiguration(localBuildScenario, localConfig);
-						configAdded = true;
-					}
-				}
-				if (!configAdded) {
-					projectDes.removeConfiguration(localConfigDes);
-				} else {
-					try {
-						// ManagedBuildManager.resetConfiguration(project, localConfig);
-						CoreModel.getDefault().setProjectDescription(project, projectDes, true, null);
-						// ManagedBuildManager.addExtensionConfiguration(localConfig);
-						// ManagedBuildManager.saveBuildInfo(project, true);
-					} catch (CoreException e) {
-						projectDes.removeConfiguration(localConfigDes);
-					}
-				}
-			}
+//		ManagedProject managedProject = (ManagedProject) buildInfo.getManagedProject();
+//		Configuration localConfigParent = (Configuration) buildInfo.getDefaultConfiguration();
+//		String localConfigId = ManagedBuildManager.calculateChildId(localConfigParent.getId(), null);
+//		Configuration localConfig = new Configuration(managedProject, localConfigParent, localConfigId, true, false);
+//		if (localConfig != null) {
+//			CConfigurationData localConfigData = localConfig.getConfigurationData();
+//			ICProjectDescription projectDes = CoreModel.getDefault().getProjectDescription(project);
+//			ICConfigurationDescription localConfigDes = null;
+//			try {
+//				localConfigDes = projectDes.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, localConfigData);
+//			} catch (WriteAccessException e) {
+//				// Nothing to do
+//			} catch (CoreException e) {
+//				// Nothing to do
+//			}
+//
+//			if (localConfigDes != null) {
+//				boolean configAdded = false;
+//				localConfig.setConfigurationDescription(localConfigDes);
+//				localConfigDes.setName("Workspace"); //$NON-NLS-1$
+//				localConfigDes.setDescription("Build inside Eclipse workspace"); //$NON-NLS-1$
+//				localConfig.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
+//				IRemoteServices localService = PTPRemoteCorePlugin.getDefault().
+//				getRemoteServices("org.eclipse.ptp.remote.LocalServices", null); //$NON-NLS-1$
+//				if (localService != null) {
+//					IRemoteConnection localConnection = localService.getConnectionManager().getConnection("local"); //$NON-NLS-1$
+//					if (localConnection != null) {
+//						BuildScenario localBuildScenario = new BuildScenario(null, localConnection, project.getLocation().toString());
+//						BuildConfigurationManager.setBuildScenarioForBuildConfiguration(localBuildScenario, localConfig);
+//						configAdded = true;
+//					}
+//				}
+//				if (!configAdded) {
+//					projectDes.removeConfiguration(localConfigDes);
+//				} else {
+//					try {
+//						// ManagedBuildManager.resetConfiguration(project, localConfig);
+//						CoreModel.getDefault().setProjectDescription(project, projectDes, true, null);
+//						// ManagedBuildManager.addExtensionConfiguration(localConfig);
+//						// ManagedBuildManager.saveBuildInfo(project, true);
+//					} catch (CoreException e) {
+//						projectDes.removeConfiguration(localConfigDes);
+//					}
+//				}
+//			}
+//		}
+		try {
+			BuildConfigurationManager.saveConfigurationData();
+		} catch (IOException e) {
+			// TODO: What to do in this case?
 		}
 		monitor.done();
 	}
