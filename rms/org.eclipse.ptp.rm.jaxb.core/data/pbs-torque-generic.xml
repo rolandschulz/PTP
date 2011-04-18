@@ -37,7 +37,7 @@ defaults value: "u", which is unspecified.]]></tooltip>
 		<attribute name="destination" type="choice">
 			<description>Designation of the queue to which to submit the job.</description>
 			<tooltip>Format: queue[@server].</tooltip>
-			<choice><![CDATA[normal,iacat2,indprio,lincoln_nomss,cap1,lincoln_debug,long,iacat,industrial,lincoln,wide,nomss,debug,iacat3,lincoln_cuda3,fernsler]]></choice>
+			<choice>normal,debug</choice>
 		</attribute>
 		<attribute name="directive" type="string">
 			<description>Defines the prefix that declares a directive to the qsub command within the script file.</description>
