@@ -19,6 +19,9 @@
      	</topic>
       	<topic label="Running PBS Jobs">
        		<anchor id="ptpPBS"/>
+      </topic>
+         <topic href="../org.eclipse.ptp.rm.jaxb.help/html/toc.html" label="Configuring and Using the JAXB Resource Managers">
+            <anchor id="ptpJAXB"/>
      	</topic>
       	<topic label="Running SLURM Jobs">
        		<anchor id="ptpSLURM"/>
