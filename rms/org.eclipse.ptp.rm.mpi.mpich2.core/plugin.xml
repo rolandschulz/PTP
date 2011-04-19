@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
-            class="org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration"
+            class="org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider"
             id="org.eclipse.ptp.rm.mpi.mpich2.resourceManager"
             name="MPICH2"
             serviceId="org.eclipse.ptp.core.LaunchService">

@@ -21,10 +21,6 @@ public class GenericRMConfiguration extends AbstractToolRMConfiguration {
 
 	public static int CAPABILITIES = CAP_LAUNCH | CAP_REMOTE_INSTALL_PATH;
 
-	public GenericRMConfiguration() {
-		super(CAPABILITIES);
-	}
-
 	public GenericRMConfiguration(String namespace, IServiceProvider provider) {
 		super(CAPABILITIES, namespace, provider);
 		setLaunchCmd(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_LAUNCH_CMD));

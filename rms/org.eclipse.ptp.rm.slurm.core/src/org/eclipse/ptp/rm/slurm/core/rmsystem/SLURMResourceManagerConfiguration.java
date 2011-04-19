@@ -28,9 +28,6 @@ public class SLURMResourceManagerConfiguration extends AbstractRemoteResourceMan
 	private static final String TAG_SLURMD_DEFAULTS = "slurmdDefaults"; //$NON-NLS-1$
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-	public SLURMResourceManagerConfiguration() {
-	}
-
 	public SLURMResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(namespace, provider);
 		setDescription("SLURM Resource Manager"); //$NON-NLS-1$

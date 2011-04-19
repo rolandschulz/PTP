@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
-public interface IResourceManagerConfiguration {
+import org.eclipse.core.runtime.IAdaptable;
+
+public interface IResourceManagerConfiguration extends IAdaptable {
 
 	/**
 	 * Get the auto start flag for this resource manager. If the auto start flag

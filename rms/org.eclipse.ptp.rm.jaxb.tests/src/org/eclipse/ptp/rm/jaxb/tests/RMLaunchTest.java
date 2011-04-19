@@ -45,7 +45,9 @@ import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerMonitor;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBServiceProvider;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider;
 
 public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 
@@ -265,9 +267,8 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 	 * We do here what is done through the wizard.
 	 */
 	private void emulateConfigureWizard() throws Throwable {
-		rmConfig = new JAXBServiceProvider();
+		rmConfig = new JAXBServiceProvider(AbstractResourceManagerConfiguration.BASE, new ResourceManagerServiceProvider());
 		// JAXBRMConfigurationSelectionWizardPage
-		rmConfig.setUniqueName("test-pbs-rm"); //$NON-NLS-1$
 		rmConfig.setRMConfigurationURL(JAXBTestsPlugin.getURL(xml));
 		// JAXBRMControlConfigurationWizardPage
 		rmConfig.realizeRMDataFromXML();

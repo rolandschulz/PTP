@@ -10,15 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
-import java.util.UUID;
-
 import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.ServiceProvider;
 
 /**
  * @since 5.0
  */
-public abstract class AbstractResourceManagerConfiguration extends ServiceProvider implements IResourceManagerConfiguration,
+public abstract class AbstractResourceManagerConfiguration implements IResourceManagerConfiguration,
 		IResourceManagerComponentConfiguration {
 	public static final String BASE = "base."; //$NON-NLS-1$
 	public static final String CONTROL = "control."; //$NON-NLS-1$
@@ -27,29 +24,15 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	private static final String TAG_AUTOSTART = "autoStart"; //$NON-NLS-1$
 	private static final String TAG_DESCRIPTION = "description"; //$NON-NLS-1$
 	private static final String TAG_NAME = "name"; //$NON-NLS-1$
-	private static final String TAG_UNIQUE_NAME = "uniqName"; //$NON-NLS-1$
 	private static final String TAG_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String TAG_REMOTE_SERVICES_ID = "remoteServicesID"; //$NON-NLS-1$
 
-	private IServiceProvider fServiceProvider = null;
-	private String fNamespace = ""; //$NON-NLS-1$
-
-	public AbstractResourceManagerConfiguration() {
-	}
+	private final IServiceProvider fServiceProvider;
+	private final String fNamespace;
 
 	public AbstractResourceManagerConfiguration(String namespace, IServiceProvider provider) {
-		/*
-		 * Only allow one level of nesting
-		 */
-		if (provider instanceof AbstractResourceManagerConfiguration) {
-			IServiceProvider baseProvider = ((AbstractResourceManagerConfiguration) provider).getServiceProvider();
-			if (baseProvider != null) {
-				provider = baseProvider;
-			}
-		}
 		fServiceProvider = provider;
 		fNamespace = namespace;
-		setDescriptor(provider.getDescriptor());
 	}
 
 	/*
@@ -75,6 +58,22 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings({ "rawtypes" })
+	public Object getAdapter(Class adapter) {
+		if (adapter.isInstance(this)) {
+			return this;
+		}
+		if (adapter == IServiceProvider.class) {
+			return fServiceProvider;
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getAutoStart()
 	 */
@@ -82,14 +81,15 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 		return getBoolean(BASE, TAG_AUTOSTART, false);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get boolean option from namespace
 	 * 
-	 * @see
-	 * org.eclipse.ptp.services.core.ServiceProvider#getBoolean(java.lang.String
-	 * , boolean)
+	 * @param key
+	 *            option key
+	 * @param defaultVal
+	 *            default value
+	 * @return boolean value of key or defaultVal if no option is defined
 	 */
-	@Override
 	public boolean getBoolean(String key, boolean defaultVal) {
 		return getBoolean(fNamespace, key, defaultVal);
 	}
@@ -97,9 +97,8 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getConnectionName
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration#
+	 * getConnectionName()
 	 */
 	public String getConnectionName() {
 		return getString(TAG_CONNECTION_NAME, ""); //$NON-NLS-1$
@@ -115,14 +114,15 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 		return getString(BASE, TAG_DESCRIPTION, ""); //$NON-NLS-1$
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get integer option from namespace
 	 * 
-	 * @see
-	 * org.eclipse.ptp.services.core.ServiceProvider#getInt(java.lang.String,
-	 * int)
+	 * @param key
+	 *            option key
+	 * @param defaultVal
+	 *            default value
+	 * @return integer value of key or defaultVal if no option is defined
 	 */
-	@Override
 	public int getInt(String key, int defaultVal) {
 		return getInt(fNamespace, key, defaultVal);
 	}
@@ -132,7 +132,6 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getName()
 	 */
-	@Override
 	public String getName() {
 		return getString(BASE, TAG_NAME, ""); //$NON-NLS-1$
 	}
@@ -140,9 +139,8 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getRemoteServicesId
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration#
+	 * getRemoteServicesId()
 	 */
 	public String getRemoteServicesId() {
 		return getString(TAG_REMOTE_SERVICES_ID, null);
@@ -156,17 +154,18 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * ()
 	 */
 	public String getResourceManagerId() {
-		return super.getId();
+		return fServiceProvider.getId();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get string option from namespace
 	 * 
-	 * @see
-	 * org.eclipse.ptp.services.core.ServiceProvider#getString(java.lang.String,
-	 * java.lang.String)
+	 * @param key
+	 *            option key
+	 * @param defaultVal
+	 *            default value
+	 * @return string value of key or defaultVal if no option is defined
 	 */
-	@Override
 	public String getString(String key, String defaultVal) {
 		return getString(fNamespace, key, defaultVal);
 	}
@@ -177,7 +176,7 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getType()
 	 */
 	public String getType() {
-		return super.getName();
+		return fServiceProvider.getName();
 	}
 
 	/*
@@ -187,12 +186,7 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getUniqueName()
 	 */
 	public String getUniqueName() {
-		String name = getString(BASE, TAG_UNIQUE_NAME, null);
-		if (name == null) {
-			name = UUID.randomUUID().toString();
-			putString(BASE, TAG_UNIQUE_NAME, name);
-		}
-		return name;
+		return ((ResourceManagerServiceProvider) fServiceProvider).getUniqueName();
 	}
 
 	/*
@@ -214,38 +208,38 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Put boolean option into namespace
 	 * 
-	 * @see
-	 * org.eclipse.ptp.services.core.ServiceProvider#putBoolean(java.lang.String
-	 * , boolean)
+	 * @param key
+	 *            option key
+	 * @param value
+	 *            option value
 	 */
-	@Override
 	public void putBoolean(String key, boolean value) {
 		putBoolean(fNamespace, key, value);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Put integer option into namespace
 	 * 
-	 * @see
-	 * org.eclipse.ptp.services.core.ServiceProvider#putInt(java.lang.String,
-	 * int)
+	 * @param key
+	 *            option key
+	 * @param value
+	 *            option value
 	 */
-	@Override
 	public void putInt(String key, int value) {
 		putInt(fNamespace, key, value);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Put string option into namespace
 	 * 
-	 * @see
-	 * org.eclipse.ptp.services.core.ServiceProvider#putString(java.lang.String,
-	 * java.lang.String)
+	 * @param key
+	 *            option key
+	 * @param value
+	 *            option value
 	 */
-	@Override
 	public void putString(String key, String value) {
 		putString(fNamespace, key, value);
 	}
@@ -264,9 +258,8 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setConnectionName
-	 * (java.lang.String)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration#
+	 * setConnectionName(java.lang.String)
 	 */
 	public void setConnectionName(String name) {
 		putString(TAG_CONNECTION_NAME, name);
@@ -297,72 +290,34 @@ public abstract class AbstractResourceManagerConfiguration extends ServiceProvid
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setRemoteServicesId
-	 * (java.lang.String)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration#
+	 * setRemoteServicesId(java.lang.String)
 	 */
 	public void setRemoteServicesId(String id) {
 		putString(TAG_REMOTE_SERVICES_ID, id);
 	}
 
-	/**
-	 * Set the IResourceManagerConfiguration unique name. This is only used to
-	 * transition to the new service model framework. It is set to the name of
-	 * the service configuration that was created for this service provider.
-	 * 
-	 * @param id
-	 */
-	public void setUniqueName(String id) {
-		putString(BASE, TAG_UNIQUE_NAME, id);
-	}
-
 	private boolean getBoolean(String namespace, String key, boolean defaultVal) {
-		if (fServiceProvider != null) {
-			return fServiceProvider.getBoolean(namespace + key, defaultVal);
-		}
-		return super.getBoolean(namespace + key, defaultVal);
+		return fServiceProvider.getBoolean(namespace + key, defaultVal);
 	}
 
 	private int getInt(String namespace, String key, int defaultVal) {
-		if (fServiceProvider != null) {
-			return fServiceProvider.getInt(namespace + key, defaultVal);
-		}
-		return super.getInt(namespace + key, defaultVal);
+		return fServiceProvider.getInt(namespace + key, defaultVal);
 	}
 
 	private String getString(String namespace, String key, String defaultVal) {
-		if (fServiceProvider != null) {
-			return fServiceProvider.getString(namespace + key, defaultVal);
-		}
-		return super.getString(namespace + key, defaultVal);
+		return fServiceProvider.getString(namespace + key, defaultVal);
 	}
 
 	private void putBoolean(String namespace, String key, boolean value) {
-		if (fServiceProvider != null) {
-			fServiceProvider.putBoolean(namespace + key, value);
-		} else {
-			super.putBoolean(namespace + key, value);
-		}
+		fServiceProvider.putBoolean(namespace + key, value);
 	}
 
 	private void putInt(String namespace, String key, int value) {
-		if (fServiceProvider != null) {
-			fServiceProvider.putInt(namespace + key, value);
-		} else {
-			super.putInt(namespace + key, value);
-		}
+		fServiceProvider.putInt(namespace + key, value);
 	}
 
 	private void putString(String namespace, String key, String value) {
-		if (fServiceProvider != null) {
-			fServiceProvider.putString(namespace + key, value);
-		} else {
-			super.putString(namespace + key, value);
-		}
+		fServiceProvider.putString(namespace + key, value);
 	}
-
-	protected IServiceProvider getServiceProvider() {
-		return fServiceProvider;
-	}
-
 }

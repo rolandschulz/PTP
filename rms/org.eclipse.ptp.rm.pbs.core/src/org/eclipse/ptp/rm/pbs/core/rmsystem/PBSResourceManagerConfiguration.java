@@ -25,9 +25,6 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  */
 public class PBSResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements IPBSNonNLSConstants {
 
-	public PBSResourceManagerConfiguration() {
-	}
-
 	public PBSResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(namespace, provider);
 		setDescription(Messages.PBSResourceManagerConfiguration_PBSResourceManager);
@@ -55,17 +52,6 @@ public class PBSResourceManagerConfiguration extends AbstractRemoteResourceManag
 	 */
 	public String getProxyConfiguration() {
 		return getString(PROXY_CONFIG_TYPE, ZEROSTR);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * getResourceManagerId()
-	 */
-	@Override
-	public String getResourceManagerId() {
-		return getId();
 	}
 
 	/**
@@ -107,7 +93,7 @@ public class PBSResourceManagerConfiguration extends AbstractRemoteResourceManag
 	 * @since 5.0
 	 */
 	public void removeTemplate(String name) {
-		keySet().remove(TEMPLATE_PREFIX + name);
+		putString(TEMPLATE_PREFIX + name, null);
 		String nameList = getString(TEMPLATE_NAMES, null);
 		if (nameList != null) {
 			String[] names = nameList.split(CM);
@@ -136,7 +122,7 @@ public class PBSResourceManagerConfiguration extends AbstractRemoteResourceManag
 	 * @since 5.0
 	 */
 	public void removeValidAttributeSet() {
-		keySet().remove(ATTRIBUTES);
+		putString(ATTRIBUTES, null);
 	}
 
 	/**

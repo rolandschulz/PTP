@@ -40,9 +40,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 	private ResourceManagerData rmdata;
 	private RMVariableMap map;
 
-	public JAXBServiceProvider() {
-	}
-
 	/**
 	 * @param namespace
 	 *            base, control or monitor
@@ -68,11 +65,6 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 	 */
 	public ResourceManagerData getResourceManagerData() {
 		return rmdata;
-	}
-
-	@Override
-	public String getResourceManagerId() {
-		return getId();
 	}
 
 	/**
