@@ -76,7 +76,7 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 		Site site = baseConfiguration.getResourceManagerData().getSiteData();
 		if (site != null) {
 			try {
-				RemoteUIServicesUtils.setConnectionHints(connectionWidget, site.getMonitorServerInstall());
+				RemoteUIServicesUtils.setConnectionHints(connectionWidget, site.getMonitorConnection());
 			} catch (Throwable t) {
 				JAXBUIPlugin.log(t);
 			}

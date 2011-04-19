@@ -29,12 +29,12 @@
 	<xs:complexType name="site">
 		<xs:annotation>
 			<xs:documentation>
-				An optional place to set remote site information.
+				An optional place to set default remote site information.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element minOccurs="0" name="control-connection" type="xs:string"/>
-			<xs:element minOccurs="0" name="monitor-server-install" type="xs:string"/>
+			<xs:element minOccurs="0" name="monitor-connection" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="control">
@@ -46,8 +46,6 @@
 				<!-- from runtime configuration information -->
 				control.user.name
 				control.address
-				<!-- from the monitoring part -->
-				available_queues
 				<!-- from the other Run Configuration tabs -->
 				executablePath
 				progArgs
@@ -94,8 +92,11 @@
 	<xs:complexType name="property">
 		<xs:annotation>
 			<xs:documentation>
-				The value for properties and attributes can by any primitive type,
-				or lists or maps of strings.
+				The value for properties and attributes can by any primitive type, or lists or maps of strings. If stdout from a
+				scheduled job is to be delivered to the client, the non-visible "stdout" property should be included in the resource manager
+				property set.
+				NOTE: the untyped "value" element on properties and attributes is for internal use only; to give a predefined value,
+				use the "default" element along with the "type" attribute.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -465,7 +466,7 @@
 		<xs:attribute name="horizontalSpan" type="xs:int"/>
 		<xs:attribute name="verticalSpan" type="xs:int"/>
 		<xs:attribute name="horizontalIndent" type="xs:int"/>
-      <xs:attribute name="verticalIndent" type="xs:int"/>
+		<xs:attribute name="verticalIndent" type="xs:int"/>
 		<xs:attribute name="minHeight" type="xs:int"/>
 		<xs:attribute name="minWidth" type="xs:int"/>
 		<xs:attribute name="heightHint" type="xs:int"/>
@@ -732,8 +733,13 @@
 	<xs:complexType name="monitor">
 		<xs:annotation>
 			<xs:documentation>
-				I have for the moment left this undefined.
+				This is a minimal definition.
 			</xs:documentation>
 		</xs:annotation>
+      <xs:sequence>
+         <xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property"/>
+      </xs:sequence>
+      <xs:attribute name="schedulerType" type="xs:string"/>
+      <xs:attribute name="refreshFrequencyInSeconds" type="xs:int" default="60"/>   
 	</xs:complexType>
 </xs:schema>
