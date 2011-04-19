@@ -215,6 +215,7 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	@Override
 	public void changeRemoteInformation(IRemoteConnection remoteConnection, String location) {
 		this.setRemoteToolsConnection(remoteConnection);
+		this.setRemoteToolsProviderID(remoteConnection.getRemoteServices().getId());
 		this.setConfigLocation(location);
 	}
 }

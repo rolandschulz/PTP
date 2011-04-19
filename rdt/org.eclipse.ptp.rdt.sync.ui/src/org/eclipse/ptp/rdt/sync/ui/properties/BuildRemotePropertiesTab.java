@@ -51,12 +51,14 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 	private Combo fConnectionCombo;
 	private Text fRootLocationText;
 	private Text fBuildLocationText;
+	private Composite parentComposite;
 
 	/**
 	 * @see PreferencePage#createContents(Composite)
 	 */
 	@Override
 	protected void createControls(Composite parent) {
+		parentComposite = parent;
 		super.createControls(parent);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -285,6 +287,7 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 	@Override
 	public void updateData(ICResourceDescription cfg) {
 		this.setValues();
+		parentComposite.update();
 	}
 	
 	private void setValues() {
