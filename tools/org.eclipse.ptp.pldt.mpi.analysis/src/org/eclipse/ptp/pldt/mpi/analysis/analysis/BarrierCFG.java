@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-
 package org.eclipse.ptp.pldt.mpi.analysis.analysis;
 
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
@@ -17,27 +16,30 @@ import org.eclipse.cdt.core.dom.ast.IASTStatement;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.impl.Block;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.impl.ControlFlowGraph;
 
+/**
+ * Barrier Control Flow Graph
+ */
 public class BarrierCFG extends ControlFlowGraph {
-	
-	public BarrierCFG(IASTStatement prog){
+
+	public BarrierCFG(IASTStatement prog) {
 		super(prog);
 	}
-	
-	protected void collectBlocks(){
+
+	protected void collectBlocks() {
 		entry_ = new Block();
 		exit_ = new Block();
 		BarrierCFGBlockCollector bc = new BarrierCFGBlockCollector();
 		bc.run();
 	}
-	
-	class BarrierCFGBlockCollector extends ASTVisitor{
 
-		public void run(){
+	class BarrierCFGBlockCollector extends ASTVisitor {
+
+		public void run() {
 			this.shouldVisitStatements = true;
 			this.shouldVisitDeclarations = true;
 			prog_.accept(this);
 		}
-		
+
 		/*
 		public int visit(IASTStatement stmt) 
 		{
