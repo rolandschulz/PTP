@@ -196,7 +196,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private Control controlData;
 	private final Map<String, String> launchEnv;
 	private final JobStatusMap jobStatusMap;
-	private final RemoteServicesDelegate delegate;
 	private boolean appendLaunchEnv;
 
 	/**
@@ -206,7 +205,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	public JAXBResourceManagerControl(AbstractResourceManagerConfiguration jaxbServiceProvider) {
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
-		delegate = new RemoteServicesDelegate(config.getRemoteServicesId(), config.getConnectionName());
 		launchEnv = new TreeMap<String, String>();
 		jobStatusMap = new JobStatusMap();
 		jobStatusMap.start();
@@ -232,7 +230,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @return wrapper object for remote services, connections and file managers
 	 */
 	public RemoteServicesDelegate getRemoteServicesDelegate() {
-		return delegate;
+		return new RemoteServicesDelegate(config.getRemoteServicesId(), config.getConnectionName());
 	}
 
 	/*
@@ -508,14 +506,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws RemoteConnectionException
 	 */
 	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException {
-		IRemoteConnection conn = delegate.getLocalConnection();
+		IRemoteConnection conn = getRemoteServicesDelegate().getLocalConnection();
 		if (!conn.isOpen()) {
 			conn.open(monitor);
 			if (!conn.isOpen()) {
 				throw new RemoteConnectionException(Messages.LocalConnectionError);
 			}
 		}
-		conn = delegate.getRemoteConnection();
+		conn = getRemoteServicesDelegate().getRemoteConnection();
 		if (!conn.isOpen()) {
 			conn.open(monitor);
 			if (!conn.isOpen()) {
@@ -572,11 +570,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * Close the connections.
 	 */
 	private void doDisconnect() {
-		IRemoteConnection conn = delegate.getLocalConnection();
+		IRemoteConnection conn = getRemoteServicesDelegate().getLocalConnection();
 		if (conn.isOpen()) {
 			conn.close();
 		}
-		conn = delegate.getRemoteConnection();
+		conn = getRemoteServicesDelegate().getRemoteConnection();
 		if (conn.isOpen()) {
 			conn.close();
 		}
@@ -714,7 +712,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (files == null || files.getFile().isEmpty()) {
 			return true;
 		}
-		ManagedFilesJob job = new ManagedFilesJob(uuid, files, delegate);
+		ManagedFilesJob job = new ManagedFilesJob(uuid, files, getRemoteServicesDelegate());
 		job.schedule();
 		try {
 			job.join();
@@ -883,7 +881,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * variables.
 	 */
 	private void setFixedConfigurationProperties() {
-		IRemoteConnection rc = delegate.getRemoteConnection();
+		IRemoteConnection rc = getRemoteServicesDelegate().getRemoteConnection();
 		rmVarMap.maybeAddProperty(CONTROL_USER_VAR, rc.getUsername(), false);
 		rmVarMap.maybeAddProperty(CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 	}
