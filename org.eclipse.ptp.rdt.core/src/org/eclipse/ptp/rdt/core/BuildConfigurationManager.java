@@ -12,13 +12,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
+import org.eclipse.cdt.core.settings.model.ICProjectDescription;
+import org.eclipse.cdt.core.settings.model.WriteAccessException;
+import org.eclipse.cdt.core.settings.model.extension.CConfigurationData;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
+import org.eclipse.cdt.managedbuilder.internal.core.ManagedProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.services.core.IRemoteServiceProvider;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
@@ -52,6 +63,8 @@ public class BuildConfigurationManager {
 	private static final String BUILD_SCENARIO_ELEMENT_NAME = "build-scenario"; //$NON-NLS-1$
 	private static final String CONFIG_ID_ELEMENT_NAME = "config-id-to-build-scenario"; //$NON-NLS-1$
 	private static final String TEMPLATE_SERVICE_CONFIGURATION_ELEMENT_NAME = "template-service-configuration-element-name"; //$NON-NLS-1$
+	private static final String LOCAL_CONFIGURATION_NAME = "Workspace"; //$NON-NLS-1$
+	private static final String LOCAL_CONFIGURATION_DES = "Build in local Eclipse workspace"; //$NON-NLS-1$
 
 	private static final Map<IProject, IServiceConfiguration> fProjectToTemplateConfiguration =
 																					new HashMap<IProject, IServiceConfiguration>();
@@ -61,6 +74,7 @@ public class BuildConfigurationManager {
 																							new HashMap<String,BuildScenario>();
 	private static final Map<BuildScenario, IServiceConfiguration> fBuildScenarioToSConfigMap =
 																			new HashMap<BuildScenario, IServiceConfiguration>();
+
 	// TODO: Figure out if this is the best way to do initialization and figure out best way to handle exceptions.
 	static {
 		try {
@@ -278,6 +292,7 @@ public class BuildConfigurationManager {
 						throw new RuntimeException("Failed to find an ancestor for build configuration " + config.getId()); //$NON-NLS-1$
 					}
 					setBuildScenarioForBuildConfigurationInternal(fBuildConfigToBuildScenarioMap.get(parentConfig), config);
+					
 				}
 			// Initialize
 			} else {
@@ -569,5 +584,78 @@ public class BuildConfigurationManager {
 			// ServicesCorePlugin.getDefault().logErrorMessage(Messages.ServiceModelManager_0 + providerId);
 		}
 		return null;
+	}
+
+	/**
+	 * Create a local build configuration. The corresponding build scenario has no sync provider and points to the project's
+	 * working directory. We take a conservative approach. Failure at any point means we abort the attempt to create a local
+	 * configuration.
+	 *
+	 * On project creation, CDT removes superfluous configurations. Thus, we place the functionality here, to be invoked at some
+	 * point after initial project creation.
+	 * 
+	 * @param project
+	 * 				The project needing a local configuration
+	 */
+
+	public static synchronized void createLocalConfiguration(IProject project) {
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			return;
+		}
+		ManagedProject managedProject = (ManagedProject) buildInfo.getManagedProject();
+		Configuration localConfigParent = (Configuration) buildInfo.getDefaultConfiguration();
+		String localConfigId = ManagedBuildManager.calculateChildId(localConfigParent.getId(), null);
+		Configuration localConfig = new Configuration(managedProject, localConfigParent, localConfigId, true, false);
+		if (localConfig != null) {
+			CConfigurationData localConfigData = localConfig.getConfigurationData();
+			ICProjectDescription projectDes = CoreModel.getDefault().getProjectDescription(project);
+			ICConfigurationDescription localConfigDes = null;
+			try {
+				localConfigDes = projectDes.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, localConfigData);
+			} catch (WriteAccessException e) {
+				// Nothing to do
+			} catch (CoreException e) {
+				// Nothing to do
+			}
+
+			if (localConfigDes != null) {
+				boolean configAdded = false;
+				localConfig.setConfigurationDescription(localConfigDes);
+				localConfigDes.setName(LOCAL_CONFIGURATION_NAME);
+				localConfigDes.setDescription(LOCAL_CONFIGURATION_DES);
+				localConfig.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
+				IRemoteServices localService = PTPRemoteCorePlugin.getDefault().
+				getRemoteServices("org.eclipse.ptp.remote.LocalServices", null); //$NON-NLS-1$
+				if (localService != null) {
+					IRemoteConnection localConnection = localService.getConnectionManager().getConnection("local"); //$NON-NLS-1$
+					if (localConnection != null) {
+						BuildScenario localBuildScenario = new BuildScenario(null, localConnection, project.getLocation().toString());
+						BuildConfigurationManager.setBuildScenarioForBuildConfigurationInternal(localBuildScenario, localConfig);
+						configAdded = true;
+					}
+				}
+				if (!configAdded) {
+					projectDes.removeConfiguration(localConfigDes);
+				} else {
+					try {
+						// ManagedBuildManager.resetConfiguration(project, localConfig);
+						CoreModel.getDefault().setProjectDescription(project, projectDes, true, null);
+						// ManagedBuildManager.addExtensionConfiguration(localConfig);
+						// ManagedBuildManager.saveBuildInfo(project, true);
+					} catch (CoreException e) {
+						projectDes.removeConfiguration(localConfigDes);
+						configAdded = false;
+					}
+				}
+				if (configAdded) {
+					try {
+						BuildConfigurationManager.saveConfigurationData();
+					} catch (IOException e) {
+						projectDes.removeConfiguration(localConfigDes);
+					}
+				}
+			}
+		}
 	}
 }
