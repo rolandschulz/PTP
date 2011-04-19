@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- ****************************************************************************** -->
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-torque-generic">
 	<control-data>
@@ -699,5 +708,5 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<custom-controller>Import PBS Script</custom-controller>
 		</launch-tab>
 	</control-data>
-	<monitor-data/>
+	<monitor-data schedulerType="PBS"/>
 </resource-manager-builder>
