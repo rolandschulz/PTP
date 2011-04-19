@@ -298,12 +298,14 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 
 		private void handleProviderSelection() {
 			ProviderInfo providerInfo = fProviders.get(fServiceProviderList.getSelectionIndex());
-			IServiceProvider provider = fModelManager.getServiceProvider(providerInfo.descriptor);
-			fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(provider);
-			if (providerInfo.factory != null) {
-				providerInfo.factory.setConfigurationName(providerInfo.name, fBaseConfiguration);
+			IServiceProvider provider = fServiceModelManager.getServiceProvider(providerInfo.descriptor);
+			if (provider != null) {
+				fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(provider);
+				if (providerInfo.factory != null) {
+					providerInfo.factory.setConfigurationName(providerInfo.name, getBaseConfiguration());
+				}
+				setWizardPages(provider);
 			}
-			setServiceProvider(provider);
 			setPageComplete(true);
 		}
 	}
@@ -314,7 +316,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	private final SelectServiceProviderPage fSelectServiceProviderPage = new SelectServiceProviderPage(
 			Messages.RMServicesConfigurationWizard_9);
 	private final ResourceManagerPage fResourceManagerPage = new ResourceManagerPage(Messages.RMServicesConfigurationWizard_10);
-	private final IServiceModelManager fModelManager = ServiceModelManager.getInstance();
+	private final IServiceModelManager fServiceModelManager = ServiceModelManager.getInstance();
 	private final IService fLaunchService = ServiceModelManager.getInstance().getService(IServiceConstants.LAUNCH_SERVICE);
 
 	private final Map<String, IWizardPage[]> fCachedPages = new HashMap<String, IWizardPage[]>();
@@ -343,8 +345,10 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		this();
 		fUseDefaultNameAndDesc = false;
 		fEditMode = true;
-		fBaseConfiguration = rm.getConfiguration();
-		setServiceProvider((IServiceProvider) fBaseConfiguration);
+		IServiceProvider provider = (IServiceProvider) rm.getConfiguration().getAdapter(IServiceProvider.class);
+		fServiceProvider = provider.copy();
+		fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(fServiceProvider);
+		setWizardPages(fServiceProvider);
 	}
 
 	/*
@@ -460,25 +464,15 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	 */
 	@Override
 	public boolean performFinish() {
-		// if (fUseDefaultNameAndDesc) {
-		// getBaseConfiguration().setDefaultNameAndDesc();
-		// }
-		fServiceProvider.save(); // does not have name YET
-		if (!fEditMode) {
-			IServiceConfiguration config = fModelManager.newServiceConfiguration(fResourceManagerPage.getRMName());
-			config.setServiceProvider(fLaunchService, fServiceProvider.getOriginal());
-			fModelManager.addConfiguration(config);
-		}
-		/*
-		 * moved this after the service provider save: that call overwrites the
-		 * config properties with those of the service provider, which were not
-		 * changed via the widgets
-		 */
 		if (fUseDefaultNameAndDesc) {
 			getBaseConfiguration().setDefaultNameAndDesc();
+		}
+		if (!fEditMode) {
+			IServiceConfiguration config = fServiceModelManager.newServiceConfiguration(fResourceManagerPage.getRMName());
+			config.setServiceProvider(fLaunchService, (IServiceProvider) getBaseConfiguration().getAdapter(IServiceProvider.class));
+			fServiceModelManager.addConfiguration(config);
 		} else {
-			getBaseConfiguration().setName(fResourceManagerPage.getRMName());
-			getBaseConfiguration().setDescription(fResourceManagerPage.getRMDesc());
+			fServiceProvider.save();
 		}
 		return true;
 	}
@@ -488,14 +482,6 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	 */
 	private int getNumPages() {
 		return fWizardPages.size();
-	}
-
-	/**
-	 * @param provider
-	 */
-	private void setServiceProvider(IServiceProvider provider) {
-		fServiceProvider = provider.copy();
-		setWizardPages(provider);
 	}
 
 	private void setWizardPages(IServiceProvider provider) {

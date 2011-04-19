@@ -37,10 +37,6 @@ public class OpenMPIResourceManagerConfiguration extends AbstractToolRMConfigura
 
 	private int serviceVersion = 0;
 
-	public OpenMPIResourceManagerConfiguration() {
-		super(OPENMPI_CAPABILITIES);
-	}
-
 	public OpenMPIResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(OPENMPI_CAPABILITIES, namespace, provider);
 		/*
@@ -90,17 +86,6 @@ public class OpenMPIResourceManagerConfiguration extends AbstractToolRMConfigura
 	 */
 	public int getMinorVersion() {
 		return minorVersion;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * getResourceManagerId()
-	 */
-	@Override
-	public String getResourceManagerId() {
-		return getId();
 	}
 
 	/**

@@ -45,16 +45,9 @@ public class IBMLLResourceManagerConfiguration extends AbstractRemoteResourceMan
 	private static final String TAG_MAX_NODE_POLL = "LL_MNodePollInterval"; //$NON-NLS-1$
 	private static final String TAG_JOB_POLL = "LL_JobPollInterval"; //$NON-NLS-1$
 
-	public IBMLLResourceManagerConfiguration() {
-	}
-
 	public IBMLLResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(namespace, provider);
 		setDescription("IBM LL Resource Manager"); //$NON-NLS-1$
-	}
-
-	public IBMLLResourceManagerConfiguration(String namespace, IBMLLResourceManagerConfiguration base) {
-		super(namespace, base);
 	}
 
 	/*
@@ -255,17 +248,6 @@ public class IBMLLResourceManagerConfiguration extends AbstractRemoteResourceMan
 	public int getMinNodePolling() {
 		return getInt(TAG_MIN_NODE_POLL,
 				Preferences.getInt(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.PROXY_MIN_NODE_POLLING));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * getResourceManagerId()
-	 */
-	@Override
-	public String getResourceManagerId() {
-		return getId();
 	}
 
 	/*

@@ -36,10 +36,6 @@ public abstract class AbstractToolRMConfiguration extends AbstractRemoteResource
 
 	private final int fCapabilities;
 
-	public AbstractToolRMConfiguration(int capabilities) {
-		fCapabilities = capabilities;
-	}
-
 	public AbstractToolRMConfiguration(int capabilities, String namespace, IServiceProvider provider) {
 		super(namespace, provider);
 		fCapabilities = capabilities;

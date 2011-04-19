@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
-            class="org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.OpenMPIResourceManagerConfiguration"
+            class="org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider"
             id="org.eclipse.ptp.rm.mpi.openmpi.OpenMPIServiceProvider"
             name="Open MPI"
             serviceId="org.eclipse.ptp.core.LaunchService">

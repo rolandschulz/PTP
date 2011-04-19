@@ -20,10 +20,6 @@ import org.eclipse.ptp.services.core.IServiceProvider;
 public class MPICH2ResourceManagerConfiguration extends AbstractToolRMConfiguration implements IMPICH2ResourceManagerConfiguration {
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
 
-	public MPICH2ResourceManagerConfiguration() {
-		super(MPICH2_CAPABILITIES);
-	}
-
 	public MPICH2ResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(MPICH2_CAPABILITIES, namespace, provider);
 
@@ -39,17 +35,6 @@ public class MPICH2ResourceManagerConfiguration extends AbstractToolRMConfigurat
 				+ MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_TIME));
 		setRemoteInstallPath(Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
 				+ MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * getResourceManagerId()
-	 */
-	@Override
-	public String getResourceManagerId() {
-		return getId();
 	}
 
 	/*

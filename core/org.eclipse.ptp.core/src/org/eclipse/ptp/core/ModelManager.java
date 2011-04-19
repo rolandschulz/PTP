@@ -55,6 +55,7 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerControlFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
 import org.eclipse.ptp.rmsystem.IResourceManagerMonitorFactory;
+import org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelEvent;
@@ -179,8 +180,8 @@ public class ModelManager implements IModelManager {
 				 * resource manager associated with it (if any).
 				 */
 				IServiceProvider provider = ((IServiceConfiguration) event.getSource()).getServiceProvider(fLaunchService);
-				if (provider != null && provider instanceof IResourceManagerConfiguration) {
-					IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
+				if (provider != null && provider instanceof ResourceManagerServiceProvider) {
+					IResourceManager rm = getResourceManagerFromUniqueName(((ResourceManagerServiceProvider) provider)
 							.getUniqueName());
 					if (rm != null) {
 						doRemoveResourceManager(rm);
@@ -198,12 +199,12 @@ public class ModelManager implements IModelManager {
 				IServiceConfiguration config = (IServiceConfiguration) event.getSource();
 				if (event.getOldProvider() == null) {
 					IServiceProvider newProvider = config.getServiceProvider(fLaunchService);
-					if (newProvider != null && newProvider instanceof IResourceManagerConfiguration) {
+					if (newProvider != null && newProvider instanceof ResourceManagerServiceProvider) {
 						/*
 						 * Check if the rm already exists. Only add a new one if
 						 * it doesn't.
 						 */
-						IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) newProvider)
+						IResourceManager rm = getResourceManagerFromUniqueName(((ResourceManagerServiceProvider) newProvider)
 								.getUniqueName());
 						if (rm == null) {
 							RMFactory factory = getResourceManagerFactory(newProvider.getId());
@@ -222,8 +223,8 @@ public class ModelManager implements IModelManager {
 				 * that something has changed and it should update.
 				 */
 				IServiceProvider provider = (IServiceProvider) event.getSource();
-				if (provider != null && provider instanceof IResourceManagerConfiguration) {
-					IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
+				if (provider != null && provider instanceof ResourceManagerServiceProvider) {
+					IResourceManager rm = getResourceManagerFromUniqueName(((ResourceManagerServiceProvider) provider)
 							.getUniqueName());
 					if (rm != null) {
 						fireResourceManagerChanged(rm);

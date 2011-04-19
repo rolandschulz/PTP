@@ -30,9 +30,6 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	private static final String TAG_JOB_POLL_INTERVAL = "PE_JobPollInterval"; //$NON-NLS-1$
 	private static final String TAG_LIBRARY_OVERRIDE = "PE_LibraryOverride"; //$NON-NLS-1$
 
-	public PEResourceManagerConfiguration() {
-	}
-
 	public PEResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(namespace, provider);
 		setDescription("IBM PE Resource Manager"); //$NON-NLS-1$
@@ -108,17 +105,6 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	public String getNodeMinPollInterval() {
 		return getString(TAG_MIN_NODE_POLL_INTERVAL,
 				Preferences.getString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.NODE_MIN_POLL_INTERVAL));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * getResourceManagerId()
-	 */
-	@Override
-	public String getResourceManagerId() {
-		return getId();
 	}
 
 	/*

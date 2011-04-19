@@ -29,9 +29,6 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 
 	private final List<String> invocationOptions = new ArrayList<String>();
 
-	public AbstractRemoteResourceManagerConfiguration() {
-	}
-
 	public AbstractRemoteResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(namespace, provider);
 	}
