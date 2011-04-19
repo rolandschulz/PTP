@@ -32,6 +32,11 @@ public abstract class RMConfigurationSelectionFactory {
 	 */
 	public abstract String[] getConfigurationNames();
 
+	/**
+	 * Get the ID of the resource manager that this extension is for.
+	 * 
+	 * @return ID of the resource manager
+	 */
 	public String getId() {
 		return fId;
 	}
@@ -43,6 +48,12 @@ public abstract class RMConfigurationSelectionFactory {
 	 */
 	public abstract void setConfigurationName(String name, IResourceManagerConfiguration configuration);
 
+	/**
+	 * /** Set the ID of the resource manager that this extension is for.
+	 * 
+	 * @param id
+	 *            resource manager ID
+	 */
 	public void setId(String id) {
 		fId = id;
 	}
