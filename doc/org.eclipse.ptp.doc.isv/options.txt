@@ -1,4 +1,4 @@
--quiet
+-verbose
 -encoding "iso-8859-1"
 -charset "iso-8859-1"
 -source 1.4
