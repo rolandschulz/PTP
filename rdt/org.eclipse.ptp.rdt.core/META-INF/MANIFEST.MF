@@ -15,7 +15,8 @@ Require-Bundle: org.eclipse.cdt.core;bundle-version="5.0.2",
  org.eclipse.ptp.remote.core,
  org.eclipse.dstore.extra;bundle-version="2.1.100",
  org.eclipse.ptp.services.core,
- org.eclipse.rse.services.dstore;bundle-version="3.1.1"
+ org.eclipse.rse.services.dstore;bundle-version="3.1.1",
+ org.eclipse.ptp.rdt.sync.core
 Export-Package: org.eclipse.ptp.internal.rdt.core;x-internal:=true,
  org.eclipse.ptp.internal.rdt.core.callhierarchy;x-friends:="org.eclipse.ptp.rdt.ui",
  org.eclipse.ptp.internal.rdt.core.contentassist;x-friends:="org.eclipse.ptp.rdt.ui",
