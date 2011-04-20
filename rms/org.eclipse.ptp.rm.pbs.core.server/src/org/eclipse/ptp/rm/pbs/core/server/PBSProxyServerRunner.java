@@ -8,7 +8,7 @@
 package org.eclipse.ptp.rm.pbs.core.server;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner;
+import org.eclipse.ptp.remote.core.server.AbstractRemoteServerRunner;
 
 public class PBSProxyServerRunner extends AbstractRemoteServerRunner {
 	public static final String SERVER_ID = "org.eclipse.ptp.rm.pbs.PBSProxyServer"; //$NON-NLS-1$
