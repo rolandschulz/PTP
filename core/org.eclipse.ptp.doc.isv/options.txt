@@ -1,0 +1,85 @@
+-quiet
+-encoding "iso-8859-1"
+-charset "iso-8859-1"
+-source 1.4
+-sourcepath "../org.eclipse.ptp.core/src
+;../org.eclipse.ptp.debug.core/src
+;../org.eclipse.ptp.debug.core/pdi
+;../org.eclipse.ptp.debug.ui/src
+;../org.eclipse.ptp.launch/src
+;../org.eclipse.ptp.remote.core/src
+;../org.eclipse.ptp.remote.ui/src
+;../org.eclipse.ptp.services.core/src
+;../org.eclipse.ptp.services.ui/src
+;../org.eclipse.ptp.ui/src"
+-d reference/api
+-bootclasspath @rt@
+-classpath @cp@
+-breakiterator
+-tag generated:X
+-tag lastgen:X
+-tag model:X
+-tag ordered:X
+-use
+-splitIndex
+-windowtitle "PTP API Specification"
+-doctitle "PTP API Specification"
+-header "<b>PTP</b><br>Release 5.0"
+-bottom "Copyright (c) IBM Corporation and others 2011. All Rights Reserved."
+-group "PTP Core Plug-in Packages" "org.eclipse.ptp.core;org.eclipse.ptp.core.*"
+-group "PTP UI Plug-in Packages" "org.eclipse.ptp.ui;org.eclipse.ptp.ui.*"
+-link http://java.sun.com/j2se/1.4.2/docs/api
+-linkoffline ./../../../org.eclipse.platform.doc.isv/reference/api @javadoc.link.location@/platform/reference/api/
+-link http://bundles.osgi.org/javadoc/r4
+
+org.eclipse.ptp.core
+org.eclipse.ptp.core.events
+org.eclipse.ptp.core.listeners
+org.eclipse.ptp.core.rmsystem
+org.eclipse.ptp.debug.core
+org.eclipse.ptp.debug.core.event
+org.eclipse.ptp.debug.core.launch
+org.eclipse.ptp.debug.core.model
+org.eclipse.ptp.debug.core.sourcelookup
+org.eclipse.ptp.debug.core.pdi
+org.eclipse.ptp.debug.core.pdi.event
+org.eclipse.ptp.debug.core.pdi.manager
+org.eclipse.ptp.debug.core.pdi.model
+org.eclipse.ptp.debug.core.pdi.model.aif
+org.eclipse.ptp.debug.core.pdi.request
+org.eclipse.ptp.debug.ui
+org.eclipse.ptp.debug.ui.events
+org.eclipse.ptp.debug.ui.listeners
+org.eclipse.ptp.debug.ui.sourcelookup
+org.eclipse.ptp.debug.ui.views
+org.eclipse.ptp.launch
+org.eclipse.ptp.launch.ui
+org.eclipse.ptp.remote.core
+org.eclipse.ptp.remote.core.exception
+org.eclipse.ptp.remote.core.server
+org.eclipse.ptp.remote.ui
+org.eclipse.ptp.remote.ui.dialogs
+org.eclipse.ptp.remote.ui.widgets
+org.eclipse.ptp.rm.core
+org.eclipse.ptp.rm.core.rmsystem
+org.eclipse.ptp.rm.ui
+org.eclipse.ptp.rm.ui.launch
+org.eclipse.ptp.rm.ui.preferences
+org.eclipse.ptp.rm.ui.wizards
+org.eclipse.ptp.services.core
+org.eclipse.ptp.services.ui
+org.eclipse.ptp.services.ui.dialogs
+org.eclipse.ptp.services.ui.preferences
+org.eclipse.ptp.services.ui.views
+org.eclipse.ptp.services.ui.widgets
+org.eclipse.ptp.services.ui.wizards
+org.eclipse.ptp.ui
+org.eclipse.ptp.ui.actions
+org.eclipse.ptp.ui.hover
+org.eclipse.ptp.ui.listeners
+org.eclipse.ptp.ui.managers
+org.eclipse.ptp.ui.model
+org.eclipse.ptp.ui.preferences
+org.eclipse.ptp.ui.views
+org.eclipse.ptp.ui.wizards
+
