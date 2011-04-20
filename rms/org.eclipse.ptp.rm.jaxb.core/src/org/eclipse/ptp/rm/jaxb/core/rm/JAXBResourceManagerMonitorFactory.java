@@ -45,6 +45,6 @@ public class JAXBResourceManagerMonitorFactory extends AbstractResourceManagerFa
 	 */
 	@Override
 	public IResourceManagerComponentConfiguration createMonitorConfiguration(IServiceProvider provider) {
-		return new JAXBServiceProvider(JAXBServiceProvider.MONITOR, provider);
+		return new JAXBResourceManagerConfiguration(JAXBResourceManagerConfiguration.MONITOR, provider);
 	}
 }

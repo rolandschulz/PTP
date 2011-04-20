@@ -36,13 +36,6 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	ResourceManagerData getResourceManagerData() throws Throwable;
 
 	/**
-	 * Unmarshal the XML into the JAXB resource manager data element tree.
-	 * 
-	 * @since 5.0
-	 */
-	void realizeRMDataFromXML() throws Throwable;
-
-	/**
 	 * Export the resource manager environment as the currently active one.
 	 * 
 	 * @since 5.0

@@ -184,12 +184,8 @@
 			<xs:element name="custom-controller" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						Fixed type. Allows the user to browse the local file system and/or workspace
-						to open and edit a custom batch
-						script will be created; this will include copy and renaming buttons.
-						Use the string as the title to appear in the top-level
-						folder
-						tab.
+						Fixed type. Allows the user to browse the workspace to open and edit a custom batch script will be created; this
+						will include copy and renaming buttons. Use the string as the title to appear in the top-level folder tab.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -225,14 +221,14 @@
 		<xs:attribute name="deleteAfterUse" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="file-match">
-		<xs:annotation>
-			<xs:documentation>
-				efsAttributes is an or'd string of tags corresponding to the EFS integer constants.
-				use "yyyy/MM/dd HH:mm:ss"
-				format for modified strings.
-			</xs:documentation>
-		</xs:annotation>
 		<xs:attribute name="efsAttributes">
+			<xs:annotation>
+				<xs:documentation>
+					An or'd string of tags corresponding to the EFS integer constants.
+					use "yyyy/MM/dd HH:mm:ss" format for 'modified'
+					strings.
+				</xs:documentation>
+			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="ATTRIBUTE_READ_ONLY"/>
@@ -275,10 +271,8 @@
 			<xs:annotation>
 				<xs:documentation>
 					The default means that each tab is a separate view or selection into the global env, and it is this subset which
-					will be passed on
-					the launch command. Setting this property to true means that the tab will pass the selected elements of the
-					entire shared
-					enviroment to the resource manager at launch.
+					will be passed on the launch command. Setting this property to true means that the tab will pass the selected elements of the
+					entire shared enviroment to the resource manager at launch.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -308,8 +302,7 @@
 		<xs:annotation>
 			<xs:documentation>
 				These are attached to the stdout or stderr streams in order to capture the output of the command and add values
-				into the resource manager environment. If displayStdout or displayStderr of the command is true, the stream will be passed on to an
-				output stream will also be sent to the terminal.
+				into the resource manager environment.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -360,13 +353,6 @@
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="composite-descriptor">
-		<xs:annotation>
-			<xs:documentation>
-				Dynamic means this group gets rebuilt; in that case, a
-				button allowing the user to select displayed attributes is
-				added.
-			</xs:documentation>
-		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="layout" minOccurs="0" type="rm:layout-descriptor"/>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
@@ -496,7 +482,7 @@
 			<xs:element name="value-list-from" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						Combo elements taken from the value of an attribute or property.
+						Combo items taken from the value of an attribute or property.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -545,9 +531,11 @@
 		<xs:annotation>
 			<xs:documentation>
 				These display their value columns as editable widgets. They are provided with checkboxes to indicate which
-				attributes have been chosen. A toggle button is provided to collapse and reopen the unchecked items in the viewer. The viewer
-				outputs its selected values to the environment (and on update removes unselected ones). The name of the viewer is also stored
-				against a string of all selected values, constructed from a template.
+				attributes have been chosen. A toggle button is provided to filter the unchecked items in the viewer. The viewer
+				outputs its
+				selected values to the environment (and on update removes unselected ones). The name of the viewer is also stored
+				against a string
+				of all selected values, constructed from a template.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -599,8 +587,7 @@
 			<xs:annotation>
 				<xs:documentation>
 					Express the template using @name, etc., markers for the attribute fields. Example: '@name="@value"' would
-					generate a string of name-value
-					assignments (the default separator being whitespace).
+					generate a string of name-value assignments (the default separator being whitespace).
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -736,10 +723,10 @@
 				This is a minimal definition.
 			</xs:documentation>
 		</xs:annotation>
-      <xs:sequence>
-         <xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property"/>
-      </xs:sequence>
-      <xs:attribute name="schedulerType" type="xs:string"/>
-      <xs:attribute name="refreshFrequencyInSeconds" type="xs:int" default="60"/>   
+		<xs:sequence>
+			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property"/>
+		</xs:sequence>
+		<xs:attribute name="schedulerType" type="xs:string"/>
+		<xs:attribute name="refreshFrequencyInSeconds" type="xs:int" default="60"/>
 	</xs:complexType>
 </xs:schema>

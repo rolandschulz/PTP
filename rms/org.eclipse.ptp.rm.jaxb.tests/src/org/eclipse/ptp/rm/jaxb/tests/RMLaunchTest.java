@@ -43,7 +43,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Property;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerMonitor;
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBServiceProvider;
+import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IJobStatus;
@@ -215,7 +215,7 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	private static final String xml = DATA + "test-pbs.xml"; //$NON-NLS-1$
-	private JAXBServiceProvider rmConfig;
+	private JAXBResourceManagerConfiguration rmConfig;
 	private JAXBResourceManager rm;
 	private ILaunchConfiguration launchConfig;
 
@@ -267,11 +267,11 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 	 * We do here what is done through the wizard.
 	 */
 	private void emulateConfigureWizard() throws Throwable {
-		rmConfig = new JAXBServiceProvider(AbstractResourceManagerConfiguration.BASE, new ResourceManagerServiceProvider());
+		rmConfig = new JAXBResourceManagerConfiguration(AbstractResourceManagerConfiguration.BASE, new ResourceManagerServiceProvider());
 		// JAXBRMConfigurationSelectionWizardPage
 		rmConfig.setRMConfigurationURL(JAXBTestsPlugin.getURL(xml));
 		// JAXBRMControlConfigurationWizardPage
-		rmConfig.realizeRMDataFromXML();
+		rmConfig.getResourceManagerData();
 		// use remote = local
 		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		assert (localServices != null);
