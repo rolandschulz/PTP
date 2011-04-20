@@ -19,6 +19,7 @@ feature@org.eclipse.ptp.rm.slurm=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cv
 feature@org.eclipse.ptp.external=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.external-feature
 feature@org.eclipse.ptp.debug.sdm=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.sdm-feature
 feature@org.eclipse.ptp.services=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.services-feature
+feature@org.eclipse.ptp.sdk=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.sdk-feature
 
 ! PLDT features
 feature@org.eclipse.ptp.pldt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.pldt-feature
@@ -99,6 +100,7 @@ plugin@org.eclipse.ptp.proxy=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroo
 plugin@org.eclipse.ptp.utils=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.utils
 plugin@org.eclipse.ptp.launch=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.launch
 plugin@org.eclipse.ptp.help=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/doc/org.eclipse.ptp.help
+plugin@org.eclipse.ptp.doc.isv=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/doc/org.eclipse.ptp.doc.isv
 
 ! Services Plugins
 plugin@org.eclipse.ptp.services.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.services.core
