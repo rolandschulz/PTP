@@ -34,6 +34,7 @@ public class LocalConnection implements IRemoteConnection {
 
 	private final IRemoteConnection fConnection = this;
 	private final IRemoteServices fRemoteServices;
+
 	private final ListenerList fListeners = new ListenerList();
 
 	public LocalConnection(IRemoteServices services) {
@@ -149,6 +150,15 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public String getName() {
 		return fName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getPort()
+	 */
+	public int getPort() {
+		return 0;
 	}
 
 	/*
@@ -275,6 +285,15 @@ public class LocalConnection implements IRemoteConnection {
 	 * )
 	 */
 	public void setPassword(String password) {
+		// Not supported
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setPort(int)
+	 */
+	public void setPort(int port) {
 		// Not supported
 	}
 
