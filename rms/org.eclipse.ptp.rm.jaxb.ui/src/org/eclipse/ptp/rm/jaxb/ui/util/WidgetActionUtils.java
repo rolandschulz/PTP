@@ -30,9 +30,9 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.rm.jaxb.core.data.FileMatch;
-import org.eclipse.ptp.rm.jaxb.core.data.Regex;
-import org.eclipse.ptp.rm.jaxb.core.data.Validator;
+import org.eclipse.ptp.rm.jaxb.core.data.FileMatchType;
+import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
+import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedMatchException;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -192,8 +192,8 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	 * @throws Exception
 	 *             if validation fails
 	 */
-	public static void validate(String value, Validator validator, IRemoteFileManager fileManager) throws Exception {
-		Regex reg = validator.getRegex();
+	public static void validate(String value, ValidatorType validator, IRemoteFileManager fileManager) throws Exception {
+		RegexType reg = validator.getRegex();
 		String error = validator.getErrorMessage();
 
 		if (error == null) {
@@ -203,7 +203,7 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		if (reg != null && new RegexImpl(reg).getMatched(value) == null) {
 			throw new UnsatisfiedMatchException(error + CO + SP + reg.getExpression() + CM + SP + value);
 		} else {
-			FileMatch match = validator.getFileInfo();
+			FileMatchType match = validator.getFileInfo();
 			try {
 				if (match != null && !validate(match, value, fileManager)) {
 					throw new UnsatisfiedMatchException(error + CO + SP + value);
@@ -299,7 +299,7 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	 * @return whether validation succeeded
 	 * @throws CoreException
 	 */
-	private static boolean validate(FileMatch match, String value, IRemoteFileManager fileManager) throws CoreException {
+	private static boolean validate(FileMatchType match, String value, IRemoteFileManager fileManager) throws CoreException {
 		if (fileManager == null) {
 			return false;
 		}

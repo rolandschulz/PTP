@@ -19,10 +19,10 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.data.Arg;
-import org.eclipse.ptp.rm.jaxb.core.data.Line;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.core.data.Script;
+import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
+import org.eclipse.ptp.rm.jaxb.core.data.LineType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.LineImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
@@ -42,7 +42,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	private final IVariableMap map;
 	private final Map<String, String> launchEnv;
 	private final boolean appendEnv;
-	private Script script;
+	private ScriptType script;
 	private String scriptValue;
 
 	/**
@@ -59,7 +59,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	 *            whether the launchEnv should be appended to or replace the
 	 *            process environment
 	 */
-	public ScriptHandler(String uuid, Script script, IVariableMap map, Map<String, String> launchEnv, boolean appendEnv) {
+	public ScriptHandler(String uuid, ScriptType script, IVariableMap map, Map<String, String> launchEnv, boolean appendEnv) {
 		super(Messages.ScriptHandlerJob);
 		this.uuid = uuid;
 		this.script = script;
@@ -89,7 +89,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		scriptValue = composeScript(monitor);
 		if (map instanceof RMVariableMap) {
 			RMVariableMap rmMap = (RMVariableMap) map;
-			Property p = new Property();
+			PropertyType p = new PropertyType();
 			p.setName(SCRIPT);
 			p.setValue(scriptValue);
 			rmMap.put(SCRIPT, p);
@@ -110,7 +110,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	 * @return the generated script string
 	 */
 	private String composeScript(IProgressMonitor monitor) {
-		List<Line> line = script.getLine();
+		List<LineType> line = script.getLine();
 		int len = line.size();
 		if (len == 0) {
 			return ZEROSTR;
@@ -170,16 +170,16 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	 * from ${rm:...} to ${lc:...} (the user never sees the latter).
 	 */
 	private void convertScript() {
-		Script ltScript = new Script();
+		ScriptType ltScript = new ScriptType();
 		ltScript.setEnvBegin(script.getEnvBegin());
 		ltScript.setEnvEnd(script.getEnvEnd());
-		List<Line> lines = ltScript.getLine();
-		List<Arg> args = null;
-		for (Line line : script.getLine()) {
-			Line newLine = new Line();
+		List<LineType> lines = ltScript.getLine();
+		List<ArgType> args = null;
+		for (LineType line : script.getLine()) {
+			LineType newLine = new LineType();
 			args = newLine.getArg();
-			for (Arg a : line.getArg()) {
-				Arg newA = new Arg();
+			for (ArgType a : line.getArg()) {
+				ArgType newA = new ArgType();
 				newA.setIsUndefinedIfMatches(a.getIsUndefinedIfMatches());
 				newA.setContent(a.getContent().replaceAll(VRM, VLC));
 				newA.setResolve(a.isResolve());

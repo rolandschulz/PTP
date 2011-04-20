@@ -23,9 +23,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IMatchable;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
-import org.eclipse.ptp.rm.jaxb.core.data.Regex;
-import org.eclipse.ptp.rm.jaxb.core.data.Target;
-import org.eclipse.ptp.rm.jaxb.core.data.Tokenizer;
+import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
+import org.eclipse.ptp.rm.jaxb.core.data.TargetType;
+import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.TargetImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -96,7 +96,7 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	 * @param tokenizer
 	 *            JAXB data element
 	 */
-	public ConfigurableRegexTokenizer(String uuid, Tokenizer tokenizer) {
+	public ConfigurableRegexTokenizer(String uuid, TokenizerType tokenizer) {
 		String d = tokenizer.getDelim();
 		if (d != null) {
 			delim = getChar(d);
@@ -124,12 +124,12 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 		applyToAll = tokenizer.isApplyToAll();
 
 		toMatch = new ArrayList<IMatchable>();
-		List<Target> targets = tokenizer.getTarget();
-		for (Target target : targets) {
+		List<TargetType> targets = tokenizer.getTarget();
+		for (TargetType target : targets) {
 			toMatch.add(new TargetImpl(uuid, target));
 		}
 
-		Regex reg = tokenizer.getExitOn();
+		RegexType reg = tokenizer.getExitOn();
 		if (reg != null) {
 			exitOn = new RegexImpl(reg);
 		}

@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Test;
-import org.eclipse.ptp.rm.jaxb.core.data.Test.Else;
+import org.eclipse.ptp.rm.jaxb.core.data.TestType;
+import org.eclipse.ptp.rm.jaxb.core.data.TestType.Else;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 
@@ -76,14 +76,14 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	 * @param test
 	 *            JAXB data element
 	 */
-	public TestImpl(String uuid, Test test) {
+	public TestImpl(String uuid, TestType test) {
 		this.uuid = uuid;
 		op = getOp(test.getOp());
 		values = test.getValue();
-		List<Test> tests = test.getTest();
+		List<TestType> tests = test.getTest();
 		if (!tests.isEmpty()) {
 			children = new ArrayList<TestImpl>();
-			for (Test t : tests) {
+			for (TestType t : tests) {
 				children.add(new TestImpl(uuid, t));
 			}
 		}

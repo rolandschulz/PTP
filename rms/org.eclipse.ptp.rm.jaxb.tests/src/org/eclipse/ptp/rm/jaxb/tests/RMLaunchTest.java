@@ -39,11 +39,11 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerMonitor;
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IJobStatus;
@@ -267,7 +267,8 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 	 * We do here what is done through the wizard.
 	 */
 	private void emulateConfigureWizard() throws Throwable {
-		rmConfig = new JAXBResourceManagerConfiguration(AbstractResourceManagerConfiguration.BASE, new ResourceManagerServiceProvider());
+		rmConfig = new JAXBResourceManagerConfiguration(AbstractResourceManagerConfiguration.BASE,
+				new ResourceManagerServiceProvider());
 		// JAXBRMConfigurationSelectionWizardPage
 		rmConfig.setRMConfigurationURL(JAXBTestsPlugin.getURL(xml));
 		// JAXBRMControlConfigurationWizardPage
@@ -302,7 +303,7 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		env.put("export_all", true); //$NON-NLS-1$
 		env.put(MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
 		env.put(MPI_ARGS, "-machinefile $PBS_NODEFILE -np 8"); //$NON-NLS-1$ 
-		Property queues = (Property) RMVariableMap.getActiveInstance().getVariables().get("available_queues"); //$NON-NLS-1$ 
+		PropertyType queues = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get("available_queues"); //$NON-NLS-1$ 
 		if (queues != null) {
 			List<String> q = (List<String>) queues.getValue();
 			env.put("destination", q.get(0)); //$NON-NLS-1$

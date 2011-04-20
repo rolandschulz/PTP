@@ -13,9 +13,9 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.NameValuePair;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
@@ -43,7 +43,7 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	 * @param map
 	 *            resource manager active environment map
 	 */
-	public static void addVariable(String uuid, NameValuePair var, Map<String, String> env, RMVariableMap map) {
+	public static void addVariable(String uuid, NameValuePairType var, Map<String, String> env, RMVariableMap map) {
 		String key = var.getName();
 		String value = getValue(uuid, key, map);
 		if (value != null && !ZEROSTR.equals(value)) {
@@ -85,11 +85,11 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	public static String toString(RMVariableMap map) {
 		StringBuffer b = new StringBuffer();
 		for (Object o : map.getVariables().values()) {
-			if (o instanceof Property) {
-				Property p = (Property) o;
+			if (o instanceof PropertyType) {
+				PropertyType p = (PropertyType) o;
 				b.append(p.getName()).append(EQ).append(p.getValue()).append(LINE_SEP);
-			} else if (o instanceof Attribute) {
-				Attribute a = (Attribute) o;
+			} else if (o instanceof AttributeType) {
+				AttributeType a = (AttributeType) o;
 				b.append(a.getName()).append(EQ).append(a.getValue()).append(LINE_SEP);
 			}
 		}

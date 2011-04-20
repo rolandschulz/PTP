@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Validator;
+import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
@@ -57,7 +57,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 	protected LCVariableMap lcMap;
 	protected ValueUpdateHandler handler;
 	protected boolean refreshing;
-	protected Validator validator;
+	protected ValidatorType validator;
 	protected IRemoteFileManager remoteFileManager;
 	protected String defaultValue;
 	protected Object mapValue;
@@ -122,7 +122,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 	 * @remoteFileManager provided in case the validation is to be done on a
 	 *                    file path.
 	 */
-	public void setValidator(Validator validator, IRemoteFileManager remoteFileManager) {
+	public void setValidator(ValidatorType validator, IRemoteFileManager remoteFileManager) {
 		this.validator = validator;
 		this.remoteFileManager = remoteFileManager;
 	}

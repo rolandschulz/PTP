@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.data.Arg;
-import org.eclipse.ptp.rm.jaxb.core.data.Line;
+import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
+import org.eclipse.ptp.rm.jaxb.core.data.LineType;
 
 /**
  * Wrapper implementation.
@@ -17,7 +17,7 @@ public class LineImpl implements IJAXBNonNLSConstants {
 
 	private final String uuid;
 	private final IVariableMap map;
-	private final List<Arg> args;
+	private final List<ArgType> args;
 
 	/**
 	 * @param uuid
@@ -28,7 +28,7 @@ public class LineImpl implements IJAXBNonNLSConstants {
 	 * @param map
 	 *            environment in which to resolve content of the line
 	 */
-	public LineImpl(String uuid, Line line, IVariableMap map) {
+	public LineImpl(String uuid, LineType line, IVariableMap map) {
 		this.uuid = uuid;
 		this.map = map;
 		args = line.getArg();

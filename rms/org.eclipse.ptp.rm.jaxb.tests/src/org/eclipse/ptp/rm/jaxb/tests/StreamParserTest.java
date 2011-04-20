@@ -21,12 +21,12 @@ import junit.framework.TestCase;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.Command;
-import org.eclipse.ptp.rm.jaxb.core.data.Control;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
+import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
-import org.eclipse.ptp.rm.jaxb.core.data.Tokenizer;
+import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.rm.jaxb.core.runnable.command.ConfigurableRegexTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -122,8 +122,8 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	private String[] values;
 	private final boolean verbose = true;
 	private String target;
-	private List<Command> startup;
-	private Command getStatus;
+	private List<CommandType> startup;
+	private CommandType getStatus;
 
 	@Override
 	public void setUp() {
@@ -142,7 +142,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 				JAXBTestsPlugin.validate(tokxml);
 				ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(JAXBTestsPlugin.getURL(tokxml));
 				if (rmdata != null) {
-					Control cd = rmdata.getControlData();
+					ControlType cd = rmdata.getControlData();
 					startup = cd.getStartUpCommand();
 					getStatus = cd.getGetJobStatus();
 				}
@@ -160,11 +160,11 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 	public void test00ParseQstat() {
 		target = "available_queues"; //$NON-NLS-1$
-		Property p = new Property();
+		PropertyType p = new PropertyType();
 		p.setName(target);
 		RMVariableMap.getActiveInstance().getVariables().put(target, p);
 		runTokenizer(startup.get(0).getStdoutParser(), getQstatOut());
-		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
+		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -175,12 +175,12 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	public void test01JobId() {
 		uuid = UUID.randomUUID().toString();
 		target = uuid;
-		Property p = new Property();
+		PropertyType p = new PropertyType();
 		p.setName(target);
 		p.setValue(target);
 		RMVariableMap.getActiveInstance().getVariables().put(target, p);
 		runTokenizer(startup.get(1).getStdoutParser(), getNoiseBeforeJobId());
-		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
+		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -193,7 +193,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		runTokenizer(startup.get(2).getStdoutParser(), getOpenMPIOut());
 		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
 		for (Object o : d.values()) {
-			Attribute ja = (Attribute) o;
+			AttributeType ja = (AttributeType) o;
 			if (verbose) {
 				System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
 				System.out.println("name " + ja.getName()); //$NON-NLS-1$
@@ -210,16 +210,16 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		runTokenizer(startup.get(3).getStdoutParser(), getImplicitWithTags());
 		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
 		for (Object o : d.values()) {
-			if (o instanceof Property) {
-				Property p = (Property) o;
+			if (o instanceof PropertyType) {
+				PropertyType p = (PropertyType) o;
 				if (verbose) {
 					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
 					System.out.println("name " + p.getName()); //$NON-NLS-1$
 					System.out.println("value " + p.getValue()); //$NON-NLS-1$
 					System.out.println("*********************************"); //$NON-NLS-1$
 				}
-			} else if (o instanceof Attribute) {
-				Attribute ja = (Attribute) o;
+			} else if (o instanceof AttributeType) {
+				AttributeType ja = (AttributeType) o;
 				if (verbose) {
 					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
 					System.out.println("name " + ja.getName()); //$NON-NLS-1$
@@ -235,7 +235,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		runTokenizer(startup.get(4).getStdoutParser(), getImplicitOrdering());
 		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
 		for (Object o : d.values()) {
-			Attribute ja = (Attribute) o;
+			AttributeType ja = (AttributeType) o;
 			if (verbose) {
 				System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
 				System.out.println("name " + ja.getName()); //$NON-NLS-1$
@@ -252,16 +252,16 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		runTokenizer(startup.get(5).getStdoutParser(), getImplicitWithTags());
 		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
 		for (Object o : d.values()) {
-			if (o instanceof Property) {
-				Property p = (Property) o;
+			if (o instanceof PropertyType) {
+				PropertyType p = (PropertyType) o;
 				if (verbose) {
 					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
 					System.out.println("name " + p.getName()); //$NON-NLS-1$
 					System.out.println("value " + p.getValue()); //$NON-NLS-1$
 					System.out.println("*********************************"); //$NON-NLS-1$
 				}
-			} else if (o instanceof Attribute) {
-				Attribute ja = (Attribute) o;
+			} else if (o instanceof AttributeType) {
+				AttributeType ja = (AttributeType) o;
 				if (verbose) {
 					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
 					System.out.println("name " + ja.getName()); //$NON-NLS-1$
@@ -277,7 +277,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		runTokenizer(startup.get(6).getStdoutParser(), getPropertyDefs());
 		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
 		for (Object o : d.values()) {
-			Property p = (Property) o;
+			PropertyType p = (PropertyType) o;
 			if (verbose) {
 				System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
 				System.out.println("name " + p.getName()); //$NON-NLS-1$
@@ -289,11 +289,11 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 	public void test07JobStates() {
 		target = "jobStates"; //$NON-NLS-1$
-		Property p = new Property();
+		PropertyType p = new PropertyType();
 		p.setName(target);
 		RMVariableMap.getActiveInstance().getVariables().put(target, p);
 		runTokenizer(startup.get(7).getStdoutParser(), getJobStates());
-		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
+		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -305,16 +305,16 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		runTokenizer(startup.get(8).getStdoutParser(), getStaggered());
 		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
 		for (Object o : d.values()) {
-			if (o instanceof Property) {
-				Property p = (Property) o;
+			if (o instanceof PropertyType) {
+				PropertyType p = (PropertyType) o;
 				if (verbose) {
 					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
 					System.out.println("name " + p.getName()); //$NON-NLS-1$
 					System.out.println("value " + p.getValue()); //$NON-NLS-1$
 					System.out.println("*********************************"); //$NON-NLS-1$
 				}
-			} else if (o instanceof Attribute) {
-				Attribute ja = (Attribute) o;
+			} else if (o instanceof AttributeType) {
+				AttributeType ja = (AttributeType) o;
 				if (verbose) {
 					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
 					System.out.println("name " + ja.getName()); //$NON-NLS-1$
@@ -330,7 +330,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		runTokenizer(startup.get(9).getStdoutParser(), getMergedOrdering());
 		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
 		for (Object o : d.values()) {
-			Property p = (Property) o;
+			PropertyType p = (PropertyType) o;
 			if (verbose) {
 				System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
 				System.out.println("name " + p.getName()); //$NON-NLS-1$
@@ -343,11 +343,11 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 	public void test10ExitOn() {
 		target = "jobStates"; //$NON-NLS-1$
-		Property p = new Property();
+		PropertyType p = new PropertyType();
 		p.setName(target);
 		RMVariableMap.getActiveInstance().getVariables().put(target, p);
 		runTokenizer(startup.get(10).getStdoutParser(), getJobStates());
-		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
+		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -357,11 +357,11 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 	public void test11ExitAfter() {
 		target = "jobStates"; //$NON-NLS-1$
-		Property p = new Property();
+		PropertyType p = new PropertyType();
 		p.setName(target);
 		RMVariableMap.getActiveInstance().getVariables().put(target, p);
 		runTokenizer(startup.get(11).getStdoutParser(), getJobStates());
-		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(target);
+		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -372,11 +372,11 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	public void test12GetStatus() {
 		target = "42226";//$NON-NLS-1$
 		uuid = target;
-		Property p = new Property();
+		PropertyType p = new PropertyType();
 		p.setName(target);
 		RMVariableMap.getActiveInstance().getVariables().put(target, p);
 		runTokenizer(getStatus.getStdoutParser(), getQstat());
-		p = (Property) RMVariableMap.getActiveInstance().getVariables().get(this.target);
+		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(this.target);
 		assertNotNull(p);
 		System.out.println(p.getName() + CM + SP + p.getValue());
 	}
@@ -405,7 +405,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		}
 	}
 
-	private void runTokenizer(Tokenizer tokenizer, InputStream stream) {
+	private void runTokenizer(TokenizerType tokenizer, InputStream stream) {
 		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(uuid, tokenizer);
 		t.setInputStream(stream);
 		Thread thr = new Thread(t);

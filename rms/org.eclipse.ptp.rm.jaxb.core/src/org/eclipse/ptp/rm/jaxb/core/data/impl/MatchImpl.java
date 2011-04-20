@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Match;
-import org.eclipse.ptp.rm.jaxb.core.data.Regex;
+import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
+import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 
 /**
  * Wrapper implementation. Consists of a Regular Expression and a reference to a
@@ -46,12 +46,12 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	 * @param target
 	 *            Wrapper for the target to which this match is bound
 	 */
-	public MatchImpl(String uuid, Match match, TargetImpl target) {
+	public MatchImpl(String uuid, MatchType match, TargetImpl target) {
 		this.target = target;
 		this.moveToTop = match.isMoveToTop();
 		this.matched = false;
 
-		Regex r = match.getExpression();
+		RegexType r = match.getExpression();
 		if (r != null) {
 			regex = new RegexImpl(r);
 		}

@@ -31,13 +31,13 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.Command;
-import org.eclipse.ptp.rm.jaxb.core.data.Control;
-import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
-import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.core.data.Script;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
+import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
+import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
+import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
@@ -193,7 +193,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	private final IJAXBResourceManagerConfiguration config;
 	private RMVariableMap rmVarMap;
-	private Control controlData;
+	private ControlType controlData;
 	private final Map<String, String> launchEnv;
 	private final JobStatusMap jobStatusMap;
 	private boolean appendLaunchEnv;
@@ -250,7 +250,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				return;
 			}
 			resetEnv();
-			Property p = new Property();
+			PropertyType p = new PropertyType();
 			p.setVisible(false);
 			p.setName(jobId);
 			rmVarMap.put(jobId, p);
@@ -311,19 +311,19 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.setUpdateRequestTime(now);
 			}
 
-			Property p = new Property();
+			PropertyType p = new PropertyType();
 			p.setVisible(false);
 			p.setName(jobId);
 			rmVarMap.put(jobId, p);
 
-			Command job = controlData.getGetJobStatus();
+			CommandType job = controlData.getGetJobStatus();
 			if (job == null) {
 				throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + JOBSTATUS, null);
 			}
 
 			runCommand(jobId, job, false, true);
 
-			p = (Property) rmVarMap.remove(jobId);
+			p = (PropertyType) rmVarMap.remove(jobId);
 			String state = IJobStatus.UNDETERMINED;
 			if (p != null) {
 				state = (String) p.getValue();
@@ -425,7 +425,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * the resource-generated id for the job/process
 		 */
 		String uuid = UUID.randomUUID().toString();
-		Property p = new Property();
+		PropertyType p = new PropertyType();
 		p.setVisible(false);
 		rmVarMap.put(uuid, p);
 
@@ -442,7 +442,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		maybeHandleScript(uuid, controlData.getScript());
 
-		ManagedFiles files = controlData.getManagedFiles();
+		ManagedFilesType files = controlData.getManagedFiles();
 
 		/*
 		 * if the script is to be staged, a managed file pointing to either its
@@ -532,7 +532,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void doControlCommand(String jobId, String operation) throws CoreException {
 		CoreException ce = CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + operation, null);
-		Command job = null;
+		CommandType job = null;
 		if (TERMINATE_OPERATION.equals(operation)) {
 			if (maybeKillInteractive(jobId)) {
 				return;
@@ -595,14 +595,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws CoreException
 	 */
 	private CommandJob doJobSubmitCommand(String uuid, String mode) throws CoreException {
-		List<JAXBElement<Command>> commands = controlData.getSubmitInteractiveOrSubmitBatchOrSubmitDebugInteractive();
+		List<JAXBElement<CommandType>> commands = controlData.getSubmitInteractiveOrSubmitBatchOrSubmitDebugInteractive();
 		if (commands.isEmpty()) {
 			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError, null);
 		}
 
-		Command command = null;
+		CommandType command = null;
 		boolean batch = false;
-		for (JAXBElement<Command> job : commands) {
+		for (JAXBElement<CommandType> job : commands) {
 			command = job.getValue();
 			if (command == null) {
 				throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + mode, null);
@@ -638,7 +638,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws CoreException
 	 */
 	private void doOnShutdown() throws CoreException {
-		List<Command> onShutDown = controlData.getShutDownCommand();
+		List<CommandType> onShutDown = controlData.getShutDownCommand();
 		runCommands(onShutDown);
 	}
 
@@ -649,7 +649,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws CoreException
 	 */
 	private void doOnStartUp(IProgressMonitor monitor) throws CoreException {
-		List<Command> onStartUp = controlData.getStartUpCommand();
+		List<CommandType> onStartUp = controlData.getStartUpCommand();
 		runCommands(onStartUp);
 	}
 
@@ -662,18 +662,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 *            the set of managed files for this submission
 	 * @return the set of managed files, possibly with the script file added
 	 */
-	private ManagedFiles maybeAddManagedFileForScript(ManagedFiles files) {
-		Property scriptVar = (Property) RMVariableMap.getActiveInstance().get(SCRIPT);
-		Property scriptPathVar = (Property) RMVariableMap.getActiveInstance().get(SCRIPT_PATH);
+	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files) {
+		PropertyType scriptVar = (PropertyType) RMVariableMap.getActiveInstance().get(SCRIPT);
+		PropertyType scriptPathVar = (PropertyType) RMVariableMap.getActiveInstance().get(SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
-				files = new ManagedFiles();
+				files = new ManagedFilesType();
 				files.setFileStagingLocation(ECLIPSESETTINGS);
 			}
-			List<ManagedFile> fileList = files.getFile();
-			ManagedFile scriptFile = null;
+			List<ManagedFileType> fileList = files.getFile();
+			ManagedFileType scriptFile = null;
 			if (!fileList.isEmpty()) {
-				for (ManagedFile f : fileList) {
+				for (ManagedFileType f : fileList) {
 					if (f.getName().equals(SCRIPT_FILE)) {
 						scriptFile = f;
 						break;
@@ -681,7 +681,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				}
 			}
 			if (scriptFile == null) {
-				scriptFile = new ManagedFile();
+				scriptFile = new ManagedFileType();
 				scriptFile.setName(SCRIPT_FILE);
 				fileList.add(scriptFile);
 			}
@@ -708,7 +708,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @return whether the necessary staging completed without error
 	 * @throws CoreException
 	 */
-	private boolean maybeHandleManagedFiles(String uuid, ManagedFiles files) throws CoreException {
+	private boolean maybeHandleManagedFiles(String uuid, ManagedFilesType files) throws CoreException {
 		if (files == null || files.getFile().isEmpty()) {
 			return true;
 		}
@@ -731,8 +731,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 *            configuration object describing how to construct the script
 	 *            from the environment
 	 */
-	private void maybeHandleScript(String uuid, Script script) {
-		Property p = (Property) rmVarMap.get(SCRIPT_PATH);
+	private void maybeHandleScript(String uuid, ScriptType script) {
+		PropertyType p = (PropertyType) rmVarMap.get(SCRIPT_PATH);
 		if (p != null && p.getValue() != null) {
 			return;
 		}
@@ -813,7 +813,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @return the runnable job object
 	 * @throws CoreException
 	 */
-	private CommandJob runCommand(String uuid, Command command, boolean batch, boolean join) throws CoreException {
+	private CommandJob runCommand(String uuid, CommandType command, boolean batch, boolean join) throws CoreException {
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
@@ -822,18 +822,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (batch) {
 			Object o = rmVarMap.get(STDOUT);
 			if (o != null) {
-				if (o instanceof Property) {
-					job.setRemoteOutPath((String) ((Property) o).getValue());
-				} else if (o instanceof Attribute) {
-					job.setRemoteOutPath((String) ((Attribute) o).getValue());
+				if (o instanceof PropertyType) {
+					job.setRemoteOutPath((String) ((PropertyType) o).getValue());
+				} else if (o instanceof AttributeType) {
+					job.setRemoteOutPath((String) ((AttributeType) o).getValue());
 				}
 			}
 			o = rmVarMap.get(STDERR);
 			if (o != null) {
-				if (o instanceof Property) {
-					job.setRemoteErrPath((String) ((Property) o).getValue());
-				} else if (o instanceof Attribute) {
-					job.setRemoteErrPath((String) ((Attribute) o).getValue());
+				if (o instanceof PropertyType) {
+					job.setRemoteErrPath((String) ((PropertyType) o).getValue());
+				} else if (o instanceof AttributeType) {
+					job.setRemoteErrPath((String) ((AttributeType) o).getValue());
 				}
 			}
 		}
@@ -852,8 +852,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	/**
 	 * Run command sequence. Invoked by startup or shutdown commands. Delegates
-	 * to {@link #runCommand(String, Command, boolean, boolean)}. Here we join
-	 * to ensure seriality. If a job in the sequence fails, the subsequent
+	 * to {@link #runCommand(String, CommandType, boolean, boolean)}. Here we
+	 * join to ensure seriality. If a job in the sequence fails, the subsequent
 	 * commands will not run.
 	 * 
 	 * @param cmds
@@ -861,8 +861,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 *            tokenizers
 	 * @throws CoreException
 	 */
-	private void runCommands(List<Command> cmds) throws CoreException {
-		for (Command cmd : cmds) {
+	private void runCommands(List<CommandType> cmds) throws CoreException {
+		for (CommandType cmd : cmds) {
 			CommandJob job = runCommand(null, cmd, false, false);
 
 			if (!job.isActive()) {
@@ -899,11 +899,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		for (Object key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
 			Object target = rmVarMap.get(key.toString());
-			if (target instanceof Property) {
-				Property p = (Property) target;
+			if (target instanceof PropertyType) {
+				PropertyType p = (PropertyType) target;
 				p.setValue(value.toString());
-			} else if (target instanceof Attribute) {
-				Attribute ja = (Attribute) target;
+			} else if (target instanceof AttributeType) {
+				AttributeType ja = (AttributeType) target;
 				ja.setValue(value);
 			}
 		}
@@ -916,13 +916,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		for (String key : rmVarMap.getVariables().keySet()) {
 			if (!lcattr.containsKey(key)) {
 				Object target = rmVarMap.get(key.toString());
-				if (target instanceof Property) {
-					Property p = (Property) target;
+				if (target instanceof PropertyType) {
+					PropertyType p = (PropertyType) target;
 					if (p.isVisible()) {
 						p.setValue(null);
 					}
-				} else if (target instanceof Attribute) {
-					Attribute ja = (Attribute) target;
+				} else if (target instanceof AttributeType) {
+					AttributeType ja = (AttributeType) target;
 					if (ja.isVisible()) {
 						ja.setValue(null);
 					}

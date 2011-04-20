@@ -15,7 +15,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
@@ -241,7 +241,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 					wait(1000);
 				} catch (InterruptedException ignored) {
 				}
-				Property p = (Property) rmVarMap.get(uuid);
+				PropertyType p = (PropertyType) rmVarMap.get(uuid);
 				if (p != null) {
 					jobId = p.getName();
 					String v = (String) p.getValue();

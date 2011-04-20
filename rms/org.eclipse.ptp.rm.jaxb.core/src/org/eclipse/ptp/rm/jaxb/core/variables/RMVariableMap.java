@@ -19,7 +19,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
 /**
  * Abstraction representing all the Property and Attribute definitions
@@ -143,7 +143,7 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		if (value == null) {
 			return;
 		}
-		Property p = new Property();
+		PropertyType p = new PropertyType();
 		p.setName(name);
 		p.setValue(value);
 		p.setVisible(visible);
@@ -169,7 +169,7 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	public void maybeOverwrite(String key1, String key2, ILaunchConfiguration configuration) throws CoreException {
 		Object value1 = null;
 		Object value2 = null;
-		Property p = (Property) variables.get(key1);
+		PropertyType p = (PropertyType) variables.get(key1);
 		if (p != null) {
 			value2 = p.getValue();
 		}
