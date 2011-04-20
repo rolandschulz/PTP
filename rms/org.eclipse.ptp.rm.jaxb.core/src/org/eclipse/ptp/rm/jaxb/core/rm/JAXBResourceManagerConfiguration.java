@@ -26,7 +26,7 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  * contains (in memory) the JAXB data object tree and the active instance of the
  * environment map.<br>
  * <br>
- * There are actually three such providers associated with a JAXB resource
+ * There are actually three such configurations associated with a JAXB resource
  * manager instance: the base configuration, and the control and monitor
  * configurations. The latter two contain references to their parent base
  * provider.
@@ -34,8 +34,8 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  * @author arossi
  * 
  */
-public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfiguration implements IJAXBResourceManagerConfiguration,
-		IJAXBNonNLSConstants {
+public class JAXBResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements
+		IJAXBResourceManagerConfiguration, IJAXBNonNLSConstants {
 
 	private ResourceManagerData rmdata;
 	private RMVariableMap map;
@@ -46,7 +46,7 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 	 * @param provider
 	 *            base provider configuration
 	 */
-	public JAXBServiceProvider(String namespace, IServiceProvider provider) {
+	public JAXBResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(namespace, provider);
 		setDescription(Messages.JAXBServiceProvider_defaultDescription);
 	}
@@ -90,25 +90,9 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 	}
 
 	/**
-	 * Unmarshals the XML into the JAXB data tree.
-	 * 
-	 * @throws unmarshaling
-	 *             exceptions
-	 */
-	public void realizeRMDataFromXML() throws Throwable {
-		URL location = getRMConfigurationURL();
-		if (location == null) {
-			rmdata = null;
-		} else {
-			rmdata = JAXBInitializationUtils.initializeRMData(location);
-		}
-	}
-
-	/**
 	 * Tells the RMVariableMap static instance variable to point to this
 	 * configuration's environment map. If that map has not been initialized,
-	 * takes care of it here. This also entails building the data tree if it
-	 * does not yet exist.
+	 * takes care of it here.
 	 */
 	public void setActive() throws Throwable {
 		map = RMVariableMap.setActiveInstance(map);
@@ -157,5 +141,20 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 		setConnectionName(null);
 		setInvocationOptions(ZEROSTR);
 		setLocalAddress(ZEROSTR);
+	}
+
+	/**
+	 * Unmarshals the XML into the JAXB data tree.
+	 * 
+	 * @throws unmarshaling
+	 *             exceptions
+	 */
+	private void realizeRMDataFromXML() throws Throwable {
+		URL location = getRMConfigurationURL();
+		if (location == null) {
+			rmdata = null;
+		} else {
+			rmdata = JAXBInitializationUtils.initializeRMData(location);
+		}
 	}
 }
