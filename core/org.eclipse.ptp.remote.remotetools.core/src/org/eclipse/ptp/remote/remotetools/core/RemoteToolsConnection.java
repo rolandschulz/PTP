@@ -327,6 +327,15 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getPort()
+	 */
+	public int getPort() {
+		return fTargetControl.getConfig().getConnectionPort();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#getProperty(java.lang.String
 	 * )
@@ -469,6 +478,15 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public void setPassword(String password) {
 		fTargetControl.getConfig().setLoginPassword(password);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setPort(int)
+	 */
+	public void setPort(int port) {
+		fTargetControl.getConfig().setConnectionPort(port);
 	}
 
 	/*

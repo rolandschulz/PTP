@@ -46,15 +46,15 @@ import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.IShell
 
 public class RSEConnection implements IRemoteConnection {
 	private IShellService fShellService = null;
-
 	private ISubSystem fSubSystem = null;
 	private Map<String, String> fEnv = null;
 	private Map<String, String> fProperties = null;
 	private IPath fWorkingDir = null;
-	private final IHost fRseHost;
 
+	private final IHost fRseHost;
 	private final IRemoteConnection fConnection = this;
 	private final IRemoteServices fRemoteServices;
+
 	private final ListenerList fListeners = new ListenerList();
 
 	private final ICommunicationsListener commsListener = new ICommunicationsListener() {
@@ -246,6 +246,15 @@ public class RSEConnection implements IRemoteConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getPort()
+	 */
+	public int getPort() {
+		return 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#getProperty(java.lang.String
 	 * )
@@ -412,6 +421,15 @@ public class RSEConnection implements IRemoteConnection {
 	 */
 	public void setPassword(String password) {
 		// TODO is this possible?
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setPort(int)
+	 */
+	public void setPort(int port) {
+		// Not supported
 	}
 
 	/*
