@@ -22,8 +22,8 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
 /**
@@ -263,13 +263,13 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		String defVal = null;
 		String strVal = null;
 		Object o = null;
-		if (value instanceof Property) {
-			Property p = (Property) value;
+		if (value instanceof PropertyType) {
+			PropertyType p = (PropertyType) value;
 			name = p.getName();
 			defVal = p.getDefault();
 			o = p.getValue();
-		} else if (value instanceof Attribute) {
-			Attribute ja = (Attribute) value;
+		} else if (value instanceof AttributeType) {
+			AttributeType ja = (AttributeType) value;
 			name = ja.getName();
 			defVal = ja.getDefault();
 			o = ja.getValue();

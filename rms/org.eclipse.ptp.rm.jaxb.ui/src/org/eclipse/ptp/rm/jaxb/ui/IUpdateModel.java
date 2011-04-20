@@ -10,7 +10,7 @@
 package org.eclipse.ptp.rm.jaxb.ui;
 
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.rm.jaxb.core.data.Validator;
+import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 
 /**
@@ -62,5 +62,5 @@ public interface IUpdateModel extends IJAXBUINonNLSConstants {
 	 * @param remoteFileManager
 	 *            from the resource manager's services
 	 */
-	void setValidator(Validator validator, IRemoteFileManager remoteFileManager);
+	void setValidator(ValidatorType validator, IRemoteFileManager remoteFileManager);
 }

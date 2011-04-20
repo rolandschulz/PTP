@@ -20,13 +20,13 @@
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="site-data" minOccurs="0" type="rm:site"/>
-			<xs:element name="control-data" type="rm:control"/>
-			<xs:element name="monitor-data" type="rm:monitor"/>
+			<xs:element name="site-data" minOccurs="0" type="rm:site-type"/>
+			<xs:element name="control-data" type="rm:control-type"/>
+			<xs:element name="monitor-data" type="rm:monitor-type"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="site">
+	<xs:complexType name="site-type">
 		<xs:annotation>
 			<xs:documentation>
 				An optional place to set default remote site information.
@@ -37,7 +37,7 @@
 			<xs:element minOccurs="0" name="monitor-connection" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="control">
+	<xs:complexType name="control-type">
 		<xs:annotation>
 			<xs:documentation>
 				The implementation will construct a variable map serving as the resource manager "environment"; these are dereferenced in the
@@ -56,11 +56,11 @@
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property"/>
-			<xs:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="rm:attribute"/>
-			<xs:element name="managed-files" minOccurs="0" type="rm:managed-files"/>
-			<xs:element name="script" minOccurs="0" type="rm:script"/>
-			<xs:element name="start-up-command" minOccurs="0" maxOccurs="unbounded" type="rm:command">
+			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property-type"/>
+			<xs:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="rm:attribute-type"/>
+			<xs:element name="managed-files" minOccurs="0" type="rm:managed-files-type"/>
+			<xs:element name="script" minOccurs="0" type="rm:script-type"/>
+			<xs:element name="start-up-command" minOccurs="0" maxOccurs="unbounded" type="rm:command-type">
 				<xs:annotation>
 					<xs:documentation>
 						Arbitrary commands which need to be run on startup.
@@ -68,28 +68,28 @@
 				</xs:annotation>
 			</xs:element>
 			<xs:choice minOccurs="1" maxOccurs="4">
-				<xs:element name="submit-interactive" type="rm:command"/>
-				<xs:element name="submit-batch" type="rm:command"/>
-				<xs:element name="submit-debug-interactive" type="rm:command"/>
-				<xs:element name="submit-debug-batch" type="rm:command"/>
+				<xs:element name="submit-interactive" type="rm:command-type"/>
+				<xs:element name="submit-batch" type="rm:command-type"/>
+				<xs:element name="submit-debug-interactive" type="rm:command-type"/>
+				<xs:element name="submit-debug-batch" type="rm:command-type"/>
 			</xs:choice>
-			<xs:element name="get-job-status" type="rm:command" minOccurs="0"/>
-			<xs:element name="terminate-job" type="rm:command" minOccurs="0"/>
-			<xs:element name="suspend-job" type="rm:command" minOccurs="0"/>
-			<xs:element name="resume-job" type="rm:command" minOccurs="0"/>
-			<xs:element name="hold-job" type="rm:command" minOccurs="0"/>
-			<xs:element name="release-job" type="rm:command" minOccurs="0"/>
-			<xs:element name="shut-down-command" minOccurs="0" maxOccurs="unbounded" type="rm:command">
+			<xs:element name="get-job-status" type="rm:command-type" minOccurs="0"/>
+			<xs:element name="terminate-job" type="rm:command-type" minOccurs="0"/>
+			<xs:element name="suspend-job" type="rm:command-type" minOccurs="0"/>
+			<xs:element name="resume-job" type="rm:command-type" minOccurs="0"/>
+			<xs:element name="hold-job" type="rm:command-type" minOccurs="0"/>
+			<xs:element name="release-job" type="rm:command-type" minOccurs="0"/>
+			<xs:element name="shut-down-command" minOccurs="0" maxOccurs="unbounded" type="rm:command-type">
 				<xs:annotation>
 					<xs:documentation>
 						Arbitrary commands which need to be run on shutdown.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="launch-tab" minOccurs="0" type="rm:launch-tab"/>
+			<xs:element name="launch-tab" minOccurs="0" type="rm:launch-tab-type"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="property">
+	<xs:complexType name="property-type">
 		<xs:annotation>
 			<xs:documentation>
 				The value for properties and attributes can by any primitive type, or lists or maps of strings. If stdout from a
@@ -108,7 +108,7 @@
 		<xs:attribute name="visible" type="xs:boolean" default="true"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 	</xs:complexType>
-	<xs:complexType name="attribute">
+	<xs:complexType name="attribute-type">
 		<xs:sequence>
 			<xs:element name="description" type="xs:string"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
@@ -121,7 +121,7 @@
 			</xs:element>
 			<xs:element name="default" minOccurs="0" type="xs:string"/>
 			<xs:element name="value" minOccurs="0"/>
-			<xs:element name="validator" minOccurs="0" type="rm:validator"/>
+			<xs:element name="validator" minOccurs="0" type="rm:validator-type"/>
 		</xs:sequence>
 		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="type" use="required" type="xs:string"/>
@@ -131,7 +131,7 @@
 		<xs:attribute name="min" type="xs:int"/>
 		<xs:attribute name="max" type="xs:int"/>
 	</xs:complexType>
-	<xs:complexType name="managed-files">
+	<xs:complexType name="managed-files-type">
 		<xs:annotation>
 			<xs:documentation>
 				List of files to be staged.
@@ -139,28 +139,28 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="file-staging-location" minOccurs="0" type="xs:string"/>
-			<xs:element name="file" maxOccurs="unbounded" type="rm:managed-file"/>
+			<xs:element name="file" maxOccurs="unbounded" type="rm:managed-file-type"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="script">
+	<xs:complexType name="script-type">
 		<xs:sequence>
-			<xs:element name="line" maxOccurs="unbounded" type="rm:line"/>
+			<xs:element name="line" maxOccurs="unbounded" type="rm:line-type"/>
 		</xs:sequence>
 		<xs:attribute name="envBegin" type="xs:int" default="-1"/>
 		<xs:attribute name="envEnd" type="xs:int" default="-1"/>
 	</xs:complexType>
-	<xs:complexType name="line">
+	<xs:complexType name="line-type">
 		<xs:sequence>
-			<xs:element name="arg" minOccurs="0" maxOccurs="unbounded" type="rm:arg"/>
+			<xs:element name="arg" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="command">
+	<xs:complexType name="command-type">
 		<xs:sequence>
-			<xs:element name="arg" maxOccurs="unbounded" type="rm:arg"/>
-			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:name-value-pair"/>
-			<xs:element name="stdout-parser" minOccurs="0" type="rm:tokenizer"/>
-			<xs:element name="stderr-parser" minOccurs="0" type="rm:tokenizer"/>
-			<xs:element name="redirect-parser" minOccurs="0" type="rm:tokenizer"/>
+			<xs:element name="arg" maxOccurs="unbounded" type="rm:arg-type"/>
+			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:name-value-pair-type"/>
+			<xs:element name="stdout-parser" minOccurs="0" type="rm:tokenizer-type"/>
+			<xs:element name="stderr-parser" minOccurs="0" type="rm:tokenizer-type"/>
+			<xs:element name="redirect-parser" minOccurs="0" type="rm:tokenizer-type"/>
 		</xs:sequence>
 		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="directory" type="xs:string"/>
@@ -170,7 +170,7 @@
 		<xs:attribute name="waitForId" type="xs:boolean" default="true"/>
 		<xs:attribute name="ignoreExitStatus" type="xs:boolean" default="false"/>
 	</xs:complexType>
-	<xs:complexType name="launch-tab">
+	<xs:complexType name="launch-tab-type">
 		<xs:annotation>
 			<xs:documentation>
 				A recursive description of the UI element associated with the control part, the Launch Tab.
@@ -179,8 +179,8 @@
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="basic" minOccurs="0" type="rm:tab-controller"/>
-			<xs:element name="advanced" minOccurs="0" type="rm:tab-controller"/>
+			<xs:element name="basic" minOccurs="0" type="rm:tab-controller-type"/>
+			<xs:element name="advanced" minOccurs="0" type="rm:tab-controller-type"/>
 			<xs:element name="custom-controller" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
@@ -191,7 +191,7 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="validator">
+	<xs:complexType name="validator-type">
 		<xs:annotation>
 			<xs:documentation>
 				A regular expression or an acl used to validate an attribute value.
@@ -199,13 +199,13 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:sequence>
-				<xs:element name="regex" minOccurs="0" type="rm:regex"/>
-				<xs:element name="fileInfo" minOccurs="0" type="rm:file-match"/>
+				<xs:element name="regex" minOccurs="0" type="rm:regex-type"/>
+				<xs:element name="fileInfo" minOccurs="0" type="rm:file-match-type"/>
 			</xs:sequence>
 			<xs:element name="error-message" minOccurs="0" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="managed-file">
+	<xs:complexType name="managed-file-type">
 		<xs:annotation>
 			<xs:documentation>
 				If 'contents' is present, the file is written.
@@ -220,7 +220,7 @@
 		<xs:attribute name="resolveContents" type="xs:boolean" default="true"/>
 		<xs:attribute name="deleteAfterUse" type="xs:boolean" default="false"/>
 	</xs:complexType>
-	<xs:complexType name="file-match">
+	<xs:complexType name="file-match-type">
 		<xs:attribute name="efsAttributes">
 			<xs:annotation>
 				<xs:documentation>
@@ -255,16 +255,16 @@
 		<xs:attribute name="length" type="xs:long"/>
 		<xs:attribute name="isDirectory" type="xs:boolean" default="false"/>
 	</xs:complexType>
-	<xs:complexType name="name-value-pair">
+	<xs:complexType name="name-value-pair-type">
 		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="value" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="tab-controller">
+	<xs:complexType name="tab-controller-type">
 		<xs:sequence>
 			<xs:element name="title" type="xs:string"/>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
-				<xs:element name="composite" type="rm:composite-descriptor"/>
+				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
+				<xs:element name="composite" type="rm:composite-type"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="sharedEnvironment" type="xs:boolean" default="false">
@@ -277,12 +277,12 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	<xs:complexType name="regex" mixed="true">
+	<xs:complexType name="regex-type" mixed="true">
 		<xs:attribute name="flags" type="xs:string"/>
 		<xs:attribute name="split" type="xs:boolean" default="false"/>
 		<xs:attribute name="expression" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType mixed="true" name="arg">
+	<xs:complexType mixed="true" name="arg-type">
 		<xs:annotation>
 			<xs:documentation>
 				The text of the argument will be parsed for references to the resource manager environment.
@@ -298,7 +298,7 @@
 		</xs:attribute>
 		<xs:attribute name="resolve" type="xs:boolean" default="true"/>
 	</xs:complexType>
-	<xs:complexType name="tokenizer">
+	<xs:complexType name="tokenizer-type">
 		<xs:annotation>
 			<xs:documentation>
 				These are attached to the stdout or stderr streams in order to capture the output of the command and add values
@@ -315,10 +315,10 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="target" maxOccurs="unbounded" type="rm:target"/>
+				<xs:element name="target" maxOccurs="unbounded" type="rm:target-type"/>
 			</xs:choice>
-			<xs:element name="exit-on" minOccurs="0" type="rm:regex"/>
-			<xs:element name="exit-after" minOccurs="0" type="rm:regex"/>
+			<xs:element name="exit-on" minOccurs="0" type="rm:regex-type"/>
+			<xs:element name="exit-after" minOccurs="0" type="rm:regex-type"/>
 		</xs:sequence>
 		<xs:attribute name="delim" type="xs:string"/>
 		<xs:attribute name="includeDelim" type="xs:boolean" default="false"/>
@@ -334,13 +334,13 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	<xs:complexType name="tab-folder-descriptor">
+	<xs:complexType name="tab-folder-type">
 		<xs:sequence>
-			<xs:element name="layout" minOccurs="0" type="rm:layout-descriptor"/>
-			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
-			<xs:element name="item" maxOccurs="unbounded" type="rm:tab-item-descriptor"/>
+			<xs:element name="layout" minOccurs="0" type="rm:layout-type"/>
+			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="item" maxOccurs="unbounded" type="rm:tab-item-type"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
-			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string">
 			<xs:annotation>
@@ -352,59 +352,59 @@
 		</xs:attribute>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="composite-descriptor">
+	<xs:complexType name="composite-type">
 		<xs:sequence>
-			<xs:element name="layout" minOccurs="0" type="rm:layout-descriptor"/>
-			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
-			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
+			<xs:element name="layout" minOccurs="0" type="rm:layout-type"/>
+			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:element name="title" minOccurs="0" type="xs:string"/>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
-				<xs:element name="composite" type="rm:composite-descriptor"/>
-				<xs:element name="widget" type="rm:widget"/>
-				<xs:element name="viewer" type="rm:attribute-viewer"/>
+				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
+				<xs:element name="composite" type="rm:composite-type"/>
+				<xs:element name="widget" type="rm:widget-type"/>
+				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="group" type="xs:boolean" default="false"/>
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="tab-item-descriptor">
+	<xs:complexType name="tab-item-type">
 		<xs:sequence>
 			<xs:element name="title" type="xs:string"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
-			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element name="composite" type="rm:composite-descriptor"/>
-				<xs:element name="tab-folder" type="rm:tab-folder-descriptor"/>
-				<xs:element name="widget" type="rm:widget"/>
+				<xs:element name="composite" type="rm:composite-type"/>
+				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
+				<xs:element name="widget" type="rm:widget-type"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="layout-descriptor">
+	<xs:complexType name="layout-type">
 		<xs:choice>
-			<xs:element name="fill-layout" type="rm:fill-layout-descriptor"/>
-			<xs:element name="row-layout" type="rm:row-layout-descriptor"/>
-			<xs:element name="grid-layout" type="rm:grid-layout-descriptor"/>
-			<xs:element name="form-layout" type="rm:form-layout-descriptor"/>
+			<xs:element name="fill-layout" type="rm:fill-layout-type"/>
+			<xs:element name="row-layout" type="rm:row-layout-type"/>
+			<xs:element name="grid-layout" type="rm:grid-layout-type"/>
+			<xs:element name="form-layout" type="rm:form-layout-type"/>
 		</xs:choice>
 	</xs:complexType>
-	<xs:complexType name="layout-data-descriptor">
+	<xs:complexType name="layout-data-type">
 		<xs:choice>
-			<xs:element name="row-data" type="rm:row-data-descriptor"/>
-			<xs:element name="grid-data" type="rm:grid-data-descriptor"/>
-			<xs:element name="form-data" type="rm:form-data-descriptor"/>
+			<xs:element name="row-data" type="rm:row-data-type"/>
+			<xs:element name="grid-data" type="rm:grid-data-type"/>
+			<xs:element name="form-data" type="rm:form-data-type"/>
 		</xs:choice>
 	</xs:complexType>
-	<xs:complexType name="fill-layout-descriptor">
+	<xs:complexType name="fill-layout-type">
 		<xs:attribute name="type" type="xs:string"/>
 		<xs:attribute name="marginHeight" type="xs:int"/>
 		<xs:attribute name="marginWidth" type="xs:int"/>
 		<xs:attribute name="spacing" type="xs:int"/>
 	</xs:complexType>
-	<xs:complexType name="row-layout-descriptor">
+	<xs:complexType name="row-layout-type">
 		<xs:attribute name="center" type="xs:boolean" default="false"/>
 		<xs:attribute name="justify" type="xs:boolean" default="false"/>
 		<xs:attribute name="fill" type="xs:boolean" default="false"/>
@@ -417,7 +417,7 @@
 		<xs:attribute name="marginRight" type="xs:int"/>
 		<xs:attribute name="spacing" type="xs:int"/>
 	</xs:complexType>
-	<xs:complexType name="grid-layout-descriptor">
+	<xs:complexType name="grid-layout-type">
 		<xs:attribute name="numColumns" type="xs:int"/>
 		<xs:attribute name="makeColumnsEqualWidth" type="xs:boolean" default="true"/>
 		<xs:attribute name="marginHeight" type="xs:int"/>
@@ -429,7 +429,7 @@
 		<xs:attribute name="horizontalSpacing" type="xs:int"/>
 		<xs:attribute name="verticalSpacing" type="xs:int"/>
 	</xs:complexType>
-	<xs:complexType name="form-layout-descriptor">
+	<xs:complexType name="form-layout-type">
 		<xs:attribute name="marginHeight" type="xs:int"/>
 		<xs:attribute name="marginWidth" type="xs:int"/>
 		<xs:attribute name="marginTop" type="xs:int"/>
@@ -438,12 +438,12 @@
 		<xs:attribute name="marginRight" type="xs:int"/>
 		<xs:attribute name="spacing" type="xs:int"/>
 	</xs:complexType>
-	<xs:complexType name="row-data-descriptor">
+	<xs:complexType name="row-data-type">
 		<xs:attribute name="height" type="xs:int"/>
 		<xs:attribute name="width" type="xs:int"/>
 		<xs:attribute name="exclude" type="xs:boolean" default="false"/>
 	</xs:complexType>
-	<xs:complexType name="grid-data-descriptor">
+	<xs:complexType name="grid-data-type">
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="horizontalAlign" type="xs:string"/>
 		<xs:attribute name="verticalAlign" type="xs:string"/>
@@ -458,28 +458,28 @@
 		<xs:attribute name="heightHint" type="xs:int"/>
 		<xs:attribute name="widthHint" type="xs:int"/>
 	</xs:complexType>
-	<xs:complexType name="form-data-descriptor">
+	<xs:complexType name="form-data-type">
 		<xs:sequence>
-			<xs:element name="top" minOccurs="0" type="rm:form-attachment-descriptor"/>
-			<xs:element name="bottom" minOccurs="0" type="rm:form-attachment-descriptor"/>
-			<xs:element name="left" minOccurs="0" type="rm:form-attachment-descriptor"/>
-			<xs:element name="right" minOccurs="0" type="rm:form-attachment-descriptor"/>
+			<xs:element name="top" minOccurs="0" type="rm:form-attachment-type"/>
+			<xs:element name="bottom" minOccurs="0" type="rm:form-attachment-type"/>
+			<xs:element name="left" minOccurs="0" type="rm:form-attachment-type"/>
+			<xs:element name="right" minOccurs="0" type="rm:form-attachment-type"/>
 		</xs:sequence>
 		<xs:attribute name="height" type="xs:int"/>
 		<xs:attribute name="width" type="xs:int"/>
 	</xs:complexType>
-	<xs:complexType name="form-attachment-descriptor">
+	<xs:complexType name="form-attachment-type">
 		<xs:attribute name="alignment" type="xs:string"/>
 		<xs:attribute name="numerator" type="xs:int"/>
 		<xs:attribute name="denominator" type="xs:int"/>
 		<xs:attribute name="offset" type="xs:int"/>
 	</xs:complexType>
-	<xs:complexType name="widget">
+	<xs:complexType name="widget-type">
 		<xs:sequence>
-			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
-			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
+			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
-			<xs:element name="value-list-from" minOccurs="0" type="xs:string">
+			<xs:element name="items-from" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
 						Combo items taken from the value of an attribute or property.
@@ -501,7 +501,7 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="arg" maxOccurs="unbounded" type="rm:arg"/>
+						<xs:element name="arg" maxOccurs="unbounded" type="rm:arg-type"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -527,7 +527,7 @@
 		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="attribute-viewer">
+	<xs:complexType name="attribute-viewer-type">
 		<xs:annotation>
 			<xs:documentation>
 				These display their value columns as editable widgets. They are provided with checkboxes to indicate which
@@ -539,12 +539,12 @@
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-descriptor"/>
-			<xs:element name="layout" minOccurs="0" type="rm:layout-descriptor"/>
+			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="layout" minOccurs="0" type="rm:layout-type"/>
 			<xs:element name="label" minOccurs="0" type="xs:string"/>
-			<xs:element name="column-data" minOccurs="0" maxOccurs="7" type="rm:column-data"/>
-			<xs:element name="items" type="rm:viewer-items"/>
-			<xs:element name="value" minOccurs="0" type="rm:template"/>
+			<xs:element name="column-data" minOccurs="0" maxOccurs="7" type="rm:column-data-type"/>
+			<xs:element name="items" type="rm:viewer-items-type"/>
+			<xs:element name="value" minOccurs="0" type="rm:template-type"/>
 		</xs:sequence>
 		<xs:attribute name="type" default="table">
 			<xs:simpleType>
@@ -561,7 +561,7 @@
 		<xs:attribute name="tooltipEnabled" type="xs:boolean" default="true"/>
 		<xs:attribute name="style" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="viewer-items">
+	<xs:complexType name="viewer-items-type">
 		<xs:sequence>
 			<xs:element name="include" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 			<xs:element name="exclude" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
@@ -569,7 +569,7 @@
 		<xs:attribute name="allPredefined" type="xs:boolean" default="false"/>
 		<xs:attribute name="allDiscovered" type="xs:boolean" default="false"/>
 	</xs:complexType>
-	<xs:complexType name="font-descriptor">
+	<xs:complexType name="font-type">
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="size" type="xs:int" default="9"/>
 		<xs:attribute name="style" default="normal">
@@ -582,7 +582,7 @@
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
-	<xs:complexType name="template">
+	<xs:complexType name="template-type">
 		<xs:attribute name="pattern" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
@@ -593,10 +593,10 @@
 		</xs:attribute>
 		<xs:attribute name="separator" type="xs:string" default=" "/>
 	</xs:complexType>
-	<xs:complexType name="target">
+	<xs:complexType name="target-type">
 		<xs:sequence>
-			<xs:element name="match" maxOccurs="unbounded" type="rm:match"/>
-			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test"/>
+			<xs:element name="match" maxOccurs="unbounded" type="rm:match-type"/>
+			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test-type"/>
 		</xs:sequence>
 		<xs:attribute name="ref" type="xs:string"/>
 		<xs:attribute name="type" default="property">
@@ -616,21 +616,21 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	<xs:complexType name="match">
+	<xs:complexType name="match-type">
 		<xs:sequence>
-			<xs:element name="expression" minOccurs="0" type="rm:regex"/>
+			<xs:element name="expression" minOccurs="0" type="rm:regex-type"/>
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
-				<xs:element name="add" type="rm:add"/>
-				<xs:element name="append" type="rm:append"/>
-				<xs:element name="put" type="rm:put"/>
-				<xs:element name="set" type="rm:set"/>
+				<xs:element name="add" type="rm:add-type"/>
+				<xs:element name="append" type="rm:append-type"/>
+				<xs:element name="put" type="rm:put-type"/>
+				<xs:element name="set" type="rm:set-type"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="moveToTop" type="xs:boolean" default="false"/>
 	</xs:complexType>
-	<xs:complexType name="column-data">
+	<xs:complexType name="column-data-type">
 		<xs:sequence>
-			<xs:element name="font" minOccurs="0" type="rm:font-descriptor"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
@@ -641,32 +641,32 @@
 		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="set">
+	<xs:complexType name="set-type">
 		<xs:sequence>
-			<xs:element name="entry" minOccurs="0" type="rm:entry"/>
+			<xs:element name="entry" minOccurs="0" type="rm:entry-type"/>
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="add">
+	<xs:complexType name="add-type">
 		<xs:sequence>
-			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded" type="rm:entry"/>
+			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded" type="rm:entry-type"/>
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="append">
+	<xs:complexType name="append-type">
 		<xs:sequence>
-			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded" type="rm:entry"/>
+			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded" type="rm:entry-type"/>
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
 		<xs:attribute name="separator" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="put">
+	<xs:complexType name="put-type">
 		<xs:sequence>
-			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded" type="rm:entry"/>
+			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded" type="rm:entry-type"/>
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="entry">
+	<xs:complexType name="entry-type">
 		<xs:attribute name="key" type="xs:string"/>
 		<xs:attribute name="keyGroup" type="xs:int" default="0"/>
 		<xs:attribute name="keyIndex" type="xs:int" default="0"/>
@@ -674,9 +674,9 @@
 		<xs:attribute name="valueGroup" type="xs:int" default="0"/>
 		<xs:attribute name="valueIndex" type="xs:int" default="0"/>
 	</xs:complexType>
-	<xs:complexType name="test">
+	<xs:complexType name="test-type">
 		<xs:sequence>
-			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test"/>
+			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test-type"/>
 			<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="2">
 				<xs:annotation>
 					<xs:documentation>
@@ -686,18 +686,18 @@
 				</xs:annotation>
 			</xs:element>
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
-				<xs:element name="add" type="rm:add"/>
-				<xs:element name="append" type="rm:append"/>
-				<xs:element name="put" type="rm:put"/>
-				<xs:element name="set" type="rm:set"/>
+				<xs:element name="add" type="rm:add-type"/>
+				<xs:element name="append" type="rm:append-type"/>
+				<xs:element name="put" type="rm:put-type"/>
+				<xs:element name="set" type="rm:set-type"/>
 			</xs:choice>
 			<xs:element name="else" minOccurs="0">
 				<xs:complexType>
 					<xs:choice maxOccurs="unbounded">
-						<xs:element name="add" type="rm:add"/>
-						<xs:element name="append" type="rm:append"/>
-						<xs:element name="put" type="rm:put"/>
-						<xs:element name="set" type="rm:set"/>
+						<xs:element name="add" type="rm:add-type"/>
+						<xs:element name="append" type="rm:append-type"/>
+						<xs:element name="put" type="rm:put-type"/>
+						<xs:element name="set" type="rm:set-type"/>
 					</xs:choice>
 				</xs:complexType>
 			</xs:element>
@@ -717,14 +717,14 @@
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
-	<xs:complexType name="monitor">
+	<xs:complexType name="monitor-type">
 		<xs:annotation>
 			<xs:documentation>
 				This is a minimal definition.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property"/>
+			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property-type"/>
 		</xs:sequence>
 		<xs:attribute name="schedulerType" type="xs:string"/>
 		<xs:attribute name="refreshFrequencyInSeconds" type="xs:int" default="60"/>

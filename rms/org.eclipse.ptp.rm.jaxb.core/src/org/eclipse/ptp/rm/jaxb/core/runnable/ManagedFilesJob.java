@@ -24,10 +24,10 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.ManagedFile;
-import org.eclipse.ptp.rm.jaxb.core.data.ManagedFiles;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
+import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.FileUtils;
@@ -47,7 +47,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 
 	private final String uuid;
 	private final String stagingDir;
-	private final List<ManagedFile> files;
+	private final List<ManagedFileType> files;
 	private final RemoteServicesDelegate delegate;
 	private final RMVariableMap rmVarMap;
 	private boolean success;
@@ -63,7 +63,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	 *            information
 	 * @throws CoreException
 	 */
-	public ManagedFilesJob(String uuid, ManagedFiles files, RemoteServicesDelegate delegate) throws CoreException {
+	public ManagedFilesJob(String uuid, ManagedFilesType files, RemoteServicesDelegate delegate) throws CoreException {
 		super(Messages.ManagedFilesJob);
 		this.uuid = uuid;
 		this.delegate = delegate;
@@ -94,7 +94,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 		 * for now we handle the files serially. NOTE: no support for Windows as
 		 * target ...
 		 */
-		for (ManagedFile file : files) {
+		for (ManagedFileType file : files) {
 			try {
 				File localFile = maybeWriteFile(file);
 				progress.worked(5);
@@ -108,7 +108,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 				if (file.isDeleteAfterUse()) {
 					localFile.delete();
 				}
-				Property p = new Property();
+				PropertyType p = new PropertyType();
 				p.setName(file.getName());
 				if (localTarget) {
 					p.setValue(new File(System.getProperty(JAVA_USER_HOME), target).getAbsolutePath());
@@ -162,7 +162,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	private File maybeWriteFile(ManagedFile file) throws IOException, CoreException {
+	private File maybeWriteFile(ManagedFileType file) throws IOException, CoreException {
 		String path = file.getPath();
 		if (path != null) {
 			return new File(path);
@@ -195,10 +195,10 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 						}
 						String key = contents.substring(start, end);
 						Object o = rmVarMap.get(key);
-						if (o instanceof Property) {
-							contents = String.valueOf(((Property) o).getValue());
-						} else if (o instanceof Attribute) {
-							contents = String.valueOf(((Attribute) o).getValue());
+						if (o instanceof PropertyType) {
+							contents = String.valueOf(((PropertyType) o).getValue());
+						} else if (o instanceof AttributeType) {
+							contents = String.valueOf(((AttributeType) o).getValue());
 						}
 					}
 				}

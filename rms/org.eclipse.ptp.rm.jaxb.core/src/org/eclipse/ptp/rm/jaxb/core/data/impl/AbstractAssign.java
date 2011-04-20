@@ -16,11 +16,11 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Add;
-import org.eclipse.ptp.rm.jaxb.core.data.Append;
-import org.eclipse.ptp.rm.jaxb.core.data.Entry;
-import org.eclipse.ptp.rm.jaxb.core.data.Put;
-import org.eclipse.ptp.rm.jaxb.core.data.Set;
+import org.eclipse.ptp.rm.jaxb.core.data.AddType;
+import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
+import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
+import org.eclipse.ptp.rm.jaxb.core.data.PutType;
+import org.eclipse.ptp.rm.jaxb.core.data.SetType;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
@@ -86,7 +86,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 *            from the target map
 	 * @return the key index
 	 */
-	protected int determineKeyIndex(Entry entry) {
+	protected int determineKeyIndex(EntryType entry) {
 		int index = entry.getKeyIndex();
 		int group = entry.getKeyGroup();
 		if (index == 0 && group != 0) {
@@ -104,7 +104,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.Entry
 	 * @return the value index
 	 */
-	protected int determineValueIndex(Entry entry) {
+	protected int determineValueIndex(EntryType entry) {
 		int index = entry.getValueIndex();
 		int group = entry.getValueGroup();
 		if (index == 0 && group != 0) {
@@ -124,7 +124,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 * @return key
 	 * @throws Throwable
 	 */
-	protected String getKey(Entry entry, String[] values) throws Throwable {
+	protected String getKey(EntryType entry, String[] values) throws Throwable {
 		String k = entry.getKey();
 		if (k != null) {
 			return (String) normalizedValue(target, uuid, k, false);
@@ -147,7 +147,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 * @return value
 	 * @throws Throwable
 	 */
-	protected Object getValue(Entry entry, String[] values) throws Throwable {
+	protected Object getValue(EntryType entry, String[] values) throws Throwable {
 		String v = entry.getValue();
 		if (v != null) {
 			return normalizedValue(target, uuid, v, true);
@@ -185,23 +185,23 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 *            the list of wrappers
 	 */
 	static void add(String uuid, Object assign, List<IAssign> list) {
-		if (assign instanceof Add) {
-			Add add = (Add) assign;
+		if (assign instanceof AddType) {
+			AddType add = (AddType) assign;
 			list.add(new AddImpl(uuid, add));
 			return;
 		}
-		if (assign instanceof Append) {
-			Append append = (Append) assign;
+		if (assign instanceof AppendType) {
+			AppendType append = (AppendType) assign;
 			list.add(new AppendImpl(uuid, append));
 			return;
 		}
-		if (assign instanceof Put) {
-			Put put = (Put) assign;
+		if (assign instanceof PutType) {
+			PutType put = (PutType) assign;
 			list.add(new PutImpl(uuid, put));
 			return;
 		}
-		if (assign instanceof Set) {
-			Set set = (Set) assign;
+		if (assign instanceof SetType) {
+			SetType set = (SetType) assign;
 			list.add(new SetImpl(uuid, set));
 			return;
 		}

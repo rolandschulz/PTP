@@ -16,9 +16,9 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.data.LaunchTab;
-import org.eclipse.ptp.rm.jaxb.core.data.Script;
-import org.eclipse.ptp.rm.jaxb.core.data.TabController;
+import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
+import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
+import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -46,8 +46,8 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 
 	private final RemoteServicesDelegate delegate;
 	private final IJAXBResourceManagerConfiguration rmConfig;
-	private final LaunchTab launchTabData;
-	private final Script script;
+	private final LaunchTabType launchTabData;
+	private final ScriptType script;
 	private final ValueUpdateHandler updateHandler;
 
 	private ScrolledComposite scrolledParent;
@@ -69,7 +69,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		delegate = rm.getControl().getRemoteServicesDelegate();
 		updateHandler = new ValueUpdateHandler(this);
 		if (launchTabData != null) {
-			TabController controller = launchTabData.getBasic();
+			TabControllerType controller = launchTabData.getBasic();
 			if (controller != null) {
 				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
 			}
@@ -127,7 +127,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	/**
 	 * @return JAXB elements for building the launch tab controls
 	 */
-	public LaunchTab getLaunchTabData() {
+	public LaunchTabType getLaunchTabData() {
 		return launchTabData;
 	}
 
@@ -142,7 +142,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	/**
 	 * @return JAXB data element for resource manager script
 	 */
-	public Script getScript() {
+	public ScriptType getScript() {
 		return script;
 	}
 

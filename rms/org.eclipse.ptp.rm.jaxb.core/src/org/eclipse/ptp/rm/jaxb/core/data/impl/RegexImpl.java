@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Regex;
+import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 
 /**
  * Wrapper implementation.
@@ -36,7 +36,7 @@ public class RegexImpl implements IJAXBNonNLSConstants {
 	 * @param regex
 	 *            JAXB data element
 	 */
-	public RegexImpl(Regex regex) {
+	public RegexImpl(RegexType regex) {
 		expression = regex.getExpression();
 		if (expression == null) {
 			expression = regex.getContent();

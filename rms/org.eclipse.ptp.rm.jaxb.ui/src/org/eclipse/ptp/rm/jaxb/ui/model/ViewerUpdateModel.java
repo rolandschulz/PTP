@@ -24,7 +24,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.ptp.rm.jaxb.core.data.Template;
+import org.eclipse.ptp.rm.jaxb.core.data.TemplateType;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
@@ -82,7 +82,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 *            name-value pairs associated with the items of the viewer into
 	 *            a single output string
 	 */
-	public ViewerUpdateModel(String name, ValueUpdateHandler handler, ICheckable viewer, Template template) {
+	public ViewerUpdateModel(String name, ValueUpdateHandler handler, ICheckable viewer, TemplateType template) {
 		super(name, handler);
 		this.viewer = viewer;
 		this.columnViewer = (ColumnViewer) viewer;

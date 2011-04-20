@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
 import org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
@@ -29,13 +29,13 @@ import org.eclipse.swt.graphics.Image;
  * 
  */
 public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJAXBUINonNLSConstants {
-	private final List<ColumnData> columnData;
+	private final List<ColumnDataType> columnData;
 
 	/**
 	 * @param columnData
 	 *            info on name, colors and font for a given column.
 	 */
-	public ViewerDataCellLabelProvider(List<ColumnData> columnData) {
+	public ViewerDataCellLabelProvider(List<ColumnDataType> columnData) {
 		this.columnData = columnData;
 	}
 

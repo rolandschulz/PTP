@@ -36,10 +36,10 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Arg;
-import org.eclipse.ptp.rm.jaxb.core.data.Command;
-import org.eclipse.ptp.rm.jaxb.core.data.NameValuePair;
-import org.eclipse.ptp.rm.jaxb.core.data.Tokenizer;
+import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
+import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
+import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
+import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
@@ -121,7 +121,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private final String uuid;
-	private final Command command;
+	private final CommandType command;
 	private final IJAXBResourceManagerControl rm;
 	private final ICommandJobStreamsProxy proxy;
 	private final boolean waitForId;
@@ -152,7 +152,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public CommandJob(String jobUUID, Command command, boolean batch, IJAXBResourceManagerControl rm) {
+	public CommandJob(String jobUUID, CommandType command, boolean batch, IJAXBResourceManagerControl rm) {
 		super(command.getName());
 		this.command = command;
 		this.batch = batch;
@@ -361,7 +361,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 * @throws CoreException
 	 */
 	private void maybeInitializeTokenizers(IRemoteProcessBuilder builder) throws CoreException {
-		Tokenizer t = null;
+		TokenizerType t = null;
 
 		if (builder.redirectErrorStream()) {
 			t = command.getRedirectParser();
@@ -407,7 +407,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 * @throws CoreException
 	 */
 	private IRemoteProcessBuilder prepareCommand() throws CoreException {
-		List<Arg> args = command.getArg();
+		List<ArgType> args = command.getArg();
 		if (args == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
 		}
@@ -439,9 +439,9 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			/*
 			 * first static env, then dynamic
 			 */
-			List<NameValuePair> vars = command.getEnvironment();
+			List<NameValuePairType> vars = command.getEnvironment();
 			RMVariableMap map = RMVariableMap.getActiveInstance();
-			for (NameValuePair var : vars) {
+			for (NameValuePairType var : vars) {
 				EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), map);
 			}
 

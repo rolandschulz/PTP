@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.data.impl;
 
-import org.eclipse.ptp.rm.jaxb.core.data.Entry;
-import org.eclipse.ptp.rm.jaxb.core.data.Set;
+import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
+import org.eclipse.ptp.rm.jaxb.core.data.SetType;
 
 /**
  * Wrapper implementation.
@@ -20,7 +20,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Set;
  */
 public class SetImpl extends AbstractAssign {
 
-	private final Entry entry;
+	private final EntryType entry;
 
 	/**
 	 * @param uuid
@@ -29,7 +29,7 @@ public class SetImpl extends AbstractAssign {
 	 * @param set
 	 *            JAXB data element
 	 */
-	public SetImpl(String uuid, Set set) {
+	public SetImpl(String uuid, SetType set) {
 		this.uuid = uuid;
 		field = set.getField();
 		entry = set.getEntry();

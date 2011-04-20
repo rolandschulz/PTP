@@ -10,7 +10,7 @@
 package org.eclipse.ptp.rm.jaxb.ui.model;
 
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 
 /**
@@ -60,7 +60,7 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 *            the Attribute object
 	 */
 	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
-			Attribute data) {
+			AttributeType data) {
 		super(name, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus());
 	}
 

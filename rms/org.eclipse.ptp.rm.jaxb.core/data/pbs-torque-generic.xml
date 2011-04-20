@@ -549,7 +549,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
-						<value-list-from>queues</value-list-from>
+						<items-from>queues</items-from>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
@@ -676,7 +676,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 							<layout-data>
 								<grid-data horizontalSpan="2"/>
 							</layout-data>
-							<value-list-from>queues</value-list-from>
+							<items-from>queues</items-from>
 						</widget>
 						<widget type="text" readOnly="true" style="SWT.LEFT | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
 							<layout-data>

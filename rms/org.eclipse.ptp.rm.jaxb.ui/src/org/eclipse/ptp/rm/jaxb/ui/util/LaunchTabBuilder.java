@@ -17,26 +17,26 @@ import java.util.TreeMap;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
-import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
-import org.eclipse.ptp.rm.jaxb.core.data.CompositeDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.FillLayoutDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.FontDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.FormAttachmentDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.FormDataDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.FormLayoutDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.GridDataDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.GridLayoutDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.LayoutDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.core.data.RowDataDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.RowLayoutDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.TabItemDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.ViewerItems;
-import org.eclipse.ptp.rm.jaxb.core.data.Widget;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
+import org.eclipse.ptp.rm.jaxb.core.data.CompositeType;
+import org.eclipse.ptp.rm.jaxb.core.data.FillLayoutType;
+import org.eclipse.ptp.rm.jaxb.core.data.FontType;
+import org.eclipse.ptp.rm.jaxb.core.data.FormAttachmentType;
+import org.eclipse.ptp.rm.jaxb.core.data.FormDataType;
+import org.eclipse.ptp.rm.jaxb.core.data.FormLayoutType;
+import org.eclipse.ptp.rm.jaxb.core.data.GridDataType;
+import org.eclipse.ptp.rm.jaxb.core.data.GridLayoutType;
+import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
+import org.eclipse.ptp.rm.jaxb.core.data.LayoutType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.RowDataType;
+import org.eclipse.ptp.rm.jaxb.core.data.RowLayoutType;
+import org.eclipse.ptp.rm.jaxb.core.data.TabFolderType;
+import org.eclipse.ptp.rm.jaxb.core.data.TabItemType;
+import org.eclipse.ptp.rm.jaxb.core.data.ViewerItemsType;
+import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -53,6 +53,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * Object responsible for constructing the configurable JAXB Launch
@@ -96,10 +97,10 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		localWidgets.clear();
 		List<Object> top = tab.getController().getTabFolderOrComposite();
 		for (Object o : top) {
-			if (o instanceof CompositeDescriptor) {
-				addComposite((CompositeDescriptor) o, parent);
-			} else if (o instanceof TabFolderDescriptor) {
-				addFolder((TabFolderDescriptor) o, parent);
+			if (o instanceof CompositeType) {
+				addComposite((CompositeType) o, parent);
+			} else if (o instanceof TabFolderType) {
+				addFolder((TabFolderType) o, parent);
 			}
 		}
 	}
@@ -122,7 +123,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * @param parent
 	 *            control to which to add the viewer
 	 */
-	private void addAttributeViewer(AttributeViewer descriptor, Composite parent) {
+	private void addAttributeViewer(AttributeViewerType descriptor, Composite parent) {
 		Layout layout = createLayout(descriptor.getLayout());
 		Object data = createLayoutData(descriptor.getLayoutData());
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
@@ -168,7 +169,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * @return the viewer
 	 */
 	private CheckboxTableViewer addCheckboxTableViewer(Composite parent, Object data, Layout layout, int style,
-			AttributeViewer descriptor) {
+			AttributeViewerType descriptor) {
 		style |= (SWT.CHECK | SWT.FULL_SELECTION);
 		Table t = WidgetBuilderUtils.createTable(parent, style, data);
 		CheckboxTableViewer viewer = new CheckboxTableViewer(t);
@@ -199,7 +200,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * @return the viewer
 	 */
 	private CheckboxTreeViewer addCheckboxTreeViewer(Composite parent, Object data, Layout layout, int style,
-			AttributeViewer descriptor) {
+			AttributeViewerType descriptor) {
 		style |= (SWT.CHECK | SWT.FULL_SELECTION);
 		Tree t = WidgetBuilderUtils.createTree(parent, style, data);
 		CheckboxTreeViewer viewer = new CheckboxTreeViewer(t);
@@ -213,15 +214,15 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * {@link WidgetBuilderUtils#createComposite(Composite, Integer, Layout, Object)}
 	 * ,
 	 * {@link WidgetBuilderUtils#createGroup(Composite, Integer, Layout, Object, String)}
-	 * , {@link #addFolder(TabFolderDescriptor, Composite)},
-	 * {@link #addComposite(CompositeDescriptor, Composite)},
+	 * , {@link #addFolder(TabFolderType, Composite)},
+	 * {@link #addComposite(CompositeType, Composite)},
 	 * {@link #addWidget(Composite, Widget)}, or
 	 * {@link #addAttributeViewer(AttributeViewer, Composite)}.
 	 * 
 	 * @see org.eclipse.swt.widgets.Composite
 	 * @see org.eclipse.swt.widgets.Group
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.CompositeDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabFolderType
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.CompositeType
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.Widget
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer
 	 * 
@@ -232,7 +233,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 *            control to which to add the composite
 	 * @return the SWT Composite
 	 */
-	private Composite addComposite(CompositeDescriptor descriptor, Composite parent) {
+	private Composite addComposite(CompositeType descriptor, Composite parent) {
 		Layout layout = createLayout(descriptor.getLayout());
 		Object data = createLayoutData(descriptor.getLayoutData());
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
@@ -244,21 +245,21 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		}
 		List<Object> widget = descriptor.getTabFolderOrCompositeOrWidget();
 		for (Object o : widget) {
-			if (o instanceof TabFolderDescriptor) {
-				addFolder((TabFolderDescriptor) o, composite);
-			} else if (o instanceof CompositeDescriptor) {
-				addComposite((CompositeDescriptor) o, composite);
-			} else if (o instanceof Widget) {
-				addWidget(composite, (Widget) o);
-			} else if (o instanceof AttributeViewer) {
-				addAttributeViewer((AttributeViewer) o, composite);
+			if (o instanceof TabFolderType) {
+				addFolder((TabFolderType) o, composite);
+			} else if (o instanceof CompositeType) {
+				addComposite((CompositeType) o, composite);
+			} else if (o instanceof WidgetType) {
+				addWidget(composite, (WidgetType) o);
+			} else if (o instanceof AttributeViewerType) {
+				addAttributeViewer((AttributeViewerType) o, composite);
 			}
 		}
 		String attr = descriptor.getBackground();
 		if (attr != null) {
 			composite.setBackground(WidgetBuilderUtils.getColor(attr));
 		}
-		FontDescriptor fd = descriptor.getFont();
+		FontType fd = descriptor.getFont();
 		if (fd != null) {
 			composite.setFont(WidgetBuilderUtils.getFont(fd));
 		}
@@ -267,11 +268,11 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 
 	/**
 	 * Constructs and configures an SWT TabFolder and its TabItems. Calls
-	 * {@link #addItem(TabFolder, TabItemDescriptor, int)}.
+	 * {@link #addItem(TabFolder, TabItemType, int)}.
 	 * 
 	 * @see org.eclipse.swt.widgets.TabFolder
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabItemDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabFolderType
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabItemType
 	 * 
 	 * @param descriptor
 	 *            JAXB data element describing the folder contents and layout
@@ -279,7 +280,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 *            control to which to add the folder
 	 * @return the SWT TabFolder
 	 */
-	private TabFolder addFolder(TabFolderDescriptor descriptor, Composite parent) {
+	private TabFolder addFolder(TabFolderType descriptor, Composite parent) {
 		TabFolder folder = new TabFolder(parent, WidgetBuilderUtils.getStyle(descriptor.getStyle()));
 		Layout layout = createLayout(descriptor.getLayout());
 		if (layout != null) {
@@ -293,16 +294,16 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		if (tt != null) {
 			folder.setToolTipText(tt);
 		}
-		List<TabItemDescriptor> items = descriptor.getItem();
+		List<TabItemType> items = descriptor.getItem();
 		int index = 0;
-		for (TabItemDescriptor i : items) {
+		for (TabItemType i : items) {
 			addItem(folder, i, index++);
 		}
 		String attr = descriptor.getBackground();
 		if (attr != null) {
 			folder.setBackground(WidgetBuilderUtils.getColor(attr));
 		}
-		FontDescriptor fd = descriptor.getFont();
+		FontType fd = descriptor.getFont();
 		if (fd != null) {
 			folder.setFont(WidgetBuilderUtils.getFont(fd));
 		}
@@ -313,13 +314,13 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * Adds an SWT TabItem to a TabFolder. Calls
 	 * {@link WidgetBuilderUtils#createTabItem(TabFolder, Integer, String, String, Integer)}
 	 * , {@link WidgetBuilderUtils#createComposite(Composite, Integer)},
-	 * {@link #addFolder(TabFolderDescriptor, Composite)},
-	 * {@link #addComposite(CompositeDescriptor, Composite)} or
+	 * {@link #addFolder(TabFolderType, Composite)},
+	 * {@link #addComposite(CompositeType, Composite)} or
 	 * {@link #addWidget(Composite, Widget)}.
 	 * 
 	 * @see org.eclipse.swt.widgets.TabFolder
 	 * @see org.eclipse.swt.widgets.TabItem
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabItemDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabItemType
 	 * 
 	 * @param folder
 	 *            to which to add the item
@@ -328,7 +329,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * @param index
 	 *            of the tab in the folder
 	 */
-	private void addItem(TabFolder folder, TabItemDescriptor descriptor, int index) {
+	private void addItem(TabFolder folder, TabItemType descriptor, int index) {
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
 		TabItem item = WidgetBuilderUtils.createTabItem(folder, style, descriptor.getTitle(), descriptor.getTooltip(), index);
 		Composite control = WidgetBuilderUtils.createComposite(folder, 1);
@@ -341,19 +342,19 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		if (attr != null) {
 			control.setBackground(WidgetBuilderUtils.getColor(attr));
 		}
-		FontDescriptor fd = descriptor.getFont();
+		FontType fd = descriptor.getFont();
 		if (fd != null) {
 			control.setFont(WidgetBuilderUtils.getFont(fd));
 		}
 
 		List<Object> children = descriptor.getCompositeOrTabFolderOrWidget();
 		for (Object o : children) {
-			if (o instanceof TabFolderDescriptor) {
-				addFolder((TabFolderDescriptor) o, control);
-			} else if (o instanceof CompositeDescriptor) {
-				addComposite((CompositeDescriptor) o, control);
-			} else if (o instanceof Widget) {
-				addWidget(control, (Widget) o);
+			if (o instanceof TabFolderType) {
+				addFolder((TabFolderType) o, control);
+			} else if (o instanceof CompositeType) {
+				addComposite((CompositeType) o, control);
+			} else if (o instanceof WidgetType) {
+				addWidget(control, (WidgetType) o);
 			}
 		}
 	}
@@ -379,10 +380,10 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 *            describing the content of the viewer's rows
 	 * @return list of models for the added items
 	 */
-	private Collection<ICellEditorUpdateModel> addRows(ColumnViewer viewer, AttributeViewer descriptor) {
+	private Collection<ICellEditorUpdateModel> addRows(ColumnViewer viewer, AttributeViewerType descriptor) {
 		RMVariableMap rmMap = RMVariableMap.getActiveInstance();
-		ViewerItems items = descriptor.getItems();
-		List<ColumnData> columnData = descriptor.getColumnData();
+		ViewerItemsType items = descriptor.getItems();
+		List<ColumnDataType> columnData = descriptor.getColumnData();
 		ICellEditorUpdateModel model = null;
 		Map<String, ICellEditorUpdateModel> hash = new TreeMap<String, ICellEditorUpdateModel>();
 		Map<String, Object> vars = null;
@@ -446,7 +447,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 *            JAXB data element describing type, style and layout data of
 	 *            widget
 	 */
-	private void addWidget(Composite control, Widget widget) {
+	private void addWidget(Composite control, WidgetType widget) {
 		IUpdateModel model = UpdateModelFactory.createModel(control, widget, tab);
 		/*
 		 * Label models are not returned, since they cannot be updated
@@ -468,35 +469,35 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * .
 	 * 
 	 * @see org.eclipse.swt.widgets.Layout
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.LayoutDescriptor
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.FillLayoutDescriptor
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.RowLayoutDescriptor
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.GridLayoutDescriptor
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.FormLayoutDescriptor
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.LayoutType
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.FillLayoutType
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.RowLayoutType
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.GridLayoutType
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.FormLayoutType
 	 * 
 	 * @param layout
 	 *            JAXB data element describing the layout
 	 * @return the created SWT layout
 	 */
-	private Layout createLayout(LayoutDescriptor layout) {
+	private Layout createLayout(LayoutType layout) {
 		if (layout != null) {
 			if (layout.getFillLayout() != null) {
-				FillLayoutDescriptor fillLayout = layout.getFillLayout();
+				FillLayoutType fillLayout = layout.getFillLayout();
 				return WidgetBuilderUtils.createFillLayout(fillLayout.getType(), fillLayout.getMarginHeight(),
 						fillLayout.getMarginWidth(), fillLayout.getSpacing());
 			} else if (layout.getRowLayout() != null) {
-				RowLayoutDescriptor rowLayout = layout.getRowLayout();
+				RowLayoutType rowLayout = layout.getRowLayout();
 				return WidgetBuilderUtils.createRowLayout(rowLayout.isCenter(), rowLayout.isFill(), rowLayout.isJustify(),
 						rowLayout.isPack(), rowLayout.getMarginHeight(), rowLayout.getMarginWidth(), rowLayout.getMarginTop(),
 						rowLayout.getMarginBottom(), rowLayout.getMarginLeft(), rowLayout.getMarginRight(), rowLayout.getSpacing());
 			} else if (layout.getGridLayout() != null) {
-				GridLayoutDescriptor gridLayout = layout.getGridLayout();
+				GridLayoutType gridLayout = layout.getGridLayout();
 				return WidgetBuilderUtils.createGridLayout(gridLayout.getNumColumns(), gridLayout.isMakeColumnsEqualWidth(),
 						gridLayout.getHorizontalSpacing(), gridLayout.getVerticalSpacing(), gridLayout.getMarginWidth(),
 						gridLayout.getMarginHeight(), gridLayout.getMarginLeft(), gridLayout.getMarginRight(),
 						gridLayout.getMarginTop(), gridLayout.getMarginBottom());
 			} else if (layout.getFormLayout() != null) {
-				FormLayoutDescriptor formLayout = layout.getFormLayout();
+				FormLayoutType formLayout = layout.getFormLayout();
 				return WidgetBuilderUtils.createFormLayout(formLayout.getMarginHeight(), formLayout.getMarginWidth(),
 						formLayout.getMarginTop(), formLayout.getMarginBottom(), formLayout.getMarginLeft(),
 						formLayout.getMarginRight(), formLayout.getSpacing());
@@ -519,13 +520,13 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 *            JAXB data element describing the layout data object
 	 * @return the data object
 	 */
-	static Object createLayoutData(LayoutDataDescriptor layoutData) {
+	static Object createLayoutData(LayoutDataType layoutData) {
 		if (layoutData != null) {
 			if (layoutData.getRowData() != null) {
-				RowDataDescriptor rowData = layoutData.getRowData();
+				RowDataType rowData = layoutData.getRowData();
 				return WidgetBuilderUtils.createRowData(rowData.getHeight(), rowData.getWidth(), rowData.isExclude());
 			} else if (layoutData.getGridData() != null) {
-				GridDataDescriptor gridData = layoutData.getGridData();
+				GridDataType gridData = layoutData.getGridData();
 				int style = WidgetBuilderUtils.getStyle(gridData.getStyle());
 				int hAlign = WidgetBuilderUtils.getStyle(gridData.getHorizontalAlign());
 				int vAlign = WidgetBuilderUtils.getStyle(gridData.getVerticalAlign());
@@ -535,12 +536,12 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 						gridData.getVerticalIndent());
 
 			} else if (layoutData.getFormData() != null) {
-				FormDataDescriptor formData = layoutData.getFormData();
+				FormDataType formData = layoutData.getFormData();
 				FormAttachment top = null;
 				FormAttachment bottom = null;
 				FormAttachment left = null;
 				FormAttachment right = null;
-				FormAttachmentDescriptor fad = formData.getTop();
+				FormAttachmentType fad = formData.getTop();
 				if (fad != null) {
 					top = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
 							fad.getOffset());
@@ -573,10 +574,10 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 *         widget and update model)
 	 */
 	private static boolean isVisible(Object data) {
-		if (data instanceof Attribute) {
-			return ((Attribute) data).isVisible();
-		} else if (data instanceof Property) {
-			return ((Property) data).isVisible();
+		if (data instanceof AttributeType) {
+			return ((AttributeType) data).isVisible();
+		} else if (data instanceof PropertyType) {
+			return ((PropertyType) data).isVisible();
 		}
 		return false;
 	}

@@ -19,11 +19,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IMatchable;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.Match;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.core.data.Target;
-import org.eclipse.ptp.rm.jaxb.core.data.Test;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.TargetType;
+import org.eclipse.ptp.rm.jaxb.core.data.TestType;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -69,19 +69,19 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	 * @param target
 	 *            JAXB data element
 	 */
-	public TargetImpl(String uuid, Target target) {
+	public TargetImpl(String uuid, TargetType target) {
 		this.uuid = uuid;
 		ref = target.getRef();
 		type = target.getType();
 		matchAll = target.isMatchAll();
 		matches = new ArrayList<MatchImpl>();
-		List<Match> mdata = target.getMatch();
-		for (Match m : mdata) {
+		List<MatchType> mdata = target.getMatch();
+		for (MatchType m : mdata) {
 			matches.add(new MatchImpl(uuid, m, this));
 		}
 		tests = new ArrayList<TestImpl>();
-		List<Test> tdata = target.getTest();
-		for (Test t : tdata) {
+		List<TestType> tdata = target.getTest();
+		for (TestType t : tdata) {
 			tests.add(new TestImpl(uuid, t));
 		}
 		targets = new ArrayList<Object>();
@@ -165,11 +165,11 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 			}
 			if (target == null) {
 				if (PROPERTY.equals(type)) {
-					Property p = new Property();
+					PropertyType p = new PropertyType();
 					target = p;
 					targets.add(target);
 				} else if (ATTRIBUTE.equals(type)) {
-					Attribute ja = new Attribute();
+					AttributeType ja = new AttributeType();
 					target = ja;
 					targets.add(target);
 				} else {
@@ -211,9 +211,9 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 					test.doTest();
 				}
 				if (PROPERTY.equals(type)) {
-					dmap.put(((Property) t).getName(), t);
+					dmap.put(((PropertyType) t).getName(), t);
 				} else if (ATTRIBUTE.equals(type)) {
-					dmap.put(((Attribute) t).getName(), t);
+					dmap.put(((AttributeType) t).getName(), t);
 				}
 			}
 			targets.clear();
@@ -246,7 +246,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	 *            Attribute
 	 * @throws Throwable
 	 */
-	private void merge(Attribute previous, Attribute current) throws Throwable {
+	private void merge(AttributeType previous, AttributeType current) throws Throwable {
 		Object v0 = previous.getValue();
 		Object v1 = current.getValue();
 		if (v0 == null) {
@@ -344,7 +344,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	 *            Property
 	 * @throws Throwable
 	 */
-	private void merge(Property previous, Property current) throws Throwable {
+	private void merge(PropertyType previous, PropertyType current) throws Throwable {
 		Object v0 = previous.getValue();
 		Object v1 = current.getValue();
 		if (v0 == null) {
@@ -392,9 +392,9 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	 * @throws Throwable
 	 */
 	private void mergeAttributes(List<Object> targets) throws Throwable {
-		Map<String, Attribute> hash = new HashMap<String, Attribute>();
+		Map<String, AttributeType> hash = new HashMap<String, AttributeType>();
 		for (Iterator<Object> i = targets.iterator(); i.hasNext();) {
-			Attribute current = (Attribute) i.next();
+			AttributeType current = (AttributeType) i.next();
 			String name = current.getName();
 			if (current.getName() == null) {
 				/*
@@ -403,7 +403,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 				i.remove();
 				continue;
 			}
-			Attribute previous = hash.get(name);
+			AttributeType previous = hash.get(name);
 			if (previous != null) {
 				merge(previous, current);
 				i.remove();
@@ -423,9 +423,9 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	 * @throws Throwable
 	 */
 	private void mergeProperties(List<Object> targets) throws Throwable {
-		Map<String, Property> hash = new HashMap<String, Property>();
+		Map<String, PropertyType> hash = new HashMap<String, PropertyType>();
 		for (Iterator<Object> i = targets.iterator(); i.hasNext();) {
-			Property current = (Property) i.next();
+			PropertyType current = (PropertyType) i.next();
 			String name = current.getName();
 			if (current.getName() == null) {
 				/*
@@ -434,7 +434,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 				i.remove();
 				continue;
 			}
-			Property previous = hash.get(name);
+			PropertyType previous = hash.get(name);
 			if (previous != null) {
 				merge(previous, current);
 				i.remove();

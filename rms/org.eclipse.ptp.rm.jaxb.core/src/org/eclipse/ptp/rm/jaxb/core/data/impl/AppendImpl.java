@@ -11,8 +11,8 @@ package org.eclipse.ptp.rm.jaxb.core.data.impl;
 
 import java.util.List;
 
-import org.eclipse.ptp.rm.jaxb.core.data.Append;
-import org.eclipse.ptp.rm.jaxb.core.data.Entry;
+import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
+import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 
 /**
  * Wrapper implementation.
@@ -23,7 +23,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Entry;
 public class AppendImpl extends AbstractAssign {
 
 	private final String separator;
-	private final List<Entry> entries;
+	private final List<EntryType> entries;
 
 	/**
 	 * @param uuid
@@ -32,7 +32,7 @@ public class AppendImpl extends AbstractAssign {
 	 * @param append
 	 *            JAXB data element
 	 */
-	public AppendImpl(String uuid, Append append) {
+	public AppendImpl(String uuid, AppendType append) {
 		this.uuid = uuid;
 		this.field = append.getField();
 		separator = append.getSeparator();

@@ -25,7 +25,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
-import org.eclipse.ptp.rm.jaxb.core.data.TabController;
+import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
@@ -79,7 +79,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener {
 
-	private final TabController controller;
+	private final TabControllerType controller;
 	private final ValueUpdateHandler updateHandler;
 	private final List<Viewer> viewers;
 	private final Map<Object, IUpdateModel> localWidgets;
@@ -98,8 +98,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	public JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, TabController controller,
-			JAXBControllerLaunchConfigurationTab parentTab) {
+	public JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog,
+			TabControllerType controller, JAXBControllerLaunchConfigurationTab parentTab) {
 		super(parentTab, dialog);
 		this.controller = controller;
 		shared = controller.isSharedEnvironment();
@@ -160,7 +160,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * 
 	 * @return the JAXB data element used to build the control
 	 */
-	public TabController getController() {
+	public TabControllerType getController() {
 		return controller;
 	}
 

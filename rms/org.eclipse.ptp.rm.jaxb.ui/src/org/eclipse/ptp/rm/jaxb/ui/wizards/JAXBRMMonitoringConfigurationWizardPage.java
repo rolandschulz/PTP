@@ -15,7 +15,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.data.Site;
+import org.eclipse.ptp.rm.jaxb.core.data.SiteType;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
@@ -62,7 +62,7 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 	protected Composite doCreateContents(Composite parent) {
 		Composite comp = super.doCreateContents(parent);
 		try {
-			Site site = getBaseConfiguration().getResourceManagerData().getSiteData();
+			SiteType site = getBaseConfiguration().getResourceManagerData().getSiteData();
 			if (site != null && site.getMonitorConnection() != null && getConfiguration().getRemoteServicesId() == null) {
 				/*
 				 * Configuration has not be initialized, so initialize now with
