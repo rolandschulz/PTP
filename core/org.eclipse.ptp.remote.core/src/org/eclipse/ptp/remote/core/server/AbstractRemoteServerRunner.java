@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.ptp.remote.launch.core;
+package org.eclipse.ptp.remote.core.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,7 +44,7 @@ import org.eclipse.ptp.remote.internal.core.DebugUtil;
 import org.osgi.framework.Bundle;
 
 /**
- * @since 4.0
+ * @since 5.0
  */
 public abstract class AbstractRemoteServerRunner extends Job {
 	private static String LAUNCH_COMMAND_VAR = "launch_command"; //$NON-NLS-1$

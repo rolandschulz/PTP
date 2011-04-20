@@ -24,7 +24,7 @@ import org.eclipse.ptp.rdt.server.dstore.internal.core.DebugUtil;
 import org.eclipse.ptp.rdt.server.dstore.messages.Messages;
 import org.eclipse.ptp.rdt.ui.subsystems.StatusMonitor;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner;
+import org.eclipse.ptp.remote.core.server.AbstractRemoteServerRunner;
 import org.eclipse.swt.widgets.Display;
 
 public class DStoreServer extends AbstractRemoteServerRunner {
