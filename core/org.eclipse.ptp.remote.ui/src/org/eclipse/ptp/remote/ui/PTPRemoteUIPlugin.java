@@ -1,6 +1,7 @@
 package org.eclipse.ptp.remote.ui;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,11 +38,6 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static PTPRemoteUIPlugin plugin;
 
-	// Cache of initialized services
-	private IRemoteServices[] fInitializedServices = null;
-	// Remote service lookup result
-	private IRemoteServices fRemoteService = null;
-
 	/**
 	 * @return
 	 */
@@ -52,7 +48,6 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
-
 	/**
 	 * @return
 	 */
@@ -114,34 +109,18 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 		log(new Status(IStatus.ERROR, getDefault().getBundle().getSymbolicName(), IStatus.ERROR, Messages.PTPRemoteUIPlugin_3, e));
 	}
 
+	// Cache of initialized services
+	private IRemoteServices[] fInitializedServices = null;
+
+	// Remote service lookup result
+	private IRemoteServices fRemoteService = null;
+
 	private Map<String, RemoteUIServicesProxy> remoteUIServices = null;
 
 	/**
 	 * The constructor
 	 */
 	public PTPRemoteUIPlugin() {
-	}
-
-	/**
-	 * Helper method to find UI services that correspond to a particular remote
-	 * services implementation
-	 * 
-	 * @param services
-	 * @return remote UI services
-	 */
-	public IRemoteUIServices getRemoteUIServices(IRemoteServices services) {
-		if (remoteUIServices == null) {
-			remoteUIServices = retrieveRemoteUIServices();
-		}
-
-		/*
-		 * Find the UI services corresponding to services.
-		 */
-		RemoteUIServicesProxy proxy = remoteUIServices.get(services.getId());
-		if (proxy != null) {
-			return proxy.getUIServices(services);
-		}
-		return null;
 	}
 
 	/**
@@ -236,6 +215,72 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 		}
 
 		return fRemoteService;
+	}
+
+	/**
+	 * Look up a remote service provider from the supplied URI and ensure it is
+	 * initialized. The method will use the supplied container's progress
+	 * service, or, if null, the platform progress service, in order to allow
+	 * the initialization to be canceled.
+	 * 
+	 * @param uri
+	 *            uri specifying service to locate
+	 * @param context
+	 *            context with progress service, or null to use the platform
+	 *            progress service
+	 * @return initialized remote services or null if the service can't be
+	 *         located or the progress monitor was canceled
+	 * @since 5.0
+	 */
+	public synchronized IRemoteServices getRemoteServices(final URI uri, IRunnableContext context) {
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				SubMonitor progress = SubMonitor.convert(monitor, Messages.PTPRemoteUIPlugin_4, 10);
+				try {
+					fRemoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(uri, progress.newChild(10));
+				} finally {
+					monitor.done();
+				}
+			}
+		};
+		try {
+			fRemoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(uri);
+			if (!fRemoteService.isInitialized()) {
+				if (context != null) {
+					context.run(true, false, runnable);
+				} else {
+					PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
+				}
+			}
+		} catch (InvocationTargetException e) {
+			log(e);
+		} catch (InterruptedException e) {
+			// cancelled
+		}
+
+		return fRemoteService;
+	}
+
+	/**
+	 * Helper method to find UI services that correspond to a particular remote
+	 * services implementation
+	 * 
+	 * @param services
+	 * @return remote UI services
+	 */
+	public IRemoteUIServices getRemoteUIServices(IRemoteServices services) {
+		if (remoteUIServices == null) {
+			remoteUIServices = retrieveRemoteUIServices();
+		}
+
+		/*
+		 * Find the UI services corresponding to services.
+		 */
+		RemoteUIServicesProxy proxy = remoteUIServices.get(services.getId());
+		if (proxy != null) {
+			return proxy.getUIServices(services);
+		}
+		return null;
 	}
 
 	/*
