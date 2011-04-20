@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="RSE ISV Doc Build" default="all" basedir=".">
+<project name="PTP ISV Doc Build" default="all" basedir=".">
 
 	<property name="javadoc.link.location" value="${basedir}/javadoc.link.location"/>
 
@@ -99,18 +99,21 @@
 	<target name="convertSchemaToHtml" if="eclipse.running">
 		<property name="dest" value="reference/extension-points" />
 		<record name="${basedir}/temp.convert.txt" action="start" />
-		<pde.convertSchemaToHTML manifest="../org.eclipse.rse.core/plugin.xml" destination="${dest}" />
-		<pde.convertSchemaToHTML manifest="../org.eclipse.rse.services/plugin.xml" destination="${dest}" />
-		<pde.convertSchemaToHTML manifest="../org.eclipse.rse.subsystems.files.ftp/plugin.xml" destination="${dest}" />
-		<pde.convertSchemaToHTML manifest="../org.eclipse.rse.ui/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.core/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.debug.core/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.debug.ui/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.launch/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.remote.core/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.remote.ui/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.services.core/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.services.ui/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.ui/plugin.xml" destination="${dest}" />
 		<record name="${basedir}/temp.convert.txt" action="stop" />
 	</target>
 
 	<target name="getJavadocPath">
 		<available file="${java.home}/../bin/javadoc.exe" property="javadoc" value="${java.home}/../bin/javadoc.exe" />
 		<available file="${java.home}/../bin/javadoc" property="javadoc" value="${java.home}/../bin/javadoc" />
-		<available file="/usr/bin/javadoc" property="javadoc" value="/usr/bin/javadoc" />
-		<available file="/shared/dsdp/tm/ibm-java2-ppc64-50/bin/javadoc" property="javadoc" value="/shared/dsdp/tm/ibm-java2-ppc64-50/bin/javadoc" />
 	</target>
 
 	<target name="generateJavadoc" depends="getJavadocPath,extractLinks,computeClasspath" if="javadoc">
