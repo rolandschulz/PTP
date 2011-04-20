@@ -63,7 +63,13 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 	/**
 	 * @return The JAXB element tree.
 	 */
-	public ResourceManagerData getResourceManagerData() {
+	public ResourceManagerData getResourceManagerData() throws Throwable {
+		if (rmdata == null) {
+			realizeRMDataFromXML();
+		}
+		if (rmdata == null) {
+			throw new InstantiationError(Messages.FailedToCreateRmData);
+		}
 		return rmdata;
 	}
 
@@ -107,13 +113,7 @@ public class JAXBServiceProvider extends AbstractRemoteResourceManagerConfigurat
 	public void setActive() throws Throwable {
 		map = RMVariableMap.setActiveInstance(map);
 		if (!map.isInitialized()) {
-			if (rmdata == null) {
-				realizeRMDataFromXML();
-			}
-			if (rmdata == null) {
-				throw new InstantiationError(Messages.FailedToCreateRmData);
-			}
-			JAXBInitializationUtils.initializeMap(rmdata, map);
+			JAXBInitializationUtils.initializeMap(getResourceManagerData(), map);
 		}
 	}
 

@@ -33,7 +33,7 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	 * 
 	 * @since 5.0
 	 */
-	ResourceManagerData getResourceManagerData();
+	ResourceManagerData getResourceManagerData() throws Throwable;
 
 	/**
 	 * Unmarshal the XML into the JAXB resource manager data element tree.

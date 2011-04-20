@@ -109,26 +109,12 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 	 *            name of the connection
 	 * @throws URISyntaxException
 	 */
-	public static void setConnectionHints(RemoteConnectionWidget connectionWidget, String connection) throws URISyntaxException {
-		String host = null;
-		String port = null;
-		if (connection != null) {
-			if (connection != null) {
-				URI uri = new URI(connection);
-				host = uri.getHost();
-				int p = uri.getPort();
-				if (p != UNDEFINED) {
-					port = String.valueOf(p);
-				}
-			}
-		}
+	public static void setConnectionHints(RemoteConnectionWidget connectionWidget, IRemoteConnection connection)
+			throws URISyntaxException {
 		Map<String, String> result = new HashMap<String, String>();
-		if (host != null && !ZEROSTR.equals(host)) {
-			result.put(IRemoteUIConnectionManager.CONNECTION_ADDRESS_HINT, host);
-		}
-		if (port != null && !ZEROSTR.equals(port)) {
-			result.put(IRemoteUIConnectionManager.CONNECTION_PORT_HINT, port);
-		}
+		result.put(IRemoteUIConnectionManager.CONNECTION_ADDRESS_HINT, connection.getAddress());
+		result.put(IRemoteUIConnectionManager.LOGIN_USERNAME_HINT, connection.getUsername());
+		result.put(IRemoteUIConnectionManager.CONNECTION_PORT_HINT, String.valueOf(connection.getPort()));
 		String[] hints = new String[result.size()];
 		String[] defaults = new String[hints.length];
 		int i = 0;
