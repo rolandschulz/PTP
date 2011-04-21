@@ -176,10 +176,6 @@ public interface IJAXBNonNLSConstants {
 	String SHUTDOWN = "OnShutDown";//$NON-NLS-1$
 	String DISCATTR = "DiscoverAttributes";//$NON-NLS-1$
 	String JOBSTATUS = "GetJobStatus";//$NON-NLS-1$
-	String SUBMIT_INTERACTIVE = "submit-interactive";//$NON-NLS-1$
-	String SUBMIT_BATCH = "submit-batch";//$NON-NLS-1$
-	String SUBMIT_DEBUG_INTERACTIVE = "submit-debug-interactive";//$NON-NLS-1$
-	String SUBMIT_DEBUG_BATCH = "submit-debug-batch";//$NON-NLS-1$
 	String VALIDATE = "ValidateJob";//$NON-NLS-1$
 
 	String JOB_ATTRIBUTE = "jobAttribute";//$NON-NLS-1$

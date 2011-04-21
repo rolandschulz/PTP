@@ -41,7 +41,6 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	private final String uuid;
 	private final IVariableMap map;
 	private final Map<String, String> launchEnv;
-	private final boolean appendEnv;
 	private ScriptType script;
 	private String scriptValue;
 
@@ -55,16 +54,12 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	 * @param launchEnv
 	 *            any special application environment variables set by the user
 	 *            in the Launch Tab
-	 * @param appendEnv
-	 *            whether the launchEnv should be appended to or replace the
-	 *            process environment
 	 */
-	public ScriptHandler(String uuid, ScriptType script, IVariableMap map, Map<String, String> launchEnv, boolean appendEnv) {
+	public ScriptHandler(String uuid, ScriptType script, IVariableMap map, Map<String, String> launchEnv) {
 		super(Messages.ScriptHandlerJob);
 		this.uuid = uuid;
 		this.script = script;
 		this.launchEnv = launchEnv;
-		this.appendEnv = appendEnv;
 		this.map = map;
 		if (map instanceof LCVariableMap) {
 			convertScript();
@@ -115,20 +110,16 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		if (len == 0) {
 			return ZEROSTR;
 		}
-		int envBegin = script.getEnvBegin();
-		int envEnd = script.getEnvEnd();
-		if (envBegin == UNDEFINED) {
-			envBegin = 1;
-		}
-		if (envEnd == UNDEFINED) {
-			envEnd = 1;
+		int envAfter = script.getInsertEnvironmentAfter();
+		if (envAfter == UNDEFINED) {
+			envAfter = 1;
 		}
 		SubMonitor progress = SubMonitor.convert(monitor, len);
 		StringBuffer buffer = new StringBuffer();
 		String s = null;
 		int i = 0;
 		String firstLine = new LineImpl(uuid, line.get(0), map).getResolved();
-		for (; i < envBegin; i++) {
+		for (; i <= envAfter; i++) {
 			s = new LineImpl(uuid, line.get(i), map).getResolved();
 			if (!ZEROSTR.equals(s)) {
 				buffer.append(s).append(REMOTE_LINE_SEP);
@@ -136,19 +127,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			progress.worked(1);
 		}
 
-		if (launchEnv != null && !appendEnv) {
-			for (String var : launchEnv.keySet()) {
-				EnvironmentVariableUtils.addVariable(var, launchEnv.get(var), firstLine, buffer);
-			}
-		}
-		for (; i < envEnd; i++) {
-			s = new LineImpl(uuid, line.get(i), map).getResolved();
-			if (!ZEROSTR.equals(s)) {
-				buffer.append(s).append(REMOTE_LINE_SEP);
-			}
-			progress.worked(1);
-		}
-		if (launchEnv != null && appendEnv) {
+		if (launchEnv != null) {
 			for (String var : launchEnv.keySet()) {
 				EnvironmentVariableUtils.addVariable(var, launchEnv.get(var), firstLine, buffer);
 			}
@@ -171,8 +150,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 	 */
 	private void convertScript() {
 		ScriptType ltScript = new ScriptType();
-		ltScript.setEnvBegin(script.getEnvBegin());
-		ltScript.setEnvEnd(script.getEnvEnd());
+		ltScript.setInsertEnvironmentAfter(script.getInsertEnvironmentAfter());
 		List<LineType> lines = ltScript.getLine();
 		List<ArgType> args = null;
 		for (LineType line : script.getLine()) {

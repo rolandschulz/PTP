@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBElement;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -595,38 +593,27 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws CoreException
 	 */
 	private CommandJob doJobSubmitCommand(String uuid, String mode) throws CoreException {
-		List<JAXBElement<CommandType>> commands = controlData.getSubmitInteractiveOrSubmitBatchOrSubmitDebugInteractive();
-		if (commands.isEmpty()) {
-			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError, null);
-		}
-
 		CommandType command = null;
 		boolean batch = false;
-		for (JAXBElement<CommandType> job : commands) {
-			command = job.getValue();
-			if (command == null) {
-				throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + mode, null);
-			}
 
-			if (command.getName().equals(SUBMIT_INTERACTIVE)) {
-				if (ILaunchManager.RUN_MODE.equals(mode)) {
-					break;
-				}
-			} else if (command.getName().equals(SUBMIT_BATCH)) {
-				if (ILaunchManager.RUN_MODE.equals(mode)) {
-					batch = true;
-					break;
-				}
-			} else if (command.getName().equals(SUBMIT_DEBUG_INTERACTIVE)) {
-				if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-					break;
-				}
-			} else if (command.getName().equals(SUBMIT_DEBUG_BATCH)) {
-				if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-					batch = true;
-					break;
-				}
+		if (ILaunchManager.RUN_MODE.equals(mode)) {
+			command = controlData.getSubmitBatch();
+			if (command != null) {
+				batch = true;
+			} else {
+				command = controlData.getSubmitInteractive();
 			}
+		} else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
+			command = controlData.getSubmitBatchDebug();
+			if (command != null) {
+				batch = true;
+			} else {
+				command = controlData.getSubmitInteractiveDebug();
+			}
+		}
+
+		if (command == null) {
+			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + SP + uuid + SP + mode, null);
 		}
 
 		return runCommand(uuid, command, batch, false);
@@ -739,7 +726,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (script == null) {
 			return;
 		}
-		ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv, appendLaunchEnv);
+		ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv);
 		job.schedule();
 		try {
 			job.join();

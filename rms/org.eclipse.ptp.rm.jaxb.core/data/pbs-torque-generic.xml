@@ -241,7 +241,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 		<attribute name="Variable_List" type="string">
 			<description>This is the list of environment variables passed with the Queue Job batch request.</description>
 		</attribute>
-		<script envBegin="36">
+		<script insertEnvironmentAfter="35">
 			<line>
 				<arg>#!/bin/bash</arg>
 			</line>

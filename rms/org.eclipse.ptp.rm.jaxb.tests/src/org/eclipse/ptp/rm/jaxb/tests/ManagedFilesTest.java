@@ -36,7 +36,6 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	private static ControlType controlData;
 	private static Map<String, Object> env;
 	private static Map<String, String> live;
-	private static boolean appendEnv;
 	private static boolean verbose = false;
 
 	private RemoteServicesDelegate delegate;
@@ -50,7 +49,6 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 			RMVariableMap map = RMVariableMap.setActiveInstance(null);
 			JAXBInitializationUtils.initializeMap(rmdata, map);
 			env = map.getVariables();
-			appendEnv = true;
 			live = new HashMap<String, String>();
 			live.put("FOO_VAR_1", "FOO_VALUE_1"); //$NON-NLS-1$ //$NON-NLS-2$
 			live.put("FOO_VAR_2", "FOO_VALUE_2"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -98,7 +96,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	private void composeScript() {
 		ScriptType script = controlData.getScript();
 		assertNotNull(script);
-		ScriptHandler job = new ScriptHandler(null, script, RMVariableMap.getActiveInstance(), live, appendEnv);
+		ScriptHandler job = new ScriptHandler(null, script, RMVariableMap.getActiveInstance(), live);
 		job.schedule();
 		try {
 			job.join();
