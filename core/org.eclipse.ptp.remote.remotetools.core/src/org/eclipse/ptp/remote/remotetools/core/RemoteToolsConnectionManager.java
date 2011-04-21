@@ -20,6 +20,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElementStatus;
@@ -138,8 +139,16 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnection
 	 * (org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
-	public void removeConnection(IRemoteConnection conn) {
+	public void removeConnection(IRemoteConnection conn) throws RemoteConnectionException {
+		if (!(conn instanceof RemoteToolsConnection)) {
+			throw new RemoteConnectionException(Messages.RemoteToolsConnectionManager_invalidConnectionType);
+
+		}
+		if (conn.isOpen()) {
+			throw new RemoteConnectionException(Messages.RemoteToolsConnectionManager_cannotRemoveOpenConnection);
+		}
 		fConnections.remove(conn);
+		((RemoteToolsConnection) conn).dispose();
 	}
 
 	/**

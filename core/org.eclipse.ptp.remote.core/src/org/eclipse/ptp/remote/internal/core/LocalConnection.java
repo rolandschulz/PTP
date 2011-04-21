@@ -34,7 +34,6 @@ public class LocalConnection implements IRemoteConnection {
 
 	private final IRemoteConnection fConnection = this;
 	private final IRemoteServices fRemoteServices;
-
 	private final ListenerList fListeners = new ListenerList();
 
 	public LocalConnection(IRemoteServices services) {
@@ -242,6 +241,16 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
 		fListeners.remove(listener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnection#removePortForwarding(int)
+	 */
+	public void removePortForwarding(int port) throws RemoteConnectionException {
+		// Do nothing
 	}
 
 	/*

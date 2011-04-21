@@ -235,6 +235,16 @@ public interface IRemoteConnection {
 	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener);
 
 	/**
+	 * Remove the port forwarding associated with the given port.
+	 * 
+	 * @param port
+	 *            forwarded port
+	 * @throws RemoteConnectionException
+	 * @since 5.0
+	 */
+	public void removePortForwarding(int port) throws RemoteConnectionException;
+
+	/**
 	 * Set the address for this connection
 	 * 
 	 * @param address

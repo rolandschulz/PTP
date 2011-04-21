@@ -32,6 +32,10 @@ public class Messages extends NLS
 	public static String RemoteToolsConnection_close;
 	public static String RemoteToolsConnectionManager_1;
 	public static String RemoteToolsConnectionManager_2;
+
+	public static String RemoteToolsConnectionManager_cannotRemoveOpenConnection;
+
+	public static String RemoteToolsConnectionManager_invalidConnectionType;
 	public static String RemoteToolsFileStore_0;
 	public static String RemoteToolsFileStore_1;
 	public static String RemoteToolsFileStore_2;
