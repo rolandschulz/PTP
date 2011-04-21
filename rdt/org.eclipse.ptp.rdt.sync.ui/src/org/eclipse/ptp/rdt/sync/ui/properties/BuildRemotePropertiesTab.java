@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.cdt.core.settings.model.ICResourceDescription;
+import org.eclipse.cdt.managedbuilder.core.IMultiConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractCBuildPropertyTab;
 import org.eclipse.jface.preference.PreferencePage;
@@ -178,11 +179,15 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 		
 		this.setValues();
 	}
-	
+
 	/**
 	 * Store remote location information for the selected build configuration
 	 */
 	public void performOK() {
+		// For now, do nothing for multi-configurations
+		if (getCfg() instanceof IMultiConfiguration) {
+			return;
+		}
 		// Change build path and save new configuration
 		String buildPath = fRootLocationText.getText();
 		if (buildPath.endsWith("/")) { //$NON-NLS-1$
@@ -291,6 +296,14 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 	}
 	
 	private void setValues() {
+		// Disable for multi-configurations. Note that we set usercomp to invisible, not the tab, because we want to reappear when
+		// the configuration changes back to a single configuration. 
+		if (getCfg() instanceof IMultiConfiguration) {
+			usercomp.setVisible(false);
+			return;
+		} else {
+			usercomp.setVisible(true);
+		}
 		populateRemoteProviderCombo(fProviderCombo);
 		BuildScenario buildScenario = BuildConfigurationManager.getBuildScenarioForBuildConfiguration(getCfg());
 		
