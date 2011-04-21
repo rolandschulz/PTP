@@ -159,12 +159,7 @@ public class TargetControl extends SSHTargetControl implements ITargetControl {
 	 * org.eclipse.ptp.remotetools.environment.control.ITargetControl#destroy()
 	 */
 	public void destroy() throws CoreException {
-		// End all jobs, if possible, then disconnect
-		try {
-			terminateJobs(null);
-		} finally {
-			disconnect();
-		}
+		disconnect();
 	}
 
 	/*
@@ -192,18 +187,16 @@ public class TargetControl extends SSHTargetControl implements ITargetControl {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remotetools.environment.control.SSHTargetControl#kill
-	 * (org.eclipse.core.runtime.IProgressMonitor)
+	 * org.eclipse.ptp.remotetools.environment.control.SSHTargetControl#kill()
 	 */
 	@Override
-	public boolean kill(IProgressMonitor monitor) throws CoreException {
+	public void kill() throws CoreException {
 		try {
 			setState(DISCONNECTING);
-			super.kill(monitor);
+			super.kill();
 		} finally {
 			setState(NOT_OPERATIONAL);
 		}
-		return true;
 	}
 
 	/*

@@ -483,8 +483,9 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 		final Display display = viewer.getControl().getDisplay();
 		display.asyncExec(new Runnable() {
 			public void run() {
-				if (!viewer.getControl().isDisposed())
+				if (!viewer.getControl().isDisposed()) {
 					viewer.refresh(true);
+				}
 			}
 		});
 	}
@@ -549,8 +550,9 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 								try {
 									element = (ITargetElement) obj;
 									control = element.getControl();
-									if (control.create(monitor))
+									if (control.create(monitor)) {
 										status = Status.OK_STATUS;
+									}
 								} catch (CoreException e) {
 									status = e.getStatus();
 									startAction.setEnabled(true);
@@ -588,8 +590,8 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 								IStatus status = null;
 
 								try {
-									if (((ITargetElement) obj).getControl().kill(monitor))
-										status = Status.OK_STATUS;
+									((ITargetElement) obj).getControl().kill();
+									status = Status.OK_STATUS;
 								} catch (CoreException e) {
 									status = e.getStatus();
 									stopAction.setEnabled(true);
@@ -775,8 +777,9 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 				if (TargetTypeElement.class.isAssignableFrom(obj.getClass())) {
 					if (viewer.getExpandedState(obj)) {
 						viewer.setExpandedState(obj, false);
-					} else
+					} else {
 						viewer.setExpandedState(obj, true);
+					}
 
 				}
 

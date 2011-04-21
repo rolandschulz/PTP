@@ -17,7 +17,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -79,18 +78,12 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#close()
 	 */
 	public synchronized void close() {
-		IProgressMonitor monitor = new NullProgressMonitor();
-
-		monitor.beginTask(Messages.RemoteToolsConnection_close, 1);
-
 		if (isOpen()) {
 			try {
-				fTargetControl.kill(monitor);
+				fTargetControl.kill();
 			} catch (CoreException e) {
 			}
 		}
-
-		monitor.done();
 	}
 
 	/**

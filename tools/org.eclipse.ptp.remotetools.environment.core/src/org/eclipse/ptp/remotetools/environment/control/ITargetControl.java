@@ -29,11 +29,6 @@ public interface ITargetControl {
 	}
 
 	/**
-	 * Add a new job listener.
-	 */
-	public void addJobListener(ITargetControlJobListener listener);
-
-	/**
 	 * Called to create an instance of the target.
 	 * 
 	 * @param monitor
@@ -83,27 +78,12 @@ public interface ITargetControl {
 	public IRemoteExecutionManager getExecutionManager();
 
 	/**
-	 * Returns how many jobs are being managed by the control.
-	 */
-	public int getJobCount();
-
-	/**
-	 * Returns an array of all jobs running remotely. All jobs are returned,
-	 * regardless if WAITING or RUNNING. Finished jobs are automatically removed
-	 * from the list.
-	 * 
-	 * @return The array of remote jobs.
-	 */
-	public ITargetJob[] getJobs();
-
-	/**
 	 * Called to halt the instance of the target.
 	 * 
-	 * @param monitor
-	 * @return
 	 * @throws CoreException
+	 * @since 2.0
 	 */
-	public boolean kill(IProgressMonitor monitor) throws CoreException;
+	public void kill() throws CoreException;
 
 	/**
 	 * Query the status of the target connection
@@ -113,23 +93,17 @@ public interface ITargetControl {
 	public int query();
 
 	/**
-	 * Remove a job listener.
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
 	 */
-	public void removeJobListener(ITargetControlJobListener listener);
-
 	public boolean resume(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Adds a new job to the set of running jobs on the environment. The job
-	 * will begin execution as soon as possible after being added.
-	 * 
-	 * @param job
-	 *            The job to be added and executed.
-	 * @return The job encapsulated as a IRemoteControlledJob
+	 * @param monitor
+	 * @return
 	 * @throws CoreException
 	 */
-	public void startJob(ITargetJob job) throws CoreException;
-
 	public boolean stop(IProgressMonitor monitor) throws CoreException;
 
 	/**
