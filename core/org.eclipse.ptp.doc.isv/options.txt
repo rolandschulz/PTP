@@ -1,7 +1,7 @@
 -verbose
 -encoding "iso-8859-1"
 -charset "iso-8859-1"
--source 1.4
+-source 1.5
 -sourcepath "../org.eclipse.ptp.core/src
 ;../org.eclipse.ptp.debug.core/src
 ;../org.eclipse.ptp.debug.core/pdi
