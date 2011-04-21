@@ -318,6 +318,41 @@ public class SymbolTable<N, S>
         else
             return parent.outermostScope();
     }
+    
+    /**
+     * Returns the symbol table corresponding to the given named scope.
+     * 
+     * @return the symbol table associated with the named scope <code>scopeName</code>, or
+     *         <code>null</code> iff no such named scope exists
+     * 
+     * @since 3.0
+     */
+    public SymbolTable<N, S> getNamedScope(String scopeName)
+    {
+        if (namedScopes != null)
+            return namedScopes.get(scopeName);
+        else
+            return null;
+    }
+
+    /**
+     * Returns the nested symbol table found by traversing successively deeper named scopes, using
+     * the given sequence of scope names.
+     * 
+     * @return the symbol table corresponding to
+     *         <code>getNamedScope(scopeNames[0]).getNamedScope(scopeNames[1]).getNamedScope(scopeNames[2])</code>
+     *         ..., or <code>null</code> iff no such named scope exists
+     * 
+     * @since 3.0
+     */
+    public SymbolTable<N, S> getNestedNamedScope(String... scopeNames)
+    {
+        SymbolTable<N, S> result = this;
+        for (String scopeName : scopeNames)
+           if (!scopeName.trim().equals("") && result != null) //$NON-NLS-1$
+               result = result.getNamedScope(scopeName);
+        return result;
+    }
 
     @Override public String toString()
     {
