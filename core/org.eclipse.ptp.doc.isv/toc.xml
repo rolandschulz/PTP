@@ -5,10 +5,10 @@
 <!-- ============================================================================= -->
 
 <toc label="PTP Developers Guide">
-	<topic label="Guide" href="guide/guide.html">
+	<!--topic label="Programmer&apos;s Guide" href="guide/guide.html">
 		<link toc="guide.xml" />
 		<anchor id="guide_additions"/>
-	</topic>
+	</topic-->
 	<topic label="Reference" href="api.html">
 		<link toc="reference.xml" />
 		<anchor id="reference_additions"/>
