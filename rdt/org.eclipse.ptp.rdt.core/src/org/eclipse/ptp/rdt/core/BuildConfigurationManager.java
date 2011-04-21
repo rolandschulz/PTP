@@ -54,7 +54,12 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 
 /**
- * Static class to map CDT build configurations (IConfigurations) to service configurations 
+ * Main static class to map CDT build configurations (IConfigurations) to service configurations. For building or sync'ing, this
+ * class keeps track of the appropriate service configuration to use. The mapping is actually a three-way map, from build
+ * configuration to build scenario to service configuration. The creation and storage of service configurations is mostly transparent
+ * to the user. The user only needs to specify the build scenario for the build configuration. On project initialization, though,
+ * a default service configuration must be given.
+ *
  * @since 3.1
  */
 public class BuildConfigurationManager {
@@ -85,7 +90,7 @@ public class BuildConfigurationManager {
 	private static final Map<BuildScenario, IServiceConfiguration> fBuildScenarioToSConfigMap =
 																			new HashMap<BuildScenario, IServiceConfiguration>();
 
-	// TODO: Figure out if this is the best way to do initialization and figure out best way to handle exceptions.
+	// TODO: Decide if this is the best way to do initialization and decide best way to handle exceptions.
 	static {
 		try {
 			loadConfigurationData();
@@ -113,7 +118,8 @@ public class BuildConfigurationManager {
 	}
 	
 	/**
-	 * Delete a build scenario, also handling removal of unneeded service configurations
+	 * Delete a build scenario and also handle removal of unneeded service configurations
+	 *
 	 * @param project
 	 * @param buildScenario
 	 */
@@ -148,7 +154,7 @@ public class BuildConfigurationManager {
 	/**
 	 * Associate the given configuration with the given build scenario. It is very important that we update configurations first,
 	 * so that children of the changed configuration will be properly set to use the prior build scenario. This is not possible,
-	 * though, until the project has been initialized (root configurations have been inserted).
+	 * though, until the project has been initialized.
 	 *
 	 * @param buildScenario
 	 * @param bconf
@@ -222,6 +228,7 @@ public class BuildConfigurationManager {
 		return fProjectToTemplateConfiguration.get(project);
 	}
 	
+	// Does the low-level work of changing a service configuration for a new build scenario.
 	private static synchronized void modifyServiceConfigurationForBuildScenario(IServiceConfiguration sConfig, BuildScenario bs) {
 		for (IService service : sConfig.getServices()) {
 			ServiceProvider provider = (ServiceProvider) sConfig.getServiceProvider(service);
@@ -235,6 +242,8 @@ public class BuildConfigurationManager {
 			}
 		}
 	}
+
+	// Does the low-level work of creating a copy of a service configuration
 	private static synchronized IServiceConfiguration copyTemplateServiceConfiguration(IProject project) {
 		IServiceConfiguration newConfig = ServiceModelManager.getInstance().newServiceConfiguration(""); //$NON-NLS-1$
 		IServiceConfiguration oldConfig = fProjectToTemplateConfiguration.get(project);
@@ -336,7 +345,7 @@ public class BuildConfigurationManager {
 		}
 	}
 
-	/*
+	/**
 	 * Indicate if the project has yet been initialized.
 	 * 
 	 * @return whether or not the project has been initialized
@@ -503,13 +512,8 @@ public class BuildConfigurationManager {
 	 * project names and map projects to templates. The import parameter has been removed. (We do not care about the id numbers,
 	 * since these configurations are for our own internal purposes.) Also, the memento name is now a parameter. Other minor
 	 * modifications made to satisfy the compiler.
-	 * 
-	 * If the configurations are being imported then a new ID is generated for
-	 * each configuration. This is to avoid the import causing duplicate
-	 * configuration IDs.
-	 * 
+	 *
 	 * @param rootMemento
-	 * @return
 	 */
 	private static synchronized void doLoadConfigurations(IMemento rootMemento, String mementoChildName) {
 		ServiceModelManager smm = ServiceModelManager.getInstance();

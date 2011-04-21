@@ -278,6 +278,9 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 		button.setEnabled(connectionManager != null);
 	}
 
+	/**
+	 * Just call "performOK". Parameters are ignored.
+	 */
 	@Override
 	public void performApply(ICResourceDescription src, ICResourceDescription dst) {
 		performOK();
@@ -289,12 +292,19 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 		
 	}
 
+	/**
+	 * Main functionality inside "setValues". Parameter is ignored.
+	 */
 	@Override
 	public void updateData(ICResourceDescription cfg) {
 		this.setValues();
 		parentComposite.update();
 	}
 	
+	/**
+	 * Main function for updating values as needed. It is important that this fill in the proper current values, or else
+	 * configuration information will be overwritten when user hits "Apply" or "OK".
+	 */
 	private void setValues() {
 		// Disable for multi-configurations. Note that we set usercomp to invisible, not the tab, because we want to reappear when
 		// the configuration changes back to a single configuration. 

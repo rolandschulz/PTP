@@ -14,11 +14,10 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.XMLMemento;
 
 /**
  * Class for build information that will be mapped to a specific service configuration. Utility methods for reading and writing
- * the information to an IConfiguration (a .cproject file) are also provided.
+ * the information to a memento are provided.
  * @since 3.1
  */
 public class BuildScenario {
@@ -77,7 +76,7 @@ public class BuildScenario {
 	 *
 	 * @param memento
 	 * @return a new build scenario or null if one of the values is not found or if something goes wrong while trying to find the
-	 * appropriate IRemoteConnection using the remote services id and remote connection id stored in the memento.
+	 * specified IRemoteConnection.
 	 */
 	public static BuildScenario loadScenario(IMemento memento) {
 		String sp = memento.getString(ATTR_SYNC_PROVIDER);
