@@ -36,8 +36,8 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.rm.pbs-feature,org.eclipse.ptp.rm.pbs-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.rm.slurm-feature,org.eclipse.ptp.rm.slurm-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.sci-feature,org.eclipse.ptp.sci-feature"/>
-<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.sdk-feature,org.eclipse.ptp.sdk-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.sdm-feature,org.eclipse.ptp.sdm-feature"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.sdk-feature,org.eclipse.ptp.sdk-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.services-feature,org.eclipse.ptp.services-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/releng/org.eclipse.ptp.utils-feature,org.eclipse.ptp.utils-feature"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.remote.core,org.eclipse.ptp.remote.core"/>
