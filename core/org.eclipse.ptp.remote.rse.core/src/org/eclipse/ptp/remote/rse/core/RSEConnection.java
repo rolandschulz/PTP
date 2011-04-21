@@ -54,7 +54,6 @@ public class RSEConnection implements IRemoteConnection {
 	private final IHost fRseHost;
 	private final IRemoteConnection fConnection = this;
 	private final IRemoteServices fRemoteServices;
-
 	private final ListenerList fListeners = new ListenerList();
 
 	private final ICommunicationsListener commsListener = new ICommunicationsListener() {
@@ -365,6 +364,16 @@ public class RSEConnection implements IRemoteConnection {
 	 */
 	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
 		fListeners.remove(listener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnection#removePortForwarding(int)
+	 */
+	public void removePortForwarding(int port) throws RemoteConnectionException {
+		// Do nothing
 	}
 
 	/*

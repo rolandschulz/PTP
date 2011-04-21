@@ -49,7 +49,9 @@ public interface IRemoteConnectionManager {
 	 * 
 	 * @param name
 	 *            name of the connection
-	 * @return a new connection or null if the creation failed for some reason
+	 * @return a new connection with the supplied name
+	 * @throws RemoteConnectionException
+	 *             if connection creation failed
 	 * @since 5.0
 	 */
 	public IRemoteConnection newConnection(String name) throws RemoteConnectionException;
@@ -59,6 +61,8 @@ public interface IRemoteConnectionManager {
 	 * 
 	 * @param connection
 	 *            connection to remove
+	 * @throws RemoteConnectionException
+	 *             if the connection could not be removed
 	 */
-	public void removeConnection(IRemoteConnection connection);
+	public void removeConnection(IRemoteConnection connection) throws RemoteConnectionException;
 }
