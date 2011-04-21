@@ -29,7 +29,7 @@
 	<xs:complexType name="site-type">
 		<xs:annotation>
 			<xs:documentation>
-				An optional place to set default remote site information.
+				An optional place to set default remote site information. The connections strings are URIs.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -40,9 +40,12 @@
 	<xs:complexType name="control-type">
 		<xs:annotation>
 			<xs:documentation>
-				The implementation will construct a variable map serving as the resource manager "environment"; these are dereferenced in the
-				configuration file via ${rm:name} or ${rm:name#getterName}; in addition to the properties specified at the top level of the control
-				tree, all attributes and parsers will be mapped for reference. The following hard-coded variables are added at runtime:
+				The top-level control elements define the properties and attributes, files to be staged, job script to be generated, commands
+				specific to the resource manager, and the layout of the Launch Tab.
+				The resource manager implementation constructs a variable map
+				serving as the resource manager "environment"; variables are dereferenced in the configuration file via ${rm:name} or
+				${rm:name#getterName}; all properties and attributes defined in the configuration are mapped. The following hard-coded variables
+				are also added at runtime:
 				<!-- from runtime configuration information -->
 				control.user.name
 				control.address
@@ -50,9 +53,6 @@
 				executablePath
 				progArgs
 				directory
-				The top level of the tree represents the available commands/methods on all resource managers, places
-				for defining stdout or stderr parsers, for defining the structure of a batch script to be used, for defining (job) attributes, and
-				finally for describing how to construct the UI (Launch Configuration Tab).
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -67,14 +67,40 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:choice minOccurs="1" maxOccurs="4">
-				<xs:element name="submit-interactive" type="rm:command-type"/>
-				<xs:element name="submit-batch" type="rm:command-type"/>
-				<xs:element name="submit-debug-interactive" type="rm:command-type"/>
-				<xs:element name="submit-debug-batch" type="rm:command-type"/>
+			<xs:choice>
+				<xs:annotation>
+					<xs:documentation>
+						Currently a configuration may have only a batch or an interactive mode. Thus it may have only two submission
+						modes, a run and a debug, for the given type. In the future we may allow all four to coexist in a single configuration.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="submit-interactive" type="rm:command-type"/>
+					<xs:element name="submit-interactive-debug" type="rm:command-type" minOccurs="0"/>
+				</xs:sequence>
+				<xs:sequence>
+					<xs:element name="submit-batch" type="rm:command-type"/>
+					<xs:element name="submit-batch-debug" type="rm:command-type" minOccurs="0"/>
+				</xs:sequence>
 			</xs:choice>
-			<xs:element name="get-job-status" type="rm:command-type" minOccurs="0"/>
-			<xs:element name="terminate-job" type="rm:command-type" minOccurs="0"/>
+			<xs:element name="get-job-status" type="rm:command-type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						A user-initiated (on demand) request to refresh the status information for a submission. Normal (polled) updates
+						are the responsibility of the monitor. The command nevertheless needs to be implemented in most cases, as it will be called
+						internally just after submission.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="terminate-job" type="rm:command-type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						NOTE: if the submission type is interactive, this command does not need to be implemented, as the process
+						termination will be handled
+						internally.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="suspend-job" type="rm:command-type" minOccurs="0"/>
 			<xs:element name="resume-job" type="rm:command-type" minOccurs="0"/>
 			<xs:element name="hold-job" type="rm:command-type" minOccurs="0"/>
@@ -92,11 +118,11 @@
 	<xs:complexType name="property-type">
 		<xs:annotation>
 			<xs:documentation>
-				The value for properties and attributes can by any primitive type, or lists or maps of strings. If stdout from a
-				scheduled job is to be delivered to the client, the non-visible "stdout" property should be included in the resource manager
-				property set.
-				NOTE: the untyped "value" element on properties and attributes is for internal use only; to give a predefined value,
-				use the "default" element along with the "type" attribute.
+				A property is any variable necessary for the functioning of the resource manager. Properties often (but not
+				necessarily) are not visible. The value for properties can by any primitive type, or lists or maps of strings. If stdout from a
+				scheduled job is to be delivered to the client, the "stdout" property should be included in the resource manager property set.
+				NOTE: the untyped "value" element on properties is for internal use only; to give a predefined (primitive) value, use the "default"
+				element along with the "type" attribute.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -105,49 +131,122 @@
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="type" type="xs:string" default="java.lang.String"/>
-		<xs:attribute name="visible" type="xs:boolean" default="true"/>
-		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
+		<xs:attribute name="visible" type="xs:boolean" default="true">
+			<xs:annotation>
+				<xs:documentation>
+					If this is set to false, the property or attribute is marked as being for internal use only, and will not be made
+					available for representation via Launch Tab widgets.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="readOnly" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Attribute or property has a predetermined value which the user can inspect but not modify.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="attribute-type">
+		<xs:annotation>
+			<xs:documentation>
+				An attribute is an externally defined variable, most often associated with the scheduler system itself; the most
+				common attributes are those pertaining to the job dimensions and requested resources. The value for attribute can by any primitive
+				type. NOTE: the untyped "value" element on attributes is for internal use only; to give a predefined (primitive) value, use the
+				"default" element along with the "type" attribute.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="description" type="xs:string"/>
-			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
+			<xs:element name="description" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						A brief (one sentence) explanation of the attribute.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tooltip" minOccurs="0" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						A somewhat more detailed explanation of format and usage. This will be displayed as a tooltip in the UI.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="choice" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						A a comma-delimited set of values for combo-box display.
+						A predetermined, fixed set of values to choose from; these are comma-delimited and will appear as the items of a
+						combo-box.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="default" minOccurs="0" type="xs:string"/>
 			<xs:element name="value" minOccurs="0"/>
-			<xs:element name="validator" minOccurs="0" type="rm:validator-type"/>
+			<xs:element name="validator" minOccurs="0" type="rm:validator-type">
+				<xs:annotation>
+					<xs:documentation>
+						The user-entered value is immediately checked against these constraints.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="type" use="required" type="xs:string"/>
 		<xs:attribute name="visible" type="xs:boolean" default="true"/>
 		<xs:attribute name="status" type="xs:string"/>
-		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
-		<xs:attribute name="min" type="xs:int"/>
-		<xs:attribute name="max" type="xs:int"/>
+		<xs:attribute name="readOnly" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Attribute or property has a predetermined value which the user can inspect but not modify.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="min" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>
+					For integer values, to be displayed as spinner boxes.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="max" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>
+					For integer values, to be displayed as spinner boxes.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="managed-files-type">
 		<xs:annotation>
 			<xs:documentation>
-				List of files to be staged.
+				List of files to be staged in connection with the job submission. NOTE: if the resource manager uses a script, its
+				staging as a file is handled automatically and need not be included among the set of managed files. A reserved property,
+				"managed_file_for_script", should be used to reference this file's path on the target resource.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="file-staging-location" minOccurs="0" type="xs:string"/>
+			<xs:element name="file-staging-location" minOccurs="0" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						The default is $USER_HOME/.eclipsesettings on the target resource.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="file" maxOccurs="unbounded" type="rm:managed-file-type"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="script-type">
+		<xs:annotation>
+			<xs:documentation>
+				The script element specifies the contents line by line. Each line can be an arbitrary set of arguments, each of
+				which can be optionally resolved in the environment, and which can be checked to see if the result after resolution should be
+				considered undefined and thus not included in the contents. The insertEnvironmentAfter (line number) indicates where to insert
+				extra environment variable definitions passed in from the Environment Tab, if any.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="line" maxOccurs="unbounded" type="rm:line-type"/>
 		</xs:sequence>
-		<xs:attribute name="envBegin" type="xs:int" default="-1"/>
-		<xs:attribute name="envEnd" type="xs:int" default="-1"/>
+		<xs:attribute name="insertEnvironmentAfter" type="xs:int" default="-1"/>
 	</xs:complexType>
 	<xs:complexType name="line-type">
 		<xs:sequence>
@@ -175,7 +274,10 @@
 			<xs:documentation>
 				A recursive description of the UI element associated with the control part, the Launch Tab.
 				As in:
-				org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab, provides a top-level "switch" between controllers.
+				org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab, provides a top-level "switch" between controllers. There
+				are a maximum of three top-level tabs or "pages"; the basic and advanced (the names are placeholders which need not correspond to
+				their actual content or usage, and can be changed) controllers are configurable; for the custom controller, see below. (see below).
+				The SWT-related types generally expose the fields of their associated Java class.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -184,8 +286,8 @@
 			<xs:element name="custom-controller" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						Fixed type. Allows the user to browse the workspace to open and edit a custom batch script will be created; this
-						will include copy and renaming buttons. Use the string as the title to appear in the top-level folder tab.
+						Fixed type; to be used with scheduler systems which accept submission scripts. Allows the user to browse the
+						workspace to open and edit a custom script. Set the text of this element to the title to appear in the top-level folder tab.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -194,13 +296,13 @@
 	<xs:complexType name="validator-type">
 		<xs:annotation>
 			<xs:documentation>
-				A regular expression or an acl used to validate an attribute value.
+				A regular expression or an EFS string used to validate an attribute value.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:sequence>
 				<xs:element name="regex" minOccurs="0" type="rm:regex-type"/>
-				<xs:element name="fileInfo" minOccurs="0" type="rm:file-match-type"/>
+				<xs:element name="file-info" minOccurs="0" type="rm:file-match-type"/>
 			</xs:sequence>
 			<xs:element name="error-message" minOccurs="0" type="xs:string"/>
 		</xs:sequence>
@@ -221,37 +323,43 @@
 		<xs:attribute name="deleteAfterUse" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="file-match-type">
-		<xs:attribute name="efsAttributes">
+		<xs:attribute name="efsAttributes" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
-					An or'd string of tags corresponding to the EFS integer constants.
-					use "yyyy/MM/dd HH:mm:ss" format for 'modified'
-					strings.
+					An or'd string of tags corresponding to the EFS integer constants; these include:
+					ATTRIBUTE_READ_ONLY
+					ATTRIBUTE_IMMUTABLE
+					ATTRIBUTE_OWNER_READ
+					ATTRIBUTE_OWNER_WRITE
+					ATTRIBUTE_OWNER_EXECUTE
+					ATTRIBUTE_GROUP_READ
+					ATTRIBUTE_GROUP_WRITE
+					ATTRIBUTE_GROUP_EXECUTE
+					ATTRIBUTE_OTHER_READ
+					ATTRIBUTE_OTHER_WRITE
+					ATTRIBUTE_OTHER_EXECUTE
+					ATTRIBUTE_EXECUTABLE
+					ATTRIBUTE_ARCHIVE
+					ATTRIBUTE_HIDDEN
+					ATTRIBUTE_SYMLINK
+					ATTRIBUTE_LINK_TARGET
 				</xs:documentation>
 			</xs:annotation>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="ATTRIBUTE_READ_ONLY"/>
-					<xs:enumeration value="ATTRIBUTE_IMMUTABLE"/>
-					<xs:enumeration value="ATTRIBUTE_OWNER_READ"/>
-					<xs:enumeration value="ATTRIBUTE_OWNER_WRITE"/>
-					<xs:enumeration value="ATTRIBUTE_OWNER_EXECUTE"/>
-					<xs:enumeration value="ATTRIBUTE_GROUP_READ"/>
-					<xs:enumeration value="ATTRIBUTE_GROUP_WRITE"/>
-					<xs:enumeration value="ATTRIBUTE_GROUP_EXECUTE"/>
-					<xs:enumeration value="ATTRIBUTE_OTHER_READ"/>
-					<xs:enumeration value="ATTRIBUTE_OTHER_WRITE"/>
-					<xs:enumeration value="ATTRIBUTE_OTHER_EXECUTE"/>
-					<xs:enumeration value="ATTRIBUTE_EXECUTABLE"/>
-					<xs:enumeration value="ATTRIBUTE_ARCHIVE"/>
-					<xs:enumeration value="ATTRIBUTE_HIDDEN"/>
-					<xs:enumeration value="ATTRIBUTE_SYMLINK"/>
-					<xs:enumeration value="ATTRIBUTE_LINK_TARGET"/>
-				</xs:restriction>
-			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="lastModifiedBefore" type="xs:string"/>
-		<xs:attribute name="lastModifiedAfter" type="xs:string"/>
+		<xs:attribute name="lastModifiedBefore" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					use "yyyy/MM/dd HH:mm:ss" as format.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="lastModifiedAfter" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					use "yyyy/MM/dd HH:mm:ss" as format.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="length" type="xs:long"/>
 		<xs:attribute name="isDirectory" type="xs:boolean" default="false"/>
 	</xs:complexType>
@@ -271,23 +379,43 @@
 			<xs:annotation>
 				<xs:documentation>
 					The default means that each tab is a separate view or selection into the global env, and it is this subset which
-					will be passed on the launch command. Setting this property to true means that the tab will pass the selected elements of the
+					will be passed on the launch command. Setting this property to true means that the tab will pass all selected elements of the
 					entire shared enviroment to the resource manager at launch.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="regex-type" mixed="true">
-		<xs:attribute name="flags" type="xs:string"/>
-		<xs:attribute name="split" type="xs:boolean" default="false"/>
-		<xs:attribute name="expression" type="xs:string"/>
+		<xs:attribute name="flags" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					An or'd string of the Java Regex flags:
+					CASE_INSENSITIVE
+					MULTILINE
+					DOTALL
+					UNICODE_CASE
+					CANON_EQ
+					LITERAL
+					COMMENTS
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="split" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Use the regex to perform a Java "split" on the segment rather than a match.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="expression" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					The actual pattern to match.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType mixed="true" name="arg-type">
-		<xs:annotation>
-			<xs:documentation>
-				The text of the argument will be parsed for references to the resource manager environment.
-			</xs:documentation>
-		</xs:annotation>
 		<xs:attribute name="isUndefinedIfMatches" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
@@ -296,13 +424,21 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="resolve" type="xs:boolean" default="true"/>
+		<xs:attribute name="resolve" type="xs:boolean" default="true">
+			<xs:annotation>
+				<xs:documentation>
+					The text of the argument will be resolved in the resource manager environment. It is important to turn this off
+					if
+					you wish to embed, for instance, shell variables (e.g., $HOME).
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="tokenizer-type">
 		<xs:annotation>
 			<xs:documentation>
-				These are attached to the stdout or stderr streams in order to capture the output of the command and add values
-				into the resource manager environment.
+				These are attached to the stdout or stderr streams in order to capture the output of the command and add values to
+				or side-effect the resource manager environment.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -317,19 +453,65 @@
 				</xs:element>
 				<xs:element name="target" maxOccurs="unbounded" type="rm:target-type"/>
 			</xs:choice>
-			<xs:element name="exit-on" minOccurs="0" type="rm:regex-type"/>
-			<xs:element name="exit-after" minOccurs="0" type="rm:regex-type"/>
+			<xs:element name="exit-on" minOccurs="0" type="rm:regex-type">
+				<xs:annotation>
+					<xs:documentation>
+						Stop tokenization and exit the parser read operation when this pattern is encountered.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="exit-after" minOccurs="0" type="rm:regex-type">
+				<xs:annotation>
+					<xs:documentation>
+						Stop tokenization and exit the parser read operation after processing the segment matching this pattern.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
-		<xs:attribute name="delim" type="xs:string"/>
-		<xs:attribute name="includeDelim" type="xs:boolean" default="false"/>
-		<xs:attribute name="maxMatchLen" type="xs:int" default="0"/>
-		<xs:attribute name="all" type="xs:boolean" default="false"/>
-		<xs:attribute name="save" type="xs:int" default="0"/>
+		<xs:attribute name="delim" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					Segment the stream using this delimiter. Must be a single character (escaped or non-escaped).
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="includeDelim" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Include the delimiting character in the segment to be matched.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="maxMatchLen" type="xs:int" default="0">
+			<xs:annotation>
+				<xs:documentation>
+					Do not break up the stream according to a delimiter, but read this many characters at a time from it. NOTE: in
+					this mode, the user should be sure that an expected expansion the regex pattern will not exceed the buffer length (and should
+					adjust that length accordingly).
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="all" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Instead of reading "forward", consume the entire stream, holding only the last portion in a buffer, to be matched
+					after the end of the stream has been reached. This is useful if you need to look for a segment or segments whose position is
+					defined from the end of the output, but you do not know in advance the actual output length.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="save" type="xs:int" default="0">
+			<xs:annotation>
+				<xs:documentation>
+					Use this in connection with "all": save the last N segments (i.e, chars, lines, etc.).
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="applyToAll" type="xs:boolean" default="false">
 			<xs:annotation>
 				<xs:documentation>
 					Means take the unmatched part of the read stream and pass it to the next target, even if there was a previous
-					match; this allows you to capture more than one regex pattern per delimited stream segment.
+					match; this allows you to capture more than one regex pattern per delimited stream segment (see tokenizer-examples.xml, ex. 6).
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -475,6 +657,12 @@
 		<xs:attribute name="offset" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="widget-type">
+		<xs:annotation>
+			<xs:documentation>
+				Widget foreground, background (color) and font are in principle configurable, though the font setting may not
+				always work.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
 			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
@@ -482,21 +670,21 @@
 			<xs:element name="items-from" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						Combo items taken from the value of an attribute or property.
+						Combo items taken from the value field of an attribute or property.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="fixed-text" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						The text of a label set once from the environment on loading; e.g, ${rm:Job_Name#description}.
+						Display text set once from the environment on loading; e.g, ${rm:Job_Name#description}.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="dynamic-text" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
-						Changing label text; the args will be refreshed against the environment.
+						Changing display text; the args will be refreshed against the environment each time the Launch Tab is updated.
 					</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
@@ -515,15 +703,40 @@
 					<xs:enumeration value="spinner"/>
 					<xs:enumeration value="combo"/>
 					<xs:enumeration value="radioButton"/>
-					<xs:enumeration value="browseLocal"/>
-					<xs:enumeration value="browseRemote"/>
+					<xs:enumeration value="browseLocal">
+						<xs:annotation>
+							<xs:documentation>
+								Creates a read-only text widget followed by a push button allowing the user to browse the local file system.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="browseRemote">
+						<xs:annotation>
+							<xs:documentation>
+								Creates a read-only text widget followed by a push button allowing the user to browse a remote file system.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="title" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
-		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
-		<xs:attribute name="saveValueTo" type="xs:string"/>
+		<xs:attribute name="readOnly" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Only applicable to text areas and combo boxes.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="saveValueTo" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					The widget is directly mapped to a property or attribute in the environment which will receive the entered value.
+					Use of this attribute is mutually exclusive with the "fixed-" and "dynamic-text" elements.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
@@ -531,11 +744,9 @@
 		<xs:annotation>
 			<xs:documentation>
 				These display their value columns as editable widgets. They are provided with checkboxes to indicate which
-				attributes have been chosen. A toggle button is provided to filter the unchecked items in the viewer. The viewer
-				outputs its
-				selected values to the environment (and on update removes unselected ones). The name of the viewer is also stored
-				against a string
-				of all selected values, constructed from a template.
+				attributes have been chosen. A checkbox button is also placed above the viewer to allow for filtering the unchecked items. The
+				viewer outputs its checked values to the environment (and on update removes unselected ones). The name of the viewer is also stored
+				against a string of all selected values, constructed from a template.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -555,13 +766,32 @@
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="sort" type="xs:boolean" default="true"/>
+		<xs:attribute name="sort" type="xs:boolean" default="true">
+			<xs:annotation>
+				<xs:documentation>
+					On the name field/column. This is a toggle sort, such that alternate clicks reverse the sort direction.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="headerVisible" type="xs:boolean" default="true"/>
 		<xs:attribute name="linesVisible" type="xs:boolean" default="true"/>
-		<xs:attribute name="tooltipEnabled" type="xs:boolean" default="true"/>
+		<xs:attribute name="tooltipEnabled" type="xs:boolean" default="true">
+			<xs:annotation>
+				<xs:documentation>
+					Enables column-viewer label provider tooltip support. The tooltip defined for an attribute will appear on the row
+					of the table or the parent node of the tree. The attribute description will also appear as a tooltip on the description columns if
+					they exist.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="style" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="viewer-items-type">
+		<xs:annotation>
+			<xs:documentation>
+				Which attributes or properties to include in or exclude from (if using the "all" attributes) the viewer.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="include" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 			<xs:element name="exclude" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
@@ -586,20 +816,42 @@
 		<xs:attribute name="pattern" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
-					Express the template using @name, etc., markers for the attribute fields. Example: '@name="@value"' would
-					generate a string of name-value assignments (the default separator being whitespace).
+					Express the template using @name and @value markers. Example: '@name="@value"' would generate a string of
+					name-value assignments (the default separator being whitespace).
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="separator" type="xs:string" default=" "/>
 	</xs:complexType>
 	<xs:complexType name="target-type">
+		<xs:annotation>
+			<xs:documentation>
+				The top-level tokenizer element: refers to an object, either to be constructed at match time, or which pre-exists
+				in the environment, on which to apply the actions associated with matches and tests, along with a set of possible matches and
+				tests. All tests are run at the conclusion of the parse operation. NOTE: when new targets are constructed, there is a merge
+				operation at the end of tokenization which attempts to combine objects into a single instance identified by the 'name' attribute.
+				This assumes that such names will be unique and that any other values to be set on the object which are not explicitly bound in
+				some way to that name through the pattern will appear on the stream before a new name does.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="match" maxOccurs="unbounded" type="rm:match-type"/>
 			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test-type"/>
 		</xs:sequence>
-		<xs:attribute name="ref" type="xs:string"/>
+		<xs:attribute name="ref" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					The name of the object in the environment (either attribute or property; do not include here the "${rm:" / "}"
+					used for resolving).
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="type" default="property">
+			<xs:annotation>
+				<xs:documentation>
+					Create an object of this type when there is a match.
+				</xs:documentation>
+			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="property"/>
@@ -610,13 +862,20 @@
 		<xs:attribute name="matchAll" type="xs:boolean" default="false">
 			<xs:annotation>
 				<xs:documentation>
-					Means do not reapply an already matched expression until all the others are matched; this allows us to use, for
-					instance, .* repeatedly but set different fields of the object with the resulting match.
+					Means do not try to match an already matched expression until all the others are matched (i.e., a logical AND
+					instead of OR governs the set of matches at successive calls to the target match operation); this allows one to use, for instance,
+					.* repeatedly but set different fields of the object with the resulting match (see tokenizer-examples.xml, ex. 5).
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="match-type">
+		<xs:annotation>
+			<xs:documentation>
+				If the match is satisfied, the apply operations are immediately called on the current target property or
+				attribute.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="expression" minOccurs="0" type="rm:regex-type"/>
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -626,9 +885,24 @@
 				<xs:element name="set" type="rm:set-type"/>
 			</xs:choice>
 		</xs:sequence>
-		<xs:attribute name="moveToTop" type="xs:boolean" default="false"/>
+		<xs:attribute name="moveToTop" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Indicates to the tokenizer that the matched target be promoted to first position in the list of targets. This is
+					useful when there is an ordering which expects types of attributes or properties to be grouped in sequence on the stream (see
+					tokenizer-examples.xml, ex. 4).
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="column-data-type">
+		<xs:annotation>
+			<xs:documentation>
+				A caveat on the foreground and background settings. They are exposed here but may not work as expected: these are
+				currently applied to the column through the cell label provider; foreground seems not to change the font color but to color the
+				entire cell.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
@@ -642,18 +916,33 @@
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="set-type">
+		<xs:annotation>
+			<xs:documentation>
+				Calls "setField(entry value)" on the target.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="entry" minOccurs="0" type="rm:entry-type"/>
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="add-type">
+		<xs:annotation>
+			<xs:documentation>
+				References (or creates) a list as the value of the target field, and adds the entry values to it.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded" type="rm:entry-type"/>
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="append-type">
+		<xs:annotation>
+			<xs:documentation>
+				References (or creates) a string (buffer) as the value of the target field, and appends the entry values to it.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded" type="rm:entry-type"/>
 		</xs:sequence>
@@ -661,12 +950,24 @@
 		<xs:attribute name="separator" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="put-type">
+		<xs:annotation>
+			<xs:documentation>
+				References (or creates) a map as the value of the target field, and adds the entry (key, value) to it.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded" type="rm:entry-type"/>
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="entry-type">
+		<xs:annotation>
+			<xs:documentation>
+				Value abstraction. "key" and "value" can be arbitrary strings; the "Group" attributes refer to the value of the
+				matched regex group;
+				"Index" attributes refer to the index of the string array created by using the regex to split the segment.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:attribute name="key" type="xs:string"/>
 		<xs:attribute name="keyGroup" type="xs:int" default="0"/>
 		<xs:attribute name="keyIndex" type="xs:int" default="0"/>
@@ -675,6 +976,13 @@
 		<xs:attribute name="valueIndex" type="xs:int" default="0"/>
 	</xs:complexType>
 	<xs:complexType name="test-type">
+		<xs:annotation>
+			<xs:documentation>
+				Useful for setting values based on other values produced during tokenization. A test is one or more comparison
+				operations (with arbitrary nesting inside the three boolean operators), plus a set of actions to apply to the target fields in the
+				case of either success or failure (the "else" element). See tokenizer-examples-xml, ex. 3, or the "get-job-status" example.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test-type"/>
 			<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="2">
@@ -703,6 +1011,12 @@
 			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="op">
+			<xs:annotation>
+				<xs:documentation>
+					Enumeration avoids XML escaping. EQ = equals, LT = less than, GT = greater than, LE = less than or equal to, GE =
+					greater than or equal to.
+				</xs:documentation>
+			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="EQ"/>

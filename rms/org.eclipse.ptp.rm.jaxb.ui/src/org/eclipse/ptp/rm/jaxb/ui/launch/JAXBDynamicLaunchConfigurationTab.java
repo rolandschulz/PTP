@@ -384,13 +384,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		refreshLocal(config);
 		LCVariableMap lcMap = parentTab.getLCMap();
 		Map<String, Object> current = lcMap.swapVariables(localMap);
-
-		Boolean append = config.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);
-		if (append == null) {
-			append = true;
-		}
 		Map env = config.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
-		ScriptHandler job = new ScriptHandler(null, parentTab.getScript(), lcMap, env, append);
+		ScriptHandler job = new ScriptHandler(null, parentTab.getScript(), lcMap, env);
 		job.schedule();
 		try {
 			job.join();
