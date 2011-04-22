@@ -4,7 +4,22 @@
 <!-- Define topics for the references                                              -->
 <!-- ============================================================================= -->
 <toc label="Reference">
-
+	
+	<topic label="API Reference" href="provisional_api.html">
+		<topic label="org.eclipse.ptp.core" href="reference/api/org/eclipse/ptp/core/package-summary.html" />
+		<topic label="org.eclipse.ptp.ui" href="reference/api/org/eclipse/ptp/ui/package-summary.html" />
+	    <topic label="org.eclipse.ptp.debug.core" href="reference/api/org/eclipse/ptp/debug/core/package-summary.html" />
+	    <topic label="org.eclipse.ptp.debug.core.pdi" href="reference/api/org/eclipse/ptp/debug/core/pdi/package-summary.html" />
+	    <topic label="org.eclipse.ptp.debug.ui" href="reference/api/org/eclipse/ptp/debug/ui/package-summary.html" />
+		<topic label="org.eclipse.ptp.launch" href="reference/api/org/eclipse/ptp/launch/package-summary.html" />
+		<topic label="org.eclipse.ptp.remote.core" href="reference/api/org/eclipse/ptp/remote/core/package-summary.html" />
+		<topic label="org.eclipse.ptp.remote.ui" href="reference/api/org/eclipse/ptp/remote/ui/package-summary.html" />
+	    <topic label="org.eclipse.ptp.rm.core" href="reference/api/org/eclipse/ptp/rm/core/package-summary.html" />
+      	<topic label="org.eclipse.ptp.rm.ui" href="reference/api/org/eclipse/ptp/rm/ui/package-summary.html" />
+		<topic label="org.eclipse.ptp.services.core" href="reference/api/org/eclipse/ptp/services/core/package-summary.html" />
+		<topic label="org.eclipse.ptp.services.ui" href="reference/api/org/eclipse/ptp/services/ui/package-summary.html" />
+	</topic>
+	
 	<topic label="Extension Points Reference" href="provisional_api.html">
 		<topic label="org_eclipse_ptp_core_resourceManagers.html" href="reference/extension-points/org_eclipse_ptp_core_resourceManagers" />
 		<topic label="org_eclipse_ptp_core_runtimeSystems.html" href="reference/extension-points/org_eclipse_ptp_core_runtimeSystems" />
@@ -25,38 +40,5 @@
 		<topic label="org_eclipse_ptp_ui_runtimeModelPresentations.html" href="reference/extension-points/org_eclipse_ptp_ui_runtimeModelPresentations" />
 		<anchor id="ptp-extension-points-ref" />
 	</topic>
-	
-	<topic label="Other reference information" href="provisional_api.html">
-		<topic label="Runtime options" href="reference/misc/runtime-options.html" />
-	</topic>
-	
-	<topic label="API Reference By Topic" href="provisional_api.html">
-		<topic label="Core" href="provisional_api.html">
-			<topic label="org.eclipse.ptp.core" href="reference/api/org/eclipse/ptp/core/package-summary.html" />
-			<topic label="org.eclipse.ptp.ui" href="reference/api/org/eclipse/ptp/ui/package-summary.html" />
-	    </topic>
-	  <topic href="provisional_api.html" label="Debug">
-	     <topic href="reference/api/org/eclipse/ptp/debug/core/package-summary.html" label="org.eclipse.ptp.debug.core"/>
-	     <topic href="reference/api/org/eclipse/ptp/debug/core/pdi/package-summary.html" label="org.eclipse.ptp.debug.core.pdi"/>
-	     <topic href="reference/api/org/eclipse/ptp/debug/ui/package-summary.html" label="org.eclipse.ptp.debug.ui"/>
-	  </topic>
-		<topic label="Launch" href="provisional_api.html">
-			<topic label="org.eclipse.ptp.launch" href="reference/api/org/eclipse/ptp/launch/package-summary.html"/>
-		</topic>
-		<topic label="Remote Services" href="provisional_api.html">
-			<topic label="org.eclipse.ptp.remote.core" href="reference/api/org/eclipse/ptp/remote/core/package-summary.html"/>
-			<topic label="org.eclipse.ptp.remote.ui" href="reference/api/org/eclipse/ptp/remote/ui/package-summary.html"/>
-		</topic>
-	    <topic label="Resource Manager" href="provisional_api.html">
-	    	<topic label="org.eclipse.ptp.rm.core" href="reference/api/org/eclipse/ptp/rm/core/package-summary.html"/>
-      		<topic href="reference/api/org/eclipse/ptp/rm/ui/package-summary.html" label="org.eclipse.ptp.rm.ui">
-      </topic>
-	    </topic>
-		<topic label="Service Configurations" href="provisional_api.html">
-			<topic label="org.eclipse.ptp.services.core" href="reference/api/org/eclipse/ptp/services/core/package-summary.html"/>
-			<topic label="org.eclipse.ptp.services.ui" href="reference/api/org/eclipse/ptp/services/ui/package-summary.html"/>
-		</topic>
-	</topic>
-	<topic label="API Reference All Packages" href="reference/api/overview-summary.html">
-	</topic>
+
 </toc>
