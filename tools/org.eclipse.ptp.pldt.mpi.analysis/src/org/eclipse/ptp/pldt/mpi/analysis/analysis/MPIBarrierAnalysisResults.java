@@ -13,22 +13,22 @@ package org.eclipse.ptp.pldt.mpi.analysis.analysis;
 
 public class MPIBarrierAnalysisResults {
 	protected BarrierTable barrierTable_ = null;
-	
+
 	protected static MPIBarrierAnalysisResults results_ = null;
-	
-	public MPIBarrierAnalysisResults(){
+
+	public MPIBarrierAnalysisResults() {
 		results_ = this;
 	}
-	
-	public static MPIBarrierAnalysisResults getAnalysisResults(){
+
+	public static MPIBarrierAnalysisResults getAnalysisResults() {
 		return results_;
 	}
-	
-	public void setBarrierTable(BarrierTable table){
+
+	public void setBarrierTable(BarrierTable table) {
 		barrierTable_ = table;
 	}
-	
-	public BarrierTable getBarrierTable(){
+
+	public BarrierTable getBarrierTable() {
 		return barrierTable_;
 	}
 }

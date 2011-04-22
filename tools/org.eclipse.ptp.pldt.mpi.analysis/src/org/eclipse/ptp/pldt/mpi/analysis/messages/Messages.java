@@ -71,7 +71,7 @@ public class Messages extends NLS {
 	public static String SimpleTreeTableMarkerView_showDetailedInfoForSelected;
 	public static String SimpleTreeTableMarkerView_showInfo;
 	public static String SimpleTreeTableMarkerView_value;
-	
+
 	public static String ShowErrors_barrier;
 	public static String ShowErrors_barrier_;
 	public static String ShowErrors_barriers;

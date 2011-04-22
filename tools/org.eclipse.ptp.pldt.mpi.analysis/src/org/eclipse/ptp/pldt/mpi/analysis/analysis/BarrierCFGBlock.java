@@ -15,14 +15,23 @@ import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTStatement;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.impl.Block;
 
+/**
+ * Barrier Control Flow Graph Block
+ * 
+ */
 public class BarrierCFGBlock extends Block {
 	protected BarrierExpression BE_;
-	
-	public BarrierCFGBlock(IASTNode content, IASTStatement parent, int type){
+
+	public BarrierCFGBlock(IASTNode content, IASTStatement parent, int type) {
 		super(content, parent, type);
 		BE_ = null;
 	}
-	
-	public BarrierExpression getBE(){return BE_;}
-	public void setBE(BarrierExpression be) {BE_ = be;}
+
+	public BarrierExpression getBE() {
+		return BE_;
+	}
+
+	public void setBE(BarrierExpression be) {
+		BE_ = be;
+	}
 }

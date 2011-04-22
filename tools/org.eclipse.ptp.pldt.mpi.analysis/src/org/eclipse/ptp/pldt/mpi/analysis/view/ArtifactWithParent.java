@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-
 package org.eclipse.ptp.pldt.mpi.analysis.view;
 
 import org.eclipse.ptp.pldt.common.Artifact;
@@ -21,7 +20,7 @@ public class ArtifactWithParent extends Artifact {
 	private String name;
 	private int index;
 
-	public ArtifactWithParent(String fileName, int line, int column, String funcName, String desc,  /*String primaryFileName,*/
+	public ArtifactWithParent(String fileName, int line, int column, String funcName, String desc, /* String primaryFileName, */
 			SourceInfo sourceInfo, int parentID, int myID, String name, int index) {
 		super(fileName, line, column, funcName, sourceInfo);
 		this.parentID = parentID;
@@ -33,16 +32,16 @@ public class ArtifactWithParent extends Artifact {
 	public int getParentID() {
 		return parentID;
 	}
-	
-	public int getMyID(){
+
+	public int getMyID() {
 		return myID;
 	}
-	
+
 	public String getMyName() {
 		return name;
 	}
-	
-	public int getIndex(){
+
+	public int getIndex() {
 		return index;
 	}
 }

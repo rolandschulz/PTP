@@ -952,7 +952,7 @@ public class MPIMVAnalysis {
 					if (params_ != null) {
 						IASTInitializerClause cl = params_[0];
 						if (cl instanceof IASTIdExpression) {
-							System.out.println("IASTInitializerClause is IASTIdExpression"); //$NON-NLS-1$
+							//System.out.println("IASTInitializerClause is IASTIdExpression"); //$NON-NLS-1$
 						}
 					}
 

@@ -31,34 +31,34 @@ public class BarrierArtifacts {
 	private ScanReturn scanReturn_;
 	private MPIArtifactMarkingVisitor visitor_;
 	private String markerID = IDs.barrierMarkerID;
-	public BarrierArtifacts(ICallGraph cg, MPIArtifactMarkingVisitor visitor){
+
+	public BarrierArtifacts(ICallGraph cg, MPIArtifactMarkingVisitor visitor) {
 		CG_ = cg;
 		visitor_ = visitor;
 	}
-	
-	public void run(){
+
+	public void run() {
 		/* first clear all existing markers */
 		IWorkspaceRoot wsResource = ResourcesPlugin.getWorkspace().getRoot();
 		try {
 			int depth = IResource.DEPTH_INFINITE;
 			wsResource.deleteMarkers(markerID, false, depth);
 
-        } catch (CoreException e) {
-            System.out.println("RM: exception deleting markers."); //$NON-NLS-1$
-            e.printStackTrace();
-        }
-        
-		for(ICallGraphNode n =  CG_.topEntry(); n != null; n = n.topNext()){
-			MPICallGraphNode node = (MPICallGraphNode)n;
+		} catch (CoreException e) {
+			System.out.println("RM: exception deleting markers."); //$NON-NLS-1$
+			e.printStackTrace();
+		}
+
+		for (ICallGraphNode n = CG_.topEntry(); n != null; n = n.topNext()) {
+			MPICallGraphNode node = (MPICallGraphNode) n;
 			List<BarrierInfo> barriers = node.getAllBarriers();
 			scanReturn_ = new ScanReturn();
-			for(Iterator<BarrierInfo> i = barriers.iterator(); i.hasNext();){
+			for (Iterator<BarrierInfo> i = barriers.iterator(); i.hasNext();) {
 				BarrierInfo bar = i.next();
 				SourceInfo sourceInfo = bar.getSourceInfo();
-				ArtifactWithParent awp = new ArtifactWithParent(node.getFileName(), 
-						sourceInfo.getStartingLine(), 1, node.getFuncName(), 
-						"Artifact Call", sourceInfo, 0, 0, "", //$NON-NLS-1$ //$NON-NLS-2$
-						bar.getID()-4);
+				ArtifactWithParent awp = new ArtifactWithParent(node.getFileName(),
+						sourceInfo.getStartingLine(), 1, node.getFuncName(), "Artifact Call", sourceInfo, 0, 0, "", //$NON-NLS-1$ //$NON-NLS-2$
+						bar.getID() - 4);
 				scanReturn_.addArtifact(awp);
 			}
 			visitor_.visitFile(node.getResource(), scanReturn_.getArtifactList());

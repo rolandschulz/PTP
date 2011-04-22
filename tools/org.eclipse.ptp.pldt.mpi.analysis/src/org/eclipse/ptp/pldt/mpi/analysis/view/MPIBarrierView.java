@@ -15,16 +15,17 @@ package org.eclipse.ptp.pldt.mpi.analysis.view;
 import org.eclipse.ptp.pldt.mpi.analysis.Activator;
 import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
- /**
-  * View to show list of barriers 
-  * 
-  * TODO: this should use the SimpleTableView from the 'common' package,
-  * which I'm hoping the other view can eventually do as well (reuse view
-  * classes from that package)
-  * TODO: replace column header from 'common' package view class
-  */
-//public class MPIBarrierView extends SimpleTableView {// use common class
-public class MPIBarrierView extends SimpleTableBarrierView {//original
+
+/**
+ * View to show list of barriers
+ * 
+ * TODO: this should use the SimpleTableView from the 'common' package,
+ * which I'm hoping the other view can eventually do as well (reuse view
+ * classes from that package)
+ * TODO: replace column header from 'common' package view class
+ */
+// public class MPIBarrierView extends SimpleTableView {// use common class
+public class MPIBarrierView extends SimpleTableBarrierView {// original
 	public MPIBarrierView() {
 
 		super(Activator.getDefault(), Messages.MPIBarrierView_function, Messages.MPIBarrierView_barrierArtifacts,
