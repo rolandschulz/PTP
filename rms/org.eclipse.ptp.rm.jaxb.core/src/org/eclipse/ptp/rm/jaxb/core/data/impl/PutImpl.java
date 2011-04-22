@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 import org.eclipse.ptp.rm.jaxb.core.data.PutType;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
  * Wrapper implementation.
@@ -33,8 +34,11 @@ public class PutImpl extends AbstractAssign {
 	 *            be <code>null</code>).
 	 * @param put
 	 *            JAXB data element
+	 * @param rmVarMap
+	 *            resource manager environment
 	 */
-	public PutImpl(String uuid, PutType put) {
+	public PutImpl(String uuid, PutType put, RMVariableMap rmVarMap) {
+		super(rmVarMap);
 		this.uuid = uuid;
 		field = put.getField();
 		entries = put.getEntry();

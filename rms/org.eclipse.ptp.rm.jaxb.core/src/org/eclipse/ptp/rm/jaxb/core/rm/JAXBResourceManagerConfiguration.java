@@ -90,15 +90,19 @@ public class JAXBResourceManagerConfiguration extends AbstractRemoteResourceMana
 	}
 
 	/**
-	 * Tells the RMVariableMap static instance variable to point to this
-	 * configuration's environment map. If that map has not been initialized,
+	 * Creates a new map if it is null. If that map has not been initialized,
 	 * takes care of it here.
+	 * 
+	 * @return rmVarMap resource manager environment
 	 */
-	public void setActive() throws Throwable {
-		map = RMVariableMap.setActiveInstance(map);
+	public RMVariableMap getRMVariableMap() throws Throwable {
+		if (map == null) {
+			map = new RMVariableMap();
+		}
 		if (!map.isInitialized()) {
 			JAXBInitializationUtils.initializeMap(getResourceManagerData(), map);
 		}
+		return map;
 	}
 
 	/**

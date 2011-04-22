@@ -37,10 +37,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private boolean waitEnabled;
 	private long lastUpdateRequest;
 
-	public CommandJobStatus() {
+	public CommandJobStatus(RMVariableMap rmVarMap) {
 		jobId = null;
 		state = IJobStatus.UNDETERMINED;
-		rmVarMap = RMVariableMap.getActiveInstance();
+		this.rmVarMap = rmVarMap;
 		waitEnabled = true;
 		lastUpdateRequest = 0;
 	}
@@ -50,10 +50,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 *            either internal UUID or resource-specific id
 	 * @param state
 	 */
-	public CommandJobStatus(String jobId, String state) {
+	public CommandJobStatus(String jobId, String state, RMVariableMap rmVarMap) {
 		this.jobId = jobId;
 		setState(state);
-		rmVarMap = RMVariableMap.getActiveInstance();
+		this.rmVarMap = rmVarMap;
 		waitEnabled = false;
 	}
 

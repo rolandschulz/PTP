@@ -395,8 +395,9 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 *            launch tab being built
 	 * @return
 	 */
-	public static IUpdateModel createModel(Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab) {
-		Control control = createControl(parent, widget, tab);
+	public static IUpdateModel createModel(Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab,
+			RMVariableMap rmVarMap) {
+		Control control = createControl(parent, widget, tab, rmVarMap);
 		if (control instanceof Label) {
 			return null;
 		}
@@ -589,8 +590,9 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 * @return the resulting control (<code>null</code> if the widget is a
 	 *         Label).
 	 */
-	private static Control createControl(final Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab) {
-		ControlDescriptor cd = new ControlDescriptor(widget, RMVariableMap.getActiveInstance());
+	private static Control createControl(final Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab,
+			RMVariableMap rmVarMap) {
+		ControlDescriptor cd = new ControlDescriptor(widget, rmVarMap);
 		String type = widget.getType();
 
 		Control c = null;

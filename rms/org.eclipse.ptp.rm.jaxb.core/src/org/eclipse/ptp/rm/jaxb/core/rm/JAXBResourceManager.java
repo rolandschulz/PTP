@@ -31,13 +31,13 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
  */
 public final class JAXBResourceManager extends AbstractResourceManager implements IJAXBResourceManager, IJAXBNonNLSConstants {
 	/**
-	 * @param jaxbServiceProvider
+	 * @param configuration
 	 * @param control
 	 * @param monitor
 	 */
-	public JAXBResourceManager(AbstractResourceManagerConfiguration jaxbServiceProvider, AbstractResourceManagerControl control,
+	public JAXBResourceManager(AbstractResourceManagerConfiguration configuration, AbstractResourceManagerControl control,
 			AbstractResourceManagerMonitor monitor) {
-		super(jaxbServiceProvider, control, monitor);
+		super(configuration, control, monitor);
 	}
 
 	/**
@@ -49,7 +49,7 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	}
 
 	/**
-	 * @return the configuration (service provider)
+	 * @return the configuration
 	 */
 	public IJAXBResourceManagerConfiguration getJAXBConfiguration() {
 		return (IJAXBResourceManagerConfiguration) getConfiguration();

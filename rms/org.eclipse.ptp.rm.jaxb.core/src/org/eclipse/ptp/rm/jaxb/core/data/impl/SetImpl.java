@@ -11,6 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core.data.impl;
 
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 import org.eclipse.ptp.rm.jaxb.core.data.SetType;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
  * Wrapper implementation.
@@ -28,8 +29,11 @@ public class SetImpl extends AbstractAssign {
 	 *            be <code>null</code>).
 	 * @param set
 	 *            JAXB data element
+	 * @param rmVarMap
+	 *            resource manager environment
 	 */
-	public SetImpl(String uuid, SetType set) {
+	public SetImpl(String uuid, SetType set, RMVariableMap rmVarMap) {
+		super(rmVarMap);
 		this.uuid = uuid;
 		field = set.getField();
 		entry = set.getEntry();

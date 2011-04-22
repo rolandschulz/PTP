@@ -21,7 +21,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IFireContentsChangedEnabled;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
@@ -63,7 +62,6 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	public JAXBControllerLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
 		super(dialog);
 		rmConfig = rm.getJAXBConfiguration();
-		rmConfig.setActive();
 		script = rmConfig.getResourceManagerData().getControlData().getScript();
 		launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
 		delegate = rm.getControl().getRemoteServicesDelegate();
@@ -140,6 +138,15 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	/**
+	 * Needed by the LaunchTabBuilder
+	 * 
+	 * @return the ResourceManager (base) configuration
+	 */
+	public IJAXBResourceManagerConfiguration getRmConfig() {
+		return rmConfig;
+	}
+
+	/**
 	 * @return JAXB data element for resource manager script
 	 */
 	public ScriptType getScript() {
@@ -178,9 +185,8 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		try {
-			rmConfig.setActive();
-			lcMap = LCVariableMap.createInstance(RMVariableMap.getActiveInstance());
-			LCVariableMap.setActiveInstance(lcMap);
+
+			lcMap = LCVariableMap.createInstance(rmConfig.getRMVariableMap());
 			updateHandler.clear();
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
