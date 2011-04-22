@@ -50,7 +50,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	private final ValueUpdateHandler updateHandler;
 
 	private ScrolledComposite scrolledParent;
-	private LCVariableMap lcMap;
+	private final LCVariableMap lcMap;
 
 	/**
 	 * @param rm
@@ -80,6 +80,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this));
 			}
 		}
+		lcMap = new LCVariableMap();
 	}
 
 	/*
@@ -169,11 +170,10 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	/*
-	 * resets the resource manager environment to active, rebuilds the launch
-	 * tab environment map, and clears the controls registered with the update
-	 * handler. This is necessary because on calls to this method subsequent to
-	 * the first, the widgets it contained will have been disposed.
-	 * (non-Javadoc)
+	 * Rebuilds the launch tab environment map, and clears the controls
+	 * registered with the update handler. This is necessary because on calls to
+	 * this method subsequent to the first, the widgets it contained will have
+	 * been disposed. (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#initializeFrom
@@ -185,8 +185,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		try {
-
-			lcMap = LCVariableMap.createInstance(rmConfig.getRMVariableMap());
+			lcMap.initialize(rmConfig.getRMVariableMap());
 			updateHandler.clear();
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);

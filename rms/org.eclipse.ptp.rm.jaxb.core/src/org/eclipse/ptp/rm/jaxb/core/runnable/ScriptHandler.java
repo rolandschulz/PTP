@@ -87,6 +87,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			PropertyType p = new PropertyType();
 			p.setName(SCRIPT);
 			p.setValue(scriptValue);
+			p.setVisible(false);
 			rmMap.put(SCRIPT, p);
 		}
 		progress.done();

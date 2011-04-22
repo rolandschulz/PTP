@@ -116,6 +116,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 				} else {
 					p.setValue(target);
 				}
+				p.setVisible(false);
 				rmVarMap.put(p.getName(), p);
 			} catch (Throwable t) {
 				progress.done();

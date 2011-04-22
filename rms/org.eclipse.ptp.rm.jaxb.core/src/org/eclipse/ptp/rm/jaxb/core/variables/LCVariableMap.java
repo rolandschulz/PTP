@@ -41,7 +41,7 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
  * in to the configuration by the Environment Tab).<br>
  * <br>
  * When this map is loaded from its RMVariableMap parent (see
- * {@link #loadValues(RMVariableMap)}), the full set of Properties and
+ * {@link #initialize(RMVariableMap)}), the full set of Properties and
  * Attributes are maintained in a global map, which remains unaltered; a second,
  * volatile map can be swapped in and out by the caller (usually subsets of the
  * global map based on the specific tab doing the calling).<br>
@@ -64,12 +64,10 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	private Map<String, Object> globalValues;
 	private Map<String, Object> values;
 	private final Map<String, String> defaultValues;
-	private final boolean initialized;
 
-	private LCVariableMap() {
+	public LCVariableMap() {
 		this.values = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.defaultValues = Collections.synchronizedMap(new TreeMap<String, String>());
-		this.initialized = false;
 	}
 
 	/**
@@ -141,10 +139,26 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * @return whether the internal maps have been loaded
+	 * Initialize this map from the resource manager environment instance.
+	 * 
+	 * @param rmVars
+	 *            resource manager environment map
+	 * @throws Throwable
 	 */
-	public boolean isInitialized() {
-		return initialized;
+	public void initialize(RMVariableMap rmVars) throws Throwable {
+		values.clear();
+		defaultValues.clear();
+		for (String s : rmVars.getVariables().keySet()) {
+			loadValues(s, rmVars.getVariables().get(s));
+		}
+		for (String s : rmVars.getDiscovered().keySet()) {
+			loadValues(s, rmVars.getDiscovered().get(s));
+		}
+		globalValues = values;
+		/*
+		 * this map will be set from the tab's local map
+		 */
+		values = null;
 	}
 
 	/**
@@ -232,27 +246,6 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Initialize this map from the resource manager environment instance.
-	 * 
-	 * @param rmVars
-	 *            resource manager environment map
-	 * @throws Throwable
-	 */
-	private void loadValues(RMVariableMap rmVars) throws Throwable {
-		for (String s : rmVars.getVariables().keySet()) {
-			loadValues(s, rmVars.getVariables().get(s));
-		}
-		for (String s : rmVars.getDiscovered().keySet()) {
-			loadValues(s, rmVars.getDiscovered().get(s));
-		}
-		globalValues = values;
-		/*
-		 * this map will be set from the tab's local map
-		 */
-		values = null;
-	}
-
-	/**
 	 * If the value of the Property or Attribute is <code>null</code> and it has
 	 * a defined default, the value is set to the default.
 	 * 
@@ -269,11 +262,17 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		Object o = null;
 		if (value instanceof PropertyType) {
 			PropertyType p = (PropertyType) value;
+			if (!p.isVisible()) {
+				return;
+			}
 			name = p.getName();
 			defVal = p.getDefault();
 			o = p.getValue();
 		} else if (value instanceof AttributeType) {
 			AttributeType ja = (AttributeType) value;
+			if (!ja.isVisible()) {
+				return;
+			}
 			name = ja.getName();
 			defVal = ja.getDefault();
 			o = ja.getValue();
@@ -290,20 +289,6 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 			strVal = defVal;
 		}
 		put(name, strVal);
-	}
-
-	/**
-	 * Creates an instance to be associated with a given Launch Tab.
-	 * 
-	 * @param rmVars
-	 *            environement map for the associated resource manager
-	 * @return the LaunchTab environment map
-	 * @throws Throwable
-	 */
-	public static LCVariableMap createInstance(RMVariableMap rmVars) throws Throwable {
-		LCVariableMap lcMap = new LCVariableMap();
-		lcMap.loadValues(rmVars);
-		return lcMap;
 	}
 
 	/**
