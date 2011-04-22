@@ -30,6 +30,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.impl.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.TargetImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
  * Stream tokenizer (parser) which can be attached to process streams to
@@ -68,12 +69,12 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	public static final String EXT_ID = "org.eclipse.ptp.rm.jaxb.configurableRegexTokenizer"; //$NON-NLS-1$
 
 	private char delim;
-	private int maxLen;
-	private Integer save;
-	private boolean all;
+	private final int maxLen;
+	private final Integer save;
+	private final boolean all;
 	private boolean includeDelim;
-	private boolean applyToAll;
-	private List<IMatchable> toMatch;
+	private final boolean applyToAll;
+	private final List<IMatchable> toMatch;
 	private RegexImpl exitOn;
 	private RegexImpl exitAfter;
 
@@ -82,12 +83,9 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 
 	private char[] chars;
 	private LinkedList<String> saved;
-	private StringBuffer segment;
+	private final StringBuffer segment;
 
 	private boolean endOfStream;
-
-	public ConfigurableRegexTokenizer() {
-	}
 
 	/**
 	 * @param uuid
@@ -95,8 +93,10 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	 *            <code>null</code>).
 	 * @param tokenizer
 	 *            JAXB data element
+	 * @param rmVarMap
+	 *            resource manager environment
 	 */
-	public ConfigurableRegexTokenizer(String uuid, TokenizerType tokenizer) {
+	public ConfigurableRegexTokenizer(String uuid, TokenizerType tokenizer, RMVariableMap rmVarMap) {
 		String d = tokenizer.getDelim();
 		if (d != null) {
 			delim = getChar(d);
@@ -126,7 +126,7 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 		toMatch = new ArrayList<IMatchable>();
 		List<TargetType> targets = tokenizer.getTarget();
 		for (TargetType target : targets) {
-			toMatch.add(new TargetImpl(uuid, target));
+			toMatch.add(new TargetImpl(uuid, target, rmVarMap));
 		}
 
 		RegexType reg = tokenizer.getExitOn();

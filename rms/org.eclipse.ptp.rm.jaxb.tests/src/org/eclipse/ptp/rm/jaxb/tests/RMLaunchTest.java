@@ -303,7 +303,8 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		env.put("export_all", true); //$NON-NLS-1$
 		env.put(MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
 		env.put(MPI_ARGS, "-machinefile $PBS_NODEFILE -np 8"); //$NON-NLS-1$ 
-		PropertyType queues = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get("available_queues"); //$NON-NLS-1$ 
+		RMVariableMap rmVarMap = rm.getJAXBConfiguration().getRMVariableMap();
+		PropertyType queues = (PropertyType) rmVarMap.getVariables().get("available_queues"); //$NON-NLS-1$ 
 		if (queues != null) {
 			List<String> q = (List<String>) queues.getValue();
 			env.put("destination", q.get(0)); //$NON-NLS-1$

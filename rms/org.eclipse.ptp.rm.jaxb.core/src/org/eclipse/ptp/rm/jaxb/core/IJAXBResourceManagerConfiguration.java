@@ -13,6 +13,7 @@ import java.net.URL;
 
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
  * JAXB-specific service provider (configuration) interface.
@@ -36,11 +37,11 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	ResourceManagerData getResourceManagerData() throws Throwable;
 
 	/**
-	 * Export the resource manager environment as the currently active one.
+	 * @return the JAXB resource manager environment map.
 	 * 
 	 * @since 5.0
 	 */
-	void setActive() throws Throwable;
+	RMVariableMap getRMVariableMap() throws Throwable;
 
 	/**
 	 * @param location

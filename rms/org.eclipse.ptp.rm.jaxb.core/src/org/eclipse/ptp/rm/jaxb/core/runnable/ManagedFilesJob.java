@@ -63,11 +63,12 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 	 *            information
 	 * @throws CoreException
 	 */
-	public ManagedFilesJob(String uuid, ManagedFilesType files, RemoteServicesDelegate delegate) throws CoreException {
+	public ManagedFilesJob(String uuid, ManagedFilesType files, RemoteServicesDelegate delegate, RMVariableMap rmVarMap)
+			throws CoreException {
 		super(Messages.ManagedFilesJob);
 		this.uuid = uuid;
 		this.delegate = delegate;
-		rmVarMap = RMVariableMap.getActiveInstance();
+		this.rmVarMap = rmVarMap;
 		stagingDir = rmVarMap.getString(uuid, files.getFileStagingLocation());
 		this.files = files.getFile();
 	}

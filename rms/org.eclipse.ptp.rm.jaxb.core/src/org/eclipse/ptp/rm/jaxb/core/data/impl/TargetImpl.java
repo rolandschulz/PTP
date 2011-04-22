@@ -50,6 +50,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  */
 public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 
+	private final RMVariableMap rmVarMap;
 	private final String uuid;
 	private final String ref;
 	private final String type;
@@ -68,8 +69,11 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	 *            be <code>null</code>).
 	 * @param target
 	 *            JAXB data element
+	 * @param rmVarMap
+	 *            resource manager environment
 	 */
-	public TargetImpl(String uuid, TargetType target) {
+	public TargetImpl(String uuid, TargetType target, RMVariableMap rmVarMap) {
+		this.rmVarMap = rmVarMap;
 		this.uuid = uuid;
 		ref = target.getRef();
 		type = target.getType();
@@ -77,12 +81,12 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		matches = new ArrayList<MatchImpl>();
 		List<MatchType> mdata = target.getMatch();
 		for (MatchType m : mdata) {
-			matches.add(new MatchImpl(uuid, m, this));
+			matches.add(new MatchImpl(uuid, m, this, rmVarMap));
 		}
 		tests = new ArrayList<TestImpl>();
 		List<TestType> tdata = target.getTest();
 		for (TestType t : tdata) {
-			tests.add(new TestImpl(uuid, t));
+			tests.add(new TestImpl(uuid, t, rmVarMap));
 		}
 		targets = new ArrayList<Object>();
 		selected = false;
@@ -151,9 +155,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		}
 		Object target = null;
 		if (ref != null) {
-			RMVariableMap vmap = RMVariableMap.getActiveInstance();
-			String name = vmap.getString(uuid, ref);
-			target = vmap.get(name);
+			String name = rmVarMap.getString(uuid, ref);
+			target = rmVarMap.get(name);
 			if (target == null) {
 				throw CoreExceptionUtils.newException(Messages.StreamParserNoSuchVariableError + name, null);
 			}
@@ -204,7 +207,7 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 			} else if (ATTRIBUTE.equals(type)) {
 				mergeAttributes(targets);
 			}
-			Map<String, Object> dmap = RMVariableMap.getActiveInstance().getDiscovered();
+			Map<String, Object> dmap = rmVarMap.getDiscovered();
 			for (Object t : targets) {
 				for (TestImpl test : tests) {
 					test.setTarget(t);

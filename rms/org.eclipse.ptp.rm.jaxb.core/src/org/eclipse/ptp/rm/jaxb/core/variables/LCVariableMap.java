@@ -59,8 +59,7 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
  * @author arossi
  */
 public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
-
-	private static LCVariableMap active;
+	private static final Object monitor = new Object();
 
 	private Map<String, Object> globalValues;
 	private Map<String, Object> values;
@@ -213,7 +212,9 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Calls the string substitution method on the variable manager.
+	 * Calls the string substitution method on the variable manager. Under
+	 * synchronization, sets the variable resolver's map reference to this
+	 * instance.
 	 * 
 	 * @param expression
 	 *            to be resolved (recursively dereferenced from the map).
@@ -224,7 +225,10 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		if (expression == null) {
 			return null;
 		}
-		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
+		synchronized (monitor) {
+			LCVariableResolver.setActive(this);
+			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
+		}
 	}
 
 	/**
@@ -303,13 +307,6 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * @return the currently active map
-	 */
-	public synchronized static LCVariableMap getActiveInstance() {
-		return active;
-	}
-
-	/**
 	 * Ensures that non-JAXB-spacific attributes remain in the configuration
 	 * during replace/refresh.
 	 * 
@@ -331,13 +328,5 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		standard.put(EXEC_PATH, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, ZEROSTR));
 		standard.put(PROG_ARGS, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, ZEROSTR));
 		return standard;
-	}
-
-	/**
-	 * @param instance
-	 *            to be exported as the currently active map
-	 */
-	public synchronized static void setActiveInstance(LCVariableMap instance) {
-		active = instance;
 	}
 }

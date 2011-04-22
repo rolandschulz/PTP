@@ -37,12 +37,18 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	protected String field;
 	protected Object target;
 	protected int index;
+	protected RMVariableMap rmVarMap;
 
-	protected AbstractAssign() {
+	/**
+	 * @param rmVarMap
+	 *            resource manager environment
+	 */
+	protected AbstractAssign(RMVariableMap rmVarMap) {
 		uuid = null;
 		field = null;
 		target = null;
 		index = 0;
+		this.rmVarMap = rmVarMap;
 	}
 
 	/**
@@ -127,7 +133,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	protected String getKey(EntryType entry, String[] values) throws Throwable {
 		String k = entry.getKey();
 		if (k != null) {
-			return (String) normalizedValue(target, uuid, k, false);
+			return (String) normalizedValue(target, uuid, k, false, rmVarMap);
 		}
 		int index = determineKeyIndex(entry);
 		if (values != null) {
@@ -150,7 +156,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	protected Object getValue(EntryType entry, String[] values) throws Throwable {
 		String v = entry.getValue();
 		if (v != null) {
-			return normalizedValue(target, uuid, v, true);
+			return normalizedValue(target, uuid, v, true, rmVarMap);
 		}
 		int index = determineValueIndex(entry);
 		if (values != null) {
@@ -183,26 +189,28 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 *            the JAXB element class.
 	 * @param list
 	 *            the list of wrappers
+	 * @param rmVarMap
+	 *            resource manager environment
 	 */
-	static void add(String uuid, Object assign, List<IAssign> list) {
+	static void add(String uuid, Object assign, List<IAssign> list, RMVariableMap rmVarMap) {
 		if (assign instanceof AddType) {
 			AddType add = (AddType) assign;
-			list.add(new AddImpl(uuid, add));
+			list.add(new AddImpl(uuid, add, rmVarMap));
 			return;
 		}
 		if (assign instanceof AppendType) {
 			AppendType append = (AppendType) assign;
-			list.add(new AppendImpl(uuid, append));
+			list.add(new AppendImpl(uuid, append, rmVarMap));
 			return;
 		}
 		if (assign instanceof PutType) {
 			PutType put = (PutType) assign;
-			list.add(new PutImpl(uuid, put));
+			list.add(new PutImpl(uuid, put, rmVarMap));
 			return;
 		}
 		if (assign instanceof SetType) {
 			SetType set = (SetType) assign;
-			list.add(new SetImpl(uuid, set));
+			list.add(new SetImpl(uuid, set, rmVarMap));
 			return;
 		}
 	}
@@ -242,11 +250,13 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 *            input to be interpreted
 	 * @param convert
 	 *            expression to boolean or int, if applicable.
-	 * 
+	 * @param rmVarMap
+	 *            resource manager environment
 	 * @return value after dereferencing or normalization
 	 * @throws Throwable
 	 */
-	static Object normalizedValue(Object target, String uuid, String expression, boolean convert) throws Throwable {
+	static Object normalizedValue(Object target, String uuid, String expression, boolean convert, RMVariableMap map)
+			throws Throwable {
 		if (expression.startsWith(PD)) {
 			if (target == null) {
 				return null;
@@ -254,8 +264,8 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 			String field = expression.substring(1);
 			return AbstractAssign.get(target, field);
 		} else if (expression.indexOf(OPENV) >= 0) {
-			expression = RMVariableMap.getActiveInstance().getString(uuid, expression);
-			return RMVariableMap.getActiveInstance().getString(uuid, expression);
+			expression = map.getString(uuid, expression);
+			return map.getString(uuid, expression);
 		} else if (convert) {
 			if (TRUE.equalsIgnoreCase(expression)) {
 				return true;

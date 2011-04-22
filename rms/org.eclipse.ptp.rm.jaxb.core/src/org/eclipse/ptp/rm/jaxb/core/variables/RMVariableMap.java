@@ -38,13 +38,13 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
  * 
  */
 public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
-	private static RMVariableMap active;
+	private static final Object monitor = new Object();
 
 	private final Map<String, Object> variables;
 	private final Map<String, Object> discovered;
 	private boolean initialized;
 
-	private RMVariableMap() {
+	public RMVariableMap() {
 		variables = Collections.synchronizedMap(new TreeMap<String, Object>());
 		discovered = Collections.synchronizedMap(new TreeMap<String, Object>());
 		initialized = false;
@@ -219,7 +219,9 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Calls the string substitution method on the variable manager.
+	 * Calls the string substitution method on the variable manager. Under
+	 * synchronization, sets the variable resolver's map reference to this
+	 * instance.
 	 * 
 	 * @param expression
 	 *            to be resolved (recursively dereferenced from the map).
@@ -230,28 +232,9 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		if (expression == null) {
 			return null;
 		}
-		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
-	}
-
-	/**
-	 * @return the currently active instance.
-	 */
-	public synchronized static RMVariableMap getActiveInstance() {
-		return active;
-	}
-
-	/**
-	 * @param instance
-	 *            if <code>null</code>, an empty map is created, set to the
-	 *            active map, and returned. Else the passed-in instance is set
-	 *            and returned.
-	 * @return the resulting active instance
-	 */
-	public synchronized static RMVariableMap setActiveInstance(RMVariableMap instance) {
-		if (instance == null) {
-			instance = new RMVariableMap();
+		synchronized (monitor) {
+			RMVariableResolver.setActive(this);
+			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
 		}
-		RMVariableMap.active = instance;
-		return RMVariableMap.active;
 	}
 }

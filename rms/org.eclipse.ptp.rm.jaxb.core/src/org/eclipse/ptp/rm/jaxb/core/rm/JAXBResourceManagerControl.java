@@ -190,10 +190,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	private final IJAXBResourceManagerConfiguration config;
-	private RMVariableMap rmVarMap;
-	private ControlType controlData;
 	private final Map<String, String> launchEnv;
 	private final JobStatusMap jobStatusMap;
+	private RMVariableMap rmVarMap;
+	private ControlType controlData;
 	private boolean appendLaunchEnv;
 
 	/**
@@ -205,7 +205,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
 		launchEnv = new TreeMap<String, String>();
 		jobStatusMap = new JobStatusMap();
-		jobStatusMap.start();
+		appendLaunchEnv = true;
 	}
 
 	/**
@@ -247,7 +247,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			if (!resourceManagerIsActive()) {
 				return;
 			}
-			resetEnv();
 			PropertyType p = new PropertyType();
 			p.setVisible(false);
 			p.setName(jobId);
@@ -282,7 +281,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
 		try {
 			if (!resourceManagerIsActive()) {
-				return new CommandJobStatus(jobId, IJobStatus.UNDETERMINED);
+				return new CommandJobStatus(jobId, IJobStatus.UNDETERMINED, rmVarMap);
 			}
 
 			/*
@@ -328,7 +327,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 
 			if (status == null) {
-				status = new CommandJobStatus(jobId, state);
+				status = new CommandJobStatus(jobId, state, rmVarMap);
 				jobStatusMap.addJobStatus(jobId, status);
 			} else {
 				status.setState(state);
@@ -360,7 +359,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected void doShutdown() throws CoreException {
 		try {
-			resetEnv();
 			doOnShutdown();
 			doDisconnect();
 			((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences();
@@ -381,6 +379,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+		initialize();
 		getResourceManager().setState(IResourceManager.STARTING_STATE);
 		try {
 			try {
@@ -388,7 +387,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			} catch (RemoteConnectionException t) {
 				throw CoreExceptionUtils.newException(t.getMessage(), t);
 			}
-			resetEnv();
 			doOnStartUp(monitor);
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
@@ -413,10 +411,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	protected synchronized IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
 		if (!resourceManagerIsActive()) {
-			return new CommandJobStatus(UUID.randomUUID().toString(), IJobStatus.UNDETERMINED);
+			return new CommandJobStatus(UUID.randomUUID().toString(), IJobStatus.UNDETERMINED, rmVarMap);
 		}
-
-		resetEnv();
 
 		/*
 		 * give submission a unique id which will in most cases be replaced by
@@ -462,11 +458,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		CommandJobStatus status = null;
 		if (job.waitForId()) {
-			status = new CommandJobStatus();
+			status = new CommandJobStatus(rmVarMap);
 			status.waitForJobId(uuid);
 		} else {
 			String state = job.isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
-			status = new CommandJobStatus(uuid, state);
+			status = new CommandJobStatus(uuid, state, rmVarMap);
 		}
 
 		/*
@@ -641,6 +637,24 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
+	 * 
+	 */
+	private void initialize() {
+		/*
+		 * Use the base configuration which contains the config file information
+		 */
+		IJAXBResourceManagerConfiguration base = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
+		try {
+			rmVarMap = base.getRMVariableMap();
+			controlData = base.getResourceManagerData().getControlData();
+		} catch (Throwable t) {
+			JAXBCorePlugin.log(t);
+		}
+		setFixedConfigurationProperties();
+		jobStatusMap.start();
+	}
+
+	/**
 	 * Checks for existence of either internally generated script or custom
 	 * script path. In either case, either replaces contents of the
 	 * corresponding managed file object or creates one.
@@ -650,8 +664,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @return the set of managed files, possibly with the script file added
 	 */
 	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files) {
-		PropertyType scriptVar = (PropertyType) RMVariableMap.getActiveInstance().get(SCRIPT);
-		PropertyType scriptPathVar = (PropertyType) RMVariableMap.getActiveInstance().get(SCRIPT_PATH);
+		PropertyType scriptVar = (PropertyType) rmVarMap.get(SCRIPT);
+		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
@@ -699,7 +713,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (files == null || files.getFile().isEmpty()) {
 			return true;
 		}
-		ManagedFilesJob job = new ManagedFilesJob(uuid, files, getRemoteServicesDelegate());
+		ManagedFilesJob job = new ManagedFilesJob(uuid, files, getRemoteServicesDelegate(), rmVarMap);
 		job.schedule();
 		try {
 			job.join();
@@ -752,29 +766,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		return false;
 	}
 
-	/**
-	 * Ensure that this manager has its own environement. Add the fixed
-	 * properties again, clear environment from the tab.
-	 */
-	private void resetEnv() {
-		try {
-			/*
-			 * Use the base configuration which contains the config file
-			 * information
-			 */
-			IJAXBResourceManagerConfiguration config = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
-			config.setActive();
-			rmVarMap = RMVariableMap.getActiveInstance();
-			controlData = config.getResourceManagerData().getControlData();
-		} catch (Throwable t) {
-			JAXBCorePlugin.log(t);
-			return;
-		}
-		setFixedConfigurationProperties();
-		launchEnv.clear();
-		appendLaunchEnv = true;
-	}
-
 	private boolean resourceManagerIsActive() {
 		IResourceManager rm = getResourceManager();
 		if (rm != null) {
@@ -805,7 +796,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		CommandJob job = new CommandJob(uuid, command, batch, this);
+		CommandJob job = new CommandJob(uuid, command, batch, this, rmVarMap);
 		if (batch) {
 			Object o = rmVarMap.get(STDOUT);
 			if (o != null) {

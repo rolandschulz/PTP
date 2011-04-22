@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
  * Wrapper implementation.
@@ -31,8 +32,11 @@ public class AppendImpl extends AbstractAssign {
 	 *            be <code>null</code>).
 	 * @param append
 	 *            JAXB data element
+	 * @param rmVarMap
+	 *            resource manager environment
 	 */
-	public AppendImpl(String uuid, AppendType append) {
+	public AppendImpl(String uuid, AppendType append, RMVariableMap rmVarMap) {
+		super(rmVarMap);
 		this.uuid = uuid;
 		this.field = append.getField();
 		separator = append.getSeparator();

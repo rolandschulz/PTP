@@ -32,6 +32,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 public class CommandJobStreamTailFMonitor extends CommandJobStreamMonitor {
 
 	private final RemoteServicesDelegate delegate;
+	private final RMVariableMap rmVarMap;
 	private String remoteFilePath;
 	private IRemoteProcess process;
 
@@ -43,8 +44,8 @@ public class CommandJobStreamTailFMonitor extends CommandJobStreamMonitor {
 	 * @param remoteFilePath
 	 *            of the file to be monitored
 	 */
-	public CommandJobStreamTailFMonitor(IJAXBResourceManagerControl rm, String remoteFilePath) {
-		this(rm, remoteFilePath, null);
+	public CommandJobStreamTailFMonitor(IJAXBResourceManagerControl rm, RMVariableMap rmVarMap, String remoteFilePath) {
+		this(rm, rmVarMap, remoteFilePath, null);
 	}
 
 	/**
@@ -57,8 +58,10 @@ public class CommandJobStreamTailFMonitor extends CommandJobStreamMonitor {
 	 * @param encoding
 	 *            stream encoding or <code>null</code> for system default
 	 */
-	public CommandJobStreamTailFMonitor(IJAXBResourceManagerControl rm, String remoteFilePath, String encoding) {
+	public CommandJobStreamTailFMonitor(IJAXBResourceManagerControl rm, RMVariableMap rmVarMap, String remoteFilePath,
+			String encoding) {
 		this.remoteFilePath = remoteFilePath;
+		this.rmVarMap = rmVarMap;
 		delegate = rm.getRemoteServicesDelegate();
 		bufferLimit = UNDEFINED;
 	}
@@ -88,7 +91,7 @@ public class CommandJobStreamTailFMonitor extends CommandJobStreamMonitor {
 	@Override
 	public void initializeFilePath(String jobId) {
 		if (remoteFilePath != null) {
-			remoteFilePath = RMVariableMap.getActiveInstance().getString(jobId, remoteFilePath);
+			remoteFilePath = rmVarMap.getString(jobId, remoteFilePath);
 		}
 	}
 

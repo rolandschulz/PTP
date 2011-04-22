@@ -100,7 +100,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 					}
 					for (BufferedOutputStream b : bout) {
 						b.write(i);
-						b.flush();
+						// b.flush();
 					}
 				} catch (EOFException eof) {
 					break;
@@ -124,6 +124,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private final CommandType command;
 	private final IJAXBResourceManagerControl rm;
 	private final ICommandJobStreamsProxy proxy;
+	private final RMVariableMap rmVarMap;
 	private final boolean waitForId;
 	private final boolean ignoreExitStatus;
 	private final boolean batch;
@@ -152,11 +153,12 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public CommandJob(String jobUUID, CommandType command, boolean batch, IJAXBResourceManagerControl rm) {
+	public CommandJob(String jobUUID, CommandType command, boolean batch, IJAXBResourceManagerControl rm, RMVariableMap rmVarMap) {
 		super(command.getName());
 		this.command = command;
 		this.batch = batch;
 		this.rm = rm;
+		this.rmVarMap = rmVarMap;
 		this.uuid = jobUUID;
 		this.proxy = new CommandJobStreamsProxy();
 		this.waitForId = command.isWaitForId();
@@ -377,7 +379,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				if (type != null) {
 					stdoutTokenizer = getTokenizer(type);
 				} else {
-					stdoutTokenizer = new ConfigurableRegexTokenizer(uuid, t);
+					stdoutTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap);
 				}
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
@@ -391,7 +393,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				if (type != null) {
 					stderrTokenizer = getTokenizer(type);
 				} else {
-					stderrTokenizer = new ConfigurableRegexTokenizer(uuid, t);
+					stderrTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap);
 				}
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
@@ -411,8 +413,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		if (args == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
 		}
-		RMVariableMap map = RMVariableMap.getActiveInstance();
-		String[] cmdArgs = ArgImpl.getArgs(uuid, args, map);
+		String[] cmdArgs = ArgImpl.getArgs(uuid, args, rmVarMap);
 		RemoteServicesDelegate delegate = rm.getRemoteServicesDelegate();
 		return delegate.getRemoteServices().getProcessBuilder(delegate.getRemoteConnection(), cmdArgs);
 	}
@@ -440,9 +441,8 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			 * first static env, then dynamic
 			 */
 			List<NameValuePairType> vars = command.getEnvironment();
-			RMVariableMap map = RMVariableMap.getActiveInstance();
 			for (NameValuePairType var : vars) {
-				EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), map);
+				EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), rmVarMap);
 			}
 
 			Map<String, String> live = rm.getLaunchEnv();
@@ -471,7 +471,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		if (stderrTokenizer != null) {
 			if (remoteErrPath != null) {
 				tokenizerErr = process.getErrorStream();
-				proxy.setErrMonitor(new CommandJobStreamTailFMonitor(rm, remoteErrPath));
+				proxy.setErrMonitor(new CommandJobStreamTailFMonitor(rm, rmVarMap, remoteErrPath));
 			} else if (!batch) {
 				PipedInputStream tokenizerErr = new PipedInputStream();
 				this.tokenizerErr = tokenizerErr;
@@ -482,7 +482,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				tokenizerErr = process.getErrorStream();
 			}
 		} else if (remoteErrPath != null) {
-			proxy.setErrMonitor(new CommandJobStreamTailFMonitor(rm, remoteErrPath));
+			proxy.setErrMonitor(new CommandJobStreamTailFMonitor(rm, rmVarMap, remoteErrPath));
 			/*
 			 * grab error stream for error reporting
 			 */
@@ -509,7 +509,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		if (stdoutTokenizer != null) {
 			if (remoteOutPath != null) {
 				tokenizerOut = process.getInputStream();
-				proxy.setOutMonitor(new CommandJobStreamTailFMonitor(rm, remoteOutPath));
+				proxy.setOutMonitor(new CommandJobStreamTailFMonitor(rm, rmVarMap, remoteOutPath));
 			} else if (!batch) {
 				PipedInputStream tokenizerOut = new PipedInputStream();
 				this.tokenizerOut = tokenizerOut;
@@ -520,7 +520,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				tokenizerOut = process.getInputStream();
 			}
 		} else if (remoteOutPath != null) {
-			proxy.setOutMonitor(new CommandJobStreamTailFMonitor(rm, remoteOutPath));
+			proxy.setOutMonitor(new CommandJobStreamTailFMonitor(rm, rmVarMap, remoteOutPath));
 			errorStreamReader(process.getInputStream());
 		} else if (!batch) {
 			proxy.setOutMonitor(new CommandJobStreamMonitor(process.getInputStream()));

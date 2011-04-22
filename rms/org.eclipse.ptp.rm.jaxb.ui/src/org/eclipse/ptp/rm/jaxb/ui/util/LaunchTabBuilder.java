@@ -68,15 +68,17 @@ import org.eclipse.swt.widgets.Widget;
 public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 
 	private final JAXBDynamicLaunchConfigurationTab tab;
+	private final RMVariableMap rmVarMap;
 	private final Map<Object, IUpdateModel> localWidgets;
 
 	/**
 	 * @param tab
 	 *            whose control is configurable from the JAXB data tree
 	 */
-	public LaunchTabBuilder(JAXBDynamicLaunchConfigurationTab tab) {
+	public LaunchTabBuilder(JAXBDynamicLaunchConfigurationTab tab) throws Throwable {
 		this.tab = tab;
 		this.localWidgets = tab.getLocalWidgets();
+		this.rmVarMap = tab.getParent().getRmConfig().getRMVariableMap();
 	}
 
 	/**
@@ -381,14 +383,13 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * @return list of models for the added items
 	 */
 	private Collection<ICellEditorUpdateModel> addRows(ColumnViewer viewer, AttributeViewerType descriptor) {
-		RMVariableMap rmMap = RMVariableMap.getActiveInstance();
 		ViewerItemsType items = descriptor.getItems();
 		List<ColumnDataType> columnData = descriptor.getColumnData();
 		ICellEditorUpdateModel model = null;
 		Map<String, ICellEditorUpdateModel> hash = new TreeMap<String, ICellEditorUpdateModel>();
 		Map<String, Object> vars = null;
 		if (items.isAllPredefined()) {
-			vars = rmMap.getVariables();
+			vars = rmVarMap.getVariables();
 			for (String key : vars.keySet()) {
 				Object o = vars.get(key);
 				if (!isVisible(o)) {
@@ -399,7 +400,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			}
 		}
 		if (items.isAllDiscovered()) {
-			vars = rmMap.getDiscovered();
+			vars = rmVarMap.getDiscovered();
 			for (String key : vars.keySet()) {
 				Object o = vars.get(key);
 				if (!isVisible(o)) {
@@ -413,12 +414,12 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 			if (hash.containsKey(key)) {
 				continue;
 			}
-			Object o = rmMap.getVariables().get(key);
+			Object o = rmVarMap.getVariables().get(key);
 			if (!isVisible(o)) {
 				continue;
 			}
 			if (o == null) {
-				o = rmMap.getDiscovered().get(key);
+				o = rmVarMap.getDiscovered().get(key);
 			}
 			if (o != null) {
 				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
@@ -448,7 +449,7 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 *            widget
 	 */
 	private void addWidget(Composite control, WidgetType widget) {
-		IUpdateModel model = UpdateModelFactory.createModel(control, widget, tab);
+		IUpdateModel model = UpdateModelFactory.createModel(control, widget, tab, rmVarMap);
 		/*
 		 * Label models are not returned, since they cannot be updated
 		 */

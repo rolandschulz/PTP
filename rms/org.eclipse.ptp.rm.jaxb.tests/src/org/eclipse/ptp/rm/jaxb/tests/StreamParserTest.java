@@ -41,9 +41,8 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		private int len;
 
 		public Range(String expression) {
-			RMVariableMap map = RMVariableMap.getActiveInstance();
-			assert (null != map);
-			this.expression = map.getString(uuid, expression);
+			assert (null != rmVarMap);
+			this.expression = rmVarMap.getString(uuid, expression);
 		}
 
 		public List<Object> findInRange(String[] values) {
@@ -124,10 +123,11 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	private String target;
 	private List<CommandType> startup;
 	private CommandType getStatus;
+	private RMVariableMap rmVarMap;
 
 	@Override
 	public void setUp() {
-		RMVariableMap.setActiveInstance(null);
+		rmVarMap = new RMVariableMap();
 		String name = getName();
 		if (name.equals("testRange")) { //$NON-NLS-1$
 			// the second number is <, not <=
@@ -162,9 +162,9 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		target = "available_queues"; //$NON-NLS-1$
 		PropertyType p = new PropertyType();
 		p.setName(target);
-		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		rmVarMap.getVariables().put(target, p);
 		runTokenizer(startup.get(0).getStdoutParser(), getQstatOut());
-		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(target);
+		p = (PropertyType) rmVarMap.getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -178,9 +178,9 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		PropertyType p = new PropertyType();
 		p.setName(target);
 		p.setValue(target);
-		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		rmVarMap.getVariables().put(target, p);
 		runTokenizer(startup.get(1).getStdoutParser(), getNoiseBeforeJobId());
-		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(target);
+		p = (PropertyType) rmVarMap.getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -191,7 +191,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	public void test02OpenMPI() {
 		target = ATTRIBUTE;
 		runTokenizer(startup.get(2).getStdoutParser(), getOpenMPIOut());
-		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		Map<String, Object> d = rmVarMap.getDiscovered();
 		for (Object o : d.values()) {
 			AttributeType ja = (AttributeType) o;
 			if (verbose) {
@@ -208,7 +208,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 	public void test03ImplicitWithTags() {
 		runTokenizer(startup.get(3).getStdoutParser(), getImplicitWithTags());
-		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		Map<String, Object> d = rmVarMap.getDiscovered();
 		for (Object o : d.values()) {
 			if (o instanceof PropertyType) {
 				PropertyType p = (PropertyType) o;
@@ -233,7 +233,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	public void test04ImplicitOrdering() {
 		target = ATTRIBUTE;
 		runTokenizer(startup.get(4).getStdoutParser(), getImplicitOrdering());
-		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		Map<String, Object> d = rmVarMap.getDiscovered();
 		for (Object o : d.values()) {
 			AttributeType ja = (AttributeType) o;
 			if (verbose) {
@@ -250,7 +250,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 	public void test05ImplicitWithTagsDotall() {
 		runTokenizer(startup.get(5).getStdoutParser(), getImplicitWithTags());
-		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		Map<String, Object> d = rmVarMap.getDiscovered();
 		for (Object o : d.values()) {
 			if (o instanceof PropertyType) {
 				PropertyType p = (PropertyType) o;
@@ -275,7 +275,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	public void test06PropertyDefsSingleLine() {
 		target = PROPERTY;
 		runTokenizer(startup.get(6).getStdoutParser(), getPropertyDefs());
-		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		Map<String, Object> d = rmVarMap.getDiscovered();
 		for (Object o : d.values()) {
 			PropertyType p = (PropertyType) o;
 			if (verbose) {
@@ -291,9 +291,9 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		target = "jobStates"; //$NON-NLS-1$
 		PropertyType p = new PropertyType();
 		p.setName(target);
-		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		rmVarMap.getVariables().put(target, p);
 		runTokenizer(startup.get(7).getStdoutParser(), getJobStates());
-		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(target);
+		p = (PropertyType) rmVarMap.getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -303,7 +303,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 	public void test08Staggered() {
 		runTokenizer(startup.get(8).getStdoutParser(), getStaggered());
-		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		Map<String, Object> d = rmVarMap.getDiscovered();
 		for (Object o : d.values()) {
 			if (o instanceof PropertyType) {
 				PropertyType p = (PropertyType) o;
@@ -328,7 +328,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	public void test09Merged() {
 		target = PROPERTY;
 		runTokenizer(startup.get(9).getStdoutParser(), getMergedOrdering());
-		Map<String, Object> d = RMVariableMap.getActiveInstance().getDiscovered();
+		Map<String, Object> d = rmVarMap.getDiscovered();
 		for (Object o : d.values()) {
 			PropertyType p = (PropertyType) o;
 			if (verbose) {
@@ -345,9 +345,9 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		target = "jobStates"; //$NON-NLS-1$
 		PropertyType p = new PropertyType();
 		p.setName(target);
-		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		rmVarMap.getVariables().put(target, p);
 		runTokenizer(startup.get(10).getStdoutParser(), getJobStates());
-		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(target);
+		p = (PropertyType) rmVarMap.getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -359,9 +359,9 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		target = "jobStates"; //$NON-NLS-1$
 		PropertyType p = new PropertyType();
 		p.setName(target);
-		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		rmVarMap.getVariables().put(target, p);
 		runTokenizer(startup.get(11).getStdoutParser(), getJobStates());
-		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(target);
+		p = (PropertyType) rmVarMap.getVariables().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -374,9 +374,9 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		uuid = target;
 		PropertyType p = new PropertyType();
 		p.setName(target);
-		RMVariableMap.getActiveInstance().getVariables().put(target, p);
+		rmVarMap.getVariables().put(target, p);
 		runTokenizer(getStatus.getStdoutParser(), getQstat());
-		p = (PropertyType) RMVariableMap.getActiveInstance().getVariables().get(this.target);
+		p = (PropertyType) rmVarMap.getVariables().get(this.target);
 		assertNotNull(p);
 		System.out.println(p.getName() + CM + SP + p.getValue());
 	}
@@ -406,7 +406,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	private void runTokenizer(TokenizerType tokenizer, InputStream stream) {
-		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(uuid, tokenizer);
+		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(uuid, tokenizer, rmVarMap);
 		t.setInputStream(stream);
 		Thread thr = new Thread(t);
 		thr.start();

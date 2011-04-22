@@ -39,6 +39,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	private static boolean verbose = false;
 
 	private RemoteServicesDelegate delegate;
+	private RMVariableMap rmVarMap;
 
 	@Override
 	public void setUp() {
@@ -46,9 +47,9 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 			JAXBTestsPlugin.validate(xml);
 			ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(JAXBTestsPlugin.getURL(xml));
 			controlData = rmdata.getControlData();
-			RMVariableMap map = RMVariableMap.setActiveInstance(null);
-			JAXBInitializationUtils.initializeMap(rmdata, map);
-			env = map.getVariables();
+			rmVarMap = new RMVariableMap();
+			JAXBInitializationUtils.initializeMap(rmdata, rmVarMap);
+			env = rmVarMap.getVariables();
 			live = new HashMap<String, String>();
 			live.put("FOO_VAR_1", "FOO_VALUE_1"); //$NON-NLS-1$ //$NON-NLS-2$
 			live.put("FOO_VAR_2", "FOO_VALUE_2"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -80,7 +81,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 		files = maybeAddManagedFileForScript(files);
 		assertNotNull(files);
 		try {
-			ManagedFilesJob job = new ManagedFilesJob(null, files, delegate);
+			ManagedFilesJob job = new ManagedFilesJob(null, files, delegate, rmVarMap);
 			job.schedule();
 			try {
 				job.join();
@@ -96,7 +97,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	private void composeScript() {
 		ScriptType script = controlData.getScript();
 		assertNotNull(script);
-		ScriptHandler job = new ScriptHandler(null, script, RMVariableMap.getActiveInstance(), live);
+		ScriptHandler job = new ScriptHandler(null, script, rmVarMap, live);
 		job.schedule();
 		try {
 			job.join();
@@ -113,8 +114,8 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files) {
-		PropertyType scriptVar = (PropertyType) RMVariableMap.getActiveInstance().get(SCRIPT);
-		PropertyType scriptPathVar = (PropertyType) RMVariableMap.getActiveInstance().get(SCRIPT_PATH);
+		PropertyType scriptVar = (PropertyType) rmVarMap.get(SCRIPT);
+		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
@@ -172,7 +173,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 		putValue(MPI_ARGS, "-np 8"); //$NON-NLS-1$ 
 		putValue(EXEC_PATH, "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ 
 		if (verbose) {
-			RMDataTest.print(RMVariableMap.getActiveInstance());
+			RMDataTest.print(rmVarMap);
 		}
 	}
 }
