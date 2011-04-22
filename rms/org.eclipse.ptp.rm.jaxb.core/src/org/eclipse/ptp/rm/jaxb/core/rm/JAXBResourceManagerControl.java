@@ -191,7 +191,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	private final IJAXBResourceManagerConfiguration config;
 	private final Map<String, String> launchEnv;
-	private final JobStatusMap jobStatusMap;
+	private JobStatusMap jobStatusMap;
 	private RMVariableMap rmVarMap;
 	private ControlType controlData;
 	private boolean appendLaunchEnv;
@@ -204,8 +204,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
 		launchEnv = new TreeMap<String, String>();
-		jobStatusMap = new JobStatusMap();
-		appendLaunchEnv = true;
 	}
 
 	/**
@@ -651,6 +649,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			JAXBCorePlugin.log(t);
 		}
 		setFixedConfigurationProperties();
+		launchEnv.clear();
+		appendLaunchEnv = true;
+		jobStatusMap = new JobStatusMap();
 		jobStatusMap.start();
 	}
 

@@ -100,7 +100,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 					}
 					for (BufferedOutputStream b : bout) {
 						b.write(i);
-						// b.flush();
+						b.flush();
 					}
 				} catch (EOFException eof) {
 					break;
