@@ -134,7 +134,8 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 * captured via tail -F and displayed in the console.<br>
 	 * <br>
 	 * Checks to see if this option makes sense by seeing if the configuration
-	 * supports batch submissions.
+	 * supports batch submissions, and also whether the configuration contains
+	 * the necessary property.
 	 * 
 	 * @param parent
 	 *            composite to add to
@@ -144,6 +145,10 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	protected void createOutputCaptureOption(final Composite parent, boolean tooltip) {
 		try {
 			if (parentTab.getRmConfig().getResourceManagerData().getControlData().getSubmitBatch() == null) {
+				return;
+			}
+			RMVariableMap map = parentTab.getRmConfig().getRMVariableMap();
+			if (map.get(STDOUT_TAIL_F) == null && map.get(STDERR_TAIL_F) == null) {
 				return;
 			}
 		} catch (Throwable t) {
