@@ -799,7 +799,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		CommandJob job = new CommandJob(uuid, command, batch, this, rmVarMap);
 		if (batch) {
-			Object o = rmVarMap.get(STDOUT);
+			Object o = rmVarMap.get(STDOUT_TAIL_F);
 			if (o != null) {
 				if (o instanceof PropertyType) {
 					job.setRemoteOutPath((String) ((PropertyType) o).getValue());
@@ -807,7 +807,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					job.setRemoteOutPath((String) ((AttributeType) o).getValue());
 				}
 			}
-			o = rmVarMap.get(STDERR);
+			o = rmVarMap.get(STDERR_TAIL_F);
 			if (o != null) {
 				if (o instanceof PropertyType) {
 					job.setRemoteErrPath((String) ((PropertyType) o).getValue());
@@ -890,19 +890,21 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * The non-selected variables have been excluded from the launch
 		 * configuration; but we need to null out the superset values here that
-		 * are undefined.
+		 * are undefined. We also need to take care of the tailF redirect
+		 * variables (which are not visible but are set in the launch tab by an
+		 * option checkbox).
 		 */
 		for (String key : rmVarMap.getVariables().keySet()) {
 			if (!lcattr.containsKey(key)) {
 				Object target = rmVarMap.get(key.toString());
 				if (target instanceof PropertyType) {
 					PropertyType p = (PropertyType) target;
-					if (p.isVisible()) {
+					if (p.isVisible() || STDOUT_TAIL_F.equals(key) || STDERR_TAIL_F.equals(key)) {
 						p.setValue(null);
 					}
 				} else if (target instanceof AttributeType) {
 					AttributeType ja = (AttributeType) target;
-					if (ja.isVisible()) {
+					if (ja.isVisible() || STDOUT_TAIL_F.equals(key) || STDERR_TAIL_F.equals(key)) {
 						ja.setValue(null);
 					}
 				}

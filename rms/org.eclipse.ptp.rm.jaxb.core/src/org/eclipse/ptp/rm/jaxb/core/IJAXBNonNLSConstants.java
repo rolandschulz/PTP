@@ -143,8 +143,8 @@ public interface IJAXBNonNLSConstants {
 	String SH = ".sh";//$NON-NLS-1$
 	String SETENV = "setenv";//$NON-NLS-1$
 	String EXPORT = "export";//$NON-NLS-1$
-	String STDOUT = "stdout";//$NON-NLS-1$
-	String STDERR = "stderr";//$NON-NLS-1$
+	String STDOUT_TAIL_F = "stdout_tailF";//$NON-NLS-1$
+	String STDERR_TAIL_F = "stderr_tailF";//$NON-NLS-1$
 	String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";//$NON-NLS-1$
 
 	String RESOURCE_MANAGERS = "resourceManagers";//$NON-NLS-1$

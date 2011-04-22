@@ -138,6 +138,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetBuilderUtils.createComposite(parent, 1);
+		createOutputCaptureOption(control, false);
 		try {
 			LaunchTabBuilder builder = new LaunchTabBuilder(this);
 			builder.build(control);
@@ -335,13 +336,14 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/*
-	 * Adds the View Script and Restore Defaults buttons to the bottom of the
-	 * control pane.
+	 * Adds the Job Output, View Script and Restore Defaults buttons to the
+	 * bottom of the control pane.
 	 */
 	private void createViewScriptGroup(final Composite control) {
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true);
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true, 5, 5, 2, 2);
 		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 2);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
+
 		if (parentTab.hasScript()) {
 			WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, this);
 		}

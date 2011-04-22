@@ -104,6 +104,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 */
 	public void createControl(final Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetBuilderUtils.createComposite(parent, 1);
+		createOutputCaptureOption(control, true);
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(5, true);
 		GridData gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 700, DEFAULT, 5, DEFAULT);
 		Composite comp = WidgetBuilderUtils.createComposite(control, SWT.NONE, layout, gd);
