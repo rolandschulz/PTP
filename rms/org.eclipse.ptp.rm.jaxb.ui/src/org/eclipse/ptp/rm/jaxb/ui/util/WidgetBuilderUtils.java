@@ -107,7 +107,9 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 */
 	public static Button createButton(Composite parent, Object layoutData, String label, Integer style, SelectionListener listener) {
 		Button button = new Button(parent, style);
-		button.setText(label);
+		if (label != null) {
+			button.setText(label);
+		}
 		if (layoutData == null) {
 			layoutData = createGridData(DEFAULT, 1);
 		}

@@ -99,6 +99,10 @@ public class Messages extends NLS {
 	public static String ConfigurationImportWizardPageLabel;
 	public static String ResourceManagersNotExist;
 	public static String ResourceManagersNotExist_title;
+	public static String CaptureJobOutput;
+	public static String CaptureJobOutputTooltip;
+	public static String CaptureJobOutputError;
+	public static String CaptureJobOutputError_title;
 
 	static {
 		// initialize resource bundle
