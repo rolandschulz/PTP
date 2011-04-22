@@ -35,8 +35,17 @@
 #include "locker.hpp"
 #include "extlaunch.hpp"
 
+#ifdef DAEMON_PORT
+#define SCID_PORT DAEMON_PORT
+#else
 #define SCID_PORT 6188
-#define SCID_NAME "sciv1"
+#endif
+
+#ifdef DAEMON_NAME
+#define SCID_NAME DAEMON_NAME
+#else
+#define SCID_NAME "sciv1" 
+#endif
 
 ExtListener::ExtListener()
 {
@@ -79,7 +88,17 @@ void ExtListener::run()
         log_error("Failed to read config file!\n");
     }
 
-    socket.listen(port);
+    try {
+        socket.listen(port);
+    }catch (SocketException &e) {
+        log_error("socket exception %s", e.getErrMsg().c_str());
+        setState(false);
+        exit(-1);
+    } catch (...) {
+        log_error("unknown exception");
+        setState(false);
+        exit(-1);
+    }
     log_crit("Extended listener is running");
 
     while (getState()) {
