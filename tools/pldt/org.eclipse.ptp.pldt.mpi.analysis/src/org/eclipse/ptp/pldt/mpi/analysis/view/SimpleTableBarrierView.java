@@ -186,17 +186,16 @@ public class SimpleTableBarrierView extends ViewPart {
 	public static final int CONSTANT = 2;
 
 	/** types of constructs, for the default case */
-	public static final String[] CONSTRUCT_TYPE_NAMES = { Messages.SimpleTableBarrierView_none, Messages.SimpleTableBarrierView_functionCall, Messages.SimpleTableBarrierView_constant };
+	public static final String[] CONSTRUCT_TYPE_NAMES = { Messages.SimpleTableBarrierView_none,
+			Messages.SimpleTableBarrierView_functionCall, Messages.SimpleTableBarrierView_constant };
 
 	/**
 	 * Simple Artifact Table View constructor
 	 * <p>
-	 * Everything can be null, and defaults will be taken, or read from
-	 * plugin.xml for the view.
+	 * Everything can be null, and defaults will be taken, or read from plugin.xml for the view.
 	 * <p>
-	 * Note: if a null plugIn instance is provided, the default plugin (this
-	 * one) will not be able to find resources (e.g. icon images) if the derived
-	 * class is in its own plug-in, and its icons are, too.
+	 * Note: if a null plugIn instance is provided, the default plugin (this one) will not be able to find resources (e.g. icon
+	 * images) if the derived class is in its own plug-in, and its icons are, too.
 	 */
 	public SimpleTableBarrierView(AbstractUIPlugin thePlugin, String thingname, String thingnames, String columnName,
 			String markerID) {
@@ -667,10 +666,8 @@ public class SimpleTableBarrierView extends ViewPart {
 		 *            the marker object that this artifact is represented by
 		 * @return image for marker
 		 *         <p>
-		 *         Note: if a null plugIn instance is provided on the view ctor,
-		 *         the default plugin (this one) will not be able to find
-		 *         resources (e.g. icon images) if the derived class is in its
-		 *         own plug-in, and its icons are, too.
+		 *         Note: if a null plugIn instance is provided on the view ctor, the default plugin (this one) will not be able to
+		 *         find resources (e.g. icon images) if the derived class is in its own plug-in, and its icons are, too.
 		 * 
 		 */
 		protected Image getCustomImage(Object obj) {
@@ -1020,7 +1017,8 @@ public class SimpleTableBarrierView extends ViewPart {
 		table.setLayout(layout);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
-		String[] STD_HEADINGS = { " ", thingname_, Messages.SimpleTableBarrierView_filename, Messages.SimpleTableBarrierView_lineNo, this.columnName_ }; //$NON-NLS-1$
+		String[] STD_HEADINGS = {
+				" ", thingname_, Messages.SimpleTableBarrierView_filename, Messages.SimpleTableBarrierView_lineNo, this.columnName_ }; //$NON-NLS-1$
 
 		layout.addColumnData(new ColumnWeightData(1, 1, true));
 		TableColumn tc0 = new TableColumn(table, SWT.NONE);
@@ -1253,7 +1251,8 @@ public class SimpleTableBarrierView extends ViewPart {
 					MessageDialog.openInformation(null, title, info.toString());
 				}// end if selectedMarker!=null
 				else {
-					MessageDialog.openInformation(null, title, Messages.SimpleTableBarrierView_no + thingname_ + Messages.SimpleTableBarrierView_selected);
+					MessageDialog.openInformation(null, title, Messages.SimpleTableBarrierView_no + thingname_
+							+ Messages.SimpleTableBarrierView_selected);
 				}
 				// ------------------
 			}
@@ -1271,11 +1270,13 @@ public class SimpleTableBarrierView extends ViewPart {
 		filterAction = new Action() {
 			@Override
 			public void run() {
-				showMessage(Messages.SimpleTableBarrierView_filter + thingnames_ + Messages.SimpleTableBarrierView_determineWhich + thingnames_ + Messages.SimpleTableBarrierView_areShownInThisViewDot);
+				showMessage(Messages.SimpleTableBarrierView_filter + thingnames_ + Messages.SimpleTableBarrierView_determineWhich
+						+ thingnames_ + Messages.SimpleTableBarrierView_areShownInThisViewDot);
 			}
 		};
 		filterAction.setText(Messages.SimpleTableBarrierView_filter + thingnames_);
-		filterAction.setToolTipText(Messages.SimpleTableBarrierView_filterWhich + thingnames_ + Messages.SimpleTableBarrierView_areShownInThisView);
+		filterAction.setToolTipText(Messages.SimpleTableBarrierView_filterWhich + thingnames_
+				+ Messages.SimpleTableBarrierView_areShownInThisView);
 	}
 
 	/**

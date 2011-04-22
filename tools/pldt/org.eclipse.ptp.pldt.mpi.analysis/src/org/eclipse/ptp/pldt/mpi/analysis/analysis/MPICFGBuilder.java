@@ -16,21 +16,22 @@ import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
 
 public class MPICFGBuilder {
 	protected ICallGraph cg_;
-	
-	public MPICFGBuilder(ICallGraph cg){
+
+	public MPICFGBuilder(ICallGraph cg) {
 		cg_ = cg;
 	}
-	
-	public void run(){
-		for(ICallGraphNode n = cg_.topEntry(); n != null; n = n.topNext()){
-			MPICallGraphNode node = (MPICallGraphNode)n;
-			if(!node.marked) continue;
-			//if(node.getFuncName().equals("yyparse"))
-				//System.out.println(node.getFuncName());
+
+	public void run() {
+		for (ICallGraphNode n = cg_.topEntry(); n != null; n = n.topNext()) {
+			MPICallGraphNode node = (MPICallGraphNode) n;
+			if (!node.marked)
+				continue;
+			// if(node.getFuncName().equals("yyparse"))
+			// System.out.println(node.getFuncName());
 			MPIControlFlowGraph cfg = new MPIControlFlowGraph(node.getFuncDef().getBody());
 			cfg.buildCFG();
 			n.setCFG(cfg);
-			//cfg.print();
+			// cfg.print();
 		}
 		MPIBlock.clean();
 	}

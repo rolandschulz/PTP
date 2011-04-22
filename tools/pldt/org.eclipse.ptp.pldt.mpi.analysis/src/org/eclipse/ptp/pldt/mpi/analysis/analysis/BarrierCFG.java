@@ -40,6 +40,7 @@ public class BarrierCFG extends ControlFlowGraph {
 			prog_.accept(this);
 		}
 
+		//@formatter:off
 		/*
 		public int visit(IASTStatement stmt) 
 		{
@@ -121,5 +122,6 @@ public class BarrierCFG extends ControlFlowGraph {
 			} 
 			return PROCESS_CONTINUE;
 		} */
+		//@formatter:on
 	}
 }

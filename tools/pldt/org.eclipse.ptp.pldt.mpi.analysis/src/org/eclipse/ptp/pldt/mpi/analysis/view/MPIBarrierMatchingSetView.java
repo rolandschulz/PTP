@@ -16,16 +16,15 @@ import org.eclipse.ptp.pldt.mpi.analysis.Activator;
 import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 
-
 /**
  * Show the members of a barrier matching set, in a tree table view.
  * 
- * TODO: try to use  class from 'common' package instead
+ * TODO: try to use class from 'common' package instead
  */
 public class MPIBarrierMatchingSetView extends SimpleTreeTableMarkerView {
 	public MPIBarrierMatchingSetView() {
 
-		super(Activator.getDefault(), "FunctionName", Messages.MPIBarrierMatchingSetView_matchingSetArtifacts,  //$NON-NLS-1$
-				Messages.MPIBarrierMatchingSetView_indexNum, IDs.matchingSetMarkerID /*,  common ver needs:"parent"*/ );
+		super(Activator.getDefault(), "FunctionName", Messages.MPIBarrierMatchingSetView_matchingSetArtifacts, //$NON-NLS-1$
+				Messages.MPIBarrierMatchingSetView_indexNum, IDs.matchingSetMarkerID /* , common ver needs:"parent" */);
 	}
 }
