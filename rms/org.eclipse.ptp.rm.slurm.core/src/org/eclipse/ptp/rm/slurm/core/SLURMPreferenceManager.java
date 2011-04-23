@@ -36,7 +36,6 @@ public class SLURMPreferenceManager extends AbstractPreferenceInitializer {
 
 	@Override
 	public void initializeDefaultPreferences() {
-		Preferences.setDefaultString(SLURMCorePlugin.getUniqueIdentifier(), RMPreferenceConstants.PROXY_PATH, ""); //$NON-NLS-1$
 		Preferences.setDefaultInt(SLURMCorePlugin.getUniqueIdentifier(), RMPreferenceConstants.OPTIONS, OPTIONS);
 	}
 }

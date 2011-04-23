@@ -115,8 +115,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	 * #getRunMiniproxy()
 	 */
 	public String getRunMiniproxy() {
-		return getString(TAG_RUN_MINIPROXY,
-				Preferences.getString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.RUN_MINIPROXY));
+		return "";
 	}
 
 	/*
