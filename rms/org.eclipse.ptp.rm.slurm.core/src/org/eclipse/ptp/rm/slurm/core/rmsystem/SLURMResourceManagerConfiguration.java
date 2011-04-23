@@ -52,8 +52,7 @@ public class SLURMResourceManagerConfiguration extends AbstractRemoteResourceMan
 	 * #getSlurmdPath()
 	 */
 	public String getSlurmdPath() {
-		return getString(TAG_SLURMD_PATH,
-				Preferences.getString(SLURMCorePlugin.getUniqueIdentifier(), RMPreferenceConstants.PROXY_PATH));
+		return "";
 	}
 
 	/*

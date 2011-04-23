@@ -15,6 +15,5 @@ package org.eclipse.ptp.rm.core;
  * Constant definitions for plug-in preferences
  */
 public interface RMPreferenceConstants {
-	public static final String PROXY_PATH = "PROXY_PATH";  //$NON-NLS-1$
 	public static final String OPTIONS = "OPTIONS";  //$NON-NLS-1$
 }

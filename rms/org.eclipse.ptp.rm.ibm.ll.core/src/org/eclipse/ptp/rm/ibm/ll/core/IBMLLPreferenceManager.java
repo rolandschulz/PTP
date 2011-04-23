@@ -69,7 +69,6 @@ public class IBMLLPreferenceManager extends AbstractPreferenceInitializer {
 			}
 		}
 
-		Preferences.setDefaultString(IBMLLCorePlugin.getUniqueIdentifier(), RMPreferenceConstants.PROXY_PATH, server);
 		Preferences.setDefaultInt(IBMLLCorePlugin.getUniqueIdentifier(), RMPreferenceConstants.OPTIONS, OPTIONS);
 		Preferences.setDefaultString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.PROXY_INFO_MESSAGE,
 				IBMLLPreferenceConstants.LL_NO);
@@ -85,16 +84,12 @@ public class IBMLLPreferenceManager extends AbstractPreferenceInitializer {
 				IBMLLPreferenceConstants.LL_NO);
 		Preferences.setDefaultString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.PROXY_DEBUG_LOOP,
 				IBMLLPreferenceConstants.LL_NO);
-		Preferences.setDefaultString(IBMLLCorePlugin.getUniqueIdentifier(),
-				IBMLLPreferenceConstants.PROXY_LOADLEVELER_LIBRARY_PATH, ""); //$NON-NLS-1$
 		Preferences.setDefaultString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.PROXY_DEFAULT_MULTICLUSTER,
 				IBMLLPreferenceConstants.LL_NO);
 		Preferences.setDefaultString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.PROXY_FORCE_LOCAL,
 				IBMLLPreferenceConstants.LL_NO);
 		Preferences.setDefaultString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.PROXY_FORCE_MULTICLUSTER,
 				IBMLLPreferenceConstants.LL_NO);
-		Preferences.setDefaultString(IBMLLCorePlugin.getUniqueIdentifier(),
-				IBMLLPreferenceConstants.PROXY_LOADLEVELER_TEMPLATE_FILE, ""); //$NON-NLS-1$
 		Preferences.setDefaultString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.PROXY_WRITE_TEMPLATE_ALWAYS,
 				IBMLLPreferenceConstants.LL_NO);
 		Preferences.setDefaultString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.PROXY_WRITE_TEMPLATE_NEVER,

@@ -224,8 +224,7 @@ public class IBMLLResourceManagerConfiguration extends AbstractRemoteResourceMan
 	 * getLibraryPath()
 	 */
 	public String getLibraryPath() {
-		return getString(TAG_LL_LIBPATH, Preferences.getString(IBMLLCorePlugin.getUniqueIdentifier(),
-				IBMLLPreferenceConstants.PROXY_LOADLEVELER_LIBRARY_PATH));
+		return "";
 	}
 
 	/*
@@ -268,8 +267,7 @@ public class IBMLLResourceManagerConfiguration extends AbstractRemoteResourceMan
 	 * getTemplateFile()
 	 */
 	public String getTemplateFile() {
-		return getString(TAG_TEMPLATE_FILE, Preferences.getString(IBMLLCorePlugin.getUniqueIdentifier(),
-				IBMLLPreferenceConstants.PROXY_LOADLEVELER_TEMPLATE_FILE));
+		return "";
 	}
 
 	/*
