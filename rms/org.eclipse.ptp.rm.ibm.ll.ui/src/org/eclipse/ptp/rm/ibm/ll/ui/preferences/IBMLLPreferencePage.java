@@ -24,31 +24,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.ll.ui.preferences;
 
-import java.io.File;
-
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLCorePlugin;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager;
 import org.eclipse.ptp.rm.ibm.ll.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.preferences.AbstractRemoteRMPreferencePage;
-import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 
 public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
@@ -94,11 +87,11 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		public void widgetSelected(SelectionEvent e) {
 			// System.err.println("preferences: widgetSelected");
 
-			Object source = e.getSource();
+			e.getSource();
 		}
 	}
 
-	private EventMonitor libraryListener = null; /* validate library name */
+	private final EventMonitor libraryListener = null; /* validate library name */
 	private Button proxyTraceMessageButton = null;
 	private Button proxyInfoMessageButton = null;
 	private Button proxyWarningMessageButton = null;
@@ -171,12 +164,10 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 	@Override
 	protected Control createContents(Composite parent) {
 		Control preferencePane;
-		Group proxyLibraryGroup = null;
 		Group proxyOptionsGroup = null;
 		Group proxyDebugGroup = null;
 		Group guiOptionsGroup = null;
 		Group proxyMulticlusterGroup = null;
-		Group proxyTemplateGroup = null;
 		Group proxyTemplateOptionsGroup = null;
 		Group proxyPollingGroup = null;
 
@@ -184,7 +175,6 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 		eventMonitor = new EventMonitor();
 		preferencePane = super.createContents(parent);
-
 
 		// *********************************************************************
 		// Check box group for proxy messages
@@ -369,7 +359,6 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyForceMulticlusterRadioButton.setToolTipText(Messages
 				.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterToolTip")); //$NON-NLS-1$
 
-
 		// *********************************************************************
 		// Template options group
 		// *********************************************************************
@@ -447,8 +436,9 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 	@Override
 	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals("")) //$NON-NLS-1$
+		if (text.trim().length() == 0 || text.equals("")) {
 			return null;
+		}
 
 		return text;
 	}
