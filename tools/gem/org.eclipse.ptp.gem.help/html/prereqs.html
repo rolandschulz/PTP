@@ -56,9 +56,9 @@ The following prerequisites are required for GEM installation.
 <br>
 
 <p>
-Some implementation of MPI must be installed, MPICH2 or OpenMPI both work well. You will also need a
-process manager (e.g. mpd) installed and running. GEM assumes your process
-manager is already running when it is loaded.
+Some implementation of MPI must be installed, MPICH2 or OpenMPI both work well. If you are using MPICH v1.2 or lower, 
+you will also need to have your process manager (e.g. mpd) and running. GEM assumes your process manager is already 
+running when it is loaded. If you are using MPICH2 v1.3 with Hydra, you don&#39;t need to worry about this.
 </p>
 
 <ul>
@@ -85,7 +85,7 @@ manager is already running when it is loaded.
         <b>Operating Systems:</b> GEM is designed for Linux and MacOS X
     </li>
     <li>
-        <b>MPI Librarys:</b> The current GEM release is for MPICH2. We have successfully tested
+        <b>MPI Libraries:</b> The current GEM release is for MPICH2. We have successfully tested
         GEM with OpenMPI as well as Microsoft’s MPI (sometimes called CCS) and Intel&#169; MPI. 
         An enhanced configure and make will be released corresponding to these MPI libraries also. 
         If you are interested, kindly let us know and we can help tailor the current distribution 
