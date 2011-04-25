@@ -143,8 +143,6 @@ public class CommandRunner {
 	 * This function creates the remote directory if it does not exist. Parent directories are also created if necessary. Note that
 	 * this command does not overwrite if the requested remote directory exists but is not a directory.
 	 * 
-	 * TODO: Check that this also holds true for creating parent directories. For example, if remoteDir =
-	 *        "/home/user/project/project1/" and "/home/user/project" is a file will it be deleted?
 	 * @param conn
 	 * @param remoteDir
 	 * @throws CoreException

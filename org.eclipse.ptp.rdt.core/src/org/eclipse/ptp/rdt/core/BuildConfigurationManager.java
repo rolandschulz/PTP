@@ -237,7 +237,7 @@ public class BuildConfigurationManager {
 				if (provider instanceof ISyncServiceProvider && bs.getSyncProvider() == null) {
 					sConfig.disable(service);
 				} else {
-					((IRemoteServiceProvider) provider).changeRemoteInformation(bs.getRemoteConnection(), bs.getLocation());
+					((IRemoteServiceProvider) provider).changeRemoteInformationAfterInit(bs.getRemoteConnection(), bs.getLocation());
 				}
 			}
 		}

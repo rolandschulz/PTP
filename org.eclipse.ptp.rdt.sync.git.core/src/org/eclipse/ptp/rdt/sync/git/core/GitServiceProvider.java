@@ -304,7 +304,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	}
 
 	@Override
-	public void changeRemoteInformation(IRemoteConnection remoteConnection, String location) {
+	public void changeRemoteInformationAfterInit(IRemoteConnection remoteConnection, String location) {
 		fConnection = remoteConnection;
 		putString(GIT_CONNECTION_NAME, remoteConnection.getName());
 		fLocation = location;
