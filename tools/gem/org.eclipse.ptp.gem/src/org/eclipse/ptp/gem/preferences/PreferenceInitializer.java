@@ -67,6 +67,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		// Hidden preference for name of child processes
 		pstore.setDefault(PreferenceConstants.GEM_PREF_PROCESS_NAME, ""); //$NON-NLS-1$
+
+		// Preferences for command line arguments
+		pstore.setDefault(PreferenceConstants.GEM_PREF_ARGS, ""); //$NON-NLS-1$
+		pstore.setDefault(PreferenceConstants.GEM_PREF_REQUEST_ARGS, true);
 	}
 
 }

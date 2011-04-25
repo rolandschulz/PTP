@@ -687,6 +687,9 @@ public class GemAnalyzer extends ViewPart {
 				}
 
 				if (isSourceFileExtension) {
+					// ask for command line arguments
+					GemUtilities.setCommandLineArgs();
+
 					// Save most recent file reference to preference as a URI
 					GemUtilities.saveMostRecentURI(inputFile.getLocationURI());
 					final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();

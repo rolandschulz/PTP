@@ -40,8 +40,9 @@ public class PreferenceConstants {
 	public static final String GEM_CONSOLE = "console"; //$NON-NLS-1$
 	public static final String GEM_BROWSER = "browser"; //$NON-NLS-1$
 	public static final String GEM_ANALYZER = "analyzer"; //$NON-NLS-1$
+	public static final String GEM_PREF_REQUEST_ARGS = "requestArgs"; //$NON-NLS-1$
 
-	// GEM paths, scripts and file names
+	// ISP paths, scripts and file names
 	public static final String GEM_PREF_ISPEXE_PATH = "ispPath"; //$NON-NLS-1$
 	public static final String GEM_PREF_ISPCC_PATH = "ispccPath"; //$NON-NLS-1$
 	public static final String GEM_PREF_ISPCPP_PATH = "ispcppPath"; //$NON-NLS-1$
@@ -57,4 +58,6 @@ public class PreferenceConstants {
 	public static final String GEM_PREF_PROCESS_NAME = "processName"; //$NON-NLS-1$
 	public static final String GEM_PREF_COMPARE_OUTPUT = "compareOutput"; //$NON-NLS-1$
 
+	// Hidden preference holding the previously used cmd line arguments
+	public static final String GEM_PREF_ARGS = "cmdArgs"; //$NON-NLS-1$
 }

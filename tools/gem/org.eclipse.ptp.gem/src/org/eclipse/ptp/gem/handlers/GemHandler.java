@@ -101,6 +101,9 @@ public class GemHandler extends AbstractHandler {
 			// Save most recent file reference to hidden preference as a URI
 			GemUtilities.saveMostRecentURI(inputFile.getLocationURI());
 
+			// ask for command line arguments
+			GemUtilities.setCommandLineArgs();
+
 			// Activate all inactive views and open up to the console
 			try {
 				final IViewReference[] activeViews = page.getViewReferences();
