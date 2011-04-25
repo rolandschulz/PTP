@@ -3,6 +3,7 @@ package org.eclipse.ptp.gem.messages;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
+
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.gem.messages.messages"; //$NON-NLS-1$
 
 	public static String Envelope_0;
@@ -137,6 +138,7 @@ public class Messages extends NLS {
 	public static String GemPreferencePage_7;
 	public static String GemPreferencePage_8;
 	public static String GemPreferencePage_9;
+	public static String GemPreferencePage_10;
 	public static String GemUtilities_1;
 	public static String GemUtilities_10;
 	public static String GemUtilities_11;
@@ -149,6 +151,7 @@ public class Messages extends NLS {
 	public static String GemUtilities_23;
 	public static String GemUtilities_26;
 	public static String GemUtilities_27;
+	public static String GemUtilities_28;
 	public static String GemUtilities_3;
 	public static String GemUtilities_4;
 	public static String GemUtilities_5;
