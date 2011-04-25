@@ -448,10 +448,8 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			IRemotePortForwarding portForwarding = fTargetControl.getExecutionManager().getPortForwardingTools()
 					.getRemotePortForwarding(port);
 			fTargetControl.getExecutionManager().getPortForwardingTools().releaseForwarding(portForwarding);
-		} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
+		} catch (Exception e) {
 			throw new RemoteConnectionException(e.getMessage());
-		} catch (PortForwardingException e) {
-			throw new AddressInUseException(e.getMessage());
 		}
 	}
 
