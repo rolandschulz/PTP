@@ -19,6 +19,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
  * @since 2.1
  */
 public interface IRemoteServiceProvider {
-	public void changeRemoteInformation(IRemoteConnection remoteConnection, String location);
+	public void changeRemoteInformationAfterInit(IRemoteConnection remoteConnection, String location);
 
 }
