@@ -12,10 +12,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.slurm.core.rmsystem;
 
-import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.rm.core.RMPreferenceConstants;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.rm.slurm.core.SLURMCorePlugin;
 import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**

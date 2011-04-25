@@ -26,7 +26,6 @@ import org.eclipse.ptp.rm.ibm.ll.ui.LLUIPlugin;
 import org.eclipse.ptp.rm.ibm.ll.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
-import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -40,7 +39,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 
 public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardPage {
 	private class EventMonitor implements SelectionListener, ModifyListener {
@@ -94,7 +92,7 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 	}
 
 	private Composite preferencePane;
-	
+
 	private Button proxyTraceMessageButton = null;
 	private Button proxyInfoMessageButton = null;
 	private Button proxyWarningMessageButton = null;
@@ -141,15 +139,13 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 	@Override
 	public void createControl(Composite parent) {
 
-		Group proxyLibraryGroup = null;
 		Group proxyOptionsGroup = null;
 		Group proxyDebugGroup = null;
 		Group guiOptionsGroup = null;
 		Group proxyMulticlusterGroup = null;
-		Group proxyTemplateGroup = null;
 		Group proxyTemplateOptionsGroup = null;
 		Group proxyPollingGroup = null;
-		
+
 		config = (IIBMLLResourceManagerConfiguration) getConfiguration();
 		String preferenceValue;
 
@@ -160,7 +156,6 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 		preferencePane = new Composite(parent, SWT.NONE);
 		layout = new GridLayout(2, true);
 		preferencePane.setLayout(layout);
-
 
 		// *********************************************************************
 		// Check box group for proxy messages
@@ -337,7 +332,6 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 		proxyForceMulticlusterRadioButton.addSelectionListener(eventMonitor);
 		proxyForceMulticlusterRadioButton.setToolTipText(Messages
 				.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterToolTip")); //$NON-NLS-1$
-
 
 		// *********************************************************************
 		// Template options group
