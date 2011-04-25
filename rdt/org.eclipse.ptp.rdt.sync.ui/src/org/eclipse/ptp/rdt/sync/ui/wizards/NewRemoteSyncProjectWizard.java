@@ -18,6 +18,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTPluginImages;
+import org.eclipse.ptp.rdt.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 
 /**
@@ -81,5 +83,14 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	protected void initializeDefaultPageImageDescriptor() {
 		setDefaultPageImageDescriptor(RDTPluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
 	}
-
+	
+	@Override
+	public boolean performFinish() {
+		boolean success = super.performFinish();
+		if (success) {
+			BuildConfigurationManager.createLocalConfiguration(this.getProject(true));
+		}
+		
+		return success;
+	}
 }

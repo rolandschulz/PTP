@@ -69,10 +69,14 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.internal.rdt.core.remotemake.ResourceRefreshJob;
+import org.eclipse.ptp.rdt.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.activator.Activator;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
+import org.eclipse.ptp.rdt.sync.core.SyncFlag;
+import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -135,9 +139,6 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		}
 	}
 	
-	
-	
-
 	public static final String REMOTE_MAKE_BUILDER_ID = "org.eclipse.ptp.rdt.core.remoteMakeBuilder"; //$NON-NLS-1$
 	
 	/* (non-Javadoc)
@@ -306,12 +307,23 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				consoleOut = (currentStdOut == null ? stdout : currentStdOut);
 				consoleErr = (currentStdErr == null ? stderr : currentStdErr);
 				
-				// Determine the service model for this configuration, and use the provider of the build
-				// service to execute the build command.
+				// Determine the service model for this configuration and then use the provider of the build service to execute the
+				// build command. Also retrieve  the sync service provider and sync before and after building. (This ensures that
+				// conflicting file changes are not introduced when the active configuration is changed, which could cause merge
+				// conflicts.)
 				ServiceModelManager smm = ServiceModelManager.getInstance();
 				
 				try{
-					IServiceConfiguration serviceConfig = smm.getActiveConfiguration(getProject());
+					IServiceConfiguration serviceConfig = BuildConfigurationManager.
+																			getConfigurationForBuildConfiguration(configuration);
+					if (serviceConfig == null) {
+						throw new RuntimeException("Cannot find service configuration for build configuration"); //$NON-NLS-1$
+					}
+					IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
+					ISyncServiceProvider syncProvider = null;
+					if (!(serviceConfig.isDisabled(syncService))) {
+						syncProvider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
+					}
 					IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
 					IServiceProvider provider = serviceConfig.getServiceProvider(buildService);
 					IRemoteExecutionServiceProvider executionProvider = null;
@@ -358,6 +370,11 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
 					if (fileManager != null) {
 						processBuilder.directory(fileManager.getResource(workingDirectory.toString()));
+					}
+					
+					// Synchronize before building
+					if (syncProvider != null) {
+						syncProvider.synchronize(null, null, SyncFlag.FORCE);
 					}
 					
 					// Before launching give visual cues via the monitor
@@ -434,7 +451,11 @@ public class RemoteMakeBuilder extends MakeBuilder {
 							}
 						}
 						
-						
+						// Synchronize after building
+						if (syncProvider != null) {
+							syncProvider.synchronize(null, null, SyncFlag.FORCE);
+						}
+
 						// create a Job for the refresh
 						List<IResource> resourcesToRefresh = new LinkedList<IResource>();
 						resourcesToRefresh.add(currProject);

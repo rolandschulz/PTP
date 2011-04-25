@@ -10,11 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.git.core;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -25,9 +27,10 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.services.core.IRemoteServiceProvider;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
-public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider {
+public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider, IRemoteServiceProvider {
 	public static final String ID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
 
 	private static final String GIT_LOCATION = "location"; //$NON-NLS-1$
@@ -174,6 +177,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		try {
 			syncLock.lock();
+			// TODO: Note that here SyncFlag.FORCE is interpreted as sync always, even if not needed otherwise. This is different
+			// from the original intent of FORCE, which was to do an immediate, blocking sync. We may need to split those two
+			// functions and introduce more flags.
+			// TODO: Also, note that we are not using the individual "sync to local" and "sync to remote" flags yet.
+			if ((syncFlags == SyncFlag.NO_FORCE) && (!(syncNeeded(delta)))) {
+				return;
+			}
 			// TODO: Use delta information
 			// switch (delta.getKind()) {
 			// case IResourceDelta.ADDED:
@@ -233,12 +243,78 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 			try {
 				fSyncConnection.syncRemoteToLocal();
+				IProject project = this.getProject();
+				if (project != null) {
+					project.refreshLocal(IResource.DEPTH_INFINITE, null);
+				}
 			} catch (final RemoteSyncException e) {
 				throw e;
 			}
 
 		} finally {
 			syncLock.unlock();
+		}
+	}
+	
+	// Are any of the changes in delta relevant for sync'ing?
+	private boolean syncNeeded(IResourceDelta delta) {
+		String[] relevantChangedResources = getRelevantChangedResources(delta);
+		if (relevantChangedResources.length == 0) {
+			return false;
+		}
+		return true;
+	}
+	
+	// This function and the next recursively compile a list of relevant resources that have changed.
+	private String[] getRelevantChangedResources(IResourceDelta delta) {
+		ArrayList<String> res = new ArrayList<String>();
+		getRelevantChangedResourcesRecursive(delta, res);
+		return res.toArray(new String[0]);
+	}
+	
+	private void getRelevantChangedResourcesRecursive(IResourceDelta delta, ArrayList<String> res) {
+		// Prune recursion if this is a directory or file of no interest (such as the ".git" directory)
+		if (irrelevantPath(delta)) {
+			return;
+		}
+		
+		// Recursion logic
+		IResourceDelta[] resChildren = delta.getAffectedChildren();
+		if (resChildren.length == 0) {
+			res.add(delta.getFullPath().toString());
+			return;
+		} else {
+			for (IResourceDelta resChild : resChildren) {
+				getRelevantChangedResourcesRecursive(resChild, res);
+			}
+		}
+	}
+	
+	// Paths that the Git sync provider can ignore. For now, only the ".git" directory is excluded. This function should expand
+	// later to include other paths, such as those in Git's ignore list.
+	private boolean irrelevantPath(IResourceDelta delta) {
+		String path = delta.getFullPath().toString();
+		if (path.endsWith("/.git")) { //$NON-NLS-1$
+			return true;
+		} else if (path.endsWith("/.git/")){ //$NON-NLS-1$
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public void changeRemoteInformationAfterInit(IRemoteConnection remoteConnection, String location) {
+		fConnection = remoteConnection;
+		putString(GIT_CONNECTION_NAME, remoteConnection.getName());
+		fLocation = location;
+		putString(GIT_LOCATION, location);
+		try {
+			fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation().toString(),
+																											this.getLocation());
+		} catch (final RemoteSyncException e) {
+			// TODO: What can we do here? Throwing an exception is not allowed.
+			e.printStackTrace();
 		}
 	}
 }
