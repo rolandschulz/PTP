@@ -1021,7 +1021,9 @@ public class GemUtilities {
 		final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
 		final String prevArgs = pstore.getString(PreferenceConstants.GEM_PREF_ARGS);
 		final String newArgs = JOptionPane.showInputDialog(null, message, prevArgs);
-		pstore.setValue(PreferenceConstants.GEM_PREF_ARGS, newArgs);
+		if (newArgs != null) {
+			pstore.setValue(PreferenceConstants.GEM_PREF_ARGS, newArgs);
+		}
 	}
 
 	/**
