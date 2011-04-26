@@ -121,12 +121,4 @@
               weight="Remote Location">
         </tab>
      </extension>
-     <extension
-           point="org.eclipse.cdt.ui.newCfgDialog">
-        <dialog
-              class="org.eclipse.ptp.rdt.sync.ui.properties.NewRDTCfgDialog"
-              mbs_id="org.eclipse.ptp.rdt.core.remotemake.RemoteMakeBuilder"
-              title="Remote Location">
-        </dialog>
-     </extension>
 </plugin>
