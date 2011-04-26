@@ -18,15 +18,21 @@ import org.eclipse.ptp.rm.core.utils.DebugUtil;
 /**
  * 
  * @author Greg Watson
- *
+ * 
  */
 public class MPICH2ListJobsParser {
-	public enum JobListState {JOBLIST_INIT, JOBLIST_START, JOBLIST_END, JOBLIST_COMPLETE, JOBLIST_ERROR}
-	
+	public enum JobListState {
+		JOBLIST_INIT,
+		JOBLIST_START,
+		JOBLIST_END,
+		JOBLIST_COMPLETE,
+		JOBLIST_ERROR
+	}
+
 	private JobListState state;
-	private MPICH2JobMap map = new MPICH2JobMap();
+	private final MPICH2JobMap map = new MPICH2JobMap();
 	private String errorMsg;
-	
+
 	/**
 	 * @param parser
 	 * @param line
@@ -48,7 +54,7 @@ public class MPICH2ListJobsParser {
 			errorMsg = line;
 			return;
 		}
-		
+
 		if ("jobid".equals(key)) { //$NON-NLS-1$
 			job.setJobID(value);
 		} else if ("jobalias".equals(key)) { //$NON-NLS-1$
@@ -70,12 +76,12 @@ public class MPICH2ListJobsParser {
 			errorMsg = line;
 			return;
 		}
-		
+
 		if (job.isComplete()) {
 			state = JobListState.JOBLIST_END;
 		}
 	}
-	
+
 	/**
 	 * @param reader
 	 * @return
@@ -86,7 +92,7 @@ public class MPICH2ListJobsParser {
 		MPICH2JobMap.Job job = null;
 
 		state = JobListState.JOBLIST_INIT;
-		
+
 		while (state != JobListState.JOBLIST_COMPLETE) {
 			switch (state) {
 			case JOBLIST_INIT:
@@ -94,7 +100,7 @@ public class MPICH2ListJobsParser {
 					state = JobListState.JOBLIST_COMPLETE;
 					break;
 				}
-				
+
 				line = line.trim();
 
 				if (line.length() == 0) {
@@ -107,23 +113,23 @@ public class MPICH2ListJobsParser {
 				job = map.new Job();
 				processJobInfo(line, job);
 				break;
-			
+
 			case JOBLIST_START:
 				if ((line = reader.readLine()) == null) {
 					state = JobListState.JOBLIST_END;
 					break;
 				}
-				
+
 				line = line.trim();
 
 				if (line.length() == 0) {
 					state = JobListState.JOBLIST_END;
 					break;
 				}
-				
+
 				processJobInfo(line, job);
 				break;
-				
+
 			case JOBLIST_END:
 				if (job != null) {
 					if (job.isComplete()) {
@@ -132,18 +138,20 @@ public class MPICH2ListJobsParser {
 						DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "job is incomplete, skipping" + job.toString()); //$NON-NLS-1$
 					}
 				}
-				
+
 				if (line == null) {
 					state = JobListState.JOBLIST_COMPLETE;
 				} else {
 					state = JobListState.JOBLIST_INIT;
 				}
-				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "found job " + job.toString()); //$NON-NLS-1$
+				if (job != null) {
+					DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "found job " + job.toString()); //$NON-NLS-1$
+				}
 				break;
-				
+
 			case JOBLIST_COMPLETE:
 				break;
-				
+
 			case JOBLIST_ERROR:
 				while ((line = reader.readLine()) != null) {
 					errorMsg += "\n" + line; //$NON-NLS-1$
@@ -151,10 +159,10 @@ public class MPICH2ListJobsParser {
 				return null;
 			}
 		}
-		
+
 		return map;
 	}
-	
+
 	/**
 	 * @return
 	 */
@@ -162,4 +170,3 @@ public class MPICH2ListJobsParser {
 		return errorMsg;
 	}
 }
-

@@ -53,10 +53,10 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIHostMap.Host;
 public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 	OpenMPIRuntimeSystem rts;
 
-	public OpenMPIDiscoverJob(OpenMPIRuntimeSystem rts, IProgressMonitor monitor) {
+	public OpenMPIDiscoverJob(OpenMPIRuntimeSystem rts) {
 		super(rts, NLS.bind(Messages.OpenMPIDiscoverJob_name, rts.getRmConfiguration().getName()), rts
 				.retrieveEffectiveToolRmConfiguration().getDiscoverCmd(), Messages.OpenMPIDiscoverJob_interruptedErrorMessage,
-				Messages.OpenMPIDiscoverJob_processErrorMessage, Messages.OpenMPIDiscoverJob_parsingErrorMessage, monitor);
+				Messages.OpenMPIDiscoverJob_processErrorMessage, Messages.OpenMPIDiscoverJob_parsingErrorMessage);
 		this.rts = rts;
 	}
 

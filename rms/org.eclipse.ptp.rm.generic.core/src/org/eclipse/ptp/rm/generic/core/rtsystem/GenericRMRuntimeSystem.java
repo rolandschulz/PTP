@@ -101,10 +101,10 @@ public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * createContinuousMonitorJob(org.eclipse.core.runtime.IProgressMonitor)
+	 * createContinuousMonitorJob()
 	 */
 	@Override
-	protected Job createContinuousMonitorJob(IProgressMonitor monitor) {
+	protected Job createContinuousMonitorJob() {
 		return null;
 	}
 
@@ -113,10 +113,10 @@ public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#createDiscoverJob
-	 * (org.eclipse.core.runtime.IProgressMonitor)
+	 * ()
 	 */
 	@Override
-	protected Job createDiscoverJob(IProgressMonitor monitor) {
+	protected Job createDiscoverJob() {
 		return null;
 	}
 
@@ -124,10 +124,10 @@ public class GenericRMRuntimeSystem extends AbstractToolRuntimeSystem {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * createPeriodicMonitorJob(org.eclipse.core.runtime.IProgressMonitor)
+	 * createPeriodicMonitorJob()
 	 */
 	@Override
-	protected Job createPeriodicMonitorJob(IProgressMonitor monitor) {
+	protected Job createPeriodicMonitorJob() {
 		return null;
 	}
 

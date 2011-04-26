@@ -20,62 +20,70 @@ import org.eclipse.ptp.rm.core.utils.DebugUtil;
 /**
  * 
  * @author Greg Watson
- *
+ * 
  */
 public class MPICH2TraceParser {
 	private String errorMessage = null;
-	private MPICH2HostMap map = new MPICH2HostMap();
+	private final MPICH2HostMap map = new MPICH2HostMap();
 	private static Pattern pattern = Pattern.compile("([^_]+)_([0-9])+ \\(([0-9.]+)\\)"); //$NON-NLS-1$
 
 	/**
 	 * Parse the output of the mpdtrace command.
 	 * 
 	 * @param reader
-	 * @return an MPICH2HostMap containing the known hosts, or null if there was an error
+	 * @return an MPICH2HostMap containing the known hosts, or null if there was
+	 *         an error
 	 * @throws IOException
 	 */
-	public MPICH2HostMap parse(BufferedReader reader) throws IOException {
-		MPICH2TraceParser parser = new MPICH2TraceParser();
+	public boolean parse(BufferedReader reader) {
 		String line;
-		while ((line = reader.readLine()) != null) {
-			line = line.trim();
+		try {
+			while ((line = reader.readLine()) != null) {
+				line = line.trim();
 
-			if (line.length()==0) {
-				// Ignore empty line
-				continue;
-			}
-
-			Matcher matcher = pattern.matcher(line);
-			if (!matcher.matches()) {
-				/*
-				 * Probably an error from mpdtrace. Collect lines and mark error.
-				 */
-				errorMessage = ""; //$NON-NLS-1$
-				
-				while ((line = reader.readLine()) != null) {
-					errorMessage += line + "\n"; //$NON-NLS-1$
+				if (line.length() == 0) {
+					// Ignore empty line
+					continue;
 				}
-				
-				return null;
-			}
 
-			if (matcher.matches() && matcher.groupCount() == 3) {
-				String host = matcher.group(1);
-				String port = matcher.group(2);
-				String addr = matcher.group(3);
-				parser.map.addHost(host, addr, port);
-				DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "found host " + host + " addr " + addr + " port " + port); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				Matcher matcher = pattern.matcher(line);
+				if (!matcher.matches()) {
+					/*
+					 * Probably an error from mpdtrace. Collect lines and mark
+					 * error.
+					 */
+					errorMessage = line;
+
+					while ((line = reader.readLine()) != null) {
+						errorMessage += line + "\n"; //$NON-NLS-1$
+					}
+
+					return false;
+				}
+
+				if (matcher.matches() && matcher.groupCount() == 3) {
+					String host = matcher.group(1);
+					String port = matcher.group(2);
+					String addr = matcher.group(3);
+					map.addHost(host, addr, port);
+					DebugUtil.trace(DebugUtil.RTS_DISCOVER_TRACING, "found host " + host + " addr " + addr + " port " + port); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
 			}
+			return true;
+		} catch (IOException e) {
+			errorMessage = e.getLocalizedMessage();
+			return false;
 		}
-		
-		return parser.map;
 	}
-	
+
 	/**
 	 * @return error message
 	 */
 	public String getErrorMessage() {
 		return errorMessage;
 	}
-}
 
+	public MPICH2HostMap getHostMap() {
+		return map;
+	}
+}
