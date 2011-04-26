@@ -400,6 +400,7 @@ public abstract class AbstractToolRMConfigurationWizardPage extends AbstractConf
 
 		if (remoteInstallPathText != null) {
 			remoteInstallPathText.setEnabled(enabled);
+			browseButton.setEnabled(enabled);
 		}
 	}
 
@@ -589,6 +590,12 @@ public abstract class AbstractToolRMConfigurationWizardPage extends AbstractConf
 						IRemoteUIConstants.OPEN);
 				if (selectedPath != null) {
 					remoteInstallPathText.setText(selectedPath);
+					/*
+					 * Some systems don't generate modify event when setText is
+					 * called. Make sure we update data source.
+					 */
+					resetErrorMessages();
+					getDataSource().storeAndValidate();
 				}
 			}
 		}
