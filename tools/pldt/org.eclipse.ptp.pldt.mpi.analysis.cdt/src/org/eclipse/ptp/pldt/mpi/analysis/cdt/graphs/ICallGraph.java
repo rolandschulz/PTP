@@ -21,68 +21,73 @@ import org.eclipse.cdt.core.dom.ast.IASTFunctionDefinition;
  * by static analysis.
  * 
  * @author Yuan Zhang
- *
+ * 
  */
 public interface ICallGraph {
-	
+
 	/**
 	 * @return all functions in the call graph
 	 */
 	public List<ICallGraphNode> getAllNodes();
-	
+
 	/**
 	 * @return all global variables
 	 */
 	public List<String> getEnv();
-	
+
 	/**
-	 * @return one root function. A root function is never called by 
-	 * other functions. There may be multiple root functions in a call
-	 * graph. 
+	 * @return one root function. A root function is never called by
+	 *         other functions. There may be multiple root functions in a call
+	 *         graph.
 	 */
 	public ICallGraphNode topEntry();
+
 	public void setTopEntry(ICallGraphNode node);
-	
+
 	/**
 	 * @return one leaf function. A leaf function never calls any other
-	 * functions. There may be multiple leaf functions in a call graph.
+	 *         functions. There may be multiple leaf functions in a call graph.
 	 */
 	public ICallGraphNode botEntry();
+
 	public void setBotEntry(ICallGraphNode node);
-	
+
 	/**
 	 * @return list of recursive function calls
 	 */
 	public List<List<ICallGraphNode>> getCycles();
-	
+
 	/**
 	 * Search for a function according to its filename and function name.
+	 * 
 	 * @param fileName
 	 * @param funcName
 	 * @return its call graph node if it is found; null otherwise.
 	 */
 	public ICallGraphNode getNode(String fileName, String funcName);
-	
+
 	/**
 	 * Search for a function according to its declaration.
+	 * 
 	 * @param fdef
 	 * @return its call graph node if it is found; null otherwise.
 	 */
 	public ICallGraphNode getNode(IASTFunctionDefinition fdef);
-	
+
 	/**
 	 * Add a function node to the call graph. Its calling relation
 	 * is not constructed yet.
+	 * 
 	 * @param node
 	 */
 	public void addNode(ICallGraphNode node);
-	
+
 	/**
 	 * Build the calling relations. This method is not reponsible for
 	 * collecting functions in a program.
 	 */
 	public void buildCG();
-	
+
 	public void print();
-	
+
 }
