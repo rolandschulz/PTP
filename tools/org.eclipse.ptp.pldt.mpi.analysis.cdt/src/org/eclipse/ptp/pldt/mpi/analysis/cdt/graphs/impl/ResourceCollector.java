@@ -40,74 +40,82 @@ import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
  * calculate the caller and callee relations.
  * 
  * @author Yuan Zhang, Beth Tibbitts
- *
+ * 
  */
 public class ResourceCollector extends ASTVisitor {
-	protected ICallGraph CG_; 
+	protected ICallGraph CG_;
 	protected IFile file_;
 	protected int depth;
-	private static final boolean traceOn=false;
-	
+	private static final boolean traceOn = false;
+
 	/**
 	 * Resource collector finds all functions in a given source file,
 	 * and adds them to the given call graph
-	 * @param cg call graph that will have this information added to it
-	 * @param file source file whose functions will be discovered and catalogued
+	 * 
+	 * @param cg
+	 *            call graph that will have this information added to it
+	 * @param file
+	 *            source file whose functions will be discovered and catalogued
 	 */
-	public ResourceCollector(ICallGraph cg, IFile file){
+	public ResourceCollector(ICallGraph cg, IFile file) {
 		CG_ = cg;
 		file_ = file;
 	}
-	
+
 	/**
 	 * Use an ASTVisitor to discover the functions in the the given source and add them to the call graph
 	 */
-	public void run(){
+	public void run() {
 		this.shouldVisitDeclarations = true;
 		this.shouldVisitTranslationUnit = true;
-		if(traceOn)System.out.println("ResourceCollector.run()  file: "+file_+"  exists? "+file_.exists()); //$NON-NLS-1$ //$NON-NLS-2$
+		if (traceOn)
+			System.out.println("ResourceCollector.run()  file: " + file_ + "  exists? " + file_.exists()); //$NON-NLS-1$ //$NON-NLS-2$
 		IASTTranslationUnit ast_ = null;
 		try {
-            ast_ = CDOM.getInstance().getASTService().getTranslationUnit(file_,
-                    CDOM.getInstance().getCodeReaderFactory(CDOM.PARSE_SAVED_RESOURCES));
-        } catch (IASTServiceProvider.UnsupportedDialectException e) {
-        } catch (NullPointerException npe) {
-        	System.out.println("ResourceCollector: no ast available from CDOM.. remote project? will try alt. approach.");
-        }
-        if(traceOn)System.out.println("     initial ast construction: ast_="+ast_); //$NON-NLS-1$
-        boolean temp=true;
-        
-        if(temp && ast_==null) {
-        	// newer way to get ast
-        	if(file_ instanceof IAdaptable) {
-        		ICElement ce = (ICElement) file_.getAdapter(ICElement.class);
-        		if(traceOn)System.out.println("     ICElement: ="+ce); //$NON-NLS-1$
-        		if(ce instanceof ITranslationUnit) {
-        			ITranslationUnit cetu=(ITranslationUnit)ce;
-        			IASTTranslationUnit ast;
+			ast_ = CDOM.getInstance().getASTService().getTranslationUnit(file_,
+					CDOM.getInstance().getCodeReaderFactory(CDOM.PARSE_SAVED_RESOURCES));
+		} catch (IASTServiceProvider.UnsupportedDialectException e) {
+		} catch (NullPointerException npe) {
+			System.out.println("ResourceCollector: no ast available from CDOM.. remote project? will try alt. approach.");
+		}
+		if (traceOn)
+			System.out.println("     initial ast construction: ast_=" + ast_); //$NON-NLS-1$
+		boolean temp = true;
+
+		if (temp && ast_ == null) {
+			// newer way to get ast
+			if (file_ instanceof IAdaptable) {
+				ICElement ce = (ICElement) file_.getAdapter(ICElement.class);
+				if (traceOn)
+					System.out.println("     ICElement: =" + ce); //$NON-NLS-1$
+				if (ce instanceof ITranslationUnit) {
+					ITranslationUnit cetu = (ITranslationUnit) ce;
+					IASTTranslationUnit ast;
 					try {
 						ast = cetu.getAST();
-						if(traceOn)System.out.println("ast: "+ast); //$NON-NLS-1$
+						if (traceOn)
+							System.out.println("ast: " + ast); //$NON-NLS-1$
 					} catch (CoreException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-        			
-        		}
-        		ITranslationUnit tu=(ITranslationUnit)file_.getAdapter(ITranslationUnit.class);
-        		try {
-					ast_=tu.getAST();
+
+				}
+				ITranslationUnit tu = (ITranslationUnit) file_.getAdapter(ITranslationUnit.class);
+				try {
+					ast_ = tu.getAST();
 				} catch (CoreException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-        	}
-        }
-        if(traceOn)System.out.println("     ast_="+ast_); //$NON-NLS-1$
-        depth = 0;
-        ast_.accept(this);
+			}
+		}
+		if (traceOn)
+			System.out.println("     ast_=" + ast_); //$NON-NLS-1$
+		depth = 0;
+		ast_.accept(this);
 	}
-	
+
 	/**
 	 * visits declaration nodes to catalog the function declarations
 	 */
@@ -152,21 +160,21 @@ public class ResourceCollector extends ASTVisitor {
 		}
 		return PROCESS_CONTINUE;
 	}
-	
 
-	public int leave(IASTDeclaration declaration) 
+	public int leave(IASTDeclaration declaration)
 	{
 		String filename = declaration.getContainingFilename();
-		//if(!filename.endsWith(".c") || !filename.endsWith(".C"))
-		if(filename.endsWith(".h")) //$NON-NLS-1$
+		// if(!filename.endsWith(".c") || !filename.endsWith(".C"))
+		if (filename.endsWith(".h")) //$NON-NLS-1$
 			return PROCESS_SKIP;
-		
+
 		if (declaration instanceof IASTFunctionDefinition) {
-			depth --;
+			depth--;
 			return PROCESS_SKIP;
 		}
 		return PROCESS_CONTINUE;
 	}
+
 	/**
 	 * Can be overridden by subclasses to create a specific kind of call graph
 	 * node if required
@@ -178,16 +186,19 @@ public class ResourceCollector extends ASTVisitor {
 		ICallGraphNode cgnode = new CallGraphNode(file, filename, fd);
 		return cgnode;
 	}
-	/** 
-     * extra optional test that derived class can do
-     */
-	protected boolean doQuickOptionalTest(String var){
-	 return true;
-	 }
-	 
+
+	/**
+	 * extra optional test that derived class can do
+	 */
+	protected boolean doQuickOptionalTest(String var) {
+		return true;
+	}
+
 	/**
 	 * optional stuff that derived class may want to do at this point
+	 * 
 	 * @param declarator
 	 */
-	 protected void doOtherDeClaratorStuff(IASTDeclarator declarator){}
+	protected void doOtherDeClaratorStuff(IASTDeclarator declarator) {
+	}
 }
