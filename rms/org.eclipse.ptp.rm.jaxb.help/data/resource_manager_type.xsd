@@ -151,7 +151,7 @@
 		<xs:annotation>
 			<xs:documentation>
 				An attribute is an externally defined variable, most often associated with the scheduler system itself; the most
-				common attributes are those pertaining to the job dimensions and requested resources. The value for attribute can by any primitive
+				common attributes are those pertaining to the job dimensions and requested resources. The value for attributes can by any primitive
 				type. NOTE: the untyped "value" element on attributes is for internal use only; to give a predefined (primitive) value, use the
 				"default" element along with the "type" attribute.
 			</xs:documentation>
@@ -276,7 +276,7 @@
 				As in:
 				org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab, provides a top-level "switch" between controllers. There
 				are a maximum of three top-level tabs or "pages"; the basic and advanced (the names are placeholders which need not correspond to
-				their actual content or usage, and can be changed) controllers are configurable; for the custom controller, see below. (see below).
+				their actual content or usage, and can be changed) controllers are configurable; for the custom controller, see below.
 				The SWT-related types generally expose the fields of their associated Java class.
 			</xs:documentation>
 		</xs:annotation>
@@ -380,7 +380,7 @@
 				<xs:documentation>
 					The default means that each tab is a separate view or selection into the global env, and it is this subset which
 					will be passed on the launch command. Setting this property to true means that the tab will pass all selected elements of the
-					entire shared enviroment to the resource manager at launch.
+					entire shared environment to the resource manager at launch.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -486,7 +486,7 @@
 			<xs:annotation>
 				<xs:documentation>
 					Do not break up the stream according to a delimiter, but read this many characters at a time from it. NOTE: in
-					this mode, the user should be sure that an expected expansion the regex pattern will not exceed the buffer length (and should
+					this mode, the user should be sure that an expected expansion of the regex pattern will not exceed the buffer length (and should
 					adjust that length accordingly).
 				</xs:documentation>
 			</xs:annotation>
@@ -503,7 +503,7 @@
 		<xs:attribute name="save" type="xs:int" default="0">
 			<xs:annotation>
 				<xs:documentation>
-					Use this in connection with "all": save the last N segments (i.e, chars, lines, etc.).
+					Use this in connection with "all": save the last N segments (i.e, buffer-lengths, lines, etc.).
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
