@@ -85,7 +85,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 	private final static String PROVIDER_CONFIGURATION_ELEMENT_NAME = "provider-configuration"; //$NON-NLS-1$
 	private final static String ATTR_PROVIDER_ID = "provider-id"; //$NON-NLS-1$
 	private final static String DEFAULT_SAVE_FILE_NAME = "service_model.xml"; //$NON-NLS-1$
-	
+
 	private static <T> T getConf(Map<IProject, T> map, IProject project) {
 		if (project == null) {
 			throw new NullPointerException();

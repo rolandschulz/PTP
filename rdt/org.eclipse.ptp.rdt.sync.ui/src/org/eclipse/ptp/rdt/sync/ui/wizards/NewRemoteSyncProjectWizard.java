@@ -18,8 +18,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTPluginImages;
-import org.eclipse.ptp.rdt.core.BuildConfigurationManager;
-import org.eclipse.ptp.rdt.core.resources.RemoteNature;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 
 /**

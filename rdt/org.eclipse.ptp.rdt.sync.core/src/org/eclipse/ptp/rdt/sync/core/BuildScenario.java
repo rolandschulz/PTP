@@ -8,7 +8,7 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.core;
+package org.eclipse.ptp.rdt.sync.core;
 
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
