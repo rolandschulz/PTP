@@ -25,7 +25,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
-import org.eclipse.ptp.rm.core.messages.Messages;
 import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
@@ -46,7 +45,6 @@ abstract public class AbstractRemoteCommandJob extends Job {
 	protected int fReschedule = 0;
 	protected IRemoteProcess fJobProcess;
 	protected AbstractToolRuntimeSystem fRtSystem;
-	protected IProgressMonitor fMonitor;
 
 	/**
 	 * A job for a remote command that is run only once.
@@ -62,19 +60,16 @@ abstract public class AbstractRemoteCommandJob extends Job {
 	 * @param parsingErrorMessage
 	 *            Error message if the output of the remote command cannot be
 	 *            parsed or <code>null</code>.
-	 * @param monitor
-	 *            progress monitor to use, or null to use system progress
-	 *            monitor
+	 * @since 3.0
 	 */
 	public AbstractRemoteCommandJob(AbstractToolRuntimeSystem rtSystem, String name, String command,
-			String interruptedErrorMessage, String processErrorMessage, String parsingErrorMessage, IProgressMonitor monitor) {
+			String interruptedErrorMessage, String processErrorMessage, String parsingErrorMessage) {
 		super(name);
 		fRtSystem = rtSystem;
 		fCommand = command;
 		fInterruptedErrorMessage = interruptedErrorMessage;
 		fProcessErrorMessage = processErrorMessage;
 		fParsingErrorMessage = parsingErrorMessage;
-		fMonitor = monitor;
 	}
 
 	/**
@@ -93,13 +88,10 @@ abstract public class AbstractRemoteCommandJob extends Job {
 	 *            parsed or <code>null</code>.
 	 * @param reschedule
 	 *            Time in milliseconds between executions of the command.
-	 * @param monitor
-	 *            progress monitor to use, or null to use system progress
-	 *            monitor
+	 * @since 3.0
 	 */
 	public AbstractRemoteCommandJob(AbstractToolRuntimeSystem rtSystem, String name, String command,
-			String interruptedErrorMessage, String processErrorMessage, String parsingErrorMessage, int reschedule,
-			IProgressMonitor monitor) {
+			String interruptedErrorMessage, String processErrorMessage, String parsingErrorMessage, int reschedule) {
 		super(name);
 		fRtSystem = rtSystem;
 		fCommand = command;
@@ -107,7 +99,6 @@ abstract public class AbstractRemoteCommandJob extends Job {
 		fProcessErrorMessage = processErrorMessage;
 		fParsingErrorMessage = parsingErrorMessage;
 		fReschedule = reschedule;
-		fMonitor = monitor;
 	}
 
 	/**
@@ -134,10 +125,6 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			Assert.isNotNull(fCommand);
 			Assert.isTrue(!fCommand.trim().equals(EMPTY_STRING));
 
-			if (fMonitor == null) {
-				fMonitor = monitor;
-			}
-
 			/*
 			 * Proposed enhancements TODO: Substitution of variables in the
 			 * command string TODO: Substitution of attributes in the command
@@ -147,7 +134,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			ArgumentParser argumentParser = new ArgumentParser(fCommand);
 			List<String> arguments = argumentParser.getTokenList();
 
-			if (fMonitor.isCanceled()) {
+			if (monitor.isCanceled()) {
 				return new Status(IStatus.CANCEL, RMCorePlugin.PLUGIN_ID, fInterruptedErrorMessage, null);
 			}
 
@@ -161,7 +148,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 				return new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, fProcessErrorMessage, e);
 			}
 
-			if (fMonitor.isCanceled()) {
+			if (monitor.isCanceled()) {
 				return new Status(IStatus.CANCEL, RMCorePlugin.PLUGIN_ID, fInterruptedErrorMessage, null);
 			}
 
@@ -171,14 +158,14 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			 * Wait for job to complete so that we can check for exit value of
 			 * command.
 			 */
-			while (!fJobProcess.isCompleted() && !fMonitor.isCanceled()) {
+			while (!fJobProcess.isCompleted() && !monitor.isCanceled()) {
 				System.out.println("waiting for job"); //$NON-NLS-1$
 				synchronized (this) {
 					wait(500);
 				}
 			}
 
-			if (fMonitor.isCanceled()) {
+			if (monitor.isCanceled()) {
 				return new Status(IStatus.CANCEL, RMCorePlugin.PLUGIN_ID, fInterruptedErrorMessage, null);
 			}
 
@@ -187,7 +174,7 @@ abstract public class AbstractRemoteCommandJob extends Job {
 						"Command failed with exit status {0}", Integer.valueOf(fJobProcess.exitValue())), null); //$NON-NLS-1$
 			}
 
-			if (fMonitor.isCanceled()) {
+			if (monitor.isCanceled()) {
 				return new Status(IStatus.CANCEL, RMCorePlugin.PLUGIN_ID, fInterruptedErrorMessage, null);
 			}
 
@@ -210,12 +197,10 @@ abstract public class AbstractRemoteCommandJob extends Job {
 		} catch (Exception e) {
 			DebugUtil.error(DebugUtil.COMMAND_TRACING_MORE, "Command failed: {0}", e); //$NON-NLS-1$
 			fRtSystem.notifyMonitorFailed(this, e);
-			return new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, Messages.AbstractRemoteCommandJob_Exception_InternalError, e);
+			return new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, e.getLocalizedMessage());
 		} finally {
-			synchronized (this) {
-				if (fJobProcess != null) {
-					fJobProcess.destroy();
-				}
+			if (fJobProcess != null) {
+				fJobProcess.destroy();
 				fJobProcess = null;
 			}
 		}
@@ -228,11 +213,8 @@ abstract public class AbstractRemoteCommandJob extends Job {
 	 */
 	@Override
 	protected void canceling() {
-		synchronized (this) {
-			if (fJobProcess != null) {
-				fJobProcess.destroy();
-				fJobProcess = null;
-			}
+		if (fJobProcess != null) {
+			fJobProcess.destroy();
 		}
 	}
 }

@@ -11,10 +11,8 @@
 package org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
@@ -33,10 +31,10 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 	MPICH2RuntimeSystem rts;
 
-	public MPICH2DiscoverJob(MPICH2RuntimeSystem rts, IProgressMonitor monitor) {
+	public MPICH2DiscoverJob(MPICH2RuntimeSystem rts) {
 		super(rts, NLS.bind(Messages.MPICH2DiscoverJob_name, rts.getRmConfiguration().getName()), rts
 				.retrieveEffectiveToolRmConfiguration().getDiscoverCmd(), Messages.MPICH2DiscoverJob_interruptedErrorMessage,
-				Messages.MPICH2DiscoverJob_processErrorMessage, Messages.MPICH2DiscoverJob_parsingErrorMessage, monitor);
+				Messages.MPICH2DiscoverJob_processErrorMessage, Messages.MPICH2DiscoverJob_parsingErrorMessage);
 		this.rts = rts;
 	}
 
@@ -54,10 +52,7 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 		 * configuration.
 		 */
 		MPICH2TraceParser parser = new MPICH2TraceParser();
-		MPICH2HostMap hostMap;
-		try {
-			hostMap = parser.parse(output);
-		} catch (IOException e) {
+		if (!parser.parse(output)) {
 			throw new CoreException(new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(),
 					parser.getErrorMessage()));
 		}
@@ -67,7 +62,7 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 		 */
 		int nodeCounter = 0;
 
-		for (MPICH2HostMap.Host host : hostMap.getHosts()) {
+		for (MPICH2HostMap.Host host : parser.getHostMap().getHosts()) {
 
 			// Add node to model
 			String nodeId = rts.createNode(rts.getMachineId(), host.getName(), nodeCounter++);
