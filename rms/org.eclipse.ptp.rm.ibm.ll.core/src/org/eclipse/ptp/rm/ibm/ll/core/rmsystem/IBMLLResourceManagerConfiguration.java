@@ -45,16 +45,9 @@ public class IBMLLResourceManagerConfiguration extends AbstractRemoteResourceMan
 	private static final String TAG_MAX_NODE_POLL = "LL_MNodePollInterval"; //$NON-NLS-1$
 	private static final String TAG_JOB_POLL = "LL_JobPollInterval"; //$NON-NLS-1$
 
-	public IBMLLResourceManagerConfiguration() {
-	}
-
 	public IBMLLResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(namespace, provider);
 		setDescription("IBM LL Resource Manager"); //$NON-NLS-1$
-	}
-
-	public IBMLLResourceManagerConfiguration(String namespace, IBMLLResourceManagerConfiguration base) {
-		super(namespace, base);
 	}
 
 	/*
@@ -231,8 +224,7 @@ public class IBMLLResourceManagerConfiguration extends AbstractRemoteResourceMan
 	 * getLibraryPath()
 	 */
 	public String getLibraryPath() {
-		return getString(TAG_LL_LIBPATH, Preferences.getString(IBMLLCorePlugin.getUniqueIdentifier(),
-				IBMLLPreferenceConstants.PROXY_LOADLEVELER_LIBRARY_PATH));
+		return "";
 	}
 
 	/*
@@ -260,17 +252,6 @@ public class IBMLLResourceManagerConfiguration extends AbstractRemoteResourceMan
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * getResourceManagerId()
-	 */
-	@Override
-	public String getResourceManagerId() {
-		return getId();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.rm.ibm.ll.ui.IIBMLLResourceManagerConfiguration#
 	 * getSuppressTemplateWrite()
 	 */
@@ -286,8 +267,7 @@ public class IBMLLResourceManagerConfiguration extends AbstractRemoteResourceMan
 	 * getTemplateFile()
 	 */
 	public String getTemplateFile() {
-		return getString(TAG_TEMPLATE_FILE, Preferences.getString(IBMLLCorePlugin.getUniqueIdentifier(),
-				IBMLLPreferenceConstants.PROXY_LOADLEVELER_TEMPLATE_FILE));
+		return "";
 	}
 
 	/*

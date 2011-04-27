@@ -23,15 +23,15 @@ import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ptp.rm.jaxb.core.data.Arg;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer;
-import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
-import org.eclipse.ptp.rm.jaxb.core.data.FontDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataDescriptor;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
-import org.eclipse.ptp.rm.jaxb.core.data.Template;
-import org.eclipse.ptp.rm.jaxb.core.data.Widget;
+import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
+import org.eclipse.ptp.rm.jaxb.core.data.FontType;
+import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.TemplateType;
+import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
@@ -96,10 +96,10 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		 * @param columnData
 		 *            list of JAXB data elements describing the viewer columns
 		 */
-		private CellDescriptor(Object data, List<ColumnData> columnData) {
+		private CellDescriptor(Object data, List<ColumnDataType> columnData) {
 			type = CellEditorType.getType(data);
-			if (data instanceof Attribute) {
-				Attribute a = (Attribute) data;
+			if (data instanceof AttributeType) {
+				AttributeType a = (AttributeType) data;
 				name = a.getName();
 				choice = a.getChoice();
 				min = a.getMin();
@@ -112,8 +112,8 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 					tooltip = WidgetBuilderUtils.removeTabOrLineBreak(tooltip);
 				}
 				description = a.getDescription();
-			} else if (data instanceof Property) {
-				Property p = (Property) data;
+			} else if (data instanceof PropertyType) {
+				PropertyType p = (PropertyType) data;
 				name = p.getName();
 				readOnly = p.isReadOnly();
 			}
@@ -137,7 +137,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 				} else {
 					background[i] = null;
 				}
-				FontDescriptor fd = columnData.get(i).getFont();
+				FontType fd = columnData.get(i).getFont();
 				if (fd != null) {
 					font[i] = WidgetBuilderUtils.getFont(fd);
 				} else {
@@ -165,8 +165,8 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		 * @return enum value for editor
 		 */
 		public static CellEditorType getType(Object object) {
-			if (object instanceof Property) {
-				Property p = (Property) object;
+			if (object instanceof PropertyType) {
+				PropertyType p = (PropertyType) object;
 				Object value = p.getValue();
 				String clzz = p.getType();
 				if (clzz != null) {
@@ -176,8 +176,8 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 					return getType(value);
 				}
 				return TEXT;
-			} else if (object instanceof Attribute) {
-				Attribute a = (Attribute) object;
+			} else if (object instanceof AttributeType) {
+				AttributeType a = (AttributeType) object;
 				if (a.getChoice() != null) {
 					return COMBO;
 				}
@@ -242,7 +242,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		private int style;
 		private String background;
 		private String foreground;
-		private FontDescriptor font;
+		private FontType font;
 		private Integer min;
 		private Integer max;
 		private String tooltip;
@@ -256,7 +256,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		 * @param rmMap
 		 *            used to retrieve data object info
 		 */
-		private ControlDescriptor(Widget widget, RMVariableMap rmMap) {
+		private ControlDescriptor(WidgetType widget, RMVariableMap rmMap) {
 			setControlData(widget);
 			setMapDependentData(widget, rmMap);
 		}
@@ -268,9 +268,9 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		 * @param widget
 		 *            JAXB data element describing widget
 		 */
-		private void setControlData(Widget widget) {
+		private void setControlData(WidgetType widget) {
 			title = widget.getTitle();
-			LayoutDataDescriptor layout = widget.getLayoutData();
+			LayoutDataType layout = widget.getLayoutData();
 			layoutData = LaunchTabBuilder.createLayoutData(layout);
 			style = WidgetBuilderUtils.getStyle(widget.getStyle());
 			readOnly = widget.isReadOnly();
@@ -291,8 +291,8 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		 *            Attribute
 		 */
 		private void setData(Object data) {
-			if (data instanceof Attribute) {
-				Attribute a = (Attribute) data;
+			if (data instanceof AttributeType) {
+				AttributeType a = (AttributeType) data;
 				choice = a.getChoice();
 				min = a.getMin();
 				max = a.getMax();
@@ -307,7 +307,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		 * @param rmMap
 		 *            used to retrieve data object info
 		 */
-		private void setMapDependentData(Widget widget, RMVariableMap rmMap) {
+		private void setMapDependentData(WidgetType widget, RMVariableMap rmMap) {
 			if (tooltip == null) {
 				tooltip = ZEROSTR;
 			} else {
@@ -326,7 +326,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 					setData(data);
 				}
 			}
-			s = widget.getValueListFrom();
+			s = widget.getItemsFrom();
 			if (s != null) {
 				Object data = vars.get(s);
 				if (data != null) {
@@ -344,14 +344,14 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		 */
 		@SuppressWarnings("unchecked")
 		private void setValueListData(Object data) {
-			if (data instanceof Attribute) {
-				Attribute a = (Attribute) data;
+			if (data instanceof AttributeType) {
+				AttributeType a = (AttributeType) data;
 				Object value = a.getValue();
 				if (value instanceof List<?>) {
 					valueList = (List<String>) value;
 				}
 			} else {
-				Property p = (Property) data;
+				PropertyType p = (PropertyType) data;
 				Object value = p.getValue();
 				if (value instanceof List<?>) {
 					valueList = (List<String>) value;
@@ -374,10 +374,10 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 *            launch tab being built (accessed for value handler)
 	 * @return
 	 */
-	public static ViewerUpdateModel createModel(ColumnViewer viewer, AttributeViewer descriptor,
+	public static ViewerUpdateModel createModel(ColumnViewer viewer, AttributeViewerType descriptor,
 			JAXBDynamicLaunchConfigurationTab tab) {
 		String name = descriptor.getName();
-		Template template = descriptor.getValue();
+		TemplateType template = descriptor.getValue();
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		ViewerUpdateModel model = new ViewerUpdateModel(name, handler, (ICheckable) viewer, template);
 		return model;
@@ -395,16 +395,17 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 *            launch tab being built
 	 * @return
 	 */
-	public static IUpdateModel createModel(Composite parent, Widget widget, JAXBDynamicLaunchConfigurationTab tab) {
-		Control control = createControl(parent, widget, tab);
+	public static IUpdateModel createModel(Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab,
+			RMVariableMap rmVarMap) {
+		Control control = createControl(parent, widget, tab, rmVarMap);
 		if (control instanceof Label) {
 			return null;
 		}
 
 		String name = widget.getSaveValueTo();
-		List<Arg> dynamic = null;
+		List<ArgType> dynamic = null;
 
-		Widget.DynamicText dt = widget.getDynamicText();
+		WidgetType.DynamicText dt = widget.getDynamicText();
 		if (dt != null) {
 			dynamic = dt.getArg();
 		}
@@ -445,7 +446,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 *            launch tab being built
 	 * @return
 	 */
-	public static ICellEditorUpdateModel createModel(Object data, ColumnViewer viewer, List<ColumnData> columnData,
+	public static ICellEditorUpdateModel createModel(Object data, ColumnViewer viewer, List<ColumnDataType> columnData,
 			JAXBDynamicLaunchConfigurationTab tab) {
 		ICellEditorUpdateModel model = null;
 		if (viewer instanceof TableViewer) {
@@ -589,8 +590,9 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 * @return the resulting control (<code>null</code> if the widget is a
 	 *         Label).
 	 */
-	private static Control createControl(final Composite parent, Widget widget, JAXBDynamicLaunchConfigurationTab tab) {
-		ControlDescriptor cd = new ControlDescriptor(widget, RMVariableMap.getActiveInstance());
+	private static Control createControl(final Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab,
+			RMVariableMap rmVarMap) {
+		ControlDescriptor cd = new ControlDescriptor(widget, rmVarMap);
 		String type = widget.getType();
 
 		Control c = null;
@@ -656,15 +658,15 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			editor = new SpinnerCellEditor(parent, cd.min, cd.max);
 		} else if (cd.type == CellEditorType.COMBO) {
 			Object o = null;
-			if (data instanceof Attribute) {
+			if (data instanceof AttributeType) {
 				if (cd.choice != null) {
 					cd.choice = cd.choice.trim();
 					cd.items = cd.choice.split(CM);
 				} else {
-					o = ((Attribute) data).getValue();
+					o = ((AttributeType) data).getValue();
 				}
 			} else {
-				o = ((Property) data).getValue();
+				o = ((PropertyType) data).getValue();
 			}
 			if (cd.items == null) {
 				if (o instanceof Collection) {
@@ -696,15 +698,15 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 * @return the cell editor update model, which contains a reference to the
 	 *         CellEditor
 	 */
-	private static ICellEditorUpdateModel createModel(Object data, TableViewer viewer, List<ColumnData> columnData,
+	private static ICellEditorUpdateModel createModel(Object data, TableViewer viewer, List<ColumnDataType> columnData,
 			JAXBDynamicLaunchConfigurationTab tab) {
 		CellDescriptor cd = new CellDescriptor(data, columnData);
 		CellEditor editor = createEditor(cd, data, viewer.getTable());
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		ICellEditorUpdateModel model = null;
-		if (data instanceof Attribute) {
-			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, (Attribute) data);
-		} else if (data instanceof Property) {
+		if (data instanceof AttributeType) {
+			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, (AttributeType) data);
+		} else if (data instanceof PropertyType) {
 			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly);
 		}
 		if (model != null) {
@@ -733,7 +735,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 * @return the cell editor update model, which contains a reference to the
 	 *         CellEditor
 	 */
-	private static ICellEditorUpdateModel createModel(Object data, TreeViewer viewer, List<ColumnData> columnData,
+	private static ICellEditorUpdateModel createModel(Object data, TreeViewer viewer, List<ColumnDataType> columnData,
 			JAXBDynamicLaunchConfigurationTab tab) {
 		CellDescriptor cd = new CellDescriptor(data, columnData);
 		CellEditor editor = createEditor(cd, data, viewer.getTree());
@@ -741,9 +743,9 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		ICellEditorUpdateModel model = null;
 		Object[] properties = viewer.getColumnProperties();
 		boolean inValueCol = properties.length == 2;
-		if (data instanceof Attribute) {
-			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, inValueCol, (Attribute) data);
-		} else if (data instanceof Property) {
+		if (data instanceof AttributeType) {
+			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, inValueCol, (AttributeType) data);
+		} else if (data instanceof PropertyType) {
 			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, inValueCol);
 		}
 		if (model != null) {

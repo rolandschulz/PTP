@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <description url="http://download.eclipse.org/tools/ptp/updates/helios">
-      Parallel Tools Platform Helios Update Site
+   <description url="http://download.eclipse.org/tools/ptp/updates/indigo">
+      Parallel Tools Platform Indigo Update Site
    </description>
    <feature url="features/org.eclipse.ptp_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
@@ -76,6 +76,9 @@
       <category name="Parallel Tools Platform"/>
    </feature>
    <feature url="features/org.eclipse.ptp.sci_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.sci" version="@ptpBranchVersion@.@timeStamp@">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+    <feature url="features/org.eclipse.ptp.sdk_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.sdk" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
    <feature url="features/org.eclipse.ptp.rdt_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rdt" version="@ptpBranchVersion@.@timeStamp@">

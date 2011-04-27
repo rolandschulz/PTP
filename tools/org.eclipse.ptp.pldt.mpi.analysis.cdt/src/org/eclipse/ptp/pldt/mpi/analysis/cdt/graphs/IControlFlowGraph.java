@@ -20,7 +20,7 @@ import org.eclipse.cdt.core.dom.ast.IASTStatement;
  * each edge represents the jump in the control flow.
  * 
  * @author Yuan Zhang
- *
+ * 
  */
 
 public interface IControlFlowGraph {
@@ -29,35 +29,38 @@ public interface IControlFlowGraph {
 	 * @return the entry block
 	 */
 	public IBlock getEntry();
-	
+
 	/**
 	 * @return the exit block
 	 */
 	public IBlock getExit();
-	
-	
-	/** Search for the block which contains the statement <stmt>
+
+	/**
+	 * Search for the block which contains the statement stmt
 	 */
 	public IBlock getBlock(IASTStatement stmt);
+
 	/**
 	 * Search for the block which contains the condition expression
-	 * <expr>, and <expr> is the predicate of statement <parent>
+	 * expr, and expr is the predicate of statement parent
+	 * 
 	 * @return
 	 */
 	public IBlock getBlock(IASTExpression expr, IASTStatement parent);
-	
+
 	/**
-	 * Search for the block which contains the <label> 
+	 * Search for the block which contains the label
+	 * 
 	 * @return
 	 */
 	public IBlock getBlock(IASTName label);
-	
+
 	public void addBlock(IBlock bb);
-	
+
 	/**
 	 * Build the control flow relation
 	 */
 	public void buildCFG();
-	
+
 	public void print();
 }

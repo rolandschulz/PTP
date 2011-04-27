@@ -20,11 +20,9 @@ public interface IBMLLPreferenceConstants
     public static final String PROXY_FATAL_MESSAGE = "ProxyFatalMessage"; //$NON-NLS-1$
     public static final String PROXY_ARGS_MESSAGE = "ProxyArgsMessage"; //$NON-NLS-1$
     public static final String PROXY_DEBUG_LOOP="ProxyDebugLoop"; //$NON-NLS-1$
-    public static final String PROXY_LOADLEVELER_LIBRARY_PATH="ProxyLoadLevelerLibraryPath"; //$NON-NLS-1$
     public static final String PROXY_DEFAULT_MULTICLUSTER="ProxyLoadLevelerMulticlusterDefault"; //$NON-NLS-1$
     public static final String PROXY_FORCE_LOCAL="ProxyLoadLevelerMulticlusterForceLocal"; //$NON-NLS-1$
     public static final String PROXY_FORCE_MULTICLUSTER="ProxyLoadLevelerMulticlusterForceMulticluster"; //$NON-NLS-1$
-    public static final String PROXY_LOADLEVELER_TEMPLATE_FILE="ProxyLoadLevelerTemplateFile"; //$NON-NLS-1$
     public static final String PROXY_WRITE_TEMPLATE_ALWAYS="ProxyLoadLevelerTemplateAlways"; //$NON-NLS-1$
     public static final String PROXY_WRITE_TEMPLATE_NEVER="ProxyLoadLevelerTemplateNever"; //$NON-NLS-1$
     public static final String PROXY_MIN_NODE_POLLING="ProxyMinimumNodePolling"; //$NON-NLS-1$

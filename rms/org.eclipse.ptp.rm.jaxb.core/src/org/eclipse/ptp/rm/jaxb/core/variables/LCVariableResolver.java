@@ -15,12 +15,21 @@ import org.eclipse.core.variables.IDynamicVariableResolver;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 
 /**
- * Resolver for the LCVariableMap (tag: ${lc:).
+ * Resolver for the LCVariableMap (tag: ${lc:). <br>
+ * <br>
+ * * In order to guarantee consistency, any implicit call to resolve should be
+ * synchronized statically and should be preceded by a call to
+ * {@link #setActive(LCVariableMap)}. <br>
+ * <br>
+ * 
+ * @see RMVariableMap
  * 
  * @author arossi
  * 
  */
 public class LCVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
+
+	private static LCVariableMap active;
 
 	/**
 	 * Only looks the the first element of the reference. This is because
@@ -29,19 +38,26 @@ public class LCVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 	 * name=primitive value.
 	 */
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
-		LCVariableMap m = LCVariableMap.getActiveInstance();
-		if (m != null) {
+		if (active != null) {
 			String[] split = argument.split(PDRX);
 			if (split.length > 1) {
 				if (split[1].equals(VALUE)) {
 					argument = split[0];
 				}
 			}
-			Object value = m.get(argument);
+			Object value = active.get(argument);
 			if (value != null) {
 				return String.valueOf(value);
 			}
 		}
 		return ZEROSTR;
+	}
+
+	/**
+	 * @param active
+	 *            current instance of the map
+	 */
+	public static void setActive(LCVariableMap active) {
+		LCVariableResolver.active = active;
 	}
 }

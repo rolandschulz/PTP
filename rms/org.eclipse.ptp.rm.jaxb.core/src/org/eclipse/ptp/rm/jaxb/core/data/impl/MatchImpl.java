@@ -14,8 +14,9 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Match;
-import org.eclipse.ptp.rm.jaxb.core.data.Regex;
+import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
+import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
  * Wrapper implementation. Consists of a Regular Expression and a reference to a
@@ -45,13 +46,15 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 	 *            JAXB data element
 	 * @param target
 	 *            Wrapper for the target to which this match is bound
+	 * @param rmVarMap
+	 *            resource manager environment
 	 */
-	public MatchImpl(String uuid, Match match, TargetImpl target) {
+	public MatchImpl(String uuid, MatchType match, TargetImpl target, RMVariableMap rmVarMap) {
 		this.target = target;
 		this.moveToTop = match.isMoveToTop();
 		this.matched = false;
 
-		Regex r = match.getExpression();
+		RegexType r = match.getExpression();
 		if (r != null) {
 			regex = new RegexImpl(r);
 		}
@@ -60,7 +63,7 @@ public class MatchImpl implements IJAXBNonNLSConstants {
 		if (!assign.isEmpty()) {
 			this.assign = new ArrayList<IAssign>();
 			for (Object o : assign) {
-				AbstractAssign.add(uuid, o, this.assign);
+				AbstractAssign.add(uuid, o, this.assign, rmVarMap);
 			}
 		}
 	}

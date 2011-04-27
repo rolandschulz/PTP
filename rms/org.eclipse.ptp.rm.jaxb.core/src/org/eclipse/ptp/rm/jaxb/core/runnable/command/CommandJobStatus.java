@@ -13,8 +13,9 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
@@ -29,16 +30,19 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private String jobId;
 	private ILaunchConfiguration launchConfig;
 	private String state;
+	private String stateDetail;
 	private ICommandJobStreamsProxy proxy;
 	private IRemoteProcess process;
 	private final RMVariableMap rmVarMap;
 	private boolean waitEnabled;
+	private long lastUpdateRequest;
 
-	public CommandJobStatus() {
+	public CommandJobStatus(RMVariableMap rmVarMap) {
 		jobId = null;
 		state = IJobStatus.UNDETERMINED;
-		rmVarMap = RMVariableMap.getActiveInstance();
+		this.rmVarMap = rmVarMap;
 		waitEnabled = true;
+		lastUpdateRequest = 0;
 	}
 
 	/**
@@ -46,10 +50,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 *            either internal UUID or resource-specific id
 	 * @param state
 	 */
-	public CommandJobStatus(String jobId, String state) {
+	public CommandJobStatus(String jobId, String state, RMVariableMap rmVarMap) {
 		this.jobId = jobId;
-		this.state = state;
-		rmVarMap = RMVariableMap.getActiveInstance();
+		setState(state);
+		this.rmVarMap = rmVarMap;
 		waitEnabled = false;
 	}
 
@@ -83,6 +87,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return jobId;
 	}
 
+	public synchronized long getLastUpdateRequest() {
+		return lastUpdateRequest;
+	}
+
 	/**
 	 * @return configuration used for this submission.
 	 */
@@ -101,7 +109,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @return more specific state identifier.
 	 */
 	public synchronized String getStateDetail() {
-		return state;
+		return stateDetail;
 	}
 
 	/**
@@ -138,12 +146,27 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
+	 * We also immediately dereference any paths associated withthe proxy
+	 * monitors by calling intialize, as the jobId property may not be in the
+	 * environment after this initial call returns. We also start the monitors
+	 * here, as tail -F will retry until the file appears.
+	 * 
 	 * @param proxy
 	 *            Wrapper containing monitoring functionality for the associated
 	 *            output and error streams.
 	 */
 	public void setProxy(ICommandJobStreamsProxy proxy) {
 		this.proxy = proxy;
+		ICommandJobStreamMonitor m = (ICommandJobStreamMonitor) proxy.getOutputStreamMonitor();
+		if (m != null) {
+			m.initializeFilePath(jobId);
+			m.startMonitoring();
+		}
+		m = (ICommandJobStreamMonitor) proxy.getErrorStreamMonitor();
+		if (m != null) {
+			m.initializeFilePath(jobId);
+			m.startMonitoring();
+		}
 	}
 
 	/**
@@ -151,17 +174,55 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 *            of the job (not of the submission process).
 	 */
 	public synchronized void setState(String state) {
-		this.state = state;
+		if (UNDETERMINED.equals(state)) {
+			this.state = UNDETERMINED;
+			stateDetail = UNDETERMINED;
+		} else if (SUBMITTED.equals(state)) {
+			this.state = SUBMITTED;
+			stateDetail = SUBMITTED;
+		} else if (RUNNING.equals(state)) {
+			this.state = RUNNING;
+			stateDetail = RUNNING;
+		} else if (SUSPENDED.equals(state)) {
+			this.state = SUSPENDED;
+			stateDetail = SUSPENDED;
+		} else if (COMPLETED.equals(state)) {
+			this.state = COMPLETED;
+			stateDetail = COMPLETED;
+		} else if (QUEUED_ACTIVE.equals(state)) {
+			this.state = SUBMITTED;
+			stateDetail = QUEUED_ACTIVE;
+		} else if (SYSTEM_ON_HOLD.equals(state)) {
+			this.state = SUBMITTED;
+			stateDetail = SYSTEM_ON_HOLD;
+		} else if (USER_ON_HOLD.equals(state)) {
+			this.state = SUBMITTED;
+			stateDetail = USER_ON_HOLD;
+		} else if (USER_SYSTEM_ON_HOLD.equals(state)) {
+			this.state = SUBMITTED;
+			stateDetail = USER_SYSTEM_ON_HOLD;
+		} else if (SYSTEM_SUSPENDED.equals(state)) {
+			this.state = SUSPENDED;
+			stateDetail = SYSTEM_SUSPENDED;
+		} else if (USER_SUSPENDED.equals(state)) {
+			this.state = SUSPENDED;
+			stateDetail = USER_SUSPENDED;
+		} else if (USER_SYSTEM_SUSPENDED.equals(state)) {
+			this.state = SUSPENDED;
+			stateDetail = USER_SYSTEM_SUSPENDED;
+		} else if (FAILED.equals(state)) {
+			this.state = COMPLETED;
+			stateDetail = FAILED;
+		}
 	}
 
 	/**
-	 * Called by the resource manager when the (batch) job state changes to
-	 * RUNNING.
+	 * @param time
+	 *            in milliseconds of last update request issued to remote
+	 *            resource
 	 */
-	public synchronized void startProxy() {
-		if (proxy != null) {
-			proxy.startMonitors();
-		}
+	public synchronized void setUpdateRequestTime(long update) {
+		lastUpdateRequest = update;
 	}
 
 	/**
@@ -180,13 +241,14 @@ public class CommandJobStatus implements ICommandJobStatus {
 					wait(1000);
 				} catch (InterruptedException ignored) {
 				}
-				Property p = (Property) rmVarMap.get(uuid);
+				PropertyType p = (PropertyType) rmVarMap.get(uuid);
 				if (p != null) {
 					jobId = p.getName();
 					String v = (String) p.getValue();
 					if (v != null) {
 						state = v;
 					}
+
 				}
 			}
 		}

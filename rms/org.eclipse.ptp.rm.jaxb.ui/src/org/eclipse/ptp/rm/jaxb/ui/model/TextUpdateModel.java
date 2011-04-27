@@ -11,7 +11,7 @@ package org.eclipse.ptp.rm.jaxb.ui.model;
 
 import java.util.List;
 
-import org.eclipse.ptp.rm.jaxb.core.data.Arg;
+import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -38,7 +38,7 @@ public class TextUpdateModel extends DynamicControlUpdateModel implements Modify
 	 * @param text
 	 *            the widget to which this model corresponds
 	 */
-	public TextUpdateModel(List<Arg> args, ValueUpdateHandler handler, Text text) {
+	public TextUpdateModel(List<ArgType> args, ValueUpdateHandler handler, Text text) {
 		super(args, handler);
 		this.text = text;
 		text.addModifyListener(this);

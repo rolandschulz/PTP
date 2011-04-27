@@ -10,21 +10,28 @@ package org.eclipse.ptp.rdt.server.dstore.core;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.dstore.core.client.ClientConnection;
 import org.eclipse.dstore.core.client.ConnectionStatus;
 import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.ptp.rdt.server.dstore.Activator;
 import org.eclipse.ptp.rdt.server.dstore.internal.core.DebugUtil;
 import org.eclipse.ptp.rdt.server.dstore.messages.Messages;
 import org.eclipse.ptp.rdt.ui.subsystems.StatusMonitor;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner;
+import org.eclipse.ptp.remote.core.server.AbstractRemoteServerRunner;
+import org.eclipse.swt.widgets.Display;
 
 public class DStoreServer extends AbstractRemoteServerRunner {
 	private enum DStoreState {
-		WAITING_FOR_SUCCESS_STRING, WAITING_FOR_PORT, COMPLETED
+		WAITING_FOR_SUCCESS_STRING,
+		WAITING_FOR_PORT,
+		COMPLETED
 	}
 
 	public static String SERVER_ID = "org.eclipse.ptp.rdt.server.dstore.RemoteToolsDStoreServer"; //$NON-NLS-1$;
@@ -55,6 +62,13 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 				}
 				waitForServerStart(TIMEOUT);
 			} catch (IOException e) {
+				final IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, e.getMessage(), e);
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						ErrorDialog.openError(Display.getDefault().getActiveShell(), Messages.DStoreServer_serverError,
+								Messages.DStoreServer_unableToStart, status);
+					}
+				});
 			}
 		}
 		if (getServerState() == ServerState.RUNNING) {

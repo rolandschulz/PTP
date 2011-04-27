@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.jaxb.ui.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -23,7 +24,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.ptp.rm.jaxb.core.data.Template;
+import org.eclipse.ptp.rm.jaxb.core.data.TemplateType;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
@@ -81,7 +82,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 *            name-value pairs associated with the items of the viewer into
 	 *            a single output string
 	 */
-	public ViewerUpdateModel(String name, ValueUpdateHandler handler, ICheckable viewer, Template template) {
+	public ViewerUpdateModel(String name, ValueUpdateHandler handler, ICheckable viewer, TemplateType template) {
 		super(name, handler);
 		this.viewer = viewer;
 		this.columnViewer = (ColumnViewer) viewer;
@@ -96,8 +97,8 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 
 	/*
 	 * Model serves as CheckStateListener for the viewer. When check state
-	 * changes, the checked field of the model is set to the new value, stored,
-	 * and the update handler notified. (non-Javadoc)
+	 * changes, the checked values are stored, and the update handler notified.
+	 * (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse
@@ -105,11 +106,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 */
 	public void checkStateChanged(CheckStateChangedEvent event) {
 		Object target = event.getElement();
-		boolean checked = viewer.getChecked(target);
-		if (target instanceof ICellEditorUpdateModel) {
-			ICellEditorUpdateModel model = (ICellEditorUpdateModel) target;
-			model.setChecked(checked);
-		} else {
+		if (!(target instanceof ICellEditorUpdateModel)) {
 			viewer.setChecked(target, false);
 		}
 		storeValue();
@@ -180,19 +177,24 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 */
 	@SuppressWarnings("unchecked")
 	public void initializeChecked() throws CoreException {
+		Map<String, String> allChecked = lcMap.getChecked(name);
 		Collection<Object> input = (Collection<Object>) ((Viewer) viewer).getInput();
 		for (Object o : input) {
-			boolean selected = false;
+			boolean checked = false;
 			if (o instanceof ICellEditorUpdateModel) {
 				ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
-				selected = model.isChecked();
-				viewer.setChecked(model, selected);
+				if (allChecked.isEmpty()) {
+					checked = true;
+				} else {
+					checked = allChecked.containsKey(model.getName());
+				}
+				viewer.setChecked(model, checked);
 			} else {
 				viewer.setChecked(o, false);
 			}
 		}
 
-		Boolean b = (Boolean) lcMap.get(name + SHOW_ONLY_CHECKED);
+		Boolean b = (Boolean) lcMap.get(SHOW_ONLY_CHECKED + name);
 		if (b == null) {
 			b = false;
 		}
@@ -200,6 +202,29 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		if (b) {
 			columnViewer.addFilter(filter);
 		}
+		storeValue();
+		handleUpdate(null);
+	}
+
+	/*
+	 * Store the checked string and the show-only-checked setting (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#storeValue()
+	 */
+	@SuppressWarnings("unchecked")
+	public void putCheckedSettings(Map<String, Object> localMap) {
+		checked.setLength(0);
+		Collection<Object> input = (Collection<Object>) ((Viewer) viewer).getInput();
+		for (Object o : input) {
+			if (o instanceof ICellEditorUpdateModel) {
+				ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
+				if (model.isChecked()) {
+					checked.append(model.getName()).append(SP);
+				}
+			}
+		}
+		localMap.put(CHECKED_ATTRIBUTES + name, checked.toString().trim());
+		localMap.put(SHOW_ONLY_CHECKED + name, showOnlySelected.getSelection());
 	}
 
 	/*
@@ -220,7 +245,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	}
 
 	/*
-	 * store the checked string and the template setting (non-Javadoc)
+	 * Store the template setting (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#storeValue()
 	 */
@@ -228,7 +253,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	@Override
 	public void storeValue() {
 		templatedValue.setLength(0);
-		checked.setLength(0);
 		Collection<Object> input = (Collection<Object>) ((Viewer) viewer).getInput();
 		for (Object o : input) {
 			if (o instanceof ICellEditorUpdateModel) {
@@ -239,7 +263,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 				String replaced = model.getReplacedValue(pattern);
 				if (!ZEROSTR.equals(replaced)) {
 					templatedValue.append(separator).append(replaced);
-					checked.append(model.getName()).append(SP);
 				}
 			}
 		}
@@ -249,12 +272,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 			lcMap.put(name, t);
 		} else {
 			lcMap.remove(name);
-		}
-		String c = checked.toString().trim();
-		if (!ZEROSTR.equals(c)) {
-			lcMap.put(CHECKED_ATTRIBUTES, c);
-		} else {
-			lcMap.remove(CHECKED_ATTRIBUTES);
 		}
 	}
 
@@ -270,15 +287,19 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		widgetSelected(e);
 	}
 
+	/*
+	 * Model serves as widget selected listener for the filter button.
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
+	 * .events.SelectionEvent)
+	 */
 	public void widgetSelected(SelectionEvent e) {
 		if (showOnlySelected.getSelection()) {
 			columnViewer.addFilter(filter);
 		} else {
 			columnViewer.removeFilter(filter);
 		}
-		/*
-		 * a memento for between sessions
-		 */
-		lcMap.put(name + SHOW_ONLY_CHECKED, showOnlySelected.getSelection());
 	}
 }

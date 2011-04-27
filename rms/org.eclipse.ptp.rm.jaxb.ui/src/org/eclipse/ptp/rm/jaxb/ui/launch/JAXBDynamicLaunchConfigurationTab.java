@@ -20,11 +20,12 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
-import org.eclipse.ptp.rm.jaxb.core.data.TabController;
+import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
@@ -78,7 +79,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener {
 
-	private final TabController controller;
+	private final TabControllerType controller;
 	private final ValueUpdateHandler updateHandler;
 	private final List<Viewer> viewers;
 	private final Map<Object, IUpdateModel> localWidgets;
@@ -97,8 +98,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	public JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, TabController controller,
-			JAXBControllerLaunchConfigurationTab parentTab) {
+	public JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog,
+			TabControllerType controller, JAXBControllerLaunchConfigurationTab parentTab) {
 		super(parentTab, dialog);
 		this.controller = controller;
 		shared = controller.isSharedEnvironment();
@@ -137,8 +138,9 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetBuilderUtils.createComposite(parent, 1);
-		LaunchTabBuilder builder = new LaunchTabBuilder(this);
+		createOutputCaptureOption(control, false);
 		try {
+			LaunchTabBuilder builder = new LaunchTabBuilder(this);
 			builder.build(control);
 		} catch (Throwable t) {
 			CoreExceptionUtils.newException(Messages.CreateControlConfigurableError, t);
@@ -159,7 +161,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * 
 	 * @return the JAXB data element used to build the control
 	 */
-	public TabController getController() {
+	public TabControllerType getController() {
 		return controller;
 	}
 
@@ -223,7 +225,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			}
 
 			LCVariableMap lcMap = parentTab.getLCMap();
-			lcMap.restoreGlobal();
+			lcMap.updateGlobal(configuration);
 
 			for (IUpdateModel m : localWidgets.values()) {
 				m.initialize(lcMap);
@@ -298,8 +300,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		Shell shell = Display.getDefault().getActiveShell();
 		try {
 			if (!parentTab.hasScript()) {
-				WidgetActionUtils.warningMessage(shell, Messages.ScriptNotSupportedWarning,
-						Messages.ScriptNotSupportedWarning_title);
+				MessageDialog.openWarning(shell, Messages.ScriptNotSupportedWarning_title, Messages.ScriptNotSupportedWarning
+						+ LINE_SEP);
 				return;
 			}
 			String text = realizeLocalScript(listenerConfiguration);
@@ -326,18 +328,22 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				}
 			} else {
 				localMap.put(m.getName(), m.getValueFromControl());
+				if (m instanceof ViewerUpdateModel) {
+					((ViewerUpdateModel) m).putCheckedSettings(localMap);
+				}
 			}
 		}
 	}
 
 	/*
-	 * Adds the View Script and Restore Defaults buttons to the bottom of the
-	 * control pane.
+	 * Adds the Job Output, View Script and Restore Defaults buttons to the
+	 * bottom of the control pane.
 	 */
 	private void createViewScriptGroup(final Composite control) {
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true);
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true, 5, 5, 2, 2);
 		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 2);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
+
 		if (parentTab.hasScript()) {
 			WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, this);
 		}
@@ -380,13 +386,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		refreshLocal(config);
 		LCVariableMap lcMap = parentTab.getLCMap();
 		Map<String, Object> current = lcMap.swapVariables(localMap);
-
-		Boolean append = config.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);
-		if (append == null) {
-			append = true;
-		}
 		Map env = config.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
-		ScriptHandler job = new ScriptHandler(null, parentTab.getScript(), lcMap, env, append);
+		ScriptHandler job = new ScriptHandler(null, parentTab.getScript(), lcMap, env);
 		job.schedule();
 		try {
 			job.join();

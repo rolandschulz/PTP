@@ -12,9 +12,7 @@
 package org.eclipse.ptp.remotetools.environment.control;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -57,20 +55,9 @@ public abstract class SSHTargetControl implements ITargetControl {
 	}
 
 	/**
-	 * Set of jobs running on the remote target environment.
-	 */
-	private final Map<ITargetJob, TargetControlledJob> remoteJobs = new HashMap<ITargetJob, TargetControlledJob>();
-
-	/**
 	 * A connection (using ssh) to the remote target environment.
 	 */
 	private IRemoteConnection remoteConnection = null;
-
-	/**
-	 * Listeners notified when jobs ared added/removed from the target
-	 * environment.
-	 */
-	private final Set<ITargetControlJobListener> jobListeners = new HashSet<ITargetControlJobListener>();
 
 	/**
 	 * Exception to terminate the environment.
@@ -86,13 +73,6 @@ public abstract class SSHTargetControl implements ITargetControl {
 	private IAuthInfo fAuthInfo = null;
 
 	/**
-	 * Add a new job listener.
-	 */
-	public synchronized void addJobListener(ITargetControlJobListener listener) {
-		jobListeners.add(listener);
-	}
-
-	/**
 	 * Create the remote target environment by opening a SSH connection to it.
 	 * First,
 	 * {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)
@@ -106,7 +86,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 				throw new CoreException(new Status(IStatus.CANCEL, EnvironmentPlugin.getUniqueIdentifier(), 0,
 						Messages.SSHTargetControl_1, null));
 			}
-			kill(monitor);
+			kill();
 			connect(monitor);
 			if (monitor.isCanceled()) {
 				disconnect();
@@ -177,56 +157,13 @@ public abstract class SSHTargetControl implements ITargetControl {
 	}
 
 	/**
-	 * Returns the number of jobs running on the remote host.
-	 */
-	public synchronized int getJobCount() {
-		return remoteJobs.size();
-	}
-
-	/**
-	 * Returns a list of jobs running on the remote target environment.
-	 */
-	public synchronized ITargetJob[] getJobs() {
-		ITargetJob[] array = new ITargetJob[remoteJobs.size()];
-		remoteJobs.keySet().toArray(array);
-		return array;
-	}
-
-	/**
 	 * Destroy the remote target environment, by closing the SSH connection to
 	 * it.
+	 * 
+	 * @since 2.0
 	 */
-	public boolean kill(IProgressMonitor monitor) throws CoreException {
-		/*
-		 * Try to gracefully terminate all running jobs. Might this fail, then
-		 * guarantee to disconnect.
-		 */
-		try {
-			terminateJobs(monitor);
-		} finally {
-			disconnect();
-		}
-		return true;
-	}
-
-	/**
-	 * Remove a job listener.
-	 */
-	public synchronized void removeJobListener(ITargetControlJobListener listener) {
-		jobListeners.remove(listener);
-	}
-
-	/**
-	 * Create a waiting job on the
-	 */
-	public synchronized void startJob(ITargetJob job) throws CoreException {
-		if ((query() != ITargetStatus.PAUSED) && (query() != ITargetStatus.RESUMED)) {
-			throw new CoreException(new Status(IStatus.ERROR, EnvironmentPlugin.getUniqueIdentifier(), 0,
-					Messages.SSHTargetControl_0, null));
-		}
-		TargetControlledJob controlledJob = new TargetControlledJob(this, job);
-		remoteJobs.put(job, controlledJob);
-		controlledJob.start();
+	public void kill() throws CoreException {
+		disconnect();
 	}
 
 	/**
@@ -272,10 +209,6 @@ public abstract class SSHTargetControl implements ITargetControl {
 	 * ressources allocated to the connection.
 	 */
 	protected synchronized void disconnect() {
-		/*
-		 * Any still running jobs will fail.
-		 */
-		remoteJobs.clear();
 		if (remoteConnection != null) {
 			remoteConnection.disconnect();
 		}
@@ -294,28 +227,6 @@ public abstract class SSHTargetControl implements ITargetControl {
 		pendingException = e;
 	}
 
-	protected synchronized void notifyFinishedJob(ITargetJob job) {
-		/** Notify listeners. */
-		for (ITargetControlJobListener listener : jobListeners) {
-			listener.afterJobFinish(job);
-		}
-		/** Remove job from list of jobs. */
-		remoteJobs.remove(job);
-	}
-
-	protected synchronized void notifyStartingJob(ITargetJob job) {
-		/** Notify listeners. */
-		for (ITargetControlJobListener listener : jobListeners) {
-			listener.beforeJobStart(job);
-		}
-		/** Guarantee that the target is operational. */
-		try {
-			resume(null);
-		} catch (CoreException e) {
-			// Ignore
-		}
-	}
-
 	/**
 	 * Set the connection parameters to be used by
 	 * {@link #create(IProgressMonitor)}.
@@ -330,32 +241,6 @@ public abstract class SSHTargetControl implements ITargetControl {
 	protected synchronized void setConnectionParameters(ITargetConfig config, IAuthInfo authInfo) {
 		fConfig = config;
 		fAuthInfo = authInfo;
-	}
-
-	protected synchronized void terminateJobs(IProgressMonitor monitor) {
-		/*
-		 * Issue each job to terminate gracefully.
-		 */
-		for (ITargetJob job : remoteJobs.keySet()) {
-			TargetControlledJob controlledJob = remoteJobs.get(job);
-			controlledJob.cancelExecution();
-		}
-
-		/*
-		 * Wait until all jobs have terminated.
-		 */
-		while (getJobCount() > 0) {
-			try {
-				wait(500);
-			} catch (InterruptedException e) {
-				return;
-			}
-			if (monitor != null) {
-				if (monitor.isCanceled()) {
-					return;
-				}
-			}
-		}
 	}
 
 	/**

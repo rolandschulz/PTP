@@ -6,15 +6,15 @@
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
-            configurationFile="data/pbs-torque_2.3.7.xml"
+            configurationFile="data/pbs-torque-generic.xml"
             id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"
-            name="PBS Torque 2.3.7">
+            name="PBS Torque (Generic)">
       </JAXBResourceManagerConfiguration>
    </extension>
    <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
-            class="org.eclipse.ptp.rm.jaxb.core.rm.JAXBServiceProvider"
+            class="org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider"
             id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"
             name="JAXB (test monitor)"
             serviceId="org.eclipse.ptp.core.LaunchService">

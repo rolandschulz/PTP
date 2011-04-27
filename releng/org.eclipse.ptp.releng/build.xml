@@ -413,6 +413,10 @@
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.sci-feature"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.sdk-feature"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>		
 		
 		<!--Plugins-->
 		<antcall target="tagone">
@@ -649,6 +653,10 @@
 		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/doc/org.eclipse.ptp.help"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/doc/org.eclipse.ptp.doc.isv"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">

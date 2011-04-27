@@ -16,7 +16,6 @@ public interface PEPreferenceConstants
     public static final String TRACE_DETAIL = "Detail"; //$NON-NLS-1$
     public static final String LOAD_LEVELER_OPTION = "PE_useLoadLeveler"; //$NON-NLS-1$
     public static final String TRACE_LEVEL = "PE_traceLevel"; //$NON-NLS-1$
-    public static final String RUN_MINIPROXY = "PE_runMiniproxy"; //$NON-NLS-1$
     public static final String LOAD_LEVELER_MODE = "PE_LoadLevelerMode"; //$NON-NLS-1$
     public static final String LIBRARY_OVERRIDE = "PE_libraryOverride"; //$NON-NLS-1$
     public static final String NODE_MIN_POLL_INTERVAL = "PE_NodeMinPollInterval"; //$NON-NLS-1$

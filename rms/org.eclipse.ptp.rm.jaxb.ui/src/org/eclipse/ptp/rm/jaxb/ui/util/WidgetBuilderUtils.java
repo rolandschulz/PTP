@@ -24,8 +24,8 @@ import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerColumn;
-import org.eclipse.ptp.rm.jaxb.core.data.ColumnData;
-import org.eclipse.ptp.rm.jaxb.core.data.FontDescriptor;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
+import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
@@ -86,7 +86,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 */
 	public static void applyMonospace(Text text) {
 		// Courier exists on Mac, Linux, Windows ...
-		FontDescriptor fd = new FontDescriptor();
+		FontType fd = new FontType();
 		fd.setName(COURIER);
 		fd.setSize(14);
 		fd.setStyle(NORMAL);
@@ -107,7 +107,9 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 */
 	public static Button createButton(Composite parent, Object layoutData, String label, Integer style, SelectionListener listener) {
 		Button button = new Button(parent, style);
-		button.setText(label);
+		if (label != null) {
+			button.setText(label);
+		}
 		if (layoutData == null) {
 			layoutData = createGridData(DEFAULT, 1);
 		}
@@ -350,7 +352,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	public static GridData createGridData(Integer style, Boolean grabExcessHorizontal, Boolean grabExcessVertical,
 			Integer widthHint, Integer heightHint, Integer horizontalSpan, Integer verticalSpan) {
 		return createGridData(style, grabExcessHorizontal, grabExcessVertical, widthHint, heightHint, DEFAULT, DEFAULT,
-				horizontalSpan, verticalSpan, DEFAULT, DEFAULT);
+				horizontalSpan, verticalSpan, DEFAULT, DEFAULT, DEFAULT, DEFAULT);
 	}
 
 	/**
@@ -365,11 +367,13 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @param verticalSpan
 	 * @param horizonalAlign
 	 * @param verticalAlign
+	 * @param horizontalIndent
+	 * @param verticalIndent
 	 * @return grid data
 	 */
 	public static GridData createGridData(Integer style, Boolean grabExcessHorizontal, Boolean grabExcessVertical,
 			Integer widthHint, Integer heightHint, Integer minimumWidth, Integer minimumHeight, Integer horizontalSpan,
-			Integer verticalSpan, Integer horizonalAlign, Integer verticalAlign) {
+			Integer verticalSpan, Integer horizonalAlign, Integer verticalAlign, Integer horizontalIndent, Integer verticalIndent) {
 		GridData data = null;
 		if (null != style) {
 			if (style == DEFAULT) {
@@ -410,6 +414,12 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		}
 		if (null != verticalAlign && verticalAlign != DEFAULT) {
 			data.verticalAlignment = verticalAlign;
+		}
+		if (null != horizontalIndent && horizontalIndent != DEFAULT) {
+			data.horizontalIndent = horizontalIndent;
+		}
+		if (null != verticalIndent && verticalIndent != DEFAULT) {
+			data.verticalIndent = verticalIndent;
 		}
 		return data;
 	}
@@ -944,7 +954,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 *            JAXB data element for font
 	 * @return font
 	 */
-	public static Font getFont(FontDescriptor fontDescriptor) {
+	public static Font getFont(FontType fontDescriptor) {
 		String key = fontDescriptor.getName() + fontDescriptor.getSize() + fontDescriptor.getStyle();
 		FontData[] data = fonts.getFontData(key);
 		if (data == null) {
@@ -1045,7 +1055,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @param headerVisible
 	 * @param linesVisible
 	 */
-	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnData> columnData,
+	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnDataType> columnData,
 			ISelectionChangedListener listener, boolean sortByName, boolean tooltip, boolean headerVisible, boolean linesVisible) {
 		setupSpecific(viewer, columnData, sortByName, headerVisible, linesVisible);
 		setupCommon(viewer, columnData, listener, tooltip);
@@ -1067,7 +1077,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @param headerVisible
 	 * @param linesVisible
 	 */
-	public static void setupAttributeTree(final CheckboxTreeViewer viewer, List<ColumnData> columnData,
+	public static void setupAttributeTree(final CheckboxTreeViewer viewer, List<ColumnDataType> columnData,
 			ISelectionChangedListener listener, boolean sortByName, boolean tooltip, boolean headerVisible, boolean linesVisible) {
 		setupSpecific(viewer, columnData, sortByName, headerVisible, linesVisible);
 		setupCommon(viewer, columnData, listener, tooltip);
@@ -1358,11 +1368,11 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @param listener
 	 * @param tooltip
 	 */
-	private static void setupCommon(final ColumnViewer viewer, List<ColumnData> columnData, ISelectionChangedListener listener,
+	private static void setupCommon(final ColumnViewer viewer, List<ColumnDataType> columnData, ISelectionChangedListener listener,
 			boolean tooltip) {
 		String[] columnProperties = new String[columnData.size()];
 		for (int i = 0; i < columnData.size(); i++) {
-			ColumnData columnDescriptor = columnData.get(i);
+			ColumnDataType columnDescriptor = columnData.get(i);
 			columnProperties[i] = columnDescriptor.getName();
 		}
 		viewer.setColumnProperties(columnProperties);
@@ -1385,10 +1395,10 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @param headerVisible
 	 * @param linesVisible
 	 */
-	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnData> columnData, Boolean sortOnName,
+	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnDataType> columnData, Boolean sortOnName,
 			boolean headerVisible, boolean linesVisible) {
 		for (int i = 0; i < columnData.size(); i++) {
-			ColumnData columnDescriptor = columnData.get(i);
+			ColumnDataType columnDescriptor = columnData.get(i);
 			TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 			TableColumn column = viewerColumn.getColumn();
 			String name = columnDescriptor.getName();
@@ -1431,10 +1441,10 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @param headerVisible
 	 * @param linesVisible
 	 */
-	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnData> columnData, Boolean sortOnName,
+	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnDataType> columnData, Boolean sortOnName,
 			boolean headerVisible, boolean linesVisible) {
 		for (int i = 0; i < columnData.size(); i++) {
-			ColumnData columnDescriptor = columnData.get(i);
+			ColumnDataType columnDescriptor = columnData.get(i);
 			TreeViewerColumn viewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
 			TreeColumn column = viewerColumn.getColumn();
 			String name = columnDescriptor.getName();

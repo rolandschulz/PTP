@@ -14,10 +14,11 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Test;
-import org.eclipse.ptp.rm.jaxb.core.data.Test.Else;
+import org.eclipse.ptp.rm.jaxb.core.data.TestType;
+import org.eclipse.ptp.rm.jaxb.core.data.TestType.Else;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
  * Wrapper implementation. A test consists of an if/else condition to be checked
@@ -60,6 +61,7 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	private static final short sOR = 6;
 	private static final short sNOT = 7;
 
+	private final RMVariableMap rmVarMap;
 	private final String uuid;
 	private final short op;
 	private final List<String> values;
@@ -75,16 +77,19 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	 *            be <code>null</code>).
 	 * @param test
 	 *            JAXB data element
+	 * @param rmVarMap
+	 *            resource manager environment
 	 */
-	public TestImpl(String uuid, Test test) {
+	public TestImpl(String uuid, TestType test, RMVariableMap rmVarMap) {
+		this.rmVarMap = rmVarMap;
 		this.uuid = uuid;
 		op = getOp(test.getOp());
 		values = test.getValue();
-		List<Test> tests = test.getTest();
+		List<TestType> tests = test.getTest();
 		if (!tests.isEmpty()) {
 			children = new ArrayList<TestImpl>();
-			for (Test t : tests) {
-				children.add(new TestImpl(uuid, t));
+			for (TestType t : tests) {
+				children.add(new TestImpl(uuid, t, rmVarMap));
 			}
 		}
 
@@ -92,7 +97,7 @@ public class TestImpl implements IJAXBNonNLSConstants {
 		if (!listif.isEmpty()) {
 			ifcond = new ArrayList<IAssign>();
 			for (Object o : listif) {
-				AbstractAssign.add(uuid, o, ifcond);
+				AbstractAssign.add(uuid, o, ifcond, rmVarMap);
 			}
 		}
 
@@ -100,7 +105,7 @@ public class TestImpl implements IJAXBNonNLSConstants {
 		if (listelse != null) {
 			elsecond = new ArrayList<IAssign>();
 			for (Object o : listelse.getAddOrAppendOrPut()) {
-				AbstractAssign.add(uuid, o, elsecond);
+				AbstractAssign.add(uuid, o, elsecond, rmVarMap);
 			}
 		}
 	}
@@ -211,8 +216,8 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private int evaluateComparable(String string1, String string2) throws Throwable {
-		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1, true);
-		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2, true);
+		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1, true, rmVarMap);
+		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2, true, rmVarMap);
 		if (value1 == null || value2 == null) {
 			return 1;
 		}
@@ -236,8 +241,8 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	 * @throws Throwable
 	 */
 	private boolean evaluateEquals(String string1, String string2) throws Throwable {
-		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1, true);
-		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2, true);
+		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1, true, rmVarMap);
+		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2, true, rmVarMap);
 		if (value1 == null) {
 			return value2 == null;
 		}

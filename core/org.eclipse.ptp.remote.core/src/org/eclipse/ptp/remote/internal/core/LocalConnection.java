@@ -154,6 +154,15 @@ public class LocalConnection implements IRemoteConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getPort()
+	 */
+	public int getPort() {
+		return 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#getProperty(java.lang.String
 	 * )
@@ -238,6 +247,16 @@ public class LocalConnection implements IRemoteConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnection#removePortForwarding(int)
+	 */
+	public void removePortForwarding(int port) throws RemoteConnectionException {
+		// Do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#setAddress(java.lang.String
 	 * )
 	 */
@@ -275,6 +294,15 @@ public class LocalConnection implements IRemoteConnection {
 	 * )
 	 */
 	public void setPassword(String password) {
+		// Not supported
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setPort(int)
+	 */
+	public void setPort(int port) {
 		// Not supported
 	}
 

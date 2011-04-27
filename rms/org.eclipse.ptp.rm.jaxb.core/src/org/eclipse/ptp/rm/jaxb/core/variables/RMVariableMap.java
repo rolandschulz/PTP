@@ -10,7 +10,6 @@
 package org.eclipse.ptp.rm.jaxb.core.variables;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -20,7 +19,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
 /**
  * Abstraction representing all the Property and Attribute definitions
@@ -39,13 +38,13 @@ import org.eclipse.ptp.rm.jaxb.core.data.Property;
  * 
  */
 public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
-	private static RMVariableMap active;
+	private static final Object monitor = new Object();
 
 	private final Map<String, Object> variables;
 	private final Map<String, Object> discovered;
 	private boolean initialized;
 
-	private RMVariableMap() {
+	public RMVariableMap() {
 		variables = Collections.synchronizedMap(new TreeMap<String, Object>());
 		discovered = Collections.synchronizedMap(new TreeMap<String, Object>());
 		initialized = false;
@@ -144,7 +143,7 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		if (value == null) {
 			return;
 		}
-		Property p = new Property();
+		PropertyType p = new PropertyType();
 		p.setName(name);
 		p.setValue(value);
 		p.setVisible(visible);
@@ -167,27 +166,19 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 *            to search
 	 * @throws CoreException
 	 */
-	@SuppressWarnings("rawtypes")
 	public void maybeOverwrite(String key1, String key2, ILaunchConfiguration configuration) throws CoreException {
-		Object value = null;
-		Property p = (Property) variables.get(key1);
+		Object value1 = null;
+		Object value2 = null;
+		PropertyType p = (PropertyType) variables.get(key1);
 		if (p != null) {
-			value = p.getValue();
+			value2 = p.getValue();
 		}
-
-		if (value instanceof Integer) {
-			value = configuration.getAttribute(key2, (Integer) value);
-		} else if (value instanceof Boolean) {
-			value = configuration.getAttribute(key2, (Boolean) value);
-		} else if (value instanceof String) {
-			value = configuration.getAttribute(key2, (String) value);
-		} else if (value instanceof List) {
-			value = configuration.getAttribute(key2, (List) value);
-		} else if (value instanceof Map) {
-			value = configuration.getAttribute(key2, (Map) value);
+		value2 = configuration.getAttributes().get(key2);
+		if (value2 == null) {
+			maybeAddProperty(key1, value1, false);
+		} else {
+			maybeAddProperty(key1, value2, false);
 		}
-
-		maybeAddProperty(key1, value, false);
 	}
 
 	/**
@@ -228,7 +219,9 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Calls the string substitution method on the variable manager.
+	 * Calls the string substitution method on the variable manager. Under
+	 * synchronization, sets the variable resolver's map reference to this
+	 * instance.
 	 * 
 	 * @param expression
 	 *            to be resolved (recursively dereferenced from the map).
@@ -239,28 +232,9 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		if (expression == null) {
 			return null;
 		}
-		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
-	}
-
-	/**
-	 * @return the currently active instance.
-	 */
-	public synchronized static RMVariableMap getActiveInstance() {
-		return active;
-	}
-
-	/**
-	 * @param instance
-	 *            if <code>null</code>, an empty map is created, set to the
-	 *            active map, and returned. Else the passed-in instance is set
-	 *            and returned.
-	 * @return the resulting active instance
-	 */
-	public synchronized static RMVariableMap setActiveInstance(RMVariableMap instance) {
-		if (instance == null) {
-			instance = new RMVariableMap();
+		synchronized (monitor) {
+			RMVariableResolver.setActive(this);
+			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
 		}
-		RMVariableMap.active = instance;
-		return RMVariableMap.active;
 	}
 }

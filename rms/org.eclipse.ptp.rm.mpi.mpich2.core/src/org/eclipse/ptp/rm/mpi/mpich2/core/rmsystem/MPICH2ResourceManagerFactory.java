@@ -42,7 +42,7 @@ public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory
 
 	@Override
 	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
+		return new MPICH2ResourceManagerConfiguration(MPICH2ResourceManagerConfiguration.BASE, provider);
 	}
 
 	/*
@@ -66,7 +66,7 @@ public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory
 	 */
 	@Override
 	public IResourceManagerComponentConfiguration createControlConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
+		return new MPICH2ResourceManagerConfiguration(MPICH2ResourceManagerConfiguration.BASE, provider);
 	}
 
 	/*
@@ -90,19 +90,6 @@ public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory
 	 */
 	@Override
 	public IResourceManagerComponentConfiguration createMonitorConfiguration(IServiceProvider provider) {
-		return createCommonConfiguration(provider);
+		return new MPICH2ResourceManagerConfiguration(MPICH2ResourceManagerConfiguration.BASE, provider);
 	}
-
-	private MPICH2ResourceManagerConfiguration createCommonConfiguration(IServiceProvider provider) {
-		if (fConfiguration == null) {
-			fConfiguration = new MPICH2ResourceManagerConfiguration(MPICH2ResourceManagerConfiguration.BASE, provider);
-		}
-		return fConfiguration;
-	} /*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createConfiguration
-	 * (org.eclipse.ptp.services.core.IServiceProvider)
-	 */
 }

@@ -10,17 +10,20 @@
 package org.eclipse.ptp.rm.jaxb.core.variables;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
 /**
@@ -38,7 +41,7 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
  * in to the configuration by the Environment Tab).<br>
  * <br>
  * When this map is loaded from its RMVariableMap parent (see
- * {@link #loadValues(RMVariableMap)}), the full set of Properties and
+ * {@link #initialize(RMVariableMap)}), the full set of Properties and
  * Attributes are maintained in a global map, which remains unaltered; a second,
  * volatile map can be swapped in and out by the caller (usually subsets of the
  * global map based on the specific tab doing the calling).<br>
@@ -56,20 +59,15 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
  * @author arossi
  */
 public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
-
-	private static LCVariableMap active;
+	private static final Object monitor = new Object();
 
 	private Map<String, Object> globalValues;
 	private Map<String, Object> values;
 	private final Map<String, String> defaultValues;
-	private final Map<String, String> checked;
-	private final boolean initialized;
 
-	private LCVariableMap() {
+	public LCVariableMap() {
 		this.values = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.defaultValues = Collections.synchronizedMap(new TreeMap<String, String>());
-		this.checked = Collections.synchronizedMap(new TreeMap<String, String>());
-		this.initialized = false;
 	}
 
 	/**
@@ -79,6 +77,23 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 */
 	public Object get(String name) {
 		return values.get(name);
+	}
+
+	/**
+	 * @param viewerName
+	 *            of viewer for which to find checked rows
+	 * @return map of checked row model names
+	 */
+	public Map<String, String> getChecked(String viewerName) {
+		Map<String, String> m = new HashMap<String, String>();
+		String checked = (String) values.get(CHECKED_ATTRIBUTES + viewerName);
+		if (checked != null) {
+			String[] split = checked.split(SP);
+			for (String s : split) {
+				m.put(s, s);
+			}
+		}
+		return m;
 	}
 
 	/**
@@ -124,19 +139,26 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * @param name
-	 *            of widget, bound to a Property or Attribute
-	 * @return if this is a checkbox element, whether it is checked
+	 * Initialize this map from the resource manager environment instance.
+	 * 
+	 * @param rmVars
+	 *            resource manager environment map
+	 * @throws Throwable
 	 */
-	public boolean isChecked(String name) {
-		return checked.containsKey(name);
-	}
-
-	/**
-	 * @return whether the internal maps have been loaded
-	 */
-	public boolean isInitialized() {
-		return initialized;
+	public void initialize(RMVariableMap rmVars) throws Throwable {
+		values.clear();
+		defaultValues.clear();
+		for (String s : rmVars.getVariables().keySet()) {
+			loadValues(s, rmVars.getVariables().get(s));
+		}
+		for (String s : rmVars.getDiscovered().keySet()) {
+			loadValues(s, rmVars.getDiscovered().get(s));
+		}
+		globalValues = values;
+		/*
+		 * this map will be set from the tab's local map
+		 */
+		values = null;
 	}
 
 	/**
@@ -160,13 +182,6 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Set the volatile map to the original global map.
-	 */
-	public void restoreGlobal() {
-		values = globalValues;
-	}
-
-	/**
 	 * Exchange the current volatile map for the one passed in.
 	 * 
 	 * @param newV
@@ -178,6 +193,24 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		Map<String, Object> oldV = values;
 		values = newV;
 		return oldV;
+	}
+
+	/**
+	 * Set the volatile map to the original global map, but first update the
+	 * latter with the most recent values from the configuration.
+	 * 
+	 * @throws CoreException
+	 */
+	@SuppressWarnings("rawtypes")
+	public void updateGlobal(ILaunchConfiguration configuration) throws CoreException {
+		Map attr = configuration.getAttributes();
+		for (Object k : attr.keySet()) {
+			Object val = attr.get(k);
+			if (val != null) {
+				globalValues.put((String) k, attr.get(k));
+			}
+		}
+		values = globalValues;
 	}
 
 	/**
@@ -193,7 +226,9 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Calls the string substitution method on the variable manager.
+	 * Calls the string substitution method on the variable manager. Under
+	 * synchronization, sets the variable resolver's map reference to this
+	 * instance.
 	 * 
 	 * @param expression
 	 *            to be resolved (recursively dereferenced from the map).
@@ -204,28 +239,10 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		if (expression == null) {
 			return null;
 		}
-		return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
-	}
-
-	/**
-	 * Initialize this map from the resource manager environment instance.
-	 * 
-	 * @param rmVars
-	 *            resource manager environment map
-	 * @throws Throwable
-	 */
-	private void loadValues(RMVariableMap rmVars) throws Throwable {
-		for (String s : rmVars.getVariables().keySet()) {
-			loadValues(s, rmVars.getVariables().get(s));
+		synchronized (monitor) {
+			LCVariableResolver.setActive(this);
+			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
 		}
-		for (String s : rmVars.getDiscovered().keySet()) {
-			loadValues(s, rmVars.getDiscovered().get(s));
-		}
-		globalValues = values;
-		/*
-		 * this map will be set from the tab's local map
-		 */
-		values = null;
 	}
 
 	/**
@@ -243,13 +260,19 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		String defVal = null;
 		String strVal = null;
 		Object o = null;
-		if (value instanceof Property) {
-			Property p = (Property) value;
+		if (value instanceof PropertyType) {
+			PropertyType p = (PropertyType) value;
+			if (!p.isVisible()) {
+				return;
+			}
 			name = p.getName();
 			defVal = p.getDefault();
 			o = p.getValue();
-		} else if (value instanceof Attribute) {
-			Attribute ja = (Attribute) value;
+		} else if (value instanceof AttributeType) {
+			AttributeType ja = (AttributeType) value;
+			if (!ja.isVisible()) {
+				return;
+			}
 			name = ja.getName();
 			defVal = ja.getDefault();
 			o = ja.getValue();
@@ -269,49 +292,26 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * The selected index is created from the SELECTED_ATTRIBUTES property, if
-	 * it is defined.
+	 * Ensures that non-JAXB-spacific attributes remain in the configuration
+	 * during replace/refresh.
 	 * 
+	 * @param configuration
+	 *            current launch settings
+	 * @return map of org.eclipse.debug and org.eclipse.ptp attributes
 	 * @throws CoreException
 	 */
-	private void setChecked() throws CoreException {
-		String checked = (String) get(CHECKED_ATTRIBUTES);
-		if (checked == null || ZEROSTR.equals(checked)) {
-			StringBuffer buffer = new StringBuffer();
-			for (Object s : values.keySet()) {
-				buffer.append(s).append(SP);
+	public static Map<String, Object> getStandardConfigurationProperties(ILaunchConfiguration configuration) throws CoreException {
+		Map<String, Object> standard = new TreeMap<String, Object>();
+		Map<?, ?> attributes = configuration.getAttributes();
+		for (Object o : attributes.keySet()) {
+			String key = (String) o;
+			if (key.startsWith(DEBUG_PACKAGE) || key.startsWith(PTP_PACKAGE)) {
+				standard.put(key, attributes.get(key));
 			}
-			values.put(CHECKED_ATTRIBUTES, buffer.toString().trim());
 		}
-	}
-
-	/**
-	 * Creates an instance to be associated with a given Launch Tab.
-	 * 
-	 * @param rmVars
-	 *            environement map for the associated resource manager
-	 * @return the LaunchTab environment map
-	 * @throws Throwable
-	 */
-	public static LCVariableMap createInstance(RMVariableMap rmVars) throws Throwable {
-		LCVariableMap lcMap = new LCVariableMap();
-		lcMap.setChecked();
-		lcMap.loadValues(rmVars);
-		return lcMap;
-	}
-
-	/**
-	 * @return the currently active map
-	 */
-	public synchronized static LCVariableMap getActiveInstance() {
-		return active;
-	}
-
-	/**
-	 * @param instance
-	 *            to be exported as the currently active map
-	 */
-	public synchronized static void setActiveInstance(LCVariableMap instance) {
-		active = instance;
+		standard.put(DIRECTORY, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, ZEROSTR));
+		standard.put(EXEC_PATH, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, ZEROSTR));
+		standard.put(PROG_ARGS, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, ZEROSTR));
+		return standard;
 	}
 }

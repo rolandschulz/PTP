@@ -16,7 +16,6 @@ import java.util.BitSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
@@ -36,11 +35,11 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 	MPICH2RuntimeSystem rts;
 
-	public MPICH2PeriodicJob(MPICH2RuntimeSystem rts, IProgressMonitor monitor) {
+	public MPICH2PeriodicJob(MPICH2RuntimeSystem rts) {
 		super(rts, NLS.bind(Messages.MPICH2MonitorJob_name, rts.getRmConfiguration().getName()), rts
 				.retrieveEffectiveToolRmConfiguration().getPeriodicMonitorCmd(), Messages.MPICH2MonitorJob_interruptedErrorMessage,
 				Messages.MPICH2MonitorJob_processErrorMessage, Messages.MPICH2MonitorJob_parsingErrorMessage, rts
-						.retrieveEffectiveToolRmConfiguration().getPeriodicMonitorTime(), monitor);
+						.retrieveEffectiveToolRmConfiguration().getPeriodicMonitorTime());
 		this.rts = rts;
 	}
 

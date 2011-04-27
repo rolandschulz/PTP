@@ -12,10 +12,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.slurm.core.rmsystem;
 
-import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.rm.core.RMPreferenceConstants;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.rm.slurm.core.SLURMCorePlugin;
 import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**
@@ -27,9 +24,6 @@ public class SLURMResourceManagerConfiguration extends AbstractRemoteResourceMan
 	private static final String TAG_SLURMD_ARGS = "slurmdArgs"; //$NON-NLS-1$
 	private static final String TAG_SLURMD_DEFAULTS = "slurmdDefaults"; //$NON-NLS-1$
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-
-	public SLURMResourceManagerConfiguration() {
-	}
 
 	public SLURMResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(namespace, provider);
@@ -55,8 +49,7 @@ public class SLURMResourceManagerConfiguration extends AbstractRemoteResourceMan
 	 * #getSlurmdPath()
 	 */
 	public String getSlurmdPath() {
-		return getString(TAG_SLURMD_PATH,
-				Preferences.getString(SLURMCorePlugin.getUniqueIdentifier(), RMPreferenceConstants.PROXY_PATH));
+		return "";
 	}
 
 	/*

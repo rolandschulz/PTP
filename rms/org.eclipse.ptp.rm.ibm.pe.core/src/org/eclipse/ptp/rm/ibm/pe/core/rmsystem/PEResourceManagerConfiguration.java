@@ -30,9 +30,6 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	private static final String TAG_JOB_POLL_INTERVAL = "PE_JobPollInterval"; //$NON-NLS-1$
 	private static final String TAG_LIBRARY_OVERRIDE = "PE_LibraryOverride"; //$NON-NLS-1$
 
-	public PEResourceManagerConfiguration() {
-	}
-
 	public PEResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(namespace, provider);
 		setDescription("IBM PE Resource Manager"); //$NON-NLS-1$
@@ -113,24 +110,12 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * getResourceManagerId()
-	 */
-	@Override
-	public String getResourceManagerId() {
-		return getId();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
 	 * #getRunMiniproxy()
 	 */
 	public String getRunMiniproxy() {
-		return getString(TAG_RUN_MINIPROXY,
-				Preferences.getString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.RUN_MINIPROXY));
+		return "";
 	}
 
 	/*

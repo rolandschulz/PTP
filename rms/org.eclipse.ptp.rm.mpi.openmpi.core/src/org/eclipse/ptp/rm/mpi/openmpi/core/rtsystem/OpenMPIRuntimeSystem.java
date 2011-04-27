@@ -146,17 +146,30 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 		return (OpenMPIResourceManagerConfiguration) getResourceManager().getConfiguration();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
+	 * createContinuousMonitorJob()
+	 */
 	@Override
-	protected Job createContinuousMonitorJob(IProgressMonitor monitor) {
+	protected Job createContinuousMonitorJob() {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#createDiscoverJob
+	 * ()
+	 */
 	@Override
-	protected Job createDiscoverJob(IProgressMonitor monitor) {
+	protected Job createDiscoverJob() {
 		if (!getConfiguration().hasDiscoverCmd()) {
 			return null;
 		}
-		Job job = new OpenMPIDiscoverJob(this, monitor);
+		Job job = new OpenMPIDiscoverJob(this);
 		job.setPriority(Job.INTERACTIVE);
 		job.setSystem(false);
 		job.setUser(false);
@@ -167,10 +180,10 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * createPeriodicMonitorJob(org.eclipse.core.runtime.IProgressMonitor)
+	 * createPeriodicMonitorJob()
 	 */
 	@Override
-	protected Job createPeriodicMonitorJob(IProgressMonitor monitor) {
+	protected Job createPeriodicMonitorJob() {
 		return null;
 	}
 

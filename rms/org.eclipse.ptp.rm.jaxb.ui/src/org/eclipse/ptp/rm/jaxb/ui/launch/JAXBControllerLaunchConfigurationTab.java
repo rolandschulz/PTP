@@ -16,12 +16,11 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.data.LaunchTab;
-import org.eclipse.ptp.rm.jaxb.core.data.Script;
-import org.eclipse.ptp.rm.jaxb.core.data.TabController;
+import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
+import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
+import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IFireContentsChangedEnabled;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
@@ -46,12 +45,12 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 
 	private final RemoteServicesDelegate delegate;
 	private final IJAXBResourceManagerConfiguration rmConfig;
-	private final LaunchTab launchTabData;
-	private final Script script;
+	private final LaunchTabType launchTabData;
+	private final ScriptType script;
 	private final ValueUpdateHandler updateHandler;
 
 	private ScrolledComposite scrolledParent;
-	private LCVariableMap lcMap;
+	private final LCVariableMap lcMap;
 
 	/**
 	 * @param rm
@@ -63,13 +62,12 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	public JAXBControllerLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
 		super(dialog);
 		rmConfig = rm.getJAXBConfiguration();
-		rmConfig.setActive();
 		script = rmConfig.getResourceManagerData().getControlData().getScript();
 		launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
 		delegate = rm.getControl().getRemoteServicesDelegate();
 		updateHandler = new ValueUpdateHandler(this);
 		if (launchTabData != null) {
-			TabController controller = launchTabData.getBasic();
+			TabControllerType controller = launchTabData.getBasic();
 			if (controller != null) {
 				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
 			}
@@ -82,6 +80,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this));
 			}
 		}
+		lcMap = new LCVariableMap();
 	}
 
 	/*
@@ -127,7 +126,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	/**
 	 * @return JAXB elements for building the launch tab controls
 	 */
-	public LaunchTab getLaunchTabData() {
+	public LaunchTabType getLaunchTabData() {
 		return launchTabData;
 	}
 
@@ -140,9 +139,18 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	/**
+	 * Needed by the LaunchTabBuilder
+	 * 
+	 * @return the ResourceManager (base) configuration
+	 */
+	public IJAXBResourceManagerConfiguration getRmConfig() {
+		return rmConfig;
+	}
+
+	/**
 	 * @return JAXB data element for resource manager script
 	 */
-	public Script getScript() {
+	public ScriptType getScript() {
 		return script;
 	}
 
@@ -162,11 +170,10 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	/*
-	 * resets the resource manager environment to active, rebuilds the launch
-	 * tab environment map, and clears the controls registered with the update
-	 * handler. This is necessary because on calls to this method subsequent to
-	 * the first, the widgets it contained will have been disposed.
-	 * (non-Javadoc)
+	 * Rebuilds the launch tab environment map, and clears the controls
+	 * registered with the update handler. This is necessary because on calls to
+	 * this method subsequent to the first, the widgets it contained will have
+	 * been disposed. (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#initializeFrom
@@ -178,10 +185,8 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		try {
-			rmConfig.setActive();
-			lcMap = LCVariableMap.createInstance(RMVariableMap.getActiveInstance());
-			LCVariableMap.setActiveInstance(lcMap);
-			updateHandler.getControlToModelMap().clear();
+			lcMap.initialize(rmConfig.getRMVariableMap());
+			updateHandler.clear();
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 			return new RMLaunchValidation(false, t.getMessage());

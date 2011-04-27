@@ -263,6 +263,7 @@ public class GemUtilities {
 		final String hostName = pstore.getString(PreferenceConstants.GEM_PREF_HOSTNAME);
 		String ispExePath = pstore.getString(PreferenceConstants.GEM_PREF_ISPEXE_PATH);
 		ispExePath += (ispExePath == "") ? "" : "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final String cmdArgs = pstore.getString(PreferenceConstants.GEM_PREF_ARGS);
 
 		// Find an available port to use
 		boolean available = isPortAvailable(portnum);
@@ -302,6 +303,8 @@ public class GemUtilities {
 		stringBuffer.append(logFilePath);
 		stringBuffer.append(" "); //$NON-NLS-1$
 		stringBuffer.append(executablePath);
+		stringBuffer.append(" "); //$NON-NLS-1$
+		stringBuffer.append(cmdArgs);
 		// Now add command line options
 		final String ispCmd = stringBuffer.toString();
 
@@ -1008,6 +1011,21 @@ public class GemUtilities {
 		}
 	}
 
+	/*
+	 * Prompts an input dialog asking the user what command line arguments they
+	 * want used and stores the result. The default value shown is the last used
+	 * value.
+	 */
+	private static void requestCommandLineArgs() {
+		final String message = Messages.GemUtilities_28;
+		final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+		final String prevArgs = pstore.getString(PreferenceConstants.GEM_PREF_ARGS);
+		final String newArgs = JOptionPane.showInputDialog(null, message, prevArgs);
+		if (newArgs != null) {
+			pstore.setValue(PreferenceConstants.GEM_PREF_ARGS, newArgs);
+		}
+	}
+
 	/**
 	 * Executes the specified command via a native runtime process instance.
 	 * 
@@ -1174,6 +1192,25 @@ public class GemUtilities {
 					logExceptionDetail(e);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Used to pass command line arguments to the profiled executable during a
+	 * verification run. If the GEM_PREF_REQUEST_ARGS preference is set,
+	 * GEM_PREF_REQUEST_ARGS requestCommandLineArgs is called to get the command
+	 * line arguments. Otherwise the command line arguments are simply set to
+	 * "".
+	 * 
+	 * @param none
+	 * @return void
+	 */
+	public static void setCommandLineArgs() {
+		final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+		if (pstore.getBoolean(PreferenceConstants.GEM_PREF_REQUEST_ARGS)) {
+			requestCommandLineArgs();
+		} else {
+			pstore.setValue(PreferenceConstants.GEM_PREF_ARGS, ""); //$NON-NLS-1$
 		}
 	}
 

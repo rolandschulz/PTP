@@ -20,13 +20,19 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 
 /**
- * Resolver for the RMVariableMap (tag: ${rm:). See further
- * {@link #RMVariableResolver()}
+ * Resolver for the RMVariableMap (tag: ${rm:). <br>
+ * <br>
+ * In order to guarantee consistency, any implicit call to resolve should be
+ * synchronized statically and should be preceded by a call to
+ * {@link #setActive(RMVariableMap)}. See further
+ * {@link #resolveValue(IDynamicVariable, String)}
  * 
  * @author arossi
  * 
  */
 public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
+
+	private static RMVariableMap active;
 
 	/**
 	 * The ${rm: tag can contain a name with a suffix, "#field", denoting the
@@ -38,7 +44,7 @@ public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 	 */
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
 		String[] parts = argument.split(PDRX);
-		Object value = RMVariableMap.getActiveInstance().get(parts[0]);
+		Object value = active.get(parts[0]);
 		if (value != null) {
 			if (parts.length == 2) {
 				try {
@@ -51,6 +57,14 @@ public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @param active
+	 *            current instance of the map
+	 */
+	public static void setActive(RMVariableMap active) {
+		RMVariableResolver.active = active;
 	}
 
 	/**

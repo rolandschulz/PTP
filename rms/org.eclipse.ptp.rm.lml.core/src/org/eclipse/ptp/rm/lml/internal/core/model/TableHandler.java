@@ -11,6 +11,7 @@
 
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -252,5 +253,16 @@ public class TableHandler extends LguiHandler {
 	
 	public String getTableTitle(int i) {
 		return getTables().get(i).getTitle();
+	}
+
+	public String[] getTableColumnNonActive(String tableType) {
+		TablelayoutType tableLayout = lguiItem.getLayoutAccess().getTableLayout(getTable(tableType).getId());
+		ArrayList<String> tableColumnNonActive = new ArrayList<String>();
+		for (int i = 0; i < tableLayout.getColumn().size(); i++) {
+			if (!tableLayout.getColumn().get(i).isActive()) {
+				tableColumnNonActive.add(tableLayout.getColumn().get(i).getKey());
+			}
+		}
+		return tableColumnNonActive.toArray(new String[tableColumnNonActive.size()]);
 	}
 }

@@ -29,9 +29,6 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 
 	private final List<String> invocationOptions = new ArrayList<String>();
 
-	public AbstractRemoteResourceManagerConfiguration() {
-	}
-
 	public AbstractRemoteResourceManagerConfiguration(String namespace, IServiceProvider provider) {
 		super(namespace, provider);
 	}
@@ -117,7 +114,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	 * getUseDefault()
 	 */
 	public boolean getUseDefault() {
-		return getBoolean(TAG_USE_DEFAULT, true);
+		return getBoolean(TAG_USE_DEFAULT, false);
 	}
 
 	/**

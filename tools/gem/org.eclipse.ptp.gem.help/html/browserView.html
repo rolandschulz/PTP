@@ -29,7 +29,7 @@ for a particular run. Please refer to the <a href="setNumProcs.html">Setting the
 
 <p>
 When you formally verify an MPI C/C++ program, the Browser View and the Analyzer View will both be
-opened and depending on what is specified in preferences, either one may be brought to the foreground
+opened and depending on what is specified in preferences, one of these views will be brought to the foreground
 and given the active focus.
 </p>
 
@@ -38,6 +38,11 @@ and given the active focus.
         Open the source code file in the Eclipse editor window and select
         <img height="16" src="images/trident.gif" width="13" /><b>Formally Verify MPI Program</b>
         from the trident pull-down icon on the Eclipse toolbar.
+        <br/><br/>
+		<center>
+		<img src="images/runVerify.png">
+		</center>
+		<br/>        
     </li>
     <li>
         From the Project Explorer window, right click on the C source code file and select
@@ -48,19 +53,16 @@ and given the active focus.
         Open the source code file in the Eclipse editor window, right click in the editor window and select
         <img height="16" src="images/trident.gif" width="13" /><b>Formally Verify MPI Program</b>
         from the GEM context menu.
+        <br/><br/>
+        <img src="images/sourceCodePopUp.png">
+        <br/><br/>        
     </li>
 </ul>
-
-<br>
-<center>
-<img src="images/runVerify.png">
-</center>
-<br>
 
 <h2>Browser Overview</h2>
 <p>
 This highly functional view summarizes and categorically groups all of the errors and warnings found
-by GEM on a particular verification run. The summary label (just above the tabs) gives the user a quick
+by GEM on a particular MPI verification run. The summary label (just above the tabs) gives the user a quick
 overview of problems found. Errors and warnings are mapped to the corresponding source code lines in 
 the Eclipse editor.  The Browser View&#39;s tabs help the user to quickly locate and fix MPI errors 
 flagged by GEM in their source code.
@@ -80,10 +82,11 @@ detailed descriptions.
 <h2>Browser View Tabs</h2>
 
 <p>
-Below the summary is a section containing a tab for category of error or warning that was found in the
+Below the GEM Browser summary label (the line above the tabs summarizing the errors and warnings found)
+is a section containing a tab for category of error or warning that was found in the
 code. By selecting a particular tab the user is given detailed information on each occurrence of that type of
 error or warning in their MPI code. Clicking on any of these occurrences takes the user to the offending 
-line in the source code within the Eclipse editor.If there are no instances of the problem then there is 
+line in the source code within the Eclipse editor. If there are no instances of the problem then there is 
 a short message indicating as much. Furthermore, a user is shown which types of errors are presented via 
 the icons of the tab (see icons directly below).
 </p>
@@ -115,14 +118,15 @@ MPI_Barrier call itself, which can then be safely removed without changing the r
 This could potentially serve to speed the application of in the absence of unnecessary synchronization.
 
 <h3>Type Mismatches Tab</h3>
-These are warnings about the send type not matching the receive type.
+These are warnings about the send type not matching the receive type. 
+In some cases this may be intentional, but often times it is a programming mistake.
 
 <br/><br/>
 <hr/>
 
 <h2>Button Explanations</h2>
 <p>
-<img height="20" src="images/setNumProcsCombo.gif" width="47" /> The first drop down combo-box shows the current number of
+<img height="20" src="images/setNumProcsCombo.gif" width="47" /> The drop down combo-box shows the current number of
 processes and lets the user conveniently choose a new value for the next GEM run.
 </p>
 

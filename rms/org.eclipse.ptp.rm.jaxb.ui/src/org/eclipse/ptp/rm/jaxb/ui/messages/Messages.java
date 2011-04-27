@@ -20,6 +20,8 @@ public class Messages extends NLS {
 	public static String JAXBRMControlConfigurationWizardPage_Title;
 	public static String JAXBRMMonitoringConfigurationWizardPage_Title;
 
+	public static String JAXBRMConfigurationImportWizard_createResourceManagersProject;
+
 	public static String JAXBRMConfigurationSelectionWizardPage_0;
 	public static String JAXBRMConfigurationSelectionWizardPage_1;
 	public static String JAXBRMConfigurationSelectionWizardPage_Project_Selection_Title;
@@ -83,11 +85,24 @@ public class Messages extends NLS {
 	public static String ScriptNotSupportedWarning_title;
 	public static String CreateControlConfigurableError;
 	public static String ReadOnlyWarning;
+	public static String ReadOnlyWarning_title;
 
 	public static String ValidationError;
 	public static String ValidationError_title;
 	public static String InvalidConfiguration;
 	public static String InvalidConfiguration_title;
+
+	public static String ConfigurationImportWizardTitle;
+	public static String ConfigurationImportWizardPageTitle;
+	public static String ConfigurationImportWizardPageDescription;
+	public static String ConfigurationImportWizardPageTooltip;
+	public static String ConfigurationImportWizardPageLabel;
+	public static String ResourceManagersNotExist;
+	public static String ResourceManagersNotExist_title;
+	public static String CaptureJobOutput;
+	public static String CaptureJobOutputTooltip;
+	public static String CaptureJobOutputError;
+	public static String CaptureJobOutputError_title;
 
 	static {
 		// initialize resource bundle

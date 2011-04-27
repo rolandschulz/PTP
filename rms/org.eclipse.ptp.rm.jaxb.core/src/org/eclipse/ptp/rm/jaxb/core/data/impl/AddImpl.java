@@ -12,8 +12,9 @@ package org.eclipse.ptp.rm.jaxb.core.data.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ptp.rm.jaxb.core.data.Add;
-import org.eclipse.ptp.rm.jaxb.core.data.Entry;
+import org.eclipse.ptp.rm.jaxb.core.data.AddType;
+import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
  * Wrapper implementation.
@@ -23,7 +24,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Entry;
  */
 public class AddImpl extends AbstractAssign {
 
-	private final List<Entry> entries;
+	private final List<EntryType> entries;
 
 	/**
 	 * @param uuid
@@ -31,8 +32,11 @@ public class AddImpl extends AbstractAssign {
 	 *            be <code>null</code>).
 	 * @param add
 	 *            JAXB data element
+	 * @param rmVarMap
+	 *            resource manager environment
 	 */
-	public AddImpl(String uuid, Add add) {
+	public AddImpl(String uuid, AddType add, RMVariableMap rmVarMap) {
+		super(rmVarMap);
 		this.uuid = uuid;
 		field = add.getField();
 		entries = add.getEntry();
@@ -49,7 +53,7 @@ public class AddImpl extends AbstractAssign {
 		}
 
 		if (!entries.isEmpty()) {
-			for (Entry e : entries) {
+			for (EntryType e : entries) {
 				Object v = getValue(e, values);
 				if (v != null) {
 					list.add(v.toString());

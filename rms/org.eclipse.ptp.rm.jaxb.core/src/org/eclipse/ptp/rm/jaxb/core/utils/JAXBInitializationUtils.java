@@ -27,9 +27,9 @@ import javax.xml.validation.Validator;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.Control;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.xml.sax.SAXException;
@@ -55,7 +55,7 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	 *            the active instance of the resource manager environment map
 	 */
 	public static void initializeMap(ResourceManagerData rmData, RMVariableMap instance) {
-		Control control = rmData.getControlData();
+		ControlType control = rmData.getControlData();
 		instance.clear();
 		Map<String, Object> env = instance.getVariables();
 		addProperties(env, control);
@@ -98,33 +98,40 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Adds the attributes.
+	 * Adds the attributes. If the attribute value is <code>null</code>,
+	 * overwrites it with the default.
 	 * 
 	 * @param env
 	 *            the active instance of the resource manager environment map
 	 * @param control
 	 *            JAXB data subtree for control part of resource manager
 	 */
-	private static void addAttributes(Map<String, Object> env, Control control) {
-		List<Attribute> jobAttributes = control.getAttribute();
-		for (Attribute jobAttribute : jobAttributes) {
-			String name = jobAttribute.getName();
-			env.put(name, jobAttribute);
+	private static void addAttributes(Map<String, Object> env, ControlType control) {
+		List<AttributeType> jobAttributes = control.getAttribute();
+		for (AttributeType jobAttribute : jobAttributes) {
+			env.put(jobAttribute.getName(), jobAttribute);
+			if (jobAttribute.getValue() == null) {
+				jobAttribute.setValue(jobAttribute.getDefault());
+			}
 		}
 	}
 
 	/**
-	 * Adds the properties.
+	 * Adds the properties. If the property value is <code>null</code>,
+	 * overwrites it with the default.
 	 * 
 	 * @param env
 	 *            the active instance of the resource manager environment map
 	 * @param control
 	 *            JAXB data subtree for control part of resource manager
 	 */
-	private static void addProperties(Map<String, Object> env, Control control) {
-		List<Property> properties = control.getProperty();
-		for (Property property : properties) {
+	private static void addProperties(Map<String, Object> env, ControlType control) {
+		List<PropertyType> properties = control.getProperty();
+		for (PropertyType property : properties) {
 			env.put(property.getName(), property);
+			if (property.getValue() == null) {
+				property.setValue(property.getDefault());
+			}
 		}
 	}
 

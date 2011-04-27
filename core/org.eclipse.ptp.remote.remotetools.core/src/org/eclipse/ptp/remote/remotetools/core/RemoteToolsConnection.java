@@ -17,7 +17,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -29,6 +28,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
+import org.eclipse.ptp.remotetools.core.IRemotePortForwarding;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
@@ -78,18 +78,12 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#close()
 	 */
 	public synchronized void close() {
-		IProgressMonitor monitor = new NullProgressMonitor();
-
-		monitor.beginTask(Messages.RemoteToolsConnection_close, 1);
-
 		if (isOpen()) {
 			try {
-				fTargetControl.kill(monitor);
+				fTargetControl.kill();
 			} catch (CoreException e) {
 			}
 		}
-
-		monitor.done();
 	}
 
 	/**
@@ -101,6 +95,16 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public IRemoteExecutionManager createExecutionManager() throws org.eclipse.ptp.remotetools.exception.RemoteConnectionException {
 		return fTargetControl.createExecutionManager();
+	}
+
+	/**
+	 * Remove element from remote tools environment and dispose of any
+	 * additional resources. NOTE: must only be called if the connection is
+	 * closed!
+	 */
+	public void dispose() {
+		fTargetElement.getType().removeElement(fTargetElement);
+		fListeners.clear();
 	}
 
 	/**
@@ -327,6 +331,15 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getPort()
+	 */
+	public int getPort() {
+		return fTargetControl.getConfig().getConnectionPort();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#getProperty(java.lang.String
 	 * )
@@ -425,6 +438,25 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnection#removePortForwarding(int)
+	 */
+	public void removePortForwarding(int port) throws RemoteConnectionException {
+		if (!isOpen()) {
+			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
+		}
+		try {
+			IRemotePortForwarding portForwarding = fTargetControl.getExecutionManager().getPortForwardingTools()
+					.getRemotePortForwarding(port);
+			fTargetControl.getExecutionManager().getPortForwardingTools().releaseForwarding(portForwarding);
+		} catch (Exception e) {
+			throw new RemoteConnectionException(e.getMessage());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#setAddress(java.lang.String
 	 * )
 	 */
@@ -469,6 +501,15 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public void setPassword(String password) {
 		fTargetControl.getConfig().setLoginPassword(password);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setPort(int)
+	 */
+	public void setPort(int port) {
+		fTargetControl.getConfig().setConnectionPort(port);
 	}
 
 	/*

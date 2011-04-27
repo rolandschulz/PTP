@@ -23,7 +23,7 @@ public class MPIErrorView extends SimpleTreeTableMarkerView {
 	public MPIErrorView() {
 
 		super(Activator.getDefault(), "FunctionName", Messages.MPIErrorView_matchingSetArtifacts, "IndexNum", //$NON-NLS-1$ //$NON-NLS-3$
-				IDs.errorMarkerID/* common needs:, IDs.parentIDAttr*/);
+				IDs.errorMarkerID/* common needs:, IDs.parentIDAttr */);
 	}
 
 }

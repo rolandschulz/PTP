@@ -17,16 +17,16 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
-import org.eclipse.ptp.rm.jaxb.core.data.Command;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 
-	private static final String rmxml = DATA + "rm-pbs-torque_2.3.7.xml"; //$NON-NLS-1$
+	private static final String rmxml = DATA + "test-pbs.xml"; //$NON-NLS-1$
 	private static final String tokxml = DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
 
 	@Override
@@ -45,7 +45,7 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 			JAXBTestsPlugin.validate(rmxml);
 			rmdata = JAXBInitializationUtils.initializeRMData(JAXBTestsPlugin.getURL(rmxml));
 			if (rmdata != null) {
-				RMVariableMap map = RMVariableMap.setActiveInstance(null);
+				RMVariableMap map = new RMVariableMap();
 				JAXBInitializationUtils.initializeMap(rmdata, map);
 				print(map);
 				String exp = map.getString(null, "${rm:stagein#description}"); //$NON-NLS-1$
@@ -64,8 +64,8 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 			JAXBTestsPlugin.validate(tokxml);
 			rmdata = JAXBInitializationUtils.initializeRMData(JAXBTestsPlugin.getURL(tokxml));
 			if (rmdata != null) {
-				List<Command> cmds = rmdata.getControlData().getStartUpCommand();
-				for (Command cmd : cmds) {
+				List<CommandType> cmds = rmdata.getControlData().getStartUpCommand();
+				for (CommandType cmd : cmds) {
 					System.out.println(cmd.getName());
 				}
 			}
@@ -80,14 +80,14 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 		for (Iterator<Map.Entry<String, Object>> i = map.getVariables().entrySet().iterator(); i.hasNext();) {
 			Map.Entry<String, Object> e = i.next();
 			Object o = e.getValue();
-			if (o instanceof Attribute) {
-				Attribute ja = (Attribute) o;
+			if (o instanceof AttributeType) {
+				AttributeType ja = (AttributeType) o;
 				buffer.append(LT).append(ja.getName()).append(GTLT).append(ja.getType()).append(GTLT).append(ja.getDefault())
 						.append(GTLT).append(ja.getChoice()).append(GTLT).append(ja.getMax()).append(GTLT).append(ja.getMin())
 						.append(GTLT).append(ja.getValidator()).append(GTLT).append(ja.getDescription()).append(GTLT)
 						.append(ja.getTooltip()).append(ja.getValue()).append(GT).append(LINE_SEP);
-			} else if (o instanceof Property) {
-				Property p = (Property) o;
+			} else if (o instanceof PropertyType) {
+				PropertyType p = (PropertyType) o;
 				buffer.append(LT).append(p.getName()).append(GTLT).append(p.getValue()).append(GT).append(LINE_SEP);
 			} else {
 				buffer.append(LT).append(e.getKey()).append(GTLT).append(e.getValue()).append(GT).append(LINE_SEP);

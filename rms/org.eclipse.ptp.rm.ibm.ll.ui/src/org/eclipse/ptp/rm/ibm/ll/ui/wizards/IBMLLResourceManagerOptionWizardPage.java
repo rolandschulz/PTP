@@ -26,7 +26,6 @@ import org.eclipse.ptp.rm.ibm.ll.ui.LLUIPlugin;
 import org.eclipse.ptp.rm.ibm.ll.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
-import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -40,7 +39,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 
 public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardPage {
 	private class EventMonitor implements SelectionListener, ModifyListener {
@@ -72,26 +70,6 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 					proxyPollingNodeMin.setSelection(max_value);
 				}
 			}
-			if (e.widget.equals(proxyLibraryTextWidget)) {
-				String correctPath = getFieldContent(proxyLibraryTextWidget.getText().trim());
-				if (validatePath(correctPath, true)) {
-					setErrorMessage(null);
-				} else {
-					setErrorMessage(Messages.getString("Invalid.llLibraryPath")); //$NON-NLS-1$
-					return;
-				}
-			}
-			if (e.widget.equals(proxyTemplateTextWidget)) {
-				String correctPath = getFieldContent(proxyTemplateTextWidget.getText().trim());
-				if (validatePath(correctPath, false)) {
-					setErrorMessage(null);
-				} else {
-					setErrorMessage(Messages.getString("Invalid.llJobCommandFileTemplate")); //$NON-NLS-1$
-					return;
-				}
-
-			}
-
 			updateConfigOptions();
 			// TODO - check for valid file here - or else implement a browse
 			// button to select and check somewhere
@@ -109,24 +87,12 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 		}
 
 		public void widgetSelected(SelectionEvent e) {
-			// System.err.println("wizard: widgetSelected entered");
-			Object source = e.getSource();
-			if (source == libraryBrowseButton) {
-				proxyLibraryTextWidget.setText(getRemoteDirectory(
-						Messages.getString("IBMLLResourceManagerOptionWizardPage.0"), proxyLibraryTextWidget.getText())); //$NON-NLS-1$
-			} else if (source == templateBrowseButton) {
-				proxyTemplateTextWidget.setText(getRemotePath(
-						Messages.getString("IBMLLResourceManagerOptionWizardPage.1"), proxyTemplateTextWidget.getText())); //$NON-NLS-1$
-			}
 			updateConfigOptions();
 		}
 	}
 
 	private Composite preferencePane;
-	private Text proxyLibraryTextWidget = null;
-	private EventMonitor libraryListener = null;;
 
-	private Button libraryBrowseButton = null;
 	private Button proxyTraceMessageButton = null;
 	private Button proxyInfoMessageButton = null;
 	private Button proxyWarningMessageButton = null;
@@ -139,12 +105,9 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 	private Button proxyForceMulticlusterRadioButton = null;
 
 	private Button proxyLLDefaultRadioButton = null;
-	private Text proxyTemplateTextWidget = null;
-	private EventMonitor templateListener = null;
 	private Button proxyTemplateNeverRadioButton = null;
 	private Button proxyTemplateAlwaysRadioButton = null;;
 
-	private Button templateBrowseButton = null;
 	private Button guiTraceMessageButton = null;
 	private Button guiInfoMessageButton = null;
 	private Button guiWarningMessageButton = null;
@@ -159,11 +122,10 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 
 	private EventMonitor eventMonitor = null;
 
-	private final IIBMLLResourceManagerConfiguration config;
+	private IIBMLLResourceManagerConfiguration config;
 
 	public IBMLLResourceManagerOptionWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.getString("Wizard.InvocationOptionsTitle")); //$NON-NLS-1$
-		this.config = (IIBMLLResourceManagerConfiguration) getConfiguration();
 		setTitle(Messages.getString("Wizard.InvocationOptionsTitle")); //$NON-NLS-1$
 		setDescription(Messages.getString("Wizard.InvocationOptions")); //$NON-NLS-1$
 	}
@@ -177,17 +139,14 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 	@Override
 	public void createControl(Composite parent) {
 
-		Group proxyLibraryGroup = null;
 		Group proxyOptionsGroup = null;
 		Group proxyDebugGroup = null;
 		Group guiOptionsGroup = null;
 		Group proxyMulticlusterGroup = null;
-		Group proxyTemplateGroup = null;
 		Group proxyTemplateOptionsGroup = null;
 		Group proxyPollingGroup = null;
-		// Preferences preferences = null;
-		libraryBrowseButton = null;
-		templateBrowseButton = null;
+
+		config = (IIBMLLResourceManagerConfiguration) getConfiguration();
 		String preferenceValue;
 
 		eventMonitor = new EventMonitor();
@@ -197,27 +156,6 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 		preferencePane = new Composite(parent, SWT.NONE);
 		layout = new GridLayout(2, true);
 		preferencePane.setLayout(layout);
-
-		// *********************************************************************
-		// Alternate LoadLeveler Library Install Location
-		// *********************************************************************
-		proxyLibraryGroup = new Group(preferencePane, SWT.NONE);
-		proxyLibraryGroup.setLayout(createGridLayout(3, false, 0, 0));
-		proxyLibraryGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		proxyLibraryGroup.setText(Messages.getString("IBMLLPrefWizPage.proxyLibraryGroupLabel")); //$NON-NLS-1$
-
-		new Label(proxyLibraryGroup, SWT.NONE).setText(Messages.getString("IBMLLPrefWizPage.proxyLibraryLabel")); //$NON-NLS-1$
-
-		proxyLibraryTextWidget = new Text(proxyLibraryGroup, SWT.SINGLE | SWT.BORDER);
-		proxyLibraryTextWidget.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		libraryListener = new EventMonitor();
-		proxyLibraryTextWidget.addModifyListener(libraryListener);
-		proxyLibraryTextWidget.setText(config.getLibraryPath());
-		proxyLibraryTextWidget.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyLibraryToolTip")); //$NON-NLS-1$
-
-		libraryBrowseButton = SWTUtil.createPushButton(proxyLibraryGroup, Messages.getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
-				null);
-		libraryBrowseButton.addSelectionListener(libraryListener);
 
 		// *********************************************************************
 		// Check box group for proxy messages
@@ -394,27 +332,6 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 		proxyForceMulticlusterRadioButton.addSelectionListener(eventMonitor);
 		proxyForceMulticlusterRadioButton.setToolTipText(Messages
 				.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterToolTip")); //$NON-NLS-1$
-
-		// *********************************************************************
-		// Template name group
-		// *********************************************************************
-		proxyTemplateGroup = new Group(preferencePane, SWT.NONE);
-		proxyTemplateGroup.setLayout(createGridLayout(3, false, 0, 0));
-		proxyTemplateGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		proxyTemplateGroup.setText(Messages.getString("IBMLLPrefWizPage.proxyTemplateGroupLabel")); //$NON-NLS-1$
-
-		new Label(proxyTemplateGroup, SWT.NONE).setText(Messages.getString("IBMLLPrefWizPage.proxyTemplateLabel")); //$NON-NLS-1$
-
-		proxyTemplateTextWidget = new Text(proxyTemplateGroup, SWT.SINGLE | SWT.BORDER);
-		proxyTemplateTextWidget.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		templateListener = new EventMonitor();
-		proxyTemplateTextWidget.addModifyListener(templateListener);
-		proxyTemplateTextWidget.setText(config.getTemplateFile());
-		proxyTemplateTextWidget.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyTemplateToolTip")); //$NON-NLS-1$
-
-		templateBrowseButton = SWTUtil.createPushButton(proxyTemplateGroup, Messages.getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
-				null);
-		templateBrowseButton.addSelectionListener(templateListener);
 
 		// *********************************************************************
 		// Template options group
@@ -629,12 +546,6 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 		boolean selection;
 
 		options = ""; //$NON-NLS-1$
-		if (proxyLibraryTextWidget != null) {
-			if (proxyLibraryTextWidget.getText().trim().length() > 0) {
-				options = options + "--lib_override=" //$NON-NLS-1$
-						+ proxyLibraryTextWidget.getText().trim() + " "; //$NON-NLS-1$
-			}
-		}
 
 		if (proxyTraceMessageButton != null) {
 			selection = proxyTraceMessageButton.getSelection();
@@ -716,14 +627,6 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 		if (proxyForceMulticlusterRadioButton != null) {
 			config.setForceProxyMulticluster(proxyForceMulticlusterRadioButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
 					: IBMLLPreferenceConstants.LL_NO);
-		}
-
-		if (proxyTemplateTextWidget != null) {
-			config.setTemplateFile(proxyTemplateTextWidget.getText().trim());
-			if (proxyTemplateTextWidget.getText().trim().length() > 0) {
-				options = options + "--template_override=" //$NON-NLS-1$
-						+ proxyTemplateTextWidget.getText().trim() + " "; //$NON-NLS-1$
-			}
 		}
 
 		if (proxyTemplateNeverRadioButton != null) {

@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.ptp.rm.jaxb.core.data.Entry;
-import org.eclipse.ptp.rm.jaxb.core.data.Put;
+import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
+import org.eclipse.ptp.rm.jaxb.core.data.PutType;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
  * Wrapper implementation.
@@ -25,7 +26,7 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
  */
 public class PutImpl extends AbstractAssign {
 
-	private final List<Entry> entries;
+	private final List<EntryType> entries;
 
 	/**
 	 * @param uuid
@@ -33,8 +34,11 @@ public class PutImpl extends AbstractAssign {
 	 *            be <code>null</code>).
 	 * @param put
 	 *            JAXB data element
+	 * @param rmVarMap
+	 *            resource manager environment
 	 */
-	public PutImpl(String uuid, Put put) {
+	public PutImpl(String uuid, PutType put, RMVariableMap rmVarMap) {
+		super(rmVarMap);
 		this.uuid = uuid;
 		field = put.getField();
 		entries = put.getEntry();
@@ -51,7 +55,7 @@ public class PutImpl extends AbstractAssign {
 		}
 
 		if (!entries.isEmpty()) {
-			for (Entry e : entries) {
+			for (EntryType e : entries) {
 				String k = getKey(e, values);
 				if (k == null) {
 					throw new IllegalStateException(Messages.StreamParserInconsistentMapValues + e.getKey() + CM + e.getKeyGroup()

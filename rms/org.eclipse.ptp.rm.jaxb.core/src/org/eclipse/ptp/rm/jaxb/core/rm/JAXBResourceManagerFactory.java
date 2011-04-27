@@ -51,7 +51,7 @@ public class JAXBResourceManagerFactory extends AbstractResourceManagerFactory {
 	 */
 	@Override
 	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider) {
-		return new JAXBServiceProvider(JAXBServiceProvider.BASE, provider);
+		return new JAXBResourceManagerConfiguration(JAXBResourceManagerConfiguration.BASE, provider);
 	}
 
 	/*
@@ -75,6 +75,6 @@ public class JAXBResourceManagerFactory extends AbstractResourceManagerFactory {
 	 */
 	@Override
 	public IResourceManagerComponentConfiguration createControlConfiguration(IServiceProvider provider) {
-		return new JAXBServiceProvider(JAXBServiceProvider.CONTROL, provider);
+		return new JAXBResourceManagerConfiguration(JAXBResourceManagerConfiguration.CONTROL, provider);
 	}
 }

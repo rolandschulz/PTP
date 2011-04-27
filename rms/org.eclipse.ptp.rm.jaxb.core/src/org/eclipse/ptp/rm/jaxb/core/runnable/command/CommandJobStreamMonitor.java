@@ -13,7 +13,6 @@
 
 package org.eclipse.ptp.rm.jaxb.core.runnable.command;
 
-import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,15 +21,11 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.debug.core.IStreamListener;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
-import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 
 /**
  * Monitors the output stream of a system process and notifies listeners of
@@ -80,48 +75,18 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 		}
 	}
 
-	private InputStream fStream;
-	private ListenerList fListeners = new ListenerList();
-	private final StringBuffer fContents;
-	private Thread fThread;
-	private boolean fKilled = false;
+	protected final StringBuffer fContents;
+	protected final String fEncoding;
+
+	protected ListenerList fListeners;
+	protected Thread fThread;
+	protected boolean fKilled = false;
+	protected int bufferLimit;
+	private final InputStream fStream;
 	private long lastSleep;
-	private int bufferLimit;
-	private final String fEncoding;
-	private final IRemoteProcessBuilder fBuilder;
-	private IRemoteProcess process;
 
-	/**
-	 * Registers a process which can be started to monitor a remote file via
-	 * tail -f.
-	 * 
-	 * @param rm
-	 *            resource manager providing remote service
-	 * @param remoteFilePath
-	 *            of the file to be monitored
-	 */
-	public CommandJobStreamMonitor(IJAXBResourceManagerControl rm, String remoteFilePath) {
-		this(rm, remoteFilePath, null);
-	}
-
-	/**
-	 * Registers a process which can be started to monitor a remote file via
-	 * tail -f.
-	 * 
-	 * @param rm
-	 *            resource manager providing remote service
-	 * @param remoteFilePath
-	 *            of the file to be monitored
-	 * @param encoding
-	 *            stream encoding or <code>null</code> for system default
-	 */
-	public CommandJobStreamMonitor(IJAXBResourceManagerControl rm, String remoteFilePath, String encoding) {
-		fContents = new StringBuffer();
-		fEncoding = encoding;
-		String[] args = new String[] { TAIL, MINUS_F, remoteFilePath };
-		RemoteServicesDelegate delegate = rm.getRemoteServicesDelegate();
-		fBuilder = delegate.getRemoteServices().getProcessBuilder(delegate.getRemoteConnection(), args);
-		bufferLimit = UNDEFINED;
+	public CommandJobStreamMonitor() {
+		this(null, null);
 	}
 
 	public CommandJobStreamMonitor(InputStream stream) {
@@ -138,11 +103,11 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	 *            stream encoding or <code>null</code> for system default
 	 */
 	public CommandJobStreamMonitor(InputStream stream, String encoding) {
-		fStream = new BufferedInputStream(stream, STREAM_BUFFER_SIZE);
+		fStream = stream;
 		fEncoding = encoding;
 		fContents = new StringBuffer();
-		fBuilder = null;
 		bufferLimit = UNDEFINED;
+		fListeners = new ListenerList();
 	}
 
 	/**
@@ -150,7 +115,6 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	 *            from client
 	 */
 	public synchronized void addListener(IStreamListener listener) {
-		listener.streamAppended(fContents.toString(), CommandJobStreamMonitor.this);
 		fListeners.add(listener);
 	}
 
@@ -164,12 +128,12 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 			Thread thread = fThread;
 			fThread = null;
 			try {
+				thread.interrupt();
 				thread.join();
 			} catch (InterruptedException ie) {
 			}
 			fContents.setLength(0);
 			fListeners = new ListenerList();
-			maybeKillProcess();
 		}
 	}
 
@@ -186,6 +150,16 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	 */
 	public synchronized String getContents() {
 		return fContents.toString();
+	}
+
+	/*
+	 * Adapter, does nothing. Subclasses may implement. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor#initializeFilePath
+	 * (java.lang.String)
+	 */
+	public void initializeFilePath(String jobId) {
 	}
 
 	/*
@@ -215,7 +189,6 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	 */
 	public synchronized void startMonitoring() {
 		if (fThread == null) {
-			maybeStartRemoteProcess();
 			fThread = new Thread(new Runnable() {
 				public void run() {
 					read();
@@ -230,32 +203,12 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	/**
 	 * Notifies the listeners that text has been appended to the stream.
 	 */
-	private void fireStreamAppended(String text) {
+	protected void fireStreamAppended(String text) {
 		getNotifier().notifyAppend(text);
 	}
 
-	private ContentNotifier getNotifier() {
+	protected ContentNotifier getNotifier() {
 		return new ContentNotifier();
-	}
-
-	private void maybeKillProcess() {
-		if (process != null && !process.isCompleted()) {
-			process.destroy();
-			process = null;
-		}
-	}
-
-	private void maybeStartRemoteProcess() {
-		if (fBuilder == null) {
-			return;
-		}
-
-		try {
-			process = fBuilder.start();
-			fStream = process.getInputStream();
-		} catch (IOException t) {
-			JAXBCorePlugin.log(t);
-		}
 	}
 
 	/**
@@ -265,11 +218,12 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	 * allow <code>OutputStreamMonitor</code> to implement <code>Runnable</code>
 	 * without publicly exposing a <code>run</code> method.
 	 */
-	private void read() {
+	protected void read() {
 		if (fStream == null) {
 			JAXBCorePlugin.log(CoreExceptionUtils.getErrorStatus(Messages.CommandJobNullMonitorStreamError, null));
 			return;
 		}
+
 		lastSleep = System.currentTimeMillis();
 		long currentTime = lastSleep;
 		byte[] bytes = new byte[STREAM_BUFFER_SIZE];
@@ -322,6 +276,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 				}
 			}
 		}
+
 		try {
 			fStream.close();
 		} catch (IOException e) {

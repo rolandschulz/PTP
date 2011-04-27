@@ -23,6 +23,7 @@ public interface IJAXBNonNLSConstants {
 	int EOF = -1;
 	long MINUTE_IN_MS = 60 * 60 * 1000;
 	long VALIDATE_TIMER = 500;
+	long TAILF_PAUSE = 1000;
 
 	/* CHARACTERS */
 	String LEN = "N";//$NON-NLS-1$
@@ -47,12 +48,14 @@ public interface IJAXBNonNLSConstants {
 	String PIP = "|";//$NON-NLS-1$
 	String DOT = ".";//$NON-NLS-1$
 	String Z3 = "000";//$NON-NLS-1$
+	String OPENP = "(";//$NON-NLS-1$
 	String OPENSQ = "[";//$NON-NLS-1$
 	String OPENV = "${";//$NON-NLS-1$
 	String OPENVRM = "${rm:";//$NON-NLS-1$
 	String OPENVLT = "${lt:";//$NON-NLS-1$
 	String VRM = "rm:";//$NON-NLS-1$
 	String VLC = "lc:";//$NON-NLS-1$
+	String CLOSP = ")";//$NON-NLS-1$
 	String CLOSSQ = "]";//$NON-NLS-1$
 	String CLOSV = "}";//$NON-NLS-1$
 	String CLOSVAL = "#value}";//$NON-NLS-1$
@@ -140,8 +143,8 @@ public interface IJAXBNonNLSConstants {
 	String SH = ".sh";//$NON-NLS-1$
 	String SETENV = "setenv";//$NON-NLS-1$
 	String EXPORT = "export";//$NON-NLS-1$
-	String STDOUT = "stdout";//$NON-NLS-1$
-	String STDERR = "stderr";//$NON-NLS-1$
+	String STDOUT_TAIL_F = "stdout_tailF";//$NON-NLS-1$
+	String STDERR_TAIL_F = "stderr_tailF";//$NON-NLS-1$
 	String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";//$NON-NLS-1$
 
 	String RESOURCE_MANAGERS = "resourceManagers";//$NON-NLS-1$
@@ -166,15 +169,13 @@ public interface IJAXBNonNLSConstants {
 	String MONITOR_ADDRESS_VAR = "monitor.address";//$NON-NLS-1$
 	String ARPA = ".in-addr.arpa";//$NON-NLS-1$
 	String ECLIPSESETTINGS = ".eclipsesettings";//$NON-NLS-1$
+	String DEBUG_PACKAGE = "org.eclipse.debug";//$NON-NLS-1$
+	String PTP_PACKAGE = "org.eclipse.ptp";//$NON-NLS-1$
 
 	String STARTUP = "OnStartUp";//$NON-NLS-1$
 	String SHUTDOWN = "OnShutDown";//$NON-NLS-1$
 	String DISCATTR = "DiscoverAttributes";//$NON-NLS-1$
 	String JOBSTATUS = "GetJobStatus";//$NON-NLS-1$
-	String SUBMIT_INTERACTIVE = "submit-interactive";//$NON-NLS-1$
-	String SUBMIT_BATCH = "submit-batch";//$NON-NLS-1$
-	String SUBMIT_DEBUG_INTERACTIVE = "submit-debug-interactive";//$NON-NLS-1$
-	String SUBMIT_DEBUG_BATCH = "submit-debug-batch";//$NON-NLS-1$
 	String VALIDATE = "ValidateJob";//$NON-NLS-1$
 
 	String JOB_ATTRIBUTE = "jobAttribute";//$NON-NLS-1$
@@ -199,7 +200,7 @@ public interface IJAXBNonNLSConstants {
 	String DOT_XML = ".xml";//$NON-NLS-1$
 	String TOKENIZER_EXT_PT = "streamParserTokenizer";//$NON-NLS-1$
 	String TAIL = "tail";//$NON-NLS-1$
-	String MINUS_F = "-f";//$NON-NLS-1$
+	String MINUS_F = "-F";//$NON-NLS-1$
 	String CONFIGURATION_FILE_ATTRIBUTE = "configurationFile"; //$NON-NLS-1$
 	String RM_CONFIG_EXTENSION_POINT = "org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations"; //$NON-NLS-1$
 	String JAXB_SERVICE_PROVIDER_EXTPT = "org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"; //$NON-NLS-1$

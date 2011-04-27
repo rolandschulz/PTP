@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.data.Arg;
+import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 
 /**
  * Wrapper implementation. An argument is a part of a string sequence which can
@@ -28,7 +28,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.Arg;
 public class ArgImpl implements IJAXBNonNLSConstants {
 
 	private final String uuid;
-	private final Arg arg;
+	private final ArgType arg;
 	private final IVariableMap map;
 
 	/**
@@ -40,7 +40,7 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 	 * @param map
 	 *            environment in which to resolve content of the arg
 	 */
-	public ArgImpl(String uuid, Arg arg, IVariableMap map) {
+	public ArgImpl(String uuid, ArgType arg, IVariableMap map) {
 		this.uuid = uuid;
 		this.arg = arg;
 		this.map = map;
@@ -67,9 +67,9 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 	 *            environment in which to resolve content of the arg
 	 * @return array of resolved arguments
 	 */
-	public static String[] getArgs(String uuid, List<Arg> args, IVariableMap map) {
+	public static String[] getArgs(String uuid, List<ArgType> args, IVariableMap map) {
 		List<String> resolved = new ArrayList<String>();
-		for (Arg a : args) {
+		for (ArgType a : args) {
 			resolved.add(getResolved(uuid, a, map));
 		}
 		return resolved.toArray(new String[0]);
@@ -87,7 +87,7 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 	 *            environment in which to resolve content of the arg
 	 * @return whitespace separated string of resolved arguments
 	 */
-	public static String toString(String uuid, List<Arg> args, IVariableMap map) {
+	public static String toString(String uuid, List<ArgType> args, IVariableMap map) {
 		if (args.isEmpty()) {
 			return ZEROSTR;
 		}
@@ -119,7 +119,7 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 	 *            environment in which to resolve content of the arg
 	 * @return result of resolution
 	 */
-	private static String getResolved(String uuid, Arg arg, IVariableMap map) {
+	private static String getResolved(String uuid, ArgType arg, IVariableMap map) {
 		if (arg == null) {
 			return ZEROSTR;
 		}

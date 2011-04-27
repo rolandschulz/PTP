@@ -39,13 +39,15 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.Property;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerMonitor;
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBServiceProvider;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider;
 
 public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 
@@ -212,8 +214,8 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		}
 	}
 
-	private static final String xml = DATA + "rm-pbs-torque_2.3.7.xml"; //$NON-NLS-1$
-	private JAXBServiceProvider rmConfig;
+	private static final String xml = DATA + "test-pbs.xml"; //$NON-NLS-1$
+	private JAXBResourceManagerConfiguration rmConfig;
 	private JAXBResourceManager rm;
 	private ILaunchConfiguration launchConfig;
 
@@ -265,12 +267,12 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 	 * We do here what is done through the wizard.
 	 */
 	private void emulateConfigureWizard() throws Throwable {
-		rmConfig = new JAXBServiceProvider();
+		rmConfig = new JAXBResourceManagerConfiguration(AbstractResourceManagerConfiguration.BASE,
+				new ResourceManagerServiceProvider());
 		// JAXBRMConfigurationSelectionWizardPage
-		rmConfig.setUniqueName("test-pbs-rm"); //$NON-NLS-1$
 		rmConfig.setRMConfigurationURL(JAXBTestsPlugin.getURL(xml));
 		// JAXBRMControlConfigurationWizardPage
-		rmConfig.realizeRMDataFromXML();
+		rmConfig.getResourceManagerData();
 		// use remote = local
 		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		assert (localServices != null);
@@ -301,7 +303,8 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		env.put("export_all", true); //$NON-NLS-1$
 		env.put(MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
 		env.put(MPI_ARGS, "-machinefile $PBS_NODEFILE -np 8"); //$NON-NLS-1$ 
-		Property queues = (Property) RMVariableMap.getActiveInstance().getVariables().get("available_queues"); //$NON-NLS-1$ 
+		RMVariableMap rmVarMap = rm.getJAXBConfiguration().getRMVariableMap();
+		PropertyType queues = (PropertyType) rmVarMap.getVariables().get("available_queues"); //$NON-NLS-1$ 
 		if (queues != null) {
 			List<String> q = (List<String>) queues.getValue();
 			env.put("destination", q.get(0)); //$NON-NLS-1$

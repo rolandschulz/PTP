@@ -206,7 +206,24 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	 */
 	private class SelectServiceProviderPage extends WizardPage {
 
+		private class ProviderInfo implements Comparable<ProviderInfo> {
+			public final String name;
+			public final IServiceProviderDescriptor descriptor;
+			public final RMConfigurationSelectionFactory factory;
+
+			public ProviderInfo(String name, IServiceProviderDescriptor descriptor, RMConfigurationSelectionFactory factory) {
+				this.name = name;
+				this.descriptor = descriptor;
+				this.factory = factory;
+			}
+
+			public int compareTo(ProviderInfo o) {
+				return name.compareTo(o.name);
+			}
+		}
+
 		private List fServiceProviderList;
+
 		private final ArrayList<ProviderInfo> fProviders = new ArrayList<ProviderInfo>();
 
 		public SelectServiceProviderPage(String pageName) {
@@ -232,22 +249,6 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			});
 
 			setControl(composite);
-		}
-
-		private class ProviderInfo implements Comparable<ProviderInfo> {
-			public final String name;
-			public final IServiceProviderDescriptor descriptor;
-			public final RMConfigurationSelectionFactory factory;
-
-			public ProviderInfo(String name, IServiceProviderDescriptor descriptor, RMConfigurationSelectionFactory factory) {
-				this.name = name;
-				this.descriptor = descriptor;
-				this.factory = factory;
-			}
-
-			public int compareTo(ProviderInfo o) {
-				return name.compareTo(o.name);
-			}
 		}
 
 		private void createServiceProviderChoiceControl(Composite container) {
@@ -297,12 +298,14 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 
 		private void handleProviderSelection() {
 			ProviderInfo providerInfo = fProviders.get(fServiceProviderList.getSelectionIndex());
-			IServiceProvider provider = fModelManager.getServiceProvider(providerInfo.descriptor);
-			fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(provider);
-			if (providerInfo.factory != null) {
-				providerInfo.factory.setConfigurationName(providerInfo.name, fBaseConfiguration);
+			IServiceProvider provider = fServiceModelManager.getServiceProvider(providerInfo.descriptor);
+			if (provider != null) {
+				fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(provider);
+				if (providerInfo.factory != null) {
+					providerInfo.factory.setConfigurationName(providerInfo.name, getBaseConfiguration());
+				}
+				setWizardPages(provider);
 			}
-			setServiceProvider(provider);
 			setPageComplete(true);
 		}
 	}
@@ -313,7 +316,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	private final SelectServiceProviderPage fSelectServiceProviderPage = new SelectServiceProviderPage(
 			Messages.RMServicesConfigurationWizard_9);
 	private final ResourceManagerPage fResourceManagerPage = new ResourceManagerPage(Messages.RMServicesConfigurationWizard_10);
-	private final IServiceModelManager fModelManager = ServiceModelManager.getInstance();
+	private final IServiceModelManager fServiceModelManager = ServiceModelManager.getInstance();
 	private final IService fLaunchService = ServiceModelManager.getInstance().getService(IServiceConstants.LAUNCH_SERVICE);
 
 	private final Map<String, IWizardPage[]> fCachedPages = new HashMap<String, IWizardPage[]>();
@@ -342,8 +345,10 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		this();
 		fUseDefaultNameAndDesc = false;
 		fEditMode = true;
-		fBaseConfiguration = rm.getConfiguration();
-		setServiceProvider((IServiceProvider) fBaseConfiguration);
+		IServiceProvider provider = (IServiceProvider) rm.getConfiguration().getAdapter(IServiceProvider.class);
+		fServiceProvider = provider.copy();
+		fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(fServiceProvider);
+		setWizardPages(fServiceProvider);
 	}
 
 	/*
@@ -462,11 +467,12 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		if (fUseDefaultNameAndDesc) {
 			getBaseConfiguration().setDefaultNameAndDesc();
 		}
-		fServiceProvider.save();
 		if (!fEditMode) {
-			IServiceConfiguration config = fModelManager.newServiceConfiguration(fResourceManagerPage.getRMName());
-			config.setServiceProvider(fLaunchService, fServiceProvider.getOriginal());
-			fModelManager.addConfiguration(config);
+			IServiceConfiguration config = fServiceModelManager.newServiceConfiguration(fResourceManagerPage.getRMName());
+			config.setServiceProvider(fLaunchService, (IServiceProvider) getBaseConfiguration().getAdapter(IServiceProvider.class));
+			fServiceModelManager.addConfiguration(config);
+		} else {
+			fServiceProvider.save();
 		}
 		return true;
 	}
@@ -476,14 +482,6 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	 */
 	private int getNumPages() {
 		return fWizardPages.size();
-	}
-
-	/**
-	 * @param provider
-	 */
-	private void setServiceProvider(IServiceProvider provider) {
-		fServiceProvider = provider.copy();
-		setWizardPages(provider);
 	}
 
 	private void setWizardPages(IServiceProvider provider) {

@@ -63,7 +63,6 @@ public class PEPreferenceManager extends AbstractPreferenceInitializer {
 			}
 		}
 
-		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), RMPreferenceConstants.PROXY_PATH, server);
 		Preferences.setDefaultInt(PECorePlugin.getUniqueIdentifier(), RMPreferenceConstants.OPTIONS, OPTIONS);
 		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.LOAD_LEVELER_OPTION,
 				PEPreferenceConstants.OPTION_NO);
@@ -72,8 +71,6 @@ public class PEPreferenceManager extends AbstractPreferenceInitializer {
 		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.NODE_MIN_POLL_INTERVAL, "30"); //$NON-NLS-1$
 		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.NODE_MAX_POLL_INTERVAL, "120"); //$NON-NLS-1$
 		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.LIBRARY_OVERRIDE, ""); //$NON-NLS-1$
-		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.RUN_MINIPROXY,
-				PEPreferenceConstants.OPTION_YES);
 		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.TRACE_LEVEL,
 				PEPreferenceConstants.TRACE_NOTHING);
 	}

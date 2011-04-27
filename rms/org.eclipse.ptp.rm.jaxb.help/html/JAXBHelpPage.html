@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>The PTP Configurable Resource Manager</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<h1>The PTP Configurable Resource Manager</h1>
+	<h2>
+		<a name="Introduction">Introduction</a>
+	</h2>
+	<p>
+		The JAXB Resource Manager plug-ins, part of the <a
+			href="../../org.eclipse.ptp.help/html/PLUGINS_ROOT/org.eclipse.ptp.help/html/toc.html">
+			Parallel Tools Platform</a> (PTP), allow you to launch and monitor
+		applications on local or remote resources using resource managers
+		which are configured from an XML file via JAXB (
+		<code>javax.xml.bind</code>
+		) technology.<br>
+	</p>
+	<p>There are two main motivations for providing this class of
+		resource managers:</p>
+	<ol>
+		<li>To allow for maximum configurability. Often job schedulers
+			(PBS, LSF, LoadLeveler, etc.) or interactive runtime systms (OpenMPI,
+			PE, SLURM, etc.) are set up by system administrators in special or
+			non-standard ways which make it difficult to use a generic tool. The
+			configuration file allows a user or community of users to fit the
+			resource manager to a class of systems or even to a single host.</li>
+		<li>Building the resource manager and its UI presentation from an
+			XML configuration means that in most cases no special coding is
+			necessary. Users should be able to accommodate new systems, at least
+			on the client-end, without writing and loading additional Eclipse
+			plugins. (The only qualification here is that the monitoring
+			component also support that type of scheduler or runtime; see the
+			following paragraphs.)</li>
+	</ol>
+	<p>An additional consideration in designing a generically
+		configurable resource manager was to partition the client
+		functionality so as to eliminate the need for special server-side
+		proxies and to scale more successfully in the updating of job and
+		resource information.</p>
+	<p>
+		To this end, JAXB resource managers now consist of two components, a
+		"control", which governs the configuration, launch and cancellation of
+		individual jobs entirely from the client end, and a "monitor", which
+		displays job status as well as global information about the HPC
+		resource. In most cases, the monitor will be a pre-built type provided
+		by the PTP distribution, either a generic class for handling
+		interactive submissions, or a batch-system monitor implemented using <a
+			href="http://www2.fz-juelich.de/jsc/llview">LLView</a>. Since <b>LLView</b>
+		already supports a good number of the standard scheduler types, adding
+		a new resource manager type will normally entail only the specific
+		configuration of its control part. We plan to make available both
+		user-initiated as well as system-wide deployment of the necessary
+		LLView parts (mostly Perl scripts) for monitoring the target resource.
+	</p>
+	<h2>
+		<a name="Requirements">Requirements</a>
+	</h2>
+	<p>In addition to having Eclipse and PTP installed, you need to
+		have the following software dependencies installed.</p>
+	<ul>
+		<li>CDT for Indigo, available from the Eclipse download site or
+			as part of the pre-built PTP package;</li>
+		<li>RSE for Indigo, available from the Eclipse download site or
+			as part of the pre-built PTP package.</li>
+	</ul>
+	<p>If the monitor of any JAXB resource manager uses LLView, an
+		LLView server must be set up separately or an installation must be
+		available to point the client monitoring component to.</p>
+	<p>
+		<b>There are two main sections to the help pages which follow. The
+			first concerns creating or modifying a resource manager
+			configuration; the second are some general guidelines for using the
+			JAXB resource managers. For those interested only in using the JAXB
+			resource managers already provided with the PTP distribution, the
+			first section may be skipped.</b>
+	</p>
+	<h2>
+		<a name="Configuring">Configuring the Resource Manager</a>
+	</h2>
+
+	<h2>
+		<a name="Using">Using the Resource Manager</a>
+	</h2>
+	<p>
+		<a href="toc.html">Back to Table of Contents</a>
+	</p>
+</body>
+</html>

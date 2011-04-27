@@ -33,44 +33,44 @@ import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIResourceCollector;
 import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 
-
 /**
  * Do MPI barrier analysis from dropdown toolbar menu
  * 
  * @author Beth Tibbitts
- *
+ * 
  */
-public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
+public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler {
 	protected MPICallGraph callGraph_;
-	boolean traceOn=false;
-	
-	public RunAnalyseMPIAnalysiscommandHandler(){ 
+	boolean traceOn = false;
+
+	public RunAnalyseMPIAnalysiscommandHandler() {
 		callGraph_ = null;
 	}
 
-	/** 
+	/**
 	 * Execute the action for MPI barrier analysis
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		boolean foundError=false;
+		boolean foundError = false;
 		getSelection(event);
-		AnalysisDropdownHandler.setLastHandledAnalysis(this,selection);
+		AnalysisDropdownHandler.setLastHandledAnalysis(this, selection);
 		if ((selection == null) || selection.isEmpty()) {
 			MessageDialog.openWarning(null, Messages.RunAnalyseMPIAnalysiscommandHandler_noFilesSelectedForAnalysis,
-							Messages.RunAnalyseMPIAnalysiscommandHandler_pleaseSelect);
+					Messages.RunAnalyseMPIAnalysiscommandHandler_pleaseSelect);
 			return null;
 		} else {
-			if(isRemote(selection)) {
-				MessageDialog.openInformation(null, Messages.RunAnalyseMPIAnalysiscommandHandler_remoteProjectFound, Messages.RunAnalyseMPIAnalysiscommandHandler_remoteNotSupported);
+			if (isRemote(selection)) {
+				MessageDialog.openInformation(null, Messages.RunAnalyseMPIAnalysiscommandHandler_remoteProjectFound,
+						Messages.RunAnalyseMPIAnalysiscommandHandler_remoteNotSupported);
 				return null;
 			}
-			final boolean reportErrors=true;
-			foundError = analyseBarriers(selection,reportErrors);
+			final boolean reportErrors = true;
+			foundError = analyseBarriers(selection, reportErrors);
 		}
 		ViewActivator.activateView(IDs.matchingSetViewID);
 		ViewActivator.activateView(IDs.barrierViewID);
 		// if error found, assure its view has focus
-		if(foundError) {
+		if (foundError) {
 			ViewActivator.activateView(IDs.errorViewID);
 		}
 		return null;
@@ -87,12 +87,12 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 	public boolean analyseBarriers(IStructuredSelection selection, boolean reportErrors) {
 		boolean foundError;
 		callGraph_ = new MPICallGraph();
-		//int numFiles=this.countFilesSelected();
+		// int numFiles=this.countFilesSelected();
 		// BRT use numfiles for a progress monitor?
 
-		for(@SuppressWarnings("rawtypes")
-		Iterator iter = selection.iterator(); iter.hasNext();){
-			Object obj =  iter.next();
+		for (@SuppressWarnings("rawtypes")
+		Iterator iter = selection.iterator(); iter.hasNext();) {
+			Object obj = iter.next();
 			// It can be a Project, Folder, File, etc...
 			if (obj instanceof IAdaptable) {
 				final IResource res = (IResource) ((IAdaptable) obj).getAdapter(IResource.class);
@@ -105,10 +105,10 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 			}
 		} // end for
 		MPIAnalysisManager manager = new MPIAnalysisManager(callGraph_);
-		foundError=manager.run(reportErrors);
+		foundError = manager.run(reportErrors);
 		return foundError;
 	}
-	
+
 	/**
 	 * Run analysis (collect resource info in the call graph) on a resource
 	 * (e.g. File or Folder) <br>
@@ -124,17 +124,18 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 		boolean foundError = false;
 
 		if (resource instanceof IFile) {
-			try{
+			try {
 				resource.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
-			} catch(CoreException e){
-				//System.out.println("Exception deleting markers.");
+			} catch (CoreException e) {
+				// System.out.println("Exception deleting markers.");
 			}
 			IFile file = (IFile) resource;
 			String filename = file.getName();
-			if(filename.endsWith(".c")){ //$NON-NLS-1$
+			if (filename.endsWith(".c")) { //$NON-NLS-1$
 				if (traceOn)
 					System.out.println("resourceCollector on c file: " + file.getName()); //$NON-NLS-1$
-				MPIResourceCollector rc = new MPIResourceCollector(callGraph_, file); // BRT why  'new'  each time?
+				MPIResourceCollector rc = new MPIResourceCollector(callGraph_, file);
+				// BRT why 'new' each time in the above line?
 				rc.run();
 			}
 			return true;
@@ -164,32 +165,34 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 
 		return foundError;
 	}
-	
+
 	/**
 	 * Returns true if resource(s) represented by given selection are remote.
-	 * Note that there may be some uncertainly that it's local if the returned value is false,
-	 * but a returned value of 'true' means the resource is definitely determined to be remote.
+	 * Note that there may be some uncertainly that it's local if the returned
+	 * value is false, but a returned value of 'true' means the resource is
+	 * definitely determined to be remote.
+	 * 
 	 * @param selection
 	 * @return
 	 */
-	private boolean isRemote (IStructuredSelection selection) {	
-		Object s1=selection.getFirstElement();
-		if(s1 instanceof IAdaptable) {
+	private boolean isRemote(IStructuredSelection selection) {
+		Object s1 = selection.getFirstElement();
+		if (s1 instanceof IAdaptable) {
 			IAdaptable iAdaptable = (IAdaptable) s1;
-			IResource resource=(IResource) iAdaptable.getAdapter(IResource.class);
+			IResource resource = (IResource) iAdaptable.getAdapter(IResource.class);
 			IProject proj = resource.getProject();
-			if(isRemote(proj)) {
+			if (isRemote(proj)) {
 				return true;
-			}			
+			}
 		}
-		return false; 
+		return false;
 
 	}
-	
-
 
 	/**
-	 * should go in a more publicly reusable/accessible place after 5.0 e.g. pldt.common.util.Utility
+	 * should go in a more publicly reusable/accessible place after 5.0 e.g.
+	 * pldt.common.util.Utility
+	 * 
 	 * @param project
 	 * @return
 	 */
@@ -204,12 +207,12 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 		}
 		for (int i = 0; i < natureIDs.length; i++) {
 			String id = natureIDs[i];
-			if(id.equals(REMOTE_NATURE_ID)) {
+			if (id.equals(REMOTE_NATURE_ID)) {
 				return true;
-			}		
+			}
 		}
 		return false;
-		
+
 	}
 
 }

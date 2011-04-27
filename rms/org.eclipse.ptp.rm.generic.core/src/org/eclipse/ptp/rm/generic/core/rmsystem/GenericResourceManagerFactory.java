@@ -43,8 +43,8 @@ public class GenericResourceManagerFactory extends AbstractResourceManagerFactor
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration(
-	 * org.eclipse.ptp.services.core.IServiceProvider)
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#createConfiguration
+	 * (org.eclipse.ptp.services.core.IServiceProvider)
 	 */
 	@Override
 	public IResourceManagerConfiguration createConfiguration(IServiceProvider provider) {

@@ -9,8 +9,13 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
+import java.net.URI;
+
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.data.Site;
+import org.eclipse.ptp.rm.jaxb.core.data.SiteType;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
@@ -29,8 +34,6 @@ import org.eclipse.swt.widgets.Composite;
 public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage implements
 		IJAXBUINonNLSConstants {
 
-	private final IJAXBResourceManagerConfiguration baseConfiguration;
-
 	public JAXBRMMonitoringConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		this(wizard, Messages.JAXBRMMonitoringConfigurationWizardPage_Title);
 	}
@@ -41,7 +44,6 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 	 */
 	public JAXBRMMonitoringConfigurationWizardPage(IRMConfigurationWizard wizard, String pageName) {
 		super(wizard, pageName);
-		baseConfiguration = (IJAXBResourceManagerConfiguration) wizard.getBaseConfiguration();
 		setPageComplete(false);
 		setTitle(Messages.JAXBRMMonitoringConfigurationWizardPage_Title);
 		setDescription(Messages.JAXBConnectionWizardPage_Description);
@@ -59,9 +61,45 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 	@Override
 	protected Composite doCreateContents(Composite parent) {
 		Composite comp = super.doCreateContents(parent);
-		Site site = baseConfiguration.getResourceManagerData().getSiteData();
 		try {
-			RemoteUIServicesUtils.setConnectionHints(connectionWidget, site.getMonitorServerInstall());
+			SiteType site = getBaseConfiguration().getResourceManagerData().getSiteData();
+			if (site != null && site.getMonitorConnection() != null && getConfiguration().getRemoteServicesId() == null) {
+				/*
+				 * Configuration has not be initialized, so initialize now with
+				 * values from XML
+				 */
+				URI uri = new URI(site.getMonitorConnection());
+				IRemoteServices services = PTPRemoteUIPlugin.getDefault().getRemoteServices(uri, getWizard().getContainer());
+				if (services != null) {
+					getConfiguration().setRemoteServicesId(services.getId());
+
+					String auth = uri.getAuthority();
+					String host = uri.getHost();
+					String user = uri.getUserInfo();
+					int port = uri.getPort();
+
+					if (auth != null && host != null) {
+						IRemoteConnection conn = services.getConnectionManager().getConnection(host);
+						if (conn == null && services.canCreateConnections()) {
+							conn = services.getConnectionManager().newConnection(host);
+							conn.setAddress(host);
+
+							if (!auth.equals(host)) {
+								if (user != null) {
+									conn.setUsername(user);
+								}
+								if (port != -1) {
+									conn.setPort(port);
+								}
+							}
+						}
+						if (conn != null) {
+							getConfiguration().setConnectionName(conn.getName());
+							RemoteUIServicesUtils.setConnectionHints(connectionWidget, conn);
+						}
+					}
+				}
+			}
 		} catch (Throwable t) {
 			JAXBUIPlugin.log(t);
 		}
@@ -77,5 +115,9 @@ public final class JAXBRMMonitoringConfigurationWizardPage extends AbstractRemot
 	@Override
 	protected IJAXBResourceManagerConfiguration getConfiguration() {
 		return (IJAXBResourceManagerConfiguration) super.getConfiguration();
+	}
+
+	private IJAXBResourceManagerConfiguration getBaseConfiguration() {
+		return (IJAXBResourceManagerConfiguration) ((IRMConfigurationWizard) getWizard()).getBaseConfiguration();
 	}
 }

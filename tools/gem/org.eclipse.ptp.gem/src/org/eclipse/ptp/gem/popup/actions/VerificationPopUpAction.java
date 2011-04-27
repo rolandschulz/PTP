@@ -76,6 +76,9 @@ public class VerificationPopUpAction implements IObjectActionDelegate {
 
 			// Open GEM views in order determined by preference
 			try {
+				// ask for command line arguments
+				GemUtilities.setCommandLineArgs();
+
 				final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
 				if (activeView.equals("analyzer")) { //$NON-NLS-1$
 					page.showView(GemBrowser.ID);

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+<!-- ============================================================================= -->
+<!-- Define the top level topics                                                   -->
+<!-- ============================================================================= -->
+
+<toc label="PTP Developers Guide">
+	<!--topic label="Programmer&apos;s Guide" href="guide/guide.html">
+		<link toc="guide.xml" />
+		<anchor id="guide_additions"/>
+	</topic-->
+	<topic label="Reference" href="api.html">
+		<link toc="reference.xml" />
+		<anchor id="reference_additions"/>
+	</topic>
+	<topic label="Legal" href="notices.html"/>
+</toc>

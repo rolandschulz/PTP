@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.ptp.rm.jaxb.core.data.Attribute;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 
 /**
@@ -76,7 +76,7 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 *            the Attribute object
 	 */
 	public ValueTreeNodeUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
-			boolean inValueCol, Attribute data) {
+			boolean inValueCol, AttributeType data) {
 		super(name, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus());
 		children = new ArrayList<InfoTreeNodeModel>();
 		generateChildren(inValueCol);
@@ -108,7 +108,7 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 		String displayValue = null;
 		if (COLUMN_NAME.equals(columnName)) {
 			displayValue = name;
-		} else if (checked && COLUMN_VALUE.equals(columnName)) {
+		} else if (isChecked() && COLUMN_VALUE.equals(columnName)) {
 			displayValue = getValueAsString();
 		}
 		if (displayValue == null) {

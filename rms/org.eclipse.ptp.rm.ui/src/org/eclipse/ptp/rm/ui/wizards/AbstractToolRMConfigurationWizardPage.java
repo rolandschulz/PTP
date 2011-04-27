@@ -369,7 +369,7 @@ public abstract class AbstractToolRMConfigurationWizardPage extends AbstractConf
 	 */
 	@Override
 	public void updateControls() {
-		boolean enabled = ((DataSource) getDataSource()).getCommandsEnabled();
+		boolean enabled = getDataSource().getCommandsEnabled();
 
 		defaultCmdButton.setEnabled(enabled);
 
@@ -400,6 +400,7 @@ public abstract class AbstractToolRMConfigurationWizardPage extends AbstractConf
 
 		if (remoteInstallPathText != null) {
 			remoteInstallPathText.setEnabled(enabled);
+			browseButton.setEnabled(enabled);
 		}
 	}
 
@@ -520,6 +521,14 @@ public abstract class AbstractToolRMConfigurationWizardPage extends AbstractConf
 		return new WidgetListener();
 	}
 
+	/**
+	 * @since 2.0
+	 */
+	@Override
+	public DataSource getDataSource() {
+		return (DataSource) super.getDataSource();
+	}
+
 	@Override
 	protected Composite doCreateContents(Composite parent) {
 		Composite contents = new Composite(parent, SWT.NONE);
@@ -582,13 +591,21 @@ public abstract class AbstractToolRMConfigurationWizardPage extends AbstractConf
 			if (connection.isOpen()) {
 				IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager();
 				fileMgr.setConnection(connection);
-
-				String initialPath = "//"; // Start at root since OMPI is probably installed in the system somewhere //$NON-NLS-1$
+				String initialPath = getDataSource().getRemoteInstallPath();
+				if (initialPath == null) {
+					initialPath = "//"; //$NON-NLS-1$
+				}
 				String selectedPath = fileMgr.browseDirectory(getControl().getShell(),
 						Messages.AbstractToolRMConfigurationWizardPage_Title_PathSelectionDialog, initialPath,
 						IRemoteUIConstants.OPEN);
 				if (selectedPath != null) {
 					remoteInstallPathText.setText(selectedPath);
+					/*
+					 * Some systems don't generate modify event when setText is
+					 * called. Make sure we update data source.
+					 */
+					resetErrorMessages();
+					getDataSource().storeAndValidate();
 				}
 			}
 		}

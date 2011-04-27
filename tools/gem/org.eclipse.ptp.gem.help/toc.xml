@@ -5,6 +5,7 @@
 	<topic label="Contents"  href="html/toc.html"/>
     <topic label="GEM Overview"  href="html/overview.html"/>
     <topic label="Prerequisites"  href="html/prereqs.html"/>
+    <topic label="Getting Started"  href="html/gettingStarted.html"/>
     <topic label="Setting the Number of Processes"  href="html/setNumProcs.html"/> 
     <topic label="Analyzer View" href="html/analyzerView.html" />
     <topic label="Browser View" href="html/browserView.html" />

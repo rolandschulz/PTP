@@ -11,9 +11,11 @@ package org.eclipse.ptp.rm.jaxb.core.runnable.command;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.List;
@@ -34,10 +36,10 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.data.Arg;
-import org.eclipse.ptp.rm.jaxb.core.data.Command;
-import org.eclipse.ptp.rm.jaxb.core.data.NameValuePair;
-import org.eclipse.ptp.rm.jaxb.core.data.Tokenizer;
+import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
+import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
+import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
+import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
@@ -119,10 +121,13 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	private final String uuid;
-	private final Command command;
+	private final CommandType command;
 	private final IJAXBResourceManagerControl rm;
 	private final ICommandJobStreamsProxy proxy;
+	private final RMVariableMap rmVarMap;
 	private final boolean waitForId;
+	private final boolean ignoreExitStatus;
+	private final boolean batch;
 
 	private IRemoteProcess process;
 	private IStreamParserTokenizer stdoutTokenizer;
@@ -135,8 +140,8 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private StreamSplitter errSplitter;
 	private String remoteOutPath;
 	private String remoteErrPath;
+	private final StringBuffer error;
 	private boolean active;
-	private final boolean batch;
 
 	/**
 	 * @param jobUUID
@@ -148,14 +153,17 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public CommandJob(String jobUUID, Command command, boolean batch, IJAXBResourceManagerControl rm) {
+	public CommandJob(String jobUUID, CommandType command, boolean batch, IJAXBResourceManagerControl rm, RMVariableMap rmVarMap) {
 		super(command.getName());
 		this.command = command;
 		this.batch = batch;
 		this.rm = rm;
+		this.rmVarMap = rmVarMap;
 		this.uuid = jobUUID;
 		this.proxy = new CommandJobStreamsProxy();
 		this.waitForId = command.isWaitForId();
+		this.ignoreExitStatus = command.isIgnoreExitStatus();
+		this.error = new StringBuffer();
 	}
 
 	/**
@@ -259,8 +267,10 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			} catch (InterruptedException ignored) {
 			}
 
-			if (exit != 0) {
-				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (ZEROSTR + exit), null);
+			if (exit != 0 && !ignoreExitStatus) {
+				String t = error.toString();
+				error.setLength(0);
+				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (ZEROSTR + exit) + SP + CO + t, null);
 			}
 
 			joinConsumers();
@@ -273,6 +283,29 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			active = false;
 		}
 		return Status.OK_STATUS;
+	}
+
+	private void errorStreamReader(final InputStream err) {
+		new Thread() {
+			@Override
+			public void run() {
+				BufferedReader br = new BufferedReader(new InputStreamReader(err));
+				while (true) {
+					try {
+						String line = br.readLine();
+						if (line == null) {
+							break;
+						}
+						error.append(line).append(LINE_SEP);
+					} catch (EOFException eof) {
+						break;
+					} catch (IOException io) {
+						JAXBCorePlugin.log(io);
+						break;
+					}
+				}
+			}
+		}.start();
 	}
 
 	/**
@@ -330,7 +363,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 * @throws CoreException
 	 */
 	private void maybeInitializeTokenizers(IRemoteProcessBuilder builder) throws CoreException {
-		Tokenizer t = null;
+		TokenizerType t = null;
 
 		if (builder.redirectErrorStream()) {
 			t = command.getRedirectParser();
@@ -346,7 +379,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				if (type != null) {
 					stdoutTokenizer = getTokenizer(type);
 				} else {
-					stdoutTokenizer = new ConfigurableRegexTokenizer(uuid, t);
+					stdoutTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap);
 				}
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
@@ -360,7 +393,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				if (type != null) {
 					stderrTokenizer = getTokenizer(type);
 				} else {
-					stderrTokenizer = new ConfigurableRegexTokenizer(uuid, t);
+					stderrTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap);
 				}
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
@@ -376,12 +409,11 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 * @throws CoreException
 	 */
 	private IRemoteProcessBuilder prepareCommand() throws CoreException {
-		List<Arg> args = command.getArg();
+		List<ArgType> args = command.getArg();
 		if (args == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
 		}
-		RMVariableMap map = RMVariableMap.getActiveInstance();
-		String[] cmdArgs = ArgImpl.getArgs(uuid, args, map);
+		String[] cmdArgs = ArgImpl.getArgs(uuid, args, rmVarMap);
 		RemoteServicesDelegate delegate = rm.getRemoteServicesDelegate();
 		return delegate.getRemoteServices().getProcessBuilder(delegate.getRemoteConnection(), cmdArgs);
 	}
@@ -408,10 +440,9 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			/*
 			 * first static env, then dynamic
 			 */
-			List<NameValuePair> vars = command.getEnvironment();
-			RMVariableMap map = RMVariableMap.getActiveInstance();
-			for (NameValuePair var : vars) {
-				EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), map);
+			List<NameValuePairType> vars = command.getEnvironment();
+			for (NameValuePairType var : vars) {
+				EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), rmVarMap);
 			}
 
 			Map<String, String> live = rm.getLaunchEnv();
@@ -426,18 +457,22 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	/**
 	 * Configures handling of the error stream. If there is a tokenizer, it
 	 * first checks to see if there will be redirection from a remote file, and
-	 * if not, splits the stream between the proxy and the tokenizer; if there
-	 * is a remote file, that stream is given to the proxy and the tokenizer
-	 * gets the stderr of the submission process. If there is no tokenizer, then
-	 * the proxy gets either stderr of the submission process or redirection
-	 * from the remote file, accordingly.
+	 * if not, splits the stream between the proxy and the tokenizer in the case
+	 * of an interactive job; if there is a remote file, that stream is given to
+	 * the proxy and the tokenizer gets the stderr of the submission process. If
+	 * there is no tokenizer, then the proxy gets either stderr of the
+	 * submission process if interactive, or redirection from the remote file,
+	 * accordingly.
 	 * 
 	 * @param process
 	 * @throws IOException
 	 */
 	private void setErrStreamRedirection(IRemoteProcess process) throws IOException {
 		if (stderrTokenizer != null) {
-			if (remoteErrPath == null) {
+			if (remoteErrPath != null) {
+				tokenizerErr = process.getErrorStream();
+				proxy.setErrMonitor(new CommandJobStreamTailFMonitor(rm, rmVarMap, remoteErrPath));
+			} else if (!batch) {
 				PipedInputStream tokenizerErr = new PipedInputStream();
 				this.tokenizerErr = tokenizerErr;
 				PipedInputStream monitorErr = new PipedInputStream();
@@ -445,30 +480,37 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				proxy.setErrMonitor(new CommandJobStreamMonitor(monitorErr));
 			} else {
 				tokenizerErr = process.getErrorStream();
-				proxy.setErrMonitor(new CommandJobStreamMonitor(rm, remoteErrPath));
 			}
-		} else if (remoteErrPath == null) {
+		} else if (remoteErrPath != null) {
+			proxy.setErrMonitor(new CommandJobStreamTailFMonitor(rm, rmVarMap, remoteErrPath));
+			/*
+			 * grab error stream for error reporting
+			 */
+			errorStreamReader(process.getErrorStream());
+		} else if (!batch) {
 			proxy.setErrMonitor(new CommandJobStreamMonitor(process.getErrorStream()));
-		} else {
-			proxy.setErrMonitor(new CommandJobStreamMonitor(rm, remoteErrPath));
 		}
 	}
 
 	/**
 	 * Configures handling of the stdout stream. If there is a tokenizer, it
 	 * first checks to see if there will be redirection from a remote file, and
-	 * if not, splits the stream between the proxy and the tokenizer; if there
-	 * is a remote file, that stream is given to the proxy and the tokenizer
-	 * gets the stdout of the submission process. If there is no tokenizer, then
-	 * the proxy gets either stdout of the submission process or redirection
-	 * from the remote file, accordingly.
+	 * if not, splits the stream between the proxy and the tokenizer in the case
+	 * of an interactive job; if there is a remote file, that stream is given to
+	 * the proxy and the tokenizer gets the stdout of the submission process. If
+	 * there is no tokenizer, then the proxy gets either stdout of the
+	 * submission process if interactive, or redirection from the remote file,
+	 * accordingly.
 	 * 
 	 * @param process
 	 * @throws IOException
 	 */
 	private void setOutStreamRedirection(IRemoteProcess process) throws IOException {
 		if (stdoutTokenizer != null) {
-			if (remoteOutPath == null) {
+			if (remoteOutPath != null) {
+				tokenizerOut = process.getInputStream();
+				proxy.setOutMonitor(new CommandJobStreamTailFMonitor(rm, rmVarMap, remoteOutPath));
+			} else if (!batch) {
 				PipedInputStream tokenizerOut = new PipedInputStream();
 				this.tokenizerOut = tokenizerOut;
 				PipedInputStream monitorOut = new PipedInputStream();
@@ -476,12 +518,12 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				proxy.setOutMonitor(new CommandJobStreamMonitor(monitorOut));
 			} else {
 				tokenizerOut = process.getInputStream();
-				proxy.setOutMonitor(new CommandJobStreamMonitor(rm, remoteOutPath));
 			}
-		} else if (remoteOutPath == null) {
-			proxy.setErrMonitor(new CommandJobStreamMonitor(process.getInputStream()));
-		} else {
-			proxy.setOutMonitor(new CommandJobStreamMonitor(rm, remoteOutPath));
+		} else if (remoteOutPath != null) {
+			proxy.setOutMonitor(new CommandJobStreamTailFMonitor(rm, rmVarMap, remoteOutPath));
+			errorStreamReader(process.getInputStream());
+		} else if (!batch) {
+			proxy.setOutMonitor(new CommandJobStreamMonitor(process.getInputStream()));
 		}
 	}
 

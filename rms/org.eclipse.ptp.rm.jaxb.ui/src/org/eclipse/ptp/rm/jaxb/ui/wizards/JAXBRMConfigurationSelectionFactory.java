@@ -85,18 +85,6 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 		if (configuration instanceof IJAXBResourceManagerConfiguration) {
 			IJAXBResourceManagerConfiguration jaxbConfiguration = (IJAXBResourceManagerConfiguration) configuration;
 			jaxbConfiguration.setRMConfigurationURL(getJAXBResourceManagerConfiguration(name));
-			/*
-			 * in order to make the Site information available to the wizards,
-			 * we need to realize the data object here, since the URL is set on
-			 * the base configuration, but the wizards access the component
-			 * configurations.
-			 */
-			try {
-				jaxbConfiguration.realizeRMDataFromXML();
-			} catch (Throwable t) {
-				WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.InvalidConfiguration + name,
-						Messages.InvalidConfiguration_title, false);
-			}
 		}
 		configuration.setName(name);
 	}
@@ -137,8 +125,11 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	 * Gets all extensions to the
 	 * org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations extension
 	 * point and loads their names and locations.
+	 * 
+	 * @param resourceManagers
+	 *            map of extId to map(name, URL)
 	 */
-	private static void loadExtensions() {
+	static void loadExtensions(Map<String, Map<String, URL>> resourceManagers) {
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(RM_CONFIG_EXTENSION_POINT);
 
@@ -146,10 +137,10 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 			for (IExtension ext : extensionPoint.getExtensions()) {
 				for (IConfigurationElement ce : ext.getConfigurationElements()) {
 					String id = ce.getAttribute(ID);
-					Map<String, URL> info = fRMJAXBResourceManagers.get(id);
+					Map<String, URL> info = resourceManagers.get(id);
 					if (info == null) {
 						info = new HashMap<String, URL>();
-						fRMJAXBResourceManagers.put(id, info);
+						resourceManagers.put(id, info);
 					}
 					String name = ce.getAttribute(NAME);
 					String configurationFile = ce.getAttribute(CONFIGURATION_FILE_ATTRIBUTE);
@@ -183,6 +174,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 			fRMJAXBResourceManagers.put(JAXB_SERVICE_PROVIDER_EXTPT, info);
 		}
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(RESOURCE_MANAGERS);
+		StringBuffer invalid = new StringBuffer();
 		if (project != null) {
 			IPath path = project.getLocation();
 			if (path != null) {
@@ -197,10 +189,8 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 						try {
 							JAXBInitializationUtils.validate(url);
 						} catch (Throwable t) {
-							if (showError) {
-								WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t,
-										Messages.InvalidConfiguration + name, Messages.InvalidConfiguration_title, false);
-							}
+							invalid.append(LINE_SEP).append(name);
+							JAXBUIPlugin.log(t.getMessage());
 							continue;
 						}
 						info.put(name, url);
@@ -209,6 +199,10 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 					}
 				}
 			}
+		}
+		if (showError && invalid.length() > 0) {
+			WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), null,
+					Messages.InvalidConfiguration + invalid.toString(), Messages.InvalidConfiguration_title, false);
 		}
 	}
 
@@ -223,7 +217,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 			fRMJAXBResourceManagers.clear();
 		}
 
-		loadExtensions();
+		loadExtensions(fRMJAXBResourceManagers);
 
 		/*
 		 * Also search the workspace for managers. By convention these should
