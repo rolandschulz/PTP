@@ -22,14 +22,16 @@
 <hr>
 
 <p><b>
-This page is designed to provide detailed explanations of the content&#47;formatting of the
-output generated in the Console View to those who are curious.
+This page is designed to provide detailed explanations (for those who are curious) of the output generated 
+in the Console View as well as the content of log files GEM generates.
 </b></p>
 
 <p>
 There is no reason for the casual user to understand in any great detail, the output displayed in 
-the GEM Console View or the contents of the log files that ISP generates. GEM exists to provide an
-intuitive, visual interface to make using and understanding ISP easier via the following views and tools:
+the GEM Console View or the contents of the log files that are generated. GEM exists to provide an
+intuitive, visual interface to debug and understand MPI applications and MPI runtime behavior and
+to keep the user insulated from the details of trace files. The following views and tools are
+provided by GEM to accomplish this:
 </p>
 <ul>
 	<li>
@@ -43,174 +45,254 @@ intuitive, visual interface to make using and understanding ISP easier via the f
 	</li>
 </ul> 
 
-<p>
-<b><i>NOTE:</i></b> The Console View is most useful to the casual user as a status and 
-notification tool while GEM/ISP are running. It may be useful to see STDERR if it exists 
-and in general, to know when a verification run is complete. The Console View also gives
-the user the opportunity to cancel stalled or long-running operations.
-</p>
+<h3>Sample Output From GEM Console View:</h3>
 
-<h3>Sample Output (from the GEM Console View):</h3>
+<ul>
+    <li>MPI Implementation&nbsp;&#8212;&nbsp;OpenMPI</li>
+    <li>UNIX Sockets enabled</li>
+    <li>FIB Enabled</li>
+    <li>Blocking Sends Enabled</li>
+    <li>3 Processes</li>
+</ul>
+
 <pre>
 ISP - Insitu Partial Order
 -----------------------------------------
-Command:&nbsp;&nbsp;&nbsp; 
-./any_srccandeadlock9.exe
-Number Procs: 3
-Server: localhost:9687
-Blocking Sends: Disabled
-FIB: Enabled
+Command:        /home/alan/mpi/MPI_AnySrc/gem/MPI_AnySrc.gem 
+Number Procs:   3
+Server:         Local Socket
+Blocking Sends: Enabled
+FIB:            Enabled
 -----------------------------------------
-Started Process: 6687
+Started Process: 22044
+(0) is alive on formal
+(2) is alive on formal
 INTERLEAVING :1
-(1) is alive on laptop
-(0) is alive on laptop
-(2) is alive on laptop
-Started Process: 6694
-(1) Finished normally
-(2) Finished normally
-(0) Finished normally
-INTERLEAVING :2
-(0) is alive on laptop
-(1) is alive on laptop
-(2) is alive on laptop
-application called MPI_Abort(MPI_COMM_WORLD, 1) process 1[cli_1]: aborting job:
-application called MPI_Abort(MPI_COMM_WORLD, 1) process 1
-application called MPI_Abort(MPI_COMM_WORLD, 1) process 0[cli_0]: aborting job:
-application called MPI_Abort(MPI_COMM_WORLD, 1) process 0
-application called MPI_Abort(MPI_COMM_WORLD, 1) process 2[cli_2]: aborting job:
-application called MPI_Abort(MPI_COMM_WORLD, 1) process 2
-rank 2 in job 6 laptop_35830 caused collective abort of all ranks
-&nbsp;&nbsp;&nbsp; exit status of rank 2: return code 1
-rank 1 in job 6 laptop_35830 caused collective abort of all ranks
-&nbsp;&nbsp;&nbsp; exit status of rank 1: return code 1
-rank 0 in job 6 laptop_35830 ; caused collective abort of all ranks
-&nbsp;&nbsp;&nbsp; exit status of rank 0: return code 1
+(1) is alive on formal
 -----------------------------------------
 Transition list for 0
-0 1 0 0 Barrier any_srccandeadlock9.c:36 1{[0, 1][0, 2]} {}
-1 4 1 0 Irecv any_srccandeadlock9.c:47 -1 0 1{[0, 2]} {}
-Matched with process :2 transition :1
-2 7 2 0 Recv any_srccandeadlock9.c:49 2 0{} {}
+0 o=1 i=0 rank=0 Barrier /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:31 count=1{[0, 1][0, 2]} {}
+1 o=4 i=1 rank=0 Irecv /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:37 src=-1 rtag=0 count=1{[0, 2]} {}    Matched [1,1]
+2 o=7 i=2 rank=0 Recv /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:39 src=1 rtag=0{} {}
 
 Transition list for 1
-0 2 0 1 Barrier any_srccandeadlock9.c:36 1{[1, 1][1, 2]} {}
-1 5 1 1 Send any_srccandeadlock9.c:74 0 0{} {}
-2 8 2 1 Barrier any_srccandeadlock9.c:77 2{} {}
+0 o=2 i=0 rank=1 Barrier /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:31 count=1{[1, 1]} {}
+1 o=5 i=1 rank=1 Send /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:50 dest=0 stag=0{[1, 2]} {}     Matched [0,1]
+2 o=8 i=2 rank=1 Recv /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:52 src=0 rtag=0{} {}
 
 Transition list for 2
-0 3 0 2 Barrier any_srccandeadlock9.c:36 1{[2, 1][2, 2]} {}
-1 6 1 2 Send any_srccandeadlock9.c:62 0 0{} {}
-Matched with process :0 transition :1
-2 9 2 2 Recv any_srccandeadlock9.c:64 0 0{} {}
+0 o=3 i=0 rank=2 Barrier /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:31 count=1{[2, 1]} {}
+1 o=6 i=1 rank=2 Send /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:58 dest=0 stag=0{} {}
 
 No matching MPI call found!
-Detected a DEADLOCK!
-Killing program any_srccandeadlock9.exe
+Detected a DEADLOCK in interleaving 1
 -----------------------------------------
+Started Process: 22048
+(1) is alive on formal
+(0) is alive on formal
+(2) is alive on formal
+INTERLEAVING :2
+(1) Finished normally
+(0) Finished normally
+(2) Finished normally
+-----------------------------------------
+ISP detected deadlock!!!
+Total Explored Interleavings: 2
+Interleaving Exploration Mode: All Relevant Interleavings
+-----------------------------------------
+
+List of Irrelevant Barriers - If want to remove, remove a complete match set:
+Match Set: 1
+0: /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:31
+1: /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:31
+2: /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:31
+
+Match Set: 2
+0: /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:61
+1: /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:61
+2: /home/alan/mpi/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c:61
 </pre>
 
 <h2>Output is separated into segments by lines of dashes.</h2>
 <br>
 <ul>
-<li>The first segment is just a title and will always display ISP Insitu Partial Order.</li>
-<li>
-The second segment is fairly self explanatory, it provides the 
-String used to specify the executable, the number of processes used, the server 
-used, whether or not Blocking Sends should be used, and whether or not FIB is 
-being used.
-</li>
-<li>
-The third segment is separated into interleavings. An interleaving (also called a schedule)
-is a description of how the ISP Scheduler issued instruction to the MPI runtime. In this
-segment, a brief explanation of how each process ran in each interleaving is given. In
-the example above all three processes started and finished normally in the first interleaving,
-but in the second interleaving a deadlock was found so each process had to abort.
-</li>
-<li>
-The last segment describes how each MPI call was handled. Its 
-format is very similar to that of the log file except that the calls are grouped 
-by the process that issued it. To understand what it means 
-please read the following section on understanding the log file.
-</li>
+    <li>
+        The first segment is simply a title and will always display <b>ISP - Insitu Partial Order</b>.
+        ISP is the underlying verification engine used by GEM. The log files GEM interprets are
+        generated by ISP.
+    </li>
+    <li>
+        The second segment is fairly self explanatory, and provides the string used to specify the 
+        name of the executable, the number of processes used, the server used, whether or not 
+        <b>Blocking Sends</b> should be used, and whether or not <b>Functionally Irrelevant Barrier 
+        (FIB) detection</b> is enabled.
+    </li>
+    <li>
+		The third segment is separated into interleavings. An interleaving (also called a schedule)
+		is a description of how the ISP Scheduler issued instruction to the MPI runtime. In this
+		segment, a brief explanation of how each process ran in each interleaving is given. In
+		the example above all three processes started and finished normally in the first interleaving,
+		but in the second interleaving a deadlock was found so each process had to abort.
+    </li>
+    <li>
+		The last segment describes how each MPI call was handled. Its 
+		format is very similar to that of the log file except that the calls are grouped 
+		by the process that issued it. To understand what it means 
+		please read the following section on understanding the log file.
+	</li>
 </ul>
 
 <h2>Understanding the Log Files</h2>
 <p>
-Like ISP output, users are not expected to be able to 
-understand log files. The best way understand what the log file contents represent is to 
-run the Java GUI to graphically see the information it holds. The log file consists 
-of a single number on the first line that says how many processes were used to 
-create the file and a list of every MPI call that program issued and information 
-about how that call interacts with other calls, unless a deadlock is found. If 
-there is a deadlock then the log will have a line giving the interleave number 
-and the word “DEADLOCK”. After this line the log file will abruptly end and 
-remaining MPI calls will not be displayed. Here is the log file generated 
-by the example above.
+Like <b>GEM Console</b> output, users are not expected to understand log files. The best way understand what 
+the log file contents represent is to run the <a href="happensBeforeViewer.html">Happens Before (HB) Viewer</a> 
+to graphically examine the information it displays. The log file consists of a single number (the first line)
+that says how many processes were used to create the file, a list of every MPI call that program issued and 
+information about how that MPI call interacts with other MPI calls, unless a deadlock is found, at which point
+progress halts for that particular interleaving. Here the log will have a line giving the interleave number 
+and the word <b>&#34;DEADLOCK&#34;</b>. It is possible to have more than one deadlock in your program. Each 
+deadlock will be contained in a particular interleaving (e.g. and interleaving can have at most one deadlock).
 </p>
 
 <pre>
-1 0 0 1 1 Barrier 0_0:1:2: { 1 2 } { [ 1 1 ] [ 1 2 ] [ 2 1 ] [ 2 2 ] } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
-1 0 1 4 5 Irecv 1 0 0_0:1:2: { 2 5 } { } Match: 1 1 File: 23 any_srccandeadlock9.c 47
-1 0 2 7 7 Recv 2 0 0_0:1:2: { 3 4 } { } Match: 2 1 File: 23 any_srccandeadlock9.c 49
-1 0 3 10 8 Send 2 0 0_0:1:2: { } { [ 2 3 ] [ 2 4 ] } Match: 2 2 File: 23 any_srccandeadlock9.c 51
-1 0 4 11 11 Recv 1 0 0_0:1:2: { 5 } { } Match: 2 3 File: 23 any_srccandeadlock9.c 54
-1 0 5 14 12 Wait { 6 } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 56
-1 0 6 15 13 Barrier 0_0:1:2: { 7 } { [ 1 3 ] [ 2 5 ] } Match: -1 -1 File: 23  any_srccandeadlock9.c 77
-1 0 7 16 16 Finalize { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 79
-1 1 0 2 2 Barrier 0_0:1:2: { 1 2 } { [ 0 1 ] [ 0 2 ] [ 2 1 ] [ 2 2 ] } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
-1 1 1 5 4 Send 0 0 0_0:1:2: { } { [ 0 2 ] [ 0 5 ] } Match: 0 1 File: 23 any_srccandeadlock9.c 74
-1 1 2 8 14 Barrier 0_0:1:2: { 3 } { [ 0 7 ] [ 2 5 ] } Match: -1 -1 File: 23 any_srccandeadlock9.c 77
-1 1 3 17 17 Finalize { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 79
-1 2 0 3 3 Barrier 0_0:1:2: { 1 2 } { [ 0 1 ] [ 0 2 ] [ 1 1 ] [ 1 2 ] } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
-1 2 1 6 6 Send 0 0 0_0:1:2: { } { [ 0 3 ] [ 0 4 ] } Match: 0 2 File: 23 any_srccandeadlock9.c 62
-1 2 2 9 9 Recv 0 0 0_0:1:2: { 3 4 } { } Match: 0 3 File: 23 any_srccandeadlock9.c 64
-1 2 3 12 10 Send 0 0 0_0:1:2: { } { [ 0 5 ] } Match: 0 4 File: 23 any_srccandeadlock9.c 66
-1 2 4 13 15 Barrier 0_0:1:2: { 5 } { [ 0 7 ] [ 1 3 ] } Match: -1 -1 File: 23 any_srccandeadlock9.c 77
-1 2 5 18 18 Finalize { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 79
-2 0 0 1 19 Barrier 0_0:1:2: { 1 2 } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
-2 0 1 4 23 Irecv 1 0 0_0:1:2: { 2 } { } Match: 2 1 File: 23 any_srccandeadlock9.c 47
-2 0 2 7 7 Recv 2 0 0_0:1:2: { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 49
-2 1 0 2 20 Barrier 0_0:1:2: { 1 2 } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
-2 1 1 5 4 Send 0 0 0_0:1:2: { } { } Match: -1 -1 File: 23 any_src-can-deadlock9.c 74
-2 1 2 8 14 Barrier 0_0:1:2: { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 77
-2 2 0 3 21 Barrier 0_0:1:2: { 1 2 } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 36
-2 2 1 6 22 Send 0 0 0_0:1:2: { } { } Match: 0 1 File: 23 any_srccandeadlock9.c 62
-2 2 2 9 9 Recv 0 0 0_0:1:2: { } { } Match: -1 -1 File: 23 any_srccandeadlock9.c 64
-2 DEADLOCK
+3
+1 0 0 1 1 Barrier 0_0:1:2: { 1 2 } { [ 1 1 ] [ 2 1 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 31
+1 0 1 4 5 Irecv -1 0 0_0:1:2: { 2 } { [ 1 2 ] } Match: 1 1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 37
+1 0 2 7 -1 Recv 1 0 0_0:1:2: { } { } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 39
+1 1 0 2 2 Barrier 0_0:1:2: { 1 } { [ 0 1 ] [ 0 2 ] [ 2 1 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 31
+1 1 1 5 4 Send 0 0 0_0:1:2: { 2 } { [ 0 2 ] } Match: 0 1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 50
+1 1 2 8 -1 Recv 0 0 0_0:1:2: { } { } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 52
+1 2 0 3 3 Barrier 0_0:1:2: { 1 } { [ 0 1 ] [ 0 2 ] [ 1 1 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 31
+1 2 1 6 -1 Send 0 0 0_0:1:2: { } { } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 58
+1 DEADLOCK
+2 0 0 1 6 Barrier 0_0:1:2: { 1 2 } { [ 1 0 ] [ 2 0 ] [ 1 1 ] [ 0 0 ] [ 2 1 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 31
+2 0 1 4 10 Irecv -1 0 0_0:1:2: { 2 5 } { [ 2 1 ] [ 2 2 ] } Match: 2 1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 37
+2 0 2 7 12 Recv 1 0 0_0:1:2: { 3 } { [ 1 1 ] [ 1 2 ] [ 0 2 ] } Match: 1 1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 39
+2 0 3 17 13 Send 1 0 0_0:1:2: { 4 } { [ 1 2 ] [ 1 3 ] [ 0 3 ] } Match: 1 2 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 41
+2 0 4 19 16 Recv -1 0 0_0:1:2: { 5 } { [ 1 3 ] [ 1 4 ] } Match: 1 3 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 44
+2 0 5 21 17 Wait { 6 } { } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 46
+2 0 6 23 18 Barrier 0_0:1:2: { 7 } { [ 1 4 ] [ 2 2 ] [ 1 5 ] [ 0 6 ] [ 2 3 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 61
+2 0 7 24 21 Finalize { } { [ 1 5 ] [ 2 3 ] [ 0 7 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 63
+2 1 0 2 7 Barrier 0_0:1:2: { 1 } { [ 0 0 ] [ 2 0 ] [ 0 1 ] [ 0 2 ] [ 1 0 ] [ 2 1 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 31
+2 1 1 5 11 Send 0 0 0_0:1:2: { 2 } { [ 0 2 ] [ 0 3 ] [ 1 1 ] } Match: 0 2 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 50
+2 1 2 18 14 Recv 0 0 0_0:1:2: { 3 } { [ 0 3 ] [ 0 4 ] [ 1 2 ] } Match: 0 3 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 52
+2 1 3 20 15 Send 0 0 0_0:1:2: { 4 } { [ 0 5 ] [ 1 3 ] } Match: 0 4 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 54
+2 1 4 22 19 Barrier 0_0:1:2: { 5 } { [ 0 6 ] [ 2 2 ] [ 0 7 ] [ 1 4 ] [ 2 3 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 61
+2 1 5 25 22 Finalize { } { [ 0 7 ] [ 2 3 ] [ 1 5 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 63
+2 2 0 3 8 Barrier 0_0:1:2: { 1 } { [ 0 0 ] [ 1 0 ] [ 0 1 ] [ 0 2 ] [ 2 0 ] [ 1 1 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 31
+2 2 1 6 9 Send 0 0 0_0:1:2: { 2 } { [ 0 2 ] [ 0 5 ] [ 2 1 ] } Match: 0 1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 58
+2 2 2 16 20 Barrier 0_0:1:2: { 3 } { [ 0 6 ] [ 1 4 ] [ 0 7 ] [ 2 2 ] [ 1 5 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 61
+2 2 3 26 23 Finalize { } { [ 0 7 ] [ 1 5 ] [ 2 3 ] } Match: -1 -1 File: 98 /home/alan/mpi/MPI_AnySrc/src/MPI_AnySrc.c 63
+...
 </pre>
 
 <hr>
 
 <p>
-To understand the format, we will take a single line from a log file as an example and explain each part.
+To understand the format, we will take a single line from the generated log file (line shown below) as an example, and explain each portion in detail:
 </p>
 
-<p>
-1 0 0 1 1 Barrier 0_0:1:2: { 1 2 } { [ 1 1 ] [ 1 2 ] [ 2 1 ] [ 2 2 ] } Match: -1 -1 File: 23 any_src-can-deadlock9.c 36
-</p>
+<hr/>
+<b><tt>
+&nbsp;&nbsp;2 0 1 4 10 Irecv -1 0 0_0:1:2: { 2 5 } { [ 2 1 ] [ 2 2 ] } Match: 2 1 File: 98 /home/alan/MPI/MPI_AnySrcCanDeadlock/src/MPI_AnySrc.c 37
+</tt>
+</b>
+<hr/>
+<br/>
 
 <table border="1" cellpadding="5">
-<tr><tH>Title</th><th>Explanation</th></tr>
-<tr><td>1 – Interleave Number (1-based)</td><td>This was issued by the first interleaving </td></tr>
-<tr><td>0 – Process Number (0-based)</td><td> This call was issued by process zero</td></tr>
-<tr><td>0 – Process Call Index (0-based)</td>
-	<td>This was first call issued by this process</td></tr>
-<tr><td style="width: 245px">1 – ISP Call Number (1-based)</td><td>This was the first call received by ISP</td></tr>
-<tr><td style="width: 245px">1 – ISP Issue Number (1-based)</td><td>This was the first call performed by ISP</td></tr>
-<tr><td style="width: 245px">Barrier – MPI Command</td><td>This call was a Barrier</td></tr>
-<tr><td style="width: 245px">0 – Call Arguments</td><td>Varies from call to call, here it is the COM</td></tr>
-<tr><td style="width: 245px">0:1:2 – Affected Processes</td>
-	<td>This call affects processes 1, 2, and 3</td></tr>
-<tr><td style="width: 245px">{1 2} – Intra-Process calls blocked</td>
-	<td>Blocks the calls from this processes with Process Call Index of 1 and 2</td></tr>
-<tr><td style="width: 245px">{ [ 1 1 ] [ 1 2 ] [ 2 1 ] [ 2 2 ] } - <br>Inter-Process calls blocked</td>
-	<td>Blocks the indicated calls found in other processes. Each are listed in pairs (numbers between the [ ] form a pair), the first element of the pair is the process where it is found, the second is the Process Call Index. So the first pair tells us that the call from process 1 with a Process Call Index of 1 is blocked.</td></tr>
-<tr><td style="width: 245px">Match: -1 -1 – Matches</td>
-	<td>For calls like Send and Recv and has -1 -1 for calls without matches</td></tr>
-<tr><td style="width: 245px">File: 23 any_src-can-deadlock9.c</td>
-	<td>The log file was generated by any_src-can-deadlock9.c</td></tr>
-<tr><td style="width: 245px">36</td><td>This call is found on line 36</td></tr>
+<tr>
+    <th>Element</th>
+    <th>Title</th>
+    <th>Explanation</th>
+</tr>
+<tr>
+    <td><b>2</b></td>
+    <td style="width: 245px">Interleaving Number (1-based)</td>
+    <td>This MPI call was issued in the second interleaving.</td>
+</tr>
+<tr>
+    <td><b>0</b></td>
+    <td style="width: 245px">Process Number (0-based)</td>
+    <td>This call was issued by process zero.</td></tr>
+<tr>
+    <td><b>1</b></td>
+    <td style="width: 245px">Process Call Index (0-based)</td>
+	<td>The order the envelope is sent by the process. This was second call issued by this process.</td>
+</tr>
+<tr>
+    <td><b>4</b></td>
+    <td style="width: 245px">Scheduler Receive Index (1-based)</td>
+    <td>This was the fourth call received by ISP&#39;s scheduler.</td>
+</tr>
+<tr>
+    <td><b>10</b></td>
+    <td style="width: 245px">Scheduler Issue Index (1-based)</td>
+    <td>The order in which MPI calls are issued to the MPI runtime. This was the tenth call performed by ISP.</td>
+</tr>
+<tr>
+    <td><b>Irecv</b></td>
+    <td style="width: 245px">MPI Call Name</td>
+    <td>This call was a MPI <b>Irecv</b> issued by process 0.</td>
+</tr>
+<tr>
+    <td><b>-1</b></td>
+    <td style="width: 245px">The Source Index</td>
+    <td>Source is -1 in this case because the MPI call itself is the source. This call was a MPI Irecv issued by process 0.</td>
+</tr>
+<tr>
+    <td><b>0</b></td>
+    <td style="width: 245px">MPI Message Tag</td>
+    <td>The MPI message tag here is <b>0</b>.</td>
+</tr>
+<tr>
+    <td><b>0_</b></td>
+    <td style="width: 245px">MPI Communicator</td>
+    <td>The MPI communicator this MPI call is a member of.</td>
+</tr>
+<tr>
+    <td><b>0:1:2</b></td>
+    <td>Processes in MPI communicator</td>
+	<td>Processes 0, 1, and 2 are in this particular MPI communicator <i>(MPI_COMM_WORLD in this example).</i></td>
+</tr>
+<tr>
+    <td><b>{2 5}</b></td>
+    <td style="width: 245px">Intra-Process MPI calls blocked</td>
+	<td>Blocks the MPI calls within this processes with <b>Process Call Index</b> of 2 and 5, Recv and Finalize in this case.</td>
+</tr>
+<tr>
+    <td><b>{ [ 2 1 ] [ 2 2 ] }</b></td>
+    <td style="width: 245px">Inter-Process MPIcalls blocked</td>
+	<td>
+	   Blocks the indicated calls across processes (MPI calls found in other processes). Each are listed in pairs 
+	   (numbers between the [ ] form a pair), the first element of the pair is the process that made the MPI call, 
+	   the second number is the <b>Process Call Index</b>. For example, the first pair tells us that the call from 
+	   process 2 with a Process Call Index of 1 is blocked.
+	</td>
+</tr>
+<tr>
+    <td><b>Match: 2 1</b></td>
+    <td style="width: 245px">Match Rank &#38; Index</td>
+	<td>
+	   For calls like Send and Recv and has -1 -1 for calls without matches (e.g. collectives). Here the <b>match rank</b> is 
+	   process <b>2</b> and the <b>match index</b> is <b>1</b>.
+	</td>
+</tr>
+<tr>
+    <td><b>File: 98</b></td>
+    <td style="width: 245px">Filename &#38; with length</td>
+	<td>The length of the file name length in this example is <b>98</b>.</td>
+</tr>
+<tr>
+    <td><b>/home/.../.../MPI_AnySrc.c</b></td>
+    <td style="width: 245px">The path and name of the source code file containing the MPI call</td>
+    <td>The fully qualified path to the source code file named <b>MPI_AnySrc.c</b>.</td>
+</tr>
+<tr>
+    <td><b>37</b></td>
+    <td style="width: 245px">Line number MPI call is found on</td>
+    <td>This MPI call is found on <b>line 37</b> of the source code file listed above.</td>
+</tr>
 </table>
 
 <p>&nbsp;</p>

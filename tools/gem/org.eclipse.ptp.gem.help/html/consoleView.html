@@ -36,6 +36,15 @@ be present here. The STDOUT generated in the Console View will be useful to the 
 Browser &#38; and Analyzer views exist to graphically examine this output as well as the generated trace file. 
 STDERR will be printed to the GEM Console in bold red.
 
+<p>
+The Console View serves as an informal progress monitor while GEM is running &nbsp;&#8212;&nbsp;a status bar of sorts.
+The actual time to formally verify any MPI application is essentially unknown and hence no actual Progress Monitor object.
+It may be useful to see <b>STDOUT</b> &#38; <b>STDERR</b> in general (if it exists), to know when a verification run is 
+complete, as other GEM views will get active focus once verification is complete. The Console View also gives
+the user the opportunity to cancel stalled or long-running operations with the Eclipse standard cancel button
+<img src="images/terminate.gif"> .
+</p>
+
 <h3>Understanding Output</h3>
 Please reference the <a href="output.html">Understanding GEM Output help page</a>.
 
