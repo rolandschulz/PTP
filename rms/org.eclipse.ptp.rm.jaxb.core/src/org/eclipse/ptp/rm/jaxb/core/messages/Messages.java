@@ -53,6 +53,7 @@ public class Messages extends NLS {
 	public static String Write_Operation_NullPath;
 	public static String Read_Operation_NullSourceFileManager;
 	public static String Read_Operation_NullPath;
+	public static String Read_Operation_resource_does_not_exist;
 	public static String Write_OperationFailed;
 	public static String Read_OperationFailed;
 	public static String FailedToCreateRmData;

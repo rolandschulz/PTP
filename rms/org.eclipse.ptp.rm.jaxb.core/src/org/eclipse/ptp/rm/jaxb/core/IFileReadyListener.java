@@ -9,33 +9,20 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
-import org.eclipse.debug.core.model.IStreamMonitor;
-
 /**
- * CommandJob-specific extension of the stream monitor.
+ * CommandJob-specific handler accepting notification that a remote file is
+ * ready to be read.
  * 
- * @see org.eclipse.debug.core.model.IStreamMonitor
  * @author arossi
  * 
  */
-public interface ICommandJobStreamMonitor extends IStreamMonitor {
+public interface IFileReadyListener {
 
 	/**
-	 * Manually close the monitor/streams.
+	 * @param jobId
+	 * @param remoteFile
+	 * @param ready
+	 *            if file is ready to read
 	 */
-	void close();
-
-	/**
-	 * Tune the monitor's buffer size
-	 * 
-	 * @param limit
-	 *            in chars
-	 * 
-	 */
-	void setBufferLimit(int limit);
-
-	/**
-	 * Starts the reading from the stream.
-	 */
-	void startMonitoring();
+	void handleReadyFile(String jobId, String remoteFile, boolean ready);
 }

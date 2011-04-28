@@ -104,6 +104,21 @@ public class Messages extends NLS {
 	public static String CaptureJobOutputError;
 	public static String CaptureJobOutputError_title;
 
+	public static String JOB_ID;
+	public static String STATE;
+	public static String STATE_DETAIL;
+	public static String STDOUT_PATH;
+	public static String STDERR_PATH;
+	public static String STDOUT_READY;
+	public static String STDERR_READY;
+	public static String JobListUpdate;
+
+	public static String OperationFailed;
+	public static String DoControlError;
+
+	public static String RemoveJobWarning;
+	public static String CannotUndoOperation;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

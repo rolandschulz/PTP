@@ -29,6 +29,22 @@ public interface ICommandJobStreamsProxy extends IStreamsProxy, IStreamsProxy2 {
 	void close();
 
 	/**
+	 * @return handler for remote error file
+	 */
+	ICommandJobRemoteOutputHandler getRemoteErrorHandler();
+
+	/**
+	 * @return handler for remote output file
+	 */
+	ICommandJobRemoteOutputHandler getRemoteOutputHandler();
+
+	/**
+	 * If there are handlers, runs the check for their files and joins on those
+	 * threads.
+	 */
+	void maybeWaitForHandlerFiles();
+
+	/**
 	 * @param err
 	 *            monitor for error stream
 	 */
@@ -42,7 +58,20 @@ public interface ICommandJobStreamsProxy extends IStreamsProxy, IStreamsProxy2 {
 	void setOutMonitor(ICommandJobStreamMonitor out);
 
 	/**
+	 * @param errHandler
+	 *            for remote error file
+	 */
+	void setRemoteErrorHandler(ICommandJobRemoteOutputHandler errHandler);
+
+	/**
+	 * @param outHandler
+	 *            for remote output file
+	 */
+	void setRemoteOutputHandler(ICommandJobRemoteOutputHandler outHandler);
+
+	/**
 	 * Attaches monitor to stream and begins reading.
 	 */
 	void startMonitors();
+
 }

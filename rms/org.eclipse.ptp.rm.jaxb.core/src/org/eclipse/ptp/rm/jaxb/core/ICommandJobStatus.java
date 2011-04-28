@@ -26,6 +26,11 @@ public interface ICommandJobStatus extends IJobStatus {
 	final long UPDATE_REQUEST_INTERVAL = 30 * 1000;
 
 	/**
+	 * @return the current control
+	 */
+	public IJAXBResourceManagerControl getControl();
+
+	/**
 	 * Cancel the Job process (if interactive).
 	 */
 	void cancel();
@@ -41,6 +46,11 @@ public interface ICommandJobStatus extends IJobStatus {
 	 * @return update in milliseconds
 	 */
 	long getLastUpdateRequest();
+
+	/**
+	 * @return owner resource manager id
+	 */
+	String getRmUniqueName();
 
 	/**
 	 * @return whether the associated Job was launched interactively or not.

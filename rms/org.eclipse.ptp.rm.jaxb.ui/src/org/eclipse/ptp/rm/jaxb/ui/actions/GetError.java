@@ -7,35 +7,17 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.core;
-
-import org.eclipse.debug.core.model.IStreamMonitor;
+package org.eclipse.ptp.rm.jaxb.ui.actions;
 
 /**
- * CommandJob-specific extension of the stream monitor.
+ * Display the remote error file contents in a console.
  * 
- * @see org.eclipse.debug.core.model.IStreamMonitor
  * @author arossi
  * 
  */
-public interface ICommandJobStreamMonitor extends IStreamMonitor {
+public class GetError extends AbstractHandlerAction {
 
-	/**
-	 * Manually close the monitor/streams.
-	 */
-	void close();
-
-	/**
-	 * Tune the monitor's buffer size
-	 * 
-	 * @param limit
-	 *            in chars
-	 * 
-	 */
-	void setBufferLimit(int limit);
-
-	/**
-	 * Starts the reading from the stream.
-	 */
-	void startMonitoring();
+	public GetError() {
+		error = true;
+	}
 }

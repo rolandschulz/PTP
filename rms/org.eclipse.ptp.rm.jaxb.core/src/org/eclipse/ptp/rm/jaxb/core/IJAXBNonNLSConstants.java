@@ -23,7 +23,7 @@ public interface IJAXBNonNLSConstants {
 	int EOF = -1;
 	long MINUTE_IN_MS = 60 * 60 * 1000;
 	long VALIDATE_TIMER = 500;
-	long TAILF_PAUSE = 1000;
+	long READY_FILE_PAUSE = 1000;
 
 	/* CHARACTERS */
 	String LEN = "N";//$NON-NLS-1$
@@ -143,8 +143,8 @@ public interface IJAXBNonNLSConstants {
 	String SH = ".sh";//$NON-NLS-1$
 	String SETENV = "setenv";//$NON-NLS-1$
 	String EXPORT = "export";//$NON-NLS-1$
-	String STDOUT_TAIL_F = "stdout_tailF";//$NON-NLS-1$
-	String STDERR_TAIL_F = "stderr_tailF";//$NON-NLS-1$
+	String STDOUT_REMOTE_FILE = "stdout_remote_path";//$NON-NLS-1$
+	String STDERR_REMOTE_FILE = "stderr_remote_path";//$NON-NLS-1$
 	String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";//$NON-NLS-1$
 
 	String RESOURCE_MANAGERS = "resourceManagers";//$NON-NLS-1$
@@ -183,6 +183,7 @@ public interface IJAXBNonNLSConstants {
 	String PROPERTY = "property";//$NON-NLS-1$
 	String QUEUES = "available_queues";//$NON-NLS-1$
 	String JOB_ID = "jobId";//$NON-NLS-1$
+	String RM_ID = "rmId";//$NON-NLS-1$
 	String EXEC_PATH = "executablePath";//$NON-NLS-1$
 	String PROG_ARGS = "progArgs";//$NON-NLS-1$
 	String DIRECTORY = "directory";//$NON-NLS-1$
