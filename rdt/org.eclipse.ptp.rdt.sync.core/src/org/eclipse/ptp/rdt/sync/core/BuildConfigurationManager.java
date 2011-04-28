@@ -456,6 +456,10 @@ public class BuildConfigurationManager {
 			if (config == null) {
 				continue;
 			}
+			BuildScenario bs = IdToBuildScenarioMap.get(buildScenarioId);
+			if (bs == null) {
+				continue;
+			}
 			setBuildScenarioForBuildConfigurationInternal(IdToBuildScenarioMap.get(buildScenarioId), config);
 		}
 	}
