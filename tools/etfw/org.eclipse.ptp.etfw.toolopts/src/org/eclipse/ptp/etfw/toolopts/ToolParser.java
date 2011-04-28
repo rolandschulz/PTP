@@ -290,6 +290,7 @@ public class ToolParser extends DefaultHandler{
 			ppTool.requireTrue=getAttribute("if",atts);
 			ppTool.useDefaultLocation=getBooleanAttribute("defaultloc",false,atts);
 			ppTool.forAllLike=getAttribute("foralllike",atts);
+			ppTool.useLatestFileOnly=getBooleanAttribute("uselatestonly",true,atts);
 			String depthS=getAttribute("depth",atts);
 			if(depthS!=null){
 				int depth=Integer.parseInt(depthS);
