@@ -181,7 +181,7 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 				};
 
 				LinkedHashSet<File> fileSet = new LinkedHashSet<File>();
-				findFiles(fileSet, workDir, tool.depth, ffn);
+				findFiles(fileSet, workDir, tool.depth, ffn, tool.useLatestFileOnly);
 				// String[] files=workDir.list(ffn);
 				if (fileSet.size() <= 0) {
 					return new Status(IStatus.ERROR,
@@ -209,20 +209,31 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 	}
 
 	// TODO: The use of set here might gain us nothing
-	private void findFiles(Set<File> fileSet, File root, int depth, FilenameFilter filter) {
+	private void findFiles(Set<File> fileSet, File root, int depth, FilenameFilter filter, boolean latestOnly) {
 
 		// ArrayList<File[]> fList=new ArrayList<File[]>();
 
 		File[] files = root.listFiles(filter);
 
 		for (File f : files) {
+			if(latestOnly){
+				if(fileSet.size()==0)
+					fileSet.add(f);
+				else{
+					if(fileSet.iterator().next().lastModified()<f.lastModified()){
+						fileSet.clear();
+						fileSet.add(f);
+					}
+				}
+			}
+			else
 			fileSet.add(f);
 		}
 
 		if (depth > 0 || depth < 0) {
 			File[] roots = root.listFiles(dFil);
 			for (int i = 0; i < roots.length; i++) {
-				findFiles(fileSet, roots[i], depth - 1, filter);
+				findFiles(fileSet, roots[i], depth - 1, filter,latestOnly);
 			}
 		}
 	}
