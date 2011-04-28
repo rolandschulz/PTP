@@ -35,11 +35,6 @@
             supportsArgument="true">
       </variable>
       <variable
-            description="Dynamic launch tab configuration variable"
-            name="lt"
-            resolver="org.eclipse.ptp.rm.jaxb.core.variables.LTVariableResolver">
-      </variable>
-      <variable
             description="Dynamic variable backed by LaunchConfiguration"
             name="lc"
             resolver="org.eclipse.ptp.rm.jaxb.core.variables.LCVariableResolver">

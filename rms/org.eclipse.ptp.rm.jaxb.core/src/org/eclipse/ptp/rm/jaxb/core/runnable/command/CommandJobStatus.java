@@ -11,13 +11,17 @@ package org.eclipse.ptp.rm.jaxb.core.runnable.command;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJobRemoteOutputHandler;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
-import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * Extension of the IJobStatus class to handle resource manager command jobs.
@@ -27,39 +31,98 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
  */
 public class CommandJobStatus implements ICommandJobStatus {
 
+	private final String rmUniqueName;
+	private final IJAXBResourceManagerControl control;
+
 	private String jobId;
 	private ILaunchConfiguration launchConfig;
 	private String state;
 	private String stateDetail;
 	private ICommandJobStreamsProxy proxy;
 	private IRemoteProcess process;
-	private final RMVariableMap rmVarMap;
+
 	private boolean waitEnabled;
 	private long lastUpdateRequest;
 
-	public CommandJobStatus(RMVariableMap rmVarMap) {
+	/**
+	 * @param rmUniqueName
+	 *            owner resource manager
+	 * @param control
+	 *            current resource manager control
+	 */
+	public CommandJobStatus(String rmUniqueName, IJAXBResourceManagerControl control) {
+		this.rmUniqueName = rmUniqueName;
 		jobId = null;
 		state = IJobStatus.UNDETERMINED;
-		this.rmVarMap = rmVarMap;
+		this.control = control;
 		waitEnabled = true;
 		lastUpdateRequest = 0;
 	}
 
 	/**
+	 * @param rmUniqueName
+	 *            owner resource manager
 	 * @param jobId
 	 *            either internal UUID or resource-specific id
 	 * @param state
+	 * @param control
+	 *            current resource manager control
 	 */
-	public CommandJobStatus(String jobId, String state, RMVariableMap rmVarMap) {
+	public CommandJobStatus(String rmUniqueName, String jobId, String state, IJAXBResourceManagerControl control) {
+		this.rmUniqueName = rmUniqueName;
 		this.jobId = jobId;
+		this.control = control;
 		setState(state);
-		this.rmVarMap = rmVarMap;
 		waitEnabled = false;
 	}
 
 	/**
+	 * Used when re-initializing from persistent memento. If either path is not
+	 * <code>null</code>, a proxy will be constructed and give the appropriate
+	 * remote file handlers.
+	 * 
+	 * @param rmUniqueName
+	 *            for obtaining the resource manager
+	 * @param jobId
+	 * @param stdoutPath
+	 * @param stderrPath
+	 */
+	public CommandJobStatus(String rmUniqueName, String jobId, String stdoutPath, String stderrPath) {
+		this.rmUniqueName = rmUniqueName;
+		this.jobId = jobId;
+		state = IJobStatus.UNDETERMINED;
+		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		if (rm != null && rm instanceof IJAXBResourceManager) {
+			IJAXBResourceManager jaxbRm = (IJAXBResourceManager) rm;
+			this.control = jaxbRm.getControl();
+		} else {
+			this.control = null;
+		}
+		waitEnabled = true;
+		lastUpdateRequest = 0;
+
+		ICommandJobRemoteOutputHandler out = null;
+		ICommandJobRemoteOutputHandler err = null;
+		if (stdoutPath != null) {
+			out = new CommandJobRemoteOutputHandler(control, stdoutPath);
+			out.initialize(jobId);
+		}
+
+		if (stderrPath != null) {
+			err = new CommandJobRemoteOutputHandler(control, stderrPath);
+			err.initialize(jobId);
+		}
+
+		if (out != null || err != null) {
+			proxy = new CommandJobStreamsProxy();
+			proxy.setRemoteOutputHandler(out);
+			proxy.setRemoteErrorHandler(err);
+		}
+	}
+
+	/**
 	 * Closes the proxy and calls destroy on the process. Used for interactive
-	 * jobs cancellation.
+	 * job cancellation.
 	 */
 	public synchronized void cancel() {
 		if (proxy != null) {
@@ -80,6 +143,15 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#getControl()
+	 */
+	public IJAXBResourceManagerControl getControl() {
+		return control;
+	}
+
 	/**
 	 * @return jobId either internal UUID or resource-specific id
 	 */
@@ -96,6 +168,14 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public ILaunchConfiguration getLaunchConfiguration() {
 		return launchConfig;
+	}
+
+	/**
+	 * 
+	 * @return owner resource manager id
+	 */
+	public String getRmUniqueName() {
+		return rmUniqueName;
 	}
 
 	/**
@@ -146,10 +226,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
-	 * We also immediately dereference any paths associated withthe proxy
-	 * monitors by calling intialize, as the jobId property may not be in the
-	 * environment after this initial call returns. We also start the monitors
-	 * here, as tail -F will retry until the file appears.
+	 * We also immediately dereference any paths associated with the proxy
+	 * handlers by calling intialize, as the jobId property may not be in the
+	 * environment after this initial call returns.
 	 * 
 	 * @param proxy
 	 *            Wrapper containing monitoring functionality for the associated
@@ -157,15 +236,13 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public void setProxy(ICommandJobStreamsProxy proxy) {
 		this.proxy = proxy;
-		ICommandJobStreamMonitor m = (ICommandJobStreamMonitor) proxy.getOutputStreamMonitor();
-		if (m != null) {
-			m.initializeFilePath(jobId);
-			m.startMonitoring();
+		ICommandJobRemoteOutputHandler handler = proxy.getRemoteOutputHandler();
+		if (handler != null) {
+			handler.initialize(jobId);
 		}
-		m = (ICommandJobStreamMonitor) proxy.getErrorStreamMonitor();
-		if (m != null) {
-			m.initializeFilePath(jobId);
-			m.startMonitoring();
+		handler = proxy.getRemoteErrorHandler();
+		if (handler != null) {
+			handler.initialize(jobId);
 		}
 	}
 
@@ -241,7 +318,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 					wait(1000);
 				} catch (InterruptedException ignored) {
 				}
-				PropertyType p = (PropertyType) rmVarMap.get(uuid);
+				RMVariableMap env = control.getEnvironment();
+				if (env == null) {
+					break;
+				}
+				PropertyType p = (PropertyType) env.get(uuid);
 				if (p != null) {
 					jobId = p.getName();
 					String v = (String) p.getValue();

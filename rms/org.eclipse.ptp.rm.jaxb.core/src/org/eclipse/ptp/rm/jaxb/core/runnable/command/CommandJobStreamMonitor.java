@@ -153,16 +153,6 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 	}
 
 	/*
-	 * Adapter, does nothing. Subclasses may implement. (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor#initializeFilePath
-	 * (java.lang.String)
-	 */
-	public void initializeFilePath(String jobId) {
-	}
-
-	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see

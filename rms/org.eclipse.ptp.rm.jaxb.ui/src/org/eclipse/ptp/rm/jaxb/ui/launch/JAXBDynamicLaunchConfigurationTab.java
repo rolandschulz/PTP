@@ -138,7 +138,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetBuilderUtils.createComposite(parent, 1);
-		createOutputCaptureOption(control, false);
 		try {
 			LaunchTabBuilder builder = new LaunchTabBuilder(this);
 			builder.build(control);

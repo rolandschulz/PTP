@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 import java.util.Map;
 
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
@@ -30,6 +31,12 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	boolean getAppendEnv();
 
 	/**
+	 * 
+	 * @return resource manager environment
+	 */
+	RMVariableMap getEnvironment();
+
+	/**
 	 * @return the user-defined environment (from the Environment Tab)
 	 */
 	Map<String, String> getLaunchEnv();
@@ -39,4 +46,8 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	 */
 	RemoteServicesDelegate getRemoteServicesDelegate();
 
+	/**
+	 * @return state of resource manager
+	 */
+	String getState();
 }

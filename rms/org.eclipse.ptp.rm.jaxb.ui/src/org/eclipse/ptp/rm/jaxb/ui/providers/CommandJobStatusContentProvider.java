@@ -5,7 +5,7 @@
  * available at http://www.eclipse.org/legal/epl-v10.html 
  * 	
  * Contributors: 
- * 	Albert L. Rossi - modifications
+ * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.providers;
 
@@ -13,15 +13,15 @@ import java.util.Collection;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.ui.model.TableRowUpdateModel;
+import org.eclipse.ptp.rm.jaxb.ui.data.PersistentCommandJobStatus;
 
 /**
- * For Attribute Table Viewer.
+ * For JobList Table Viewer.
  * 
  * @author arossi
  * 
  */
-public class TableDataContentProvider implements IStructuredContentProvider {
+public class CommandJobStatusContentProvider implements IStructuredContentProvider {
 
 	public void dispose() {
 	}
@@ -37,7 +37,7 @@ public class TableDataContentProvider implements IStructuredContentProvider {
 	@SuppressWarnings("unchecked")
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof Collection<?>) {
-			Collection<TableRowUpdateModel> list = (Collection<TableRowUpdateModel>) inputElement;
+			Collection<PersistentCommandJobStatus> list = (Collection<PersistentCommandJobStatus>) inputElement;
 			return list.toArray();
 		}
 		return new Object[0];

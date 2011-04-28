@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.jaxb.core.runnable.command;
 import java.io.IOException;
 
 import org.eclipse.debug.core.model.IStreamMonitor;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJobRemoteOutputHandler;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
@@ -32,9 +33,12 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 
 	private ICommandJobStreamMonitor out;
 	private ICommandJobStreamMonitor err;
+	private ICommandJobRemoteOutputHandler outHandler;
+	private ICommandJobRemoteOutputHandler errHandler;
 
 	private boolean fClosed = false;
 	private boolean fStarted = false;
+	private boolean fFilesChecked = false;
 
 	/**
 	 * Closes both monitors.
@@ -73,6 +77,61 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 		return out;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#getRemoteErrorHandler()
+	 */
+	public ICommandJobRemoteOutputHandler getRemoteErrorHandler() {
+		return errHandler;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#getRemoteOutputHandler()
+	 */
+	public ICommandJobRemoteOutputHandler getRemoteOutputHandler() {
+		return outHandler;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy#maybeWaitForHandlerFiles
+	 * ()
+	 */
+	public void maybeWaitForHandlerFiles() {
+		if (fFilesChecked) {
+			return;
+		}
+		Thread tout = null;
+		Thread terr = null;
+		if (outHandler != null) {
+			tout = outHandler.checkForReady(true);
+
+		}
+		if (errHandler != null) {
+			terr = errHandler.checkForReady(true);
+		}
+		if (tout != null) {
+			try {
+				tout.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
+		if (terr != null) {
+			try {
+				terr.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
+		fFilesChecked = true;
+	}
+
 	/**
 	 * @param err
 	 *            monitor for error stream
@@ -87,6 +146,29 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 	 */
 	public void setOutMonitor(ICommandJobStreamMonitor out) {
 		this.out = out;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy#setRemoteErrorHandler
+	 * (org.eclipse.ptp.rm.jaxb.core.ICommandJobRemoteOutputHandler)
+	 */
+	public void setRemoteErrorHandler(ICommandJobRemoteOutputHandler errHandler) {
+		this.errHandler = errHandler;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy#setRemoteOutputHandler
+	 * (org.eclipse.ptp.rm.jaxb.core.ICommandJobRemoteOutputHandler)
+	 */
+	public void setRemoteOutputHandler(ICommandJobRemoteOutputHandler outHandler) {
+		this.outHandler = outHandler;
 	}
 
 	/**
