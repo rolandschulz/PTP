@@ -12,14 +12,10 @@
 	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-torque-generic">
 	<control-data>
 		<property name="queues" visible="false"/>
-		<!-- translate from PBS-specific attribute to generic property -->
-		<property name="stdout_remote_path" visible="false">
-			<default>${rm:Output_Path#value}</default>
-		</property>
-		<!-- translate from PBS-specific attribute to generic property -->
-		<property name="stderr_remote_path" visible="false">
-         <default>${rm:Error_Path#value}</default>
-      </property>
+		<!-- needed by RM internals for fetch -->
+		<property name="stdout_remote_path" visible="true"/>
+		<!-- needed by RM internals for fetch -->
+		<property name="stderr_remote_path" visible="true"/>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
