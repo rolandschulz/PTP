@@ -23,8 +23,9 @@
 
 <h2>Running the Happens Before Viewer</h2>
 <p>
-The Happens Before Viewer may be launched from within the <a href="analyzerView.html#hbviewer">Analyzer View</a> or
-on a log file directly; via context menus as shown in the image below:
+The Happens Before Viewer is actually an external tool and is launched from within the 
+<a href="analyzerView.html#hbviewer">Analyzer View</a> or on a pre-existing log file (generated 
+at runtime by GEM) directly. This is done via context menus as shown in the image below.
 </p>
 
 <p>
@@ -33,7 +34,7 @@ the top level of the current project.</i>
 </p>
 <ul>
     <li>
-        From the Analyzer View, simply click the <b>HB Viewer</b> button after the analyzer has been run.
+        From the Analyzer View, simply click the <b>HB Viewer</b> button after GEM has been run.
     </li>
     <li>
         From the Project Explorer window, right click on the generated log file
@@ -52,45 +53,49 @@ the top level of the current project.</i>
 <h2>Understanding What You See</h2><br>
 <ul>
     <li>
-        <b>Showing Interleaving:</b> indicates which interleaving is being shown and how many there are in total.
+        <b>Showing Interleaving:</b>&nbsp;&nbsp;indicates which interleaving is currently being shown and 
+        the total number of interleavings GEM examined.
     </li>
     <li>
-        <b>Deadlock:</b>Is either followed by <font COLOR="#00ff00">no </font>or <font COLOR="#ff0000">yes</font>,
-        and indicates if any of the interleavings has a deadlock.
+        <b>Deadlock:</b>&nbsp;&nbsp;Is either followed by <font COLOR="#00ff00">no </font>or 
+        <font COLOR="#ff0000">yes</font>, and indicates if any of the interleavings contain a deadlock.
     </li>
     <li>
-        <b>Red Bordered DEADLOCK</b> at the bottom of the window indicates that at this point the currently selected
+        <b>Red Bordered DEADLOCK:</b>&nbsp;&nbsp;At the bottom of the window indicates that at this point the currently selected
         interleaving is deadlocked. Calls above this will be issued and calls that would come afterward are not shown.
     </li>
     <li>
-        <b>Process[Number]:</b> This specifies which Process the calls below it belong to (Where Number is the number
+        <b>Process[Number]:</b>&nbsp;&nbsp;This specifies which Process the calls below it belong to (Where Number is the number
         of the process in question). The color of the border around this text is arbitrary and serves only to help
         the human eye distinguish the various columns and return to a column of interest more quickly.
     </li>
     <li>
-        <b>Blue Arrows:</b> show CB (Completes Before) edges that stay in the same process. A CB edge is a guarantee
-        that the source must complete before the destination. For example a Barrier will always have a CB edge
-        connecting it to the next call in the same process because the next call cannot complete before the barrier
-        is finished. It is important to note though that there is only a CB edge to each call blocked by the call in
+        <b>Blue Arrows:</b>&nbsp;&nbsp;Show CB (Completes Before) edges that connect intra-process MPI calls
+        (calls within the same MPI process). A CB edge is a guarantee that the source must complete before 
+        the destination. For example a Barrier will always have a CB edge connecting it to the next call in 
+        the same process because the next call cannot complete before the barrier is finished. It is 
+        important to note though that there is only a CB edge to each call blocked by the call in
         question. As an example lets imagine that a Barrier is followed by a second Barrier and then a Send. There
         is a CB edge between the first and second Barrier and between the second Barrier and the Send, but none
         between the first Barrier and the Send because it the second Barriers that directly blocks the send. The
-        CB edges are by default not shown, but 4.3 will show you how to make them appear.
+        CB edges are by default not shown, but the <a href="#changing">Changing What You See</a> section
+        below will show you how to make them appear.
     </li>
     <li>
-        <b>Red Arrows</b> show CB edges that connect calls of different processes.
+        <b>Red Arrows:</b>&nbsp;&nbsp;Show CB edges that connect inter-process MPI calls (calls between different processes).
     </li>
     <li>
-        <b>Black Arrows</b> connect calls that match. For example a Send will have a Black Arrow pointing to the
+        <b>Black Arrows:</b>&nbsp;&nbsp;Connect MPI calls that match. For example a Send will have a Black Arrow pointing to the
         Receive that picks up its message.
     </li>
     <li>
-        <b>Dotted Black Arrows</b> like solid Block Arrows these connect calls that match. The only difference
+        <b>Dotted Black Arrows:</b>&nbsp;&nbsp;Like solid Block Arrows these connect calls that match. The only difference
         is that these connect a Red Bordered call.
     </li>
     <li>
-        <b>Red Borders</b> indicates that this call is the source of a different interleaving. Or in other words
-        that what is currently being displayed is one potential match for the Red Bordered call, but that another
+        <b>Red Borders:</b>&nbsp;&nbsp;Indicates that this call is the source of a different interleaving and is
+        the cause of the non-determinism (most likely some type of Recv with an MPI_ANY_SOURCE). In other words 
+        what is currently being displayed is one potential match for the Red Bordered call, but that another 
         possible match exists and can be viewed by changing which interleaving is being shown.
     </li>
 </ul>
@@ -99,10 +104,7 @@ the top level of the current project.</i>
 <img alt="" src="images/hpv.png">
 <br><br>
 
-<h2>Changing What You See</h2>
-<p>
-To change which log file you are viewing you can click File -&gt; Open Trace and navigate to the desired file.
-</p>
+<h2><a name="changing">Changing What You See</a></h2>
 
 <ul>
     <li>
@@ -119,16 +121,28 @@ To change which log file you are viewing you can click File -&gt; Open Trace and
         To see the source file that generated the log click on “Show Source”.
     </li>
     <li>
-        To see only the Intra-process Completes-Before Edges (CBs for a given Processes right click that process and
-        select “ViewIntraCB”.<br><br>
+        To add Completes-Before (CB) Edges, there are several choices. 
+        For a given call, process or some subset of either (e.g. you can select all processes and all calls or 
+        some subset therein)
+        <ol>
+            <li>
+                right click the call and select either View InterCB, View IntraCB or View Both as desired.
+            </li>
+            <li>
+                Lastly you will need to indicate whether you want to view the edgesin: the <b>Root Window</b> 
+                or in a <b>Separate Window</b> (see images below). A separate window with IntraCB Edges is 
+                shown below.
+            </li>
+        </ol>
+        <img src="images/cbChoices.png"><br><br>
+        <br><br>
         <img src="images/process-intracb.png"><br><br>
     </li>
-    <li>
-        To add Completes-Before Edges (CBs) for a given call to the current window, right click the call and select either View
-        IntraCB, View InterCB, or View Both as desired. Lastly you will need to indicate whether you want to view
-        the results in the current window or in a new popup window.
-    </li>
 </ul>
+
+<p>
+You may also change which log file you are viewing by clicking: File -&gt; Open Trace and navigate to the desired file.
+</p>
 
 <p>&nbsp;</p>
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
