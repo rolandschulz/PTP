@@ -35,7 +35,7 @@
          point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
             class="org.eclipse.ptp.rm.slurm.ui.wizards.SLURMRMConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.slurm.resourceManager">
+            id="org.eclipse.ptp.rm.slurm.control">
       </configurationWizard>
    </extension>
 </plugin>

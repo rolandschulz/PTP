@@ -23,9 +23,6 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
  * command jobs.<br>
  * <br>
  * 
- * Note that for batch submissions the stream monitors will be attached to a
- * tail -f stream rather than the stream from the actual running process.
- * 
  * @author arossi
  */
 public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {

@@ -26,7 +26,7 @@
 <p>
 To help get the new GEM user started, this page will walk through examples of how to use GEM 
 to formally verify a MPI Managed-Build project as well as a larger MPI Makefile project. Please
-note that when we say <b>&#34;formally verify&#34;</b>, we mean <b>&#34;check for correctness&#34;</b>
+note that when we say <b>&#34;formally verify&#34;</b>, we mean <b>&#34;check the correctness&#34;</b>
 of your MPI application.
 </p>
 
@@ -40,14 +40,14 @@ For Example - GEM will check your MPI application for the presence of:
 </ul>
 
 <p>
-These errors and problems are <b>extremely difficult</b> to detect and find with traditional 
+Some of these errors and problems are <b>extremely difficult</b> to detect and find with traditional 
 debugging tools and practices.
 </p>
 
 <p>
 Remember that no code instrumentation is necessary. At compile time, GEM will link in its profiler library
 which takes care of everything for you automatically (using the PMPI mechanism). GEM offers push-button formal
-verification for MPI C/C++ applications.
+verification for MPI C/C++ applications. Fortran support is planned in the future.
 </p>
 
 <p>
@@ -62,12 +62,13 @@ and launch your MPI apps all from the comfort of the Eclipse IDE.
 <h2>Verifying a MPI <ins>Managed Build</ins> Project</h2>
 
 <h3>STEP - 1:&nbsp;&nbsp;&nbsp;Set the Number of Processes to Verify With</h3>
-This would be the same number of processes that you would run your MPI application with mpiexec or mpirun:<br/>
+This would be the same number of processes that you would run your MPI application with using mpiexec or mpirun:<br/>
 To do this, please consult the help page detailing <a href="setNumProcs.html">Setting the number of processes</a>
 
 <h3>STEP - 2:&nbsp;&nbsp;&nbsp;Specify Command Line Arguments</h3>
 
-Depending on whether or not the preference is set to collect command line arguments to pass to 
+Depending on whether or not the preference is set to collect command line arguments (please see the
+<a href="preferences.html#gemprefs">GEM Preference Page</a> for this) to pass to 
 your MPI application, a dialog may be opened prior to verification to collect this information.
 
 <br/><br/>
@@ -78,23 +79,29 @@ your MPI application, a dialog may be opened prior to verification to collect th
 <img src="images/comandLineArgsDialog.png">
 <br/><br/>
 
-<h3>STEP - 3:&nbsp;&nbsp;&nbsp;Choose the project to verify with GEM</h3>
-In this example, we&#39;ll verify the simple <b>MPI Pi C</b> project that you can create with the CDT New
+<h3>STEP - 3:&nbsp;&nbsp;&nbsp;Choose Project to Formally Verify</h3>
+In this example, we&#39;ll verify the simple <tt><b>MPI Pi C</b></tt> project that you can create with the CDT New
 MPI Project Wizard.<br/>
 <i>NOTE: GEM&#39;s views may not be visible at first, but will be opened when a verification run is started.</i><br/><br/>
 
 Your C/C++ perspective might look something like the image below (notice the <tt><b>Pi.c</b></tt> file open in the Eclipse editor).<br/><br/>
 <img src="images/gemPiExample.png">
 
+<h3><a name="rungem">Running GEM</a></h3>
 <p>
-When you formally verify an MPI C/C++ program, the Console, Browser and Analyzer Views will both be
+When you formally verify an MPI C/C++ application, the Console, Browser and Analyzer Views will both be
 opened and depending on what is specified in preferences, one of these views will be brought to the foreground
 and given the active focus.
 </p>
 
 <p>
-There are three initial ways to start GEM&#39;s verification process on your MPI application:
+There are three initial ways to start GEM&#39;s verification process on your MPI application. These three methods 
+are for smaller projects, e.g. the program entry point <tt><b>main</b></tt> and all of the MPI is in a single file.
 </p>
+
+<p>
+For using GEM on larger Makefile projects, please see the section below on
+<a href="#makefileproject">Verifying a MPI Makefile Build Project</a>.
 
 <ol>
     <li>
@@ -111,7 +118,7 @@ There are three initial ways to start GEM&#39;s verification process on your MPI
         from the GEM context menu (see image below).
     </li>
     <li>
-        Open the source code file in the Eclipse editor window, right click on the source file <tt><b>Pi.c</b></tt>
+        Open the source code file in the Eclipse editor window, right click on the <tt><b>Pi.c</b></tt>
         source code file in the editor window and select
         <img height="16" src="images/trident.gif" width="13" /><b>Formally Verify MPI Program</b>
         from the GEM context menu (see image below).
@@ -129,10 +136,10 @@ There are three initial ways to start GEM&#39;s verification process on your MPI
 </p>
 
 <p>
-Once verification starts you will see the three GEM Views open (the they aren&#39;t already). Terminal output will 
-be presented as it occurs in the Console View, <b>STDOUT</b> in black and <b>STDERR</b> in red. This output serves
+Once verification starts you will see the three GEM Views open (if they weren&#39;t already). Terminal output will 
+be posted as it occurs in the <a href="consoleView.html">Console View</a>, <b>STDOUT</b> in black and <b>STDERR</b> in red. This output serves
 to inform the user of forward progress, a status bar of sorts, as there is now way to determine exactly how long a 
-verification run will take (hence no Progress Monitor).
+verification run will take (hence no actual Progress Monitor object).
 </p>
 
 <img src="images/gemConsole.png">
@@ -141,8 +148,8 @@ verification run will take (hence no Progress Monitor).
 <ol>
 	<li>
 		The <b>Analyzer View</b> will help you walk through the execution of your MPI application
-		and understand the MPI runtime as GEM is a dynamic formal verification tool and tracks the actual events 
-		as they occurred at runtime.
+		and understand MPI runtime behavior. GEM is a dynamic formal verification tool and tracks the actual events 
+		e.g. p2p send-recv matches as they occurred at runtime.
 		<br/><br/>
 		For detailed coverage of the <b>Analyzer View</b> and how to use it, please refer to the
 		 <a href="analyzerView.html"><b>Analyzer View Documentation</b></a>.
@@ -152,7 +159,7 @@ verification run will take (hence no Progress Monitor).
 	</li>
 	<li>
 		The <b>Browser View</b> summarizes and categorically groups all of the errors and warnings found 
-		by GEM on a particular MPI verification run. The summary label (just above the tabs) gives the 
+		by GEM for a particular MPI verification run. The summary label (just above the tabs) gives the 
 		user a quick overview of problems found. Errors and warnings are mapped to the corresponding 
 		source code lines in the Eclipse editor. The Browser View's tabs help the user to quickly locate 
 		and fix MPI errors flagged by GEM in their source code.
@@ -172,7 +179,7 @@ verification run will take (hence no Progress Monitor).
 	</li>
 </ol>
 
-<h2>Verifying a MPI <ins>Makefile Build</ins> Project</h2>
+<h2><a name="makefileproject">Verifying a MPI <ins>Makefile Build</ins> Project</a></h2>
 
 The process for verifying a <b>Makefile</b> Project differs only slightly an is detailed in
 the <a href="makefileSupport.html"><b>Makefile Support Documentation</b></a>.

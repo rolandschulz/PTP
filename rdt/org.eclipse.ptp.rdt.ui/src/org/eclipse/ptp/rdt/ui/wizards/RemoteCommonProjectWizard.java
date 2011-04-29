@@ -395,7 +395,6 @@ public abstract class RemoteCommonProjectWizard extends BasicNewResourceWizard i
 				IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
 				RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
 				if (rbsp != null) {
-					rbsp.setRemoteToolsProviderID(remoteServices.getId());
 					rbsp.setRemoteToolsConnection(remoteConnection);
 					config.setServiceProvider(buildService, rbsp);
 				}

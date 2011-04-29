@@ -12,9 +12,10 @@
 	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-torque-generic">
 	<control-data>
 		<property name="queues" visible="false"/>
-		<property name="stdout_tailF" visible="false">
-			<default>${rm:directory#value}/${rm:@jobId#name}.ember.out</default>
-		</property>
+		<!-- needed by RM internals for fetch -->
+		<property name="stdout_remote_path" visible="true"/>
+		<!-- needed by RM internals for fetch -->
+		<property name="stderr_remote_path" visible="true"/>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
@@ -357,7 +358,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<arg resolve="false">if [ "-np" == "${MPI_ARGS}" ] ; then</arg>
 			</line>
 			<line>
-				<arg resolve="false">  MPI_ARGS=</arg>
+				<arg resolve="false"> MPI_ARGS=</arg>
 			</line>
 			<line>
 				<arg resolve="false">fi</arg>
@@ -369,38 +370,23 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<arg resolve="false">if [ -n "${COMMAND}" ] ; then</arg>
 			</line>
 			<line>
-				<arg resolve="false">  COMMAND="${COMMAND} ${MPI_ARGS}</arg>
+				<arg resolve="false"> COMMAND="${COMMAND} ${MPI_ARGS}</arg>
 				<arg>${rm:executablePath#value} ${rm:progArgs#value}"</arg>
 			</line>
 			<line>
 				<arg resolve="false">else</arg>
 			</line>
 			<line>
-				<arg>  COMMAND="${rm:executablePath#value} ${rm:progArgs#value}"</arg>
+				<arg> COMMAND="${rm:executablePath#value} ${rm:progArgs#value}"</arg>
 			</line>
 			<line>
 				<arg resolve="false">fi</arg>
-			</line>
-			<line>
-				<arg>STDOUT_TAIL_F=${rm:stdout_tailF#value}</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="cd">cd ${rm:directory#value}</arg>
 			</line>
 			<line>
-				<arg resolve="false">if [ -n "${STDOUT_TAIL_F}" ] ; then</arg>
-			</line>
-			<line>
-				<arg resolve="false">  ${COMMAND} &gt;&amp; ${PBS_JOBID}.out</arg>
-			</line>
-			<line>
-				<arg resolve="false">else</arg>
-			</line>
-			<line>
-				<arg resolve="false">  ${COMMAND}</arg>
-			</line>
-			<line>
-				<arg resolve="false">fi</arg>
+				<arg resolve="false">${COMMAND}</arg>
 			</line>
 			<line>
 				<arg resolve="false">touch DONE</arg>

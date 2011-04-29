@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+import org.eclipse.ptp.rmsystem.IJobStatus;
+
 /**
  * Gathers all internal, unmodifiable string constants into a single place for
  * convenience and the interest of uncluttered code.
@@ -23,7 +25,8 @@ public interface IJAXBNonNLSConstants {
 	int EOF = -1;
 	long MINUTE_IN_MS = 60 * 60 * 1000;
 	long VALIDATE_TIMER = 500;
-	long TAILF_PAUSE = 1000;
+	long READY_FILE_PAUSE = 1000;
+	int READY_FILE_BLOCK = 60;
 
 	/* CHARACTERS */
 	String LEN = "N";//$NON-NLS-1$
@@ -143,8 +146,6 @@ public interface IJAXBNonNLSConstants {
 	String SH = ".sh";//$NON-NLS-1$
 	String SETENV = "setenv";//$NON-NLS-1$
 	String EXPORT = "export";//$NON-NLS-1$
-	String STDOUT_TAIL_F = "stdout_tailF";//$NON-NLS-1$
-	String STDERR_TAIL_F = "stderr_tailF";//$NON-NLS-1$
 	String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";//$NON-NLS-1$
 
 	String RESOURCE_MANAGERS = "resourceManagers";//$NON-NLS-1$
@@ -182,7 +183,10 @@ public interface IJAXBNonNLSConstants {
 	String ATTRIBUTE = "attribute";//$NON-NLS-1$
 	String PROPERTY = "property";//$NON-NLS-1$
 	String QUEUES = "available_queues";//$NON-NLS-1$
-	String JOB_ID = "jobId";//$NON-NLS-1$
+	String JOB_ID = IJobStatus.JOB_ID;
+	String RM_ID = IJobStatus.RM_ID;
+	String STDOUT_REMOTE_FILE = IJobStatus.STDOUT_REMOTE_FILE;
+	String STDERR_REMOTE_FILE = IJobStatus.STDERR_REMOTE_FILE;
 	String EXEC_PATH = "executablePath";//$NON-NLS-1$
 	String PROG_ARGS = "progArgs";//$NON-NLS-1$
 	String DIRECTORY = "directory";//$NON-NLS-1$

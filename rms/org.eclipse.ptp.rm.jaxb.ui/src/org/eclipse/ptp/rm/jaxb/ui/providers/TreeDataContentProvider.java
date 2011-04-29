@@ -6,7 +6,6 @@
  * 	
  * Contributors: 
  * 	Albert L. Rossi - modifications
- *  M Venkataramana - original code: http://eclipse.dzone.com/users/venkat_r_m
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.providers;
 
