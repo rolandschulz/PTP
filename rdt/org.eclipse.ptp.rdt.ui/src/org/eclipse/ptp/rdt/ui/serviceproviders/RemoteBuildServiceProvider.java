@@ -191,6 +191,7 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 			name = connection.getName();
 		}
 		putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, name);
+		setRemoteToolsProviderID(connection.getRemoteServices().getId());
 	}
 
 	/**
@@ -199,7 +200,7 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	 * 
 	 * @param id
 	 */
-	public void setRemoteToolsProviderID(String id) {
+	protected void setRemoteToolsProviderID(String id) {
 		putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, id);
 	}
 

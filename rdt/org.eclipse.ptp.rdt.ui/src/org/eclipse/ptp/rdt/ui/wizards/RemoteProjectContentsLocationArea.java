@@ -471,9 +471,7 @@ public class RemoteProjectContentsLocationArea {
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
 	protected void okPressed() {
-
-		// set the provider
-		fProvider.setRemoteToolsProviderID(fSelectedProvider.getId());
+		// set the connection
 		fProvider.setRemoteToolsConnection(fSelectedConnection);
 
 	}
