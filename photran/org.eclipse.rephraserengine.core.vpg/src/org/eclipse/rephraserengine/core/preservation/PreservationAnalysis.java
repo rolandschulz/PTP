@@ -238,6 +238,13 @@ public final class PreservationAnalysis
         return replacements.toString();
     }
 
+    /** @since 3.0 */
+    public void logPostTransformTime(long milliseconds)
+    {
+        this.fields += SEPARATOR + "PostTransform"; //$NON-NLS-1$
+        this.times += SEPARATOR + milliseconds;
+    }
+
     public void checkForPreservation(
         RefactoringStatus status,
         IProgressMonitor progressMonitor, int ticks)
@@ -468,5 +475,5 @@ public final class PreservationAnalysis
         }
         in.close();
         return sb.toString();
-}
+    }
 }
