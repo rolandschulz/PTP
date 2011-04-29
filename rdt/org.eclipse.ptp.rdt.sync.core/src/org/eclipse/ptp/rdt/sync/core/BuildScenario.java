@@ -45,14 +45,26 @@ public class BuildScenario {
 		location = l;
 	}
 
+	/**
+	 * Get sync provider name
+	 * @return sync provider name
+	 */
 	public String getSyncProvider() {
 		return syncProvider;
 	}
 
+	/**
+	 * Get remote connection
+	 * @return remote connection
+	 */
 	public IRemoteConnection getRemoteConnection() {
 		return remoteConnection;
 	}
 
+	/**
+	 * Get location (directory)
+	 * @return location (directory)
+	 */
 	public String getLocation() {
 		return location;
 	}
