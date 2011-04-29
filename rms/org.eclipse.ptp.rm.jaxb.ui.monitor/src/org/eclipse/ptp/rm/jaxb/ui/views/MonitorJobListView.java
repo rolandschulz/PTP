@@ -9,11 +9,16 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.views;
 
+import java.io.BufferedInputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -30,6 +35,11 @@ import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBMonitorPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.data.JobStatusData;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
@@ -60,10 +70,20 @@ import org.eclipse.ui.progress.UIJob;
  * 
  */
 public class MonitorJobListView extends ViewPart implements IResourceManagerListener, IJobListener {
+	private static final int UNDEFINED = -1;
+	private static final int COPY_BUFFER_SIZE = 64 * 1024;
 
 	private TableViewer viewer;
 	private final Map<String, JobStatusData> jobs = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
 
+	/**
+	 * Exercises a control operation on the remote job.
+	 * 
+	 * @param job
+	 * @param autoStart
+	 * @param operation
+	 * @throws CoreException
+	 */
 	public void callDoControl(JobStatusData job, boolean autoStart, String operation) throws CoreException {
 		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
 		IResourceManagerControl control = rm.getControl();
@@ -103,6 +123,67 @@ public class MonitorJobListView extends ViewPart implements IResourceManagerList
 		Menu menu = contextMenu.createContextMenu(control);
 		control.setMenu(menu);
 		refresh();
+	}
+
+	/**
+	 * Fetches the remote stdout/stderr contents. This is functionality imported
+	 * from JAXB core to avoid dependencies.
+	 * 
+	 * @param rmId
+	 *            resource manager unique name
+	 * @param path
+	 *            of remote file.
+	 * @param autoStart
+	 *            start the resource manager if it is not started
+	 * @return contents of the file, or empty string if path is undefined.
+	 */
+	public String doRead(String rmId, String path, boolean autoStart) throws CoreException {
+
+		if (path == null) {
+			return JobStatusData.ZEROSTR;
+		}
+		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+		IResourceManagerControl control = rm.getControl();
+		if (checkControl(rm, control, autoStart)) {
+			String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
+			if (remoteServicesId != null) {
+				IProgressMonitor monitor = new NullProgressMonitor();
+				IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, monitor);
+				IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
+				String remoteConnectionName = control.getControlConfiguration().getConnectionName();
+				IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
+				IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
+				IFileStore lres = remoteFileManager.getResource(path);
+				BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE, monitor));
+				StringBuffer sb = new StringBuffer();
+				byte[] buffer = new byte[COPY_BUFFER_SIZE];
+				int rcvd = 0;
+				try {
+					while (true) {
+						try {
+							rcvd = is.read(buffer, 0, COPY_BUFFER_SIZE);
+						} catch (EOFException eof) {
+							break;
+						}
+
+						if (rcvd == UNDEFINED) {
+							break;
+						}
+						sb.append(new String(buffer, 0, rcvd));
+					}
+				} catch (IOException ioe) {
+					throw new CoreException(new Status(IStatus.ERROR, JAXBMonitorPlugin.PLUGIN_ID, ioe.getMessage(), ioe));
+				} finally {
+					try {
+						is.close();
+					} catch (IOException ioe) {
+						JAXBMonitorPlugin.log(ioe);
+					}
+				}
+				return sb.toString();
+			}
+		}
+		return JobStatusData.ZEROSTR;
 	}
 
 	public TableViewer getViewer() {

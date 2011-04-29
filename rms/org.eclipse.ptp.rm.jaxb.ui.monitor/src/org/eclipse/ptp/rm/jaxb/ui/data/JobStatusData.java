@@ -52,8 +52,8 @@ public class JobStatusData {
 		outputPath = status.getOutputPath();
 		errorPath = status.getErrorPath();
 		interactive = status.isInteractive();
-		outReady = false;
-		errReady = false;
+		outReady = outputPath != null && IJobStatus.JOB_OUTERR_READY.equals(stateDetail);
+		errReady = errorPath != null && IJobStatus.JOB_OUTERR_READY.equals(stateDetail);
 	}
 
 	/**
@@ -70,8 +70,8 @@ public class JobStatusData {
 		outputPath = memento.getString(IJobStatus.STDOUT_REMOTE_FILE);
 		errorPath = memento.getString(IJobStatus.STDERR_REMOTE_FILE);
 		interactive = memento.getBoolean(IJobStatus.INTERACTIVE);
-		outReady = false;
-		errReady = false;
+		outReady = outputPath != null && IJobStatus.JOB_OUTERR_READY.equals(stateDetail);
+		errReady = errorPath != null && IJobStatus.JOB_OUTERR_READY.equals(stateDetail);
 	}
 
 	/**

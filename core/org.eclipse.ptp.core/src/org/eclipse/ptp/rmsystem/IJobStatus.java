@@ -149,16 +149,6 @@ public interface IJobStatus {
 	String getErrorPath();
 
 	/**
-	 * @return contents of file
-	 */
-	String getJobError();
-
-	/**
-	 * @return contents of file
-	 */
-	String getJobOutput();
-
-	/**
 	 * @return path to remote file
 	 */
 	String getOutputPath();

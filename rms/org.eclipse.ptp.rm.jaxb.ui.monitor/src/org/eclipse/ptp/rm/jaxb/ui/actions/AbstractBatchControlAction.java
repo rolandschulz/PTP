@@ -16,7 +16,8 @@ import org.eclipse.ptp.rm.jaxb.ui.data.JobStatusData;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 
 /**
- * Base class for actions on the job status object.
+ * Base class for actions on the job status object which initiate a batch
+ * control operation.
  * 
  * @author arossi
  * 

@@ -11,14 +11,15 @@ package org.eclipse.ptp.rm.jaxb.ui.actions;
 
 import java.io.IOException;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.rm.jaxb.ui.data.JobStatusData;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.views.MonitorJobListView;
 import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
@@ -26,7 +27,8 @@ import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 
 /**
- * Base class for actions on the job status object.
+ * Base class for actions on the job status object which read remote file output
+ * to a console.
  * 
  * @author arossi
  * 
@@ -34,7 +36,7 @@ import org.eclipse.ui.console.IOConsoleOutputStream;
 public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	protected boolean error;
 	protected JobStatusData status;
-	protected IViewPart view;
+	protected MonitorJobListView view;
 
 	/*
 	 * (non-Javadoc)
@@ -43,19 +45,22 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	 */
 	public void run(IAction action) {
 		if (status != null) {
-			String contents = getContents();
-			IOConsole console = new IOConsole(getPath(), null);
-			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
-			console.activate();
-			IOConsoleOutputStream stream = console.newOutputStream();
+			IOConsoleOutputStream stream = null;
 			try {
+				String contents = getContents();
+				IOConsole console = new IOConsole(getPath(), null);
+				ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
+				console.activate();
+				stream = console.newOutputStream();
 				stream.write(contents.getBytes());
-			} catch (IOException t) {
+			} catch (Throwable t) {
 				MessageDialog.openError(view.getSite().getShell(), Messages.ConsoleWriteError, t.getMessage());
 			} finally {
 				try {
-					stream.flush();
-					stream.close();
+					if (stream != null) {
+						stream.flush();
+						stream.close();
+					}
 				} catch (IOException t) {
 				}
 			}
@@ -91,17 +96,18 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	 * action.IAction, org.eclipse.ui.IWorkbenchPart)
 	 */
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		view = (IViewPart) targetPart;
+		view = (MonitorJobListView) targetPart;
 	}
 
 	/**
 	 * @return correct file contents
+	 * @throws CoreException
 	 */
-	protected String getContents() {
+	protected String getContents() throws CoreException {
 		if (error) {
-			return status.getStatus().getJobError();
+			return view.doRead(status.getRmId(), status.getErrorPath(), true);
 		}
-		return status.getStatus().getJobOutput();
+		return view.doRead(status.getRmId(), status.getOutputPath(), true);
 	}
 
 	/**
