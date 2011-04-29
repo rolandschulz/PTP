@@ -347,7 +347,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		fEditMode = true;
 		IServiceProvider provider = (IServiceProvider) rm.getConfiguration().getAdapter(IServiceProvider.class);
 		fServiceProvider = provider.copy();
-		fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(fServiceProvider);
+		fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(provider);
 		setWizardPages(fServiceProvider);
 	}
 
@@ -471,8 +471,8 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			IServiceConfiguration config = fServiceModelManager.newServiceConfiguration(fResourceManagerPage.getRMName());
 			config.setServiceProvider(fLaunchService, (IServiceProvider) getBaseConfiguration().getAdapter(IServiceProvider.class));
 			fServiceModelManager.addConfiguration(config);
-		} else {
-			fServiceProvider.save();
+			// } else {
+			// fServiceProvider.save();
 		}
 		return true;
 	}

@@ -15,9 +15,11 @@ import java.io.EOFException;
 import java.io.IOException;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
@@ -46,7 +48,7 @@ public class FileUtils implements IJAXBNonNLSConstants {
 	 * @param progress
 	 * @throws CoreException
 	 */
-	public static void copy(IRemoteFileManager from, String source, IRemoteFileManager to, String target, SubMonitor progress)
+	public static void copy(IRemoteFileManager from, String source, IRemoteFileManager to, String target, IProgressMonitor progress)
 			throws CoreException {
 		if (from == null) {
 			throw CoreExceptionUtils.newException(Messages.Copy_Operation_NullSourceFileManager, null);
@@ -62,12 +64,50 @@ public class FileUtils implements IJAXBNonNLSConstants {
 		}
 
 		IFileStore lres = from.getResource(source);
-		if (!lres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
+		if (!lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5)).exists()) {
 			throw CoreExceptionUtils.newException(Messages.Copy_Operation_Local_resource_does_not_exist + CO + SP + lres.getName(),
 					null);
 		}
 		IFileStore rres = to.getResource(target);
-		lres.copy(rres, EFS.OVERWRITE, progress.newChild(5));
+		lres.copy(rres, EFS.OVERWRITE, new SubProgressMonitor(progress, 5));
+	}
+
+	/**
+	 * Checks for existence of file. If it does exist, tests to see if it is
+	 * stable by checking size after the given timeout.
+	 * 
+	 * @param manager
+	 *            for resource where file is located
+	 * @param path
+	 *            of file
+	 * @param intervalInSecs
+	 *            time after which to check size of file again
+	 * @param progress
+	 * @return true if file exists and is not being written to over the given
+	 *         interval.
+	 */
+	public static boolean isStable(IRemoteFileManager manager, String path, int intervalInSecs, IProgressMonitor progress)
+			throws CoreException {
+		if (manager == null) {
+			throw CoreExceptionUtils.newException(Messages.Read_Operation_NullSourceFileManager, null);
+		}
+		if (path == null) {
+			throw CoreExceptionUtils.newException(Messages.Read_Operation_NullPath, null);
+		}
+
+		IFileStore lres = manager.getResource(path);
+		IFileInfo info = lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5));
+		if (!info.exists()) {
+			return false;
+		}
+		long l0 = info.getLength();
+		try {
+			Thread.sleep(1000 * intervalInSecs);
+		} catch (InterruptedException ignored) {
+		}
+		info = lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5));
+		long l1 = info.getLength();
+		return l0 == l1;
 	}
 
 	/**
@@ -79,7 +119,7 @@ public class FileUtils implements IJAXBNonNLSConstants {
 	 * @return contents of file
 	 * @throws CoreException
 	 */
-	public static String read(IRemoteFileManager manager, String path, SubMonitor progress) throws CoreException {
+	public static String read(IRemoteFileManager manager, String path, IProgressMonitor progress) throws CoreException {
 		if (manager == null) {
 			throw CoreExceptionUtils.newException(Messages.Read_Operation_NullSourceFileManager, null);
 		}
@@ -88,6 +128,9 @@ public class FileUtils implements IJAXBNonNLSConstants {
 		}
 
 		IFileStore lres = manager.getResource(path);
+		if (!lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5)).exists()) {
+			throw CoreExceptionUtils.newException(Messages.Read_Operation_resource_does_not_exist + CO + SP + lres.getName(), null);
+		}
 		BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE, progress));
 		StringBuffer sb = new StringBuffer();
 		byte[] buffer = new byte[COPY_BUFFER_SIZE];
@@ -128,7 +171,8 @@ public class FileUtils implements IJAXBNonNLSConstants {
 	 * @param progress
 	 * @throws CoreException
 	 */
-	public static void write(IRemoteFileManager manager, String path, String contents, SubMonitor progress) throws CoreException {
+	public static void write(IRemoteFileManager manager, String path, String contents, IProgressMonitor progress)
+			throws CoreException {
 		if (contents == null) {
 			return;
 		}

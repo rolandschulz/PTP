@@ -22,6 +22,7 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
@@ -76,6 +77,16 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	private static final FontRegistry fonts = new FontRegistry();
 
 	private WidgetBuilderUtils() {
+	}
+
+	public static TableColumn addTableColumn(final TableViewer viewer, String columnName, int style, int width,
+			final SelectionAdapter s) {
+		Table t = viewer.getTable();
+		TableColumn c = new TableColumn(t, style);
+		c.setText(columnName);
+		c.setWidth(width);
+		c.addSelectionListener(s);
+		return c;
 	}
 
 	/**

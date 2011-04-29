@@ -8,11 +8,15 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     QNX Software System
- *     Sergey Prigogin, Google - https://bugs.eclipse.org/bugs/show_bug.cgi?id=13221
+ *     Sergey Prigogin (Google) - https://bugs.eclipse.org/bugs/show_bug.cgi?id=13221
  *     Ed Swartz (Nokia)
  *     Anton Leherbauer (Wind River Systems)
  *******************************************************************************/
-
+/* -- ST-Origin --
+ * Source folder: org.eclipse.cdt.ui/src
+ * Class: org.eclipse.cdt.internal.ui.editor.OpenIncludeAction
+ * Version: 1.37
+ */
 package org.eclipse.ptp.internal.rdt.ui.editor;
 
 import java.io.File;
@@ -36,6 +40,7 @@ import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.cdt.utils.PathUtil;
+import org.eclipse.cdt.utils.UNCPathConverter;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
@@ -53,6 +58,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.rdt.core.RDTLog;
+import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 
@@ -96,9 +102,17 @@ public class OpenIncludeAction extends
 			String fullFileName= include.getFullFileName(); //the full path, if there is one
 			
 			if (fullFileName != null) {
-				IPath fullPath= new Path(fullFileName);
+				IPath fullPath = new Path(fullFileName);
 				if (fullPath.isAbsolute() && fullPath.toFile().exists()) { //local
-					filesFound.add(fullPath.toFile().toURI());
+					//Bug 343648 - Remote project outline displays header file from local host
+					if (!RemoteNature.hasRemoteNature(include.getCProject().getProject())) {
+						filesFound.add(fullPath.toFile().toURI());
+					}
+				} else if (fullPath.isUNC()) {
+					IFileStore store = EFS.getStore(UNCPathConverter.getInstance().toURI(fullPath));
+					if (store.fetchInfo().exists()) {
+						filesFound.add(fullPath.toFile().toURI());
+					}
 				}
 				if (filesFound.isEmpty()) {
 					//remote: get host information and try again
@@ -186,10 +200,7 @@ public class OpenIncludeAction extends
 			CUIPlugin.log(e.getStatus());
 		}
 	}
-	
-	/**
-	 * 
-	 */
+
 	private void noElementsFound() {
 		MessageBox errorMsg = new MessageBox(CUIPlugin.getActiveWorkbenchShell(), SWT.ICON_ERROR | SWT.OK);
 		errorMsg.setText(CUIPlugin.getResourceString("OpenIncludeAction.error")); //$NON-NLS-1$
@@ -231,7 +242,7 @@ public class OpenIncludeAction extends
 		// in case it is an absolute path and it's local
 		IPath includeFile= new Path(name);		
 		if (includeFile.isAbsolute()) {
-			includeFile = PathUtil.getCanonicalPath(includeFile);
+			includeFile = PathUtil.getCanonicalPathWindows(includeFile);
 			if (includeFile.toFile().exists()) {
 				list.add(includeFile.toFile().toURI());
 				return;
@@ -239,7 +250,7 @@ public class OpenIncludeAction extends
 		}
 		HashSet<IPath> foundSet = new HashSet<IPath>();
 		for (String includePath : includePaths) {
-			IPath path = PathUtil.getCanonicalPath(new Path(includePath).append(includeFile));
+			IPath path = PathUtil.getCanonicalPathWindows(new Path(includePath).append(includeFile));
 			//local case:
 			File file = path.toFile();
 			if (file.exists()) {
@@ -316,5 +327,4 @@ public class OpenIncludeAction extends
 			return null;
 		}
 	}
-
 }

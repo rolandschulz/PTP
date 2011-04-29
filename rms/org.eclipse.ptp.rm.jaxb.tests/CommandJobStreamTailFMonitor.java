@@ -41,6 +41,8 @@ public class CommandJobStreamTailFMonitor extends CommandJobStreamMonitor {
 	 * 
 	 * @param rm
 	 *            resource manager providing remote service
+	 * @param rmVarMap
+	 *            current environment
 	 * @param remoteFilePath
 	 *            of the file to be monitored
 	 */
@@ -53,6 +55,8 @@ public class CommandJobStreamTailFMonitor extends CommandJobStreamMonitor {
 	 * 
 	 * @param rm
 	 *            resource manager providing remote service
+	 * @param rmVarMap
+	 *            current environment
 	 * @param remoteFilePath
 	 *            of the file to be monitored
 	 * @param encoding
@@ -79,6 +83,13 @@ public class CommandJobStreamTailFMonitor extends CommandJobStreamMonitor {
 			process.destroy();
 		}
 		super.close();
+	}
+
+	/**
+	 * @return path to the output file
+	 */
+	public String getRemoteFilePath() {
+		return remoteFilePath;
 	}
 
 	/*

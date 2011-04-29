@@ -21,60 +21,42 @@
 
 <hr>
 
-<h2>Activating the Browser View</h2>
+<h2>Using the Browser View</h2>
 <p>
-Before formally verifying an MPI C/C++ program, you need to set the number of processes
-for a particular run. Please refer to the <a href="setNumProcs.html">Setting the Number of Processes Page</a>.
-</p>
-
-<p>
-When you formally verify an MPI C/C++ program, the Browser View and the Analyzer View will both be
-opened and depending on what is specified in preferences, one of these views will be brought to the foreground
-and given the active focus.
+Before formally verifying an MPI C/C++ application, the number of processes needs to be set
+for the verification run. You will also need to know how to run GEM itself. The links below
+detail these processes:
 </p>
 
 <ul>
     <li>
-        Open the source code file in the Eclipse editor window and select
-        <img height="16" src="images/trident.gif" width="13" /><b>Formally Verify MPI Program</b>
-        from the trident pull-down icon on the Eclipse toolbar.
-        <br/><br/>
-		<center>
-		<img src="images/runVerify.png">
-		</center>
-		<br/>        
+        <a href="gettingStarted.html">Getting Started</a>
     </li>
     <li>
-        From the Project Explorer window, right click on the C source code file and select
-        <img height="16" src="images/trident.gif" width="13" /><b>Formally Verify MPI Program</b>
-        from the GEM context menu.
+        <a href="setNumProcs.html">Setting the Number of Processes</a>
     </li>
     <li>
-        Open the source code file in the Eclipse editor window, right click in the editor window and select
-        <img height="16" src="images/trident.gif" width="13" /><b>Formally Verify MPI Program</b>
-        from the GEM context menu.
-        <br/><br/>
-        <img src="images/sourceCodePopUp.png">
-        <br/><br/>        
+        <a href="gettingStarted.html#rungem">Running GEM</a>.
     </li>
 </ul>
+
+<p>
+When GEM has finished the verification of your MPI C/C++ application, the Console, Browser and Analyzer Views will all be
+opened and depending on what is specified in the <a href="preferences.html#gemprefs">GEM Preference Page</a>, 
+one of these views will be brought to the foreground and given the active focus.
+</p>
 
 <h2>Browser Overview</h2>
 <p>
 This highly functional view summarizes and categorically groups all of the errors and warnings found
-by GEM on a particular MPI verification run. The summary label (just above the tabs) gives the user a quick
+by GEM for a particular MPI verification run. The summary label (just above the tabs) gives the user a quick
 overview of problems found. Errors and warnings are mapped to the corresponding source code lines in 
-the Eclipse editor.  The Browser View&#39;s tabs help the user to quickly locate and fix MPI errors 
-flagged by GEM in their source code.
+the Eclipse editor. The Browser View&#39;s tabs help the user to quickly localize and fix MPI errors
+and warnings flagged by GEM within their source code.
 </p>
 
 <p>
-Below are listings of the errors and warnings summarized by GEM's Browser View, along with a more
-detailed descriptions. 
-</p>
-
-<p>
-<i>The image below shows what the Browser View should look like along with an explanation of its components.</i>
+<i>The image below shows what the Browser View might look like followed by an explanation of its components.</i>
 </p>
 
 <img src="images/browserIntegration.png" width="900" height="680"/>
@@ -82,30 +64,35 @@ detailed descriptions.
 <h2>Browser View Tabs</h2>
 
 <p>
-Below the GEM Browser summary label (the line above the tabs summarizing the errors and warnings found)
-is a section containing a tab for category of error or warning that was found in the
-code. By selecting a particular tab the user is given detailed information on each occurrence of that type of
-error or warning in their MPI code. Clicking on any of these occurrences takes the user to the offending 
-line in the source code within the Eclipse editor. If there are no instances of the problem then there is 
-a short message indicating as much. Furthermore, a user is shown which types of errors are presented via 
-the icons of the tab (see icons directly below).
+Below the GEM Browser View&#39;s summary label (the line above the tabs) is a section containing a tab for 
+each category of error or warning that was found by GEM at runtime. By selecting a particular tab, 
+the user is given detailed information on each occurrence of this error or warning in their MPI code. 
+Clicking on any of these occurrences takes the user to the offending line of source code within the Eclipse 
+editor. If there are no instances of the problem, then there is a short message indicating such. Furthermore, a 
+user is shown which types of errors are presented via the icons of the tab (see icons directly below).
 </p>
+
+<p>
+The following is a listing of all errors and warnings summarized by the GEM Browser View, 
+each with a detailed description. 
+</p>
+
 <ul>
 	<li>
 		<img src="images/no-error.gif">
-		Indicates that there are no instances of this particular type of problem.
+		Indicates that there are no instances of this particular error&#47;problem.
 	</li>
 	<li>
 		<img src="images/magnified-trident.gif">
-		Tells the user that this problem is present in their code.
+		Tells the user that this error&#47;problem is present in their code.
 	</li>
 </ul>
 
 <h3>Deadlocks Tab</h3>
-This tab allows the user to visit all of the calls that did not complete due to a detected deadlock.
+This tab allows the user to visit all calls that did not complete due to a detected deadlock.
 
 <h3>Assertion Violations Tab</h3>
-This tab list all local assertion violations found. CLicking any one of these will take the user to the line of 
+This tab lists all local assertion violations found. Clicking any one of these will take the user to the line of 
 source code with the failed assertion.
 
 <h3>Leaks Tab</h3>
@@ -114,8 +101,8 @@ resource was allocated (these are usually MPI communicators and MPI DataTypes).
 
 <h3>Irrelevant Barriers Tab</h3>
 This tab is reserved for Functionally Irrelevant Barriers. Clicking any these will take the user to the corresponding
-MPI_Barrier call itself, which can then be safely removed without changing the runtime behavior of the program.
-This could potentially serve to speed the application of in the absence of unnecessary synchronization.
+MPI_Barrier call itself, which can then be safely removed without changing the runtime behavior of the MPI application.
+This could potentially speed the application up with the absence of unnecessary synchronization.
 
 <h3>Type Mismatches Tab</h3>
 These are warnings about the send type not matching the receive type. 
@@ -131,31 +118,26 @@ processes and lets the user conveniently choose a new value for the next GEM run
 </p>
 
 <p>
-<img height="16" src="images/trident.gif" width="12" /> This will re-run GEM on the current MPI project. This is semantically
-equivalent to choosing &#34;Formally Verify MPI Program&#34; from the toolbar button drop-down and is provided for convenience.
+<img height="16" src="images/trident.gif" width="12" /> This will re-run GEM on the current MPI project. This is
+equivalent to choosing &#34;Formally Verify MPI Program&#34; from the toolbar button drop-down and is provided 
+for convenience.
 </p>
 
 <br/><br/>
 <hr/>
 
 <h2>Menu &#38; Toolbar Options</h2>
-<ul>
-	<li>
-		<img src="images/terminate.gif">
-		Terminate Operation - Forcibly terminates the current GEM operation
-	</li>
-	<li>
-		<img src="images/save-file.gif">
-		Save to File - Saves a listing of all results to a local text file.
-	</li>
-	<li>
-		<img src="images/help-contents.gif">
-		Get Browser Help - Opens the Eclipse help topic related to the Browser View page.
-	</li>
-</ul>
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/terminate.gif">
+Terminate Operation - Forcibly terminates the current GEM operation
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/save-file.gif">
+Save to File - Saves a listing of all results to a local text file.
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/help-contents.gif">
+Get Browser Help - Opens the Eclipse help topic related to the Browser View page.
 
 <p>
-<b>Note:</b> This same functionality can be obtained through the context and pull-down menus for the view.
+<b>Note:</b> This same functionality can be obtained through the Browser View context and pull-down menus.
 </p>
 
 <p>&nbsp;</p>

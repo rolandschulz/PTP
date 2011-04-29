@@ -353,6 +353,26 @@ public class SymbolTable<N, S>
                result = result.getNamedScope(scopeName);
         return result;
     }
+    
+    /**
+     * Returns the symbol table containing the given named scope.
+     * 
+     * @return the symbol table containing the given named scope,
+     *         or <code>null</code> iff no such named scope exists
+     * 
+     * @since 3.0
+     */
+    public SymbolTable<N, S> getStartingScope(String scopeName)
+    {
+        assert scopeName != null;
+
+        if (namedScopes != null && namedScopes.get(scopeName) != null)
+            return this;
+        else if (settings.resolveInOuterScopeIfLookupFails)
+            return parent.getStartingScope(scopeName);
+        else
+            return null;
+    }
 
     @Override public String toString()
     {

@@ -26,14 +26,6 @@ public interface ICommandJobStreamMonitor extends IStreamMonitor {
 	void close();
 
 	/**
-	 * Initialize file path from current env.
-	 * 
-	 * @param jobId
-	 *            from status
-	 */
-	void initializeFilePath(String jobId);
-
-	/**
 	 * Tune the monitor's buffer size
 	 * 
 	 * @param limit

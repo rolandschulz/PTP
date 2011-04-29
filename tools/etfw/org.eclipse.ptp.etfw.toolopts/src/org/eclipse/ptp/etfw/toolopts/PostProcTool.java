@@ -7,5 +7,6 @@ public class PostProcTool extends ExternalTool {
 	public ToolApp[] analysisCommands=null;
 	public boolean useDefaultLocation=false;
 	public String forAllLike=null;
+	public boolean useLatestFileOnly=true;
 	public int depth=-1;
 }

@@ -9,65 +9,89 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.runnable.command;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
-import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.utils.FileUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
 /**
  * Extension of the IJobStatus class to handle resource manager command jobs.
+ * Also handles availability notification for remote stdout and stderr files.
  * 
  * @author arossi
  * 
  */
 public class CommandJobStatus implements ICommandJobStatus {
 
+	private final String rmUniqueName;
+	private final IJAXBResourceManagerControl control;
+
 	private String jobId;
 	private ILaunchConfiguration launchConfig;
 	private String state;
 	private String stateDetail;
+	private String remoteOutputPath;
+	private String remoteErrorPath;
 	private ICommandJobStreamsProxy proxy;
 	private IRemoteProcess process;
-	private final RMVariableMap rmVarMap;
+
 	private boolean waitEnabled;
 	private long lastUpdateRequest;
+	private boolean dirty = false;
+	private boolean fFilesChecked = false;
 
-	public CommandJobStatus(RMVariableMap rmVarMap) {
-		jobId = null;
-		state = IJobStatus.UNDETERMINED;
-		this.rmVarMap = rmVarMap;
+	/**
+	 * @param rmUniqueName
+	 *            owner resource manager
+	 * @param control
+	 *            resource manager control
+	 */
+	public CommandJobStatus(String rmUniqueName, IJAXBResourceManagerControl control) {
+		this(rmUniqueName, null, UNDETERMINED, control);
+	}
+
+	/**
+	 * @param rmUniqueName
+	 *            owner resource manager
+	 * @param jobId
+	 * @param state
+	 * @param control
+	 *            resource manager control
+	 */
+	public CommandJobStatus(String rmUniqueName, String jobId, String state, IJAXBResourceManagerControl control) {
+		this.rmUniqueName = rmUniqueName;
+		this.jobId = jobId;
+		this.state = state;
+		this.control = control;
+		assert (null != control);
 		waitEnabled = true;
 		lastUpdateRequest = 0;
 	}
 
 	/**
-	 * @param jobId
-	 *            either internal UUID or resource-specific id
-	 * @param state
-	 */
-	public CommandJobStatus(String jobId, String state, RMVariableMap rmVarMap) {
-		this.jobId = jobId;
-		setState(state);
-		this.rmVarMap = rmVarMap;
-		waitEnabled = false;
-	}
-
-	/**
 	 * Closes the proxy and calls destroy on the process. Used for interactive
-	 * jobs cancellation.
+	 * job cancellation.
 	 */
-	public synchronized void cancel() {
-		if (proxy != null) {
-			proxy.close();
-		}
+	public synchronized boolean cancel() {
 		if (process != null) {
 			process.destroy();
+			if (proxy != null) {
+				proxy.close();
+			}
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -78,6 +102,24 @@ public class CommandJobStatus implements ICommandJobStatus {
 			waitEnabled = false;
 			notifyAll();
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#getControl()
+	 */
+	public IJAXBResourceManagerControl getControl() {
+		return control;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getErrorPath()
+	 */
+	public String getErrorPath() {
+		return remoteErrorPath;
 	}
 
 	/**
@@ -96,6 +138,23 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public ILaunchConfiguration getLaunchConfiguration() {
 		return launchConfig;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getOutputPath()
+	 */
+	public String getOutputPath() {
+		return remoteOutputPath;
+	}
+
+	/**
+	 * 
+	 * @return owner resource manager id
+	 */
+	public String getRmUniqueName() {
+		return rmUniqueName;
 	}
 
 	/**
@@ -120,6 +179,45 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return proxy;
 	}
 
+	/*
+	 * NOTE: since the script/job attribute defining this path is generated
+	 * prior to submission, @jobId cannot appear in the path; at the same time,
+	 * a batch variable replacement will not work, as that would not be
+	 * interpretable for the RM. One actually needs to configure two separate
+	 * strings in this case, giving one to the script and one to the resource
+	 * manager. We treat the path as requiring a possible substitution of the
+	 * jobId tag.
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#initialize(java.lang.String
+	 * )
+	 */
+	public void initialize(String jobId) {
+		this.jobId = jobId;
+		String path = null;
+		RMVariableMap rmVarMap = control.getEnvironment();
+		Object o = rmVarMap.get(STDOUT_REMOTE_FILE);
+		if (o != null) {
+			if (o instanceof PropertyType) {
+				path = (String) ((PropertyType) o).getValue();
+			} else if (o instanceof AttributeType) {
+				path = (String) ((PropertyType) o).getValue();
+			}
+			path = rmVarMap.getString(path);
+			remoteOutputPath = path.replaceAll(IJAXBNonNLSConstants.JOB_ID_TAG, jobId);
+		}
+		o = rmVarMap.get(STDERR_REMOTE_FILE);
+		if (o != null) {
+			if (o instanceof PropertyType) {
+				path = (String) ((PropertyType) o).getValue();
+			} else if (o instanceof AttributeType) {
+				path = (String) ((AttributeType) o).getValue();
+			}
+			path = rmVarMap.getString(path);
+			remoteErrorPath = path.replaceAll(IJAXBNonNLSConstants.JOB_ID_TAG, jobId);
+		}
+	}
+
 	/**
 	 * @return whether a process object has been attached to this status object
 	 *         (in which case the submission is not through an asynchronous job
@@ -127,6 +225,47 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public boolean isInteractive() {
 		return process != null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#maybeWaitForHandlerFiles
+	 * (int)
+	 */
+	public void maybeWaitForHandlerFiles(int blockForSecs) {
+		if (fFilesChecked) {
+			return;
+		}
+
+		Thread tout = null;
+		Thread terr = null;
+
+		if (remoteOutputPath != null) {
+			tout = checkForReady(remoteOutputPath, blockForSecs);
+
+		}
+
+		if (remoteErrorPath != null) {
+			terr = checkForReady(remoteErrorPath, blockForSecs);
+		}
+
+		if (tout != null) {
+			try {
+				tout.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
+
+		if (terr != null) {
+			try {
+				terr.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
+		setState(IJobStatus.JOB_OUTERR_READY);
+		fFilesChecked = true;
 	}
 
 	/**
@@ -146,10 +285,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
-	 * We also immediately dereference any paths associated withthe proxy
-	 * monitors by calling intialize, as the jobId property may not be in the
-	 * environment after this initial call returns. We also start the monitors
-	 * here, as tail -F will retry until the file appears.
+	 * We also immediately dereference any paths associated with the job by
+	 * calling intialize, as the jobId property may not be in the environment
+	 * after this initial call returns.
 	 * 
 	 * @param proxy
 	 *            Wrapper containing monitoring functionality for the associated
@@ -157,16 +295,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public void setProxy(ICommandJobStreamsProxy proxy) {
 		this.proxy = proxy;
-		ICommandJobStreamMonitor m = (ICommandJobStreamMonitor) proxy.getOutputStreamMonitor();
-		if (m != null) {
-			m.initializeFilePath(jobId);
-			m.startMonitoring();
-		}
-		m = (ICommandJobStreamMonitor) proxy.getErrorStreamMonitor();
-		if (m != null) {
-			m.initializeFilePath(jobId);
-			m.startMonitoring();
-		}
+		initialize(jobId);
 	}
 
 	/**
@@ -174,6 +303,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 *            of the job (not of the submission process).
 	 */
 	public synchronized void setState(String state) {
+		dirty = false;
+		String previousDetail = stateDetail;
 		if (UNDETERMINED.equals(state)) {
 			this.state = UNDETERMINED;
 			stateDetail = UNDETERMINED;
@@ -213,6 +344,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 		} else if (FAILED.equals(state)) {
 			this.state = COMPLETED;
 			stateDetail = FAILED;
+		} else if (JOB_OUTERR_READY.equals(state)) {
+			this.state = COMPLETED;
+			stateDetail = JOB_OUTERR_READY;
+		}
+		if (previousDetail == null || !previousDetail.equals(stateDetail)) {
+			dirty = true;
 		}
 	}
 
@@ -223,6 +360,17 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public synchronized void setUpdateRequestTime(long update) {
 		lastUpdateRequest = update;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#stateChanged()
+	 */
+	public boolean stateChanged() {
+		boolean changed = dirty;
+		dirty = false;
+		return changed;
 	}
 
 	/**
@@ -241,7 +389,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 					wait(1000);
 				} catch (InterruptedException ignored) {
 				}
-				PropertyType p = (PropertyType) rmVarMap.get(uuid);
+				RMVariableMap env = control.getEnvironment();
+				if (env == null) {
+					break;
+				}
+				PropertyType p = (PropertyType) env.get(uuid);
 				if (p != null) {
 					jobId = p.getName();
 					String v = (String) p.getValue();
@@ -252,5 +404,47 @@ public class CommandJobStatus implements ICommandJobStatus {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Checks for file existence, then waits 3 seconds to compare file length.
+	 * If block is false, the listeners may be notified that the file is still
+	 * not ready; else the listeners will receive a ready = true notification
+	 * when the file does finally stabilize. (non-Javadoc)
+	 * 
+	 * @param path
+	 * @param blockInSeconds
+	 * @return thread running the check
+	 */
+	private Thread checkForReady(final String path, final int block) {
+		Thread t = new Thread() {
+			@Override
+			public void run() {
+				boolean ready = false;
+				long timeout = block * 1000;
+				RemoteServicesDelegate d = control.getRemoteServicesDelegate();
+				long start = System.currentTimeMillis();
+				while (!ready) {
+					try {
+						ready = FileUtils.isStable(d.getRemoteFileManager(), path, 3, new NullProgressMonitor());
+					} catch (Throwable t) {
+						JAXBCorePlugin.log(t);
+					}
+
+					if (System.currentTimeMillis() - start >= timeout) {
+						break;
+					}
+
+					synchronized (this) {
+						try {
+							wait(IJAXBNonNLSConstants.READY_FILE_PAUSE);
+						} catch (InterruptedException ignored) {
+						}
+					}
+				}
+			}
+		};
+		t.start();
+		return t;
 	}
 }

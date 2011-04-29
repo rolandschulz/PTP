@@ -45,4 +45,5 @@ public interface ICommandJobStreamsProxy extends IStreamsProxy, IStreamsProxy2 {
 	 * Attaches monitor to stream and begins reading.
 	 */
 	void startMonitors();
+
 }
