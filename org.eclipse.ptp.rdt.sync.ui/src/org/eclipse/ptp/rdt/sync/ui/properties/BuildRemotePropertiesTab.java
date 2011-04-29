@@ -11,6 +11,7 @@ import org.eclipse.cdt.managedbuilder.ui.properties.AbstractCBuildPropertyTab;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
@@ -32,6 +33,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
+	// Button and label names
+	
 	public BuildRemotePropertiesTab() {
 		super();
 	}
@@ -68,7 +71,7 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 
 		// Label for "Provider:"
 		Label providerLabel = new Label(usercomp, SWT.LEFT);
-		providerLabel.setText("Remote Provider:"); //$NON-NLS-1$
+		providerLabel.setText(Messages.BRPTab_RemoteProviderLabel);
 
 		// combo for providers
 		fProviderCombo = new Combo(usercomp, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -85,7 +88,7 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 		// connection combo
 		// Label for "Connection:"
 		Label connectionLabel = new Label(usercomp, SWT.LEFT);
-		connectionLabel.setText("Connection:"); //$NON-NLS-1$
+		connectionLabel.setText(Messages.BRPTab_ConnectionLabel);
 
 		// combo for providers
 		fConnectionCombo = new Combo(usercomp, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -100,7 +103,7 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 
 		// new connection button
 		fNewConnectionButton = new Button(usercomp, SWT.PUSH);
-		fNewConnectionButton.setText("Connection: "); //$NON-NLS-1$
+		fNewConnectionButton.setText(Messages.BRPTab_ConnectionLabel);
 		fNewConnectionButton.setEnabled(false);
 		fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -115,7 +118,7 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 		});
 
 		Label rootLocationLabel = new Label(usercomp, SWT.LEFT);
-		rootLocationLabel.setText("Root Location:"); //$NON-NLS-1$
+		rootLocationLabel.setText(Messages.BRPTab_RootLocation);
 
 		fRootLocationText = new Text(usercomp, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -133,7 +136,7 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 
 		// new connection button
 		fBrowseButton = new Button(usercomp, SWT.PUSH);
-		fBrowseButton.setText("Browse:"); //$NON-NLS-1$
+		fBrowseButton.setText(Messages.BRPTab_BrowseButton);
 		fBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -161,7 +164,7 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 		
 		// Build subdirectory label and text box
 		Label buildLocationLabel = new Label(usercomp, SWT.LEFT);
-		buildLocationLabel.setText("Build Subdirectory:"); //$NON-NLS-1$
+		buildLocationLabel.setText(Messages.BRPTab_BuildSubdirLabel);
 
 		fBuildLocationText = new Text(usercomp, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
