@@ -91,6 +91,24 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getErrorPath()
+		 */
+		public String getErrorPath() {
+			return null;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getJobError()
+		 */
+		public String getJobError() {
+			return null;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getJobId()
 		 */
 		public String getJobId() {
@@ -100,10 +118,37 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getJobOutput()
+		 */
+		public String getJobOutput() {
+			return null;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getLaunchConfiguration()
 		 */
 		public ILaunchConfiguration getLaunchConfiguration() {
 			return fConfig;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getOutputPath()
+		 */
+		public String getOutputPath() {
+			return null;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getRmUniqueName()
+		 */
+		public String getRmUniqueName() {
+			return getResourceManager().getUniqueName();
 		}
 
 		/*
@@ -153,6 +198,15 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 			AbstractRuntimeResourceManagerMonitor monitor = (AbstractRuntimeResourceManagerMonitor) getResourceManager()
 					.getMonitor();
 			return monitor.getProxy(fJobId);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#isInteractive()
+		 */
+		public boolean isInteractive() {
+			return false;
 		}
 
 		private IPJob getJob() {
@@ -529,21 +583,6 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 				NLS.bind(Messages.AbstractRuntimeResourceManager_4, new Object[] { name, e.getErrorMessage() }));
 	}
 
-	private void cleanUp() {
-		/*
-		 * Cancel any pending job submissions.
-		 */
-		synchronized (jobSubmissions) {
-			for (JobSubmission sub : jobSubmissions.values()) {
-				sub.setStatus(JobSubStatus.CANCELLED);
-			}
-			jobSubmissions.clear();
-		}
-		synchronized (fJobStatus) {
-			fJobStatus.clear();
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -583,7 +622,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		synchronized (fJobStatus) {
 			return fJobStatus.get(jobId);
 		}
-	};
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -594,7 +633,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	protected void doShutdown() throws CoreException {
 		getRuntimeSystem().removeRuntimeEventListener(this);
 		cleanUp();
-	}
+	};
 
 	/*
 	 * (non-Javadoc)
@@ -684,5 +723,20 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 
 	protected IRuntimeSystem getRuntimeSystem() {
 		return getResourceManager().getRuntimeSystem();
+	}
+
+	private void cleanUp() {
+		/*
+		 * Cancel any pending job submissions.
+		 */
+		synchronized (jobSubmissions) {
+			for (JobSubmission sub : jobSubmissions.values()) {
+				sub.setStatus(JobSubStatus.CANCELLED);
+			}
+			jobSubmissions.clear();
+		}
+		synchronized (fJobStatus) {
+			fJobStatus.clear();
+		}
 	}
 }
