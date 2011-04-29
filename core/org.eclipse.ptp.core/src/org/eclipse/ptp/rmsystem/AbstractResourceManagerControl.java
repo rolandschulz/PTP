@@ -87,12 +87,32 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 		}
 		if (status == null) {
 			status = new IJobStatus() {
+				public String getErrorPath() {
+					return null;
+				}
+
+				public String getJobError() {
+					return null;
+				}
+
 				public String getJobId() {
+					return null;
+				}
+
+				public String getJobOutput() {
 					return null;
 				}
 
 				public ILaunchConfiguration getLaunchConfiguration() {
 					return null;
+				}
+
+				public String getOutputPath() {
+					return null;
+				}
+
+				public String getRmUniqueName() {
+					return getResourceManager().getUniqueName();
 				}
 
 				public String getState() {
@@ -105,6 +125,10 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 
 				public IStreamsProxy getStreamsProxy() {
 					return null;
+				}
+
+				public boolean isInteractive() {
+					return false;
 				}
 			};
 		}

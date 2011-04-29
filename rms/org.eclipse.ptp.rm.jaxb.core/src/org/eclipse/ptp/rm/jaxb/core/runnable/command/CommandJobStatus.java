@@ -9,22 +9,27 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.runnable.command;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.rm.jaxb.core.ICommandJobRemoteOutputHandler;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.FileUtils;
+import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IJobStatus;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * Extension of the IJobStatus class to handle resource manager command jobs.
+ * Also handles availability notification for remote stdout and stderr files.
  * 
  * @author arossi
  * 
@@ -38,99 +43,57 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private ILaunchConfiguration launchConfig;
 	private String state;
 	private String stateDetail;
+	private String remoteOutputPath;
+	private String remoteErrorPath;
 	private ICommandJobStreamsProxy proxy;
 	private IRemoteProcess process;
 
 	private boolean waitEnabled;
 	private long lastUpdateRequest;
+	private boolean dirty = false;
+	private boolean fFilesChecked = false;
 
 	/**
 	 * @param rmUniqueName
 	 *            owner resource manager
 	 * @param control
-	 *            current resource manager control
+	 *            resource manager control
 	 */
 	public CommandJobStatus(String rmUniqueName, IJAXBResourceManagerControl control) {
-		this.rmUniqueName = rmUniqueName;
-		jobId = null;
-		state = IJobStatus.UNDETERMINED;
-		this.control = control;
-		waitEnabled = true;
-		lastUpdateRequest = 0;
+		this(rmUniqueName, null, UNDETERMINED, control);
 	}
 
 	/**
 	 * @param rmUniqueName
 	 *            owner resource manager
 	 * @param jobId
-	 *            either internal UUID or resource-specific id
 	 * @param state
 	 * @param control
-	 *            current resource manager control
+	 *            resource manager control
 	 */
 	public CommandJobStatus(String rmUniqueName, String jobId, String state, IJAXBResourceManagerControl control) {
 		this.rmUniqueName = rmUniqueName;
 		this.jobId = jobId;
+		this.state = state;
 		this.control = control;
-		setState(state);
-		waitEnabled = false;
-	}
-
-	/**
-	 * Used when re-initializing from persistent memento. If either path is not
-	 * <code>null</code>, a proxy will be constructed and give the appropriate
-	 * remote file handlers.
-	 * 
-	 * @param rmUniqueName
-	 *            for obtaining the resource manager
-	 * @param jobId
-	 * @param stdoutPath
-	 * @param stderrPath
-	 */
-	public CommandJobStatus(String rmUniqueName, String jobId, String stdoutPath, String stderrPath) {
-		this.rmUniqueName = rmUniqueName;
-		this.jobId = jobId;
-		state = IJobStatus.UNDETERMINED;
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm != null && rm instanceof IJAXBResourceManager) {
-			IJAXBResourceManager jaxbRm = (IJAXBResourceManager) rm;
-			this.control = jaxbRm.getControl();
-		} else {
-			this.control = null;
-		}
+		assert (null != control);
 		waitEnabled = true;
 		lastUpdateRequest = 0;
-
-		ICommandJobRemoteOutputHandler out = null;
-		ICommandJobRemoteOutputHandler err = null;
-		if (stdoutPath != null) {
-			out = new CommandJobRemoteOutputHandler(control, stdoutPath);
-			out.initialize(jobId);
-		}
-
-		if (stderrPath != null) {
-			err = new CommandJobRemoteOutputHandler(control, stderrPath);
-			err.initialize(jobId);
-		}
-
-		if (out != null || err != null) {
-			proxy = new CommandJobStreamsProxy();
-			proxy.setRemoteOutputHandler(out);
-			proxy.setRemoteErrorHandler(err);
-		}
 	}
 
 	/**
 	 * Closes the proxy and calls destroy on the process. Used for interactive
 	 * job cancellation.
 	 */
-	public synchronized void cancel() {
-		if (proxy != null) {
-			proxy.close();
-		}
+	public synchronized boolean cancel() {
 		if (process != null) {
 			process.destroy();
+			if (proxy != null) {
+				proxy.close();
+			}
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -152,11 +115,38 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return control;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getErrorPath()
+	 */
+	public String getErrorPath() {
+		return remoteErrorPath;
+	}
+
+	/*
+	 * Calls {@link #getFileContents(String)} (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getJobError()
+	 */
+	public String getJobError() {
+		return getFileContents(remoteErrorPath);
+	}
+
 	/**
 	 * @return jobId either internal UUID or resource-specific id
 	 */
 	public synchronized String getJobId() {
 		return jobId;
+	}
+
+	/*
+	 * Calls {@link #getFileContents(String)} (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getJobOutput()
+	 */
+	public String getJobOutput() {
+		return getFileContents(remoteOutputPath);
 	}
 
 	public synchronized long getLastUpdateRequest() {
@@ -168,6 +158,15 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public ILaunchConfiguration getLaunchConfiguration() {
 		return launchConfig;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getOutputPath()
+	 */
+	public String getOutputPath() {
+		return remoteOutputPath;
 	}
 
 	/**
@@ -200,6 +199,45 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return proxy;
 	}
 
+	/*
+	 * NOTE: since the script/job attribute defining this path is generated
+	 * prior to submission, @jobId cannot appear in the path; at the same time,
+	 * a batch variable replacement will not work, as that would not be
+	 * interpretable for the RM. One actually needs to configure two separate
+	 * strings in this case, giving one to the script and one to the resource
+	 * manager. We treat the path as requiring a possible substitution of the
+	 * jobId tag.
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#initialize(java.lang.String
+	 * )
+	 */
+	public void initialize(String jobId) {
+		this.jobId = jobId;
+		String path = null;
+		RMVariableMap rmVarMap = control.getEnvironment();
+		Object o = rmVarMap.get(STDOUT_REMOTE_FILE);
+		if (o != null) {
+			if (o instanceof PropertyType) {
+				path = (String) ((PropertyType) o).getValue();
+			} else if (o instanceof AttributeType) {
+				path = (String) ((PropertyType) o).getValue();
+			}
+			path = rmVarMap.getString(path);
+			remoteOutputPath = path.replaceAll(IJAXBNonNLSConstants.JOB_ID_TAG, jobId);
+		}
+		o = rmVarMap.get(STDERR_REMOTE_FILE);
+		if (o != null) {
+			if (o instanceof PropertyType) {
+				path = (String) ((PropertyType) o).getValue();
+			} else if (o instanceof AttributeType) {
+				path = (String) ((AttributeType) o).getValue();
+			}
+			path = rmVarMap.getString(path);
+			remoteErrorPath = path.replaceAll(IJAXBNonNLSConstants.JOB_ID_TAG, jobId);
+		}
+	}
+
 	/**
 	 * @return whether a process object has been attached to this status object
 	 *         (in which case the submission is not through an asynchronous job
@@ -207,6 +245,47 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public boolean isInteractive() {
 		return process != null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#maybeWaitForHandlerFiles
+	 * (int)
+	 */
+	public void maybeWaitForHandlerFiles(int blockForSecs) {
+		if (fFilesChecked) {
+			return;
+		}
+
+		Thread tout = null;
+		Thread terr = null;
+
+		if (remoteOutputPath != null) {
+			tout = checkForReady(remoteOutputPath, blockForSecs);
+
+		}
+
+		if (remoteErrorPath != null) {
+			terr = checkForReady(remoteErrorPath, blockForSecs);
+		}
+
+		if (tout != null) {
+			try {
+				tout.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
+
+		if (terr != null) {
+			try {
+				terr.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
+		setState(IJobStatus.JOB_OUTERR_READY);
+		fFilesChecked = true;
 	}
 
 	/**
@@ -226,9 +305,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
-	 * We also immediately dereference any paths associated with the proxy
-	 * handlers by calling intialize, as the jobId property may not be in the
-	 * environment after this initial call returns.
+	 * We also immediately dereference any paths associated with the job by
+	 * calling intialize, as the jobId property may not be in the environment
+	 * after this initial call returns.
 	 * 
 	 * @param proxy
 	 *            Wrapper containing monitoring functionality for the associated
@@ -236,14 +315,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public void setProxy(ICommandJobStreamsProxy proxy) {
 		this.proxy = proxy;
-		ICommandJobRemoteOutputHandler handler = proxy.getRemoteOutputHandler();
-		if (handler != null) {
-			handler.initialize(jobId);
-		}
-		handler = proxy.getRemoteErrorHandler();
-		if (handler != null) {
-			handler.initialize(jobId);
-		}
+		initialize(jobId);
 	}
 
 	/**
@@ -251,6 +323,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 *            of the job (not of the submission process).
 	 */
 	public synchronized void setState(String state) {
+		dirty = false;
+		String previousDetail = stateDetail;
 		if (UNDETERMINED.equals(state)) {
 			this.state = UNDETERMINED;
 			stateDetail = UNDETERMINED;
@@ -290,6 +364,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 		} else if (FAILED.equals(state)) {
 			this.state = COMPLETED;
 			stateDetail = FAILED;
+		} else if (JOB_OUTERR_READY.equals(state)) {
+			this.state = COMPLETED;
+			stateDetail = JOB_OUTERR_READY;
+		}
+		if (previousDetail == null || !previousDetail.equals(stateDetail)) {
+			dirty = true;
 		}
 	}
 
@@ -300,6 +380,17 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public synchronized void setUpdateRequestTime(long update) {
 		lastUpdateRequest = update;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#stateChanged()
+	 */
+	public boolean stateChanged() {
+		boolean changed = dirty;
+		dirty = false;
+		return changed;
 	}
 
 	/**
@@ -333,5 +424,72 @@ public class CommandJobStatus implements ICommandJobStatus {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Checks for file existence, then waits 3 seconds to compare file length.
+	 * If block is false, the listeners may be notified that the file is still
+	 * not ready; else the listeners will receive a ready = true notification
+	 * when the file does finally stabilize. (non-Javadoc)
+	 * 
+	 * @param path
+	 * @param blockInSeconds
+	 * @return thread running the check
+	 */
+	private Thread checkForReady(final String path, final int block) {
+		Thread t = new Thread() {
+			@Override
+			public void run() {
+				boolean ready = false;
+				long timeout = block * 1000;
+				RemoteServicesDelegate d = control.getRemoteServicesDelegate();
+				long start = System.currentTimeMillis();
+				while (!ready) {
+					try {
+						ready = FileUtils.isStable(d.getRemoteFileManager(), path, 3, new NullProgressMonitor());
+					} catch (Throwable t) {
+						JAXBCorePlugin.log(t);
+					}
+
+					if (System.currentTimeMillis() - start >= timeout) {
+						break;
+					}
+
+					synchronized (this) {
+						try {
+							wait(IJAXBNonNLSConstants.READY_FILE_PAUSE);
+						} catch (InterruptedException ignored) {
+						}
+					}
+				}
+			}
+		};
+		t.start();
+		return t;
+	}
+
+	/**
+	 * Fetches the remote stdout/stderr contents.
+	 * 
+	 * @param path
+	 *            of remote file.
+	 * @return contents of the file, or <code>null</code> if path is undefined.
+	 */
+	private String getFileContents(String path) {
+		if (path == null) {
+			return IJAXBNonNLSConstants.ZEROSTR;
+		}
+
+		if (control == null) {
+			JAXBCorePlugin.log(CoreExceptionUtils.getErrorStatus(Messages.CommandJobNullMonitorStreamError, null));
+			return IJAXBNonNLSConstants.ZEROSTR;
+		}
+		RemoteServicesDelegate d = control.getRemoteServicesDelegate();
+		try {
+			return FileUtils.read(d.getRemoteFileManager(), path, new NullProgressMonitor());
+		} catch (Throwable t) {
+			JAXBCorePlugin.log(t);
+		}
+		return IJAXBNonNLSConstants.ZEROSTR;
 	}
 }

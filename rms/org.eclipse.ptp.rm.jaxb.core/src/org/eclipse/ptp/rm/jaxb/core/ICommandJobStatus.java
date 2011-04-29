@@ -33,7 +33,7 @@ public interface ICommandJobStatus extends IJobStatus {
 	/**
 	 * Cancel the Job process (if interactive).
 	 */
-	void cancel();
+	boolean cancel();
 
 	/**
 	 * Notify all waiting on the job id of its arrival.
@@ -48,14 +48,21 @@ public interface ICommandJobStatus extends IJobStatus {
 	long getLastUpdateRequest();
 
 	/**
-	 * @return owner resource manager id
+	 * Initialize remote file paths from current env.
+	 * 
+	 * @param jobId
+	 *            for the associated job
 	 */
-	String getRmUniqueName();
+	void initialize(String jobId);
 
 	/**
-	 * @return whether the associated Job was launched interactively or not.
+	 * If there are remote output files, runs the check and joins on those
+	 * threads.
+	 * 
+	 * @param blockForSecs
+	 *            will continue trying for this long before returning
 	 */
-	boolean isInteractive();
+	void maybeWaitForHandlerFiles(int blockForSecs);
 
 	/**
 	 * @param process
@@ -75,6 +82,11 @@ public interface ICommandJobStatus extends IJobStatus {
 	 *            resource
 	 */
 	void setUpdateRequestTime(long update);
+
+	/**
+	 * @return if the state has changed since the last check.
+	 */
+	boolean stateChanged();
 
 	/**
 	 * Do a monitor wait until the job id arrives.

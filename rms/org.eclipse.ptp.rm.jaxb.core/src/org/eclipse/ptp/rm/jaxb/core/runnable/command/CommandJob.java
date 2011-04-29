@@ -136,8 +136,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private InputStream tokenizerErr;
 	private StreamSplitter outSplitter;
 	private StreamSplitter errSplitter;
-	private String remoteOutPath;
-	private String remoteErrPath;
 	private final StringBuffer error;
 	private boolean active;
 
@@ -194,25 +192,6 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 */
 	public boolean isBatch() {
 		return batch;
-	}
-
-	/**
-	 * Used by stream proxy to read stderr from file if submission is batch.
-	 * 
-	 * @param remoteErrPath
-	 *            for stream redirection (batch submissions)
-	 */
-	public void setRemoteErrPath(String remoteErrPath) {
-		this.remoteErrPath = remoteErrPath;
-	}
-
-	/**
-	 * Used by stream proxy to read stdout from file if submission is batch.
-	 * 
-	 * @param remoteOutPath
-	 */
-	public void setRemoteOutPath(String remoteOutPath) {
-		this.remoteOutPath = remoteOutPath;
 	}
 
 	/**
@@ -430,19 +409,14 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Configures handling of the error stream. First sets a remote file handler
-	 * if the path is not <code>null</code>. If there is a tokenizer, the stream
-	 * is split between it and the proxy monitor. Otherwise, the proxy just gets
-	 * the stream.
+	 * Configures handling of the error stream. If there is a tokenizer, the
+	 * stream is split between it and the proxy monitor. Otherwise, the proxy
+	 * just gets the stream.
 	 * 
 	 * @param process
 	 * @throws IOException
 	 */
 	private void setErrStreamRedirection(IRemoteProcess process) throws IOException {
-		if (remoteErrPath != null) {
-			proxy.setRemoteErrorHandler(new CommandJobRemoteOutputHandler(rm, remoteErrPath));
-		}
-
 		if (stderrTokenizer == null) {
 			proxy.setErrMonitor(new CommandJobStreamMonitor(process.getErrorStream()));
 		} else {
@@ -455,19 +429,14 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Configures handling of the stdout stream. First sets a remote file
-	 * handler if the path is not <code>null</code>. If there is a tokenizer,
-	 * the stream is split between it and the proxy monitor. Otherwise, the
-	 * proxy just gets the stream.
+	 * Configures handling of the stdout stream. If there is a tokenizer, the
+	 * stream is split between it and the proxy monitor. Otherwise, the proxy
+	 * just gets the stream.
 	 * 
 	 * @param process
 	 * @throws IOException
 	 */
 	private void setOutStreamRedirection(IRemoteProcess process) throws IOException {
-		if (remoteOutPath != null) {
-			proxy.setRemoteOutputHandler(new CommandJobRemoteOutputHandler(rm, remoteOutPath));
-		}
-
 		if (stdoutTokenizer == null) {
 			proxy.setOutMonitor(new CommandJobStreamMonitor(process.getInputStream()));
 		} else {

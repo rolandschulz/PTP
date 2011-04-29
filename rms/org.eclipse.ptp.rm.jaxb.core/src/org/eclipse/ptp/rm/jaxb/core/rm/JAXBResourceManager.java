@@ -41,6 +41,14 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	}
 
 	/**
+	 * Expose this for internal use by the control.
+	 */
+	@Override
+	public void fireJobChanged(String jobId) {
+		super.fireJobChanged(jobId);
+	}
+
+	/**
 	 * @return the control manager associated with this base manager
 	 */
 	@Override
@@ -54,5 +62,4 @@ public final class JAXBResourceManager extends AbstractResourceManager implement
 	public IJAXBResourceManagerConfiguration getJAXBConfiguration() {
 		return (IJAXBResourceManagerConfiguration) getConfiguration();
 	}
-
 }
