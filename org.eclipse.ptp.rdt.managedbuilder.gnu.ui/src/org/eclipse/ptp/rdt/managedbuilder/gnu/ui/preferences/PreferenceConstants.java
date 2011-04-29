@@ -17,7 +17,7 @@ package org.eclipse.ptp.rdt.managedbuilder.gnu.ui.preferences;
  */
 public class PreferenceConstants {
 
-	public static final String P_GCC_COMPILER_ROOT = "GCC_compilerRoot"; //$NON-NLS-1$
+	public static final String P_GCC_COMPILER_ROOT = "XL_compilerRoot"; //$NON-NLS-1$
 
 	public static final String P_GCC_COMPILER_VERSION = "GCC_compilerVersion";  //$NON-NLS-1$
 		
