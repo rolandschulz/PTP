@@ -146,8 +146,9 @@ public class EnvironmentPlugin extends Plugin {
 	}
 
 	public TargetEnvironmentManager getTargetsManager() {
-		if (manager == null)
+		if (manager == null) {
 			manager = new TargetEnvironmentManager();
+		}
 		return manager;
 	}
 
@@ -165,7 +166,9 @@ public class EnvironmentPlugin extends Plugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		manager.writeToFile();
+		if (manager != null) {
+			manager.writeToFile();
+		}
 		plugin = null;
 	}
 
