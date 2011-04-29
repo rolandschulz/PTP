@@ -30,38 +30,36 @@ Projects as well as your Managed Build Projects.
 <h2>Makefile Modification Steps</h2>
 
 <p>
-The following are the necessary procedures to modify your CDT MPI Makefile Project so that it can be verified and
-analyzed by GEM. If you are creating a project from scratch, make sure to start with a new <b>Makefile Project</b>
+The following are the necessary steps to modify your CDT MPI Makefile Project so that it can be formally
+verified by GEM. If you are creating a project from scratch, make sure to start with a new <b>Makefile Project</b>
 and not a <b>Managed-Build Project</b>!
 </p>
 
 <ul>
     <li>
-        <b>
-        	Change the compiler to &#34;ispcc&#34; for C or &#34;ispCC&#34; for C++. These are wrappers for 
-        	&#34;mpicc&#34; and &#34;mpicxx&#34; that allow ISP's Profiler to intercept MPI calls at runtime.</b>
-        <pre>
-        # Which compiler to use
-        # CC = mpicc  &#60;-- comment this out
-        
-        # For MPI C applications
-        CC = ispcc    &#60;-- add this for C compilation (ispcc is a wrapper for mpicc)
-        
-        # For MPI C++ applications
-        CXX = ispCC   &#60;-- add this for C++ compilation (ispCC is a wrapper for mpicxx)
-        </pre>
+       	Change the compiler to <tt><b>ispcc</b></tt> for C or <tt><b>ispCC</b></tt> for C++. These are wrappers for 
+       	<tt><b>mpicc</b></tt> and <tt><b>mpicxx</b></tt> that allow GEM to intercept MPI calls at runtime with an
+       	interposition layer (the PMPI mechanism).
+	        <pre>
+	        # Which compiler to use
+	        # CC = mpicc  &#60;-- comment this out
+	        
+	        # For MPI C applications
+	        CC = ispcc    &#60;-- add this for C compilation (ispcc is a wrapper for mpicc)
+	        
+	        # For MPI C++ applications
+	        CXX = ispCC   &#60;-- add this for C++ compilation (ispCC is a wrapper for mpicxx)
+	        </pre>
     </li>
     <li>
-        <b>
-            GEM requires the fully qualified path to all source code in order to do the code analyzing. ISP itself uses
-            the __FILE__ and __LINE__ macros in generating a runtime log. Your Makefiles will have to pass the source files to
-            ispcc/ispCC (gcc/g++) at compile time in order to get that back in the same form. This is accomplished by the following being
-            added to your Makefiles
-        </b>
-        <pre>
-        SOURCEPATH = $(shell pwd)   # defining this will give the compiler the fully qualified path to each file encountered
-        $(CC) $(CFLAGS) -c $(SOURCEPATH)/$*.c   # add this to your build rules
-        </pre>
+        GEM requires the fully qualified path to all source code files in order to know how to locate errors
+        and problems in your code. ISP itself uses the <tt><b>__FILE__</b></tt> and <tt><b>__LINE__</b></tt>
+        macros in generating a runtime log. The modification below facilitates this by giving this information 
+        to ispcc/ispCC (gcc/g++) at compile time in order to get that back in the same form.
+	        <pre>
+	        SOURCEPATH = $(shell pwd)   # defining this will give the compiler the fully qualified path to each file encountered
+	        $(CC) $(CFLAGS) -c $(SOURCEPATH)/$*.c   # add this to your build rules
+	        </pre>
     </li>
     <li>
         <b>Change the extension of the generated executables to <i>".gem"</i></b>
@@ -119,8 +117,10 @@ and not a <b>Managed-Build Project</b>!
         </ul>
     </li>  
 </ul>
-<br/>
 
+<h4>That's it!</h4>
+
+<br/><br/>
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
 <br/><br/>
 
