@@ -1,5 +1,4 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +15,6 @@ import org.eclipse.ptp.services.core.ServiceProvider;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ui.IMemento;
 
 /**
  * A build service provider that does nothing.
@@ -27,30 +25,26 @@ import org.eclipse.ui.IMemento;
  * with the RDT team.
  * 
  * @author vkong
+ * @since 3.0
  *
  */
 public class NullBuildServiceProvider extends ServiceProvider implements IServiceProvider, IRemoteExecutionServiceProvider {
 	
 	public static final String ID = "org.eclipse.ptp.rdt.ui.NullBuildServiceProvider"; //$NON-NLS-1$
+
+
 	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.core.BuildService"; //$NON-NLS-1$
+
+
 	public static final String NAME = Messages.getString("NullBuildServiceProvider.name"); //$NON-NLS-1$
-
-
-	public String getConfigurationString() {
-		return Messages.getString("NullServiceProvider.config"); //$NON-NLS-1$
-	}
-
-
-	public boolean isConfigured() {
-		return true;
-	}
-
-
 	/**
 	 * @since 2.0
 	 */
 	public String getConfigLocation() {
 		return null;
+	}
+	public String getConfigurationString() {
+		return Messages.getString("NullServiceProvider.config"); //$NON-NLS-1$
 	}
 
 
@@ -67,6 +61,35 @@ public class NullBuildServiceProvider extends ServiceProvider implements IServic
 	 */
 	public IRemoteServices getRemoteServices() {
 		return null;
+	}
+
+
+	public boolean isConfigured() {
+		return true;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setConfigLocation(java.lang.String)
+	 */
+	/**
+	 * @since 3.0
+	 */
+	public void setConfigLocation(String configLocation) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 */
+	/**
+	 * @since 3.0
+	 */
+	public void setRemoteToolsConnection(IRemoteConnection connection) {
+		// TODO Auto-generated method stub
+		
 	}
 
 
