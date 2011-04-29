@@ -202,7 +202,8 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 		
 		// Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
 		// the BuildConfigurationManager relies on the data being up-to-date.
-		BuildScenario buildScenario = new BuildScenario("Git", fSelectedConnection, fRootLocationText.getText()); //$NON-NLS-1$
+		String syncProvider = BuildConfigurationManager.getBuildScenarioForBuildConfiguration(getCfg()).getSyncProvider();
+		BuildScenario buildScenario = new BuildScenario(syncProvider, fSelectedConnection, fRootLocationText.getText());
 		BuildConfigurationManager.setBuildScenarioForBuildConfiguration(buildScenario, getCfg());
 		try {
 			BuildConfigurationManager.saveConfigurationData();
