@@ -21,55 +21,74 @@
 
 <hr>
 
-<h2>Activating the Console View</h2>
+<h2>Using the Console View</h2>
 
 <p>
-The Console View is opened automatically when GEM is run. This allows the user to see progress as GEM runs and
-also gives the user a chance to cancel long running operations. Once a GEM verification run is complete, the
-view with the active focus will visible &#40;see the GEM <a href=preferences.html#gemPrefs>Preference Page</a>
-for details&#41;.
+Before formally verifying an MPI C/C++ application, the number of processes needs to be set
+for the verification run. You will also need to know how to run GEM itself. The links below
+detail these processes:
 </p>
 
+<ul>
+    <li>
+        <a href="gettingStarted.html">Getting Started</a>
+    </li>
+    <li>
+        <a href="setNumProcs.html">Setting the Number of Processes</a>
+    </li>
+    <li>
+        <a href="gettingStarted.html#rungem">Running GEM</a>.
+    </li>
+</ul>
+
 <h2>Console Overview</h2>
-The GEM Console view is dedicated console for viewing STDOUT &#38; STDERR from ISP itself. No other terminal data will 
-be present here. The STDOUT generated in the Console View will be useful to the advanced user, but in general, the
-Browser &#38; and Analyzer views exist to graphically examine this output as well as the generated trace file. 
-STDERR will be printed to the GEM Console in bold red.
+<p>
+When GEM has finished the verification of your MPI C/C++ application, the Console, Browser and 
+Analyzer Views will all be opened and depending on what is specified in the 
+<a href="preferences.html#gemprefs">GEM Preference Page</a>, one of these views will be 
+brought to the foreground and given the active focus.
+</p>
 
 <p>
 The Console View serves as an informal progress monitor while GEM is running &nbsp;&#8212;&nbsp;a status bar of sorts.
 The actual time to formally verify any MPI application is essentially unknown and hence no actual Progress Monitor object.
-It may be useful to see <b>STDOUT</b> &#38; <b>STDERR</b> in general (if it exists), to know when a verification run is 
-complete, as other GEM views will get active focus once verification is complete. The Console View also gives
-the user the opportunity to cancel stalled or long-running operations with the Eclipse standard cancel button
-<img src="images/terminate.gif"> .
+It may be useful to see <b>STDOUT</b> &#38; <b>STDERR</b> to know when a verification run is complete. The Console 
+View also gives the user the opportunity to cancel stalled or long-running operations with the standard Eclipse  
+cancel button <img src="images/terminate.gif">.
 </p>
 
 <h3>Understanding Output</h3>
-Please reference the <a href="output.html">Understanding GEM Output help page</a>.
+Please reference the <a href="output.html">Understanding GEM Console Output</a>  help page.
 
 <p>
-The image below shows what the Console View should look like.
+<i>The image below shows what the Console View might look like followed by an explanation of its components.</i>
 </p>
 
 <img src="images/consoleIntegration.png" width="800" height="607"/>
 
 <p>
-<b>Note:</b>&nbsp; On the <a href=preferences.html#gemPrefs>GEM Preference Page</a>, you can specify whether you want new output to 
-replace the older or if it should be appended to the existing terminal output.
+<b>Note:</b>&nbsp; On the <a href="preferences.html#gemprefs">GEM Preference Page</a>, you can specify whether you 
+want new output to replace the older, or if new output should be appended to the older output.
 </p>
 
-<h3>GEM Console View Options</h3>
-This view's toolbar has three buttons:<br><br>
-<img height="16" src="images/clear-console.gif" width="16">
-Clear Console - Removes all entries from the consoles, leaving it blank.<br>
-<img height="16" src="images/save-file.gif" width="16">
-Save Output to File - Launches a window that lets you save the current contents as a .txt file anywhere you want.<br>
-<img height="16" src="images/help-contents.gif" width="16">
+<br/><br/>
+<hr/>
+
+<h2>Menu &#38; Toolbar Options</h2>
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/terminate.gif">
+Terminate Operation - Forcibly terminates the current GEM operation
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img height="16" src="images/clear-console.gif" width="16">
+Clear Console - Removes all entries from the consoles, leaving it blank.
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img height="16" src="images/save-file.gif" width="16">
+Save Output to File - Launches a window that lets you save the current contents as a .txt file anywhere you want.
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img height="16" src="images/help-contents.gif" width="16">
 Get GEM Console Help - Opens the Eclipse help topic related to the GEM Console View.
 
 <p>
-<b>Note:</b> This same functionality can be obtained through the context and pull-down menus for the view.
+<b>Note:</b> This same functionality can be obtained through the Console View context and pull-down menus.
 </p>
 
 <p>&nbsp;</p>
