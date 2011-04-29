@@ -20,8 +20,6 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
-import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.FileUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -124,29 +122,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return remoteErrorPath;
 	}
 
-	/*
-	 * Calls {@link #getFileContents(String)} (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getJobError()
-	 */
-	public String getJobError() {
-		return getFileContents(remoteErrorPath);
-	}
-
 	/**
 	 * @return jobId either internal UUID or resource-specific id
 	 */
 	public synchronized String getJobId() {
 		return jobId;
-	}
-
-	/*
-	 * Calls {@link #getFileContents(String)} (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getJobOutput()
-	 */
-	public String getJobOutput() {
-		return getFileContents(remoteOutputPath);
 	}
 
 	public synchronized long getLastUpdateRequest() {
@@ -466,30 +446,5 @@ public class CommandJobStatus implements ICommandJobStatus {
 		};
 		t.start();
 		return t;
-	}
-
-	/**
-	 * Fetches the remote stdout/stderr contents.
-	 * 
-	 * @param path
-	 *            of remote file.
-	 * @return contents of the file, or <code>null</code> if path is undefined.
-	 */
-	private String getFileContents(String path) {
-		if (path == null) {
-			return IJAXBNonNLSConstants.ZEROSTR;
-		}
-
-		if (control == null) {
-			JAXBCorePlugin.log(CoreExceptionUtils.getErrorStatus(Messages.CommandJobNullMonitorStreamError, null));
-			return IJAXBNonNLSConstants.ZEROSTR;
-		}
-		RemoteServicesDelegate d = control.getRemoteServicesDelegate();
-		try {
-			return FileUtils.read(d.getRemoteFileManager(), path, new NullProgressMonitor());
-		} catch (Throwable t) {
-			JAXBCorePlugin.log(t);
-		}
-		return IJAXBNonNLSConstants.ZEROSTR;
 	}
 }
