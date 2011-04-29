@@ -38,6 +38,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.services.core.IRemoteServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -80,7 +81,7 @@ public class BuildConfigurationManager {
 	private static final String CONFIG_ID_ELEMENT_NAME = "config-id-to-build-scenario"; //$NON-NLS-1$
 	private static final String TEMPLATE_SERVICE_CONFIGURATION_ELEMENT_NAME = "template-service-configuration-element-name"; //$NON-NLS-1$
 	private static final String LOCAL_CONFIGURATION_NAME = "Workspace"; //$NON-NLS-1$
-	private static final String LOCAL_CONFIGURATION_DES = "Build in local Eclipse workspace"; //$NON-NLS-1$
+	private static final String LOCAL_CONFIGURATION_DES = Messages.BCM_WorkspaceConfigDes;
 
 	private static final Map<IProject, IServiceConfiguration> fProjectToTemplateConfigurationMap =
 													Collections.synchronizedMap(new HashMap<IProject, IServiceConfiguration>());
@@ -129,7 +130,7 @@ public class BuildConfigurationManager {
 	private static void deleteBuildScenario(IProject project, BuildScenario buildScenario) {
 		IServiceConfiguration oldConfig = fBuildScenarioToSConfigMap.get(buildScenario);
 		if (oldConfig == null) {
-			throw new RuntimeException("Unable to find service configuration for build scenario"); //$NON-NLS-1$
+			throw new RuntimeException(Messages.BCM_ScenarioToServiceConfigError);
 		}
 		fBuildScenarioToSConfigMap.remove(buildScenario);
 	}
@@ -148,7 +149,7 @@ public class BuildConfigurationManager {
 			throw new NullPointerException();
 		}
 		if (!(fProjectToTemplateConfigurationMap.containsKey(bconf.getOwner().getProject()))) {
-			throw new RuntimeException("Project configurations not yet initialized."); //$NON-NLS-1$
+			throw new RuntimeException(Messages.BCM_InitError);
 		}
 		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
 		return fBuildConfigToBuildScenarioMap.get(bconf.getId());
@@ -169,7 +170,7 @@ public class BuildConfigurationManager {
 			throw new NullPointerException();
 		}
 		if (!(fProjectToTemplateConfigurationMap.containsKey(bconf.getOwner().getProject()))) {
-			throw new RuntimeException("Project configurations not yet initialized."); //$NON-NLS-1$
+			throw new RuntimeException(Messages.BCM_InitError);
 		}
 		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
 		setBuildScenarioForBuildConfigurationInternal(bs, bconf);
@@ -203,7 +204,7 @@ public class BuildConfigurationManager {
 			throw new NullPointerException();
 		}
 		if (!(fProjectToTemplateConfigurationMap.containsKey(bconf.getOwner().getProject()))) {
-			throw new RuntimeException("Project configurations not yet initialized."); //$NON-NLS-1$
+			throw new RuntimeException(Messages.BCM_InitError);
 		}
 		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
 		BuildScenario bs = fBuildConfigToBuildScenarioMap.get(bconf.getId());
@@ -213,7 +214,7 @@ public class BuildConfigurationManager {
 		 
 		 IServiceConfiguration conf = fBuildScenarioToSConfigMap.get(bs);
 		 if (conf == null) {
-			 throw new RuntimeException("Unable to find a service configuration for the build scenario"); //$NON-NLS-1$
+			 throw new RuntimeException(Messages.BCM_ScenarioToServiceConfigError);
 		 }
 		 
 		 return conf;
@@ -239,7 +240,7 @@ public class BuildConfigurationManager {
 		IServiceConfiguration newConfig = ServiceModelManager.getInstance().newServiceConfiguration(""); //$NON-NLS-1$
 		IServiceConfiguration oldConfig = fProjectToTemplateConfigurationMap.get(project);
 		if (oldConfig == null) {
-			throw new RuntimeException("No template service configuration set for project " + project.getName()); //$NON-NLS-1$
+			throw new RuntimeException(Messages.BCM_TemplateError + project.getName());
 		}
 		
 		for (IService service : oldConfig.getServices()) {
@@ -253,9 +254,9 @@ public class BuildConfigurationManager {
 				newProvider.restoreState(oldProviderState);
 				newConfig.setServiceProvider(service, newProvider);
 			} catch (InstantiationException e) {
-				throw new RuntimeException("Cannot instantiate provider class: " + oldProvider.getClass()); //$NON-NLS-1$
+				throw new RuntimeException(Messages.BCM_ProviderError + oldProvider.getClass());
 			} catch (IllegalAccessException e) {
-				throw new RuntimeException("Cannot instantiate provider class: " + oldProvider.getClass()); //$NON-NLS-1$
+				throw new RuntimeException(Messages.BCM_ProviderError + oldProvider.getClass());
 			}
 		}
 		
@@ -289,7 +290,7 @@ public class BuildConfigurationManager {
 	private static void initializeOrUpdateConfigurations(IProject project, BuildScenario bs) {
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
-			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
+			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
 		}
 		
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
@@ -299,7 +300,7 @@ public class BuildConfigurationManager {
 				if (!(fBuildConfigToBuildScenarioMap.containsKey(config.getId()))) {
 					String parentConfig = findAncestorConfig(config.getId());
 					if (parentConfig == null) {
-						throw new RuntimeException("Failed to find an ancestor for build configuration " + config.getId()); //$NON-NLS-1$
+						throw new RuntimeException(Messages.BCM_AncestorError + config.getId());
 					}
 					setBuildScenarioForBuildConfigurationInternal(fBuildConfigToBuildScenarioMap.get(parentConfig), config);
 					
@@ -528,7 +529,7 @@ public class BuildConfigurationManager {
 			String projectName = configMemento.getString(ATTR_PROJECT);
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 			if (project == null) {
-				throw new RuntimeException("Project " + project + " not found in workspace while loading configuration"); //$NON-NLS-1$ //$NON-NLS-2$
+				throw new RuntimeException(Messages.BCM_ProjectError + project);
 			}
 			// Interface IServiceConfiguration cannot be used because of "addFormerServiceProvider" method.
 			ServiceConfiguration config = (ServiceConfiguration) smm.newServiceConfiguration(configName);
