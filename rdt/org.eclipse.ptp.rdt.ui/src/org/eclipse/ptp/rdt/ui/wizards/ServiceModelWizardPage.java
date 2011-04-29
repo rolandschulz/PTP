@@ -197,7 +197,6 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 				IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
 				RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
 				if (rbsp != null) {
-					rbsp.setRemoteToolsProviderID(remoteServices.getId());
 					rbsp.setRemoteToolsConnection(remoteConnection);
 					fNewConfig.setServiceProvider(buildService, rbsp);
 				}
