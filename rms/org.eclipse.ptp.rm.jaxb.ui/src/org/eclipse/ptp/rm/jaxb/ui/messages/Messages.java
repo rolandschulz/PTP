@@ -59,12 +59,15 @@ public class Messages extends NLS {
 
 	public static String ClearScript;
 	public static String BatchScriptPath;
+	public static String RemoteScriptPath;
 	public static String DefaultDynamicTab_title;
 	public static String ViewScript;
 	public static String ErrorOnLoadTitle;
 	public static String ErrorOnLoadFromStore;
 	public static String WidgetSelectedError;
 	public static String WidgetSelectedErrorTitle;
+	public static String ModifyErrorTitle;
+	public static String ModifyError;
 	public static String MissingLaunchConfigurationError;
 	public static String JAXBRMLaunchConfigurationFactory_wrongRMType;
 	public static String JAXBRMLaunchConfigurationFactory_doCreateError;
@@ -118,6 +121,10 @@ public class Messages extends NLS {
 
 	public static String RemoveJobWarning;
 	public static String CannotUndoOperation;
+
+	public static String EnableStdoutFetch;
+	public static String EnableStderrFetch;
+	public static String RemotePathTooltip;
 
 	static {
 		// initialize resource bundle
