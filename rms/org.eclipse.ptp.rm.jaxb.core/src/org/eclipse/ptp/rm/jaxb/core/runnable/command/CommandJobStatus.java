@@ -437,7 +437,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 
 					synchronized (this) {
 						try {
-							wait(IJAXBNonNLSConstants.READY_FILE_PAUSE);
+							wait(IJAXBNonNLSConstants.STANDARD_WAIT);
 						} catch (InterruptedException ignored) {
 						}
 					}

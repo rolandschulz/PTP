@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
@@ -53,7 +54,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  * @author arossi
  * 
  */
-public class CommandJob extends Job implements IJAXBNonNLSConstants {
+public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants {
 
 	/**
 	 * Internal class used for multiplexing output streams between two different
@@ -126,6 +127,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private final boolean waitForId;
 	private final boolean ignoreExitStatus;
 	private final boolean batch;
+	private final boolean keepOpen;
 
 	private IRemoteProcess process;
 	private IStreamParserTokenizer stdoutTokenizer;
@@ -149,17 +151,18 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public CommandJob(String jobUUID, CommandType command, boolean batch, IJAXBResourceManagerControl rm, RMVariableMap rmVarMap) {
+	public CommandJob(String jobUUID, CommandType command, boolean batch, IJAXBResourceManagerControl rm) {
 		super(command.getName());
 		this.command = command;
 		this.batch = batch;
 		this.rm = rm;
-		this.rmVarMap = rmVarMap;
+		this.rmVarMap = rm.getEnvironment();
 		this.uuid = jobUUID;
 		this.proxy = new CommandJobStreamsProxy();
 		this.waitForId = command.isWaitForId();
 		this.ignoreExitStatus = command.isIgnoreExitStatus();
 		this.error = new StringBuffer();
+		this.keepOpen = command.isKeepOpen();
 	}
 
 	/**
@@ -207,7 +210,8 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	/**
 	 * Uses the IRemoteProcessBuilder to set up the command and environment.
 	 * After start, the tokenizers (if any) are handled, and stream redirection
-	 * managed. Waits for the process, then joins on the consumers.<br>
+	 * managed. Returns immediately if <code>keepOpen</code> is true; else waits
+	 * for the process, then joins on the consumers.<br>
 	 * <br>
 	 * Note: the resource manager does not join on this thread, but retrieves
 	 * the status object from the job, potentially while it is still running, in
@@ -236,6 +240,11 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 
 			synchronized (this) {
 				active = true;
+			}
+
+			if (keepOpen) {
+				rm.getProcessTable().put(getName(), process);
+				return Status.OK_STATUS;
 			}
 
 			int exit = 0;

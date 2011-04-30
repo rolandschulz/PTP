@@ -7,8 +7,13 @@
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
             configurationFile="data/pbs-torque-generic.xml"
-            id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"
+            id="org.eclipse.ptp.rm.jaxb.PBSTorqueGeneric"
             name="PBS Torque (Generic)">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/pbs-torque-interactive.xml"
+            id="org.eclipse.ptp.rm.jaxb.PBSTorqueInteractive"
+            name="PBS Torque (Interactive)">
       </JAXBResourceManagerConfiguration>
    </extension>
    <extension
