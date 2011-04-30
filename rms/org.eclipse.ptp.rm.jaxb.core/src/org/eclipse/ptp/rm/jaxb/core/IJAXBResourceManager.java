@@ -23,10 +23,10 @@ public interface IJAXBResourceManager extends IResourceManager {
 	/**
 	 * @return the control sub-manager.
 	 */
-	JAXBResourceManagerControl getControl();
+	public JAXBResourceManagerControl getControl();
 
 	/**
 	 * @return the associated configuration
 	 */
-	IJAXBResourceManagerConfiguration getJAXBConfiguration();
+	public IJAXBResourceManagerConfiguration getJAXBConfiguration();
 }

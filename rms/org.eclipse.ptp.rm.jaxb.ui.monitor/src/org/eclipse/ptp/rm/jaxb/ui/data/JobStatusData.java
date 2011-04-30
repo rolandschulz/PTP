@@ -34,11 +34,11 @@ public class JobStatusData {
 
 	private final String rmId;
 	private final String jobId;
-	private String state;
-	private String stateDetail;
 	private final String outputPath;
 	private final String errorPath;
 	private final boolean interactive;
+	private String state;
+	private String stateDetail;
 	private boolean outReady;
 	private boolean errReady;
 

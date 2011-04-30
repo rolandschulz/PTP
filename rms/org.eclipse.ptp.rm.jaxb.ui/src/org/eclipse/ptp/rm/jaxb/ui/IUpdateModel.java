@@ -24,17 +24,17 @@ public interface IUpdateModel extends IJAXBUINonNLSConstants {
 	/**
 	 * @return the control to which this model is bound
 	 */
-	Object getControl();
+	public Object getControl();
 
 	/**
 	 * @return identifier for the value of the model
 	 */
-	String getName();
+	public String getName();
 
 	/**
 	 * @return the value retrieved from the associated control/widget
 	 */
-	Object getValueFromControl();
+	public Object getValueFromControl();
 
 	/**
 	 * Load values and settings from Launch Tab environment.
@@ -42,19 +42,19 @@ public interface IUpdateModel extends IJAXBUINonNLSConstants {
 	 * @param lcMap
 	 *            Launch Tab environment
 	 */
-	void initialize(LCVariableMap lcMap);
+	public void initialize(LCVariableMap lcMap);
 
 	/**
 	 * Update call triggered by the handler.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler
 	 */
-	void refreshValueFromMap();
+	public void refreshValueFromMap();
 
 	/**
 	 * Called by the Launch Tab.
 	 */
-	void restoreDefault();
+	public void restoreDefault();
 
 	/**
 	 * @param validator
@@ -62,5 +62,5 @@ public interface IUpdateModel extends IJAXBUINonNLSConstants {
 	 * @param remoteFileManager
 	 *            from the resource manager's services
 	 */
-	void setValidator(ValidatorType validator, IRemoteFileManager remoteFileManager);
+	public void setValidator(ValidatorType validator, IRemoteFileManager remoteFileManager);
 }

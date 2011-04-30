@@ -28,21 +28,21 @@ public interface IColumnViewerLabelSupport extends ITableColorProvider, ITableFo
 	 * @param columnName
 	 * @return image
 	 */
-	Image getColumnImage(String columnName);
+	public Image getColumnImage(String columnName);
 
 	/**
 	 * @return description (only Attributes)
 	 */
-	String getDescription();
+	public String getDescription();
 
 	/**
 	 * @param columnName
 	 * @return the text label for the given column
 	 */
-	String getDisplayValue(String columnName);
+	public String getDisplayValue(String columnName);
 
 	/**
 	 * @return tooltip (only Attributes)
 	 */
-	String getTooltip();
+	public String getTooltip();
 }

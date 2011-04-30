@@ -24,5 +24,5 @@ public interface IFileReadyListener {
 	 * @param ready
 	 *            if file is ready to read
 	 */
-	void handleReadyFile(String jobId, String remoteFile, boolean ready);
+	public void handleReadyFile(String jobId, String remoteFile, boolean ready);
 }
