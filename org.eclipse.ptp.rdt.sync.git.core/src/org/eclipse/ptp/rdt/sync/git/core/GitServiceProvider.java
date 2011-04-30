@@ -328,13 +328,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		fConnection = connection;
 		putString(GIT_CONNECTION_NAME, connection.getName());
-		try {
-			fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation().toString(),
-																											this.getLocation());
-		} catch (final RemoteSyncException e) {
-			// TODO: What can we do here? Throwing an exception is not allowed.
-			e.printStackTrace();
-		}
+		fSyncConnection = null;  //get reinitialized by next synchronize call
 	}
 
 	/*
@@ -345,12 +339,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	public void setConfigLocation(String configLocation) {
 		fLocation = configLocation;
 		putString(GIT_LOCATION, configLocation);
-		try {
-			fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation().toString(),
-																											this.getLocation());
-		} catch (final RemoteSyncException e) {
-			// TODO: What can we do here? Throwing an exception is not allowed.
-			e.printStackTrace();
-		}
+		fSyncConnection = null;  //get reinitialized by next synchronize call
 	}
 }
