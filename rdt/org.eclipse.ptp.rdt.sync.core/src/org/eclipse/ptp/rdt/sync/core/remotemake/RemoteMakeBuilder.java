@@ -138,7 +138,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		}
 	}
 	
-	public static final String REMOTE_MAKE_BUILDER_ID = "org.eclipse.ptp.rdt.core.remoteMakeBuilder"; //$NON-NLS-1$
+	public static final String REMOTE_MAKE_BUILDER_ID = "org.eclipse.ptp.rdt.sync.core.remoteMakeBuilder"; //$NON-NLS-1$
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.make.core.MakeBuilder#invokeMake(int, org.eclipse.cdt.make.core.IMakeBuilderInfo, org.eclipse.core.runtime.IProgressMonitor)
