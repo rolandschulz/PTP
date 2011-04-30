@@ -221,17 +221,20 @@ public class BuildConfigurationManager {
 
 	// Does the low-level work of changing a service configuration for a new build scenario.
 	private static void modifyServiceConfigurationForBuildScenario(IServiceConfiguration sConfig, BuildScenario bs) {
+		IService syncService = null;
 		for (IService service : sConfig.getServices()) {
 			ServiceProvider provider = (ServiceProvider) sConfig.getServiceProvider(service);
 			if (provider instanceof IRemoteServiceProvider) {
 				// For local configuration, for example, that does not need to sync
 				if (provider instanceof ISyncServiceProvider && bs.getSyncProvider() == null) {
-					sConfig.disable(service);
+					syncService = service;
 				} else {
 					((IRemoteServiceProvider) provider).changeRemoteInformationAfterInit(bs.getRemoteConnection(), bs.getLocation());
 				}
 			}
 		}
+		if (syncService!=null)
+			sConfig.disable(syncService);
 	}
 
 	// Does the low-level work of creating a copy of a service configuration
