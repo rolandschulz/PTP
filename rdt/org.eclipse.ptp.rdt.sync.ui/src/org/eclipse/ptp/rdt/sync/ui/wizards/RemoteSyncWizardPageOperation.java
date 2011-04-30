@@ -75,7 +75,6 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
 		if (rbsp != null) {
 			IRemoteConnection remoteConnection = participant.getProvider(project).getRemoteConnection();
-			rbsp.setRemoteToolsProviderID(remoteConnection.getRemoteServices().getId());
 			rbsp.setRemoteToolsConnection(remoteConnection);
 			serviceConfig.setServiceProvider(buildService, rbsp);
 		}
