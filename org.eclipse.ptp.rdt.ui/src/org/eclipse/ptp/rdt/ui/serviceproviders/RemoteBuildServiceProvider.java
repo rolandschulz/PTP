@@ -26,7 +26,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.services.core.IRemoteServiceProvider;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
 /**
@@ -40,7 +39,7 @@ import org.eclipse.ptp.services.core.ServiceProvider;
  * 
  * @author crecoskie
  */
-public class RemoteBuildServiceProvider extends ServiceProvider implements IRemoteExecutionServiceProvider, IRemoteServiceProvider {
+public class RemoteBuildServiceProvider extends ServiceProvider implements IRemoteExecutionServiceProvider {
 
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID = "RemoteBuildServiceProvider.remoteToolsProviderID"; //$NON-NLS-1$
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME = "RemoteBuildServiceProvider.remoteToolsConnectionName"; //$NON-NLS-1$
@@ -208,14 +207,5 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	@Override
 	public String toString() {
 		return "RemoteBuildServiceProvider(" + getRemoteConnectionName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/**
-	 * @since 3.0
-	 */
-	public void changeRemoteInformationAfterInit(IRemoteConnection remoteConnection, String location) {
-		this.setRemoteToolsConnection(remoteConnection);
-		this.setRemoteToolsProviderID(remoteConnection.getRemoteServices().getId());
-		this.setConfigLocation(location);
 	}
 }

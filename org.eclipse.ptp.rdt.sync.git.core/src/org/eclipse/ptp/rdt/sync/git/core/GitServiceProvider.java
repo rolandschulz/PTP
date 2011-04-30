@@ -21,16 +21,16 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.services.core.IRemoteServiceProvider;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
-public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider, IRemoteServiceProvider {
+public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider, IRemoteExecutionServiceProvider {
 	public static final String ID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
 
 	private static final String GIT_LOCATION = "location"; //$NON-NLS-1$
@@ -303,11 +303,49 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 
-	public void changeRemoteInformationAfterInit(IRemoteConnection remoteConnection, String location) {
-		fConnection = remoteConnection;
-		putString(GIT_CONNECTION_NAME, remoteConnection.getName());
-		fLocation = location;
-		putString(GIT_LOCATION, location);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConnection()
+	 */
+	public IRemoteConnection getConnection() {
+		return fConnection;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConfigLocation()
+	 */
+	public String getConfigLocation() {
+		return fLocation;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection()
+	 */
+	public void setRemoteToolsConnection(IRemoteConnection connection) {
+		fConnection = connection;
+		putString(GIT_CONNECTION_NAME, connection.getName());
+		try {
+			fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation().toString(),
+																											this.getLocation());
+		} catch (final RemoteSyncException e) {
+			// TODO: What can we do here? Throwing an exception is not allowed.
+			e.printStackTrace();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setConfigLocation()
+	 */
+	public void setConfigLocation(String configLocation) {
+		fLocation = configLocation;
+		putString(GIT_LOCATION, configLocation);
 		try {
 			fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation().toString(),
 																											this.getLocation());
