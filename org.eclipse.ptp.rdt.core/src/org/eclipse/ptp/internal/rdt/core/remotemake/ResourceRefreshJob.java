@@ -12,11 +12,7 @@ package org.eclipse.ptp.internal.rdt.core.remotemake;
 
 import java.util.List;
 
-import org.eclipse.cdt.core.resources.RefreshScopeManager;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -32,12 +28,12 @@ import org.eclipse.ptp.rdt.core.activator.Activator;
  */
 public class ResourceRefreshJob extends Job {
 
-	private List<IProject> fProjectsToRefresh;
+	private List<IResource> fResourcesToRefresh;
 	
-	public ResourceRefreshJob(List<IProject> projectsToRefresh) {
+	public ResourceRefreshJob(List<IResource> resourcesToRefresh) {
 		super(Messages.ResourceRefreshJob_0);
-		fProjectsToRefresh = projectsToRefresh;
-		this.setRule(new MultiRule(fProjectsToRefresh.toArray(new ISchedulingRule[0])));
+		fResourcesToRefresh = resourcesToRefresh;
+		this.setRule(new MultiRule(fResourcesToRefresh.toArray(new ISchedulingRule[0])));
 	}
 
 	/* (non-Javadoc)
@@ -45,14 +41,9 @@ public class ResourceRefreshJob extends Job {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor arg0) {
-		RefreshScopeManager manager = RefreshScopeManager.getInstance();
-		for(IProject project : fProjectsToRefresh) {
+		for(IResource resource : fResourcesToRefresh) {
 			try {
-				// resource.refreshLocal(IResource.DEPTH_INFINITE, arg0);
-				
-				// use refresh scope manager to refresh
-				IWorkspaceRunnable runnable = manager.getRefreshRunnable(project);
-				ResourcesPlugin.getWorkspace().run(runnable, arg0);
+				resource.refreshLocal(IResource.DEPTH_INFINITE, arg0);
 			} catch (CoreException e) {
 				return Activator.createStatus(Messages.ResourceRefreshJob_1, e);
 			}

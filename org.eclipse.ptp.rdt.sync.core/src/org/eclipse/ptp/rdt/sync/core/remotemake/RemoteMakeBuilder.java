@@ -456,9 +456,10 @@ public class RemoteMakeBuilder extends MakeBuilder {
 						}
 
 						// create a Job for the refresh
-						List<IProject> projectsToRefresh = new LinkedList<IProject>();
-						projectsToRefresh.add(currProject);
-						Job refreshJob = new ResourceRefreshJob(projectsToRefresh);
+						List<IResource> resourcesToRefresh = new LinkedList<IResource>();
+						resourcesToRefresh.add(currProject);
+						Job refreshJob = new ResourceRefreshJob(resourcesToRefresh);
+
 						refreshJob.schedule();
 
 					}
