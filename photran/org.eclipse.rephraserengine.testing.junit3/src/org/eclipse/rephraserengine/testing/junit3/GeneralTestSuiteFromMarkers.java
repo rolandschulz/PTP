@@ -39,6 +39,8 @@ public abstract class GeneralTestSuiteFromMarkers extends TestSuite
 {
     protected final String description;
     protected final String marker;
+    /** @since 3.0 */
+    protected final String markerEnd;
     
     /**
      * Constructor.  Creates this {@link TestSuite} and populates it with test cases.
@@ -52,8 +54,27 @@ public abstract class GeneralTestSuiteFromMarkers extends TestSuite
      */
     public GeneralTestSuiteFromMarkers(String description, String marker, File fileOrDirectory, FilenameFilter filenameFilter, Object... initializationData) throws Exception
     {
+        this(description, marker, "\n", fileOrDirectory, filenameFilter, initializationData); //$NON-NLS-1$
+    }
+    
+    /**
+     * Constructor.  Creates this {@link TestSuite} and populates it with test cases.
+     * 
+     * @param description
+     * @param marker
+     * @param markerEnd
+     * @param fileOrDirectory
+     * @param filenameFilter
+     * @param initializationData these arguments (if any) will be passed directly to {@link #initialize(Object...)} before adding tests to the test suite
+     * @throws Exception
+     * 
+     * @since 3.0
+     */
+    public GeneralTestSuiteFromMarkers(String description, String marker, String markerEnd, File fileOrDirectory, FilenameFilter filenameFilter, Object... initializationData) throws Exception
+    {
         this.description = description;
         this.marker = marker;
+        this.markerEnd = markerEnd;
         setName(getDescription(fileOrDirectory));
         
         initialize(initializationData);
@@ -108,7 +129,7 @@ public abstract class GeneralTestSuiteFromMarkers extends TestSuite
              index >= 0;
              index = fileContents.indexOf(marker, index+1))
         {
-            int endOfLine = fileContents.indexOf('\n', index);
+            int endOfLine = fileContents.indexOf(markerEnd, index);
             if (endOfLine < 0) endOfLine = fileContents.length();
             
             int nextMarker = fileContents.indexOf(marker, index+1);

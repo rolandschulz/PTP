@@ -204,7 +204,7 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
     {
         for (File file : filesInDirectory)
         {
-            if (!shouldSkip(file, filenamesToSkip))
+            if (!file.isDirectory() && !shouldSkip(file, filenamesToSkip))
             {
                 TestSuite subSuite = new TestSuite(description + " " + describe(file)); //$NON-NLS-1$
                 subSuite.addTest(createTestFor(file));
