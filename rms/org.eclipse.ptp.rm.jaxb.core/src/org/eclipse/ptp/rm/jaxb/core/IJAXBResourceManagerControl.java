@@ -11,6 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.util.Map;
 
+import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
@@ -24,14 +25,12 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 
 	/**
-	 * 
 	 * @return whether the launch environment should be appended to (or replace)
 	 *         the environment for a given command execution.
 	 */
 	public boolean getAppendEnv();
 
 	/**
-	 * 
 	 * @return resource manager environment
 	 */
 	public RMVariableMap getEnvironment();
@@ -40,6 +39,11 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	 * @return the user-defined environment (from the Environment Tab)
 	 */
 	public Map<String, String> getLaunchEnv();
+
+	/**
+	 * @return table of open processes
+	 */
+	public Map<String, IRemoteProcess> getProcessTable();
 
 	/**
 	 * @return connection information for this resource manager

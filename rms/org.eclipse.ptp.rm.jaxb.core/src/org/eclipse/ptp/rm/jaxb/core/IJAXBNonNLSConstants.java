@@ -23,7 +23,7 @@ public interface IJAXBNonNLSConstants {
 	public static final int EOF = -1;
 	public static final long MINUTE_IN_MS = 60 * 60 * 1000;
 	public static final long VALIDATE_TIMER = 500;
-	public static final long READY_FILE_PAUSE = 1000;
+	public static final long STANDARD_WAIT = 1000;
 	public static final int READY_FILE_BLOCK = 60;
 
 	/* CHARACTERS */
@@ -205,7 +205,7 @@ public interface IJAXBNonNLSConstants {
 	public static final String MINUS_F = "-F";//$NON-NLS-1$
 	public static final String CONFIGURATION_FILE_ATTRIBUTE = "configurationFile"; //$NON-NLS-1$
 	public static final String RM_CONFIG_EXTENSION_POINT = "org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations"; //$NON-NLS-1$
-	public static final String JAXB_SERVICE_PROVIDER_EXTPT = "org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"; //$NON-NLS-1$
+	public static final String IMPORTED_JAXB_CONFIG = "org.eclipse.ptp.rm.jaxb.ImportedConfigurations"; //$NON-NLS-1$
 	/*
 	 * EFS Attributes
 	 */

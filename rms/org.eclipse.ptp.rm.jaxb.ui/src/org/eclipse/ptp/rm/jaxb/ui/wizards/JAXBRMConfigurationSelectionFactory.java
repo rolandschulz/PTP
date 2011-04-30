@@ -60,7 +60,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 		}
 	};
 
-	private static Map<String, Map<String, URL>> fRMJAXBResourceManagers = null;
+	private static Map<String, URL> fRMJAXBResourceManagers = null;
 
 	/*
 	 * (non-Javadoc)
@@ -98,9 +98,8 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	 */
 	private URL getJAXBResourceManagerConfiguration(String name) {
 		loadJAXBResourceManagers(false);
-		Map<String, URL> info = fRMJAXBResourceManagers.get(getId());
-		if (info != null) {
-			return info.get(name);
+		if (fRMJAXBResourceManagers != null) {
+			return fRMJAXBResourceManagers.get(name);
 		}
 		return null;
 	}
@@ -114,9 +113,8 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	 */
 	private String[] getJAXBResourceManagerNames() {
 		loadJAXBResourceManagers(true);
-		Map<String, URL> info = fRMJAXBResourceManagers.get(getId());
-		if (info != null) {
-			return info.keySet().toArray(new String[0]);
+		if (fRMJAXBResourceManagers != null) {
+			return fRMJAXBResourceManagers.keySet().toArray(new String[0]);
 		}
 		return new String[0];
 	}
@@ -129,19 +127,14 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	 * @param resourceManagers
 	 *            map of extId to map(name, URL)
 	 */
-	static void loadExtensions(Map<String, Map<String, URL>> resourceManagers) {
+	static void loadExtensions(Map<String, URL> resourceManagers) {
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(RM_CONFIG_EXTENSION_POINT);
 
 		if (extensionPoint != null) {
 			for (IExtension ext : extensionPoint.getExtensions()) {
 				for (IConfigurationElement ce : ext.getConfigurationElements()) {
-					String id = ce.getAttribute(ID);
-					Map<String, URL> info = resourceManagers.get(id);
-					if (info == null) {
-						info = new HashMap<String, URL>();
-						resourceManagers.put(id, info);
-					}
+					ce.getAttribute(ID);
 					String name = ce.getAttribute(NAME);
 					String configurationFile = ce.getAttribute(CONFIGURATION_FILE_ATTRIBUTE);
 					String bundleId = ce.getDeclaringExtension().getContributor().getName();
@@ -149,7 +142,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 					if (bundle != null) {
 						URL url = bundle.getEntry(configurationFile);
 						if (url != null) {
-							info.put(name, url);
+							resourceManagers.put(name, url);
 						}
 					}
 				}
@@ -168,11 +161,6 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	 *            the first time.
 	 */
 	private static void loadExternal(boolean showError) {
-		Map<String, URL> info = fRMJAXBResourceManagers.get(JAXB_SERVICE_PROVIDER_EXTPT);
-		if (info == null) {
-			info = new HashMap<String, URL>();
-			fRMJAXBResourceManagers.put(JAXB_SERVICE_PROVIDER_EXTPT, info);
-		}
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(RESOURCE_MANAGERS);
 		StringBuffer invalid = new StringBuffer();
 		if (project != null) {
@@ -193,7 +181,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 							JAXBUIPlugin.log(t.getMessage());
 							continue;
 						}
-						info.put(name, url);
+						fRMJAXBResourceManagers.put(name, url);
 					} catch (MalformedURLException t) {
 						JAXBUIPlugin.log(t);
 					}
@@ -212,7 +200,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	 */
 	private static void loadJAXBResourceManagers(boolean showError) {
 		if (fRMJAXBResourceManagers == null) {
-			fRMJAXBResourceManagers = new HashMap<String, Map<String, URL>>();
+			fRMJAXBResourceManagers = new HashMap<String, URL>();
 		} else {
 			fRMJAXBResourceManagers.clear();
 		}
