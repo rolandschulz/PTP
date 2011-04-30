@@ -243,16 +243,16 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 			try {
 				fSyncConnection.syncRemoteToLocal();
-				IProject project = this.getProject();
-				if (project != null) {
-					project.refreshLocal(IResource.DEPTH_INFINITE, null);
-				}
 			} catch (final RemoteSyncException e) {
 				throw e;
 			}
 
 		} finally {
 			syncLock.unlock();
+		}
+		IProject project = this.getProject();
+		if (project != null) {
+			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		}
 	}
 	
