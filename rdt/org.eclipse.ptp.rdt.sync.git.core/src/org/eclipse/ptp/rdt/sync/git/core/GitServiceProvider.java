@@ -326,9 +326,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection()
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
+		syncLock.lock();
 		fConnection = connection;
 		putString(GIT_CONNECTION_NAME, connection.getName());
 		fSyncConnection = null;  //get reinitialized by next synchronize call
+		syncLock.unlock();
 	}
 
 	/*
@@ -337,8 +339,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setConfigLocation()
 	 */
 	public void setConfigLocation(String configLocation) {
+		syncLock.lock();
 		fLocation = configLocation;
 		putString(GIT_LOCATION, configLocation);
 		fSyncConnection = null;  //get reinitialized by next synchronize call
+		syncLock.unlock();
 	}
 }
