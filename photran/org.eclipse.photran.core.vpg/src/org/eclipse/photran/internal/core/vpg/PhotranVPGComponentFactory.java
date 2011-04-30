@@ -51,8 +51,8 @@ public class PhotranVPGComponentFactory
             System.out.println("Using Photran VPG database " + file.getAbsolutePath()); //$NON-NLS-1$
 
         return new ProfilingDB<IFortranAST, Token, PhotranTokenRef>(
-            //new PhotranVPGDB1(this, file, log));
-            new PhotranVPGDB2(this, file, log));
+            new PhotranVPGDB1(this, file, log));
+            //new PhotranVPGDB2(this, file, log));
     }
 
     private static File createTempFile()

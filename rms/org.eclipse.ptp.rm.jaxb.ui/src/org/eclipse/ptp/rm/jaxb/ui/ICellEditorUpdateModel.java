@@ -28,12 +28,12 @@ public interface ICellEditorUpdateModel extends IUpdateModel, IColumnViewerLabel
 	/**
 	 * @return whether the cell is editable
 	 */
-	boolean canEdit();
+	public boolean canEdit();
 
 	/**
 	 * @return the cell editor for this model
 	 */
-	CellEditor getCellEditor();
+	public CellEditor getCellEditor();
 
 	/**
 	 * Insert name and value into template as indicated by the pattern
@@ -43,41 +43,41 @@ public interface ICellEditorUpdateModel extends IUpdateModel, IColumnViewerLabel
 	 *            the attribute names and values in the viewer
 	 * @return the output string
 	 */
-	String getReplacedValue(String pattern);
+	public String getReplacedValue(String pattern);
 
 	/**
 	 * @return text to display as tooltip
 	 */
-	String getTooltip();
+	public String getTooltip();
 
 	/**
 	 * @return the underlying value type appropriate for the cell editor in
 	 *         question
 	 */
-	Object getValueForEditor();
+	public Object getValueForEditor();
 
 	/**
 	 * @return whether this item (row) is checked in the viewer
 	 */
-	boolean isChecked();
+	public boolean isChecked();
 
 	/**
 	 * @param background
 	 *            any defined colors for each column of the viewer
 	 */
-	void setBackground(Color[] background);
+	public void setBackground(Color[] background);
 
 	/**
 	 * @param font
 	 *            any defined fonts for each column of the viewer
 	 */
-	void setFont(Font[] font);
+	public void setFont(Font[] font);
 
 	/**
 	 * @param foreground
 	 *            any defined colors for each column of the viewer
 	 */
-	void setForeground(Color[] foreground);
+	public void setForeground(Color[] foreground);
 
 	/**
 	 * Translate the editor value into a type appropriate for storage
@@ -85,11 +85,11 @@ public interface ICellEditorUpdateModel extends IUpdateModel, IColumnViewerLabel
 	 * @param value
 	 *            from the editor
 	 */
-	void setValueFromEditor(Object value);
+	public void setValueFromEditor(Object value);
 
 	/**
 	 * @param viewerModel
 	 *            the model of the viewer to which this cell model belongs
 	 */
-	void setViewer(ViewerUpdateModel viewerModel);
+	public void setViewer(ViewerUpdateModel viewerModel);
 }

@@ -26,24 +26,24 @@ public interface ICommandJobStreamsProxy extends IStreamsProxy, IStreamsProxy2 {
 	/**
 	 * Manually close the proxy.
 	 */
-	void close();
+	public void close();
 
 	/**
 	 * @param err
 	 *            monitor for error stream
 	 */
-	void setErrMonitor(ICommandJobStreamMonitor err);
+	public void setErrMonitor(ICommandJobStreamMonitor err);
 
 	/**
 	 * 
 	 * @param out
 	 *            monitor for out stream
 	 */
-	void setOutMonitor(ICommandJobStreamMonitor out);
+	public void setOutMonitor(ICommandJobStreamMonitor out);
 
 	/**
 	 * Attaches monitor to stream and begins reading.
 	 */
-	void startMonitors();
+	public void startMonitors();
 
 }

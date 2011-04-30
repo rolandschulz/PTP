@@ -8,7 +8,7 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.util;
+package org.eclipse.rephraserengine.core.util;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -23,13 +23,15 @@ import java.util.Map;
  * key and a value.
  * 
  * @author Jeff Overbey
+ * 
+ * @since 3.0
  */
-public final class LRUCache<T, U>
+public class LRUCache<T, U>
 {
     protected final int cacheSize;
     
-    protected Map<T, U> cache;
-    protected List<T> lruKeys;
+    protected final Map<T, U> cache;
+    protected final List<T> lruKeys;
     
     public LRUCache(int cacheSize)
     {
@@ -74,7 +76,7 @@ public final class LRUCache<T, U>
         return cache.size() == cacheSize;
     }
 
-    private void removeLeastRecentlyUsedFromCache()
+    protected void removeLeastRecentlyUsedFromCache()
     {
         T lru = lruKeys.remove(0);
         cache.remove(lru);

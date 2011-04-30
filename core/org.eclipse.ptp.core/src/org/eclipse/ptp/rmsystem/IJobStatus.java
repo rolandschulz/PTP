@@ -17,14 +17,6 @@ import org.eclipse.debug.core.model.IStreamsProxy;
  * @since 5.0
  */
 public interface IJobStatus {
-	String JOB_ID = "jobId";//$NON-NLS-1$
-	String RM_ID = "rmId";//$NON-NLS-1$
-	String STDOUT_REMOTE_FILE = "stdout_remote_path";//$NON-NLS-1$
-	String STDERR_REMOTE_FILE = "stderr_remote_path";//$NON-NLS-1$
-	String INTERACTIVE = "interactive";//$NON-NLS-1$;
-	String STATE = "state";//$NON-NLS-1$;
-	String STATE_DETAIL = "state_detail";//$NON-NLS-1$;
-
 	/*********** PRIMARY JOB STATES ********/
 	/**
 	 * Job status cannot be determined

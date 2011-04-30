@@ -55,7 +55,7 @@ import org.eclipse.photran.internal.core.parser.ASTNodeWithErrorRecoverySymbols;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.sourceform.ISourceForm;
 import org.eclipse.photran.internal.core.sourceform.SourceForm;
-import org.eclipse.photran.internal.core.util.LRUCache;
+import org.eclipse.rephraserengine.core.util.LRUCache;
 import org.eclipse.rephraserengine.core.vpg.ILazyVPGPopulator;
 import org.eclipse.rephraserengine.core.vpg.VPGDB;
 import org.eclipse.rephraserengine.core.vpg.VPGDependency;

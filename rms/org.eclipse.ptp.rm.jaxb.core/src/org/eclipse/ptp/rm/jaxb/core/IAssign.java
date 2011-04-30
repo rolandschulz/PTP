@@ -23,16 +23,16 @@ public interface IAssign {
 	 *            parsed values from match expression
 	 * @throws Throwable
 	 */
-	void assign(String[] values) throws Throwable;
+	public void assign(String[] values) throws Throwable;
 
 	/**
 	 * @return index of assign action next target
 	 */
-	int getIndex();
+	public int getIndex();
 
 	/**
 	 * @param target
 	 *            current target for the assign action
 	 */
-	void setTarget(Object target);
+	public void setTarget(Object target);
 }
