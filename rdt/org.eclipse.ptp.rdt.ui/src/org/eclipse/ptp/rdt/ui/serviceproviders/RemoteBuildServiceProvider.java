@@ -208,4 +208,5 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	public String toString() {
 		return "RemoteBuildServiceProvider(" + getRemoteConnectionName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
 }
