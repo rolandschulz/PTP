@@ -12,6 +12,32 @@
       </runtime>
    </extension>
    <extension
+         id="remoteMakeNature"
+         name="%RemoteMakeNature.name"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.ptp.rdt.sync.core.resources.RemoteMakeNature">
+         </run>
+      </runtime>
+      <builder
+            id="org.eclipse.ptp.rdt.sync.core.remoteMakeBuilder">
+      </builder>
+   </extension>
+   <extension
+         id="org.eclipse.ptp.rdt.sync.core.remoteMakeBuilder"
+         name="%RemoteMakeBuilder.name"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            callOnEmptyDelta="true"
+            hasNature="true"
+            isConfigurable="true">
+         <run
+               class="org.eclipse.ptp.rdt.sync.core.remotemake.RemoteMakeBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
          point="org.eclipse.ptp.services.core.services">
       <service
             id="org.eclipse.ptp.rdt.sync.core.SyncService"
