@@ -27,7 +27,7 @@ public interface IVariableMap {
 	 *            expression to resolve.
 	 * @return resolved expression
 	 */
-	String getString(String value);
+	public String getString(String value);
 
 	/**
 	 * @param uuid
@@ -36,5 +36,5 @@ public interface IVariableMap {
 	 *            expression to resolve.
 	 * @return resolved expression
 	 */
-	String getString(String uuid, String value);
+	public String getString(String uuid, String value);
 }

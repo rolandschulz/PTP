@@ -196,7 +196,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 		this.jobId = jobId;
 		String path = null;
 		RMVariableMap rmVarMap = control.getEnvironment();
-		Object o = rmVarMap.get(STDOUT_REMOTE_FILE);
+		Object o = rmVarMap.get(IJAXBNonNLSConstants.STDOUT_REMOTE_FILE);
 		if (o != null) {
 			if (o instanceof PropertyType) {
 				path = (String) ((PropertyType) o).getValue();
@@ -206,7 +206,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 			path = rmVarMap.getString(path);
 			remoteOutputPath = path.replaceAll(IJAXBNonNLSConstants.JOB_ID_TAG, jobId);
 		}
-		o = rmVarMap.get(STDERR_REMOTE_FILE);
+		o = rmVarMap.get(IJAXBNonNLSConstants.STDERR_REMOTE_FILE);
 		if (o != null) {
 			if (o instanceof PropertyType) {
 				path = (String) ((PropertyType) o).getValue();

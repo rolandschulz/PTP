@@ -25,25 +25,25 @@ public interface IMatchable {
 	 * @return whether there was a successful match
 	 * @throws Throwable
 	 */
-	boolean doMatch(StringBuffer segment) throws Throwable;
+	public boolean doMatch(StringBuffer segment) throws Throwable;
 
 	/**
 	 * @return whether the tokenizer should promote this object to first in its
 	 *         list.
 	 */
-	boolean isSelected();
+	public boolean isSelected();
 
 	/**
 	 * Run post-processing operations on the object.
 	 * 
 	 * @throws Throwable
 	 */
-	void postProcess() throws Throwable;
+	public void postProcess() throws Throwable;
 
 	/**
 	 * @param selected
 	 *            whether the tokenizer should promote this object to first in
 	 *            its list.
 	 */
-	void setSelected(boolean selected);
+	public void setSelected(boolean selected);
 }

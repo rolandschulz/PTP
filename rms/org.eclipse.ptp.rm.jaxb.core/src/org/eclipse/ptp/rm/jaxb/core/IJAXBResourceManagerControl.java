@@ -28,26 +28,26 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	 * @return whether the launch environment should be appended to (or replace)
 	 *         the environment for a given command execution.
 	 */
-	boolean getAppendEnv();
+	public boolean getAppendEnv();
 
 	/**
 	 * 
 	 * @return resource manager environment
 	 */
-	RMVariableMap getEnvironment();
+	public RMVariableMap getEnvironment();
 
 	/**
 	 * @return the user-defined environment (from the Environment Tab)
 	 */
-	Map<String, String> getLaunchEnv();
+	public Map<String, String> getLaunchEnv();
 
 	/**
 	 * @return connection information for this resource manager
 	 */
-	RemoteServicesDelegate getRemoteServicesDelegate();
+	public RemoteServicesDelegate getRemoteServicesDelegate();
 
 	/**
 	 * @return state of resource manager
 	 */
-	String getState();
+	public String getState();
 }

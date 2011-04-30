@@ -23,7 +23,7 @@ public interface ICommandJobStreamMonitor extends IStreamMonitor {
 	/**
 	 * Manually close the monitor/streams.
 	 */
-	void close();
+	public void close();
 
 	/**
 	 * Tune the monitor's buffer size
@@ -32,10 +32,10 @@ public interface ICommandJobStreamMonitor extends IStreamMonitor {
 	 *            in chars
 	 * 
 	 */
-	void setBufferLimit(int limit);
+	public void setBufferLimit(int limit);
 
 	/**
 	 * Starts the reading from the stream.
 	 */
-	void startMonitoring();
+	public void startMonitoring();
 }

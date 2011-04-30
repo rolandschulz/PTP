@@ -29,11 +29,11 @@ public interface IStreamParserTokenizer extends Runnable {
 	/**
 	 * @return any fatal exception raised during parsing
 	 */
-	Throwable getInternalError();
+	public Throwable getInternalError();
 
 	/**
 	 * @param stream
 	 *            to be parsed
 	 */
-	void setInputStream(InputStream stream);
+	public void setInputStream(InputStream stream);
 }

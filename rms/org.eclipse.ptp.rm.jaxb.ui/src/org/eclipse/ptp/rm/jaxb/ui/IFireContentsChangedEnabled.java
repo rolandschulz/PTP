@@ -23,5 +23,5 @@ public interface IFireContentsChangedEnabled {
 	/**
 	 * Used to delegate to the internal contents changed method of the tab
 	 */
-	void fireContentsChanged();
+	public void fireContentsChanged();
 }

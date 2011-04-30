@@ -27,21 +27,21 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	 * 
 	 * @since 5.0
 	 */
-	void clearReferences();
+	public void clearReferences();
 
 	/**
 	 * @return the JAXB resource manager data element tree.
 	 * 
 	 * @since 5.0
 	 */
-	ResourceManagerData getResourceManagerData() throws Throwable;
+	public ResourceManagerData getResourceManagerData() throws Throwable;
 
 	/**
 	 * @return the JAXB resource manager environment map.
 	 * 
 	 * @since 5.0
 	 */
-	RMVariableMap getRMVariableMap() throws Throwable;
+	public RMVariableMap getRMVariableMap() throws Throwable;
 
 	/**
 	 * @param location
@@ -49,5 +49,5 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	 * 
 	 * @since 5.0
 	 */
-	void setRMConfigurationURL(URL location);
+	public void setRMConfigurationURL(URL location);
 }
