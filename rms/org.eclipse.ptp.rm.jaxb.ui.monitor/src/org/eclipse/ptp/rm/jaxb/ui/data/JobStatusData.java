@@ -24,6 +24,13 @@ import org.eclipse.ui.IMemento;
  */
 public class JobStatusData {
 	public static final String ZEROSTR = "";//$NON-NLS-1$
+	public static final String JOB_ID = "job_id";//$NON-NLS-1$
+	public static final String RM_ID = "rm_id";//$NON-NLS-1$
+	public static final String STDOUT_REMOTE_FILE = "stdout_remote_path";//$NON-NLS-1$
+	public static final String STDERR_REMOTE_FILE = "stderr_remote_path";//$NON-NLS-1$
+	public static final String INTERACTIVE = "interactive";//$NON-NLS-1$;
+	public static final String STATE = "state";//$NON-NLS-1$;
+	public static final String STATE_DETAIL = "state_detail";//$NON-NLS-1$;
 
 	private final String rmId;
 	private final String jobId;
@@ -63,13 +70,13 @@ public class JobStatusData {
 	 *            child node for a single jobId
 	 */
 	public JobStatusData(IMemento memento) {
-		rmId = memento.getString(IJobStatus.RM_ID);
-		jobId = memento.getString(IJobStatus.JOB_ID);
-		state = memento.getString(IJobStatus.STATE);
-		stateDetail = memento.getString(IJobStatus.STATE_DETAIL);
-		outputPath = memento.getString(IJobStatus.STDOUT_REMOTE_FILE);
-		errorPath = memento.getString(IJobStatus.STDERR_REMOTE_FILE);
-		interactive = memento.getBoolean(IJobStatus.INTERACTIVE);
+		rmId = memento.getString(RM_ID);
+		jobId = memento.getString(JOB_ID);
+		state = memento.getString(STATE);
+		stateDetail = memento.getString(STATE_DETAIL);
+		outputPath = memento.getString(STDOUT_REMOTE_FILE);
+		errorPath = memento.getString(STDERR_REMOTE_FILE);
+		interactive = memento.getBoolean(INTERACTIVE);
 		outReady = outputPath != null && IJobStatus.JOB_OUTERR_READY.equals(stateDetail);
 		errReady = errorPath != null && IJobStatus.JOB_OUTERR_READY.equals(stateDetail);
 	}
@@ -154,14 +161,14 @@ public class JobStatusData {
 		if (memento == null) {
 			return;
 		}
-		IMemento jobMemento = memento.createChild(IJobStatus.JOB_ID, jobId);
-		jobMemento.putString(IJobStatus.JOB_ID, jobId);
-		jobMemento.putString(IJobStatus.RM_ID, rmId);
-		jobMemento.putString(IJobStatus.STATE, state);
-		jobMemento.putString(IJobStatus.STATE_DETAIL, stateDetail);
-		jobMemento.putString(IJobStatus.STDOUT_REMOTE_FILE, outputPath);
-		jobMemento.putString(IJobStatus.STDERR_REMOTE_FILE, errorPath);
-		jobMemento.putBoolean(IJobStatus.INTERACTIVE, interactive);
+		IMemento jobMemento = memento.createChild(JOB_ID, jobId);
+		jobMemento.putString(JOB_ID, jobId);
+		jobMemento.putString(RM_ID, rmId);
+		jobMemento.putString(STATE, state);
+		jobMemento.putString(STATE_DETAIL, stateDetail);
+		jobMemento.putString(STDOUT_REMOTE_FILE, outputPath);
+		jobMemento.putString(STDERR_REMOTE_FILE, errorPath);
+		jobMemento.putBoolean(INTERACTIVE, interactive);
 	}
 
 	/**
@@ -200,7 +207,7 @@ public class JobStatusData {
 	public static List<JobStatusData> reload(IMemento memento) {
 		List<JobStatusData> jobs = new ArrayList<JobStatusData>();
 		if (memento != null) {
-			IMemento[] children = memento.getChildren(IJobStatus.JOB_ID);
+			IMemento[] children = memento.getChildren(JOB_ID);
 			for (IMemento child : children) {
 				jobs.add(new JobStatusData(child));
 			}
