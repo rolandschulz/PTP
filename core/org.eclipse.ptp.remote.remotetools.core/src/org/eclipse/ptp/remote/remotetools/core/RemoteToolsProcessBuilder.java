@@ -81,10 +81,22 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start()
+	 * @see
+	 * org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getSupportedFlags
+	 * ()
 	 */
 	@Override
-	public IRemoteProcess start() throws IOException {
+	public int getSupportedFlags() {
+		return ALLOCATE_PTY | FORWARD_X11;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start(int)
+	 */
+	@Override
+	public IRemoteProcess start(int flags) throws IOException {
 		// The exit command is called to force the remote shell to close after
 		// our command
 		// is executed. This is to prevent a running process at the end of the
@@ -127,6 +139,9 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 				}
 			}
 
+			script.setAllocateTerminal((flags & ALLOCATE_PTY) == ALLOCATE_PTY);
+			script.setForwardX11((flags & FORWARD_X11) == FORWARD_X11);
+
 			RemoteProcess process = exeTools.executeProcess(script);
 			return new RemoteToolsProcess(process, redirectErrorStream());
 		} catch (Exception e) {
@@ -135,8 +150,9 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	}
 
 	private String spaceEscapify(String inputString) {
-		if (inputString == null)
+		if (inputString == null) {
 			return null;
+		}
 		return inputString.replaceAll(" ", "\\\\ "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
