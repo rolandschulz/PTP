@@ -8,9 +8,11 @@ import org.eclipse.cdt.core.settings.model.ICResourceDescription;
 import org.eclipse.cdt.managedbuilder.core.IMultiConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractCBuildPropertyTab;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -37,6 +39,10 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 	
 	public BuildRemotePropertiesTab() {
 		super();
+		IProject project = getCfg().getOwner().getProject();
+		if (!(RemoteSyncNature.hasNature(project))) {
+			this.setVisible(false);
+		}
 	}
 
 	private IRemoteConnection fSelectedConnection;
