@@ -174,15 +174,17 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * TODO: use the force
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
+		
+		// TODO: Note that here SyncFlag.FORCE is interpreted as sync always, even if not needed otherwise. This is different
+		// from the original intent of FORCE, which was to do an immediate, blocking sync. We may need to split those two
+		// functions and introduce more flags.
+		// TODO: Also, note that we are not using the individual "sync to local" and "sync to remote" flags yet.
+		if ((syncFlags == SyncFlag.NO_FORCE) && (!(syncNeeded(delta)))) {
+			return;
+		}
+		
+		syncLock.lock();
 		try {
-			syncLock.lock();
-			// TODO: Note that here SyncFlag.FORCE is interpreted as sync always, even if not needed otherwise. This is different
-			// from the original intent of FORCE, which was to do an immediate, blocking sync. We may need to split those two
-			// functions and introduce more flags.
-			// TODO: Also, note that we are not using the individual "sync to local" and "sync to remote" flags yet.
-			if ((syncFlags == SyncFlag.NO_FORCE) && (!(syncNeeded(delta)))) {
-				return;
-			}
 			// TODO: Use delta information
 			// switch (delta.getKind()) {
 			// case IResourceDelta.ADDED:
@@ -327,10 +329,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		syncLock.lock();
-		fConnection = connection;
-		putString(GIT_CONNECTION_NAME, connection.getName());
-		fSyncConnection = null;  //get reinitialized by next synchronize call
-		syncLock.unlock();
+		try {
+			fConnection = connection;
+			putString(GIT_CONNECTION_NAME, connection.getName());
+			fSyncConnection = null;  //get reinitialized by next synchronize call
+		} finally {
+			syncLock.unlock();
+		}
 	}
 
 	/*
@@ -340,9 +345,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setConfigLocation(String configLocation) {
 		syncLock.lock();
-		fLocation = configLocation;
-		putString(GIT_LOCATION, configLocation);
-		fSyncConnection = null;  //get reinitialized by next synchronize call
-		syncLock.unlock();
+		try {
+			fLocation = configLocation;
+			putString(GIT_LOCATION, configLocation);
+			fSyncConnection = null;  //get reinitialized by next synchronize call
+		} finally {
+			syncLock.unlock();
+		}
 	}
 }
