@@ -37,9 +37,7 @@ public class JobIdPinTable implements IJAXBNonNLSConstants {
 				} catch (InterruptedException ignored) {
 				}
 			}
-			if (map.containsKey(jobId)) {
-				map.put(jobId, Thread.currentThread());
-			}
+			map.put(jobId, Thread.currentThread());
 		}
 	}
 

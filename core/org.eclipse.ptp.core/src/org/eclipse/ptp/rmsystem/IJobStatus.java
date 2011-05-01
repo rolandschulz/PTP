@@ -83,6 +83,12 @@ public interface IJobStatus {
 	public static String FAILED = "FAILED"; //$NON-NLS-1$
 
 	/**
+	 * Job was canceled/aborted by user before finishing. Jobs in this state
+	 * have completed execution and are considered "COMPLETED".
+	 */
+	public static String CANCELED = "CANCELED"; //$NON-NLS-1$
+
+	/**
 	 * Stdout and/or stderr have been copied to a user-determined location. Jobs
 	 * in this state have completed execution and are considered "COMPLETED".
 	 */

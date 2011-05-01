@@ -49,13 +49,6 @@
 
    <element name="JAXBResourceManagerConfiguration">
       <complexType>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  ID of the resource manager that this configuration file is for.
-               </documentation>
-            </annotation>
-         </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>

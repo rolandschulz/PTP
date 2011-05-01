@@ -40,6 +40,21 @@ public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
 	}
 
 	/**
+	 * Synchronized cancel. External calls are premature and thus should not
+	 * block waiting for the remote files if any.
+	 * 
+	 * @param jobId
+	 *            either internal UUID or scheduler id for the job.
+	 */
+	public ICommandJobStatus cancelAndRemove(String jobId) {
+		ICommandJobStatus status = null;
+		synchronized (map) {
+			remove(jobId, false);
+		}
+		return status;
+	}
+
+	/**
 	 * 
 	 * @param jobId
 	 *            either internal UUID or scheduler id for the job.
@@ -61,21 +76,6 @@ public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
 			running = false;
 			map.notifyAll();
 		}
-	}
-
-	/**
-	 * Synchronized remove. External calls are premature and thus should not
-	 * block waiting for the remote files if any.
-	 * 
-	 * @param jobId
-	 *            either internal UUID or scheduler id for the job.
-	 */
-	public ICommandJobStatus removeJobStatus(String jobId) {
-		ICommandJobStatus status = null;
-		synchronized (map) {
-			status = remove(jobId, false);
-		}
-		return status;
 	}
 
 	/**

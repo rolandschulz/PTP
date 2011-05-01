@@ -164,9 +164,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			p.setName(jobId);
 			rmVarMap.put(jobId, p);
 			doControlCommand(jobId, operation);
-			rmVarMap.remove(jobId);
 			if (TERMINATE_OPERATION.equals(operation)) {
-				jobStatusMap.removeJobStatus(jobId);
+				jobStatusMap.cancelAndRemove(jobId);
+				p.setValue(IJobStatus.CANCELED);
+			} else {
+				rmVarMap.remove(jobId);
 			}
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
@@ -226,23 +228,33 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.setUpdateRequestTime(now);
 			}
 
-			PropertyType p = new PropertyType();
-			p.setVisible(false);
-			p.setName(jobId);
-			rmVarMap.put(jobId, p);
-
-			CommandType job = controlData.getGetJobStatus();
-			if (job == null) {
-				throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + JOBSTATUS, null);
-			}
-
-			runCommand(jobId, job, false, true);
-
-			p = (PropertyType) rmVarMap.remove(jobId);
-
+			PropertyType p = (PropertyType) rmVarMap.get(jobId);
 			String state = IJobStatus.UNDETERMINED;
+
 			if (p != null) {
-				state = (String) p.getValue();
+				/*
+				 * premature termination
+				 */
+				state = String.valueOf(p.getValue());
+			} else {
+				state = status == null ? state : status.getStateDetail();
+
+				p = new PropertyType();
+				p.setVisible(false);
+				p.setName(jobId);
+				rmVarMap.put(jobId, p);
+
+				CommandType job = controlData.getGetJobStatus();
+				if (job == null) {
+					throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + JOBSTATUS, null);
+				}
+
+				runCommand(jobId, job, false, true);
+
+				p = (PropertyType) rmVarMap.remove(jobId);
+				if (p != null) {
+					state = String.valueOf(p.getValue());
+				}
 			}
 
 			if (status == null) {
@@ -252,7 +264,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.setState(state);
 			}
 
-			if (IJobStatus.COMPLETED.equals(state)) {
+			if (IJobStatus.COMPLETED.equals(status.getState())) {
 				/*
 				 * leave the status in the map in case there are further calls;
 				 * it will be pruned by the daemon
@@ -721,12 +733,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		boolean killed = false;
 		if (status != null) {
 			killed = status.cancel();
-		}
-		if (killed) {
-			/*
-			 * automatically unpins the id
-			 */
-			jobStatusMap.removeJobStatus(jobId);
 		}
 		return killed;
 	}
