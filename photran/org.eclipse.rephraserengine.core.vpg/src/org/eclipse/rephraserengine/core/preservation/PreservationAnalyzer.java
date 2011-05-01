@@ -217,7 +217,32 @@ abstract class PreservationAnalyzer<A, T, R extends IVPGNode<T>> extends Preserv
     
     @Override void handlePreserveSuperset()
     {
-        throw new UnsupportedOperationException(); // FIXME
+        VPGEdge<A,T,R> finalEdge = finalEdge();
+        VPGEdge<A,T,R> initialEdge = initialEdge();
+        
+        if (finalEdge == null && initialEdge != null)
+        {
+            this.initialEdge = initialIterator.hasNext() ? initialIterator.next() : null;
+            throw new UnexpectedInitialEdge(initialEdge);
+        }
+        else if (finalEdge != null && initialEdge != null)
+        {
+            int comparison = finalEdge.compareTo(initialEdge);
+            if (comparison < 0)
+            {
+                this.finalEdge = finalIterator.hasNext() ? finalIterator.next() : null;
+                throw new UnexpectedFinalEdge(finalEdge);
+            }
+            else if (comparison == 0)
+            {
+                this.initialEdge = initialIterator.hasNext() ? initialIterator.next() : null;
+                this.finalEdge = finalIterator.hasNext() ? finalIterator.next() : null;
+            }
+            else // (comparison > 0)
+            {
+                this.initialEdge = initialIterator.hasNext() ? initialIterator.next() : null;
+            }
+        }
     }
 
     public boolean hasEdgesRemaining()
