@@ -12,7 +12,6 @@ package org.eclipse.ptp.rdt.sync.git.core;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.resources.IProject;
@@ -42,7 +41,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private IRemoteConnection fConnection = null;
 	private GitRemoteSyncConnection fSyncConnection = null;
 	
-	private static final Lock syncLock = new ReentrantLock();
+	private final ReentrantLock syncLock = new ReentrantLock();
+	private Integer syncTaskId = -1;  //ID for most recent synchronization task, functions as a time-stamp 
+	private int finishedSyncTaskId = -1; //all synchronizations up to this ID (including it) have finished
 
 	/**
 	 * Get the remote directory that will be used for synchronization
@@ -174,15 +175,31 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * TODO: use the force
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
+		
+		// TODO: Note that here SyncFlag.FORCE is interpreted as sync always, even if not needed otherwise. This is different
+		// from the original intent of FORCE, which was to do an immediate, blocking sync. We may need to split those two
+		// functions and introduce more flags.
+		// TODO: Also, note that we are not using the individual "sync to local" and "sync to remote" flags yet.
+		if ((syncFlags == SyncFlag.NO_FORCE) && (!(syncNeeded(delta)))) {
+			return;
+		}
+		
+		int mySyncTaskId;
+		synchronized (syncTaskId) {
+			syncTaskId++;    
+			mySyncTaskId=syncTaskId;
+			//suggestion for Deltas: add delta to list of deltas
+		}
+		
+		if (syncLock.hasQueuedThreads() && syncFlags == SyncFlag.NO_FORCE)
+			return;   //the queued Thread will do the work for us. And we don't have to wait because of NO_FORCE
+		
+		syncLock.lock();
 		try {
-			syncLock.lock();
-			// TODO: Note that here SyncFlag.FORCE is interpreted as sync always, even if not needed otherwise. This is different
-			// from the original intent of FORCE, which was to do an immediate, blocking sync. We may need to split those two
-			// functions and introduce more flags.
-			// TODO: Also, note that we are not using the individual "sync to local" and "sync to remote" flags yet.
-			if ((syncFlags == SyncFlag.NO_FORCE) && (!(syncNeeded(delta)))) {
+			if (mySyncTaskId<=finishedSyncTaskId)  //some other thread has already done the work for us 
 				return;
-			}
+
+			
 			// TODO: Use delta information
 			// switch (delta.getKind()) {
 			// case IResourceDelta.ADDED:
@@ -231,6 +248,15 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					throw new RemoteSyncException(e);
 				}
 			}
+			
+			int willFinishTaskId;
+			synchronized (syncTaskId) {
+				willFinishTaskId = syncTaskId;  //This synchronization operation will include all tasks up to current syncTaskId 
+			                                    //syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
+												//we might synchronize even more than that if a file is already saved but syncTaskId wasn't increased yet
+												//thus we cannot guarantee a maximum but we can guarantee syncTaskId as a minimum
+				//suggestion for Deltas: make local copy of list of deltas, remove list of deltas
+			}
 
 			// Sync local and remote. For now, do both ways each time.
 			// TODO: Sync more efficiently and appropriately to the situation.
@@ -245,6 +271,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			} catch (final RemoteSyncException e) {
 				throw e;
 			}
+			finishedSyncTaskId = willFinishTaskId;
 
 		} finally {
 			syncLock.unlock();
@@ -327,10 +354,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		syncLock.lock();
-		fConnection = connection;
-		putString(GIT_CONNECTION_NAME, connection.getName());
-		fSyncConnection = null;  //get reinitialized by next synchronize call
-		syncLock.unlock();
+		try {
+			fConnection = connection;
+			putString(GIT_CONNECTION_NAME, connection.getName());
+			fSyncConnection = null;  //get reinitialized by next synchronize call
+		} finally {
+			syncLock.unlock();
+		}
 	}
 
 	/*
@@ -340,9 +370,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setConfigLocation(String configLocation) {
 		syncLock.lock();
-		fLocation = configLocation;
-		putString(GIT_LOCATION, configLocation);
-		fSyncConnection = null;  //get reinitialized by next synchronize call
-		syncLock.unlock();
+		try {
+			fLocation = configLocation;
+			putString(GIT_LOCATION, configLocation);
+			fSyncConnection = null;  //get reinitialized by next synchronize call
+		} finally {
+			syncLock.unlock();
+		}
 	}
 }
