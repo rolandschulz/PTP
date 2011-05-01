@@ -22,25 +22,27 @@ import org.eclipse.ptp.remote.core.NullInputStream;
 public class LocalProcess extends AbstractRemoteProcess {
 	private static int refCount = 0;
 
-	private Process localProcess;
+	private final Process localProcess;
 	private InputStream procStdout;
 	private InputStream procStderr;
 	private Thread stdoutReader;
 	private Thread stderrReader;
+	private final Thread completedChecker;
+	private volatile boolean isCompleted;
 
 	/**
 	 * Thread to merge stdout and stderr. Keeps refcount so that output stream
 	 * is not closed too early.
 	 * 
 	 * @author greg
-	 *
+	 * 
 	 */
 	private class ProcOutputMerger implements Runnable {
 		private final static int BUF_SIZE = 8192;
-		
-		private InputStream input;
-		private OutputStream output;
-		
+
+		private final InputStream input;
+		private final OutputStream output;
+
 		public ProcOutputMerger(InputStream input, OutputStream output) {
 			this.input = input;
 			this.output = output;
@@ -48,11 +50,11 @@ public class LocalProcess extends AbstractRemoteProcess {
 				refCount++;
 			}
 		}
-		
+
 		public void run() {
 			int len;
 			byte b[] = new byte[BUF_SIZE];
-			
+
 			try {
 				while ((len = input.read(b)) > 0) {
 					output.write(b, 0, len);
@@ -69,19 +71,19 @@ public class LocalProcess extends AbstractRemoteProcess {
 			}
 		}
 	}
-	
+
 	public LocalProcess(Process proc, boolean merge) throws IOException {
 		localProcess = proc;
-		
+
 		if (merge) {
 			PipedOutputStream pipedOutput = new PipedOutputStream();
-			
+
 			procStderr = new NullInputStream();
 			procStdout = new PipedInputStream(pipedOutput);
 
 			stderrReader = new Thread(new ProcOutputMerger(proc.getErrorStream(), pipedOutput));
 			stdoutReader = new Thread(new ProcOutputMerger(proc.getInputStream(), pipedOutput));
-			
+
 			stderrReader.start();
 			stdoutReader.start();
 		} else {
@@ -89,9 +91,25 @@ public class LocalProcess extends AbstractRemoteProcess {
 			procStdout = localProcess.getInputStream();
 		}
 
+		completedChecker = new Thread(new Runnable() {
+			public void run() {
+				while (!isCompleted) {
+					try {
+						localProcess.waitFor();
+					} catch (InterruptedException e) {
+						continue;
+					}
+					isCompleted = true;
+				}
+			}
+
+		});
+		completedChecker.start();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#destroy()
 	 */
 	@Override
@@ -99,7 +117,9 @@ public class LocalProcess extends AbstractRemoteProcess {
 		localProcess.destroy();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#exitValue()
 	 */
 	@Override
@@ -107,7 +127,9 @@ public class LocalProcess extends AbstractRemoteProcess {
 		return localProcess.exitValue();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getErrorStream()
 	 */
 	@Override
@@ -115,7 +137,9 @@ public class LocalProcess extends AbstractRemoteProcess {
 		return procStderr;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getInputStream()
 	 */
 	@Override
@@ -123,7 +147,9 @@ public class LocalProcess extends AbstractRemoteProcess {
 		return procStdout;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getOutputStream()
 	 */
 	@Override
@@ -131,23 +157,23 @@ public class LocalProcess extends AbstractRemoteProcess {
 		return localProcess.getOutputStream();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#waitFor()
 	 */
 	@Override
 	public int waitFor() throws InterruptedException {
 		return localProcess.waitFor();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcess#isCompleted()
 	 */
+	@Override
 	public boolean isCompleted() {
-		try {
-			localProcess.exitValue();
-			return true;
-		} catch (IllegalThreadStateException e) {
-			return false;
-		}
+		return isCompleted;
 	}
 }
