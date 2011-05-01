@@ -100,28 +100,10 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getJobError()
-		 */
-		public String getJobError() {
-			return null;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
 		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getJobId()
 		 */
 		public String getJobId() {
 			return fJobId;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getJobOutput()
-		 */
-		public String getJobOutput() {
-			return null;
 		}
 
 		/*

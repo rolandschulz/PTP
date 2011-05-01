@@ -49,7 +49,7 @@ public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
 	public ICommandJobStatus cancelAndRemove(String jobId) {
 		ICommandJobStatus status = null;
 		synchronized (map) {
-			remove(jobId, false);
+			status = remove(jobId, false);
 		}
 		return status;
 	}

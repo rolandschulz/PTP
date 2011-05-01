@@ -166,6 +166,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			doControlCommand(jobId, operation);
 			if (TERMINATE_OPERATION.equals(operation)) {
 				jobStatusMap.cancelAndRemove(jobId);
+				/*
+				 * Leave this in the environment, as getStatus() will be called
+				 * immediately after; this allows the state detail to correspond
+				 * to CANCELED
+				 */
 				p.setValue(IJobStatus.CANCELED);
 			} else {
 				rmVarMap.remove(jobId);
@@ -202,8 +207,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			pinTable.pin(jobId);
 
 			/*
-			 * first check to see when the last call was made; throttle requests
-			 * coming in intervals less than
+			 * If not prematurely aborted (entry still present in the status
+			 * map), first check to see when the last call was made; throttle
+			 * requests coming in intervals less than
 			 * ICommandJobStatus.UPDATE_REQUEST_INTERVAL
 			 */
 			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
@@ -211,7 +217,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				if (IJobStatus.COMPLETED.equals(status.getState())) {
 					/*
 					 * leave the status in the map in case there are further
-					 * calls; it will be pruned by the daemon
+					 * calls (regarding remote file state); it will be pruned by
+					 * the daemon
 					 */
 					status = jobStatusMap.terminated(jobId);
 					if (status.stateChanged()) {
@@ -228,15 +235,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.setUpdateRequestTime(now);
 			}
 
-			PropertyType p = (PropertyType) rmVarMap.get(jobId);
 			String state = IJobStatus.UNDETERMINED;
 
-			if (p != null) {
-				/*
-				 * premature termination
-				 */
-				state = String.valueOf(p.getValue());
-			} else {
+			/*
+			 * premature termination (cancellation) will have left the id mapped
+			 * against "CANCELED" state in the environment
+			 */
+			PropertyType p = (PropertyType) rmVarMap.remove(jobId);
+
+			if (p == null) {
 				state = status == null ? state : status.getStateDetail();
 
 				p = new PropertyType();
@@ -252,9 +259,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				runCommand(jobId, job, false, true);
 
 				p = (PropertyType) rmVarMap.remove(jobId);
-				if (p != null) {
-					state = String.valueOf(p.getValue());
-				}
+			}
+
+			if (p != null) {
+				state = String.valueOf(p.getValue());
 			}
 
 			if (status == null) {
@@ -266,8 +274,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			if (IJobStatus.COMPLETED.equals(status.getState())) {
 				/*
-				 * leave the status in the map in case there are further calls;
-				 * it will be pruned by the daemon
+				 * leave the status in the map in case there are further calls
+				 * (regarding remote file state); it will be pruned by the
+				 * daemon
 				 */
 				status = jobStatusMap.terminated(jobId);
 			}
@@ -412,10 +421,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 * proxy-specific info
 			 */
 			rmVarMap.remove(uuid);
-			jobId = p.getName();
 
-			pinTable.release(jobId);
-			rmVarMap.put(p.getName(), p);
+			jobId = p.getName();
+			pinTable.pin(jobId);
+			rmVarMap.put(jobId, p);
 
 			ICommandJobStreamsProxy proxy = job.getProxy();
 			status.setProxy(proxy);
@@ -428,7 +437,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			/*
 			 * to ensure the most recent script is used at the next call
 			 */
-			rmVarMap.remove(p.getName());
+			rmVarMap.remove(jobId);
 			rmVarMap.remove(SCRIPT_PATH);
 			rmVarMap.remove(SCRIPT);
 
@@ -474,6 +483,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void doControlCommand(String jobId, String operation) throws CoreException {
 		CoreException ce = CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + operation, null);
+
 		CommandType job = null;
 		if (TERMINATE_OPERATION.equals(operation)) {
 			if (maybeKillInteractive(jobId)) {

@@ -91,15 +91,7 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 					return null;
 				}
 
-				public String getJobError() {
-					return null;
-				}
-
 				public String getJobId() {
-					return null;
-				}
-
-				public String getJobOutput() {
 					return null;
 				}
 
