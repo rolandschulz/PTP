@@ -12,7 +12,6 @@ package org.eclipse.ptp.rdt.sync.git.core;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.resources.IProject;
@@ -42,7 +41,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private IRemoteConnection fConnection = null;
 	private GitRemoteSyncConnection fSyncConnection = null;
 	
-	private static final Lock syncLock = new ReentrantLock();
+	private final ReentrantLock syncLock = new ReentrantLock();
+	private Integer syncTaskId = -1;  //ID for most recent synchronization task, functions as a time-stamp 
+	private int finishedSyncTaskId = -1; //all synchronizations up to this ID (including it) have finished
 
 	/**
 	 * Get the remote directory that will be used for synchronization
@@ -183,8 +184,22 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			return;
 		}
 		
+		int mySyncTaskId;
+		synchronized (syncTaskId) {
+			syncTaskId++;    
+			mySyncTaskId=syncTaskId;
+			//suggestion for Deltas: add delta to list of deltas
+		}
+		
+		if (syncLock.hasQueuedThreads() && syncFlags == SyncFlag.NO_FORCE)
+			return;   //the queued Thread will do the work for us. And we don't have to wait because of NO_FORCE
+		
 		syncLock.lock();
 		try {
+			if (mySyncTaskId<=finishedSyncTaskId)  //some other thread has already done the work for us 
+				return;
+
+			
 			// TODO: Use delta information
 			// switch (delta.getKind()) {
 			// case IResourceDelta.ADDED:
@@ -233,6 +248,15 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					throw new RemoteSyncException(e);
 				}
 			}
+			
+			int willFinishTaskId;
+			synchronized (syncTaskId) {
+				willFinishTaskId = syncTaskId;  //This synchronization operation will include all tasks up to current syncTaskId 
+			                                    //syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
+												//we might synchronize even more than that if a file is already saved but syncTaskId wasn't increased yet
+												//thus we cannot guarantee a maximum but we can guarantee syncTaskId as a minimum
+				//suggestion for Deltas: make local copy of list of deltas, remove list of deltas
+			}
 
 			// Sync local and remote. For now, do both ways each time.
 			// TODO: Sync more efficiently and appropriately to the situation.
@@ -247,6 +271,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			} catch (final RemoteSyncException e) {
 				throw e;
 			}
+			finishedSyncTaskId = willFinishTaskId;
 
 		} finally {
 			syncLock.unlock();
