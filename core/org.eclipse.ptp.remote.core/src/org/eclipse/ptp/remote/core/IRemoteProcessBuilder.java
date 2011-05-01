@@ -23,7 +23,7 @@ public interface IRemoteProcessBuilder {
 	public static int NONE = 0x00;
 
 	/**
-	 * Flag to request allocation of a psuedo-terminal for the process (RFC-4254
+	 * Flag to request allocation of a pseudo-terminal for the process (RFC-4254
 	 * Sec. 6.2)
 	 * 
 	 * @since 5.0
@@ -140,7 +140,7 @@ public interface IRemoteProcessBuilder {
 	 * <pre>
 	 * Current flags are:
 	 *   NONE			- disable any flags
-	 *   ALLOCATE_PTY	- allocate a psuedo-terminal for the process (RFC-4254 Sec. 6.2)
+	 *   ALLOCATE_PTY	- allocate a pseudo-terminal for the process (RFC-4254 Sec. 6.2)
 	 *   FORWARD_X11	- enable X11 forwarding (RFC-4254 Sec. 6.3)
 	 * </pre>
 	 * 

@@ -158,28 +158,42 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			if (!resourceManagerIsActive()) {
 				return;
 			}
+
+			if (monitor != null) {
+				monitor.beginTask(operation, 10);
+			}
+
 			pinTable.pin(jobId);
 			PropertyType p = new PropertyType();
 			p.setVisible(false);
 			p.setName(jobId);
 			rmVarMap.put(jobId, p);
+
+			if (monitor != null) {
+				monitor.worked(3);
+			}
 			doControlCommand(jobId, operation);
+
+			if (monitor != null) {
+				monitor.worked(4);
+			}
+			rmVarMap.remove(jobId);
+
 			if (TERMINATE_OPERATION.equals(operation)) {
-				jobStatusMap.cancelAndRemove(jobId);
-				/*
-				 * Leave this in the environment, as getStatus() will be called
-				 * immediately after; this allows the state detail to correspond
-				 * to CANCELED
-				 */
-				p.setValue(IJobStatus.CANCELED);
-			} else {
-				rmVarMap.remove(jobId);
+				jobStatusMap.cancel(jobId);
+			}
+
+			if (monitor != null) {
+				monitor.worked(3);
 			}
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
 			throw ce;
 		} finally {
 			pinTable.release(jobId);
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
 	}
 
@@ -207,9 +221,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			pinTable.pin(jobId);
 
 			/*
-			 * If not prematurely aborted (entry still present in the status
-			 * map), first check to see when the last call was made; throttle
-			 * requests coming in intervals less than
+			 * First check to see when the last call was made; throttle requests
+			 * coming in intervals less than
 			 * ICommandJobStatus.UPDATE_REQUEST_INTERVAL
 			 */
 			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
@@ -235,31 +248,21 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.setUpdateRequestTime(now);
 			}
 
-			String state = IJobStatus.UNDETERMINED;
+			String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
 
-			/*
-			 * premature termination (cancellation) will have left the id mapped
-			 * against "CANCELED" state in the environment
-			 */
-			PropertyType p = (PropertyType) rmVarMap.remove(jobId);
+			PropertyType p = new PropertyType();
+			p.setVisible(false);
+			p.setName(jobId);
+			rmVarMap.put(jobId, p);
 
-			if (p == null) {
-				state = status == null ? state : status.getStateDetail();
-
-				p = new PropertyType();
-				p.setVisible(false);
-				p.setName(jobId);
-				rmVarMap.put(jobId, p);
-
-				CommandType job = controlData.getGetJobStatus();
-				if (job == null) {
-					throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + JOBSTATUS, null);
-				}
-
-				runCommand(jobId, job, false, true);
-
-				p = (PropertyType) rmVarMap.remove(jobId);
+			CommandType job = controlData.getGetJobStatus();
+			if (job == null) {
+				throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + JOBSTATUS, null);
 			}
+
+			runCommand(jobId, job, false, true);
+
+			p = (PropertyType) rmVarMap.remove(jobId);
 
 			if (p != null) {
 				state = String.valueOf(p.getValue());
@@ -272,7 +275,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.setState(state);
 			}
 
-			if (IJobStatus.COMPLETED.equals(status.getState())) {
+			if (IJobStatus.COMPLETED.equals(state)) {
 				/*
 				 * leave the status in the map in case there are further calls
 				 * (regarding remote file state); it will be pruned by the
@@ -325,7 +328,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+		if (monitor != null) {
+			monitor.beginTask(IResourceManager.STARTING_STATE, 10);
+		}
 		initialize();
+		if (monitor != null) {
+			monitor.worked(2);
+		}
 		getResourceManager().setState(IResourceManager.STARTING_STATE);
 		try {
 			try {
@@ -333,10 +342,20 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			} catch (RemoteConnectionException t) {
 				throw CoreExceptionUtils.newException(t.getMessage(), t);
 			}
+			if (monitor != null) {
+				monitor.worked(2);
+			}
 			doOnStartUp(monitor);
+			if (monitor != null) {
+				monitor.worked(4);
+			}
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
 			throw ce;
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
 		getResourceManager().setState(IResourceManager.STARTED_STATE);
 	}
@@ -361,6 +380,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					IJobStatus.UNDETERMINED, this);
 		}
 
+		if (monitor != null) {
+			monitor.beginTask(mode, 20);
+		}
+
 		/*
 		 * give submission a unique id which will in most cases be replaced by
 		 * the resource-generated id for the job/process
@@ -378,6 +401,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 */
 			updatePropertyValuesFromTab(configuration);
 
+			if (monitor != null) {
+				monitor.worked(2);
+			}
+
 			/*
 			 * create the script if necessary; adds the contents to env as
 			 * "${rm:script}". If a custom script has been selected for use, the
@@ -385,6 +412,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 * configuration; if so, the following returns immediately.
 			 */
 			maybeHandleScript(uuid, controlData.getScript());
+
+			if (monitor != null) {
+				monitor.worked(2);
+			}
 
 			ManagedFilesType files = controlData.getManagedFiles();
 
@@ -395,11 +426,23 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 */
 			files = maybeAddManagedFileForScript(files);
 
+			if (monitor != null) {
+				monitor.worked(2);
+			}
+
 			if (!maybeHandleManagedFiles(uuid, files)) {
 				throw CoreExceptionUtils.newException(Messages.CannotCompleteSubmitFailedStaging, null);
 			}
 
+			if (monitor != null) {
+				monitor.worked(4);
+			}
+
 			ICommandJob job = doJobSubmitCommand(uuid, mode);
+
+			if (monitor != null) {
+				monitor.worked(5);
+			}
 
 			/*
 			 * If the submit job lacks a jobId on the standard streams, then we
@@ -413,6 +456,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			} else {
 				String state = job.isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
 				status = new CommandJobStatus(getResourceManager().getUniqueName(), uuid, state, this);
+			}
+
+			if (monitor != null) {
+				monitor.worked(3);
 			}
 
 			/*
@@ -434,6 +481,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.setProcess(job.getProcess());
 			}
 
+			if (monitor != null) {
+				monitor.worked(2);
+			}
+
 			/*
 			 * to ensure the most recent script is used at the next call
 			 */
@@ -445,6 +496,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		} finally {
 			pinTable.release(uuid);
 			pinTable.release(jobId);
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
 	}
 

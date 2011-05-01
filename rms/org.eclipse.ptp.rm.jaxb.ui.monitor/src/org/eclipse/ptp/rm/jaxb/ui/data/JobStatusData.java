@@ -195,7 +195,9 @@ public class JobStatusData {
 	public void updateState(IJobStatus status) {
 		this.status = status;
 		state = status.getState();
-		stateDetail = status.getStateDetail();
+		if (!detailIsFinal(stateDetail)) {
+			stateDetail = status.getStateDetail();
+		}
 	}
 
 	/**
@@ -213,5 +215,9 @@ public class JobStatusData {
 			}
 		}
 		return jobs;
+	}
+
+	private static boolean detailIsFinal(String detail) {
+		return IJobStatus.CANCELED.equals(detail) || IJobStatus.FAILED.equals(detail) || IJobStatus.JOB_OUTERR_READY.equals(detail);
 	}
 }

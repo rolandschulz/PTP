@@ -46,10 +46,14 @@ public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
 	 * @param jobId
 	 *            either internal UUID or scheduler id for the job.
 	 */
-	public ICommandJobStatus cancelAndRemove(String jobId) {
+	public ICommandJobStatus cancel(String jobId) {
 		ICommandJobStatus status = null;
 		synchronized (map) {
-			status = remove(jobId, false);
+			status = map.get(jobId);
+			if (status != null) {
+				status.cancel();
+				status.setState(IJobStatus.CANCELED);
+			}
 		}
 		return status;
 	}
@@ -146,7 +150,8 @@ public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
 	private ICommandJobStatus doTerminated(String jobId, boolean block) {
 		ICommandJobStatus status = map.get(jobId);
 		if (status != null) {
-			if (block) {
+			String d = status.getStateDetail();
+			if (!IJobStatus.CANCELED.equals(d) && !IJobStatus.FAILED.equals(d) && block) {
 				status.maybeWaitForHandlerFiles(READY_FILE_BLOCK);
 			}
 			status.cancel();

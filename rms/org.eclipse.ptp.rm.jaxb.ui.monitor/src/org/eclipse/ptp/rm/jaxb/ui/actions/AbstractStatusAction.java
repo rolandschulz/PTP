@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.actions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -24,7 +27,7 @@ import org.eclipse.ui.IWorkbenchPart;
  * 
  */
 public abstract class AbstractStatusAction implements IObjectActionDelegate {
-	protected JobStatusData status;
+	protected List<JobStatusData> selected;
 	protected MonitorJobListView view;
 	protected static final String COSP = ": ";//$NON-NLS-1$
 
@@ -40,8 +43,12 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 			action.setEnabled(false);
 			return;
 		}
-		status = (JobStatusData) ((IStructuredSelection) selection).getFirstElement();
-		validate(action, status);
+		List<?> list = ((IStructuredSelection) selection).toList();
+		selected = new ArrayList<JobStatusData>();
+		for (Object o : list) {
+			selected.add((JobStatusData) o);
+		}
+		validate(action);
 	}
 
 	/*
@@ -59,7 +66,6 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 	 * Enables the action.
 	 * 
 	 * @param action
-	 * @param status
 	 */
-	protected abstract void validate(IAction action, JobStatusData status);
+	protected abstract void validate(IAction action);
 }
