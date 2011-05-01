@@ -187,6 +187,7 @@ public abstract class CDTDB<A, T, R extends IVPGNode<T>>
     private static File copyFile(File orig) throws IOException
     {
         File tempFile = File.createTempFile("rephraser-tmp", "db"); //$NON-NLS-1$ //$NON-NLS-2$
+        tempFile.deleteOnExit();
         FileChannel from = new FileInputStream(orig).getChannel();
         FileChannel to = new FileOutputStream(tempFile).getChannel();
         to.transferFrom(from, 0, from.size());

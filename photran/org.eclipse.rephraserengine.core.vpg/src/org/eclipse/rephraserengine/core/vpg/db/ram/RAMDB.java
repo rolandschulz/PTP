@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.nio.channels.FileChannel;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -188,50 +189,47 @@ public abstract class RAMDB<A, T, R extends IVPGNode<T>>
     
     
     // HYPOTHETICAL UPDATING ///////////////////////////////////////////////////
-
-    private HashMap<String, Long> otherFiles = null;
-    private HashSet<VPGDependency<A, T, R>> otherDependencies = null;
-    private HashMap<R, Set<VPGEdge<A, T, R>>> otherOutgoingEdges = null;
-    private HashMap<R, Set<VPGEdge<A, T, R>>> otherIncomingEdges = null;
-    private TwoKeyHashMap<R, Integer, Serializable> otherAnnotations = null;
     
-    @SuppressWarnings("unchecked")
+    private File originalContents = null;
+    
     @Override
     public void enterHypotheticalMode() throws IOException
     {
         if (isInHypotheticalMode()) return;
         
-        //clone all fields
-        otherFiles = (HashMap<String, Long>)this.files.clone();
-        otherDependencies = (HashSet<VPGDependency<A, T, R>>)this.dependencies.clone();
-        otherOutgoingEdges = (HashMap<R, Set<VPGEdge<A, T, R>>>)this.outgoingEdges.clone();
-        otherIncomingEdges = (HashMap<R, Set<VPGEdge<A, T, R>>>)this.incomingEdges.clone();
-        otherAnnotations = (TwoKeyHashMap<R, Integer, Serializable>)this.annotations.clone();   
+        flush();
+        originalContents = copyFile(file);
+        clearDatabase();
+        readFrom(file);
     }
     
+    private static File copyFile(File orig) throws IOException
+    {
+        File tempFile = File.createTempFile("rephraser-tmp", "db"); //$NON-NLS-1$ //$NON-NLS-2$
+        tempFile.deleteOnExit();
+        FileChannel from = new FileInputStream(orig).getChannel();
+        FileChannel to = new FileOutputStream(tempFile).getChannel();
+        to.transferFrom(from, 0, from.size());
+        from.close();
+        to.close();
+        return tempFile;
+    }
+
     @Override
     public void leaveHypotheticalMode() throws IOException
     {
         if (!isInHypotheticalMode()) return;
         
-        this.files = otherFiles;
-        this.dependencies = otherDependencies;
-        this.outgoingEdges = otherOutgoingEdges;
-        this.incomingEdges = otherIncomingEdges;
-        this.annotations = otherAnnotations;
-        
-        otherFiles = null;
-        otherDependencies = null;
-        otherOutgoingEdges = null;
-        otherIncomingEdges = null;
-        otherAnnotations = null;
+        clearDatabase();
+        readFrom(originalContents);
+        originalContents.delete();
+        originalContents = null;
     }
     
     @Override
     public boolean isInHypotheticalMode()
     {
-        return !(otherFiles == null && otherDependencies == null
-            && otherOutgoingEdges == null && otherIncomingEdges == null && otherAnnotations == null);
+        return originalContents != null;
     }
     
     
@@ -449,28 +447,16 @@ public abstract class RAMDB<A, T, R extends IVPGNode<T>>
     public Collection<? extends VPGEdge<A, T, R>> getAllEdgesFor(String filename)
     {
         checkIfFileInDatabase(filename);
-        checkIfFileInDatabase(filename);
         
         Set<VPGEdge<A, T, R>> toReturn = new TreeSet<VPGEdge<A, T, R>>(); 
-        
+
         for (R r : outgoingEdges.keySet())
-        {
             if (r.getFilename().equals(filename))
-            {
                 toReturn.addAll(this.getOutgoingEdgesFrom(r, ALL_EDGES));
+   
+        for (R r : incomingEdges.keySet())
+            if (r.getFilename().equals(filename))
                 toReturn.addAll(this.getIncomingEdgesTo(r, ALL_EDGES));
-            }
-            
-            for (VPGEdge<A, T, R> e : outgoingEdges.get(r))
-            {
-                R ref = e.getSink();
-                if (ref.getFilename().equals(filename))
-                {
-                    toReturn.addAll(this.getOutgoingEdgesFrom(r, ALL_EDGES));
-                    toReturn.addAll(this.getIncomingEdgesTo(r, ALL_EDGES));
-                }
-            }
-        }
    
         return toReturn;
     }

@@ -106,6 +106,7 @@ abstract class PreservationAnalyzer<A, T, R extends IVPGNode<T>> extends Preserv
             catch (UnexpectedInitialEdge exception)
             {
                 VPGEdge<A,T,R> entry = exception.getEdge();
+                System.err.println("Unexpected initial edge " + entry); //$NON-NLS-1$
                 VPGEdge<A,T,R> otherEntry = findEdgeWithNewSink(entry);
                 if (otherEntry != null)
                 {
@@ -125,6 +126,7 @@ abstract class PreservationAnalyzer<A, T, R extends IVPGNode<T>> extends Preserv
             catch (UnexpectedFinalEdge exception)
             {
                 VPGEdge<A,T,R> edge = exception.getEdge();
+                System.err.println("Unexpected final edge " + edge); //$NON-NLS-1$
                 diff.add(new EdgeAdded(edge));
             }
         }
