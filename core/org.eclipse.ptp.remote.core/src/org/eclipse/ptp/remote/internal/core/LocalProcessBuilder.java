@@ -70,10 +70,22 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start()
+	 * @see
+	 * org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getSupportedFlags
+	 * ()
 	 */
 	@Override
-	public IRemoteProcess start() throws IOException {
+	public int getSupportedFlags() {
+		return NONE;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start(int)
+	 */
+	@Override
+	public IRemoteProcess start(int flags) throws IOException {
 		String commandArray[] = command().toArray(new String[0]);
 		String environmentArray[] = new String[environment().size()];
 		int index = 0;
