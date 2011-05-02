@@ -149,7 +149,7 @@ public class ControlChannel implements ILineStreamListener {
 	}
 
 	public void killRemoteProcess(int pid) {
-		if (pid > 0) {
+		if (pid > 0 && outputToControlTerminalInput != null) {
 			try {
 				outputToControlTerminalInput.write(new String("kill -9 " + pid + "\n").getBytes()); //$NON-NLS-1$ //$NON-NLS-2$
 				outputToControlTerminalInput.flush();
