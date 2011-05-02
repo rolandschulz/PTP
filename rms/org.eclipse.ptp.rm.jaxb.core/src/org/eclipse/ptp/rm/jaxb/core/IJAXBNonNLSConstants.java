@@ -225,4 +225,11 @@ public interface IJAXBNonNLSConstants {
 	public static final String ATTRIBUTE_HIDDEN = "ATTRIBUTE_HIDDEN";//$NON-NLS-1$
 	public static final String ATTRIBUTE_SYMLINK = "ATTRIBUTE_SYMLINK";//$NON-NLS-1$
 	public static final String ATTRIBUTE_LINK_TARGET = "ATTRIBUTE_LINK_TARGET";//$NON-NLS-1$
+
+	/*
+	 * IRemoteProcessBuilder
+	 */
+	public static final String TAG_NONE = "NONE";//$NON-NLS-1$
+	public static final String TAG_ALLOCATE_PTY = "ALLOCATE_PTY";//$NON-NLS-1$
+	public static final String TAG_FORWARD_X11 = "FORWARD_X11";//$NON-NLS-1$
 }

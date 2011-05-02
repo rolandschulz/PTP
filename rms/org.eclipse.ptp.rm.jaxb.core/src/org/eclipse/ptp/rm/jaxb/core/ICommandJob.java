@@ -19,6 +19,11 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
  */
 public interface ICommandJob {
 	/**
+	 * @return the status of the command just after execution
+	 */
+	public ICommandJobStatus getJobStatus();
+
+	/**
 	 * @return the process wrapper (CommandJob).
 	 */
 	public IRemoteProcess getProcess();

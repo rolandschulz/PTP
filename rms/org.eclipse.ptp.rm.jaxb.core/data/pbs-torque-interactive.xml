@@ -9,7 +9,7 @@
 <!-- * Albert L. Rossi - design and implementation -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-torque-generic">
+	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-torque-interactive">
 	<control-data>
 		<property name="mpiPrefix" visible="false">
 			<default>${rm:mpiCommand#value} -np ${rm:mpiCores#value}</default>
@@ -21,26 +21,19 @@
 		<attribute name="mpiCores" min="1" type="integer">
 			<description>the '-np' value</description>
 		</attribute>
-		<attribute name="Account_Name" type="string">
-			<description>Account to which to charge this job.</description>
-			<tooltip>Format: string</tooltip>
-		</attribute>
-		<attribute name="destination" type="choice">
-			<description>Designation of the queue to which to submit the job.</description>
-			<tooltip>Format: queue[@server].</tooltip>
-			<choice>normal,debug</choice>
-		</attribute>
-		<start-up-command name="shell-command" waitForId="true" keepOpen="true">
+		<submit-interactive name="submit-interactive" waitForId="true" keepOpen="true" flags="ALLOCATE_PTY">
 			<arg>qsub</arg>
 			<arg>-I</arg>
 			<arg>-l nodes=1</arg>
 			<arg>-l mem=20mb</arg>
 			<arg>-l walltime=00:30:00</arg>
 			<arg>-V</arg>
+			<input isUndefinedIfMatches=".+ -np">${rm:mpiPrefix#value}</input>
+			<input>${rm:executablePath#value} ${rm:progArgs#value}</input>
 			<stdout-parser delim="\n" all="true" save="1">
 				<target ref="@jobId">
 					<match>
-						<expression>.*qsub: job ([\d]+)[.]+ ready.*</expression>
+						<expression>.*qsub: job ([\d]+)[.].+ ready.*</expression>
 						<set field="name">
 							<entry valueGroup="1"/>
 						</set>
@@ -50,10 +43,6 @@
 					</match>
 				</target>
 			</stdout-parser>
-		</start-up-command>
-		<submit-interactive name="submit-interactive" asInputToProcess="shell-command">
-			<arg isUndefinedIfMatches=".+ -np">${rm:mpiPrefix#value}</arg>
-			<arg>${rm:executablePath#value} ${rm:progArgs#value}</arg>
 		</submit-interactive>
 		<launch-tab>
 			<basic>

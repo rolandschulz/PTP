@@ -25,8 +25,8 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
-import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
@@ -42,7 +42,6 @@ import org.eclipse.ptp.rm.jaxb.core.runnable.JobStatusMap;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.runnable.command.CommandJob;
-import org.eclipse.ptp.rm.jaxb.core.runnable.command.CommandJobInput;
 import org.eclipse.ptp.rm.jaxb.core.runnable.command.CommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.JobIdPinTable;
@@ -169,31 +168,23 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			p.setName(jobId);
 			rmVarMap.put(jobId, p);
 
-			if (monitor != null) {
-				monitor.worked(3);
-			}
+			worked(monitor, 3);
 			doControlCommand(jobId, operation);
 
-			if (monitor != null) {
-				monitor.worked(4);
-			}
+			worked(monitor, 4);
 			rmVarMap.remove(jobId);
 
 			if (TERMINATE_OPERATION.equals(operation)) {
 				jobStatusMap.cancel(jobId);
 			}
 
-			if (monitor != null) {
-				monitor.worked(3);
-			}
+			worked(monitor, 3);
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
 			throw ce;
 		} finally {
 			pinTable.release(jobId);
-			if (monitor != null) {
-				monitor.done();
-			}
+			worked(monitor, 0);
 		}
 	}
 
@@ -332,9 +323,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			monitor.beginTask(IResourceManager.STARTING_STATE, 10);
 		}
 		initialize();
-		if (monitor != null) {
-			monitor.worked(2);
-		}
+		worked(monitor, 2);
 		getResourceManager().setState(IResourceManager.STARTING_STATE);
 		try {
 			try {
@@ -342,20 +331,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			} catch (RemoteConnectionException t) {
 				throw CoreExceptionUtils.newException(t.getMessage(), t);
 			}
-			if (monitor != null) {
-				monitor.worked(2);
-			}
+			worked(monitor, 2);
 			doOnStartUp(monitor);
-			if (monitor != null) {
-				monitor.worked(4);
-			}
+			worked(monitor, 4);
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
 			throw ce;
 		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
+			worked(monitor, 0);
 		}
 		getResourceManager().setState(IResourceManager.STARTED_STATE);
 	}
@@ -400,10 +383,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 * overwrite property/attribute values based on user choices
 			 */
 			updatePropertyValuesFromTab(configuration);
-
-			if (monitor != null) {
-				monitor.worked(2);
-			}
+			worked(monitor, 2);
 
 			/*
 			 * create the script if necessary; adds the contents to env as
@@ -412,10 +392,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 * configuration; if so, the following returns immediately.
 			 */
 			maybeHandleScript(uuid, controlData.getScript());
-
-			if (monitor != null) {
-				monitor.worked(2);
-			}
+			worked(monitor, 3);
 
 			ManagedFilesType files = controlData.getManagedFiles();
 
@@ -425,42 +402,17 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 * (SCRIPT_PATH) must exist.
 			 */
 			files = maybeAddManagedFileForScript(files);
-
-			if (monitor != null) {
-				monitor.worked(2);
-			}
+			worked(monitor, 3);
 
 			if (!maybeHandleManagedFiles(uuid, files)) {
 				throw CoreExceptionUtils.newException(Messages.CannotCompleteSubmitFailedStaging, null);
 			}
-
-			if (monitor != null) {
-				monitor.worked(4);
-			}
+			worked(monitor, 4);
 
 			ICommandJob job = doJobSubmitCommand(uuid, mode);
+			worked(monitor, 5);
 
-			if (monitor != null) {
-				monitor.worked(5);
-			}
-
-			/*
-			 * If the submit job lacks a jobId on the standard streams, then we
-			 * assign it the UUID (it is most probably interactive); else we
-			 * wait for the id to be set by the tokenizer.
-			 */
-			CommandJobStatus status = null;
-			if (job.waitForId()) {
-				status = new CommandJobStatus(getResourceManager().getUniqueName(), this);
-				status.waitForJobId(uuid);
-			} else {
-				String state = job.isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
-				status = new CommandJobStatus(getResourceManager().getUniqueName(), uuid, state, this);
-			}
-
-			if (monitor != null) {
-				monitor.worked(3);
-			}
+			ICommandJobStatus status = job.getJobStatus();
 
 			/*
 			 * property containing actual jobId as name was set in the wait
@@ -473,17 +425,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			pinTable.pin(jobId);
 			rmVarMap.put(jobId, p);
 
-			ICommandJobStreamsProxy proxy = job.getProxy();
-			status.setProxy(proxy);
 			jobStatusMap.addJobStatus(status.getJobId(), status);
 			status.setLaunchConfig(configuration);
 			if (!job.isBatch()) {
 				status.setProcess(job.getProcess());
 			}
-
-			if (monitor != null) {
-				monitor.worked(2);
-			}
+			worked(monitor, 2);
 
 			/*
 			 * to ensure the most recent script is used at the next call
@@ -491,14 +438,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			rmVarMap.remove(jobId);
 			rmVarMap.remove(SCRIPT_PATH);
 			rmVarMap.remove(SCRIPT);
-
 			return status;
 		} finally {
 			pinTable.release(uuid);
 			pinTable.release(jobId);
-			if (monitor != null) {
-				monitor.done();
-			}
+			worked(monitor, 0);
 		}
 	}
 
@@ -625,7 +569,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + SP + uuid + SP + mode, null);
 		}
 
-		return runCommand(uuid, command, batch, false);
+		/*
+		 * NOTE: changed this to join, because the waitForId is now part of the
+		 * run() method of the command itself (05.01.2011)
+		 */
+		return runCommand(uuid, command, batch, true);
 	}
 
 	/**
@@ -834,13 +782,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		ICommandJob job = null;
-
-		if (command.getAsInputToProcess() != null) {
-			job = new CommandJobInput(uuid, command, this);
-		} else {
-			job = new CommandJob(uuid, command, batch, this);
-		}
+		ICommandJob job = new CommandJob(uuid, command, batch, (IJAXBResourceManager) getResourceManager());
 
 		job.schedule();
 
@@ -948,5 +890,21 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));
 		appendLaunchEnv = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, appendLaunchEnv);
+	}
+
+	/**
+	 * Encapsulates null check.
+	 * 
+	 * @param monitor
+	 * @param units
+	 */
+	private void worked(IProgressMonitor monitor, int units) {
+		if (monitor != null) {
+			if (units == 0) {
+				monitor.done();
+			} else {
+				monitor.worked(units);
+			}
+		}
 	}
 }

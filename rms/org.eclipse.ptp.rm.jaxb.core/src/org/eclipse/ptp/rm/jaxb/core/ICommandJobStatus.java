@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
@@ -65,10 +66,20 @@ public interface ICommandJobStatus extends IJobStatus {
 	public void maybeWaitForHandlerFiles(int blockForSecs);
 
 	/**
+	 * @param configuration
+	 */
+	public void setLaunchConfig(ILaunchConfiguration configuration);
+
+	/**
 	 * @param process
 	 *            if the Job is interactive.
 	 */
 	public void setProcess(IRemoteProcess process);
+
+	/**
+	 * @param proxy
+	 */
+	public void setProxy(ICommandJobStreamsProxy proxy);
 
 	/**
 	 * @param state
