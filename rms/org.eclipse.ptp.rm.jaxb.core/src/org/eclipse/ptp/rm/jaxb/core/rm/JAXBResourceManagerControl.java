@@ -241,19 +241,17 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
 
-			PropertyType p = new PropertyType();
-			p.setVisible(false);
-			p.setName(jobId);
-			rmVarMap.put(jobId, p);
+			PropertyType p = null;
 
 			CommandType job = controlData.getGetJobStatus();
-			if (job == null) {
-				throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + JOBSTATUS, null);
+			if (job != null) {
+				p = new PropertyType();
+				p.setVisible(false);
+				p.setName(jobId);
+				rmVarMap.put(jobId, p);
+				runCommand(jobId, job, false, true);
+				p = (PropertyType) rmVarMap.remove(jobId);
 			}
-
-			runCommand(jobId, job, false, true);
-
-			p = (PropertyType) rmVarMap.remove(jobId);
 
 			if (p != null) {
 				state = String.valueOf(p.getValue());

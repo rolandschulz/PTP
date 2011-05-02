@@ -114,7 +114,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	public CommandJobStatus(String rmUniqueName, String jobId, String state, IJAXBResourceManagerControl control) {
 		this.rmUniqueName = rmUniqueName;
 		this.jobId = jobId;
-		this.state = state;
+		setState(state);
 		this.control = control;
 		assert (null != control);
 		waitEnabled = true;
@@ -452,11 +452,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 					jobId = p.getName();
 					String v = (String) p.getValue();
 					if (v != null) {
-						state = v;
+						setState(v);
 					}
-
 				}
 			}
+			System.out.println(this + ":" + jobId + ", " + state);
 		}
 	}
 
