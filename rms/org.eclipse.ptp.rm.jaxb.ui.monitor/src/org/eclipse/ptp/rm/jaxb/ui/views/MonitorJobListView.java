@@ -200,6 +200,9 @@ public class MonitorJobListView extends ViewPart implements IResourceManagerList
 	 */
 	public void handleEvent(IJobChangedEvent e) {
 		String jobId = e.getJobId();
+		if (jobId == null) {
+			return;
+		}
 		IResourceManager rm = e.getSource();
 		IJobStatus status = rm.getControl().getJobStatus(jobId);
 		JobStatusData data = jobs.get(jobId);
@@ -270,7 +273,11 @@ public class MonitorJobListView extends ViewPart implements IResourceManagerList
 		registerInitial();
 		List<JobStatusData> jobs = JobStatusData.reload(memento);
 		for (JobStatusData job : jobs) {
-			this.jobs.put(job.getJobId(), job);
+			String jobId = job.getJobId();
+			if (jobId == null) {
+				continue;
+			}
+			this.jobs.put(jobId, job);
 			try {
 				maybeUpdateJobState(job, false);
 			} catch (Throwable t) {

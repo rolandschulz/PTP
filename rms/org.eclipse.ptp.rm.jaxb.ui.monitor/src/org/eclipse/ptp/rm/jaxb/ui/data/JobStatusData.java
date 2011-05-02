@@ -161,6 +161,9 @@ public class JobStatusData {
 		if (memento == null) {
 			return;
 		}
+		if (jobId == null) {
+			return;
+		}
 		IMemento jobMemento = memento.createChild(JOB_ID, jobId);
 		jobMemento.putString(JOB_ID, jobId);
 		jobMemento.putString(RM_ID, rmId);

@@ -224,7 +224,7 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	 */
 	private static int getEfsAttributeValue(String efsAttrStr) {
 		int attributes = 0;
-		String[] split = efsAttrStr.split(PIP);
+		String[] split = efsAttrStr.split(REGPIP);
 		for (String s : split) {
 			s = s.trim();
 			if (ATTRIBUTE_READ_ONLY.equals(s)) {

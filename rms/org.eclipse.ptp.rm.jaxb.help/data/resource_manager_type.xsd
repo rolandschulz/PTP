@@ -256,6 +256,15 @@
 	<xs:complexType name="command-type">
 		<xs:sequence>
 			<xs:element name="arg" maxOccurs="unbounded" type="rm:arg-type"/>
+			<xs:element name="input" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type">
+				<xs:annotation>
+					<xs:documentation>
+						When there is input present, it is directed to the input stream of the command with this name. If the "keepOpen"
+						attribute is true, a check will be made to see if there already exists an open process (which is also alive) corresponding to the
+						name of this command, and use that; otherwise, ut first executes the arguments, then provides the input arguments to it.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:name-value-pair-type"/>
 			<xs:element name="stdout-parser" minOccurs="0" type="rm:tokenizer-type"/>
 			<xs:element name="stderr-parser" minOccurs="0" type="rm:tokenizer-type"/>
@@ -268,6 +277,25 @@
 		<xs:attribute name="replaceEnvironment" type="xs:boolean" default="false"/>
 		<xs:attribute name="waitForId" type="xs:boolean" default="true"/>
 		<xs:attribute name="ignoreExitStatus" type="xs:boolean" default="false"/>
+		<xs:attribute name="keepOpen" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Process will be added to table under the name of this command; all such processes will be closed when the
+					resource manager is closed.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="flags" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					An or'd string corresponding to the remote process flags. Currently these include only:
+					NONE
+					ALLOCATE_PTY
+					(allocates pseudo-terminal)
+					FORWARD_X11
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="launch-tab-type">
 		<xs:annotation>
@@ -277,7 +305,8 @@
 				org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab, provides a top-level "switch" between controllers. There
 				are a maximum of three top-level tabs or "pages"; the basic and advanced (the names are placeholders which need not correspond to
 				their actual content or usage, and can be changed) controllers are configurable; for the custom controller, see below.
-				The SWT-related types generally expose the fields of their associated Java class.
+				The
+				SWT-related types generally expose the fields of their associated Java class.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>

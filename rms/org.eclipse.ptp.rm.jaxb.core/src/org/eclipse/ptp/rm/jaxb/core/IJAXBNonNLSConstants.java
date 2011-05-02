@@ -47,6 +47,7 @@ public interface IJAXBNonNLSConstants {
 	public static final String AT = "@";//$NON-NLS-1$
 	public static final String DOL = "$";//$NON-NLS-1$
 	public static final String PIP = "|";//$NON-NLS-1$
+	public static final String REGPIP = "[|]";//$NON-NLS-1$
 	public static final String DOT = ".";//$NON-NLS-1$
 	public static final String Z3 = "000";//$NON-NLS-1$
 	public static final String OPENP = "(";//$NON-NLS-1$
