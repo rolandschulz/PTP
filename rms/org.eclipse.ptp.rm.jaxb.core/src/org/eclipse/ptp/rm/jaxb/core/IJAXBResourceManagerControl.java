@@ -11,7 +11,6 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.util.Map;
 
-import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
@@ -41,9 +40,9 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	public Map<String, String> getLaunchEnv();
 
 	/**
-	 * @return table of open processes
+	 * @return table of jobs with open processes
 	 */
-	public Map<String, IRemoteProcess> getProcessTable();
+	public Map<String, ICommandJob> getJobTable();
 
 	/**
 	 * @return connection information for this resource manager

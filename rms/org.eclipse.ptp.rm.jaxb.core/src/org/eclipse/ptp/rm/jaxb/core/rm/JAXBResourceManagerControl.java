@@ -21,7 +21,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
@@ -76,7 +75,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private final IJAXBResourceManagerConfiguration config;
 
 	private Map<String, String> launchEnv;
-	private Map<String, IRemoteProcess> processTable;
+	private Map<String, ICommandJob> processTable;
 	private JobStatusMap jobStatusMap;
 	private JobIdPinTable pinTable;
 	private RMVariableMap rmVarMap;
@@ -111,18 +110,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
+	 * @return table of open remote processes
+	 */
+	public Map<String, ICommandJob> getJobTable() {
+		return processTable;
+	}
+
+	/**
 	 * @return any environment variables passed in through the
 	 *         LaunchConfiguration
 	 */
 	public Map<String, String> getLaunchEnv() {
 		return launchEnv;
-	}
-
-	/**
-	 * @return table of open remote processes
-	 */
-	public Map<String, IRemoteProcess> getProcessTable() {
-		return processTable;
 	}
 
 	/**
@@ -207,7 +206,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
 		try {
 			if (!resourceManagerIsActive()) {
-				return new CommandJobStatus(getResourceManager().getUniqueName(), jobId, IJobStatus.UNDETERMINED, this);
+				return new CommandJobStatus(getResourceManager().getUniqueName(), jobId, IJobStatus.COMPLETED, this);
 			}
 			pinTable.pin(jobId);
 
@@ -289,8 +288,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * Resets the env and executes any shutdown commands, then disconnects.
-	 * (non-Javadoc)
+	 * Executes any shutdown commands, then disconnects. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doShutdown()
 	 */
@@ -298,9 +296,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	protected void doShutdown() throws CoreException {
 		try {
 			doOnShutdown();
-			doDisconnect();
 			((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences();
 			jobStatusMap.halt();
+			doDisconnect();
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
 			throw ce;
@@ -309,7 +307,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * Connects, resets the env and executes any startup commands. (non-Javadoc)
+	 * Connects and executes any startup commands. (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doStartup(org
@@ -582,10 +580,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private void doOnShutdown() throws CoreException {
 		List<CommandType> onShutDown = controlData.getShutDownCommand();
 		runCommands(onShutDown);
-		for (IRemoteProcess process : processTable.values()) {
-			if (!process.isCompleted()) {
-				process.destroy();
-			}
+		for (ICommandJob job : processTable.values()) {
+			job.terminate();
+			String jobId = job.getJobStatus().getJobId();
+			System.out.println("final job change notification: " + jobId);
+			getBaseResourceManager().fireJobChanged(jobId);
 		}
 	}
 
@@ -612,7 +611,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void initialize() {
 		launchEnv = new TreeMap<String, String>();
-		processTable = new HashMap<String, IRemoteProcess>();
+		processTable = new HashMap<String, ICommandJob>();
 		pinTable = new JobIdPinTable();
 
 		/*

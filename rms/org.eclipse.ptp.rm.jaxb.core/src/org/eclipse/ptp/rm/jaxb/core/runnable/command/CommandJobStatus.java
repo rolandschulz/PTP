@@ -126,7 +126,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * job cancellation.
 	 */
 	public synchronized boolean cancel() {
-		if (process != null) {
+		if (process != null && !process.isCompleted()) {
 			process.destroy();
 			if (proxy != null) {
 				proxy.close();
@@ -456,7 +456,6 @@ public class CommandJobStatus implements ICommandJobStatus {
 					}
 				}
 			}
-			System.out.println(this + ":" + jobId + ", " + state);
 		}
 	}
 

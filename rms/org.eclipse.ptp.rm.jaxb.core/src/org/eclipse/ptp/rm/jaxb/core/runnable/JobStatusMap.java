@@ -18,6 +18,7 @@ public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
 
 	private final IResourceManagerControl control;
 	private final Map<String, ICommandJobStatus> map;
+	private Thread t;
 	private boolean running = false;
 
 	public JobStatusMap(IResourceManagerControl control) {
@@ -78,6 +79,7 @@ public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
 	public void halt() {
 		synchronized (map) {
 			running = false;
+			t.interrupt();
 			map.notifyAll();
 		}
 	}
@@ -89,6 +91,7 @@ public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
 	 */
 	@Override
 	public void run() {
+		t = Thread.currentThread();
 		Map<String, String> toPrune = new HashMap<String, String>();
 
 		synchronized (map) {
@@ -151,7 +154,7 @@ public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
 		ICommandJobStatus status = map.get(jobId);
 		if (status != null) {
 			String d = status.getStateDetail();
-			if (!IJobStatus.CANCELED.equals(d) && !IJobStatus.FAILED.equals(d) && block) {
+			if (!status.isInteractive() && !IJobStatus.CANCELED.equals(d) && !IJobStatus.FAILED.equals(d) && block) {
 				status.maybeWaitForHandlerFiles(READY_FILE_BLOCK);
 			}
 			status.cancel();

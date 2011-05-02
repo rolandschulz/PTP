@@ -239,6 +239,29 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 		return batch;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#terminate()
+	 */
+	public synchronized void terminate() {
+		if (active) {
+			if (process != null && !process.isCompleted()) {
+				process.destroy();
+			}
+			if (proxy != null) {
+				proxy.close();
+			}
+			try {
+				joinConsumers();
+			} catch (CoreException ce) {
+				JAXBCorePlugin.log(ce);
+			}
+			cancel();
+			active = false;
+		}
+	}
+
 	/**
 	 * The resource manager should wait for the job id on the stream (parsed by
 	 * an apposite tokenizer) before returning the status object to the caller.
@@ -251,17 +274,22 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 
 	/**
 	 * If this process has no input, execute it normally. Otherwise, if the
-	 * process is to be kept open, check for it in the process table; if it is
-	 * there and still alive, send the input to it; if not, start the process,
-	 * and then send the input.
+	 * process is to be kept open, check for the command job in the job table;
+	 * if it is there and still alive, send the input to it; if not, start the
+	 * process, and then send the input.
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		boolean input = !command.getInput().isEmpty();
 		if (input) {
-			process = control.getProcessTable().get(getName());
-			if (process != null && !process.isCompleted()) {
-				return writeInputToProcess(process);
+			ICommandJob job = control.getJobTable().get(getName());
+			if (job != null && job.isActive()) {
+				IRemoteProcess process = job.getProcess();
+				if (process != null && !process.isCompleted()) {
+					return writeInputToProcess(process);
+				} else {
+					job.terminate();
+				}
 			}
 		}
 
@@ -283,13 +311,14 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 				String state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
 				jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, control);
 			}
-			jobStatus.setProxy(getProxy());
-		}
 
-		if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
-			if (input) {
-				if (process != null && !process.isCompleted()) {
-					runStatus = writeInputToProcess(process);
+			jobStatus.setProxy(getProxy());
+
+			if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
+				if (input) {
+					if (process != null && !process.isCompleted()) {
+						runStatus = writeInputToProcess(process);
+					}
 				}
 			}
 		}
@@ -327,7 +356,7 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 			}
 
 			if (keepOpen) {
-				control.getProcessTable().put(getName(), process);
+				control.getJobTable().put(getName(), this);
 				return Status.OK_STATUS;
 			}
 

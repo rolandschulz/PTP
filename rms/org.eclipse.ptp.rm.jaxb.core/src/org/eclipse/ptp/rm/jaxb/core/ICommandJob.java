@@ -54,6 +54,11 @@ public interface ICommandJob {
 	public void schedule();
 
 	/**
+	 * Shuts off the proxy, terminates the process and cancels the job.
+	 */
+	public void terminate();
+
+	/**
 	 * @return whether to wait (CommandJob).
 	 */
 	public boolean waitForId();
