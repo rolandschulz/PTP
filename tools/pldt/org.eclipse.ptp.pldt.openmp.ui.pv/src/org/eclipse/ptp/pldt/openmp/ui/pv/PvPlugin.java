@@ -19,13 +19,13 @@ import org.osgi.framework.BundleContext;
  */
 public class PvPlugin extends AbstractUIPlugin {
 
-	//The shared instance.
+	// The shared instance.
 	private static PvPlugin plugin;
-    
-    public static final String MARKER_ID       = "org.eclipse.ptp.pldt.openmp.ui.pv.openMPProblemMarker"; //$NON-NLS-1$
-    
-    public static final String VIEW_ID         = "org.eclipse.ptp.pldt.openmp.ui.pv.views.OpenMPProblemsView"; //$NON-NLS-1$
-	
+
+	public static final String MARKER_ID = "org.eclipse.ptp.pldt.openmp.ui.pv.openMPProblemMarker"; //$NON-NLS-1$
+
+	public static final String VIEW_ID = "org.eclipse.ptp.pldt.openmp.ui.pv.views.OpenMPProblemsView"; //$NON-NLS-1$
+
 	/**
 	 * The constructor.
 	 */
@@ -58,8 +58,9 @@ public class PvPlugin extends AbstractUIPlugin {
 	/**
 	 * Returns an image descriptor for the image file at the given
 	 * plug-in relative path.
-	 *
-	 * @param path the path
+	 * 
+	 * @param path
+	 *            the path
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {

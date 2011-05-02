@@ -14,8 +14,8 @@ import org.eclipse.ptp.pldt.common.ArtifactMarkingVisitor;
 
 public class UPCArtifactMarkingVisitor extends ArtifactMarkingVisitor
 {
-    public UPCArtifactMarkingVisitor(String markerId)
-    {
-        super(markerId);
-    }
+	public UPCArtifactMarkingVisitor(String markerId)
+	{
+		super(markerId);
+	}
 }

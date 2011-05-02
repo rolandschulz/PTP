@@ -29,18 +29,20 @@ import org.osgi.framework.Bundle;
 
 /**
  * Help book for C++ MPI functions
+ * 
  * @author tibbitts
- *
+ * 
  */
 public class MpiCPPHelpBook extends CHelpBookImpl
 {
-    private static final String TITLE = Messages.getString("MpiCPPHelpBook_MPI_CPP_HELP_BOOK_TITLE"); //$NON-NLS-1$
-    private static final boolean traceOn=false;
+	private static final String TITLE = Messages.getString("MpiCPPHelpBook_MPI_CPP_HELP_BOOK_TITLE"); //$NON-NLS-1$
+	private static final boolean traceOn = false;
 
-    public MpiCPPHelpBook()
-    {
+	public MpiCPPHelpBook()
+	{
 		super(MpiPlugin.getPluginId());
-		if(traceOn)System.out.println("MPI CPP help book ctor()..."); //$NON-NLS-1$
+		if (traceOn)
+			System.out.println("MPI CPP help book ctor()..."); //$NON-NLS-1$
 		// populate func map
 		Bundle bundle = Platform.getBundle(MpiPlugin.getPluginId());
 		Path path = new Path("mpiref.xml"); //$NON-NLS-1$
@@ -54,20 +56,23 @@ public class MpiCPPHelpBook extends CHelpBookImpl
 		}
 
 		List<FunctionSummaryImpl> mpiFuncList = MPIDocXMLParser.parseDOM(xmlIn, "cppname"); //$NON-NLS-1$
-		int temp=0;
+		int temp = 0;
 		for (Iterator<FunctionSummaryImpl> it = mpiFuncList.iterator(); it.hasNext();) {
 			FunctionSummaryImpl functionSummary = it.next();
-			if(traceOn)if(2>temp++)System.out.println("  "+functionSummary.getName()+"-"+functionSummary.getDescription()); //$NON-NLS-1$ //$NON-NLS-2$
+			if (traceOn)
+				if (2 > temp++)
+					System.out.println("  " + functionSummary.getName() + "-" + functionSummary.getDescription()); //$NON-NLS-1$ //$NON-NLS-2$
 			funcName2FuncInfo.put(functionSummary.getName(), functionSummary);
-		};
-    	// set title
-    	setTitle(TITLE);
+		}
+		;
+		// set title
+		setTitle(TITLE);
 
-    }
-    
-    public int getCHelpType()
-    {
-        return ICHelpBook.HELP_TYPE_CPP;
-    }
+	}
+
+	public int getCHelpType()
+	{
+		return ICHelpBook.HELP_TYPE_CPP;
+	}
 
 }

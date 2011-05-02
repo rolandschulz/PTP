@@ -121,15 +121,15 @@ public class MPIBarrierExpr extends ASTVisitor {
 				currentNode_.setBarrierExpr(comm, be);
 			}
 		}
-		 
+
 		// if(traceOn)System.out.println("Total number of repeat subtrees: " + BarrierExpression.count_repeat);
 		// if(traceOn)System.out.println("Total number of branch subtrees: " + BarrierExpression.count_branch);
 		if (traceOn)
 			System.out.println("Total number of nodes: " + BarrierExpression.count_node); //$NON-NLS-1$
-		 
-		 // BarrierExpression.count_branch = 0;
-		 // BarrierExpression.count_repeat = 0;
-		  
+
+		// BarrierExpression.count_branch = 0;
+		// BarrierExpression.count_repeat = 0;
+
 	}
 
 	public int visit(IASTStatement stmt) {

@@ -17,6 +17,7 @@ import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 
 /**
  * Class used to initialize default preference values.
+ * 
  * @autho Beth Tibbitts
  */
 public class OpenMPPreferenceInitializer extends AbstractPreferenceInitializer {
@@ -27,8 +28,8 @@ public class OpenMPPreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = OpenMPPlugin.getDefault()
 				.getPreferenceStore();
-    	store.setDefault(OpenMPIDs.OpenMP_BUILD_CMD, "gcc -fopenmp"); //$NON-NLS-1$
-    	store.setDefault(OpenMPIDs.OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE, true);
+		store.setDefault(OpenMPIDs.OpenMP_BUILD_CMD, "gcc -fopenmp"); //$NON-NLS-1$
+		store.setDefault(OpenMPIDs.OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE, true);
 	}
 
 }

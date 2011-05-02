@@ -29,5 +29,4 @@ public class OpenMpIDs {
 	 */
 	public static final String NonConcurrencyType = "org.eclipse.ptp.pldt.openmp.analysis.nonconcurrency";
 
-
 }

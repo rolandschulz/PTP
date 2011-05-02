@@ -15,12 +15,12 @@ import org.eclipse.ptp.pldt.common.ArtifactMarkingVisitor;
 /**
  * 
  * @author tibbitts
- *
+ * 
  */
 public class MPIArtifactMarkingVisitor extends ArtifactMarkingVisitor
 {
-    public MPIArtifactMarkingVisitor(String markerId)
-    {
-        super(markerId);
-    }
+	public MPIArtifactMarkingVisitor(String markerId)
+	{
+		super(markerId);
+	}
 }

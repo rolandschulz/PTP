@@ -41,7 +41,7 @@ public class MatchingSet {
 
 		} catch (CoreException e) {
 			//System.out.println("MatchingSet: exception deleting markers."); //$NON-NLS-1$
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 
 		MPIArtifactMarkingVisitor visitor = new MPIArtifactMarkingVisitor(IDs.matchingSetMarkerID);

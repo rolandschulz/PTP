@@ -28,8 +28,9 @@ import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 /**
  * Provide help for OpenMP APIs.<br>
  * This includes hover help, F1 help, and content assist (ctrl-space)
+ * 
  * @author tibbitts
- *
+ * 
  */
 public class OpenMPCHelpBook extends CHelpBookImpl {
 	private static final String TITLE = Messages.OpenMPCHelpBook_omp_c_and_fortran_help_book_title;
@@ -37,7 +38,7 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 	public OpenMPCHelpBook() {
 		super(OpenMPPlugin.getPluginId());
 		// populate func map
-		funcName2FuncInfo=makeFunctionMap();
+		funcName2FuncInfo = makeFunctionMap();
 
 		// set title
 		setTitle(TITLE);
@@ -47,22 +48,22 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 	 * Make function map of API names and info.<br>
 	 * Note this is also used for (one-time) generation of the html
 	 * files by the main() and generateHTML() methods below.
+	 * 
 	 * @return hashmap of the function names and associated info
 	 */
 	private static Map<String, IFunctionSummary> makeFunctionMap() {
-		Map<String, IFunctionSummary> funcMap= new HashMap<String, IFunctionSummary>();
+		Map<String, IFunctionSummary> funcMap = new HashMap<String, IFunctionSummary>();
 		funcMap.put("omp_set_num_threads", //$NON-NLS-1$
-						new FunctionSummaryImpl("omp_set_num_threads","", //$NON-NLS-1$ //$NON-NLS-2$
-								Messages.OpenMPCHelpBook_set_num_threads,
-								new FunctionPrototypeSummaryImpl(
-										"omp_set_num_threads", "void", //$NON-NLS-1$ //$NON-NLS-2$
-										"int num_threads"), null)); //$NON-NLS-1$
+				new FunctionSummaryImpl("omp_set_num_threads", "", //$NON-NLS-1$ //$NON-NLS-2$
+						Messages.OpenMPCHelpBook_set_num_threads,
+						new FunctionPrototypeSummaryImpl("omp_set_num_threads", "void", //$NON-NLS-1$ //$NON-NLS-2$
+								"int num_threads"), null)); //$NON-NLS-1$
 
 		funcMap.put("omp_get_num_threads", new FunctionSummaryImpl( //$NON-NLS-1$
 				"omp_get_num_threads", "", Messages.OpenMPCHelpBook_get_num_threads, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_get_num_threads", //$NON-NLS-1$
 						"int", "int num_threads"), null)); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		funcMap.put("omp_get_max_threads", new FunctionSummaryImpl( //$NON-NLS-1$
 				"omp_get_max_threads", "", Messages.OpenMPCHelpBook_get_max_threads, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_get_max_threads", //$NON-NLS-1$
@@ -98,7 +99,7 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 				"omp_get_nested", "", Messages.OpenMPCHelpBook_get_nested, //$NON-NLS-1$ //$NON-NLS-2$ 
 				new FunctionPrototypeSummaryImpl("omp_get_nested", //$NON-NLS-1$
 						"int", "void"), null)); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		funcMap.put("omp_init_lock", new FunctionSummaryImpl( //$NON-NLS-1$
 				"omp_init_lock", "", Messages.OpenMPCHelpBook_init_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_init_lock", "void", //$NON-NLS-1$ //$NON-NLS-2$
@@ -107,7 +108,7 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 				"omp_init_nest_lock", "", Messages.OpenMPCHelpBook_nest_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_init_nest_lock", "void", //$NON-NLS-1$ //$NON-NLS-2$
 						"omp_nest_lock_t *lock"), null)); //$NON-NLS-1$
-		
+
 		funcMap.put("omp_destroy_lock", new FunctionSummaryImpl( //$NON-NLS-1$
 				"omp_destroy_lock", "", Messages.OpenMPCHelpBook_destroy_lock, //$NON-NLS-1$ //$NON-NLS-2$ 
 				new FunctionPrototypeSummaryImpl("omp_destroy_lock", //$NON-NLS-1$
@@ -116,7 +117,7 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 				"omp_destroy_nest_lock", "", Messages.OpenMPCHelpBook_destroy_nest_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_destroy_nest_lock", //$NON-NLS-1$
 						"void", "omp_nest_lock_t *lock"), null)); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		funcMap.put("omp_set_lock", new FunctionSummaryImpl( //$NON-NLS-1$
 				"omp_set_lock", "", Messages.OpenMPCHelpBook_set_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_set_lock", "void", //$NON-NLS-1$ //$NON-NLS-2$
@@ -125,7 +126,7 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 				"omp_set_nest_lock", "", Messages.OpenMPCHelpBook_set_nest_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_set_nest_lock", "void", //$NON-NLS-1$ //$NON-NLS-2$
 						"omp_nest_lock_t *lock"), null)); //$NON-NLS-1$
-		
+
 		funcMap.put("omp_test_lock", new FunctionSummaryImpl( //$NON-NLS-1$
 				"omp_test_lock", "", Messages.OpenMPCHelpBook_test_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_test_lock", "int", //$NON-NLS-1$ //$NON-NLS-2$
@@ -134,7 +135,7 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 				"omp_test_nest_lock", "", Messages.OpenMPCHelpBook_test_nest_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_test_nest_lock", "int", //$NON-NLS-1$ //$NON-NLS-2$
 						"omp_nest_lock_t *lock"), null)); //$NON-NLS-1$
-		
+
 		funcMap.put("omp_unset_lock", new FunctionSummaryImpl( //$NON-NLS-1$
 				"omp_unset_lock", "", Messages.OpenMPCHelpBook_unset_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_unset_lock", //$NON-NLS-1$
@@ -143,7 +144,7 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 				"omp_unset_nest_lock", "", Messages.OpenMPCHelpBook_unset_nest_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_unset_nest_lock", //$NON-NLS-1$
 						"void", "omp_nest_lock_t *lock"), null)); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		funcMap.put("omp_get_wtime", new FunctionSummaryImpl( //$NON-NLS-1$
 				"omp_get_wtime", "", Messages.OpenMPCHelpBook_get_wtime, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_get_wtime", "double", //$NON-NLS-1$ //$NON-NLS-2$
@@ -154,14 +155,14 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 						"void"), null)); //$NON-NLS-1$
 
 		// try to define constants too...
-//		funcMap.put("OMP_DYNAMIC", new FunctionSummaryImpl(
-//				"OMP_DYNAMIC", "", "OMP_DYNAMIC description",
-//				new FunctionPrototypeSummaryImpl("OMP_DYNAMIC", "ret",
-//						"int arg1, int arg2"), null));
-		
+		// funcMap.put("OMP_DYNAMIC", new FunctionSummaryImpl(
+		// "OMP_DYNAMIC", "", "OMP_DYNAMIC description",
+		// new FunctionPrototypeSummaryImpl("OMP_DYNAMIC", "ret",
+		// "int arg1, int arg2"), null));
+
 		return funcMap;
-		}
-	
+	}
+
 	/** one-time generation of html docs in generateHTML() uses this value */
 	private static final String HTML_DIR = "C:\\ews\\ptpJan06\\org.eclipse.ptp.pldt.openmp.core\\html\\"; //$NON-NLS-1$
 
@@ -169,7 +170,7 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 	 * generate html documents (one-time)
 	 */
 	public static void generateHTML(Map fMap) {
-		int count=0;
+		int count = 0;
 		Collection fColl = fMap.values();
 		for (Iterator iter = fColl.iterator(); iter.hasNext();) {
 			FunctionSummaryImpl fsi = (FunctionSummaryImpl) iter.next();
@@ -180,7 +181,7 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 
 			if (fsi != null) {
 				PrintStream html = null;
-				String filename=HTML_DIR+fsi.getName() + ".html"; //$NON-NLS-1$
+				String filename = HTML_DIR + fsi.getName() + ".html"; //$NON-NLS-1$
 				try {
 					html = new PrintStream(new FileOutputStream(filename));
 					html.print("<html><head><title>"); //$NON-NLS-1$
@@ -201,22 +202,25 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 				} finally {
 					if (html != null)
 						html.close();
-					System.out.println("wrote "+filename); //$NON-NLS-1$
+					System.out.println("wrote " + filename); //$NON-NLS-1$
 					count++;
 				}
 			}
 		}
-		System.out.println("Wrote "+count+" html files."); //$NON-NLS-1$ //$NON-NLS-2$
+		System.out.println("Wrote " + count + " html files."); //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
 	/**
 	 * Run as Java app to generate the HTML files that will be used
 	 * for F1 help.
-	 * @param args unused
+	 * 
+	 * @param args
+	 *            unused
 	 */
 	public static void main(String[] args) {
 		Map map = makeFunctionMap();
 		generateHTML(map);
-		
+
 	}
 
 }
