@@ -26,10 +26,11 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * Common behavior between the different PLDT new project wizard pages
+ * 
  * @author beth
- *
+ * 
  */
-public abstract class AbstractProjectWizardPage extends AbstractWizardDataPage{
+public abstract class AbstractProjectWizardPage extends AbstractWizardDataPage {
 
 	protected IPreferenceStore preferenceStore;
 	protected IPreferencePage preferencePage;
@@ -38,27 +39,33 @@ public abstract class AbstractProjectWizardPage extends AbstractWizardDataPage{
 	public AbstractProjectWizardPage(String string) {
 		super(string);
 	}
+
 	/**
 	 * Inform the user that PLDT preferences have not been set, and offer to set them now,
 	 * and return the include path.
-	 * @param type - e.g. "MPI" or "OpenMP" the type of preferences that aren't set
+	 * 
+	 * @param type
+	 *            - e.g. "MPI" or "OpenMP" the type of preferences that aren't set
 	 * @return
 	 */
-	protected  String showNoPrefs(String type, String prefID) {
+	protected String showNoPrefs(String type, String prefID) {
 		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		
-		//IPreferencePage pp = new MPIPreferencePage();
-		//MessageDialogWithLink md = new MessageDialogWithLink(shell,"MPI", "MPI preferences have not been set. Click below to do it now.","Click here to add MPI preferencess now",pp);
-		//int result = md.open();
-		
-		String msg = type+Messages.AbstractProjectWizardPage_preferences_have_not_been_set;
-		boolean doit = MessageDialog.openQuestion(shell, Messages.AbstractProjectWizardPage_no+type+Messages.AbstractProjectWizardPage_preferences, msg);
-		if(doit) {
+
+		// IPreferencePage pp = new MPIPreferencePage();
+		// MessageDialogWithLink md = new MessageDialogWithLink(shell,"MPI",
+		// "MPI preferences have not been set. Click below to do it now.","Click here to add MPI preferencess now",pp);
+		// int result = md.open();
+
+		String msg = type + Messages.AbstractProjectWizardPage_preferences_have_not_been_set;
+		boolean doit = MessageDialog.openQuestion(shell, Messages.AbstractProjectWizardPage_no + type
+				+ Messages.AbstractProjectWizardPage_preferences, msg);
+		if (doit) {
 			showPreferenceDialog(type);
 		}
 		String mip = preferenceStore.getString(prefID);
 		return mip;
 	}
+
 	private void showPreferenceDialog(String type) {
 		PreferenceManager mgr = new PreferenceManager();
 		IPreferencePage preferencePage = getPreferencePage();
@@ -69,9 +76,10 @@ public abstract class AbstractProjectWizardPage extends AbstractWizardDataPage{
 		PreferenceDialog dialog = new PreferenceDialog(shell, mgr);
 		dialog.create();
 		// must do dialog.create() before setting message
-		dialog.setMessage(preferencePage.getTitle()); 
+		dialog.setMessage(preferencePage.getTitle());
 		dialog.open();
 	}
+
 	abstract IPreferencePage getPreferencePage();
 
 }

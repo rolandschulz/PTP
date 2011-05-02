@@ -14,7 +14,6 @@ package org.eclipse.ptp.pldt.wizards.wizardPages;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 
-
 /**
  * Wizard Page for collecting info about MPI C project - specifics for C vs C++
  * 
@@ -37,6 +36,5 @@ public class MPIProjectWizardPageC extends MPIProjectWizardPage {
 		String cmd = preferenceStore.getString(MpiIDs.MPI_BUILD_CMD);
 		return cmd;
 	}
-	
 
 }
