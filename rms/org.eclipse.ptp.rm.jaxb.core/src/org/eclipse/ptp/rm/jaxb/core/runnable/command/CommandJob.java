@@ -28,6 +28,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.IStreamListener;
+import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJob;
@@ -236,7 +238,7 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 	protected IStatus run(IProgressMonitor monitor) {
 		boolean input = !command.getInput().isEmpty();
 		if (input) {
-			IRemoteProcess process = getProcess();
+			IRemoteProcess process = control.getProcessTable().get(getName());
 			if (process != null && !process.isCompleted()) {
 				return writeInputToProcess(process);
 			}
@@ -263,10 +265,11 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 			jobStatus.setProxy(getProxy());
 		}
 
-		if (input) {
-			IRemoteProcess process = getProcess();
-			if (process != null && !process.isCompleted()) {
-				runStatus = writeInputToProcess(process);
+		if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
+			if (input) {
+				if (process != null && !process.isCompleted()) {
+					runStatus = writeInputToProcess(process);
+				}
 			}
 		}
 		return runStatus;
@@ -347,7 +350,7 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 			return IRemoteProcessBuilder.NONE;
 		}
 
-		String[] split = flags.split(PIP);
+		String[] split = flags.split(REGPIP);
 		int f = IRemoteProcessBuilder.NONE;
 		for (String s : split) {
 			s = s.trim();
@@ -535,6 +538,11 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 			errSplitter = new StreamSplitter(process.getErrorStream(), tokenizerErr, monitorErr);
 			proxy.setErrMonitor(new CommandJobStreamMonitor(monitorErr));
 		}
+		proxy.getErrorStreamMonitor().addListener(new IStreamListener() {
+			public void streamAppended(String text, IStreamMonitor monitor) {
+				JAXBCorePlugin.log(text);
+			}
+		});
 	}
 
 	/**
@@ -599,10 +607,11 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 	 * 
 	 * @param process
 	 */
-	private IStatus writeInputToProcess(IRemoteProcess process2) {
+	private IStatus writeInputToProcess(IRemoteProcess process) {
 		OutputStream stream = process.getOutputStream();
 		try {
 			stream.write(prepareInput().getBytes());
+			stream.write(LINE_SEP.getBytes());
 			stream.flush();
 		} catch (Throwable t) {
 			return CoreExceptionUtils.getErrorStatus(Messages.ProcessRunError, t);
