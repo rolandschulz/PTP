@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +74,7 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 	private class StreamSplitter extends Thread {
 		private final InputStream in;
 		private final PipedOutputStream[] pout;
-		private final BufferedOutputStream[] bout;
+		private final List<BufferedOutputStream> boutList;
 
 		/**
 		 * @param in
@@ -87,8 +89,9 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 			this.in = in;
 			assert (pipe1 != null && pipe2 != null);
 			pout = new PipedOutputStream[] { new PipedOutputStream(pipe1), new PipedOutputStream(pipe2) };
-			bout = new BufferedOutputStream[] { new BufferedOutputStream(pout[0], STREAM_BUFFER_SIZE),
-					new BufferedOutputStream(pout[1], STREAM_BUFFER_SIZE) };
+			boutList = new ArrayList<BufferedOutputStream>();
+			boutList.add(new BufferedOutputStream(pout[0], STREAM_BUFFER_SIZE));
+			boutList.add(new BufferedOutputStream(pout[1], STREAM_BUFFER_SIZE));
 		}
 
 		/**
@@ -103,9 +106,27 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 					if (i == -1) {
 						break;
 					}
-					for (BufferedOutputStream b : bout) {
-						b.write(i);
-						b.flush();
+					BufferedOutputStream stream = null;
+					for (Iterator<BufferedOutputStream> b = boutList.iterator(); b.hasNext();) {
+						try {
+							stream = b.next();
+							stream.write(i);
+							stream.flush();
+						} catch (IOException dead) {
+							/*
+							 * we need to check for this here because the
+							 * tokenizer can be set to exit early
+							 */
+							if (dead.getMessage().indexOf(DEAD) >= 0) {
+								b.remove();
+								try {
+									stream.close();
+								} catch (IOException t) {
+								}
+							} else {
+								throw dead;
+							}
+						}
 					}
 				} catch (EOFException eof) {
 					break;
@@ -114,7 +135,7 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 					break;
 				}
 			}
-			for (BufferedOutputStream b : bout) {
+			for (BufferedOutputStream b : boutList) {
 				try {
 					b.close();
 				} catch (IOException t) {
@@ -231,14 +252,14 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 	/**
 	 * If this process has no input, execute it normally. Otherwise, if the
 	 * process is to be kept open, check for it in the process table; if it is
-	 * there and still alive, sent the input to it; if not, start the process,
+	 * there and still alive, send the input to it; if not, start the process,
 	 * and then send the input.
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		boolean input = !command.getInput().isEmpty();
 		if (input) {
-			IRemoteProcess process = control.getProcessTable().get(getName());
+			process = control.getProcessTable().get(getName());
 			if (process != null && !process.isCompleted()) {
 				return writeInputToProcess(process);
 			}
@@ -279,11 +300,7 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 	 * Uses the IRemoteProcessBuilder to set up the command and environment.
 	 * After start, the tokenizers (if any) are handled, and stream redirection
 	 * managed. Returns immediately if <code>keepOpen</code> is true; else waits
-	 * for the process, then joins on the consumers.<br>
-	 * <br>
-	 * Note: the resource manager does not join on this thread, but retrieves
-	 * the status object from the job, potentially while it is still running, in
-	 * order to hand it off to the caller for stream processing.
+	 * for the process, then joins on the consumers.x
 	 */
 	private IStatus execute(IProgressMonitor monitor) {
 		try {

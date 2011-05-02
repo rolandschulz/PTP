@@ -24,7 +24,7 @@
 		<submit-interactive name="submit-interactive" waitForId="true" keepOpen="true" flags="ALLOCATE_PTY">
 			<arg>qsub</arg>
 			<arg>-I</arg>
-			<arg>-l nodes=1,mem=20mb,walltime=00:30:00</arg>
+			<arg>-l nodes=1,mem=20gb,walltime=00:30:00</arg>
 			<arg>-V</arg>
 			<input isUndefinedIfMatches=".+ -np">${rm:mpiPrefix#value}</input>
 			<input>${rm:executablePath#value} ${rm:progArgs#value}</input>
@@ -36,10 +36,11 @@
 							<entry valueGroup="1"/>
 						</set>
 						<set field="value">
-							<entry value="SUBMITTED"/>
+							<entry value="RUNNING"/>
 						</set>
 					</match>
 				</target>
+				<exit-after flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.][\w]+[\s]ready.*</exit-after>
 			</stdout-parser>
 			<stderr-parser delim="\n">
             <target ref="@jobId">
