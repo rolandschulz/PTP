@@ -76,6 +76,7 @@ public class GemPreferencePage extends FieldEditorPreferencePage implements IWor
 
 		helpButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
+				// do nothing
 			}
 
 			public void widgetSelected(SelectionEvent e) {
@@ -102,6 +103,7 @@ public class GemPreferencePage extends FieldEditorPreferencePage implements IWor
 	 * org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench) {
+		// do nothing
 	}
 
 }
