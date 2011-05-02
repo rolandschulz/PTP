@@ -48,13 +48,12 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
 		// super(OpenMPPlugin.getDefault(), "OpenMP Artifact", "OpenMP Artifacts", "Construct", OpenMPPlugin.MARKER_ID);
 		super(
 				OpenMPPlugin.getDefault(),
-				Messages.OpenMPArtifactView_OpenMP_Artifact,  
-				Messages.OpenMPArtifactView_OpenMP_Artifacts, 
+				Messages.OpenMPArtifactView_OpenMP_Artifact,
+				Messages.OpenMPArtifactView_OpenMP_Artifacts,
 				Messages.OpenMPArtifactView_Construct,
 				OpenMPPlugin.MARKER_ID);
 
 	}
-
 
 	/**
 	 * Provide custom info for filling in the last column
@@ -64,101 +63,110 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
 		if (temp != null) {
 			Integer constructType = (Integer) temp;
 			int i = constructType.intValue();
-			String val="";  //$NON-NLS-1$
+			String val = ""; //$NON-NLS-1$
 			if (i < Artifact.CONSTRUCT_TYPE_NAMES.length)
 				val = Artifact.CONSTRUCT_TYPE_NAMES[i];
 			else
 				val = "value is " + i; //$NON-NLS-1$
-		
+
 			/*
-			val = "value is " + i; // BRT need a more robust lookup
-			if (i == 0)
-				val = "OpenMP Pragma";
-			if (i == 1)
-				val = "Function Call";
-	*/
+			 * val = "value is " + i; // BRT need a more robust lookup
+			 * if (i == 0)
+			 * val = "OpenMP Pragma";
+			 * if (i == 1)
+			 * val = "Function Call";
+			 */
 			return val;
 		} else
 			return " "; //$NON-NLS-1$
 	}
-    
 
-    /**
-     * Make "show info" action to display artifact information
-     * This is the "show pragma region" action for OpenMP artifacts
-     */
-    protected void makeShowInfoAction()
-    {
-        infoAction = new Action() {
+	/**
+	 * Make "show info" action to display artifact information
+	 * This is the "show pragma region" action for OpenMP artifacts
+	 */
+	protected void makeShowInfoAction()
+	{
+		infoAction = new Action() {
 
-            /* (non-Javadoc)
-             * @see org.eclipse.jface.action.IAction#run()
-             */
-            @SuppressWarnings("restriction")
-            public void run()
-            {
-                ISelection selection = viewer.getSelection();
-                Object obj = ((IStructuredSelection) selection).getFirstElement();
-                IMarker marker = (IMarker) obj;
-                if(marker==null){
-                	MessageDialog.openInformation(null, org.eclipse.ptp.pldt.openmp.core.messages.Messages.OpenMPArtifactView_noSelection,   
-                			org.eclipse.ptp.pldt.openmp.core.messages.Messages.OpenMPArtifactView_noArtifactSelected); 
-                	return;
-                }
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.action.IAction#run()
+			 */
+			@SuppressWarnings("restriction")
+			public void run()
+			{
+				ISelection selection = viewer.getSelection();
+				Object obj = ((IStructuredSelection) selection).getFirstElement();
+				IMarker marker = (IMarker) obj;
+				if (marker == null) {
+					MessageDialog.openInformation(null,
+							org.eclipse.ptp.pldt.openmp.core.messages.Messages.OpenMPArtifactView_noSelection,
+							org.eclipse.ptp.pldt.openmp.core.messages.Messages.OpenMPArtifactView_noArtifactSelected);
+					return;
+				}
 
-                try {
-                    //Object o = artifactManager_.getArtifact((String)marker.getAttribute(IDs.ID));
-                    Object o = ArtifactManager.getArtifact(marker);
-                    if (o==null || !(o instanceof Artifact))  return;
-                    Artifact artifact = (Artifact)o;
-                    Object p = artifact.getArtifactAssist();
-                    if (p==null || !(p instanceof PASTOMPPragma))  return;
-                    PASTOMPPragma ompPragma = (PASTOMPPragma)p;
-                    IASTNode      iRegion    = ompPragma.getRegion();
-                    ASTNode       region     = (iRegion instanceof ASTNode ? (ASTNode)iRegion : null);
-                    if (region==null)  return;
-                    
-                    // determine if we collected location information for this omp pragma
-                    String filename = ompPragma.getRegionFilename(); //region.getContainingFilename(); 
-                    if (filename==null)  return;
-                    
-                    IResource r = ParserUtil.getResourceForFilename(filename);
-                    
-                    IEditorPart aPart = null;
-                    if (r!=null) {
-                        try{
-                            aPart = EditorUtility.openInEditor(r);
-                        }
-                        catch(PartInitException pie) { return; }
-                        catch(CModelException e)     { return; }
-                    }
-                    else {
-                        return;
-                    }
-                    
-                    if (aPart instanceof AbstractTextEditor) 
-                    {
-                        int offset = ompPragma.getRegionOffset(); //ifl.getNodeOffset();  //locs[0].getNodeOffset();
-                        int length = ompPragma.getRegionLength(); //ifl.getNodeLength();  //region.getLength(); 
-                        //System.out.println("OMPAV: Pragma offset: "+offset+" length: "+length);
-                        ((AbstractTextEditor)aPart).selectAndReveal( offset, length);
-                    }  
-                     
-                    
-                } catch (Exception e) {
-                    System.out.println("ATV.doubleclickAction: Error positioning editor page from marker line number"); //$NON-NLS-1$
-                    //showStatusMessage("Error positioning editor from marker line number", "error marker goto");
-                    e.printStackTrace();
-                }
-                 
-            }
-        };
+				try {
+					// Object o = artifactManager_.getArtifact((String)marker.getAttribute(IDs.ID));
+					Object o = ArtifactManager.getArtifact(marker);
+					if (o == null || !(o instanceof Artifact))
+						return;
+					Artifact artifact = (Artifact) o;
+					Object p = artifact.getArtifactAssist();
+					if (p == null || !(p instanceof PASTOMPPragma))
+						return;
+					PASTOMPPragma ompPragma = (PASTOMPPragma) p;
+					IASTNode iRegion = ompPragma.getRegion();
+					ASTNode region = (iRegion instanceof ASTNode ? (ASTNode) iRegion : null);
+					if (region == null)
+						return;
 
-        infoAction.setText(Messages.OpenMPArtifactView_showPragmaRegion);   
-        infoAction.setToolTipText(Messages.OpenMPArtifactView_showRegionForSelected + thingname_); 
-        infoAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
-                ISharedImages.IMG_OBJS_INFO_TSK));
+					// determine if we collected location information for this omp pragma
+					String filename = ompPragma.getRegionFilename(); // region.getContainingFilename();
+					if (filename == null)
+						return;
 
-    }
+					IResource r = ParserUtil.getResourceForFilename(filename);
+
+					IEditorPart aPart = null;
+					if (r != null) {
+						try {
+							aPart = EditorUtility.openInEditor(r);
+						}
+						catch (PartInitException pie) {
+							return;
+						}
+						catch (CModelException e) {
+							return;
+						}
+					}
+					else {
+						return;
+					}
+
+					if (aPart instanceof AbstractTextEditor)
+					{
+						int offset = ompPragma.getRegionOffset(); // ifl.getNodeOffset(); //locs[0].getNodeOffset();
+						int length = ompPragma.getRegionLength(); // ifl.getNodeLength(); //region.getLength();
+						// System.out.println("OMPAV: Pragma offset: "+offset+" length: "+length);
+						((AbstractTextEditor) aPart).selectAndReveal(offset, length);
+					}
+
+				} catch (Exception e) {
+					System.out.println("ATV.doubleclickAction: Error positioning editor page from marker line number"); //$NON-NLS-1$
+					// showStatusMessage("Error positioning editor from marker line number", "error marker goto");
+					e.printStackTrace();
+				}
+
+			}
+		};
+
+		infoAction.setText(Messages.OpenMPArtifactView_showPragmaRegion);
+		infoAction.setToolTipText(Messages.OpenMPArtifactView_showRegionForSelected + thingname_);
+		infoAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
+				ISharedImages.IMG_OBJS_INFO_TSK));
+
+	}
 
 }

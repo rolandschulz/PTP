@@ -14,10 +14,10 @@ import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
 
 /**
  * @author Beth Tibbitts
- *
+ * 
  */
 public class OpenMPIDs {
- 
+
 	public static final String OpenMP_INCLUDES = Messages.OpenMPIDs_OpenMP_includes;
 	// FIXME the following is used as a key?
 	public static final String OpenMP_BUILD_CMD = "gcc -fopenmp"; //$NON-NLS-1$

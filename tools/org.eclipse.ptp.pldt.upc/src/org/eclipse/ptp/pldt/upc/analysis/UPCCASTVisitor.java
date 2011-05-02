@@ -43,11 +43,11 @@ public class UPCCASTVisitor extends PldtAstVisitor {
 		this.shouldVisitTranslationUnit = true;
 	}
 
-    /**
+	/**
 	 * @since 4.0
 	 */
-    public UPCCASTVisitor(List upcIncludes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr){
-        super(upcIncludes, fileName, allowPrefixOnlyMatch, msr);
+	public UPCCASTVisitor(List upcIncludes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr) {
+		super(upcIncludes, fileName, allowPrefixOnlyMatch, msr);
 		ARTIFACT_CALL = Messages.UPCCASTVisitor_upc_call;
 		ARTIFACT_CONSTANT = Messages.UPCCASTVisitor_upc_constant;
 	}

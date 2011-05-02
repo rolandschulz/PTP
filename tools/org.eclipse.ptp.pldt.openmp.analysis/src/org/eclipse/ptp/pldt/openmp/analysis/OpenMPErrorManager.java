@@ -16,48 +16,52 @@ import java.util.LinkedList;
  * Holds all the errors encountered during analysis, ref. OpenMPAnalysisManager
  * 
  * @author pazel
- *
+ * 
  */
 public class OpenMPErrorManager
 {
-    protected LinkedList errors_ = new LinkedList();    // holds the errors
-    
-    protected static OpenMPErrorManager currentManager_ = null;
-    
-    /**
-     * OpenMPErrorManager - constructor
-     *
-     */
-    public OpenMPErrorManager()
-    {
-        currentManager_ = this;
-    }
-    
-    /**
-     * Get the current error manager
-     * @return OpenMPErrorManager
-     */
-    public static OpenMPErrorManager getCurrentErrorManager()
-    {
-        return currentManager_;
-    }
-    
-    /**
-     * Add an error
-     * @param error - OpenMPError
-     */
-    public void addError(OpenMPError error)
-    {
-        errors_.add(error);
-    }
-    
-    /**
-     * Return an list of all errors
-     * @return LinkedList
-     */
-    public LinkedList getErrors()
-    {
-        return errors_;
-    }
+	protected LinkedList errors_ = new LinkedList(); // holds the errors
+
+	protected static OpenMPErrorManager currentManager_ = null;
+
+	/**
+	 * OpenMPErrorManager - constructor
+	 * 
+	 */
+	public OpenMPErrorManager()
+	{
+		currentManager_ = this;
+	}
+
+	/**
+	 * Get the current error manager
+	 * 
+	 * @return OpenMPErrorManager
+	 */
+	public static OpenMPErrorManager getCurrentErrorManager()
+	{
+		return currentManager_;
+	}
+
+	/**
+	 * Add an error
+	 * 
+	 * @param error
+	 *            - OpenMPError
+	 */
+	public void addError(OpenMPError error)
+	{
+		errors_.add(error);
+	}
+
+	/**
+	 * Return an list of all errors
+	 * 
+	 * @return LinkedList
+	 */
+	public LinkedList getErrors()
+	{
+		return errors_;
+	}
 
 }

@@ -28,12 +28,13 @@ import org.osgi.framework.Bundle;
 
 /**
  * Help book for C MPI functions
+ * 
  * @author tibbitts
- *
+ * 
  */
 public class MpiCHelpBook extends CHelpBookImpl {
 	private static final String TITLE = Messages.getString("MpiCHelpBook_MPI_C_HELP_BOOK_TITLE"); //$NON-NLS-1$
-    
+
 	/**
 	 * builds the list of function summaries by parsing an XML file
 	 */
@@ -42,8 +43,8 @@ public class MpiCHelpBook extends CHelpBookImpl {
 		// populate func map
 		Bundle bundle = Platform.getBundle(MpiPlugin.getPluginId());
 		Path path = new Path("mpiref.xml"); //$NON-NLS-1$
-		////
-		//URL fileURL = Platform.find(bundle, path); // old
+		// //
+		// URL fileURL = Platform.find(bundle, path); // old
 		URL fileURL = FileLocator.find(bundle, path, null);
 		InputStream xmlIn = null;
 		try {
@@ -57,7 +58,7 @@ public class MpiCHelpBook extends CHelpBookImpl {
 			FunctionSummaryImpl functionSummary = it.next();
 			funcName2FuncInfo.put(functionSummary.getName(), functionSummary);
 		}
-		
+
 		// set title
 		setTitle(TITLE);
 	}

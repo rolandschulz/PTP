@@ -52,7 +52,7 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 		super(mpiIncludes, fileName, allowPrefixOnlyMatch, msr);
 		ARTIFACT_CALL = Messages.getString("MpiCASTVisitor.mpiCall"); //$NON-NLS-1$
 		ARTIFACT_CONSTANT = Messages.getString("MpiCASTVisitor.mpiConstant"); //$NON-NLS-1$
-		ARTIFACT_NAME="MPI"; //$NON-NLS-1$
+		ARTIFACT_NAME = "MPI"; //$NON-NLS-1$
 
 		traceOn = CommonPlugin.getTraceOn();
 		if (traceOn)
@@ -114,8 +114,8 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 	}
 
 	/**
-	 * allow dynamic adding to include path?
-	 * <br>Note: if this returns true, be certain to override getIncludesPrefID() and
+	 * allow dynamic adding to include path? <br>
+	 * Note: if this returns true, be certain to override getIncludesPrefID() and
 	 * getPreferenceStore() which will be needed by the implementation to do this
 	 * 
 	 * @return
@@ -125,18 +125,22 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 		boolean canAsk = getPreferenceStore().getBoolean(MpiIDs.MPI_PROMPT_FOR_OTHER_INCLUDES);
 		return canAsk;
 	}
+
 	/**
-	 * needs to be overridden for derived classes that need to dynamically update the pref store 
+	 * needs to be overridden for derived classes that need to dynamically update the pref store
 	 * e.g. for the includes path
+	 * 
 	 * @return
 	 */
 	@Override
 	protected String getIncludesPrefID() {
 		return MpiIDs.MPI_INCLUDES;
 	}
+
 	/**
-	 * needs to be overridden for derived classes that need to dynamically update the pref store 
+	 * needs to be overridden for derived classes that need to dynamically update the pref store
 	 * e.g. for the includes path
+	 * 
 	 * @return
 	 */
 	@Override
@@ -145,10 +149,11 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 	}
 
 	/**
-	 * needs to be overridden for derived classes that need to dynamically update the pref store 
-	 * e.g. for the includes path.  This type name is used for messages, etc.
+	 * needs to be overridden for derived classes that need to dynamically update the pref store
+	 * e.g. for the includes path. This type name is used for messages, etc.
+	 * 
 	 * @return artifact type name such as "MPI", "OpenMP" etc.
-	 */	
+	 */
 	@Override
 	protected String getTypeName() {
 		return ARTIFACT_NAME;
