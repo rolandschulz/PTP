@@ -256,6 +256,15 @@
 	<xs:complexType name="command-type">
 		<xs:sequence>
 			<xs:element name="arg" maxOccurs="unbounded" type="rm:arg-type"/>
+			<xs:element name="input" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type">
+				<xs:annotation>
+					<xs:documentation>
+						When there is input present, it is directed to the input stream of the command with this name. If the "keepOpen"
+						attribute is true, a check will be made to see if there already exists an open process (which is also alive) corresponding to the
+						name of this command, and use that; otherwise, ut first executes the arguments, then provides the input arguments to it.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:name-value-pair-type"/>
 			<xs:element name="stdout-parser" minOccurs="0" type="rm:tokenizer-type"/>
 			<xs:element name="stderr-parser" minOccurs="0" type="rm:tokenizer-type"/>
@@ -271,17 +280,19 @@
 		<xs:attribute name="keepOpen" type="xs:boolean" default="false">
 			<xs:annotation>
 				<xs:documentation>
-					Process will be added to table under the name of this command; all such processes will be closed when
-					the resource
-					manager is closed.
+					Process will be added to table under the name of this command; all such processes will be closed when the
+					resource manager is closed.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="asInputToProcess" type="xs:string">
+		<xs:attribute name="flags" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
-					Do not execute this command but send it instead as input to the indicated command process. NOTE: the only
-					relevant elements for such a command are the args; if this attribute is true, any other attributes or elements are ignored.
+					An or'd string corresponding to the remote process flags. Currently these include only:
+					NONE
+					ALLOCATE_PTY
+					(allocates pseudo-terminal)
+					FORWARD_X11
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
