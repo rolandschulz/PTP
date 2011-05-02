@@ -61,7 +61,6 @@ import org.eclipse.ui.PlatformUI;
  */
 public class PldtAstVisitor extends CASTVisitor {
 
-
 	/**
 	 * @since 4.0
 	 */
@@ -72,19 +71,18 @@ public class PldtAstVisitor extends CASTVisitor {
 	public static String ARTIFACT_CONSTANT = "Artifact Constant"; //$NON-NLS-1$
 	protected static String ARTIFACT_NAME = "Artifact Name"; //$NON-NLS-1$
 	protected static String PREFIX = ""; //$NON-NLS-1$
-	private static /*final*/ boolean traceOn=false;
-	
-	private static boolean dontAskToModifyIncludePathAgain=false;
-	protected boolean allowPrefixOnlyMatch=false;
+	private static/* final */boolean traceOn = false;
+
+	private static boolean dontAskToModifyIncludePathAgain = false;
+	protected boolean allowPrefixOnlyMatch = false;
 
 	/**
 	 * List of include paths that we'll probably want to consider in the work that this visitor does.
 	 * For example, only paths found in this list (specified in PLDT preferences) would be considered
-	 * to be a path from which definitions of "Artifacts" would be found.
-	 * <br>
+	 * to be a path from which definitions of "Artifacts" would be found. <br>
 	 * Note that this can now be dynamically modified during artifact analysis, thus no longer final
 	 */
-	private /*final*/ List<String> includes_;
+	private/* final */List<String> includes_;
 	private final String fileName;
 	private final ScanReturn scanReturn;
 
@@ -97,23 +95,25 @@ public class PldtAstVisitor extends CASTVisitor {
 	 *            the name of the file that this visitor is visiting(?)
 	 * @param prefixOnlyMatch
 	 *            if true, then artifact is recognized if it starts with the plugin-specific prefix
-	 *            (e.g. "MPI_"  etc.) instead of forcing a lookup of the location of the header file
-	 *            in which the API is found.  This proves to be difficult for users to get right, so prefix-only
+	 *            (e.g. "MPI_" etc.) instead of forcing a lookup of the location of the header file
+	 *            in which the API is found. This proves to be difficult for users to get right, so prefix-only
 	 *            recognition of artifacts is allowed here.
 	 * @param scanReturn
 	 *            the ScanReturn object to which the artifacts that we find will
 	 *            be appended.
-
 	 */
-	public PldtAstVisitor(List<String> includes, String fileName, boolean prefixOnlyMatch, ScanReturn scanReturn ) {
+	public PldtAstVisitor(List<String> includes, String fileName, boolean prefixOnlyMatch, ScanReturn scanReturn) {
 		this.includes_ = includes;
 		this.fileName = fileName;
 		this.scanReturn = scanReturn;
-		dontAskToModifyIncludePathAgain=false;
-		this.allowPrefixOnlyMatch=prefixOnlyMatch;
-		if(!traceOn) traceOn=CommonPlugin.getTraceOn();
-		if(traceOn)System.out.println("PldtAstVisitor, traceOn="+traceOn); //$NON-NLS-1$
+		dontAskToModifyIncludePathAgain = false;
+		this.allowPrefixOnlyMatch = prefixOnlyMatch;
+		if (!traceOn)
+			traceOn = CommonPlugin.getTraceOn();
+		if (traceOn)
+			System.out.println("PldtAstVisitor, traceOn=" + traceOn); //$NON-NLS-1$
 	}
+
 	/**
 	 * Constructor without prefixOnlyMatch arg, assumes false
 	 */
@@ -121,15 +121,14 @@ public class PldtAstVisitor extends CASTVisitor {
 		this(includes, fileName, false, scanReturn);
 	}
 
-
 	/**
 	 * Skip statements that are included.
 	 */
-	public int visit(IASTStatement statement) { 
+	public int visit(IASTStatement statement) {
 		if (preprocessorIncluded(statement)) {
 			return ASTVisitor.PROCESS_SKIP;
 		}
-		return ASTVisitor.PROCESS_CONTINUE; 
+		return ASTVisitor.PROCESS_CONTINUE;
 	}
 
 	/**
@@ -138,7 +137,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	 * @param declaration
 	 * @return
 	 */
-	public int visit(IASTDeclaration declaration) {//called; both paths get taken
+	public int visit(IASTDeclaration declaration) {// called; both paths get taken
 		if (preprocessorIncluded(declaration)) {
 			return ASTVisitor.PROCESS_SKIP;
 		}
@@ -157,24 +156,26 @@ public class PldtAstVisitor extends CASTVisitor {
 	 * @param funcName
 	 */
 	public void processFuncName(IASTName funcName, IASTExpression astExpr) {
-		//IASTTranslationUnit tu = funcName.getTranslationUnit();
-		String strName=funcName.toString();
-		if ((this.allowPrefixOnlyMatch&&matchesPrefix(strName)) || isArtifact(funcName)) { // brt C++ test 2/16/10
+		// IASTTranslationUnit tu = funcName.getTranslationUnit();
+		String strName = funcName.toString();
+		if ((this.allowPrefixOnlyMatch && matchesPrefix(strName)) || isArtifact(funcName)) { // brt C++ test 2/16/10
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
 			if (sourceInfo != null) {
-				if(traceOn) System.out.println("found artifact: " + funcName.toString()); //$NON-NLS-1$
+				if (traceOn)
+					System.out.println("found artifact: " + funcName.toString()); //$NON-NLS-1$
 				// Note: we're determining the artifact name twice. (also in chooseName())
-				String artName=funcName.toString();
-				String rawName=funcName.getRawSignature();
-				//String bName=funcName.getBinding().getName();
-				if(!artName.equals(rawName)) {
-					if(rawName.length()==0)rawName="  "; //$NON-NLS-1$
-					artName=artName+"  ("+rawName+")"; // indicate orig pre-pre-processor value in parens //$NON-NLS-1$ //$NON-NLS-2$
+				String artName = funcName.toString();
+				String rawName = funcName.getRawSignature();
+				// String bName=funcName.getBinding().getName();
+				if (!artName.equals(rawName)) {
+					if (rawName.length() == 0)
+						rawName = "  "; //$NON-NLS-1$
+					artName = artName + "  (" + rawName + ")"; // indicate orig pre-pre-processor value in parens //$NON-NLS-1$ //$NON-NLS-2$
 					// note: currently rawName seems to always be empty.
 				}
-					scanReturn.addArtifact(new Artifact(fileName, sourceInfo
-							.getStartingLine(), 1, artName, sourceInfo));
-				 
+				scanReturn.addArtifact(new Artifact(fileName, sourceInfo
+						.getStartingLine(), 1, artName, sourceInfo));
+
 			}
 		}
 	}
@@ -185,12 +186,12 @@ public class PldtAstVisitor extends CASTVisitor {
 	 */
 	public void processExprWithConstant(IASTExpression astExpr) {
 		IASTName funcName = ((IASTIdExpression) astExpr).getName();
-		//IASTTranslationUnit tu = funcName.getTranslationUnit();
-		String strName=funcName.toString();
-		if ((this.allowPrefixOnlyMatch&& matchesPrefix(strName)) || isArtifact(funcName)) {
+		// IASTTranslationUnit tu = funcName.getTranslationUnit();
+		String strName = funcName.toString();
+		if ((this.allowPrefixOnlyMatch && matchesPrefix(strName)) || isArtifact(funcName)) {
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
 			if (sourceInfo != null) {
-				//System.out.println("found MPI artifact: " + funcName.toString());
+				// System.out.println("found MPI artifact: " + funcName.toString());
 				scanReturn.addArtifact(new Artifact(fileName, sourceInfo.getStartingLine(), 1,
 						funcName.toString(), sourceInfo));
 			}
@@ -200,7 +201,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	/**
 	 * Determines if the funcName is an instance of the type of artifact in
 	 * which we are interested. <br>
-	 * An artifact is a function name that was found in the  include path (e.g. MPI or OpenMP),
+	 * An artifact is a function name that was found in the include path (e.g. MPI or OpenMP),
 	 * as defined in the PLDT preferences.
 	 * 
 	 * @param funcName
@@ -222,7 +223,7 @@ public class PldtAstVisitor extends CASTVisitor {
 			IASTFileLocation floc = name2.getFileLocation();
 			if (floc == null) {
 				if (traceOn)
-					System.out.println("PldtAstVisitor  IASTFileLocn null for "+ name2 + " (" + funcName + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					System.out.println("PldtAstVisitor  IASTFileLocn null for " + name2 + " (" + funcName + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				return false; // (e.g. 'ptr' )
 			}
 			String filename = floc.getFileName();
@@ -232,11 +233,13 @@ public class PldtAstVisitor extends CASTVisitor {
 				return true;
 			} else {
 				if (traceOn) {
-					System.out.println(name+ " was found in "+ path+ " but  PLDT preferences have been set to only include: "+ includes_.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+					System.out
+							.println(name
+									+ " was found in " + path + " but  PLDT preferences have been set to only include: " + includes_.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				// add them here?
 				if (allowIncludePathAdd()) {
-					boolean addit = addIncludePath(path, name,dontAskToModifyIncludePathAgain);
+					boolean addit = addIncludePath(path, name, dontAskToModifyIncludePathAgain);
 					if (addit)
 						return true;
 				}
@@ -244,26 +247,28 @@ public class PldtAstVisitor extends CASTVisitor {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Choose how to distinguish between binding name, and raw signature.<br>
 	 * Could be overridden by subclasses if, for example, a name with a prefix e.g. "MPI::foo" should be preferred over "foo".<br>
-	 * Here, the default case is that we always choose the regular/binding name, unless it's empty, in which case we choose the rawSignature.
+	 * Here, the default case is that we always choose the regular/binding name, unless it's empty, in which case we choose the
+	 * rawSignature.
+	 * 
 	 * @param bindingName
 	 * @param rawSignature
 	 * @return
 	 */
-	protected String chooseName(String bindingName, String rawSignature){
-		String name=bindingName;
-		if(bindingName.length()==0) {
-			name=rawSignature;
+	protected String chooseName(String bindingName, String rawSignature) {
+		String name = bindingName;
+		if (bindingName.length() == 0) {
+			name = rawSignature;
 		}
 		return name;
 	}
- 
+
 	public void processMacroLiteral(IASTLiteralExpression expression) {
 		IASTNodeLocation[] locations = expression.getNodeLocations();
-		if ((locations.length == 1) && (locations[0] instanceof IASTMacroExpansion)) {//path taken &not
+		if ((locations.length == 1) && (locations[0] instanceof IASTMacroExpansion)) {// path taken &not
 			// found a macro, does it come from the include path required to be "one of ours"?
 			IASTMacroExpansion astMacroExpansion = (IASTMacroExpansion) locations[0];
 			IASTPreprocessorMacroDefinition preprocessorMacroDefinition = astMacroExpansion
@@ -294,10 +299,11 @@ public class PldtAstVisitor extends CASTVisitor {
 
 	/**
 	 * Is this path found in the include path in which we are interested?
-	 * E.g. is it in the  include path specified in PLDT preferences,
-	 * which would identify it as an  artifact of interest?
+	 * E.g. is it in the include path specified in PLDT preferences,
+	 * which would identify it as an artifact of interest?
 	 * 
-	 * @param includeFilePath under consideration
+	 * @param includeFilePath
+	 *            under consideration
 	 * @return true if this is found in the include path from PLDT preferences
 	 */
 	private boolean isInIncludePath(IPath includeFilePath) {
@@ -305,7 +311,8 @@ public class PldtAstVisitor extends CASTVisitor {
 			return false;
 		for (String includeDir : includes_) {
 			IPath includePath = new Path(includeDir);
-			if(traceOn)System.out.println("PldtAstVisitor: is "+includeFilePath+" found in "+includeDir+"?"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (traceOn)
+				System.out.println("PldtAstVisitor: is " + includeFilePath + " found in " + includeDir + "?"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (includePath.isPrefixOf(includeFilePath))
 				return true;
 		}
@@ -329,15 +336,15 @@ public class PldtAstVisitor extends CASTVisitor {
 			}
 			// handle the case e.g. #define foo MPI_fn - recognize foo() as MPI_fn()
 			else if (locations[0] instanceof IASTMacroExpansion) {
-				IASTMacroExpansion me=(IASTMacroExpansion)locations[0];
-				astFileLocation=me.asFileLocation();
+				IASTMacroExpansion me = (IASTMacroExpansion) locations[0];
+				astFileLocation = me.asFileLocation();
 			}
-			if(astFileLocation!=null) {
+			if (astFileLocation != null) {
 				sourceInfo = new SourceInfo();
 				sourceInfo.setStartingLine(astFileLocation.getStartingLineNumber());
 				sourceInfo.setStart(astFileLocation.getNodeOffset());
 				sourceInfo.setEnd(astFileLocation.getNodeOffset() + astFileLocation.getNodeLength());
-				sourceInfo.setConstructType(constructType);			
+				sourceInfo.setConstructType(constructType);
 			}
 		}
 		return sourceInfo;
@@ -362,7 +369,7 @@ public class PldtAstVisitor extends CASTVisitor {
 
 		return sourceInfo;
 	}
-	
+
 	private boolean preprocessorIncluded(IASTNode astNode) {
 		if (astNode.getFileLocation() == null)
 			return false;
@@ -373,8 +380,8 @@ public class PldtAstVisitor extends CASTVisitor {
 
 	public void processIdExprAsLiteral(IASTIdExpression expression) {
 		IASTName name = expression.getName();
-		String strName=name.toString();
-		if ((this.allowPrefixOnlyMatch&& matchesPrefix(strName)) || isArtifact(name)) {// brt C++ test 2/16/10
+		String strName = name.toString();
+		if ((this.allowPrefixOnlyMatch && matchesPrefix(strName)) || isArtifact(name)) {// brt C++ test 2/16/10
 			SourceInfo sourceInfo = getSourceInfo(expression, Artifact.CONSTANT);
 			if (sourceInfo != null) {
 				scanReturn.addArtifact(new Artifact(fileName, sourceInfo.getStartingLine(), 1, // column:
@@ -384,181 +391,196 @@ public class PldtAstVisitor extends CASTVisitor {
 	}
 
 	/**
-	 * allow dynamic adding to include path?  Can be overridden by derived classes.
+	 * allow dynamic adding to include path? Can be overridden by derived classes.
+	 * 
 	 * @return
 	 */
 	public boolean allowIncludePathAdd() {
 		return !dontAskToModifyIncludePathAgain;
 	}
+
 	/**
 	 * Replace the includes list in this visitor so the change will be recognized.
+	 * 
 	 * @param includes
 	 */
 	@SuppressWarnings("unchecked")
-  protected void replaceIncludes(String includes) {
-		includes_=convertToList(includes);
+	protected void replaceIncludes(String includes) {
+		includes_ = convertToList(includes);
 	}
-    @SuppressWarnings({ "unchecked"})
+
+	@SuppressWarnings({ "unchecked" })
 	public List convertToList(String stringList)
-    {
-        StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
-        List dirs = new ArrayList();
-        while (st.hasMoreElements()) {
-            dirs.add(st.nextToken());
-        }
-        return dirs;
-    }
-	/** 
+	{
+		StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
+		List dirs = new ArrayList();
+		while (st.hasMoreElements()) {
+			dirs.add(st.nextToken());
+		}
+		return dirs;
+	}
+
+	/**
 	 * Add an include path to the prefs - probably found dynamically during analysis
-	 * and requested to be added by the user
-	 * <br>
+	 * and requested to be added by the user <br>
 	 * Note that the path will be to the actual file in which the name was found;
 	 * the path that will be added to the prefs is the parent directory of that file.
+	 * 
 	 * @param path
-	 * @param name the name (function etc) that was found in the path
-	 * @param dontAskAgain  initial value of toggle "don't ask again"
+	 * @param name
+	 *            the name (function etc) that was found in the path
+	 * @param dontAskAgain
+	 *            initial value of toggle "don't ask again"
 	 * 
 	 * @returns whether the user chose to add the path or not
 	 */
-	public boolean addIncludePath( IPath path,  String name/*, IPreferenceStore store, String id*/, boolean dontAskAgain) {
+	public boolean addIncludePath(IPath path, String name/* , IPreferenceStore store, String id */, boolean dontAskAgain) {
 
-		IPreferenceStore store=getPreferenceStore();
-		String id=getIncludesPrefID();
-		String type=getTypeName();
-		boolean doitThisTime=false;
-		
-		if(store==null || id == null) {
-			CommonPlugin.log(IStatus.ERROR, "PLDT: Visitor subclass does not implement getPreferenceStore() or "+ //$NON-NLS-1$
+		IPreferenceStore store = getPreferenceStore();
+		String id = getIncludesPrefID();
+		String type = getTypeName();
+		boolean doitThisTime = false;
+
+		if (store == null || id == null) {
+			CommonPlugin.log(IStatus.ERROR, "PLDT: Visitor subclass does not implement getPreferenceStore() or " + //$NON-NLS-1$
 					"getIncludesPrefID() to return non-null values."); //$NON-NLS-1$
 			return false;
 		}
-		
-		try {
-		 String value = store.getString(id);
-		if(traceOn)System.out.println("value: "+value); //$NON-NLS-1$
-		
-		if (!dontAskAgain) {
-        // probably inefficient string construction, but rarely called.
-        String msg = Messages.PldtAstVisitor_20
-            + name
-            + Messages.PldtAstVisitor_21
-            + path.toString()
-            + Messages.PldtAstVisitor_22
-            + type
-            + Messages.PldtAstVisitor_23
-            + value
-            + Messages.PldtAstVisitor_24;
-        String title = Messages.PldtAstVisitor_25 + type + Messages.PldtAstVisitor_26;
-        boolean[] twoAnswers = askUI(title, msg, dontAskToModifyIncludePathAgain);
-        doitThisTime = twoAnswers[0];
-        dontAskAgain = twoAnswers[1];
-        dontAskToModifyIncludePathAgain = dontAskAgain;
-      }
 
-      if (doitThisTime) {
-        String s = java.io.File.pathSeparator;
-        String parent = path.toFile().getParent();
-        // add path separator (: or ; ?) if necessary
-        if (!value.endsWith(s)) {
-          value += s;
-        }
-        // add this new include path location to the value stored in
-        // preferences, and add it to the value within this class as well.
-        value += parent + s;
-        store.putValue(id, value);
-        replaceIncludes(value);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+		try {
+			String value = store.getString(id);
+			if (traceOn)
+				System.out.println("value: " + value); //$NON-NLS-1$
+
+			if (!dontAskAgain) {
+				// probably inefficient string construction, but rarely called.
+				String msg = Messages.PldtAstVisitor_20
+						+ name
+						+ Messages.PldtAstVisitor_21
+						+ path.toString()
+						+ Messages.PldtAstVisitor_22
+						+ type
+						+ Messages.PldtAstVisitor_23
+						+ value
+						+ Messages.PldtAstVisitor_24;
+				String title = Messages.PldtAstVisitor_25 + type + Messages.PldtAstVisitor_26;
+				boolean[] twoAnswers = askUI(title, msg, dontAskToModifyIncludePathAgain);
+				doitThisTime = twoAnswers[0];
+				dontAskAgain = twoAnswers[1];
+				dontAskToModifyIncludePathAgain = dontAskAgain;
+			}
+
+			if (doitThisTime) {
+				String s = java.io.File.pathSeparator;
+				String parent = path.toFile().getParent();
+				// add path separator (: or ; ?) if necessary
+				if (!value.endsWith(s)) {
+					value += s;
+				}
+				// add this new include path location to the value stored in
+				// preferences, and add it to the value within this class as well.
+				value += parent + s;
+				store.putValue(id, value);
+				replaceIncludes(value);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return doitThisTime;
 	}
 
 	/**
-	 * needs to be overrridden for derived classes that need to dynamically update the pref store 
-	 * e.g. for the includes path.  This type name is used for messages, etc.
+	 * needs to be overrridden for derived classes that need to dynamically update the pref store
+	 * e.g. for the includes path. This type name is used for messages, etc.
+	 * 
 	 * @return artifact type name such as "MPI", "OpenMP" etc.
-	 */	
+	 */
 	protected String getTypeName() {
 		return ""; //$NON-NLS-1$
 	}
 
 	/**
-	 * needs to be overrridden for derived classes that need to dynamically update the pref store 
+	 * needs to be overrridden for derived classes that need to dynamically update the pref store
 	 * e.g. for the includes path
+	 * 
 	 * @return
 	 */
 	protected String getIncludesPrefID() {
 		return null;
 	}
+
 	/**
-	 * needs to be overrridden for derived classes that need to dynamically update the pref store 
+	 * needs to be overrridden for derived classes that need to dynamically update the pref store
 	 * e.g. for the includes path
+	 * 
 	 * @return
 	 */
 	protected IPreferenceStore getPreferenceStore() {
 		return null;
 	}
 
-
 	/**
 	 * Dialog to ask a question in the UI thread
+	 * 
 	 * @author beth
-	 *
-	 */	
+	 * 
+	 */
 	public boolean[] askUI(final String title, final String message, boolean dontAskAgain) {
-	  boolean[] twoAnswers = new boolean[2];
-		RunGetAnswer runner = new RunGetAnswer(title,message,dontAskAgain);
-		
+		boolean[] twoAnswers = new boolean[2];
+		RunGetAnswer runner = new RunGetAnswer(title, message, dontAskAgain);
+
 		Display.getDefault().syncExec(runner);
-		boolean answer=runner.getAnswer();
-		dontAskAgain=runner.getDontAskAgain();
-		twoAnswers[0]=answer;
-		twoAnswers[1]=dontAskAgain;
+		boolean answer = runner.getAnswer();
+		dontAskAgain = runner.getDontAskAgain();
+		twoAnswers[0] = answer;
+		twoAnswers[1] = dontAskAgain;
 		return twoAnswers;
 	}
+
 	/**
 	 * Runnable used by askUI to ask a question in the UI thread
+	 * 
 	 * @author beth
-	 *
+	 * 
 	 */
-	  class RunGetAnswer implements Runnable {
-	    boolean answer, dontAskAgain;
-	    String title, message;
+	class RunGetAnswer implements Runnable {
+		boolean answer, dontAskAgain;
+		String title, message;
 
-	    RunGetAnswer(String title, String message, boolean initialToggleState) {
-	      this.title = title;
-	      this.message = message;
-	      this.dontAskAgain=initialToggleState;
-	    }
+		RunGetAnswer(String title, String message, boolean initialToggleState) {
+			this.title = title;
+			this.message = message;
+			this.dontAskAgain = initialToggleState;
+		}
 
-	    public void run() {
-	      IWorkbench wb = PlatformUI.getWorkbench();
-	      IWorkbenchWindow w = wb.getActiveWorkbenchWindow();
-	      Shell shell = w.getShell();
-	      if (shell == null) {
-	        Display display = CommonPlugin.getStandardDisplay();
-	        shell = display.getActiveShell();
-	      }
-	      
-	      // see also: openYesNoCancelQuestion
-	      String toggleMessage=Messages.PldtAstVisitor_28;
-	      IPreferenceStore store = null;
-	      String key = null;
-	      MessageDialogWithToggle md;
-	      md=MessageDialogWithToggle.openYesNoQuestion(shell, title, message, toggleMessage, dontAskAgain, store, key);
-	      int retCode=md.getReturnCode();  // yes=2
-	      answer = (retCode==2);
-	      dontAskAgain= md.getToggleState();  
-	    }
+		public void run() {
+			IWorkbench wb = PlatformUI.getWorkbench();
+			IWorkbenchWindow w = wb.getActiveWorkbenchWindow();
+			Shell shell = w.getShell();
+			if (shell == null) {
+				Display display = CommonPlugin.getStandardDisplay();
+				shell = display.getActiveShell();
+			}
 
-	    public boolean getAnswer() {
-	      return answer;
-	    }
-	    public boolean getDontAskAgain() {
-	      return dontAskAgain;
-	    }
-	  }
+			// see also: openYesNoCancelQuestion
+			String toggleMessage = Messages.PldtAstVisitor_28;
+			IPreferenceStore store = null;
+			String key = null;
+			MessageDialogWithToggle md;
+			md = MessageDialogWithToggle.openYesNoQuestion(shell, title, message, toggleMessage, dontAskAgain, store, key);
+			int retCode = md.getReturnCode(); // yes=2
+			answer = (retCode == 2);
+			dontAskAgain = md.getToggleState();
+		}
+
+		public boolean getAnswer() {
+			return answer;
+		}
+
+		public boolean getDontAskAgain() {
+			return dontAskAgain;
+		}
+	}
 
 	/**
 	 * will be overridden where needed; note that for C code, the test for if
@@ -569,8 +591,8 @@ public class PldtAstVisitor extends CASTVisitor {
 	 * @return
 	 * @since 4.0
 	 */
-	  public boolean matchesPrefix(String name) {
-		  return true;
-	  }
+	public boolean matchesPrefix(String name) {
+		return true;
+	}
 
 }

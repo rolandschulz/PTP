@@ -28,13 +28,12 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * 
  * RunAnalyseHandler - keeps state information for the analysis handlers in
  * the dropdown analysis menu.
- * Common behavior is in  (derived class) RunAnalyseHandlerBase.
+ * Common behavior is in (derived class) RunAnalyseHandlerBase.
  * 
- * That is, the AnalysisDropdownHandler will repeat the action of the last RunAnalyseHandler 
+ * That is, the AnalysisDropdownHandler will repeat the action of the last RunAnalyseHandler
  * that was executed - they are cached as one of these.
  * 
  * @author Beth Tibbitts
-
  */
 public abstract class RunAnalyseHandler extends AbstractHandler {
 	/**
@@ -42,7 +41,7 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 	 */
 	protected IStructuredSelection selection;
 
-	public RunAnalyseHandler(){
+	public RunAnalyseHandler() {
 	}
 
 	/**
@@ -50,7 +49,7 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 	 * (e.g. resource in the project explorer) then return it.
 	 * If it's e.g. a text selection in the editor, we don't care about that
 	 * 
-	 * Note that we  cache the last structured selection (like the previous "action" version
+	 * Note that we cache the last structured selection (like the previous "action" version
 	 * of this class) since we don't get selection changed events.
 	 * However, AnalysisDropDownHandler does get these events, and its value
 	 * will be used if HanderUtil doesn't have any information yet.
@@ -63,8 +62,8 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 		if (curSel instanceof IStructuredSelection) {
 			selection = (IStructuredSelection) curSel;
 		}
-		
-		if(selection == null) {
+
+		if (selection == null) {
 			selection = AnalysisDropdownHandler.getInstance().getLastSelection();
 		}
 		// If there isn't a current selection appropriate for us,
@@ -75,7 +74,7 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 			selection = AnalysisDropdownHandler.getLastAnalysisSelection();
 		}
 		return selection;
-	
+
 	}
 
 	/**
@@ -114,7 +113,7 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 			return 1;
 		} else if (res instanceof IContainer) {
 			int count = 0;
-	
+
 			try {
 				IResource[] kids = ((IContainer) res).members();
 				for (int i = 0; i < kids.length; i++) {
@@ -129,59 +128,62 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 		}
 		return 0;
 	}
-	 @SuppressWarnings("unchecked")
-	  protected int countFilesSelected(String[] exts) {
-	    int count = 0;
-	    // Get elements of a possible multiple selection
-	    Iterator iter = this.selection.iterator();
-	    while (iter.hasNext()) {
-	      Object obj = (Object) iter.next();
-	      // It can be a Project, Folder, File, etc...
-	      if (obj instanceof IAdaptable) {
-	        final IResource res = (IResource) ((IAdaptable) obj)
-	            .getAdapter(IResource.class);
-	        count = count + countFiles(res,exts);
-	      }
-	    }
-	    // System.out.println("number of files: " + count);
-	    return count;
-	  }
+
+	@SuppressWarnings("unchecked")
+	protected int countFilesSelected(String[] exts) {
+		int count = 0;
+		// Get elements of a possible multiple selection
+		Iterator iter = this.selection.iterator();
+		while (iter.hasNext()) {
+			Object obj = (Object) iter.next();
+			// It can be a Project, Folder, File, etc...
+			if (obj instanceof IAdaptable) {
+				final IResource res = (IResource) ((IAdaptable) obj)
+						.getAdapter(IResource.class);
+				count = count + countFiles(res, exts);
+			}
+		}
+		// System.out.println("number of files: " + count);
+		return count;
+	}
+
 	/**
 	 * count files ending in one of the given file extensions
 	 * 
 	 * @param res
-	 * @param exts array of extensions e.g. ".h", ".hpp" etc
+	 * @param exts
+	 *            array of extensions e.g. ".h", ".hpp" etc
 	 * @return
 	 */
-	protected int countFiles(IResource res, String[]exts) {
-	  if (res instanceof IFile) {
-	    IFile file = (IFile)res;
-	    String filename = file.getName();
-      for (int i = 0; i < exts.length; i++) {
-        String ext = exts[i];
-        if(filename.endsWith(ext)){
-          System.out.println("found "+ext+" in file: "+file.getName()+"  count+1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-          return 1;
-        }
-      }
-        return 0;  // not found
+	protected int countFiles(IResource res, String[] exts) {
+		if (res instanceof IFile) {
+			IFile file = (IFile) res;
+			String filename = file.getName();
+			for (int i = 0; i < exts.length; i++) {
+				String ext = exts[i];
+				if (filename.endsWith(ext)) {
+					System.out.println("found " + ext + " in file: " + file.getName() + "  count+1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					return 1;
+				}
+			}
+			return 0; // not found
 
-    } else if (res instanceof IContainer) {
-      int count = 0;
-  
-      try {
-        IResource[] kids = ((IContainer) res).members();
-        for (int i = 0; i < kids.length; i++) {
-          IResource child = kids[i];
-          count = count + countFiles(child,exts);
-        }
-        return count;
-      } catch (CoreException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-    }
-    return 0;
+		} else if (res instanceof IContainer) {
+			int count = 0;
+
+			try {
+				IResource[] kids = ((IContainer) res).members();
+				for (int i = 0; i < kids.length; i++) {
+					IResource child = kids[i];
+					count = count + countFiles(child, exts);
+				}
+				return count;
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return 0;
 	}
 
 }

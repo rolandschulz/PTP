@@ -201,14 +201,15 @@ public class CommonPlugin extends AbstractUIPlugin {
 	public static void log(String msg) {
 		log(IStatus.INFO, msg);
 	}
+
 	/**
-	 * Returns the preference setting for  include paths, as a List of Strings
+	 * Returns the preference setting for include paths, as a List of Strings
 	 * 
 	 * @return
 	 * @since 5.0
 	 */
 	public List<String> getIncludeDirs(String includeID) {
-		String stringList=getPreferenceStore().getString(includeID);
+		String stringList = getPreferenceStore().getString(includeID);
 		StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
 		List<String> dirs = new ArrayList<String>();
 		while (st.hasMoreElements()) {

@@ -15,42 +15,42 @@ import org.eclipse.cdt.ui.IFunctionSummary.IFunctionPrototypeSummary;
 
 public class FunctionPrototypeSummaryImpl implements IFunctionPrototypeSummary
 {
-    private String name;
-    private String returnType; // "void";
-    private String arguments; // "int argc, char** argv";
+	private String name;
+	private String returnType; // "void";
+	private String arguments; // "int argc, char** argv";
 
-    public FunctionPrototypeSummaryImpl()
-    {
-    	
-    }
-    
-    public FunctionPrototypeSummaryImpl(String name, String returnType, String arguments)
-    {
-        this.name = name;
-        this.returnType = returnType;
-        this.arguments = arguments;
-    }
+	public FunctionPrototypeSummaryImpl()
+	{
 
-    public String getName()
-    {
-        return this.name;
-    }
+	}
 
-    public String getReturnType()
-    {
-        return returnType;
-    }
+	public FunctionPrototypeSummaryImpl(String name, String returnType, String arguments)
+	{
+		this.name = name;
+		this.returnType = returnType;
+		this.arguments = arguments;
+	}
 
-    public String getArguments()
-    {
-        return arguments;
-    }
+	public String getName()
+	{
+		return this.name;
+	}
 
-    public String getPrototypeString(boolean namefirst)
-    {
-        return namefirst ? name + "(" + arguments + ") " + returnType : returnType + " " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                + name + "(" + arguments + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-    }
+	public String getReturnType()
+	{
+		return returnType;
+	}
+
+	public String getArguments()
+	{
+		return arguments;
+	}
+
+	public String getPrototypeString(boolean namefirst)
+	{
+		return namefirst ? name + "(" + arguments + ") " + returnType : returnType + " " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ name + "(" + arguments + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
 
 	public void setArguments(String arguments) {
 		this.arguments = arguments;

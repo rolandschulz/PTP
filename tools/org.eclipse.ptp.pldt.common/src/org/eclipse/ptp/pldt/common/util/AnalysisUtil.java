@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.content.IContentType;
  * 
  */
 public class AnalysisUtil {
- 
+
 	private AnalysisUtil() {
 		super();
 	}
@@ -47,11 +47,10 @@ public class AnalysisUtil {
 		String ext = filename.substring(loc + 1);
 		ext = ext.toLowerCase();
 		boolean result = false;
-		if (ext.startsWith("c") ||ext.startsWith("f") ) // c or fortran //$NON-NLS-1$ //$NON-NLS-2$
+		if (ext.startsWith("c") || ext.startsWith("f")) // c or fortran //$NON-NLS-1$ //$NON-NLS-2$
 			result = true;
-		else
-			if(isCPP && ext.startsWith("h")) // C++ can have code in header files //$NON-NLS-1$
-			  result=true;
+		else if (isCPP && ext.startsWith("h")) // C++ can have code in header files //$NON-NLS-1$
+			result = true;
 		return result;
 	}
 

@@ -21,20 +21,20 @@ import org.eclipse.ui.PlatformUI;
 @Deprecated
 public class ViewActivater
 {
-    /**
-     * Activate the view identified by the view id.
-     * 
-     * @param strViewId
-     */
-    public static void activateView(String strViewId)
-    {
-        assert strViewId!=null;
-        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        try {
-            page.showView(strViewId);
-        } catch (PartInitException e) {
-            e.printStackTrace();
-        }
-        // page.activate(page.findView(strViewId));
-    }
+	/**
+	 * Activate the view identified by the view id.
+	 * 
+	 * @param strViewId
+	 */
+	public static void activateView(String strViewId)
+	{
+		assert strViewId != null;
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		try {
+			page.showView(strViewId);
+		} catch (PartInitException e) {
+			e.printStackTrace();
+		}
+		// page.activate(page.findView(strViewId));
+	}
 }
