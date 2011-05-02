@@ -200,18 +200,16 @@ public class SimpleTableMarkerView extends ViewPart {
 	public static final int CONSTANT = 2;
 
 	/** types of constructs, for the default case */
-	public static   String[] CONSTRUCT_TYPE_NAMES = { Messages.SimpleTableMarkerView_none,
+	public static String[] CONSTRUCT_TYPE_NAMES = { Messages.SimpleTableMarkerView_none,
 			Messages.SimpleTableMarkerView_function_call, Messages.SimpleTableMarkerView_constant };
 
 	/**
 	 * Simple Artifact Table View constructor
 	 * <p>
-	 * Everything can be null, and defaults will be taken, or read from
-	 * plugin.xml for the view.
+	 * Everything can be null, and defaults will be taken, or read from plugin.xml for the view.
 	 * <p>
-	 * Note: if a null plugIn instance is provided, the default plugin (this
-	 * one) will not be able to find resources (e.g. icon images) if the derived
-	 * class is in its own plug-in, and its icons are, too.
+	 * Note: if a null plugIn instance is provided, the default plugin (this one) will not be able to find resources (e.g. icon
+	 * images) if the derived class is in its own plug-in, and its icons are, too.
 	 */
 	public SimpleTableMarkerView(AbstractUIPlugin thePlugin, String thingname,
 			String thingnames, String columnName, String[] markerIDs) {
@@ -233,11 +231,11 @@ public class SimpleTableMarkerView extends ViewPart {
 		findViewInfo();
 
 	}
+
 	public SimpleTableMarkerView(AbstractUIPlugin thePlugin, String thingname,
 			String thingnames, String columnName, String markerID) {
-		this(thePlugin, thingname, thingnames, columnName, new String[]{markerID});
-		
-	
+		this(thePlugin, thingname, thingnames, columnName, new String[] { markerID });
+
 	}
 
 	/**
@@ -271,9 +269,9 @@ public class SimpleTableMarkerView extends ViewPart {
 	 * read from from plugin.xml.)
 	 * 
 	 */
-//	public SimpleTableMarkerView() {
-//		this(null, null, null, null, null);
-//	}
+	// public SimpleTableMarkerView() {
+	// this(null, null, null, null, null);
+	// }
 
 	/**
 	 * Find info from the view info in the manifest. This includes the icon
@@ -285,8 +283,7 @@ public class SimpleTableMarkerView extends ViewPart {
 		String classname = this.getClass().getName();
 		// try to find the icon specified in the plugin.xml for this
 		// extension/view
-		IExtension[] ext = Platform.getExtensionRegistry().getExtensionPoint(
-				"org.eclipse.ui.views").getExtensions(); //$NON-NLS-1$
+		IExtension[] ext = Platform.getExtensionRegistry().getExtensionPoint("org.eclipse.ui.views").getExtensions(); //$NON-NLS-1$
 		for (int i = 0; i < ext.length; i++) {
 			IExtension extension = ext[i];
 			IConfigurationElement[] ces = extension.getConfigurationElements();
@@ -303,8 +300,8 @@ public class SimpleTableMarkerView extends ViewPart {
 					if (markerIDs_ == null) {
 						// use plug-in id for marker id, if not specified
 						markerIDs_ = new String[1];
-						String pluginID=cElement.getAttribute("id"); //$NON-NLS-1$
-						markerIDs_[1]=pluginID;
+						String pluginID = cElement.getAttribute("id"); //$NON-NLS-1$
+						markerIDs_[1] = pluginID;
 					}
 				}
 
@@ -378,9 +375,9 @@ public class SimpleTableMarkerView extends ViewPart {
 		 */
 		public Object[] getElements(Object parent) {
 			Object[] objs = null;
-			List<IMarker>  allObjs=new ArrayList<IMarker>();
+			List<IMarker> allObjs = new ArrayList<IMarker>();
 			try {
-				//String id = markerIDs_;
+				// String id = markerIDs_;
 				if (input == null) {
 					if (traceOn)
 						System.out.println("input is null in getElements..."); //$NON-NLS-1$
@@ -389,18 +386,20 @@ public class SimpleTableMarkerView extends ViewPart {
 				// workspace objs = ResourcesPlugin.getWorkspace().getRoot().findMarkers(id,
 				// false, IResource.DEPTH_INFINITE);
 				for (int i = 0; i < markerIDs_.length; i++) {
-					String id= markerIDs_[i];
+					String id = markerIDs_[i];
 					objs = input.findMarkers(id, false, IResource.DEPTH_INFINITE);
-					List  markList= Arrays.asList(objs);
-					//allObjs.addAll((List<IMarker>) Arrays.asList(objs));
-					if(traceOn)System.out.println("found "+(objs.length)+ " markers of type " //$NON-NLS-1$ //$NON-NLS-2$
-							+id);
+					List markList = Arrays.asList(objs);
+					// allObjs.addAll((List<IMarker>) Arrays.asList(objs));
+					if (traceOn)
+						System.out.println("found " + (objs.length) + " markers of type " //$NON-NLS-1$ //$NON-NLS-2$
+								+ id);
 					allObjs.addAll(markList);
-					 
-					//String[] sl = (String[]) list.toArray(new String[0]);
+
+					// String[] sl = (String[]) list.toArray(new String[0]);
 				}
-				if(traceOn)System.out.println("Found "+allObjs.size()+" total markers"); //$NON-NLS-1$ //$NON-NLS-2$
-				 
+				if (traceOn)
+					System.out.println("Found " + allObjs.size() + " total markers"); //$NON-NLS-1$ //$NON-NLS-2$
+
 			} catch (CoreException e) {
 				System.out
 						.println("ATV, exception getting model elements (markers for Table view)"); //$NON-NLS-1$
@@ -486,7 +485,8 @@ public class SimpleTableMarkerView extends ViewPart {
 		 * Some debugging statement help
 		 * 
 		 * @param delta
-		 * @param indent number of levels of indent we should consider ourselves as being in
+		 * @param indent
+		 *            number of levels of indent we should consider ourselves as being in
 		 */
 		private void printOneResourceChanged(IResourceDelta delta, int indent) {
 			StringBuffer buf = new StringBuffer(80);
@@ -568,7 +568,7 @@ public class SimpleTableMarkerView extends ViewPart {
 		IArtifact artifact = null;
 		try {
 			id = (String) marker.getAttribute(uniqueID_);
-			artifact =ArtifactManager.getArtifact(marker);
+			artifact = ArtifactManager.getArtifact(marker);
 		} catch (CoreException e) {
 			// e.printStackTrace();
 			System.out.println(e.getMessage()
@@ -682,7 +682,7 @@ public class SimpleTableMarkerView extends ViewPart {
 					if (columnName_ != null) {// we're not using array
 						return getConstructStr(marker);
 					}
-				// else drop through...
+					// else drop through...
 
 				default:
 					String attrName = markerAttrNames_[index - 4];
@@ -704,9 +704,11 @@ public class SimpleTableMarkerView extends ViewPart {
 		 * cell can contain both, an image and text, which will be displayed
 		 * side-by-side)
 		 * 
-		 * @param obj -
+		 * @param obj
+		 *            -
 		 *            the object we're getting the image for
-		 * @param index -
+		 * @param index
+		 *            -
 		 *            the column that this image is to go in
 		 */
 		public Image getColumnImage(Object obj, int index) {
@@ -727,10 +729,8 @@ public class SimpleTableMarkerView extends ViewPart {
 		 *            the marker object that this artifact is represented by
 		 * @return image for marker
 		 *         <p>
-		 *         Note: if a null plugIn instance is provided on the view ctor,
-		 *         the default plugin (this one) will not be able to find
-		 *         resources (e.g. icon images) if the derived class is in its
-		 *         own plug-in, and its icons are, too.
+		 *         Note: if a null plugIn instance is provided on the view ctor, the default plugin (this one) will not be able to
+		 *         find resources (e.g. icon images) if the derived class is in its own plug-in, and its icons are, too.
 		 * 
 		 */
 		protected Image getCustomImage(Object obj) {
@@ -896,15 +896,15 @@ public class SimpleTableMarkerView extends ViewPart {
 				try {
 					IMarker m1 = (IMarker) e1;
 					Object tempObj = m1.getAttribute(LINE);
-					int line1=0;
-					int line2=0;
+					int line1 = 0;
+					int line2 = 0;
 					if (tempObj instanceof Integer) {
-						line1 = ((Integer)tempObj).intValue();
+						line1 = ((Integer) tempObj).intValue();
 						IMarker m2 = (IMarker) e2;
-						tempObj= m2.getAttribute(LINE);
+						tempObj = m2.getAttribute(LINE);
 						// we assume if the first was Integer, this one is, too.
 						assert tempObj instanceof Integer;
-						line2 = ((Integer)tempObj).intValue();
+						line2 = ((Integer) tempObj).intValue();
 
 					}
 					int result = 0;
@@ -975,7 +975,8 @@ public class SimpleTableMarkerView extends ViewPart {
 				IMarker m2 = (IMarker) e2;
 				String file1 = (String) m1.getAttribute(FILENAME);
 				String file2 = (String) m2.getAttribute(FILENAME);
-				if(traceOn)System.out.println("ascending=" + ascending); //$NON-NLS-1$
+				if (traceOn)
+					System.out.println("ascending=" + ascending); //$NON-NLS-1$
 				if (ascending)
 					res = collator.compare(file1, file2);
 				else
@@ -1275,7 +1276,8 @@ public class SimpleTableMarkerView extends ViewPart {
 					}
 					StringBuffer info = new StringBuffer();
 
-					IArtifact artifact=null;;
+					IArtifact artifact = null;
+					;
 					try {
 						artifact = ArtifactManager.getArtifact(selectedMarker_);
 					} catch (CoreException e) {
@@ -1286,12 +1288,12 @@ public class SimpleTableMarkerView extends ViewPart {
 						info.append(Messages.SimpleTableMarkerView_filename2).append(artifact.getFileName());
 						info.append(Messages.SimpleTableMarkerView_lineno2).append(artifact.getLine());
 						info.append(Messages.SimpleTableMarkerView_name2).append(artifact.getShortName());
-						String desc=artifact.getDescription();
-						if (desc!=null){
+						String desc = artifact.getDescription();
+						if (desc != null) {
 							info.append(Messages.SimpleTableMarkerView_description2).append(desc);
 						}
 					}
-					else{
+					else {
 						info.append(Messages.SimpleTableMarkerView_no_info_avail);
 					}
 					MessageDialog.openInformation(null, title, info.toString());
@@ -1318,32 +1320,33 @@ public class SimpleTableMarkerView extends ViewPart {
 			public void run() {
 				// batch changes so we get only one resource change event
 				final IWorkspaceRoot wsResource = ResourcesPlugin.getWorkspace().getRoot();
-				
-				IWorkspaceRunnable runnable = new IWorkspaceRunnable(){
+
+				IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 					public void run(IProgressMonitor monitor) throws CoreException {
-					try {
-						int depth = IResource.DEPTH_INFINITE;
+						try {
+							int depth = IResource.DEPTH_INFINITE;
 
-						for (int i = 0; i < markerIDs_.length; i++) {
-							String markerID = markerIDs_[i];
-							wsResource.deleteMarkers(markerID,false,depth);
+							for (int i = 0; i < markerIDs_.length; i++) {
+								String markerID = markerIDs_[i];
+								wsResource.deleteMarkers(markerID, false, depth);
+							}
+
+							if (traceOn)
+								System.out.println("markers removed."); //$NON-NLS-1$
+						} catch (CoreException e) {
+							System.out.println("RM: exception deleting markers."); //$NON-NLS-1$
+							// e.printStackTrace();
 						}
-						
-						if(traceOn)System.out.println("markers removed."); //$NON-NLS-1$
-					} catch (CoreException e) {
-						System.out.println("RM: exception deleting markers."); //$NON-NLS-1$
-						// e.printStackTrace();
 					}
-					}};
-					try {
-						runnable.run(null);
-					} catch (CoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+				};
+				try {
+					runnable.run(null);
+				} catch (CoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-				 
-			}//end run()
+			}// end run()
 		};// end new action
 		removeMarkerAction.setText(Messages.SimpleTableMarkerView_removeMarkers);
 		removeMarkerAction.setToolTipText(Messages.SimpleTableMarkerView_removeMarkersTooltip);
@@ -1368,14 +1371,14 @@ public class SimpleTableMarkerView extends ViewPart {
 		filterAction.setToolTipText(Messages.SimpleTableMarkerView_95 + thingnames_
 				+ Messages.SimpleTableMarkerView_96);
 		// from org.eclipse.ui.views plugin
-		Path path=new Path("icons/filter_ps.gif"); //$NON-NLS-1$
+		Path path = new Path("icons/filter_ps.gif"); //$NON-NLS-1$
 		Bundle b = CommonPlugin.getDefault().getBundle();
-		String temp=b.getSymbolicName();
+		String temp = b.getSymbolicName();
 		URL url = FileLocator.find(CommonPlugin.getDefault().getBundle(), path, null);
 		ImageDescriptor id = ImageDescriptor.createFromURL(url);
-		 
+
 		Image img = id.createImage();
-		
+
 		filterAction.setImageDescriptor(id);
 	}
 
@@ -1418,8 +1421,7 @@ public class SimpleTableMarkerView extends ViewPart {
 				} catch (Exception e) {
 					System.out
 							.println("ATV.doubleclickAction: Error positioning editor page from marker line number"); //$NON-NLS-1$
-					showStatusMessage(
-							"Error positioning editor from marker line number", //$NON-NLS-1$
+					showStatusMessage("Error positioning editor from marker line number", //$NON-NLS-1$
 							"error marker goto"); //$NON-NLS-1$
 					e.printStackTrace();
 				}
@@ -1486,7 +1488,7 @@ public class SimpleTableMarkerView extends ViewPart {
 	}
 
 	public ImageDescriptor makeImageDescriptor(String iconName) {
-		URL url=FileLocator.find(thePlugin_.getBundle(), new Path(iconName), null);
+		URL url = FileLocator.find(thePlugin_.getBundle(), new Path(iconName), null);
 		ImageDescriptor id = ImageDescriptor.createFromURL(url);
 		return id;
 	}
@@ -1672,13 +1674,13 @@ public class SimpleTableMarkerView extends ViewPart {
 					}
 				} // end if CHANGED
 				else if (delta.getKind() == IResourceDelta.ADDED) {
-					//System.out.println("Resource added.");
+					// System.out.println("Resource added.");
 					checkMarkerDeltas(delta);
 				} else if (delta.getKind() == IResourceDelta.REPLACED) {
-					//System.out.println("Resource replaced.");
+					// System.out.println("Resource replaced.");
 					checkMarkerDeltas(delta);
 				} else if (delta.getKind() == IResourceDelta.REMOVED) {
-					//System.out.println("Resource removed.");
+					// System.out.println("Resource removed.");
 					checkMarkerDeltas(delta);
 				}
 			} // end if FILE
@@ -1688,7 +1690,7 @@ public class SimpleTableMarkerView extends ViewPart {
 		private void checkMarkerDeltas(IResourceDelta delta) {
 			IMarkerDelta[] md1 = delta.getMarkerDeltas();
 			int len = md1.length;
-			//System.out.println("       ... found " + len + " markerDeltas.");
+			// System.out.println("       ... found " + len + " markerDeltas.");
 		}
 
 		/**
@@ -1746,16 +1748,16 @@ public class SimpleTableMarkerView extends ViewPart {
 		}
 
 	} // end class UpdateVisitor
-	
-	class ArtifactFilter extends ViewerFilter{
+
+	class ArtifactFilter extends ViewerFilter {
 
 		@Override
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
-			if(element instanceof IMarker){
-				IMarker marker = (IMarker)element;
+			if (element instanceof IMarker) {
+				IMarker marker = (IMarker) element;
 				try {
-					Object obj=marker.getAttribute("foo"); //$NON-NLS-1$
-					System.out.println("obj="+obj); //$NON-NLS-1$
+					Object obj = marker.getAttribute("foo"); //$NON-NLS-1$
+					System.out.println("obj=" + obj); //$NON-NLS-1$
 				} catch (CoreException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -1763,7 +1765,7 @@ public class SimpleTableMarkerView extends ViewPart {
 			}
 			return false;
 		}
-		
+
 	}
 
 }

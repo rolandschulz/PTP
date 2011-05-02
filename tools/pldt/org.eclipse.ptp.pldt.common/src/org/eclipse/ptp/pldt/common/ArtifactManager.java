@@ -16,24 +16,22 @@ import java.util.HashMap;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
-
 /**
  * Manage the artifacts: be able to retrieve an artifact from the id in a marker, for example.
  * <p>
- * Note that there can be more than one ArtifactManager, distinguished by 
- * an ID, probably a markerID.  That is, all artifacts of the same markerID
- * (probably shown in the same view) are managed by the same (distinct) ArtifactManager.
+ * Note that there can be more than one ArtifactManager, distinguished by an ID, probably a markerID. That is, all artifacts of the
+ * same markerID (probably shown in the same view) are managed by the same (distinct) ArtifactManager.
  * 
- * TODO Question: why can't we just store the objects in an attribute?? 
+ * TODO Question: why can't we just store the objects in an attribute??
+ * 
  * @author Beth Tibbitts
  * 
  * 
  */
 public class ArtifactManager {
 
-
 	/** to be able to look up artifacts by unique ID */
-	static HashMap hashMap = new HashMap();  
+	static HashMap hashMap = new HashMap();
 
 	/** ID for this registry */
 	private String id_;
@@ -63,11 +61,12 @@ public class ArtifactManager {
 	 * @return
 	 */
 	public static ArtifactManager getManager(String id) {
-        Object o = (Object)registry.get(id);
-        if (o==null)
-            new ArtifactManager(id);
+		Object o = (Object) registry.get(id);
+		if (o == null)
+			new ArtifactManager(id);
 		return (ArtifactManager) registry.get(id);
 	}
+
 	/**
 	 * return the artifact for a marker; involves looking up the
 	 * Artifact Manager, then the Artifact within that.
@@ -78,16 +77,14 @@ public class ArtifactManager {
 	 * @return
 	 * @throws CoreException
 	 */
-	public static IArtifact getArtifact(IMarker marker) throws CoreException{
+	public static IArtifact getArtifact(IMarker marker) throws CoreException {
 		String id = (String) marker.getAttribute(IDs.UNIQUE_ID);
-		String markerID=marker.getAttribute(IDs.ID).toString();
-		ArtifactManager aMgr=getManager(markerID);
-		IArtifact a =  aMgr.getArtifact(id);
-		
+		String markerID = marker.getAttribute(IDs.ID).toString();
+		ArtifactManager aMgr = getManager(markerID);
+		IArtifact a = aMgr.getArtifact(id);
+
 		return a;
 	}
-
-
 
 	/**
 	 * Add an artifact to the hashtable for future lookup
@@ -119,37 +116,41 @@ public class ArtifactManager {
 	public HashMap getArtifactMap() {
 		return hashMap;
 	}
+
 	/**
 	 * Remove artifact by artifact object
+	 * 
 	 * @param a
 	 * @return true if it was removed
 	 */
-	public boolean removeArtifact(IArtifact a){
+	public boolean removeArtifact(IArtifact a) {
 		return removeArtifact(a.getId());
 	}
+
 	/**
 	 * Remove artifact by key
+	 * 
 	 * @param key
 	 * @return
 	 */
-	public boolean removeArtifact(String key){
-		if(hashMap.containsKey(key)){
+	public boolean removeArtifact(String key) {
+		if (hashMap.containsKey(key)) {
 			hashMap.remove(key);
 			return true;
 		}
 		return false;
 	}
+
 	/**
 	 * Remove all the artifacts
-	 *
+	 * 
 	 */
-	public void clear(){
+	public void clear() {
 		hashMap.clear();
 	}
-	public String toString(){
-		return "ArtifactManager for "+id_; //$NON-NLS-1$
+
+	public String toString() {
+		return "ArtifactManager for " + id_; //$NON-NLS-1$
 	}
-
-
 
 }
