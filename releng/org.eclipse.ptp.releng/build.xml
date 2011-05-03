@@ -842,6 +842,14 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.git.core"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.git.ui"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.ui.test"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
