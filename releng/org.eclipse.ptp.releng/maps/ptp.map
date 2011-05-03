@@ -183,3 +183,9 @@ fragment@org.eclipse.ptp.etfw.parallel=@ptpTag@,:pserver:anonymous@dev.eclipse.o
 ! Tests
 plugin@org.eclipse.ptp.rdt.core.tests=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.tests
 
+! Orbit bundles
+plugin@javax.xml,1.3.4=GET,http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/bundles/javax.xml_1.3.4.v201005080400.jar
+plugin@javax.xml.stream,1.0.1=GET,http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/bundles/javax.xml.stream_1.0.1.v201004272200.jar
+plugin@javax.xml.bind,2.1.9=GET,http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/bundles/javax.xml.bind_2.1.9.v201005080401.jar
+plugin@com.sun.xml.bind,2.1.9=GET,http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/bundles/com.sun.xml.bind_2.1.9.v200905260854.jar
+
