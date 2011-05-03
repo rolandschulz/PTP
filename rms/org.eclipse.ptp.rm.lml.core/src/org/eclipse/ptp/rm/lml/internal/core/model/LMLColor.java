@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- * 		Carsten Karbach, FZ Juelich
+ * 		Carsten Karbach, Claudia Knobloch, FZ Juelich
  */
 
 package org.eclipse.ptp.rm.lml.internal.core.model;
@@ -265,6 +265,11 @@ public class LMLColor {
 			}
 
 		return new LMLColor(red, green, blue);	
+	}
+	
+	@Override
+	public String toString() {
+		return "#" + Integer.toHexString(r) + Integer.toHexString(g) + Integer.toHexString(b);
 	}
 
 }

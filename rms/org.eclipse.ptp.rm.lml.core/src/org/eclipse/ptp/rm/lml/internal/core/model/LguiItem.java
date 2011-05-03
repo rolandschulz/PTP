@@ -10,7 +10,10 @@
  */
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
+import java.math.BigInteger;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -25,7 +28,11 @@ import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiHandler;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.TablelayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiUpdatedEvent;
 
 /**
@@ -36,7 +43,7 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * Source of the XML-file from which the LguiType was generated.
 	 */
-	private URL xmlFile;
+	private URI xmlFile;
 	
 	/*
 	 * The generated LguiType 
@@ -73,7 +80,7 @@ public class LguiItem implements ILguiItem {
 	 * Within the constructor the method for parsing an XML-file into LguiItem is called.
 	 * @param xmlFile the source of the XML file.
 	 */
-	public LguiItem(URL xmlFile) {
+	public LguiItem(URI xmlFile) {
 		
 		this.xmlFile = xmlFile;
 		try {
@@ -83,7 +90,7 @@ public class LguiItem implements ILguiItem {
 		}
 		
 		createLguiHandlers();
-		
+		setCid();
 	}
 	
 	/**
@@ -112,7 +119,7 @@ public class LguiItem implements ILguiItem {
 	 * @see
 	 * org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getXMLFile()
 	 */
-	public URL getXmlFile() {
+	public URI getXmlFile() {
 		return xmlFile;
 	}
 	
@@ -153,13 +160,51 @@ public class LguiItem implements ILguiItem {
 		return lgui;
 	}
 	
-	
+	private void setCid(){
+		for (TableType table : getTableHandler().getTables()) {
+			for (RowType row : table.getRow()) {
+				int cid = 1;
+				for (CellType cell : row.getCell()) {
+					if (cell.getCid() == null) {
+						cell.setCid(BigInteger.valueOf(cid));
+					} else {
+						cid =  cell.getCid().intValue();
+					}
+					cid++;
+				}
+			}
+		}
+	}
 	
 	/**
 	 * Parsing an XML file.
 	 * The method generates from an XML file an instance of LguiType.
 	 * @param xml the URL source of the XML file
-	 * @return sthe generated LguiType
+	 * @return the generated LguiType
+	 * @throws MalformedURLException 
+	 * @throws JAXBException
+	 */
+	private static LguiType parseLML(URI xml) throws MalformedURLException{
+		LguiType lml = null;
+		try {
+			Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
+			
+			JAXBElement<LguiType> doc = (JAXBElement<LguiType>)unmarshaller.unmarshal(xml.toURL());
+			
+			lml = doc.getValue();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+		
+		return lml;
+		
+	}
+	
+	/**
+	 * Parsing an XML file.
+	 * The method generates from an XML file an instance of LguiType.
+	 * @param xml the URL source of the XML file
+	 * @return the generated LguiType
 	 * @throws MalformedURLException 
 	 * @throws JAXBException
 	 */
@@ -260,10 +305,21 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**
+	 * Inform all listeners, that something changed in the data-model.
+	 * Handlers should use this event to update their model-references.
+	 * Otherwise inconsistent return-values will be the result.
+	 */
+	public void updateData(){
+		
+		updateData(lgui);
+		
+	}
+	
+	/**
 	 * Call this method, if lml-model changed. The new model is passed
 	 * to the listening handlers. All getter-functions accessing the handler will
 	 * then return data, which is collected from this new model
-	 * @param model new lml-data-model
+	 * @param lgui new lml-data-model
 	 */
 	public void updateData(LguiType pmodel) {
 		
@@ -276,11 +332,41 @@ public class LguiItem implements ILguiItem {
 		      l.handleEvent(event);
 	}
 	
+	public void updateXML() {
+		lgui = null;
+		try {
+			xmlFile = new URI(xmlFile.toString());
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			lgui = parseLML(xmlFile);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		 
+		ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
+		for (ILguiListener listener : listeners) {
+			listener.handleEvent(e);
+		}
+	}
+	
+	
 	public void update() {
+		
 		for (ILguiListener listener : listeners) {
 			ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
 			listener.handleEvent(e);
 		}
+	}
+
+	@Override
+	public void addJob() {
+		LguiType newLgui = lgui;
+		lgui.getObjectsAndRelationsAndInformation();
+		updateData(newLgui);
 	}
 
 }

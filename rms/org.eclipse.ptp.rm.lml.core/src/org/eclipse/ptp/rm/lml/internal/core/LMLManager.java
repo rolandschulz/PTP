@@ -10,6 +10,7 @@
  */
 package org.eclipse.ptp.rm.lml.internal.core;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,13 +21,24 @@ import org.eclipse.ptp.rm.lml.core.ILMLManager;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiSelectedEvent;
+import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
+import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.internal.core.events.JobListSortedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiSelectedEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.MarkObjectEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.SelectedObjectChangeEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.TableColumnChangeEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.UnmarkObjectEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.UnselectObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
 
 /**
@@ -78,7 +90,7 @@ public class LMLManager implements ILMLManager{
 	 * @see
 	 * org.eclipse.ptp.rm.lml.core.ILMLManager#addLgui(URL xmlFile)
 	 */
-	public boolean addLgui(URL xmlFile) {
+	public boolean addLgui(URI xmlFile) {
 		if (!LGUIS.containsKey(xmlFile.getPath())) {
 			fSelectedLguiItem = new LguiItem(xmlFile);
 			synchronized (LGUIS){
@@ -153,7 +165,7 @@ public class LMLManager implements ILMLManager{
 		fireSelectedLgui();
 	}
 	
-	public void selectLgui(URL xmlFile) {
+	public void selectLgui(URI xmlFile) {
 		fSelectedLguiItem = LGUIS.get(xmlFile.getPath());
 		fireSelectedLgui();
 	}
@@ -186,5 +198,69 @@ public class LMLManager implements ILMLManager{
 	public void removeListener(IViewListener listener) {
 		viewListeners.remove(listener);
 		listeners.remove("ViewManager");
+	}
+
+	@Override
+	public void setTableColumnActive(String gid, String text) {
+		fSelectedLguiItem.getTableHandler().setTableColumnActive(gid, text, true);
+		fireChangeTableColumn();
+	}
+
+	private void fireChangeTableColumn() {
+		ITableColumnChangeEvent event = new TableColumnChangeEvent(this, fSelectedLguiItem);
+		for (Object listener : lmlListeners.getListeners()) {
+			((ILMLListener) listener).handleEvent(event);
+		}
+		
+	}
+
+	public void selectObject(String oid) {
+		fireChangeSelectedObject(oid);
+	}
+
+	private void fireChangeSelectedObject(String oid) {
+		ISelectedObjectChangeEvent event = new SelectedObjectChangeEvent(oid);
+		for (Object listener : lmlListeners.getListeners()) {
+			((ILMLListener) listener).handleEvent(event);
+		}
+	}
+	
+	public void update(){
+		fSelectedLguiItem.updateXML();
+		fireNewLgui();
+	}
+
+	public void markObject(String oid) {
+		fireMarkObject(oid);
+	}
+	
+	private void fireMarkObject(String oid) {
+		IMarkObjectEvent event = new MarkObjectEvent(oid);
+		for (Object listener : lmlListeners.getListeners()) {
+			((ILMLListener) listener).handleEvent(event);
+		}
+	}
+
+	public void unmarkObject(String oid) {
+		fireUnmarkObject(oid);
+	}
+	
+	private void fireUnmarkObject(String oid) {
+		IUnmarkObjectEvent event = new UnmarkObjectEvent(oid);
+		for (Object listener : lmlListeners.getListeners()) {
+			((ILMLListener) listener).handleEvent(event);
+		}
+	}
+
+	@Override
+	public void unselectObject(String oid) {
+		fireUnselectObject(oid);
+	}
+
+	private void fireUnselectObject(String oid) {
+		IUnselectedObjectEvent event = new UnselectObjectEvent(oid);
+		for (Object listener : lmlListeners.getListeners()) {
+			((ILMLListener) listener).handleEvent(event);
+		}
 	}
 }

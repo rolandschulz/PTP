@@ -1,16 +1,9 @@
-/**
- * Based on the class IResourceManagerListener 
- * 		 in package org.eclipse.ptp.core.listeners
- * 
- * Modified by:
- * 		Claudia Knobloch, Forschungszentrum Juelich GmbH
- */
-
 package org.eclipse.ptp.rm.lml.core.listeners;
 
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiSelectedEvent;
+
 
 /**
  * This interface manages the handling of different events.

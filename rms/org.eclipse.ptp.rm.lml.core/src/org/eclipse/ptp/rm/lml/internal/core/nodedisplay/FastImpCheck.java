@@ -1,14 +1,3 @@
-/**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- * 		Carsten Karbach, FZ Juelich
- */
-
 package org.eclipse.ptp.rm.lml.internal.core.nodedisplay;
 
 import java.util.ArrayList;
@@ -23,7 +12,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeType;
 /**
  * This class is capable of checking implicit names given by refid-attributes
  * faster than by creating all implicit names and then look if refid-values were created
- * @author Carsten Karbach, FZ Juelich
+ * @author karbach
  *
  */
 public class FastImpCheck {

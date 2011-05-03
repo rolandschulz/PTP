@@ -38,6 +38,8 @@ public class OIDToInformation extends LguiHandler{
 	private HashMap<String, List<InfoType>> oidtoinfo;
 	
 	/**
+	 * Create an information-handler with standard-parameters.
+	 * 
 	 * @param psuperHandler LML-data-handler, which groups this handler and others to a set
 	 * of LMLHandler. This instance is needed to notify all LMLHandler, if any data of
 	 * the LguiType-instance was changed.
@@ -57,9 +59,9 @@ public class OIDToInformation extends LguiHandler{
 	}
 	
 	/**
-	 * Extracts all info-tags from lml-model
+	 * Extracts all info-tags from lml-model and saves them in oidtoinfo.
 	 */
-	public void getInformationFromModel(){
+	private void getInformationFromModel(){
 		
 		oidtoinfo=new HashMap<String, List<InfoType>>();
 		
@@ -96,6 +98,38 @@ public class OIDToInformation extends LguiHandler{
 	
 	
 	/**
+	 * Get all information of passed type defined in the lml-instance.
+	 * example:
+	 * 
+	 * <pre>
+	 * {@code
+	 * <information>
+		<info oid="empty" type="short" description="additional infos for this job">
+			<data key="owner" value="noone" />
+			<data key="cpus" value="19840" />
+		</info>
+		
+		<info oid="job1" type="short" >
+			<data key="owner" value="carsten" />
+			<data key="cpus" value="1024" />
+		</info>
+		
+		<info oid="job1" type="long" >
+			<data key="owner" value="carsten" />
+			<data key="cpus" value="1024" />
+			<data key="starttime" value="05.04.2011" />
+			<data key="endtime" value="06.04.2011" />
+		</info>
+		
+		</information>
+		
+	 * }
+	 * </pre>
+	 * 
+	 * getInfosByType( "job1", "short") returns the second info-tag
+	 * getInfosByType( "empty", "short") returns the first info-tag
+	 * 
+	 * 
 	 * @param id identification for an object 
 	 * @param type type of information
 	 * @return all infos of a type for object with given id, null if no infos there, empty list if no infos with this type exist
@@ -117,6 +151,38 @@ public class OIDToInformation extends LguiHandler{
 	}
 	
 	/**
+	 * Get all info-objects for the object with passed id.
+	 * 
+	 * example
+	 * 
+	 * <pre>
+	 * {@code
+	 * <information>
+		<info oid="empty" type="short" description="additional infos for this job">
+			<data key="owner" value="noone" />
+			<data key="cpus" value="19840" />
+		</info>
+		
+		<info oid="job1" type="short" >
+			<data key="owner" value="carsten" />
+			<data key="cpus" value="1024" />
+		</info>
+		
+		<info oid="job1" type="long" >
+			<data key="owner" value="carsten" />
+			<data key="cpus" value="1024" />
+			<data key="starttime" value="05.04.2011" />
+			<data key="endtime" value="06.04.2011" />
+		</info>
+		
+		</information>
+		
+	 * }
+	 * </pre>
+	 * 
+	 * getInfosById("job1") returns a list with the last two info-tags, which are associated with object "job1"
+	 * 
+	 * 
 	 * @param id ID-name of an object defined in objects-tag
 	 * @return all info-elements for this object, null if no info exists for this id
 	 */
@@ -124,21 +190,11 @@ public class OIDToInformation extends LguiHandler{
 		return oidtoinfo.get(id);
 	}
 	
-	public static void main(String[] args) {
-		for(int r=0; r<=8; r++){
-			for(int ra=0; ra<=7; ra++){
-				for(int m=0; m<=1; m++){
-					System.out.println("<object id=\"R"+String.valueOf(r)+String.valueOf(ra)+"-M"+m+"\" type=\"node\"/>") ;
-				}
-			}
-		}
-	}
-	
 	/**
 	 * Call this method, if lml-model changed. The new model is passed
 	 * to this handler. All getter-functions accessing the handler will
 	 * then return data, which is collected from this new model
-	 * @param model new lml-data-model
+	 * @param lgui new lml-data-model
 	 */
 	public void updateData(LguiType pmodel) {
 		lgui=pmodel;
@@ -146,4 +202,3 @@ public class OIDToInformation extends LguiHandler{
 		getInformationFromModel();
 	}
 }
-
