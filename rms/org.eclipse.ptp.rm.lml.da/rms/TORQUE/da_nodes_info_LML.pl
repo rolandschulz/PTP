@@ -62,7 +62,11 @@ my %mapping = (
 # unknown attributes
     );
 
-open(IN,"/usr/bin/pbsnodes -a |");
+
+my $cmd="/usr/bin/pbsnodes";
+$cmd=$ENV{"CMD_NODEINFO"} if($ENV{"CMD_NODEINFO"}); 
+
+open(IN,"$cmd -a |");
 my $nodeid="-";
 my $lastkey="-";
 

@@ -107,7 +107,11 @@ my %mapping = (
 # unknown attributes
     );
 
-open(IN," llstatus -l |");
+
+my $cmd="/usr/bin/llstatus";
+$cmd=$ENV{"CMD_NODEINFO"} if($ENV{"CMD_NODEINFO"}); 
+
+open(IN," $cmd -l |");
 my $nodeid="-";
 my $lastkey="-";
 
