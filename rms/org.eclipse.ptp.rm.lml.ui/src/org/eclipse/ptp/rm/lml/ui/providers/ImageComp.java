@@ -1,14 +1,3 @@
-/**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- * 		Carsten Karbach, FZ Juelich
- */
-
 package org.eclipse.ptp.rm.lml.ui.providers;
 
 import java.io.IOException;
@@ -27,6 +16,9 @@ import org.eclipse.swt.widgets.Display;
  * SWT-Conversion of class ImagePanel
  * 
  * Just a composite with an background image loaded from an url
+ * 
+ * @author karbach
+ *
  */
 public class ImageComp extends Composite {
 	
@@ -123,3 +115,4 @@ public class ImageComp extends Composite {
 	}
 	
 }
+

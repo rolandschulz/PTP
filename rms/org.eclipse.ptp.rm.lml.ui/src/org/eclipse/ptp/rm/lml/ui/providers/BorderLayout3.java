@@ -1,14 +1,3 @@
-/**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- * 		Claudia Knobloch, FZ Juelich
- */
-
 package org.eclipse.ptp.rm.lml.ui.providers;
 
 import org.eclipse.swt.SWT;
@@ -18,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 
-class BorderLayout extends Layout {
+class BorderLayout3 extends Layout {
   public static final int NWFIELD = 0;
   public static final int NFIELD = 1;
   public static final int NEFIELD = 2;
@@ -31,17 +20,6 @@ class BorderLayout extends Layout {
 
   public static class BorderData {
     public int field;
-    
-    public static final BorderData NORTH=new BorderData(NFIELD);
-    public static final BorderData WEST=new BorderData(WFIELD);
-    public static final BorderData EAST=new BorderData(EFIELD);
-    public static final BorderData SOUTH=new BorderData(SFIELD);
-    public static final BorderData CENTER=new BorderData(MFIELD);
-    
-    public static final BorderData NORTHWEST=new BorderData(NWFIELD);
-    public static final BorderData NORTHEAST=new BorderData(NEFIELD);
-    public static final BorderData SOUTHWEST=new BorderData(SWFIELD);
-    public static final BorderData SOUTHEAST=new BorderData(SEFIELD);
 
     public BorderData() {
 	  this.field = MFIELD;
@@ -169,8 +147,13 @@ class BorderLayout extends Layout {
 	  controls = new Control[9];
 	  points = new Point[9]; 
 	  for (int i = 0; i < children.length; i++) {
-		  BorderData borderData = (BorderData) children[i].getLayoutData();
-		  if (borderData != null &&  borderData.field >= 0 && borderData.field <= 8) {
+		  
+		  Object layoutData = children[i].getLayoutData();
+		  if (!(layoutData instanceof BorderData)) {
+			  continue;
+		  }
+		  BorderData borderData = (BorderData) layoutData;
+		  if (borderData != null ||  (borderData.field < 0 || borderData.field > 8)) {
 			  controls[borderData.field] = children[i];
 			  points[borderData.field] = children[i].computeSize(SWT.DEFAULT, SWT.DEFAULT, flushCache);
 		  }
