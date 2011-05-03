@@ -44,7 +44,7 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	 *            resource manager active environment map
 	 */
 	public static void addVariable(String uuid, NameValuePairType var, Map<String, String> env, RMVariableMap map) {
-		String key = var.getName();
+		String key = var.getValue();
 		String value = getValue(uuid, key, map);
 		if (value != null && !ZEROSTR.equals(value)) {
 			env.put(var.getName(), value);
@@ -127,19 +127,19 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Convert the simple variable name to a resource-manager map resolver
-	 * reference, and resolve.
+	 * Convert the name to a resource-manager map resolver reference, and
+	 * resolve.
 	 * 
 	 * @param uuid
 	 *            an internal or resource-specific job id.
 	 * @param key
-	 *            the variable name
+	 *            the attribute or property name
 	 * @param map
 	 *            resource manager active environment map
 	 * @return the resolved value
 	 */
 	private static String getValue(String uuid, String key, RMVariableMap map) {
-		String name = OPENVRM + key + CLOSVAL;
+		String name = OPENVRM + key + PD + VALUE + CLOSVAL;
 		return map.getString(uuid, name);
 	}
 
