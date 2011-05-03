@@ -10,7 +10,6 @@
 #*******************************************************************************/ 
 package LML_gen_table;
 
-my $VERSION='1.0';
 my($debug)=0;
 
 use strict;
@@ -165,7 +164,6 @@ sub get_lml_tablelayout {
 	$lastcid++;$cid=$lastcid;
 	$ds->{column}->{$cid}->{cid}=$cid;
 	$ds->{column}->{$cid}->{key}=$key;
-	$ds->{column}->{$cid}->{pos}=$cid;
 	$ds->{column}->{$cid}->{width}="1";
 	$ds->{column}->{$cid}->{active}="false";
 	$lastcid=$cid if($cid>$lastcid);

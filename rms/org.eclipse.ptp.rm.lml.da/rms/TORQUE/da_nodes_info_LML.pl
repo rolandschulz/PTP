@@ -41,10 +41,10 @@ my %mapping = (
     "idletime"                               => "",
     "jobs"                                   => "",
     "loadave"                                => "",
-    "ncpus"                                  => "",
+    "ncpus"                                  => "ncores",
     "netload"                                => "",
     "note"                                   => "",
-    "np"                                     => "ncores",
+    "np"                                     => "",
     "nsessions"                              => "",
     "ntype"                                  => "",
     "nusers"                                 => "",
@@ -135,7 +135,6 @@ printf(OUT "</lml:lgui>\n");
 close(OUT);
 
 foreach $key (sort(keys(%notfoundkeys))) {
-#    printf("not found key %-40s: %6d times\n",$key,$notfoundkeys{$key});
     printf("%-40s => \"\",\n","\"".$key."\"",$notfoundkeys{$key});
 }
 

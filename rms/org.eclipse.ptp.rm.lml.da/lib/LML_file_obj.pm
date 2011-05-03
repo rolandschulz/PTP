@@ -10,7 +10,6 @@
 #*******************************************************************************/ 
 package LML_file_obj;
 
-my $VERSION='$Revision: 1.00 $';
 my($debug)=0;
 
 use strict;
@@ -43,6 +42,8 @@ sub new {
 #                 {INFO}  ->{$oid}->{oid}  
 #                                 ->{type}
 #                 {INFODATA}->{$oid}->{$key}
+
+#                 {REQUEST}->{$key}
 #
 #                 {TABLELAYOUT}->{$id}->{id}
 #                                     ->{gid}
@@ -64,6 +65,12 @@ sub new {
 #                                   ... elref->{elname}  
 #                                            ->{key}
 #                                            ->{elements}->[elref, elref, ...]
+#
+#                 {NODEDISPLAY}->{$id}->{id}
+#                                            ->{elements}->[elref, elref, ...]
+#                                               ... elref->{elname}  
+#                                                        ->{key}
+#                                                        ->{elements}->[elref, elref, ...]
 #
 #
 # derived:
@@ -96,7 +103,7 @@ sub get_stat {
 	$log.=sprintf("objects: total #%d\n",scalar keys(%{$self->{DATA}->{OBJECT}}));
 	foreach $id (keys %{$self->{DATA}->{OBJECT}}) {
 	    $type=$self->{DATA}->{OBJECT}->{$id}->{type};
-	    $types{$type}++;
+	    $types{$type}++ if($type);
 	}
 	foreach $type (sort keys %types) {
 	    $log.=sprintf("        |-- %10d (%s)\n",$types{$type},$type);
@@ -127,6 +134,21 @@ sub get_stat {
 	    }
 	}
     }
+
+    {
+	my($type,%types,$id);
+	if($self->{DATA}->{NODEDISPLAYLAYOUT}) {
+	    $log.=sprintf("nodedisplaylayout: total #%d\n",scalar keys(%{$self->{DATA}->{NODEDISPLAYLAYOUT}}));
+	}
+    }
+
+    {
+	my($type,%types,$id);
+	if($self->{DATA}->{NODEDISPLAY}) {
+	    $log.=sprintf("nodedisplay: total #%d\n",scalar keys(%{$self->{DATA}->{NODEDISPLAY}}));
+	}
+    }
+
     return($log);
 } 
 
@@ -139,7 +161,7 @@ sub read_lml_fast {
 
     my $tstart=time;
     if(!open(IN,$infile)) {
-	print "could not open $infile, leaving ...\n";return(0);
+	print STDERR "$0: ERROR: could not open $infile, leaving ...\n";return(0);
     }
     while(<IN>) {
 	$xmlin.=$_;
@@ -147,6 +169,11 @@ sub read_lml_fast {
     close(IN);
     my $tdiff=time-$tstart;
     printf("LML_file_obj: read  XML in %6.4f sec\n",$tdiff) if($self->{VERBOSE});
+
+    if(!$xmlin) {
+	print STDERR "$0: ERROR: empty file $infile, leaving ...\n";return(0);
+    }
+
 
     $self->{DATA}->{SEARCHTYPE}=$type;
     $tstart=time;
@@ -166,8 +193,9 @@ sub read_lml_fast {
 	}
 	
 #	print "TAG: '$tag'\n";
-	if($tag=~/^<[\/\?](.*)[^\s\>]/) {
+	if($tag=~/^<[\/\?](.*[^\s\>])/) {
 	    $tagname=$1;
+#	    print "TAGE: '$tagname'\n";
 	    $self->lml_end($self->{DATA},$tagname,());
 	} elsif($tag=~/<([^\s]+)\s*$/) {
 	    $tagname=$1;
@@ -175,12 +203,12 @@ sub read_lml_fast {
 	    $self->lml_start($self->{DATA},$tagname,());
 	} elsif($tag=~/<([^\s]+)(\s(.*)[^\/])$/) {
 	    $tagname=$1;
-	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;
+	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;
 #	    print "TAG1: '$tagname' rest='$rest'\n";
 	    $self->lml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
 	} elsif($tag=~/<([^\s]+)(\s(.*)\s?)\/$/) {
 	    $tagname=$1;
-	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;
+	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;
 #	    print "TAG2: '$tagname' rest='$rest' closed\n";
 	    $self->lml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
 	    $self->lml_end($self->{DATA},$tagname,());
@@ -201,8 +229,9 @@ sub lml_start {
     my $self=shift; # object reference
     my $o   =shift;
     my $name=shift;
-#    print "WF: >",ref($o),"< >$name<\n";
     my($k,$v,$actnodename,$id,$cid,$oid);
+
+#    print "LML_file_obj: lml_start >$name< \n";
 
     if($name eq "!--") {
 	# a comment
@@ -212,7 +241,6 @@ sub lml_start {
 
     if($name eq "lml:lgui") {
 	foreach $k (sort keys %attr) {
-#	    print "$k: $attr{$k}\n";
 	    $o->{LMLLGUI}->{$k}=$attr{$k};
 	}
 	return(1);
@@ -228,11 +256,19 @@ sub lml_start {
 	    return(0);
     	}
 	foreach $k (sort keys %attr) {
-#	    print "$k: $attr{$k}\n";
 	    $o->{OBJECT}->{$id}->{$k}=$attr{$k};
 	}
 	return(1);
     }
+
+    # Request
+    if($name eq "request") {
+	foreach $k (sort keys %attr) {
+	    $o->{OBJECT}->{request}->{$k}=$attr{$k};
+	}
+	return(1);
+    }
+
     # Information
     if($name eq "information") {
 	return(1);
@@ -252,16 +288,31 @@ sub lml_start {
 	return(1);
     }
     if($name eq "data") {
-	$id=$o->{LASTINFOID};
-	$k=$attr{key};
-	$v=$attr{value};
-#	$o->{INFOATTR}->{$o->{LASTINFOTYPE}}->{$k}++;
-	if(exists($o->{INFODATA}->{$id}->{$k})) {
-	    print "LML_file_obj: WARNING infodata with id >$id< and key >$k< exists, skipping\n";
-	    return(0);
-    	}
-	$o->{INFODATA}->{$id}->{$k}=$v;
-	return(1);
+	if($o->{LASTINFOID}) {
+	    $id=$o->{LASTINFOID};
+	    $k=$attr{key};
+	    $v=$attr{value};
+	    if(exists($o->{INFODATA}->{$id}->{$k})) {
+		print "LML_file_obj: WARNING infodata with id >$id< and key >$k< exists, skipping\n";
+		return(0);
+	    }
+	    $o->{INFODATA}->{$id}->{$k}=$v;
+	    return(1);
+	}
+	if($o->{LASTNODEDISPLAYID}) {
+	    $id=$o->{LASTNODEDISPLAYID};
+	    $o->{NODEDISPLAY}->{$id}->{dataroot}=LML_ndtree->new("dataroot");
+	    $o->{NODEDISPLAY}->{$id}->{dataroot}->{_level}=-1;
+	    push(@{$o->{NODEDISPLAYSTACK}},$o->{NODEDISPLAY}->{$id}->{dataroot});
+	}
+    }
+    if($name eq "scheme") {
+	if($o->{LASTNODEDISPLAYID}) {
+	    $id=$o->{LASTNODEDISPLAYID};
+	    $o->{NODEDISPLAY}->{$id}->{schemeroot}=LML_ndtree->new("schemeroot");
+	    $o->{NODEDISPLAY}->{$id}->{schemeroot}->{_level}=-1;
+	    push(@{$o->{NODEDISPLAYSTACK}},$o->{NODEDISPLAY}->{$id}->{schemeroot});
+	}
     }
     # Tablelayout
     if($name eq "tablelayout") {
@@ -295,6 +346,19 @@ sub lml_start {
     }
 
     # nodedisplaylayout
+    if($name eq "nodedisplay") {
+	$id=$attr{id};
+	$o->{LASTNODEDISPLAYID}=$id;
+	if(exists($o->{NODEDISPLAY}->{$id})) {
+	    print "LML_file_obj: WARNING Nodedisplay with id >$id< exists, skipping\n";
+	    return(0);
+    	}
+	foreach $k (sort keys %attr) {
+	    $o->{NODEDISPLAY}->{$id}->{$k}=$attr{$k};
+	}
+	return(1);
+    }
+    # nodedisplaylayout
     if($name eq "nodedisplaylayout") {
 	$id=$attr{id};
 	if(exists($o->{NODEDISPLAYLAYOUT}->{$id})) {
@@ -306,16 +370,15 @@ sub lml_start {
 	}
 	$o->{NODEDISPLAYLAYOUT}->{$id}->{tree}=LML_ndtree->new("ndlytree");
 	$o->{NODEDISPLAYLAYOUT}->{$id}->{tree}->{_level}=-1;
-	push(@{$o->{NODEDISPLAYLAYOUTSTACK}},$o->{NODEDISPLAYLAYOUT}->{$id}->{tree});
+	push(@{$o->{NODEDISPLAYSTACK}},$o->{NODEDISPLAYLAYOUT}->{$id}->{tree});
 	return(1);
     }
-    if(($name=~/el\d/) || ($name eq 'img')) {
-	my $lastelem=$o->{NODEDISPLAYLAYOUTSTACK}->[-1];
+    if(($name=~/el\d/) || ($name eq 'img') ) {
+	my $lastelem=$o->{NODEDISPLAYSTACK}->[-1];
 	my $treenode=$lastelem->new_child(\%attr,$name);
-	push(@{$o->{NODEDISPLAYLAYOUTSTACK}},$treenode);
+	push(@{$o->{NODEDISPLAYSTACK}},$treenode);
 	return(1);
     }
-
     print "LML_file_obj: WARNING unknown tag >$name< \n";
    
 }
@@ -324,9 +387,29 @@ sub lml_end {
     my $self=shift; # object reference
     my $o   =shift;
     my $name=shift;
-    if(($name=~/el\d/) || ($name eq 'img')) {
-	pop(@{$o->{NODEDISPLAYLAYOUTSTACK}});
+#    print "LML_file_obj: lml_end >$name< \n";
+
+    if($name=~/data/) {
+	if(!$self->{LASTINFOID}) {
+	    pop(@{$o->{NODEDISPLAYSTACK}});
+	}
     }
+
+    if(($name=~/el\d/) || ($name eq 'img') || ($name eq 'scheme')) {
+	pop(@{$o->{NODEDISPLAYSTACK}});
+    }
+    if($name=~/nodedisplaylayout\d/) {
+	pop(@{$o->{NODEDISPLAYSTACK}});
+    }
+    if($name=~/nodedisplay\d/) {
+	pop(@{$o->{NODEDISPLAYSTACK}});
+	$o->{LASTNODEDISPLAYID} = undef;
+    }
+    if($name=~/info/) {
+	$o->{LASTINFOID} = undef;
+    }
+
+#    print Dumper($o->{NODEDISPLAYSTACK});
 }
 
 
@@ -402,7 +485,9 @@ sub write_lml {
  	    foreach $k (sort {$a <=> $b} keys %{$tablelayout->{column}}) {
 		printf(OUT "<column");
 		for $key ("cid","pos","width","active","key") {
-		    printf(OUT " %s=\"%s\"",$key,  $tablelayout->{column}->{$k}->{$key});
+		    if(exists($tablelayout->{column}->{$k}->{$key})) {
+			printf(OUT " %s=\"%s\"",$key,  $tablelayout->{column}->{$k}->{$key});
+		    }
 		}
 		printf(OUT "/>\n");
 	    }

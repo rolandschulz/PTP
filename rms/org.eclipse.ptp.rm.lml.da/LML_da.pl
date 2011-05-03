@@ -49,9 +49,9 @@ usage($0) if( ! GetOptions(
 my $date=`date`;
 chomp($date);
 
-print "-"x90,"\n" if($opt_verbose);
-print "  LML Data Access Workflow Manager $version, starting at ($date)\n"; 
-print "-"x90,"\n" if($opt_verbose);
+print STDERR "-"x90,"\n" if($opt_verbose);
+print STDERR "  LML Data Access Workflow Manager $version, starting at ($date)\n"; 
+print STDERR "-"x90,"\n" if($opt_verbose);
 
 # read config file
 print STDERR "$0: configfile=$opt_configfile\n" if($opt_verbose);
@@ -60,7 +60,7 @@ my $confxml=$xs->XMLin($opt_configfile,
 		       KeyAttr => {step => "+id"},
 		       ForceArray => 1);
 $tdiff=time-$tstart;
-printf("$0: parsing XML configfile in %6.4f sec\n",$tdiff) if($opt_verbose);
+printf(STDERR "$0: parsing XML configfile in %6.4f sec\n",$tdiff) if($opt_verbose);
 
 # init global vars
 my $vardefs=$confxml->{'vardefs'}->[0];
@@ -79,7 +79,7 @@ my $stepdefs=$confxml->{'step'};
 #&LML_da_util::substitute_recursive($stepdefs,$globalvarref); 
 
 if($opt_dump) {
-    print Dumper($confxml);
+    print STDERR Dumper($confxml);
     exit(1);
 }
 
@@ -89,14 +89,14 @@ my $tmpdir=$globalvarref->{tmpdir};
 
 # check permament snd temporary directory
 if(! -d $permdir) {
-	printf( "LML_da.pl: permament directory not found, create new directory $permdir ...\n");
+	printf(STDERR "LML_da.pl: permament directory not found, create new directory $permdir ...\n");
 	if(!mkdir($permdir,0755)) {
 	    die "LML_da.pl: could not create $permdir ...$!\n";
 	}
 }
 
 if(! -d $tmpdir) {
-	printf( "LML_da.pl: temporary directory not found, create new directory $tmpdir ...\n");
+	printf(STDERR "LML_da.pl: temporary directory not found, create new directory $tmpdir ...\n");
 	if(!mkdir($tmpdir,0755)) {
 	    die "LML_da.pl: could not create $tmpdir ...$!\n";
 	}
@@ -105,7 +105,7 @@ if(! -d $tmpdir) {
 
 # check if another LML_da.pl is running
 if (-f "$permdir/RUNNING") {
-	printf( "LML_da.pl: another LML_da.pl process is running ... exiting, please remove $permdir/RUNNING\n");
+	printf(STDERR "LML_da.pl: another LML_da.pl process is running ... exiting, please remove $permdir/RUNNING\n");
 } else {
     # touch RUNNING stamp
     open(RUNNING,"> $permdir/RUNNING");
@@ -122,9 +122,9 @@ if (-f "$permdir/RUNNING") {
 
 
 
-print "-"x90,"\n" if($opt_verbose);
-print "  LML Data Access Workflow Manager $version, ending at   ($date)\n"; 
-print "-"x90,"\n" if($opt_verbose);
+print STDERR "-"x90,"\n" if($opt_verbose);
+print STDERR "  LML Data Access Workflow Manager $version, ending at   ($date)\n"; 
+print STDERR "-"x90,"\n" if($opt_verbose);
 
 
 sub mydie {
