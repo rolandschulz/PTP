@@ -178,7 +178,7 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		lguiManager.shutdown();
+		lguiManager.shutDown();
 		lguiManager = null;
 		plugin = null;
 	}

@@ -23,7 +23,9 @@ import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
 import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
+import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
+import org.eclipse.ptp.rm.lml.ui.views.NodesView;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -38,6 +40,8 @@ public class ViewManager {
 			deleteOldViews();
 			selectedLgui = e.getLguiItem();
 			generateNewViews();
+			
+			selectedLgui.getObjectStatus().addComponent(new EventForwarder());
 		}
 
 		public void handleEvent(ILguiRemovedEvent e) {
@@ -60,7 +64,9 @@ public class ViewManager {
 	
 	public IViewListener viewListener = new ViewListener();
 	
-	public int viewsAtStart = 0;
+	public int i = 0;
+	
+	public int j = 0;
 	
 	
 	public ViewManager() {
@@ -68,7 +74,7 @@ public class ViewManager {
 		lmlManager.addListener(viewListener);
 	}
 	
-	public void shutdown() {
+	public void shutDown() {
 		lmlManager.removeListener(viewListener);
 	}
 	
@@ -90,24 +96,25 @@ public class ViewManager {
 		}	
 	}
 	
-	public void setViewsAtStart() {
-		viewsAtStart = LMLUIPlugin.getActivePage().getViewReferences().length - 1;
-	}
-	
 	private void generateNewViews() {
 		IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
-		for (int i = 0; i < selectedLgui.getTableHandler().getNumberOfTables();  i++) {
+		String[] activeTableLayoutsGid = selectedLgui.getLayoutAccess().getActiveTableLayoutsGid(); 
+		for (String gid : activeTableLayoutsGid) {
 			try {
 				IViewPart view = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(i), activePage.VIEW_VISIBLE);
-				((TableView) view).generateTable(i);
+				((TableView) view).generateTable(gid);
 				view.setFocus();
+				i++;
 			} catch (PartInitException e) {
 				e.printStackTrace();
 			}
 		}
-		for (int i = 0; i < selectedLgui.getNodedisplayAccess().getNodedisplayNumbers(); i ++) {
+		String[] activeNodedisplayLayoutGid = selectedLgui.getLayoutAccess().getActiveNodedisplayLayoutGid();
+		for (String gid : activeNodedisplayLayoutGid) {
 			try {
-				activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(i), activePage.VIEW_VISIBLE);
+				IViewPart view = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(j), activePage.VIEW_VISIBLE);
+				((NodesView)view).generateNodesdisplay(gid);
+				j++;
 			} catch (PartInitException e) {
 				e.printStackTrace();
 			}

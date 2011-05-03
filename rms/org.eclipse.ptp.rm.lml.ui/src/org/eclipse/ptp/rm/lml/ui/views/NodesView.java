@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- * 		Claudia Knobloch, Carsten Karbach, FZ Juelich
+ * 		Claudia Knobloch
  */
 
 package org.eclipse.ptp.rm.lml.ui.views;
@@ -15,16 +15,21 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.lml.core.ILMLManager;
 import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
+import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
+import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.part.ViewPart;
 
 /**
- * @author Claudia Knobloch, Carsten Karbach
+ * @author Claudia Knobloch
  * 
  *         Based on original work by Greg Watson, Clement Chu and Daniel (JD) Barboza
  * 
@@ -33,12 +38,39 @@ public class NodesView extends LMLViewPart {
 	private final class LguiListener implements ILMLListener {
 		public void handleEvent(IJobListSortedEvent e) {
 		}
+
+		@Override
+		public void handleEvent(ITableColumnChangeEvent e) {
+			
+		}
+
+		@Override
+		public void handleEvent(ISelectedObjectChangeEvent event) {
+			fLguiItem.getObjectStatus().mouseOver(event.getOid());
+		}
+
+		@Override
+		public void handleEvent(IMarkObjectEvent event) {
+			fLguiItem.getObjectStatus().mouseDown(event.getOid());
+		}
+
+		@Override
+		public void handleEvent(IUnmarkObjectEvent event) {
+			fLguiItem.getObjectStatus().mouseUp(event.getOid());
+		}
+
+		@Override
+		public void handleEvent(IUnselectedObjectEvent event) {
+			ObjectType object = fLguiItem.getOIDToObject().getObjectById(event.getOid());
+			fLguiItem.getObjectStatus().mouseexit(object);
+		}
 	}
 	
 	private Composite composite = null;
 	private Composite nodedisplayView = null;
 	public Viewer viewer;
 	public ILguiItem fLguiItem = null;
+	private String gid = null;
 	private final ILMLListener lguiListener = new LguiListener();
 	private final ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager(); 
 	
@@ -54,9 +86,7 @@ public class NodesView extends LMLViewPart {
 		composite.setLayout(new FillLayout());
 		composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));	
 		
-		ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager();
 		fLguiItem = lmlManager.getSelectedLguiItem();
-		createNodedisplayView();
 		lmlManager.addListener(lguiListener, this.getClass().getName());
 	}
 
@@ -66,6 +96,12 @@ public class NodesView extends LMLViewPart {
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	public void setFocus() {
+	}
+	
+	public void generateNodesdisplay(String gid) {
+		this.gid = gid;
+		fLguiItem = lmlManager.getSelectedLguiItem();
+		createNodedisplayView();
 	}
 
 	

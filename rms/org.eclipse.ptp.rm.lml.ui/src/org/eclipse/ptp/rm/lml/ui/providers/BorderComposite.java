@@ -1,14 +1,3 @@
-/**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- * 		Carsten Karbach, FZ Juelich
- */
-
 package org.eclipse.ptp.rm.lml.ui.providers;
 
 import org.eclipse.swt.SWT;
@@ -20,9 +9,11 @@ import org.eclipse.swt.widgets.Display;
 /**
  * This is a composite with a border. The border's width can be altered at runtime.
  * The same for background-color. This composite uses a FillLayout as layout. 
+ * 
+ * @author karbach
  *
  */
-public class BorderComposite extends Composite{
+public class BorderComposite extends Composite {
 	
 	/**
 	 * The used layout for this composite
@@ -34,12 +25,12 @@ public class BorderComposite extends Composite{
 	 * @param parent parent composite
 	 * @param style SWT-style
 	 */
-	public BorderComposite(Composite parent, int style){
+	public BorderComposite(Composite parent, int style) {
 		super(parent, style);
 		
-		filllayout=new FillLayout();
-		filllayout.marginWidth=1;
-		filllayout.marginHeight=1;
+		filllayout = new FillLayout();
+		filllayout.marginWidth = 1;
+		filllayout.marginHeight = 1;
 		
 		setLayout(filllayout);
 		
@@ -50,7 +41,7 @@ public class BorderComposite extends Composite{
 	 * Set the border's color
 	 * @param c SWT-color for the border
 	 */
-	public void setBorderColor(Color c){
+	public void setBorderColor(Color c) {
 		setBackground(c);
 	}
 	
@@ -58,13 +49,12 @@ public class BorderComposite extends Composite{
 	 * Alter width of border
 	 * @param width border-width
 	 */
-	public void setBorderWidth(int width){
-		filllayout.marginHeight=width;
-		filllayout.marginWidth=width;
+	public void setBorderWidth(int width) {
+		filllayout.marginHeight = width;
+		filllayout.marginWidth = width;
 		
 		this.layout(true);
 	}
 	
 
 }
-

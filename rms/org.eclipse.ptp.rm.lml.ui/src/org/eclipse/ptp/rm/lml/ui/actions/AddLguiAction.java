@@ -22,13 +22,19 @@
 
 package org.eclipse.ptp.rm.lml.ui.actions;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
+import org.eclipse.ptp.rm.lml.core.util.RemoteServicesDelegate;
+import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
-import org.eclipse.ptp.rm.lml.ui.wizards.SelectFilesWizard;
+import org.eclipse.ptp.rm.lml.ui.util.RemoteUIServicesUtils;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class AddLguiAction extends Action {
@@ -44,13 +50,22 @@ public class AddLguiAction extends Action {
 	}
 
 	public void run() {
-		final SelectFilesWizard wizard = new SelectFilesWizard();
-		
-		final WizardDialog dialog = new WizardDialog(shell, wizard);
-		int status = dialog.open();
-		if (status != Dialog.OK) {
-			return;
+		RemoteServicesDelegate remote = new RemoteServicesDelegate(null	, null);
+		URI uri = null;
+		try {
+			uri = RemoteUIServicesUtils.browse(shell, new URI("file:///home/"), remote, false, false);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
 		}
+		boolean existingLgui = LMLCorePlugin.getDefault().getLMLManager().addLgui(uri);
+		if (existingLgui && !LMLCorePlugin.getDefault().getLMLManager().getSelectedLguiItem().getXmlFile().getPath().equals(uri.getPath())) {
+			MessageBox messageBox = new MessageBox(LMLUIPlugin.getDisplay().getActiveShell(), SWT.OK | SWT.CANCEL);
+			messageBox.setMessage("The LML file " + uri.getPath() + " is already loaded. Should this file be selected?");
+			int rc = messageBox.open();
+			if (rc == SWT.OK) {
+				LMLCorePlugin.getDefault().getLMLManager().selectLgui(uri);
+			}
+		} 
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
