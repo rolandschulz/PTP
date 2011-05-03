@@ -13,7 +13,7 @@
 LML_da: LML data access tool
 -----------------------------
 
-W.Frings, Forschungszentrum Juelich GmbH, 12 March 2011
+W.Frings, Forschungszentrum Juelich GmbH,  3 May 2011
 
 Introduction
 ------------
@@ -330,6 +330,30 @@ If these modules are not part of the Perl standard installation,
 packages could be found at CPAN (http://search.cpan.org/).
 
 
+
+LLVIEW Data Access Workflow Manager Driver
+------------------------------------------
+
+The script LML_da_driver.pl will be used as a driver script for
+calling LML_da on the remote site via ssh from monitoring part in
+the PTP client, auto-configuration of LML_da (selecting handler
+for rms on remote site) and handling of temporary files and
+directories.
+
+Usage: 
+      LML_da_driver.pl <options> <requestfile> <outputfile>
+ or
+      LML_da_driver.pl <options> < <requestfile> > <outputfile>
+
+      -rawfile <LML raw file>  : use LML raw file as data source
+                                 (default: query system)
+      -tmpdir  <dir>           : use this directory for temporary data
+                                 (default: ./tmp) 
+      -keeptmp                 : keep temporary directory
+      -verbose                 : verbose mode
+      -quiet                   : prints no messages on stderr
+
+
 ChangeLog:
 ----------
 
@@ -343,3 +367,10 @@ ChangeLog:
    - LML_da new option -demo to generate anonymous job data 
    - Date and time attributes are converted to LML std format
    - redirect log and debug output to stderr instead of stdout
+
+1.03:
+   - added driver script LML_da_driver.pl
+     - called from from monitoring part of the PTP client via ssh,
+     - calls LML_da on the remote site 
+     - auto-configuration of LML_da (selecting handler for rms on remote site) 
+     - handling of temporary files and directories

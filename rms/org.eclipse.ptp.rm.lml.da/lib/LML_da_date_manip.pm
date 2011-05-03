@@ -30,6 +30,12 @@ sub date_to_stddate {
 	$outdate=sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$monthmap{$mon},$mday,$hour,$min,$sec);
 	return($outdate);
     } 
+
+    if($indate=~/^\w\w\w\s+(\w\w\w)\s+(\d+)\s+(\d\d):(\d\d):(\d\d)\s+(CEST)\s+(\d\d\d\d)$/) {
+	($sec,$min,$hour,$mday,$mon,$year)=($5,$4,$3,$2,$1,$7);
+	$outdate=sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$monthmap{$mon},$mday,$hour,$min,$sec);
+	return($outdate);
+    } 
     print "ERROR: date_to_stddate: could not convert date  '$indate' -> ?\n";
     return($indate);
 }
