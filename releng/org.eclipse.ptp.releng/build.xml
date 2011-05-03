@@ -119,6 +119,16 @@
 		<zip destfile="${zipsdir}/${masterFile}"
 			basedir="${buildDirectory}/site/eclipse"/>
 		
+		<!-- for some reason Orbit bundles aren't getting picked up-->		
+		<copy file="${buildDirectory}/plugins/javax.xml_1.3.4.v201005080400.jar"
+			todir="${buildDirectory}/site/eclipse/plugins"/>
+		<copy file="${buildDirectory}/plugins/javax.xml.stream_1.0.1.v201004272200.jar"
+			todir="${buildDirectory}/site/eclipse/plugins"/>
+		<copy file="${buildDirectory}/plugins/javax.xml.bind_2.1.9.v201005080401.jar"
+			todir="${buildDirectory}/site/eclipse/plugins"/>
+		<copy file="${buildDirectory}/plugins/com.sun.xml.bind_2.1.9.v200905260854.jar"
+			todir="${buildDirectory}/site/eclipse/plugins"/>
+
 		<!-- generate proxy zip -->
 		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.aix.ppc_${ptpBranchVersion}.${timestamp}">
 			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.aix.ppc"/>
