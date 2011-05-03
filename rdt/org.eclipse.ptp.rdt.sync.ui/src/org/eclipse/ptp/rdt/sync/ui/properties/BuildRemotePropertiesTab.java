@@ -104,7 +104,7 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 
 		// new connection button
 		fNewConnectionButton = new Button(usercomp, SWT.PUSH);
-		fNewConnectionButton.setText(Messages.BRPTab_ConnectionLabel);
+		fNewConnectionButton.setText(Messages.BRPTab_ConnectionButton);
 		fNewConnectionButton.setEnabled(false);
 		fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
