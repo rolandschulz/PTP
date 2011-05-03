@@ -19,7 +19,7 @@
    <license url="%licenseURL">
       %license
    </license>
-  
+
    <url>
       <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
    </url>
@@ -94,6 +94,14 @@
 
    <includes
          id="org.eclipse.ptp.rdt.remotetools"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.jaxb"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.lml"
          version="0.0.0"/>
 
    <plugin
