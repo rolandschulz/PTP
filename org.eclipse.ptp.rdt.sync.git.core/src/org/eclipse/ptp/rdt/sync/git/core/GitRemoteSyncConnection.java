@@ -451,7 +451,7 @@ public class GitRemoteSyncConnection {
 	private URIish buildURI() {
 		return new URIish()
 				// .setUser(connection.getUsername())
-				.setHost("/not/a/real/host") //$NON-NLS-1$
+				.setHost("none") //$NON-NLS-1$
 				// .setPass("")
 				.setScheme("ssh") //$NON-NLS-1$
 				.setPath(remoteDirectory);

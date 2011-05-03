@@ -14,7 +14,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
@@ -143,8 +143,6 @@ public class CommandRunner {
 	 * This function creates the remote directory if it does not exist. Parent directories are also created if necessary. Note that
 	 * this command does not overwrite if the requested remote directory exists but is not a directory.
 	 * 
-	 * TODO: Check that this also holds true for creating parent directories. For example, if remoteDir =
-	 *        "/home/user/project/project1/" and "/home/user/project" is a file will it be deleted?
 	 * @param conn
 	 * @param remoteDir
 	 * @throws CoreException
@@ -201,8 +199,13 @@ public class CommandRunner {
 
 		final CommandResults commandResults = new CommandResults();
 		// Run the command and wait for it to complete.
-		final List<String> commandStrings = Arrays.asList(command.split("\\s+")); //$NON-NLS-1$
-		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandStrings);
+		// final List<String> commandStrings = Arrays.asList(command.split("\\s+")); //$NON-NLS-1$
+		final List<String> commandList = new LinkedList<String>();
+		commandList.add("sh"); //$NON-NLS-1$
+		commandList.add("-c"); //$NON-NLS-1$
+		commandList.add(command);
+
+		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandList);
 		final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
 		if (rfm != null) {
 			rpb.directory(rfm.getResource(remoteDirectory));
