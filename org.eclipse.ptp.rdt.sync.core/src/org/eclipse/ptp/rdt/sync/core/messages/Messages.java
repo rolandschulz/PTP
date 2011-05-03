@@ -21,6 +21,14 @@ public class Messages extends NLS {
 	public static String ResourceChangeListener_jobName;
 	public static String ResourceRefreshJob_0;
 	public static String ResourceRefreshJob_1;
+	public static String BCM_WorkspaceConfigDes;
+	public static String BCM_ScenarioToServiceConfigError;
+	public static String BCM_InitError;
+	public static String BCM_TemplateError;
+	public static String BCM_ProviderError;
+	public static String BCM_BuildInfoError;
+	public static String BCM_AncestorError;
+	public static String BCM_ProjectError;
 
 	static {
 		initializeMessages(BUNDLE_NAME, Messages.class);

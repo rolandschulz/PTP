@@ -315,8 +315,11 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 			fSelectedProvider = null;
 		}
 		fProviderArea.layout();
-		MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY,
-				fSelectedProvider.getParticipant());
+		if (fSelectedProvider != null) {
+			MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY, fSelectedProvider.getParticipant());
+		} else {
+			MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY, null);
+		}
 	}
 
 	private void addProviderControl(ISynchronizeParticipantDescriptor desc) {

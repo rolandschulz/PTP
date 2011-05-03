@@ -185,5 +185,41 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 		putString(RSYNC_SERVICES_ID, services.getId());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConnection()
+	 */
+	public IRemoteConnection getConnection() {
+		return fConnection;
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConfigLocation()
+	 */
+	public String getConfigLocation() {
+		return fLocation;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection()
+	 */
+	public void setRemoteToolsConnection(IRemoteConnection connection) {
+		fConnection = connection;
+		putString(RSYNC_CONNECTION_NAME, connection.getName());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setConfigLocation()
+	 */
+	public void setConfigLocation(String configLocation) {
+		fLocation = configLocation;
+		putString(RSYNC_LOCATION, configLocation);
+	}
 }
