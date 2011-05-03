@@ -13,7 +13,7 @@
             class="org.eclipse.ptp.rm.lml.ui.views.NodesView"
             icon="icons/parallel_perspective.gif"
             id="org.eclipse.ptp.rm.lml.ui.views.NodesView"
-            name="%NodesView.name"
+            name="org.eclipse.ptp.rm.lml.ui.views.NodesView"
             restorable="false">
       </view>
       <view
@@ -31,6 +31,14 @@
             id="org.eclipse.ptp.rm.lml.ui.views.TableView"
             name="org.eclipse.ptp.rm.lml.ui.views.TableView"
             restorable="false">
+      </view>
+      <view
+            category="org.eclipse.ptp.rm.lml.ui.views"
+            class="org.eclipse.ptp.rm.lml.ui.views.JobsView"
+            icon="icons/job/job_suspended.gif"
+            id="org.eclipse.ptp.rm.lml.ui.views.JobsView"
+            name="org.eclipse.ptp.rm.lml.ui.views.JobsView"
+            restorable="true">
       </view>
    </extension>
    <extension

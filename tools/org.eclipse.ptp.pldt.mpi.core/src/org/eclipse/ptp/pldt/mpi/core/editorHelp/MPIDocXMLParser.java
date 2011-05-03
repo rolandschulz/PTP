@@ -33,24 +33,26 @@ import org.xml.sax.SAXException;
 /**
  */
 public class MPIDocXMLParser {
-	
-	public static void main(String [] args)
+
+	public static void main(String[] args)
 	{
 		File file = new File(args[0]);
 		try {
 			List<FunctionSummaryImpl> functions = parseDOM(new FileInputStream(file), "cname");//$NON-NLS-1$
-			System.out.println("num of functions gathered: "+functions.size());//$NON-NLS-1$
-            System.out.println("first function summary:");//$NON-NLS-1$
-            System.out.println((FunctionSummaryImpl)(functions.iterator().next()));
+			System.out.println("num of functions gathered: " + functions.size());//$NON-NLS-1$
+			System.out.println("first function summary:");//$NON-NLS-1$
+			System.out.println((FunctionSummaryImpl) (functions.iterator().next()));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 
-	 * @param xmlIn input stream for XML file
-	 * @param cOrCppName the name of the 'name' node: "cname" for C, "cppName" for C++
+	 * @param xmlIn
+	 *            input stream for XML file
+	 * @param cOrCppName
+	 *            the name of the 'name' node: "cname" for C, "cppName" for C++
 	 * @return
 	 */
 	public static List<FunctionSummaryImpl> parseDOM(InputStream xmlIn, String cOrCppName) {
@@ -80,26 +82,25 @@ public class MPIDocXMLParser {
 				for (int j = 0; j < child.getLength(); j++) {
 					Node sub = child.item(j);
 					if (sub.getNodeName().equals(cOrCppName)) {
- 						cname = sub.getTextContent(); // java 5 
-//                        cname = sub.getFirstChild().getNodeValue();
+						cname = sub.getTextContent(); // java 5
+						// cname = sub.getFirstChild().getNodeValue();
 					} else if (sub.getNodeName().equals("description")) {//$NON-NLS-1$
 						desc = sub.getTextContent(); // java 5
-//                     desc = sub.getFirstChild().getNodeValue();
+						// desc = sub.getFirstChild().getNodeValue();
 					} else if (sub.getNodeName().equals("prototype")) {//$NON-NLS-1$
 						NodeList protoSub = sub.getChildNodes();
-                        // java 5
+						// java 5
 						prototypeSummary = new FunctionPrototypeSummaryImpl(
 								protoSub.item(3).getTextContent(), protoSub
 										.item(1).getTextContent(), protoSub
 										.item(5).getTextContent());
-//                        prototypeSummary = new FunctionPrototypeSummaryImpl(
-//                              protoSub.item(3).getFirstChild().getNodeValue(), protoSub
-//                                      .item(1).getFirstChild().getNodeValue(), protoSub
-//                                      .item(5).getFirstChild().getNodeValue());
+						// prototypeSummary = new FunctionPrototypeSummaryImpl(
+						// protoSub.item(3).getFirstChild().getNodeValue(), protoSub
+						// .item(1).getFirstChild().getNodeValue(), protoSub
+						// .item(5).getFirstChild().getNodeValue());
 					}
 				}
-				FunctionSummaryImpl functionSummary = new FunctionSummaryImpl(cname,
-						"", desc, prototypeSummary, null); //$NON-NLS-1$
+				FunctionSummaryImpl functionSummary = new FunctionSummaryImpl(cname, "", desc, prototypeSummary, null); //$NON-NLS-1$
 				mpiFuncList.add(functionSummary);
 			}
 		}

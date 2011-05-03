@@ -12,16 +12,23 @@ package org.eclipse.ptp.rm.lml.ui.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
 import org.eclipse.swt.widgets.Display;
 
-public class TableViewPullDownMenuAction extends Action {
+public class ShowTableColumnAction extends Action {
 	
-	public TableViewPullDownMenuAction(String name) {
+	private String gid;
+	
+	
+	public ShowTableColumnAction(String gid, String name) {
+		this.gid = gid; 
 		setText(name);
 	}
 	
 	public void run() {
+		// TODO Remove
 		MessageDialog.openInformation(Display.getCurrent().getActiveShell(), "Click!", "There will be an update and an additional tablecolumn ("+ getText()+") will be seen");
+		LMLCorePlugin.getDefault().getLMLManager().setTableColumnActive(gid, getText());
 	}
 
 }

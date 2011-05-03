@@ -22,11 +22,15 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -38,6 +42,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -49,14 +54,21 @@ import org.eclipse.swt.widgets.Text;
  * @author arossi
  * 
  */
-public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener {
+public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener,
+		ModifyListener {
 
 	private Text choice;
 	private Text editor;
+	private Text stdoutText;
+	private Text stderrText;
 	private Button browseWorkspace;
 	private Button clear;
+	private Button enableFetchStdout;
+	private Button enableFetchStderr;
 
 	private String selected;
+	private String stdoutPath;
+	private String stderrPath;
 	private final StringBuffer contents;
 
 	/**
@@ -75,6 +87,8 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 		if (title != null) {
 			this.title = title;
 		}
+		stdoutPath = ZEROSTR;
+		stderrPath = ZEROSTR;
 		contents = new StringBuffer();
 	}
 
@@ -104,24 +118,38 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 */
 	public void createControl(final Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetBuilderUtils.createComposite(parent, 1);
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(5, true);
-		GridData gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 700, DEFAULT, 5, DEFAULT);
-		Composite comp = WidgetBuilderUtils.createComposite(control, SWT.NONE, layout, gd);
+
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(6, false);
+		GridData gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, false, false, 700, DEFAULT, 6, DEFAULT);
+		Group comp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
+
+		/*
+		 * script upload controls
+		 */
 		WidgetBuilderUtils.createLabel(comp, Messages.BatchScriptPath, SWT.LEFT, 1);
-		GridData gdsub = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 275, DEFAULT, 2, DEFAULT);
+		WidgetBuilderUtils.createLabel(comp, ZEROSTR, SWT.LEFT, 1);
+		GridData gdsub = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 410, DEFAULT, 2, DEFAULT);
 		String s = selected == null ? ZEROSTR : selected.toString();
 		choice = WidgetBuilderUtils.createText(comp, SWT.BORDER, gdsub, true, s);
 		browseWorkspace = WidgetBuilderUtils.createPushButton(comp, Messages.JAXBRMConfigurationSelectionWizardPage_1, this);
 		clear = WidgetBuilderUtils.createPushButton(comp, Messages.ClearScript, this);
-		layout = WidgetBuilderUtils.createGridLayout(5, true);
+
+		/*
+		 * path buttons/text
+		 */
+		maybeAddPathControls(control, ((IJAXBResourceManager) rm).getControl().getEnvironment());
+
+		/*
+		 * text editor
+		 */
+		layout = WidgetBuilderUtils.createGridLayout(1, true);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, null);
 		int style = SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL;
-		gdsub = WidgetBuilderUtils.createGridDataFill(700, 700, 5);
+		gdsub = WidgetBuilderUtils.createGridDataFill(700, 700, 1);
 		editor = WidgetBuilderUtils.createText(grp, style, gdsub, true, ZEROSTR, null, null);
 		WidgetBuilderUtils.applyMonospace(editor);
 		editor.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {
-
 			}
 
 			public void mouseDown(MouseEvent e) {
@@ -177,6 +205,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 				selected = null;
 			}
 			uploadScript();
+			maybeInitializePaths(configuration);
 		} catch (Throwable t) {
 			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnLoadFromStore, Messages.ErrorOnLoadTitle, false);
 		}
@@ -197,6 +226,26 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	}
 
 	/*
+	 * Tab acts as listener for path text boxes. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events
+	 * .ModifyEvent)
+	 */
+	public void modifyText(ModifyEvent e) {
+		try {
+			if (stdoutText == e.getSource()) {
+				stdoutPath = stdoutText.getText().trim();
+			} else if (stderrText == e.getSource()) {
+				stderrPath = stderrText.getText().trim();
+			}
+			fireContentsChanged();
+		} catch (Throwable t) {
+			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ModifyError, Messages.ModifyErrorTitle, false);
+		}
+	}
+
+	/*
 	 * Nothing to do here. (non-Javadoc)
 	 * 
 	 * @see
@@ -210,7 +259,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	}
 
 	/*
-	 * Tab acts as listener for browse and clear buttons (non-Javadoc)
+	 * Tab acts as listener for browse, clear and path buttons (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
@@ -221,7 +270,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	}
 
 	/*
-	 * Tab acts as listener for browse and clear buttons (non-Javadoc)
+	 * Tab acts as listener for browse, clear and path buttons (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
@@ -236,6 +285,26 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 			} else if (source == clear) {
 				selected = null;
 				updateContents();
+			} else if (source == enableFetchStdout) {
+				boolean enabled = enableFetchStdout.getSelection();
+				if (enabled) {
+					stdoutText.setText(stdoutPath);
+					stdoutText.setEnabled(true);
+				} else {
+					stdoutText.setText(ZEROSTR);
+					stdoutText.setEnabled(false);
+				}
+				fireContentsChanged();
+			} else if (source == enableFetchStderr) {
+				boolean enabled = enableFetchStderr.getSelection();
+				if (enabled) {
+					stderrText.setText(stderrPath);
+					stderrText.setEnabled(true);
+				} else {
+					stderrText.setText(ZEROSTR);
+					stderrText.setEnabled(false);
+				}
+				fireContentsChanged();
 			}
 		} catch (Throwable t) {
 			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.WidgetSelectedError, Messages.WidgetSelectedErrorTitle,
@@ -245,7 +314,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 
 	/*
 	 * If there is a path selected, store it in the local map as the
-	 * SCRIPT_PATH.(non-Javadoc)
+	 * SCRIPT_PATH. Also store or remove remote paths. (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab#
@@ -255,6 +324,101 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	protected void doRefreshLocal() {
 		if (selected != null) {
 			localMap.put(SCRIPT_PATH, selected);
+		}
+		maybeRefreshPaths();
+	}
+
+	/**
+	 * If the variables for remote path are defined in the configuration, add
+	 * the buttons and text for retrieving them.
+	 * 
+	 * @param parent
+	 * @throws CoreException
+	 */
+	private void maybeAddPathControls(final Composite parent, RMVariableMap env) throws CoreException {
+		if (env == null) {
+			/*
+			 * This means the tab has been opened without having started the RM.
+			 * When the RM is started, this tab will be rebuilt.
+			 */
+			return;
+		}
+
+		Object stdout = env.get(STDOUT_REMOTE_FILE);
+		Object stderr = env.get(STDERR_REMOTE_FILE);
+		if (stdout == null && stderr == null) {
+			return;
+		}
+
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(4, false);
+		GridData data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, false, false, 400, DEFAULT, 4, DEFAULT);
+		Group group = WidgetBuilderUtils.createGroup(parent, SWT.NONE, layout, data);
+		if (stdout != null) {
+			Label l = WidgetBuilderUtils.createLabel(group, Messages.RemoteScriptPath, SWT.LEFT, 1);
+			l.setToolTipText(Messages.RemotePathTooltip);
+			data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 175, DEFAULT, 2, DEFAULT);
+			stdoutText = WidgetBuilderUtils.createText(group, SWT.BORDER, data, false, ZEROSTR);
+			stdoutText.addModifyListener(this);
+			enableFetchStdout = WidgetBuilderUtils.createCheckButton(group, Messages.EnableStdoutFetch, this);
+		}
+		if (stderr != null) {
+			WidgetBuilderUtils.createLabel(group, Messages.RemoteScriptPath, SWT.LEFT, 1);
+			data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 175, DEFAULT, 2, DEFAULT);
+			stderrText = WidgetBuilderUtils.createText(group, SWT.BORDER, data, false, ZEROSTR);
+			stderrText.addModifyListener(this);
+			enableFetchStderr = WidgetBuilderUtils.createCheckButton(group, Messages.EnableStderrFetch, this);
+		}
+	}
+
+	/**
+	 * Upload the saved values, or disable if none.
+	 * 
+	 * @param configuration
+	 */
+	private void maybeInitializePaths(ILaunchConfiguration configuration) {
+		try {
+			if (stdoutText != null) {
+				stdoutPath = configuration.getAttribute(STDOUT_REMOTE_FILE, ZEROSTR);
+				if (ZEROSTR.equals(stdoutPath)) {
+					stdoutText.setText(ZEROSTR);
+					stdoutText.setEnabled(false);
+					enableFetchStdout.setSelection(false);
+				} else {
+					stdoutText.setText(stdoutPath);
+					stdoutText.setEnabled(true);
+					enableFetchStdout.setSelection(true);
+				}
+			}
+			if (stderrText != null) {
+				stderrPath = configuration.getAttribute(STDERR_REMOTE_FILE, ZEROSTR);
+				if (ZEROSTR.equals(stderrPath)) {
+					stderrText.setText(ZEROSTR);
+					stderrText.setEnabled(false);
+					enableFetchStderr.setSelection(false);
+				} else {
+					stderrText.setText(stderrPath);
+					stderrText.setEnabled(true);
+					enableFetchStderr.setSelection(true);
+				}
+			}
+		} catch (CoreException t) {
+			JAXBUIPlugin.log(t);
+		}
+	}
+
+	/**
+	 * If the values are non-empty, add to map; else remove.
+	 */
+	private void maybeRefreshPaths() {
+		if (ZEROSTR.equals(stdoutPath)) {
+			localMap.remove(STDOUT_REMOTE_FILE);
+		} else {
+			localMap.put(STDOUT_REMOTE_FILE, stdoutPath);
+		}
+		if (ZEROSTR.equals(stderrPath)) {
+			localMap.remove(STDERR_REMOTE_FILE);
+		} else {
+			localMap.put(STDERR_REMOTE_FILE, stderrPath);
 		}
 	}
 

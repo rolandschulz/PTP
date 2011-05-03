@@ -13,8 +13,8 @@ use strict;
 use Data::Dumper;
 use lib "$FindBin::RealBin/../LML_specs";
 use LML_specs;
+use LML_da_date_manip;
 
-my $VERSION='$Revision$';
 my($debug)=0;
 
 sub check_jobs {
@@ -28,6 +28,11 @@ sub check_jobs {
 	    foreach $key (keys %{$inforef}) {
 		if(!exists($LML_specs::LMLattributes->{'job'}->{$key})) {
 		    $unknown_attr{$key}++;
+		} else {
+		    # modify dates to std format
+		    if($LML_specs::LMLattributes->{'job'}->{$key}->[0] eq "D") {
+			$dataptr->{INFODATA}->{$id}->{$key}=&LML_da_date_manip::date_to_stddate($dataptr->{INFODATA}->{$id}->{$key});
+		    }
 		}
 	    }
 	    foreach $key (keys %{$LML_specs::LMLattributes->{'job'}}) {
@@ -45,9 +50,8 @@ sub check_jobs {
     foreach $key (sort keys(%unset_attr)) {
 	printf("check_jobs: WARNING: unset attribute '%s' %d occurrences\n",$key,$unset_attr{$key});
     }
-
+    
     return(1);
 } 
-
 
 1;

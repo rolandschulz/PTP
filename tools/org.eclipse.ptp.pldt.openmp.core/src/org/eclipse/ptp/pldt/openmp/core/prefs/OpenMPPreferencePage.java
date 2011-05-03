@@ -28,56 +28,56 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class OpenMPPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
-    private static final String INCLUDES_PREFERENCE_LABEL  = Messages.OpenMPPreferencePage_OpenMP_include_paths;
-    private static final String INCLUDES_PREFERENCE_BROWSE = Messages.OpenMPPreferencePage_PleaseChooseAdirForOpenMPincludes;
-    private static final String OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL = Messages.OpenMPPreferencePage_recognizeAPISByPrefixAlone; //$NON-NLS-1$
+	private static final String INCLUDES_PREFERENCE_LABEL = Messages.OpenMPPreferencePage_OpenMP_include_paths;
+	private static final String INCLUDES_PREFERENCE_BROWSE = Messages.OpenMPPreferencePage_PleaseChooseAdirForOpenMPincludes;
+	private static final String OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL = Messages.OpenMPPreferencePage_recognizeAPISByPrefixAlone; //$NON-NLS-1$
 
-    
-    public OpenMPPreferencePage()
-    {
-        super(GRID);
-        initPreferenceStore();
-    }
+	public OpenMPPreferencePage()
+	{
+		super(GRID);
+		initPreferenceStore();
+	}
 
-    public OpenMPPreferencePage(int style)
-    {
-        super(style);
-        initPreferenceStore();
-    }
+	public OpenMPPreferencePage(int style)
+	{
+		super(style);
+		initPreferenceStore();
+	}
 
-    public OpenMPPreferencePage(String title, ImageDescriptor image, int style)
-    {
-        super(title, image, style);
-        initPreferenceStore();
-    }
+	public OpenMPPreferencePage(String title, ImageDescriptor image, int style)
+	{
+		super(title, image, style);
+		initPreferenceStore();
+	}
 
-    public OpenMPPreferencePage(String title, int style)
-    {
-        super(title, style);
-        initPreferenceStore();
-    }
+	public OpenMPPreferencePage(String title, int style)
+	{
+		super(title, style);
+		initPreferenceStore();
+	}
 
-    /**
-     * Init preference store and set the preference store for the preference page
-     */
-    private void initPreferenceStore()
-    {
-        IPreferenceStore store = OpenMPPlugin.getDefault().getPreferenceStore();
-        setPreferenceStore(store);
-    }
+	/**
+	 * Init preference store and set the preference store for the preference page
+	 */
+	private void initPreferenceStore()
+	{
+		IPreferenceStore store = OpenMPPlugin.getDefault().getPreferenceStore();
+		setPreferenceStore(store);
+	}
 
-    public void init(IWorkbench workbench)
-    {
-    }
+	public void init(IWorkbench workbench)
+	{
+	}
 
-    protected void createFieldEditors()
-    {
-    	 
-    	 BooleanFieldEditor bPrefix = new BooleanFieldEditor(OpenMPIDs.OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE, OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL, getFieldEditorParent());
-         addField(bPrefix);
-         
-        PathEditor pathEditor = new PathEditor(OpenMPPlugin.OPEN_MP_INCLUDES, INCLUDES_PREFERENCE_LABEL,
-                INCLUDES_PREFERENCE_BROWSE, getFieldEditorParent());
-        addField(pathEditor);
-    }
+	protected void createFieldEditors()
+	{
+
+		BooleanFieldEditor bPrefix = new BooleanFieldEditor(OpenMPIDs.OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE,
+				OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL, getFieldEditorParent());
+		addField(bPrefix);
+
+		PathEditor pathEditor = new PathEditor(OpenMPPlugin.OPEN_MP_INCLUDES, INCLUDES_PREFERENCE_LABEL,
+				INCLUDES_PREFERENCE_BROWSE, getFieldEditorParent());
+		addField(pathEditor);
+	}
 }

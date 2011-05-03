@@ -26,18 +26,18 @@ import org.osgi.framework.BundleContext;
  */
 public class OpenMPPlugin extends AbstractUIPlugin {
 
-	//The shared instance.
+	// The shared instance.
 	private static OpenMPPlugin plugin;
-    public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.openmp.core"; //$NON-NLS-1$
-	
-    // Constants
-    // preference page name for OpenMP
-    public static final String OPEN_MP_INCLUDES    = Messages.OpenMPPlugin_OpenMP_includes;
-    
-    public static final String MARKER_ID       = "org.eclipse.ptp.pldt.openmp.core.openMPMarker"; //$NON-NLS-1$
-   
-    // artifact view id
-    public static final String VIEW_ID = "org.eclipse.ptp.pldt.openmp.core.views.OpenMPArtifactView"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.openmp.core"; //$NON-NLS-1$
+
+	// Constants
+	// preference page name for OpenMP
+	public static final String OPEN_MP_INCLUDES = Messages.OpenMPPlugin_OpenMP_includes;
+
+	public static final String MARKER_ID = "org.eclipse.ptp.pldt.openmp.core.openMPMarker"; //$NON-NLS-1$
+
+	// artifact view id
+	public static final String VIEW_ID = "org.eclipse.ptp.pldt.openmp.core.views.OpenMPArtifactView"; //$NON-NLS-1$
 
 	/**
 	 * The constructor.
@@ -71,32 +71,34 @@ public class OpenMPPlugin extends AbstractUIPlugin {
 	/**
 	 * Returns an image descriptor for the image file at the given
 	 * plug-in relative path.
-	 *
-	 * @param path the path
+	 * 
+	 * @param path
+	 *            the path
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.pldt.openmp.core", path); //$NON-NLS-1$
 	}
-    /**
-     * Returns the preference setting for OpenMP include paths
-     * 
-     * @return
-     */
-    public List<String> getIncludeDirs()
-    {
-        String stringList = getPluginPreferences().getString(OPEN_MP_INCLUDES);
-        StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
-        List<String> dirs = new ArrayList<String>();
-        while (st.hasMoreElements()) {
-            dirs.add(st.nextToken());
-        }
-        return dirs;
-    }
 
-    public static String getPluginId()
-    {
-        return PLUGIN_ID;
-    }
+	/**
+	 * Returns the preference setting for OpenMP include paths
+	 * 
+	 * @return
+	 */
+	public List<String> getIncludeDirs()
+	{
+		String stringList = getPluginPreferences().getString(OPEN_MP_INCLUDES);
+		StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
+		List<String> dirs = new ArrayList<String>();
+		while (st.hasMoreElements()) {
+			dirs.add(st.nextToken());
+		}
+		return dirs;
+	}
+
+	public static String getPluginId()
+	{
+		return PLUGIN_ID;
+	}
 
 }

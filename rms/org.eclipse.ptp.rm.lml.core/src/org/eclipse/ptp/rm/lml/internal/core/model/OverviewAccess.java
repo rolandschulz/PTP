@@ -17,6 +17,7 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.internal.core.elements.AbslayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InformationType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutType;
@@ -26,15 +27,15 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.SplitlayoutType;
 
 public class OverviewAccess extends LguiHandler{
 	
-	public OverviewAccess(ILguiItem lguiItem, LguiType model) {
-		super(lguiItem, model);
+	public OverviewAccess(ILguiItem lguiItem, LguiType lgui) {
+		super(lguiItem, lgui);
 	}
 	
 	/**
 	 * Getting a list with all elements of type ObjectsType from LguiType.
 	 * @return list of elements(ObjectsType)
 	 */
-	List<ObjectsType> getObjects() {
+	public List<ObjectsType> getObjects() {
 		List<ObjectsType> objects = new LinkedList<ObjectsType>();
 		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
 			if (tag.getValue() instanceof ObjectsType) {
@@ -48,7 +49,7 @@ public class OverviewAccess extends LguiHandler{
 	 * Getting a list of all elements of type InformationsType from LguiType.
 	 * @return list of elements(InfomationsType)
 	 */
-	List<InformationType> getInformations() {
+	public List<InformationType> getInformations() {
 		List<InformationType> informations = new LinkedList<InformationType>();
 		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
 			if (tag.getValue() instanceof InformationType) {
@@ -62,7 +63,7 @@ public class OverviewAccess extends LguiHandler{
 	 * Getting a list of all elements of type GobjectType from LguiType.
 	 * @return list of elements(GobjectsType)
 	 */
-	List<GobjectType> getGraphicalObjects() {
+	public List<GobjectType> getGraphicalObjects() {
 		List<GobjectType> objects = new LinkedList<GobjectType>();
 		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
 			if (tag.getValue() instanceof GobjectType) {
@@ -77,7 +78,7 @@ public class OverviewAccess extends LguiHandler{
 	 * Getting a list of all elements of type LayoutType.
 	 * @return list of elements(LayoutType)
 	 */
-	List<LayoutType> getLayouts() {
+	public List<LayoutType> getLayouts() {
 		List<LayoutType> layouts = new LinkedList<LayoutType>();
 		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
 			if (tag.getValue() instanceof LayoutType) {
@@ -91,7 +92,7 @@ public class OverviewAccess extends LguiHandler{
 	 * Getting a list of all elements of type Splitlayout.
 	 * @return list of elements(Splitlayout)
 	 */
-	List<SplitlayoutType> getSplitlayouts() {
+	public List<SplitlayoutType> getSplitlayouts() {
 		List<SplitlayoutType> tables = new LinkedList<SplitlayoutType>();
 		for (LayoutType tag : getLayouts()) {
 			if (tag instanceof SplitlayoutType) {
@@ -101,9 +102,20 @@ public class OverviewAccess extends LguiHandler{
 		return tables;
 	}
 	
+	/**
+	 * Getting a list of all elements of type AbsLayout.
+	 * @return list of elements(AbsLayout)
+	 */
+	public List<AbslayoutType> getAbslayouts() {
+		List<AbslayoutType> layouts = new LinkedList<AbslayoutType>();
+		for (LayoutType tag : getLayouts()) {
+			if (tag instanceof AbslayoutType) {
+				layouts.add((AbslayoutType) tag);
+			}
+		}
+		return layouts;
+	}
 	
 	
-	
-
 }
 

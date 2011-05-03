@@ -11,7 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 /**
  * Gathers all internal, unmodifiable string constants into a single place for
- * convenience and the interest of uncluttered code.
+ * convenience and in the interest of uncluttered code.
  * 
  * @since 5.0
  */
@@ -23,7 +23,7 @@ public interface IJAXBNonNLSConstants {
 	public static final int EOF = -1;
 	public static final long MINUTE_IN_MS = 60 * 60 * 1000;
 	public static final long VALIDATE_TIMER = 500;
-	public static final long READY_FILE_PAUSE = 1000;
+	public static final long STANDARD_WAIT = 1000;
 	public static final int READY_FILE_BLOCK = 60;
 
 	/* CHARACTERS */
@@ -47,6 +47,7 @@ public interface IJAXBNonNLSConstants {
 	public static final String AT = "@";//$NON-NLS-1$
 	public static final String DOL = "$";//$NON-NLS-1$
 	public static final String PIP = "|";//$NON-NLS-1$
+	public static final String REGPIP = "[|]";//$NON-NLS-1$
 	public static final String DOT = ".";//$NON-NLS-1$
 	public static final String Z3 = "000";//$NON-NLS-1$
 	public static final String OPENP = "(";//$NON-NLS-1$
@@ -78,6 +79,7 @@ public interface IJAXBNonNLSConstants {
 	/* KEY WORDS */
 	public static final String TRUE = "true";//$NON-NLS-1$
 	public static final String FALSE = "false";//$NON-NLS-1$
+	public static final String Y = "y" + LINE_SEP;//$NON-NLS-1$
 	public static final String YES = "yes";//$NON-NLS-1$
 	public static final String NO = "no";//$NON-NLS-1$
 	public static final String NOT = "not";//$NON-NLS-1$
@@ -111,6 +113,7 @@ public interface IJAXBNonNLSConstants {
 	public static final String JOB_ID_TAG = "@jobId";//$NON-NLS-1$
 	public static final String NAME_TAG = AT + NAME;
 	public static final String VALUE_TAG = AT + VALUE;
+	public static final String DEAD = "dead";//$NON-NLS-1$
 
 	/* TYPE MATCHING */
 	public static final String NT = "nt";//$NON-NLS-1$
@@ -205,7 +208,7 @@ public interface IJAXBNonNLSConstants {
 	public static final String MINUS_F = "-F";//$NON-NLS-1$
 	public static final String CONFIGURATION_FILE_ATTRIBUTE = "configurationFile"; //$NON-NLS-1$
 	public static final String RM_CONFIG_EXTENSION_POINT = "org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations"; //$NON-NLS-1$
-	public static final String JAXB_SERVICE_PROVIDER_EXTPT = "org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"; //$NON-NLS-1$
+	public static final String IMPORTED_JAXB_CONFIG = "org.eclipse.ptp.rm.jaxb.ImportedConfigurations"; //$NON-NLS-1$
 	/*
 	 * EFS Attributes
 	 */
@@ -225,4 +228,11 @@ public interface IJAXBNonNLSConstants {
 	public static final String ATTRIBUTE_HIDDEN = "ATTRIBUTE_HIDDEN";//$NON-NLS-1$
 	public static final String ATTRIBUTE_SYMLINK = "ATTRIBUTE_SYMLINK";//$NON-NLS-1$
 	public static final String ATTRIBUTE_LINK_TARGET = "ATTRIBUTE_LINK_TARGET";//$NON-NLS-1$
+
+	/*
+	 * IRemoteProcessBuilder
+	 */
+	public static final String TAG_NONE = "NONE";//$NON-NLS-1$
+	public static final String TAG_ALLOCATE_PTY = "ALLOCATE_PTY";//$NON-NLS-1$
+	public static final String TAG_FORWARD_X11 = "FORWARD_X11";//$NON-NLS-1$
 }

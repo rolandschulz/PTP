@@ -990,7 +990,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		if (style == null || ZEROSTR.equals(style)) {
 			return SWT.NONE;
 		}
-		return getStyle(style.split(OPENSQ + PIP + CLOSSQ));
+		return getStyle(style.split(REGPIP));
 	}
 
 	/**

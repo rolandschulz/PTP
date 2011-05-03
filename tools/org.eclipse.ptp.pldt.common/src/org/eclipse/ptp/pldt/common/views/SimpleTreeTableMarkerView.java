@@ -199,17 +199,17 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	public static final int CONSTANT = 2;
 
 	/** types of constructs, for the default case */
-	public static final String[] CONSTRUCT_TYPE_NAMES = { Messages.SimpleTreeTableMarkerView_none, Messages.SimpleTreeTableMarkerView_function_call, org.eclipse.ptp.pldt.common.messages.Messages.SimpleTreeTableMarkerView_constant };
+	public static final String[] CONSTRUCT_TYPE_NAMES = { Messages.SimpleTreeTableMarkerView_none,
+			Messages.SimpleTreeTableMarkerView_function_call,
+			org.eclipse.ptp.pldt.common.messages.Messages.SimpleTreeTableMarkerView_constant };
 
 	/**
 	 * Simple Artifact Table View constructor
 	 * <p>
-	 * Everything can be null, and defaults will be taken, or read from
-	 * plugin.xml for the view.
+	 * Everything can be null, and defaults will be taken, or read from plugin.xml for the view.
 	 * <p>
-	 * Note: if a null plugIn instance is provided, the default plugin (this
-	 * one) will not be able to find resources (e.g. icon images) if the derived
-	 * class is in its own plug-in, and its icons are, too.
+	 * Note: if a null plugIn instance is provided, the default plugin (this one) will not be able to find resources (e.g. icon
+	 * images) if the derived class is in its own plug-in, and its icons are, too.
 	 */
 	public SimpleTreeTableMarkerView(AbstractUIPlugin thePlugin, String thingname, String thingnames,
 			String columnName, String markerID, String parentMarkerAttrName) {
@@ -227,7 +227,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			this.columnName_ = columnName; // last column named by subclass
 		}
 		this.markerID_ = markerID;// if null, will use view id.
-		this.parentMarkerAttrib=parentMarkerAttrName;
+		this.parentMarkerAttrib = parentMarkerAttrName;
 
 		findViewInfo();
 
@@ -264,7 +264,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 * 
 	 */
 	public SimpleTreeTableMarkerView() {
-		this(null, null, null, null, null,null);
+		this(null, null, null, null, null, null);
 	}
 
 	/**
@@ -377,7 +377,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 						System.out.println("input is null in getElements..."); //$NON-NLS-1$
 				}
 				objs = input.findMarkers(id, false, IResource.DEPTH_INFINITE);
-				parentList=createParents(objs);
+				parentList = createParents(objs);
 			} catch (CoreException e) {
 				System.out.println("ATV, exception getting model elements (markers for Table view)"); //$NON-NLS-1$
 				e.printStackTrace();
@@ -403,8 +403,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				IMarker marker = markers[i];
 				String parentName = getParentAttr(marker);
 				// make one single parent, if attrs don't have parent info (yet)
-				if(parentName==null) {
-					parentName="dummy"; //$NON-NLS-1$
+				if (parentName == null) {
+					parentName = "dummy"; //$NON-NLS-1$
 				}
 				getParentNode(parentName);
 			}
@@ -416,13 +416,13 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			try {
 				parentName = (String) marker.getAttribute(parentMarkerAttrib);
 				// temporary override to create an intial parent for all
-				if( parentName==null)
-					parentName="dummy"; //$NON-NLS-1$
+				if (parentName == null)
+					parentName = "dummy"; //$NON-NLS-1$
 			} catch (CoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			return parentName;
 		}
 
@@ -432,8 +432,9 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 * 
 		 * @param parentName
 		 *            the marker attribute with the name of the parent required
-		 * @param createIfNeeded whether or not to create the parent node if we don't
-		 * find one already exists
+		 * @param createIfNeeded
+		 *            whether or not to create the parent node if we don't
+		 *            find one already exists
 		 * @return
 		 */
 		private ParentNode getParentNode(String parentName, boolean createIfNeeded) {
@@ -445,7 +446,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				}
 			}
 			// not found; make a new one
-			parentNode=null;
+			parentNode = null;
 			if (createIfNeeded) {
 				parentNode = new ParentNode(parentName);
 				parentList.add(parentNode);
@@ -630,8 +631,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		}
 
 		public boolean hasChildren(Object element) {
-			Object[] kids=getChildren(element);
-			return kids.length>0;
+			Object[] kids = getChildren(element);
+			return kids.length > 0;
 		}
 
 	} // end ViewContentProvider
@@ -789,9 +790,11 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 * cell can contain both, an image and text, which will be displayed
 		 * side-by-side)
 		 * 
-		 * @param obj -
+		 * @param obj
+		 *            -
 		 *            the object we're getting the image for
-		 * @param index -
+		 * @param index
+		 *            -
 		 *            the column that this image is to go in
 		 */
 		public Image getColumnImage(Object obj, int index) {
@@ -812,10 +815,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 *            the marker object that this artifact is represented by
 		 * @return image for marker
 		 *         <p>
-		 *         Note: if a null plugIn instance is provided on the view ctor,
-		 *         the default plugin (this one) will not be able to find
-		 *         resources (e.g. icon images) if the derived class is in its
-		 *         own plug-in, and its icons are, too.
+		 *         Note: if a null plugIn instance is provided on the view ctor, the default plugin (this one) will not be able to
+		 *         find resources (e.g. icon images) if the derived class is in its own plug-in, and its icons are, too.
 		 * 
 		 */
 		protected Image getCustomImage(Object obj) {
@@ -1056,7 +1057,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				IMarker m2 = (IMarker) e2;
 				String file1 = (String) m1.getAttribute(FILENAME);
 				String file2 = (String) m2.getAttribute(FILENAME);
-				if(traceOn)System.out.println("ascending=" + ascending); //$NON-NLS-1$
+				if (traceOn)
+					System.out.println("ascending=" + ascending); //$NON-NLS-1$
 				if (ascending)
 					res = collator.compare(file1, file2);
 				else
@@ -1129,110 +1131,111 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 		// Widget created and customized and then passed to viewer during
 		// creation :
-/*		Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI | SWT.FULL_SELECTION);
-		TableLayout layout = new TableLayout();
-		table.setLayout(layout);
-		table.setLinesVisible(true);
-		table.setHeaderVisible(true);
-		String[] STD_HEADINGS = { " ", thingname_, "Filename", "LineNo", this.columnName_ };
-
-		layout.addColumnData(new ColumnWeightData(1, 1, true));
-		TableColumn tc0 = new TableColumn(table, SWT.NONE);
-		tc0.setText(STD_HEADINGS[0]);
-		tc0.setAlignment(SWT.LEFT);
-		tc0.setResizable(true);
-
-		layout.addColumnData(new ColumnWeightData(10, true));
-		TableColumn tc1 = new TableColumn(table, SWT.NONE);
-		tc1.setText(STD_HEADINGS[1]);
-		tc1.setAlignment(SWT.LEFT);
-		tc1.setResizable(true);
-
-		layout.addColumnData(new ColumnWeightData(10, true));
-		TableColumn tc2 = new TableColumn(table, SWT.NONE);
-		tc2.setText(STD_HEADINGS[2]);
-		tc2.setAlignment(SWT.LEFT);
-		tc2.setResizable(true);
-
-		layout.addColumnData(new ColumnWeightData(5, true));
-		TableColumn tc3 = new TableColumn(table, SWT.NONE);
-		tc3.setText(STD_HEADINGS[3]);
-		tc3.setAlignment(SWT.LEFT);
-		tc3.setResizable(true);
-
-		TableColumn tc4 = null;
-		if (this.columnName_ != null) {
-			layout.addColumnData(new ColumnWeightData(5, true));
-			tc4 = new TableColumn(table, SWT.NONE);
-			tc4.setText(STD_HEADINGS[4]);
-			tc4.setAlignment(SWT.LEFT);
-			tc4.setResizable(true);
-		} else {
-			int numCols = columnNames_.length;
-			TableColumn[] tableCols = new TableColumn[numCols];
-			for (int i = 0; i < numCols; i++) {
-				layout.addColumnData(new ColumnWeightData(5, true));
-				TableColumn tc = new TableColumn(table, SWT.NONE);
-				tc.setText(columnNames_[i]);
-				tc.setAlignment(SWT.LEFT);
-				tc.setResizable(true);
-				tableCols[i] = tc;
-			}
-		}
-
-		// add listeners for table sorting
-		// Sort by "icon" (the original sort order, actually)
-		tc0.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				viewer.setSorter(null);
-				viewer.setSorter(nameSorter);
-			}
-
-			public void widgetDefaultSelected(SelectionEvent event) {
-			}
-		});
-		// Sort by artifact name
-		tc1.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				nameArtifactSorter.sort();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent event) {
-			}
-		});
-		// Sort by file name (then by lineNo)
-		tc2.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				filenameSorter.sort();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent event) {
-			}
-		});
-		// Sort by Line number
-		tc3.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				lineNoSorter.sort();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent event) {
-			}
-		});
-		// Sort by Construct (if we're not doing an array of extra columns)
-		if (tc4 != null) {
-			tc4.addSelectionListener(new SelectionListener() {
-				public void widgetSelected(SelectionEvent event) {
-					constructSorter.sort();
-				}
-
-				public void widgetDefaultSelected(SelectionEvent event) {
-				}
-			});
-		}
-*/
+		/*
+		 * Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI | SWT.FULL_SELECTION);
+		 * TableLayout layout = new TableLayout();
+		 * table.setLayout(layout);
+		 * table.setLinesVisible(true);
+		 * table.setHeaderVisible(true);
+		 * String[] STD_HEADINGS = { " ", thingname_, "Filename", "LineNo", this.columnName_ };
+		 * 
+		 * layout.addColumnData(new ColumnWeightData(1, 1, true));
+		 * TableColumn tc0 = new TableColumn(table, SWT.NONE);
+		 * tc0.setText(STD_HEADINGS[0]);
+		 * tc0.setAlignment(SWT.LEFT);
+		 * tc0.setResizable(true);
+		 * 
+		 * layout.addColumnData(new ColumnWeightData(10, true));
+		 * TableColumn tc1 = new TableColumn(table, SWT.NONE);
+		 * tc1.setText(STD_HEADINGS[1]);
+		 * tc1.setAlignment(SWT.LEFT);
+		 * tc1.setResizable(true);
+		 * 
+		 * layout.addColumnData(new ColumnWeightData(10, true));
+		 * TableColumn tc2 = new TableColumn(table, SWT.NONE);
+		 * tc2.setText(STD_HEADINGS[2]);
+		 * tc2.setAlignment(SWT.LEFT);
+		 * tc2.setResizable(true);
+		 * 
+		 * layout.addColumnData(new ColumnWeightData(5, true));
+		 * TableColumn tc3 = new TableColumn(table, SWT.NONE);
+		 * tc3.setText(STD_HEADINGS[3]);
+		 * tc3.setAlignment(SWT.LEFT);
+		 * tc3.setResizable(true);
+		 * 
+		 * TableColumn tc4 = null;
+		 * if (this.columnName_ != null) {
+		 * layout.addColumnData(new ColumnWeightData(5, true));
+		 * tc4 = new TableColumn(table, SWT.NONE);
+		 * tc4.setText(STD_HEADINGS[4]);
+		 * tc4.setAlignment(SWT.LEFT);
+		 * tc4.setResizable(true);
+		 * } else {
+		 * int numCols = columnNames_.length;
+		 * TableColumn[] tableCols = new TableColumn[numCols];
+		 * for (int i = 0; i < numCols; i++) {
+		 * layout.addColumnData(new ColumnWeightData(5, true));
+		 * TableColumn tc = new TableColumn(table, SWT.NONE);
+		 * tc.setText(columnNames_[i]);
+		 * tc.setAlignment(SWT.LEFT);
+		 * tc.setResizable(true);
+		 * tableCols[i] = tc;
+		 * }
+		 * }
+		 * 
+		 * // add listeners for table sorting
+		 * // Sort by "icon" (the original sort order, actually)
+		 * tc0.addSelectionListener(new SelectionListener() {
+		 * public void widgetSelected(SelectionEvent event) {
+		 * viewer.setSorter(null);
+		 * viewer.setSorter(nameSorter);
+		 * }
+		 * 
+		 * public void widgetDefaultSelected(SelectionEvent event) {
+		 * }
+		 * });
+		 * // Sort by artifact name
+		 * tc1.addSelectionListener(new SelectionListener() {
+		 * public void widgetSelected(SelectionEvent event) {
+		 * nameArtifactSorter.sort();
+		 * }
+		 * 
+		 * public void widgetDefaultSelected(SelectionEvent event) {
+		 * }
+		 * });
+		 * // Sort by file name (then by lineNo)
+		 * tc2.addSelectionListener(new SelectionListener() {
+		 * public void widgetSelected(SelectionEvent event) {
+		 * filenameSorter.sort();
+		 * }
+		 * 
+		 * public void widgetDefaultSelected(SelectionEvent event) {
+		 * }
+		 * });
+		 * // Sort by Line number
+		 * tc3.addSelectionListener(new SelectionListener() {
+		 * public void widgetSelected(SelectionEvent event) {
+		 * lineNoSorter.sort();
+		 * }
+		 * 
+		 * public void widgetDefaultSelected(SelectionEvent event) {
+		 * }
+		 * });
+		 * // Sort by Construct (if we're not doing an array of extra columns)
+		 * if (tc4 != null) {
+		 * tc4.addSelectionListener(new SelectionListener() {
+		 * public void widgetSelected(SelectionEvent event) {
+		 * constructSorter.sort();
+		 * }
+		 * 
+		 * public void widgetDefaultSelected(SelectionEvent event) {
+		 * }
+		 * });
+		 * }
+		 */
 		// Selection listener to know when a table row is selected.
 
-		//table.addSelectionListener(new SelectionAdapter() {
+		// table.addSelectionListener(new SelectionAdapter() {
 		tree.addSelectionListener(new SelectionAdapter() {
 
 			// public void widgetDefaultSelected(SelectionEvent e) {
@@ -1364,7 +1367,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					MessageDialog.openInformation(null, title, info.toString());
 				}// end if selectedMarker!=null
 				else {
-					MessageDialog.openInformation(null, title, Messages.SimpleTreeTableMarkerView_No + thingname_ + Messages.SimpleTreeTableMarkerView_selected);
+					MessageDialog.openInformation(null, title, Messages.SimpleTreeTableMarkerView_No + thingname_
+							+ Messages.SimpleTreeTableMarkerView_selected);
 				}
 				// ------------------
 			}
@@ -1381,7 +1385,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	private void makeFilterAction() {
 		filterAction = new Action() {
 			public void run() {
-				showMessage(Messages.SimpleTreeTableMarkerView_83 + thingnames_ + Messages.SimpleTreeTableMarkerView_84 + thingnames_ + Messages.SimpleTreeTableMarkerView_85);
+				showMessage(Messages.SimpleTreeTableMarkerView_83 + thingnames_ + Messages.SimpleTreeTableMarkerView_84
+						+ thingnames_ + Messages.SimpleTreeTableMarkerView_85);
 			}
 		};
 		filterAction.setText(Messages.SimpleTreeTableMarkerView_86 + thingnames_);
@@ -1668,13 +1673,13 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					}
 				} // end if CHANGED
 				else if (delta.getKind() == IResourceDelta.ADDED) {
-					//System.out.println("Resource added.");
+					// System.out.println("Resource added.");
 					checkMarkerDeltas(delta);
 				} else if (delta.getKind() == IResourceDelta.REPLACED) {
-					//System.out.println("Resource replaced.");
+					// System.out.println("Resource replaced.");
 					checkMarkerDeltas(delta);
 				} else if (delta.getKind() == IResourceDelta.REMOVED) {
-					//System.out.println("Resource removed.");
+					// System.out.println("Resource removed.");
 					checkMarkerDeltas(delta);
 				}
 			} // end if FILE
@@ -1684,7 +1689,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		private void checkMarkerDeltas(IResourceDelta delta) {
 			IMarkerDelta[] md1 = delta.getMarkerDeltas();
 			int len = md1.length;
-			//System.out.println("       ... found " + len + " markerDeltas.");
+			// System.out.println("       ... found " + len + " markerDeltas.");
 		}
 
 		/**

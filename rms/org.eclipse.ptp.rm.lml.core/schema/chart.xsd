@@ -1,16 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-          LML - LLView markup language 
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+LML - LLView markup language
 
-   Copyright (c) 2011 Forschungszentrum Juelich GmbH
-   All rights reserved. This program and the accompanying materials
-   are made available under the terms of the Eclipse Public License v1.0
-   which accompanies this distribution and is available at
-   http://www.eclipse.org/legal/epl-v10.html
- -->
-<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
 
-	<include schemaLocation="lgui.xsd"></include>
+Copyright (c) 2011 Forschungszentrum Juelich GmbH
+
+All rights reserved. This program and the accompanying materials
+
+are made available under the terms of the Eclipse Public License v1.0
+
+which accompanies this distribution and is available at
+
+http://www.eclipse.org/legal/epl-v10.html
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
+
+	<include schemaLocation="lgui.xsd"/>
 	
     <complexType name="chart_type">
     	<annotation>
@@ -22,10 +27,9 @@
     	<complexContent>
     		<extension base="lml:gobject_type">
 		    	<sequence>
-		    		<element name="axes" type="lml:axes_type" minOccurs="0"
-		    			maxOccurs="1">
+		    		<element maxOccurs="1" minOccurs="0" name="axes" type="lml:axes_type">
 		    		</element>
-		    		<element name="data" type="lml:datacollection_type" minOccurs="0" maxOccurs="unbounded"></element>
+		    		<element maxOccurs="unbounded" minOccurs="0" name="data" type="lml:datacollection_type"/>
 		    	</sequence>
     		</extension>    	
     	</complexContent>
@@ -36,9 +40,9 @@
         	<documentation>Type for either x- or y-axis. Contains important data of these objects.</documentation>
         </annotation>
         <sequence>
-    		<element name="ticlabels" type="lml:ticlabels_type" minOccurs="0" maxOccurs="1"></element>
+    		<element maxOccurs="1" minOccurs="0" name="ticlabels" type="lml:ticlabels_type"/>
     	</sequence>
-    	<attribute name="type" type="lml:axis_type_constants" default="linear"></attribute>
+    	<attribute default="linear" name="type" type="lml:axis_type_constants"/>
     	<attribute name="unit" type="string">
     		<annotation>
     			<documentation>
@@ -53,10 +57,10 @@
     			</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="shortlabel" type="string"></attribute>
-    	<attribute name="min" type="double" use="required"></attribute>
-    	<attribute name="max" type="double" use="required"></attribute>
-    	<attribute name="ticcount" type="nonNegativeInteger" default="10"></attribute>
+    	<attribute name="shortlabel" type="string"/>
+    	<attribute name="min" type="double" use="required"/>
+    	<attribute name="max" type="double" use="required"/>
+    	<attribute default="10" name="ticcount" type="nonNegativeInteger"/>
     </complexType>
 
     <simpleType name="axis_type_constants">
@@ -64,8 +68,8 @@
         	<documentation>Defines possible axis-types. Defines how numbers are arranged in this axis.</documentation>
         </annotation>
         <restriction base="string">
-    		<enumeration value="linear"></enumeration>
-    		<enumeration value="log"></enumeration>
+    		<enumeration value="linear"/>
+    		<enumeration value="log"/>
     	</restriction>
     </simpleType>
 
@@ -73,11 +77,12 @@
         <annotation>
         	<documentation>One ticlabel is one name or string, that is shown on an axis instead of a numerical value. The tic-labels will be shown in addition to normal tic-labels given by inserting ticcount-times a numerical value into the axis.</documentation>
         </annotation>
-        <attribute name="pos" type="double" use="required"></attribute>
+        <attribute name="pos" type="double" use="required"/>
     	<attribute name="text" type="string">
     		<annotation>
     			<documentation>not required. If not set pos will be printed</documentation>
-    		</annotation></attribute>
+    		</annotation>
+</attribute>
     </complexType>
 
     <complexType name="ticlabels_type">
@@ -85,7 +90,7 @@
         	<documentation>Collects a list of ticlabels.</documentation>
         </annotation>
         <sequence>
-    		<element name="label" type="lml:ticlabel_type" minOccurs="1" maxOccurs="unbounded"></element>
+    		<element maxOccurs="unbounded" minOccurs="1" name="label" type="lml:ticlabel_type"/>
     	</sequence>
     </complexType>
 
@@ -94,10 +99,9 @@
         	<documentation>Combines one x-axis-element and one y-axis-element.</documentation>
         </annotation>
         <sequence>
-    		<element name="x" type="lml:axis_type" minOccurs="1"
-    			maxOccurs="1">
+    		<element maxOccurs="1" minOccurs="1" name="x" type="lml:axis_type">
     		</element>
-    		<element name="y" type="lml:axis_type" minOccurs="1" maxOccurs="1"></element>
+    		<element maxOccurs="1" minOccurs="1" name="y" type="lml:axis_type"/>
     	</sequence>
     </complexType>
 
@@ -108,9 +112,9 @@
     			chart.
     		</documentation>
     	</annotation>
-    	<attribute name="x" type="double" use="required"></attribute>
-    	<attribute name="y" type="double" use="required"></attribute>
-    	<attribute name="oid" type="NCName"></attribute>
+    	<attribute name="x" type="double" use="required"/>
+    	<attribute name="y" type="double" use="required"/>
+    	<attribute name="oid" type="NCName"/>
     </complexType>
 
     <complexType name="datarect_type">
@@ -135,7 +139,8 @@
     			<attribute name="text" type="string">
     				<annotation>
     					<documentation>This text should be shown within the rect if possible</documentation>
-    				</annotation></attribute>
+    				</annotation>
+</attribute>
     		</extension>
     	</complexContent>
     </complexType>
@@ -145,16 +150,14 @@
         	<documentation>Defines a set of datapoints and datarects.
 Saves real data of a diagram.</documentation>
         </annotation>
-        <sequence minOccurs="0" maxOccurs="unbounded">
-    		<element name="p" type="lml:datapoint_type" minOccurs="0"
-    			maxOccurs="unbounded">
+        <sequence maxOccurs="unbounded" minOccurs="0">
+    		<element maxOccurs="unbounded" minOccurs="0" name="p" type="lml:datapoint_type">
     		</element>
-    		<element name="r" type="lml:datarect_type" minOccurs="0"
-    			maxOccurs="unbounded">
+    		<element maxOccurs="unbounded" minOccurs="0" name="r" type="lml:datarect_type">
     		</element>
     	</sequence>
-    	<attribute name="name" type="string"></attribute>
-    	<attribute name="description" type="string"></attribute>
+    	<attribute name="name" type="string"/>
+    	<attribute name="description" type="string"/>
     </complexType>
 
     <complexType name="chartgroup_type">
@@ -164,7 +167,7 @@ Saves real data of a diagram.</documentation>
         <complexContent>
     		<extension base="lml:gobject_type">
     			<sequence>
-    				<element name="chart" type="lml:chart_type" minOccurs="1" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="1" name="chart" type="lml:chart_type"/>
     			</sequence>
     		</extension>
     	</complexContent>

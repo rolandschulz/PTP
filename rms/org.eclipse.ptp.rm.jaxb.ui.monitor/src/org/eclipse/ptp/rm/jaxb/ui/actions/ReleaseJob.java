@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.actions;
 
-import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.rm.jaxb.ui.data.JobStatusData;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -20,7 +19,7 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
  * @author arossi
  * 
  */
-public class ReleaseJob extends AbstractBatchControlAction {
+public class ReleaseJob extends AbstractControlAction {
 
 	public ReleaseJob() {
 		operation = IResourceManager.RELEASE_OPERATION;
@@ -35,12 +34,11 @@ public class ReleaseJob extends AbstractBatchControlAction {
 	 * org.eclipse.ptp.rm.jaxb.ui.data.PersistentCommandJobStatus)
 	 */
 	@Override
-	protected void validateState(IAction action, JobStatusData status) {
+	protected boolean validateState(JobStatusData status) {
 		String detail = status.getStateDetail();
 		if (!IJobStatus.USER_ON_HOLD.equals(detail) && !IJobStatus.SYSTEM_ON_HOLD.equals(detail)) {
-			action.setEnabled(false);
-		} else {
-			action.setEnabled(true);
+			return false;
 		}
+		return true;
 	}
 }

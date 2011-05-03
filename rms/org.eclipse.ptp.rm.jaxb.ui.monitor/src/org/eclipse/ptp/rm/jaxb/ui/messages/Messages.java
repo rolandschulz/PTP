@@ -33,7 +33,11 @@ public class Messages extends NLS {
 
 	public static String JAXBMonitorPlugin_Exception_InternalError;
 	public static String RefreshJobStatus;
+	public static String RefreshJobStatusErrorTitle;
 	public static String RefreshJobStatusError;
+
+	public static String MultiSelectError;
+	public static String MultiSelectErrorTitle;
 
 	static {
 		// initialize resource bundle

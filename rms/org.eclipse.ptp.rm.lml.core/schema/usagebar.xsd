@@ -1,19 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-          LML - LLView markup language 
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+LML - LLView markup language
 
-   Copyright (c) 2011 Forschungszentrum Juelich GmbH
-   All rights reserved. This program and the accompanying materials
-   are made available under the terms of the Eclipse Public License v1.0
-   which accompanies this distribution and is available at
-   http://www.eclipse.org/legal/epl-v10.html
- -->
-<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
 
-	<include schemaLocation="lgui.xsd"></include>
+Copyright (c) 2011 Forschungszentrum Juelich GmbH
+
+All rights reserved. This program and the accompanying materials
+
+are made available under the terms of the Eclipse Public License v1.0
+
+which accompanies this distribution and is available at
+
+http://www.eclipse.org/legal/epl-v10.html
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
+
+	<include schemaLocation="lgui.xsd"/>
 
     <annotation>
-    	<documentation>Gives a brief overview of running jobs on the system.</documentation></annotation>
+    	<documentation>Gives a brief overview of running jobs on the system.</documentation>
+</annotation>
     <complexType name="job_type">
         <annotation>
         	<documentation>Describes one job in the usagebar. Saves how many cpus are used by this job and how many cpus are on one node.
@@ -21,16 +27,16 @@ If this job is running on different node-architectures, where cpupernode differs
 So one job can be divided into jobparts for a more detailled description.</documentation>
         </annotation>
         <sequence>
-    		<element name="jobpart" type="lml:job_part_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element maxOccurs="unbounded" minOccurs="0" name="jobpart" type="lml:job_part_type"/>
     	</sequence>
-    	<attribute name="oid" type="NCName" use="required"></attribute>
-    	<attribute name="cpucount" type="nonNegativeInteger" use="required"></attribute>
-    	<attribute name="cpupernode" type="positiveInteger"></attribute>
+    	<attribute name="oid" type="NCName" use="required"/>
+    	<attribute name="cpucount" type="nonNegativeInteger" use="required"/>
+    	<attribute name="cpupernode" type="positiveInteger"/>
     </complexType>
     
     <complexType name="job_part_type">
-    	<attribute name="cpucount" type="nonNegativeInteger" use="required"></attribute>
-    	<attribute name="cpupernode" type="positiveInteger"></attribute>
+    	<attribute name="cpucount" type="nonNegativeInteger" use="required"/>
+    	<attribute name="cpupernode" type="positiveInteger"/>
     </complexType>
 
     <complexType name="usagebar_type">
@@ -44,12 +50,10 @@ So one job can be divided into jobparts for a more detailled description.</docum
     	<complexContent>
     		<extension base="lml:gobject_type">
     			<sequence>
-    				<element name="job" type="lml:job_type"
-    					minOccurs="0" maxOccurs="unbounded">
+    				<element maxOccurs="unbounded" minOccurs="0" name="job" type="lml:job_type">
     				</element>
     			</sequence>
-    			<attribute name="cpucount" type="nonNegativeInteger"
-    				use="required">
+    			<attribute name="cpucount" type="nonNegativeInteger" use="required">
     				<annotation>
     					<documentation>
     						defines how many cpus are in the whole
@@ -57,7 +61,7 @@ So one job can be divided into jobparts for a more detailled description.</docum
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="cpupernode" type="positiveInteger" default="1"></attribute>
+    			<attribute default="1" name="cpupernode" type="positiveInteger"/>
     		</extension>
     	</complexContent>
     </complexType>

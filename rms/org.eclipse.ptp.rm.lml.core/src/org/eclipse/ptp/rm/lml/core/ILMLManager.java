@@ -10,7 +10,7 @@
  */
 package org.eclipse.ptp.rm.lml.core;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IListener;
@@ -43,7 +43,7 @@ public interface ILMLManager{
 	 * @param xmlFile the source of the XML file
 	 * @return true, if a new ILguiItem was created; otherwise false
 	 */
-	public boolean addLgui(URL xmlFile);
+	public boolean addLgui(URI xmlFile);
 	
 	/**
 	 * The current considered IlguiItem was sorted.
@@ -52,7 +52,7 @@ public interface ILMLManager{
 	
 	public void selectLgui(int index);
 	
-	public void selectLgui(URL xmlFile);
+	public void selectLgui(URI xmlFile);
 	
 	/**
 	 * Getting the current considered ILguiItem.
@@ -65,5 +65,17 @@ public interface ILMLManager{
 	public int getSelectedLguiIndex(String title);
 	
 	public void removeLgui(String title);
+
+	public void setTableColumnActive(String gid, String text);
+
+	public void selectObject(String oid);
+	
+	public void update();
+
+	public void markObject(String oid);
+	
+	public void unmarkObject(String oid);
+
+	public void unselectObject(String oid);
 	
 }

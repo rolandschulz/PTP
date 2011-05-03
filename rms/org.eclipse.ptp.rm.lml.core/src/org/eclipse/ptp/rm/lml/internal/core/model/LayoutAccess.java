@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -107,15 +108,27 @@ public class LayoutAccess extends LguiHandler{
 		boolean replaced=false;
 		
 		//Over all objects in lml-file
-		for(JAXBElement<?> aobj: allobjects){
+		for(int i=0; i<allobjects.size(); i++){
+			JAXBElement<?> aobj=allobjects.get(i);
+			
 			//Over all Componentlayouts
 			if(aobj.getValue() instanceof ComponentlayoutType){
 				
 				ComponentlayoutType alayout=(ComponentlayoutType)aobj.getValue();
 				
 				if( alayout.getGid()!=null && alayout.getGid().equals(gid) ){
-					((JAXBElement<ComponentlayoutType>)aobj).setValue(newlayout);
-					replaced=true;
+					
+					if(!replaced){
+
+						((JAXBElement<ComponentlayoutType>)aobj).setValue(newlayout);
+						lguiItem.updateData();
+						replaced=true;
+					}
+					else{//Delete this object
+						allobjects.remove(aobj);
+						//One step back
+						i--;
+					}
 				}
 				
 			}
@@ -135,8 +148,10 @@ public class LayoutAccess extends LguiHandler{
 						   NodedisplaylayoutType.class, (NodedisplaylayoutType)newlayout );
 			}
 			
-			if(newel!=null)
+			if(newel!=null){
 				lgui.getObjectsAndRelationsAndInformation().add(newel);
+				lguiItem.updateData();
+			}
 		}
 		
 	}
@@ -212,6 +227,13 @@ public class LayoutAccess extends LguiHandler{
 	}
 	
 	/**
+	 * This method merges the layout information given by the "layout"-instance with
+	 * the layout, which is included in "data". Component-layouts in "data" are replaced with
+	 * corresponding layouts in layout.
+	 * Global layouts of "layout" replace global layouts in data with the same name.
+	 * New layouts in "layout" are added.
+	 * Remark: "data" is modified by this method. A reference to data is returned.
+	 * 
 	 * @param data model of lml-data, contingently with layout-information, this object will be modified and returned 
 	 * @param layout more important layout-data, overwrite componentlayouts of data-model, but add additional abs/-splitlayouts
 	 * @return merged lml-model
@@ -321,6 +343,9 @@ public class LayoutAccess extends LguiHandler{
 	}
 	
 	/**
+	 * Take a graphical object and minimize the data so that this instance is valid against
+	 * the LML-Schema but at the same time as small as possible.
+	 * 
 	 * @param gobj
 	 * @return a copy of gobj with minimal size, only attributes in GobjectType are copied 
 	 * 			 and lower special elements which are needed to make lml-model valid
@@ -342,12 +367,16 @@ public class LayoutAccess extends LguiHandler{
 		else if(gobj instanceof UsagebarType){
 			UsagebarType ut=objectFactory.createUsagebarType();
 			
+			ut.setCpucount(BigInteger.valueOf(0));
+			
 			value=ut;
 			
 			qname="usagebar";
 		}
 		else if(gobj instanceof TextboxType){
 			TextboxType ut=objectFactory.createTextboxType();
+			
+			ut.setText("");
 			
 			value=ut;
 			
@@ -383,6 +412,13 @@ public class LayoutAccess extends LguiHandler{
 		}
 		else if(gobj instanceof ChartgroupType){
 			ChartgroupType ut=objectFactory.createChartgroupType();
+			//Add lower chart-elements to the minimized chart-group
+			ChartgroupType orig=(ChartgroupType)gobj;
+			//Go through all charts minimize them and add them to ut
+			for(ChartType chart: orig.getChart()){
+				ChartType min=(ChartType) (minimizeGobjectType(chart).getValue());
+				ut.getChart().add(min);
+			}
 			
 			value=ut;
 			
@@ -401,7 +437,7 @@ public class LayoutAccess extends LguiHandler{
 	
 	
 	/**
-	 * Remove all important data from modell
+	 * Remove all real data from modell
 	 * return only layout-information and data, which is needed to make 
 	 * lml-model valid
 	 * @param modell lml-modell with data and layout-information
@@ -441,10 +477,12 @@ public class LayoutAccess extends LguiHandler{
 				
 			}
 			else if(value instanceof ComponentlayoutType){
-				res.getObjectsAndRelationsAndInformation().add(tag);
-				
-				ComponentlayoutType complayout=(ComponentlayoutType)value;
-				neededComponents.add(complayout.getGid());
+				if( ((ComponentlayoutType)value).isActive() ){
+					res.getObjectsAndRelationsAndInformation().add(tag);
+
+					ComponentlayoutType complayout=(ComponentlayoutType)value;
+					neededComponents.add(complayout.getGid());
+				}
 			}
 			
 		}
@@ -480,7 +518,7 @@ public class LayoutAccess extends LguiHandler{
 	 * @param output OutputStream to save xml-representation of obj in
 	 * @throws JAXBException 
 	 */
-	public static void objToLML(LguiType obj, OutputStream output) throws JAXBException {
+	private static void objToLML(LguiType obj, OutputStream output) throws JAXBException {
 
 		JAXBContext jc = JAXBContext.newInstance("lml");
 		
@@ -549,13 +587,10 @@ public class LayoutAccess extends LguiHandler{
 		else
 			return;
 			
-		this.lgui.getObjectsAndRelationsAndInformation().add( jaxbel );
+		lgui.getObjectsAndRelationsAndInformation().add( jaxbel );
 		
-		if( lguiItem instanceof LguiItem){
-			LguiItem internal=(LguiItem) lguiItem;
-			
-			internal.updateData(lgui);
-		}
+		
+		lguiItem.updateData();
 			
 	}
 	
@@ -586,6 +621,7 @@ public class LayoutAccess extends LguiHandler{
 			for(ComponentlayoutType complayout: layouts){
 				if( complayout.isActive() ){
 					activeobjects.add(gobj);
+					break;
 				}					
 			}
 		}
@@ -631,29 +667,33 @@ public class LayoutAccess extends LguiHandler{
 		return res;
 	}
 	
-	public TablelayoutType getDefaultTableLayout(TableType table) {
-		String id = table.getId();
-		if (getTableLayout(id) == null || getTableLayout(id).getColumn().size() <= 0) {
-			getTableLayout(id).setId(table.getId()+"_layout");
-			getTableLayout(id).setGid(table.getId());
-			for (int i = 0; i < table.getColumn().size(); i++) {
+	public TablelayoutType getDefaultTableLayout(String gid) {
+		if (getTableLayout(gid) == null) {
+			TablelayoutType tableLayout = new TablelayoutType();
+			tableLayout.setGid(gid);
+			getTableLayouts().add(tableLayout);
+		}
+		if (getTableLayout(gid).getColumn().size() <= 0) {
+			getTableLayout(gid).setId(gid+"_layout");
+			getTableLayout(gid).setGid(gid);
+			for (int i = 0; i < lguiItem.getTableHandler().getTable(gid).getColumn().size(); i++) {
 				ColumnlayoutType column = new ColumnlayoutType();
 				column.setCid(BigInteger.valueOf(i + 1));
 				column.setPos(BigInteger.valueOf(i));
 				column.setWidth(Double.valueOf(1));
 				column.setActive(true);
-				column.setKey(table.getColumn().get(i).getName());
-				getTableLayout(id).getColumn().add(column);
+				column.setKey(lguiItem.getTableHandler().getTable(gid).getColumn().get(i).getName());
+				getTableLayout(gid).getColumn().add(column);
 			}
 		}
-		return getTableLayout(id);
+		return getTableLayout(gid);
 	}
 	
 	/**
 	 * Getting a list of all elements of type ComponentlayoutType from LguiType.
 	 * @return list of elements(ComponentlayoutType)
 	 */
-	List<ComponentlayoutType> getComponentLayouts() {
+	public List<ComponentlayoutType> getComponentLayouts() {
 		List<ComponentlayoutType> layouts = new LinkedList<ComponentlayoutType>();
 		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
 			if (tag.getValue() instanceof ComponentlayoutType) {
@@ -667,7 +707,7 @@ public class LayoutAccess extends LguiHandler{
 	 * Getting a list of elements of type NodedisplaylayoutType.
 	 * @return list of elements(NodedisplaylayoutType)
 	 */
-	List<NodedisplaylayoutType> getNodedisplayLayouts() {
+	public List<NodedisplaylayoutType> getNodedisplayLayouts() {
 		List<NodedisplaylayoutType> nodedisplayLayouts = new LinkedList<NodedisplaylayoutType>();
 		for (ComponentlayoutType tag : getComponentLayouts()) {
 			if (tag instanceof NodedisplaylayoutType) {
@@ -682,7 +722,7 @@ public class LayoutAccess extends LguiHandler{
 	 * Getting a list of all elements of type TablelayoutType.
 	 * @return list of elements(TablelayoutType)
 	 */
-	List<TablelayoutType> getTableLayouts() {
+	public List<TablelayoutType> getTableLayouts() {
 		List<TablelayoutType> tableLayouts = new LinkedList<TablelayoutType>();
 		for (ComponentlayoutType tag : getComponentLayouts()) {
 			if (tag instanceof TablelayoutType) {
@@ -707,7 +747,7 @@ public class LayoutAccess extends LguiHandler{
 	}
 	
 
-	List<UsagebarlayoutType> getUsagebarLayouts() {
+	public List<UsagebarlayoutType> getUsagebarLayouts() {
 		List<UsagebarlayoutType> usagebarLayouts = new LinkedList<UsagebarlayoutType>();
 		for (ComponentlayoutType tag : getComponentLayouts()) {
 			if (tag instanceof UsagebarlayoutType) {
@@ -718,14 +758,49 @@ public class LayoutAccess extends LguiHandler{
 	}
 	
 
-	List<ChartlayoutType> getChartLayouts() {
+	public List<ChartlayoutType> getChartLayouts() {
 		List<ChartlayoutType> chartLayouts = new LinkedList<ChartlayoutType>();
-		for (ComponentlayoutType tag : chartLayouts) {
+		for (ComponentlayoutType tag : getComponentLayouts()) {
 			if (tag instanceof ChartlayoutType) {
 				chartLayouts.add((ChartlayoutType) tag);
 			}
 		}
 		return chartLayouts;
+	}
+	
+	public String[] getActiveTableLayoutsGid(){
+		ArrayList<String> tableLayoutsId = new ArrayList<String>();
+		List<TablelayoutType> tableLayouts = getTableLayouts();
+		for (TablelayoutType tableLayout : tableLayouts) {
+			if (tableLayout.isActive()) {
+				tableLayoutsId.add(tableLayout.getGid());
+			}
+		}
+		return tableLayoutsId.toArray(new String[tableLayoutsId.size()]);
+	}
+
+	public ColumnlayoutType[] getLayoutColumsToCids(BigInteger[] cids, String gid) {
+		ColumnlayoutType[] columns = new ColumnlayoutType[cids.length];
+		for (int i = 0; i < cids.length; i ++) {
+			for (ColumnlayoutType column : getTableLayout(gid).getColumn()) {
+				if (column.getCid().equals(cids[i])) {
+					columns[i] = column;
+					break;
+				}
+			}
+		}	
+		return columns;
+	}
+
+	public String[] getActiveNodedisplayLayoutGid() {
+		ArrayList<String> nodedisplayID = new ArrayList<String>();
+		List<NodedisplaylayoutType> nodedisplayLayouts= getNodedisplayLayouts();
+		for (NodedisplaylayoutType nodedisplayLayout : nodedisplayLayouts) {
+			if (nodedisplayLayout.isActive()) {
+				nodedisplayID.add(nodedisplayLayout.getGid());
+			}
+		}
+		return nodedisplayID.toArray(new String[nodedisplayID.size()]);
 	}
 	
 }

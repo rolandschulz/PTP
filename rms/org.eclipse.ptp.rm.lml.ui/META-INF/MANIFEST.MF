@@ -9,14 +9,12 @@ Import-Package: org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.jface.util,
  org.eclipse.jface.viewers,
- org.eclipse.ptp.rm.lml.core,
- org.eclipse.ptp.rm.lml.core.events,
- org.eclipse.ptp.rm.lml.core.util,
- org.eclipse.search.ui,
+ org.eclipse.ptp.remote.core,
+ org.eclipse.ptp.remote.ui,
+ org.eclipse.ptp.remote.ui.widgets,
  org.eclipse.swt.graphics,
  org.eclipse.swt.widgets,
  org.eclipse.ui,
- org.eclipse.ui.console,
  org.eclipse.ui.plugin,
  org.osgi.framework
 Require-Bundle: org.eclipse.ui;bundle-version="3.6.1",
@@ -25,9 +23,32 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.6.1",
 Bundle-Vendor: %pluginProvider
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.rm.lml.ui.LMLUIPlugin
-Export-Package: org.eclipse.ptp.rm.lml.ui,
- org.eclipse.ptp.rm.lml.ui.actions,
- org.eclipse.ptp.rm.lml.ui.managers,
- org.eclipse.ptp.rm.lml.ui.views,
- org.eclipse.ptp.rm.lml.ui.wizards
+Export-Package: org.eclipse.ptp.rm.lml.ui;
+  uses:="org.eclipse.core.runtime,
+   org.eclipse.ptp.rm.lml.core,
+   org.eclipse.ui,
+   org.eclipse.ui.plugin,
+   org.eclipse.jface.viewers,
+   org.eclipse.swt.graphics,
+   org.osgi.framework,
+   org.eclipse.swt.widgets,
+   org.eclipse.ptp.rm.lml.ui.managers",
+ org.eclipse.ptp.rm.lml.ui.actions;
+  uses:="org.eclipse.jface.action,
+   org.eclipse.jface.viewers,
+   org.eclipse.core.commands,
+   org.eclipse.swt.widgets",
+ org.eclipse.ptp.rm.lml.ui.managers;
+  uses:="org.eclipse.ptp.rm.lml.core.model,
+   org.eclipse.ptp.rm.lml.core.listeners,
+   org.eclipse.ptp.rm.lml.core,
+   org.eclipse.ptp.rm.lml.core.events",
+ org.eclipse.ptp.rm.lml.ui.views;
+  uses:="org.eclipse.ptp.rm.lml.core.model,
+   org.eclipse.ptp.rm.lml.internal.core.elements,
+   org.eclipse.swt.events,
+   org.eclipse.jface.viewers,
+   org.eclipse.ui.part,
+   org.eclipse.swt.widgets,
+   org.eclipse.ptp.rm.lml.ui.providers"
 Bundle-ClassPath: lmlui.jar

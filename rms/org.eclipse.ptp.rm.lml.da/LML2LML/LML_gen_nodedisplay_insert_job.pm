@@ -29,6 +29,10 @@ sub insert_job_into_nodedisplay  {
 
     foreach $node (sort(split(/\s*,\s*/,$nodelist))) {
 	$listref=$self->get_numbers_from_name($node,$schemeref);
+	if(!defined($listref)) {
+	    print STDERR "insert_job_into_nodedisplay: Error: could not map node $node ($listref)\n";
+	    return(0)
+	}
 	push(@nodelistrefs,$listref);
     }
     
@@ -373,6 +377,7 @@ sub get_numbers_from_name  {
    
     foreach $child (@{$schemeref->{_childs}}) {
 	$listref=$self->_get_numbers_from_name($child,$name);
+	last if(defined($listref)); 
     }
 
     return($listref);
@@ -383,23 +388,33 @@ sub _get_numbers_from_name {
     my($schemeref)=shift;
     my($name)=shift;
     my($rg,$child,@list,$listref);
-
+    
+    $listref=undef;
 
     $rg=$schemeref->{ATTR}->{_maskregall};
     if($name=~/^$rg$/) {
 	@list=$name=~/^$rg$/;
 	print "get_numbers_from_name: found on level ",$schemeref->{_level}+1," $name -> ",join(',',@list),"\n" if($debug>=2); 
+	$listref=\@list;
 	return(\@list);
     } else {
 	foreach $child (@{$schemeref->{_childs}}) {
 	    $listref=$self->_get_numbers_from_name($child,$name);
-	    if(defined($listref)) {
-		return($listref);
-	    }
+	    last if(defined($listref)); 
 	}
     }
-    return(undef);
+    # remap strings to number on that level
+    if(defined($listref)) {
+	if(exists($schemeref->{ATTR}->{_map})) {
+	    
+	    if(exists($schemeref->{ATTR}->{_map}->{$listref->[$schemeref->{_level}-1]})) {
+#		print "_get_numbers_from_name: remap on level ",$schemeref->{_level}," $name -> ",$listref->[$schemeref->{_level}-1],"\n" if($debug>=2); 
+		$listref->[$schemeref->{_level}-1]=$schemeref->{ATTR}->{_map}->{$listref->[$schemeref->{_level}-1]};
+	    }
+	    
+	}
+    }
+    return($listref);
 }
-
 
 1;

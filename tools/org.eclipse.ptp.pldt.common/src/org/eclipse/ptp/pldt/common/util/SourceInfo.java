@@ -13,101 +13,108 @@ package org.eclipse.ptp.pldt.common.util;
 import org.eclipse.ptp.pldt.common.Artifact;
 
 /**
- * Class encapsulates locational information for creating  markers representing Artifacts.
+ * Class encapsulates locational information for creating markers representing Artifacts.
  * 
  * 
  */
 public class SourceInfo
 {
 	/** starting line location within in the file */
-    private int startingLine;
-    /** line number within the file */
-    private int start;
-    /** end position (character position) relative to start of file */
-    private int end;
-    /** type of construct, e.g. Artifact.CONSTANT, etc. */
-    private int constructType;
+	private int startingLine;
+	/** line number within the file */
+	private int start;
+	/** end position (character position) relative to start of file */
+	private int end;
+	/** type of construct, e.g. Artifact.CONSTANT, etc. */
+	private int constructType;
 
-    /** explicit default contstructor with no info; assumed to
-     * be filled in with set methods.
-     *
-     */
-    public SourceInfo(){
-    }
-    
-    /** ctor with info already filled in */
-    public SourceInfo(int startLine, int start, int end, int construct){
-    	this.startingLine=startLine;
-    	this.start=start;
-    	this.end=end;
-    	this.constructType=construct;
-    }
-    /**
-     * @return Returns the end position, relative to start of file
-     */
-    public int getEnd()
-    {
-        return end;
-    }
+	/**
+	 * explicit default contstructor with no info; assumed to
+	 * be filled in with set methods.
+	 * 
+	 */
+	public SourceInfo() {
+	}
 
-    /**
-     * @param end The end to set.
-     */
-    public void setEnd(int end)
-    {
-        this.end = end;
-    }
+	/** ctor with info already filled in */
+	public SourceInfo(int startLine, int start, int end, int construct) {
+		this.startingLine = startLine;
+		this.start = start;
+		this.end = end;
+		this.constructType = construct;
+	}
 
-    /**
-     * @return Returns the start position, relative to start of file
-     */
-    public int getStart()
-    {
-        return start;
-    }
+	/**
+	 * @return Returns the end position, relative to start of file
+	 */
+	public int getEnd()
+	{
+		return end;
+	}
 
-    /**
-     * @param start The start to set.
-     */
-    public void setStart(int start)
-    {
-        this.start = start;
-    }
+	/**
+	 * @param end
+	 *            The end to set.
+	 */
+	public void setEnd(int end)
+	{
+		this.end = end;
+	}
 
-    /**
-     * @return Returns the startingLine.
-     */
-    public int getStartingLine()
-    {
-        return startingLine;
-    }
+	/**
+	 * @return Returns the start position, relative to start of file
+	 */
+	public int getStart()
+	{
+		return start;
+	}
 
-    /**
-     * @param startingLine The startingLine to set.
-     */
-    public void setStartingLine(int startingLine)
-    {
-        this.startingLine = startingLine;
-    }
+	/**
+	 * @param start
+	 *            The start to set.
+	 */
+	public void setStart(int start)
+	{
+		this.start = start;
+	}
 
-    /**
-     * @return Returns the constructType.
-     */
-    public int getConstructType()
-    {
-        return constructType;
-    }
+	/**
+	 * @return Returns the startingLine.
+	 */
+	public int getStartingLine()
+	{
+		return startingLine;
+	}
 
-    /**
-     * @param constructType The constructType to set.
-     */
-    public void setConstructType(int constructType)
-    {
-        this.constructType = constructType;
-    }
-    /**
-     * A string representation of the object
-     */
+	/**
+	 * @param startingLine
+	 *            The startingLine to set.
+	 */
+	public void setStartingLine(int startingLine)
+	{
+		this.startingLine = startingLine;
+	}
+
+	/**
+	 * @return Returns the constructType.
+	 */
+	public int getConstructType()
+	{
+		return constructType;
+	}
+
+	/**
+	 * @param constructType
+	 *            The constructType to set.
+	 */
+	public void setConstructType(int constructType)
+	{
+		this.constructType = constructType;
+	}
+
+	/**
+	 * A string representation of the object
+	 */
 	public String toString() {
 		StringBuffer s = new StringBuffer();
 		s.append("SourceInfo line:").append(getStartingLine()); //$NON-NLS-1$

@@ -84,11 +84,12 @@ public class MonitorJobListView extends ViewPart implements IResourceManagerList
 	 * @param operation
 	 * @throws CoreException
 	 */
-	public void callDoControl(JobStatusData job, boolean autoStart, String operation) throws CoreException {
+	public void callDoControl(JobStatusData job, boolean autoStart, String operation, IProgressMonitor monitor)
+			throws CoreException {
 		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
 		IResourceManagerControl control = rm.getControl();
 		if (checkControl(rm, control, autoStart)) {
-			control.control(job.getJobId(), operation, new NullProgressMonitor());
+			control.control(job.getJobId(), operation, monitor);
 			maybeUpdateJobState(job, autoStart);
 		}
 	}
@@ -199,6 +200,9 @@ public class MonitorJobListView extends ViewPart implements IResourceManagerList
 	 */
 	public void handleEvent(IJobChangedEvent e) {
 		String jobId = e.getJobId();
+		if (jobId == null) {
+			return;
+		}
 		IResourceManager rm = e.getSource();
 		IJobStatus status = rm.getControl().getJobStatus(jobId);
 		JobStatusData data = jobs.get(jobId);
@@ -269,7 +273,11 @@ public class MonitorJobListView extends ViewPart implements IResourceManagerList
 		registerInitial();
 		List<JobStatusData> jobs = JobStatusData.reload(memento);
 		for (JobStatusData job : jobs) {
-			this.jobs.put(job.getJobId(), job);
+			String jobId = job.getJobId();
+			if (jobId == null) {
+				continue;
+			}
+			this.jobs.put(jobId, job);
 			try {
 				maybeUpdateJobState(job, false);
 			} catch (Throwable t) {
@@ -316,7 +324,6 @@ public class MonitorJobListView extends ViewPart implements IResourceManagerList
 	 */
 	public void removeJob(String jobId) {
 		jobs.remove(jobId);
-		refresh();
 	}
 
 	@Override
@@ -396,6 +403,16 @@ public class MonitorJobListView extends ViewPart implements IResourceManagerList
 		}
 	}
 
+	/**
+	 * Convenience method for control creation.
+	 * 
+	 * @param viewer
+	 * @param columnName
+	 * @param style
+	 * @param width
+	 * @param s
+	 * @return
+	 */
 	private static TableColumn addTableColumn(final TableViewer viewer, String columnName, int style, int width,
 			final SelectionAdapter s) {
 		Table t = viewer.getTable();

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- ****************************************************************************** -->
+<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-torque-interactive">
+	<control-data>
+		<property name="queues" visible="false"/>
+		<property name="mpiPrefix" visible="false">
+			<default>${rm:mpiCommand#value} -np ${rm:mpiCores#value}</default>
+		</property>
+		<attribute name="mpiCommand" type="choice">
+			<description>Which mpi command to use.</description>
+			<choice>,mpiexec,mpirun</choice>
+		</attribute>
+		<attribute name="mpiCores" min="1" type="integer">
+			<description>the '-np' value</description>
+		</attribute>
+		<attribute name="destination" type="string">
+			<description>Designation of the queue to which to submit the job.</description>
+			<tooltip>Format: queue[@server].</tooltip>
+		</attribute>
+		<attribute name="Resource_List.mem" type="string">
+			<description>Maximum amount of memory used by all concurrent processes in the job.</description>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier 
+in bytes or words (word size of the host): b (bytes), 
+w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
+			<default>20gb</default>
+		</attribute>
+		<attribute name="Resource_List.walltime" type="string">
+			<description>Maximum amount of real time during which the job can be in the running state.</description>
+			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
+			<default>00:30:00</default>
+		</attribute>
+		<start-up-command name="get-queues">
+			<arg>qstat</arg>
+			<arg>-Q</arg>
+			<arg>-f</arg>
+			<stdout-parser delim="\n">
+				<target ref="queues">
+					<match>
+						<expression>Queue: ([\w\d]+)</expression>
+						<add field="value">
+							<entry valueGroup="1"/>
+						</add>
+					</match>
+				</target>
+			</stdout-parser>
+		</start-up-command>
+		<submit-interactive name="submit-interactive" waitForId="true" keepOpen="true" flags="ALLOCATE_PTY">
+			<arg>qsub</arg>
+			<arg>-I</arg>
+			<arg>-q ${rm:destination#value}</arg>
+			<arg>-l nodes=1,mem=${rm:Resource_List.mem#value},walltime=${rm:Resource_List.walltime#value}</arg>
+			<arg>-V</arg>
+			<input isUndefinedIfMatches=".+ -np">${rm:mpiPrefix#value}</input>
+			<input>${rm:executablePath#value} ${rm:progArgs#value}</input>
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.][\w]+[\s]ready.*</expression>
+						<set field="name">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="value">
+							<entry value="RUNNING"/>
+						</set>
+					</match>
+				</target>
+				<exit-after flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.][\w]+[\s]ready.*</exit-after>
+			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>.+</expression>
+						<set field="name">
+							<entry value="${rm:@jobId#name}"/>
+						</set>
+						<set field="value">
+							<entry value="FAILED"/>
+						</set>
+					</match>
+				</target>
+			</stderr-parser>
+		</submit-interactive>
+		<launch-tab>
+			<basic>
+				<title>Basic PBS Settings</title>
+				<!-- QUEUES remote path group -->
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false"/>
+					</layout>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"/>
+						</layout-data>
+						<tooltip>${rm:destination#tooltip}</tooltip>
+						<fixed-text>Queue: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+						<layout-data>
+							<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
+						</layout-data>
+						<items-from>queues</items-from>
+					</widget>
+				</composite>
+				<!-- ATTRIBUTES group -->
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<!-- HEADER -->
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Name</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Value</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Description</fixed-text>
+					</widget>
+					<!-- row 1 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${rm:Resource_List.mem#tooltip}</tooltip>
+						<fixed-text>Total Memory Needed: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${rm:Resource_List.mem#description}</fixed-text>
+					</widget>
+					<!-- row 2 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
+						<fixed-text>Wallclock Time: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${rm:Resource_List.walltime#description}</fixed-text>
+					</widget>
+					<!-- row 3 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>MPI Command: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCommand">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${rm:mpiCommand#description}</fixed-text>
+					</widget>
+					<!-- row 4 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>MPI Number of Cores: </fixed-text>
+					</widget>
+					<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${rm:mpiCores#description}</fixed-text>
+					</widget>
+				</composite>
+			</basic>
+		</launch-tab>
+	</control-data>
+	<monitor-data schedulerType="PBS"/>
+</resource-manager-builder>

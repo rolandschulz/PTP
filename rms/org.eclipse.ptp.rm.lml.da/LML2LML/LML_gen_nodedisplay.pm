@@ -36,6 +36,9 @@ sub new {
     $self->{LAYOUT}      = undef; 
     $self->{NODEMAPPING} = undef; 
     $self->{NODENAMENAMASK}= "n%06d";
+    $self->{SCHEMEROOT} =  undef; 
+    $self->{DATAROOT}   =  undef; 
+    $self->{SCHEMEFROMREQUEST} =  undef; 
     $self->{IDLISTREF}   = undef; 
     bless $self, $class;
     return $self;
@@ -49,6 +52,7 @@ sub get_ids {
 sub process {
     my($self) = shift;
     my $layoutref  = shift;
+    my $schemefromrequest  = shift;
     my $filehandler_LML  = shift;
     my ($numids,$gid,$idlistref);
     my ($schemeroot,$dataroot);
@@ -56,6 +60,9 @@ sub process {
     $self->{LAYOUT}    = $layoutref; 
     $self->{LMLFH}     = $filehandler_LML; 
     $gid               = $layoutref->{gid};
+
+    $self->{SCHEMEFROMREQUEST} =  $schemefromrequest; 
+
 
     # internal structure
     $self->{SCHEMEROOT} = $schemeroot = LML_ndtree->new();
@@ -70,19 +77,36 @@ sub process {
 	    return(-1);
 	}
     } elsif($self->{SYSTEMTYPE} eq "Cluster") {
-	
-	# standard one-level tree, mapping of node names
-	$self->_get_system_size_cluster();
-	if(!$self->_init_trees_cluster()) {
-	    print "ERROR: could not init internal data structures, system type: $self->{SYSTEMTYPE}, aborting ...\n";
-	    return(-1);
+
+	# user define scheme given
+	if($self->{SCHEMEFROMREQUEST}) {
+
+	    if(!$self->_init_trees_cluster_from_scheme()) {
+		print "ERROR: could not init internal data structures, system type: $self->{SYSTEMTYPE}, aborting ...\n";
+		return(-1);
+	    }
+	    
+	} else {
+	    # standard one-level tree, mapping of node names
+	    my $numnodes=$self->_get_system_size_cluster();
+	    if(!$self->_init_trees_cluster()) {
+		print "ERROR: could not init internal data structures, system type: $self->{SYSTEMTYPE}, aborting ...\n";
+		return(-1);
+	    }
+	    $self->_adjust_layout_cluster($numnodes);
 	}
     } else {
 	print "ERROR: not supported system type: $self->{SYSTEMTYPE}, aborting ...\n";
 	return(-1);
     }
-    # add regular expression to each level of node display scheme for fast pattern scann of nodenames
+    # add regular expression to each level of node display scheme for fast pattern scan of nodenames
     $self->_add_regexp_to_scheme();
+    # adjust min,max attribute if only one is given
+    $self->_update_scheme_attr();
+    
+    # init data tree with empty root nodes
+    $self->_add_empty_root_elements();
+
 
     $idlistref=[];
     print "LML_gen_nodedisplay::process: gid=$gid\n" if($self->{VERBOSE});
@@ -91,6 +115,9 @@ sub process {
     $self->{IDLISTREF}=$idlistref;
     $numids=scalar @{$idlistref};
     
+    # update layout
+    
+
     return($numids);
 }
 
@@ -100,13 +127,13 @@ sub _insert_run_jobs {
     
     keys(%{$self->{LMLFH}->{DATA}->{OBJECT}}); # reset iterator
     while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
+#	last; # WF
 	next if($ref->{type} ne 'job');
 	$inforef=$self->{LMLFH}->{DATA}->{INFODATA}->{$key};
 	next if($inforef->{state} ne 'Running');
 	$nodelist=$self->_remap_nodes($inforef->{nodelist});
 	$self->insert_job_into_nodedisplay($self->{SCHEMEROOT},$self->{DATAROOT},$nodelist,$key);
 	push(@idlist,$key);
-#	last; # WF
     }
     return(\@idlist);
 }
@@ -176,10 +203,17 @@ sub __add_regexp_to_scheme {
     my($self) = shift;
     my($schemeref)=shift;
     my($regexp)=shift;
-    my($rg,$child);
+    my($rg,$child,$key);
 
     if(exists($schemeref->{ATTR}->{mask})) {
 	$rg=String::Scanf::format_to_re($schemeref->{ATTR}->{mask});
+    } elsif(exists($schemeref->{ATTR}->{map})) {
+	$rg="\(".join("\|",split('\s*,\s*',$schemeref->{ATTR}->{map}))."\)";
+	my $num=$schemeref->{ATTR}->{min};
+	foreach $key (split('\s*,\s*',$schemeref->{ATTR}->{map})) {
+	    $schemeref->{ATTR}->{_map}->{$key}=$num;
+	    $num++;
+	}
     } else {
 	$rg="";
     }
@@ -192,38 +226,79 @@ sub __add_regexp_to_scheme {
     return(1);
 }
 
+sub _update_scheme_attr  {
+    my($self) = shift;
+    my($child);
+
+    my $schemeref=$self->{SCHEMEROOT};
+
+    foreach $child (@{$schemeref->{_childs}}) {
+	$self->__update_scheme_attr($child);
+    }
+    return(1);
+}
+
+sub __update_scheme_attr {
+    my($self) = shift;
+    my($schemeref)=shift;
+    my($child);
+    
+    foreach $child (@{$schemeref->{_childs}}) {
+	$self->__update_scheme_attr($child);
+    }
+    
+    if(!exists($schemeref->{ATTR}->{min})) {
+	$schemeref->{ATTR}->{min} = $schemeref->{ATTR}->{max} if(exists($schemeref->{ATTR}->{max}));
+    }
+    if(!exists($schemeref->{ATTR}->{max})) {
+	$schemeref->{ATTR}->{max} = $schemeref->{ATTR}->{min} if(exists($schemeref->{ATTR}->{min}));
+    }
+
+    return(1);
+}
 
 sub _remap_nodes {
     my($self) = shift;
     my($nodelist)=shift;
     my($newnodelist,$spec,$node,$num,$newnode);
-    if($self->{NODEMAPPING}) {
-	foreach $spec (split(/\),?\(/,$nodelist)) {
-	    if($spec=~/\(?([^,]+),(\d+)\)?/) {
-		$node=$1;$num=$2;
-		if(exists($self->{NODEMAPPING}->{$node})) {
-		    $newnode=$self->{NODEMAPPING}->{$node};
-		    $newnodelist.="," if($newnodelist);
-		    $newnodelist.=sprintf("%s-c%02d",$newnode,$num);
-		} else {
-		    print "ERROR: _remap_nodes: unknown node '$node', skipping a\n";
-		}
-	    }
-	    if($spec=~/^([^,]+)$/) {
-		$node=$1;
-		if(exists($self->{NODEMAPPING}->{$node})) {
-		    $newnode=$self->{NODEMAPPING}->{$node};
-		    $newnodelist.="," if($newnodelist);
-		    $newnodelist.=sprintf("%s-c%02d",$newnode,0);
-		} else {
-		    print "ERROR: _remap_nodes: unknown node '$node', skipping\n";
-		}
-	    }
+    foreach $spec (split(/\),?\(/,$nodelist)) {
+	# change form '(node,node num)' to (node-c<num>)
+	if($spec=~/\(?([^,]+),(\d+)\)?/) {
+	    $node=$1;$num=$2;
+	} elsif($spec=~/^([^,]+)$/) {
+	    $node=$1;$num=0;	
+	} else {
+	    print "ERROR: _remap_nodes: unknown node '$node', skipping\n";
 	}
-	return($newnodelist);
-    } else {
-	return($nodelist);
+	
+	if(exists($self->{NODEMAPPING}->{$node})) {
+	    $newnode=$self->{NODEMAPPING}->{$node}; 
+	} else {
+	    $newnode=$node;
+	}
+	$newnodelist.="," if($newnodelist);
+	$newnodelist.=sprintf("%s-c%02d",$newnode,$num);
     }
+    return($newnodelist);
+}
+
+
+sub _add_empty_root_elements  {
+    my($self) = shift;
+    my($treenode, $child);
+
+    my $schemeroot=$self->{SCHEMEROOT};
+
+    # insert first element in data section
+    $treenode=$self->{DATAROOT};
+    foreach $child (@{$schemeroot->{_childs}}) {
+	my $subnode=$treenode->new_child();
+	$subnode->add_attr({ min     => $child->{ATTR}->{min},
+			     max     => $child->{ATTR}->{max},
+			     oid     => 'empty' });
+    }
+	
+    return(1);
 }
 
 ###############################################
@@ -241,8 +316,12 @@ sub _get_system_size_cluster  {
 	$name=$ref->{name};
 	$ncores=$self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{ncores};
 	if(!defined($ncores)) {
-	    print "_get_system_size_cluster: suspect node: $name   , assuming 0 cores\n"  if($self->{VERBOSE});
-	    $ncores=0;
+	    print "_get_system_size_cluster: suspect node: $name, assuming 1 cores\n"  if($self->{VERBOSE});
+	    $ncores=1;
+	}
+	if($ncores<0) {
+	    print "_get_system_size_cluster: suspect node: $name negative number of cores, assuming 1 cores\n"  if($self->{VERBOSE});
+	    $ncores=1;
 	}
 	push(@{$self->{NODESIZES}->{$ncores}},$name);
     }
@@ -265,7 +344,18 @@ sub _get_system_size_cluster  {
     }
     printf("_get_system_size_cluster: Cluster found of size: %d\n",$numnodes) if($self->{VERBOSE});
     
-    return();
+    return($numnodes);
+}
+
+sub _init_trees_cluster_from_scheme  {
+    my($self) = shift;
+    my($treenode, $child);
+
+    my $schemeroot=$self->{SCHEMEROOT};
+
+    $schemeroot->copy_tree($self->{SCHEMEFROMREQUEST});
+
+    return(1);
 }
 
 sub _init_trees_cluster  {
@@ -285,9 +375,9 @@ sub _init_trees_cluster  {
 	$treenode=$treenode->new_child();
 	$treenode->add_attr({ tagname => 'core',
 			      min     => 0,
-			      max     => $ncores,
+			      max     => $ncores-1,
 			      mask    => '-c%02d' });
-
+	
 	# insert first element in data section
 	$treenode=$self->{DATAROOT};
 	$treenode=$treenode->new_child();
@@ -296,8 +386,39 @@ sub _init_trees_cluster  {
 			      oid     => 'empty' });
 	$start+=$numnodes;
     }
-
     return(1);
+}
+
+sub _adjust_layout_cluster  {
+    my($self) = shift;
+    my($numnodes)=@_;
+    my($id,$subid,$treenode,$child,$ncores,$start,$numchilds);
+    my $rc=1;
+    my $default_nodes_per_row=32;
+   
+
+    $treenode=$self->{LAYOUT}->{tree};
+
+    $numchilds=scalar @{$treenode->{_childs}};
+    if($numchilds==1) {
+	$child=$treenode->{_childs}->[0];
+	if( ($child->{ATTR}->{rows} eq 0) && ($child->{ATTR}->{cols} eq 0)) {
+	    $child->{ATTR}->{rows}=$default_nodes_per_row;
+	    $child->{ATTR}->{cols}=int($numnodes/$default_nodes_per_row)+1;
+	} elsif($child->{ATTR}->{cols} eq 0) {
+	    $child->{ATTR}->{cols}=int($numnodes/$child->{ATTR}->{rows})+1;
+	} elsif($child->{ATTR}->{rows} eq 0) {
+	    $child->{ATTR}->{rows}=int($numnodes/$child->{ATTR}->{cols})+1;
+	}
+
+	if(!exists($child->{ATTR}->{maxlevel})) {
+	    $child->{ATTR}->{maxlevel}=1;
+	}
+    } else {
+	# more sophisticated layout, tbd
+    }
+
+    return($rc);
 }
 
 ###############################################
@@ -385,13 +506,6 @@ sub _init_trees_bg  {
 			  max     => 3,
 			  mask    => '-%01d' });
 
-
-    # insert first element in data section
-    $treenode=$self->{DATAROOT};
-    $treenode=$treenode->new_child();
-    $treenode->add_attr({ min     => $bgsystem->{ATTR}->{min},
-			  max     => $bgsystem->{ATTR}->{max},
-			  oid     => 'empty' });
 
     return(1);
 }

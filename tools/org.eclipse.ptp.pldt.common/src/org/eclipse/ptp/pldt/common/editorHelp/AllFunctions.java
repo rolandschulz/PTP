@@ -18,7 +18,7 @@ import org.eclipse.cdt.ui.IFunctionSummary;
 
 /**
  * Unused???? 3/13/08
- *
+ * 
  */
 public class AllFunctions {
 	private List<IFunctionSummary> allFunctionList = new ArrayList<IFunctionSummary>();
@@ -30,7 +30,7 @@ public class AllFunctions {
 	public void setAllFunctionList(List<IFunctionSummary> allFunctionList) {
 		this.allFunctionList = allFunctionList;
 	}
-	
+
 	public void addFunction(IFunctionSummary functionSummary)
 	{
 		allFunctionList.add(functionSummary);

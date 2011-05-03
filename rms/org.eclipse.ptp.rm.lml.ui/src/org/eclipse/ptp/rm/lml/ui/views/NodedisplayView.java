@@ -1,13 +1,3 @@
-/**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- * 		Carsten Karbach, Claudia Knobloch, FZ Juelich
- */
 package org.eclipse.ptp.rm.lml.ui.views;
 
 import java.util.ArrayDeque;
@@ -16,9 +6,10 @@ import java.util.Deque;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.ui.providers.DisplayNode;
-import org.eclipse.ptp.rm.lml.ui.providers.LMLWidget;
+import org.eclipse.ptp.rm.lml.ui.providers.LguiWidget;
 import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayComp;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
@@ -29,13 +20,17 @@ import org.eclipse.swt.widgets.Composite;
  * one instance of this class. NodedisplayView represents one zoomable
  * NodedisplayComp.
  */
-public class NodedisplayView extends LMLWidget{
+public class NodedisplayView extends LguiWidget{
 
 	private Nodedisplay model;//LML-Data-model for this view
 	
 	private NodedisplayComp root;//root nodedisplay which is currently shown
 	
 	private Deque<String> zoomstack=new ArrayDeque<String>();//Saves zoom-levels to zoom out later, saves full-implicit name of nodes to create Displaynodes from these ids
+	
+	//Cursors for showing processing
+	private Cursor waitcursor;//Cursor to show while processing
+	private Cursor defaultcursor;//default cursor
 	
 	/**
 	 * Create a composite as surrounding component for NodedisplayComps.
@@ -44,16 +39,19 @@ public class NodedisplayView extends LMLWidget{
 	 * @param pmodel
 	 * @param parent
 	 */
-	public NodedisplayView(ILguiItem lguiItem, Nodedisplay pmodel, Composite parent){
+	public NodedisplayView(ILguiItem lgui, Nodedisplay pmodel, Composite parent){
 		
-		super(lguiItem, parent, SWT.None);
+		super(lgui, parent, SWT.None);		
 		
 		model=pmodel;
 		
 		setLayout(new FillLayout());
 		
-		root=new NodedisplayComp(lguiItem, model, this, SWT.None);
+		root=new NodedisplayComp(lgui, model, this, SWT.None);
 		
+		//Create cursors
+		defaultcursor=this.getCursor();
+		waitcursor = new Cursor(this.getDisplay() , SWT.CURSOR_WAIT);
 	}
 	
 	/**
@@ -67,6 +65,8 @@ public class NodedisplayView extends LMLWidget{
 	 * Go one level higher in zoomstack
 	 */
 	public void zoomOut(){
+		this.setCursor(waitcursor);
+		
 		if(! zoomstack.isEmpty()){
 			String impname=zoomstack.pop();
 			//Get back null-values
@@ -76,9 +76,13 @@ public class NodedisplayView extends LMLWidget{
 			//Switch view to node with impname
 			goToImpname(impname);
 		}
+		
+		this.setCursor(defaultcursor);
 	}
 	
 	public void zoomIn(String impname){
+		this.setCursor(waitcursor);
+		
 		String oldshown=root.getShownImpname();
 		
 		if(goToImpname(impname)){
@@ -86,6 +90,8 @@ public class NodedisplayView extends LMLWidget{
 				oldshown="";
 			zoomstack.push(oldshown);
 		}
+		
+		this.setCursor(defaultcursor);
 	}
 	
 	/**
@@ -119,19 +125,21 @@ public class NodedisplayView extends LMLWidget{
 		
 		root.dispose();//Delete old root-element
 		System.gc();
-		
 		if(impname!=null){
-			DisplayNode newnode=DisplayNode.getDisplayNodeFromImpName(lguiItem, impname, model);
+			DisplayNode newnode=DisplayNode.getDisplayNodeFromImpName(lgui, impname, model);
 			
-			newcomp=new NodedisplayComp(lguiItem, model, newnode, this, SWT.None);
+			newcomp=new NodedisplayComp(lgui, model, newnode, this, SWT.None);
 		}
-		else newcomp=new NodedisplayComp(lguiItem, model, this, SWT.None);//if impname is null => go up to root-level
-		
+		else newcomp=new NodedisplayComp(lgui, model, this, SWT.None);//if impname is null => go up to root-level
 		root=newcomp;
-		
 		this.layout();
 		
 		return true;
+	}
+	
+	public void dispose(){
+		//Dispose created cursor
+		waitcursor.dispose();
 	}
 	
 }

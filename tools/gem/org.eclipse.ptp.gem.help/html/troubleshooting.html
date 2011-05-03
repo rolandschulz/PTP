@@ -35,24 +35,69 @@ will get back to you with a solution as soon as possible.
 <th>Problem</th><th>Solution</th>
 </tr>
 <tr>
-    <td>When I try to run GEM, the GEM Console View reports:<br></br> <b>&quot;No such file or directory&quot;</b>.</td>
-    <td>Make sure the paths to the ISP executable and other scripts are properly set on the GEM preference page</td>
+    <td>
+        When I run Gem on a particular source file I get a dialog box appears stating that a valid
+        executable could not be created from the source file:<br/><br/><img src="images/invalidExecutable.png">
+    </td>
+    <td>
+        SOLUTION-1
+	    You have most likely run the GEM command <b>&#34;Formally Verify MPI Program&#34;</b> on
+	    a source file that does not contain a <b>main()</b> program entry point, or does not simply compile by itself.
+	    Remember, for anything larger than a simple single-file Managed Build Project you will need to create a Makefile
+	    Project and run GEM via the steps outlined in <a href="makefileSupport.html">GEM Makefile Support</a>.
+        <br/><br/>
+        SOLUTION-2
+        If you get STDERR in the GEM Console like the following:
+        <pre>
+            /usr/local/lib/libisp_prof.so: undefined reference to `MPI::Win::Free()'
+            /usr/local/lib/libisp_prof.so: undefined reference to `MPI::Datatype::Free()'
+            /usr/local/lib/libisp_prof.so: undefined reference to `MPI::Comm::Comm()'
+            /usr/local/lib/libisp_prof.so: undefined reference to `ompi_mpi_cxx_op_intercept'
+        </pre>
+        Then you are most likely using OpenMPI and <tt><b>libmpi_cxx</b></tt> is not being linked in by 
+        <tt><b>ispcc</b></tt>. Locate the script <tt><b>ispcc</b></tt> and add <tt><b>-lmpi_cxx</b></tt>
+        to the end of the single line in the script beginning with <tt><b>exec</b></tt> (see example below).
+        <pre>
+        exec "/usr/local/bin/mpicc" "-L/usr/local/lib" "-I/usr/local/include/isp" \
+        -Wl,-rpath=/usr/local/lib -include isp.h $* -lisp_prof -lmpi_cxx
+        </pre>
+    </td>
 </tr>
 <tr>
-    <td>When I try to formally verify my MPI C/C++ application, I get an error message saying that an error occurred while trying to run ISP.</td>
-    <td>If the error details say: “Cannot run program ISPCC” Then ISP was not installed properly.  Try re-installing ISP itself.</td>
+    <td>
+        When I run Gem on a particular source file, GEM just hangs.
+    </td>
+    <td> 
+        You can terminate the current GEM operation by clicking the <img src="images/terminate.gif"> &#34;Terminate
+        Operation&#34; button in the GEM <a href="consoleView.html">Console View</a>.<br/><br/>
+        You also may have most run the GEM command <b>&#34;Formally Verify MPI Program&#34;</b> on
+        a source file that does not contain a <b>main()</b> program entry point, or does not simply compile by itself.
+        Remember, for anything larger than a simple single-file Managed Build Project you will need to create a Makefile
+        Project and run GEM via the steps outlined in <a href="makefileSupport.html">GEM Makefile Support</a>.
+    </td>
 </tr>
 <tr>
-    <td>Dialog box appears stating:<br></br> <b>&quot;An error has occurred while trying to run ISP. Please make sure ISP is configured and installed correctly,
-    and that all preferences and paths for the ISP Plugin have been properly set.&quot;</b></td>
-    <td>You most likely have not set the paths to the ISP executable or one of its scripts properly in the 
-    preference page. Make sure you don't have a trailing <b>&#34;&#47;&#34;</b> on any path. (e.g. &#47;usr&#47;local&#47;bin&#47;)
-    Just use the browse buttons on the GEM preference page to safely navigate to the directory.</td>
+    <td>
+	    When I try to formally verify my MPI C/C++ program, I get an error message saying that an error
+	    occurred while trying to run a particular command.<br/><br/><img src="images/unknownCommand.png">
+    </td> 
+    <td>
+	    This particular command either does not exist on the target machine or is not in your path. For anything 
+	    ISP related, e.g. <b>isp, ispcc, ispCC or ispcxx</b>, you may not have ISP installed. Please install ISP
+	    per documentation in the <a href="prereqs.html"> GEM Prerequisites Page</a> and also make sure the 
+	    ISP paths are correctly set on the <a href="preferences.html#ispPrefs">ISP Preference Page</a>
+	    
+    </td>
 </tr>
 <tr>
-    <td>I don’t see the GEM icon, there is no trident icon anywhere, and the GEM Views do not exist.</td>
-    <td>The Eclipse Plug-­in was not installed properly.  Try installing it again from <a href="http://eclipse.org/ptp/">
-        http://eclipse.org/ptp</a>.</td>
+    <td>
+	    I don’t see the GEM icon... there is no <img src="images/trident.gif"> trident icon anywhere, and the 
+	    GEM Views do not exist.
+    </td>
+    <td>
+	    The Eclipse Plug-­in was not installed properly.  Try installing it again from the update site for your
+	    installation of Eclipse or through <a href="http://eclipse.org/ptp/">http://eclipse.org/ptp</a>.
+    </td>
 </tr>
 <tr>
     <td>I’m running Eclipse and when I try to running GEM, Eclipse becomes unresponsive.</td>

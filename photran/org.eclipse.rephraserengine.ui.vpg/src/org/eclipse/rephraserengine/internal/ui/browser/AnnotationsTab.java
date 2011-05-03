@@ -214,14 +214,14 @@ class AnnotationsTab
         }
         private void displayCaretInformation(CaretEvent event)
         { 
-            int caretLine =  styledText.getLineAtOffset(styledText.getCaretOffset())+1;
+            int caretLine = styledText.getLineAtOffset(styledText.getCaretOffset());
             int lineOffset = styledText.getOffsetAtLine(caretLine);
             int caretOffset = styledText.getCaretOffset();
             int caretColumn = caretOffset-lineOffset+1 ; 
            
             label.setText(
                 Messages.bind(Messages.AnnotationsTab_LineColOffset, new Object[] {
-                    caretLine,
+                    caretLine+1,
                     caretColumn,
                     styledText.getCaretOffset() }));
             label.pack();
@@ -254,7 +254,7 @@ class AnnotationsTab
     {
         if (isValid(startOffset) && isValid(endOffset))
         {
-            Rectangle srcRect = styledText.getTextBounds(startOffset, Math.max(0, endOffset - 1));
+            Rectangle srcRect = styledText.getTextBounds(startOffset, Math.max(startOffset, Math.max(0, endOffset - 1)));
             e.gc.drawRectangle(srcRect);
             return srcRect;
         }

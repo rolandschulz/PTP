@@ -52,7 +52,8 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
 		ILanguage lang;
-		boolean allowPrefixOnlyMatch=UPCPlugin.getDefault().getPreferenceStore().getBoolean(UPCIDs.UPC_RECOGNIZE_APIS_BY_PREFIX_ALONE);	
+		boolean allowPrefixOnlyMatch = UPCPlugin.getDefault().getPreferenceStore()
+				.getBoolean(UPCIDs.UPC_RECOGNIZE_APIS_BY_PREFIX_ALONE);
 		try {
 			lang = tu.getLanguage();
 
@@ -106,9 +107,11 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase {
 	protected void activateArtifactView() {
 		ViewActivator.activateView(UPCIDs.UPC_VIEW_ID);
 	}
-    @Override
+
+	@Override
 	public boolean areIncludePathsNeeded() {
-    	boolean allowPrefixOnlyMatch= UPCPlugin.getDefault().getPreferenceStore().getBoolean(UPCIDs.UPC_RECOGNIZE_APIS_BY_PREFIX_ALONE);
-    	return !allowPrefixOnlyMatch;
-    }
+		boolean allowPrefixOnlyMatch = UPCPlugin.getDefault().getPreferenceStore()
+				.getBoolean(UPCIDs.UPC_RECOGNIZE_APIS_BY_PREFIX_ALONE);
+		return !allowPrefixOnlyMatch;
+	}
 }

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This object represents the collection of  artifacts (e.g. MPI or OpenMP artifacts) returned from analysis, 
+ * This object represents the collection of artifacts (e.g. MPI or OpenMP artifacts) returned from analysis,
  * which will eventually be displayed in
  * the associated view, etc. <br>
  * It can also contain other information such as return codes, generalized analysis results, parameters, etc. <br>
@@ -26,28 +26,29 @@ import java.util.List;
 public class ScanReturn
 {
 
-    private List<Artifact> artifacts = new ArrayList<Artifact>();
-    
-    public ScanReturn()
-    {      
-    }
+	private List<Artifact> artifacts = new ArrayList<Artifact>();
 
-    public boolean wasError()
-    {
-        return false;
-    }
+	public ScanReturn()
+	{
+	}
 
-    public List<Artifact> getArtifactList()
-    {
-        return artifacts;
-    }
+	public boolean wasError()
+	{
+		return false;
+	}
 
-    public void addArtifact(Artifact a)
-    {
-        artifacts.add(a);
-    }
-    public String toString() {
-    	return "ScanReturn with "+artifacts.size()+" artifacts";
-    }
+	public List<Artifact> getArtifactList()
+	{
+		return artifacts;
+	}
+
+	public void addArtifact(Artifact a)
+	{
+		artifacts.add(a);
+	}
+
+	public String toString() {
+		return "ScanReturn with " + artifacts.size() + " artifacts";
+	}
 
 }

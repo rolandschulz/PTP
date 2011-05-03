@@ -10,7 +10,6 @@
 #*******************************************************************************/ 
 package LML_combine_file_obj;
 
-my $VERSION='$Revision$';
 my($debug)=0;
 
 use strict;

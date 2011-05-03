@@ -32,15 +32,15 @@ public class OpenMPFortranASTVisitor extends GenericASTVisitor {
 	private String fileName;
 
 	public OpenMPFortranASTVisitor(String fileName, ScanReturn scanReturn) {
-		this.scanReturn=scanReturn;
-		this.fileName=fileName;
+		this.scanReturn = scanReturn;
+		this.fileName = fileName;
 	}
 
 	@Override
 	public void visitToken(Token node) {
 		/*
 		 * In Fortran, OpenMP directives are comments (e.g., !$omp parallel).
-		 * Photran attaches comments to the following token.  Since they appear
+		 * Photran attaches comments to the following token. Since they appear
 		 * before several types of statements (including END statements), it's
 		 * easiest to just iterate through all the tokens in the AST and collect
 		 * the preceding OpenMP directives.
@@ -60,11 +60,11 @@ public class OpenMPFortranASTVisitor extends GenericASTVisitor {
 
 	private void addArtifact(Token token, int artifactType) {
 		String callname = token.getText().toUpperCase();
-		if (artifactType == Artifact.PRAGMA || callname.startsWith(PREFIX)){
+		if (artifactType == Artifact.PRAGMA || callname.startsWith(PREFIX)) {
 			int start = token.getFileOffset();
-			int end = token.getFileOffset()+token.getLength();
-			SourceInfo si= new SourceInfo(token.getLine(), start, end, artifactType);
-			scanReturn.addArtifact(new Artifact(fileName, token.getLine(), 1, callname, si)); 
+			int end = token.getFileOffset() + token.getLength();
+			SourceInfo si = new SourceInfo(token.getLine(), start, end, artifactType);
+			scanReturn.addArtifact(new Artifact(fileName, token.getLine(), 1, callname, si));
 		}
 	}
 }

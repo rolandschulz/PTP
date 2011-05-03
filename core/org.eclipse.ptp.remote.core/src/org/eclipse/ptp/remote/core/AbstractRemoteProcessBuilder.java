@@ -17,6 +17,9 @@ import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
 
+/**
+ * @since 5.0
+ */
 public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuilder {
 	private List<String> fCommandArgs;
 	private IRemoteConnection fRemoteConnection;
@@ -30,27 +33,6 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 
 	public AbstractRemoteProcessBuilder(IRemoteConnection conn, String... command) {
 		this(conn, Arrays.asList(command));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#connection()
-	 */
-	public IRemoteConnection connection() {
-		return fRemoteConnection;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#connection(org.eclipse
-	 * .ptp.remote.core.IRemoteConnection)
-	 */
-	public IRemoteProcessBuilder connection(IRemoteConnection conn) {
-		fRemoteConnection = conn;
-		return this;
 	}
 
 	/*
@@ -88,6 +70,27 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#connection()
+	 */
+	public IRemoteConnection connection() {
+		return fRemoteConnection;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#connection(org.eclipse
+	 * .ptp.remote.core.IRemoteConnection)
+	 */
+	public IRemoteProcessBuilder connection(IRemoteConnection conn) {
+		fRemoteConnection = conn;
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#directory()
 	 */
 	public IFileStore directory() {
@@ -117,6 +120,17 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#getSupportedFlags()
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public abstract int getSupportedFlags();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#redirectErrorStream()
 	 */
 	public boolean redirectErrorStream() {
@@ -140,5 +154,17 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start()
 	 */
-	public abstract IRemoteProcess start() throws IOException;
+	public IRemoteProcess start() throws IOException {
+		return start(NONE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start(int)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public abstract IRemoteProcess start(int flags) throws IOException;
 }

@@ -35,6 +35,7 @@ import org.eclipse.ui.console.IOConsoleOutputStream;
  */
 public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	protected boolean error;
+	protected ISelection selection;
 	protected JobStatusData status;
 	protected MonitorJobListView view;
 
@@ -79,7 +80,10 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 			action.setEnabled(false);
 			return;
 		}
-
+		if (((IStructuredSelection) selection).size() > 1) {
+			action.setEnabled(false);
+			return;
+		}
 		status = (JobStatusData) ((IStructuredSelection) selection).getFirstElement();
 		if (getReady()) {
 			action.setEnabled(true);

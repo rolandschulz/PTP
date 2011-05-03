@@ -11,7 +11,6 @@
 
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
-import java.awt.Color;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,6 +42,7 @@ public class OIDToObject extends LguiHandler{
 	private String systemId=null;//Id of an object with type system, there should only be one
 
 	/**
+	 * Create OIDToObject with standard parameters
 	 * @param lguiItem LML-data-handler, which groups this handler and others to a set
 	 * of LMLHandler. This instance is needed to notify all LMLHandler, if any data of
 	 * the LguiType-instance was changed.
@@ -67,7 +67,7 @@ public class OIDToObject extends LguiHandler{
 	 * All getter-functions accessing the handler will
 	 * then return data, which is collected from this new model
 	 */
-	public void updateData(){
+	private void updateData(){
 
 		List<ObjectsType> allobjs = lguiItem.getOverviewAccess().getObjects();
 
@@ -93,17 +93,48 @@ public class OIDToObject extends LguiHandler{
 
 	/**
 	 * get an object by an Id of this object
+	 * 
+	 * example:
+	 * 
+	 * <pre>
+	 * {@code
+	 * <objects>
+		<object id="job1" type="job" color="#F00" />
+		<object id="job2" type="job" color="#0F0" />
+		<object id="job3" type="job" color="#00F" />
+	   </objects>
+	 * }
+	 * </pre>
+	 * 
+	 * getObjectById("job2") returns JAXB-instance of ObjectType with content {@code <object id="job2" type="job" color="#0F0" />}
+	 * 
 	 * @param id
-	 * @return
+	 * @return object with given id
 	 */
 	public ObjectType getObjectById(String id){
 		return oidToObject.get(id);		
 	}
 
 	/**
-	 * Get a color-object for a objects-id
-	 * @param id
-	 * @return
+	 * Get a color-object for an objects-id
+	 * 
+	 * * example:
+	 * 
+	 * <pre>
+	 * {@code
+	 * <objects>
+		<object id="job1" type="job" color="#F00" />
+		<object id="job2" type="job" color="#0F0" />
+		<object id="job3" type="job" color="#00F" />
+	   </objects>
+	 * }
+	 * </pre>
+	 * 
+	 * getColorById("job2") returns LMLColor with color intensities: red=0, green=255, blue=0
+	 * 
+	 * 
+	 * @param id id of an object
+	 * @return LMLColor for this object
 	 */
 	public LMLColor getColorById(String id){		
 		if(id==null) 
@@ -115,53 +146,25 @@ public class OIDToObject extends LguiHandler{
 	}
 	
 	/**
-	 * Convert a colorstring into an Color-Object
-	 * 
-	 * Allowed strings: #FFF #0000FF ffeeff cef ...
-	 * 
-	 * @param colorstring
-	 * @return
-	 */
-	public static Color stringToColor(String colorstring){
-
-		if(colorstring==null || colorstring.length()==0){
-			return Color.white;
-		}
-
-		if(colorstring.charAt(0)=='#'){
-			colorstring=colorstring.substring(1);
-		}
-
-		int red=0;
-		int green=0;
-		int blue=0;
-
-
-		if(colorstring.length()==3){
-			red=Integer.parseInt(colorstring.substring(0,1), 16);
-			green=Integer.parseInt(colorstring.substring(1,2), 16);
-			blue=Integer.parseInt(colorstring.substring(2,3), 16);
-
-			red=red+16*red;
-			green=green+16*green;
-			blue=blue+16*blue;
-		}
-		else
-			if(colorstring.length()==6){
-				red=Integer.parseInt(colorstring.substring(0,2), 16);
-				green=Integer.parseInt(colorstring.substring(2,4), 16);
-				blue=Integer.parseInt(colorstring.substring(4,6), 16);
-			}
-			else{
-				System.err.println("Not allowed color specified: "+colorstring);
-			}
-
-		return new Color(red, green, blue);	
-	}
-
-	/**
 	 * search for an object of type "system", return its id
 	 * Searching will only be done once for every model
+	 * 
+	 * example
+	 * 
+	 * * <pre>
+	 * {@code
+	 * <objects>
+		<object id="job1" type="job" color="#F00" />
+		<object id="job2" type="job" color="#0F0" />
+		<object id="job3" type="job" color="#00F" />
+		<object id="pc" type="system"/>
+	   </objects>
+	 * }
+	 * </pre>
+	 * 
+	 * getSystemObjectId() will return id "pc". If there is no object with type="system"
+	 * this function returns null.
+	 * 
 	 * @return id of system-object
 	 */
 	public String getSystemObjectId(){

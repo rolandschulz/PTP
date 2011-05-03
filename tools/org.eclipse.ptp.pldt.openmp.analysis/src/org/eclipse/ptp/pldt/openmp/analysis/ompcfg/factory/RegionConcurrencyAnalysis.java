@@ -33,7 +33,8 @@ public class RegionConcurrencyAnalysis {
 	/**
 	 * RegionConcurrencyAnalysis - Constructor
 	 * 
-	 * @param cfg -
+	 * @param cfg
+	 *            -
 	 *            OMPCFG
 	 */
 	public RegionConcurrencyAnalysis(OMPCFG cfg) {
@@ -85,7 +86,8 @@ public class RegionConcurrencyAnalysis {
 	/**
 	 * getNodesConcurrentTo - get all nodes concurrent to given node
 	 * 
-	 * @param node -
+	 * @param node
+	 *            -
 	 *            IASTNode
 	 * @return Set
 	 */

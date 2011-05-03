@@ -92,8 +92,6 @@ sub insert_attr_into_tree  {
 
     print "WF: insert_attr_into_tree: $spec, ",join(",",%{$attrhashref}),"\n"; 
     
-    
-    
     return(1);
 }
 
@@ -113,6 +111,27 @@ sub remove_child  {
     return(1);
 }
 
+
+sub copy_tree {
+    my($self) = shift;
+    my($sourcetree) = @_;
+    my($child,$subtree);
+    my $rc=1;
+
+    # copy name
+    $self->{_name}=$sourcetree->{_name};
+
+    # copy attributes
+    $self->add_attr($sourcetree->{ATTR});
+    
+    # dive in
+    foreach $child (@{$sourcetree->{_childs}}) {
+	$subtree=$self->new_child();
+	$subtree->copy_tree($child);
+    }
+	
+    return($rc);
+}
 
 sub get_xml_tree {
     my($self) = shift;
@@ -134,7 +153,7 @@ sub get_xml_tree {
 	    $xmldata.="<$elname";
 	    foreach $subid (sort {$b cmp $a} (keys(%{$self->{ATTR}}))) {
 		next if($subid=~/\_/);
-		$xmldata.=" $subid= \"".$self->{ATTR}->{$subid}."\"";
+		$xmldata.=" $subid=\"".$self->{ATTR}->{$subid}."\"";
 	    }
 	    $xmldata.=">\n";
 	}
@@ -154,5 +173,6 @@ sub get_xml_tree {
 
     return($xmldata);
 }
+
 
 1;

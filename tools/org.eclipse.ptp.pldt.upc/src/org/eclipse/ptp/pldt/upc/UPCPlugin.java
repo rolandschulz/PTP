@@ -27,7 +27,7 @@ public class UPCPlugin extends AbstractUIPlugin {
 	/** The shared instance. */
 	private static UPCPlugin plugin;
 	public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.upc"; //$NON-NLS-1$
-	
+
 	/**
 	 * The constructor.
 	 */
@@ -60,32 +60,33 @@ public class UPCPlugin extends AbstractUIPlugin {
 	/**
 	 * Returns an image descriptor for the image file at the given
 	 * plug-in relative path.
-	 *
-	 * @param path the path
+	 * 
+	 * @param path
+	 *            the path
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.pldt.upc", path); //$NON-NLS-1$
 	}
-    
-    /**
-     * Returns the preference setting for UPC include paths
-     * 
-     * @return
-     */
-    public List<String> getUPCIncludeDirs()
-    {
-        String stringList = getPluginPreferences().getString(UPCIDs.UPC_INCLUDES);
-        StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
-        List<String> dirs = new ArrayList<String>();
-        while (st.hasMoreElements()) {
-            dirs.add(st.nextToken());
-        }
-        return dirs;
-    }
-    
-    public static String getPluginId()
-    {
-        return PLUGIN_ID;
-    }
+
+	/**
+	 * Returns the preference setting for UPC include paths
+	 * 
+	 * @return
+	 */
+	public List<String> getUPCIncludeDirs()
+	{
+		String stringList = getPluginPreferences().getString(UPCIDs.UPC_INCLUDES);
+		StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
+		List<String> dirs = new ArrayList<String>();
+		while (st.hasMoreElements()) {
+			dirs.add(st.nextToken());
+		}
+		return dirs;
+	}
+
+	public static String getPluginId()
+	{
+		return PLUGIN_ID;
+	}
 }

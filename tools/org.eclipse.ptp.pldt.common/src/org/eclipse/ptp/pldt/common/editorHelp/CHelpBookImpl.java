@@ -25,12 +25,13 @@ import org.eclipse.ptp.pldt.common.messages.Messages;
 
 /**
  * C Help Book implementation for hover help, etc. etc.
+ * 
  * @author Beth Tibbitts
- *
+ * 
  */
 public class CHelpBookImpl implements ICHelpBook {
 	private String title = Messages.generic_c_help_book;
-	private static final boolean traceOn=false;
+	private static final boolean traceOn = false;
 
 	private String pluginId;
 
@@ -62,12 +63,12 @@ public class CHelpBookImpl implements ICHelpBook {
 	public IFunctionSummary getFunctionInfo(ICHelpInvocationContext context,
 			String name) {
 		IFunctionSummary fs = funcName2FuncInfo.get(name);
-		if(traceOn){
-			
-			String cn=this.getClass().getSimpleName();
-			String finfo=(fs!=null)?(fs.toString().substring(0,25)):null;
-			if(finfo!=null)
-				System.out.println("CHelpBookImpl "+cn+" getFunctionInfo for "+name+ "= "+finfo); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (traceOn) {
+
+			String cn = this.getClass().getSimpleName();
+			String finfo = (fs != null) ? (fs.toString().substring(0, 25)) : null;
+			if (finfo != null)
+				System.out.println("CHelpBookImpl " + cn + " getFunctionInfo for " + name + "= " + finfo); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		return fs;
 	}
@@ -110,15 +111,15 @@ public class CHelpBookImpl implements ICHelpBook {
 		resourceDescriptor[0] = hrd; // html file path is in here
 		return resourceDescriptor;
 	}
+
 	/**
 	 * Convenience function for filling in table info
+	 * 
 	 * @since 5.0
 	 */
 	public void func(String fname, String desc, String retType, String args) {
 		funcName2FuncInfo.put(fname, new FunctionSummaryImpl(fname, "", desc,
-                new FunctionPrototypeSummaryImpl(fname, retType, args), null));
+				new FunctionPrototypeSummaryImpl(fname, retType, args), null));
 	}
-
-	
 
 }

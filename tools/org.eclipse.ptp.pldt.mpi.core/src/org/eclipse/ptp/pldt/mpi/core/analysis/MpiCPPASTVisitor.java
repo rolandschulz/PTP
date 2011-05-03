@@ -125,34 +125,38 @@ public class MpiCPPASTVisitor extends PldtAstVisitor {
 
 		return PROCESS_CONTINUE;
 	}
+
 	@Override
-	protected String chooseName(String bindingName, String rawSignature){
-		String name=bindingName;
-		if(bindingName.length()==0) {
-			name=rawSignature;
+	protected String chooseName(String bindingName, String rawSignature) {
+		String name = bindingName;
+		if (bindingName.length() == 0) {
+			name = rawSignature;
 		}
-		if(rawSignature.startsWith(PREFIX2)){
-			name=rawSignature;
+		if (rawSignature.startsWith(PREFIX2)) {
+			name = rawSignature;
 		}
 		return name;
 	}
+
 	/**
 	 * Don't allow dynamic include path adding for C++ -- too complicated to know if something is an MPI artifact.
 	 * Consider implementing this later.
 	 */
 	@Override
-	 public boolean allowIncludePathAdd() {
-	    return false;
-	  }
-	@Override
-  public boolean addIncludePath( IPath path,  String name, boolean dontAskAgain) {
-	  return false;
+	public boolean allowIncludePathAdd() {
+		return false;
 	}
+
+	@Override
+	public boolean addIncludePath(IPath path, String name, boolean dontAskAgain) {
+		return false;
+	}
+
 	@Override
 	public boolean matchesPrefix(String name) {
-		boolean result=false;
-		if(name.startsWith(PREFIX1)||name.startsWith(PREFIX2)) {
-			result=true;
+		boolean result = false;
+		if (name.startsWith(PREFIX1) || name.startsWith(PREFIX2)) {
+			result = true;
 		}
 		return result;
 	}

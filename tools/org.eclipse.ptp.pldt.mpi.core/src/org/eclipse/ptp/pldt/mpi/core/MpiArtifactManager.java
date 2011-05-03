@@ -23,70 +23,70 @@ import org.eclipse.ptp.pldt.common.Artifact;
  */
 public class MpiArtifactManager
 {
-    static List    repository;
-    static HashMap hashMap = new HashMap(); // to be able to look up by unique ID (finding
-    static String  inputFileName;
+	static List repository;
+	static HashMap hashMap = new HashMap(); // to be able to look up by unique ID (finding
+	static String inputFileName;
 
-    /**
-     * Add an MPI artifact to the repository
-     * 
-     * @param pi
-     */
-    public static void addMpiArtifact(Artifact pi)
-    {
-        repository.add(pi);
-    }
+	/**
+	 * Add an MPI artifact to the repository
+	 * 
+	 * @param pi
+	 */
+	public static void addMpiArtifact(Artifact pi)
+	{
+		repository.add(pi);
+	}
 
-    /**
-     * Add an MPI artifact to the hashtable for future lookup
-     * 
-     * @param pi
-     */
-    public static void addMpiArtifactToHash(Artifact pi)
-    {
-        String id = pi.getId(); // for debugging access only
-        hashMap.put(id, pi);
-    }
+	/**
+	 * Add an MPI artifact to the hashtable for future lookup
+	 * 
+	 * @param pi
+	 */
+	public static void addMpiArtifactToHash(Artifact pi)
+	{
+		String id = pi.getId(); // for debugging access only
+		hashMap.put(id, pi);
+	}
 
-    /**
-     * retrieve MPI artifact by unique ID. Used for retrieving artifacts when needed from the Markers - since markers
-     * can't hold on to them
-     * 
-     * @param id
-     * @return
-     */
-    public static Artifact getMpiArtifact(String id)
-    {
-        Artifact pi = (Artifact) hashMap.get(id);
-        return pi;
-    }
+	/**
+	 * retrieve MPI artifact by unique ID. Used for retrieving artifacts when needed from the Markers - since markers
+	 * can't hold on to them
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public static Artifact getMpiArtifact(String id)
+	{
+		Artifact pi = (Artifact) hashMap.get(id);
+		return pi;
+	}
 
-    public static Object[] getMpiArtifacts()
-    {
-        Object[] pis = hashMap.values().toArray();
-        return pis;
-    }
+	public static Object[] getMpiArtifacts()
+	{
+		Object[] pis = hashMap.values().toArray();
+		return pis;
+	}
 
-    public static HashMap getMpiArtifactMap()
-    {
-        return hashMap;
-    }
+	public static HashMap getMpiArtifactMap()
+	{
+		return hashMap;
+	}
 
-    /**
-     * getList - get the list of mpi artifacts
-     */
-    public static List getList()
-    {
-        return repository;
-    }
+	/**
+	 * getList - get the list of mpi artifacts
+	 */
+	public static List getList()
+	{
+		return repository;
+	}
 
-    /**
-     * getInputFile - get the input file ( on which analysis is invoked )
-     * 
-     */
-    public static String getInputFile()
-    {
-        return inputFileName;
-    }
+	/**
+	 * getInputFile - get the input file ( on which analysis is invoked )
+	 * 
+	 */
+	public static String getInputFile()
+	{
+		return inputFileName;
+	}
 
 }

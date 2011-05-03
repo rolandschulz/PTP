@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+LML - LLView markup language
+
+
+Copyright (c) 2011 Forschungszentrum Juelich GmbH
+
+All rights reserved. This program and the accompanying materials
+
+are made available under the terms of the Eclipse Public License v1.0
+
+which accompanies this distribution and is available at
+
+http://www.eclipse.org/legal/epl-v10.html
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
+
+    
+
+
+    <complexType name="RequestType">
+    	<annotation>
+    		<documentation>
+    			A type for collecting request information. LML can be
+    			used as communication language. The client sends layout
+    			information and empty data-tags to the server. The
+    			server returns the corresponding data.
+    		</documentation>
+    	</annotation>
+    	<attribute default="false" name="saveLayout" type="boolean">
+    		<annotation>
+    			<documentation>
+    				If true, the server should save the currently send
+    				layout for this user.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute default="false" name="getDefaultData" type="boolean">
+    		<annotation>
+    			<documentation>If true the server should return default data with a default layout. This can be usefull when the client connects to the server for the first time.</documentation>
+    		</annotation>
+</attribute>
+    </complexType>
+</schema>

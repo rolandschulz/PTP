@@ -17,20 +17,25 @@ import java.util.Map;
 import org.eclipse.core.filesystem.IFileStore;
 
 public interface IRemoteProcessBuilder {
+	/**
+	 * @since 5.0
+	 */
+	public static int NONE = 0x00;
 
 	/**
-	 * Returns this process builder's connection.
+	 * Flag to request allocation of a pseudo-terminal for the process (RFC-4254
+	 * Sec. 6.2)
 	 * 
-	 * @return the connection used by this process builder
+	 * @since 5.0
 	 */
-	public IRemoteConnection connection();
+	public static int ALLOCATE_PTY = 0x01;
 
 	/**
-	 * Sets this process builder's connection.
+	 * Flag to request X11 forwarding (RFC-4254 Sec. 6.3)
 	 * 
-	 * @return This process builder
+	 * @since 5.0
 	 */
-	public IRemoteProcessBuilder connection(IRemoteConnection conn);
+	public static int FORWARD_X11 = 0x02;
 
 	/**
 	 * Returns this process builder's operating system program and arguments.
@@ -54,6 +59,20 @@ public interface IRemoteProcessBuilder {
 	 * @return this process builder
 	 */
 	public IRemoteProcessBuilder command(String... command);
+
+	/**
+	 * Returns this process builder's connection.
+	 * 
+	 * @return the connection used by this process builder
+	 */
+	public IRemoteConnection connection();
+
+	/**
+	 * Sets this process builder's connection.
+	 * 
+	 * @return This process builder
+	 */
+	public IRemoteProcessBuilder connection(IRemoteConnection conn);
 
 	/**
 	 * Returns this process builder's working directory.
@@ -80,6 +99,14 @@ public interface IRemoteProcessBuilder {
 	public Map<String, String> environment();
 
 	/**
+	 * Get the flags that are supported by this process builder.
+	 * 
+	 * @return bitwise-or of the supported flags
+	 * @since 5.0
+	 */
+	public int getSupportedFlags();
+
+	/**
 	 * Tells whether this process builder merges standard error and standard
 	 * output.
 	 * 
@@ -102,4 +129,24 @@ public interface IRemoteProcessBuilder {
 	 * @throws IOException
 	 */
 	public IRemoteProcess start() throws IOException;
+
+	/**
+	 * Starts a new process using the attributes of this process builder. The
+	 * flags may be used to modify behavior of the remote process. These flags
+	 * may only be supported by specific types of remote service providers.
+	 * Clients can use {@link #getSupportedFlags()} to find out the flags
+	 * supported by the service provider.
+	 * 
+	 * <pre>
+	 * Current flags are:
+	 *   NONE			- disable any flags
+	 *   ALLOCATE_PTY	- allocate a pseudo-terminal for the process (RFC-4254 Sec. 6.2)
+	 *   FORWARD_X11	- enable X11 forwarding (RFC-4254 Sec. 6.3)
+	 * </pre>
+	 * 
+	 * @param flags
+	 *            bitwise-or of flags to use when starting process
+	 * @since 5.0
+	 */
+	public IRemoteProcess start(int flags) throws IOException;
 }

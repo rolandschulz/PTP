@@ -20,7 +20,7 @@ public class Messages extends NLS {
 	public static String Artifact_function_call;
 	public static String Artifact_none;
 	public static String Artifact_pragma;
-	
+
 	public static String SimpleTableMarkerView_0;
 	public static String SimpleTableMarkerView_1;
 	public static String SimpleTableMarkerView_2;
@@ -69,9 +69,9 @@ public class Messages extends NLS {
 	public static String SimpleTreeTableMarkerView_selected;
 	public static String SimpleTreeTableMarkerView_show_info;
 	public static String SimpleTreeTableMarkerView_show_info_tooltip;
-	
+
 	public static String generic_c_help_book;
-	
+
 	public static String PldtAstVisitor_20;
 	public static String PldtAstVisitor_21;
 	public static String PldtAstVisitor_22;
@@ -80,7 +80,7 @@ public class Messages extends NLS {
 	public static String PldtAstVisitor_25;
 	public static String PldtAstVisitor_26;
 	public static String PldtAstVisitor_28;
-	
+
 	public static String AnalysisDropdownHandler_10;
 	public static String AnalysisDropdownHandler_9;
 	public static String RunAnalyseHandlerBase_15;

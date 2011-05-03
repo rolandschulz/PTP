@@ -14,9 +14,8 @@ package org.eclipse.ptp.pldt.wizards.wizardPages;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 
-
 /**
- * Wizard Page for collecting info about MPI C++ project 
+ * Wizard Page for collecting info about MPI C++ project
  * 
  * @author Beth Tibbitts
  * 
@@ -31,12 +30,11 @@ public class MPIProjectWizardPageCPP extends MPIProjectWizardPage {
 	protected String getMpiProjectType() {
 		return MPI_PROJECT_TYPE_CPP;
 	}
-	
+
 	@Override
 	protected String getDefaultMpiBuildCommand() {
 		String cmd = preferenceStore.getString(MpiIDs.MPI_CPP_BUILD_CMD);
 		return cmd;
 	}
-	
 
 }

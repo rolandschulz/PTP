@@ -10,13 +10,14 @@
  *******************************************************************************/
 
 package org.eclipse.ptp.pldt.openmp.analysis;
+
 /**
  * @author pazel
  */
-public class OpenMPAnalysisException extends Exception 
+public class OpenMPAnalysisException extends Exception
 {
-    public OpenMPAnalysisException(String text)
-    {
-    	super(text);
-    }
+	public OpenMPAnalysisException(String text)
+	{
+		super(text);
+	}
 }

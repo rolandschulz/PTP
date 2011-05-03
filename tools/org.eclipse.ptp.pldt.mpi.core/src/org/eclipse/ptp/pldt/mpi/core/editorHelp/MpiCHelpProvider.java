@@ -13,28 +13,26 @@ package org.eclipse.ptp.pldt.mpi.core.editorHelp;
 
 import org.eclipse.ptp.pldt.common.editorHelp.CHelpProviderImpl;
 
-
 /**
  * 
  * Provides help information for MPI APIs for C (F1, hover, content assist, etc.)
  */
 public class MpiCHelpProvider extends CHelpProviderImpl
-{    
+{
 	/**
 	 * Default ctor required, or else for some reason this
 	 * class never gets instantiated.
-	 *
+	 * 
 	 */
 	public MpiCHelpProvider() {
 		// default ctor for testing that it gets called
-	    //   System.out.println("MpiCHelpProvider ctor()...");
+		// System.out.println("MpiCHelpProvider ctor()...");
 
 	}
-    public void initialize()
-    {
-        helpBook = new MpiCHelpBook();
-        //System.out.println("MpiCHelpProvider initialize()...");
-    }
-}
 
- 
+	public void initialize()
+	{
+		helpBook = new MpiCHelpBook();
+		// System.out.println("MpiCHelpProvider initialize()...");
+	}
+}
