@@ -50,6 +50,12 @@ public class Messages extends NLS {
 	public static String RemoteSyncWizardPage_0;
 	public static String RemoteSyncWizardPage_description;
 	public static String SynchronizeParticipantDescriptor_invalidClass;
+	public static String BRPTab_RemoteProviderLabel;
+	public static String BRPTab_ConnectionLabel;
+	public static String BRPTab_RootLocation;
+	public static String BRPTab_BuildSubdirLabel;
+	public static String BRPTab_BrowseButton;
+	public static String BRPTab_ConnectionButton;
 
 	static {
 		// initialize resource bundle
