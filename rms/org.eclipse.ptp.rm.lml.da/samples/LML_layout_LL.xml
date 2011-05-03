@@ -1,29 +1,39 @@
+<!---
+ Copyright (c) 2011 Forschungszentrum Juelich GmbH.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
+-->
 <?xml version="1.0" encoding="UTF-8"?>
 <lml:lgui xmlns:lml="http://www.llview.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.llview.de lgui.xsd " version="1.0"> 
 
 <nodedisplaylayout id="nodedisplay" gid="1">
-  <el0 rows="0" cols="0">
+  <el0 rows="16" cols="0">
   </el0>
-
+</nodedisplaylayout>
 
 <tablelayout id="tl_RUN" gid="joblist_RUN">
  <column cid="1" pos="0" width="0.1" active="true" key="totalcores" />
- <column cid="2" pos="1" width="1" active="true" key="owner" />
- <column cid="3" pos="2" width="1" active="true" key="queue" />
- <column cid="4" pos="3" width="1" active="true" key="wall" />
- <column cid="5" pos="5" width="1" active="true" key="queuedate" />
- <column cid="6" pos="6" width="1" active="true" key="dispatchdate" />
+ <column cid="2" pos="1" width="0.1" active="true" key="owner" />
+ <column cid="3" pos="2" width="0.1" active="true" key="queue" />
+ <column cid="4" pos="3" width="0.2" active="true" key="wall" />
+ <column cid="5" pos="4" width="0.2" active="true" key="queuedate" />
+ <column cid="6" pos="5" width="0.2" active="true" key="dispatchdate" />
 </tablelayout>
 
 
 <tablelayout id="tl_WAIT" gid="joblist_WAIT">
  <column cid="1" pos="0" width="0.3" active="true" key="size_req" />
- <column cid="2" pos="1" width="1" active="true" key="owner" />
- <column cid="3" pos="2" width="1" active="true" key="queue" />
- <column cid="4" pos="3" width="1" active="true" key="wall" />
- <column cid="5" pos="5" width="1" active="true" key="queuedate" />
- <column cid="6" pos="6" width="1" active="true" key="name" />
+ <column cid="2" pos="1" width="0.1" active="true" key="owner" />
+ <column cid="3" pos="2" width="0.2" active="true" key="queue" />
+ <column cid="4" pos="3" width="0.1" active="true" key="wall" />
+ <column cid="5" pos="4" width="0.15" active="true" key="queuedate" />
+ <column cid="6" pos="5" width="0.15" active="true" key="name" />
 </tablelayout>
 
 </lml:lgui>

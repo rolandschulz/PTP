@@ -86,8 +86,6 @@ my %mapping = (
     "step"                                   => "step",
     "totaltasks"                             => "totaltasks",
     "spec"                                   => "spec",
-    "Resource_List.signal"                   => "",
-    "x"                                      => "",
 
 # unknown attributes
     "group"                                  => "group",
@@ -224,6 +222,7 @@ sub modify {
     if(($mkey eq "bgp_state")) {
 	$ret=~s/\<unknown\>/unknown/gs;
     }
+
     # mask & in user input
     if($ret=~/\&/) {
 	$ret=~s/\&/\&amp\;/gs;

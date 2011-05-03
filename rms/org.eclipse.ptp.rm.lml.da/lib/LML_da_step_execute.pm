@@ -10,7 +10,6 @@
 #*******************************************************************************/ 
 package LML_da_step_execute;
 
-my $VERSION='$Revision$';
 my($debug)=0;
 
 use strict;
