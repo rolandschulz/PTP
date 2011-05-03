@@ -79,6 +79,7 @@ public interface IJAXBNonNLSConstants {
 	/* KEY WORDS */
 	public static final String TRUE = "true";//$NON-NLS-1$
 	public static final String FALSE = "false";//$NON-NLS-1$
+	public static final String Y = "y" + LINE_SEP;//$NON-NLS-1$
 	public static final String YES = "yes";//$NON-NLS-1$
 	public static final String NO = "no";//$NON-NLS-1$
 	public static final String NOT = "not";//$NON-NLS-1$

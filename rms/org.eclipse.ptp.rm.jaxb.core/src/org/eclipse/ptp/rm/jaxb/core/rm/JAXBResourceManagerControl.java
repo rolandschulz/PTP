@@ -75,7 +75,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private final IJAXBResourceManagerConfiguration config;
 
 	private Map<String, String> launchEnv;
-	private Map<String, ICommandJob> processTable;
+	private Map<String, ICommandJob> jobTable;
 	private JobStatusMap jobStatusMap;
 	private JobIdPinTable pinTable;
 	private RMVariableMap rmVarMap;
@@ -113,7 +113,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @return table of open remote processes
 	 */
 	public Map<String, ICommandJob> getJobTable() {
-		return processTable;
+		return jobTable;
 	}
 
 	/**
@@ -480,13 +480,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		CommandType job = null;
 		if (TERMINATE_OPERATION.equals(operation)) {
-			if (maybeKillInteractive(jobId)) {
-				return;
-			}
-
 			job = controlData.getTerminateJob();
 			if (job == null) {
-				throw ce;
+				maybeKillInteractive(jobId);
+				return;
 			}
 		} else if (SUSPEND_OPERATION.equals(operation)) {
 			job = controlData.getSuspendJob();
@@ -580,10 +577,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private void doOnShutdown() throws CoreException {
 		List<CommandType> onShutDown = controlData.getShutDownCommand();
 		runCommands(onShutDown);
-		for (ICommandJob job : processTable.values()) {
+		for (ICommandJob job : jobTable.values()) {
 			job.terminate();
 			String jobId = job.getJobStatus().getJobId();
-			System.out.println("final job change notification: " + jobId);
 			getBaseResourceManager().fireJobChanged(jobId);
 		}
 	}
@@ -611,7 +607,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void initialize() {
 		launchEnv = new TreeMap<String, String>();
-		processTable = new HashMap<String, ICommandJob>();
+		jobTable = new HashMap<String, ICommandJob>();
 		pinTable = new JobIdPinTable();
 
 		/*

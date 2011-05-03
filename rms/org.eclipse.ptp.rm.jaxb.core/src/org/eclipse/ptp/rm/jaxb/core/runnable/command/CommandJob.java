@@ -246,7 +246,14 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 	 */
 	public synchronized void terminate() {
 		if (active) {
+			active = false;
 			if (process != null && !process.isCompleted()) {
+				try {
+					process.getOutputStream().write(3);
+					process.getOutputStream().write(Y.getBytes());
+				} catch (IOException t) {
+					JAXBCorePlugin.log(t);
+				}
 				process.destroy();
 			}
 			if (proxy != null) {
@@ -258,7 +265,6 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 				JAXBCorePlugin.log(ce);
 			}
 			cancel();
-			active = false;
 		}
 	}
 
