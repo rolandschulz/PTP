@@ -159,6 +159,7 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 	private final boolean keepOpen;
 	private final StringBuffer error;
 
+	private Thread jobThread;
 	private IRemoteProcess process;
 	private IStreamParserTokenizer stdoutTokenizer;
 	private IStreamParserTokenizer stderrTokenizer;
@@ -248,21 +249,20 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 		if (active) {
 			active = false;
 			if (process != null && !process.isCompleted()) {
-				try {
-					process.getOutputStream().write(3);
-					process.getOutputStream().write(Y.getBytes());
-				} catch (IOException t) {
-					JAXBCorePlugin.log(t);
-				}
 				process.destroy();
+				if (proxy != null) {
+					proxy.close();
+				}
+				try {
+					joinConsumers();
+				} catch (CoreException ce) {
+					JAXBCorePlugin.log(ce);
+				}
 			}
-			if (proxy != null) {
-				proxy.close();
-			}
-			try {
-				joinConsumers();
-			} catch (CoreException ce) {
-				JAXBCorePlugin.log(ce);
+			if (jobThread != null && jobThread != Thread.currentThread()) {
+				if (jobThread.isAlive()) {
+					jobThread.interrupt();
+				}
 			}
 			cancel();
 		}
@@ -286,6 +286,7 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		jobThread = Thread.currentThread();
 		boolean input = !command.getInput().isEmpty();
 		if (input) {
 			ICommandJob job = control.getJobTable().get(getName());
