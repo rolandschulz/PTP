@@ -55,12 +55,9 @@ public class LMLView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.rm.lml.core.listeners.ILguiListener#
-		 * handleEvent
+		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILguiListener# handleEvent
 		 * (org.eclipse.ptp.core.events.ILguiAddedEvent)
 		 */
-		@Override
 		public synchronized void handleEvent(ILguiAddedEvent e) {
 			fSelected = e.getLguiItem();
 			createList();
@@ -69,35 +66,28 @@ public class LMLView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.rm.lml.core.listeners.ILguiListener#
-		 * handleEvent
+		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILguiListener# handleEvent
 		 * (org.eclipse.ptp.core.events.ILguiRemovedEvent)
 		 */
-		@Override
 		public synchronized void handleEvent(ILguiRemovedEvent e) {
 			fSelected = e.getLguiItem();
 			createList();
 		}
 
-		@Override
 		public void handleEvent(ILguiSelectedEvent e) {
 			fSelected = e.getLguiItem();
 			createList();
-			
+
 		}
 
 	}
-	
-	public final class ListSelectionListener implements SelectionListener {
 
-		@Override
+	public final class ListSelectionListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent e) {
 			int selectedItem = list.getSelectionIndex();
 			lmlManager.selectLgui(selectedItem);
 		}
 
-		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {
 			lmlManager.selectLgui(0);
 		}
@@ -127,30 +117,27 @@ public class LMLView extends ViewPart {
 		viewer.setLabelProvider(new LMLListLabelProvider());
 		viewer.setContentProvider(new IStructuredContentProvider() {
 
-			@Override
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			}
 
-			@Override
 			public void dispose() {
 			}
 
-			@Override
 			public Object[] getElements(Object parent) {
 				return null;
 			}
 		});
-		
+
 		lmlViewListener = (LMLViewListener) lmlManager.getListener(this.getClass().getName());
 		if (lmlViewListener == null) {
 			lmlViewListener = new LMLViewListener();
 			lmlManager.addListener(lmlViewListener, this.getClass().getName());
 		}
-		
+
 		fSelected = lmlManager.getSelectedLguiItem();
 		createList();
 	}
-	
+
 	private void createList() {
 		list = viewer.getList();
 		list.removeAll();
@@ -174,8 +161,8 @@ public class LMLView extends ViewPart {
 	@Override
 	public void dispose() {
 	}
-	
-	private void createContextMenu(){
+
+	private void createContextMenu() {
 		final Shell shell = getSite().getShell();
 		addLguiAction = new AddLguiAction(shell);
 		removeLguiAction = new RemoveLguiAction(shell);
@@ -184,7 +171,6 @@ public class LMLView extends ViewPart {
 		MenuManager menuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuManager.setRemoveAllWhenShown(true);
 		menuManager.addMenuListener(new IMenuListener() {
-			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				fillContextMenu(manager);
 			}
@@ -194,7 +180,7 @@ public class LMLView extends ViewPart {
 		viewer.getControl().setMenu(menu);
 		getSite().registerContextMenu(menuManager, viewer);
 	}
-	
+
 	private void fillContextMenu(IMenuManager manager) {
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		manager.add(addLguiAction);

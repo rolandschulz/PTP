@@ -22,56 +22,47 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.List;
 
 public class JobsView extends LMLViewPart {
-	
+
 	public final class JobListener implements ILMLListener {
 
-		@Override
 		public void handleEvent(IJobListSortedEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
-		@Override
 		public void handleEvent(ITableColumnChangeEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
-		@Override
 		public void handleEvent(ISelectedObjectChangeEvent event) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
-		@Override
 		public void handleEvent(IMarkObjectEvent event) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
-		@Override
 		public void handleEvent(IUnmarkObjectEvent event) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
-		@Override
 		public void handleEvent(IUnselectedObjectEvent event) {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
-	
-	
+
 	public final class ListSelectionListener implements SelectionListener {
 
-		@Override
 		public void widgetSelected(SelectionEvent e) {
 			int selectedItem = list.getSelectionIndex();
 			lmlManager.selectLgui(selectedItem);
 		}
 
-		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {
 			lmlManager.selectLgui(0);
 		}
@@ -83,11 +74,10 @@ public class JobsView extends LMLViewPart {
 	 */
 	public ListViewer viewer;
 	private ILguiItem fSelected = null;
-	private ILMLListener jobListener = new JobListener();
+	private final ILMLListener jobListener = new JobListener();
 	private final ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager();
 	private List list = null;
 	private final ListSelectionListener listListener = new ListSelectionListener();
-
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -95,25 +85,21 @@ public class JobsView extends LMLViewPart {
 		viewer.setLabelProvider(new LMLListLabelProvider());
 		viewer.setContentProvider(new IStructuredContentProvider() {
 
-			@Override
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			}
 
-			@Override
 			public void dispose() {
 			}
 
-			@Override
 			public Object[] getElements(Object parent) {
 				return null;
 			}
 		});
 
-		
 		fSelected = lmlManager.getSelectedLguiItem();
 		createList();
 	}
-	
+
 	private void createList() {
 		list = viewer.getList();
 		list.removeAll();
@@ -140,8 +126,7 @@ public class JobsView extends LMLViewPart {
 	@Override
 	public void prepareDispose() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
-
