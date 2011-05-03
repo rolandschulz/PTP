@@ -10,11 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.git.core;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -40,7 +41,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private IRemoteConnection fConnection = null;
 	private GitRemoteSyncConnection fSyncConnection = null;
 	
-	private static final Lock syncLock = new ReentrantLock();
+	private final ReentrantLock syncLock = new ReentrantLock();
+	private Integer syncTaskId = -1;  //ID for most recent synchronization task, functions as a time-stamp 
+	private int finishedSyncTaskId = -1; //all synchronizations up to this ID (including it) have finished
 
 	/**
 	 * Get the remote directory that will be used for synchronization
@@ -172,8 +175,31 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * TODO: use the force
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
+		
+		// TODO: Note that here SyncFlag.FORCE is interpreted as sync always, even if not needed otherwise. This is different
+		// from the original intent of FORCE, which was to do an immediate, blocking sync. We may need to split those two
+		// functions and introduce more flags.
+		// TODO: Also, note that we are not using the individual "sync to local" and "sync to remote" flags yet.
+		if ((syncFlags == SyncFlag.NO_FORCE) && (!(syncNeeded(delta)))) {
+			return;
+		}
+		
+		int mySyncTaskId;
+		synchronized (syncTaskId) {
+			syncTaskId++;    
+			mySyncTaskId=syncTaskId;
+			//suggestion for Deltas: add delta to list of deltas
+		}
+		
+		if (syncLock.hasQueuedThreads() && syncFlags == SyncFlag.NO_FORCE)
+			return;   //the queued Thread will do the work for us. And we don't have to wait because of NO_FORCE
+		
+		syncLock.lock();
 		try {
-			syncLock.lock();
+			if (mySyncTaskId<=finishedSyncTaskId)  //some other thread has already done the work for us 
+				return;
+
+			
 			// TODO: Use delta information
 			// switch (delta.getKind()) {
 			// case IResourceDelta.ADDED:
@@ -222,6 +248,15 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					throw new RemoteSyncException(e);
 				}
 			}
+			
+			int willFinishTaskId;
+			synchronized (syncTaskId) {
+				willFinishTaskId = syncTaskId;  //This synchronization operation will include all tasks up to current syncTaskId 
+			                                    //syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
+												//we might synchronize even more than that if a file is already saved but syncTaskId wasn't increased yet
+												//thus we cannot guarantee a maximum but we can guarantee syncTaskId as a minimum
+				//suggestion for Deltas: make local copy of list of deltas, remove list of deltas
+			}
 
 			// Sync local and remote. For now, do both ways each time.
 			// TODO: Sync more efficiently and appropriately to the situation.
@@ -236,7 +271,109 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			} catch (final RemoteSyncException e) {
 				throw e;
 			}
+			finishedSyncTaskId = willFinishTaskId;
 
+		} finally {
+			syncLock.unlock();
+		}
+		IProject project = this.getProject();
+		if (project != null) {
+			project.refreshLocal(IResource.DEPTH_INFINITE, null);
+		}
+	}
+	
+	// Are any of the changes in delta relevant for sync'ing?
+	private boolean syncNeeded(IResourceDelta delta) {
+		String[] relevantChangedResources = getRelevantChangedResources(delta);
+		if (relevantChangedResources.length == 0) {
+			return false;
+		}
+		return true;
+	}
+	
+	// This function and the next recursively compile a list of relevant resources that have changed.
+	private String[] getRelevantChangedResources(IResourceDelta delta) {
+		ArrayList<String> res = new ArrayList<String>();
+		getRelevantChangedResourcesRecursive(delta, res);
+		return res.toArray(new String[0]);
+	}
+	
+	private void getRelevantChangedResourcesRecursive(IResourceDelta delta, ArrayList<String> res) {
+		// Prune recursion if this is a directory or file of no interest (such as the ".git" directory)
+		if (irrelevantPath(delta)) {
+			return;
+		}
+		
+		// Recursion logic
+		IResourceDelta[] resChildren = delta.getAffectedChildren();
+		if (resChildren.length == 0) {
+			res.add(delta.getFullPath().toString());
+			return;
+		} else {
+			for (IResourceDelta resChild : resChildren) {
+				getRelevantChangedResourcesRecursive(resChild, res);
+			}
+		}
+	}
+	
+	// Paths that the Git sync provider can ignore. For now, only the ".git" directory is excluded. This function should expand
+	// later to include other paths, such as those in Git's ignore list.
+	private boolean irrelevantPath(IResourceDelta delta) {
+		String path = delta.getFullPath().toString();
+		if (path.endsWith("/.git")) { //$NON-NLS-1$
+			return true;
+		} else if (path.endsWith("/.git/")){ //$NON-NLS-1$
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConnection()
+	 */
+	public IRemoteConnection getConnection() {
+		return fConnection;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConfigLocation()
+	 */
+	public String getConfigLocation() {
+		return fLocation;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection()
+	 */
+	public void setRemoteToolsConnection(IRemoteConnection connection) {
+		syncLock.lock();
+		try {
+			fConnection = connection;
+			putString(GIT_CONNECTION_NAME, connection.getName());
+			fSyncConnection = null;  //get reinitialized by next synchronize call
+		} finally {
+			syncLock.unlock();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setConfigLocation()
+	 */
+	public void setConfigLocation(String configLocation) {
+		syncLock.lock();
+		try {
+			fLocation = configLocation;
+			putString(GIT_LOCATION, configLocation);
+			fSyncConnection = null;  //get reinitialized by next synchronize call
 		} finally {
 			syncLock.unlock();
 		}
