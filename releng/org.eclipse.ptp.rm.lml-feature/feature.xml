@@ -42,24 +42,23 @@
    </requires>
 
    <plugin
-         id="org.eclipse.ptp.rm.jaxb.core"
+         id="org.eclipse.ptp.rm.lml.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.jaxb.help"
+         id="org.eclipse.ptp.rm.lml.da"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.jaxb.ui"
+         id="org.eclipse.ptp.rm.lml.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
 </feature>
