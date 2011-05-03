@@ -31,7 +31,8 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * @author Claudia Knobloch
  * 
- *         Based on original work by Greg Watson, Clement Chu and Daniel (JD) Barboza
+ *         Based on original work by Greg Watson, Clement Chu and Daniel (JD)
+ *         Barboza
  * 
  */
 public class NodesView extends LMLViewPart {
@@ -39,41 +40,36 @@ public class NodesView extends LMLViewPart {
 		public void handleEvent(IJobListSortedEvent e) {
 		}
 
-		@Override
 		public void handleEvent(ITableColumnChangeEvent e) {
-			
+
 		}
 
-		@Override
 		public void handleEvent(ISelectedObjectChangeEvent event) {
 			fLguiItem.getObjectStatus().mouseOver(event.getOid());
 		}
 
-		@Override
 		public void handleEvent(IMarkObjectEvent event) {
 			fLguiItem.getObjectStatus().mouseDown(event.getOid());
 		}
 
-		@Override
 		public void handleEvent(IUnmarkObjectEvent event) {
 			fLguiItem.getObjectStatus().mouseUp(event.getOid());
 		}
 
-		@Override
 		public void handleEvent(IUnselectedObjectEvent event) {
 			ObjectType object = fLguiItem.getOIDToObject().getObjectById(event.getOid());
 			fLguiItem.getObjectStatus().mouseexit(object);
 		}
 	}
-	
+
 	private Composite composite = null;
 	private Composite nodedisplayView = null;
 	public Viewer viewer;
 	public ILguiItem fLguiItem = null;
 	private String gid = null;
 	private final ILMLListener lguiListener = new LguiListener();
-	private final ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager(); 
-	
+	private final ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager();
+
 	/**
 	 * 
 	 */
@@ -81,11 +77,12 @@ public class NodesView extends LMLViewPart {
 		super();
 	}
 
+	@Override
 	public void createPartControl(final Composite parent) {
 		composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new FillLayout());
-		composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));	
-		
+		composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		lmlManager.addListener(lguiListener, this.getClass().getName());
 	}
@@ -95,18 +92,18 @@ public class NodesView extends LMLViewPart {
 	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
+	@Override
 	public void setFocus() {
 	}
-	
+
 	public void generateNodesdisplay(String gid) {
 		this.gid = gid;
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		createNodedisplayView();
 	}
 
-	
 	private void createNodedisplayView() {
-	
+
 		if (fLguiItem != null) {
 			this.setPartName(fLguiItem.getNodedisplayAccess().toString());
 			nodedisplayView = new NodedisplayView(fLguiItem, fLguiItem.getNodedisplayAccess().getNodedisplays().get(0), composite);
@@ -117,8 +114,9 @@ public class NodesView extends LMLViewPart {
 
 	}
 
+	@Override
 	public void prepareDispose() {
 		lmlManager.removeListener(lguiListener);
 	}
-	
+
 }
