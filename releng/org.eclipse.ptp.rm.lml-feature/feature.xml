@@ -23,22 +23,6 @@
       <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
    </url>
 
-   <requires>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.ptp.remote.core" version="2.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.remote.ui"/>
-      <import plugin="org.junit"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.equinox.preferences"/>
-      <import plugin="org.eclipse.osgi"/>
-      <import plugin="org.eclipse.ui" version="3.6.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.runtime" version="3.6.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jface"/>
-      <import plugin="org.eclipse.swt"/>
-      <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.ui.workbench"/>
-   </requires>
-
    <plugin
          id="org.eclipse.ptp.rm.lml.core"
          download-size="0"
