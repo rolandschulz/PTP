@@ -89,6 +89,11 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				</target>
 			</stderr-parser>
 		</submit-interactive>
+		<!-- PBS -I cannot be canceled simply by tearing down the process/connection -->
+		<terminate-job name="cancel">
+         <arg>qdel</arg>
+         <arg>${rm:@jobId#name}</arg>
+      </terminate-job>
 		<launch-tab>
 			<basic>
 				<title>Basic PBS Settings</title>
