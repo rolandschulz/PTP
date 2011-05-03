@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lml:lgui xmlns:lml="http://www.llview.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.llview.de lgui.xsd " version="1.0" layout="true"> 
+
+	<!-- data-tag stub for validity -->
+	<text id="6" title="System-Overview">
+		<text></text>
+	</text>	
+	
+	<!-- replace all layouts for this graphical object -->
+	<textlayout id="newtextlayout" gid="6">
+		<typecol pos="0" width="0.4" sorted="asc"/>
+		<infocol pos="1" width="0.6" />
+	</textlayout>
+	
+	<!-- data-tag stub for validity -->
+	<nodedisplay title="JUGENE Nodedisplay" id="jugene" description="a nice view for jugene-status">
+		<!-- definition of empty system -->
+		<scheme>
+			<el1 />
+		</scheme>
+		<!--  connection between physical elements and jobs -->
+		<data>
+			<el1 />
+		</data>
+	</nodedisplay>
+	
+
+	<!-- new nodedisplaylayout without images -->
+	<nodedisplaylayout id="newnodedisplaylayout" gid="jugene">
+
+		<el0 rows="0" cols="1" vgap="4" hgap="0" fontsize="10" border="0"
+			fontfamily="Monospaced" showtitle="false" background="#777"
+			mouseborder="0" maxlevel="4" transparent="false">
+
+			<!-- no inheritance of attribute values -->
+			<el1 min="0" max="8" cols="8" hgap="0" >
+
+				<el2 min="0" max="7" cols="1" highestrowfirst="true" vgap="0" hgap="0" >
+					<el3 cols="4" min="0" max="1" showtitle="false" fontsize="8"
+						vgap="0" hgap="0" showfulltitle="true"  />
+				</el2>
+			</el1>
+
+		</el0>
+	</nodedisplaylayout>
+	
+	<!-- replace old abs1, only nodedisplay inside -->
+	<abslayout id="abs1">
+		<comp gid="jugene" x="0" y="0" w="400" h="750" />
+	</abslayout>
+	
+	<!-- add a new splitlayout -->
+	<splitlayout id="newsplit" divpos="0.4">
+		<left gid="jugene"/>
+		<right gid="6">
+		</right>
+	</splitlayout>
+	
+	
+
+</lml:lgui>

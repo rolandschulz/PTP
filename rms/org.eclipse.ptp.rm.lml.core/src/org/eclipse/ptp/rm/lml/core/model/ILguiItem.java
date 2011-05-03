@@ -6,11 +6,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- * 		Claudia Knobloch, Carsten Karbach, FZ Juelich
+ * 		Claudia Knobloch
  */
 package org.eclipse.ptp.rm.lml.core.model;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.internal.core.model.LayoutAccess;
@@ -32,7 +32,7 @@ public interface ILguiItem  {
 	 * Getting the source of the XML file from whcih the corresponding LguiType has been generated. 
 	 * @return the source of the XML file
 	 */
-	public URL getXmlFile();
+	public URI getXmlFile();
 	
 	/**
 	 * Getting a string representing the ILguiItem.
@@ -67,5 +67,16 @@ public interface ILguiItem  {
 	public NodedisplayAccess getNodedisplayAccess();
 	
 	public LayoutAccess getLayoutAccess();
+	
+	/**
+	 * Inform all listeners, that something changed in the data-model.
+	 * Handlers should use this event to update their model-references.
+	 * Otherwise inconsistent return-values will be the result.
+	 */
+	public void updateData();
+	
+	public void updateXML();
+	
+	public void addJob();
 
 }

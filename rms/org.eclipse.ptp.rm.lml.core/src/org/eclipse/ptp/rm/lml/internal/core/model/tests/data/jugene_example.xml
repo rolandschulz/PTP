@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lml:lgui xmlns:lml="http://www.llview.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.llview.de lgui.xsd " version="1.0"> 
+
+	<objects>
+		<object id="job1" type="job" color="#F00" />
+		<object id="job2" type="job" color="#0F0" />
+		<object id="job3" type="job" color="#00F" />
+		<object id="job4" type="job" color="#FF0" />
+		<object id="job5" type="job" color="#0FF" />
+		<object id="job6" type="job" color="#F0F" />
+		<object id="job7" type="job" color="#ABC" />
+		<object id="job8" type="job" color="#CAC" />
+		<object id="job9" type="job" color="#DEA" />
+		<object id="job10" type="job" color="#943" />
+		<object id="job11" type="job" color="#5A2" />
+		<object id="job12" type="job" color="#17A" />
+		<object id="job13" type="job" color="#0EA" />
+		<object id="job14" type="job" color="#40C" />
+		<object id="job15" type="job" color="#C5D" />
+		<object id="empty" type="job" color="#FFF" />
+	</objects>
+	
+	<information>
+		<info oid="empty" type="short" description="Zusatzinformationen zum Job">
+			<data key="owner" value="noone" />
+			<data key="cpus" value="19840" />
+			<data key="info" value="these are the lazy jobs" />
+		</info>
+		<info oid="job1" type="short" description="Zusatzinformationen zum Job">
+			<data key="owner" value="Carsten" />
+			<data key="nodes" value="32" />
+			<data key="time" value="4h30min" />
+		</info>
+		<info oid="job2" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate=" value="07/15/10 09:10:23" />
+			<data key="job_nodelist" value="-" />
+			<data key="job_group" value="hwu04" />
+			<data key="job_groupprio" value="0" />
+		</info>
+		<info oid="job3" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/20/10 11:18:25" />
+			<data key="job_totaltasks" value="8192" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="jiff4002" />
+		</info>
+
+		<info oid="job4" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/20/10 11:41:52" />
+			<data key="job_totaltasks" value="49152" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="hac098" />
+		</info>
+
+		<info oid="job5" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/19/10 23:46:12" />
+			<data key="job_totaltasks" value="16384" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="hda121" />
+		</info>
+
+		<info oid="job6" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/20/10 06:34:29" />
+			<data key="job_totaltasks" value="32768" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="jiff3501" />
+		</info>
+
+		<info oid="job7" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/19/10 11:58:31" />
+			<data key="job_totaltasks" value="512" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="hhd191" />
+		</info>
+
+		<info oid="job8" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/19/10 14:07:32" />
+			<data key="job_totaltasks" value="128" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="fzj023wu" />
+		</info>
+
+		<info oid="job9" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/19/10 11:40:47" />
+			<data key="job_totaltasks" value="12288" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="hde092" />
+		</info>
+
+		<info oid="job10" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/20/10 07:33:39" />
+			<data key="job_totaltasks" value="8192" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="hkl0700" />
+		</info>
+
+		<info oid="job11" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/20/10 00:17:54" />
+			<data key="job_totaltasks" value="12288" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="jiff3206" />
+		</info>
+
+		<info oid="job12" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/19/10 17:59:28" />
+			<data key="job_totaltasks" value="16384" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="hmu130" />
+		</info>
+
+		<info oid="job13" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/20/10 09:54:34" />
+			<data key="job_totaltasks" value="4096" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="hac202" />
+		</info>
+
+		<info oid="job14" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/20/10 10:25:48" />
+			<data key="job_totaltasks" value="12288" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="hde075" />
+		</info>
+
+		<info oid="job15" type="short" description="Zusatzinformationen zum Job">
+			<data key="job_queuedate" value="07/20/10 11:40:57" />
+			<data key="job_totaltasks" value="12288" />
+			<data key="job_taskspernodeR" value="512" />
+			<data key="job_owner" value="jiff0505" />
+		</info>
+
+	</information>
+
+	<table title="Job-Liste" id="2">
+		<!-- Spaltendefinitionen -->
+		<column id="1" name="jobname" sort="alpha" />
+		<column id="2" name="queuedate" sort="date" />
+		<column id="3" name="totaltasks" sort="numeric" />
+		<column id="4" name="owner" sort="alpha" />
+		<!-- Tabelleninhalt -->
+		<row oid="job1">
+			<cell cid="1" value="job1" />
+			<cell cid="3" value="65536" />
+			<cell cid="2" value="02/08/10" />
+			<cell cid="4" value="Carsten" />
+		</row>
+
+		<row oid="job2">
+			<cell cid="1" value="job2" />
+			<cell value="07/15/10 09:10:23" />
+			<cell value="24576" />
+			<cell value="hwu04" />
+		</row>
+
+		<row oid="job3">
+			<cell cid="1" value="job3" />
+			<cell value="07/20/10 11:18:25" />
+			<cell value="8192" />
+			<cell value="jiff4002" />
+		</row>
+
+		<row oid="job4">
+			<cell cid="1" value="job4" />
+			<cell value="07/20/10 11:41:52" />
+			<cell value="49152" />
+			<cell value="hac098" />
+		</row>
+
+		<row oid="job5">
+			<cell cid="1" value="job5" />
+			<cell value="07/19/10 23:46:12" />
+			<cell value="16384" />
+			<cell value="hda121" />
+		</row>
+
+		<row oid="job6">
+			<cell cid="1" value="job6" />
+			<cell value="07/20/10 06:34:29" />
+			<cell value="32768" />
+			<cell value="jiff3501" />
+		</row>
+
+		<row oid="job7">
+			<cell cid="1" value="job7" />
+			<cell value="07/19/10 11:58:31" />
+			<cell value="512" />
+			<cell value="hhd191" />
+		</row>
+
+		<row oid="job8">
+			<cell cid="1" value="job8" />
+			<cell value="07/19/10 14:07:32" />
+			<cell value="128" />
+			<cell value="fzj023wu" />
+		</row>
+
+		<row oid="job9">
+			<cell cid="1" value="job9" />
+			<cell value="07/19/10 11:40:47" />
+			<cell value="12288" />
+			<cell value="hde092" />
+		</row>
+
+		<row oid="job10">
+			<cell cid="1" value="job10" />
+			<cell value="07/20/10 07:33:39" />
+			<cell value="8192" />
+			<cell value="hkl0700" />
+		</row>
+
+		<row oid="job11">
+			<cell cid="1" value="job11" />
+			<cell value="07/20/10 00:17:54" />
+			<cell value="12288" />
+			<cell value="jiff3206" />
+		</row>
+
+		<row oid="job12">
+			<cell cid="1" value="job12" />
+			<cell value="07/19/10 17:59:28" />
+			<cell value="16384" />
+			<cell value="hmu130" />
+		</row>
+
+		<row oid="job13">
+			<cell cid="1" value="job13" />
+			<cell value="07/20/10 09:54:34" />
+			<cell value="4096" />
+			<cell value="hac202" />
+		</row>
+
+		<row oid="job14">
+			<cell cid="1" value="job14" />
+			<cell value="07/20/10 10:25:48" />
+			<cell value="12288" />
+			<cell value="hde075" />
+		</row>
+
+		<row oid="job15">
+			<cell cid="1" value="job15" />
+			<cell value="07/20/10 11:40:57" />
+			<cell value="12288" />
+			<cell value="jiff0505" />
+		</row>
+
+	</table>
+
+	<usagebar id="3" cpucount="294912" title="Job-Usage"
+		cpupernode="2048">
+		<job oid="job1" cpucount="65536" />
+		<job oid="job2" cpucount="24576" />
+		<job oid="job3" cpucount="8192" />
+		<job oid="job4" cpucount="49152" />
+		<job oid="job5" cpucount="16384" />
+		<job oid="job6" cpucount="32768" />
+		<job oid="job7" cpucount="512" />
+		<job oid="job8" cpucount="128" />
+		<job oid="job9" cpucount="12288" />
+		<job oid="job10" cpucount="8192" />
+		<job oid="job11" cpucount="12288" />
+		<job oid="job12" cpucount="16384" />
+		<job oid="job13" cpucount="4096" />
+		<job oid="job14" cpucount="12288" />
+		<job oid="job15" cpucount="12288" />
+		<job oid="empty" cpucount="19840" />
+	</usagebar>
+	
+	<usagebarlayout id="ubl1" gid="3" scale="nodes" interval="32"/>
+
+	<!-- Infofelder fuer verschiedene Informationstypen -->
+	<infobox id="4" title="General Info" type="short" />
+	
+	<infoboxlayout id="infolayout" gid="4">
+		<typecol pos="0" width="0.5" sorted="asc"/>
+		<infocol pos="1" width="0.5" />
+	</infoboxlayout>
+	
+	<text id="5" title="Message of today">
+<text>This is LLapp-overview for supercomputer jugene.
+It is just an example.
+Here some special information for today
+could be broadcasted.</text>
+	</text>
+	<!-- mit Daten ueber Schluessel- Werte-Paare -->
+	<text id="6" title="System-Overview">
+		<info>
+			<data key="cpu" value="300000" />
+			<data key="os" value="linux" />
+			<data key="name" value="jugene" />
+		</info>
+	</text>
+	
+	<textlayout id="textlayout" gid="6">
+		<typecol pos="0" width="0.5" sorted="asc"/>
+		<infocol pos="1" width="0.5" />
+	</textlayout>
+	<!-- a second textlayout -->
+	<textlayout id="textlayout2" gid="6">
+		<typecol pos="0" width="0.5" sorted="desc"/>
+		<infocol pos="1" width="0.5" />
+	</textlayout>
+	
+	<chart id="7" title="Job-size-histogram">
+		<axes>
+			<x type="log" unit="cpucount" label="job size"
+					shortlabel="size" min="0.1" max="300000" ticcount="12">
+				<ticlabels>
+					<label pos="1"/>
+					<label pos="4"/>
+					<label pos="16"/>
+					<label pos="256"/>
+					<label pos="4096"/>
+				</ticlabels>	
+			</x>
+			<y type="log" unit="count" min="0.1" max="1000" label="count" ticcount="7"/>			
+		</axes>
+		
+		<data name="waiting jobs" description="all waiting jobs">
+				<p x="1" y="60" />
+				<p x="512" y="500" />
+				<p x="1024" y="40" />
+				<p x="2048" y="200" />
+				<p x="4096" y="10" />
+				<p x="8192" y="40" />
+				<p x="16384" y="4" />
+		</data>
+		<data name="running jobs" description="all running jobs">
+				<p x="1" y="50" />
+				<p x="512" y="200" />
+				<p x="1024" y="30" />
+		</data>
+	</chart>
+	
+	<chartlayout id="cl1" gid="7" border="1"/>
+	
+	<chart id="prediction" title="prediction of job starts">
+		<axes>
+			<x type="linear" unit="time" label="time"
+					shortlabel="t" min="0" max="4320">
+				<ticlabels>
+					<label pos="0" text="Tue"/>
+					<label pos="1440" text="Wed"/>
+					<label pos="2880" text="Thu"/>
+				</ticlabels>	
+			</x>
+			<y type="linear" unit="nodes" min="0" max="144" label="nodes" ticcount="10"/>			
+		</axes>			
+		
+		<data name="jobs" description="started jobs">
+				<r x="0" y="20" w="1000" h="20" text="job1"/>
+				<r x="0" y="50" w="1200" h="30" text="job2"/>
+				<r x="0" y="60" w="500" h="10" text="job3"/>
+				<r x="0" y="70" w="500" h="10" text="job4"/>
+				<r x="0" y="90" w="600" h="20" text="job5"/>
+				<r x="0" y="100" w="1000" h="10" text="job6"/>
+				<r x="0" y="140" w="500" h="40" text="job7"/>
+		</data>
+
+	</chart>
+	
+	<chartlayout id="cl2" gid="prediction" border="1" active="false"/>
+
+	<nodedisplay title="JUGENE Nodedisplay" id="jugene">
+		<!-- definition of empty system -->
+		<scheme>
+			<el1 tagname="row" min="0" max="8" mask="R%01d">
+				<el2 tagname="rack" min="0" max="7" mask="%01d">
+					<el3 tagname="midplane" min="0" max="1" mask="-M%1d">
+						<el4 tagname="nodecard" min="0" max="15" mask="-N%02d">
+							<el5 tagname="computecard" min="4" max="35" mask="-C%02d">
+								<el6 tagname="core" min="0" max="3" mask="-%01d">
+								</el6>
+							</el5>
+						</el4>
+					</el3>
+				</el2>
+			</el1>
+		</scheme>
+		<!--  connection between physical elements and jobs -->
+		<data>
+			<el1 min="0" max="1" oid="job1" />
+			<el1 min="2" oid="job2">
+				<el2 list="3,5" oid="job3" />
+			</el1>
+			<el1 list="3,5" oid="job4">
+				<el2 list="0,7" oid="job5" />
+			</el1>
+			<el1 list="4" oid="job6">
+				<el2 list="6" oid="job6"/>
+			</el1>
+			<el1 min="6" oid="job9">
+				<el2 list="1,7" oid="job10" />
+				<el2 list="3,4,5" oid="job11" />
+			</el1>
+			<el1 list="7" oid="job12" >
+				<el2 min="0" max="3" oid="empty"/>
+			</el1>
+			<el1 list="8" oid="job13">
+				<el2 min="0" max="2" oid="job14" />
+				<el2 min="3" max="5" oid="job15" />
+				<el2 min="7" oid="empty">
+					<el3 list="1" oid="empty">
+							<el4 min="0" max="3" oid="job7" />
+							<el4 min="4" oid="job8" />
+					</el3>
+				</el2>
+			</el1>
+		</data>
+	</nodedisplay>
+
+	<!-- define a layout for a nodedisplay -->
+	<nodedisplaylayout id="jugenelayout" gid="jugene">
+
+		<el0 rows="0" cols="1" vgap="4" hgap="0" fontsize="10" border="0"
+			fontfamily="Monospaced" showtitle="false" background="#777"
+			mouseborder="0" maxlevel="4" transparent="false">
+
+			<!-- no inheritance of attribute values -->
+			<el1 min="0" max="8" cols="8" hgap="0" >
+				<img src="http://zam1163.zam.kfa-juelich.de/Applets/LLapp/pic/links.png" align="WEST"
+					width="0.1" height="1" />
+				<img src="http://zam1163.zam.kfa-juelich.de/Applets/LLapp/pic/rechts.png" align="EAST"
+					width="0.1" height="1" />
+				<img src="http://zam1163.zam.kfa-juelich.de/Applets/LLapp/pic/rechteck.png" align="CENTER"
+					width="1" height="1" />
+
+				<el2 min="0" max="7" cols="1" highestrowfirst="true" vgap="0" hgap="0" >
+					<el3 cols="4" min="0" max="1" showtitle="false" fontsize="8"
+						vgap="0" hgap="0" showfulltitle="true"  />
+				</el2>
+			</el1>
+
+		</el0>
+	</nodedisplaylayout>
+
+
+	<abslayout id="abs1">
+		<comp gid="jugene" x="0" y="0" w="400" h="750" />
+		<comp gid="3" x="410" y="0" w="390" h="150" />
+		<comp gid="2" x="410" y="150" w="390" h="300" />
+		<comp gid="4" x="410" y="450" w="180" h="150" />
+		<comp gid="7" x="600" y="450" w="200" h="150" />
+		<comp gid="5" x="410" y="600" w="180" h="150" />
+		<comp gid="6" x="600" y="600" w="200" h="150" />
+	</abslayout>
+	
+	<abslayout id="abs2">
+		<comp gid="jugene" x="0" y="0" w="400" h="500" />
+		<comp gid="3" x="410" y="0" w="390" h="80" />
+		<comp gid="2" x="410" y="80" w="390" h="250" />
+		<comp gid="4" x="410" y="330" w="180" h="150" />
+		<comp gid="7" x="600" y="330" w="390" h="150" />
+		<comp gid="5" x="810" y="0" w="180" h="165" />
+		<comp gid="6" x="810" y="165" w="180" h="165" />
+	</abslayout>
+	
+	<splitlayout id="split1">
+		<left gid="jugene"/>
+		<right divpos="0.2">
+			<top gid="3"/>
+			<bottom divpos="0.5">
+				<top gid="2"/>
+				<bottom divpos="0.5">
+					<top divpos="0.5">
+						<left gid="4"/>
+						<right gid="7"/>
+					</top>
+					<bottom divpos="0.5">
+						<left gid="prediction"/>
+						<right gid="6"/>
+					</bottom>
+				</bottom>
+			</bottom>
+		</right>
+	</splitlayout>
+	
+	
+
+</lml:lgui>

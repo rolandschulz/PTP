@@ -1,24 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-          LML - LLView markup language 
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+LML - LLView markup language
 
-   Copyright (c) 2011 Forschungszentrum Juelich GmbH
-   All rights reserved. This program and the accompanying materials
-   are made available under the terms of the Eclipse Public License v1.0
-   which accompanies this distribution and is available at
-   http://www.eclipse.org/legal/epl-v10.html
- -->
-<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
 
-    <include schemaLocation="lgui.xsd"></include>
+Copyright (c) 2011 Forschungszentrum Juelich GmbH
+
+All rights reserved. This program and the accompanying materials
+
+are made available under the terms of the Eclipse Public License v1.0
+
+which accompanies this distribution and is available at
+
+http://www.eclipse.org/legal/epl-v10.html
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
+
+    <include schemaLocation="lgui.xsd"/>
     <complexType name="column_type">
         <annotation>
         	<documentation>Describes one column of table.</documentation>
         </annotation>
-        <attribute name="name" type="NCName" use="required"></attribute>
-    	<attribute name="sort" type="lml:sorting_type"></attribute>
-    	<attribute name="description" type="string"></attribute>
-    	<attribute name="id" type="positiveInteger" use="required"></attribute>
+        <attribute name="name" type="NCName" use="required"/>
+    	<attribute name="sort" type="lml:sorting_type"/>
+    	<attribute name="description" type="string"/>
+    	<attribute name="id" type="positiveInteger" use="required"/>
     </complexType>
 
     <simpleType name="sorting_type">
@@ -26,9 +31,9 @@
         	<documentation>Defines allowed ways of how columns are sorted.</documentation>
         </annotation>
         <restriction base="string">
-    		<enumeration value="numeric"></enumeration>
-    		<enumeration value="alpha"></enumeration>
-    		<enumeration value="date"></enumeration>
+    		<enumeration value="numeric"/>
+    		<enumeration value="alpha"/>
+    		<enumeration value="date"/>
     	</restriction>
     </simpleType>
 
@@ -40,8 +45,9 @@ Otherwise order of cells define connections to columns.</documentation>
         <attribute name="cid" type="positiveInteger">
     		<annotation>
     			<documentation>Is cid not defined, order of columns and cells will define which cell is connected to which column.</documentation>
-    		</annotation></attribute>
-    	<attribute name="value" type="string"></attribute>
+    		</annotation>
+</attribute>
+    	<attribute name="value" type="string"/>
     </complexType>
 
 
@@ -50,12 +56,13 @@ Otherwise order of cells define connections to columns.</documentation>
         	<documentation>One row in final table.</documentation>
         </annotation>
         <sequence>
-    		<element name="cell" type="lml:cell_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element maxOccurs="unbounded" minOccurs="0" name="cell" type="lml:cell_type"/>
     	</sequence>
     	<attribute name="oid" type="NCName">
     		<annotation>
     			<documentation>Reference to object-tag</documentation>
-    		</annotation></attribute>
+    		</annotation>
+</attribute>
     </complexType>
 
 
@@ -70,11 +77,9 @@ Otherwise order of cells define connections to columns.</documentation>
     	<complexContent>
     		<extension base="lml:gobject_type">    		
     			<sequence>
-		    		<element name="column" type="lml:column_type" minOccurs="0"
-		    			maxOccurs="unbounded">
+		    		<element maxOccurs="unbounded" minOccurs="0" name="column" type="lml:column_type">
 		    		</element>
-		    		<element name="row" type="lml:row_type" minOccurs="0"
-		    			maxOccurs="unbounded">
+		    		<element maxOccurs="unbounded" minOccurs="0" name="row" type="lml:row_type">
 		    			
 		    			<!-- for one column only one cell in a row -->
 	        			<unique name="cellCIDUnique">

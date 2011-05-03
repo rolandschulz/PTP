@@ -22,7 +22,11 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 
 
 /**
- * Saves which object has to be highlighted
+ * Saves which object have to be highlighted.
+ * 
+ * Components, which want to be informed for user interactions can call "addComponent"
+ * to add a listening component to this instance. Every call for "mouseover" or "mousedown"
+ * and so on will be forwarded to all listening Updatable-instances.
  */
 public class ObjectStatus extends LguiHandler{
 
@@ -32,9 +36,6 @@ public class ObjectStatus extends LguiHandler{
 	 * It contains a callback-function, which is called for every registered
 	 * component. So every component is informed, if the status of highlighted
 	 * objects has changed. 
-	 * 
-	 * @author karbach
-	 *
 	 */
 	public static interface Updatable{
 		/**
@@ -49,22 +50,20 @@ public class ObjectStatus extends LguiHandler{
 	/**
 	 * Saves all state-attributes, which can be changed by the user via
 	 * mouse-interaction.
-	 * 
-	 * @author karbach
 	 */
 	private static class State{
 		
-		public boolean mousedown, mouseover;
+		public boolean mouseDown, mouseOver;
 		
 		public State(){
-			mousedown=false;
-			mouseover=false;
+			mouseDown=false;
+			mouseOver=false;
 		}	
 	}
 	
-	//lastmouseover and lastmousedown might be null at sturtup
-	private ObjectType lastmouseover;//saves the last object, which was touched by the mouse-cursor
-	private ObjectType lastmousedown;//saves the last object, on which the mouse clicked 
+	//lastMouseOver and lastMouseDown might be null at startup
+	private ObjectType lastMouseOver;//saves the last object, which was touched by the mouse-cursor
+	private ObjectType lastMouseDown;//saves the last object, on which the mouse clicked 
 	
 	private HashMap<ObjectType, State> mapping;
 	
@@ -72,13 +71,13 @@ public class ObjectStatus extends LguiHandler{
 	
 	
 	/**
-	 * Initialise object-status attributes.
-	 * @param psuperHandler LML-data-handler, which groups this handler and others to a set
+	 * Initialize object-status attributes.
+	 * @param lguiItem LML-data-handler, which groups this handler and others to a set
 	 * of LMLHandler. This instance is needed to notify all LMLHandler, if any data of
 	 * the LguiType-instance was changed.
 	 */
-	public ObjectStatus(ILguiItem psuperHandler, LguiType model){
-		super(psuperHandler, model);
+	public ObjectStatus(ILguiItem lguiItem, LguiType lgui){
+		super(lguiItem, lgui);
 		
 		mapping=new HashMap<ObjectType, State>();
 		components=new ArrayList<Updatable>();
@@ -96,14 +95,14 @@ public class ObjectStatus extends LguiHandler{
 	 * @return last and current object, which was touched by the mouse-cursor or null
 	 */
 	public ObjectType getLastMouseOver(){
-		return lastmouseover;
+		return lastMouseOver;
 	}
 	
 	/**
 	 * @return last and current object, on which the user is pressing the mouse
 	 */
 	public ObjectType getLastMouseDown(){
-		return lastmousedown;
+		return lastMouseDown;
 	}
 	
 	/**
@@ -111,8 +110,8 @@ public class ObjectStatus extends LguiHandler{
 	 */
 	private void reset(){
 		mapping=new HashMap<ObjectType, State>();
-		lastmouseover=null;
-		lastmousedown=null;
+		lastMouseOver=null;
+		lastMouseDown=null;
 	}
 	
 	/**
@@ -146,6 +145,8 @@ public class ObjectStatus extends LguiHandler{
 		}
 	}
 	
+	
+	
 	/**
 	 * @param obj 
 	 * @return true, if the connected object is currently touched by the cursor
@@ -154,7 +155,7 @@ public class ObjectStatus extends LguiHandler{
 		if(obj==null) return false;
 		
 		if(mapping.containsKey(obj)){
-			return mapping.get(obj).mouseover;
+			return mapping.get(obj).mouseOver;
 		}
 		else{//Otherwise insert new pair into mapping-instance
 			mapping.put(obj, new State());
@@ -163,10 +164,10 @@ public class ObjectStatus extends LguiHandler{
 	}
 	
 	/**
-	 * @return true <=> at least one job has mouseover=true
+	 * @return true {@code <=>} at least one job has mouseover=true
 	 */
 	public boolean isAnyMouseover(){
-		return lastmouseover!=null;
+		return lastMouseOver!=null;
 	}
 	
 	/**
@@ -177,7 +178,7 @@ public class ObjectStatus extends LguiHandler{
 		if(obj==null) return false;
 		
 		if(mapping.containsKey(obj)){
-			return mapping.get(obj).mousedown;
+			return mapping.get(obj).mouseDown;
 		}
 		else{//Otherwise insert new pair into mapping-instance
 			mapping.put(obj, new State());
@@ -186,10 +187,10 @@ public class ObjectStatus extends LguiHandler{
 	}
 	
 	/**
-	 * @return true <=> at least one job has mousedown=true
+	 * @return true {@code <=>} at least one job has mousedown=true
 	 */
 	public boolean isAnyMousedown(){
-		return lastmousedown!=null;
+		return lastMouseDown!=null;
 	}
 	
 	/**
@@ -207,10 +208,23 @@ public class ObjectStatus extends LguiHandler{
 		
 		State az=mapping.get(obj);
 		
-		if(! az.mouseover){
-			az.mouseover=true;
-			informAll(obj, true, az.mousedown);
+		if(! az.mouseOver){
+			az.mouseOver=true;
+			informAll(obj, true, az.mouseDown);
 		}
+	}
+	
+	/**
+	 * Call this function, if the object with id oid is focussed by mouse-over.
+	 * Does Mouseexit for jobs, which were focussed before, does normal
+	 * mouse-over-action. Finally calls a mouseup for the last pressed job,
+	 * except the last job is equal to obj.
+	 * 
+	 * @param oid id of ObjectType-instance
+	 */
+	public void mouseOver(String oid) {
+		ObjectType object = lguiItem.getOIDToObject().getObjectById(oid);
+		mouseover(object);
 	}
 	
 	/**
@@ -224,16 +238,28 @@ public class ObjectStatus extends LguiHandler{
 	public void mouseover(ObjectType obj){
 		if(obj==null) return ;
 		
-		if(obj==lastmouseover) return;
+		if(obj==lastMouseOver) return;
 		
-		if(obj!=lastmouseover)
+		if(obj!=lastMouseOver)
 			mouseExitLast();		
-		if(obj!=lastmousedown){
-			mouseup(lastmousedown);		
+		if(obj!=lastMouseDown){
+			mouseup(lastMouseDown);		
 		}
 		
-		lastmouseover=obj;
+		lastMouseOver=obj;
 		justMouseover(obj);		
+	}
+	
+	/**
+	 * Sets mousedown-property for object with id oid.
+	 * Should be called, if mouse is pressed on the
+	 * object.
+	 * 
+	 * @param oid id of ObjectType-instance
+	 */
+	public void mouseDown(String oid) {
+		ObjectType object = lguiItem.getOIDToObject().getObjectById(oid);
+		mousedown(object);
 	}
 	
 	/**
@@ -251,11 +277,22 @@ public class ObjectStatus extends LguiHandler{
 		
 		State az=mapping.get(obj);
 		
-		if(! az.mousedown){
-			az.mousedown=true;
-			lastmousedown=obj;
-			informAll(obj, az.mouseover, true);			
+		if(! az.mouseDown){
+			az.mouseDown=true;
+			lastMouseDown=obj;
+			informAll(obj, az.mouseOver, true);			
 		}
+	}
+	
+	/**
+	 * Sets mouse-over-property for object with given oid to false.
+	 * This method is used, if the mouse exits the object.
+	 * 
+	 * @param oid id of ObjectType-instance
+	 */
+	public void mouseExit(String oid) {
+		ObjectType object = lguiItem.getOIDToObject().getObjectById(oid);
+		mouseexit(object);
 	}
 	
 	/**
@@ -272,10 +309,10 @@ public class ObjectStatus extends LguiHandler{
 		
 		State az=mapping.get(obj);
 		
-		if(az.mouseover){
-			az.mouseover=false;
-			lastmouseover=null;
-			informAll(obj, false, az.mousedown);			
+		if(az.mouseOver){
+			az.mouseOver=false;
+			lastMouseOver=null;
+			informAll(obj, false, az.mouseDown);			
 		}
 	}
 	
@@ -284,8 +321,19 @@ public class ObjectStatus extends LguiHandler{
 	 * Last focused objects are set to unfocused.
 	 */
 	public void mouseExitLast(){
-		mouseexit(lastmouseover);
-		mouseup(lastmousedown);
+		mouseexit(lastMouseOver);
+		mouseup(lastMouseDown);
+	}
+	
+	
+	/**
+	 * Call this function, if mouse releases on this object.
+	 * 
+	 * @param oid id of ObjectType-instance
+	 */
+	public void mouseUp(String oid) {
+		ObjectType object = lguiItem.getOIDToObject().getObjectById(oid);
+		mouseup(object);
 	}
 	
 	/**
@@ -297,8 +345,8 @@ public class ObjectStatus extends LguiHandler{
 		if(obj==null) return ;
 		
 		//Release the last object, on which the mouse pressed 
-		if(lastmousedown!=obj){
-			mouseup(lastmousedown);
+		if(lastMouseDown!=obj){
+			mouseup(lastMouseDown);
 			mouseExitLast();
 			mouseover(obj);
 		}
@@ -308,10 +356,10 @@ public class ObjectStatus extends LguiHandler{
 		}
 		State az=mapping.get(obj);
 		
-		if(az.mousedown){
-			az.mousedown=false;
-			lastmousedown=null;
-			informAll(obj, az.mouseover, false);			
+		if(az.mouseDown){
+			az.mouseDown=false;
+			lastMouseDown=null;
+			informAll(obj, az.mouseOver, false);			
 		}
 	}
 

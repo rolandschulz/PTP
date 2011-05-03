@@ -8,6 +8,7 @@ Import-Package: org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.core.runtime.preferences,
  org.eclipse.osgi.util,
+ org.eclipse.ptp.remote.core,
  org.osgi.framework,
  org.osgi.service.prefs
 Export-Package: org.eclipse.ptp.rm.lml.core,
@@ -21,3 +22,4 @@ Export-Package: org.eclipse.ptp.rm.lml.core,
  org.eclipse.ptp.rm.lml.internal.core.nodedisplay
 Bundle-Activator: org.eclipse.ptp.rm.lml.core.LMLCorePlugin
 Bundle-ActivationPolicy: lazy
+Require-Bundle: org.junit

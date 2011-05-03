@@ -1,21 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-          LML - LLView markup language 
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+LML - LLView markup language
 
-   Copyright (c) 2011 Forschungszentrum Juelich GmbH
-   All rights reserved. This program and the accompanying materials
-   are made available under the terms of the Eclipse Public License v1.0
-   which accompanies this distribution and is available at
-   http://www.eclipse.org/legal/epl-v10.html
- -->
-<schema targetNamespace="http://www.llview.de" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
+
+Copyright (c) 2011 Forschungszentrum Juelich GmbH
+
+All rights reserved. This program and the accompanying materials
+
+are made available under the terms of the Eclipse Public License v1.0
+
+which accompanies this distribution and is available at
+
+http://www.eclipse.org/legal/epl-v10.html
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" elementFormDefault="qualified" targetNamespace="http://www.llview.de">
 
     <simpleType name="hexcolor_type">
         <annotation>
         	<documentation>Defines possible color-values. Allowed values: #Ff0 #FF0000 #FA9</documentation>
         </annotation>
         <restriction base="string">
-    		<pattern value="#((([0-9]|[a-f]|[A-F]){3})|(([0-9]|[a-f]|[A-F]){6}))"></pattern>
+    		<pattern value="#((([0-9]|[a-f]|[A-F]){3})|(([0-9]|[a-f]|[A-F]){6}))"/>
     	</restriction>
     </simpleType>
 
@@ -23,8 +28,8 @@
         <annotation>
         	<documentation>Definition of a color name. Connects a name like "red" width a html-like color like "#F00"</documentation>
         </annotation>
-        <attribute name="name" type="NCName" use="required"></attribute>
-    	<attribute name="color" type="lml:hexcolor_type" use="required"></attribute>
+        <attribute name="name" type="NCName" use="required"/>
+    	<attribute name="color" type="lml:hexcolor_type" use="required"/>
     </complexType>
 
 
@@ -33,7 +38,7 @@
         	<documentation>Collects a list of colorconstants.</documentation>
         </annotation>
         <sequence>
-    		<element name="colorname" type="lml:colorconstant_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element maxOccurs="unbounded" minOccurs="0" name="colorname" type="lml:colorconstant_type"/>
     	</sequence>
     </complexType>
 
