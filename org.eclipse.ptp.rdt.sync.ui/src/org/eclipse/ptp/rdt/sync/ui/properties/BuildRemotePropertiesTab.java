@@ -36,14 +36,6 @@ import org.eclipse.swt.widgets.Text;
 
 public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 	// Button and label names
-	
-	public BuildRemotePropertiesTab() {
-		super();
-		IProject project = getCfg().getOwner().getProject();
-		if (!(RemoteSyncNature.hasNature(project))) {
-			this.setVisible(false);
-		}
-	}
 
 	private IRemoteConnection fSelectedConnection;
 	// TODO: Support other providers
@@ -67,6 +59,9 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 	 */
 	@Override
 	protected void createControls(Composite parent) {
+		if (!(isApplicable())) {
+			return;
+		}
 		parentComposite = parent;
 		super.createControls(parent);
 		GridLayout layout = new GridLayout();
@@ -192,6 +187,9 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 	 * Store remote location information for the selected build configuration
 	 */
 	public void performOK() {
+		if (!(isApplicable())) {
+			return;
+		}
 		// For now, do nothing for multi-configurations
 		if (getCfg() instanceof IMultiConfiguration) {
 			return;
@@ -306,6 +304,9 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 	 */
 	@Override
 	public void updateData(ICResourceDescription cfg) {
+		if (!isApplicable()) {
+			return;
+		}
 		this.setValues();
 		parentComposite.update();
 	}
@@ -358,7 +359,19 @@ public class BuildRemotePropertiesTab extends AbstractCBuildPropertyTab {
 
 	@Override
 	protected void updateButtons() {
+		if (!(isApplicable())) {
+			return;
+		}
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private boolean isApplicable() {
+		IProject project = getCfg().getOwner().getProject();
+		if (!(RemoteSyncNature.hasNature(project))) {
+			this.setVisible(false);
+			return false;
+		}
+		return true;
 	}
 }
