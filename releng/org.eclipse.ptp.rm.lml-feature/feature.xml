@@ -25,20 +25,18 @@
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.search"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.proxy.protocol"/>
-      <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.ptp.remote.core" version="2.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.rm.core" version="1.0.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.services.ui" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.remote.ui"/>
-      <import plugin="org.eclipse.ptp.utils.ui" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.ui" version="3.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.launch" version="3.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.rm.ui" version="1.0.1" match="greaterOrEqual"/>
+      <import plugin="org.junit"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.equinox.preferences"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.ui" version="3.6.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.ui.workbench"/>
    </requires>
 
    <plugin
