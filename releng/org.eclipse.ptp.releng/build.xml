@@ -812,6 +812,10 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.gnu.ui"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
