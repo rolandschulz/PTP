@@ -192,4 +192,5 @@ plugin@javax.xml.bind,2.1.9=GET,http://download.eclipse.org/tools/orbit/download
 plugin@com.sun.xml.bind,2.1.9=GET,http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/bundles/com.sun.xml.bind_2.1.9.v200905260854.jar
 
 ! JGit plugins
-plugin@org.eclipse.jgit=GET,http://download.eclipse.org/jgit/maven/org/eclipse/jgit/org.eclipse.jgit/0.12.1/org.eclipse.jgit-0.12.1.jar
+!plugin@org.eclipse.jgit=GET,http://download.eclipse.org/jgit/maven/org/eclipse/jgit/org.eclipse.jgit/0.12.1/org.eclipse.jgit-0.12.1.jar
+plugin@org.eclipse.jgit=GET,http://download.eclipse.org/tools/ptp/builds/jgit/org.eclipse.jgit_0.12.1.jar
