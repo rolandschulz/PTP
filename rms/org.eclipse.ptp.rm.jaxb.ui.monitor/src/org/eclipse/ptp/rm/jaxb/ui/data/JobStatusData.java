@@ -197,8 +197,8 @@ public class JobStatusData {
 	 */
 	public void updateState(IJobStatus status) {
 		this.status = status;
-		state = status.getState();
 		if (!detailIsFinal(stateDetail)) {
+			state = status.getState();
 			stateDetail = status.getStateDetail();
 		}
 	}

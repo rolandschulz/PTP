@@ -62,6 +62,17 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<input isUndefinedIfMatches=".+ -np">${rm:mpiPrefix#value}</input>
 			<input>${rm:executablePath#value} ${rm:progArgs#value}</input>
 			<stdout-parser delim="\n">
+			   <target ref="@jobId">
+               <match>
+                  <expression flags="DOTALL">qsub:.+job[\s]+([\d]+)[.][\w]+[\s]to start.*</expression>
+                  <set field="name">
+                     <entry valueGroup="1"/>
+                  </set>
+                  <set field="value">
+                     <entry value="SUBMITTED"/>
+                  </set>
+               </match>
+            </target>
 				<target ref="@jobId">
 					<match>
 						<expression flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.][\w]+[\s]ready.*</expression>
@@ -89,8 +100,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				</target>
 			</stderr-parser>
 		</submit-interactive>
-		<!-- PBS -I cannot be canceled simply by tearing down the process/connection -->
-		<terminate-job name="cancel">
+		<terminate-job name="cancel" waitForId="false">
          <arg>qdel</arg>
          <arg>${rm:@jobId#name}</arg>
       </terminate-job>
