@@ -241,13 +241,19 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * First unblock any wait; this will allow the run method to return. Destroy
+	 * the process and close streams, interrupt the tread and cancel with
+	 * manager. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#terminate()
 	 */
 	public synchronized void terminate() {
 		if (active) {
 			active = false;
+			if (jobStatus != null) {
+				jobStatus.cancelWait();
+				jobStatus.getJobId();
+			}
 			if (process != null && !process.isCompleted()) {
 				process.destroy();
 				if (proxy != null) {
@@ -265,6 +271,7 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 				}
 			}
 			cancel();
+			control.getJobTable().remove(getName());
 		}
 	}
 
@@ -307,16 +314,20 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 		 * If the submit job lacks a jobId on the standard streams, then we
 		 * assign it the UUID (it is most probably interactive); else we wait
 		 * for the id to be set by the tokenizer. NOTE that the caller should
-		 * now join on all commands with this property (05.01.2011).
+		 * now join on all commands with this property (05.01.2011). Open
+		 * connection jobs should have their jobId tokenizers set a RUNNING
+		 * state.
 		 */
 		jobStatus = null;
+		String waitUntil = keepOpen ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
+		ICommandJob parent = keepOpen ? this : null;
 		if (uuid != null) {
 			if (waitForId) {
-				jobStatus = new CommandJobStatus(rm.getUniqueName(), control);
-				jobStatus.waitForJobId(uuid);
+				jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
+				jobStatus.waitForJobId(uuid, waitUntil);
 			} else {
 				String state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
-				jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, control);
+				jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
 			}
 
 			jobStatus.setProxy(getProxy());

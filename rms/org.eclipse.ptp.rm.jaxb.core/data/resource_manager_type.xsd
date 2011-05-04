@@ -96,8 +96,8 @@
 				<xs:annotation>
 					<xs:documentation>
 						NOTE: if the submission type is interactive, this command does not need to be implemented, as the process
-						termination will be handled
-						internally.
+						termination will be handled internally. However, in some cases (such as PBS -I) one may need this command in order to force
+						termination of the interactive terminal job.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
