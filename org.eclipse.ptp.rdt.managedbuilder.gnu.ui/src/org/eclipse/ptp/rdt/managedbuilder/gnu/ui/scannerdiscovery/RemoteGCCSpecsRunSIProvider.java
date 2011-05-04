@@ -64,7 +64,7 @@ public class RemoteGCCSpecsRunSIProvider extends RemoteSpecsRunSIProvider implem
 			compilerPath = ""; //$NON-NLS-1$
 		}
 
-		gcc = gcc.replaceAll("\\$\\{XLC_COMPILER_ROOT\\}", compilerPath); //$NON-NLS-1$
+		//gcc = gcc.replaceAll("\\$\\{XL_COMPILER_ROOT\\}", compilerPath); //$NON-NLS-1$
 
 		String args = buildInfo.getProviderRunArguments(providerId);
 		String specsFileName = getSpecsFileName(project);

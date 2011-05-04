@@ -15,12 +15,12 @@
       outputFlag="-o">
    <supportedProperties>
       <property
-            id="org.eclipse.ptp.rdt.build.core.buildArtefactType">
+            id="org.eclipse.cdt.build.core.buildArtefactType">
          <value
-               id="org.eclipse.ptp.rdt.build.core.buildArtefactType.exe">
+               id="org.eclipse.cdt.build.core.buildArtefactType.exe">
          </value>
          <value
-               id="org.eclipse.ptp.rdt.build.core.buildArtefactType.sharedLib">
+               id="org.eclipse.cdt.build.core.buildArtefactType.sharedLib">
          </value>
       </property>
    </supportedProperties>
@@ -138,7 +138,7 @@
             value="true">
          <checkBuildProperty
                property="org.eclipse.ptp.rdt.build.core.buildArtefactType"
-               value="org.eclipse.ptp.rdt.build.core.buildArtefactType.sharedLib">
+               value="org.eclipse.cdt.build.core.buildArtefactType.sharedLib">
          </checkBuildProperty>
       </enablement>
    </option>
@@ -234,10 +234,10 @@
        <property
              id="org.eclipse.ptp.rdt.build.core.buildArtefactType">
           <value
-                id="org.eclipse.ptp.rdt.build.core.buildArtefactType.exe">
+                id="org.eclipse.cdt.build.core.buildArtefactType.exe">
           </value>
           <value
-                id="org.eclipse.ptp.rdt.build.core.buildArtefactType.sharedLib">
+                id="org.eclipse.cdt.build.core.buildArtefactType.sharedLib">
           </value>
        </property>
     </supportedProperties>
@@ -347,7 +347,7 @@
              value="true">
           <checkBuildProperty
                 property="org.eclipse.ptp.rdt.build.core.buildArtefactType"
-                value="org.eclipse.ptp.rdt.build.core.buildArtefactType.sharedLib">
+                value="org.eclipse.cdt.build.core.buildArtefactType.sharedLib">
           </checkBuildProperty>
        </enablement>
     </option>
@@ -442,7 +442,7 @@
        <property
              id="org.eclipse.ptp.rdt.build.core.buildArtefactType">
           <value
-                id="org.eclipse.ptp.rdt.build.core.buildArtefactType.staticLib">
+                id="org.eclipse.cdt.build.core.buildArtefactType.staticLib">
           </value>
        </property>
     </supportedProperties>
@@ -1206,7 +1206,7 @@
              type="ALL">
           <checkBuildProperty
                 property="org.eclipse.ptp.rdt.build.core.buildArtefactType"
-                value="org.eclipse.ptp.rdt.build.core.buildArtefactType.staticLib">
+                value="org.eclipse.cdt.build.core.buildArtefactType.staticLib">
           </checkBuildProperty>
        </enablement>
     </tool>
@@ -1226,7 +1226,7 @@
           <not>
              <checkBuildProperty
                    property="org.eclipse.ptp.rdt.build.core.buildArtefactType"
-                   value="org.eclipse.ptp.rdt.build.core.buildArtefactType.staticLib">
+                   value="org.eclipse.cdt.build.core.buildArtefactType.staticLib">
              </checkBuildProperty>
           </not>
        </enablement>
@@ -1239,7 +1239,7 @@
           <not>
              <checkBuildProperty
                    property="org.eclipse.ptp.rdt.build.core.buildArtefactType"
-                   value="org.eclipse.ptp.rdt.build.core.buildArtefactType.staticLib">
+                   value="org.eclipse.cdt.build.core.buildArtefactType.staticLib">
              </checkBuildProperty>
           </not>
        </enablement>
@@ -1259,7 +1259,7 @@
           value="so">
        <checkBuildProperty
              property="org.eclipse.ptp.rdt.build.core.buildArtefactType"
-             value="org.eclipse.ptp.rdt.build.core.buildArtefactType.sharedLib">
+             value="org.eclipse.cdt.build.core.buildArtefactType.sharedLib">
        </checkBuildProperty>
     </enablement>
     <enablement
@@ -1269,12 +1269,12 @@
           value="a">
        <checkBuildProperty
              property="org.eclipse.ptp.rdt.build.core.buildArtefactType"
-             value="org.eclipse.ptp.rdt.build.core.buildArtefactType.staticLib">
+             value="org.eclipse.cdt.build.core.buildArtefactType.staticLib">
        </checkBuildProperty>
     </enablement>
  </configuration>
  <projectType
-       buildArtefactType="org.eclipse.ptp.rdt.build.core.buildArtefactType.exe"
+       buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe"
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.exe"
        isAbstract="false"
        isTest="false">
@@ -1390,7 +1390,7 @@
     </configuration>
  </projectType>
  <projectType
-       buildArtefactType="org.eclipse.ptp.rdt.build.core.buildArtefactType.sharedLib"
+       buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib"
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.so"
        isAbstract="false"
        isTest="false">
@@ -1538,7 +1538,7 @@
     </configuration>
  </projectType>
  <projectType
-       buildArtefactType="org.eclipse.ptp.rdt.build.core.buildArtefactType.staticLib"
+       buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib"
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.lib"
        isAbstract="false"
        isTest="false">
@@ -1661,7 +1661,7 @@
 			<!-- The output for C or C++ projects will be different as the ScannerInfoProvider substitute the ${specs_file} variable below with a dummy "c" file or "cpp" file -->
 			<run
 					arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
-					command="${XLC_COMPILER_ROOT}/gcc"
+					command="gcc"
 					class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsRunSIProvider">
 			</run>
 			<!-- Specifies the parser for the output generated by the compiler with the above command line -->
@@ -1680,7 +1680,7 @@
          name="%scannerConfigProfile.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="org.eclipse.cdt.managedbuilder.internal.scannerconfig.DefaultGCCScannerInfoCollector"
+            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerFileSICollector"
             scope="file">
       </scannerInfoCollector>
       <scannerInfoProvider providerId="specsFile">
@@ -1689,7 +1689,7 @@
 			<!-- The output for C or C++ projects will be different as the ScannerInfoProvider substitute the ${specs_file} variable below with a dummy "c" file or "cpp" file -->
 			<run
 					arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
-					command="${XLC_COMPILER_ROOT}/gcc"
+					command="gcc"
 					class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsRunSIProvider">
 			</run>
 			<!-- Specifies the parser for the output generated by the compiler with the above command line -->
@@ -1717,7 +1717,7 @@
 			<!-- The output for C or C++ projects will be different as the ScannerInfoProvider substitute the ${specs_file} variable below with a dummy "c" file or "cpp" file -->
 			<run
 					arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
-					command="${XLC_COMPILER_ROOT}/g++"
+					command="g++"
 					class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsRunSIProvider">
 			</run>
 			<!-- Specifies the parser for the output generated by the compiler with the above command line -->
@@ -1736,7 +1736,7 @@
          name="%scannerConfigProfileCpp.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="org.eclipse.cdt.managedbuilder.internal.scannerconfig.DefaultGCCScannerInfoCollector"
+            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerFileSICollector"
             scope="file">
       </scannerInfoCollector>
       <scannerInfoProvider providerId="specsFile">
@@ -1745,7 +1745,7 @@
 			<!-- The output for C or C++ projects will be different as the ScannerInfoProvider substitute the ${specs_file} variable below with a dummy "c" file or "cpp" file -->
 			<run
 					arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
-					command="${XLC_COMPILER_ROOT}/g++"
+					command="g++"
 					class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsRunSIProvider">
 			</run>
 			<!-- Specifies the parser for the output generated by the compiler with the above command line -->
