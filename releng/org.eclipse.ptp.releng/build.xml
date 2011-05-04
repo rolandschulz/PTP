@@ -246,6 +246,14 @@
 			<param name="p2site" value="${p2dir}"/>
 		</antcall>
 		
+		<!-- fix artifacts -->
+		<p2.process.artifacts pack="true" repositoryPath="file:/${p2dir}"/>
+
+		<!-- clean up some unnecessary files -->
+		<delete failonerror="false" quiet="true">
+			<fileset dir="${p2dir}" includes="artifacts.jar.pack.gz, content.jar.pack.gz, site.xml"/>
+		</delete>
+
 		<!-- zip everything back up -->
 		<zip destfile="${destination}"
 			basedir="${p2dir}"/>
