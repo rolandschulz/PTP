@@ -247,7 +247,7 @@
 		</antcall>
 		
 		<!-- fix artifacts -->
-		<p2.process.artifacts pack="true" repositoryPath="file:/${p2dir}"/>
+		<p2.process.artifacts repositoryPath="file:/${p2dir}"/>
 
 		<!-- clean up some unnecessary files -->
 		<delete failonerror="false" quiet="true">
