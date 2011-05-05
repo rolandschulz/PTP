@@ -471,7 +471,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public void waitForJobId(String uuid, String waitUntil) {
 		synchronized (this) {
-			while (waitEnabled && jobId == null && !waitUntil.equals(state)) {
+			while (waitEnabled && (jobId == null || !waitUntil.equals(state))) {
 				try {
 					wait(1000);
 				} catch (InterruptedException ignored) {
