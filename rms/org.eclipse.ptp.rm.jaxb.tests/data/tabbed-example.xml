@@ -11,11 +11,11 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="tabbed-example">
 	<control-data>
-	   <property name="e1" visible="true"/>
-	   <property name="e2" visible="true"/>
-	   <property name="e3" visible="true"/>
-	   <property name="e4" visible="true"/>
-	   <property name="e5" visible="true"/>
+		<property name="e1" visible="true"/>
+		<property name="e2" visible="true"/>
+		<property name="e3" visible="true"/>
+		<property name="e4" visible="true"/>
+		<property name="e5" visible="true"/>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
@@ -107,11 +107,11 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 									<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 								</layout-data>
 							</widget>
-							<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+							<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 								<layout-data>
 									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 								</layout-data>
-								<fixed-text>Description</fixed-text>
+								<fixed-text>${rm:Resource_List.walltime#description}</fixed-text>
 							</widget>
 							<widget type="label" style="SWT.LEFT">
 								<layout-data>
@@ -147,6 +147,42 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 								</layout-data>
 								<fixed-text>${rm:mpiCores#description}</fixed-text>
+							</widget>
+							<!-- row 4 -->
+							<widget type="label" style="SWT.LEFT">
+								<layout-data>
+									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+								</layout-data>
+								<fixed-text>Browse URI: </fixed-text>
+							</widget>
+							<widget type="browseUri" style="SWT.BORDER" readOnly="false" title="Browse URI">
+								<layout-data>
+									<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+								</layout-data>
+							</widget>
+							<!-- row 5 -->
+							<widget type="label" style="SWT.LEFT">
+								<layout-data>
+									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+								</layout-data>
+								<fixed-text>Browse PATH: </fixed-text>
+							</widget>
+							<widget type="browsePath" style="SWT.BORDER" readOnly="true" title="Browse Path">
+								<layout-data>
+									<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+								</layout-data>
+							</widget>
+							<!-- row 6 -->
+							<widget type="label" style="SWT.LEFT">
+								<layout-data>
+									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+								</layout-data>
+								<fixed-text>Browse Local: </fixed-text>
+							</widget>
+							<widget type="browseLocal" style="SWT.BORDER | SWT.H_SCROLL" readOnly="true" title="Browse Local">
+								<layout-data>
+									<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+								</layout-data>
 							</widget>
 						</composite>
 					</item>

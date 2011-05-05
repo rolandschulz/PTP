@@ -63,6 +63,7 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 		IRemoteUIServices uIServices = null;
 		IRemoteUIFileManager uiFileManager = null;
 		IRemoteConnection conn = null;
+
 		URI home = null;
 		String path = null;
 		int type = readOnly ? IRemoteUIConstants.OPEN : IRemoteUIConstants.SAVE;
@@ -79,7 +80,7 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 			home = delegate.getRemoteHome();
 		}
 
-		path = current == null ? home.getPath() : current.getPath();
+		path = (current == null) ? home.getPath() : current.getPath();
 
 		try {
 			uiFileManager.setConnection(conn);

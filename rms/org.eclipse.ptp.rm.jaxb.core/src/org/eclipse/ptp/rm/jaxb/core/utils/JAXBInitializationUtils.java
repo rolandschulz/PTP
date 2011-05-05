@@ -31,8 +31,10 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
+import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Convenience methods for validating and unmarshaling XML using JAXB.
@@ -94,7 +96,12 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 		Schema schema = factory.newSchema(xsd);
 		Validator validator = schema.newValidator();
 		Source source = new StreamSource(instance.openStream());
-		validator.validate(source);
+		try {
+			validator.validate(source);
+		} catch (SAXParseException sax) {
+			JAXBCorePlugin.log(printInfo(sax));
+			throw sax;
+		}
 	}
 
 	/**
@@ -133,6 +140,22 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 				property.setValue(property.getDefault());
 			}
 		}
+	}
+
+	/**
+	 * Details from the parse exception.
+	 * 
+	 * @param e
+	 * @return
+	 */
+	private static String printInfo(SAXParseException e) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(Messages.PublicId + e.getPublicId()).append(LINE_SEP);
+		sb.append(Messages.SystemId + e.getSystemId()).append(LINE_SEP);
+		sb.append(Messages.LineNumber + e.getLineNumber()).append(LINE_SEP);
+		sb.append(Messages.ColumnNumber + e.getColumnNumber()).append(LINE_SEP);
+		sb.append(Messages.Message + e.getMessage()).append(LINE_SEP);
+		return sb.toString();
 	}
 
 	/**
