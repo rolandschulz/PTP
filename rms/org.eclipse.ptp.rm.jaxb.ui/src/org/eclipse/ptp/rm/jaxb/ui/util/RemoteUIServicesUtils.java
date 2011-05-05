@@ -23,6 +23,7 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 
@@ -93,7 +94,7 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 				path = uiFileManager.browseFile(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, type);
 			}
 		} catch (Throwable t) {
-			t.printStackTrace();
+			JAXBUIPlugin.log(t);
 		}
 
 		if (path == null) {
