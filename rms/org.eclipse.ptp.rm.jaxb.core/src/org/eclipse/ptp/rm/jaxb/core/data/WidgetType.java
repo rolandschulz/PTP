@@ -9,6 +9,7 @@ package org.eclipse.ptp.rm.jaxb.core.data;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -65,8 +66,10 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;enumeration value="spinner"/>
  *             &lt;enumeration value="combo"/>
  *             &lt;enumeration value="radioButton"/>
- *             &lt;enumeration value="browseLocal"/>
- *             &lt;enumeration value="browseRemote"/>
+ *             &lt;enumeration value="browseFile"/>
+ *             &lt;enumeration value="browseDir"/>
+ *             &lt;enumeration value="browseUri"/>
+ *             &lt;enumeration value="browsePath"/>
  *           &lt;/restriction>
  *         &lt;/simpleType>
  *       &lt;/attribute>
