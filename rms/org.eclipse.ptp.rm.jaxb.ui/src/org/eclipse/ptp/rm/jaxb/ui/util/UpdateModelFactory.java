@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
-import java.io.File;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
@@ -56,7 +55,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -238,7 +236,11 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	private static class ControlDescriptor {
 		private String title;
 		private Object layoutData;
+		private Object subLayoutData;
 		private boolean readOnly;
+		private boolean localOnly;
+		private boolean directory;
+		private boolean returnUri;
 		private int style;
 		private String background;
 		private String foreground;
@@ -272,7 +274,12 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			title = widget.getTitle();
 			LayoutDataType layout = widget.getLayoutData();
 			layoutData = LaunchTabBuilder.createLayoutData(layout);
+			layout = widget.getSubLayoutData();
+			subLayoutData = LaunchTabBuilder.createLayoutData(layout);
 			style = WidgetBuilderUtils.getStyle(widget.getStyle());
+			directory = widget.isDirectory();
+			returnUri = widget.isUri();
+			localOnly = widget.isLocalOnly();
 			readOnly = widget.isReadOnly();
 			if (readOnly) {
 				style |= SWT.READ_ONLY;
@@ -458,55 +465,6 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	}
 
 	/**
-	 * Creates a read-only Text area and adjacent browse button using local
-	 * connection information. The update model will be attached to the returned
-	 * text widget, as its text value will trigger updates.
-	 * 
-	 * @see org.eclipse.swt.widgets.Text
-	 * @see org.eclipse.swt.widgets.Button
-	 * 
-	 * @param parent
-	 *            to which the control belongs
-	 * @param cd
-	 *            internal data object carrying model description info
-	 * @param dir
-	 *            whether to browse directory of file
-	 * @return the text widget carrying the browse selection
-	 */
-	private static Text createBrowseLocal(final Composite parent, final ControlDescriptor cd, final boolean dir) {
-		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, ZEROSTR);
-		WidgetBuilderUtils.createButton(parent, null, cd.title, SWT.PUSH, new SelectionListener() {
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				try {
-					String path = t.getText();
-					int type = cd.readOnly ? SWT.OPEN : SWT.SAVE;
-					FileDialog d = new FileDialog(parent.getShell(), type);
-					if (dir) {
-						d.setFilterPath(path);
-					} else {
-						d.setFileName(path);
-					}
-					String result = d.open();
-					String f = result == null ? null : (dir ? d.getFilterPath() : d.getFileName());
-					if (f != null) {
-						t.setText(new File(f).getAbsolutePath());
-					} else {
-						t.setText(ZEROSTR);
-					}
-				} catch (Throwable t) {
-					JAXBUIPlugin.log(t);
-				}
-			}
-		});
-		return t;
-	}
-
-	/**
 	 * Creates a read-only Text area and adjacent browse button using remote
 	 * connection information. The update model will be attached to the returned
 	 * text widget, as its text value will trigger updates.
@@ -520,14 +478,11 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 *            internal data object carrying model description info
 	 * @param tab
 	 *            launch tab being built
-	 * @param returnUri
-	 *            text carries URI; if false, just the (absolute) path
 	 * @return the text widget carrying the browse selection
 	 */
-	private static Text createBrowseUri(final Composite parent, final ControlDescriptor cd,
-			final JAXBDynamicLaunchConfigurationTab tab, final boolean returnUri) {
+	private static Text createBrowse(final Composite parent, final ControlDescriptor cd, final JAXBDynamicLaunchConfigurationTab tab) {
 		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, ZEROSTR);
-		WidgetBuilderUtils.createButton(parent, null, cd.title, SWT.PUSH, new SelectionListener() {
+		WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.PUSH, new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
@@ -542,9 +497,10 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 					} else {
 						uri = new URI(initial);
 					}
-					uri = RemoteUIServicesUtils.browse(parent.getShell(), uri, tab.getParent().getDelegate(), true, cd.readOnly);
+					uri = RemoteUIServicesUtils.browse(parent.getShell(), uri, tab.getParent().getDelegate(), !cd.localOnly,
+							cd.readOnly, cd.directory);
 					if (uri != null) {
-						if (returnUri) {
+						if (cd.returnUri) {
 							t.setText(uri.toString());
 						} else {
 							t.setText(uri.getPath());
@@ -625,14 +581,8 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			c = WidgetBuilderUtils.createSpinner(parent, cd.layoutData, cd.title, cd.min, cd.max, cd.min, null);
 		} else if (COMBO.equals(type)) {
 			c = createCombo(parent, cd);
-		} else if (BROWSEFILE.equals(type)) {
-			c = createBrowseLocal(parent, cd, false);
-		} else if (BROWSEDIR.equals(type)) {
-			c = createBrowseLocal(parent, cd, true);
-		} else if (BROWSEURI.equals(type)) {
-			c = createBrowseUri(parent, cd, tab, true);
-		} else if (BROWSEPATH.equals(type)) {
-			c = createBrowseUri(parent, cd, tab, false);
+		} else if (BROWSE.equals(type)) {
+			c = createBrowse(parent, cd, tab);
 		}
 
 		if (c != null) {

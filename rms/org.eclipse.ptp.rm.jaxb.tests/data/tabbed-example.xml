@@ -158,46 +158,58 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>Browse URI: </fixed-text>
 					</widget>
-					<widget type="browseUri" style="SWT.BORDER" readOnly="false" title="Browse URI">
+					<widget type="browse" uri="true" style="SWT.BORDER" readOnly="false" title="Browse">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
+						<sub-layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+                  </sub-layout-data>
 					</widget>
 					<!-- row 5 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>Browse PATH: </fixed-text>
+						<fixed-text>Browse Dir Path: </fixed-text>
 					</widget>
-					<widget type="browsePath" style="SWT.BORDER" readOnly="true" title="Browse Path">
+					<widget type="browse" uri="false" directory="true" style="SWT.BORDER" readOnly="true" title="Browse">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
+						<sub-layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+						</sub-layout-data>
 					</widget>
 					<!-- row 6 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>Browse File: </fixed-text>
+						<fixed-text>Browse Local File: </fixed-text>
 					</widget>
-					<widget type="browseFile" style="SWT.BORDER | SWT.H_SCROLL" readOnly="true" title="Browse File">
+					<widget type="browse" style="SWT.BORDER | SWT.H_SCROLL" readOnly="true" localOnly="true" title="Browse">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
+						<sub-layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+                  </sub-layout-data>
 					</widget>
 					<!-- row 7 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>Browse Dir: </fixed-text>
+						<fixed-text>Browse Local Dir URI: </fixed-text>
 					</widget>
-					<widget type="browseDir" style="SWT.BORDER" readOnly="true" title="Browse Dir">
+					<widget type="browse" directory="true" uri="true" style="SWT.BORDER" readOnly="true" localOnly="true" title="Browse">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
+						<sub-layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+                  </sub-layout-data>
 					</widget>
 				</composite>
 			</dynamic>

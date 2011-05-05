@@ -55,11 +55,13 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 	 * @param readOnly
 	 *            whether to disallow the user to type in a path (default is
 	 *            <code>true</code>)
+	 * @param dir
+	 *            whether to browse/return a directory (default is file)
 	 * @return the selected file path as URI or <code>null</code> if canceled
 	 * @throws URISyntaxException
 	 */
-	public static URI browse(Shell shell, URI current, RemoteServicesDelegate delegate, boolean remote, boolean readOnly)
-			throws URISyntaxException {
+	public static URI browse(Shell shell, URI current, RemoteServicesDelegate delegate, boolean remote, boolean readOnly,
+			boolean dir) throws URISyntaxException {
 		IRemoteUIServices uIServices = null;
 		IRemoteUIFileManager uiFileManager = null;
 		IRemoteConnection conn = null;
@@ -85,7 +87,11 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 		try {
 			uiFileManager.setConnection(conn);
 			uiFileManager.showConnections(remote);
-			path = uiFileManager.browseFile(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, type);
+			if (dir) {
+				path = uiFileManager.browseDirectory(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, type);
+			} else {
+				path = uiFileManager.browseFile(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, type);
+			}
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
