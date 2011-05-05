@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,11 @@
  *    IBM Corporation - initial API and implementation
  *******************************************************************************/ 
 
+/* -- ST-Origin --
+ * Source folder: org.eclipse.cdt.ui/src
+ * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchMatch
+ * Version: 1.9
+ */
 package org.eclipse.ptp.internal.rdt.core.search;
 
 import java.io.Serializable;
@@ -31,6 +36,9 @@ public class RemoteSearchMatch implements Serializable {
 	private IIndexName fName;
 	private int fOffset;
 	private int fLength;
+	
+	private boolean fIsPolymorphicCall;
+
 
 	public RemoteSearchMatch(IIndex index, IIndexBinding binding, IIndexName name, int nodeOffset, int nodeLength) {
 		try {
@@ -79,5 +87,14 @@ public class RemoteSearchMatch implements Serializable {
 	public int getLength() {
 		return fLength;
 	}
+	
+	public void setIsPolymorphicCall() {
+		fIsPolymorphicCall= true;
+	}
+	
+	public boolean isPolymorphicCall() {
+		return fIsPolymorphicCall;
+	}
+
 	
 }

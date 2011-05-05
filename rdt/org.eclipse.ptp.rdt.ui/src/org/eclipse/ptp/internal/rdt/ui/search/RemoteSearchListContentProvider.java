@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 QNX Software Systems and others.
+ * Copyright (c) 2006, 2011 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,14 +13,13 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchListContentProvider
- * Version: 1.2
+ * Version: 1.6
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,25 +35,31 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchElement;
+
 
 public class RemoteSearchListContentProvider implements
 		IStructuredContentProvider, IPDOMSearchContentProvider {
 
 	private TableViewer viewer;
 	private RemoteSearchResult result;
+	private final RemoteSearchViewPage fPage;
+
+	
+	RemoteSearchListContentProvider(RemoteSearchViewPage page) {
+		fPage= page;
+	}
+
 	
 	public Object[] getElements(Object inputElement) {
-		Set uncoveredProjects = new HashSet(); 
+		Set<String> uncoveredProjects = new HashSet<String>(); 
 		
 		RemoteSearchResult result = (RemoteSearchResult) inputElement;
 		
 		Object[] results = result.getElements();
-		List resultList = new ArrayList(Arrays.asList(results));
+		List<Object> resultList = new ArrayList<Object>();
 		
-		// see if indexer was busy
-		if (result.wasIndexerBusy()) {
-			resultList.add(IPDOMSearchContentProvider.INCOMPLETE_RESULTS_NODE);
-		}
+	
 		
 		// see which projects returned results
 		for (int i = 0; i < results.length; i++) {
@@ -64,7 +69,16 @@ public class RemoteSearchListContentProvider implements
 				if (path != null) {
 					uncoveredProjects.add(new Path(path).segment(0));
 				}
+				if (fPage.getDisplayedMatchCount(searchElement) > 0) {
+					resultList.add(searchElement);
+				}
+
 			}
+		}
+		
+		// see if indexer was busy
+		if (result.wasIndexerBusy()) {
+			resultList.add(IPDOMSearchContentProvider.INCOMPLETE_RESULTS_NODE);
 		}
 		
 		// add message for all the projects which have no results
@@ -114,7 +128,7 @@ public class RemoteSearchListContentProvider implements
 			return;
 		
 		for (int i= 0; i < elements.length; i++) {
-			if (result.getMatchCount(elements[i]) > 0) {
+			if (fPage.getDisplayedMatchCount(elements[i]) > 0) {
 				if (viewer.testFindItem(elements[i]) != null)
 					viewer.refresh(elements[i]);
 				else

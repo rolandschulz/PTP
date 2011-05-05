@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHViewPart
- * Version: 1.26
+ * Version: 1.29
  */
 
 package org.eclipse.ptp.internal.rdt.ui.callhierarchy;
@@ -34,6 +34,7 @@ import org.eclipse.cdt.internal.core.model.CModel;
 import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.CPluginImages;
 import org.eclipse.cdt.internal.ui.IContextMenuConstants;
+import org.eclipse.cdt.internal.ui.actions.CopyTreeAction;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHMessages;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHMultiDefNode;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHNode;
@@ -44,6 +45,7 @@ import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.internal.ui.util.Messages;
 import org.eclipse.cdt.internal.ui.viewsupport.AdaptingSelectionProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementLabels;
+import org.eclipse.cdt.internal.ui.viewsupport.DecoratingCLabelProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.EditorOpener;
 import org.eclipse.cdt.internal.ui.viewsupport.ExtendedTreeViewer;
 import org.eclipse.cdt.internal.ui.viewsupport.IndexUI;
@@ -75,6 +77,7 @@ import org.eclipse.ptp.internal.rdt.ui.actions.OpenViewActionGroup;
 import org.eclipse.ptp.internal.rdt.ui.search.actions.SelectionSearchGroup;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.Transfer;
@@ -98,6 +101,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
+import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -118,6 +122,9 @@ public class RemoteCHViewPart extends ViewPart {
     private int fNavigationDetail;
     
 	private ArrayList<ICElement> fHistoryEntries= new ArrayList<ICElement>(MAX_HISTORY_SIZE);
+	
+	private Clipboard fClipboard;
+
 
     // widgets
     private PageBook fPagebook;
@@ -146,6 +153,8 @@ public class RemoteCHViewPart extends ViewPart {
 	private Action fHistoryAction;
 	private Action fShowReference;
 	private Action fOpenElement;
+	private CopyTreeAction fCopyAction;
+
 	
 	// action groups
 	private OpenViewActionGroup fOpenViewActionGroup;
@@ -219,6 +228,8 @@ public class RemoteCHViewPart extends ViewPart {
         createViewerPage();
                 
         getSite().setSelectionProvider(new AdaptingSelectionProvider(ICElement.class, fTreeViewer));
+
+        fClipboard = new Clipboard(parent.getDisplay());
 
         initDragAndDrop();
         createActions();
@@ -327,7 +338,7 @@ public class RemoteCHViewPart extends ViewPart {
         fLabelProvider= new CHLabelProvider(display, fContentProvider);
         fTreeViewer= new ExtendedTreeViewer(fViewerPage);
         fTreeViewer.setContentProvider(fContentProvider);
-        fTreeViewer.setLabelProvider(fLabelProvider);
+        fTreeViewer.setLabelProvider(new DecoratingCLabelProvider(fLabelProvider));
         fTreeViewer.setAutoExpandLevel(2);     
         fTreeViewer.addOpenListener(new IOpenListener() {
 			public void open(OpenEvent event) {
@@ -499,6 +510,8 @@ public class RemoteCHViewPart extends ViewPart {
 
         fHistoryAction = new CHHistoryDropDownAction(this);
 
+        fCopyAction= new CopyCallHierarchyAction(this, fTreeViewer);
+        
         // setup action bar
         // global action hooks
         IActionBars actionBars = getViewSite().getActionBars();
@@ -678,7 +691,7 @@ public class RemoteCHViewPart extends ViewPart {
                 String format, scope, label;
             	
                 // label
-                label= CElementBaseLabels.getElementLabel(elem, CHHistoryAction.LABEL_OPTIONS);
+                label= CElementLabels.getElementLabel(elem, CHHistoryAction.LABEL_OPTIONS);
             	
                 // scope
                 IWorkingSet workingSet= fWorkingSetFilterUI.getWorkingSet();
@@ -741,7 +754,7 @@ public class RemoteCHViewPart extends ViewPart {
 				final ICElement element= node.getRepresentedDeclaration();
 				if (element != null) {
 					String label= Messages.format(CHMessages.CHViewPart_FocusOn_label, 
-							CElementLabels.getTextLabel(element, CElementBaseLabels.ALL_FULLY_QUALIFIED | CElementBaseLabels.M_PARAMETER_TYPES));
+							CElementLabels.getTextLabel(element, CElementLabels.ALL_FULLY_QUALIFIED | CElementLabels.M_PARAMETER_TYPES));
 					menu.appendToGroup(IContextMenuConstants.GROUP_OPEN, new Action(label) {
 						@Override
 						public void run() {
@@ -757,6 +770,11 @@ public class RemoteCHViewPart extends ViewPart {
 		if (OpenViewActionGroup.canActionBeAdded(selection)){
 			fOpenViewActionGroup.fillContextMenu(menu);
 		}
+		
+		if (fCopyAction.canActionBeAdded()) {
+        	menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fCopyAction);
+		}
+
 
 		if (SelectionSearchGroup.canActionBeAdded(selection)){
 			fSelectionSearchGroup.fillContextMenu(menu);
@@ -841,4 +859,12 @@ public class RemoteCHViewPart extends ViewPart {
 	public TreeViewer getTreeViewer() {
 		return fTreeViewer;
 	}
+	
+	private static class CopyCallHierarchyAction extends CopyTreeAction {
+		public CopyCallHierarchyAction(ViewPart view, TreeViewer viewer) {
+			super(CHMessages.CHViewPart_CopyCallHierarchy_label, view, viewer);
+		}
+	}
+
+
 }

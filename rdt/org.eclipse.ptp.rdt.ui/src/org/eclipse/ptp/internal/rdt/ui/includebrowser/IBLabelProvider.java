@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.includebrowser.IBLabelProvider
- * Version: 1.4
+ * Version: 1.5
  */
 
 package org.eclipse.ptp.internal.rdt.ui.includebrowser;
@@ -22,9 +22,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.internal.ui.CPluginImages;
 import org.eclipse.cdt.internal.ui.includebrowser.IBNode;
 import org.eclipse.cdt.internal.ui.viewsupport.ImageImageDescriptor;
+import org.eclipse.cdt.ui.CDTSharedImages;
 import org.eclipse.cdt.ui.CElementImageDescriptor;
 import org.eclipse.cdt.ui.CElementLabelProvider;
 import org.eclipse.core.runtime.IPath;
@@ -54,7 +54,7 @@ public class IBLabelProvider extends LabelProvider implements IColorProvider {
         if (element instanceof IBNode) {
             IBNode node= (IBNode) element;
             ITranslationUnit tu= node.getRepresentedTranslationUnit();
-            Image image= tu != null ? fCLabelProvider.getImage(tu) : CPluginImages.get(CPluginImages.IMG_OBJS_TUNIT_HEADER);
+            Image image= tu != null ? fCLabelProvider.getImage(tu) : CDTSharedImages.getImage(CDTSharedImages.IMG_OBJS_TUNIT_HEADER);
             return decorateImage(image, node);
         }
         return super.getImage(element);

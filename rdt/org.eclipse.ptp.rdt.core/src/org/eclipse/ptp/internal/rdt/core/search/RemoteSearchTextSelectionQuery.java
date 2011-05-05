@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 QNX Software Systems and others.
+ * Copyright (c) 2006, 2011 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,16 @@
  *    IBM Corporation
  *******************************************************************************/
 
+/* -- ST-Origin --
+ * Source folder: org.eclipse.cdt.ui/src
+ * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchTextSelectionQuery
+ * Version: 1.22
+ */
+
 package org.eclipse.ptp.internal.rdt.core.search;
 
 import org.eclipse.cdt.core.dom.ast.DOMException;
+import org.eclipse.cdt.core.dom.ast.EScopeKind;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.IBinding;
@@ -24,7 +31,9 @@ import org.eclipse.cdt.core.dom.ast.cpp.ICPPBlockScope;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexLocationConverter;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPTemplates;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -37,6 +46,8 @@ public class RemoteSearchTextSelectionQuery extends RemoteSearchQuery {
 	private String selection;
 	private int offset;
 	private int length;
+	private String tuFullPath;
+
 	
 	public RemoteSearchTextSelectionQuery(ICElement[] scope, ITranslationUnit tu, String selection, int offset, int length, int flags) {
 		super(scope, flags | IIndex.SEARCH_ACROSS_LANGUAGE_BOUNDARIES);
@@ -53,8 +64,9 @@ public class RemoteSearchTextSelectionQuery extends RemoteSearchQuery {
 		parseIndex.acquireReadLock();
 		try{
 			IASTTranslationUnit ast = tu.getAST(parseIndex, ITranslationUnit.AST_SKIP_INDEXED_HEADERS);
-
+			
 			if (ast != null) {
+				tuFullPath = ast.getFilePath();
 				IASTName searchName= ast.getNodeSelector(null).findEnclosingName(offset, length);
 				if (searchName != null) {
 					selection= searchName.toString();
@@ -66,12 +78,14 @@ public class RemoteSearchTextSelectionQuery extends RemoteSearchQuery {
 								scope = binding.getScope();
 							} catch (DOMException e) {
 							}
-							if (scope instanceof ICPPBlockScope || scope instanceof ICFunctionScope) {
-								createLocalMatches(ast, binding);
-								
+							if (scope != null && scope.getKind() == EScopeKind.eLocal) {
+								createLocalMatches(ast, binding); 
+								return;
 							}
+							
 						}
 						binding = parseIndex.findBinding(searchName);
+						binding= CPPTemplates.findDeclarationForSpecialization(binding);
 						
 					}
 				}
@@ -80,6 +94,7 @@ public class RemoteSearchTextSelectionQuery extends RemoteSearchQuery {
 			parseIndex.releaseReadLock();
 		}
 		if (binding != null) {
+			cElement = CElementForBinding(parseIndex, binding);
 			searchScopeindex.acquireReadLock();
 			try{
 				createMatches(searchScopeindex, binding);
@@ -89,10 +104,17 @@ public class RemoteSearchTextSelectionQuery extends RemoteSearchQuery {
 			
 			
 		}
-			
+		
 	}
 
 	public String getSelection() {
 		return selection;
 	}
+
+	public String getTuFullPath() {
+		return tuFullPath;
+	}
+
+	
+	
 }
