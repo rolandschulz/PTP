@@ -187,8 +187,8 @@
                       <optvalue type="dir" default="."/>
                 </togoption>
                 
-                <togoption label="Profile Format" optname="TAU_PROFILE_FORMAT" envvar="true" tooltip="Format of profile output. Note that merged output may prevent automatic database uploads.">
-                      <optvalue type="combo" defaultnum="0" items="profile:::merged:::snapshot:::none"/>
+                <togoption label="Profile Format" optname="TAU_PROFILE_FORMAT" envvar="true" defstate="true" tooltip="Format of profile output. Note that merged output may prevent automatic database uploads.">
+                      <optvalue type="combo" defaultnum="1" items="profile:::merged:::snapshot:::none"/>
                 </togoption>
                 
                <togoption label="Callpath Profiling" optname="TAU_CALLPATH" envvar="true" defstate="false" tooltip="Generate TAU callpath profiles">
