@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
@@ -66,15 +68,11 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
 		updateHandler = new ValueUpdateHandler(this);
 		if (launchTabData != null) {
-			TabControllerType controller = launchTabData.getBasic();
-			if (controller != null) {
+			List<TabControllerType> dynamic = launchTabData.getDynamic();
+			for (TabControllerType controller : dynamic) {
 				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
 			}
-			controller = launchTabData.getAdvanced();
-			if (controller != null) {
-				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
-			}
-			String title = launchTabData.getCustomController();
+			String title = launchTabData.getImport();
 			if (title != null) {
 				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this));
 			}

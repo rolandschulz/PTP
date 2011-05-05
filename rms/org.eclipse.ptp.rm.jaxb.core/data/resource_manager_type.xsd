@@ -303,16 +303,13 @@
 				A recursive description of the UI element associated with the control part, the Launch Tab.
 				As in:
 				org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab, provides a top-level "switch" between controllers. There
-				are a maximum of three top-level tabs or "pages"; the basic and advanced (the names are placeholders which need not correspond to
-				their actual content or usage, and can be changed) controllers are configurable; for the custom controller, see below.
-				The
-				SWT-related types generally expose the fields of their associated Java class.
+				can be an arbitrary number of top-level tabs or "pages"; the dynamic controllers are configurable; for the import controller, see
+				below. The SWT-related types generally expose the fields of their associated Java class.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="basic" minOccurs="0" type="rm:tab-controller-type"/>
-			<xs:element name="advanced" minOccurs="0" type="rm:tab-controller-type"/>
-			<xs:element name="custom-controller" minOccurs="0" type="xs:string">
+			<xs:element name="dynamic" minOccurs="0" maxOccurs="unbounded" type="rm:tab-controller-type"/>
+			<xs:element name="import" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
 						Fixed type; to be used with scheduler systems which accept submission scripts. Allows the user to browse the
@@ -742,7 +739,8 @@
 					<xs:enumeration value="browseDir">
 						<xs:annotation>
 							<xs:documentation>
-								Creates a text widget followed by a push button allowing the user to browse the local file system for directory.
+								Creates a text widget followed by a push button allowing the user to browse the local file system for
+								directory.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:enumeration>

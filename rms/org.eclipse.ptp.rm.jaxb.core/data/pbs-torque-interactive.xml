@@ -105,7 +105,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
          <arg>${rm:@jobId#name}</arg>
       </terminate-job>
 		<launch-tab>
-			<basic>
+			<dynamic>
 				<title>Basic PBS Settings</title>
 				<!-- QUEUES remote path group -->
 				<composite group="true">
@@ -225,7 +225,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<fixed-text>${rm:mpiCores#description}</fixed-text>
 					</widget>
 				</composite>
-			</basic>
+			</dynamic>
 		</launch-tab>
 	</control-data>
 	<monitor-data schedulerType="PBS"/>
