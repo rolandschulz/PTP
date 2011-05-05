@@ -34,7 +34,7 @@ public abstract class AbstractCallHierarchyService implements ICallHierarchyServ
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.ui/src
 	 * Class: org.eclipse.cdt.internal.ui.callhierarchy.CallHierarchyUI
-	 * Version: 1.22
+	 * Version: 1.25
 	 */
 	/**
 	 * Returns <code>true</code> if the given <code>IBinding</code>

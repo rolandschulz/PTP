@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.viewsupport.IndexUI
- * Version: 1.23
+ * Version: 1.38
  */
 package org.eclipse.ptp.internal.rdt.core.index;
 
@@ -27,8 +27,17 @@ import java.util.List;
 
 import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.DOMException;
+import org.eclipse.cdt.core.dom.ast.IASTDeclarator;
+import org.eclipse.cdt.core.dom.ast.IASTExpression;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
+import org.eclipse.cdt.core.dom.ast.IASTFunctionCallExpression;
+import org.eclipse.cdt.core.dom.ast.IASTFunctionDefinition;
+import org.eclipse.cdt.core.dom.ast.IASTIdExpression;
 import org.eclipse.cdt.core.dom.ast.IASTName;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
+import org.eclipse.cdt.core.dom.ast.IASTNodeSelector;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorMacroExpansion;
+import org.eclipse.cdt.core.dom.ast.IASTSimpleDeclaration;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.cdt.core.dom.ast.ICompositeType;
@@ -61,6 +70,7 @@ import org.eclipse.cdt.core.model.IInclude;
 import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.internal.core.dom.parser.ASTQueries;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.ICPPInstanceCache;
 import org.eclipse.cdt.internal.core.index.IndexFileLocation;
 import org.eclipse.core.runtime.CoreException;
@@ -80,11 +90,15 @@ public class IndexQueries {
 	private static final ICElement[] EMPTY_ELEMENTS = new ICElement[0];
 
 	public static IIndexBinding elementToBinding(IIndex index, ICElement element, String path) throws CoreException {
+		return elementToBinding(index, element, path, -1);
+	}
+
+	public static IIndexBinding elementToBinding(IIndex index, ICElement element, String path, int linkageID) throws CoreException {
 		if (element instanceof ISourceReference) {
 			ISourceReference sf = ((ISourceReference)element);
 			ISourceRange range= sf.getSourceRange();
 			if (range.getIdLength() != 0) {
-				IIndexName name= remoteElementToName(index, element, path);
+				IIndexName name= remoteElementToName(index, element, path, linkageID);
 				if (name != null) {
 					return index.findBinding(name);
 				}
@@ -93,8 +107,7 @@ public class IndexQueries {
 				String name= element.getElementName();
 				name= name.substring(name.lastIndexOf(':')+1);
 				IIndexBinding[] bindings= index.findBindings(name.toCharArray(), IndexFilter.ALL, new NullProgressMonitor());
-				for (int i = 0; i < bindings.length; i++) {
-					IIndexBinding binding = bindings[i];
+				for (IIndexBinding binding : bindings) {
 					if (checkBinding(binding, element)) {
 						return binding;
 					}
@@ -155,8 +168,13 @@ public class IndexQueries {
 		}
 		return false;
 	}
-
+	
 	public static IIndexName elementToName(IIndex index, ICElement element) throws CoreException {
+		return elementToName(index, element, -1);
+	}
+
+
+	public static IIndexName elementToName(IIndex index, ICElement element, int linkageID) throws CoreException {
 		if (element instanceof ISourceReference) {
 			ISourceReference sf = ((ISourceReference)element);
 			ITranslationUnit tu= sf.getTranslationUnit();
@@ -164,19 +182,20 @@ public class IndexQueries {
 				IIndexFileLocation location= IndexLocationFactory.getIFL(tu);
 				if (location != null) {
 					IIndexFile[] files= index.getFiles(location);
-					for (int i = 0; i < files.length; i++) {
-						IIndexFile file = files[i];
-						String elementName= element.getElementName();
-						int idx= elementName.lastIndexOf(":")+1; //$NON-NLS-1$
-						ISourceRange pos= sf.getSourceRange();
-//						IRegion region = getConvertedRegion(tu, file, pos.getIdStartPos()+idx, pos.getIdLength()-idx);
-						int offset = pos.getIdStartPos()+idx;
-						int length = pos.getIdLength()-idx;
-						IIndexName[] names= file.findNames(offset, length);
-						for (int j = 0; j < names.length; j++) {
-							IIndexName name = names[j];
-							if (!name.isReference() && elementName.endsWith(new String(name.toCharArray()))) {
-								return name;
+					for (IIndexFile file : files) {
+						if (linkageID == -1 || file.getLinkageID() == linkageID) {
+							String elementName= element.getElementName();
+							int idx= elementName.lastIndexOf(":")+1; //$NON-NLS-1$
+							ISourceRange pos= sf.getSourceRange();
+	//						IRegion region = getConvertedRegion(tu, file, pos.getIdStartPos()+idx, pos.getIdLength()-idx);
+							int offset = pos.getIdStartPos()+idx;
+							int length = pos.getIdLength()-idx;
+							IIndexName[] names= file.findNames(offset, length);
+							for (IIndexName name2 : names) {
+								IIndexName name = name2;
+								if (!name.isReference() && elementName.endsWith(new String(name.getSimpleID()))) {
+									return name;
+								}
 							}
 						}
 					}
@@ -187,6 +206,10 @@ public class IndexQueries {
 	}
 	
 	public static IIndexName remoteElementToName(IIndex index, ICElement element, String path) throws CoreException {
+		return remoteElementToName(index, element, path, -1);
+	}
+	
+	public static IIndexName remoteElementToName(IIndex index, ICElement element, String path, int linkageID) throws CoreException {
 		if (element instanceof ISourceReference) {
 			ISourceReference sf = ((ISourceReference)element);
 			ITranslationUnit tu= sf.getTranslationUnit();
@@ -206,19 +229,20 @@ public class IndexQueries {
 
 				if (location != null) {
 					IIndexFile[] files= index.getFiles(location);
-					for (int i = 0; i < files.length; i++) {
-						IIndexFile file = files[i];
-						String elementName= element.getElementName();
-						int idx= elementName.lastIndexOf(":")+1; //$NON-NLS-1$
-						ISourceRange pos= sf.getSourceRange();
-//						IRegion region = getConvertedRegion(tu, file, pos.getIdStartPos()+idx, pos.getIdLength()-idx);
-						int offset = pos.getIdStartPos()+idx;
-						int length = pos.getIdLength()-idx;
-						IIndexName[] names= file.findNames(offset, length);
-						for (int j = 0; j < names.length; j++) {
-							IIndexName name = names[j];
-							if (!name.isReference() && elementName.endsWith(new String(name.toCharArray()))) {
-								return name;
+					for (IIndexFile file : files) {
+						if (linkageID == -1 || file.getLinkageID() == linkageID) {
+							String elementName= element.getElementName();
+							int idx= elementName.lastIndexOf(":")+1; //$NON-NLS-1$
+							ISourceRange pos= sf.getSourceRange();
+	//						IRegion region = getConvertedRegion(tu, file, pos.getIdStartPos()+idx, pos.getIdLength()-idx);
+							int offset = pos.getIdStartPos()+idx;
+							int length = pos.getIdLength()-idx;
+							IIndexName[] names= file.findNames(offset, length);
+							for (IIndexName name2 : names)  {
+								IIndexName name = name2;
+								if (!name.isReference() && elementName.endsWith(new String(name.getSimpleID()))) {
+									return name;
+								}
 							}
 						}
 					}
@@ -255,10 +279,8 @@ public class IndexQueries {
 				IIndexFileLocation location= IndexLocationFactory.getIFL(tu);
 				if (location != null) {
 					IIndexFile[] files= index.getFiles(location);
-					for (int j=0; j<files.length; j++) {
-						IIndexFile file= files[j];
+					for (IIndexFile file : files) {
 						String elementName= include.getElementName();
-						elementName= elementName.substring(elementName.lastIndexOf('/')+1);
 						ISourceRange pos= include.getSourceRange();
 						//IRegion region= getConvertedRegion(tu, file, pos.getIdStartPos(), pos.getIdLength());
 						int offset = pos.getIdStartPos();
@@ -266,18 +288,18 @@ public class IndexQueries {
 						IIndexInclude[] includes= index.findIncludes(file);
 						int bestDiff= Integer.MAX_VALUE;
 						IIndexInclude best= null;
-						for (int i = 0; i < includes.length; i++) {
-							IIndexInclude candidate = includes[i];
+						for (IIndexInclude candidate : includes) {
 							int diff= Math.abs(candidate.getNameOffset()- offset);
 							if (diff > bestDiff) {
 								break;
 							}
-							if (candidate.getName().endsWith(elementName)) {
+							if (candidate.getFullName().endsWith(elementName)) {
 								bestDiff= diff;
 								best= candidate;
 							}
 						}
-						return best;
+						if (best != null)
+							return best;
 					}
 				}
 			}
@@ -313,8 +335,7 @@ public class IndexQueries {
 			IIndexName[] defs= index.findNames(binding, IIndex.FIND_DEFINITIONS | IIndex.SEARCH_ACROSS_LANGUAGE_BOUNDARIES);
 			
 			ArrayList<ICElement> result= new ArrayList<ICElement>();
-			for (int i = 0; i < defs.length; i++) {
-				IIndexName in = defs[i];
+			for (IIndexName in : defs) {
 				ICElement definition= getCElementForName(preferProject, index, in, converter, projectFactory);
 				if (definition != null) {
 					result.add(definition);
@@ -419,8 +440,8 @@ public class IndexQueries {
 			throws CoreException {
 		if (binding != null) {
 			IIndexName[] names= index.findNames(binding, IIndex.FIND_DECLARATIONS);
-			for (int i = 0; i < names.length; i++) {
-				ICElement elem= getCElementForName(preferProject, index, names[i], converter, projectFactory);
+			for (IIndexName name : names) {
+				ICElement elem= getCElementForName(preferProject, index, name, converter, projectFactory);
 				if (elem != null) {
 					return elem;
 				}
@@ -449,7 +470,38 @@ public class IndexQueries {
 		
 		int options= ITranslationUnit.AST_SKIP_INDEXED_HEADERS;
 		IASTTranslationUnit ast = workingCopy.getAST(index, options);
-		return ast.getNodeSelector(null).findEnclosingName(selectionStart, selectionLength);
+		IASTNodeSelector nodeSelector = ast.getNodeSelector(null);
+		IASTName name = nodeSelector.findEnclosingName(selectionStart, selectionLength);
+		if (name == null) {
+			name= nodeSelector.findImplicitName(selectionStart, selectionLength);
+		}
+		if (name != null && name.getParent() instanceof IASTPreprocessorMacroExpansion) {
+			IASTFileLocation floc= name.getParent().getFileLocation();
+			IASTNode node= nodeSelector.findEnclosingNodeInExpansion(floc.getNodeOffset(), floc.getNodeLength());
+			if (node instanceof IASTName) {
+				name= (IASTName) node;
+			} else if (node instanceof IASTFunctionCallExpression){
+				IASTExpression expr= ((IASTFunctionCallExpression) node).getFunctionNameExpression();
+				if (expr instanceof IASTIdExpression) {
+					name= ((IASTIdExpression) expr).getName();
+				}
+			} else {
+				if (node instanceof IASTSimpleDeclaration) {
+					IASTNode[] dtors= ((IASTSimpleDeclaration) node).getDeclarators();
+					if (dtors != null && dtors.length > 0) {
+						node= dtors[0];
+					}
+				} else if (node instanceof IASTFunctionDefinition) {
+					node= ((IASTFunctionDefinition) node).getDeclarator();
+				}
+				if (node instanceof IASTDeclarator) {
+					IASTDeclarator dtor= ASTQueries.findTypeRelevantDeclarator((IASTDeclarator) node);
+					name= dtor.getName();
+				}
+			}
+		}
+		return name;
+		
 	}
 	
 	/**

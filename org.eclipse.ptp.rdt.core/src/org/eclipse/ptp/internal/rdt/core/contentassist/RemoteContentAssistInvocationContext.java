@@ -31,6 +31,8 @@ public class RemoteContentAssistInvocationContext implements Serializable {
 	int fInvocationOffset;
 	private boolean fInPreprocessorKeyword;
 	private CharSequence fIdentifierPrefix;
+	
+	private boolean showCamelCaseMatches;
 
 	public boolean isInPreprocessorDirective() {
 		return fInPreprocessorDirective;
@@ -98,4 +100,14 @@ public class RemoteContentAssistInvocationContext implements Serializable {
 	public void setIdentifierPrefix(CharSequence identifierPrefix) {
 		fIdentifierPrefix = identifierPrefix;
 	}
+
+	public void setShowCamelCaseMatches(boolean showCamelCaseMatches) {
+		this.showCamelCaseMatches = showCamelCaseMatches;
+	}
+
+	public boolean getShowCamelCaseMatches() {
+		return showCamelCaseMatches;
+	}
+	
+	
 }

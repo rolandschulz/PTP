@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 QNX Software Systems and others.
+ * Copyright (c) 2006, 2011 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchViewPage
- * Version: 1.7
+ * Version: 1.11
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search;
@@ -22,31 +22,79 @@ package org.eclipse.ptp.internal.rdt.ui.search;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.index.IndexLocationFactory;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.search.IPDOMSearchContentProvider;
-import org.eclipse.cdt.internal.ui.search.TypeInfoSearchElement;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
+import org.eclipse.cdt.internal.ui.viewsupport.ColoringLabelProvider;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteLineSearchElement;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchElement;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.search.ui.text.Match;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * Implementation of the search view page for index based searches.
  */
 public class RemoteSearchViewPage extends AbstractTextSearchViewPage {
+	
+	public static final int LOCATION_COLUMN_INDEX = 0; 
+	public static final int DEFINITION_COLUMN_INDEX = 1;
+	public static final int MATCH_COLUMN_INDEX = 2;
+
+	private static final String[] fColumnLabels = new String[] { 
+		CSearchMessages.PDOMSearchViewPageLocationColumn_label,
+		CSearchMessages.PDOMSearchViewPageDefinitionColumn_label,
+		CSearchMessages.PDOMSearchViewPageMatchColumn_label
+	};
+	
+	private static final String KEY_LOCATION_COLUMN_WIDTH = "locationColumnWidth"; //$NON-NLS-1$
+	private static final String KEY_DEFINITION_COLUMN_WIDTH = "definitionColumnWidth"; //$NON-NLS-1$
+	private static final String KEY_MATCH_COLUMN_WIDTH = "matchColumnWidth"; //$NON-NLS-1$
+	private static final String KEY_SHOW_ENCLOSING_DEFINITIONS = "showEnclosingDefinitions"; //$NON-NLS-1$
+
 
 	private IPDOMSearchContentProvider contentProvider;
+	
+	private boolean fShowEnclosingDefinitions;
+	private ShowEnclosingDefinitionsAction fShowEnclosingDefinitionsAction;
+	private int[] fColumnWidths = { 300, 150, 300 };
+	
+	private class ShowEnclosingDefinitionsAction extends Action {
+		public ShowEnclosingDefinitionsAction() {
+			super(CSearchMessages.PDOMSearchViewPage_ShowEnclosingDefinitions_actionLabel, SWT.CHECK);
+			setChecked(fShowEnclosingDefinitions);
+		}
+		
+		@Override
+		public void run() {
+			setShowEnclosingDefinitions(isChecked());
+		}
+	}
+
 	
 	public RemoteSearchViewPage(int supportedLayouts) {
 		super(supportedLayouts);
@@ -55,6 +103,78 @@ public class RemoteSearchViewPage extends AbstractTextSearchViewPage {
 	public RemoteSearchViewPage() {
 		super();
 	}
+	
+	@Override
+	public void init(IPageSite pageSite) {
+		super.init(pageSite);
+		fShowEnclosingDefinitionsAction = new ShowEnclosingDefinitionsAction();
+		IMenuManager menuManager= pageSite.getActionBars().getMenuManager();
+		menuManager.add(fShowEnclosingDefinitionsAction);
+		menuManager.updateAll(true);
+		pageSite.getActionBars().updateActionBars();
+	}
+
+	@Override
+	public void restoreState(IMemento memento) {
+		super.restoreState(memento);
+		IDialogSettings settings = getSettings();
+		boolean showEnclosingDefinitions = true;
+		if (settings.get(KEY_SHOW_ENCLOSING_DEFINITIONS) != null)
+			showEnclosingDefinitions = settings.getBoolean(KEY_SHOW_ENCLOSING_DEFINITIONS);
+		if (memento != null) {
+			Boolean value = memento.getBoolean(KEY_SHOW_ENCLOSING_DEFINITIONS);
+			if (value != null)
+				showEnclosingDefinitions = value.booleanValue();
+			String[] keys = { KEY_LOCATION_COLUMN_WIDTH, KEY_DEFINITION_COLUMN_WIDTH, KEY_MATCH_COLUMN_WIDTH };
+			for (int i = 0; i < keys.length; i++) {
+				Integer width = memento.getInteger(keys[i]);
+				if (width == null)
+					continue;
+				if (width > 0)
+					fColumnWidths[i] = width;
+			}
+		}
+		setShowEnclosingDefinitions(showEnclosingDefinitions);
+	}
+	
+	@Override
+	public void saveState(IMemento memento) {
+		super.saveState(memento);
+		saveColumnWidths();
+		memento.putInteger(KEY_DEFINITION_COLUMN_WIDTH, fColumnWidths[DEFINITION_COLUMN_INDEX]);
+		memento.putInteger(KEY_LOCATION_COLUMN_WIDTH, fColumnWidths[LOCATION_COLUMN_INDEX]);
+		memento.putInteger(KEY_MATCH_COLUMN_WIDTH, fColumnWidths[MATCH_COLUMN_INDEX]);
+		memento.putBoolean(KEY_SHOW_ENCLOSING_DEFINITIONS, fShowEnclosingDefinitions);
+	}
+	
+	public void setShowEnclosingDefinitions(boolean showEnclosingDefinitions) {
+		if (fShowEnclosingDefinitions == showEnclosingDefinitions)
+			return;
+		fShowEnclosingDefinitions = showEnclosingDefinitions;
+		getSettings().put(KEY_SHOW_ENCLOSING_DEFINITIONS, fShowEnclosingDefinitions);
+		if (fShowEnclosingDefinitionsAction.isChecked() != showEnclosingDefinitions)
+			fShowEnclosingDefinitionsAction.setChecked(showEnclosingDefinitions);
+		StructuredViewer viewer = getViewer();
+		if (viewer instanceof TableViewer) {
+			TableViewer tableViewer = (TableViewer) viewer;
+			TableColumn tableColumn = tableViewer.getTable().getColumn(DEFINITION_COLUMN_INDEX);
+			if (fShowEnclosingDefinitions) {
+				tableColumn.setWidth(fColumnWidths[DEFINITION_COLUMN_INDEX]);
+				tableColumn.setResizable(true);
+			} else {
+				fColumnWidths[DEFINITION_COLUMN_INDEX] = tableColumn.getWidth();
+				tableColumn.setWidth(0);
+				tableColumn.setResizable(false);
+			}
+		}
+		if (viewer != null)
+			viewer.refresh();
+	}
+
+	public boolean isShowEnclosingDefinitions() {
+		return fShowEnclosingDefinitions;
+	}
+
 
 	@Override
 	protected void elementsChanged(Object[] objects) {
@@ -89,6 +209,27 @@ public class RemoteSearchViewPage extends AbstractTextSearchViewPage {
 	 *
 	 */
 	private class SearchViewerComparator extends ViewerComparator {
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public int compare(Viewer viewer, Object e1, Object e2) {
+			if (e1 instanceof RemoteLineSearchElement && e2 instanceof RemoteLineSearchElement) {
+				RemoteLineSearchElement l1 = (RemoteLineSearchElement) e1;
+				RemoteLineSearchElement l2 = (RemoteLineSearchElement) e2;
+				if (viewer instanceof TableViewer) {
+					String p1 = l1.getLocation().getURI().getPath();
+					String p2 = l2.getLocation().getURI().getPath();
+					int cmp = p1.compareTo(p2);
+					if (cmp != 0)
+						return cmp;
+				}
+				return l1.getLineNumber() - l2.getLineNumber();
+			}
+			return super.compare(viewer, e1, e2);
+		}
+
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ViewerComparator#category(java.lang.Object)
 		 */
@@ -133,19 +274,65 @@ public class RemoteSearchViewPage extends AbstractTextSearchViewPage {
 	
 	@Override
 	protected void configureTreeViewer(TreeViewer viewer) {
-		contentProvider = new RemoteSearchTreeContentProvider();
+		contentProvider = new RemoteSearchTreeContentProvider(this);
 		viewer.setComparator(new SearchViewerComparator());
 		viewer.setContentProvider((RemoteSearchTreeContentProvider)contentProvider);
-		viewer.setLabelProvider(new RemoteSearchTreeLabelProvider(this));
+		RemoteSearchTreeLabelProvider innerLabelProvider = new RemoteSearchTreeLabelProvider(this);
+		ColoringLabelProvider labelProvider = new ColoringLabelProvider(innerLabelProvider);
+		viewer.setLabelProvider(labelProvider);
 	}
 
 	@Override
 	protected void configureTableViewer(TableViewer viewer) {
-		contentProvider = new RemoteSearchListContentProvider();
+		createColumns(viewer);
+		contentProvider = new RemoteSearchListContentProvider(this);
 		viewer.setComparator(new SearchViewerComparator());
 		viewer.setContentProvider((RemoteSearchListContentProvider)contentProvider);
-		viewer.setLabelProvider(new RemoteSearchListLabelProvider(this));
 	}
+	
+	@Override
+	protected TableViewer createTableViewer(Composite parent) {
+		TableViewer tableViewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		tableViewer.getControl().addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				saveColumnWidths();
+			}
+		});
+		return tableViewer;
+	}
+	
+	private void saveColumnWidths() {
+		StructuredViewer viewer = getViewer();
+		if (viewer instanceof TableViewer) {
+			TableViewer tableViewer = (TableViewer) viewer;
+			for (int i = 0; i < fColumnLabels.length; i++) {
+				if (i == DEFINITION_COLUMN_INDEX && !fShowEnclosingDefinitions)
+					continue;
+				fColumnWidths[i] = tableViewer.getTable().getColumn(i).getWidth(); 
+			}		
+		}
+	}
+
+	private void createColumns(TableViewer viewer) {
+		for (int i = 0; i < fColumnLabels.length; i++) {
+			TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
+			viewerColumn.setLabelProvider(new RemoteSearchListLabelProvider(this, i));
+			TableColumn tableColumn = viewerColumn.getColumn();
+			tableColumn.setText(fColumnLabels[i]);
+			tableColumn.setWidth(fColumnWidths[i]);
+			tableColumn.setResizable(true);
+			tableColumn.setMoveable(false);
+			if (i == DEFINITION_COLUMN_INDEX && !fShowEnclosingDefinitions) {
+				tableColumn.setWidth(0);
+				tableColumn.setResizable(false);
+			}
+		}
+		Table table = viewer.getTable();
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+	}
+
+
 
 	@Override
 	protected void showMatch(Match match, int currentOffset, int currentLength, boolean activate) throws PartInitException {
@@ -155,11 +342,13 @@ public class RemoteSearchViewPage extends AbstractTextSearchViewPage {
 		try {
 			Object element= ((RemoteSearchMatchAdapter)match).getElement();
 			IIndexFileLocation ifl= ((RemoteSearchElement)element).getLocation();
-			IPath path = IndexLocationFactory.getPath(ifl);
 			IEditorPart editor = null;
-			if(path != null)
-				editor = EditorUtility.openInEditor(path, null);
-			else
+			if(ifl.getFullPath()!=null){
+				IPath path = IndexLocationFactory.getPath(ifl);
+				
+				if(path != null)
+					editor = EditorUtility.openInEditor(path, null, activate);
+			}else
 				editor = EditorUtility.openInEditor(ifl.getURI(), null);
 			if (editor instanceof ITextEditor) {
 				ITextEditor textEditor = (ITextEditor)editor;
