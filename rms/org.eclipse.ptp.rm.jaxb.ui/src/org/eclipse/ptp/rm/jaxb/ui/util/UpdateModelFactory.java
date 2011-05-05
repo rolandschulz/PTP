@@ -474,8 +474,8 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 * @return the text widget carrying the browse selection
 	 */
 	private static Text createBrowseLocal(final Composite parent, final ControlDescriptor cd) {
-		final Text t = WidgetBuilderUtils.createText(parent, SWT.BORDER, cd.layoutData, true, ZEROSTR);
-		WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, cd.style, new SelectionListener() {
+		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, ZEROSTR);
+		WidgetBuilderUtils.createButton(parent, null, cd.title, SWT.PUSH, new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
@@ -517,10 +517,10 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 *            launch tab being built
 	 * @return the text widget carrying the browse selection
 	 */
-	private static Text createBrowseRemote(final Composite parent, final ControlDescriptor cd,
-			final JAXBDynamicLaunchConfigurationTab tab) {
-		final Text t = WidgetBuilderUtils.createText(parent, SWT.BORDER, cd.layoutData, true, ZEROSTR);
-		WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, cd.style, new SelectionListener() {
+	private static Text createBrowseUri(final Composite parent, final ControlDescriptor cd,
+			final JAXBDynamicLaunchConfigurationTab tab, final boolean returnUri) {
+		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, ZEROSTR);
+		WidgetBuilderUtils.createButton(parent, null, cd.title, SWT.PUSH, new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
@@ -528,10 +528,20 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					URI uri = new URI(t.getText());
+					String initial = t.getText();
+					URI uri = null;
+					if (ZEROSTR.equals(initial)) {
+						uri = tab.getParent().getDelegate().getRemoteHome();
+					} else {
+						uri = new URI(initial);
+					}
 					uri = RemoteUIServicesUtils.browse(parent.getShell(), uri, tab.getParent().getDelegate(), true, cd.readOnly);
 					if (uri != null) {
-						t.setText(uri.toString());
+						if (returnUri) {
+							t.setText(uri.toString());
+						} else {
+							t.setText(uri.getPath());
+						}
 					} else {
 						t.setText(ZEROSTR);
 					}
@@ -610,8 +620,10 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			c = createCombo(parent, cd);
 		} else if (BROWSELOCAL.equals(type)) {
 			c = createBrowseLocal(parent, cd);
-		} else if (BROWSEREMOTE.equals(type)) {
-			c = createBrowseRemote(parent, cd, tab);
+		} else if (BROWSEURI.equals(type)) {
+			c = createBrowseUri(parent, cd, tab, true);
+		} else if (BROWSEPATH.equals(type)) {
+			c = createBrowseUri(parent, cd, tab, false);
 		}
 
 		if (c != null) {
