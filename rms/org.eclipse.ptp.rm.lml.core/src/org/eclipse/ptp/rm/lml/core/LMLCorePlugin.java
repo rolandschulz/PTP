@@ -197,7 +197,6 @@ public class LMLCorePlugin extends Plugin {
 	 */
 	private void createUnmarshaller() throws MalformedURLException, JAXBException {
 		URL xsd = getBundle().getEntry("/schema/lgui.xsd");	
-		
 		JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements");
 		
 		unmarshaller = jc.createUnmarshaller();

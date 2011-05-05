@@ -32,14 +32,6 @@
             name="org.eclipse.ptp.rm.lml.ui.views.TableView"
             restorable="false">
       </view>
-      <view
-            category="org.eclipse.ptp.rm.lml.ui.views"
-            class="org.eclipse.ptp.rm.lml.ui.views.JobsView"
-            icon="icons/job/job_suspended.gif"
-            id="org.eclipse.ptp.rm.lml.ui.views.JobsView"
-            name="org.eclipse.ptp.rm.lml.ui.views.JobsView"
-            restorable="true">
-      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
