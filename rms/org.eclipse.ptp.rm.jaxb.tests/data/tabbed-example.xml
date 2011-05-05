@@ -48,185 +48,186 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<environment name="VAR_5" value="e5"/>
 		</submit-interactive>
 		<launch-tab>
-			<basic>
-				<title>My Resource Manager</title>
-				<!-- TAB FOLDER -->
-				<tab-folder style="SWT.BORDER | SWT.TOP">
-					<item>
-						<title>Settings</title>
-						<composite>
-							<layout>
-								<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
-							</layout>
-							<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>Name</fixed-text>
-							</widget>
-							<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>Value</fixed-text>
-							</widget>
-							<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>Description</fixed-text>
-							</widget>
-							<!-- row 1 -->
-							<widget type="label" style="SWT.LEFT">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<tooltip>${rm:Resource_List.mem#tooltip}</tooltip>
-								<fixed-text>Total Memory Needed: </fixed-text>
-							</widget>
-							<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-								</layout-data>
-							</widget>
-							<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>${rm:Resource_List.mem#description}</fixed-text>
-							</widget>
-							<widget type="label" style="SWT.LEFT">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
-								<fixed-text>Wallclock Time: </fixed-text>
-							</widget>
-							<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-								</layout-data>
-							</widget>
-							<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>${rm:Resource_List.walltime#description}</fixed-text>
-							</widget>
-							<widget type="label" style="SWT.LEFT">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>MPI Command: </fixed-text>
-							</widget>
-							<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCommand">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
-								</layout-data>
-							</widget>
-							<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>${rm:mpiCommand#description}</fixed-text>
-							</widget>
-							<!-- row 4 -->
-							<widget type="label" style="SWT.LEFT">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>MPI Number of Cores: </fixed-text>
-							</widget>
-							<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
-								</layout-data>
-							</widget>
-							<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>${rm:mpiCores#description}</fixed-text>
-							</widget>
-							<!-- row 4 -->
-							<widget type="label" style="SWT.LEFT">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>Browse URI: </fixed-text>
-							</widget>
-							<widget type="browseUri" style="SWT.BORDER" readOnly="false" title="Browse URI">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
-								</layout-data>
-							</widget>
-							<!-- row 5 -->
-							<widget type="label" style="SWT.LEFT">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>Browse PATH: </fixed-text>
-							</widget>
-							<widget type="browsePath" style="SWT.BORDER" readOnly="true" title="Browse Path">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
-								</layout-data>
-							</widget>
-							<!-- row 6 -->
-							<widget type="label" style="SWT.LEFT">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-								</layout-data>
-								<fixed-text>Browse File: </fixed-text>
-							</widget>
-							<widget type="browseFile" style="SWT.BORDER | SWT.H_SCROLL" readOnly="true" title="Browse File">
-								<layout-data>
-									<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
-								</layout-data>
-							</widget>
-							<!-- row 7 -->
-                     <widget type="label" style="SWT.LEFT">
-                        <layout-data>
-                           <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>Browse Dir: </fixed-text>
-                     </widget>
-                     <widget type="browseDir" style="SWT.BORDER" readOnly="true" title="Browse Dir">
-                        <layout-data>
-                           <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
-                        </layout-data>
-                     </widget>
-						</composite>
-					</item>
-					<item>
-						<title>Environment</title>
-						<composite group="true">
-							<layout>
-								<grid-layout numColumns="1"/>
-							</layout>
-							<viewer name="environment" style="SWT.BORDER | SWT.MULTI" sort="true" type="table">
-								<layout-data>
-									<grid-data widthHint="600" heightHint="200" horizontalSpan="1"/>
-								</layout-data>
-								<column-data name="Name" width="175">
-									<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
-								</column-data>
-								<column-data name="Value" width="400">
-									<tooltip>Click to activate value widget.</tooltip>
-								</column-data>
-								<items>
-									<include>e1</include>
-									<include>e2</include>
-									<include>e3</include>
-									<include>e4</include>
-									<include>e5</include>
-								</items>
-								<value pattern="export @name='@value'" separator="; "/>
-							</viewer>
-						</composite>
-					</item>
-				</tab-folder>
-			</basic>
+			<dynamic sharedEnvironment="true">
+				<title>Settings</title>
+				<composite>
+					<layout>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Name</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Value</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Description</fixed-text>
+					</widget>
+					<!-- row 1 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${rm:Resource_List.mem#tooltip}</tooltip>
+						<fixed-text>Total Memory Needed: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${rm:Resource_List.mem#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
+						<fixed-text>Wallclock Time: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${rm:Resource_List.walltime#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>MPI Command: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCommand">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${rm:mpiCommand#description}</fixed-text>
+					</widget>
+					<!-- row 4 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>MPI Number of Cores: </fixed-text>
+					</widget>
+					<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${rm:mpiCores#description}</fixed-text>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic sharedEnvironment="true">
+				<title>Paths</title>
+				<composite>
+					<layout>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Browse URI: </fixed-text>
+					</widget>
+					<widget type="browseUri" style="SWT.BORDER" readOnly="false" title="Browse URI">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+					<!-- row 5 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Browse PATH: </fixed-text>
+					</widget>
+					<widget type="browsePath" style="SWT.BORDER" readOnly="true" title="Browse Path">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+					<!-- row 6 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Browse File: </fixed-text>
+					</widget>
+					<widget type="browseFile" style="SWT.BORDER | SWT.H_SCROLL" readOnly="true" title="Browse File">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+					<!-- row 7 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Browse Dir: </fixed-text>
+					</widget>
+					<widget type="browseDir" style="SWT.BORDER" readOnly="true" title="Browse Dir">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic sharedEnvironment="true">
+				<title>Environment</title>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="1"/>
+					</layout>
+					<viewer name="environment" style="SWT.BORDER | SWT.MULTI" sort="true" type="table">
+						<layout-data>
+							<grid-data widthHint="600" heightHint="200" horizontalSpan="1"/>
+						</layout-data>
+						<column-data name="Name" width="175">
+							<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
+						</column-data>
+						<column-data name="Value" width="400">
+							<tooltip>Click to activate value widget.</tooltip>
+						</column-data>
+						<items>
+							<include>e1</include>
+							<include>e2</include>
+							<include>e3</include>
+							<include>e4</include>
+							<include>e5</include>
+						</items>
+						<value pattern="export @name='@value'" separator="; "/>
+					</viewer>
+				</composite>
+			</dynamic>
 		</launch-tab>
 	</control-data>
 	<monitor-data schedulerType="MyMonitor"/>
