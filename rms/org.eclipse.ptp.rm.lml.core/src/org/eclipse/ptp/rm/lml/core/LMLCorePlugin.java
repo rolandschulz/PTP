@@ -56,17 +56,17 @@ public class LMLCorePlugin extends Plugin {
 
 	// The shared instance.
 	private static LMLCorePlugin fPlugin;
-	
+
 	/*
-	 * Unmarshaller for JAXB-generator 
+	 * Unmarshaller for JAXB-generator
 	 */
 	private static Unmarshaller unmarshaller;
-	
+
 	/*
 	 * DateFormat for (EEE MMM d HH:mm:ss yyyy)
 	 */
 	private SimpleDateFormat simpleDateFormat1;
-	
+
 	/*
 	 * DateFormat for (EEE MMM dd HH:mm:ss yyyy)
 	 */
@@ -151,21 +151,22 @@ public class LMLCorePlugin extends Plugin {
 	 */
 	public LMLCorePlugin() {
 		super();
-		
+
 		fPlugin = this;
-		
+
 		try {
 			resourceBundle = ResourceBundle.getBundle(PLUGIN_ID + ".ParallelPluginResources"); //$NON-NLS-1$
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}
 	}
-	
+
 	/**
 	 * Getting the corresponding SimpleDateFormat to a given length:
 	 * 
-	 * @param length of a string
-	 * @return 
+	 * @param length
+	 *            of a string
+	 * @return
 	 */
 	public SimpleDateFormat getSimpleDateFormat(int length) {
 		return length == simpleDateFormat1.toPattern().length() ? simpleDateFormat1 : simpleDateFormat2;
@@ -179,7 +180,7 @@ public class LMLCorePlugin extends Plugin {
 	public ILMLManager getLMLManager() {
 		return lmlManager;
 	}
-	
+
 	/**
 	 * Get the JAXB unmarshaller.
 	 * 
@@ -188,37 +189,41 @@ public class LMLCorePlugin extends Plugin {
 	public Unmarshaller getUnmarshaller() {
 		return unmarshaller;
 	}
-	
-	
+
 	/**
-	 * For the generation of instances from classes by JAXB a unmarshaller is needed. In the method the needed unmarshaller is created. It is said where the classes for the instantiation are.
+	 * For the generation of instances from classes by JAXB a unmarshaller is
+	 * needed. In the method the needed unmarshaller is created. It is said
+	 * where the classes for the instantiation are.
+	 * 
 	 * @throws MalformedURLException
 	 * @throws JAXBException
 	 */
 	private void createUnmarshaller() throws MalformedURLException, JAXBException {
-		URL xsd = getBundle().getEntry("/schema/lgui.xsd");	
-		JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements");
-		
+		URL xsd = getBundle().getEntry("/schema/lgui.xsd");
+
+		JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements",
+				LMLCorePlugin.class.getClassLoader());
+
 		unmarshaller = jc.createUnmarshaller();
-		
-		//if xsd is null => do not check for validity
-		if(xsd!=null){
-			
+
+		// if xsd is null => do not check for validity
+		if (xsd != null) {
+
 			Schema mySchema;
-			SchemaFactory sf = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
-			
+			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
 			try {
-				
-				mySchema = sf.newSchema( xsd );
-			} catch( SAXException saxe ){
+
+				mySchema = sf.newSchema(xsd);
+			} catch (SAXException saxe) {
 				// ...(error handling)
 				mySchema = null;
-				
+
 			}
-			
-			//Connect schema to unmarshaller
+
+			// Connect schema to unmarshaller
 			unmarshaller.setSchema(mySchema);
-			
+
 		}
 	}
 
