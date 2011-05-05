@@ -735,7 +735,9 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 		}
 		return (ICElement[]) result;
 	}
-	
+	/**
+	 * @deprecated
+	 */
 	@SuppressWarnings("unchecked")
 	public List<RemoteSearchMatch> runQuery(Scope scope, RemoteSearchQuery query, IProgressMonitor monitor) {
     	monitor.beginTask(Messages.getString("RSECIndexSubsystem.8") + query.getScopeDescription(), 100); //$NON-NLS-1$
@@ -744,6 +746,18 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 			return Collections.emptyList();
 		}
 		return (List<RemoteSearchMatch>) result;
+	}
+	
+	/**
+	 * @since 3.1
+	 */
+	public RemoteSearchQuery runQuery2(Scope scope, RemoteSearchQuery query, IProgressMonitor monitor) {
+    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.8") + query.getScopeDescription(), 100); //$NON-NLS-1$
+		Object result = sendRequest(CDTMiner.C_SEARCH_RUN_QUERY2, new Object[] { scope, getHostName(), query  }, null);
+		if (result == null) {
+			return null;
+		}
+		return (RemoteSearchQuery) result;
 	}
 	
 	@SuppressWarnings("unchecked")

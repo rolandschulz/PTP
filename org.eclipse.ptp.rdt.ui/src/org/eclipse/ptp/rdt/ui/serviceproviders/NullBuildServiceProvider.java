@@ -73,7 +73,7 @@ public class NullBuildServiceProvider extends ServiceProvider implements IServic
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setConfigLocation(java.lang.String)
 	 */
 	/**
-	 * @since 3.0
+	 * @since 3.1
 	 */
 	public void setConfigLocation(String configLocation) {
 		// TODO Auto-generated method stub
@@ -85,7 +85,7 @@ public class NullBuildServiceProvider extends ServiceProvider implements IServic
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	/**
-	 * @since 3.0
+	 * @since 3.1
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		// TODO Auto-generated method stub

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.callhierarchy.OpenCallHierarchyAction
- * Version: 1.7
+ * Version: 1.10
  */
 package org.eclipse.ptp.internal.rdt.ui.callhierarchy;
 
@@ -56,7 +56,7 @@ public class OpenCallHierarchyAction extends SelectionDispatchAction {
 		fEditor= editor;
 		setEnabled(fEditor != null && CUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editor.getEditorInput()) != null);
 	}
-
+	@Override
 	public void run(ITextSelection sel) {
 
 		if (fEditor instanceof CEditor) {
@@ -75,7 +75,7 @@ public class OpenCallHierarchyAction extends SelectionDispatchAction {
 
 		}
 	}
-	
+	@Override
 	public void run(IStructuredSelection selection) {
 		if (!selection.isEmpty()) {
 			Object selectedObject= selection.getFirstElement();
@@ -96,10 +96,10 @@ public class OpenCallHierarchyAction extends SelectionDispatchAction {
 			}
 		}
 	}
-
+	@Override
 	public void selectionChanged(ITextSelection sel) {
 	}
-			
+	@Override		
 	public void selectionChanged(IStructuredSelection selection) {
 		if (selection.isEmpty()) {
 			setEnabled(false);
@@ -128,7 +128,7 @@ public class OpenCallHierarchyAction extends SelectionDispatchAction {
 		}
 		return false;
 	}
-
+	@SuppressWarnings("rawtypes")
 	private Object getAdapter(Object object, Class desiredClass) {
 		if (desiredClass.isInstance(object)) {
 			return object;

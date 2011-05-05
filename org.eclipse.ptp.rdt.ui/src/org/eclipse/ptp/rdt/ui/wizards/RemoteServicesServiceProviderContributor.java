@@ -48,7 +48,7 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
 
 	
 	/**
-	 * @since 3.0
+	 * @since 3.1
 	 */
 	public void configureServiceProvider(IServiceProviderWorkingCopy provider, final Composite container) {
 		//The UI components works with IServiceProviderWorkingCopy and not the original IServiceProvider

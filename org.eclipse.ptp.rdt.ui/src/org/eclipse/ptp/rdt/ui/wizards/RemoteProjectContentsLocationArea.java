@@ -121,7 +121,7 @@ public class RemoteProjectContentsLocationArea {
 	// createContents(composite);
 	// }
 	/**
-	 * @since 3.0
+	 * @since 3.1
 	 */
 	public RemoteProjectContentsLocationArea(IErrorMessageReporter reporter, Composite composite, IRunnableContext context) {
 		fErrorReporter = reporter;

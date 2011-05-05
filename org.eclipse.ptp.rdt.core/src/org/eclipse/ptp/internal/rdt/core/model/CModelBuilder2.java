@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.core/model
  * Class: org.eclipse.cdt.internal.core.model.CModelBuilder2
- * Version: 1.48
+ * Version: 1.52
  */
 
 package org.eclipse.ptp.internal.rdt.core.model;
@@ -45,6 +45,7 @@ import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTNamedTypeSpecifier;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTNodeLocation;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorFunctionStyleMacroDefinition;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIncludeStatement;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorMacroDefinition;
 import org.eclipse.cdt.core.dom.ast.IASTProblem;
@@ -268,6 +269,10 @@ public class CModelBuilder2 {
 		// set positions
 		setIdentifierPosition(element, name);
 		setBodyPosition(element, macro);
+		if (macro instanceof IASTPreprocessorFunctionStyleMacroDefinition) {
+			element.setFunctionStyle(true);
+		}
+
 		return element;
 	}
 
@@ -577,7 +582,7 @@ public class CModelBuilder2 {
 		
 		IASTExpression initialValue= enumDef.getValue();
 		if(initialValue != null){
-			element.setConstantExpression(ASTSignatureUtil.getExpressionString(initialValue));
+			element.setConstantExpression(ASTStringUtil.getExpressionString(initialValue));
 		}
 		// add to parent
 		enumarator.addChild(element);
@@ -744,7 +749,7 @@ public class CModelBuilder2 {
 			final FieldInfo fieldInfo= (FieldInfo)getElementInfo(newElement);
 			if (specifier instanceof ICPPASTDeclSpecifier) {
 				final ICPPASTDeclSpecifier cppSpecifier= (ICPPASTDeclSpecifier)specifier;
-				fieldInfo.setMutable(cppSpecifier.getStorageClass() == ICPPASTDeclSpecifier.sc_mutable);
+				fieldInfo.setMutable(cppSpecifier.getStorageClass() == IASTDeclSpecifier.sc_mutable);
 			}
 			fieldInfo.setTypeName(ASTStringUtil.getSignatureString(specifier, declarator));			
 			fieldInfo.setVisibility(getCurrentVisibility());

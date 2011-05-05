@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 QNX Software Systems and others.
+ * Copyright (c) 2006, 2011 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,26 +14,35 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchElement
- * Version: 1.10
+ * Version: 1.12
  */
 
-package org.eclipse.ptp.internal.rdt.ui.search;
+package org.eclipse.ptp.internal.rdt.core.search;
+
+import java.io.Serializable;
 
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Path;
 
 /**
  * Element class used to group matches.
  */
-public class RemoteSearchElement implements IAdaptable {
+public class RemoteSearchElement implements IAdaptable, Serializable{
 
-	private final IIndexFileLocation location;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private IIndexFileLocation location;
 	
-	public RemoteSearchElement(IIndexFileLocation loc) throws CoreException {
+	public void setLocation(IIndexFileLocation location) {
+		this.location = location;
+	}
+
+	public RemoteSearchElement(IIndexFileLocation loc) {
 		this.location= loc;
 	}
 	
@@ -50,11 +59,13 @@ public class RemoteSearchElement implements IAdaptable {
 		return location.equals(other.location);
 	}
 
-	IIndexFileLocation getLocation() {
+	public IIndexFileLocation getLocation() {
 		return location;
 	}
 	
-	@SuppressWarnings("unchecked")
+	
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Object getAdapter(Class adapterType) {
 		if (adapterType.isAssignableFrom(IFile.class)) {
 			String fullPath= location.getFullPath();
