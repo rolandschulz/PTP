@@ -75,7 +75,8 @@ public interface IJAXBUINonNLSConstants extends IJAXBNonNLSConstants {
 	public static final String SPINNER = "spinner";//$NON-NLS-1$
 	public static final String COMBO = "combo";//$NON-NLS-1$
 	public static final String RADIOBUTTON = "radioButton";//$NON-NLS-1$
-	public static final String BROWSELOCAL = "browseLocal";//$NON-NLS-1$
+	public static final String BROWSEFILE = "browseFile";//$NON-NLS-1$
+	public static final String BROWSEDIR = "browseDir";//$NON-NLS-1$
 	public static final String BROWSEURI = "browseUri";//$NON-NLS-1$
 	public static final String BROWSEPATH = "browsePath";//$NON-NLS-1$
 

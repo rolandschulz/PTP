@@ -469,11 +469,11 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 *            to which the control belongs
 	 * @param cd
 	 *            internal data object carrying model description info
-	 * @param tab
-	 *            launch tab being built
+	 * @param dir
+	 *            whether to browse directory of file
 	 * @return the text widget carrying the browse selection
 	 */
-	private static Text createBrowseLocal(final Composite parent, final ControlDescriptor cd) {
+	private static Text createBrowseLocal(final Composite parent, final ControlDescriptor cd, final boolean dir) {
 		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, ZEROSTR);
 		WidgetBuilderUtils.createButton(parent, null, cd.title, SWT.PUSH, new SelectionListener() {
 
@@ -483,13 +483,18 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					URI uri = new URI(t.getText());
+					String path = t.getText();
 					int type = cd.readOnly ? SWT.OPEN : SWT.SAVE;
 					FileDialog d = new FileDialog(parent.getShell(), type);
-					d.setFileName(uri.getPath());
-					String f = d.open();
+					if (dir) {
+						d.setFilterPath(path);
+					} else {
+						d.setFileName(path);
+					}
+					d.open();
+					String f = dir ? d.getFilterPath() : d.getFileName();
 					if (f != null) {
-						t.setText(new File(f).toURI().toString());
+						t.setText(new File(f).getAbsolutePath());
 					} else {
 						t.setText(ZEROSTR);
 					}
@@ -515,6 +520,8 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 *            internal data object carrying model description info
 	 * @param tab
 	 *            launch tab being built
+	 * @param returnUri
+	 *            text carries URI; if false, just the (absolute) path
 	 * @return the text widget carrying the browse selection
 	 */
 	private static Text createBrowseUri(final Composite parent, final ControlDescriptor cd,
@@ -618,8 +625,10 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			c = WidgetBuilderUtils.createSpinner(parent, cd.layoutData, cd.title, cd.min, cd.max, cd.min, null);
 		} else if (COMBO.equals(type)) {
 			c = createCombo(parent, cd);
-		} else if (BROWSELOCAL.equals(type)) {
-			c = createBrowseLocal(parent, cd);
+		} else if (BROWSEFILE.equals(type)) {
+			c = createBrowseLocal(parent, cd, false);
+		} else if (BROWSEDIR.equals(type)) {
+			c = createBrowseLocal(parent, cd, true);
 		} else if (BROWSEURI.equals(type)) {
 			c = createBrowseUri(parent, cd, tab, true);
 		} else if (BROWSEPATH.equals(type)) {

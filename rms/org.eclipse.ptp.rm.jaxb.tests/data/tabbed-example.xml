@@ -177,13 +177,25 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 								<layout-data>
 									<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 								</layout-data>
-								<fixed-text>Browse Local: </fixed-text>
+								<fixed-text>Browse File: </fixed-text>
 							</widget>
-							<widget type="browseLocal" style="SWT.BORDER | SWT.H_SCROLL" readOnly="true" title="Browse Local">
+							<widget type="browseFile" style="SWT.BORDER | SWT.H_SCROLL" readOnly="true" title="Browse File">
 								<layout-data>
 									<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
 								</layout-data>
 							</widget>
+							<!-- row 7 -->
+                     <widget type="label" style="SWT.LEFT">
+                        <layout-data>
+                           <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                        </layout-data>
+                        <fixed-text>Browse Dir: </fixed-text>
+                     </widget>
+                     <widget type="browseDir" style="SWT.BORDER" readOnly="true" title="Browse Dir">
+                        <layout-data>
+                           <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+                        </layout-data>
+                     </widget>
 						</composite>
 					</item>
 					<item>

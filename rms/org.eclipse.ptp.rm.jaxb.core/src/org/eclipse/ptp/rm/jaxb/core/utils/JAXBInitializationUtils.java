@@ -146,7 +146,8 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	 * Details from the parse exception.
 	 * 
 	 * @param e
-	 * @return
+	 *            thrown parse exception
+	 * @return line, column and other info.
 	 */
 	private static String printInfo(SAXParseException e) {
 		StringBuffer sb = new StringBuffer();
