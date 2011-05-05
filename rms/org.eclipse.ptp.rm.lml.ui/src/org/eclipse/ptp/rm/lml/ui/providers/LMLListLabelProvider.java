@@ -11,18 +11,17 @@
 package org.eclipse.ptp.rm.lml.ui.providers;
 
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
-import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
 import org.eclipse.swt.graphics.Image;
 
 public class LMLListLabelProvider extends LabelProvider {
-	
-	public String getText(Object obj) {
-		return (String) obj;
-	}
-	
+
 	public Image getImage(Object obj, int index) {
 		return null;
 	}
-	
+
+	@Override
+	public String getText(Object obj) {
+		return (String) obj;
+	}
+
 }

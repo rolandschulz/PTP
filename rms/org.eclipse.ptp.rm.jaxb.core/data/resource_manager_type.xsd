@@ -691,6 +691,14 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="sub-layout-data" minOccurs="0" type="rm:layout-data-type">
+				<xs:annotation>
+					<xs:documentation>
+						If the widget is a composite (like the browse button), the first layout data will be applied to the first
+						element and the sub-layout the second (in this case, the text and button components, respectively).
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="items-from" minOccurs="0" type="xs:string">
@@ -729,34 +737,10 @@
 					<xs:enumeration value="spinner"/>
 					<xs:enumeration value="combo"/>
 					<xs:enumeration value="radioButton"/>
-					<xs:enumeration value="browseFile">
+					<xs:enumeration value="browse">
 						<xs:annotation>
 							<xs:documentation>
-								Creates a text widget followed by a push button allowing the user to browse the local file system for file.
-							</xs:documentation>
-						</xs:annotation>
-					</xs:enumeration>
-					<xs:enumeration value="browseDir">
-						<xs:annotation>
-							<xs:documentation>
-								Creates a text widget followed by a push button allowing the user to browse the local file system for
-								directory.
-							</xs:documentation>
-						</xs:annotation>
-					</xs:enumeration>
-					<xs:enumeration value="browseUri">
-						<xs:annotation>
-							<xs:documentation>
-								Creates a text widget followed by a push button allowing the user to browse a local or remote file system,
-								according to the connection schema. Text stores full URI.
-							</xs:documentation>
-						</xs:annotation>
-					</xs:enumeration>
-					<xs:enumeration value="browsePath">
-						<xs:annotation>
-							<xs:documentation>
-								Creates a text widget followed by a push button allowing the user to browse a local or remote file system,
-								according to the connection schema. Text stores path.
+								Creates a text widget followed by a push button allowing the user to browse for directory or file.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:enumeration>
@@ -765,6 +749,27 @@
 		</xs:attribute>
 		<xs:attribute name="title" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
+		<xs:attribute name="directory" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					For the browser widget. Browse and return directory. Default is browse file.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="uri" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					For the browser widget. Browse connection is local or remote, and returns a uri. Default returns path.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="localOnly" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					For the browser widget. Use local file browser instead of the default remote connection browser.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false">
 			<xs:annotation>
 				<xs:documentation>
