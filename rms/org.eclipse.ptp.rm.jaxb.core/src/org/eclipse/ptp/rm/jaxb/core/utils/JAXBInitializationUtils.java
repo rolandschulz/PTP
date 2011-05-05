@@ -44,6 +44,9 @@ import org.xml.sax.SAXParseException;
  */
 public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 
+	private static Unmarshaller unmarshaller;
+	private static Validator validator;
+
 	private JAXBInitializationUtils() {
 	}
 
@@ -91,13 +94,9 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	 * @throws URISyntaxException
 	 */
 	public static void validate(URL instance) throws SAXException, IOException, URISyntaxException {
-		URL xsd = JAXBCorePlugin.getResource(RM_XSD);
-		SchemaFactory factory = SchemaFactory.newInstance(XMLSchema);
-		Schema schema = factory.newSchema(xsd);
-		Validator validator = schema.newValidator();
 		Source source = new StreamSource(instance.openStream());
 		try {
-			validator.validate(source);
+			getValidator().validate(source);
 		} catch (SAXParseException sax) {
 			JAXBCorePlugin.log(printInfo(sax));
 			throw sax;
@@ -143,6 +142,37 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	}
 
 	/**
+	 * Uses the ResourceManagerData context.
+	 * 
+	 * @return static singleton
+	 * @throws JAXBException
+	 */
+	private synchronized static Unmarshaller getUnmarshaller() throws JAXBException {
+		if (unmarshaller == null) {
+			JAXBContext jc = JAXBContext.newInstance(JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
+			unmarshaller = jc.createUnmarshaller();
+		}
+		return unmarshaller;
+	}
+
+	/**
+	 * * Uses the ResourceManagerData schema.
+	 * 
+	 * @return static singleton
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	private synchronized static Validator getValidator() throws IOException, SAXException {
+		if (validator == null) {
+			URL xsd = JAXBCorePlugin.getResource(RM_XSD);
+			SchemaFactory factory = SchemaFactory.newInstance(XMLSchema);
+			Schema schema = factory.newSchema(xsd);
+			validator = schema.newValidator();
+		}
+		return validator;
+	}
+
+	/**
 	 * Details from the parse exception.
 	 * 
 	 * @param e
@@ -176,9 +206,7 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	private static ResourceManagerData unmarshalResourceManagerData(URL xml) throws JAXBException, IOException, SAXException,
 			URISyntaxException {
 		validate(xml);
-		JAXBContext jc = JAXBContext.newInstance(JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
-		Unmarshaller u = jc.createUnmarshaller();
-		JAXBElement<?> o = (JAXBElement<?>) u.unmarshal(xml.openStream());
+		JAXBElement<?> o = (JAXBElement<?>) getUnmarshaller().unmarshal(xml.openStream());
 		ResourceManagerData rmdata = (ResourceManagerData) o.getValue();
 		return rmdata;
 	}
