@@ -28,9 +28,15 @@ public class DummyFile implements IIndexFile, Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	IIndexFileLocation fLocation;
+	long timestamp;
 	
 	public DummyFile(IIndexFileLocation location) {
 		fLocation = location;
+	}
+	
+	public DummyFile(IIndexFileLocation location, long timestamp) {
+		fLocation = location;
+		timestamp = timestamp;
 	}
 
 	/* (non-Javadoc)
@@ -100,8 +106,12 @@ public class DummyFile implements IIndexFile, Serializable {
 	 * @see org.eclipse.cdt.core.index.IIndexFile#getTimestamp()
 	 */
 	public long getTimestamp() throws CoreException {
-		// TODO Auto-generated method stub
-		return 0;
+		if(timestamp>0){
+			return timestamp;
+		}else{
+			return 0;
+		}
+		
 	}
 
 	/* (non-Javadoc)

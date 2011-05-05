@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 Wind River Systems, Inc and others.
+ * Copyright (c) 2008, 2011 Wind River Systems, Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.core/browser
  * Class: org.eclipse.cdt.internal.core.browser.ASTTypeInfo
- * Version: 1.2
+ * Version: 1.5
  */
 
 package org.eclipse.ptp.internal.rdt.core.search;
@@ -111,65 +111,12 @@ public class RemoteASTTypeInfo implements ITypeInfo, IFunctionInfo {
 		this.reference= reference;
 	}
 		
-	public void addDerivedReference(ITypeReference location) {
-		throw new UnsupportedOperationException();
-	}
-
-	public void addReference(ITypeReference location) {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean canSubstituteFor(ITypeInfo info) {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean encloses(ITypeInfo info) {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean exists() {
-		throw new UnsupportedOperationException();
-	}
+	
 
 	public int getCElementType() {
 		return elementType;
 	}
-
-	public ITypeReference[] getDerivedReferences() {
-		throw new UnsupportedOperationException();
-	}
-
-	public ITypeInfo[] getEnclosedTypes() {
-		throw new UnsupportedOperationException();
-	}
-
-	public ITypeInfo[] getEnclosedTypes(int[] kinds) {
-		throw new UnsupportedOperationException();
-	}
-
-	public ITypeInfo getEnclosingNamespace(boolean includeGlobalNamespace) {
-		throw new UnsupportedOperationException();
-	}
-
-	public ICProject getEnclosingProject() {
-		if(getResolvedReference()!=null) {
-			IProject project = reference.getProject();
-			if(project!=null) {
-				return CCorePlugin.getDefault().getCoreModel().getCModel().getCProject(project.getName());
-			}
-		}
-		return null;
-	}
-
-	public ITypeInfo getEnclosingType() {
-		// TODO not sure
-		return null;
-	}
-
-	public ITypeInfo getEnclosingType(int[] kinds) {
-		throw new UnsupportedOperationException();
-	}
-
+	
 	public String getName() {
 		return fqn[fqn.length-1];
 	}
@@ -181,81 +128,21 @@ public class RemoteASTTypeInfo implements ITypeInfo, IFunctionInfo {
 	public ITypeReference getResolvedReference() {
 		return reference;
 	}
-
-	private static RemoteASTTypeReference createReference(IASTName name) {
-		IASTFileLocation floc= name.getFileLocation();
-		if (floc != null) {
-			String filename= floc.getFileName();
-			IIndexFileLocation ifl = new RemoteIndexFileLocation(filename, null);
-			return new RemoteASTTypeReference(ifl, name.resolveBinding(), new Path(filename), floc.getNodeOffset(), floc.getNodeLength());
+	
+	public ITypeReference[] getReferences() {
+		return new ITypeReference[] {reference};
+	}
+	
+	public ICProject getEnclosingProject() {
+		if(getResolvedReference()!=null) {
+			IProject project = reference.getProject();
+			if(project!=null) {
+				return CCorePlugin.getDefault().getCoreModel().getCModel().getCProject(project.getName());
+			}
 		}
 		return null;
 	}
-
-
-	public ITypeReference[] getReferences() {
-		throw new UnsupportedOperationException();
-	}
-
-	public ITypeInfo getRootNamespace(boolean includeGlobalNamespace) {
-		throw new UnsupportedOperationException();
-	}
-
-	public ITypeInfo[] getSubTypes() {
-		throw new UnsupportedOperationException();
-	}
-
-	public ASTAccessVisibility getSuperTypeAccess(ITypeInfo subType) {
-		throw new UnsupportedOperationException();
-	}
-
-	public ITypeInfo[] getSuperTypes() {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean hasEnclosedTypes() {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean hasSubTypes() {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean hasSuperTypes() {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean isClass() {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean isEnclosed(ITypeInfo info) {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean isEnclosed(ITypeSearchScope scope) {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean isEnclosedType() {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean isEnclosingType() {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean isReferenced(ITypeSearchScope scope) {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean isUndefinedType() {
-		throw new UnsupportedOperationException();
-	}
-
-	public void setCElementType(int type) {
-		throw new UnsupportedOperationException();
-	}
+	
 
 	/*
 	 * @see org.eclipse.cdt.internal.core.browser.IFunctionInfo#getParameters()
@@ -301,9 +188,126 @@ public class RemoteASTTypeInfo implements ITypeInfo, IFunctionInfo {
 			return false;
 		return true;
 	}
-
-
+	
 	public IIndexFileLocation getIFL() {
 		return reference.getIFL();
 	}
+	
+	private static RemoteASTTypeReference createReference(IASTName name) {
+		IASTFileLocation floc= name.getFileLocation();
+		if (floc != null) {
+			String filename= floc.getFileName();
+			IIndexFileLocation ifl = new RemoteIndexFileLocation(filename, null);
+			return new RemoteASTTypeReference(ifl, name.resolveBinding(), new Path(filename), floc.getNodeOffset(), floc.getNodeLength());
+		}
+		return null;
+	}
+	@Deprecated
+	public void addDerivedReference(ITypeReference location) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public void addReference(ITypeReference location) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean canSubstituteFor(ITypeInfo info) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean encloses(ITypeInfo info) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean exists() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public ITypeReference[] getDerivedReferences() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public ITypeInfo[] getEnclosedTypes() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public ITypeInfo[] getEnclosedTypes(int[] kinds) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public ITypeInfo getEnclosingNamespace(boolean includeGlobalNamespace) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public ITypeInfo getEnclosingType() {
+		// TODO not sure
+		return null;
+	}
+	@Deprecated
+	public ITypeInfo getEnclosingType(int[] kinds) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public ITypeInfo getRootNamespace(boolean includeGlobalNamespace) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public ITypeInfo[] getSubTypes() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public ASTAccessVisibility getSuperTypeAccess(ITypeInfo subType) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public ITypeInfo[] getSuperTypes() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean hasEnclosedTypes() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean hasSubTypes() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean hasSuperTypes() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean isClass() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean isEnclosed(ITypeInfo info) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean isEnclosed(ITypeSearchScope scope) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean isEnclosedType() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean isEnclosingType() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean isReferenced(ITypeSearchScope scope) {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public boolean isUndefinedType() {
+		throw new UnsupportedOperationException();
+	}
+	@Deprecated
+	public void setCElementType(int type) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	
 }

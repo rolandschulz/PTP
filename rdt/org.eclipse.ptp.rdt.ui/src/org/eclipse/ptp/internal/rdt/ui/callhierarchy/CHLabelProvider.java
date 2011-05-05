@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHLabelProvider
- * Version: 1.10
+ * Version: 1.12
  */
 
 package org.eclipse.ptp.internal.rdt.ui.callhierarchy;
@@ -26,7 +26,9 @@ import org.eclipse.cdt.core.model.util.CElementBaseLabels;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHMessages;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHMultiDefNode;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHNode;
+import org.eclipse.cdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.cdt.internal.ui.viewsupport.CElementLabels;
 import org.eclipse.cdt.internal.ui.viewsupport.CUILabelProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.ImageImageDescriptor;
 import org.eclipse.cdt.ui.CElementImageDescriptor;
@@ -34,6 +36,8 @@ import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -41,12 +45,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 
-public class CHLabelProvider extends LabelProvider implements IColorProvider {
-	private final static int LABEL_OPTIONS_SIMPLE = CElementBaseLabels.ALL_FULLY_QUALIFIED
-	| CElementBaseLabels.M_PARAMETER_TYPES | CElementBaseLabels.TEMPLATE_ARGUMENTS;
-	private final static int LABEL_OPTIONS_SHOW_FILES= LABEL_OPTIONS_SIMPLE | CElementBaseLabels.MF_POST_FILE_QUALIFIED;
+public class CHLabelProvider extends AppearanceAwareLabelProvider {
+	private final static long LABEL_OPTIONS_SIMPLE = CElementLabels.ALL_FULLY_QUALIFIED
+	| CElementLabels.M_PARAMETER_TYPES | CElementLabels.M_APP_RETURNTYPE | CElementLabels.F_APP_TYPE_SIGNATURE | CElementLabels.TEMPLATE_ARGUMENTS;
+	private final static long LABEL_OPTIONS_SHOW_FILES= LABEL_OPTIONS_SIMPLE | CElementLabels.MF_POST_FILE_QUALIFIED;
+
 	
-	 private CUILabelProvider fCLabelProvider= new CUILabelProvider(LABEL_OPTIONS_SIMPLE, CElementImageProvider.OVERLAY_ICONS);
+    private CUILabelProvider fCLabelProvider= new CUILabelProvider(LABEL_OPTIONS_SIMPLE, CElementImageProvider.OVERLAY_ICONS);
     private CHContentProvider fContentProvider;
     private HashMap<String, Image> fCachedImages= new HashMap<String, Image>();
 	private Color fColorInactive;
@@ -101,12 +106,49 @@ public class CHLabelProvider extends LabelProvider implements IColorProvider {
             	if (refCount > 1) {
             		label += NLS.bind(" ({0} {1})", new Integer(refCount), CHMessages.CHLabelProvider_matches);  //$NON-NLS-1$
             	}
-            	return label;
+            	return decorateText(label, element);
             }
         }
         return super.getText(element);
     }
     
+    @Override
+	public StyledString getStyledText(Object element) {
+    	if (element instanceof CHNode) {
+            CHNode node= (CHNode) element;
+            ICElement decl= node.getOneRepresentedDeclaration();
+            if (decl != null) {
+            	StyledString label;
+            	if (node.isMultiDef()) {
+            		long options= fCLabelProvider.getTextFlags();
+            		fCLabelProvider.setTextFlags(LABEL_OPTIONS_SIMPLE);
+            		label= fCLabelProvider.getStyledText(decl);
+            		fCLabelProvider.setTextFlags(options);
+            	}
+            	else {
+            		label= fCLabelProvider.getStyledText(decl);
+            		if (node.isInitializer()) {
+            			label= addInitializerDecoration(label);
+            		}
+            	}
+            	int refCount= node.getReferenceCount();
+            	if (refCount > 1) {
+            		final int offset= label.length();
+            		label.append(NLS.bind(" ({0} {1})", new Integer(refCount), CHMessages.CHLabelProvider_matches));  //$NON-NLS-1$
+                	label.setStyle(offset, label.length() - offset, StyledString.COUNTER_STYLER);
+    				
+            	}
+            	//return label;
+            	String decorated= decorateText(label.getString(), element);
+        		if (decorated != null) {
+        			return StyledCellLabelProvider.styleDecoratedString(decorated, StyledString.DECORATIONS_STYLER, label);
+        		}
+        		return label;
+        	}
+        }
+        return fCLabelProvider.getStyledText(element);
+	}
+
     private String addInitializerDecoration(String label) {
     	int i= 0;
     	char[] content= label.toCharArray();
@@ -124,12 +166,32 @@ public class CHLabelProvider extends LabelProvider implements IColorProvider {
 
     	return buf.toString();
 	}
+    
+    private StyledString addInitializerDecoration(StyledString label) {
+    	int i= 0;
+    	char[] content= label.toString().toCharArray();
+    	for (i = 0; i < content.length; i++) {
+			char c = content[i];
+			if (c == '-' || Character.isWhitespace(c)) {
+				break;
+			}
+		}
+    	StyledString label2= new StyledString();
+    	label2.append("{init "); //$NON-NLS-1$
+    	i += label2.length();
+    	label2.append(label);
+    	label2.insert('}', i++);
+    	label2.insert('(', i++);
+    	label2.insert(')', i++);
+    	label2.setStyle(0, i, null);
+    	return label2;
+	}
+
 
 	@Override
 	public void dispose() {
         fCLabelProvider.dispose();
-        for (Iterator<Image> iter = fCachedImages.values().iterator(); iter.hasNext();) {
-            Image image = iter.next();
+        for (Image image : fCachedImages.values()) {
             image.dispose();
         }
         fCachedImages.clear();
@@ -172,10 +234,7 @@ public class CHLabelProvider extends LabelProvider implements IColorProvider {
         return result;
     }
 
-    public Color getBackground(Object element) {
-        return null;
-    }
-
+  
     public Color getForeground(Object element) {
     	if (element instanceof CHMultiDefNode) {
     		return fColorInactive;

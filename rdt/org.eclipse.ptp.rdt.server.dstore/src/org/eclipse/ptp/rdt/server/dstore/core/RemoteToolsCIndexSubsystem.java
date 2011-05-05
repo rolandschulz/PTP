@@ -787,6 +787,21 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		}
 		return (List<RemoteSearchMatch>) result;
 	}
+	
+	/**
+	 * @see
+	 * org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#runQuery2
+	 * @since 2.0
+	 */
+	public RemoteSearchQuery runQuery2(Scope scope, RemoteSearchQuery query, IProgressMonitor monitor) {
+    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.8") + query.getScopeDescription(), 100); //$NON-NLS-1$
+		Object result = sendRequest(CDTMiner.C_SEARCH_RUN_QUERY2, new Object[] { scope, getHostName(), query  }, null);
+		if (result == null) {
+			return null;
+		}
+		return (RemoteSearchQuery) result;
+	}
+	
 
 	/**
 	 * @param requestType
