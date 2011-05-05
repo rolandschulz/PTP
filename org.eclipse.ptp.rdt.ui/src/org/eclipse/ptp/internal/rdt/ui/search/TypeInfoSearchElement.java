@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2008, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.TypeInfoSearchElement
- * Version: 1.1
+ * Version: 1.4
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search;
@@ -20,6 +20,9 @@ package org.eclipse.ptp.internal.rdt.ui.search;
 import org.eclipse.cdt.core.browser.ITypeInfo;
 import org.eclipse.cdt.core.index.IIndexName;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteASTTypeInfo;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchElement;
+
 
 /**
  * Represents a a c/c++-entity in a search.
@@ -31,6 +34,12 @@ public class TypeInfoSearchElement extends RemoteSearchElement {
 		super(name.getFile().getLocation());
 		this.typeInfo= typeInfo;
 	}
+	
+	public TypeInfoSearchElement(RemoteASTTypeInfo typeInfo) {
+		super(typeInfo.getIFL());
+		this.typeInfo= typeInfo;
+	}
+
 
 	@Override
 	public int hashCode() {
@@ -45,9 +54,7 @@ public class TypeInfoSearchElement extends RemoteSearchElement {
 		if (!(obj instanceof TypeInfoSearchElement))
 			return false;
 		TypeInfoSearchElement other= (TypeInfoSearchElement)obj;
-		return typeInfo.getCElementType() == other.typeInfo.getCElementType() &&
-			typeInfo.getName().equals(other.typeInfo.getName()) &&
-			super.equals(other);
+		return super.equals(other) && typeInfo.equals(other.typeInfo);
 	}
 
 	public final ITypeInfo getTypeInfo() {

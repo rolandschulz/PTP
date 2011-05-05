@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,22 +9,19 @@
  *    IBM Corporation
  *******************************************************************************/ 
 
-/* -- ST-Origin --
- * Source folder: org.eclipse.cdt.ui/src
- * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHContentProvider
- * Version: 1.17
- */
 
-/* -- ST-Origin --
- * Source folder: org.eclipse.cdt.ui/src
- * Class: org.eclipse.cdt.internal.ui.callhierarchy.CallHierarchyUI
- * Version: 1.22
- */
+
 package org.eclipse.ptp.internal.rdt.core.callhierarchy;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IBinding;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPMethod;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPSpecialization;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexManager;
 import org.eclipse.cdt.core.index.IIndexName;
@@ -34,17 +31,25 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.IWorkingCopy;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.ClassTypeHelper;
 import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.CModelUtil;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
+import org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory;
 import org.eclipse.ptp.internal.rdt.core.model.LocalCProjectFactory;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 
 public class LocalCallHierarchyService extends AbstractCallHierarchyService {
-	private static final ICElement[] NO_ELEMENTS = {};
 
+	
+	/* -- ST-Origin --
+	 * Source folder: org.eclipse.cdt.ui/src
+	 * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHQueries
+	 * Version: 1.20
+	 */
+	
 	public CalledByResult findCalledBy(Scope scope, ICElement callee, IProgressMonitor pm) 
 			throws CoreException, InterruptedException {
 		CalledByResult result= new CalledByResult();
@@ -56,22 +61,47 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 		IIndex index= CCorePlugin.getIndexManager().getIndex(projects);
 		index.acquireReadLock();
 		try {
-			String path = EFSExtensionManager.getDefault().getPathFromURI(callee.getLocationURI());
-			IBinding calleeBinding= IndexQueries.elementToBinding(index, callee, path);
-			findCalledBy(index, calleeBinding, callee.getCProject(), result);
+			
+			findCalledBy(callee, index, result);
 			return result;
 		}
 		finally {
 			index.releaseReadLock();
 		}
 	}
-
-	private void findCalledBy(IIndex index, IBinding callee, ICProject project, CalledByResult result) 
+	
+	private static void findCalledBy(ICElement callee, IIndex index, CalledByResult result)
 			throws CoreException {
-		if (callee != null) {
-			IIndexName[] names= index.findReferences(callee);
-			for (int i = 0; i < names.length; i++) {
-				IIndexName rname = names[i];
+		final ICProject project = callee.getCProject();
+		String path = EFSExtensionManager.getDefault().getPathFromURI(callee.getLocationURI());
+		IBinding calleeBinding= IndexQueries.elementToBinding(index, callee, path);
+		if (calleeBinding != null) {
+			findCalledBy1(index, calleeBinding, true, project, result);
+			if (calleeBinding instanceof ICPPMethod) {
+				IBinding[] overriddenBindings= ClassTypeHelper.findOverridden((ICPPMethod) calleeBinding);
+				for (IBinding overriddenBinding : overriddenBindings) {
+					findCalledBy1(index, overriddenBinding, false, project, result);
+				}
+
+			}
+		}
+	}
+		
+	private static void findCalledBy1(IIndex index, IBinding callee, boolean includeOrdinaryCalls,
+			ICProject project, CalledByResult result) throws CoreException {
+		findCalledBy2(index, callee, includeOrdinaryCalls, project, result);
+		List<? extends IBinding> specializations = IndexQueries.findSpecializations(callee);
+		for (IBinding spec : specializations) {
+			findCalledBy2(index, spec, includeOrdinaryCalls, project, result);
+		}
+	}
+
+
+	private static void findCalledBy2(IIndex index, IBinding callee, boolean includeOrdinaryCalls, ICProject project, CalledByResult result) 
+			throws CoreException {
+		IIndexName[] names= index.findNames(callee, IIndex.FIND_REFERENCES | IIndex.SEARCH_ACROSS_LANGUAGE_BOUNDARIES);
+		for (IIndexName rname : names) {
+			if (includeOrdinaryCalls || rname.couldBePolymorphicMethodCall()) {
 				IIndexName caller= rname.getEnclosingDefinition();
 				if (caller != null) {
 					ICElement elem= IndexQueries.getCElementForName(project, index, caller, null, new LocalCProjectFactory());
@@ -82,6 +112,8 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 			}
 		}
 	}
+	
+		
 
 	public CallsToResult findCalls(Scope scope, ICElement caller, IProgressMonitor pm) 
 			throws CoreException, InterruptedException {
@@ -102,20 +134,149 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 		IIndexName callerName= IndexQueries.elementToName(index, caller);
 		if (callerName != null) {
 			IIndexName[] refs= callerName.getEnclosedNames();
-			for (int i = 0; i < refs.length; i++) {
-				IIndexName name = refs[i];
+			final ICProject project = caller.getCProject();
+			ICProjectFactory projectFactory = new LocalCProjectFactory();
+			for (IIndexName name : refs) {
 				IBinding binding= index.findBinding(name);
 				if (isRelevantForCallHierarchy(binding)) {
-					ICElement[] defs = IndexQueries.findRepresentative(index, binding, null, null, new LocalCProjectFactory());
-					if (defs != null && defs.length > 0) {
-						result.add(defs, name);
+					for(;;) {
+						ICElement[] defs=null;
+						if (binding instanceof ICPPMethod) {
+							defs = findOverriders(index, (ICPPMethod) binding, project, projectFactory);
+						}
+						if (defs == null) {
+							defs= IndexQueries.findRepresentative(index, binding, null, project, projectFactory);
+						}
+						if (defs != null && defs.length > 0) {
+							result.add(defs, name);
+						} else if (binding instanceof ICPPSpecialization) {
+							binding= ((ICPPSpecialization) binding).getSpecializedBinding();
+							if (binding != null)
+								continue;
+						}
+						break;
+
+
 					}
+					
 				}
 			}
 		}
 		return result;
 	}
 	
+	/**
+	 * Searches for overriders of method and converts them to ICElement, returns null, if there are none.
+	 */
+	static ICElement[] findOverriders(IIndex index, ICPPMethod binding, ICProject project, ICProjectFactory projectFactory)	throws CoreException {
+		IBinding[] virtualOverriders= ClassTypeHelper.findOverriders(index, binding);
+		if (virtualOverriders.length > 0) {
+			ArrayList<ICElement> list= new ArrayList<ICElement>();
+			list.addAll(Arrays.asList(IndexQueries.findRepresentative(index, binding, null, project, projectFactory)));
+			for (IBinding overrider : virtualOverriders) {
+				list.addAll(Arrays.asList(IndexQueries.findRepresentative(index, overrider, null, project, projectFactory)));
+			}
+			return list.toArray(new ICElement[list.size()]);
+		}
+		return null;
+	}
+
+	
+	/*********************************************************************************************************************************/
+	/* -- ST-Origin --
+	 * Source folder: org.eclipse.cdt.ui/src
+	 * Class: org.eclipse.cdt.internal.ui.callhierarchy.CallHierarchyUI
+	 * Version: 1.25
+	 */
+	
+	private static final ICElement[] NO_ELEMENTS = {};
+	
+	public ICElement[] findDefinitions(Scope scope, ICProject project, IWorkingCopy workingCopy, int selectionStart, int selectionLength, IProgressMonitor pm) throws CoreException {
+		try {
+			IIndex index= CCorePlugin.getIndexManager().getIndex(project, IIndexManager.ADD_DEPENDENCIES | IIndexManager.ADD_DEPENDENT);
+	
+			index.acquireReadLock();
+			try {
+				IASTName name= IndexQueries.getSelectedName(index, workingCopy, selectionStart, selectionLength);
+				if (name != null) {
+					IBinding binding= name.resolveBinding();
+					if (isRelevantForCallHierarchy(binding)) {
+						final LocalCProjectFactory projectFactory = new LocalCProjectFactory();
+						if (name.isDefinition()) {
+							ICElement elem= IndexQueries.getCElementForName(project, index, name, null, projectFactory);
+							if (elem != null) {
+								return new ICElement[]{elem};
+							}
+							return NO_ELEMENTS;
+
+						}
+						
+						
+
+						ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, null, project, projectFactory);
+						if (elems.length != 0) 
+							return elems;
+							
+								
+						if (name.isDeclaration()) {
+							ICElement elem= IndexQueries.getCElementForName(project, index, name, null, projectFactory);
+							if (elem != null) {
+								return new ICElement[] {elem};
+							}
+							return NO_ELEMENTS;
+
+						}
+						ICElement elem= IndexQueries.findAnyDeclaration(index, project, binding, null, projectFactory);
+						
+						if (elem != null) {
+							return new ICElement[]{elem};
+						}
+						if (binding instanceof ICPPSpecialization) {
+							return findSpecializationDeclaration(binding, project, index, projectFactory);
+						}
+
+					
+						return NO_ELEMENTS;
+
+						
+					}
+				}
+			}
+			finally {
+				
+					index.releaseReadLock();
+				
+			}
+		}
+		catch (CoreException e) {
+			CCorePlugin.log(e);
+		} 
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+		return NO_ELEMENTS;
+	}
+	
+	private static ICElement[] findSpecializationDeclaration(IBinding binding, ICProject project,
+			IIndex index, LocalCProjectFactory projectFactory) throws CoreException {
+		while (binding instanceof ICPPSpecialization) {
+			IBinding original= ((ICPPSpecialization) binding).getSpecializedBinding();
+			ICElement[] elems= IndexQueries.findAllDefinitions(index, original, null, project, projectFactory);
+			if (elems.length == 0) {
+				ICElement elem= IndexQueries.findAnyDeclaration(index, project, original, null, projectFactory);
+				if (elem != null) {
+					elems= new ICElement[]{elem};
+				}
+			}
+			if (elems.length > 0) {
+				return elems;
+			}
+			binding= original;
+		}
+		return NO_ELEMENTS;
+	}
+
+
 	public ICElement[] findDefinitions(Scope scope, ICElement input, IProgressMonitor pm) {
 		try {
 			final ITranslationUnit tu= CModelUtil.getTranslationUnit(input);
@@ -143,9 +304,8 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 					}
 				}
 				finally {
-					if (index != null) {
-						index.releaseReadLock();
-					}
+					index.releaseReadLock();
+					
 				}
 			}
 		}
@@ -157,58 +317,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 		}
 		return new ICElement[] {input};
 	}
-
-	public ICElement[] findDefinitions(Scope scope, ICProject project, IWorkingCopy workingCopy, int selectionStart, int selectionLength, IProgressMonitor pm) throws CoreException {
-		try {
-			IIndex index= CCorePlugin.getIndexManager().getIndex(project, IIndexManager.ADD_DEPENDENCIES | IIndexManager.ADD_DEPENDENT);
 	
-			index.acquireReadLock();
-			try {
-				IASTName name= IndexQueries.getSelectedName(index, workingCopy, selectionStart, selectionLength);
-				if (name != null) {
-					IBinding binding= name.resolveBinding();
-					if (isRelevantForCallHierarchy(binding)) {
-						final LocalCProjectFactory projectFactory = new LocalCProjectFactory();
-						if (name.isDefinition()) {
-							ICElement elem= IndexQueries.getCElementForName(project, index, name, null, projectFactory);
-							if (elem != null) {
-								return new ICElement[]{elem};
-							}
-						}
-						else {
-							ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, null, project, projectFactory);
-							if (elems.length == 0) {
-								ICElement elem= null;
-								if (name.isDeclaration()) {
-									elem= IndexQueries.getCElementForName(project, index, name, null, projectFactory);
-								}
-								else {
-									elem= IndexQueries.findAnyDeclaration(index, project, binding, null, projectFactory);
-								}
-								if (elem != null) {
-									elems= new ICElement[]{elem};
-								}
-							}
-							return elems;
-						}
-					}
-				}
-			}
-			finally {
-				if (index != null) {
-					index.releaseReadLock();
-				}
-			}
-		}
-		catch (CoreException e) {
-			CCorePlugin.log(e);
-		} 
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
-		return NO_ELEMENTS;
-	}
-
 	private static boolean needToFindDefinition(ICElement elem) {
 		switch (elem.getElementType()) {
 		case ICElement.C_FUNCTION_DECLARATION:

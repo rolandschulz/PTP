@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchPatternQuery
- * Version: 1.27
+ * Version: 1.34
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search;
@@ -21,6 +21,7 @@ import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.util.Messages;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchPatternQuery;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchTextSelectionQuery;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
 
 public class RemoteSearchPatternQueryAdapter extends RemoteSearchQueryAdapter {
@@ -31,5 +32,11 @@ public class RemoteSearchPatternQueryAdapter extends RemoteSearchQueryAdapter {
 	@Override
 	public String getLabel() {
 		return Messages.format(CSearchMessages.PDOMSearchPatternQuery_PatternQuery_labelPatternInScope, super.getLabel(), ((RemoteSearchPatternQuery) fQuery).getPattern(), ((RemoteSearchPatternQuery) fQuery).getScopeDescription()); 
+	}
+	
+	@Override
+	public String getResultLabel(int numMatches) {
+		return getResultLabel(((RemoteSearchPatternQuery) fQuery).getPatternStr(), ((RemoteSearchPatternQuery) fQuery).getScopeDescription(), numMatches); 
+
 	}
 }
