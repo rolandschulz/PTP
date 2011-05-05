@@ -91,7 +91,7 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 		}
 
 		if (path == null) {
-			return current;
+			return null;
 		}
 
 		return new URI(home.getScheme(), home.getUserInfo(), home.getHost(), home.getPort(), path, home.getQuery(),
