@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Control;
  */
 public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IFireContentsChangedEnabled {
 
-	private final RemoteServicesDelegate delegate;
+	private RemoteServicesDelegate delegate;
 	private final IJAXBResourceManagerConfiguration rmConfig;
 	private final LaunchTabType launchTabData;
 	private final ScriptType script;
@@ -64,7 +64,6 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		rmConfig = rm.getJAXBConfiguration();
 		script = rmConfig.getResourceManagerData().getControlData().getScript();
 		launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
-		delegate = rm.getControl().getRemoteServicesDelegate();
 		updateHandler = new ValueUpdateHandler(this);
 		if (launchTabData != null) {
 			TabControllerType controller = launchTabData.getBasic();
@@ -185,6 +184,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		try {
+			delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate();
 			lcMap.initialize(rmConfig.getRMVariableMap());
 			updateHandler.clear();
 		} catch (Throwable t) {

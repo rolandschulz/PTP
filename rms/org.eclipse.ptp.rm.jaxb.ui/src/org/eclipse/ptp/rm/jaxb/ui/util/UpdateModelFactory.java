@@ -491,8 +491,8 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 					} else {
 						d.setFileName(path);
 					}
-					d.open();
-					String f = dir ? d.getFilterPath() : d.getFileName();
+					String result = d.open();
+					String f = result == null ? null : (dir ? d.getFilterPath() : d.getFileName());
 					if (f != null) {
 						t.setText(new File(f).getAbsolutePath());
 					} else {
