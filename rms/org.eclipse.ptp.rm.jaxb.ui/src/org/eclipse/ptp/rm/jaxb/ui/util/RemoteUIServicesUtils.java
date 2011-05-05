@@ -55,7 +55,7 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 	 * @param readOnly
 	 *            whether to disallow the user to type in a path (default is
 	 *            <code>true</code>)
-	 * @return the selected file path as URI
+	 * @return the selected file path as URI or <code>null</code> if canceled
 	 * @throws URISyntaxException
 	 */
 	public static URI browse(Shell shell, URI current, RemoteServicesDelegate delegate, boolean remote, boolean readOnly)
