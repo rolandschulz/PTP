@@ -15,7 +15,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 
 /**
  * Project nature for remote projects.
@@ -45,7 +44,6 @@ public class RemoteSyncNature implements IProjectNature {
 		try {
 			return project.hasNature(NATURE_ID);
 		} catch (CoreException e) {
-			RDTSyncCorePlugin.log(e);
 			return false;
 		}
 	}
