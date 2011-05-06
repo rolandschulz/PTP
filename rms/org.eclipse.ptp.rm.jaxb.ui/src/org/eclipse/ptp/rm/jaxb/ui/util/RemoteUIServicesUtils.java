@@ -23,6 +23,7 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 
@@ -55,14 +56,17 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 	 * @param readOnly
 	 *            whether to disallow the user to type in a path (default is
 	 *            <code>true</code>)
-	 * @return the selected file path as URI
+	 * @param dir
+	 *            whether to browse/return a directory (default is file)
+	 * @return the selected file path as URI or <code>null</code> if canceled
 	 * @throws URISyntaxException
 	 */
-	public static URI browse(Shell shell, URI current, RemoteServicesDelegate delegate, boolean remote, boolean readOnly)
-			throws URISyntaxException {
+	public static URI browse(Shell shell, URI current, RemoteServicesDelegate delegate, boolean remote, boolean readOnly,
+			boolean dir) throws URISyntaxException {
 		IRemoteUIServices uIServices = null;
 		IRemoteUIFileManager uiFileManager = null;
 		IRemoteConnection conn = null;
+
 		URI home = null;
 		String path = null;
 		int type = readOnly ? IRemoteUIConstants.OPEN : IRemoteUIConstants.SAVE;
@@ -79,18 +83,22 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 			home = delegate.getRemoteHome();
 		}
 
-		path = current == null ? home.getPath() : current.getPath();
+		path = (current == null) ? home.getPath() : current.getPath();
 
 		try {
 			uiFileManager.setConnection(conn);
 			uiFileManager.showConnections(remote);
-			path = uiFileManager.browseFile(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, type);
+			if (dir) {
+				path = uiFileManager.browseDirectory(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, type);
+			} else {
+				path = uiFileManager.browseFile(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, type);
+			}
 		} catch (Throwable t) {
-			t.printStackTrace();
+			JAXBUIPlugin.log(t);
 		}
 
 		if (path == null) {
-			return current;
+			return null;
 		}
 
 		return new URI(home.getScheme(), home.getUserInfo(), home.getHost(), home.getPort(), path, home.getQuery(),

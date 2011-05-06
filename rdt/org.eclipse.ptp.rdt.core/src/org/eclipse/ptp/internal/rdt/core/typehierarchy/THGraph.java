@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.typehierarchy.THGraph
- * Version: 1.15
+ * Version: 1.16
  */
 package org.eclipse.ptp.internal.rdt.core.typehierarchy;
 
@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.cdt.core.dom.IName;
@@ -111,9 +110,8 @@ public class THGraph implements Serializable {
 		while (!stack.isEmpty()) {
 			THGraphNode node= stack.remove(stack.size()-1);
 			List<THGraphEdge> out= node.getOutgoing();
-			for (Iterator<THGraphEdge> iterator = out.iterator(); iterator.hasNext();) {
-				THGraphEdge	edge= (THGraphEdge) iterator.next();
-				node= edge.getEndNode();
+			for (THGraphEdge edge : out) {
+ 				node= edge.getEndNode();
 				if (node == from) {
 					return true;
 				}
@@ -124,9 +122,8 @@ public class THGraph implements Serializable {
 		}
 		// check if edge is already there.
 		List<THGraphEdge> out= from.getOutgoing();
-		for (Iterator<THGraphEdge> iterator = out.iterator(); iterator.hasNext();) {
-			THGraphEdge edge = iterator.next();
-			if (edge.getEndNode() == to) {
+		for (THGraphEdge edge : out) {
+ 			if (edge.getEndNode() == to) {
 				return true;
 			}
 		}
@@ -208,11 +205,10 @@ public class THGraph implements Serializable {
 				if (binding instanceof ICPPClassType) {
 					ICPPClassType ct= (ICPPClassType) binding;
 					ICPPBase[] bases= ct.getBases();
-					for (int i = 0; i < bases.length; i++) {
+					for (ICPPBase base : bases) {
 						if (monitor.isCanceled()) {
 							return;
 						}
-						ICPPBase base= bases[i];
 						IName name= base.getBaseClassSpecifierName();
 						IBinding basecl= name != null ? index.findBinding(name) : base.getBaseClass();
 						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter, null, projectFactory);
@@ -281,11 +277,10 @@ public class THGraph implements Serializable {
 				IBinding binding = IndexQueries.elementToBinding(index, elem, se.fPath);
 				if (binding != null) {
 					IIndexName[] names= index.findNames(binding, IIndex.FIND_REFERENCES | IIndex.FIND_DEFINITIONS);
-					for (int i = 0; i < names.length; i++) {
+					for (IIndexName indexName : names) {
 						if (monitor.isCanceled()) {
 							return;
 						}
-						IIndexName indexName = names[i];
 						if (indexName.isBaseSpecifier()) {
 							IIndexName subClassDef= indexName.getEnclosingDefinition();
 							if (subClassDef != null) {
@@ -350,8 +345,7 @@ public class THGraph implements Serializable {
 	
 	private void addMemberElements(IIndex index, IBinding[] members, List<ICElement> memberList, ICProjectFactory projectFactory) 
 			throws CoreException {
-		for (int i = 0; i < members.length; i++) {
-			IBinding binding = members[i];
+		for (IBinding binding : members) {
 			ICElement[] elems= IndexQueries.findRepresentative(index, binding, fConverter, null, projectFactory);
 			if (elems.length > 0) {
 				memberList.add(elems[0]);

@@ -18,6 +18,7 @@ import java.util.Map;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.IScannerInfo;
+import org.eclipse.cdt.internal.core.parser.util.ContentAssistMatcherFactory;
 import org.eclipse.cdt.internal.ui.text.contentassist.CContentAssistInvocationContext;
 import org.eclipse.cdt.ui.text.contentassist.ContentAssistInvocationContext;
 import org.eclipse.core.resources.IProject;
@@ -69,6 +70,8 @@ public class RemoteContentAssistService extends AbstractRemoteService implements
 		}
 		
 		RemoteContentAssistInvocationContext remoteContext = ContentAssistUtil.adaptContext(cContext);
+		remoteContext.setShowCamelCaseMatches(ContentAssistMatcherFactory.getInstance().getShowCamelCaseMatches());
+		
 		ICIndexSubsystem subsystem = getSubSystem();
 		
 		// TODO: This can potentially take a while.  But we need

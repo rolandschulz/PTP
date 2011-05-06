@@ -9,12 +9,13 @@
 <!-- * Albert L. Rossi - design and implementation -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-torque-interactive">
+	xsi:schemaLocation="resource_manager_type.xsd" name="tabbed-example">
 	<control-data>
-		<property name="queues" visible="false"/>
-		<property name="mpiPrefix" visible="false">
-			<default>${rm:mpiCommand#value} -np ${rm:mpiCores#value}</default>
-		</property>
+		<property name="e1" visible="true"/>
+		<property name="e2" visible="true"/>
+		<property name="e3" visible="true"/>
+		<property name="e4" visible="true"/>
+		<property name="e5" visible="true"/>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
@@ -38,100 +39,21 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
 		</attribute>
-		<start-up-command name="get-queues">
-			<arg>qstat</arg>
-			<arg>-Q</arg>
-			<arg>-f</arg>
-			<stdout-parser delim="\n">
-				<target ref="queues">
-					<match>
-						<expression>Queue: ([\w\d]+)</expression>
-						<add field="value">
-							<entry valueGroup="1"/>
-						</add>
-					</match>
-				</target>
-			</stdout-parser>
-		</start-up-command>
-		<submit-interactive name="submit-interactive" waitForId="true" keepOpen="true" flags="ALLOCATE_PTY">
-			<arg>qsub</arg>
-			<arg>-I</arg>
-			<arg>-q ${rm:destination#value}</arg>
-			<arg>-l nodes=1,mem=${rm:Resource_List.mem#value},walltime=${rm:Resource_List.walltime#value}</arg>
-			<arg>-V</arg>
-			<input isUndefinedIfMatches=".+ -np">${rm:mpiPrefix#value}</input>
-			<input>${rm:executablePath#value} ${rm:progArgs#value}</input>
-			<stdout-parser delim="\n">
-			   <target ref="@jobId">
-               <match>
-                  <expression flags="DOTALL">qsub:.+job[\s]+([\d]+)[.][\w]+[\s]to start.*</expression>
-                  <set field="name">
-                     <entry valueGroup="1"/>
-                  </set>
-                  <set field="value">
-                     <entry value="SUBMITTED"/>
-                  </set>
-               </match>
-            </target>
-				<target ref="@jobId">
-					<match>
-						<expression flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.][\w]+[\s]ready.*</expression>
-						<set field="name">
-							<entry valueGroup="1"/>
-						</set>
-						<set field="value">
-							<entry value="RUNNING"/>
-						</set>
-					</match>
-				</target>
-				<exit-after flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.][\w]+[\s]ready.*</exit-after>
-			</stdout-parser>
-			<stderr-parser delim="\n">
-				<target ref="@jobId">
-					<match>
-						<expression>.+</expression>
-						<set field="name">
-							<entry value="${rm:@jobId#name}"/>
-						</set>
-						<set field="value">
-							<entry value="FAILED"/>
-						</set>
-					</match>
-				</target>
-			</stderr-parser>
+		<submit-interactive name="submit-interactive">
+			<arg></arg>
+			<environment name="VAR_1" value="e1"/>
+			<environment name="VAR_2" value="e2"/>
+			<environment name="VAR_3" value="e3"/>
+			<environment name="VAR_4" value="e4"/>
+			<environment name="VAR_5" value="e5"/>
 		</submit-interactive>
-		<terminate-job name="cancel" waitForId="false">
-         <arg>qdel</arg>
-         <arg>${rm:@jobId#name}</arg>
-      </terminate-job>
 		<launch-tab>
-			<dynamic>
-				<title>Basic PBS Settings</title>
-				<!-- QUEUES remote path group -->
-				<composite group="true">
-					<layout>
-						<grid-layout numColumns="3" makeColumnsEqualWidth="false"/>
-					</layout>
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"/>
-						</layout-data>
-						<tooltip>${rm:destination#tooltip}</tooltip>
-						<fixed-text>Queue: </fixed-text>
-					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
-						<layout-data>
-							<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
-						</layout-data>
-						<items-from>queues</items-from>
-					</widget>
-				</composite>
-				<!-- ATTRIBUTES group -->
-				<composite group="true">
+			<dynamic sharedEnvironment="true">
+				<title>Settings</title>
+				<composite>
 					<layout>
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
 					</layout>
-					<!-- HEADER -->
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -169,7 +91,6 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>${rm:Resource_List.mem#description}</fixed-text>
 					</widget>
-					<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -188,7 +109,6 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>${rm:Resource_List.walltime#description}</fixed-text>
 					</widget>
-					<!-- row 3 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -226,7 +146,101 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 				</composite>
 			</dynamic>
+			<dynamic sharedEnvironment="true">
+				<title>Paths</title>
+				<composite>
+					<layout>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Browse URI: </fixed-text>
+					</widget>
+					<widget type="browse" uri="true" style="SWT.BORDER" readOnly="false" title="Browse">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+						<sub-layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+                  </sub-layout-data>
+					</widget>
+					<!-- row 5 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Browse Dir Path: </fixed-text>
+					</widget>
+					<widget type="browse" uri="false" directory="true" style="SWT.BORDER" readOnly="true" title="Browse">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+						<sub-layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+						</sub-layout-data>
+					</widget>
+					<!-- row 6 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Browse Local File: </fixed-text>
+					</widget>
+					<widget type="browse" style="SWT.BORDER | SWT.H_SCROLL" readOnly="true" localOnly="true" title="Browse">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+						<sub-layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+                  </sub-layout-data>
+					</widget>
+					<!-- row 7 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Browse Local Dir URI: </fixed-text>
+					</widget>
+					<widget type="browse" directory="true" uri="true" style="SWT.BORDER" readOnly="true" localOnly="true" title="Browse">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+						<sub-layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+                  </sub-layout-data>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic sharedEnvironment="true">
+				<title>Environment</title>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="1"/>
+					</layout>
+					<viewer name="environment" style="SWT.BORDER | SWT.MULTI" sort="true" type="table">
+						<layout-data>
+							<grid-data widthHint="600" heightHint="200" horizontalSpan="1"/>
+						</layout-data>
+						<column-data name="Name" width="175">
+							<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
+						</column-data>
+						<column-data name="Value" width="400">
+							<tooltip>Click to activate value widget.</tooltip>
+						</column-data>
+						<items>
+							<include>e1</include>
+							<include>e2</include>
+							<include>e3</include>
+							<include>e4</include>
+							<include>e5</include>
+						</items>
+						<value pattern="export @name='@value'" separator="; "/>
+					</viewer>
+				</composite>
+			</dynamic>
 		</launch-tab>
 	</control-data>
-	<monitor-data schedulerType="PBS"/>
+	<monitor-data schedulerType="MyMonitor"/>
 </resource-manager-builder>

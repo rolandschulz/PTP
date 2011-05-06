@@ -141,6 +141,17 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged
+	 * (java.lang.String)
+	 */
+	public void jobStateChanged(String jobId) {
+		((JAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
+	}
+
+	/*
 	 * For termination, pause, hold, suspension and resume requests. Resets the
 	 * environment, generates a uuid property; if the control request is
 	 * termination, calls remove on the state map. (non-Javadoc)
@@ -206,7 +217,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
 		try {
 			if (!resourceManagerIsActive()) {
-				return new CommandJobStatus(getResourceManager().getUniqueName(), jobId, IJobStatus.COMPLETED, this);
+				return new CommandJobStatus(getResourceManager().getUniqueName(), jobId, IJobStatus.COMPLETED, null, this);
 			}
 			pinTable.pin(jobId);
 
@@ -225,7 +236,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					 */
 					status = jobStatusMap.terminated(jobId);
 					if (status.stateChanged()) {
-						getBaseResourceManager().fireJobChanged(jobId);
+						jobStateChanged(jobId);
 					}
 					return status;
 				}
@@ -257,7 +268,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 
 			if (status == null) {
-				status = new CommandJobStatus(getResourceManager().getUniqueName(), jobId, state, this);
+				status = new CommandJobStatus(getResourceManager().getUniqueName(), jobId, state, null, this);
 				jobStatusMap.addJobStatus(jobId, status);
 			} else {
 				status.setState(state);
@@ -273,7 +284,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 
 			if (status.stateChanged()) {
-				getBaseResourceManager().fireJobChanged(jobId);
+				jobStateChanged(jobId);
 			}
 
 			// XXX eliminate when monitoring is in place
@@ -354,20 +365,20 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
+		/*
+		 * give submission a unique id which will in most cases be replaced by
+		 * the resource-generated id for the job/process
+		 */
+		String uuid = UUID.randomUUID().toString();
+
 		if (!resourceManagerIsActive()) {
-			return new CommandJobStatus(getResourceManager().getUniqueName(), UUID.randomUUID().toString(),
-					IJobStatus.UNDETERMINED, this);
+			return new CommandJobStatus(getResourceManager().getUniqueName(), uuid, IJobStatus.UNDETERMINED, null, this);
 		}
 
 		if (monitor != null) {
 			monitor.beginTask(mode, 20);
 		}
 
-		/*
-		 * give submission a unique id which will in most cases be replaced by
-		 * the resource-generated id for the job/process
-		 */
-		String uuid = UUID.randomUUID().toString();
 		String jobId = null;
 		try {
 			pinTable.pin(uuid);
@@ -418,6 +429,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			rmVarMap.remove(uuid);
 
 			jobId = p.getName();
+
+			/*
+			 * job was cancelled during waitForId
+			 */
+			if (jobId == null) {
+				return new CommandJobStatus(getResourceManager().getUniqueName(), uuid, IJobStatus.CANCELED, null, this);
+			}
 			pinTable.pin(jobId);
 			rmVarMap.put(jobId, p);
 
@@ -480,9 +498,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		CommandType job = null;
 		if (TERMINATE_OPERATION.equals(operation)) {
+			maybeKillInteractive(jobId);
 			job = controlData.getTerminateJob();
 			if (job == null) {
-				maybeKillInteractive(jobId);
 				return;
 			}
 		} else if (SUSPEND_OPERATION.equals(operation)) {
@@ -579,8 +597,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		runCommands(onShutDown);
 		for (ICommandJob job : jobTable.values()) {
 			job.terminate();
-			String jobId = job.getJobStatus().getJobId();
-			getBaseResourceManager().fireJobChanged(jobId);
+			ICommandJobStatus status = job.getJobStatus();
+			status.setState(IJobStatus.CANCELED);
+			String jobId = status.getJobId();
+			maybeForceExternalTermination(jobId);
+			jobStateChanged(jobId);
 		}
 	}
 
@@ -593,13 +614,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private void doOnStartUp(IProgressMonitor monitor) throws CoreException {
 		List<CommandType> onStartUp = controlData.getStartUpCommand();
 		runCommands(onStartUp);
-	}
-
-	/**
-	 * @return specific implementation; used to call fireJobChanged internally.
-	 */
-	private JAXBResourceManager getBaseResourceManager() {
-		return (JAXBResourceManager) getResourceManager();
 	}
 
 	/**
@@ -674,6 +688,42 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 		}
 		return files;
+	}
+
+	/**
+	 * Some interactive jobs are launched as pseudo-terminals; in this case, an
+	 * external call may be necessary to terminate them cleanly.
+	 * 
+	 * @param jobId
+	 */
+	private void maybeForceExternalTermination(String jobId) {
+		if (jobId == null) {
+			return;
+		}
+
+		CommandType job = controlData.getTerminateJob();
+		if (job == null) {
+			return;
+		}
+
+		PropertyType p = (PropertyType) rmVarMap.get(jobId);
+		if (p == null) {
+			pinTable.pin(jobId);
+			p = new PropertyType();
+			p.setVisible(false);
+			p.setName(jobId);
+			rmVarMap.put(jobId, p);
+		}
+
+		try {
+			runCommand(jobId, job, false, true);
+		} catch (CoreException t) {
+			JAXBCorePlugin.log(t);
+		} finally {
+			pinTable.release(jobId);
+		}
+
+		rmVarMap.remove(jobId);
 	}
 
 	/**

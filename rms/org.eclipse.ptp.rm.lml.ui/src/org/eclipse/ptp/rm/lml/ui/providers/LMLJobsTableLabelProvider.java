@@ -18,21 +18,17 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
 import org.eclipse.swt.graphics.Image;
 
-public class LMLJobsTableLabelProvider extends LabelProvider implements ITableLabelProvider{
+public class LMLJobsTableLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-	@Override
 	public Image getColumnImage(Object element, int index) {
 		return null;
 	}
 
-	@Override
 	public String getColumnText(Object element, int index) {
 		RowType row = (RowType) element;
 		List<CellType> cells = row.getCell();
 		String returnValue = cells.get(index).getValue();
 		return returnValue;
 	}
-
-	
 
 }

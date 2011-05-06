@@ -45,12 +45,13 @@ import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBDynamicLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.model.ViewerUpdateModel;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
@@ -269,10 +270,10 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	}
 
 	/**
-	 * Constructs and configures an SWT TabFolder and its TabItems. Calls
+	 * Constructs and configures an SWT CTabFolder and its CTabItems. Calls
 	 * {@link #addItem(TabFolder, TabItemType, int)}.
 	 * 
-	 * @see org.eclipse.swt.widgets.TabFolder
+	 * @see org.eclipse.swt.custom.CTabFolder
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabFolderType
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabItemType
 	 * 
@@ -282,8 +283,8 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 *            control to which to add the folder
 	 * @return the SWT TabFolder
 	 */
-	private TabFolder addFolder(TabFolderType descriptor, Composite parent) {
-		TabFolder folder = new TabFolder(parent, WidgetBuilderUtils.getStyle(descriptor.getStyle()));
+	private CTabFolder addFolder(TabFolderType descriptor, Composite parent) {
+		CTabFolder folder = new CTabFolder(parent, WidgetBuilderUtils.getStyle(descriptor.getStyle()));
 		Layout layout = createLayout(descriptor.getLayout());
 		if (layout != null) {
 			folder.setLayout(layout);
@@ -320,8 +321,8 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * {@link #addComposite(CompositeType, Composite)} or
 	 * {@link #addWidget(Composite, Widget)}.
 	 * 
-	 * @see org.eclipse.swt.widgets.TabFolder
-	 * @see org.eclipse.swt.widgets.TabItem
+	 * @see org.eclipse.swt.custom.CTabFolder
+	 * @see org.eclipse.swt.custom.CTabItem
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabItemType
 	 * 
 	 * @param folder
@@ -331,9 +332,9 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 	 * @param index
 	 *            of the tab in the folder
 	 */
-	private void addItem(TabFolder folder, TabItemType descriptor, int index) {
+	private void addItem(CTabFolder folder, TabItemType descriptor, int index) {
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
-		TabItem item = WidgetBuilderUtils.createTabItem(folder, style, descriptor.getTitle(), descriptor.getTooltip(), index);
+		CTabItem item = WidgetBuilderUtils.createTabItem(folder, style, descriptor.getTitle(), descriptor.getTooltip(), index);
 		Composite control = WidgetBuilderUtils.createComposite(folder, 1);
 		item.setControl(control);
 		String tt = descriptor.getTooltip();

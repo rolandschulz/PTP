@@ -21,42 +21,6 @@
       <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
    </url>
 
-   <requires>
-      <import plugin="org.eclipse.cdt.core" version="5.0.2" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.dstore.core" version="3.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.rse.core" version="3.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.cdt.make.core" version="5.0.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.core" version="5.0.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.remote.core"/>
-      <import plugin="org.eclipse.dstore.extra" version="2.1.100" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.services.core"/>
-      <import plugin="org.eclipse.rse.services.dstore" version="3.1.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.cdt.ui" version="5.0.2" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.workbench.texteditor" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jface.text" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.editors" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.ide" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.views" version="3.2.200" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.help" version="3.3.100" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.navigator" version="3.3.100" match="greaterOrEqual"/>
-      <import plugin="com.ibm.icu" version="3.8.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.navigator.resources" version="3.3.100" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.ui" version="5.0.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.remote.core" version="2.0.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.remote.ui" version="2.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.console" version="3.3.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.services.ui" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.rdt.sync.core" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.rse.files.ui"/>
-   </requires>
-
    <plugin
          id="org.eclipse.ptp.rdt.sync.core"
          download-size="0"
@@ -66,6 +30,27 @@
 
    <plugin
          id="org.eclipse.ptp.rdt.sync.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.rdt.sync.git.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.rdt.sync.git.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jgit"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,7 @@ import org.eclipse.cdt.core.dom.ast.ASTNameCollector;
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTDeclaration;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
+import org.eclipse.cdt.core.dom.ast.IASTFunctionDefinition;
 import org.eclipse.cdt.core.dom.ast.IASTFunctionStyleMacroParameter;
 import org.eclipse.cdt.core.dom.ast.IASTImplicitName;
 import org.eclipse.cdt.core.dom.ast.IASTImplicitNameOwner;
@@ -128,7 +129,7 @@ public class OpenDeclarationHandler {
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.ui/src
 	 * Class: org.eclipse.cdt.internal.ui.search.actions.OpenDeclarationsJob
-	 * Version: 1.16
+	 * Version: 1.22
 	 */	
 	
 	private static OpenDeclarationResult doHandleOpenDeclaration(String scopeName, String scheme, ITranslationUnit workingCopy, String path, String selectedText, 
@@ -196,21 +197,24 @@ public class OpenDeclarationHandler {
 					if (binding != null && !(binding instanceof IProblemBinding)) {
 						IName[] names = findDeclNames(index, ast, kind, binding);
 						for (final IName name : names) {
-							if (name instanceof IIndexName &&
-									filename.equals(((IIndexName) name).getFileLocation().getFileName())) {
-								// Exclude index names from the current file.
-							} else if (areOverlappingNames(name, sourceName)) {
-								// Exclude the current location.
-							} else if (binding instanceof IParameter) {
-								if (isInSameFunction(sourceName, name)) {
+							if (name != null) {
+
+								if (name instanceof IIndexName &&
+										filename.equals(((IIndexName) name).getFileLocation().getFileName())) {
+									// Exclude index names from the current file.
+								} else if (areOverlappingNames(name, sourceName)) {
+									// Exclude the current location.
+								} else if (binding instanceof IParameter) {
+									if (isInSameFunction(sourceName, name)) {
+										targets = ArrayUtil.append(targets, name);
+									}
+								} else if (binding instanceof ICPPTemplateParameter) {
+									if (isInSameTemplate(sourceName, name)) {
+										targets = ArrayUtil.append(targets, name);			
+									}
+								} else {
 									targets = ArrayUtil.append(targets, name);
 								}
-							} else if (binding instanceof ICPPTemplateParameter) {
-								if (isInSameTemplate(sourceName, name)) {
-									targets = ArrayUtil.append(targets, name);			
-								}
-							} else if (name != null) {
-								targets = ArrayUtil.append(targets, name);
 							}
 						}
 					}
@@ -273,24 +277,28 @@ public class OpenDeclarationHandler {
 				min(loc1.getNodeOffset() + loc1.getNodeLength(), loc2.getNodeOffset() + loc2.getNodeLength());
 	}
 
-	private static boolean isInSameFunction(IASTName name1, IName name2) {
-		IASTDeclaration decl1 = getEnclosingDeclaration(name1);
-		IASTDeclaration decl2 = name2 instanceof IASTName ? getEnclosingDeclaration((IASTName) name2) : null;
-		return decl1 != null && decl1.equals(decl2) || decl1 == null && decl2 == null;
+	private static boolean isInSameFunction(IASTName refName, IName funcDeclName) {
+		if (funcDeclName instanceof IASTName) {
+			IASTDeclaration fdef = getEnclosingFunctionDefinition((IASTNode) funcDeclName);
+			return fdef != null && fdef.contains(refName);
+		} 
+		return false;
 	}
-
-	private static IASTDeclaration getEnclosingDeclaration(IASTNode node) {
-		while (node != null && !(node instanceof IASTDeclaration)) {
+	
+	private static IASTDeclaration getEnclosingFunctionDefinition(IASTNode node) {
+		while (node != null && !(node instanceof IASTFunctionDefinition)) {
 			node= node.getParent();
 		}
 		return (IASTDeclaration) node;
 	}
 
-	private static boolean isInSameTemplate(IASTName name1, IName name2) {
-		IASTDeclaration decl1 = getEnclosingTemplateDeclaration(name1);
-		IASTDeclaration decl2 = name2 instanceof IASTName ?
-				getEnclosingTemplateDeclaration((IASTName) name2) : null;
-		return decl1 != null && decl1.equals(decl2) || decl1 == null && decl2 == null;
+	private static boolean isInSameTemplate(IASTName refName, IName templateDeclName) {
+		
+		if (templateDeclName instanceof IASTName) {
+			IASTDeclaration template = getEnclosingTemplateDeclaration(refName);
+			return template != null && template.contains(refName);
+		} 
+		return false;
 	}
 	
 	private static IASTDeclaration getEnclosingTemplateDeclaration(IASTNode node) {
@@ -511,16 +519,14 @@ public class OpenDeclarationHandler {
 			
 			// Bug 252549, search for names in the AST first.
 			Set<IBinding> primaryBindings= new HashSet<IBinding>();
-			Set<IBinding> ignoreIndexBindings= new HashSet<IBinding>();
 			ASTNameCollector nc= new ASTNameCollector(selectedText);
 			ast.accept(nc);
 			IASTName[] candidates= nc.getNames();
 			for (IASTName astName : candidates) {
 				try {
 					IBinding b= astName.resolveBinding();
-					if (b != null && !(b instanceof IProblemBinding) &&
-							!ignoreIndexBindings.contains(b) && primaryBindings.add(b)) {
-						ignoreIndexBindings.add(index.adaptBinding(b));
+					if (b != null && !(b instanceof IProblemBinding)){ 
+						primaryBindings.add(b);
 					}
 				} catch (RuntimeException e) {
 					RDTLog.logError(e);
@@ -531,9 +537,9 @@ public class OpenDeclarationHandler {
 			IndexFilter filter = IndexFilter.getDeclaredBindingFilter(ast.getLinkage().getLinkageID(), false);			
 			IIndexBinding[] idxBindings = index.findBindings(name, false, filter, null);
 			for (IIndexBinding idxBinding : idxBindings) {
-				if (!ignoreIndexBindings.contains(idxBinding)) {
-					primaryBindings.add(idxBinding);
-				}
+				
+				primaryBindings.add(idxBinding);
+				
 			}
 			
 			IIndexMacro[] macros = index.findMacros(name, filter, null);

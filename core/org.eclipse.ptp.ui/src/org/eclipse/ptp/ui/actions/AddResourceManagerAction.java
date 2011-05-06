@@ -23,7 +23,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.wizards.RMServicesConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.swt.widgets.Shell;
 
 public class AddResourceManagerAction extends Action {
@@ -40,7 +40,7 @@ public class AddResourceManagerAction extends Action {
 
 	@Override
 	public void run() {
-		final RMServicesConfigurationWizard wizard = new RMServicesConfigurationWizard();
+		final RMConfigurationWizard wizard = new RMConfigurationWizard();
 
 		final WizardDialog dialog = new WizardDialog(shell, wizard);
 		dialog.open();

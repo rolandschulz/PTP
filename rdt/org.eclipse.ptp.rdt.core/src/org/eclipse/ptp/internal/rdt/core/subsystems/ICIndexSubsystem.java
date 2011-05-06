@@ -178,8 +178,21 @@ public interface ICIndexSubsystem {
 	 * @param query The query to be run.
 	 * @param monitor
 	 * @return A List of RemoteSearchMatch objects containing the search results.
+	 * @deprecated
 	 */
 	public List<RemoteSearchMatch> runQuery(Scope scope, RemoteSearchQuery query, IProgressMonitor monitor);
+	
+	
+	/**
+	 * Runs the following search query and returns the results.
+	 * 
+	 * @param scope
+	 * @param query The query to be run.
+	 * @param monitor
+	 * @return A RemoteSearchQuery that contains a List of RemoteSearchMatch objects containing the search results.
+	 * @since 4.0
+	 */
+	public RemoteSearchQuery runQuery2(Scope scope, RemoteSearchQuery query, IProgressMonitor monitor);
 
 	/**
 	 * Returns content assist completion proposals for the given context.

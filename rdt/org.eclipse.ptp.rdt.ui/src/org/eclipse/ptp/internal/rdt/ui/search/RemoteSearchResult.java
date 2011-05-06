@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 QNX Software Systems and others.
+ * Copyright (c) 2006, 2011 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchResult
- * Version: 1.11
+ * Version: 1.17
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search;
@@ -28,9 +28,8 @@ import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.index.IIndexName;
 import org.eclipse.cdt.core.index.IndexLocationFactory;
 import org.eclipse.cdt.core.resources.EFSFileStorage;
-import org.eclipse.cdt.internal.ui.search.CSearchMessages;
+import org.eclipse.cdt.internal.ui.search.HidePolymorphicCalls;
 import org.eclipse.cdt.internal.ui.util.ExternalEditorInput;
-import org.eclipse.cdt.internal.ui.util.Messages;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
@@ -40,10 +39,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchElement;
 import org.eclipse.search.ui.text.AbstractTextSearchResult;
 import org.eclipse.search.ui.text.IEditorMatchAdapter;
 import org.eclipse.search.ui.text.IFileMatchAdapter;
 import org.eclipse.search.ui.text.Match;
+import org.eclipse.search.ui.text.MatchFilter;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPathEditorInput;
@@ -53,6 +54,10 @@ import org.eclipse.ui.editors.text.ILocationProviderExtension;
 import org.eclipse.ui.part.FileEditorInput;
 
 public class RemoteSearchResult extends AbstractTextSearchResult implements IEditorMatchAdapter, IFileMatchAdapter {
+
+	private static final String KEY_SHOW_POLYMORPHIC_CALLS = "ShowPolymorphicCalls"; //$NON-NLS-1$
+	final static MatchFilter[] ALL_FILTERS = new MatchFilter[] {HidePolymorphicCalls.FILTER};
+	final static MatchFilter[] NO_FILTERS = {};
 
 	private RemoteSearchQueryAdapter fQuery;
 	private boolean indexerBusy;
@@ -73,44 +78,51 @@ public class RemoteSearchResult extends AbstractTextSearchResult implements IEdi
 	}
 
 	private String getFileName(IEditorPart editor) {
-		IEditorInput input = editor.getEditorInput();
+		final IEditorInput input = editor.getEditorInput();
+		String pathStr= null;
+
 		if (input instanceof FileEditorInput) {
-			FileEditorInput fileInput = (FileEditorInput)input;
+			final FileEditorInput fileInput = (FileEditorInput)input;
 			
 			IPath location = fileInput.getFile().getLocation();
 			
 			if(location != null)
-				return fileInput.getFile().getLocation().toOSString();
+				pathStr= fileInput.getFile().getLocation().toOSString();
 			else
-				return fileInput.getFile().getLocationURI().toString();
+				pathStr= fileInput.getFile().getLocationURI().toString();
 		} else if (input instanceof ExternalEditorInput) {
-			ExternalEditorInput extInput = (ExternalEditorInput)input;
+			final ExternalEditorInput extInput = (ExternalEditorInput)input;
 			if(extInput.getPath() != null) 	{
-				return extInput.getPath().toOSString();
+				pathStr= extInput.getPath().toOSString();
 			}
 			else {
-				return extInput.getURI().toString();
+				pathStr= extInput.getURI().toString();
 			}
 				
 		} else if (input instanceof IStorageEditorInput) {
 				try {
-					IStorage storage = ((IStorageEditorInput)input).getStorage();
+					final IStorage storage = ((IStorageEditorInput)input).getStorage();
 					if (storage.getFullPath() != null) {
-						return storage.getFullPath().toOSString();
+						pathStr= storage.getFullPath().toOSString();
 					}
 				} catch (CoreException exc) {
 					// ignore
 				}
 		} else if (input instanceof IPathEditorInput) {
 			IPath path= ((IPathEditorInput)input).getPath();
-			return path.toOSString();
-		}
-		ILocationProvider provider= (ILocationProvider) input.getAdapter(ILocationProvider.class);
-		if (provider != null) {
-			IPath path= provider.getPath(input);
-			return path.toOSString();
-		}
-		return null;
+			if(path!=null)
+				pathStr = path.toOSString();
+		} else {
+			ILocationProvider provider= (ILocationProvider) input.getAdapter(ILocationProvider.class);
+			if (provider != null) {
+				IPath path= provider.getPath(input);
+				if(path!=null){
+					pathStr=path.toOSString();
+				}
+			}
+		}		
+
+		return pathStr;
 	}
 	
 	private URI getLocationURI(IEditorPart editor) {
@@ -234,9 +246,8 @@ public class RemoteSearchResult extends AbstractTextSearchResult implements IEdi
 
 	public String getLabel() {
 		// report pattern and number of matches
-		String label = fQuery.getLabel();
-		String countLabel = Messages.format(CSearchMessages.CSearchResultCollector_matches, new Integer(getMatchCount()));
-		return label + " " + countLabel; //$NON-NLS-1$
+		return fQuery.getResultLabel(getMatchCount());
+		
 	}
 
 	public String getTooltip() {
@@ -265,5 +276,35 @@ public class RemoteSearchResult extends AbstractTextSearchResult implements IEdi
 	public boolean wasIndexerBusy() {
 		return indexerBusy;
 	}
+	
+	@Override
+	public MatchFilter[] getAllMatchFilters() {
+		return ALL_FILTERS;
+	}
+
+	@Override
+	public MatchFilter[] getActiveMatchFilters() {	
+		MatchFilter[] result = super.getActiveMatchFilters();
+		if (result == null) {
+			if (CUIPlugin.getDefault().getDialogSettings().getBoolean(KEY_SHOW_POLYMORPHIC_CALLS)) {
+				return ALL_FILTERS;
+			}
+			return NO_FILTERS;
+		}
+		return result;
+	}
+
+	@Override
+	public void setActiveMatchFilters(MatchFilter[] filters) {
+		boolean showPoly= false;
+		for (int i = 0; i < filters.length; i++) {
+			if (filters[i] == HidePolymorphicCalls.FILTER) {
+				showPoly= true;
+			}
+		}
+		CUIPlugin.getDefault().getDialogSettings().put(KEY_SHOW_POLYMORPHIC_CALLS, showPoly);
+		super.setActiveMatchFilters(filters);
+	}
+
 
 }

@@ -82,7 +82,7 @@ public class ToolParser extends DefaultHandler{
 	private static final String NAME = "optname";
 	private static final String VALUE = "optvalue";
 	private static final String DEFAULT = "default";
-	private static final String DEFAULTNUM = "defnum";
+	private static final String DEFAULTNUM = "defaultnum";
 	private static final String MINIMUM = "minimum";
 	private static final String MAXIMUM = "maximum";
 	private static final String DEFSTATE = "defstate";

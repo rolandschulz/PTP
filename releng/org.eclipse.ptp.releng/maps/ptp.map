@@ -78,7 +78,7 @@ plugin@org.eclipse.ptp.rm.ibm.pe.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:
 plugin@org.eclipse.ptp.rm.jaxb.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.core
 plugin@org.eclipse.ptp.rm.jaxb.help=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.help
 plugin@org.eclipse.ptp.rm.jaxb.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.ui
-plugin@org.eclipse.ptp.rm.lml.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.core
+plugin@org.eclipse.ptp.rm.lml.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml.core
 plugin@org.eclipse.ptp.rm.lml.da=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml.da
 plugin@org.eclipse.ptp.rm.lml.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml.ui
 plugin@org.eclipse.ptp.rm.mpi.mpich2.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.mpich2.core
@@ -160,6 +160,8 @@ plugin@org.eclipse.ptp.rdt.core.stubs=@ptpTag@,:pserver:anonymous@dev.eclipse.or
 plugin@org.eclipse.ptp.rdt.server.dstore=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.server.dstore
 plugin@org.eclipse.ptp.rdt.sync.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.core
 plugin@org.eclipse.ptp.rdt.sync.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.ui
+plugin@org.eclipse.ptp.rdt.sync.git.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.git.core
+plugin@org.eclipse.ptp.rdt.sync.git.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.git.ui
 
 ! GEM Plugins
 plugin@org.eclipse.ptp.gem=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/gem/org.eclipse.ptp.gem
@@ -189,3 +191,6 @@ plugin@javax.xml.stream,1.0.1=GET,http://download.eclipse.org/tools/orbit/downlo
 plugin@javax.xml.bind,2.1.9=GET,http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/bundles/javax.xml.bind_2.1.9.v201005080401.jar
 plugin@com.sun.xml.bind,2.1.9=GET,http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/bundles/com.sun.xml.bind_2.1.9.v200905260854.jar
 
+! JGit plugins
+!plugin@org.eclipse.jgit=GET,http://download.eclipse.org/jgit/maven/org/eclipse/jgit/org.eclipse.jgit/0.12.1/org.eclipse.jgit-0.12.1.jar
+plugin@org.eclipse.jgit=GET,http://download.eclipse.org/tools/ptp/builds/jgit/org.eclipse.jgit_0.12.1.jar

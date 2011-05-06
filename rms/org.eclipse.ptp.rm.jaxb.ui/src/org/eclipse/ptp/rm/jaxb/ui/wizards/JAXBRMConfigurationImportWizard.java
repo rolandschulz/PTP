@@ -94,10 +94,11 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 								return Status.OK_STATUS;
 							}
 
-							IFile newConfig = project.getFile(name + DOT_XML);
+							String nameTry = name + SP + COPY;
+							IFile newConfig = project.getFile(nameTry + DOT_XML);
 							int createTry = 1;
 							while (newConfig.exists()) {
-								newConfig = project.getFile(name + SP + OPENP + createTry++ + CLOSP + DOT_XML);
+								newConfig = project.getFile(nameTry + SP + OPENP + createTry++ + CLOSP + DOT_XML);
 							}
 							newConfig.create(selection.openStream(), IResource.NONE, subMon.newChild(10));
 						} catch (CoreException io) {
