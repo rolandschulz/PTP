@@ -16,7 +16,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.text.contentassist.DOMCompletionProposalComputer
- * Version: 1.27
+ * Version: 1.31
  */
 
 package org.eclipse.ptp.internal.rdt.core.contentassist;
@@ -64,6 +64,7 @@ import org.eclipse.cdt.core.dom.ast.cpp.ICPPNamespace;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPUsingDeclaration;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.parser.util.CharArrayUtils;
+import org.eclipse.cdt.core.parser.util.IContentAssistMatcher;
 import org.eclipse.cdt.internal.core.dom.parser.c.CBuiltinParameter;
 import org.eclipse.cdt.internal.core.dom.parser.c.CBuiltinVariable;
 import org.eclipse.cdt.internal.core.dom.parser.c.CImplicitFunction;
@@ -74,6 +75,7 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPImplicitFunction;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPImplicitMethod;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPImplicitTypedef;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.AccessContext;
+import org.eclipse.cdt.internal.core.parser.util.ContentAssistMatcherFactory;
 
 /**
  * Searches the DOM (both the AST and the index) for completion proposals.
@@ -134,23 +136,39 @@ public class CompletionProposalComputer {
 	}
 
 	private void addMacroProposals(RemoteContentAssistInvocationContext context, String prefix, List<Proposal> proposals) {
-		char[] prefixChars= prefix.toCharArray();
-		final boolean matchPrefix= !context.isContextInformationStyle();
+		
 		IASTCompletionNode completionNode = context.getCompletionNode();
-		IASTPreprocessorMacroDefinition[] macros = completionNode.getTranslationUnit().getMacroDefinitions();
-		if (macros != null)
-			for (int i = 0; i < macros.length; ++i) {
-				final char[] macroName= macros[i].getName().toCharArray();
-				if (CharArrayUtils.equals(macroName, 0, matchPrefix ? prefixChars.length : macroName.length, prefixChars, true))
-					handleMacro(macros[i], context, prefix, proposals);
+		addMacroProposals(context, prefix, proposals, completionNode.getTranslationUnit()
+				.getMacroDefinitions());
+		addMacroProposals(context, prefix, proposals, completionNode.getTranslationUnit()
+				.getBuiltinMacroDefinitions());
+	}
+	private void addMacroProposals(RemoteContentAssistInvocationContext context, String prefix,
+			List<Proposal> proposals, IASTPreprocessorMacroDefinition[] macros) {
+		if (macros != null) {
+
+			char[] prefixChars= prefix.toCharArray();
+			final boolean matchPrefix= !context.isContextInformationStyle();
+			
+			if (matchPrefix) {
+				IContentAssistMatcher matcher = ContentAssistMatcherFactory.getInstance().createMatcher(prefixChars);
+			
+				for (int i = 0; i < macros.length; ++i) {
+					final char[] macroName= macros[i].getName().toCharArray();
+					if (matcher.match(macroName)) {
+						handleMacro(macros[i], context, prefix, proposals);
+					}
+				}
+			}else{
+				
+				for (int i = 0; i < macros.length; ++i) {
+					final char[] macroName= macros[i].getName().toCharArray();
+					if (CharArrayUtils.equals(macroName, 0, macroName.length, prefixChars, true)) {
+						handleMacro(macros[i], context, prefix, proposals);
+					}
+				}
 			}
-		macros = completionNode.getTranslationUnit().getBuiltinMacroDefinitions();
-		if (macros != null)
-			for (int i = 0; i < macros.length; ++i) {
-				final char[] macroName= macros[i].getName().toCharArray();
-				if (CharArrayUtils.equals(macroName, 0, matchPrefix ? prefixChars.length : macroName.length, prefixChars, true))
-					handleMacro(macros[i], context, prefix, proposals);
-			}
+		}
 	}
 	
 	private void handleMacro(IASTPreprocessorMacroDefinition macro, RemoteContentAssistInvocationContext context, String prefix, List<Proposal> proposals) {
@@ -229,10 +247,10 @@ public class CompletionProposalComputer {
 				handleClass((ICPPClassType) binding, astContext, cContext, baseRelevance, proposals);
 			} else if (binding instanceof IFunction) {
 				handleFunction((IFunction)binding, cContext, baseRelevance, proposals);
-			} else if (!cContext.isContextInformationStyle()) {
-				if (binding instanceof IVariable) {
+			} else if (binding instanceof IVariable) {
 					handleVariable((IVariable) binding, cContext, baseRelevance, proposals);
-				} else if (binding instanceof ITypedef) {
+			} else if (!cContext.isContextInformationStyle()) {
+				if (binding instanceof ITypedef) {
 					proposals.add(createProposal(name, name, getElementType(binding), baseRelevance + RelevanceConstants.TYPEDEF_TYPE_RELEVANCE, cContext));
 				} else if (binding instanceof ICPPNamespace) {
 					handleNamespace((ICPPNamespace) binding, astContext, cContext, baseRelevance, proposals);

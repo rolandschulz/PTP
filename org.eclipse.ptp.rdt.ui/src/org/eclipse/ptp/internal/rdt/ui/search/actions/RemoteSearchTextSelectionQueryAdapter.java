@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
+
+/* -- ST-Origin --
+ * Source folder: org.eclipse.cdt.ui/src
+ * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchTextSelectionQuery
+ * Version: 1.22
+ */
 package org.eclipse.ptp.internal.rdt.ui.search.actions;
 
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
@@ -23,5 +29,12 @@ public class RemoteSearchTextSelectionQueryAdapter extends RemoteSearchQueryAdap
 
 	public String getLabel() {
 		return super.getLabel() + " " + ((RemoteSearchTextSelectionQuery) fQuery).getSelection(); //$NON-NLS-1$
+	}
+	
+	@Override
+	public String getResultLabel(int numMatches) {
+		String label = ((RemoteSearchTextSelectionQuery)fQuery).getSelection();
+		label = labelForBinding(label);
+		return getResultLabel(label, numMatches);
 	}
 }

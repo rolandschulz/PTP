@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 QNX Software Systems and others.
+ * Copyright (c) 2006, 2011 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchPatternQuery
- * Version: 1.27
+ * Version: 1.34
  */
 
 package org.eclipse.ptp.internal.rdt.core.search;
@@ -88,13 +88,28 @@ public class RemoteSearchPatternQuery extends RemoteSearchQuery {
     	for (int i = 0; i < n; ++i) {
     		char c = patternStr.charAt(i);
     		switch (c) {
+    		case '\\':
+    			if (i+1 < n) {
+    				switch(patternStr.charAt(i+1)) {
+    				case '?':
+    					buff.append("\\?"); //$NON-NLS-1$
+    					break;
+    				case '*':
+    					buff.append("\\*"); //$NON-NLS-1$
+    					break;
+    				default:
+    					buff.append('\\');
+    				}
+    			} else {
+    				buff.append('\\');
+    			}
+    			break;
     		case '*':
     			buff.append(".*"); //$NON-NLS-1$
     			break;
     		case '?':
     			buff.append('.');
     			break;
-    		case '.':
     		case ':':
     			if (buff.length() > 0) {
     				if (isCaseSensitive)
@@ -104,6 +119,9 @@ public class RemoteSearchPatternQuery extends RemoteSearchQuery {
     				buff = new StringBuffer();
     			}
     			break;
+			case '|': case '+': case '^': case '(': case ')': case '[': case ']': 
+				buff.append('\\').append(c);
+				break;
    			default:
     			buff.append(c);
     		}
@@ -127,6 +145,7 @@ public class RemoteSearchPatternQuery extends RemoteSearchQuery {
 		IndexFilter filter= IndexFilter.ALL;
 		IIndexBinding[] bindings = new IIndexBinding[0];
 		parseIndex.acquireReadLock();
+		ArrayList<IIndexBinding> matchedBindings = new ArrayList<IIndexBinding>();
 		try{
 			bindings = parseIndex.findBindings(pattern, false, filter, monitor);
 		}finally{
@@ -181,12 +200,8 @@ public class RemoteSearchPatternQuery extends RemoteSearchQuery {
 				matches= (flags & FIND_TYPEDEF) != 0;
 			}
 			if (matches) {
-				searchScopeindex.acquireReadLock();
-				try{
-					createMatches(searchScopeindex, pdomBinding);
-				}finally{
-					searchScopeindex.releaseReadLock();
-				}
+				matchedBindings.add(pdomBinding);
+				
 			}
 		}
 		if ((flags & FIND_MACRO) != 0 && pattern.length == 1) {
@@ -197,14 +212,17 @@ public class RemoteSearchPatternQuery extends RemoteSearchQuery {
 				parseIndex.releaseReadLock();
 			}
 			for (IIndexBinding indexBinding : bindings) {
-				searchScopeindex.acquireReadLock();
-				try{
-					createMatches(searchScopeindex, indexBinding);
-				}finally{
-					searchScopeindex.releaseReadLock();
-				}
+				matchedBindings.add(indexBinding);
 			}
-		}		
+		}
+		if(matchedBindings.size()>0){
+			searchScopeindex.acquireReadLock();
+			try{
+				createMatches(searchScopeindex, matchedBindings.toArray(new IIndexBinding[matchedBindings.size()]));
+			}finally{
+				searchScopeindex.releaseReadLock();
+			}
+		}
 	}
 
 	@Override
@@ -215,4 +233,10 @@ public class RemoteSearchPatternQuery extends RemoteSearchQuery {
 	public Object getPattern() {
 		return patternStr;
 	}
+
+	public String getPatternStr() {
+		return patternStr;
+	}
+	
+	
 }

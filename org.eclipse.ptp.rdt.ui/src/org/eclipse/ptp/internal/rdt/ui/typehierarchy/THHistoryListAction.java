@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.typehierarchy.THHistoryListAction
- * Version: 1.5
+ * Version: 1.6
  */
 package org.eclipse.ptp.internal.rdt.ui.typehierarchy;
 
@@ -32,6 +32,7 @@ import org.eclipse.cdt.internal.ui.wizards.dialogfields.ListDialogField;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.StatusDialog;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -71,7 +72,7 @@ public class THHistoryListAction extends Action {
 				}				
 			};
 		
-			LabelProvider labelProvider= new CUILabelProvider(THHistoryAction.LABEL_OPTIONS, CElementImageProvider.OVERLAY_ICONS);
+			ILabelProvider labelProvider= new CUILabelProvider(THHistoryAction.LABEL_OPTIONS, CElementImageProvider.OVERLAY_ICONS);
 			
 			fHistoryList= new ListDialogField<ICElement>(adapter, buttonLabels, labelProvider);
 			fHistoryList.setLabelText(Messages.THHistoryListAction_HistoryList_label); 

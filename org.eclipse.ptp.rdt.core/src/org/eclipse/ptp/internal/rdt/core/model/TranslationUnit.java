@@ -40,6 +40,7 @@ import org.eclipse.cdt.core.parser.FileContent;
 import org.eclipse.cdt.core.parser.IParserLogService;
 import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.cdt.core.parser.IncludeFileContentProvider;
+import org.eclipse.cdt.internal.core.dom.parser.ASTTranslationUnit;
 import org.eclipse.cdt.internal.core.index.IndexBasedFileContentProvider;
 import org.eclipse.cdt.internal.core.model.IBufferFactory;
 import org.eclipse.cdt.internal.core.pdom.ASTFilePathResolver;
@@ -180,7 +181,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.core/model
 	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
-	 * Version: 1.110
+	 * Version: 1.118
 	 */
 	private IncludeFileContentProvider getIncludeFileContentProvider(int style, IIndex index, int linkageID) {
 		final ASTFilePathResolver pathResolver = new RemoteIndexerInputAdapter();
@@ -193,7 +194,8 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		}
 		
 		if (index != null && (style & AST_SKIP_INDEXED_HEADERS) != 0) {
-			IndexBasedFileContentProvider ibcf= new IndexBasedFileContentProvider(index, pathResolver, linkageID, fileContentsProvider);
+			IndexBasedFileContentProvider ibcf= new IndexBasedFileContentProvider(index, pathResolver, linkageID,
+					fileContentsProvider);
 			if ((style & AST_CONFIGURE_USING_SOURCE_CONTEXT) != 0) {
 				ibcf.setSupportFillGapFromContextToHeader(true);
 			}
@@ -203,6 +205,11 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		return fileContentsProvider;
 	}
 
+	/* -- ST-Origin --
+	 * Source folder: org.eclipse.cdt.core/model
+	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
+	 * Version: 1.118
+	 */
 	public IASTTranslationUnit getAST(IIndex index, int style) throws CoreException {
 		checkState();
 		
@@ -212,28 +219,39 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		}
 		
 		FileContent fileContent= FileContent.create(getPathForASTFileLocation(), getContents());
-		if (fileContent != null) {
-			ILanguage language= getLanguage();
-			if (language != null) {
-				IncludeFileContentProvider crf= getIncludeFileContentProvider(style, index, language.getLinkageID());
-				int options= 0;
-				if ((style & AST_SKIP_FUNCTION_BODIES) != 0) {
-					options |= ILanguage.OPTION_SKIP_FUNCTION_BODIES;
-				}
-				if ((style & AST_SKIP_TRIVIAL_EXPRESSIONS_IN_AGGREGATE_INITIALIZERS) != 0) {
-					options |= ILanguage.OPTION_SKIP_TRIVIAL_EXPRESSIONS_IN_AGGREGATE_INITIALIZERS;
-				}
-				if ((style & AST_PARSE_INACTIVE_CODE) != 0) {
-					options |= ILanguage.OPTION_PARSE_INACTIVE_CODE;
-				}
-				if (isSourceUnit()) {
-					options |= ILanguage.OPTION_IS_SOURCE_UNIT;
-				}
-				IParserLogService log = new DefaultLogService();
-				return ((AbstractLanguage)language).getASTTranslationUnit(fileContent, scanInfo, crf, index, options, log);
-			}
+		if (fileContent == null) {
+			return null;
 		}
-		return null;
+
+		ILanguage language= getLanguage();
+			
+		if (language == null) {
+			return null;
+		}
+
+		IncludeFileContentProvider crf= getIncludeFileContentProvider(style, index, language.getLinkageID());
+		int options= 0;
+		if ((style & AST_SKIP_FUNCTION_BODIES) != 0) {
+			options |= ILanguage.OPTION_SKIP_FUNCTION_BODIES;
+		}
+		if ((style & AST_SKIP_TRIVIAL_EXPRESSIONS_IN_AGGREGATE_INITIALIZERS) != 0) {
+			options |= ILanguage.OPTION_SKIP_TRIVIAL_EXPRESSIONS_IN_AGGREGATE_INITIALIZERS;
+		}
+		if ((style & AST_PARSE_INACTIVE_CODE) != 0) {
+			options |= ILanguage.OPTION_PARSE_INACTIVE_CODE;
+		}
+		if (isSourceUnit()) {
+			options |= ILanguage.OPTION_IS_SOURCE_UNIT;
+		}
+		IParserLogService log = new DefaultLogService();
+		
+		ASTTranslationUnit ast = (ASTTranslationUnit) ((AbstractLanguage) language).getASTTranslationUnit(
+				fileContent, scanInfo, crf, index, options, log);
+		ast.setOriginatingTranslationUnit(this);
+
+		return ast;
+
+		
 	}
 	
 	/**
@@ -271,7 +289,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.core/model
 	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
-	 * Version: 1.110
+	 * Version: 1.118
 	 */
 	public IASTCompletionNode getCompletionNode(IIndex index, int style, int offset) throws CoreException {
 		checkState();
@@ -286,11 +304,13 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		ILanguage language= getLanguage();
 		if (language != null) {
 			IncludeFileContentProvider crf= getIncludeFileContentProvider(style, index, language.getLinkageID());
-			IASTCompletionNode result = language.getCompletionNode(fileContent, scanInfo, crf, index, new DefaultLogService(), offset);
+			IASTCompletionNode result = language.getCompletionNode(fileContent, scanInfo, crf, index,
+					new DefaultLogService(), offset);
 			if (result != null) {
 				final IASTTranslationUnit ast = result.getTranslationUnit();
 				if (ast != null) {
 					ast.setIsHeaderUnit(!isSourceUnit());
+					((ASTTranslationUnit) ast).setOriginatingTranslationUnit(this);
 				}
 			}
 			return result;

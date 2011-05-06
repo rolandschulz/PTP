@@ -16,16 +16,14 @@ import java.util.List;
 
 import org.eclipse.cdt.make.core.scannerconfig.IExternalScannerInfoProvider;
 import org.eclipse.cdt.make.core.scannerconfig.IScannerConfigBuilderInfo2;
-import org.eclipse.cdt.managedbuilder.xlc.ui.XLCUIPlugin;
-import org.eclipse.ptp.rdt.managedbuilder.gnu.ui.preferences.PreferenceConstants;
 import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.remotemake.RemoteSpecsRunSIProvider;
+import org.eclipse.ptp.rdt.managedbuilder.gnu.ui.preferences.PreferenceConstants;
 
 /**
  * @author mlindo
@@ -55,16 +53,10 @@ public class RemoteGCCSpecsRunSIProvider extends RemoteSpecsRunSIProvider implem
 		}
 
 		if (compilerPath == null) {
-			// use the workbench preference
-			IPreferenceStore prefStore = XLCUIPlugin.getDefault().getPreferenceStore();
-			compilerPath = prefStore.getString(PreferenceConstants.P_GCC_COMPILER_ROOT);
-		}
-
-		if (compilerPath == null) {
 			compilerPath = ""; //$NON-NLS-1$
 		}
 
-		gcc = gcc.replaceAll("\\$\\{XLC_COMPILER_ROOT\\}", compilerPath); //$NON-NLS-1$
+		//gcc = gcc.replaceAll("\\$\\{XL_COMPILER_ROOT\\}", compilerPath); //$NON-NLS-1$
 
 		String args = buildInfo.getProviderRunArguments(providerId);
 		String specsFileName = getSpecsFileName(project);

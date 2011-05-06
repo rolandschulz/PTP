@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2009, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,13 +14,17 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.actions.OpenDeclarationsJob
- * Version: 1.16
+ * Version: 1.22
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search.actions;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
@@ -35,10 +39,12 @@ import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.editor.CEditorMessages;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
+import org.eclipse.cdt.internal.ui.viewsupport.CElementLabels;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -216,16 +222,33 @@ class OpenDeclarationsJob extends Job{
 		if (elements == null || elements.length == 0)
 			return;
 
+		final ICElement[] uniqueElements;
+		if (elements.length < 2) {
+			uniqueElements= elements;
+		} else {
+			// Make sure only one element per location is proposed
+			Set<String> sigs= new HashSet<String>();
+			sigs.add(null);
+			List<ICElement> uniqueElementsList= new ArrayList<ICElement>();
+			for (ICElement elem : elements) {
+				if (sigs.add(getLocationSignature((ISourceReference) elem))) {
+					uniqueElementsList.add(elem);
+
+				}
+			}
+			uniqueElements = uniqueElementsList.toArray(new ICElement[uniqueElementsList.size()]);
+		}
+
 		runInUIThread(new Runnable() {
 			public void run() {
 				ICElement target;
-				if (elements.length == 1) {
-					target= elements[0];
+				if (uniqueElements.length == 1) {
+					target= uniqueElements[0];
 				}
 				else {
 					target = OpenActionUtil.selectCElement(elements, fAction.getSite().getShell(),
 							CEditorMessages.OpenDeclarationsAction_dialog_title, CEditorMessages.OpenDeclarationsAction_selectMessage,
-							CElementBaseLabels.ALL_DEFAULT | CElementBaseLabels.ALL_FULLY_QUALIFIED | CElementBaseLabels.MF_POST_FILE_QUALIFIED, 0);
+							CElementLabels.ALL_DEFAULT | CElementLabels.ALL_FULLY_QUALIFIED | CElementLabels.MF_POST_FILE_QUALIFIED, 0);
 				}
 				
 				if (target instanceof ISourceReference) {
@@ -242,6 +265,21 @@ class OpenDeclarationsJob extends Job{
 			}
 		});
 	}
+	
+	private String getLocationSignature(ISourceReference elem) {
+		ITranslationUnit tu= elem.getTranslationUnit();
+		ISourceRange sourceRange;
+		try {
+			sourceRange = elem.getSourceRange();
+			if (tu != null && sourceRange != null) {
+				return tu.getPath().toString() + IPath.SEPARATOR + sourceRange.getIdStartPos() + IPath.SEPARATOR + sourceRange.getIdLength();
+			}
+		} catch (CoreException e) {
+			CUIPlugin.log(e);
+		}
+		return null;
+	}
+
 	
 	
 	protected void reportSourceFileOpenFailure(String path) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,7 @@
  *    IBM Corporation
  *******************************************************************************/ 
 
-/* -- ST-Origin --
- * Source folder: org.eclipse.cdt.ui/src
- * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHContentProvider
- * Version: 1.17
- */
+
 package org.eclipse.ptp.internal.rdt.core.navigation;
 
 import org.eclipse.cdt.core.model.ITranslationUnit;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 QNX Software Systems and others.
+ * Copyright (c) 2006, 2011 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchTreeContentProvider
- * Version: 1.11
+ * Version: 1.15
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search;
@@ -34,6 +34,7 @@ import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ISourceRoot;
+import org.eclipse.cdt.internal.core.resources.ResourceLookup;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.search.IPDOMSearchContentProvider;
 import org.eclipse.cdt.ui.CUIPlugin;
@@ -51,15 +52,23 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchElement;
+
 
 public class RemoteSearchTreeContentProvider implements ITreeContentProvider, IPDOMSearchContentProvider {
 
 	private TreeViewer viewer;
 	private RemoteSearchResult result;
 	private Map<Object, Set<Object>> tree = new HashMap<Object, Set<Object>>();
+	private final RemoteSearchViewPage fPage;
+
+	RemoteSearchTreeContentProvider(RemoteSearchViewPage page) {
+		fPage= page;
+	}
+
 
 	public Object[] getChildren(Object parentElement) {
-		Set children = tree.get(parentElement);
+		Set<Object> children = tree.get(parentElement);
 		if (children == null)
 			return new Object[0];
 		
@@ -67,10 +76,10 @@ public class RemoteSearchTreeContentProvider implements ITreeContentProvider, IP
 	}
 
 	public Object getParent(Object element) {
-		Iterator p = tree.keySet().iterator();
+		Iterator<Object> p = tree.keySet().iterator();
 		while (p.hasNext()) {
 			Object parent = p.next();
-			Set children = tree.get(parent);
+			Set<Object> children = tree.get(parent);
 			if (children.contains(element))
 				return parent;
 		}
@@ -135,7 +144,7 @@ public class RemoteSearchTreeContentProvider implements ITreeContentProvider, IP
 			IPath path= IndexLocationFactory.getAbsolutePath(element.getLocation());
 			
 			if(path != null)
-				files= ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(path);
+				files= ResourceLookup.findFilesForLocation(path);
 			else
 				files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(location.getURI());
 		}
@@ -208,7 +217,7 @@ public class RemoteSearchTreeContentProvider implements ITreeContentProvider, IP
 		if (elements != null) {
 			for (int i = 0; i < elements.length; ++i) {
 				RemoteSearchElement element = (RemoteSearchElement)elements[i];
-				if (result.getMatchCount(element) > 0) {
+				if (fPage.getDisplayedMatchCount(element) > 0) {
 					insertSearchElement(element);
 				} else {
 					boolean remove = true;
@@ -255,7 +264,9 @@ public class RemoteSearchTreeContentProvider implements ITreeContentProvider, IP
 			
 			Object[] elements = result.getElements();
 			for (int i = 0; i < elements.length; ++i) {
-				insertSearchElement((RemoteSearchElement)elements[i]);
+				final RemoteSearchElement element = (RemoteSearchElement)elements[i];
+				if (fPage.getDisplayedMatchCount(element) > 0)
+					insertSearchElement(element);
 			}
 
 			// add all the projects which have no results
@@ -276,7 +287,7 @@ public class RemoteSearchTreeContentProvider implements ITreeContentProvider, IP
 			// reached the search result
 			return;
 		
-		Set siblings = tree.get(parent);
+		Set<Object> siblings = tree.get(parent);
 		siblings.remove(element);
 		
 		if (siblings.isEmpty()) {
