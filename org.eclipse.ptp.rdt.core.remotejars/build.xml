@@ -539,6 +539,9 @@ export serverpath CLASSPATH LIBPATH
 		<touch file="${remoteServerTempDir}/rdtserver_version.dat"/>
 		<concat destfile="${remoteServerTempDir}/rdtserver_version.dat">${serverVersion}-${timestamp}</concat>
 		
+		<!--Create empty URICreator.dat file-->
+		<touch file="${remoteServerTempDir}/URICreator.dat"/>
+		
 		<!--Add libspawner.so for specific platforms-->
 		<antcall target="add.so.${platform}"/>
 	</target>
