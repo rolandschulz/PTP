@@ -112,6 +112,17 @@
            </nature>
         </wizardPage>
      </extension>
-     
-     
+     <extension
+           point="org.eclipse.ui.propertyPages">
+        <page
+              category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
+              class="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesPage"
+              id="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesPage"
+              name="Synchronize">
+		<filter
+			name="projectNature"
+			value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+		</filter>
+        </page>
+     </extension>
 </plugin>
