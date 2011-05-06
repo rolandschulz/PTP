@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 
-class BorderLayout3 extends Layout {
+class BorderLayout extends Layout {
   public static final int NWFIELD = 0;
   public static final int NFIELD = 1;
   public static final int NEFIELD = 2;

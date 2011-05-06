@@ -52,7 +52,7 @@ import org.eclipse.ptp.rm.lml.internal.core.model.NodedisplayAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable;
 import org.eclipse.ptp.rm.lml.internal.core.nodedisplay.LMLCheck;
 import org.eclipse.ptp.rm.lml.internal.core.nodedisplay.LMLCheck.SchemeAndData;
-import org.eclipse.ptp.rm.lml.ui.providers.BorderLayout2.BorderData;
+import org.eclipse.ptp.rm.lml.ui.providers.BorderLayout.BorderData;
 import org.eclipse.ptp.rm.lml.ui.views.NodedisplayView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -338,7 +338,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		backgroundColor = ColorConversion.getColor(LMLColor.stringToColor(apref.getBackground()));
 
 		pictureFrame = new Composite(this, SWT.None);
-		pictureFrame.setLayout(new BorderLayout2());
+		pictureFrame.setLayout(new BorderLayout());
 		// Redo layout when resized
 		pictureFrame.addListener(SWT.Resize, new Listener() {
 
@@ -349,16 +349,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		});
 
 		insertPictures();
-
-		// if(centerpic==null)
-		// mainpanel=new JPanel();
-		// else{
-		// ImagePanel picturepanel=new ImagePanel(centerpic.getPic(),
-		// centerpic.getPercentWidth(), centerpic.getPercentHeight());
-		// picturepanel.setAlign(centerpic.getAlign());
-		//
-		// mainpanel=picturepanel;
-		// }
 
 		mainPanel = new Composite(pictureFrame, SWT.None);
 
@@ -371,8 +361,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		fontObject = this.getDisplay().getSystemFont();
 
 		// Create output
-		mainPanel.setLayout(new BorderLayout2());
-		mainPanel.setLayoutData(BorderData.CENTER);
+		mainPanel.setLayout(new BorderLayout());
+		mainPanel.setLayoutData(new BorderLayout.BorderData(BorderLayout.MFIELD));
 
 		// Insert title if needed
 		if (node != null) {
@@ -392,7 +382,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			titleLabel.setText(title);
 			titleLabel.setFont(fontObject);
 			titleLabel.setBackground(titleBackgroundColor);
-			titleLabel.setLayoutData(BorderData.NORTH);
+			titleLabel.setLayoutData(new BorderLayout.BorderData(BorderLayout.NFIELD));
 
 			addZoomFunction();
 
@@ -420,6 +410,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		pictureFrame.setBackground(backgroundColor);
 
 	}
+
 
 	/**
 	 * Remove recursively this component and all inner NodedisplayComp-instances
@@ -615,16 +606,16 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 			switch (picture.getAlign()) {
 			case WEST:
-				icomp.setLayoutData(BorderData.WEST);
+				icomp.setLayoutData(new BorderLayout.BorderData(BorderLayout.WFIELD));
 				break;
 			case EAST:
-				icomp.setLayoutData(BorderData.EAST);
+				icomp.setLayoutData(new BorderLayout.BorderData(BorderLayout.EFIELD));
 				break;
 			case NORTH:
-				icomp.setLayoutData(BorderData.NORTH);
+				icomp.setLayoutData(new BorderLayout.BorderData(BorderLayout.NFIELD));
 				break;
 			case SOUTH:
-				icomp.setLayoutData(BorderData.SOUTH);
+				icomp.setLayoutData(new BorderLayout.BorderData(BorderLayout.SFIELD));
 				break;
 			}
 		}
@@ -1137,7 +1128,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		borderFrame.setBorderColor(bordercolor);
 		borderFrame.setBorderWidth(apref.getBorder().intValue());
-		borderFrame.setLayoutData(BorderData.CENTER);
+		borderFrame.setLayoutData(new BorderLayout.BorderData(BorderLayout.MFIELD));
 
 		if (maxLevel <= alevel) {// Do other panels have to be inserted?
 			innerPanel = new Composite(borderFrame, SWT.NONE);
