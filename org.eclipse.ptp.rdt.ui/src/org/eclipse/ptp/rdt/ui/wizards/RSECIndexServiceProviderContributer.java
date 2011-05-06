@@ -54,7 +54,7 @@ public class RSECIndexServiceProviderContributer implements IServiceProviderCont
 	private String configPath;
 
 	/**
-	 * @since 3.0
+	 * @since 3.1
 	 */
 	public void configureServiceProvider(IServiceProviderWorkingCopy sp, final Composite container) {
 		//The UI components works with IServiceProviderWorkingCopy and not the original IServiceProvider

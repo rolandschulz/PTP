@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.typehierarchy.THViewPart
- * Version: 1.18
+ * Version: 1.22
  */
 package org.eclipse.ptp.internal.rdt.ui.typehierarchy;
 
@@ -29,21 +29,23 @@ import org.eclipse.cdt.core.model.IDeclaration;
 import org.eclipse.cdt.core.model.IMember;
 import org.eclipse.cdt.core.model.IMethodDeclaration;
 import org.eclipse.cdt.core.model.ISourceReference;
-import org.eclipse.cdt.core.model.util.CElementBaseLabels;
 import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
 import org.eclipse.cdt.internal.core.model.CModel;
 import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.CPluginImages;
 import org.eclipse.cdt.internal.ui.IContextMenuConstants;
+import org.eclipse.cdt.internal.ui.actions.CopyTreeAction;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.cdt.internal.ui.typehierarchy.ITHModelPresenter;
 import org.eclipse.cdt.internal.ui.typehierarchy.Messages;
 import org.eclipse.cdt.internal.ui.typehierarchy.THNode;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.internal.ui.viewsupport.AdaptingSelectionProvider;
+import org.eclipse.cdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementImageProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementLabels;
 import org.eclipse.cdt.internal.ui.viewsupport.CUILabelProvider;
+import org.eclipse.cdt.internal.ui.viewsupport.DecoratingCLabelProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.SelectionProviderMediator;
 import org.eclipse.cdt.internal.ui.viewsupport.WorkingSetFilterUI;
 import org.eclipse.cdt.ui.CUIPlugin;
@@ -83,6 +85,7 @@ import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ViewForm;
+import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.Transfer;
@@ -109,6 +112,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
+import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
@@ -138,8 +142,9 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	private static final int ORIENTATION_SINGLE = 3;
 	
 	// options for label provider
-	private static final int MEMBER_LABEL_OPTIONS_SIMPLE = CElementBaseLabels.M_PARAMETER_TYPES;
-	private static final int MEMBER_LABEL_OPTIONS_QUALIFIED = MEMBER_LABEL_OPTIONS_SIMPLE | CElementBaseLabels.ALL_POST_QUALIFIED;
+	private static final long MEMBER_LABEL_OPTIONS_SIMPLE = CElementLabels.M_PARAMETER_TYPES | CElementLabels.M_APP_RETURNTYPE | CElementLabels.F_APP_TYPE_SIGNATURE;
+	private static final long MEMBER_LABEL_OPTIONS_QUALIFIED = MEMBER_LABEL_OPTIONS_SIMPLE | CElementLabels.ALL_POST_QUALIFIED;
+	
 	private static final int MEMBER_ICON_OPTIONS = CElementImageProvider.OVERLAY_ICONS;
     
 	// state information
@@ -149,6 +154,9 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	private boolean fInComputeOrientation= false;
 	private ArrayList<ICElement> fHistoryEntries= new ArrayList<ICElement>(MAX_HISTORY_SIZE);
 	private int fIgnoreSelectionChanges= 0;
+
+	private Clipboard fClipboard;
+
 
     // widgets
     private PageBook fPagebook;
@@ -183,6 +191,8 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
     private Action fCancelAction;
 	private Action fHistoryAction;
 	private Action fOpenElement;
+	private CopyTreeAction fCopyAction;
+
 
 	private Action fHorizontalOrientation;
 	private Action fVerticalOrientation;
@@ -239,6 +249,8 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
         createViewerPage();
                 
         initSelectionProvider();
+        
+        fClipboard = new Clipboard(parent.getDisplay());
 
         initDragAndDrop();
         createActions();
@@ -405,7 +417,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 			if (hierarchyView && !elem.equals(fModel.getInput())) {
 				String label= MessageFormat.format(Messages.THViewPart_FocusOn, 
 						new Object[] {
-						CElementLabels.getTextLabel(elem, CElementBaseLabels.ALL_FULLY_QUALIFIED | CElementBaseLabels.M_PARAMETER_TYPES)
+						CElementLabels.getTextLabel(elem, CElementLabels.ALL_FULLY_QUALIFIED | CElementLabels.M_PARAMETER_TYPES)
 				});
 				menu.appendToGroup(IContextMenuConstants.GROUP_OPEN, new Action(label) {
 					@Override
@@ -420,6 +432,10 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 		ISelection selection = getSite().getSelectionProvider().getSelection();
 		if (OpenViewActionGroup.canActionBeAdded(selection)){
 			fOpenViewActionGroup.fillContextMenu(menu);
+		}
+		
+		if (hierarchyView && fCopyAction.canActionBeAdded()) {
+        	menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fCopyAction);
 		}
 
 		if (SelectionSearchGroup.canActionBeAdded(selection)){
@@ -455,10 +471,10 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	}
    
 	private Control createMemberControl(ViewForm parent) {
-		fMemberLabelProvider= new CUILabelProvider(MEMBER_LABEL_OPTIONS_SIMPLE, MEMBER_ICON_OPTIONS);
+		fMemberLabelProvider= new AppearanceAwareLabelProvider(MEMBER_LABEL_OPTIONS_SIMPLE, MEMBER_ICON_OPTIONS);
 		fMemberViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		fMemberViewer.setContentProvider(new THMemberContentProvider());
-		fMemberViewer.setLabelProvider(fMemberLabelProvider);
+		fMemberViewer.setLabelProvider(new DecoratingCLabelProvider(fMemberLabelProvider, true));
 		fMemberViewer.addOpenListener(new IOpenListener() {
 			public void open(OpenEvent event) {
 				onOpenElement(event.getSelection());
@@ -524,11 +540,11 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 
 	private Control createHierarchyControl(ViewForm parent) {
 		Display display= getSite().getShell().getDisplay();
-		fModel= new THHierarchyModel(this, display);
+		fModel= new THHierarchyModel(this, display, false);
 		fHierarchyLabelProvider= new THLabelProvider(display, fModel);
     	fHierarchyTreeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
     	fHierarchyTreeViewer.setContentProvider(new THContentProvider());
-    	fHierarchyTreeViewer.setLabelProvider(fHierarchyLabelProvider);
+    	fHierarchyTreeViewer.setLabelProvider(new DecoratingCLabelProvider(fHierarchyLabelProvider, true));
     	fHierarchyTreeViewer.setSorter(new ViewerSorter());
     	fHierarchyTreeViewer.setUseHashlookup(true);
     	fHierarchyTreeViewer.addOpenListener(new IOpenListener() {
@@ -560,16 +576,14 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 
     private void initDragAndDrop() {
         THDropTargetListener dropListener= new THDropTargetListener(this);
-        Transfer[] localSelectionTransfer= new Transfer[] {
-        		LocalSelectionTransfer.getTransfer()
-        };
+        Transfer[] localSelectionTransfer= new Transfer[] {LocalSelectionTransfer.getTransfer()};
         DropTarget dropTarget = new DropTarget(fPagebook, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK | DND.DROP_DEFAULT);
         dropTarget.setTransfer(localSelectionTransfer);
         dropTarget.addDropListener(dropListener);
     }
 
     private void createActions() {
-    	// action gruops
+    	// action groups
     	fOpenViewActionGroup= new OpenViewActionGroup(this);
     	fOpenViewActionGroup.setSuppressTypeHierarchy(true);
     	fOpenViewActionGroup.setSuppressProperties(true);
@@ -727,8 +741,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 			public void run() {
                 if (isChecked()) {
                     fMemberViewer.addFilter(fStaticFilter);
-                }
-                else {
+                }else {
                 	fMemberViewer.removeFilter(fStaticFilter);
                 }
             }
@@ -741,8 +754,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 			public void run() {
                 if (isChecked()) {
                     fMemberViewer.addFilter(fNonPublicFilter);
-                }
-                else {
+                }else {
                 	fMemberViewer.removeFilter(fNonPublicFilter);
                 }
             }
@@ -786,6 +798,9 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
         CPluginImages.setImageDescriptors(fCancelAction, CPluginImages.T_LCL, CPluginImages.IMG_LCL_CANCEL);       
 
         fHistoryAction = new THHistoryDropDownAction(this);
+        
+        fCopyAction= new CopyTypeHierarchyAction(this, fClipboard, fHierarchyTreeViewer);
+
 
         // setup action bar
         // global action hooks
@@ -915,14 +930,13 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
                 String label;
             	
                 // label
-                label= CElementBaseLabels.getElementLabel(elem, 0);
+                label= CElementLabels.getElementLabel(elem, 0);
             	
                 // scope
                 IWorkingSet workingSet= fWorkingSetFilterUI.getWorkingSet();
             	if (workingSet == null) {	
             		message= label;
-            	}
-            	else {
+            	}else {
             		String scope= workingSet.getLabel();
                 	message= MessageFormat.format("{0} - {1}", new Object[] {label, scope}); //$NON-NLS-1$
             	}
@@ -933,7 +947,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
             	if (node != null) {
             		elem= node.getElement();
             		if (elem != null) {
-            			label= CElementBaseLabels.getElementLabel(elem, 0);
+            			label= CElementLabels.getElementLabel(elem, 0);
             			image= fHierarchyLabelProvider.getImage(elem);
             		}
             	}
@@ -982,8 +996,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
     			fHierarchyTreeViewer.refresh();
     			fMemberViewer.refresh();
     			setSelections();
-    		}
-    		finally {
+    		}finally {
     			fIgnoreSelectionChanges--;
     		}
     	}
@@ -996,8 +1009,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
     			updateViewers();
     			updateDescription();
     			updateActionEnablement();
-    		}
-    		finally {
+    		}finally {
     			fIgnoreSelectionChanges--;
     		}
     	}
@@ -1015,8 +1027,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 			if (elem != null) {
 				fMemberViewer.setSelection(new StructuredSelection(elem));
 			}
-		}
-		finally {
+		}finally {
 			fIgnoreSelectionChanges--;
 		}
 	}
@@ -1148,9 +1159,8 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 
 	private int getBestOrientation() {
 		Point size= fSplitter.getSize();
-		if (size.x != 0 && size.y != 0) {
-			if (3*size.x < 2*size.y) 
-				return ORIENTATION_VERTICAL;
+		if (size.x != 0 && size.y != 0 && 3 * size.x < 2 * size.y) { 
+			return ORIENTATION_VERTICAL;
 		}
 		return ORIENTATION_HORIZONTAL;
 	}
@@ -1166,4 +1176,12 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	public IWorkbenchSiteProgressService getProgressService() {
 		return (IWorkbenchSiteProgressService) getSite().getAdapter(IWorkbenchSiteProgressService.class);	
 	}
+	
+	private static class CopyTypeHierarchyAction extends CopyTreeAction {
+		public CopyTypeHierarchyAction(ViewPart view, Clipboard clipboard, TreeViewer viewer) {
+			super(Messages.THViewPart_CopyTypeHierarchy, view, viewer);
+//			PlatformUI.getWorkbench().getHelpSystem().setHelp(this, ICHelpContextIds.TYPE_HIERARCHY_COPY_ACTION);
+		}
+	}
+
 }
