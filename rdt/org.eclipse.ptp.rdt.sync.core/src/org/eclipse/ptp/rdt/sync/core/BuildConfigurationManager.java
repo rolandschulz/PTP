@@ -155,7 +155,7 @@ public class BuildConfigurationManager {
 		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
 		BuildScenario buildScenario = fBuildConfigToBuildScenarioMap.get(bconf.getId());
 		if (buildScenario == null) {
-			String parentConfigId = findAncestorConfig(bconf);
+			String parentConfigId = findAncestorConfig(bconf.getId());
 			if (parentConfigId != null) {
 				buildScenario = fBuildConfigToBuildScenarioMap.get(parentConfigId);
 			}
@@ -311,7 +311,7 @@ public class BuildConfigurationManager {
 			// Update
 			if (bs == null) {
 				if (!(fBuildConfigToBuildScenarioMap.containsKey(config.getId()))) {
-					String parentConfig = findAncestorConfig(config);
+					String parentConfig = findAncestorConfig(config.getId());
 					if (parentConfig == null) {
 						throw new RuntimeException(Messages.BCM_AncestorError + config.getId());
 					}
@@ -326,8 +326,7 @@ public class BuildConfigurationManager {
 	}
 	
 	// Find the closest ancestor of the configuration that we have recorded.
-	private static String findAncestorConfig(IConfiguration config) {
-		String configId = config.getId();
+	private static String findAncestorConfig(String configId) {
 		while ((configId = getParentId(configId)) != null) {
 			if (fBuildConfigToBuildScenarioMap.containsKey(configId)) {
 				return configId;

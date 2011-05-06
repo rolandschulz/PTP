@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Oak Ridge National Laboratory and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    John Eblen - initial implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui.properties;
 
 import java.io.IOException;
@@ -40,17 +50,18 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private IConfiguration fConfigBeforeSwitch = null;
 	private boolean fWidgetsReady = false;
 
+	// Container for all information that appears on a page
 	private static class PageSettings {
-		Integer connectionIndex;
-		Integer remoteServicesIndex;
+		IRemoteConnection connection;
+		IRemoteServices remoteProvider;
 		String rootLocation;
 		String buildLocation;
 		
 		public boolean equals(PageSettings otherSettings) {
-			if (!(this.connectionIndex.equals(otherSettings.connectionIndex))) {
+			if (this.connection != otherSettings.connection) {
 				return false;
 			}
-			if (!(this.remoteServicesIndex.equals(otherSettings.remoteServicesIndex))) {
+			if (this.remoteProvider != otherSettings.remoteProvider) {
 				return false;
 			}
 			if (!(this.rootLocation.equals(otherSettings.rootLocation))) {
@@ -69,14 +80,15 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
 	private final Map<IRemoteConnection, Integer> fComboRemoteConnectionToIndexMap = new HashMap<IRemoteConnection, Integer>();
 
+	// Cache of page settings for each configuration accessed.
+	private final Map<String, PageSettings> fConfigToPageSettings = new HashMap<String, PageSettings>();
+
 	private Button fBrowseButton;
 	private Button fNewConnectionButton;
 	private Combo fProviderCombo;
 	private Combo fConnectionCombo;
-	private final Map<String, PageSettings> fConfigToPageSettings = new HashMap<String, PageSettings>();
 	private Text fRootLocationText;
 	private Text fBuildLocationText;
-	private Composite parentComposite;
 	private Composite composite;
 
 	/**
@@ -87,10 +99,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	}
 
 	/**
-	 * @see PreferencePage#createContents(Composite)
+	 * Create widgets on given composite
+	 *
+	 * @param parent
+	 * 				The parent composite
 	 */
 	public void createWidgets(Composite parent) {
-		parentComposite = parent;
 		composite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -263,24 +277,25 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		button.setEnabled(connectionManager != null);
 	}
 
-	public void performDefaults() {
-		super.performDefaults();
-	}
-	
+	/**
+	 * Save each visited configuration
+	 */
 	@Override
 	public boolean performOk() {
 		super.performOk();
-		this.updateSettings(getCfg());
+		if (fWidgetsReady == false) {
+			return true;
+		}
+		// Don't forget to save changes made to the current configuration before proceeding
+		this.storeSettings(getCfg());
 		for (ICConfigurationDescription desc : getCfgsReadOnly(getProject())) {
 			IConfiguration config = getCfg(desc);
 			if (config == null || config instanceof MultiConfiguration) {
 				continue;
 			}
-			PageSettings settings = this.getSettings(config);
-			if (settings == null) {
-				continue;
-			}
-			if (this.isConfigAltered(config, settings)) {
+
+			PageSettings settings = fConfigToPageSettings.get(config.getId());
+			if (settings != null && this.isConfigAltered(config, settings)) {
 				this.saveConfig(config, settings);
 			}
 		}
@@ -288,6 +303,15 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		return true;
 	}
 	
+	/**
+	 * Load system settings for config and see if they differ from passed settings
+	 *
+	 * @param config
+	 * 				the configuration to load and compare
+	 * @param settings
+	 * 				settings to compare (presumably the settings entered by the user)
+	 * @return whether or not settings differ
+	 */
 	private boolean isConfigAltered(IConfiguration config, PageSettings settings) {
 		PageSettings systemSettings = this.loadSettings(config);
 		// TODO: null return?
@@ -298,6 +322,14 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 	}
 
+	/**
+	 * Save new settings for the configuration to the BuildConfigurationManager
+	 *
+	 * @param config
+	 * 				configuration
+	 * @param settings
+	 * 				new settings
+	 */
 	private void saveConfig(IConfiguration config, PageSettings settings) {
         // Change build path and save new configuration
         String buildPath = settings.rootLocation;
@@ -315,8 +347,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
         // Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
         // the BuildConfigurationManager relies on the data being up-to-date.
         String syncProvider = BuildConfigurationManager.getBuildScenarioForBuildConfiguration(config).getSyncProvider();
-        IRemoteConnection conn = fComboIndexToRemoteConnectionMap.get(settings.connectionIndex);
-        BuildScenario buildScenario = new BuildScenario(syncProvider, conn, settings.rootLocation);
+        BuildScenario buildScenario = new BuildScenario(syncProvider, settings.connection, settings.rootLocation);
         BuildConfigurationManager.setBuildScenarioForBuildConfiguration(buildScenario, config);
         try {
                 BuildConfigurationManager.saveConfigurationData();
@@ -325,6 +356,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
         }
 	}
 	
+	// Connection button handling
 	private void checkConnection() {
 		IRemoteUIConnectionManager mgr = getUIConnectionManager();
 		if (mgr != null) {
@@ -332,9 +364,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 	}
 	
-	/**
-	 * @return
-	 */
 	private IRemoteUIConnectionManager getUIConnectionManager() {
 		IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedProvider)
 				.getUIConnectionManager();
@@ -342,34 +371,45 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	}
 	
 	/**
-	 * Main function for updating values as needed. It is important that this fill in the proper current values, or else
-	 * configuration information will be overwritten when user hits "Apply" or "OK".
+	 * Set page values based on passed configuration
+	 *
+	 * @param config
+	 * 				the configuration 
 	 */
 	private void setValues(IConfiguration config) {
 		// Disable for multi-configurations. Note that we set parentComposite to invisible, not the tab, because we want to reappear when
 		// the configuration changes back to a single configuration.
 		if (config instanceof IMultiConfiguration) {
-			parentComposite.setVisible(false);
+			composite.setEnabled(false);
 			return;
 		}
-		parentComposite.setVisible(true);		
+		composite.setEnabled(true);
 		populateRemoteProviderCombo(fProviderCombo);
-		PageSettings settings = getSettings(getCfg());
+		PageSettings settings = fConfigToPageSettings.get(getCfg().getId());
 		if (settings == null) {
-			// Log, this should never happen
-			return;
+			settings = this.loadSettings(getCfg());
+			if (settings == null) {
+				// Log: should never happen
+			}
+			fConfigToPageSettings.put(getCfg().getId(), settings);
 		}
 
 		// Note that provider selection populates the local connection map variables as well as the connection combo. Thus, the
 		// provider must be selected first. (Calling select invokes the "handle" listeners for each combo.)
-		fProviderCombo.select(settings.remoteServicesIndex);
+		fProviderCombo.select(fComboRemoteServicesProviderToIndexMap.get(settings.remoteProvider));
 		handleServicesSelected();
-		fConnectionCombo.select(settings.connectionIndex);
+		fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(settings.connection));
 		handleConnectionSelected();
 		fRootLocationText.setText(settings.rootLocation);
 		fBuildLocationText.setText(settings.buildLocation);
 	}
 	
+	/**
+	 * Handle change of configuration. Current page values must be stored and then updated
+	 * 
+	 * @param cfg
+	 * 			the new configuration. Passed to superclass but otherwise ignored.
+	 */
 	@Override
 	protected void cfgChanged(ICConfigurationDescription cfg) {
 		super.cfgChanged(cfg);
@@ -378,7 +418,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			return;
 		}
 		// Update settings for previous configuration first
-		this.updateSettings(fConfigBeforeSwitch);
+		this.storeSettings(fConfigBeforeSwitch);
 		fConfigBeforeSwitch = getCfg();
 		this.setValues(getCfg());
 	}
@@ -392,32 +432,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	}
 	
 	/**
-	 * Return the page settings for the current configuration. If the configuration has not yet been accessed, load settings from the
-	 * BuildConfigurationManager.
-	 *
-	 * @return settings for this page or null if this is a multiconfiguration or current configuration not available
-	 */
-	private PageSettings getSettings(IConfiguration config) {
-		if (config == null || config instanceof MultiConfiguration) {
-			return null;
-		}
-
-		if (!(fConfigToPageSettings.containsKey(config.getId()))) {
-			PageSettings settings = this.loadSettings(config);
-			if (settings == null) {
-				// TODO: What to do in this case?
-			}
-			fConfigToPageSettings.put(config.getId(), settings);
-		}
-		
-		return fConfigToPageSettings.get(config.getId());
-	}
-	
-	/**
 	 * Load settings from the BuildConfigurationManager for the given configuration
+	 * Note that this works even for new configurations, as the manager will return a build scenario for the closest known
+	 * ancestor configuration in that case.
 	 *
 	 * @param config
-	 * 				The configuration
+	 * 				the configuration
 	 * @return Configuration settings or null if config not found in BuildConfigurationManager
 	 */
 	private PageSettings loadSettings(IConfiguration config) {
@@ -427,19 +447,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			return null;
 		}
 		PageSettings settings = new PageSettings();
-		Integer providerSelection = fComboRemoteServicesProviderToIndexMap.get(buildScenario.getRemoteConnection().
-																											getRemoteServices());
-		if (providerSelection == null) {
-			providerSelection = new Integer(0);
-		}
-		settings.remoteServicesIndex = providerSelection;
-
-		Integer connectionSelection = fComboRemoteConnectionToIndexMap.get(buildScenario.getRemoteConnection());
-		if (connectionSelection == null) {
-			connectionSelection = new Integer(0);
-		}
-		settings.connectionIndex = connectionSelection;
-
+		settings.remoteProvider = buildScenario.getRemoteConnection().getRemoteServices();
+		settings.connection = buildScenario.getRemoteConnection();
 		settings.rootLocation = buildScenario.getLocation();
 
 		String buildSubDir = config.getToolChain().getBuilder().getBuildPath();
@@ -450,17 +459,41 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		return settings;
 	}
 
-	private void updateSettings(IConfiguration config) {
+	/**
+	 * Store the current page values as the settings for the passed configuration
+	 *
+	 * @param config
+	 * 				the configuration
+	 */
+	private void storeSettings(IConfiguration config) {
 		if (config == null || config instanceof MultiConfiguration) {
 			return;
 		}
 
 		PageSettings settings = new PageSettings();
-		settings.remoteServicesIndex = fProviderCombo.getSelectionIndex();
-		settings.connectionIndex = fConnectionCombo.getSelectionIndex();
+		Integer remoteServicesIndex = fProviderCombo.getSelectionIndex();
+		Integer connectionIndex = fConnectionCombo.getSelectionIndex();
+		settings.remoteProvider = fComboIndexToRemoteServicesProviderMap.get(remoteServicesIndex);
+		settings.connection = fComboIndexToRemoteConnectionMap.get(connectionIndex);
 		settings.rootLocation = fRootLocationText.getText();
 		settings.buildLocation = fBuildLocationText.getText();
 		
 		fConfigToPageSettings.put(config.getId(), settings);
+	}
+	
+	/**
+	 * Reload settings for current configuration and update page accordingly.
+	 */
+	@Override
+	public void performDefaults() {
+		if (fWidgetsReady == false) {
+			return;
+		}
+		PageSettings settings = this.loadSettings(getCfg());
+		if (settings == null) {
+			// TODO: What to do in this case?
+		}
+		fConfigToPageSettings.put(getCfg().getId(), settings);
+		this.setValues(getCfg());
 	}
 }
