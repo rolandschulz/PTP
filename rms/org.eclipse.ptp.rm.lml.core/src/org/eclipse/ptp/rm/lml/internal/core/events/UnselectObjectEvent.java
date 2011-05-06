@@ -4,13 +4,12 @@ import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 
 public class UnselectObjectEvent implements IUnselectedObjectEvent {
 
-	private String oid;
-	
+	private final String oid;
+
 	public UnselectObjectEvent(String oid) {
 		this.oid = oid;
 	}
 
-	@Override
 	public String getOid() {
 		return oid;
 	}

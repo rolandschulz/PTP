@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * @since 5.0
  */
-public class RMServicesConfigurationWizard extends Wizard implements IRMConfigurationWizard {
+public class RMConfigurationWizard extends Wizard implements IRMConfigurationWizard {
 
 	/**
 	 * Wizard page for common resource manager configuration. This is the final
@@ -328,7 +328,10 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	/*
 	 * Constructor used when creating a new resource manager.
 	 */
-	public RMServicesConfigurationWizard() {
+	/**
+	 * @since 5.0
+	 */
+	public RMConfigurationWizard() {
 		setForcePreviousAndNextButtons(true);
 		setNeedsProgressMonitor(true);
 		setWizardPages(null);
@@ -341,13 +344,13 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	/**
 	 * @since 5.0
 	 */
-	public RMServicesConfigurationWizard(IResourceManager rm) {
+	public RMConfigurationWizard(IResourceManager rm) {
 		this();
 		fUseDefaultNameAndDesc = false;
 		fEditMode = true;
 		IServiceProvider provider = (IServiceProvider) rm.getConfiguration().getAdapter(IServiceProvider.class);
 		fServiceProvider = provider.copy();
-		fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(provider);
+		fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(fServiceProvider);
 		setWizardPages(fServiceProvider);
 	}
 
@@ -471,8 +474,8 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			IServiceConfiguration config = fServiceModelManager.newServiceConfiguration(fResourceManagerPage.getRMName());
 			config.setServiceProvider(fLaunchService, (IServiceProvider) getBaseConfiguration().getAdapter(IServiceProvider.class));
 			fServiceModelManager.addConfiguration(config);
-			// } else {
-			// fServiceProvider.save();
+		} else {
+			fServiceProvider.save();
 		}
 		return true;
 	}

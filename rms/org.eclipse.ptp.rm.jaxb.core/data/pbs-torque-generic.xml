@@ -502,7 +502,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<arg>${rm:@jobId#name}</arg>
 		</terminate-job>
 		<launch-tab>
-			<basic>
+			<dynamic>
 				<title>Basic PBS Settings</title>
 				<!-- STDOUT/STDERR remote path group -->
 				<composite group="true">
@@ -694,8 +694,8 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<fixed-text>${rm:mpiCores#description}</fixed-text>
 					</widget>
 				</composite>
-			</basic>
-			<advanced>
+			</dynamic>
+			<dynamic>
 				<title>Advanced PBS Settings</title>
 				<composite>
 					<layout>
@@ -786,8 +786,8 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</viewer>
 					</composite>
 				</composite>
-			</advanced>
-			<custom-controller>Import PBS Script</custom-controller>
+			</dynamic>
+			<import>Import PBS Script</import>
 		</launch-tab>
 	</control-data>
 	<monitor-data schedulerType="PBS"/>

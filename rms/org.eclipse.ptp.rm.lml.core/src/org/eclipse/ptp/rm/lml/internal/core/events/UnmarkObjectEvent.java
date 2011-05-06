@@ -4,13 +4,12 @@ import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 
 public class UnmarkObjectEvent implements IUnmarkObjectEvent {
 
-	private String oid;
-	
+	private final String oid;
+
 	public UnmarkObjectEvent(String oid) {
 		this.oid = oid;
 	}
 
-	@Override
 	public String getOid() {
 		return oid;
 	}

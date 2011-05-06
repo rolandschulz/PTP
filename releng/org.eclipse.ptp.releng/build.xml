@@ -113,13 +113,9 @@
 		</replace>
 		<copy file="pack.properties" todir="${buildDirectory}/site/eclipse"/>
 
-		<!-- remove the master feature from the update site -->
-		<delete verbose="true" file="${buildDirectory}/site/eclipse/features/${masterFeature}"/>
-
-		<zip destfile="${zipsdir}/${masterFile}"
-			basedir="${buildDirectory}/site/eclipse"/>
-		
 		<!-- for some reason Orbit bundles aren't getting picked up-->		
+		<copy file="${buildDirectory}/plugins/org.eclipse.jgit_0.12.1.jar"
+			todir="${buildDirectory}/site/eclipse/plugins"/>
 		<copy file="${buildDirectory}/plugins/javax.xml_1.3.4.v201005080400.jar"
 			todir="${buildDirectory}/site/eclipse/plugins"/>
 		<copy file="${buildDirectory}/plugins/javax.xml.stream_1.0.1.v201004272200.jar"
@@ -129,6 +125,12 @@
 		<copy file="${buildDirectory}/plugins/com.sun.xml.bind_2.1.9.v200905260854.jar"
 			todir="${buildDirectory}/site/eclipse/plugins"/>
 
+		<!-- remove the master feature from the update site -->
+		<delete verbose="true" file="${buildDirectory}/site/eclipse/features/${masterFeature}"/>
+
+		<zip destfile="${zipsdir}/${masterFile}"
+			basedir="${buildDirectory}/site/eclipse"/>
+		
 		<!-- generate proxy zip -->
 		<copy todir="${buildDirectory}/proxy/org.eclipse.ptp.aix.ppc_${ptpBranchVersion}.${timestamp}">
 			<fileset dir="${buildDirectory}/plugins/org.eclipse.ptp.aix.ppc"/>
@@ -244,6 +246,14 @@
 			<param name="p2site" value="${p2dir}"/>
 		</antcall>
 		
+		<!-- fix artifacts -->
+		<p2.process.artifacts repositoryPath="file:/${p2dir}"/>
+
+		<!-- clean up some unnecessary files -->
+		<delete failonerror="false" quiet="true">
+			<fileset dir="${p2dir}" includes="artifacts.jar.pack.gz, content.jar.pack.gz, site.xml"/>
+		</delete>
+
 		<!-- zip everything back up -->
 		<zip destfile="${destination}"
 			basedir="${p2dir}"/>
@@ -810,6 +820,10 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.gnu.ui"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
@@ -839,6 +853,14 @@
 		</antcall>
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.ui"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.git.core"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.git.ui"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">

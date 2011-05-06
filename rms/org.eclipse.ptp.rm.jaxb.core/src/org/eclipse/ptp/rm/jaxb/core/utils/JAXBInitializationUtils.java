@@ -31,8 +31,10 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
+import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Convenience methods for validating and unmarshaling XML using JAXB.
@@ -41,6 +43,9 @@ import org.xml.sax.SAXException;
  * 
  */
 public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
+
+	private static Unmarshaller unmarshaller;
+	private static Validator validator;
 
 	private JAXBInitializationUtils() {
 	}
@@ -89,12 +94,13 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	 * @throws URISyntaxException
 	 */
 	public static void validate(URL instance) throws SAXException, IOException, URISyntaxException {
-		URL xsd = JAXBCorePlugin.getResource(RM_XSD);
-		SchemaFactory factory = SchemaFactory.newInstance(XMLSchema);
-		Schema schema = factory.newSchema(xsd);
-		Validator validator = schema.newValidator();
 		Source source = new StreamSource(instance.openStream());
-		validator.validate(source);
+		try {
+			getValidator().validate(source);
+		} catch (SAXParseException sax) {
+			JAXBCorePlugin.log(printInfo(sax));
+			throw sax;
+		}
 	}
 
 	/**
@@ -136,6 +142,54 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	}
 
 	/**
+	 * Uses the ResourceManagerData context.
+	 * 
+	 * @return static singleton
+	 * @throws JAXBException
+	 */
+	private synchronized static Unmarshaller getUnmarshaller() throws JAXBException {
+		if (unmarshaller == null) {
+			JAXBContext jc = JAXBContext.newInstance(JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
+			unmarshaller = jc.createUnmarshaller();
+		}
+		return unmarshaller;
+	}
+
+	/**
+	 * * Uses the ResourceManagerData schema.
+	 * 
+	 * @return static singleton
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	private synchronized static Validator getValidator() throws IOException, SAXException {
+		if (validator == null) {
+			URL xsd = JAXBCorePlugin.getResource(RM_XSD);
+			SchemaFactory factory = SchemaFactory.newInstance(XMLSchema);
+			Schema schema = factory.newSchema(xsd);
+			validator = schema.newValidator();
+		}
+		return validator;
+	}
+
+	/**
+	 * Details from the parse exception.
+	 * 
+	 * @param e
+	 *            thrown parse exception
+	 * @return line, column and other info.
+	 */
+	private static String printInfo(SAXParseException e) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(Messages.PublicId + e.getPublicId()).append(LINE_SEP);
+		sb.append(Messages.SystemId + e.getSystemId()).append(LINE_SEP);
+		sb.append(Messages.LineNumber + e.getLineNumber()).append(LINE_SEP);
+		sb.append(Messages.ColumnNumber + e.getColumnNumber()).append(LINE_SEP);
+		sb.append(Messages.Message + e.getMessage()).append(LINE_SEP);
+		return sb.toString();
+	}
+
+	/**
 	 * First validates the xml, then gets the JAXB context and calls the JAXB
 	 * unmarshaller from it.
 	 * 
@@ -152,9 +206,7 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	private static ResourceManagerData unmarshalResourceManagerData(URL xml) throws JAXBException, IOException, SAXException,
 			URISyntaxException {
 		validate(xml);
-		JAXBContext jc = JAXBContext.newInstance(JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
-		Unmarshaller u = jc.createUnmarshaller();
-		JAXBElement<?> o = (JAXBElement<?>) u.unmarshal(xml.openStream());
+		JAXBElement<?> o = (JAXBElement<?>) getUnmarshaller().unmarshal(xml.openStream());
 		ResourceManagerData rmdata = (ResourceManagerData) o.getValue();
 		return rmdata;
 	}

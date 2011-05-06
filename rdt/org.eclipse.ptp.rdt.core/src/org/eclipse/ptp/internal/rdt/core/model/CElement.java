@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.core/model
  * Class: org.eclipse.cdt.internal.core.model.ext.CElementHandle
- * Version: 1.13
+ * Version: 1.16
  */
 
 package org.eclipse.ptp.internal.rdt.core.model;
@@ -42,7 +42,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.ptp.rdt.core.RDTLog;
+
 
 public abstract class CElement implements ICElement, Serializable, IHasManagedLocation, IHasRemotePath {
 	private static final long serialVersionUID = 1L;

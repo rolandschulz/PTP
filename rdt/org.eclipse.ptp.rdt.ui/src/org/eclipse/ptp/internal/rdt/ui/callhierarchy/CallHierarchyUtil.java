@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.callhierarchy.CallHierarchyUI
- * Version: 1.22
+ * Version: 1.25
  */
 package org.eclipse.ptp.internal.rdt.ui.callhierarchy;
 
@@ -25,6 +25,7 @@ import org.eclipse.cdt.internal.ui.actions.OpenActionUtil;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHMessages;
 import org.eclipse.cdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.cdt.internal.ui.util.StatusLineHandler;
+import org.eclipse.cdt.internal.ui.viewsupport.CElementLabels;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -55,6 +56,7 @@ public class CallHierarchyUtil {
 				final Display display= Display.getCurrent();
 	
 				Job job= new Job(CHMessages.CallHierarchyUI_label) {
+	        		@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						try {
 							StatusLineHandler.clearStatusLine(editor.getSite());
@@ -130,7 +132,7 @@ public class CallHierarchyUtil {
 			}
 			elem = OpenActionUtil.selectCElement(input, window.getShell(),
 					CHMessages.CallHierarchyUI_label, CHMessages.CallHierarchyUI_selectMessage,
-					CElementBaseLabels.ALL_DEFAULT | CElementBaseLabels.MF_POST_FILE_QUALIFIED, 0);
+					CElementLabels.ALL_DEFAULT | CElementLabels.MF_POST_FILE_QUALIFIED, 0);
 			break;
 		}
 		if (elem != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 QNX Software Systems and others.
+ * Copyright (c) 2006, 2011 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,19 +13,25 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchPage
- * Version: 1.9
+ * Version: 1.21
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.model.ICContainer;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.core.model.ISourceReference;
+import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.core.parser.Keywords;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.search.CSearchUtil;
 import org.eclipse.cdt.internal.ui.search.PDOMSearchPatternQuery;
@@ -65,14 +71,18 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
@@ -142,7 +152,7 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 		new Integer(RemoteSearchQuery.FIND_DECLARATIONS),
 		new Integer(RemoteSearchQuery.FIND_DEFINITIONS),
 		new Integer(RemoteSearchQuery.FIND_REFERENCES),
-		new Integer(RemoteSearchQuery.FIND_ALL_OCCURANCES),
+		new Integer(RemoteSearchQuery.FIND_ALL_OCCURRENCES),
 	};
 	
 	// The index of FIND_ALL_OCCURANCES
@@ -162,6 +172,28 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 	private ISearchPageContainer pageContainer;
 	
 	private IStatusLineManager fLineManager;
+
+	
+	private static ICProject getProject(String name) {
+		return CoreModel.getDefault().create(ResourcesPlugin.getWorkspace().getRoot().getProject(name));
+	}
+	
+	private ICElement getElement(Object obj) {
+		if (obj instanceof IResource) {
+			return CoreModel.getDefault().create((IResource)obj);
+		} 
+		if (obj instanceof ICElement) {
+			ICElement elem= (ICElement) obj;
+			if (elem instanceof ISourceReference)
+				return ((ISourceReference) elem).getTranslationUnit();
+			if (elem instanceof ITranslationUnit || elem instanceof ICContainer || elem instanceof ICProject)
+				return elem;
+			
+			return elem.getCProject();
+		}
+		return null;
+	}
+
 
 	private static ICProject getProject(Object object) {
 		if (object instanceof ICElement)
@@ -197,29 +229,60 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 	    }
 	    
 		// get the list of elements for the scope
-		List elements = new ArrayList();
+		Set<ICElement> elements = new HashSet<ICElement>();
 		String scopeDescription = ""; //$NON-NLS-1$
 		switch (getContainer().getSelectedScope()) {
 		case ISearchPageContainer.SELECTED_PROJECTS_SCOPE:
-			if (structuredSelection != null) {
-				scopeDescription = CSearchMessages.ProjectScope; 
-				for (Iterator i = structuredSelection.iterator(); i.hasNext();) {
-					ICProject project = getProject(i.next());
-					if (project != null)
-						elements.add(project);
+			final String[] prjNames = getContainer().getSelectedProjectNames();
+			scopeDescription = CSearchMessages.ProjectScope; 
+			int ip= 0;
+			for (String prjName: prjNames) {
+
+				ICProject project = getProject(prjName);
+				if (project != null) {
+					elements.add(project);
+					switch(ip++) {
+					case 0: 
+						scopeDescription+= " '" + prjName + "'";  //$NON-NLS-1$//$NON-NLS-2$
+						break;
+					case 1:
+						scopeDescription= scopeDescription + ", '" + prjName + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+						break;
+					case 2:
+						scopeDescription+= ", ..."; //$NON-NLS-1$
+						break;
+					default:
+						break;
+					} 
 				}
+
 			}
+			
 			break;
 		case ISearchPageContainer.SELECTION_SCOPE:
 			if( structuredSelection != null) {
 				scopeDescription = CSearchMessages.SelectionScope; 
-				for (Iterator i = structuredSelection.iterator(); i.hasNext();) {
-					Object obj = i.next();
-					if (obj instanceof IResource)
-						elements.add(CoreModel.getDefault().create((IResource)obj));
-					else if (obj instanceof ICElement)
-						elements.add(obj);
+				int ie= 0;
+				for (Object sel : structuredSelection.toList()) {
+					ICElement elem= getElement(sel);
+					if (elem != null) {
+						elements.add(elem);
+						switch(ie++) {
+						case 0: 
+							scopeDescription= " '" + elem.toString() + "'";  //$NON-NLS-1$//$NON-NLS-2$
+							break;
+						case 1:
+							scopeDescription= scopeDescription + ", '" + elem.toString() + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+							break;
+						case 2:
+							scopeDescription+= ", ..."; //$NON-NLS-1$
+							break;
+						default:
+							break;
+						} 
+					}
 				}
+
 				break;
 			}
 			break;
@@ -233,18 +296,17 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 			for (int i = 0; i < workingSets.length; ++i) {
 				IAdaptable[] wsElements = workingSets[i].getElements();
 				for (int j = 0; j < wsElements.length; ++j) {
-					ICProject project = getProject(wsElements[j]);
-					if (project != null)
-						elements.add(project);
+					ICElement elem = getElement(wsElements[j]);
+					if (elem != null)
+						elements.add(elem);
 				}
 			}
 			break;
 		}
 		
-		ICElement[] scope
-			= elements.isEmpty()
-			? null
-			: (ICElement[])elements.toArray(new ICElement[elements.size()]);
+		ICElement[] scope = elements.isEmpty() ?
+				null : elements.toArray(new ICElement[elements.size()]);
+		
 		
 		try {
 			// TODO: Where are we going to find an IProject when doing a global search?
@@ -382,10 +444,55 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 
 		// Pattern combo
 		patternCombo = new Combo( result, SWT.SINGLE | SWT.BORDER );
-		patternCombo.addSelectionListener( new SelectionAdapter() {
-			public void widgetSelected( SelectionEvent e ) {
-				//handlePatternSelected();
+		patternCombo.addVerifyListener(new VerifyListener() {
+			public void verifyText(VerifyEvent event) {
+				final String text = patternCombo.getText();
+				final char[] newChars= event.text.toCharArray();
+				final StringBuilder result= new StringBuilder(newChars.length);
+				boolean relax= prefix(text, event.start, result).contains(Keywords.OPERATOR + " "); //$NON-NLS-1$
+				for (final char c : newChars) {
+					switch (c) {
+					case  '_': 
+					case ':': // scope operator
+					case '?': case '*':  // wild cards
+					case '\\': // escaping wild-cards
+						result.append(c);
+						break;
+					case ' ':
+						if (prefix(text, event.start, result).endsWith(Keywords.OPERATOR)) {
+							relax= true;
+							result.append(c);
+						}
+						break;
+					case '&': case '|': case '+': case '-':
+					case '!': case '=': case '>': case '<':
+					case '%': case '^': case '(': case ')':
+					case '[': case ']': 
+						if (prefix(text, event.start, result).endsWith(Keywords.OPERATOR)) {
+							result.append(' ');
+							relax= true;
+						}
+						if (relax)
+							result.append(c);
+						break;
+					case '~':
+					default:
+						if (Character.isLetterOrDigit(c)) {
+							result.append(c);
+						}
+						break;
+					}
+					event.text= result.toString();
+				}
 			}
+
+			private String prefix(String text, int len, StringBuilder rest) {
+				StringBuilder result= new StringBuilder(len + rest.length());
+				result.append(text, 0, len);
+				result.append(rest);
+				return result.toString();
+			}
+
 		});
 		
 		patternCombo.addModifyListener( new ModifyListener() {
@@ -421,11 +528,36 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 		layout.numColumns = 2;
 		result.setLayout( layout );
 
+		Listener limitToListener = new Listener() {
+			public void handleEvent(Event event) {
+				Button me = (Button)event.widget;
+				if (me == limitToButtons[limitToAllButtonIndex]) {
+					if (me.getSelection()) {
+						for (int i = 0; i < limitToButtons.length; ++i) {
+							if (i != limitToAllButtonIndex) {
+								limitToButtons[i].setSelection(true);
+								limitToButtons[i].setEnabled(false);
+							}
+						}
+					} else {
+						for (int i = 0; i < limitToButtons.length; ++i) {
+							if (i != limitToAllButtonIndex) {
+								limitToButtons[i].setSelection(false);
+								limitToButtons[i].setEnabled(true);
+							}
+						}
+					}
+				}
+				setPerformActionEnabled();
+			}
+		};
+
 		limitToButtons = new Button[limitToText.length];
 		for( int i = 0; i < limitToText.length; i++ ){
-			Button button = new Button(result, SWT.RADIO);
+			Button button = new Button(result, SWT.CHECK);
 			button.setText( limitToText[i] );
 			button.setData( limitToData[i] );
+			button.addListener(SWT.Selection, limitToListener);
 			limitToButtons[i] = button;
 		}
 
@@ -492,11 +624,12 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 		
 		// Need a type
 		boolean any = false;
-		for (int i = 0; i < searchForButtons.length; ++i)
+		for (int i = 0; i < searchForButtons.length; ++i){
 			if (searchForButtons[i].getSelection()) {
 				any = true;
 				break;
 			}
+		}
 		if (!any)
 			enable = false;
 		
@@ -518,7 +651,7 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 				
 				IDialogSettings settings = getDialogSettings();
 				
-				int searchFlags = PDOMSearchPatternQuery.FIND_ALL_TYPES | RemoteSearchQuery.FIND_ALL_OCCURANCES;
+				int searchFlags = PDOMSearchPatternQuery.FIND_ALL_TYPES | RemoteSearchQuery.FIND_ALL_OCCURRENCES;
 				try {
 					searchFlags = settings.getInt(STORE_SEARCH_FLAGS);
 				} catch (NumberFormatException e) {
@@ -526,8 +659,10 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 				}
 
 				previousPatterns = settings.getArray(STORE_PREVIOUS_PATTERNS);
-				if (previousPatterns != null)
+				if (previousPatterns != null){
 					patternCombo.setItems(previousPatterns);
+				}
+				patternCombo.setVisibleItemCount(15);
 
 				// Initialize the selection
 				ISelection selection = getContainer().getSelection();
@@ -585,7 +720,12 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 					patternCombo.setText(textSelection.getText());
 					// TODO it might be good to do a selection parse to ensure that
 					// the selection is valid.
+				}				
+				
+				if (patternCombo.getText().trim().length() == 0 && previousPatterns != null && previousPatterns.length > 0) {
+					patternCombo.setText(previousPatterns[0]);
 				}
+
 
 				caseSensitiveButton.setSelection(settings.getBoolean(STORE_CASE_SENSITIVE));
 				
@@ -607,8 +747,15 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 					}
 				}
 				
-				if ((searchFlags & RemoteSearchQuery.FIND_ALL_OCCURANCES) == RemoteSearchQuery.FIND_ALL_OCCURANCES) {
+				if ((searchFlags & RemoteSearchQuery.FIND_ALL_OCCURRENCES) == RemoteSearchQuery.FIND_ALL_OCCURRENCES) {
 					limitToButtons[limitToAllButtonIndex].setSelection(true);
+					for (int i = 0; i < limitToButtons.length; ++i) {
+						if (i != limitToAllButtonIndex) {
+							limitToButtons[i].setSelection(true);
+							limitToButtons[i].setEnabled(false);
+						}
+					}
+
 				} else {
 					limitToButtons[limitToAllButtonIndex].setSelection(false);
 					for (int i = 0; i < limitToButtons.length - 2; ++i) {

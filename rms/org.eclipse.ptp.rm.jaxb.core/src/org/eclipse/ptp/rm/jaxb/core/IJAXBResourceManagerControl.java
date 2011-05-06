@@ -35,14 +35,14 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	public RMVariableMap getEnvironment();
 
 	/**
-	 * @return the user-defined environment (from the Environment Tab)
-	 */
-	public Map<String, String> getLaunchEnv();
-
-	/**
 	 * @return table of jobs with open processes
 	 */
 	public Map<String, ICommandJob> getJobTable();
+
+	/**
+	 * @return the user-defined environment (from the Environment Tab)
+	 */
+	public Map<String, String> getLaunchEnv();
 
 	/**
 	 * @return connection information for this resource manager
@@ -53,4 +53,9 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	 * @return state of resource manager
 	 */
 	public String getState();
+
+	/**
+	 * For callbacks to the resource manager from internal jobs.
+	 */
+	public void jobStateChanged(String jobId);
 }

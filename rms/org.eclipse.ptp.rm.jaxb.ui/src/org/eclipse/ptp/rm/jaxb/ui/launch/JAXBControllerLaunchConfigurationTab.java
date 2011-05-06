@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.launch;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
@@ -43,7 +45,7 @@ import org.eclipse.swt.widgets.Control;
  */
 public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IFireContentsChangedEnabled {
 
-	private final RemoteServicesDelegate delegate;
+	private RemoteServicesDelegate delegate;
 	private final IJAXBResourceManagerConfiguration rmConfig;
 	private final LaunchTabType launchTabData;
 	private final ScriptType script;
@@ -64,18 +66,13 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		rmConfig = rm.getJAXBConfiguration();
 		script = rmConfig.getResourceManagerData().getControlData().getScript();
 		launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
-		delegate = rm.getControl().getRemoteServicesDelegate();
 		updateHandler = new ValueUpdateHandler(this);
 		if (launchTabData != null) {
-			TabControllerType controller = launchTabData.getBasic();
-			if (controller != null) {
+			List<TabControllerType> dynamic = launchTabData.getDynamic();
+			for (TabControllerType controller : dynamic) {
 				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
 			}
-			controller = launchTabData.getAdvanced();
-			if (controller != null) {
-				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
-			}
-			String title = launchTabData.getCustomController();
+			String title = launchTabData.getImport();
 			if (title != null) {
 				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this));
 			}
@@ -185,6 +182,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		try {
+			delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate();
 			lcMap.initialize(rmConfig.getRMVariableMap());
 			updateHandler.clear();
 		} catch (Throwable t) {

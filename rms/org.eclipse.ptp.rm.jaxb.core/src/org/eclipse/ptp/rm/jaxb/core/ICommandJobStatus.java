@@ -28,6 +28,8 @@ public interface ICommandJobStatus extends IJobStatus {
 
 	/**
 	 * Cancel the Job process (if interactive).
+	 * 
+	 * @return true if canceled.
 	 */
 	public boolean cancel();
 
@@ -104,6 +106,10 @@ public interface ICommandJobStatus extends IJobStatus {
 	 * 
 	 * @param uuid
 	 *            internal id which the job id will be mapped to.
+	 * @param waitUntil
+	 *            wait until this state is reached.
+	 * @param control
+	 *            callback
 	 */
-	public void waitForJobId(String uuid);
+	public void waitForJobId(String uuid, String waitUntil);
 }

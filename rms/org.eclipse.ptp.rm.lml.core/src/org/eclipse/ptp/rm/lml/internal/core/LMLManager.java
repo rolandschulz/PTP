@@ -11,7 +11,6 @@
 package org.eclipse.ptp.rm.lml.internal.core;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +29,6 @@ import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
-import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.internal.core.events.JobListSortedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiSelectedEvent;
@@ -44,90 +42,87 @@ import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
 /**
  * Class of the interface ILMLManager
  */
-public class LMLManager implements ILMLManager{
-	
+public class LMLManager implements ILMLManager {
+
 	/*
-	 * Map of all ILguioItems 
+	 * Map of all ILguioItems
 	 */
 	protected final Map<String, ILguiItem> LGUIS = new HashMap<String, ILguiItem>();
-	
+
 	/*
 	 * The current considered ILguiItem
 	 */
 	private ILguiItem fSelectedLguiItem = null;
-	
+
 	/*
 	 * A list of all listeners on the ILguiItem
 	 */
-	private ListenerList lmlListeners = new ListenerList();
-	
-	private ListenerList viewListeners = new ListenerList();
-	
+	private final ListenerList lmlListeners = new ListenerList();
+
+	private final ListenerList viewListeners = new ListenerList();
+
 	private final Map<String, IListener> listeners = new HashMap<String, IListener>();
 
 	public void addListener(IViewListener listener) {
 		viewListeners.add(listener);
 		listeners.put("ViewManager", listener);
 	}
-	
+
 	public void addListener(IViewListener listener, String view) {
 		viewListeners.add(listener);
-		listeners.put(view,listener);
+		listeners.put(view, listener);
 	}
-	
+
 	public void addListener(ILMLListener listener, String view) {
 		lmlListeners.add(listener);
-//		listeners.put(view, (IListener) listener);
+		// listeners.put(view, (IListener) listener);
 	}
-	
+
 	public IListener getListener(String view) {
 		return listeners.get(view);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.ILMLManager#addLgui(URL xmlFile)
+	 * @see org.eclipse.ptp.rm.lml.core.ILMLManager#addLgui(URL xmlFile)
 	 */
 	public boolean addLgui(URI xmlFile) {
 		if (!LGUIS.containsKey(xmlFile.getPath())) {
 			fSelectedLguiItem = new LguiItem(xmlFile);
-			synchronized (LGUIS){
+			synchronized (LGUIS) {
 				LGUIS.put(xmlFile.getPath(), fSelectedLguiItem);
 			}
 			fireNewLgui();
 			return false;
 		} else {
 			return true;
-		}	
+		}
 	}
-	
+
 	public String[] getLguis() {
 		Set<String> lguis = LGUIS.keySet();
 		return lguis.toArray(new String[lguis.size()]);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.ILMLManager#sortLgui
+	 * @see org.eclipse.ptp.rm.lml.core.ILMLManager#sortLgui
 	 */
 	public void sortLgui() {
 		fireSortedLgui();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.ILMLManager#getSelectedLguiItem()
+	 * @see org.eclipse.ptp.rm.lml.core.ILMLManager#getSelectedLguiItem()
 	 */
 	public ILguiItem getSelectedLguiItem() {
 		return fSelectedLguiItem;
 	}
-	
+
 	/**
 	 * Method is called when a new ILguiItem was generated.
 	 */
@@ -137,7 +132,7 @@ public class LMLManager implements ILMLManager{
 			((IViewListener) listener).handleEvent(event);
 		}
 	}
-	
+
 	/**
 	 * Method is called when an ILguiItem was sorted.
 	 */
@@ -147,7 +142,7 @@ public class LMLManager implements ILMLManager{
 			((ILMLListener) listener).handleEvent(event);
 		}
 	}
-	
+
 	private void fireSelectedLgui() {
 		ILguiSelectedEvent event = new LguiSelectedEvent(this, fSelectedLguiItem);
 		for (Object listener : viewListeners.getListeners()) {
@@ -159,12 +154,12 @@ public class LMLManager implements ILMLManager{
 		String[] lguis = LGUIS.keySet().toArray(new String[LGUIS.size()]);
 		return lguis[index];
 	}
-	
+
 	public void selectLgui(int index) {
 		fSelectedLguiItem = LGUIS.get(getSelectedLguiTitle(index));
 		fireSelectedLgui();
 	}
-	
+
 	public void selectLgui(URI xmlFile) {
 		fSelectedLguiItem = LGUIS.get(xmlFile.getPath());
 		fireSelectedLgui();
@@ -194,13 +189,12 @@ public class LMLManager implements ILMLManager{
 	public void removeListener(ILMLListener listener) {
 		lmlListeners.remove(listener);
 	}
-	
+
 	public void removeListener(IViewListener listener) {
 		viewListeners.remove(listener);
 		listeners.remove("ViewManager");
 	}
 
-	@Override
 	public void setTableColumnActive(String gid, String text) {
 		fSelectedLguiItem.getTableHandler().setTableColumnActive(gid, text, true);
 		fireChangeTableColumn();
@@ -211,7 +205,7 @@ public class LMLManager implements ILMLManager{
 		for (Object listener : lmlListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
-		
+
 	}
 
 	public void selectObject(String oid) {
@@ -224,8 +218,8 @@ public class LMLManager implements ILMLManager{
 			((ILMLListener) listener).handleEvent(event);
 		}
 	}
-	
-	public void update(){
+
+	public void update() {
 		fSelectedLguiItem.updateXML();
 		fireNewLgui();
 	}
@@ -233,7 +227,7 @@ public class LMLManager implements ILMLManager{
 	public void markObject(String oid) {
 		fireMarkObject(oid);
 	}
-	
+
 	private void fireMarkObject(String oid) {
 		IMarkObjectEvent event = new MarkObjectEvent(oid);
 		for (Object listener : lmlListeners.getListeners()) {
@@ -244,7 +238,7 @@ public class LMLManager implements ILMLManager{
 	public void unmarkObject(String oid) {
 		fireUnmarkObject(oid);
 	}
-	
+
 	private void fireUnmarkObject(String oid) {
 		IUnmarkObjectEvent event = new UnmarkObjectEvent(oid);
 		for (Object listener : lmlListeners.getListeners()) {
@@ -252,7 +246,6 @@ public class LMLManager implements ILMLManager{
 		}
 	}
 
-	@Override
 	public void unselectObject(String oid) {
 		fireUnselectObject(oid);
 	}

@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.includebrowser.IBHistoryListAction
- * Version: 1.7
+ * Version: 1.8
  */
 
 package org.eclipse.ptp.internal.rdt.ui.includebrowser;
@@ -22,10 +22,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.core.model.util.CElementBaseLabels;
 import org.eclipse.cdt.internal.ui.dialogs.StatusInfo;
 import org.eclipse.cdt.internal.ui.includebrowser.IBMessages;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.cdt.internal.ui.viewsupport.CElementLabels;
 import org.eclipse.cdt.internal.ui.viewsupport.CUILabelProvider;
 import org.eclipse.cdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.cdt.internal.ui.wizards.dialogfields.IListAdapter;
@@ -34,6 +34,7 @@ import org.eclipse.cdt.internal.ui.wizards.dialogfields.ListDialogField;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.StatusDialog;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -72,7 +73,7 @@ public class IBHistoryListAction extends Action {
 				}				
 			};
 		
-			CUILabelProvider labelProvider= new CUILabelProvider(CElementBaseLabels.APPEND_ROOT_PATH, CElementImageProvider.OVERLAY_ICONS);
+			ILabelProvider labelProvider= new CUILabelProvider(CElementLabels.APPEND_ROOT_PATH, CElementImageProvider.OVERLAY_ICONS);
 			
 			fHistoryList= new ListDialogField<ITranslationUnit>(adapter, buttonLabels, labelProvider);
 			fHistoryList.setLabelText(IBMessages.IBHistoryListAction_HistoryList_label); 
