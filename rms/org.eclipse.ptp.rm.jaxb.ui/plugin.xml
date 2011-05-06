@@ -46,7 +46,7 @@
             id="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMConfigurationImportWizard"
             name="Resource Manager Definition from Plug-in">
          <description>
-            Import XML configurations for the JAXB Resource Managers from plugins to the workspace
+            Import XML configurations from the Resource Manager plug-ins to the workspace
          </description>
       </wizard>
    </extension>
