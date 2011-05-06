@@ -13,7 +13,12 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.remote.ui,
+Export-Package: org.eclipse.ptp.remote.internal.ui;
+  x-friends:="org.eclipse.ptp.rm.jaxb.tests,
+   org.eclipse.ptp.rm.jaxb.ui,
+   org.eclipse.ptp.rm.jaxb.ui.monitor,
+   org.eclipse.ptp.rm.lml.ui",
+ org.eclipse.ptp.remote.ui,
  org.eclipse.ptp.remote.ui.dialogs,
  org.eclipse.ptp.remote.ui.widgets
 Bundle-Localization: plugin
