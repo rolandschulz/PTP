@@ -26,14 +26,14 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.xml.sax.SAXException;
 
-public class JAXBTestsPlugin extends Plugin implements IJAXBNonNLSConstants {
+public class JAXBTestsPlugin extends Plugin {
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.jaxb.tests"; //$NON-NLS-1$
 
@@ -130,7 +130,7 @@ public class JAXBTestsPlugin extends Plugin implements IJAXBNonNLSConstants {
 		URL url = null;
 		if (getDefault() != null) {
 			Bundle bundle = getDefault().getBundle();
-			url = FileLocator.find(bundle, new Path(PATH_SEP + resource), null);
+			url = FileLocator.find(bundle, new Path(JAXBRMConstants.PATH_SEP + resource), null);
 		} else {
 			url = new File(resource).toURL();
 		}

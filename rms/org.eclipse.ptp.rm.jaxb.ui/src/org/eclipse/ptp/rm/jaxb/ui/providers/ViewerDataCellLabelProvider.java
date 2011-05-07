@@ -15,7 +15,7 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
 import org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -27,7 +27,7 @@ import org.eclipse.swt.graphics.Image;
  * @author arossi
  * 
  */
-public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJAXBUINonNLSConstants {
+public class ViewerDataCellLabelProvider extends CellLabelProvider {
 	private final List<ColumnDataType> columnData;
 
 	/**
@@ -176,7 +176,7 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider implements IJ
 			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
 			return support.getDisplayValue(getColumnName(columnIndex));
 		}
-		return ZEROSTR;
+		return JAXBRMUIConstants.ZEROSTR;
 	}
 
 	/**

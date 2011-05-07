@@ -19,7 +19,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
  * @author arossi
  * 
  */
-public interface IUpdateModel extends IJAXBUINonNLSConstants {
+public interface IUpdateModel {
 
 	/**
 	 * @return the control to which this model is bound

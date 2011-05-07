@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.jaxb.core.variables;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IDynamicVariable;
 import org.eclipse.core.variables.IDynamicVariableResolver;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 
 /**
  * Resolver for the LCVariableMap (tag: ${lc:). <br>
@@ -27,7 +27,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
  * @author arossi
  * 
  */
-public class LCVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
+public class LCVariableResolver implements IDynamicVariableResolver {
 
 	private static LCVariableMap active;
 
@@ -39,9 +39,9 @@ public class LCVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 	 */
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
 		if (active != null) {
-			String[] split = argument.split(PDRX);
+			String[] split = argument.split(JAXBRMConstants.PDRX);
 			if (split.length > 1) {
-				if (split[1].equals(VALUE)) {
+				if (split[1].equals(JAXBRMConstants.VALUE)) {
 					argument = split[0];
 				}
 			}
@@ -50,7 +50,7 @@ public class LCVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 				return String.valueOf(value);
 			}
 		}
-		return ZEROSTR;
+		return JAXBRMConstants.ZEROSTR;
 	}
 
 	/**

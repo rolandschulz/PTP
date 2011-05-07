@@ -11,6 +11,7 @@ package org.eclipse.ptp.rm.jaxb.ui.model;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 
 /**
@@ -38,7 +39,8 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 *            if this is a text box, whether it is editable
 	 */
 	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly) {
-		super(name, handler, editor, items, readOnly, ZEROSTR, ZEROSTR, ZEROSTR);
+		super(name, handler, editor, items, readOnly, JAXBRMUIConstants.ZEROSTR, JAXBRMUIConstants.ZEROSTR,
+				JAXBRMUIConstants.ZEROSTR);
 	}
 
 	/**
@@ -75,23 +77,23 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 */
 	public String getDisplayValue(String columnName) {
 		String displayValue = null;
-		if (COLUMN_NAME.equals(columnName)) {
+		if (JAXBRMUIConstants.COLUMN_NAME.equals(columnName)) {
 			displayValue = name;
 		} else if (isChecked()) {
-			if (COLUMN_DESC.equals(columnName)) {
+			if (JAXBRMUIConstants.COLUMN_DESC.equals(columnName)) {
 				displayValue = description;
-			} else if (COLUMN_DEFAULT.equals(columnName)) {
+			} else if (JAXBRMUIConstants.COLUMN_DEFAULT.equals(columnName)) {
 				displayValue = defaultValue;
-			} else if (COLUMN_TYPE.equals(columnName)) {
+			} else if (JAXBRMUIConstants.COLUMN_TYPE.equals(columnName)) {
 				displayValue = getType();
-			} else if (COLUMN_VALUE.equals(columnName)) {
+			} else if (JAXBRMUIConstants.COLUMN_VALUE.equals(columnName)) {
 				displayValue = getValueAsString();
-			} else if (COLUMN_STATUS.equals(columnName)) {
+			} else if (JAXBRMUIConstants.COLUMN_STATUS.equals(columnName)) {
 				displayValue = status;
 			}
 		}
 		if (displayValue == null) {
-			return ZEROSTR;
+			return JAXBRMUIConstants.ZEROSTR;
 		}
 		return displayValue;
 	}

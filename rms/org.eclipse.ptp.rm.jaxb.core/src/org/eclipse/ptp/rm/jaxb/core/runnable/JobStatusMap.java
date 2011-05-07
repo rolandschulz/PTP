@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
@@ -14,7 +14,7 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  * @author arossi
  * 
  */
-public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
+public class JobStatusMap extends Thread {
 
 	private final IResourceManagerControl control;
 	private final Map<String, ICommandJobStatus> map;
@@ -101,7 +101,7 @@ public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
 		while (isRunning()) {
 			synchronized (map) {
 				try {
-					map.wait(2 * MINUTE_IN_MS);
+					map.wait(2 * JAXBRMConstants.MINUTE_IN_MS);
 				} catch (InterruptedException ignored) {
 				}
 
@@ -155,7 +155,7 @@ public class JobStatusMap extends Thread implements IJAXBNonNLSConstants {
 		if (status != null) {
 			String d = status.getStateDetail();
 			if (!status.isInteractive() && !IJobStatus.CANCELED.equals(d) && !IJobStatus.FAILED.equals(d) && block) {
-				status.maybeWaitForHandlerFiles(READY_FILE_BLOCK);
+				status.maybeWaitForHandlerFiles(JAXBRMConstants.READY_FILE_BLOCK);
 			}
 			status.cancel();
 		}

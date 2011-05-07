@@ -16,7 +16,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
@@ -24,10 +24,10 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
-public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
+public class RMDataTest extends TestCase {
 
-	private static final String rmxml = DATA + "test-pbs.xml"; //$NON-NLS-1$
-	private static final String tokxml = DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
+	private static final String rmxml = JAXBRMConstants.DATA + "test-pbs.xml"; //$NON-NLS-1$
+	private static final String tokxml = JAXBRMConstants.DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
 
 	@Override
 	public void setUp() {
@@ -82,15 +82,19 @@ public class RMDataTest extends TestCase implements IJAXBNonNLSConstants {
 			Object o = e.getValue();
 			if (o instanceof AttributeType) {
 				AttributeType ja = (AttributeType) o;
-				buffer.append(LT).append(ja.getName()).append(GTLT).append(ja.getType()).append(GTLT).append(ja.getDefault())
-						.append(GTLT).append(ja.getChoice()).append(GTLT).append(ja.getMax()).append(GTLT).append(ja.getMin())
-						.append(GTLT).append(ja.getValidator()).append(GTLT).append(ja.getDescription()).append(GTLT)
-						.append(ja.getTooltip()).append(ja.getValue()).append(GT).append(LINE_SEP);
+				buffer.append(JAXBRMConstants.LT).append(ja.getName()).append(JAXBRMConstants.GTLT).append(ja.getType())
+						.append(JAXBRMConstants.GTLT).append(ja.getDefault()).append(JAXBRMConstants.GTLT).append(ja.getChoice())
+						.append(JAXBRMConstants.GTLT).append(ja.getMax()).append(JAXBRMConstants.GTLT).append(ja.getMin())
+						.append(JAXBRMConstants.GTLT).append(ja.getValidator()).append(JAXBRMConstants.GTLT)
+						.append(ja.getDescription()).append(JAXBRMConstants.GTLT).append(ja.getTooltip()).append(ja.getValue())
+						.append(JAXBRMConstants.GT).append(JAXBRMConstants.LINE_SEP);
 			} else if (o instanceof PropertyType) {
 				PropertyType p = (PropertyType) o;
-				buffer.append(LT).append(p.getName()).append(GTLT).append(p.getValue()).append(GT).append(LINE_SEP);
+				buffer.append(JAXBRMConstants.LT).append(p.getName()).append(JAXBRMConstants.GTLT).append(p.getValue())
+						.append(JAXBRMConstants.GT).append(JAXBRMConstants.LINE_SEP);
 			} else {
-				buffer.append(LT).append(e.getKey()).append(GTLT).append(e.getValue()).append(GT).append(LINE_SEP);
+				buffer.append(JAXBRMConstants.LT).append(e.getKey()).append(JAXBRMConstants.GTLT).append(e.getValue())
+						.append(JAXBRMConstants.GT).append(JAXBRMConstants.LINE_SEP);
 			}
 		}
 		System.out.println(buffer);

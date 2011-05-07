@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.cell.SpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 import org.eclipse.swt.graphics.Color;
@@ -173,14 +174,14 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 */
 	public String getReplacedValue(String pattern) {
 		if (!isChecked()) {
-			return ZEROSTR;
+			return JAXBRMUIConstants.ZEROSTR;
 		}
 		String value = getValueAsString();
-		if (ZEROSTR.equals(value)) {
-			return ZEROSTR;
+		if (JAXBRMUIConstants.ZEROSTR.equals(value)) {
+			return JAXBRMUIConstants.ZEROSTR;
 		}
-		String result = pattern.replaceAll(NAME_TAG, name);
-		result = result.replaceAll(VALUE_TAG, value);
+		String result = pattern.replaceAll(JAXBRMUIConstants.NAME_TAG, name);
+		result = result.replaceAll(JAXBRMUIConstants.VALUE_TAG, value);
 		return result;
 	}
 
@@ -202,7 +203,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 		} else if (editor instanceof SpinnerCellEditor) {
 			return Integer.TYPE.getCanonicalName();
 		}
-		return STRING;
+		return JAXBRMUIConstants.STRING;
 	}
 
 	/*
@@ -269,7 +270,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 		refreshing = true;
 		mapValue = lcMap.get(name);
 		if (editor instanceof TextCellEditor) {
-			stringValue = ZEROSTR;
+			stringValue = JAXBRMUIConstants.ZEROSTR;
 			if (mapValue != null) {
 				stringValue = (String) mapValue;
 			}
@@ -294,8 +295,8 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 			}
 		} else if (editor instanceof ComboBoxCellEditor) {
 			if (mapValue == null) {
-				index = UNDEFINED;
-				stringValue = ZEROSTR;
+				index = JAXBRMUIConstants.UNDEFINED;
+				stringValue = JAXBRMUIConstants.ZEROSTR;
 			} else {
 				stringValue = (String) mapValue;
 				for (int i = 0; i < items.length; i++) {
@@ -305,8 +306,8 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 					}
 				}
 				if (index == items.length) {
-					index = UNDEFINED;
-					stringValue = ZEROSTR;
+					index = JAXBRMUIConstants.UNDEFINED;
+					stringValue = JAXBRMUIConstants.ZEROSTR;
 				}
 			}
 		}
@@ -359,7 +360,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 */
 	public void setValueFromEditor(Object value) {
 		if (editor instanceof TextCellEditor) {
-			stringValue = ZEROSTR;
+			stringValue = JAXBRMUIConstants.ZEROSTR;
 			if (value != null) {
 				stringValue = (String) value;
 			}
@@ -380,9 +381,9 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 			}
 			mapValue = integerValue;
 		} else if (editor instanceof ComboBoxCellEditor) {
-			if (value == null || ((Integer) value) == UNDEFINED) {
-				index = UNDEFINED;
-				stringValue = ZEROSTR;
+			if (value == null || ((Integer) value) == JAXBRMUIConstants.UNDEFINED) {
+				index = JAXBRMUIConstants.UNDEFINED;
+				stringValue = JAXBRMUIConstants.ZEROSTR;
 			} else {
 				index = (Integer) value;
 				stringValue = items[index];
@@ -415,6 +416,6 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 		} else if (editor instanceof SpinnerCellEditor) {
 			return String.valueOf(integerValue);
 		}
-		return ZEROSTR;
+		return JAXBRMUIConstants.ZEROSTR;
 	}
 }

@@ -19,9 +19,9 @@ import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -58,7 +58,7 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
  * 
  * @author arossi
  */
-public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
+public class LCVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
 
 	private Map<String, Object> globalValues;
@@ -86,9 +86,9 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 */
 	public Map<String, String> getChecked(String viewerName) {
 		Map<String, String> m = new HashMap<String, String>();
-		String checked = (String) values.get(CHECKED_ATTRIBUTES + viewerName);
+		String checked = (String) values.get(JAXBRMConstants.CHECKED_ATTRIBUTES + viewerName);
 		if (checked != null) {
-			String[] split = checked.split(SP);
+			String[] split = checked.split(JAXBRMConstants.SP);
 			for (String s : split) {
 				m.put(s, s);
 			}
@@ -117,7 +117,7 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	 */
 	public String getString(String value) {
 		try {
-			value = value.replaceAll(VRM, VLC);
+			value = value.replaceAll(JAXBRMConstants.VRM, JAXBRMConstants.VLC);
 			return dereference(value);
 		} catch (CoreException t) {
 			JAXBCorePlugin.log(t);
@@ -277,7 +277,7 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 			defVal = ja.getDefault();
 			o = ja.getValue();
 			String status = ja.getStatus();
-			put(name + PD + STATUS, status);
+			put(name + JAXBRMConstants.PD + JAXBRMConstants.STATUS, status);
 		} else {
 			throw new ArrayStoreException(Messages.IllegalVariableValueType + value.getClass());
 		}
@@ -305,13 +305,16 @@ public class LCVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 		Map<?, ?> attributes = configuration.getAttributes();
 		for (Object o : attributes.keySet()) {
 			String key = (String) o;
-			if (key.startsWith(DEBUG_PACKAGE) || key.startsWith(PTP_PACKAGE)) {
+			if (key.startsWith(JAXBRMConstants.DEBUG_PACKAGE) || key.startsWith(JAXBRMConstants.PTP_PACKAGE)) {
 				standard.put(key, attributes.get(key));
 			}
 		}
-		standard.put(DIRECTORY, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, ZEROSTR));
-		standard.put(EXEC_PATH, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, ZEROSTR));
-		standard.put(PROG_ARGS, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, ZEROSTR));
+		standard.put(JAXBRMConstants.DIRECTORY,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, JAXBRMConstants.ZEROSTR));
+		standard.put(JAXBRMConstants.EXEC_PATH,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBRMConstants.ZEROSTR));
+		standard.put(JAXBRMConstants.PROG_ARGS,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBRMConstants.ZEROSTR));
 		return standard;
 	}
 }

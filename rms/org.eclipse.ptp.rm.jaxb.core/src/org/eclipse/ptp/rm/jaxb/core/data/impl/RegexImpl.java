@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.jaxb.core.data.impl;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 
 /**
@@ -21,7 +21,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
  * @author arossi
  * 
  */
-public class RegexImpl implements IJAXBNonNLSConstants {
+public class RegexImpl {
 	private String expression;
 	private final boolean split;
 	private final Pattern pattern;
@@ -94,21 +94,21 @@ public class RegexImpl implements IJAXBNonNLSConstants {
 			return 0;
 		}
 		int f = 0;
-		String[] split = flags.split(REGPIP);
+		String[] split = flags.split(JAXBRMConstants.REGPIP);
 		for (String s : split) {
-			if (CASE_INSENSITIVE.equals(s.trim())) {
+			if (JAXBRMConstants.CASE_INSENSITIVE.equals(s.trim())) {
 				f |= Pattern.CASE_INSENSITIVE;
-			} else if (MULTILINE.equals(s.trim())) {
+			} else if (JAXBRMConstants.MULTILINE.equals(s.trim())) {
 				f |= Pattern.MULTILINE;
-			} else if (DOTALL.equals(s.trim())) {
+			} else if (JAXBRMConstants.DOTALL.equals(s.trim())) {
 				f |= Pattern.DOTALL;
-			} else if (UNICODE_CASE.equals(s.trim())) {
+			} else if (JAXBRMConstants.UNICODE_CASE.equals(s.trim())) {
 				f |= Pattern.UNICODE_CASE;
-			} else if (CANON_EQ.equals(s.trim())) {
+			} else if (JAXBRMConstants.CANON_EQ.equals(s.trim())) {
 				f |= Pattern.CANON_EQ;
-			} else if (LITERAL.equals(s.trim())) {
+			} else if (JAXBRMConstants.LITERAL.equals(s.trim())) {
 				f |= Pattern.LITERAL;
-			} else if (COMMENTS.equals(s.trim())) {
+			} else if (JAXBRMConstants.COMMENTS.equals(s.trim())) {
 				f |= Pattern.COMMENTS;
 			}
 		}

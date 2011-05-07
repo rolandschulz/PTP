@@ -13,16 +13,16 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.utils.FileUtils;
-import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
@@ -68,13 +68,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 
 				synchronized (this) {
 					try {
-						wait(IJAXBNonNLSConstants.STANDARD_WAIT);
+						wait(JAXBRMConstants.STANDARD_WAIT);
 					} catch (InterruptedException ignored) {
 					}
 				}
 			}
 		}
-
 	}
 
 	private final String rmUniqueName;
@@ -258,7 +257,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 		this.jobId = jobId;
 		String path = null;
 		RMVariableMap rmVarMap = control.getEnvironment();
-		Object o = rmVarMap.get(IJAXBNonNLSConstants.STDOUT_REMOTE_FILE);
+		Object o = rmVarMap.get(JAXBRMConstants.STDOUT_REMOTE_FILE);
 		if (o != null) {
 			if (o instanceof PropertyType) {
 				path = (String) ((PropertyType) o).getValue();
@@ -266,9 +265,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 				path = (String) ((PropertyType) o).getValue();
 			}
 			path = rmVarMap.getString(path);
-			remoteOutputPath = path.replaceAll(IJAXBNonNLSConstants.JOB_ID_TAG, jobId);
+			remoteOutputPath = path.replaceAll(JAXBRMConstants.JOB_ID_TAG, jobId);
 		}
-		o = rmVarMap.get(IJAXBNonNLSConstants.STDERR_REMOTE_FILE);
+		o = rmVarMap.get(JAXBRMConstants.STDERR_REMOTE_FILE);
 		if (o != null) {
 			if (o instanceof PropertyType) {
 				path = (String) ((PropertyType) o).getValue();
@@ -276,7 +275,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				path = (String) ((AttributeType) o).getValue();
 			}
 			path = rmVarMap.getString(path);
-			remoteErrorPath = path.replaceAll(IJAXBNonNLSConstants.JOB_ID_TAG, jobId);
+			remoteErrorPath = path.replaceAll(JAXBRMConstants.JOB_ID_TAG, jobId);
 		}
 	}
 

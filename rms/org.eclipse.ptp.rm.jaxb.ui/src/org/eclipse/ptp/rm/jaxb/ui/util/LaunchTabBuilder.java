@@ -39,8 +39,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.ViewerItemsType;
 import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.launch.JAXBDynamicLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.model.ViewerUpdateModel;
@@ -66,7 +66,7 @@ import org.eclipse.swt.widgets.Widget;
  * @author arossi
  * 
  */
-public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
+public class LaunchTabBuilder {
 
 	private final JAXBDynamicLaunchConfigurationTab tab;
 	private final RMVariableMap rmVarMap;
@@ -132,9 +132,9 @@ public class LaunchTabBuilder implements IJAXBUINonNLSConstants {
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
 		Button showHide = WidgetBuilderUtils.createCheckButton(parent, Messages.ToggleShowHideSelectedAttributes, null);
 		ColumnViewer viewer = null;
-		if (TABLE.equals(descriptor.getType())) {
+		if (JAXBRMUIConstants.TABLE.equals(descriptor.getType())) {
 			viewer = addCheckboxTableViewer(parent, data, layout, style, descriptor);
-		} else if (TREE.equals(descriptor.getType())) {
+		} else if (JAXBRMUIConstants.TREE.equals(descriptor.getType())) {
 			viewer = addCheckboxTreeViewer(parent, data, layout, style, descriptor);
 		}
 		if (viewer != null) {

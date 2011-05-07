@@ -28,7 +28,7 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
+public class JAXBCorePlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.jaxb.core"; //$NON-NLS-1$
@@ -126,7 +126,7 @@ public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
 		URL url = null;
 		if (getDefault() != null) {
 			Bundle bundle = getDefault().getBundle();
-			url = FileLocator.find(bundle, new Path(PATH_SEP + resource), null);
+			url = FileLocator.find(bundle, new Path(JAXBRMConstants.PATH_SEP + resource), null);
 		} else {
 			url = new File(resource).toURI().toURL();
 		}

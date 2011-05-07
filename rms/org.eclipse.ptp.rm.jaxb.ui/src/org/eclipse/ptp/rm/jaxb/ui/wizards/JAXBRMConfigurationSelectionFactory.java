@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
@@ -48,7 +48,7 @@ import org.osgi.framework.Bundle;
  * configurations.
  * 
  */
-public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectionFactory implements IJAXBUINonNLSConstants {
+public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectionFactory {
 
 	/**
 	 * For searching the "resourceManagers" project for .xml files.
@@ -56,7 +56,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	private static final FilenameFilter xmlFilter = new FilenameFilter() {
 		public boolean accept(File dir, String name) {
 			File f = new File(dir, name);
-			return name.endsWith(DOT_XML) && f.isFile();
+			return name.endsWith(JAXBRMUIConstants.DOT_XML) && f.isFile();
 		}
 	};
 
@@ -129,14 +129,14 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	 */
 	static void loadExtensions(Map<String, URL> resourceManagers) {
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(RM_CONFIG_EXTENSION_POINT);
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(JAXBRMUIConstants.RM_CONFIG_EXTENSION_POINT);
 
 		if (extensionPoint != null) {
 			for (IExtension ext : extensionPoint.getExtensions()) {
 				for (IConfigurationElement ce : ext.getConfigurationElements()) {
-					ce.getAttribute(ID);
-					String name = ce.getAttribute(NAME);
-					String configurationFile = ce.getAttribute(CONFIGURATION_FILE_ATTRIBUTE);
+					ce.getAttribute(JAXBRMUIConstants.ID);
+					String name = ce.getAttribute(JAXBRMUIConstants.NAME);
+					String configurationFile = ce.getAttribute(JAXBRMUIConstants.CONFIGURATION_FILE_ATTRIBUTE);
 					String bundleId = ce.getDeclaringExtension().getContributor().getName();
 					Bundle bundle = Platform.getBundle(bundleId);
 					if (bundle != null) {
@@ -161,7 +161,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	 *            the first time.
 	 */
 	private static void loadExternal(boolean showError) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(RESOURCE_MANAGERS);
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBRMUIConstants.RESOURCE_MANAGERS);
 		StringBuffer invalid = new StringBuffer();
 		if (project != null) {
 			IPath path = project.getLocation();
@@ -177,7 +177,7 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 						try {
 							JAXBInitializationUtils.validate(url);
 						} catch (Throwable t) {
-							invalid.append(LINE_SEP).append(name);
+							invalid.append(JAXBRMUIConstants.LINE_SEP).append(name);
 							JAXBUIPlugin.log(t.getMessage());
 							continue;
 						}
