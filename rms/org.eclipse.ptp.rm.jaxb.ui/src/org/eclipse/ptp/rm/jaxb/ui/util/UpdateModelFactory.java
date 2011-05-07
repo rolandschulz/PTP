@@ -22,6 +22,7 @@ import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ptp.remote.ui.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
@@ -33,8 +34,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.TemplateType;
 import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.cell.SpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
@@ -66,7 +67,7 @@ import org.eclipse.swt.widgets.Text;
  * @author arossi
  * 
  */
-public class UpdateModelFactory implements IJAXBUINonNLSConstants {
+public class UpdateModelFactory {
 
 	/**
 	 * Internal data object for configuration convenience.
@@ -105,7 +106,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 				readOnly = a.isReadOnly();
 				tooltip = a.getTooltip();
 				if (tooltip == null) {
-					tooltip = ZEROSTR;
+					tooltip = JAXBRMUIConstants.ZEROSTR;
 				} else {
 					tooltip = WidgetBuilderUtils.removeTabOrLineBreak(tooltip);
 				}
@@ -116,7 +117,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 				readOnly = p.isReadOnly();
 			}
 			if (description == null) {
-				description = ZEROSTR;
+				description = JAXBRMUIConstants.ZEROSTR;
 			}
 			int cols = columnData.size();
 			foreground = new Color[cols];
@@ -208,19 +209,19 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		 * @return enum value for editor
 		 */
 		private static CellEditorType getTypeFromClass(String clzz) {
-			if (clzz.indexOf(NT) > 0) {
+			if (clzz.indexOf(JAXBRMUIConstants.NT) > 0) {
 				return SPINNER;
 			}
-			if (clzz.indexOf(BOOL) >= 0) {
+			if (clzz.indexOf(JAXBRMUIConstants.BOOL) >= 0) {
 				return CHECK;
 			}
-			if (clzz.indexOf(IST) > 0) {
+			if (clzz.indexOf(JAXBRMUIConstants.IST) > 0) {
 				return COMBO;
 			}
-			if (clzz.indexOf(ET) > 0) {
+			if (clzz.indexOf(JAXBRMUIConstants.ET) > 0) {
 				return COMBO;
 			}
-			if (clzz.indexOf(ECTOR) > 0) {
+			if (clzz.indexOf(JAXBRMUIConstants.ECTOR) > 0) {
 				return COMBO;
 			}
 			return TEXT;
@@ -316,7 +317,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		 */
 		private void setMapDependentData(WidgetType widget, RMVariableMap rmMap) {
 			if (tooltip == null) {
-				tooltip = ZEROSTR;
+				tooltip = JAXBRMUIConstants.ZEROSTR;
 			} else {
 				tooltip = WidgetBuilderUtils.removeTabOrLineBreak(rmMap.getString(tooltip));
 			}
@@ -420,7 +421,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		IUpdateModel model = null;
 		if (control instanceof Text) {
-			if (name != null && !ZEROSTR.equals(name)) {
+			if (name != null && !JAXBRMUIConstants.ZEROSTR.equals(name)) {
 				model = new TextUpdateModel(name, handler, (Text) control);
 			}
 			if (dynamic != null) {
@@ -481,7 +482,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 * @return the text widget carrying the browse selection
 	 */
 	private static Text createBrowse(final Composite parent, final ControlDescriptor cd, final JAXBDynamicLaunchConfigurationTab tab) {
-		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, ZEROSTR);
+		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, JAXBRMUIConstants.ZEROSTR);
 		WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.PUSH, new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -492,7 +493,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 				try {
 					String initial = t.getText();
 					URI uri = null;
-					if (ZEROSTR.equals(initial)) {
+					if (JAXBRMUIConstants.ZEROSTR.equals(initial)) {
 						uri = tab.getParent().getDelegate().getRemoteHome();
 					} else {
 						uri = new URI(initial);
@@ -506,7 +507,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 							t.setText(uri.getPath());
 						}
 					} else {
-						t.setText(ZEROSTR);
+						t.setText(JAXBRMUIConstants.ZEROSTR);
 					}
 				} catch (Throwable t) {
 					JAXBUIPlugin.log(t);
@@ -530,7 +531,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		if (cd.valueList != null) {
 			items = cd.valueList.toArray(new String[0]);
 		} else if (cd.choice != null) {
-			items = cd.choice.split(CM);
+			items = cd.choice.split(JAXBRMUIConstants.CM);
 		}
 		if (items == null) {
 			items = new String[0];
@@ -539,7 +540,8 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 				items = WidgetBuilderUtils.normalizeComboItems(items);
 			}
 		}
-		return WidgetBuilderUtils.createCombo(parent, cd.style, cd.layoutData, items, ZEROSTR, cd.title, cd.tooltip, null);
+		return WidgetBuilderUtils.createCombo(parent, cd.style, cd.layoutData, items, JAXBRMUIConstants.ZEROSTR, cd.title,
+				cd.tooltip, null);
 	}
 
 	/**
@@ -569,24 +571,24 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 		String type = widget.getType();
 
 		Control c = null;
-		if (LABEL.equals(type)) {
+		if (JAXBRMUIConstants.LABEL.equals(type)) {
 			c = WidgetBuilderUtils.createLabel(parent, cd.fixedText, cd.style, cd.layoutData);
-		} else if (TEXT.equals(type)) {
+		} else if (JAXBRMUIConstants.TEXT.equals(type)) {
 			c = createText(parent, cd);
-		} else if (RADIOBUTTON.equals(type)) {
+		} else if (JAXBRMUIConstants.RADIOBUTTON.equals(type)) {
 			c = WidgetBuilderUtils.createRadioButton(parent, cd.title, null, null);
-		} else if (CHECKBOX.equals(type)) {
+		} else if (JAXBRMUIConstants.CHECKBOX.equals(type)) {
 			c = WidgetBuilderUtils.createCheckButton(parent, cd.title, null);
-		} else if (SPINNER.equals(type)) {
+		} else if (JAXBRMUIConstants.SPINNER.equals(type)) {
 			c = WidgetBuilderUtils.createSpinner(parent, cd.layoutData, cd.title, cd.min, cd.max, cd.min, null);
-		} else if (COMBO.equals(type)) {
+		} else if (JAXBRMUIConstants.COMBO.equals(type)) {
 			c = createCombo(parent, cd);
-		} else if (BROWSE.equals(type)) {
+		} else if (JAXBRMUIConstants.BROWSE.equals(type)) {
 			c = createBrowse(parent, cd, tab);
 		}
 
 		if (c != null) {
-			if (!ZEROSTR.equals(cd.tooltip)) {
+			if (!JAXBRMUIConstants.ZEROSTR.equals(cd.tooltip)) {
 				c.setToolTipText(cd.tooltip);
 			}
 			if (cd.foreground != null) {
@@ -632,7 +634,7 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 			if (data instanceof AttributeType) {
 				if (cd.choice != null) {
 					cd.choice = cd.choice.trim();
-					cd.items = cd.choice.split(CM);
+					cd.items = cd.choice.split(JAXBRMUIConstants.CM);
 				} else {
 					o = ((AttributeType) data).getValue();
 				}
@@ -737,6 +739,6 @@ public class UpdateModelFactory implements IJAXBUINonNLSConstants {
 	 * @return SWT text widget
 	 */
 	private static Text createText(final Composite parent, final ControlDescriptor cd) {
-		return WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, ZEROSTR);
+		return WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, JAXBRMUIConstants.ZEROSTR);
 	}
 }

@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IDynamicVariable;
 import org.eclipse.core.variables.IDynamicVariableResolver;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 
@@ -30,7 +30,7 @@ import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
  * @author arossi
  * 
  */
-public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLSConstants {
+public class RMVariableResolver implements IDynamicVariableResolver {
 
 	private static RMVariableMap active;
 
@@ -43,7 +43,7 @@ public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 	 * takes.
 	 */
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
-		String[] parts = argument.split(PDRX);
+		String[] parts = argument.split(JAXBRMConstants.PDRX);
 		Object value = active.get(parts[0]);
 		if (value != null) {
 			if (parts.length == 2) {
@@ -85,7 +85,7 @@ public class RMVariableResolver implements IDynamicVariableResolver, IJAXBNonNLS
 	 */
 	private static String invokeGetter(Object target, String string) throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-		String name = GET + string.substring(0, 1).toUpperCase() + string.substring(1);
+		String name = JAXBRMConstants.GET + string.substring(0, 1).toUpperCase() + string.substring(1);
 		Method getter = target.getClass().getDeclaredMethod(name, (Class[]) null);
 		Object result = getter.invoke(target, (Object[]) null);
 		if (result == null) {

@@ -20,9 +20,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IMatchable;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 import org.eclipse.ptp.rm.jaxb.core.data.TargetType;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
@@ -64,7 +64,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  * @author arossi
  * 
  */
-public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXBNonNLSConstants, Runnable {
+public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runnable {
 
 	public static final String EXT_ID = "org.eclipse.ptp.rm.jaxb.configurableRegexTokenizer"; //$NON-NLS-1$
 
@@ -209,7 +209,7 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 			int read = 0;
 			try {
 				read = in.read(chars, 0, len);
-				if (read == EOF) {
+				if (read == JAXBRMConstants.EOF) {
 					endOfStream = true;
 					break;
 				}
@@ -361,10 +361,10 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, IJAXB
 	 * @return the non-escaped char
 	 */
 	private static char getChar(String delim) {
-		if (delim.indexOf(RTESC) >= 0 || delim.indexOf(LNESC) >= 0) {
-			return LINE_SEP.charAt(0);
-		} else if (delim.indexOf(TBESC) >= 0) {
-			return TAB.charAt(0);
+		if (delim.indexOf(JAXBRMConstants.RTESC) >= 0 || delim.indexOf(JAXBRMConstants.LNESC) >= 0) {
+			return JAXBRMConstants.LINE_SEP.charAt(0);
+		} else if (delim.indexOf(JAXBRMConstants.TBESC) >= 0) {
+			return JAXBRMConstants.TAB.charAt(0);
 		}
 		return delim.charAt(0);
 	}

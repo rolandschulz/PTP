@@ -16,9 +16,9 @@ import java.util.TreeMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
 /**
@@ -37,7 +37,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
  * @author arossi
  * 
  */
-public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
+public class RMVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
 
 	private final Map<String, Object> variables;
@@ -103,7 +103,7 @@ public class RMVariableMap implements IVariableMap, IJAXBNonNLSConstants {
 	public String getString(String jobId, String value) {
 		try {
 			if (jobId != null) {
-				value = value.replaceAll(JOB_ID_TAG, jobId);
+				value = value.replaceAll(JAXBRMConstants.JOB_ID_TAG, jobId);
 			}
 			return dereference(value);
 		} catch (CoreException t) {

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.TestType;
 import org.eclipse.ptp.rm.jaxb.core.data.TestType.Else;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -50,7 +50,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  * @author arossi
  * 
  */
-public class TestImpl implements IJAXBNonNLSConstants {
+public class TestImpl {
 
 	private static final short sEQ = 0;
 	private static final short sLT = 1;
@@ -286,30 +286,30 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	 */
 	private String getOp(short op) {
 		if (sEQ == op) {
-			return xEQ;
+			return JAXBRMConstants.xEQ;
 		}
 		if (sLT == op) {
-			return xLT;
+			return JAXBRMConstants.xLT;
 		}
 		if (sGT == op) {
-			return xGT;
+			return JAXBRMConstants.xGT;
 		}
 		if (sLE == op) {
-			return xLE;
+			return JAXBRMConstants.xLE;
 		}
 		if (sGE == op) {
-			return xGE;
+			return JAXBRMConstants.xGE;
 		}
 		if (sAND == op) {
-			return AND;
+			return JAXBRMConstants.AND;
 		}
 		if (sOR == op) {
-			return OR;
+			return JAXBRMConstants.OR;
 		}
 		if (sNOT == op) {
-			return NOT;
+			return JAXBRMConstants.NOT;
 		}
-		return EQ;
+		return JAXBRMConstants.EQ;
 	}
 
 	/**
@@ -320,28 +320,28 @@ public class TestImpl implements IJAXBNonNLSConstants {
 	 * @return short value
 	 */
 	private short getOp(String op) {
-		if (xEQ.equalsIgnoreCase(op)) {
+		if (JAXBRMConstants.xEQ.equalsIgnoreCase(op)) {
 			return sEQ;
 		}
-		if (xLT.equalsIgnoreCase(op)) {
+		if (JAXBRMConstants.xLT.equalsIgnoreCase(op)) {
 			return sLT;
 		}
-		if (xGT.equalsIgnoreCase(op)) {
+		if (JAXBRMConstants.xGT.equalsIgnoreCase(op)) {
 			return sGT;
 		}
-		if (xLE.equalsIgnoreCase(op)) {
+		if (JAXBRMConstants.xLE.equalsIgnoreCase(op)) {
 			return sLE;
 		}
-		if (xGE.equalsIgnoreCase(op)) {
+		if (JAXBRMConstants.xGE.equalsIgnoreCase(op)) {
 			return sGE;
 		}
-		if (AND.equalsIgnoreCase(op)) {
+		if (JAXBRMConstants.AND.equalsIgnoreCase(op)) {
 			return sAND;
 		}
-		if (OR.equalsIgnoreCase(op)) {
+		if (JAXBRMConstants.OR.equalsIgnoreCase(op)) {
 			return sOR;
 		}
-		if (NOT.equalsIgnoreCase(op)) {
+		if (JAXBRMConstants.NOT.equalsIgnoreCase(op)) {
 			return sNOT;
 		}
 		return sEQ;

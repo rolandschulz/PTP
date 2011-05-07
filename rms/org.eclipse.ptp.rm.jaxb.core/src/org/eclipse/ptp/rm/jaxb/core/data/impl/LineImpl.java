@@ -2,7 +2,6 @@ package org.eclipse.ptp.rm.jaxb.core.data.impl;
 
 import java.util.List;
 
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.LineType;
@@ -13,7 +12,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.LineType;
  * @author arossi
  * 
  */
-public class LineImpl implements IJAXBNonNLSConstants {
+public class LineImpl {
 
 	private final String uuid;
 	private final IVariableMap map;

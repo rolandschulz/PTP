@@ -20,7 +20,6 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -43,8 +42,7 @@ import org.eclipse.swt.widgets.Composite;
  * @author arossi
  * 
  */
-public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunchConfigurationDynamicTab implements
-		IJAXBUINonNLSConstants {
+public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunchConfigurationDynamicTab {
 
 	protected final JAXBControllerLaunchConfigurationTab parentTab;
 	protected final Map<String, Object> localMap;

@@ -21,14 +21,15 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
@@ -44,7 +45,6 @@ import org.eclipse.ptp.rm.jaxb.core.runnable.command.CommandJob;
 import org.eclipse.ptp.rm.jaxb.core.runnable.command.CommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.JobIdPinTable;
-import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
@@ -69,8 +69,7 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
  * @author arossi
  * 
  */
-public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl,
-		IJAXBNonNLSConstants {
+public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl {
 
 	private final IJAXBResourceManagerConfiguration config;
 
@@ -288,7 +287,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 
 			// XXX eliminate when monitoring is in place
-			System.out.println(Messages.RefreshedJobStatusMessage + jobId + CM + SP + status.getState());
+			System.out.println(Messages.RefreshedJobStatusMessage + jobId + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ status.getState());
 			return status;
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
@@ -450,8 +450,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 * to ensure the most recent script is used at the next call
 			 */
 			rmVarMap.remove(jobId);
-			rmVarMap.remove(SCRIPT_PATH);
-			rmVarMap.remove(SCRIPT);
+			rmVarMap.remove(JAXBRMConstants.SCRIPT_PATH);
+			rmVarMap.remove(JAXBRMConstants.SCRIPT);
 			return status;
 		} finally {
 			pinTable.release(uuid);
@@ -577,7 +577,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		if (command == null) {
-			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + SP + uuid + SP + mode, null);
+			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + JAXBRMConstants.SP + uuid + JAXBRMConstants.SP
+					+ mode, null);
 		}
 
 		/*
@@ -655,18 +656,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @return the set of managed files, possibly with the script file added
 	 */
 	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files) {
-		PropertyType scriptVar = (PropertyType) rmVarMap.get(SCRIPT);
-		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(SCRIPT_PATH);
+		PropertyType scriptVar = (PropertyType) rmVarMap.get(JAXBRMConstants.SCRIPT);
+		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(JAXBRMConstants.SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
-				files.setFileStagingLocation(ECLIPSESETTINGS);
+				files.setFileStagingLocation(JAXBRMConstants.ECLIPSESETTINGS);
 			}
 			List<ManagedFileType> fileList = files.getFile();
 			ManagedFileType scriptFile = null;
 			if (!fileList.isEmpty()) {
 				for (ManagedFileType f : fileList) {
-					if (f.getName().equals(SCRIPT_FILE)) {
+					if (f.getName().equals(JAXBRMConstants.SCRIPT_FILE)) {
 						scriptFile = f;
 						break;
 					}
@@ -674,7 +675,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 			if (scriptFile == null) {
 				scriptFile = new ManagedFileType();
-				scriptFile.setName(SCRIPT_FILE);
+				scriptFile.setName(JAXBRMConstants.SCRIPT_FILE);
 				fileList.add(scriptFile);
 			}
 			scriptFile.setResolveContents(false);
@@ -683,7 +684,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				scriptFile.setPath(String.valueOf(scriptPathVar.getValue()));
 				scriptFile.setDeleteAfterUse(false);
 			} else {
-				scriptFile.setContents(OPENVRM + SCRIPT + PD + VALUE + CLOSV);
+				scriptFile.setContents(JAXBRMConstants.OPENVRM + JAXBRMConstants.SCRIPT + JAXBRMConstants.PD
+						+ JAXBRMConstants.VALUE + JAXBRMConstants.CLOSV);
 				scriptFile.setDeleteAfterUse(true);
 			}
 		}
@@ -760,7 +762,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 *            from the environment
 	 */
 	private void maybeHandleScript(String uuid, ScriptType script) {
-		PropertyType p = (PropertyType) rmVarMap.get(SCRIPT_PATH);
+		PropertyType p = (PropertyType) rmVarMap.get(JAXBRMConstants.SCRIPT_PATH);
 		if (p != null && p.getValue() != null) {
 			return;
 		}
@@ -871,8 +873,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void setFixedConfigurationProperties() {
 		IRemoteConnection rc = getRemoteServicesDelegate().getRemoteConnection();
-		rmVarMap.maybeAddProperty(CONTROL_USER_VAR, rc.getUsername(), false);
-		rmVarMap.maybeAddProperty(CONTROL_ADDRESS_VAR, rc.getAddress(), false);
+		rmVarMap.maybeAddProperty(JAXBRMConstants.CONTROL_USER_VAR, rc.getUsername(), false);
+		rmVarMap.maybeAddProperty(JAXBRMConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 	}
 
 	/**
@@ -924,10 +926,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * pull these out of the configuration; they are needed for the script
 		 */
-		rmVarMap.maybeOverwrite(SCRIPT_PATH, SCRIPT_PATH, configuration);
-		rmVarMap.maybeOverwrite(DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
-		rmVarMap.maybeOverwrite(EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
-		rmVarMap.maybeOverwrite(PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
+		rmVarMap.maybeOverwrite(JAXBRMConstants.SCRIPT_PATH, JAXBRMConstants.SCRIPT_PATH, configuration);
+		rmVarMap.maybeOverwrite(JAXBRMConstants.DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
+		rmVarMap.maybeOverwrite(JAXBRMConstants.EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
+		rmVarMap.maybeOverwrite(JAXBRMConstants.PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
 		setFixedConfigurationProperties();
 
 		launchEnv.clear();

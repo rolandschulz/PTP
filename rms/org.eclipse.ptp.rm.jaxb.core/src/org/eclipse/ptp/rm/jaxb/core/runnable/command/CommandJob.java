@@ -34,14 +34,15 @@ import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
@@ -50,7 +51,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
-import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
@@ -62,7 +62,7 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
  * @author arossi
  * 
  */
-public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants {
+public class CommandJob extends Job implements ICommandJob {
 
 	/**
 	 * Internal class used for multiplexing output streams between two different
@@ -90,8 +90,8 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 			assert (pipe1 != null && pipe2 != null);
 			pout = new PipedOutputStream[] { new PipedOutputStream(pipe1), new PipedOutputStream(pipe2) };
 			boutList = new ArrayList<BufferedOutputStream>();
-			boutList.add(new BufferedOutputStream(pout[0], STREAM_BUFFER_SIZE));
-			boutList.add(new BufferedOutputStream(pout[1], STREAM_BUFFER_SIZE));
+			boutList.add(new BufferedOutputStream(pout[0], JAXBRMConstants.STREAM_BUFFER_SIZE));
+			boutList.add(new BufferedOutputStream(pout[1], JAXBRMConstants.STREAM_BUFFER_SIZE));
 		}
 
 		/**
@@ -117,7 +117,7 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 							 * we need to check for this here because the
 							 * tokenizer can be set to exit early
 							 */
-							if (dead.getMessage().indexOf(DEAD) >= 0) {
+							if (dead.getMessage().indexOf(JAXBRMConstants.DEAD) >= 0) {
 								b.remove();
 								try {
 									stream.close();
@@ -387,7 +387,8 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 			if (exit != 0 && !ignoreExitStatus) {
 				String t = error.toString();
 				error.setLength(0);
-				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (ZEROSTR + exit) + SP + CO + t, null);
+				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (JAXBRMConstants.ZEROSTR + exit)
+						+ JAXBRMConstants.SP + JAXBRMConstants.CO + t, null);
 			}
 
 			joinConsumers();
@@ -414,13 +415,13 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 			return IRemoteProcessBuilder.NONE;
 		}
 
-		String[] split = flags.split(REGPIP);
+		String[] split = flags.split(JAXBRMConstants.REGPIP);
 		int f = IRemoteProcessBuilder.NONE;
 		for (String s : split) {
 			s = s.trim();
-			if (TAG_ALLOCATE_PTY.equals(s)) {
+			if (JAXBRMConstants.TAG_ALLOCATE_PTY.equals(s)) {
 				f |= IRemoteProcessBuilder.ALLOCATE_PTY;
-			} else if (TAG_FORWARD_X11.equals(s)) {
+			} else if (JAXBRMConstants.TAG_FORWARD_X11.equals(s)) {
 				f |= IRemoteProcessBuilder.FORWARD_X11;
 			}
 		}
@@ -675,7 +676,7 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 		OutputStream stream = process.getOutputStream();
 		try {
 			stream.write(prepareInput().getBytes());
-			stream.write(LINE_SEP.getBytes());
+			stream.write(JAXBRMConstants.LINE_SEP.getBytes());
 			stream.flush();
 		} catch (Throwable t) {
 			return CoreExceptionUtils.getErrorStatus(Messages.ProcessRunError, t);
@@ -693,13 +694,13 @@ public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants
 	 */
 	public static IStreamParserTokenizer getTokenizer(String type) throws CoreException {
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBCorePlugin.PLUGIN_ID,
-				TOKENIZER_EXT_PT);
+				JAXBRMConstants.TOKENIZER_EXT_PT);
 		IConfigurationElement[] elements = extensionPoint.getConfigurationElements();
 		for (int i = 0; i < elements.length; i++) {
 			IConfigurationElement element = elements[i];
 			try {
-				if (element.getAttribute(ID).equals(type)) {
-					return (IStreamParserTokenizer) element.createExecutableExtension(CLASS);
+				if (element.getAttribute(JAXBRMConstants.ID).equals(type)) {
+					return (IStreamParserTokenizer) element.createExecutableExtension(JAXBRMConstants.CLASS);
 				}
 			} catch (CoreException ce) {
 				throw ce;

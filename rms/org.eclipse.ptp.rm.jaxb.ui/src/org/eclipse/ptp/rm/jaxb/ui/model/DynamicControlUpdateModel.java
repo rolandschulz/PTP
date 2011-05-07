@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.ArgImpl;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 
 /**
@@ -40,7 +41,7 @@ public abstract class DynamicControlUpdateModel extends AbstractUpdateModel {
 	 *            values
 	 */
 	protected DynamicControlUpdateModel(List<ArgType> dynamic, ValueUpdateHandler handler) {
-		super(ZEROSTR, handler);
+		super(JAXBRMUIConstants.ZEROSTR, handler);
 		this.dynamic = dynamic;
 	}
 

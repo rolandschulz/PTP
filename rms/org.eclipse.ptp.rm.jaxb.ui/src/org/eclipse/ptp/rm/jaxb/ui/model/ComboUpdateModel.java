@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.model;
 
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.swt.events.ModifyEvent;
@@ -72,7 +73,7 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 			return;
 		}
 		validateJob.cancel();
-		validateJob.schedule(VALIDATE_TIMER);
+		validateJob.schedule(JAXBRMUIConstants.VALIDATE_TIMER);
 	}
 
 	/*
@@ -84,7 +85,7 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	public void refreshValueFromMap() {
 		refreshing = true;
 		mapValue = lcMap.get(name);
-		String s = ZEROSTR;
+		String s = JAXBRMUIConstants.ZEROSTR;
 		if (mapValue != null) {
 			s = (String) mapValue;
 		}

@@ -15,7 +15,7 @@ package org.eclipse.ptp.rm.jaxb.core;
  * 
  * @since 5.0
  */
-public interface IJAXBNonNLSConstants {
+public class JAXBRMConstants {
 
 	public static final int UNDEFINED = -1;
 	public static final int COPY_BUFFER_SIZE = 64 * 1024;
@@ -114,7 +114,6 @@ public interface IJAXBNonNLSConstants {
 	public static final String NAME_TAG = AT + NAME;
 	public static final String VALUE_TAG = AT + VALUE;
 	public static final String DEAD = "dead";//$NON-NLS-1$
-	public static final String COPY = "copy";//$NON-NLS-1$
 
 	/* TYPE MATCHING */
 	public static final String NT = "nt";//$NON-NLS-1$

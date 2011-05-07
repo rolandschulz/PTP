@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 
 /**
@@ -34,7 +34,7 @@ import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
  * @author arossi
  * 
  */
-public class FileUtils implements IJAXBNonNLSConstants {
+public class FileUtils {
 
 	/**
 	 * @param from
@@ -65,8 +65,8 @@ public class FileUtils implements IJAXBNonNLSConstants {
 
 		IFileStore lres = from.getResource(source);
 		if (!lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5)).exists()) {
-			throw CoreExceptionUtils.newException(Messages.Copy_Operation_Local_resource_does_not_exist + CO + SP + lres.getName(),
-					null);
+			throw CoreExceptionUtils.newException(Messages.Copy_Operation_Local_resource_does_not_exist + JAXBRMConstants.CO
+					+ JAXBRMConstants.SP + lres.getName(), null);
 		}
 		IFileStore rres = to.getResource(target);
 		lres.copy(rres, EFS.OVERWRITE, new SubProgressMonitor(progress, 5));
@@ -129,22 +129,23 @@ public class FileUtils implements IJAXBNonNLSConstants {
 
 		IFileStore lres = manager.getResource(path);
 		if (!lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5)).exists()) {
-			throw CoreExceptionUtils.newException(Messages.Read_Operation_resource_does_not_exist + CO + SP + lres.getName(), null);
+			throw CoreExceptionUtils.newException(Messages.Read_Operation_resource_does_not_exist + JAXBRMConstants.CO
+					+ JAXBRMConstants.SP + lres.getName(), null);
 		}
 		BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE, progress));
 		StringBuffer sb = new StringBuffer();
-		byte[] buffer = new byte[COPY_BUFFER_SIZE];
+		byte[] buffer = new byte[JAXBRMConstants.COPY_BUFFER_SIZE];
 		int rcvd = 0;
 
 		try {
 			while (true) {
 				try {
-					rcvd = is.read(buffer, 0, COPY_BUFFER_SIZE);
+					rcvd = is.read(buffer, 0, JAXBRMConstants.COPY_BUFFER_SIZE);
 				} catch (EOFException eof) {
 					break;
 				}
 
-				if (rcvd == UNDEFINED) {
+				if (rcvd == JAXBRMConstants.UNDEFINED) {
 					break;
 				}
 				sb.append(new String(buffer, 0, rcvd));

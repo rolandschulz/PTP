@@ -7,25 +7,20 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.core.utils;
+package org.eclipse.ptp.remote.core;
 
 import java.net.URI;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 
 /**
  * A wrapper for holding initialized remote services information.
  * 
  * @author arossi
+ * @since 5.0
  * 
  */
-public class RemoteServicesDelegate implements IJAXBNonNLSConstants {
+public class RemoteServicesDelegate {
 	private final IRemoteServices remoteServices;
 	private final IRemoteServices localServices;
 	private final IRemoteConnectionManager remoteConnectionManager;
@@ -56,7 +51,7 @@ public class RemoteServicesDelegate implements IJAXBNonNLSConstants {
 		 * Since it's a local service, it doesn't matter which parameter is
 		 * passed
 		 */
-		localConnection = localConnectionManager.getConnection(ZEROSTR);
+		localConnection = localConnectionManager.getConnection("");//$NON-NLS-1$
 		assert (localConnection != null);
 		localFileManager = localServices.getFileManager(localConnection);
 		assert (localFileManager != null);
@@ -120,5 +115,4 @@ public class RemoteServicesDelegate implements IJAXBNonNLSConstants {
 	public IRemoteServices getRemoteServices() {
 		return remoteServices;
 	}
-
 }

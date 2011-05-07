@@ -13,7 +13,6 @@ package org.eclipse.ptp.rm.jaxb.ui.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.SWT;
@@ -32,7 +31,7 @@ import org.eclipse.swt.widgets.Text;
  * 
  * @author arossi
  */
-public class ScrollingEditableMessageDialog extends MessageDialog implements IJAXBUINonNLSConstants {
+public class ScrollingEditableMessageDialog extends MessageDialog {
 	public static final int DEFAULT_INDEX = 0;
 	public static final String[] DEFAULT_LABELS = { Messages.DialogClose };
 

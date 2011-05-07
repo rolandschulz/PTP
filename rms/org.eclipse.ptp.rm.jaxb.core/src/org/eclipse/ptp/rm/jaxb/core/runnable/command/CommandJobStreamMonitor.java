@@ -22,8 +22,8 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamMonitor;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 
@@ -40,7 +40,7 @@ import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
  * @author arossi
  * 
  */
-public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBNonNLSConstants {
+public class CommandJobStreamMonitor implements ICommandJobStreamMonitor {
 	class ContentNotifier implements ISafeRunnable {
 
 		private IStreamListener fListener;
@@ -106,7 +106,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 		fStream = stream;
 		fEncoding = encoding;
 		fContents = new StringBuffer();
-		bufferLimit = UNDEFINED;
+		bufferLimit = JAXBRMConstants.UNDEFINED;
 		fListeners = new ListenerList();
 	}
 
@@ -216,7 +216,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 
 		lastSleep = System.currentTimeMillis();
 		long currentTime = lastSleep;
-		byte[] bytes = new byte[STREAM_BUFFER_SIZE];
+		byte[] bytes = new byte[JAXBRMConstants.STREAM_BUFFER_SIZE];
 		int read = 0;
 		while (read >= 0) {
 			try {
@@ -234,7 +234,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor, IJAXBN
 					synchronized (this) {
 						fContents.append(text);
 						int len = fContents.length();
-						if (bufferLimit != UNDEFINED && len > bufferLimit) {
+						if (bufferLimit != JAXBRMConstants.UNDEFINED && len > bufferLimit) {
 							fContents.delete(0, len - bufferLimit);
 						}
 						fireStreamAppended(text);
