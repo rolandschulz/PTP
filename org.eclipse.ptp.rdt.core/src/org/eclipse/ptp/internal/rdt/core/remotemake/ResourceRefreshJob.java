@@ -48,11 +48,11 @@ public class ResourceRefreshJob extends Job {
 		RefreshScopeManager manager = RefreshScopeManager.getInstance();
 		for(IProject project : fProjectsToRefresh) {
 			try {
-				// resource.refreshLocal(IResource.DEPTH_INFINITE, arg0);
+				project.refreshLocal(IResource.DEPTH_INFINITE, arg0);
 				
 				// use refresh scope manager to refresh
-				IWorkspaceRunnable runnable = manager.getRefreshRunnable(project);
-				ResourcesPlugin.getWorkspace().run(runnable, arg0);
+				//IWorkspaceRunnable runnable = manager.getRefreshRunnable(project);
+				//ResourcesPlugin.getWorkspace().run(runnable, arg0);
 			} catch (CoreException e) {
 				return Activator.createStatus(Messages.ResourceRefreshJob_1, e);
 			}

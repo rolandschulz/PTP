@@ -137,7 +137,8 @@ public class BuildConfigurationManager {
 	
 	/**
 	 * Return the build scenario for the passed configuration. Any newly created configurations should be recorded by the call to
-	 * "updateConfigurations".
+	 * "updateConfigurations". In addition, for unknown configurations (perhaps newly created configurations not yet recorded in
+	 * CDT, return the build scenario for the closest known ancestor. If no ancestor, return null.
 	 * 
 	 * @param bconf
 	 * 				The build configuration
@@ -152,7 +153,14 @@ public class BuildConfigurationManager {
 			throw new RuntimeException(Messages.BCM_InitError);
 		}
 		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
-		return fBuildConfigToBuildScenarioMap.get(bconf.getId());
+		BuildScenario buildScenario = fBuildConfigToBuildScenarioMap.get(bconf.getId());
+		if (buildScenario == null) {
+			String parentConfigId = findAncestorConfig(bconf.getId());
+			if (parentConfigId != null) {
+				buildScenario = fBuildConfigToBuildScenarioMap.get(parentConfigId);
+			}
+		}
+		return buildScenario;
 	}
 	
 	/**

@@ -21,13 +21,23 @@ package org.eclipse.ptp.internal.rdt.ui.search;
 
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteLineSearchElement;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchElement;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.search.ui.text.Match;
 
 public class RemoteSearchMatchAdapter extends Match {
+	private boolean fIsPolymorphicCall;
 
 	public RemoteSearchMatchAdapter(RemoteSearchMatch match) throws CoreException {
 		super(new TypeInfoSearchElement(match.getName(), match.getTypeInfo()), match.getOffset(), match.getLength());
+		if(match.isPolymorphicCall()){
+			setIsPolymorphicCall();
+		}
+	}
+	
+	public RemoteSearchMatchAdapter(RemoteLineSearchElement ele, int offset, int length){
+		super(ele, offset, length);
 	}
 
 	IIndexFileLocation getLocation() {
@@ -44,5 +54,13 @@ public class RemoteSearchMatchAdapter extends Match {
 		return getElement().equals(other.getElement())
 			&& getOffset() == other.getOffset()
 			&& getLength() <= other.getLength();
+	}
+	
+	public void setIsPolymorphicCall() {
+		fIsPolymorphicCall= true;
+	}
+	
+	public boolean isPolymorphicCall() {
+		return fIsPolymorphicCall;
 	}
 }
