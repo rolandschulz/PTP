@@ -114,9 +114,9 @@ public class LMLView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new ListViewer(parent, SWT.SINGLE);
-		viewer.setLabelProvider(new LabelProvider(){
-			public String getText(Object obj) {
-				return (String) obj;
+		viewer.setLabelProvider(new LabelProvider() {
+			public String getText(Object element) {
+				return element.toString();
 			}
 		});
 		viewer.setContentProvider(new IStructuredContentProvider() {
