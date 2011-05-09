@@ -20,6 +20,8 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -27,6 +29,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider {
 	public static final String ID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
@@ -236,7 +239,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(),
 							this.getProject().getLocation().toString(),	this.getLocation());
 				} catch (final RemoteSyncException e) {
-					throw e;
+					this.handleRemoteSyncException(e);
+					return;
 				}
 			}
 
@@ -245,7 +249,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				try {
 					this.getRemoteConnection().open(monitor);
 				} catch (final RemoteConnectionException e) {
-					throw new RemoteSyncException(e);
+					this.handleRemoteSyncException(new RemoteSyncException(e));
+					return;
 				}
 			}
 			
@@ -263,13 +268,15 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			try {
 				fSyncConnection.syncLocalToRemote();
 			} catch (final RemoteSyncException e) {
-				throw e;
+				this.handleRemoteSyncException(e);
+				return;
 			}
 
 			try {
 				fSyncConnection.syncRemoteToLocal();
 			} catch (final RemoteSyncException e) {
-				throw e;
+				this.handleRemoteSyncException(e);
+				return;
 			}
 			finishedSyncTaskId = willFinishTaskId;
 
@@ -282,6 +289,30 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 	
+	/**
+	 * Error handler. There are several reasons why a sync operation may fail. This function is responsible for handling each case
+	 * appropriately.
+	 *
+	 * @param e
+	 * 			the remote sync exception
+	 */
+	private void handleRemoteSyncException(RemoteSyncException e) {
+		IStatus status = null;
+		int severity = e.getStatus().getSeverity();
+		String message = null;
+		
+		// RemoteSyncException is generally used by either creating a new exception with a message describing the problem or by
+		// embedding another type of error. So we need to decide which message to use.
+		if (e.getMessage() != null || e.getCause() == null) {
+			message = e.getMessage();
+		} else {
+			message = e.getCause().getMessage();
+		}
+		message = "Synchronization error for project " + this.getProject().getName() + message; //$NON-NLS-1$
+		status = new Status(severity, Activator.PLUGIN_ID, message, e);
+		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
+	}
+
 	// Are any of the changes in delta relevant for sync'ing?
 	private boolean syncNeeded(IResourceDelta delta) {
 		String[] relevantChangedResources = getRelevantChangedResources(delta);

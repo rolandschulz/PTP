@@ -89,8 +89,6 @@ public class GitRemoteSyncConnection {
 		// Build repo, creating it if it is not already present.
 		try {
 			buildRepo();
-		} catch (final CoreException e) {
-			throw new RemoteSyncException(e);
 		} catch (final IOException e) {
 			throw new RemoteSyncException(e);
 		} catch (final RemoteExecutionException e) {
@@ -135,8 +133,6 @@ public class GitRemoteSyncConnection {
 	 * @param localDirectory
 	 * @param remoteHost
 	 * @return the repository
-	 * @throws CoreException
-	 *             on problems creating the remote directory.
 	 * @throws IOException
 	 *             on problems writing to the file system.
 	 * @throws RemoteExecutionException
@@ -147,7 +143,7 @@ public class GitRemoteSyncConnection {
 	 * 		   For example, if the repo is created but the initial commit fails.
 	 * TODO: Consider evaluating the output of "git init".
 	 */
-	private Git buildRepo() throws CoreException, IOException, RemoteExecutionException, RemoteSyncException {
+	private Git buildRepo() throws IOException, RemoteExecutionException, RemoteSyncException {
 		final File localDir = new File(localDirectory);
 		final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
 		Repository repository = null;
@@ -179,7 +175,7 @@ public class GitRemoteSyncConnection {
 		try {
 			CommandRunner.createRemoteDirectory(connection, remoteDirectory);
 		} catch (final CoreException e) {
-			throw e;
+			throw new RemoteSyncException(e);
 		}
 		
 		// Initialize remote directory if necessary
