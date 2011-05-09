@@ -27,6 +27,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.lml.core.ILMLManager;
@@ -39,7 +40,6 @@ import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.ui.actions.AddLguiAction;
 import org.eclipse.ptp.rm.lml.ui.actions.RemoveLguiAction;
 import org.eclipse.ptp.rm.lml.ui.actions.UpdateLguiAction;
-import org.eclipse.ptp.rm.lml.ui.providers.LMLListLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -114,7 +114,11 @@ public class LMLView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new ListViewer(parent, SWT.SINGLE);
-		viewer.setLabelProvider(new LMLListLabelProvider());
+		viewer.setLabelProvider(new LabelProvider(){
+			public String getText(Object obj) {
+				return (String) obj;
+			}
+		});
 		viewer.setContentProvider(new IStructuredContentProvider() {
 
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
