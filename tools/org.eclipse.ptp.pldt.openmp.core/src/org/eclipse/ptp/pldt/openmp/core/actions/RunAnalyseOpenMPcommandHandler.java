@@ -77,22 +77,23 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		final String fileName = tu.getElementName();
 		IASTTranslationUnit atu = null;
 		ILanguage lang;
-		boolean allowPrefixOnlyMatch=OpenMPPlugin.getDefault().getPreferenceStore().getBoolean(OpenMPIDs.OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE);
+		boolean allowPrefixOnlyMatch = OpenMPPlugin.getDefault().getPreferenceStore()
+				.getBoolean(OpenMPIDs.OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE);
 		try {
 			lang = tu.getLanguage();
 
 			atu = tu.getAST();
 			String languageID = lang.getId();
-			
-			if(languageID.equals(GCCLanguage.ID) || languageID.equals(GPPLanguage.ID)) {
+
+			if (languageID.equals(GCCLanguage.ID) || languageID.equals(GPPLanguage.ID)) {
 				// null IASTTranslationUnit when we're doing C/C++ means we should quit.
 				// but want to continue to see if this is a fortran file we are analyzing.
-				if(atu==null) {// this is null for Fortran file during JUnit testing.
+				if (atu == null) {// this is null for Fortran file during JUnit testing.
 					System.out.println("RunAnalyseOpenMPCommandHandler.doArtifactAnalysis(), atu is null (testing?)");
 					return msr;
 				}
 			}
-			
+
 			if (languageID.equals(GCCLanguage.ID)) {// cdt40
 				atu.accept(new OpenMPCASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
 			} else {
@@ -139,9 +140,9 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		PASTNode[] pList = omgr.getPAST();
 
 		for (int i = 0; i < pList.length; i++) {// length local=3271; remote 4 (!!)
-			PASTNode temp=pList[i];
-			String tempStr=temp.getRawSignature();
-			// local: will be a PASTOMPPragma node;   remote: will be a PASTPragma node.
+			PASTNode temp = pList[i];
+			String tempStr = temp.getRawSignature();
+			// local: will be a PASTOMPPragma node; remote: will be a PASTPragma node.
 			// So workaround is to accept a PASTPragma node here so we can handle remote files.
 			// Need to investigate what this does to further analysis e.g. concurrency analysis.
 			if (pList[i] instanceof PASTPragma) {// was PASTOMPPragma
@@ -150,9 +151,9 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 				if (traceOn)
 					System.out.println("found #pragma, line " + pop.getStartingLine()); //$NON-NLS-1$
 				SourceInfo si = getSourceInfo(pop, Artifact.PRAGMA);
-				String shortName=pop.getContent();
-				if(shortName.length()==0) { 
-					shortName="#pragma"; // HACK: workaround for remote files where getContent() is always empty.
+				String shortName = pop.getContent();
+				if (shortName.length() == 0) {
+					shortName = "#pragma"; // HACK: workaround for remote files where getContent() is always empty.
 					// The same reason why this is empty is also (I think) why it's not a PASTOMPPragma node.
 					// PASTOMPFactory.parse() always finds empty token first on a remote file, so aborts.
 				}

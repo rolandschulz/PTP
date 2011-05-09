@@ -28,22 +28,22 @@
 	
 	<!-- PLATFORM VERSIONS MUST BE UPDATED FOR NEW PLATFORM VERSION -->
 	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
-	<property name="platformVersion" value="S-3.7M6-201103101119"/>
-	<property name="platformBaseName" value="eclipse-platform-3.7M6"/>
-	<property name="icuBaseZip" value="com.ibm.icu.base-3.7M6.zip"/>
+	<property name="platformVersion" value="S-3.7M7-201104280848"/>
+	<property name="platformBaseName" value="eclipse-platform-3.7M7"/>
+	<property name="icuBaseZip" value="com.ibm.icu.base-3.7M7.zip"/>
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.4.2.v20110208.jar"/>
 	
 	<property name="coreRuntimeVersion" value="3.7.0.v20110110"/>
 	<property name="coreRuntimeJar" value="org.eclipse.core.runtime_${coreRuntimeVersion}.jar"/>
 	
-	<property name="equinoxVersion" value="3.6.0.v20110110"/>
+	<property name="equinoxVersion" value="3.6.0.v20110427"/>
 	<property name="equinoxJar" value="org.eclipse.equinox.common_${equinoxVersion}.jar"/>
 	
-	<property name="filesystemVersion" value="1.3.100.v20110207"/>
+	<property name="filesystemVersion" value="1.3.100.v20110423-0524"/>
 	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
 	
 	<!-- CDT VERSIONS MUST BE UPDATED FOR NEW CDT VERSION -->
-	<property name="cdtVersion" value="201104290807"/>
+	<property name="cdtVersion" value="201105021546"/>
 	
 	<!-- CDT branch need to be added for PTP maintenance builds -->
 	<property name="cdtBranch" value=""/>
@@ -538,6 +538,9 @@ export serverpath CLASSPATH LIBPATH
 		
 		<touch file="${remoteServerTempDir}/rdtserver_version.dat"/>
 		<concat destfile="${remoteServerTempDir}/rdtserver_version.dat">${serverVersion}-${timestamp}</concat>
+		
+		<!--Create empty URICreator.dat file-->
+		<touch file="${remoteServerTempDir}/URICreator.dat"/>
 		
 		<!--Add libspawner.so for specific platforms-->
 		<antcall target="add.so.${platform}"/>

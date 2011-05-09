@@ -113,12 +113,16 @@
         </wizardPage>
      </extension>
      <extension
-           point="org.eclipse.cdt.ui.cPropertyTab">
-        <tab
-              class="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesTab"
-              name="Remote Location"
-              parent="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
-              weight="Remote Location">
-        </tab>
+           point="org.eclipse.ui.propertyPages">
+        <page
+              category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
+              class="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesPage"
+              id="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesPage"
+              name="Remote Information">
+		<filter
+			name="projectNature"
+			value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+		</filter>
+        </page>
      </extension>
 </plugin>

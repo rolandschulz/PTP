@@ -9,6 +9,7 @@
 #* Contributors:
 #*    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
 #*******************************************************************************/ 
+
 use strict;
 use Getopt::Long;
 use Data::Dumper;
@@ -45,11 +46,13 @@ my $opt_outfile="./test.xml";
 my $opt_verbose=0;
 my $opt_timings=0;
 my $opt_dump=0;
+my $opt_demo=0;
 my $opt_layout="./layout.xml";
 usage($0) if( ! GetOptions( 
 			    'verbose'          => \$opt_verbose,
 			    'timings'          => \$opt_timings,
 			    'dump'             => \$opt_dump,
+			    'demo'             => \$opt_demo,
 			    'layout=s'         => \$opt_layout,
 			    'output=s'         => \$opt_outfile
 			    ) );
@@ -76,6 +79,10 @@ print "reading file: $LML_filename  ...\n" if($opt_verbose);
 $filehandler_LML->read_lml_fast($LML_filename);
 if($opt_verbose) {
     print $filehandler_LML->get_stat();
+}
+
+if($opt_demo) {
+    &modify_jobs_anonymous($filehandler_LML);
 }
 
 print "reading file: $opt_layout  ...\n" if($opt_verbose); 
@@ -130,13 +137,23 @@ foreach $tid (keys(%{$filehandler_layout->{DATA}->{TABLELAYOUT}})) {
 ############################
 # process nodedisplay layout
 ############################
+#print Dumper($filehandler_layout->{DATA});
 #print Dumper($filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT});
 my ($nid,$nlayoutref);
 foreach $nid (keys(%{$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}})) {
-    my($nd_handler,$numids,$idlistref,$cnt);
+    my($nd_handler,$numids,$idlistref,$cnt,$nlayoutref_gid,$nschemeref);
     $nd_handler = LML_gen_nodedisplay->new($opt_verbose,$opt_timings);
     $nlayoutref=$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}->{$nid};
-    $numids=$nd_handler->process($nlayoutref,$filehandler_LML);
+    $nlayoutref_gid=$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}->{$nid}->{gid};
+    $nschemeref=undef;
+    if(exists($filehandler_layout->{DATA}->{NODEDISPLAY})) {
+	if(exists($filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid})) {
+	    $nschemeref=$filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid}->{schemeroot};
+	}
+    }
+#    print "WF: nschemeref ",Dumper($nschemeref);
+
+    $numids=$nd_handler->process($nlayoutref,$nschemeref,$filehandler_LML);
 
     $idlistref=$nd_handler->get_ids();
     print "Nodedisplay Layout: $nid processed ($numids objects found)\n"  if($opt_verbose);
@@ -190,6 +207,53 @@ sub define_default_objects  {
     $fh_out->{DATA}->{OBJECT}->{$id}->{name} = "Empty job";
 
     return(1);
+}
+
+sub modify_jobs_anonymous {
+    my($filehandler_LML) = @_;
+    my($tstart,$tdiff,$rc,$job);
+    my($demoid,$partition,$reservation);
+    my(%userlist,$user,$demoidcntuser);
+    my(%grouplist,$group,$demoidcntgroup);
+
+    $tstart=time;
+    $demoidcntuser=0;
+    keys(%{$filehandler_LML->{DATA}->{OBJECT}}); # reset iterator
+    my($key,$ref);
+    while(($key,$ref)=each(%{$filehandler_LML->{DATA}->{OBJECT}})) {
+	if($ref->{type} eq 'job') {
+	    $ref=$filehandler_LML->{DATA}->{INFODATA}->{$key};
+	    if($ref->{owner}) {
+		$user=$ref->{owner};
+		if($userlist{$user}) { $demoid=$userlist{$user};} 
+		else                 { 
+		    $demoid=$userlist{$user}=sprintf("User#%03d",$demoidcntuser++);
+#		    printf("demouser  ->  %-10s %10s (job)\n",$user,$demoid) if($opt_verbose); 
+		}
+		$ref->{owner}=$demoid;
+	    }
+	    if($ref->{group}) {
+		$group=$ref->{group};
+		if($grouplist{$group}) { $demoid=$grouplist{$group};} 
+		else                 { 
+		    $demoid=$grouplist{$group}=sprintf("Group#%03d",$demoidcntgroup++);
+#		    printf("demogroup  ->  %-10s %10s (job)\n",$group,$demoid) if($opt_verbose); 
+		}
+		$ref->{group}=$demoid;
+	    }
+	    if($ref->{executable}) {
+		$ref->{executable}="";
+	    }
+	    if($ref->{name}) {
+		$ref->{name}="jobname";
+	    }
+	}
+    }
+    keys(%{$filehandler_LML->{DATA}->{OBJECT}}); # reset iterator
+    $tdiff=time-$tstart;
+    printf("$0: changed jobs to anonymous in %6.4f sec\n",$tdiff) if($opt_verbose);
+
+    return($rc);
 }
 
 

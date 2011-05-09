@@ -24,17 +24,20 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 
 	/**
-	 * 
 	 * @return whether the launch environment should be appended to (or replace)
 	 *         the environment for a given command execution.
 	 */
 	public boolean getAppendEnv();
 
 	/**
-	 * 
 	 * @return resource manager environment
 	 */
 	public RMVariableMap getEnvironment();
+
+	/**
+	 * @return table of jobs with open processes
+	 */
+	public Map<String, ICommandJob> getJobTable();
 
 	/**
 	 * @return the user-defined environment (from the Environment Tab)
@@ -50,4 +53,9 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	 * @return state of resource manager
 	 */
 	public String getState();
+
+	/**
+	 * For callbacks to the resource manager from internal jobs.
+	 */
+	public void jobStateChanged(String jobId);
 }

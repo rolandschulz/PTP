@@ -22,5 +22,5 @@ public class PreferenceConstants {
 	public static final String P_CHOICE = "choicePreference"; //$NON-NLS-1$
 
 	public static final String P_STRING = "stringPreference"; //$NON-NLS-1$
-	
+
 }

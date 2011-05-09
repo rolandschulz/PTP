@@ -42,7 +42,7 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements I
 	private URL[] urls;
 	private int index;
 
-	private final Map<String, Map<String, URL>> fRMJAXBResourceManagers;
+	private final Map<String, URL> fRMJAXBResourceManagers;
 
 	/**
 	 * @param pageName
@@ -50,7 +50,7 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements I
 	public JAXBRMConfigurationImportWizardPage(String pageName) {
 		super(pageName);
 		setDescription(Messages.ConfigurationImportWizardPageDescription);
-		fRMJAXBResourceManagers = new TreeMap<String, Map<String, URL>>();
+		fRMJAXBResourceManagers = new TreeMap<String, URL>();
 	}
 
 	/*
@@ -102,11 +102,9 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements I
 		names.add(ZEROSTR);
 		List<URL> locations = new ArrayList<URL>();
 		locations.add(null);
-		for (Map<String, URL> map : fRMJAXBResourceManagers.values()) {
-			for (Map.Entry<String, URL> e : map.entrySet()) {
-				names.add(e.getKey());
-				locations.add(e.getValue());
-			}
+		for (Map.Entry<String, URL> e : fRMJAXBResourceManagers.entrySet()) {
+			names.add(e.getKey());
+			locations.add(e.getValue());
 		}
 		items = names.toArray(new String[0]);
 		urls = locations.toArray(new URL[0]);

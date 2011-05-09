@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHContentProvider
- * Version: 1.17
+ * Version: 1.21
  */
 package org.eclipse.ptp.internal.rdt.ui.callhierarchy;
 
@@ -144,6 +144,26 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 			});
 		}
 		ITranslationUnit tu= CModelUtil.getTranslationUnit(element);
+		/* -- ST-Origin --
+		 * Source folder: org.eclipse.cdt.ui/src
+		 * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHContentProvider
+		 * Version: 1.17
+		 */
+		/* won't be able to port CHContentProvider 1.21 change, todo: create a new remote index service to handle this query.
+		if (!fComputeReferencedBy && element instanceof IMethod) {
+			IIndexName methodName= IndexUI.elementToName(index, element);
+			if (methodName != null) {
+				IBinding methodBinding= index.findBinding(methodName);
+				if (methodBinding instanceof ICPPMethod) {
+					ICElement[] defs= CHQueries.findOverriders(index, (ICPPMethod) methodBinding);
+					if (defs != null && defs.length > 0) {
+						return new Object[] { new CHMultiDefNode(null, tu, 0, defs, methodBinding.getLinkage().getLinkageID()) };
+					}
+				}
+			}
+		}
+		*/
+
 		return new Object[] { new CHNode(null, tu, 0, element, -1) };
 	}
 
@@ -203,8 +223,7 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 	CHNode[] createNodes(CHNode node, CalledByResult result) throws CoreException {
 		ArrayList<CHNode> nodes= new ArrayList<CHNode>();
 		ICElement[] elements= result.getElements();
-		for (int i = 0; i < elements.length; i++) {
-			ICElement element = elements[i];
+		for (ICElement element : elements) { 
 			if (element != null) {
 				if (fFilter == null || fFilter.isPartOfWorkingSet(element)) {
 					IIndexName[] refs= result.getReferences(element);
@@ -227,8 +246,7 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 		}
 		boolean readAccess= false;
 		boolean writeAccess= false;
-		for (int i = 0; i < refs.length; i++) {
-			IIndexName reference = refs[i];
+		for (IIndexName reference : refs)  {
 			node.addReference(new CHReferenceInfo(reference.getNodeOffset(), reference.getNodeLength()));
 			readAccess= (readAccess || reference.isReadAccess());
 			writeAccess= (writeAccess || reference.isWriteAccess());
@@ -242,8 +260,8 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 		ITranslationUnit tu= CModelUtil.getTranslationUnit(node.getRepresentedDeclaration());
 		ArrayList<CHNode> result= new ArrayList<CHNode>();
 		CElementSet[] elementSets= callsTo.getElementSets();
-		for (int i = 0; i < elementSets.length; i++) {
-			CElementSet set = elementSets[i];
+		for (CElementSet elementSet : elementSets) {
+			CElementSet set = elementSet;
 			if (!set.isEmpty()) {
 				IIndexName[] refs= callsTo.getReferences(set);
 				ICElement[] elements= set.getElements();
@@ -259,22 +277,21 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 	private CHNode createReftoNode(CHNode parent, ITranslationUnit tu, ICElement[] elements, IIndexName[] references) throws CoreException {
 		assert elements.length > 0;
 
-		CHNode node;
-		long timestamp= references[0].getFile().getTimestamp();
 		final IIndexFile file = references[0].getFile();
+		final long timestamp= file.getTimestamp();
 		final int linkageID= file.getLinkageID();
+
+		CHNode node;
 		
 		if (elements.length == 1) {
 			node= new CHNode(parent, tu, timestamp, elements[0], linkageID);
-		}
-		else {
+		}else {
 			node= new CHMultiDefNode(parent, tu, timestamp, elements, linkageID);
 		}
 		
 		boolean readAccess= false;
 		boolean writeAccess= false;
-		for (int i = 0; i < references.length; i++) {
-			IIndexName reference = references[i];
+		for (IIndexName reference : references) {
 			node.addReference(new CHReferenceInfo(reference.getNodeOffset(), reference.getNodeLength()));
 			readAccess= (readAccess || reference.isReadAccess());
 			writeAccess= (writeAccess || reference.isWriteAccess());

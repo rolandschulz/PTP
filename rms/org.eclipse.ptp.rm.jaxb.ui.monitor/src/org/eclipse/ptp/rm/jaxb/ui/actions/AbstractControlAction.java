@@ -10,10 +10,14 @@
 package org.eclipse.ptp.rm.jaxb.ui.actions;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.jaxb.ui.data.JobStatusData;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * Base class for actions on the job status object which initiate a batch
@@ -22,22 +26,32 @@ import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
  * @author arossi
  * 
  */
-public abstract class AbstractBatchControlAction extends AbstractStatusAction {
+public abstract class AbstractControlAction extends AbstractStatusAction {
 
 	protected String operation;
 
 	/*
-	 * Restarts the control if it is not running. (non-Javadoc)
+	 * Restarts the resource manager control if it is not running. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-		try {
-			view.callDoControl(status, true, operation);
-		} catch (CoreException t) {
-			MessageDialog.openError(view.getSite().getShell(), Messages.DoControlError, Messages.OperationFailed + operation + COSP
-					+ t.getMessage());
-		}
+		UIJob job = new UIJob(operation) {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				for (JobStatusData status : selected) {
+					try {
+						view.callDoControl(status, true, operation, monitor);
+					} catch (CoreException t) {
+						MessageDialog.openError(view.getSite().getShell(), Messages.DoControlError, Messages.OperationFailed
+								+ operation + COSP + t.getMessage());
+					}
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setUser(true);
+		job.schedule();
 	}
 
 	/*
@@ -47,12 +61,17 @@ public abstract class AbstractBatchControlAction extends AbstractStatusAction {
 	 * org.eclipse.ptp.rm.jaxb.ui.data.PersistentCommandJobStatus)
 	 */
 	@Override
-	protected void validate(IAction action, JobStatusData status) {
-		if (status.isInteractive()) {
-			action.setEnabled(false);
-		} else {
-			validateState(action, status);
+	protected void validate(IAction action) {
+		for (JobStatusData status : selected) {
+			if (status.isInteractive()) {
+				action.setEnabled(false);
+				return;
+			} else if (!validateState(status)) {
+				action.setEnabled(false);
+				return;
+			}
 		}
+		action.setEnabled(true);
 	}
 
 	/**
@@ -61,5 +80,5 @@ public abstract class AbstractBatchControlAction extends AbstractStatusAction {
 	 * @param action
 	 * @param status
 	 */
-	protected abstract void validateState(IAction action, JobStatusData status);
+	protected abstract boolean validateState(JobStatusData status);
 }

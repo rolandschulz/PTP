@@ -128,7 +128,7 @@ public class JAXBCorePlugin extends Plugin implements IJAXBNonNLSConstants {
 			Bundle bundle = getDefault().getBundle();
 			url = FileLocator.find(bundle, new Path(PATH_SEP + resource), null);
 		} else {
-			url = new File(resource).toURL();
+			url = new File(resource).toURI().toURL();
 		}
 		return url;
 	}

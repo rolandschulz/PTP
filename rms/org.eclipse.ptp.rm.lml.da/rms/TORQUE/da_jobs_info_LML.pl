@@ -86,14 +86,15 @@ my %mapping = (
     "step"                                   => "step",
     "totaltasks"                             => "totaltasks",
     "spec"                                   => "spec",
-    "Resource_List.signal"                   => "",
-    "x"                                      => "",
 
 # unknown attributes
     "group"                                  => "group",
     );
 
-open(IN,"/usr/bin/qstat -f |");
+my $cmd="/usr/bin/qstat";
+$cmd=$ENV{"CMD_JOBINFO"} if($ENV{"CMD_JOBINFO"}); 
+
+open(IN,"$cmd -f |");
 my $jobid="-";
 my $lastkey="-";
 
@@ -208,22 +209,36 @@ sub modify {
     }
 
     if($mkey eq "totalcores") {
-	if($ret=~/$patint[:]ppn=$patint/) {
-	    $ret=$1*$2;
+	my $numcores=0;
+	my ($spec);
+	foreach $spec (split(/\s*\+\s*/,$ret)) {
+	    # std job
+	    if($ret=~/^$patint[:]ppn=$patint/) {
+		$numcores+=$1*$2;
+	    } elsif($ret=~/^$patwrd[:]ppn=$patint/) {
+		$numcores+=1*$2;
+	    }
 	}
+	$ret=$numcores if($numcores>0);
     }
     if($mkey eq "totaltasks") {
-	if($ret=~/$patint[:]ppn=$patint/) {
-	    $ret=$1*$2;
+	my $numcores=0;
+	my ($spec);
+	foreach $spec (split(/\s*\+\s*/,$ret)) {
+	    # std job
+	    if($ret=~/^$patint[:]ppn=$patint/) {
+		$numcores+=$1*$2;
+	    } elsif($ret=~/^$patwrd[:]ppn=$patint/) {
+		$numcores+=1*$2;
+	    }
 	}
+	$ret=$numcores if($numcores>0);
     }
 
     if(($mkey eq "comment")) {
 	$ret=~s/\"//gs;
     }
-    if(($mkey eq "bgp_state")) {
-	$ret=~s/\<unknown\>/unknown/gs;
-    }
+
     # mask & in user input
     if($ret=~/\&/) {
 	$ret=~s/\&/\&amp\;/gs;

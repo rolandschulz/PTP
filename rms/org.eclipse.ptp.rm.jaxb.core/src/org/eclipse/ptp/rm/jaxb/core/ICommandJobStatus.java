@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
@@ -27,6 +28,8 @@ public interface ICommandJobStatus extends IJobStatus {
 
 	/**
 	 * Cancel the Job process (if interactive).
+	 * 
+	 * @return true if canceled.
 	 */
 	public boolean cancel();
 
@@ -65,10 +68,20 @@ public interface ICommandJobStatus extends IJobStatus {
 	public void maybeWaitForHandlerFiles(int blockForSecs);
 
 	/**
+	 * @param configuration
+	 */
+	public void setLaunchConfig(ILaunchConfiguration configuration);
+
+	/**
 	 * @param process
 	 *            if the Job is interactive.
 	 */
 	public void setProcess(IRemoteProcess process);
+
+	/**
+	 * @param proxy
+	 */
+	public void setProxy(ICommandJobStreamsProxy proxy);
 
 	/**
 	 * @param state
@@ -93,6 +106,10 @@ public interface ICommandJobStatus extends IJobStatus {
 	 * 
 	 * @param uuid
 	 *            internal id which the job id will be mapped to.
+	 * @param waitUntil
+	 *            wait until this state is reached.
+	 * @param control
+	 *            callback
 	 */
-	public void waitForJobId(String uuid);
+	public void waitForJobId(String uuid, String waitUntil);
 }

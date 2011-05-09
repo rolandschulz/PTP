@@ -13,7 +13,7 @@
             class="org.eclipse.ptp.rm.lml.ui.views.NodesView"
             icon="icons/parallel_perspective.gif"
             id="org.eclipse.ptp.rm.lml.ui.views.NodesView"
-            name="%NodesView.name"
+            name="org.eclipse.ptp.rm.lml.ui.views.NodesView"
             restorable="false">
       </view>
       <view

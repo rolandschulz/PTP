@@ -22,9 +22,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
  * 
  */
 public class RegexImpl implements IJAXBNonNLSConstants {
-
-	private static final String FLAG_SEP = OPENSQ + PIP + CLOSSQ;
-
 	private String expression;
 	private final boolean split;
 	private final Pattern pattern;
@@ -97,7 +94,7 @@ public class RegexImpl implements IJAXBNonNLSConstants {
 			return 0;
 		}
 		int f = 0;
-		String[] split = flags.split(FLAG_SEP);
+		String[] split = flags.split(REGPIP);
 		for (String s : split) {
 			if (CASE_INSENSITIVE.equals(s.trim())) {
 				f |= Pattern.CASE_INSENSITIVE;

@@ -21,7 +21,6 @@ import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
 import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
 
-
 /**
  * This dom-walker collects OpenMP related constructs (currently function calls and constants), and add markers to the
  * source file for C code. Currently, it delegates work to MpiGeneralASTVisitorBehavior.
@@ -29,45 +28,45 @@ import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
  */
 public class OpenMPCASTVisitor extends PldtAstVisitor
 {
-    {
-        this.shouldVisitExpressions = true;
-        this.shouldVisitStatements = true;
-        this.shouldVisitDeclarations = true;
-        this.shouldVisitTranslationUnit = true;
-    }
+	{
+		this.shouldVisitExpressions = true;
+		this.shouldVisitStatements = true;
+		this.shouldVisitDeclarations = true;
+		this.shouldVisitTranslationUnit = true;
+	}
 
+	public OpenMPCASTVisitor(List<String> includes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr)
+	{
+		super(includes, fileName, allowPrefixOnlyMatch, msr);
+		ARTIFACT_CALL = Messages.OpenMPCASTVisitor_OpenMP_Call;
+		ARTIFACT_CONSTANT = Messages.OpenMPCASTVisitor_OpenMP_Constant;
+	}
 
-    public OpenMPCASTVisitor(List<String> includes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr)
-    {
-        super(includes, fileName, allowPrefixOnlyMatch, msr);
-        ARTIFACT_CALL = Messages.OpenMPCASTVisitor_OpenMP_Call;
-		ARTIFACT_CONSTANT=Messages.OpenMPCASTVisitor_OpenMP_Constant;
-    }
-    public void newAPI() {}
+	public void newAPI() {
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.cdt.core.dom.ast.ASTVisitor#visit(org.eclipse.cdt.core.dom.ast.IASTExpression)
+	 */
+	private static final String PREFIX = "omp_"; //$NON-NLS-1$
 
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.cdt.core.dom.ast.ASTVisitor#visit(org.eclipse.cdt.core.dom.ast.IASTExpression)
-     */
-    private static final String PREFIX="omp_"; //$NON-NLS-1$
-    public int visit(IASTExpression expression)
-    {
-        if (expression instanceof IASTFunctionCallExpression) {
-            IASTExpression astExpr = ((IASTFunctionCallExpression) expression).getFunctionNameExpression();
-            String signature = astExpr.getRawSignature();
-            //System.out.println("func signature=" + signature);
-            if (signature.startsWith(PREFIX)) {
-                if (astExpr instanceof IASTIdExpression) {
-                    IASTName funcName = ((IASTIdExpression) astExpr).getName();
-                    processFuncName(funcName, astExpr);
-                }
-            }
-        } else if (expression instanceof IASTLiteralExpression) {
-            processMacroLiteral((IASTLiteralExpression) expression);
-        }
-        return PROCESS_CONTINUE;
-    }
+	public int visit(IASTExpression expression)
+	{
+		if (expression instanceof IASTFunctionCallExpression) {
+			IASTExpression astExpr = ((IASTFunctionCallExpression) expression).getFunctionNameExpression();
+			String signature = astExpr.getRawSignature();
+			// System.out.println("func signature=" + signature);
+			if (signature.startsWith(PREFIX)) {
+				if (astExpr instanceof IASTIdExpression) {
+					IASTName funcName = ((IASTIdExpression) astExpr).getName();
+					processFuncName(funcName, astExpr);
+				}
+			}
+		} else if (expression instanceof IASTLiteralExpression) {
+			processMacroLiteral((IASTLiteralExpression) expression);
+		}
+		return PROCESS_CONTINUE;
+	}
 }

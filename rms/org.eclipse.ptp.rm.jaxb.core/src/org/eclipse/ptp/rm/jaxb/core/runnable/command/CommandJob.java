@@ -14,8 +14,11 @@ import java.io.BufferedOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,10 +30,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.IStreamListener;
+import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJob;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
@@ -44,6 +52,7 @@ import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.EnvironmentVariableUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 
 /**
  * Implementation of runnable Job for executing external processes. Uses the
@@ -53,7 +62,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  * @author arossi
  * 
  */
-public class CommandJob extends Job implements IJAXBNonNLSConstants {
+public class CommandJob extends Job implements ICommandJob, IJAXBNonNLSConstants {
 
 	/**
 	 * Internal class used for multiplexing output streams between two different
@@ -65,7 +74,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private class StreamSplitter extends Thread {
 		private final InputStream in;
 		private final PipedOutputStream[] pout;
-		private final BufferedOutputStream[] bout;
+		private final List<BufferedOutputStream> boutList;
 
 		/**
 		 * @param in
@@ -80,8 +89,9 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			this.in = in;
 			assert (pipe1 != null && pipe2 != null);
 			pout = new PipedOutputStream[] { new PipedOutputStream(pipe1), new PipedOutputStream(pipe2) };
-			bout = new BufferedOutputStream[] { new BufferedOutputStream(pout[0], STREAM_BUFFER_SIZE),
-					new BufferedOutputStream(pout[1], STREAM_BUFFER_SIZE) };
+			boutList = new ArrayList<BufferedOutputStream>();
+			boutList.add(new BufferedOutputStream(pout[0], STREAM_BUFFER_SIZE));
+			boutList.add(new BufferedOutputStream(pout[1], STREAM_BUFFER_SIZE));
 		}
 
 		/**
@@ -96,9 +106,27 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 					if (i == -1) {
 						break;
 					}
-					for (BufferedOutputStream b : bout) {
-						b.write(i);
-						b.flush();
+					BufferedOutputStream stream = null;
+					for (Iterator<BufferedOutputStream> b = boutList.iterator(); b.hasNext();) {
+						try {
+							stream = b.next();
+							stream.write(i);
+							stream.flush();
+						} catch (IOException dead) {
+							/*
+							 * we need to check for this here because the
+							 * tokenizer can be set to exit early
+							 */
+							if (dead.getMessage().indexOf(DEAD) >= 0) {
+								b.remove();
+								try {
+									stream.close();
+								} catch (IOException t) {
+								}
+							} else {
+								throw dead;
+							}
+						}
 					}
 				} catch (EOFException eof) {
 					break;
@@ -107,7 +135,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 					break;
 				}
 			}
-			for (BufferedOutputStream b : bout) {
+			for (BufferedOutputStream b : boutList) {
 				try {
 					b.close();
 				} catch (IOException t) {
@@ -120,13 +148,18 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 
 	private final String uuid;
 	private final CommandType command;
-	private final IJAXBResourceManagerControl rm;
+	private final IJAXBResourceManager rm;
+	private final IJAXBResourceManagerControl control;
 	private final ICommandJobStreamsProxy proxy;
 	private final RMVariableMap rmVarMap;
+	private final int flags;
 	private final boolean waitForId;
 	private final boolean ignoreExitStatus;
 	private final boolean batch;
+	private final boolean keepOpen;
+	private final StringBuffer error;
 
+	private Thread jobThread;
 	private IRemoteProcess process;
 	private IStreamParserTokenizer stdoutTokenizer;
 	private IStreamParserTokenizer stderrTokenizer;
@@ -136,7 +169,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	private InputStream tokenizerErr;
 	private StreamSplitter outSplitter;
 	private StreamSplitter errSplitter;
-	private final StringBuffer error;
+	private ICommandJobStatus jobStatus;
 	private boolean active;
 
 	/**
@@ -149,17 +182,30 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public CommandJob(String jobUUID, CommandType command, boolean batch, IJAXBResourceManagerControl rm, RMVariableMap rmVarMap) {
+	public CommandJob(String jobUUID, CommandType command, boolean batch, IJAXBResourceManager rm) {
 		super(command.getName());
 		this.command = command;
 		this.batch = batch;
 		this.rm = rm;
-		this.rmVarMap = rmVarMap;
+		this.control = rm.getControl();
+		this.rmVarMap = this.control.getEnvironment();
 		this.uuid = jobUUID;
 		this.proxy = new CommandJobStreamsProxy();
 		this.waitForId = command.isWaitForId();
 		this.ignoreExitStatus = command.isIgnoreExitStatus();
 		this.error = new StringBuffer();
+		this.keepOpen = command.isKeepOpen();
+		String flags = command.getFlags();
+		this.flags = getFlags(flags);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#getExecuteStatus()
+	 */
+	public ICommandJobStatus getJobStatus() {
+		return jobStatus;
 	}
 
 	/**
@@ -194,6 +240,41 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 		return batch;
 	}
 
+	/*
+	 * First unblock any wait; this will allow the run method to return. Destroy
+	 * the process and close streams, interrupt the tread and cancel with
+	 * manager. (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#terminate()
+	 */
+	public synchronized void terminate() {
+		if (active) {
+			active = false;
+			if (jobStatus != null) {
+				jobStatus.cancelWait();
+				jobStatus.getJobId();
+			}
+			if (process != null && !process.isCompleted()) {
+				process.destroy();
+				if (proxy != null) {
+					proxy.close();
+				}
+				try {
+					joinConsumers();
+				} catch (CoreException ce) {
+					JAXBCorePlugin.log(ce);
+				}
+			}
+			if (jobThread != null && jobThread != Thread.currentThread()) {
+				if (jobThread.isAlive()) {
+					jobThread.interrupt();
+				}
+			}
+			cancel();
+			control.getJobTable().remove(getName());
+		}
+	}
+
 	/**
 	 * The resource manager should wait for the job id on the stream (parsed by
 	 * an apposite tokenizer) before returning the status object to the caller.
@@ -205,16 +286,70 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	}
 
 	/**
-	 * Uses the IRemoteProcessBuilder to set up the command and environment.
-	 * After start, the tokenizers (if any) are handled, and stream redirection
-	 * managed. Waits for the process, then joins on the consumers.<br>
-	 * <br>
-	 * Note: the resource manager does not join on this thread, but retrieves
-	 * the status object from the job, potentially while it is still running, in
-	 * order to hand it off to the caller for stream processing.
+	 * If this process has no input, execute it normally. Otherwise, if the
+	 * process is to be kept open, check for the command job in the job table;
+	 * if it is there and still alive, send the input to it; if not, start the
+	 * process, and then send the input.
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		jobThread = Thread.currentThread();
+		boolean input = !command.getInput().isEmpty();
+		if (input) {
+			ICommandJob job = control.getJobTable().get(getName());
+			if (job != null && job.isActive()) {
+				IRemoteProcess process = job.getProcess();
+				if (process != null && !process.isCompleted()) {
+					return writeInputToProcess(process);
+				} else {
+					job.terminate();
+				}
+			}
+		}
+
+		IStatus runStatus = execute(monitor);
+
+		/*
+		 * When there is a UUID defined for this command, set the status for it.
+		 * If the submit job lacks a jobId on the standard streams, then we
+		 * assign it the UUID (it is most probably interactive); else we wait
+		 * for the id to be set by the tokenizer. NOTE that the caller should
+		 * now join on all commands with this property (05.01.2011). Open
+		 * connection jobs should have their jobId tokenizers set a RUNNING
+		 * state.
+		 */
+		jobStatus = null;
+		String waitUntil = keepOpen ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
+		ICommandJob parent = keepOpen ? this : null;
+		if (uuid != null) {
+			if (waitForId) {
+				jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
+				jobStatus.waitForJobId(uuid, waitUntil);
+			} else {
+				String state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
+				jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
+			}
+
+			jobStatus.setProxy(getProxy());
+
+			if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
+				if (input) {
+					if (process != null && !process.isCompleted()) {
+						runStatus = writeInputToProcess(process);
+					}
+				}
+			}
+		}
+		return runStatus;
+	}
+
+	/**
+	 * Uses the IRemoteProcessBuilder to set up the command and environment.
+	 * After start, the tokenizers (if any) are handled, and stream redirection
+	 * managed. Returns immediately if <code>keepOpen</code> is true; else waits
+	 * for the process, then joins on the consumers.x
+	 */
+	private IStatus execute(IProgressMonitor monitor) {
 		try {
 			synchronized (this) {
 				active = false;
@@ -224,7 +359,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 
 			process = null;
 			try {
-				process = builder.start();
+				process = builder.start(flags);
 			} catch (IOException t) {
 				throw CoreExceptionUtils.newException(Messages.CouldNotLaunch + builder.command(), t);
 			}
@@ -236,6 +371,11 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 
 			synchronized (this) {
 				active = true;
+			}
+
+			if (keepOpen) {
+				control.getJobTable().put(getName(), this);
+				return Status.OK_STATUS;
 			}
 
 			int exit = 0;
@@ -260,6 +400,31 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			active = false;
 		}
 		return Status.OK_STATUS;
+	}
+
+	/**
+	 * Converts or'd string into bit-wise or of available flags for remote
+	 * process builder.
+	 * 
+	 * @param flags
+	 * @return bit-wise or
+	 */
+	private int getFlags(String flags) {
+		if (flags == null) {
+			return IRemoteProcessBuilder.NONE;
+		}
+
+		String[] split = flags.split(REGPIP);
+		int f = IRemoteProcessBuilder.NONE;
+		for (String s : split) {
+			s = s.trim();
+			if (TAG_ALLOCATE_PTY.equals(s)) {
+				f |= IRemoteProcessBuilder.ALLOCATE_PTY;
+			} else if (TAG_FORWARD_X11.equals(s)) {
+				f |= IRemoteProcessBuilder.FORWARD_X11;
+			}
+		}
+		return f;
 	}
 
 	/**
@@ -368,7 +533,7 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
 		}
 		String[] cmdArgs = ArgImpl.getArgs(uuid, args, rmVarMap);
-		RemoteServicesDelegate delegate = rm.getRemoteServicesDelegate();
+		RemoteServicesDelegate delegate = control.getRemoteServicesDelegate();
 		return delegate.getRemoteServices().getProcessBuilder(delegate.getRemoteConnection(), cmdArgs);
 	}
 
@@ -381,9 +546,9 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 	 * @throws CoreException
 	 */
 	private void prepareEnv(IRemoteProcessBuilder builder) throws CoreException {
-		if (!rm.getAppendEnv()) {
+		if (!control.getAppendEnv()) {
 			builder.environment().clear();
-			Map<String, String> live = rm.getLaunchEnv();
+			Map<String, String> live = control.getLaunchEnv();
 			for (String var : live.keySet()) {
 				builder.environment().put(var, live.get(var));
 			}
@@ -399,13 +564,24 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), rmVarMap);
 			}
 
-			Map<String, String> live = rm.getLaunchEnv();
+			Map<String, String> live = control.getLaunchEnv();
 			for (String var : live.keySet()) {
 				builder.environment().put(var, live.get(var));
 			}
 		}
 
 		builder.redirectErrorStream(command.isRedirectStderr());
+	}
+
+	/**
+	 * Resolves the command input arguments against the current environment.
+	 * 
+	 * @return the arguments as a single string
+	 * @throws CoreException
+	 */
+	private String prepareInput() throws CoreException {
+		List<ArgType> args = command.getInput();
+		return ArgImpl.toString(uuid, args, control.getEnvironment());
 	}
 
 	/**
@@ -426,6 +602,11 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 			errSplitter = new StreamSplitter(process.getErrorStream(), tokenizerErr, monitorErr);
 			proxy.setErrMonitor(new CommandJobStreamMonitor(monitorErr));
 		}
+		proxy.getErrorStreamMonitor().addListener(new IStreamListener() {
+			public void streamAppended(String text, IStreamMonitor monitor) {
+				JAXBCorePlugin.log(text);
+			}
+		});
 	}
 
 	/**
@@ -483,6 +664,23 @@ public class CommandJob extends Job implements IJAXBNonNLSConstants {
 				throw CoreExceptionUtils.newException(Messages.StderrParserError, e);
 			}
 		}
+	}
+
+	/**
+	 * Calls {@link #prepareInput()}.
+	 * 
+	 * @param process
+	 */
+	private IStatus writeInputToProcess(IRemoteProcess process) {
+		OutputStream stream = process.getOutputStream();
+		try {
+			stream.write(prepareInput().getBytes());
+			stream.write(LINE_SEP.getBytes());
+			stream.flush();
+		} catch (Throwable t) {
+			return CoreExceptionUtils.getErrorStatus(Messages.ProcessRunError, t);
+		}
+		return Status.OK_STATUS;
 	}
 
 	/**

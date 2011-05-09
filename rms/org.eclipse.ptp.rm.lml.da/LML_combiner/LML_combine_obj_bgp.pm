@@ -12,7 +12,6 @@ package LML_combine_obj_bgp;
 use strict;
 use Data::Dumper;
 
-my $VERSION='$Revision$';
 my($debug)=0;
 
 sub update {

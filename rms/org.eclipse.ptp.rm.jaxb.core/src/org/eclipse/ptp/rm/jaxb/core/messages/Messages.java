@@ -61,6 +61,12 @@ public class Messages extends NLS {
 	public static String RefreshedJobStatusMessage;
 	public static String UndefinedByteBeforeEndOfFile;
 
+	public static String PublicId;
+	public static String SystemId;
+	public static String LineNumber;
+	public static String ColumnNumber;
+	public static String Message;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -26,7 +26,7 @@ public class OpenMpIDs {
 	 * These are the marker type used for showing non-concurrency
 	 */
 	public static final String NonConcurrencyType = "org.eclipse.ptp.pldt.openmp.analysis.nonconcurrency";
-	
+
 	public static final String OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE = "openmpRecognizeAPIsByPrefixAlone";
 
 }

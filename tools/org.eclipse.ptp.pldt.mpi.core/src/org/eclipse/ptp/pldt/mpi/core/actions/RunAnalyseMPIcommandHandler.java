@@ -33,7 +33,7 @@ import org.eclipse.ptp.pldt.mpi.core.analysis.MpiCPPASTVisitor;
 
 /**
  * @author tibbitts
- *
+ * 
  */
 public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 {
@@ -53,24 +53,25 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 	 * @return
 	 */
 	@Override
-	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,	final List<String> includes) {
+	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu, final List<String> includes) {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
 		ILanguage lang;
-		boolean allowPrefixOnlyMatch=MpiPlugin.getDefault().getPreferenceStore().getBoolean(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
+		boolean allowPrefixOnlyMatch = MpiPlugin.getDefault().getPreferenceStore()
+				.getBoolean(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
 		try {
-			lang = tu.getLanguage(); 
-            
-			//long startTime = System.currentTimeMillis();
+			lang = tu.getLanguage();
+
+			// long startTime = System.currentTimeMillis();
 			IASTTranslationUnit atu = getAST(tu); // use index; was tu.getAST();
 
-			//long endTime = System.currentTimeMillis();
-			//System.out.println("RunAnalyseMPICommandHandler: time to build AST for "+tu+": "+(endTime-startTime)/1000.0+" sec");
-			String languageID=lang.getId();
-			if(languageID.equals(GCCLanguage.ID) || languageID.equals(GPPLanguage.ID)) {
+			// long endTime = System.currentTimeMillis();
+			// System.out.println("RunAnalyseMPICommandHandler: time to build AST for "+tu+": "+(endTime-startTime)/1000.0+" sec");
+			String languageID = lang.getId();
+			if (languageID.equals(GCCLanguage.ID) || languageID.equals(GPPLanguage.ID)) {
 				// null IASTTranslationUnit when we're doing C/C++ means we should quit.
 				// but want to continue to see if this is a fortran file we are analyzing.
-				if(atu==null) {// this is null for Fortran file during JUnit testing.
+				if (atu == null) {// this is null for Fortran file during JUnit testing.
 					System.out.println("RunAnalyseMPICommandHandler.doArtifactAnalysis(), atu is null (testing?)");
 					return msr;
 				}
@@ -79,7 +80,7 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 				atu.accept(new MpiCASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
 			}
 			else if (languageID.equals(GPPLanguage.ID)) { // C++
-			  atu.accept(new MpiCPPASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
+				atu.accept(new MpiCPPASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
 			}
 			else {
 				// Attempt to handle Fortran
@@ -94,27 +95,28 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();
-			CommonPlugin.log(IStatus.ERROR,"RunAnalyseMPICommandHandler.getAST():Error setting up visitor for project "+tu.getCProject()+" error="+e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+			CommonPlugin
+					.log(IStatus.ERROR,
+							"RunAnalyseMPICommandHandler.getAST():Error setting up visitor for project " + tu.getCProject() + " error=" + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return msr;
 	}
-
 
 	@Override
 	protected List<String> getIncludePath() {
 		return MpiPlugin.getDefault().getMpiIncludeDirs();
 	}
-    @Override
+
+	@Override
 	protected void activateArtifactView() {
 		ViewActivator.activateView(MpiIDs.MPI_VIEW_ID);
 	}
-    @Override
-	public boolean areIncludePathsNeeded() {
-    	boolean allowPrefixOnlyMatch= MpiPlugin.getDefault().getPreferenceStore().getBoolean(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
-    	return !allowPrefixOnlyMatch;
-    }
 
-	
-	 
+	@Override
+	public boolean areIncludePathsNeeded() {
+		boolean allowPrefixOnlyMatch = MpiPlugin.getDefault().getPreferenceStore()
+				.getBoolean(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
+		return !allowPrefixOnlyMatch;
+	}
 
 }

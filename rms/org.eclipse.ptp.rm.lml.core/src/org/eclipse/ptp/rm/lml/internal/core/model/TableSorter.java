@@ -67,6 +67,9 @@ public class TableSorter implements Comparator<RowType>{
 	 * @return integer which represents the result of the comparison
 	 */
 	public int compare(RowType a, RowType b) {
+		if (a.getCell().get(sortIndex) == null || b.getCell().get(sortIndex) == null)	{
+			return 0;
+		}
 		// The two elements are equal
 		if(a.getCell().get(sortIndex).getValue().equals(b.getCell().get(sortIndex).getValue())) {
 			return 0;

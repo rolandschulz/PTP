@@ -23,35 +23,33 @@ import org.eclipse.cdt.ui.text.ICHelpInvocationContext;
  */
 public abstract class CHelpProviderImpl implements ICHelpProvider
 {
-    protected CHelpBookImpl helpBook;
-    
+	protected CHelpBookImpl helpBook;
 
+	public ICHelpBook[] getCHelpBooks()
+	{
+		return new ICHelpBook[] { helpBook };
+	}
 
-    public ICHelpBook[] getCHelpBooks()
-    {
-        return new ICHelpBook[] {helpBook};
-    }
+	/**
+	 * called on hover
+	 */
+	public IFunctionSummary getFunctionInfo(ICHelpInvocationContext context, ICHelpBook[] helpBooks, String name)
+	{
+		return (helpBooks.length == 0) ? null : helpBook.getFunctionInfo(context, name);
+	}
 
-    /**
-     * called on hover
-     */
-    public IFunctionSummary getFunctionInfo(ICHelpInvocationContext context, ICHelpBook[] helpBooks, String name)
-    {
-        return (helpBooks.length == 0) ? null : helpBook.getFunctionInfo(context, name);
-    }
+	public IFunctionSummary[] getMatchingFunctions(ICHelpInvocationContext context, ICHelpBook[] helpBooks,
+			String prefix)
+	{
+		return (helpBooks.length == 0) ? null : helpBook.getMatchingFunctions(context, prefix);
+	}
 
-    public IFunctionSummary[] getMatchingFunctions(ICHelpInvocationContext context, ICHelpBook[] helpBooks,
-            String prefix)
-    {
-        return (helpBooks.length == 0) ? null : helpBook.getMatchingFunctions(context, prefix);
-    }
-
-    /**
-     * called on F1
-     */
-    public ICHelpResourceDescriptor[] getHelpResources(ICHelpInvocationContext context, ICHelpBook[] helpBooks,
-            String name)
-    {
-        return (helpBooks.length == 0) ? null : helpBook.getHelpResources(context, name);
-    }
+	/**
+	 * called on F1
+	 */
+	public ICHelpResourceDescriptor[] getHelpResources(ICHelpInvocationContext context, ICHelpBook[] helpBooks,
+			String name)
+	{
+		return (helpBooks.length == 0) ? null : helpBook.getHelpResources(context, name);
+	}
 }

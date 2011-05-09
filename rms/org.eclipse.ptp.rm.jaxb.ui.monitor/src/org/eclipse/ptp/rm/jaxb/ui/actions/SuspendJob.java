@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.actions;
 
-import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.rm.jaxb.ui.data.JobStatusData;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -20,7 +19,7 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
  * @author arossi
  * 
  */
-public class SuspendJob extends AbstractBatchControlAction {
+public class SuspendJob extends AbstractControlAction {
 
 	public SuspendJob() {
 		operation = IResourceManager.SUSPEND_OPERATION;
@@ -35,15 +34,14 @@ public class SuspendJob extends AbstractBatchControlAction {
 	 * org.eclipse.ptp.rm.jaxb.ui.data.PersistentCommandJobStatus)
 	 */
 	@Override
-	protected void validateState(IAction action, JobStatusData status) {
+	protected boolean validateState(JobStatusData status) {
 		String state = status.getState();
 		status.getStateDetail();
 		if (IJobStatus.COMPLETED.equals(state)) {
-			action.setEnabled(false);
+			return false;
 		} else if (IJobStatus.SUSPENDED.equals(state)) {
-			action.setEnabled(false);
-		} else {
-			action.setEnabled(true);
+			return false;
 		}
+		return true;
 	}
 }

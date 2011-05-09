@@ -60,7 +60,7 @@ public abstract class KillableExecution extends AbstractRemoteExecution {
 		getExecutionManager().getConnection().unregisterObservedExecution(this);
 		/*
 		 * Force the end of the execution by closing the channel and killing
-		 * (SIGHUP or something simular) on the remote host. Remote the channel
+		 * (SIGHUP or something similar) on the remote host. Remove the channel
 		 * from the connection pool.
 		 */
 		getExecutionManager().getConnection().killExecution(this);

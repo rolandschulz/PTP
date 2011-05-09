@@ -10,6 +10,7 @@
  *********************************************************************************/
 
 package org.eclipse.ptp.pldt.wizards.wizardPages;
+
 import org.eclipse.cdt.ui.templateengine.IPagesAfterTemplateSelectionProvider;
 import org.eclipse.cdt.ui.templateengine.IWizardDataPage;
 import org.eclipse.core.runtime.CoreException;
@@ -19,19 +20,20 @@ import org.eclipse.ui.IWorkbenchWizard;
 
 /**
  * Wizard Pages for MPI C++ projects as opposed to C projects
+ * 
  * @author Beth Tibbitts
- *
+ * 
  */
 public class MPIProjectProcessPagesCPP implements IPagesAfterTemplateSelectionProvider {
 	IWizardDataPage[] pages;
-	
+
 	public IWizardDataPage[] createAdditionalPages(IWorkbenchWizard wizard,
 			IWorkbench workbench, IStructuredSelection selection) {
 		try {
-			pages= new IWizardDataPage[] {new MPIProjectWizardPageCPP()};
+			pages = new IWizardDataPage[] { new MPIProjectWizardPageCPP() };
 			// TODO - log error
-		} catch(CoreException ce) {
-			pages= new IWizardDataPage[0];
+		} catch (CoreException ce) {
+			pages = new IWizardDataPage[0];
 		}
 		return pages;
 	}

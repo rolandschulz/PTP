@@ -22,11 +22,11 @@ import java.util.*;
  * @author Beth Tibbitts
  */
 public class MpiWizardsPlugin extends AbstractUIPlugin {
-	//The shared instance.
+	// The shared instance.
 	private static MpiWizardsPlugin plugin;
-	//Resource bundle.
+	// Resource bundle.
 	private ResourceBundle resourceBundle;
-	
+
 	/**
 	 * The constructor.
 	 */
@@ -87,8 +87,9 @@ public class MpiWizardsPlugin extends AbstractUIPlugin {
 	/**
 	 * Returns an image descriptor for the image file at the given
 	 * plug-in relative path.
-	 *
-	 * @param path the path
+	 * 
+	 * @param path
+	 *            the path
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {

@@ -65,6 +65,18 @@ public class PreservationRuleset
         addRule(edgeType, Classification.EXTERNAL, Rule.PRESERVE_ALL);
     }
     
+    public void preserveSupersetOutgoing(int edgeType)
+    {
+        addRule(edgeType, Classification.OUTGOING, Rule.PRESERVE_SUPERSET);
+        addRule(edgeType, Classification.EXTERNAL, Rule.PRESERVE_ALL);
+    }
+    
+    public void preserveSubsetInternal(int edgeType)
+    {
+        addRule(edgeType, Classification.INTERNAL, Rule.PRESERVE_SUBSET);
+        addRule(edgeType, Classification.EXTERNAL, Rule.PRESERVE_ALL);
+    }
+    
     private void addRule(int edgeType, Classification classification, Rule rule)
     {
         preservationRules.put(edgeType, classification, rule);

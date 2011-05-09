@@ -23,10 +23,11 @@ import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
  * we have this opportunity to use that information to modify the include paths, build cmds etc.
  * in the project
  * 
- * <p>This handles the special differences for C++ projects, over and above plain C projects.
+ * <p>
+ * This handles the special differences for C++ projects, over and above plain C projects.
  * 
  * @author Beth Tibbitts
- *
+ * 
  */
 public class MPIProjectProcessCPP extends MPIProjectProcess {
 
@@ -36,7 +37,8 @@ public class MPIProjectProcessCPP extends MPIProjectProcess {
 	 * Need to set both C and C++ build commands; the C++ build command is passed in as an arg.
 	 * The C build command was not solicited from the user on the wizard page, so we just
 	 * get the default value to use here.
-	 * <p>C++ projects use both a C build command and a C++ build command in their settings.
+	 * <p>
+	 * C++ projects use both a C build command and a C++ build command in their settings.
 	 */
 	protected void setCompileCommand(IConfiguration cf, String buildCmd) {
 		if (traceOn)
@@ -44,11 +46,11 @@ public class MPIProjectProcessCPP extends MPIProjectProcess {
 		// access the preference store from the MPI plugin so we can get c compiler too
 		IPreferenceStore preferenceStore = MpiPlugin.getDefault().getPreferenceStore();
 		String c_build_cmd = preferenceStore.getString(MpiIDs.MPI_BUILD_CMD);
-		
+
 		// 'buildCmd' arg we assume to be the same as cpp_build_cmd unless the user changed it in the wizard page, so we use that
 		// and so we don't use this
-		//String cpp_build_cmd = preferenceStore.getString(MpiIDs.MPI_CPP_BUILD_CMD);
-		
+		// String cpp_build_cmd = preferenceStore.getString(MpiIDs.MPI_CPP_BUILD_CMD);
+
 		ITool c_compiler = cf.getToolFromInputExtension("c"); //$NON-NLS-1$
 		ITool cpp_compiler = cf.getToolFromInputExtension("cpp"); //$NON-NLS-1$
 

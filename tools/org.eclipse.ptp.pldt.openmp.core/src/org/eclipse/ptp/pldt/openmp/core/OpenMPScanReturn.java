@@ -11,8 +11,6 @@
 
 package org.eclipse.ptp.pldt.openmp.core;
 
-
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,53 +25,57 @@ import org.eclipse.ptp.pldt.openmp.analysis.OpenMPError;
  */
 public class OpenMPScanReturn extends ScanReturn
 {
-    private LinkedList<OpenMPError> problems_ = new LinkedList<OpenMPError>();  
-    
-    /**
-     * OpenMPScanReturn - constructor
-     *
-     */
-    public OpenMPScanReturn()
-    {
-       super();   
-    }
+	private LinkedList<OpenMPError> problems_ = new LinkedList<OpenMPError>();
 
-    /**
-     * addOpenMPArtifact - add a pragma to the pragma list
-     * @param a
-     */
-    public void addOpenMPArtifact(Artifact a)
-    {
-        addArtifact(a);
-    }
+	/**
+	 * OpenMPScanReturn - constructor
+	 * 
+	 */
+	public OpenMPScanReturn()
+	{
+		super();
+	}
 
-    /**
-     * getOpenMPList - get the pragma list
-     * @return
-     */
-    public List<Artifact> getOpenMPList()
-    {
-        return getArtifactList();
-    }
-    
+	/**
+	 * addOpenMPArtifact - add a pragma to the pragma list
+	 * 
+	 * @param a
+	 */
+	public void addOpenMPArtifact(Artifact a)
+	{
+		addArtifact(a);
+	}
 
-    /**
-     * addProblemst - add a set of problems to the list
-     * @param errors - LinkedList
-     */
-    public void addProblems(LinkedList<OpenMPError> errors)
-    {
-        if (errors.size()>0)  // 0 sized appends seem to add junk to problems_
-          problems_.addAll(errors);
-    }
+	/**
+	 * getOpenMPList - get the pragma list
+	 * 
+	 * @return
+	 */
+	public List<Artifact> getOpenMPList()
+	{
+		return getArtifactList();
+	}
 
-    /**
-     * getProblems - accessor to problems list
-     * @return
-     */
-    public LinkedList<OpenMPError> getProblems()
-    {
-        return problems_;
-    }
+	/**
+	 * addProblemst - add a set of problems to the list
+	 * 
+	 * @param errors
+	 *            - LinkedList
+	 */
+	public void addProblems(LinkedList<OpenMPError> errors)
+	{
+		if (errors.size() > 0) // 0 sized appends seem to add junk to problems_
+			problems_.addAll(errors);
+	}
+
+	/**
+	 * getProblems - accessor to problems list
+	 * 
+	 * @return
+	 */
+	public LinkedList<OpenMPError> getProblems()
+	{
+		return problems_;
+	}
 
 }

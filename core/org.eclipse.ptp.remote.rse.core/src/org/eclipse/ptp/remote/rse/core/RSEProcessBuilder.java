@@ -84,10 +84,22 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#start()
+	 * @see
+	 * org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getSupportedFlags
+	 * ()
 	 */
 	@Override
-	public IRemoteProcess start() throws IOException {
+	public int getSupportedFlags() {
+		return NONE;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#start(int)
+	 */
+	@Override
+	public IRemoteProcess start(int flags) throws IOException {
 		List<String> cmdArgs = command();
 		if (cmdArgs.size() < 1) {
 			throw new IndexOutOfBoundsException();
@@ -108,19 +120,17 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 			if (directory() != null) {
 				initialDir = directory().toURI().getPath();
 			}
-			
+
 			SpawnerSubsystem subsystem = getSpawnerSubsystem();
-			
-			if(subsystem != null) {
+
+			if (subsystem != null) {
 				hostShell = subsystem.spawnRedirected(remoteCmd, initialDir, null, getEnvironment(), new NullProgressMonitor());
-				
-				if(hostShell == null) {
+
+				if (hostShell == null) {
 					// fall back to old method of using RSE
 					hostShell = launchCommandWithRSE(remoteCmd, initialDir);
 				}
-			}
-			
-			else {
+			} else {
 				// fall back to old method of using RSE
 				hostShell = launchCommandWithRSE(remoteCmd, initialDir);
 			}
@@ -132,7 +142,6 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 
 		return new RSEProcess(hostShell, redirectErrorStream());
 	}
-
 
 	private IHostShell launchCommandWithRSE(String remoteCmd, String initialDir) throws IOException, SystemMessageException {
 		// The exit command is called to force the remote shell to close after
@@ -153,33 +162,36 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 
 	private SpawnerSubsystem getSpawnerSubsystem() {
 		DStoreConnectorService dstoreConnectorService = getDStoreConnectorService();
-		
-		if(dstoreConnectorService == null) {
+
+		if (dstoreConnectorService == null) {
 			return null;
 		}
-		
+
 		ISubSystem subsystems[] = dstoreConnectorService.getSubSystems();
-		
-		for(ISubSystem subsystem : subsystems) {
-			if(subsystem instanceof SpawnerSubsystem)
+
+		for (ISubSystem subsystem : subsystems) {
+			if (subsystem instanceof SpawnerSubsystem) {
 				return (SpawnerSubsystem) subsystem;
+			}
 		}
-		
+
 		return null;
 	}
-	
+
 	private DStoreConnectorService getDStoreConnectorService() {
-		for(IConnectorService service : fConnection.getHost().getConnectorServices()) {
-			if(service instanceof DStoreConnectorService)
+		for (IConnectorService service : fConnection.getHost().getConnectorServices()) {
+			if (service instanceof DStoreConnectorService) {
 				return (DStoreConnectorService) service;
+			}
 		}
-		
+
 		return null;
 	}
-	
+
 	private String spaceEscapify(String inputString) {
-		if (inputString == null)
+		if (inputString == null) {
 			return null;
+		}
 		return inputString.replaceAll(" ", "\\\\ "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 

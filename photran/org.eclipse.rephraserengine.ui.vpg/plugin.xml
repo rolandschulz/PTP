@@ -104,7 +104,7 @@
       </category>
       <command
             name="Browse VPG"
-            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            categoryId="org.eclipse.rephraserengine.ui.VPGDebuggingCategory"
             id="org.eclipse.rephraserengine.ui.BrowseCommand">
       </command>
    </extension>

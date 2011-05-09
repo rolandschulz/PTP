@@ -42,9 +42,11 @@ public class Symbol {
 	/**
 	 * constructor
 	 * 
-	 * @param declarator -
+	 * @param declarator
+	 *            -
 	 *            IASTDeclarator
-	 * @param declaration -
+	 * @param declaration
+	 *            -
 	 *            IASTDeclartion (for this declarator - and possibly others
 	 */
 	public Symbol(IASTDeclarator declarator, IASTDeclaration declaration) {
@@ -55,9 +57,11 @@ public class Symbol {
 	/**
 	 * constructor
 	 * 
-	 * @param declarator -
+	 * @param declarator
+	 *            -
 	 *            IASTDeclarator
-	 * @param declaration -
+	 * @param declaration
+	 *            -
 	 *            IASTParameterDeclartion (for this declarator - and possibly
 	 *            others
 	 */
@@ -103,7 +107,7 @@ public class Symbol {
 		// find the unique scope for this name
 		IASTName name = declarator_.getName();
 		IBinding binding = name.resolveBinding();
-		//IBinding binding = name.getBinding();
+		// IBinding binding = name.getBinding();
 		if (binding == null)
 			return null;
 
@@ -118,25 +122,30 @@ public class Symbol {
 		return scope;
 	}
 
-    /**
-     * getDefiningFunction - get the function in which declartor is defined
-     * @return IASTNode - either IASTTranslationUnit or IASTFunctionDefinition
-     */
-    public IASTNode getDefiningFunction()
-    {
-        IScope scope = getScope();
-        
-        if (scope==null)  return null;
-        
-        // cdt 8.0: no longer throws exception here
-        IASTNode node = ASTInternal.getPhysicalNodeOfScope(scope); // cdt40
-        
-        // keep moving up the tree until we find the node
-        while(true) {
-            if (node==null)  return null;
-            if (node instanceof IASTTranslationUnit) return node;      // global dict
-            if (node instanceof IASTFunctionDefinition)  return node;  // our function
-            node = node.getParent();
-        }
-    }
+	/**
+	 * getDefiningFunction - get the function in which declartor is defined
+	 * 
+	 * @return IASTNode - either IASTTranslationUnit or IASTFunctionDefinition
+	 */
+	public IASTNode getDefiningFunction()
+	{
+		IScope scope = getScope();
+
+		if (scope == null)
+			return null;
+
+		// cdt 8.0: no longer throws exception here
+		IASTNode node = ASTInternal.getPhysicalNodeOfScope(scope); // cdt40
+
+		// keep moving up the tree until we find the node
+		while (true) {
+			if (node == null)
+				return null;
+			if (node instanceof IASTTranslationUnit)
+				return node; // global dict
+			if (node instanceof IASTFunctionDefinition)
+				return node; // our function
+			node = node.getParent();
+		}
+	}
 }

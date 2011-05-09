@@ -26,8 +26,11 @@ public class RemoveJob extends AbstractStatusAction {
 	 */
 	public void run(IAction action) {
 		if (MessageDialog.openQuestion(view.getSite().getShell(), Messages.CannotUndoOperation, Messages.RemoveJobWarning)) {
-			view.removeJob(status.getJobId());
+			for (JobStatusData status : selected) {
+				view.removeJob(status.getJobId());
+			}
 		}
+		view.refresh();
 	}
 
 	/*
@@ -39,7 +42,7 @@ public class RemoveJob extends AbstractStatusAction {
 	 * org.eclipse.ptp.rm.jaxb.ui.data.PersistentCommandJobStatus)
 	 */
 	@Override
-	protected void validate(IAction action, JobStatusData status) {
+	protected void validate(IAction action) {
 		action.setEnabled(true);
 	}
 }

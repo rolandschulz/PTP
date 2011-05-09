@@ -96,8 +96,8 @@
 				<xs:annotation>
 					<xs:documentation>
 						NOTE: if the submission type is interactive, this command does not need to be implemented, as the process
-						termination will be handled
-						internally.
+						termination will be handled internally. However, in some cases (such as PBS -I) one may need this command in order to force
+						termination of the interactive terminal job.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -256,6 +256,15 @@
 	<xs:complexType name="command-type">
 		<xs:sequence>
 			<xs:element name="arg" maxOccurs="unbounded" type="rm:arg-type"/>
+			<xs:element name="input" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type">
+				<xs:annotation>
+					<xs:documentation>
+						When there is input present, it is directed to the input stream of the command with this name. If the "keepOpen"
+						attribute is true, a check will be made to see if there already exists an open process (which is also alive) corresponding to the
+						name of this command, and use that; otherwise, ut first executes the arguments, then provides the input arguments to it.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:name-value-pair-type"/>
 			<xs:element name="stdout-parser" minOccurs="0" type="rm:tokenizer-type"/>
 			<xs:element name="stderr-parser" minOccurs="0" type="rm:tokenizer-type"/>
@@ -268,6 +277,25 @@
 		<xs:attribute name="replaceEnvironment" type="xs:boolean" default="false"/>
 		<xs:attribute name="waitForId" type="xs:boolean" default="true"/>
 		<xs:attribute name="ignoreExitStatus" type="xs:boolean" default="false"/>
+		<xs:attribute name="keepOpen" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Process will be added to table under the name of this command; all such processes will be closed when the
+					resource manager is closed.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="flags" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					An or'd string corresponding to the remote process flags. Currently these include only:
+					NONE
+					ALLOCATE_PTY
+					(allocates pseudo-terminal)
+					FORWARD_X11
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="launch-tab-type">
 		<xs:annotation>
@@ -275,15 +303,13 @@
 				A recursive description of the UI element associated with the control part, the Launch Tab.
 				As in:
 				org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab, provides a top-level "switch" between controllers. There
-				are a maximum of three top-level tabs or "pages"; the basic and advanced (the names are placeholders which need not correspond to
-				their actual content or usage, and can be changed) controllers are configurable; for the custom controller, see below.
-				The SWT-related types generally expose the fields of their associated Java class.
+				can be an arbitrary number of top-level tabs or "pages"; the dynamic controllers are configurable; for the import controller, see
+				below. The SWT-related types generally expose the fields of their associated Java class.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="basic" minOccurs="0" type="rm:tab-controller-type"/>
-			<xs:element name="advanced" minOccurs="0" type="rm:tab-controller-type"/>
-			<xs:element name="custom-controller" minOccurs="0" type="xs:string">
+			<xs:element name="dynamic" minOccurs="0" maxOccurs="unbounded" type="rm:tab-controller-type"/>
+			<xs:element name="import" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
 						Fixed type; to be used with scheduler systems which accept submission scripts. Allows the user to browse the
@@ -665,6 +691,14 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="sub-layout-data" minOccurs="0" type="rm:layout-data-type">
+				<xs:annotation>
+					<xs:documentation>
+						If the widget is a composite (like the browse button), the first layout data will be applied to the first
+						element and the sub-layout the second (in this case, the text and button components, respectively).
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="items-from" minOccurs="0" type="xs:string">
@@ -703,17 +737,10 @@
 					<xs:enumeration value="spinner"/>
 					<xs:enumeration value="combo"/>
 					<xs:enumeration value="radioButton"/>
-					<xs:enumeration value="browseLocal">
+					<xs:enumeration value="browse">
 						<xs:annotation>
 							<xs:documentation>
-								Creates a read-only text widget followed by a push button allowing the user to browse the local file system.
-							</xs:documentation>
-						</xs:annotation>
-					</xs:enumeration>
-					<xs:enumeration value="browseRemote">
-						<xs:annotation>
-							<xs:documentation>
-								Creates a read-only text widget followed by a push button allowing the user to browse a remote file system.
+								Creates a text widget followed by a push button allowing the user to browse for directory or file.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:enumeration>
@@ -722,6 +749,27 @@
 		</xs:attribute>
 		<xs:attribute name="title" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
+		<xs:attribute name="directory" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					For the browser widget. Browse and return directory. Default is browse file.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="uri" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					For the browser widget. Browse connection is local or remote, and returns a uri. Default returns path.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="localOnly" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					For the browser widget. Use local file browser instead of the default remote connection browser.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false">
 			<xs:annotation>
 				<xs:documentation>

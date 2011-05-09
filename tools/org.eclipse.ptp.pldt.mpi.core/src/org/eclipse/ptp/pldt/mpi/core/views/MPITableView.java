@@ -9,8 +9,7 @@ import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
  * An MPI artifact view based on SimpleTableView <br>
  * Note that the ID must be unique.
  * <p>
- * If you need to read icon images, etc. from the plug-in, be sure to pass in an
- * actual Plugin class instance for first arg
+ * If you need to read icon images, etc. from the plug-in, be sure to pass in an actual Plugin class instance for first arg
  */
 public class MPITableView extends SimpleTableMarkerView {
 	public MPITableView() {

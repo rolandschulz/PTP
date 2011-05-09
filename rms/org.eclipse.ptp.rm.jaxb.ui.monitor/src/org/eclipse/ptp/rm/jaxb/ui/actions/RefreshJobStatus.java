@@ -9,11 +9,14 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.actions;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.jaxb.ui.data.JobStatusData;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * Refreshes the state of the job by invoking getJobStatus on the resource
@@ -23,19 +26,28 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
  * 
  */
 public class RefreshJobStatus extends AbstractStatusAction {
-
 	/*
-	 * Restarts the control if it is not running. (non-Javadoc)
+	 * Restarts the resource manager control if it is not running. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-		try {
-			view.maybeUpdateJobState(status, true);
-		} catch (Throwable t) {
-			MessageDialog.openError(view.getSite().getShell(), Messages.RefreshJobStatus,
-					Messages.RefreshJobStatusError + COSP + t.getMessage());
-		}
+		UIJob job = new UIJob(Messages.RefreshJobStatus) {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				for (JobStatusData status : selected) {
+					try {
+						view.maybeUpdateJobState(status, true);
+					} catch (Throwable t) {
+						MessageDialog.openError(view.getSite().getShell(), Messages.RefreshJobStatusErrorTitle,
+								Messages.RefreshJobStatusError + COSP + t.getMessage());
+					}
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setUser(true);
+		job.schedule();
 	}
 
 	/*
@@ -47,12 +59,7 @@ public class RefreshJobStatus extends AbstractStatusAction {
 	 * org.eclipse.ptp.rm.jaxb.ui.data.PersistentCommandJobStatus)
 	 */
 	@Override
-	protected void validate(IAction action, JobStatusData status) {
-		String state = status.getState();
-		if (IJobStatus.COMPLETED.equals(state)) {
-			action.setEnabled(false);
-		} else {
-			action.setEnabled(true);
-		}
+	protected void validate(IAction action) {
+		action.setEnabled(true);
 	}
 }

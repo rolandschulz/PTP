@@ -7,8 +7,11 @@
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
             configurationFile="data/pbs-torque-generic.xml"
-            id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider"
             name="PBS Torque (Generic)">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/pbs-torque-interactive.xml"
+            name="PBS Torque (Interactive)">
       </JAXBResourceManagerConfiguration>
    </extension>
    <extension
@@ -42,11 +45,11 @@
    </extension>
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer">
-      <StreamParserTokenizer
-            class="org.eclipse.ptp.rm.jaxb.core.runnable.ConfigurableRegexTokenizer"
+      <streamParserTokenizer
+            class="org.eclipse.ptp.rm.jaxb.core.runnable.command.ConfigurableRegexTokenizer"
             id="org.eclipse.ptp.rm.jaxb.configurableRegexTokenizer"
             name="Configurable Regex Tokenizer">
-      </StreamParserTokenizer>
+      </streamParserTokenizer>
    </extension>
    <extension
          point="org.eclipse.ptp.core.resourceManagers">

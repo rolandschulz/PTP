@@ -145,7 +145,7 @@ public final class ReplacementList implements Iterable<Replacement>
         
         String filename = tokenRef.getFilename();
         int newOffset = offset(filename, tokenRef.getOffset());
-        int newEndOffset = offset(filename, tokenRef.getEndOffset()-1)+1;
+        int newEndOffset = offset(filename, tokenRef.getEndOffset());//-1)+1;
         return vpg.getVPGNode(
             filename,
             newOffset,

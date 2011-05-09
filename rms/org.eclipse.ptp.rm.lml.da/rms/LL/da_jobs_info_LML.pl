@@ -183,10 +183,16 @@ my %mapping = (
     "Num_Task_Inst"                          => "",
     "Step_rCxt_Blocks"                       => "",
     "TaskInstances"                          => "nodelist",
-    "TaskInstances"                          => "nodelist",
+    "totaltasks"                             => "totaltasks",
+    "totalcores"                             => "totalcores",
+
     );
 
-open(IN,"llq -l |");
+
+my $cmd="/usr/bin/llq";
+$cmd=$ENV{"CMD_JOBINFO"} if($ENV{"CMD_JOBINFO"}); 
+
+open(IN,"$cmd -l |");
 my $jobid="-";
 my $lastkey="-";
 my (%nodelastcorenumber);
@@ -201,6 +207,8 @@ while($line=<IN>) {
 	if($num>=0) {
 	    $jobs{$jobid}{TaskInstances}.="($host,".$nodelastcorenumber{$host}.")";
 	    $nodelastcorenumber{$host}++;
+	    $jobs{$jobid}{totalcores}++;
+	    $jobs{$jobid}{totaltasks}++;
 	}
     } elsif($line=~/^=+ Job Step $patwrd =+/) {
 	$jobid=$1;
@@ -214,9 +222,17 @@ while($line=<IN>) {
 	$line=~s/^\s*//gs;
 	$jobs{$jobid}{$lastkey}.=",$line";
     }
-
 }
 close(IN);
+
+# add unknown but manatory attributes to jobs
+foreach $jobid (sort(keys(%jobs))) {
+    $jobs{$jobid}{group}      = "unknown" if(!exists($jobs{$jobid}{group}));
+    $jobs{$jobid}{exec_host}  = "-" if(!exists($jobs{$jobid}{exec_host}));
+    $jobs{$jobid}{totaltasks} = 0 if(!exists($jobs{$jobid}{totaltasks}));
+    $jobs{$jobid}{spec}       = 0 if(!exists($jobs{$jobid}{spec}));
+}
+
 
 open(OUT,"> $filename") || die "cannot open file $filename";
 printf(OUT "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");

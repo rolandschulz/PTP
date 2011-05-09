@@ -36,7 +36,7 @@ my %mapping = (
 
 my ($sysinfoid,$line,%sysinfo,%sysinfonr,$key,$value,$count,%notmappedkeys,%notfoundkeys);
 
-$sysinfoid="jugene";
+$sysinfoid="cluster";
 $sysinfo{$sysinfoid}{hostname}=$Hostname;
 $sysinfo{$sysinfoid}{date}=&get_current_date();
 $sysinfo{$sysinfoid}{type}="Cluster";

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 QNX Software Systems and others.
+ * Copyright (c) 2006, 2011 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,15 @@
  * IBM Corporation
  *******************************************************************************/
 
+/* -- ST-Origin --
+ * Source folder: org.eclipse.cdt.ui/src
+ * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchElementQuery
+ * Version: 1.14
+ */
+
 package org.eclipse.ptp.internal.rdt.core.search;
 
-import org.eclipse.cdt.core.dom.ast.DOMException;
+
 import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexLocationConverter;
@@ -21,9 +27,7 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 
 public class RemoteSearchElementQuery extends RemoteSearchQuery {
@@ -38,6 +42,11 @@ public class RemoteSearchElementQuery extends RemoteSearchQuery {
 		fElement = element;
 		fPath = path;
 	}
+	
+	public ISourceReference getSourceReference() {
+		return fElement;
+	}
+
 
 	public void runWithIndex(IIndex parseIndex,  IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException, CoreException, InterruptedException {
 		fConverter = converter;
@@ -47,6 +56,7 @@ public class RemoteSearchElementQuery extends RemoteSearchQuery {
 			parseIndex.acquireReadLock();
 			try{
 				binding= IndexQueries.elementToBinding(parseIndex, (ICElement) fElement, fPath);
+				cElement = CElementForBinding(parseIndex, binding);
 			}finally{
 				parseIndex.releaseReadLock();
 			}
@@ -62,7 +72,4 @@ public class RemoteSearchElementQuery extends RemoteSearchQuery {
 	
 	}
 	
-	public ISourceReference getSourceReference() {
-		return fElement;
-	}
 }

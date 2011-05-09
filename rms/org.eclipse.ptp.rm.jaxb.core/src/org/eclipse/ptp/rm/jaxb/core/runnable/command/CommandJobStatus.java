@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
@@ -34,8 +35,51 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
  */
 public class CommandJobStatus implements ICommandJobStatus {
 
+	/**
+	 * Checks for file existence, then waits 3 seconds to compare file length.
+	 * If block is false, the listeners may be notified that the file is still
+	 * not ready; else the listeners will receive a ready = true notification
+	 * when the file does finally stabilize, provided this occurs within the
+	 * block parameter (seconds).
+	 * 
+	 * @author arossi
+	 */
+	private class FileReadyChecker extends Thread {
+		private boolean ready;
+		private int block;
+		private String path;
+
+		@Override
+		public void run() {
+			ready = false;
+			long timeout = block * 1000;
+			RemoteServicesDelegate d = control.getRemoteServicesDelegate();
+			long start = System.currentTimeMillis();
+			while (!ready) {
+				try {
+					ready = FileUtils.isStable(d.getRemoteFileManager(), path, 3, new NullProgressMonitor());
+				} catch (Throwable t) {
+					JAXBCorePlugin.log(t);
+				}
+
+				if (System.currentTimeMillis() - start >= timeout) {
+					break;
+				}
+
+				synchronized (this) {
+					try {
+						wait(IJAXBNonNLSConstants.STANDARD_WAIT);
+					} catch (InterruptedException ignored) {
+					}
+				}
+			}
+		}
+
+	}
+
 	private final String rmUniqueName;
 	private final IJAXBResourceManagerControl control;
+	private final ICommandJob open;
 
 	private String jobId;
 	private ILaunchConfiguration launchConfig;
@@ -57,8 +101,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @param control
 	 *            resource manager control
 	 */
-	public CommandJobStatus(String rmUniqueName, IJAXBResourceManagerControl control) {
-		this(rmUniqueName, null, UNDETERMINED, control);
+	public CommandJobStatus(String rmUniqueName, ICommandJob open, IJAXBResourceManagerControl control) {
+		this(rmUniqueName, null, UNDETERMINED, open, control);
 	}
 
 	/**
@@ -69,10 +113,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @param control
 	 *            resource manager control
 	 */
-	public CommandJobStatus(String rmUniqueName, String jobId, String state, IJAXBResourceManagerControl control) {
+	public CommandJobStatus(String rmUniqueName, String jobId, String state, ICommandJob open, IJAXBResourceManagerControl control) {
 		this.rmUniqueName = rmUniqueName;
 		this.jobId = jobId;
-		this.state = state;
+		setState(state);
+		this.open = open;
 		this.control = control;
 		assert (null != control);
 		waitEnabled = true;
@@ -82,9 +127,26 @@ public class CommandJobStatus implements ICommandJobStatus {
 	/**
 	 * Closes the proxy and calls destroy on the process. Used for interactive
 	 * job cancellation.
+	 * 
+	 * @return true if canceled during this call.
 	 */
 	public synchronized boolean cancel() {
-		if (process != null) {
+		if (getStateRank(stateDetail) > 4) {
+			return false;
+		}
+
+		/*
+		 * If this process is persistent (open), call terminate on the job, as
+		 * it may still be running; the process will be killed and the proxy
+		 * closed inside the job
+		 */
+		if (open != null) {
+			open.terminate();
+			return true;
+		}
+
+		cancelWait();
+		if (process != null && !process.isCompleted()) {
 			process.destroy();
 			if (proxy != null) {
 				proxy.close();
@@ -239,8 +301,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 			return;
 		}
 
-		Thread tout = null;
-		Thread terr = null;
+		FileReadyChecker tout = null;
+		FileReadyChecker terr = null;
 
 		if (remoteOutputPath != null) {
 			tout = checkForReady(remoteOutputPath, blockForSecs);
@@ -249,6 +311,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 
 		if (remoteErrorPath != null) {
 			terr = checkForReady(remoteErrorPath, blockForSecs);
+		}
+
+		if (tout == null && terr == null) {
+			fFilesChecked = true;
+			return;
 		}
 
 		if (tout != null) {
@@ -264,7 +331,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 			} catch (InterruptedException ignored) {
 			}
 		}
-		setState(IJobStatus.JOB_OUTERR_READY);
+
+		if ((tout == null || tout.ready) && (terr == null || terr.ready)) {
+			setState(IJobStatus.JOB_OUTERR_READY);
+		}
+
 		fFilesChecked = true;
 	}
 
@@ -303,8 +374,13 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 *            of the job (not of the submission process).
 	 */
 	public synchronized void setState(String state) {
+		if (!canUpdateState(state)) {
+			return;
+		}
+
 		dirty = false;
 		String previousDetail = stateDetail;
+
 		if (UNDETERMINED.equals(state)) {
 			this.state = UNDETERMINED;
 			stateDetail = UNDETERMINED;
@@ -344,6 +420,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 		} else if (FAILED.equals(state)) {
 			this.state = COMPLETED;
 			stateDetail = FAILED;
+		} else if (CANCELED.equals(state)) {
+			this.state = COMPLETED;
+			stateDetail = CANCELED;
 		} else if (JOB_OUTERR_READY.equals(state)) {
 			this.state = COMPLETED;
 			stateDetail = JOB_OUTERR_READY;
@@ -373,18 +452,26 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return changed;
 	}
 
-	/**
+	/*
 	 * Wait until the jobId has been set on the job id property in the
 	 * environment.
 	 * 
-	 * @param uuid
-	 *            key for the property containing as its name the
-	 *            resource-specific jobId and as its value its initial state
-	 *            (SUBMITTED)
+	 * The uuid key for the property containing as its name the
+	 * resource-specific jobId and as its value the state.
+	 * 
+	 * The waitUntil state will usually be either SUBMITTED or RUNNING (for
+	 * interactive)
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#waitForJobId(java.lang
+	 * .String, java.lang.String,
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl)
 	 */
-	public void waitForJobId(String uuid) {
+	public void waitForJobId(String uuid, String waitUntil) {
 		synchronized (this) {
-			while (waitEnabled && jobId == null) {
+			while (waitEnabled && (jobId == null || !waitUntil.equals(state))) {
 				try {
 					wait(1000);
 				} catch (InterruptedException ignored) {
@@ -398,12 +485,35 @@ public class CommandJobStatus implements ICommandJobStatus {
 					jobId = p.getName();
 					String v = (String) p.getValue();
 					if (v != null) {
-						state = v;
+						setState(v);
 					}
-
+				}
+				if (jobId != null && stateChanged()) {
+					control.jobStateChanged(jobId);
 				}
 			}
 		}
+	}
+
+	/**
+	 * Implicitly describes the legal state transitions.
+	 * 
+	 * @param newState
+	 * @return transition is legal
+	 */
+	private boolean canUpdateState(String newState) {
+		int prevRank = getStateRank(stateDetail);
+		int currRank = getStateRank(newState);
+		if (prevRank >= currRank) {
+			if (prevRank == 0) {
+				return true;
+			}
+			if (prevRank != 4 || currRank != 3) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -416,35 +526,50 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @param blockInSeconds
 	 * @return thread running the check
 	 */
-	private Thread checkForReady(final String path, final int block) {
-		Thread t = new Thread() {
-			@Override
-			public void run() {
-				boolean ready = false;
-				long timeout = block * 1000;
-				RemoteServicesDelegate d = control.getRemoteServicesDelegate();
-				long start = System.currentTimeMillis();
-				while (!ready) {
-					try {
-						ready = FileUtils.isStable(d.getRemoteFileManager(), path, 3, new NullProgressMonitor());
-					} catch (Throwable t) {
-						JAXBCorePlugin.log(t);
-					}
-
-					if (System.currentTimeMillis() - start >= timeout) {
-						break;
-					}
-
-					synchronized (this) {
-						try {
-							wait(IJAXBNonNLSConstants.READY_FILE_PAUSE);
-						} catch (InterruptedException ignored) {
-						}
-					}
-				}
-			}
-		};
+	private FileReadyChecker checkForReady(final String path, final int block) {
+		FileReadyChecker t = new FileReadyChecker();
+		t.block = block;
+		t.path = path;
 		t.start();
 		return t;
+	}
+
+	/**
+	 * Gives ordering of states.
+	 * 
+	 * @param state
+	 * @return the ordering of the state
+	 */
+	private int getStateRank(String state) {
+		if (SUBMITTED.equals(state)) {
+			return 1;
+		} else if (RUNNING.equals(state)) {
+			return 4;
+		} else if (SUSPENDED.equals(state)) {
+			return 3;
+		} else if (COMPLETED.equals(state)) {
+			return 5;
+		} else if (QUEUED_ACTIVE.equals(state)) {
+			return 2;
+		} else if (SYSTEM_ON_HOLD.equals(state)) {
+			return 3;
+		} else if (USER_ON_HOLD.equals(state)) {
+			return 3;
+		} else if (USER_SYSTEM_ON_HOLD.equals(state)) {
+			return 3;
+		} else if (SYSTEM_SUSPENDED.equals(state)) {
+			return 3;
+		} else if (USER_SUSPENDED.equals(state)) {
+			return 3;
+		} else if (USER_SYSTEM_SUSPENDED.equals(state)) {
+			return 3;
+		} else if (FAILED.equals(state)) {
+			return 6;
+		} else if (CANCELED.equals(state)) {
+			return 6;
+		} else if (JOB_OUTERR_READY.equals(state)) {
+			return 6;
+		}
+		return 0;
 	}
 }

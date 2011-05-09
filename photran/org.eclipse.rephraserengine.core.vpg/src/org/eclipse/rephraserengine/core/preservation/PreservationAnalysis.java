@@ -11,6 +11,7 @@
 package org.eclipse.rephraserengine.core.preservation;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -297,7 +298,10 @@ public final class PreservationAnalysis
     {
         try
         {
-            FileWriter output = new FileWriter("/Users/joverbey/Desktop/times.csv", true); //$NON-NLS-1$
+            FileWriter output = new FileWriter(
+                System.getProperty("user.home") + File.separator + //$NON-NLS-1$
+                "Desktop" + File.separator + //$NON-NLS-1$
+                "times.csv", true); //$NON-NLS-1$
             output.write(fields + "\n"); //$NON-NLS-1$
             output.write(times + "\n"); //$NON-NLS-1$
             output.close();
