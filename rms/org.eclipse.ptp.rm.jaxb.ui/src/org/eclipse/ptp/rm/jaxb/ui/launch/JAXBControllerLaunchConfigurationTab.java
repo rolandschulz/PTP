@@ -26,6 +26,8 @@ import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IFireContentsChangedEnabled;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -48,11 +50,11 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	private RemoteServicesDelegate delegate;
 	private final IJAXBResourceManagerConfiguration rmConfig;
 	private final LaunchTabType launchTabData;
-	private final ScriptType script;
 	private final ValueUpdateHandler updateHandler;
-
-	private ScrolledComposite scrolledParent;
 	private final LCVariableMap lcMap;
+
+	private ScriptType script;
+	private ScrolledComposite scrolledParent;
 
 	/**
 	 * @param rm
@@ -64,20 +66,35 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	public JAXBControllerLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
 		super(dialog);
 		rmConfig = rm.getJAXBConfiguration();
-		script = rmConfig.getResourceManagerData().getControlData().getScript();
-		launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
-		updateHandler = new ValueUpdateHandler(this);
-		if (launchTabData != null) {
-			List<TabControllerType> dynamic = launchTabData.getDynamic();
-			for (TabControllerType controller : dynamic) {
-				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
-			}
-			String title = launchTabData.getImport();
-			if (title != null) {
-				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this));
-			}
+		try {
+			script = rmConfig.getResourceManagerData().getControlData().getScript();
+			voidRMConfig = false;
+		} catch (Throwable t) {
+			script = null;
+			voidRMConfig = true;
+			WidgetActionUtils.errorMessage(dialog.getActiveTab().getControl().getShell(), t, Messages.VoidLaunchTabMessage,
+					Messages.VoidLaunchTabTitle, false);
 		}
-		lcMap = new LCVariableMap();
+		if (!voidRMConfig) {
+			launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
+			updateHandler = new ValueUpdateHandler(this);
+			if (launchTabData != null) {
+				List<TabControllerType> dynamic = launchTabData.getDynamic();
+				for (TabControllerType controller : dynamic) {
+					addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
+				}
+				String title = launchTabData.getImport();
+				if (title != null) {
+					addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this));
+				}
+			}
+			lcMap = new LCVariableMap();
+		} else {
+			getControllers().clear();
+			launchTabData = null;
+			updateHandler = null;
+			lcMap = null;
+		}
 	}
 
 	/*
@@ -91,9 +108,11 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 */
 	@Override
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
-		updateHandler.clear();
-		if (parent instanceof ScrolledComposite) {
-			scrolledParent = (ScrolledComposite) parent;
+		if (!voidRMConfig) {
+			updateHandler.clear();
+			if (parent instanceof ScrolledComposite) {
+				scrolledParent = (ScrolledComposite) parent;
+			}
 		}
 		super.createControl(parent, rm, queue);
 	}
@@ -181,13 +200,15 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 */
 	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
-		try {
-			delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate();
-			lcMap.initialize(rmConfig.getRMVariableMap());
-			updateHandler.clear();
-		} catch (Throwable t) {
-			JAXBUIPlugin.log(t);
-			return new RMLaunchValidation(false, t.getMessage());
+		if (!voidRMConfig) {
+			try {
+				delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate();
+				lcMap.initialize(rmConfig.getRMVariableMap());
+				updateHandler.clear();
+			} catch (Throwable t) {
+				JAXBUIPlugin.log(t);
+				return new RMLaunchValidation(false, t.getMessage());
+			}
 		}
 		return super.initializeFrom(control, rm, queue, configuration);
 	}

@@ -310,11 +310,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences();
 			jobStatusMap.halt();
 			doDisconnect();
+			getResourceManager().setState(IResourceManager.STOPPED_STATE);
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
 			throw ce;
 		}
-		getResourceManager().setState(IResourceManager.STOPPED_STATE);
 	}
 
 	/*
@@ -329,25 +329,24 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (monitor != null) {
 			monitor.beginTask(IResourceManager.STARTING_STATE, 10);
 		}
-		initialize();
-		worked(monitor, 2);
-		getResourceManager().setState(IResourceManager.STARTING_STATE);
 		try {
-			try {
-				doConnect(monitor);
-			} catch (RemoteConnectionException t) {
-				throw CoreExceptionUtils.newException(t.getMessage(), t);
-			}
+			initialize();
+			worked(monitor, 2);
+			getResourceManager().setState(IResourceManager.STARTING_STATE);
+			doConnect(monitor);
 			worked(monitor, 2);
 			doOnStartUp(monitor);
 			worked(monitor, 4);
+			getResourceManager().setState(IResourceManager.STARTED_STATE);
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
 			throw ce;
+		} catch (Throwable t) {
+			getResourceManager().setState(IResourceManager.ERROR_STATE);
+			throw CoreExceptionUtils.newException(t.getMessage(), t);
 		} finally {
 			worked(monitor, 0);
 		}
-		getResourceManager().setState(IResourceManager.STARTED_STATE);
 	}
 
 	/*
@@ -620,7 +619,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/**
 	 * Sets the maps and data tree.
 	 */
-	private void initialize() {
+	private void initialize() throws Throwable {
 		launchEnv = new TreeMap<String, String>();
 		jobTable = new HashMap<String, ICommandJob>();
 		pinTable = new JobIdPinTable();
@@ -629,12 +628,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * Use the base configuration which contains the config file information
 		 */
 		IJAXBResourceManagerConfiguration base = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
-		try {
-			rmVarMap = base.getRMVariableMap();
-			controlData = base.getResourceManagerData().getControlData();
-		} catch (Throwable t) {
-			JAXBCorePlugin.log(t);
-		}
+		rmVarMap = base.getRMVariableMap();
+		controlData = base.getResourceManagerData().getControlData();
 		setFixedConfigurationProperties();
 		launchEnv.clear();
 		appendLaunchEnv = true;
