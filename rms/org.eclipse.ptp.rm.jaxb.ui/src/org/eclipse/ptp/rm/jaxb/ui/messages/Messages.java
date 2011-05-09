@@ -126,6 +126,9 @@ public class Messages extends NLS {
 	public static String EnableStderrFetch;
 	public static String RemotePathTooltip;
 
+	public static String VoidLaunchTabMessage;
+	public static String VoidLaunchTabTitle;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

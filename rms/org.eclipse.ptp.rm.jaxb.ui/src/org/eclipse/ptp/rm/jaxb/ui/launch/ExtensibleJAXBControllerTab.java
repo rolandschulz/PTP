@@ -41,6 +41,16 @@ import org.eclipse.swt.widgets.TabItem;
 public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfigurationDynamicTab implements
 		IRMLaunchConfigurationContentsChangedListener {
 
+	/**
+	 * This flag is set when there is a validation error for the resource
+	 * manager configuration. An error will be displayed to the user, but the
+	 * exception will not be thrown. This allows the ResourcesTab to cache this
+	 * invalid RM instead of trying to reconstruct it everytime the selection
+	 * changed listener is called. The user will be advised that this
+	 * ResourceManager has become invalid and should be discarded.
+	 */
+	protected boolean voidRMConfig;
+
 	private final List<AbstractJAXBLaunchConfigurationTab> tabControllers = new ArrayList<AbstractJAXBLaunchConfigurationTab>();
 
 	private Composite control;
@@ -50,6 +60,7 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 */
 	protected ExtensibleJAXBControllerTab(ILaunchConfigurationDialog dialog) {
 		super(dialog);
+		voidRMConfig = false;
 	}
 
 	/*
@@ -82,18 +93,20 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		control.setLayout(layout);
+		if (!voidRMConfig) {
+			GridLayout layout = new GridLayout();
+			control.setLayout(layout);
 
-		final TabFolder tabFolder = new TabFolder(control, SWT.NONE);
-		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			final TabFolder tabFolder = new TabFolder(control, SWT.NONE);
+			tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
-			final TabItem simpleTabItem = new TabItem(tabFolder, SWT.NONE);
-			tabControl.createControl(tabFolder, rm, queue);
-			simpleTabItem.setText(tabControl.getText());
-			simpleTabItem.setImage(tabControl.getImage());
-			simpleTabItem.setControl(tabControl.getControl());
+			for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+				final TabItem simpleTabItem = new TabItem(tabFolder, SWT.NONE);
+				tabControl.createControl(tabFolder, rm, queue);
+				simpleTabItem.setText(tabControl.getText());
+				simpleTabItem.setImage(tabControl.getImage());
+				simpleTabItem.setControl(tabControl.getControl());
+			}
 		}
 	}
 
