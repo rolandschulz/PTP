@@ -737,12 +737,14 @@ public class WidgetBuilderUtils {
 		}
 
 		Spinner s = new Spinner(parent, SWT.NONE);
-		if (maximum != null) {
-			s.setMaximum(maximum);
+		if (maximum == null) {
+			maximum = Integer.MAX_VALUE;
 		}
-		if (minimum != null) {
-			s.setMinimum(minimum);
+		if (minimum == null) {
+			minimum = 0;
 		}
+		s.setMaximum(maximum);
+		s.setMinimum(minimum);
 		if (initialValue != null) {
 			s.setSelection(initialValue);
 		}

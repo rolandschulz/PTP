@@ -170,6 +170,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private StreamSplitter outSplitter;
 	private StreamSplitter errSplitter;
 	private ICommandJobStatus jobStatus;
+	private IStatus status;
 	private boolean active;
 
 	/**
@@ -220,6 +221,15 @@ public class CommandJob extends Job implements ICommandJob {
 	 */
 	public ICommandJobStreamsProxy getProxy() {
 		return proxy;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#getRunStatus()
+	 */
+	public IStatus getRunStatus() {
+		return status;
 	}
 
 	/**
@@ -307,7 +317,7 @@ public class CommandJob extends Job implements ICommandJob {
 			}
 		}
 
-		IStatus runStatus = execute(monitor);
+		status = execute(monitor);
 
 		/*
 		 * When there is a UUID defined for this command, set the status for it.
@@ -335,12 +345,12 @@ public class CommandJob extends Job implements ICommandJob {
 			if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
 				if (input) {
 					if (process != null && !process.isCompleted()) {
-						runStatus = writeInputToProcess(process);
+						status = writeInputToProcess(process);
 					}
 				}
 			}
 		}
-		return runStatus;
+		return status;
 	}
 
 	/**
@@ -352,6 +362,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private IStatus execute(IProgressMonitor monitor) {
 		try {
 			synchronized (this) {
+				status = null;
 				active = false;
 			}
 			IRemoteProcessBuilder builder = prepareCommand();

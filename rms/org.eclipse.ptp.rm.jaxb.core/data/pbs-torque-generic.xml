@@ -684,7 +684,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					</widget>
 					<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
