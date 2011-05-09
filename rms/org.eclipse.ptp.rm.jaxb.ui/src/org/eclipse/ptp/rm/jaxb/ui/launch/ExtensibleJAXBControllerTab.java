@@ -45,9 +45,10 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 * This flag is set when there is a validation error for the resource
 	 * manager configuration. An error will be displayed to the user, but the
 	 * exception will not be thrown. This allows the ResourcesTab to cache this
-	 * invalid RM instead of trying to reconstruct it everytime the selection
+	 * launch tab instead of trying to reconstruct it everytime the selection
 	 * changed listener is called. The user will be advised that this
-	 * ResourceManager has become invalid and should be discarded.
+	 * ResourceManager has become invalid and should be discarded. The flag is
+	 * reset to valid (false) at the next load of a resource manager.
 	 */
 	protected boolean voidRMConfig;
 
