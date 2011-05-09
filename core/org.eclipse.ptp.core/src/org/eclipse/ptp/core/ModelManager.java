@@ -481,9 +481,9 @@ public class ModelManager implements IModelManager {
 	 * ptp.rmsystem.IResourceManager)
 	 */
 	public void removeResourceManager(IResourceManager rm) {
-		IResourceManagerConfiguration rmConf = rm.getConfiguration();
-		if (rmConf instanceof IServiceProvider) {
-			removeProviderFromConfiguration((IServiceProvider) rmConf);
+		IServiceProvider provider = (IServiceProvider) rm.getConfiguration().getAdapter(IServiceProvider.class);
+		if (provider != null) {
+			removeProviderFromConfiguration(provider);
 		}
 		doRemoveResourceManager(rm);
 	}
