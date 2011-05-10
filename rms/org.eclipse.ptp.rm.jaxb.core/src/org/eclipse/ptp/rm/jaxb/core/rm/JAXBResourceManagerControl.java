@@ -569,14 +569,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * Close the connections.
 	 */
 	private void doDisconnect() {
-		IRemoteConnection conn = getRemoteServicesDelegate().getLocalConnection();
-		if (conn.isOpen()) {
-			conn.close();
-		}
-		conn = getRemoteServicesDelegate().getRemoteConnection();
-		if (conn.isOpen()) {
-			conn.close();
-		}
+		// IRemoteConnection conn =
+		// getRemoteServicesDelegate().getLocalConnection();
+		// if (conn.isOpen()) {
+		// conn.close();
+		// }
+		// conn = getRemoteServicesDelegate().getRemoteConnection();
+		// if (conn.isOpen()) {
+		// conn.close();
+		// }
 	}
 
 	/**
