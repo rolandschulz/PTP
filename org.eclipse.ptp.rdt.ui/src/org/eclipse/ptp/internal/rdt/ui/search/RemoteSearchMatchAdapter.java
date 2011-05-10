@@ -14,7 +14,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.PDOMSearchMatch
- * Version: 1.7
+ * Version: 1.9
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.core/model
  * Class: org.eclipse.cdt.internal.core.model.CModelBuilder2
- * Version: 1.48
+ * Version: 1.52
  */
 
 package org.eclipse.ptp.internal.rdt.core.model;
@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorFunctionStyleMacroDefinition;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.IEnumeration;
@@ -657,6 +658,9 @@ public class ModelBuilder {
 			org.eclipse.ptp.internal.rdt.core.model.SourceManipulation remoteElement = (org.eclipse.ptp.internal.rdt.core.model.SourceManipulation)macro;
 			setIdentifierPosition(element, remoteElement);
 			setBodyPosition(element, remoteElement);
+		}
+		if (macro instanceof IASTPreprocessorFunctionStyleMacroDefinition) {
+			element.setFunctionStyle(true);
 		}
 		
 		return element;
