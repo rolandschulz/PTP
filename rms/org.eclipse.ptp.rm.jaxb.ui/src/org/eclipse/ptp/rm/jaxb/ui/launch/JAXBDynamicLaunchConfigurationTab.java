@@ -146,7 +146,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			CoreExceptionUtils.newException(Messages.CreateControlConfigurableError, t);
 		}
 		createViewScriptGroup(control);
-		parentTab.resize(this.control);
+		size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 	}
 
 	/**
@@ -336,8 +336,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/*
-	 * Adds the Job Output, View Script and Restore Defaults buttons to the
-	 * bottom of the control pane.
+	 * Adds the View Script and Restore Defaults buttons to the bottom of the
+	 * control pane.
 	 */
 	private void createViewScriptGroup(final Composite control) {
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true, 5, 5, 2, 2);

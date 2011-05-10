@@ -121,7 +121,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 		control = WidgetBuilderUtils.createComposite(parent, 1);
 
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(6, false);
-		GridData gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, false, false, 700, JAXBRMUIConstants.DEFAULT, 6,
+		GridData gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, false, false, 600, JAXBRMUIConstants.DEFAULT, 6,
 				JAXBRMUIConstants.DEFAULT);
 		Group comp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
 
@@ -130,7 +130,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 		 */
 		WidgetBuilderUtils.createLabel(comp, Messages.BatchScriptPath, SWT.LEFT, 1);
 		WidgetBuilderUtils.createLabel(comp, JAXBRMUIConstants.ZEROSTR, SWT.LEFT, 1);
-		GridData gdsub = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 410, JAXBRMUIConstants.DEFAULT,
+		GridData gdsub = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 310, JAXBRMUIConstants.DEFAULT,
 				2, JAXBRMUIConstants.DEFAULT);
 		String s = selected == null ? JAXBRMUIConstants.ZEROSTR : selected.toString();
 		choice = WidgetBuilderUtils.createText(comp, SWT.BORDER, gdsub, true, s);
@@ -148,7 +148,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 		layout = WidgetBuilderUtils.createGridLayout(1, true);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, null);
 		int style = SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL;
-		gdsub = WidgetBuilderUtils.createGridDataFill(700, 700, 1);
+		gdsub = WidgetBuilderUtils.createGridDataFill(600, 400, 1);
 		editor = WidgetBuilderUtils.createText(grp, style, gdsub, true, JAXBRMUIConstants.ZEROSTR, null, null);
 		WidgetBuilderUtils.applyMonospace(editor);
 		editor.addMouseListener(new MouseListener() {
@@ -163,8 +163,8 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 			}
 		});
 
+		size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		selected = null;
-		parentTab.resize(control);
 		updateControls();
 	}
 

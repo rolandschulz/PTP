@@ -51,9 +51,9 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 * reset to valid (false) at the next load of a resource manager.
 	 */
 	protected boolean voidRMConfig;
+	protected TabFolder tabFolder;
 
 	private final List<AbstractJAXBLaunchConfigurationTab> tabControllers = new ArrayList<AbstractJAXBLaunchConfigurationTab>();
-
 	private Composite control;
 
 	/**
@@ -98,7 +98,7 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 			GridLayout layout = new GridLayout();
 			control.setLayout(layout);
 
-			final TabFolder tabFolder = new TabFolder(control, SWT.NONE);
+			tabFolder = new TabFolder(control, SWT.NONE);
 			tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 			for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
