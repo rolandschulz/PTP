@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.typehierarchy.THViewPart
- * Version: 1.22
+ * Version: 1.24
  */
 package org.eclipse.ptp.internal.rdt.ui.typehierarchy;
 
@@ -85,7 +85,6 @@ import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ViewForm;
-import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.Transfer;
@@ -154,8 +153,6 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	private boolean fInComputeOrientation= false;
 	private ArrayList<ICElement> fHistoryEntries= new ArrayList<ICElement>(MAX_HISTORY_SIZE);
 	private int fIgnoreSelectionChanges= 0;
-
-	private Clipboard fClipboard;
 
 
     // widgets
@@ -244,14 +241,12 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	@Override
 	public void createPartControl(Composite parent) {
         fPagebook = new PageBook(parent, SWT.NULL);
-        fPagebook.setLayoutData(new GridData(GridData.FILL_BOTH));
+        
         createInfoPage();
         createViewerPage();
                 
         initSelectionProvider();
         
-        fClipboard = new Clipboard(parent.getDisplay());
-
         initDragAndDrop();
         createActions();
         createContextMenu();
@@ -799,8 +794,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 
         fHistoryAction = new THHistoryDropDownAction(this);
         
-        fCopyAction= new CopyTypeHierarchyAction(this, fClipboard, fHierarchyTreeViewer);
-
+        fCopyAction= new CopyTypeHierarchyAction(this, fHierarchyTreeViewer);
 
         // setup action bar
         // global action hooks
@@ -1178,7 +1172,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	}
 	
 	private static class CopyTypeHierarchyAction extends CopyTreeAction {
-		public CopyTypeHierarchyAction(ViewPart view, Clipboard clipboard, TreeViewer viewer) {
+		public CopyTypeHierarchyAction(ViewPart view, TreeViewer viewer) {
 			super(Messages.THViewPart_CopyTypeHierarchy, view, viewer);
 //			PlatformUI.getWorkbench().getHelpSystem().setHelp(this, ICHelpContextIds.TYPE_HIERARCHY_COPY_ACTION);
 		}
