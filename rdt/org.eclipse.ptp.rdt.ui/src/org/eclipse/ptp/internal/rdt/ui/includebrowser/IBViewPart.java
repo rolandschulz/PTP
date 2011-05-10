@@ -14,7 +14,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.includebrowser.IBViewPart
- * Version: 1.30
+ * Version: 1.31
  */
 
 package org.eclipse.ptp.internal.rdt.ui.includebrowser;
@@ -278,7 +278,6 @@ public class IBViewPart extends ViewPart
 		fSetInputJob= new IBSetInputJob(this, Display.getCurrent());
 		
         fPagebook = new PageBook(parent, SWT.NULL);
-        fPagebook.setLayoutData(new GridData(GridData.FILL_BOTH));
         createInfoPage();
         createViewerPage();
                 
