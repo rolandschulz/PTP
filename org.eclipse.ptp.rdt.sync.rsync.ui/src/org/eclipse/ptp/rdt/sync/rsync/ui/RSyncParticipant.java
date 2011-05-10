@@ -11,13 +11,30 @@
 package org.eclipse.ptp.rdt.sync.rsync.ui;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.cdt.internal.ui.CPluginImages;
+import org.eclipse.cdt.ui.newui.CDTPrefUtil;
+import org.eclipse.cdt.ui.newui.PageLayout;
+import org.eclipse.cdt.ui.newui.UIMessages;
+import org.eclipse.cdt.ui.wizards.CNewWizard;
+import org.eclipse.cdt.ui.wizards.CWizardHandler;
+import org.eclipse.cdt.ui.wizards.EntryDescriptor;
+import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.rsync.core.RSyncServiceProvider;
@@ -34,10 +51,13 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.accessibility.AccessibleAdapter;
+import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -47,6 +67,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 
 /**
  * Launches a dialog that configures a remote sync target with OK and Cancel
@@ -201,6 +223,287 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 				}
 			}
 		});
+
+		createDynamicGroup(configArea);
+		// switchTo(updateData(tree, right, show_sup, RemoteMainWizardPage.this,
+		// getWizard()), getDescriptor(tree));
+	}
+
+	private Tree tree;
+	private Composite right;
+	private Button show_sup;
+	private Label right_label;
+	public CWizardHandler h_selected = null;
+	private Label categorySelectedLabel;
+	public static final String DESC = "EntryDescriptor"; //$NON-NLS-1$ 
+	private static final Image IMG_CATEGORY = CPluginImages.get(CPluginImages.IMG_OBJS_SEARCHFOLDER);
+	private static final Image IMG_ITEM = CPluginImages.get(CPluginImages.IMG_OBJS_VARIABLE);
+	private static final String EXTENSION_POINT_ID = "org.eclipse.cdt.ui.CDTWizard"; //$NON-NLS-1$
+	private static final String ELEMENT_NAME = "wizard"; //$NON-NLS-1$
+	private static final String CLASS_NAME = "class"; //$NON-NLS-1$
+
+	private void createDynamicGroup(Composite parent) {
+		Composite c = new Composite(parent, SWT.NONE);
+		c.setLayoutData(new GridData(GridData.FILL_BOTH));
+		c.setLayout(new GridLayout(2, true));
+
+		Label l1 = new Label(c, SWT.NONE);
+		l1.setText("Project type:");
+		l1.setFont(parent.getFont());
+		l1.setLayoutData(new GridData(GridData.BEGINNING));
+
+		right_label = new Label(c, SWT.NONE);
+		right_label.setFont(parent.getFont());
+		right_label.setLayoutData(new GridData(GridData.BEGINNING));
+
+		tree = new Tree(c, SWT.SINGLE | SWT.BORDER);
+		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
+		tree.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				TreeItem[] tis = tree.getSelection();
+				if (tis == null || tis.length == 0) {
+					return;
+				}
+				switchTo((CWizardHandler) tis[0].getData(), (EntryDescriptor) tis[0].getData(DESC));
+				// setPageComplete(validatePage());
+			}
+		});
+		tree.getAccessible().addAccessibleListener(new AccessibleAdapter() {
+			@Override
+			public void getName(AccessibleEvent e) {
+				for (int i = 0; i < tree.getItemCount(); i++) {
+					if (tree.getItem(i).getText().compareTo(e.result) == 0) {
+						return;
+					}
+				}
+				e.result = "Project type:";
+			}
+		});
+		right = new Composite(c, SWT.NONE);
+		right.setLayoutData(new GridData(GridData.FILL_BOTH));
+		right.setLayout(new PageLayout());
+
+		show_sup = new Button(c, SWT.CHECK);
+		show_sup.setText(UIMessages.getString("CMainWizardPage.1")); //$NON-NLS-1$
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		show_sup.setLayoutData(gd);
+		show_sup.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (h_selected != null) {
+					h_selected.setSupportedOnly(show_sup.getSelection());
+				}
+				// switchTo(updateData(tree, right, show_sup,
+				// RemoteMainWizardPage.this, getWizard()),
+				// getDescriptor(tree));
+			}
+		});
+
+		// restore settings from preferences
+		show_sup.setSelection(!CDTPrefUtil.getBool(CDTPrefUtil.KEY_NOSUPP));
+	}
+
+	private void switchTo(CWizardHandler h, EntryDescriptor ed) {
+		if (h == null) {
+			h = ed.getHandler();
+		}
+		if (ed.isCategory()) {
+			h = null;
+		}
+		try {
+			if (h != null) {
+				h.initialize(ed);
+			}
+		} catch (CoreException e) {
+			h = null;
+		}
+		if (h_selected != null) {
+			h_selected.handleUnSelection();
+		}
+		h_selected = h;
+		if (h == null) {
+			if (ed.isCategory()) {
+				if (categorySelectedLabel == null) {
+					categorySelectedLabel = new Label(right, SWT.WRAP);
+					categorySelectedLabel
+							.setText("Project category is selected. Expand the category and select a concrete project type.");
+					right.layout();
+				}
+				categorySelectedLabel.setVisible(true);
+			}
+			return;
+		}
+		right_label.setText(h_selected.getHeader());
+		if (categorySelectedLabel != null) {
+			categorySelectedLabel.setVisible(false);
+		}
+		h_selected.handleSelection();
+		h_selected.setSupportedOnly(show_sup.getSelection());
+	}
+
+	public static CWizardHandler updateData(Tree tree, Composite right, Button show_sup, IWizardItemsListListener ls, IWizard wizard) {
+		// remember selected item
+		TreeItem[] sel = tree.getSelection();
+		String savedStr = (sel.length > 0) ? sel[0].getText() : null;
+
+		tree.removeAll();
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(EXTENSION_POINT_ID);
+		if (extensionPoint == null) {
+			return null;
+		}
+		IExtension[] extensions = extensionPoint.getExtensions();
+		if (extensions == null) {
+			return null;
+		}
+
+		List<EntryDescriptor> items = new ArrayList<EntryDescriptor>();
+		for (int i = 0; i < extensions.length; ++i) {
+			IConfigurationElement[] elements = extensions[i].getConfigurationElements();
+			for (IConfigurationElement element : elements) {
+				if (element.getName().equals(ELEMENT_NAME)) {
+					CNewWizard w = null;
+					try {
+						w = (CNewWizard) element.createExecutableExtension(CLASS_NAME);
+					} catch (CoreException e) {
+						System.out.println(UIMessages.getString("CMainWizardPage.5") + e.getLocalizedMessage()); //$NON-NLS-1$
+						return null;
+					}
+					if (w == null) {
+						return null;
+					}
+					w.setDependentControl(right, ls);
+					for (EntryDescriptor ed : w.createItems(show_sup.getSelection(), wizard)) {
+						items.add(ed);
+					}
+				}
+			}
+		}
+		// If there is a EntryDescriptor which is default for category, make
+		// sure it
+		// is in the front of the list.
+		for (int i = 0; i < items.size(); ++i) {
+			EntryDescriptor ed = items.get(i);
+			if (ed.isDefaultForCategory()) {
+				items.remove(i);
+				items.add(0, ed);
+				break;
+			}
+		}
+
+		// bug # 211935 : allow items filtering.
+		if (ls != null) {
+			items = ls.filterItems(items);
+		}
+		addItemsToTree(tree, items);
+
+		if (tree.getItemCount() > 0) {
+			TreeItem target = null;
+			// try to search item which was selected before
+			if (savedStr != null) {
+				TreeItem[] all = tree.getItems();
+				for (TreeItem element : all) {
+					if (savedStr.equals(element.getText())) {
+						target = element;
+						break;
+					}
+				}
+			}
+			if (target == null) {
+				target = tree.getItem(0);
+				if (target.getItemCount() != 0) {
+					target = target.getItem(0);
+				}
+			}
+			tree.setSelection(target);
+			return (CWizardHandler) target.getData();
+		}
+		return null;
+	}
+
+	private static void addItemsToTree(Tree tree, List<EntryDescriptor> items) {
+		// Sorting is disabled because of users requests
+		// Collections.sort(items, CDTListComparator.getInstance());
+
+		ArrayList<TreeItem> placedTreeItemsList = new ArrayList<TreeItem>(items.size());
+		ArrayList<EntryDescriptor> placedEntryDescriptorsList = new ArrayList<EntryDescriptor>(items.size());
+		for (EntryDescriptor wd : items) {
+			if (wd.getParentId() == null) {
+				wd.setPath(wd.getId());
+				TreeItem ti = new TreeItem(tree, SWT.NONE);
+				ti.setText(TextProcessor.process(wd.getName()));
+				ti.setData(wd.getHandler());
+				ti.setData(DESC, wd);
+				ti.setImage(calcImage(wd));
+				placedTreeItemsList.add(ti);
+				placedEntryDescriptorsList.add(wd);
+			}
+		}
+		while (true) {
+			boolean found = false;
+			Iterator<EntryDescriptor> it2 = items.iterator();
+			while (it2.hasNext()) {
+				EntryDescriptor wd1 = it2.next();
+				if (wd1.getParentId() == null) {
+					continue;
+				}
+				for (int i = 0; i < placedEntryDescriptorsList.size(); i++) {
+					EntryDescriptor wd2 = placedEntryDescriptorsList.get(i);
+					if (wd2.getId().equals(wd1.getParentId())) {
+						found = true;
+						wd1.setParentId(null);
+						CWizardHandler h = wd2.getHandler();
+						/*
+						 * If neither wd1 itself, nor its parent (wd2) have a
+						 * handler associated with them, and the item is not a
+						 * category, then skip it. If it's category, then it's
+						 * possible that children will have a handler associated
+						 * with them.
+						 */
+						if (h == null && wd1.getHandler() == null && !wd1.isCategory()) {
+							break;
+						}
+
+						wd1.setPath(wd2.getPath() + "/" + wd1.getId()); //$NON-NLS-1$
+						wd1.setParent(wd2);
+						if (h != null) {
+							if (wd1.getHandler() == null && !wd1.isCategory()) {
+								wd1.setHandler((CWizardHandler) h.clone());
+							}
+							if (!h.isApplicable(wd1)) {
+								break;
+							}
+						}
+
+						TreeItem p = placedTreeItemsList.get(i);
+						TreeItem ti = new TreeItem(p, SWT.NONE);
+						ti.setText(wd1.getName());
+						ti.setData(wd1.getHandler());
+						ti.setData(DESC, wd1);
+						ti.setImage(calcImage(wd1));
+						placedTreeItemsList.add(ti);
+						placedEntryDescriptorsList.add(wd1);
+						break;
+					}
+				}
+			}
+			// repeat iterations until all items are placed.
+			if (!found) {
+				break;
+			}
+		}
+		// orphan elements (with not-existing parentId) are ignored
+	}
+
+	private static Image calcImage(EntryDescriptor ed) {
+		if (ed.getImage() != null) {
+			return ed.getImage();
+		}
+		if (ed.isCategory()) {
+			return IMG_CATEGORY;
+		}
+		return IMG_ITEM;
 	}
 
 	/*
