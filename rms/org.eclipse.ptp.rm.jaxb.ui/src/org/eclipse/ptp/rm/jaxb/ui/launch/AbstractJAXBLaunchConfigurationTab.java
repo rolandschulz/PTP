@@ -24,6 +24,7 @@ import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -48,6 +49,7 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	protected final Map<String, Object> localMap;
 	protected String title;
 	protected Composite control;
+	protected Point size;
 
 	/**
 	 * @param parentTab
@@ -68,6 +70,14 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 * @return image to display in the folder tab for this LaunchTab
 	 */
 	public abstract Image getImage();
+
+	/**
+	 * @return size of control as originally computed.
+	 * 
+	 */
+	public Point getSize() {
+		return size;
+	}
 
 	/**
 	 * @return text to display in the folder tab for this LaunchTab

@@ -29,8 +29,10 @@ import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -45,7 +47,8 @@ import org.eclipse.swt.widgets.Control;
  * 
  * @author arossi
  */
-public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IFireContentsChangedEnabled {
+public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IFireContentsChangedEnabled,
+		SelectionListener {
 
 	private RemoteServicesDelegate delegate;
 	private final IJAXBResourceManagerConfiguration rmConfig;
@@ -115,6 +118,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 			}
 		}
 		super.createControl(parent, rm, queue);
+		tabFolder.addSelectionListener(this);
 	}
 
 	/*
@@ -210,15 +214,34 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				return new RMLaunchValidation(false, t.getMessage());
 			}
 		}
-		return super.initializeFrom(control, rm, queue, configuration);
+		RMLaunchValidation validation = super.initializeFrom(control, rm, queue, configuration);
+		AbstractJAXBLaunchConfigurationTab t = getControllers().get(0);
+		resize(t.getSize());
+		return validation;
 	}
 
-	/*
-	 * Attempt to suggest resizing to scrolled ResourcesTab composite.
+	/**
+	 * see {@link #widgetSelected(SelectionEvent)}
 	 */
-	public void resize(Control control) {
-		if (scrolledParent != null) {
-			scrolledParent.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		}
+	public void widgetDefaultSelected(SelectionEvent e) {
+		widgetSelected(e);
+	}
+
+	/**
+	 * For resizing scrolled parent.
+	 */
+	public void widgetSelected(SelectionEvent e) {
+		AbstractJAXBLaunchConfigurationTab t = getControllers().get(tabFolder.getSelectionIndex());
+		resize(t.getSize());
+	}
+
+	/**
+	 * Suggest resizing to scrolled ResourcesTab composite.
+	 * 
+	 * @param p
+	 *            size of control
+	 */
+	private void resize(Point p) {
+		scrolledParent.setMinSize(getControl().computeSize(p.x + 25, p.y + 50));
 	}
 }
