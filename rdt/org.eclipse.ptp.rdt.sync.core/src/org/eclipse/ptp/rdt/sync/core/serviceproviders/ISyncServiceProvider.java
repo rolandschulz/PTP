@@ -18,12 +18,25 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**
  * Provides synchronization services.
  */
 public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
+
+	/**
+	 * Get the build location specified by this sync service provider.
+	 * 
+	 * @return
+	 */
+	public String getLocation();
+
+	/**
+	 * Get the remote connection used by this sync service provider.
+	 * 
+	 * @return
+	 */
+	public IRemoteConnection getRemoteConnection();
 
 	/**
 	 * Performs synchronization.
@@ -33,14 +46,12 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * @param monitor
 	 *            progress monitor for monitoring or canceling synch
 	 * @param syncFlags
-	 * 			  Various flags for the sync call. For example, the sync can be forced, either to local (from remote) or to remote
-	 *            (from local). If forced, it is guaranteed to happen before returning. Otherwise, it may happen at any time.
+	 *            Various flags for the sync call. For example, the sync can be
+	 *            forced, either to local (from remote) or to remote (from
+	 *            local). If forced, it is guaranteed to happen before
+	 *            returning. Otherwise, it may happen at any time.
 	 * @throws CoreException
 	 *             if synchronization fails
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
-
-	public IRemoteConnection getRemoteConnection();
-	
-	public String getLocation();
 }
