@@ -586,6 +586,7 @@
 				<xs:element name="composite" type="rm:composite-type"/>
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="widget" type="rm:widget-type"/>
+				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string"/>
