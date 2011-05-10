@@ -62,6 +62,17 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<input isUndefinedIfMatches=".+ -np">${rm:mpiPrefix#value}</input>
 			<input>${rm:executablePath#value} ${rm:progArgs#value}</input>
 			<stdout-parser delim="\n">
+			   <target ref="@jobId">
+               <match>
+                  <expression flags="DOTALL">qsub:.+job[\s]+([\d]+)[.][\w]+[\s]to start.*</expression>
+                  <set field="name">
+                     <entry valueGroup="1"/>
+                  </set>
+                  <set field="value">
+                     <entry value="SUBMITTED"/>
+                  </set>
+               </match>
+            </target>
 				<target ref="@jobId">
 					<match>
 						<expression flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.][\w]+[\s]ready.*</expression>
@@ -89,8 +100,12 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				</target>
 			</stderr-parser>
 		</submit-interactive>
+		<terminate-job name="cancel" waitForId="false">
+         <arg>qdel</arg>
+         <arg>${rm:@jobId#name}</arg>
+      </terminate-job>
 		<launch-tab>
-			<basic>
+			<dynamic>
 				<title>Basic PBS Settings</title>
 				<!-- QUEUES remote path group -->
 				<composite group="true">
@@ -200,7 +215,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 					<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
@@ -210,7 +225,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<fixed-text>${rm:mpiCores#description}</fixed-text>
 					</widget>
 				</composite>
-			</basic>
+			</dynamic>
 		</launch-tab>
 	</control-data>
 	<monitor-data schedulerType="PBS"/>
