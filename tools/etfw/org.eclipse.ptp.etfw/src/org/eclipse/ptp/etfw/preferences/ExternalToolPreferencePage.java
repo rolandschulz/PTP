@@ -191,7 +191,7 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if (path.fetchInfo().exists())
+			if (path!=null&&path.fetchInfo().exists())
 				dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toURI().getPath()); //TODO: This may be bad
 		}
 
