@@ -100,7 +100,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				</target>
 			</stderr-parser>
 		</submit-interactive>
-		<terminate-job name="cancel" waitForId="false">
+		<terminate-job name="cancel">
          <arg>qdel</arg>
          <arg>${rm:@jobId#name}</arg>
       </terminate-job>

@@ -251,7 +251,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
 
-			PropertyType p = null;
+			PropertyType p = (PropertyType) rmVarMap.get(jobId);
 
 			CommandType job = controlData.getGetJobStatus();
 			if (job != null) {
@@ -566,18 +566,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * Close the connections.
+	 * Close the remote connection if it is remote.
 	 */
 	private void doDisconnect() {
-		// IRemoteConnection conn =
-		// getRemoteServicesDelegate().getLocalConnection();
-		// if (conn.isOpen()) {
-		// conn.close();
-		// }
-		// conn = getRemoteServicesDelegate().getRemoteConnection();
-		// if (conn.isOpen()) {
-		// conn.close();
-		// }
+		IRemoteConnection conn = getRemoteServicesDelegate().getRemoteConnection();
+		IRemoteConnection local = getRemoteServicesDelegate().getLocalConnection();
+		if (conn != local && conn.isOpen()) {
+			conn.close();
+		}
 	}
 
 	/**

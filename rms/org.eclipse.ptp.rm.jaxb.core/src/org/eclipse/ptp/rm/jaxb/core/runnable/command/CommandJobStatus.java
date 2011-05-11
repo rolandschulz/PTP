@@ -446,7 +446,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#stateChanged()
 	 */
 	public boolean stateChanged() {
-		boolean changed = dirty;
+		boolean changed = dirty && !UNDETERMINED.equals(state);
 		dirty = false;
 		return changed;
 	}
@@ -469,26 +469,35 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl)
 	 */
 	public void waitForJobId(String uuid, String waitUntil) {
+		RMVariableMap env = control.getEnvironment();
+		if (env == null) {
+			return;
+		}
 		synchronized (this) {
-			while (waitEnabled && (jobId == null || !waitUntil.equals(state))) {
+			while (waitEnabled && (jobId == null || !isReached(state, waitUntil))) {
 				try {
 					wait(1000);
 				} catch (InterruptedException ignored) {
 				}
-				RMVariableMap env = control.getEnvironment();
-				if (env == null) {
-					break;
-				}
 				PropertyType p = (PropertyType) env.get(uuid);
-				if (p != null) {
-					jobId = p.getName();
-					String v = (String) p.getValue();
-					if (v != null) {
-						setState(v);
-					}
+				if (p == null) {
+					continue;
 				}
+
+				jobId = p.getName();
+				String v = (String) p.getValue();
+				if (v != null) {
+					setState(v);
+				}
+
 				if (jobId != null && stateChanged()) {
-					control.jobStateChanged(jobId);
+					/*
+					 * guarantee the presence of intermediate state
+					 */
+					if (p != null && !isReached(state, waitUntil)) {
+						env.put(jobId, p);
+						control.jobStateChanged(jobId);
+					}
 				}
 			}
 		}
@@ -570,5 +579,18 @@ public class CommandJobStatus implements ICommandJobStatus {
 			return 6;
 		}
 		return 0;
+	}
+
+	/**
+	 * @param state
+	 *            current
+	 * @param waitUntil
+	 *            state to reach
+	 * @return true if the current state has reached the indicated state
+	 */
+	private boolean isReached(String state, String waitUntil) {
+		int i = getStateRank(state);
+		int j = getStateRank(waitUntil);
+		return i >= j;
 	}
 }

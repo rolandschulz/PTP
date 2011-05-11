@@ -44,7 +44,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="redirectStderr" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="replaceEnvironment" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="streamBufferLimit" type="{http://www.w3.org/2001/XMLSchema}int" default="-1" />
- *       &lt;attribute name="waitForId" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" />
+ *       &lt;attribute name="waitForId" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -311,7 +311,7 @@ public class CommandType {
 	 */
 	public boolean isWaitForId() {
 		if (waitForId == null) {
-			return true;
+			return false;
 		} else {
 			return waitForId;
 		}
