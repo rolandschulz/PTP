@@ -252,7 +252,7 @@ public class CommandJob extends Job implements ICommandJob {
 
 	/*
 	 * First unblock any wait; this will allow the run method to return. Destroy
-	 * the process and close streams, interrupt the tread and cancel with
+	 * the process and close streams, interrupt the thread and cancel with
 	 * manager. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#terminate()
@@ -262,7 +262,6 @@ public class CommandJob extends Job implements ICommandJob {
 			active = false;
 			if (jobStatus != null) {
 				jobStatus.cancelWait();
-				jobStatus.getJobId();
 			}
 			if (process != null && !process.isCompleted()) {
 				process.destroy();
@@ -334,7 +333,7 @@ public class CommandJob extends Job implements ICommandJob {
 		if (uuid != null) {
 			if (waitForId) {
 				jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
-				jobStatus.waitForJobId(uuid, waitUntil);
+				jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap());
 			} else {
 				String state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
 				jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
@@ -348,6 +347,8 @@ public class CommandJob extends Job implements ICommandJob {
 						status = writeInputToProcess(process);
 					}
 				}
+			} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
+				terminate();
 			}
 		}
 		return status;

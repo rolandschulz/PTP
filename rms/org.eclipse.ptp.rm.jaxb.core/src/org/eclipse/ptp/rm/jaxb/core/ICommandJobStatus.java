@@ -108,8 +108,8 @@ public interface ICommandJobStatus extends IJobStatus {
 	 *            internal id which the job id will be mapped to.
 	 * @param waitUntil
 	 *            wait until this state is reached.
-	 * @param control
-	 *            callback
+	 * @param map
+	 *            callback to map for waits with intermediate states
 	 */
-	public void waitForJobId(String uuid, String waitUntil);
+	public void waitForJobId(String uuid, String waitUntil, ICommandJobStatusMap map);
 }

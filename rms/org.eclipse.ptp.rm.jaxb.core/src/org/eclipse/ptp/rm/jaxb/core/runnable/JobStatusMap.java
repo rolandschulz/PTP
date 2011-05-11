@@ -1,9 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2011 University of Illinois All rights reserved. This program
+ * and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html 
+ * 	
+ * Contributors: 
+ * 	Albert L. Rossi - design and implementation
+ ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.runnable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
@@ -14,7 +24,7 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  * @author arossi
  * 
  */
-public class JobStatusMap extends Thread {
+public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 
 	private final IResourceManagerControl control;
 	private final Map<String, ICommandJobStatus> map;
@@ -26,13 +36,12 @@ public class JobStatusMap extends Thread {
 		map = new HashMap<String, ICommandJobStatus>();
 	}
 
-	/**
-	 * Also unpins the id if it is pinned.
+	/*
+	 * Also unpins the id if it is pinned. (non-Javadoc)
 	 * 
-	 * @param jobId
-	 *            either internal UUID or scheduler id for the job.
-	 * @param status
-	 *            object containing status info and stream proxy
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#addJobStatus(java.lang
+	 * .String, org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus)
 	 */
 	public void addJobStatus(String jobId, ICommandJobStatus status) {
 		synchronized (map) {
@@ -40,12 +49,13 @@ public class JobStatusMap extends Thread {
 		}
 	}
 
-	/**
+	/*
 	 * Synchronized cancel. External calls are premature and thus should not
-	 * block waiting for the remote files if any.
+	 * block waiting for the remote files if any.(non-Javadoc)
 	 * 
-	 * @param jobId
-	 *            either internal UUID or scheduler id for the job.
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#cancel(java.lang.String
+	 * )
 	 */
 	public ICommandJobStatus cancel(String jobId) {
 		ICommandJobStatus status = null;
@@ -59,11 +69,12 @@ public class JobStatusMap extends Thread {
 		return status;
 	}
 
-	/**
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param jobId
-	 *            either internal UUID or scheduler id for the job.
-	 * @return object containing status info and stream proxy
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#getStatus(java.lang
+	 * .String)
 	 */
 	public ICommandJobStatus getStatus(String jobId) {
 		ICommandJobStatus status = null;
@@ -73,8 +84,10 @@ public class JobStatusMap extends Thread {
 		return status;
 	}
 
-	/**
-	 * shuts down the daemon
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#halt()
 	 */
 	public void halt() {
 		synchronized (map) {
@@ -128,11 +141,12 @@ public class JobStatusMap extends Thread {
 		}
 	}
 
-	/**
-	 * Synchronized terminate.
+	/*
+	 * Synchronized terminate. (non-Javadoc)
 	 * 
-	 * @param jobId
-	 *            either internal UUID or scheduler id for the job.
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#terminated(java.lang
+	 * .String)
 	 */
 	public ICommandJobStatus terminated(String jobId) {
 		ICommandJobStatus status = null;

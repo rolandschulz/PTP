@@ -16,6 +16,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
@@ -473,7 +474,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * .String, java.lang.String,
 	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl)
 	 */
-	public void waitForJobId(String uuid, String waitUntil) {
+	public void waitForJobId(String uuid, String waitUntil, ICommandJobStatusMap map) {
 		RMVariableMap env = control.getEnvironment();
 		if (env == null) {
 			return;
@@ -505,6 +506,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				 */
 				if (!isReached(state, waitUntil)) {
 					env.put(jobId, p);
+					map.addJobStatus(jobId, this);
 					control.jobStateChanged(jobId);
 				}
 			}

@@ -55,6 +55,11 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	public String getState();
 
 	/**
+	 * @return resource manager status map
+	 */
+	public ICommandJobStatusMap getStatusMap();
+
+	/**
 	 * For callbacks to the resource manager from internal jobs.
 	 */
 	public void jobStateChanged(String jobId);

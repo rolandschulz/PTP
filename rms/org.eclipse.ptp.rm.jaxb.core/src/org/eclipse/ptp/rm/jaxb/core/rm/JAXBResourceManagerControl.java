@@ -26,6 +26,7 @@ import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus;
+import org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
@@ -76,7 +77,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	private Map<String, String> launchEnv;
 	private Map<String, ICommandJob> jobTable;
-	private JobStatusMap jobStatusMap;
+	private ICommandJobStatusMap jobStatusMap;
 	private JobIdPinTable pinTable;
 	private RMVariableMap rmVarMap;
 	private ControlType controlData;
@@ -138,6 +139,16 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	public String getState() {
 		return getResourceManager().getState();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getStatusMap()
+	 */
+	public ICommandJobStatusMap getStatusMap() {
+		return jobStatusMap;
 	}
 
 	/*
@@ -436,6 +447,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			worked(monitor, 4);
 
 			ICommandJob job = doJobSubmitCommand(uuid, mode);
+
 			worked(monitor, 5);
 
 			ICommandJobStatus status = job.getJobStatus();
@@ -446,7 +458,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 * proxy-specific info
 			 */
 			rmVarMap.remove(uuid);
-
 			jobId = p.getName();
 
 			/*
@@ -460,9 +471,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			jobStatusMap.addJobStatus(status.getJobId(), status);
 			status.setLaunchConfig(configuration);
-			if (!job.isBatch()) {
-				status.setProcess(job.getProcess());
-			}
 			worked(monitor, 2);
 
 			/*
@@ -663,7 +671,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * start daemon
 		 */
 		jobStatusMap = new JobStatusMap(this);
-		jobStatusMap.start();
+		((Thread) jobStatusMap).start();
 	}
 
 	/**
@@ -962,4 +970,5 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 		}
 	}
+
 }
