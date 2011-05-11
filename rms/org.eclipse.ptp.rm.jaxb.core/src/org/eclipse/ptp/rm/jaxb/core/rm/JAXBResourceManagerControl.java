@@ -300,7 +300,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * Executes any shutdown commands, then disconnects. (non-Javadoc)
+	 * Executes any shutdown commands, then calls halt on the status map thread.
+	 * NOTE: closing the RM does not terminate the remote connection it may be
+	 * using. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doShutdown()
 	 */
@@ -310,7 +312,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			doOnShutdown();
 			((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences();
 			jobStatusMap.halt();
-			doDisconnect();
 			getResourceManager().setState(IResourceManager.STOPPED_STATE);
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
@@ -563,17 +564,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		runCommand(jobId, job, false, true);
-	}
-
-	/**
-	 * Close the remote connection if it is remote.
-	 */
-	private void doDisconnect() {
-		IRemoteConnection conn = getRemoteServicesDelegate().getRemoteConnection();
-		IRemoteConnection local = getRemoteServicesDelegate().getLocalConnection();
-		if (conn != local && conn.isOpen()) {
-			conn.close();
-		}
 	}
 
 	/**

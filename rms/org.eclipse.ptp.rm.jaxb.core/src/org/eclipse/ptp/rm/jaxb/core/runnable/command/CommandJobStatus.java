@@ -242,12 +242,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 
 	/*
 	 * NOTE: since the script/job attribute defining this path is generated
-	 * prior to submission, @jobId cannot appear in the path; at the same time,
-	 * a batch variable replacement will not work, as that would not be
-	 * interpretable for the RM. One actually needs to configure two separate
+	 * prior to submission, ${rm:@jobId#name} cannot appear in the path; at the
+	 * same time, a batch variable replacement will not work, as that would not
+	 * be interpretable for the RM. One actually needs to configure two separate
 	 * strings in this case, giving one to the script and one to the resource
 	 * manager. We treat the path as requiring a possible substitution of the
-	 * jobId tag.
+	 * "@jobId" tag.
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#initialize(java.lang.String
@@ -256,6 +256,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	public void initialize(String jobId) {
 		this.jobId = jobId;
 		String path = null;
+		remoteOutputPath = null;
+		remoteErrorPath = null;
 		RMVariableMap rmVarMap = control.getEnvironment();
 		Object o = rmVarMap.get(JAXBRMConstants.STDOUT_REMOTE_FILE);
 		if (o != null) {
@@ -264,8 +266,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 			} else if (o instanceof AttributeType) {
 				path = (String) ((PropertyType) o).getValue();
 			}
-			path = rmVarMap.getString(path);
-			remoteOutputPath = path.replaceAll(JAXBRMConstants.JOB_ID_TAG, jobId);
+			if (path != null && !JAXBRMConstants.ZEROSTR.equals(path)) {
+				path = rmVarMap.getString(path);
+				remoteOutputPath = path.replaceAll(JAXBRMConstants.JOB_ID_TAG, jobId);
+			}
 		}
 		o = rmVarMap.get(JAXBRMConstants.STDERR_REMOTE_FILE);
 		if (o != null) {
@@ -274,8 +278,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 			} else if (o instanceof AttributeType) {
 				path = (String) ((AttributeType) o).getValue();
 			}
-			path = rmVarMap.getString(path);
-			remoteErrorPath = path.replaceAll(JAXBRMConstants.JOB_ID_TAG, jobId);
+			if (path != null && !JAXBRMConstants.ZEROSTR.equals(path)) {
+				path = rmVarMap.getString(path);
+				remoteErrorPath = path.replaceAll(JAXBRMConstants.JOB_ID_TAG, jobId);
+			}
 		}
 	}
 
@@ -305,7 +311,6 @@ public class CommandJobStatus implements ICommandJobStatus {
 
 		if (remoteOutputPath != null) {
 			tout = checkForReady(remoteOutputPath, blockForSecs);
-
 		}
 
 		if (remoteErrorPath != null) {
@@ -490,14 +495,17 @@ public class CommandJobStatus implements ICommandJobStatus {
 					setState(v);
 				}
 
-				if (jobId != null && stateChanged()) {
-					/*
-					 * guarantee the presence of intermediate state
-					 */
-					if (p != null && !isReached(state, waitUntil)) {
-						env.put(jobId, p);
-						control.jobStateChanged(jobId);
-					}
+				if (jobId == null || p == null || !stateChanged()) {
+					continue;
+				}
+
+				/*
+				 * guarantee the presence of intermediate state in the
+				 * environment
+				 */
+				if (!isReached(state, waitUntil)) {
+					env.put(jobId, p);
+					control.jobStateChanged(jobId);
 				}
 			}
 		}
@@ -576,7 +584,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 		} else if (CANCELED.equals(state)) {
 			return 6;
 		} else if (JOB_OUTERR_READY.equals(state)) {
-			return 6;
+			return 7;
 		}
 		return 0;
 	}

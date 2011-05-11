@@ -497,7 +497,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				</target>
 			</stderr-parser>
 		</get-job-status>
-		<terminate-job name="cancel">
+		<terminate-job name="cancel" ignoreExitStatus="true">
 			<arg>qdel</arg>
 			<arg>${rm:@jobId#name}</arg>
 		</terminate-job>

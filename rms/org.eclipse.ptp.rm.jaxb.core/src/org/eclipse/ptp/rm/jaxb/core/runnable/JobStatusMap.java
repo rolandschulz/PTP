@@ -154,8 +154,13 @@ public class JobStatusMap extends Thread {
 		ICommandJobStatus status = map.get(jobId);
 		if (status != null) {
 			String d = status.getStateDetail();
-			if (!status.isInteractive() && !IJobStatus.CANCELED.equals(d) && !IJobStatus.FAILED.equals(d) && block) {
-				status.maybeWaitForHandlerFiles(JAXBRMConstants.READY_FILE_BLOCK);
+			block = block && !IJobStatus.CANCELED.equals(d) && !IJobStatus.FAILED.equals(d);
+			if (!status.isInteractive()) {
+				if (block) {
+					status.maybeWaitForHandlerFiles(JAXBRMConstants.READY_FILE_BLOCK);
+				} else {
+					status.maybeWaitForHandlerFiles(0);
+				}
 			}
 			status.cancel();
 		}
