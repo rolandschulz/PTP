@@ -13,6 +13,7 @@ package org.eclipse.ptp.rdt.sync.git.core;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
@@ -197,9 +198,7 @@ public class CommandRunner {
 			}
 		}
 
-		final CommandResults commandResults = new CommandResults();
-		// Run the command and wait for it to complete.
-		// final List<String> commandStrings = Arrays.asList(command.split("\\s+")); //$NON-NLS-1$
+		// Setup a new process
 		final List<String> commandList = new LinkedList<String>();
 		commandList.add("sh"); //$NON-NLS-1$
 		commandList.add("-c"); //$NON-NLS-1$
@@ -211,60 +210,80 @@ public class CommandRunner {
 			rpb.directory(rfm.getResource(remoteDirectory));
 		}
 
+		// Run process and stream readers
 		IRemoteProcess rp = null;
-		try {
-			rp = rpb.start();
-		} catch (final IOException e) {
-			throw e;
-		}
-
-		// Read and store stdout and stderr.
-		BufferedReader commandOutputReader = null;
-		BufferedReader commandErrorReader = null;
-		commandOutputReader = new BufferedReader(new InputStreamReader(rp.getInputStream()));
-		commandErrorReader = new BufferedReader(new InputStreamReader(rp.getErrorStream()));
-
-		String output = ""; //$NON-NLS-1$
-		try {
-			String line;
-			while ((line = commandOutputReader.readLine()) != null) {
-				output += line;
-				output += "\n"; //$NON-NLS-1$
-			}
-		} catch (final IOException e) {
-			throw e;
-		} finally {
-			commandOutputReader.close();
-		}
-
-		String error = ""; //$NON-NLS-1$
-		try {
-			String line;
-			while ((line = commandErrorReader.readLine()) != null) {
-				error += line;
-				error += "\n"; //$NON-NLS-1$
-			}
-		} catch (final IOException e) {
-			throw e;
-		} finally {
-			commandErrorReader.close();
-		}
-		
+		StreamReader outputStreamReader = null;
+		StreamReader errorStreamReader = null;
 		int exitCode;
 		try {
+			rp = rpb.start();
+			outputStreamReader = new StreamReader(rp.getInputStream());
+			errorStreamReader = new StreamReader(rp.getErrorStream());
+			outputStreamReader.start();
+			errorStreamReader.start();
 			exitCode = rp.waitFor();
+			
+			// Notify callers of stream IO errors
+			IOException outputStreamError = outputStreamReader.getIOException();
+			IOException errorStreamError = errorStreamReader.getIOException();
+			if (outputStreamError != null) {
+				throw outputStreamError;
+			} else if (errorStreamError != null) {
+				throw errorStreamError;
+			}
+		} catch (final IOException e) {
+			throw e;
 		} catch (final InterruptedException e) {
 			throw e;
 		}
+		
+		// Successful execution - compile and return results
+		final CommandResults commandResults = new CommandResults();
 		commandResults.setExitCode(exitCode);
-
-		commandResults.setStdout(output);
-		commandResults.setStderr(error);
+		commandResults.setStdout(outputStreamReader.getResult());
+		commandResults.setStderr(errorStreamReader.getResult());
 		return commandResults;
 	}
 
 	// Enforce as static
 	private CommandRunner() {
-		throw new AssertionError("Cannot create instances of static class CommandRunner"); //$NON-NLS-1$
+		throw new AssertionError(Messages.CR_CreateInstanceError);
+	}
+	
+	private static class StreamReader extends Thread {
+		private String result = ""; //$NON-NLS-1$
+		private final InputStream stream;
+		private IOException ioException = null;
+
+		public StreamReader(InputStream s) {
+			stream = s;
+		}
+
+		public void run() {
+			BufferedReader streamReader = new BufferedReader(new InputStreamReader(stream));
+			try {
+				String line;
+				while ((line = streamReader.readLine()) != null) {
+					result += line;
+					result += "\n"; //$NON-NLS-1$
+				}
+			} catch (final IOException e) {
+				ioException = e;
+			} finally {
+				try {
+					streamReader.close();
+				} catch (IOException e) {
+					// Ignore
+				}
+			}
+		}
+
+		public IOException getIOException() {
+			return ioException;
+		}
+
+		public String getResult() {
+			return result;
+		}
 	}
 }
