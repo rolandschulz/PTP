@@ -17,6 +17,9 @@ public class Messages extends NLS {
 	public static String GSP_ChangeProjectError;
 	public static String GSP_SyncErrorMessage;
 	public static String GSP_SyncTaskName;
+	public static String GitServiceProvider_1;
+	public static String GitServiceProvider_2;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
