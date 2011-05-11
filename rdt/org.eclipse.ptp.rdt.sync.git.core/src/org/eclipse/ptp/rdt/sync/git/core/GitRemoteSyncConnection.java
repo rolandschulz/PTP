@@ -62,7 +62,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  */
 public class GitRemoteSyncConnection {
 	private final static String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
-	private final static String commitMessage = "Eclipse Automatic Commit"; //$NON-NLS-1$
+	private final static String commitMessage = Messages.GRSC_CommitMessage;
 	private final static String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final IRemoteConnection connection;
 	private final String localDirectory;
@@ -221,8 +221,7 @@ public class GitRemoteSyncConnection {
 		}
 
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteExecutionException("remote git init failed with message: " + //$NON-NLS-1$
-																						commandResults.getStderr());
+			throw new RemoteExecutionException(Messages.GRSC_GitInitFailure + commandResults.getStderr());
 		}
 	}
 	
@@ -279,8 +278,7 @@ public class GitRemoteSyncConnection {
 			throw new RemoteExecutionException(e);
 		}
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteExecutionException("remote git commit failed with message: " + //$NON-NLS-1$
-																						 commandResults.getStderr());
+			throw new RemoteExecutionException(Messages.GRSC_GitCommitFailure + commandResults.getStderr());
 		}
 	}
 
@@ -305,8 +303,7 @@ public class GitRemoteSyncConnection {
 			throw new RemoteExecutionException(e);
 		}
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteExecutionException("remote git rm failed with message: " + //$NON-NLS-1$
-																						 commandResults.getStderr());
+			throw new RemoteExecutionException(Messages.GRSC_GitRmFailure + commandResults.getStderr());
 		}
 	}
 
@@ -331,8 +328,7 @@ public class GitRemoteSyncConnection {
 			throw new RemoteExecutionException(e);
 		}
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteExecutionException("remote git add failed with message: " + //$NON-NLS-1$
-																						 commandResults.getStderr());
+			throw new RemoteExecutionException(Messages.GRSC_GitAddFailure + commandResults.getStderr());
 		}
 	}
 
@@ -354,8 +350,7 @@ public class GitRemoteSyncConnection {
 			throw new RemoteExecutionException(e);
 		}
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteExecutionException("remote git ls-files failed with message: " + //$NON-NLS-1$
-																						 commandResults.getStderr());
+			throw new RemoteExecutionException(Messages.GRSC_GitLsFilesFailure + commandResults.getStderr());
 		}
 		
 		BufferedReader statusReader = new BufferedReader(new StringReader(commandResults.getStdout()));
@@ -560,8 +555,7 @@ public class GitRemoteSyncConnection {
 		}
 
 		if (mergeResults.getExitCode() != 0) {
-			throw new RemoteSyncException(new RemoteExecutionException("Remote merge failed with message: " +  //$NON-NLS-1$
-																									mergeResults.getStderr()));
+			throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure + mergeResults.getStderr()));
 		}
 	}
 

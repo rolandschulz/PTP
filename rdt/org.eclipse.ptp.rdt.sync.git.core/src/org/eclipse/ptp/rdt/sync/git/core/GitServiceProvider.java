@@ -124,7 +124,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setLocation(String location) {
 		if (fLocation != null) {
-			throw new RuntimeException("Changing of remote location is not supported."); //$NON-NLS-1$
+			throw new RuntimeException(Messages.GSP_ChangeLocationError);
 		}
 		fLocation = location;
 		putString(GIT_LOCATION, location);
@@ -138,7 +138,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setProject(IProject project) {
 		if (fProject != null) {
-			throw new RuntimeException("Changing of project is not supported."); //$NON-NLS-1$
+			throw new RuntimeException(Messages.GSP_ChangeProjectError);
 		}
 		fProject = project;
 		putString(GIT_PROJECT_NAME, project.getName());
@@ -153,7 +153,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setRemoteConnection(IRemoteConnection conn) {
 		if (fConnection != null) {
-			throw new RuntimeException("Changing of remote connection is not supported."); //$NON-NLS-1$
+			throw new RuntimeException(Messages.GSP_ChangeConnectionError);
 		}
 		fConnection = conn;
 		putString(GIT_CONNECTION_NAME, conn.getName());
@@ -178,12 +178,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * TODO: use the force
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		
-		// TODO: Note that here SyncFlag.FORCE is interpreted as sync always, even if not needed otherwise. This is different
-		// from the original intent of FORCE, which was to do an immediate, blocking sync. We may need to split those two
-		// functions and introduce more flags.
-		// TODO: Also, note that we are not using the individual "sync to local" and "sync to remote" flags yet.
-		if ((syncFlags == SyncFlag.NO_FORCE) && (!(syncNeeded(delta)))) {
+		if (!(syncNeeded(delta))) {
 			return;
 		}
 		
@@ -199,10 +194,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		
 		syncLock.lock();
 		try {
-			if (mySyncTaskId<=finishedSyncTaskId)  //some other thread has already done the work for us 
+			if (mySyncTaskId<=finishedSyncTaskId) {  //some other thread has already done the work for us 
 				return;
+			}
 
-			
 			// TODO: Use delta information
 			// switch (delta.getKind()) {
 			// case IResourceDelta.ADDED:
@@ -235,54 +230,41 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			// TODO: Review exception handling
 			if (fSyncConnection == null) {
 				// Open a remote sync connection
-				try {
-					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(),
-							this.getProject().getLocation().toString(),	this.getLocation());
-				} catch (final RemoteSyncException e) {
-					this.handleRemoteSyncException(e);
-					return;
-				}
+				fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(),
+																this.getProject().getLocation().toString(),	this.getLocation());
 			}
 
 			// Open remote connection if necessary
 			if (this.getRemoteConnection().isOpen() == false) {
-				try {
-					this.getRemoteConnection().open(monitor);
-				} catch (final RemoteConnectionException e) {
-					this.handleRemoteSyncException(new RemoteSyncException(e));
-					return;
-				}
+				this.getRemoteConnection().open(monitor);
 			}
-			
+
+			// This synchronization operation will include all tasks up to current syncTaskId
+			// syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
+			// we might synchronize even more than that if a file is already saved but syncTaskId wasn't increased yet
+			// thus we cannot guarantee a maximum but we can guarantee syncTaskId as a minimum
+			// suggestion for Deltas: make local copy of list of deltas, remove list of deltas
 			int willFinishTaskId;
 			synchronized (syncTaskId) {
-				willFinishTaskId = syncTaskId;  //This synchronization operation will include all tasks up to current syncTaskId 
-			                                    //syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
-												//we might synchronize even more than that if a file is already saved but syncTaskId wasn't increased yet
-												//thus we cannot guarantee a maximum but we can guarantee syncTaskId as a minimum
-				//suggestion for Deltas: make local copy of list of deltas, remove list of deltas
+				willFinishTaskId = syncTaskId;
 			}
 
 			// Sync local and remote. For now, do both ways each time.
 			// TODO: Sync more efficiently and appropriately to the situation.
-			try {
-				fSyncConnection.syncLocalToRemote();
-			} catch (final RemoteSyncException e) {
-				this.handleRemoteSyncException(e);
-				return;
-			}
+			fSyncConnection.syncLocalToRemote();
+			fSyncConnection.syncRemoteToLocal();
 
-			try {
-				fSyncConnection.syncRemoteToLocal();
-			} catch (final RemoteSyncException e) {
-				this.handleRemoteSyncException(e);
-				return;
-			}
 			finishedSyncTaskId = willFinishTaskId;
-
+		} catch (final RemoteSyncException e) {
+			this.handleRemoteSyncException(e);
+			return;
+		} catch (RemoteConnectionException e) {
+			this.handleRemoteSyncException(new RemoteSyncException(e));
+			return;
 		} finally {
 			syncLock.unlock();
 		}
+		
 		IProject project = this.getProject();
 		if (project != null) {
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
@@ -291,7 +273,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	
 	/**
 	 * Error handler. There are several reasons why a sync operation may fail. This function is responsible for handling each case
-	 * appropriately.
+	 * appropriately. For now we simply report any errors to the user.
 	 *
 	 * @param e
 	 * 			the remote sync exception
@@ -308,7 +290,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		} else {
 			message = e.getCause().getMessage();
 		}
-		message = "Synchronization error for project " + this.getProject().getName() + message; //$NON-NLS-1$
+		message = Messages.GSP_SyncErrorMessage + this.getProject().getName() + message;
 		status = new Status(severity, Activator.PLUGIN_ID, message, e);
 		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
 	}

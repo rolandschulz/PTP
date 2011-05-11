@@ -313,7 +313,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				ServiceModelManager smm = ServiceModelManager.getInstance();
 				
 				try{
-					IServiceConfiguration serviceConfig = BuildConfigurationManager.
+					IServiceConfiguration serviceConfig = BuildConfigurationManager.getInstance().
 																			getConfigurationForBuildConfiguration(configuration);
 					if (serviceConfig == null) {
 						throw new RuntimeException("Cannot find service configuration for build configuration"); //$NON-NLS-1$
