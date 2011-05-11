@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHViewPart
- * Version: 1.29
+ * Version: 1.31
  */
 
 package org.eclipse.ptp.internal.rdt.ui.callhierarchy;
@@ -29,7 +29,6 @@ import org.eclipse.cdt.core.model.IFunction;
 import org.eclipse.cdt.core.model.IMethod;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.core.model.util.CElementBaseLabels;
 import org.eclipse.cdt.internal.core.model.CModel;
 import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.CPluginImages;
@@ -77,7 +76,6 @@ import org.eclipse.ptp.internal.rdt.ui.actions.OpenViewActionGroup;
 import org.eclipse.ptp.internal.rdt.ui.search.actions.SelectionSearchGroup;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.Transfer;
@@ -123,9 +121,6 @@ public class RemoteCHViewPart extends ViewPart {
     
 	private ArrayList<ICElement> fHistoryEntries= new ArrayList<ICElement>(MAX_HISTORY_SIZE);
 	
-	private Clipboard fClipboard;
-
-
     // widgets
     private PageBook fPagebook;
     private Composite fViewerPage;
@@ -223,13 +218,10 @@ public class RemoteCHViewPart extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
         fPagebook = new PageBook(parent, SWT.NULL);
-        fPagebook.setLayoutData(new GridData(GridData.FILL_BOTH));
         createInfoPage();
         createViewerPage();
                 
         getSite().setSelectionProvider(new AdaptingSelectionProvider(ICElement.class, fTreeViewer));
-
-        fClipboard = new Clipboard(parent.getDisplay());
 
         initDragAndDrop();
         createActions();

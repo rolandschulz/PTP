@@ -1,4 +1,4 @@
-package org.eclipse.ptp.rdt.sync.git.core;
+package org.eclipse.ptp.rdt.sync.git.core.messages;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -16,6 +16,7 @@ public class Messages extends NLS {
 	public static String GSP_ChangeLocationError;
 	public static String GSP_ChangeProjectError;
 	public static String GSP_SyncErrorMessage;
+	public static String GSP_SyncTaskName;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

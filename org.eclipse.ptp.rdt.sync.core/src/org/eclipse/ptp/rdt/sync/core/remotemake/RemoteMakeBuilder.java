@@ -373,7 +373,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					
 					// Synchronize before building
 					if (syncProvider != null) {
-						syncProvider.synchronize(null, null, SyncFlag.FORCE);
+						syncProvider.synchronize(null, monitor, SyncFlag.FORCE);
 					}
 					
 					// Before launching give visual cues via the monitor
@@ -452,7 +452,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 						
 						// Synchronize after building
 						if (syncProvider != null) {
-							syncProvider.synchronize(null, null, SyncFlag.FORCE);
+							syncProvider.synchronize(null, monitor, SyncFlag.FORCE);
 						}
 
 						// create a Job for the refresh
