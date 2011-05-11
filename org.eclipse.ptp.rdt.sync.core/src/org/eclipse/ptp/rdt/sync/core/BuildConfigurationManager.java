@@ -671,7 +671,7 @@ public class BuildConfigurationManager {
 				IRemoteServices localService = PTPRemoteCorePlugin.getDefault().
 				getRemoteServices("org.eclipse.ptp.remote.LocalServices", null); //$NON-NLS-1$
 				if (localService != null) {
-					IRemoteConnection localConnection = localService.getConnectionManager().getConnection("local"); //$NON-NLS-1$
+					IRemoteConnection localConnection = localService.getConnectionManager().getConnection("Local"); //$NON-NLS-1$
 					if (localConnection != null) {
 						BuildScenario localBuildScenario = new BuildScenario(null, localConnection, project.getLocation().toString());
 						this.setBuildScenarioForBuildConfigurationInternal(localBuildScenario, localConfig);
