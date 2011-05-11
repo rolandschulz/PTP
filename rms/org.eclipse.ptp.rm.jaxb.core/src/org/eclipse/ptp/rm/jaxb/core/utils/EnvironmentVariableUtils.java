@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.jaxb.core.utils;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
@@ -25,7 +25,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  * @author arossi
  * 
  */
-public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
+public class EnvironmentVariableUtils {
 
 	private EnvironmentVariableUtils() {
 	}
@@ -46,7 +46,7 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	public static void addVariable(String uuid, NameValuePairType var, Map<String, String> env, RMVariableMap map) {
 		String key = var.getValue();
 		String value = getValue(uuid, key, map);
-		if (value != null && !ZEROSTR.equals(value)) {
+		if (value != null && !JAXBRMConstants.ZEROSTR.equals(value)) {
 			env.put(var.getName(), value);
 		}
 	}
@@ -67,10 +67,10 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	 * @see org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler#composeScript(IProgressMonitor)
 	 */
 	public static void addVariable(String name, String value, String directive, StringBuffer buffer) {
-		if (value != null && !ZEROSTR.equals(value)) {
-			if (SETENV.equals(getSyntax(directive))) {
+		if (value != null && !JAXBRMConstants.ZEROSTR.equals(value)) {
+			if (JAXBRMConstants.SETENV.equals(getSyntax(directive))) {
 				setenv(name, value, buffer);
-			} else if (EXPORT.equals(getSyntax(directive))) {
+			} else if (JAXBRMConstants.EXPORT.equals(getSyntax(directive))) {
 				export(name, value, buffer);
 			}
 		}
@@ -87,10 +87,10 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 		for (Object o : map.getVariables().values()) {
 			if (o instanceof PropertyType) {
 				PropertyType p = (PropertyType) o;
-				b.append(p.getName()).append(EQ).append(p.getValue()).append(LINE_SEP);
+				b.append(p.getName()).append(JAXBRMConstants.EQ).append(p.getValue()).append(JAXBRMConstants.LINE_SEP);
 			} else if (o instanceof AttributeType) {
 				AttributeType a = (AttributeType) o;
-				b.append(a.getName()).append(EQ).append(a.getValue()).append(LINE_SEP);
+				b.append(a.getName()).append(JAXBRMConstants.EQ).append(a.getValue()).append(JAXBRMConstants.LINE_SEP);
 			}
 		}
 
@@ -108,7 +108,8 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	 *            running contents of the script being generated
 	 */
 	private static void export(String name, String value, StringBuffer buffer) {
-		buffer.append(EXPORT).append(SP).append(name).append(EQ).append(QT).append(value).append(QT).append(REMOTE_LINE_SEP);
+		buffer.append(JAXBRMConstants.EXPORT).append(JAXBRMConstants.SP).append(name).append(JAXBRMConstants.EQ)
+				.append(JAXBRMConstants.QT).append(value).append(JAXBRMConstants.QT).append(JAXBRMConstants.REMOTE_LINE_SEP);
 	}
 
 	/**
@@ -120,10 +121,10 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	 * @return syntax type.
 	 */
 	private static String getSyntax(String directive) {
-		if (directive.indexOf(CSH) >= 0) {
-			return SETENV;
+		if (directive.indexOf(JAXBRMConstants.CSH) >= 0) {
+			return JAXBRMConstants.SETENV;
 		}
-		return EXPORT;
+		return JAXBRMConstants.EXPORT;
 	}
 
 	/**
@@ -139,7 +140,7 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	 * @return the resolved value
 	 */
 	private static String getValue(String uuid, String key, RMVariableMap map) {
-		String name = OPENVRM + key + PD + VALUE + CLOSVAL;
+		String name = JAXBRMConstants.OPENVRM + key + JAXBRMConstants.PD + JAXBRMConstants.VALUE + JAXBRMConstants.CLOSVAL;
 		return map.getString(uuid, name);
 	}
 
@@ -154,6 +155,7 @@ public class EnvironmentVariableUtils implements IJAXBNonNLSConstants {
 	 *            running contents of the script being generated
 	 */
 	private static void setenv(String name, String value, StringBuffer buffer) {
-		buffer.append(SETENV).append(SP).append(name).append(SP).append(QT).append(value).append(QT).append(REMOTE_LINE_SEP);
+		buffer.append(JAXBRMConstants.SETENV).append(JAXBRMConstants.SP).append(name).append(JAXBRMConstants.SP)
+				.append(JAXBRMConstants.QT).append(value).append(JAXBRMConstants.QT).append(JAXBRMConstants.REMOTE_LINE_SEP);
 	}
 }

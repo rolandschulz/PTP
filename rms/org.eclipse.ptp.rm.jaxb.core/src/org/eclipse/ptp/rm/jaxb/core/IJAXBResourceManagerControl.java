@@ -11,7 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.util.Map;
 
-import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 

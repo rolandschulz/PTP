@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.jaxb.ui.model;
 import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -90,7 +91,7 @@ public class TextUpdateModel extends DynamicControlUpdateModel implements Modify
 			return;
 		}
 		validateJob.cancel();
-		validateJob.schedule(VALIDATE_TIMER);
+		validateJob.schedule(JAXBRMUIConstants.VALIDATE_TIMER);
 	}
 
 	/*
@@ -107,7 +108,7 @@ public class TextUpdateModel extends DynamicControlUpdateModel implements Modify
 		} else {
 			mapValue = lcMap.get(name);
 		}
-		String s = ZEROSTR;
+		String s = JAXBRMUIConstants.ZEROSTR;
 		if (mapValue != null) {
 			s = (String) mapValue;
 		}

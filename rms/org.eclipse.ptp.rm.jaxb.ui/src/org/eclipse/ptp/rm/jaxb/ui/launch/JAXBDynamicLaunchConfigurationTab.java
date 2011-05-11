@@ -31,6 +31,7 @@ import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.dialogs.ScrollingEditableMessageDialog;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
@@ -145,7 +146,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			CoreExceptionUtils.newException(Messages.CreateControlConfigurableError, t);
 		}
 		createViewScriptGroup(control);
-		parentTab.resize(this.control);
+		size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 	}
 
 	/**
@@ -300,7 +301,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		try {
 			if (!parentTab.hasScript()) {
 				MessageDialog.openWarning(shell, Messages.ScriptNotSupportedWarning_title, Messages.ScriptNotSupportedWarning
-						+ LINE_SEP);
+						+ JAXBRMUIConstants.LINE_SEP);
 				return;
 			}
 			String text = realizeLocalScript(listenerConfiguration);
@@ -335,8 +336,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/*
-	 * Adds the Job Output, View Script and Restore Defaults buttons to the
-	 * bottom of the control pane.
+	 * Adds the View Script and Restore Defaults buttons to the bottom of the
+	 * control pane.
 	 */
 	private void createViewScriptGroup(final Composite control) {
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true, 5, 5, 2, 2);
@@ -381,7 +382,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private synchronized String realizeLocalScript(ILaunchConfiguration config) throws Throwable {
-		String value = ZEROSTR;
+		String value = JAXBRMUIConstants.ZEROSTR;
 		refreshLocal(config);
 		LCVariableMap lcMap = parentTab.getLCMap();
 		Map<String, Object> current = lcMap.swapVariables(localMap);

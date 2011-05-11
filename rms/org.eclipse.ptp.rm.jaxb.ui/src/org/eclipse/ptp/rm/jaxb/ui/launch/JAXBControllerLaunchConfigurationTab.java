@@ -16,19 +16,23 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
-import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IFireContentsChangedEnabled;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -43,16 +47,17 @@ import org.eclipse.swt.widgets.Control;
  * 
  * @author arossi
  */
-public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IFireContentsChangedEnabled {
+public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IFireContentsChangedEnabled,
+		SelectionListener {
 
 	private RemoteServicesDelegate delegate;
 	private final IJAXBResourceManagerConfiguration rmConfig;
 	private final LaunchTabType launchTabData;
-	private final ScriptType script;
 	private final ValueUpdateHandler updateHandler;
-
-	private ScrolledComposite scrolledParent;
 	private final LCVariableMap lcMap;
+
+	private ScriptType script;
+	private ScrolledComposite scrolledParent;
 
 	/**
 	 * @param rm
@@ -64,20 +69,35 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	public JAXBControllerLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
 		super(dialog);
 		rmConfig = rm.getJAXBConfiguration();
-		script = rmConfig.getResourceManagerData().getControlData().getScript();
-		launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
-		updateHandler = new ValueUpdateHandler(this);
-		if (launchTabData != null) {
-			List<TabControllerType> dynamic = launchTabData.getDynamic();
-			for (TabControllerType controller : dynamic) {
-				addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
-			}
-			String title = launchTabData.getImport();
-			if (title != null) {
-				addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this));
-			}
+		try {
+			script = rmConfig.getResourceManagerData().getControlData().getScript();
+			voidRMConfig = false;
+		} catch (Throwable t) {
+			script = null;
+			voidRMConfig = true;
+			WidgetActionUtils.errorMessage(dialog.getActiveTab().getControl().getShell(), t, Messages.VoidLaunchTabMessage,
+					Messages.VoidLaunchTabTitle, false);
 		}
-		lcMap = new LCVariableMap();
+		if (!voidRMConfig) {
+			launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
+			updateHandler = new ValueUpdateHandler(this);
+			if (launchTabData != null) {
+				List<TabControllerType> dynamic = launchTabData.getDynamic();
+				for (TabControllerType controller : dynamic) {
+					addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
+				}
+				String title = launchTabData.getImport();
+				if (title != null) {
+					addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, title, this));
+				}
+			}
+			lcMap = new LCVariableMap();
+		} else {
+			getControllers().clear();
+			launchTabData = null;
+			updateHandler = null;
+			lcMap = null;
+		}
 	}
 
 	/*
@@ -91,11 +111,14 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 */
 	@Override
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
-		updateHandler.clear();
-		if (parent instanceof ScrolledComposite) {
-			scrolledParent = (ScrolledComposite) parent;
+		if (!voidRMConfig) {
+			updateHandler.clear();
+			if (parent instanceof ScrolledComposite) {
+				scrolledParent = (ScrolledComposite) parent;
+			}
 		}
 		super.createControl(parent, rm, queue);
+		tabFolder.addSelectionListener(this);
 	}
 
 	/*
@@ -181,23 +204,44 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 */
 	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
-		try {
-			delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate();
-			lcMap.initialize(rmConfig.getRMVariableMap());
-			updateHandler.clear();
-		} catch (Throwable t) {
-			JAXBUIPlugin.log(t);
-			return new RMLaunchValidation(false, t.getMessage());
+		if (!voidRMConfig) {
+			try {
+				delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate();
+				lcMap.initialize(rmConfig.getRMVariableMap());
+				updateHandler.clear();
+			} catch (Throwable t) {
+				JAXBUIPlugin.log(t);
+				return new RMLaunchValidation(false, t.getMessage());
+			}
 		}
-		return super.initializeFrom(control, rm, queue, configuration);
+		RMLaunchValidation validation = super.initializeFrom(control, rm, queue, configuration);
+		AbstractJAXBLaunchConfigurationTab t = getControllers().get(0);
+		resize(t.getSize());
+		return validation;
 	}
 
-	/*
-	 * Attempt to suggest resizing to scrolled ResourcesTab composite.
+	/**
+	 * see {@link #widgetSelected(SelectionEvent)}
 	 */
-	public void resize(Control control) {
-		if (scrolledParent != null) {
-			scrolledParent.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		}
+	public void widgetDefaultSelected(SelectionEvent e) {
+		widgetSelected(e);
+	}
+
+	/**
+	 * For resizing scrolled parent.
+	 */
+	public void widgetSelected(SelectionEvent e) {
+		AbstractJAXBLaunchConfigurationTab t = getControllers().get(tabFolder.getSelectionIndex());
+		resize(t.getSize());
+	}
+
+	/**
+	 * Suggest resizing to scrolled ResourcesTab composite.
+	 * 
+	 * @param p
+	 *            size of control
+	 */
+	private void resize(Point p) {
+		scrolledParent.setMinSize(getControl().computeSize(p.x + 25, p.y + 50));
 	}
 }

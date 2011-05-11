@@ -17,8 +17,8 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IMatchable;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
@@ -48,7 +48,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  * @author arossi
  * 
  */
-public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
+public class TargetImpl implements IMatchable {
 
 	private final RMVariableMap rmVarMap;
 	private final String uuid;
@@ -167,11 +167,11 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 				target = targets.get(i);
 			}
 			if (target == null) {
-				if (PROPERTY.equals(type)) {
+				if (JAXBRMConstants.PROPERTY.equals(type)) {
 					PropertyType p = new PropertyType();
 					target = p;
 					targets.add(target);
-				} else if (ATTRIBUTE.equals(type)) {
+				} else if (JAXBRMConstants.ATTRIBUTE.equals(type)) {
 					AttributeType ja = new AttributeType();
 					target = ja;
 					targets.add(target);
@@ -202,9 +202,9 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 	 */
 	public synchronized void postProcess() throws Throwable {
 		if (refTarget == null) {
-			if (PROPERTY.equals(type)) {
+			if (JAXBRMConstants.PROPERTY.equals(type)) {
 				mergeProperties(targets);
-			} else if (ATTRIBUTE.equals(type)) {
+			} else if (JAXBRMConstants.ATTRIBUTE.equals(type)) {
 				mergeAttributes(targets);
 			}
 			Map<String, Object> dmap = rmVarMap.getDiscovered();
@@ -213,9 +213,9 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 					test.setTarget(t);
 					test.doTest();
 				}
-				if (PROPERTY.equals(type)) {
+				if (JAXBRMConstants.PROPERTY.equals(type)) {
 					dmap.put(((PropertyType) t).getName(), t);
-				} else if (ATTRIBUTE.equals(type)) {
+				} else if (JAXBRMConstants.ATTRIBUTE.equals(type)) {
 					dmap.put(((AttributeType) t).getName(), t);
 				}
 			}
@@ -255,7 +255,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (v0 == null) {
 			previous.setValue(v1);
 		} else if (v1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + CM + SP + v1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ v1);
 		}
 
 		String s0 = previous.getDefault();
@@ -263,7 +264,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (s0 == null) {
 			previous.setDefault(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ s1);
 		}
 
 		s0 = previous.getType();
@@ -271,7 +273,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (s0 == null) {
 			previous.setType(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ s1);
 		}
 
 		s0 = previous.getStatus();
@@ -279,7 +282,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (s0 == null) {
 			previous.setStatus(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ s1);
 		}
 
 		boolean b0 = previous.isReadOnly();
@@ -299,7 +303,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (i0 == null) {
 			previous.setMax(i1);
 		} else if (i1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + CM + SP + i1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ i1);
 		}
 
 		i0 = previous.getMin();
@@ -307,7 +312,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (i0 == null) {
 			previous.setMin(i1);
 		} else if (i1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + CM + SP + i1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ i1);
 		}
 
 		s0 = previous.getDescription();
@@ -315,7 +321,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (s0 == null) {
 			previous.setDescription(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ s1);
 		}
 
 		s0 = previous.getChoice();
@@ -323,7 +330,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (s0 == null) {
 			previous.setChoice(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ s1);
 		}
 
 		s0 = previous.getTooltip();
@@ -331,7 +339,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (s0 == null) {
 			previous.setTooltip(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ s1);
 		}
 	}
 
@@ -353,7 +362,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (v0 == null) {
 			previous.setValue(v1);
 		} else if (v1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + CM + SP + v1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ v1);
 		}
 
 		String s0 = previous.getDefault();
@@ -361,7 +371,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (s0 == null) {
 			previous.setDefault(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ s1);
 		}
 
 		s0 = previous.getType();
@@ -369,7 +380,8 @@ public class TargetImpl implements IMatchable, IJAXBNonNLSConstants {
 		if (s0 == null) {
 			previous.setType(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + CM + SP + s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBRMConstants.CM + JAXBRMConstants.SP
+					+ s1);
 		}
 
 		boolean b0 = previous.isReadOnly();

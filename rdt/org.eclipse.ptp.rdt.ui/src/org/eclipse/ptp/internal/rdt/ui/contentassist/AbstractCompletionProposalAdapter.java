@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 QNX Software Systems and others.
+ * Copyright (c) 2007, 2011 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.text.contentassist.DOMCompletionProposalComputer
- * Version: 1.31
+ * Version: 1.32
  */
 
 package org.eclipse.ptp.internal.rdt.ui.contentassist;

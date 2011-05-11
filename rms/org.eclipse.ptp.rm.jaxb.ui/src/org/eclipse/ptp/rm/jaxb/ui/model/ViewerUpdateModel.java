@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ptp.rm.jaxb.core.data.TemplateType;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 import org.eclipse.swt.events.SelectionEvent;
@@ -88,7 +89,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		this.columnViewer = (ColumnViewer) viewer;
 		pattern = template.getPattern();
 		String s = template.getSeparator();
-		separator = s == null ? ZEROSTR : s;
+		separator = s == null ? JAXBRMUIConstants.ZEROSTR : s;
 		checked = new StringBuffer();
 		templatedValue = new StringBuffer();
 		viewer.addCheckStateListener(this);
@@ -194,7 +195,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 			}
 		}
 
-		Boolean b = (Boolean) lcMap.get(SHOW_ONLY_CHECKED + name);
+		Boolean b = (Boolean) lcMap.get(JAXBRMUIConstants.SHOW_ONLY_CHECKED + name);
 		if (b == null) {
 			b = false;
 		}
@@ -219,12 +220,12 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 			if (o instanceof ICellEditorUpdateModel) {
 				ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
 				if (model.isChecked()) {
-					checked.append(model.getName()).append(SP);
+					checked.append(model.getName()).append(JAXBRMUIConstants.SP);
 				}
 			}
 		}
-		localMap.put(CHECKED_ATTRIBUTES + name, checked.toString().trim());
-		localMap.put(SHOW_ONLY_CHECKED + name, showOnlySelected.getSelection());
+		localMap.put(JAXBRMUIConstants.CHECKED_ATTRIBUTES + name, checked.toString().trim());
+		localMap.put(JAXBRMUIConstants.SHOW_ONLY_CHECKED + name, showOnlySelected.getSelection());
 	}
 
 	/*
@@ -261,14 +262,14 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 				 * model will return ZEROSTR if the entry is not selected
 				 */
 				String replaced = model.getReplacedValue(pattern);
-				if (!ZEROSTR.equals(replaced)) {
+				if (!JAXBRMUIConstants.ZEROSTR.equals(replaced)) {
 					templatedValue.append(separator).append(replaced);
 				}
 			}
 		}
 		templatedValue.delete(0, separator.length());
 		String t = templatedValue.toString().trim();
-		if (!ZEROSTR.equals(t)) {
+		if (!JAXBRMUIConstants.ZEROSTR.equals(t)) {
 			lcMap.put(name, t);
 		} else {
 			lcMap.remove(name);

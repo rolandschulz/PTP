@@ -1,7 +1,6 @@
 package org.eclipse.ptp.rm.lml.ui.views;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Stack;
 
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
@@ -26,7 +25,7 @@ public class NodedisplayView extends LguiWidget{
 	
 	private NodedisplayComp root;//root nodedisplay which is currently shown
 	
-	private Deque<String> zoomstack=new ArrayDeque<String>();//Saves zoom-levels to zoom out later, saves full-implicit name of nodes to create Displaynodes from these ids
+	private Stack<String> zoomstack=new Stack<String>();//Saves zoom-levels to zoom out later, saves full-implicit name of nodes to create Displaynodes from these ids
 	
 	//Cursors for showing processing
 	private Cursor waitcursor;//Cursor to show while processing
@@ -58,7 +57,7 @@ public class NodedisplayView extends LguiWidget{
 	 * The stack which saves the last zoom-levels is restarted
 	 */
 	public void restartZoom(){
-		zoomstack=new ArrayDeque<String>();
+		zoomstack=new Stack<String>();
 	}
 	
 	/**

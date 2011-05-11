@@ -35,7 +35,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 import org.eclipse.ptp.rm.jaxb.core.data.impl.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.core.exceptions.UnsatisfiedMatchException;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.FileDialog;
@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author arossi
  * 
  */
-public class WidgetActionUtils implements IJAXBUINonNLSConstants {
+public class WidgetActionUtils {
 
 	private WidgetActionUtils() {
 	}
@@ -75,9 +75,9 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	 * @param causeTrace
 	 */
 	public static void errorMessage(Shell shell, Throwable throwable, String message, String title, boolean causeTrace) {
-		String append = throwable == null ? ZEROSTR : throwable.getMessage();
+		String append = throwable == null ? JAXBRMUIConstants.ZEROSTR : throwable.getMessage();
 		Throwable t = throwable == null ? null : throwable.getCause();
-		String lineSep = LINE_SEP;
+		String lineSep = JAXBRMUIConstants.LINE_SEP;
 		if (causeTrace) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
@@ -100,7 +100,7 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	 */
 	public static String getSelected(Combo combo) {
 		if (combo.isDisposed()) {
-			return ZEROSTR;
+			return JAXBRMUIConstants.ZEROSTR;
 		}
 		if (combo.getItemCount() == 0) {
 			return combo.getText();
@@ -142,17 +142,17 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	 */
 	public static String select(Combo combo, String text) {
 		if (combo.isDisposed()) {
-			return ZEROSTR;
+			return JAXBRMUIConstants.ZEROSTR;
 		}
 		int style = combo.getStyle();
 		boolean readOnly = style == (style | SWT.READ_ONLY);
 		String[] items = combo.getItems();
 		if (items.length == 0) {
-			return ZEROSTR;
+			return JAXBRMUIConstants.ZEROSTR;
 		}
 		int i = 0;
 		if (text == null) {
-			text = ZEROSTR;
+			text = JAXBRMUIConstants.ZEROSTR;
 		}
 		for (; i < items.length; i++) {
 			if (items[i].equals(text)) {
@@ -163,7 +163,7 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 
 		if (i == items.length) {
 			if (readOnly) {
-				return ZEROSTR;
+				return JAXBRMUIConstants.ZEROSTR;
 			} else {
 				List<String> newItems = new ArrayList<String>();
 				for (String item : items) {
@@ -197,16 +197,17 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 		String error = validator.getErrorMessage();
 
 		if (error == null) {
-			error = ZEROSTR;
+			error = JAXBRMUIConstants.ZEROSTR;
 		}
 
 		if (reg != null && new RegexImpl(reg).getMatched(value) == null) {
-			throw new UnsatisfiedMatchException(error + CO + SP + reg.getExpression() + CM + SP + value);
+			throw new UnsatisfiedMatchException(error + JAXBRMUIConstants.CO + JAXBRMUIConstants.SP + reg.getExpression()
+					+ JAXBRMUIConstants.CM + JAXBRMUIConstants.SP + value);
 		} else {
 			FileMatchType match = validator.getFileInfo();
 			try {
 				if (match != null && !validate(match, value, fileManager)) {
-					throw new UnsatisfiedMatchException(error + CO + SP + value);
+					throw new UnsatisfiedMatchException(error + JAXBRMUIConstants.CO + JAXBRMUIConstants.SP + value);
 				}
 			} catch (CoreException ce) {
 				throw new UnsatisfiedMatchException(ce);
@@ -224,40 +225,40 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	 */
 	private static int getEfsAttributeValue(String efsAttrStr) {
 		int attributes = 0;
-		String[] split = efsAttrStr.split(REGPIP);
+		String[] split = efsAttrStr.split(JAXBRMUIConstants.REGPIP);
 		for (String s : split) {
 			s = s.trim();
-			if (ATTRIBUTE_READ_ONLY.equals(s)) {
+			if (JAXBRMUIConstants.ATTRIBUTE_READ_ONLY.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_READ_ONLY;
-			} else if (ATTRIBUTE_IMMUTABLE.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_IMMUTABLE.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_IMMUTABLE;
-			} else if (ATTRIBUTE_OWNER_READ.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_OWNER_READ.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_OWNER_READ;
-			} else if (ATTRIBUTE_OWNER_WRITE.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_OWNER_WRITE.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_OWNER_WRITE;
-			} else if (ATTRIBUTE_OWNER_EXECUTE.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_OWNER_EXECUTE.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_OWNER_EXECUTE;
-			} else if (ATTRIBUTE_GROUP_READ.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_GROUP_READ.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_GROUP_READ;
-			} else if (ATTRIBUTE_GROUP_WRITE.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_GROUP_WRITE.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_GROUP_WRITE;
-			} else if (ATTRIBUTE_GROUP_EXECUTE.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_GROUP_EXECUTE.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_GROUP_EXECUTE;
-			} else if (ATTRIBUTE_OTHER_READ.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_OTHER_READ.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_OTHER_READ;
-			} else if (ATTRIBUTE_OTHER_WRITE.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_OTHER_WRITE.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_OTHER_WRITE;
-			} else if (ATTRIBUTE_OTHER_EXECUTE.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_OTHER_EXECUTE.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_OTHER_EXECUTE;
-			} else if (ATTRIBUTE_EXECUTABLE.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_EXECUTABLE.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_EXECUTABLE;
-			} else if (ATTRIBUTE_ARCHIVE.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_ARCHIVE.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_ARCHIVE;
-			} else if (ATTRIBUTE_HIDDEN.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_HIDDEN.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_HIDDEN;
-			} else if (ATTRIBUTE_SYMLINK.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_SYMLINK.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_SYMLINK;
-			} else if (ATTRIBUTE_LINK_TARGET.equals(s)) {
+			} else if (JAXBRMUIConstants.ATTRIBUTE_LINK_TARGET.equals(s)) {
 				attributes |= EFS.ATTRIBUTE_LINK_TARGET;
 			}
 		}
@@ -272,7 +273,7 @@ public class WidgetActionUtils implements IJAXBUINonNLSConstants {
 	 * @return milliseconds
 	 */
 	private static Long getTimeInMillis(String dateTime) {
-		DateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		DateFormat formatter = new SimpleDateFormat(JAXBRMUIConstants.DATE_FORMAT);
 		try {
 			Date d = formatter.parse(dateTime);
 			return new Long(d.getTime());

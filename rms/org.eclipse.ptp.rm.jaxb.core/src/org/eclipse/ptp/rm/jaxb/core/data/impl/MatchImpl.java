@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
@@ -30,7 +29,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  * @author arossi
  * 
  */
-public class MatchImpl implements IJAXBNonNLSConstants {
+public class MatchImpl {
 
 	private RegexImpl regex;
 	private final TargetImpl target;

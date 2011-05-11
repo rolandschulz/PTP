@@ -14,12 +14,11 @@ import java.net.URI;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.SiteType;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.util.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.widgets.Composite;
@@ -31,8 +30,7 @@ import org.eclipse.swt.widgets.Composite;
  * @author arossi
  * 
  */
-public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage implements
-		IJAXBUINonNLSConstants {
+public final class JAXBRMControlConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage {
 
 	/**
 	 * @param wizard

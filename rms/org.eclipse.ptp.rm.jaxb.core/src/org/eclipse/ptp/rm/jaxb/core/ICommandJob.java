@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 
 /**
@@ -32,6 +33,11 @@ public interface ICommandJob {
 	 * @return object wrapping stream monitors (CommandJob).
 	 */
 	public ICommandJobStreamsProxy getProxy();
+
+	/**
+	 * @return the status returned by the run() method
+	 */
+	public IStatus getRunStatus();
 
 	/**
 	 * @return if job is active

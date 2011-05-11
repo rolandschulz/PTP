@@ -43,9 +43,10 @@
 				The top-level control elements define the properties and attributes, files to be staged, job script to be generated, commands
 				specific to the resource manager, and the layout of the Launch Tab.
 				The resource manager implementation constructs a variable map
-				serving as the resource manager "environment"; variables are dereferenced in the configuration file via ${rm:name} or
+				serving as the resource manager "environment"; variables are dereferenced in the configuration file via
 				${rm:name#getterName}; all properties and attributes defined in the configuration are mapped. The following hard-coded variables
-				are also added at runtime:
+				are also added at
+				runtime:
 				<!-- from runtime configuration information -->
 				control.user.name
 				control.address
@@ -96,8 +97,8 @@
 				<xs:annotation>
 					<xs:documentation>
 						NOTE: if the submission type is interactive, this command does not need to be implemented, as the process
-						termination will be handled
-						internally.
+						termination will be handled internally. However, in some cases (such as PBS -I) one may need this command in order to force
+						termination of the interactive terminal job.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -303,16 +304,13 @@
 				A recursive description of the UI element associated with the control part, the Launch Tab.
 				As in:
 				org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab, provides a top-level "switch" between controllers. There
-				are a maximum of three top-level tabs or "pages"; the basic and advanced (the names are placeholders which need not correspond to
-				their actual content or usage, and can be changed) controllers are configurable; for the custom controller, see below.
-				The
-				SWT-related types generally expose the fields of their associated Java class.
+				can be an arbitrary number of top-level tabs or "pages"; the dynamic controllers are configurable; for the import controller, see
+				below. The SWT-related types generally expose the fields of their associated Java class.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="basic" minOccurs="0" type="rm:tab-controller-type"/>
-			<xs:element name="advanced" minOccurs="0" type="rm:tab-controller-type"/>
-			<xs:element name="custom-controller" minOccurs="0" type="xs:string">
+			<xs:element name="dynamic" minOccurs="0" maxOccurs="unbounded" type="rm:tab-controller-type"/>
+			<xs:element name="import" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
 						Fixed type; to be used with scheduler systems which accept submission scripts. Allows the user to browse the
@@ -589,6 +587,7 @@
 				<xs:element name="composite" type="rm:composite-type"/>
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="widget" type="rm:widget-type"/>
+				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string"/>
@@ -694,6 +693,14 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="sub-layout-data" minOccurs="0" type="rm:layout-data-type">
+				<xs:annotation>
+					<xs:documentation>
+						If the widget is a composite (like the browse button), the first layout data will be applied to the first
+						element and the sub-layout the second (in this case, the text and button components, respectively).
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="items-from" minOccurs="0" type="xs:string">
@@ -732,17 +739,10 @@
 					<xs:enumeration value="spinner"/>
 					<xs:enumeration value="combo"/>
 					<xs:enumeration value="radioButton"/>
-					<xs:enumeration value="browseLocal">
+					<xs:enumeration value="browse">
 						<xs:annotation>
 							<xs:documentation>
-								Creates a read-only text widget followed by a push button allowing the user to browse the local file system.
-							</xs:documentation>
-						</xs:annotation>
-					</xs:enumeration>
-					<xs:enumeration value="browseRemote">
-						<xs:annotation>
-							<xs:documentation>
-								Creates a read-only text widget followed by a push button allowing the user to browse a remote file system.
+								Creates a text widget followed by a push button allowing the user to browse for directory or file.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:enumeration>
@@ -751,6 +751,27 @@
 		</xs:attribute>
 		<xs:attribute name="title" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
+		<xs:attribute name="directory" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					For the browser widget. Browse and return directory. Default is browse file.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="uri" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					For the browser widget. Browse connection is local or remote, and returns a uri. Default returns path.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="localOnly" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					For the browser widget. Use local file browser instead of the default remote connection browser.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false">
 			<xs:annotation>
 				<xs:documentation>

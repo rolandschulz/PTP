@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 
 /**
@@ -48,7 +49,8 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 */
 	public ValueTreeNodeUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
 			boolean inValueCol) {
-		super(name, handler, editor, items, readOnly, ZEROSTR, ZEROSTR, ZEROSTR);
+		super(name, handler, editor, items, readOnly, JAXBRMUIConstants.ZEROSTR, JAXBRMUIConstants.ZEROSTR,
+				JAXBRMUIConstants.ZEROSTR);
 		children = new ArrayList<InfoTreeNodeModel>();
 		generateChildren(inValueCol);
 	}
@@ -106,13 +108,13 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 */
 	public String getDisplayValue(String columnName) {
 		String displayValue = null;
-		if (COLUMN_NAME.equals(columnName)) {
+		if (JAXBRMUIConstants.COLUMN_NAME.equals(columnName)) {
 			displayValue = name;
-		} else if (isChecked() && COLUMN_VALUE.equals(columnName)) {
+		} else if (isChecked() && JAXBRMUIConstants.COLUMN_VALUE.equals(columnName)) {
 			displayValue = getValueAsString();
 		}
 		if (displayValue == null) {
-			return ZEROSTR;
+			return JAXBRMUIConstants.ZEROSTR;
 		}
 		return displayValue;
 	}
@@ -133,9 +135,9 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 *            column whose name matches the id.
 	 */
 	private void generateChildren(boolean inValueCol) {
-		children.add(new InfoTreeNodeModel(this, COLUMN_DEFAULT, inValueCol));
-		children.add(new InfoTreeNodeModel(this, COLUMN_TYPE, inValueCol));
-		children.add(new InfoTreeNodeModel(this, COLUMN_STATUS, inValueCol));
-		children.add(new InfoTreeNodeModel(this, COLUMN_DESC, inValueCol));
+		children.add(new InfoTreeNodeModel(this, JAXBRMUIConstants.COLUMN_DEFAULT, inValueCol));
+		children.add(new InfoTreeNodeModel(this, JAXBRMUIConstants.COLUMN_TYPE, inValueCol));
+		children.add(new InfoTreeNodeModel(this, JAXBRMUIConstants.COLUMN_STATUS, inValueCol));
+		children.add(new InfoTreeNodeModel(this, JAXBRMUIConstants.COLUMN_DESC, inValueCol));
 	}
 }

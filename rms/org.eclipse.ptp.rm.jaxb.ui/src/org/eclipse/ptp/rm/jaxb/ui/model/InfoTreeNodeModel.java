@@ -10,7 +10,7 @@
 package org.eclipse.ptp.rm.jaxb.ui.model;
 
 import org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -22,7 +22,7 @@ import org.eclipse.swt.graphics.Image;
  * @author arossi
  * 
  */
-public class InfoTreeNodeModel implements IColumnViewerLabelSupport, IJAXBUINonNLSConstants {
+public class InfoTreeNodeModel implements IColumnViewerLabelSupport {
 	private final String id;
 	private final String displayCol;
 	private final ValueTreeNodeUpdateModel parent;
@@ -41,7 +41,7 @@ public class InfoTreeNodeModel implements IColumnViewerLabelSupport, IJAXBUINonN
 		this.parent = parent;
 		this.id = id;
 		if (inValueCol) {
-			this.displayCol = COLUMN_VALUE;
+			this.displayCol = JAXBRMUIConstants.COLUMN_VALUE;
 		} else {
 			this.displayCol = id;
 		}
@@ -89,25 +89,25 @@ public class InfoTreeNodeModel implements IColumnViewerLabelSupport, IJAXBUINonN
 	 */
 	public String getDisplayValue(String columnName) {
 		String displayValue = null;
-		if (COLUMN_NAME.equals(columnName)) {
+		if (JAXBRMUIConstants.COLUMN_NAME.equals(columnName)) {
 			displayValue = id;
 		} else if (displayCol.equals(columnName)) {
 			if (parent.isChecked()) {
-				if (COLUMN_DESC.equals(id)) {
+				if (JAXBRMUIConstants.COLUMN_DESC.equals(id)) {
 					displayValue = parent.getDescription();
-				} else if (COLUMN_DEFAULT.equals(id)) {
+				} else if (JAXBRMUIConstants.COLUMN_DEFAULT.equals(id)) {
 					displayValue = parent.getDefault();
-				} else if (COLUMN_TYPE.equals(id)) {
+				} else if (JAXBRMUIConstants.COLUMN_TYPE.equals(id)) {
 					displayValue = parent.getType();
-				} else if (COLUMN_VALUE.equals(id)) {
+				} else if (JAXBRMUIConstants.COLUMN_VALUE.equals(id)) {
 					displayValue = parent.getValueAsString();
-				} else if (COLUMN_STATUS.equals(id)) {
+				} else if (JAXBRMUIConstants.COLUMN_STATUS.equals(id)) {
 					displayValue = parent.getStatus();
 				}
 			}
 		}
 		if (displayValue == null) {
-			return ZEROSTR;
+			return JAXBRMUIConstants.ZEROSTR;
 		}
 		return displayValue;
 	}
@@ -149,9 +149,9 @@ public class InfoTreeNodeModel implements IColumnViewerLabelSupport, IJAXBUINonN
 	 */
 	public String getTooltip() {
 		String ttip = null;
-		if (COLUMN_NAME.equals(id)) {
+		if (JAXBRMUIConstants.COLUMN_NAME.equals(id)) {
 			ttip = parent.getTooltip();
-		} else if (COLUMN_DESC.equals(id)) {
+		} else if (JAXBRMUIConstants.COLUMN_DESC.equals(id)) {
 			ttip = parent.getDescription();
 		}
 		return ttip;

@@ -17,8 +17,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.LineType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
@@ -36,7 +36,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  * @author arossi
  * 
  */
-public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
+public class ScriptHandler extends Job {
 
 	private final String uuid;
 	private final IVariableMap map;
@@ -85,10 +85,10 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		if (map instanceof RMVariableMap) {
 			RMVariableMap rmMap = (RMVariableMap) map;
 			PropertyType p = new PropertyType();
-			p.setName(SCRIPT);
+			p.setName(JAXBRMConstants.SCRIPT);
 			p.setValue(scriptValue);
 			p.setVisible(false);
-			rmMap.put(SCRIPT, p);
+			rmMap.put(JAXBRMConstants.SCRIPT, p);
 		}
 		progress.done();
 		return Status.OK_STATUS;
@@ -109,10 +109,10 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		List<LineType> line = script.getLine();
 		int len = line.size();
 		if (len == 0) {
-			return ZEROSTR;
+			return JAXBRMConstants.ZEROSTR;
 		}
 		int envAfter = script.getInsertEnvironmentAfter();
-		if (envAfter == UNDEFINED) {
+		if (envAfter == JAXBRMConstants.UNDEFINED) {
 			envAfter = 1;
 		}
 		SubMonitor progress = SubMonitor.convert(monitor, len);
@@ -122,8 +122,8 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		String firstLine = new LineImpl(uuid, line.get(0), map).getResolved();
 		for (; i <= envAfter; i++) {
 			s = new LineImpl(uuid, line.get(i), map).getResolved();
-			if (!ZEROSTR.equals(s)) {
-				buffer.append(s).append(REMOTE_LINE_SEP);
+			if (!JAXBRMConstants.ZEROSTR.equals(s)) {
+				buffer.append(s).append(JAXBRMConstants.REMOTE_LINE_SEP);
 			}
 			progress.worked(1);
 		}
@@ -135,8 +135,8 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 		}
 		for (; i < len; i++) {
 			s = new LineImpl(uuid, line.get(i), map).getResolved();
-			if (!ZEROSTR.equals(s)) {
-				buffer.append(s).append(REMOTE_LINE_SEP);
+			if (!JAXBRMConstants.ZEROSTR.equals(s)) {
+				buffer.append(s).append(JAXBRMConstants.REMOTE_LINE_SEP);
 			}
 			progress.worked(1);
 		}
@@ -160,7 +160,7 @@ public class ScriptHandler extends Job implements IJAXBNonNLSConstants {
 			for (ArgType a : line.getArg()) {
 				ArgType newA = new ArgType();
 				newA.setIsUndefinedIfMatches(a.getIsUndefinedIfMatches());
-				newA.setContent(a.getContent().replaceAll(VRM, VLC));
+				newA.setContent(a.getContent().replaceAll(JAXBRMConstants.VRM, JAXBRMConstants.VLC));
 				newA.setResolve(a.isResolve());
 				args.add(newA);
 			}

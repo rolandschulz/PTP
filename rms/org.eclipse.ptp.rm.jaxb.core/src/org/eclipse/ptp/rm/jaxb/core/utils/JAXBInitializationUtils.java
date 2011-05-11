@@ -25,8 +25,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
@@ -42,7 +42,7 @@ import org.xml.sax.SAXParseException;
  * @author arossi
  * 
  */
-public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
+public class JAXBInitializationUtils {
 
 	private static Unmarshaller unmarshaller;
 	private static Validator validator;
@@ -149,7 +149,7 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	 */
 	private synchronized static Unmarshaller getUnmarshaller() throws JAXBException {
 		if (unmarshaller == null) {
-			JAXBContext jc = JAXBContext.newInstance(JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
+			JAXBContext jc = JAXBContext.newInstance(JAXBRMConstants.JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
 			unmarshaller = jc.createUnmarshaller();
 		}
 		return unmarshaller;
@@ -164,8 +164,8 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	 */
 	private synchronized static Validator getValidator() throws IOException, SAXException {
 		if (validator == null) {
-			URL xsd = JAXBCorePlugin.getResource(RM_XSD);
-			SchemaFactory factory = SchemaFactory.newInstance(XMLSchema);
+			URL xsd = JAXBCorePlugin.getResource(JAXBRMConstants.RM_XSD);
+			SchemaFactory factory = SchemaFactory.newInstance(JAXBRMConstants.XMLSchema);
 			Schema schema = factory.newSchema(xsd);
 			validator = schema.newValidator();
 		}
@@ -181,11 +181,11 @@ public class JAXBInitializationUtils implements IJAXBNonNLSConstants {
 	 */
 	private static String printInfo(SAXParseException e) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(Messages.PublicId + e.getPublicId()).append(LINE_SEP);
-		sb.append(Messages.SystemId + e.getSystemId()).append(LINE_SEP);
-		sb.append(Messages.LineNumber + e.getLineNumber()).append(LINE_SEP);
-		sb.append(Messages.ColumnNumber + e.getColumnNumber()).append(LINE_SEP);
-		sb.append(Messages.Message + e.getMessage()).append(LINE_SEP);
+		sb.append(Messages.PublicId + e.getPublicId()).append(JAXBRMConstants.LINE_SEP);
+		sb.append(Messages.SystemId + e.getSystemId()).append(JAXBRMConstants.LINE_SEP);
+		sb.append(Messages.LineNumber + e.getLineNumber()).append(JAXBRMConstants.LINE_SEP);
+		sb.append(Messages.ColumnNumber + e.getColumnNumber()).append(JAXBRMConstants.LINE_SEP);
+		sb.append(Messages.Message + e.getMessage()).append(JAXBRMConstants.LINE_SEP);
 		return sb.toString();
 	}
 
