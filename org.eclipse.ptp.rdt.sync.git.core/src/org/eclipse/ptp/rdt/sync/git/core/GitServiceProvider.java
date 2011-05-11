@@ -178,18 +178,23 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#
 	 * synchronize(org.eclipse.core.resources.IResourceDelta, org.eclipse.core.runtime.IProgressMonitor, boolean)
-	 * TODO: use the force
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 100);
 		try {
-			// TODO: Note that here SyncFlag.FORCE is interpreted as sync always, even if not needed for delta. This is different
-			// from the original intent of FORCE, which was to do an immediate, blocking sync. We may need to split those two
-			// functions and introduce more flags.
-			// TODO: Also, note that we are not using the individual "sync to local" and "sync to remote" flags yet.
-			// Example: Why sync if sync not needed for delta? The RemoteMakeBuilder forces a sync before and after building. In some
-			// cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
-			if ((syncFlags == SyncFlag.NO_FORCE) && (!(syncNeeded(delta)))) {
+			/* A synchronize with SyncFlag.FORCE gurantees that both directories are in sync.
+			 * 
+			 * More precise: it gurantees that all changes written to disk at the moment of the call are guranteed to be 
+			 * synchronized between both directories. No gurantess are given for changes occoring during the synchronize call.
+			 * 
+			 * To satify this gurantee, this call needs to make sure that both the current delta and all outstanding sync requests
+			 * finish before this call returns.
+			 * 
+			 *  Example: Why sync if current delta is empty? The RemoteMakeBuilder forces a sync before and after building. 
+			 *  In some cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
+			 */
+			// TODO: We are not using the individual "sync to local" and "sync to remote" flags yet.
+			if ((syncFlags == SyncFlag.NO_FORCE) && (!(hasRelevantChangedResources(delta)))) {
 				return;
 			}
 			
@@ -324,7 +329,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	}
 
 	// Are any of the changes in delta relevant for sync'ing?
-	private boolean syncNeeded(IResourceDelta delta) {
+	private boolean hasRelevantChangedResources(IResourceDelta delta) {
 		if (delta == null) {
 			return false;
 		}
