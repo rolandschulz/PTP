@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui;
 
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 
 /**
  * Gathers all internal, unmodifiable string constants into a single place for
@@ -17,7 +17,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
  * 
  * @since 5.0
  */
-public interface IJAXBUINonNLSConstants extends IJAXBNonNLSConstants {
+public class JAXBRMUIConstants extends JAXBRMConstants {
 
 	public static final int DEFAULT = UNDEFINED;
 

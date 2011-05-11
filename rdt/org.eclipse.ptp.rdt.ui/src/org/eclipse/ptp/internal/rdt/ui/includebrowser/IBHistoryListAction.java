@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.includebrowser.IBHistoryListAction
- * Version: 1.8
+ * Version: 1.9
  */
 
 package org.eclipse.ptp.internal.rdt.ui.includebrowser;
@@ -106,7 +106,7 @@ public class IBHistoryListAction extends Action {
 
 			LayoutUtil.doDefaultLayout(inner, new DialogField[] { fHistoryList }, true, 0, 0);
 			LayoutUtil.setHeightHint(fHistoryList.getListControl(null), convertHeightInCharsToPixels(12));
-			LayoutUtil.setHorizontalGrabbing(fHistoryList.getListControl(null));
+			LayoutUtil.setHorizontalGrabbing(fHistoryList.getListControl(null), true);
 
 			applyDialogFont(composite);		
 			return composite;

@@ -23,6 +23,7 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
@@ -87,8 +88,8 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 		if (title != null) {
 			this.title = title;
 		}
-		stdoutPath = ZEROSTR;
-		stderrPath = ZEROSTR;
+		stdoutPath = JAXBRMUIConstants.ZEROSTR;
+		stderrPath = JAXBRMUIConstants.ZEROSTR;
 		contents = new StringBuffer();
 	}
 
@@ -120,16 +121,18 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 		control = WidgetBuilderUtils.createComposite(parent, 1);
 
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(6, false);
-		GridData gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, false, false, 700, DEFAULT, 6, DEFAULT);
+		GridData gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, false, false, 600, JAXBRMUIConstants.DEFAULT, 6,
+				JAXBRMUIConstants.DEFAULT);
 		Group comp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
 
 		/*
 		 * script upload controls
 		 */
 		WidgetBuilderUtils.createLabel(comp, Messages.BatchScriptPath, SWT.LEFT, 1);
-		WidgetBuilderUtils.createLabel(comp, ZEROSTR, SWT.LEFT, 1);
-		GridData gdsub = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 410, DEFAULT, 2, DEFAULT);
-		String s = selected == null ? ZEROSTR : selected.toString();
+		WidgetBuilderUtils.createLabel(comp, JAXBRMUIConstants.ZEROSTR, SWT.LEFT, 1);
+		GridData gdsub = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 310, JAXBRMUIConstants.DEFAULT,
+				2, JAXBRMUIConstants.DEFAULT);
+		String s = selected == null ? JAXBRMUIConstants.ZEROSTR : selected.toString();
 		choice = WidgetBuilderUtils.createText(comp, SWT.BORDER, gdsub, true, s);
 		browseWorkspace = WidgetBuilderUtils.createPushButton(comp, Messages.JAXBRMConfigurationSelectionWizardPage_1, this);
 		clear = WidgetBuilderUtils.createPushButton(comp, Messages.ClearScript, this);
@@ -145,8 +148,8 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 		layout = WidgetBuilderUtils.createGridLayout(1, true);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, null);
 		int style = SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL;
-		gdsub = WidgetBuilderUtils.createGridDataFill(700, 700, 1);
-		editor = WidgetBuilderUtils.createText(grp, style, gdsub, true, ZEROSTR, null, null);
+		gdsub = WidgetBuilderUtils.createGridDataFill(600, 400, 1);
+		editor = WidgetBuilderUtils.createText(grp, style, gdsub, true, JAXBRMUIConstants.ZEROSTR, null, null);
 		WidgetBuilderUtils.applyMonospace(editor);
 		editor.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {
@@ -160,8 +163,8 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 			}
 		});
 
+		size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		selected = null;
-		parentTab.resize(control);
 		updateControls();
 	}
 
@@ -198,8 +201,8 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 */
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		try {
-			String uriStr = configuration.getAttribute(SCRIPT_PATH, ZEROSTR);
-			if (!ZEROSTR.equals(uriStr)) {
+			String uriStr = configuration.getAttribute(JAXBRMUIConstants.SCRIPT_PATH, JAXBRMUIConstants.ZEROSTR);
+			if (!JAXBRMUIConstants.ZEROSTR.equals(uriStr)) {
 				selected = uriStr;
 			} else {
 				selected = null;
@@ -291,7 +294,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 					stdoutText.setText(stdoutPath);
 					stdoutText.setEnabled(true);
 				} else {
-					stdoutText.setText(ZEROSTR);
+					stdoutText.setText(JAXBRMUIConstants.ZEROSTR);
 					stdoutText.setEnabled(false);
 				}
 				fireContentsChanged();
@@ -301,7 +304,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 					stderrText.setText(stderrPath);
 					stderrText.setEnabled(true);
 				} else {
-					stderrText.setText(ZEROSTR);
+					stderrText.setText(JAXBRMUIConstants.ZEROSTR);
 					stderrText.setEnabled(false);
 				}
 				fireContentsChanged();
@@ -323,7 +326,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	@Override
 	protected void doRefreshLocal() {
 		if (selected != null) {
-			localMap.put(SCRIPT_PATH, selected);
+			localMap.put(JAXBRMUIConstants.SCRIPT_PATH, selected);
 		}
 		maybeRefreshPaths();
 	}
@@ -344,27 +347,30 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 			return;
 		}
 
-		Object stdout = env.get(STDOUT_REMOTE_FILE);
-		Object stderr = env.get(STDERR_REMOTE_FILE);
+		Object stdout = env.get(JAXBRMUIConstants.STDOUT_REMOTE_FILE);
+		Object stderr = env.get(JAXBRMUIConstants.STDERR_REMOTE_FILE);
 		if (stdout == null && stderr == null) {
 			return;
 		}
 
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(4, false);
-		GridData data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, false, false, 400, DEFAULT, 4, DEFAULT);
+		GridData data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, false, false, 400, JAXBRMUIConstants.DEFAULT,
+				4, JAXBRMUIConstants.DEFAULT);
 		Group group = WidgetBuilderUtils.createGroup(parent, SWT.NONE, layout, data);
 		if (stdout != null) {
 			Label l = WidgetBuilderUtils.createLabel(group, Messages.RemoteScriptPath, SWT.LEFT, 1);
 			l.setToolTipText(Messages.RemotePathTooltip);
-			data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 175, DEFAULT, 2, DEFAULT);
-			stdoutText = WidgetBuilderUtils.createText(group, SWT.BORDER, data, false, ZEROSTR);
+			data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 175, JAXBRMUIConstants.DEFAULT, 2,
+					JAXBRMUIConstants.DEFAULT);
+			stdoutText = WidgetBuilderUtils.createText(group, SWT.BORDER, data, false, JAXBRMUIConstants.ZEROSTR);
 			stdoutText.addModifyListener(this);
 			enableFetchStdout = WidgetBuilderUtils.createCheckButton(group, Messages.EnableStdoutFetch, this);
 		}
 		if (stderr != null) {
 			WidgetBuilderUtils.createLabel(group, Messages.RemoteScriptPath, SWT.LEFT, 1);
-			data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 175, DEFAULT, 2, DEFAULT);
-			stderrText = WidgetBuilderUtils.createText(group, SWT.BORDER, data, false, ZEROSTR);
+			data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 175, JAXBRMUIConstants.DEFAULT, 2,
+					JAXBRMUIConstants.DEFAULT);
+			stderrText = WidgetBuilderUtils.createText(group, SWT.BORDER, data, false, JAXBRMUIConstants.ZEROSTR);
 			stderrText.addModifyListener(this);
 			enableFetchStderr = WidgetBuilderUtils.createCheckButton(group, Messages.EnableStderrFetch, this);
 		}
@@ -378,9 +384,9 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	private void maybeInitializePaths(ILaunchConfiguration configuration) {
 		try {
 			if (stdoutText != null) {
-				stdoutPath = configuration.getAttribute(STDOUT_REMOTE_FILE, ZEROSTR);
-				if (ZEROSTR.equals(stdoutPath)) {
-					stdoutText.setText(ZEROSTR);
+				stdoutPath = configuration.getAttribute(JAXBRMUIConstants.STDOUT_REMOTE_FILE, JAXBRMUIConstants.ZEROSTR);
+				if (JAXBRMUIConstants.ZEROSTR.equals(stdoutPath)) {
+					stdoutText.setText(JAXBRMUIConstants.ZEROSTR);
 					stdoutText.setEnabled(false);
 					enableFetchStdout.setSelection(false);
 				} else {
@@ -390,9 +396,9 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 				}
 			}
 			if (stderrText != null) {
-				stderrPath = configuration.getAttribute(STDERR_REMOTE_FILE, ZEROSTR);
-				if (ZEROSTR.equals(stderrPath)) {
-					stderrText.setText(ZEROSTR);
+				stderrPath = configuration.getAttribute(JAXBRMUIConstants.STDERR_REMOTE_FILE, JAXBRMUIConstants.ZEROSTR);
+				if (JAXBRMUIConstants.ZEROSTR.equals(stderrPath)) {
+					stderrText.setText(JAXBRMUIConstants.ZEROSTR);
 					stderrText.setEnabled(false);
 					enableFetchStderr.setSelection(false);
 				} else {
@@ -410,15 +416,15 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 * If the values are non-empty, add to map; else remove.
 	 */
 	private void maybeRefreshPaths() {
-		if (ZEROSTR.equals(stdoutPath)) {
-			localMap.remove(STDOUT_REMOTE_FILE);
+		if (JAXBRMUIConstants.ZEROSTR.equals(stdoutPath)) {
+			localMap.remove(JAXBRMUIConstants.STDOUT_REMOTE_FILE);
 		} else {
-			localMap.put(STDOUT_REMOTE_FILE, stdoutPath);
+			localMap.put(JAXBRMUIConstants.STDOUT_REMOTE_FILE, stdoutPath);
 		}
-		if (ZEROSTR.equals(stderrPath)) {
-			localMap.remove(STDERR_REMOTE_FILE);
+		if (JAXBRMUIConstants.ZEROSTR.equals(stderrPath)) {
+			localMap.remove(JAXBRMUIConstants.STDERR_REMOTE_FILE);
 		} else {
-			localMap.put(STDERR_REMOTE_FILE, stderrPath);
+			localMap.put(JAXBRMUIConstants.STDERR_REMOTE_FILE, stderrPath);
 		}
 	}
 
@@ -439,10 +445,10 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 		if (selected != null) {
 			choice.setText(selected);
 		} else {
-			choice.setText(ZEROSTR);
+			choice.setText(JAXBRMUIConstants.ZEROSTR);
 		}
 		editor.setText(contents.toString());
-		if (ZEROSTR.equals(contents)) {
+		if (JAXBRMUIConstants.ZEROSTR.equals(contents)) {
 			clear.setEnabled(false);
 		} else {
 			clear.setEnabled(true);
@@ -463,7 +469,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 					if (line == null) {
 						break;
 					}
-					contents.append(line).append(LINE_SEP);
+					contents.append(line).append(JAXBRMUIConstants.LINE_SEP);
 				} catch (EOFException eof) {
 					break;
 				}

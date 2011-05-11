@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.ui.util;
+package org.eclipse.ptp.remote.ui;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,16 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.remote.ui.messages.Messages;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
-import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
-import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -33,12 +27,13 @@ import org.eclipse.swt.widgets.Shell;
  * @see org.eclipse.ptp.remote.ui.IRemoteUIServices
  * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager
  * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager
- * @see org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate
+ * @see org.eclipse.ptp.remote.core.RemoteServicesDelegate
  * 
  * @author arossi
+ * @since 5.0
  * 
  */
-public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
+public class RemoteUIServicesUtils {
 
 	/**
 	 * Opens a browse dialog using the indicated remote or local service and
@@ -66,6 +61,7 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 		IRemoteUIServices uIServices = null;
 		IRemoteUIFileManager uiFileManager = null;
 		IRemoteConnection conn = null;
+		IRemoteFileManager manager = null;
 
 		URI home = null;
 		String path = null;
@@ -74,35 +70,37 @@ public class RemoteUIServicesUtils implements IJAXBUINonNLSConstants {
 		if (!remote) {
 			uIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(delegate.getLocalServices());
 			uiFileManager = uIServices.getUIFileManager();
+			manager = delegate.getLocalFileManager();
 			conn = delegate.getLocalConnection();
 			home = delegate.getLocalHome();
 		} else {
 			uIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(delegate.getRemoteServices());
 			uiFileManager = uIServices.getUIFileManager();
+			manager = delegate.getRemoteFileManager();
 			conn = delegate.getRemoteConnection();
 			home = delegate.getRemoteHome();
 		}
 
 		path = (current == null) ? home.getPath() : current.getPath();
 
+		String title = dir ? Messages.RemoteResourceBrowser_directoryTitle : Messages.RemoteResourceBrowser_fileTitle;
 		try {
 			uiFileManager.setConnection(conn);
 			uiFileManager.showConnections(remote);
 			if (dir) {
-				path = uiFileManager.browseDirectory(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, type);
+				path = uiFileManager.browseDirectory(shell, title, path, type);
 			} else {
-				path = uiFileManager.browseFile(shell, Messages.JAXBRMConfigurationSelectionWizardPage_0, path, type);
+				path = uiFileManager.browseFile(shell, title, path, type);
 			}
 		} catch (Throwable t) {
-			JAXBUIPlugin.log(t);
+			PTPRemoteUIPlugin.log(t);
 		}
 
 		if (path == null) {
 			return null;
 		}
 
-		return new URI(home.getScheme(), home.getUserInfo(), home.getHost(), home.getPort(), path, home.getQuery(),
-				home.getFragment());
+		return manager.toURI(path);
 	}
 
 	/**

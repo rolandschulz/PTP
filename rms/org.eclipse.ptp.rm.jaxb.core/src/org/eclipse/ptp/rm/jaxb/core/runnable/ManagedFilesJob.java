@@ -22,8 +22,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
@@ -31,7 +32,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.core.utils.FileUtils;
-import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 /**
@@ -43,7 +43,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  * @author arossi
  * 
  */
-public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
+public class ManagedFilesJob extends Job {
 
 	private final String uuid;
 	private final String stagingDir;
@@ -103,7 +103,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 				if (file.isUniqueIdPrefix()) {
 					fileName = UUID.randomUUID() + fileName;
 				}
-				String pathSep = localTarget ? PATH_SEP : REMOTE_PATH_SEP;
+				String pathSep = localTarget ? JAXBRMConstants.PATH_SEP : JAXBRMConstants.REMOTE_PATH_SEP;
 				String target = stagingDir + pathSep + fileName;
 				copyFileToRemoteHost(localFile.getAbsolutePath(), target, progress);
 				if (file.isDeleteAfterUse()) {
@@ -112,7 +112,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 				PropertyType p = new PropertyType();
 				p.setName(file.getName());
 				if (localTarget) {
-					p.setValue(new File(System.getProperty(JAVA_USER_HOME), target).getAbsolutePath());
+					p.setValue(new File(System.getProperty(JAXBRMConstants.JAVA_USER_HOME), target).getAbsolutePath());
 				} else {
 					p.setValue(target);
 				}
@@ -170,7 +170,7 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 			return new File(path);
 		}
 		String name = rmVarMap.getString(uuid, file.getName());
-		File sourceDir = new File(System.getProperty(JAVA_TMP_DIR));
+		File sourceDir = new File(System.getProperty(JAXBRMConstants.JAVA_TMP_DIR));
 		File localFile = new File(sourceDir, name);
 		String contents = file.getContents();
 		FileWriter fw = null;
@@ -187,13 +187,13 @@ public class ManagedFilesJob extends Job implements IJAXBNonNLSConstants {
 					 * magic to avoid attempted resolution of unknown shell
 					 * variables
 					 */
-					int start = contents.indexOf(OPENVRM);
+					int start = contents.indexOf(JAXBRMConstants.OPENVRM);
 					int end = contents.length();
 					if (start >= 0) {
-						start += OPENVRM.length();
-						end = contents.indexOf(PD);
+						start += JAXBRMConstants.OPENVRM.length();
+						end = contents.indexOf(JAXBRMConstants.PD);
 						if (end < 0) {
-							end = contents.indexOf(CLOSV);
+							end = contents.indexOf(JAXBRMConstants.CLOSV);
 						}
 						String key = contents.substring(start, end);
 						Object o = rmVarMap.get(key);

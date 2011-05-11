@@ -16,7 +16,8 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
@@ -27,12 +28,11 @@ import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
-import org.eclipse.ptp.rm.jaxb.core.utils.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
-public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
+public class ManagedFilesTest extends TestCase {
 
-	private static final String xml = DATA + "test-pbs.xml"; //$NON-NLS-1$
+	private static final String xml = JAXBRMConstants.DATA + "test-pbs.xml"; //$NON-NLS-1$
 	private static ControlType controlData;
 	private static Map<String, Object> env;
 	private static Map<String, String> live;
@@ -72,7 +72,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	public void testManagedFiles() {
 		composeScript();
 		if (verbose) {
-			PropertyType contents = (PropertyType) env.get(SCRIPT);
+			PropertyType contents = (PropertyType) env.get(JAXBRMConstants.SCRIPT);
 			if (contents != null) {
 				System.out.println(contents.getValue());
 			}
@@ -105,7 +105,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 			t.printStackTrace();
 		}
 
-		PropertyType contents = (PropertyType) env.get(SCRIPT);
+		PropertyType contents = (PropertyType) env.get(JAXBRMConstants.SCRIPT);
 		assertNotNull(contents);
 	}
 
@@ -114,18 +114,18 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files) {
-		PropertyType scriptVar = (PropertyType) rmVarMap.get(SCRIPT);
-		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(SCRIPT_PATH);
+		PropertyType scriptVar = (PropertyType) rmVarMap.get(JAXBRMConstants.SCRIPT);
+		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(JAXBRMConstants.SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
-				files.setFileStagingLocation(ECLIPSESETTINGS);
+				files.setFileStagingLocation(JAXBRMConstants.ECLIPSESETTINGS);
 			}
 			List<ManagedFileType> fileList = files.getFile();
 			ManagedFileType scriptFile = null;
 			if (!fileList.isEmpty()) {
 				for (ManagedFileType f : fileList) {
-					if (f.getName().equals(SCRIPT_FILE)) {
+					if (f.getName().equals(JAXBRMConstants.SCRIPT_FILE)) {
 						scriptFile = f;
 						break;
 					}
@@ -133,7 +133,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 			}
 			if (scriptFile == null) {
 				scriptFile = new ManagedFileType();
-				scriptFile.setName(SCRIPT_FILE);
+				scriptFile.setName(JAXBRMConstants.SCRIPT_FILE);
 				fileList.add(scriptFile);
 			}
 			scriptFile.setResolveContents(false);
@@ -142,7 +142,8 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 				scriptFile.setPath(String.valueOf(scriptPathVar.getValue()));
 				scriptFile.setDeleteAfterUse(false);
 			} else {
-				scriptFile.setContents(OPENVRM + SCRIPT + PD + VALUE + CLOSV);
+				scriptFile.setContents(JAXBRMConstants.OPENVRM + JAXBRMConstants.SCRIPT + JAXBRMConstants.PD
+						+ JAXBRMConstants.VALUE + JAXBRMConstants.CLOSV);
 				scriptFile.setDeleteAfterUse(true);
 			}
 		}
@@ -166,12 +167,12 @@ public class ManagedFilesTest extends TestCase implements IJAXBNonNLSConstants {
 				((AttributeType) target).setValue(value);
 			}
 		}
-		putValue(CONTROL_USER_VAR, "fooUser"); //$NON-NLS-1$
-		putValue(CONTROL_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
-		putValue(DIRECTORY, "/u/ncsa/arossi/test"); //$NON-NLS-1$ 
-		putValue(MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
-		putValue(MPI_ARGS, "-np 8"); //$NON-NLS-1$ 
-		putValue(EXEC_PATH, "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ 
+		putValue(JAXBRMConstants.CONTROL_USER_VAR, "fooUser"); //$NON-NLS-1$
+		putValue(JAXBRMConstants.CONTROL_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
+		putValue(JAXBRMConstants.DIRECTORY, "/u/ncsa/arossi/test"); //$NON-NLS-1$ 
+		putValue(JAXBRMConstants.MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
+		putValue(JAXBRMConstants.MPI_ARGS, "-np 8"); //$NON-NLS-1$ 
+		putValue(JAXBRMConstants.EXEC_PATH, "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ 
 		if (verbose) {
 			RMDataTest.print(rmVarMap);
 		}

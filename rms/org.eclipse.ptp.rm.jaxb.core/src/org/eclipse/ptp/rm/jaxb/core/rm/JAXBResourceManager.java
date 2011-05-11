@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.rm;
 
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
@@ -29,7 +28,7 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
  * @author arossi
  * 
  */
-public final class JAXBResourceManager extends AbstractResourceManager implements IJAXBResourceManager, IJAXBNonNLSConstants {
+public final class JAXBResourceManager extends AbstractResourceManager implements IJAXBResourceManager {
 	/**
 	 * @param configuration
 	 * @param control

@@ -49,12 +49,12 @@
 		resource. In most cases, the monitor will be a pre-built type provided
 		by the PTP distribution, either a generic class for handling
 		interactive submissions, or a batch-system monitor implemented using <a
-			href="http://www2.fz-juelich.de/jsc/llview">LLView</a>. Since <b>LLView</b>
+			href="http://www2.fz-juelich.de/jsc/llview">LLview</a>. Since <b>LLview</b>
 		already supports a good number of the standard scheduler types, adding
 		a new resource manager type will normally entail only the specific
 		configuration of its control part. We plan to make available both
 		user-initiated as well as system-wide deployment of the necessary
-		LLView parts (mostly Perl scripts) for monitoring the target resource.
+		LLview parts (mostly Perl scripts) for monitoring the target resource.
 	</p>
 	<h2>
 		<a name="Requirements">Requirements</a>
@@ -67,9 +67,11 @@
 		<li>RSE for Indigo, available from the Eclipse download site or
 			as part of the pre-built PTP package.</li>
 	</ul>
-	<p>If the monitor of any JAXB resource manager uses LLView, an
-		LLView server must be set up separately or an installation must be
-		available to point the client monitoring component to.</p>
+	<p>If the monitor of any JAXB resource manager uses LLview, an
+		LLview server must be set up separately or an installation must be
+		available to point the client monitoring component to; as mentioned
+		above, we plan to provide a user-initiated automatic deployment
+		version of the LLview monitor.</p>
 	<p>
 		<b>There are two main sections to the help pages which follow. The
 			first concerns creating or modifying a resource manager
@@ -81,6 +83,98 @@
 	<h2>
 		<a name="Configuring">Configuring the Resource Manager</a>
 	</h2>
+
+	<p>
+		The JAXB Resource Manager is <b><i>model-driven</i> </b>; this means
+		that its functioning and appearance are determined by a set of
+		definitions provided usually via an XML file. What folllows is a
+		detailed explanation of the schema governing the resource manager XML
+		configuration.
+	</p>
+
+	<h4>
+		<a name="ResourceManagerData">The Resource Manager Data Type</a>
+	</h4>
+	<img alt="ResourceManagerData" src="images/01rm-data.png" />
+	<br>
+
+	<p>
+		The top-level of the definition tree consists of three elements: <b>site-</b>,
+		<b>control-</b> and <b>monitor-data</b>. In addition, a resource
+		manager should be given a name which sufficiently distinguishes it
+		from others of a similar type; e.g., <i>pbs-torque-v_2.3.7_abe</i> is
+		specific to an installation on the host abe, <i>ll-v_4.0</i> suits all
+		installations of LoadLeveler version 4, etc.
+	</p>
+	<p>
+		The <b>site-data</b> element provides an optional place to set default
+		remote site information. The connection strings are URIs which are
+		specific to the PTP RemoteServices definitions. The scheme for these
+		URIs will usually name the specific remote service (e.g,
+		<code>rse:</code>
+		or
+		<code>remotetools:</code>
+		; local is simply
+		<code>file:</code>
+		). The host name and port given here will appear as defaults in the
+		resource manager selection wizard when you create a new connection.
+	</p>
+
+	<p>
+		The principal section of the schema is devoted to defining the
+		resource manager's <b>control</b> part. The top-level control elements
+		include properties and attributes, files to be staged, job script to
+		be generated (if any), commands specific to the resource manager, and
+		the layout of the Launch Tab.
+	</p>
+	<p>
+		The resource manager implementation constructs a variable map from the
+		defined properties and attributes which serves as the resource manager
+		"environment"; these variables are dereferenced in the configuration
+		file via
+		<code>
+			${rm:name#<i>fieldName</i>}
+		</code>
+		, e.g.,
+		<code>${rm:queues#value}</code>
+		(see further below on the fields for properties and attributes); all
+		properties and attributes defined in the configuration are mapped. The
+		following hard-coded properties are also added at runtime: <br> <br>
+		<code>control.user.name</code>
+		<br>
+		<code>control.address</code>
+		<br>
+		<code>executablePath</code>
+		<br>
+		<code>progArgs</code>
+		<br>
+		<code>directory</code>
+		<br>
+	</p>
+	<p>
+		<i>Commands</i> are externally executed calls, either to a local or
+		remote OS, depending on the connection defined for the resource
+		manager. The <b>start-up-</b> and <b>shut-down-command</b>s are
+		arbitrary commands to be run (in order) at startup or exit. The <b>submit</b>
+		commands are those used to launch jobs. Currently a configuration may
+		have only a batch or an interactive mode. Thus it may have only two
+		submission modes, a run and a debug, for the given type. In the future
+		we may allow all four to coexist in a single configuration. <b>get-job-status</b>
+		is a user-initiated (on-demand) request to refresh the status
+		information for a submission. Normal (polled) updates are the
+		responsibility of the monitor. The command nevertheless needs to be
+		implemented in most cases, as it will be called internally just after
+		submission. The remaining commands are operations which can be applied
+		to running jobs; with the exception of <i>terminate</i>, the rest of
+		these have to do with schedulers (batch-systems) and do not apply to
+		resource managers which connect to interactive runtime-systems such as
+		OpenMPI or PE. <b>Note</b>: if the submission type is interactive, the
+		<b>terminate-job</b> command usually does not need to be implemented,
+		as the process termination will be handled internally. However, in
+		some cases (such as PBS -I) which require the interactive job to run
+		as a pseudo-terminal, one may need this command in order to force its
+		termination.
+	</p>
 
 	<h2>
 		<a name="Using">Using the Resource Manager</a>

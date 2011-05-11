@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.SWT;
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Label;
  * @author arossi
  * 
  */
-public class JAXBRMConfigurationImportWizardPage extends WizardPage implements IJAXBUINonNLSConstants, SelectionListener {
+public class JAXBRMConfigurationImportWizardPage extends WizardPage implements SelectionListener {
 	private Combo configurations;
 	private String[] items;
 	private URL[] urls;
@@ -68,8 +68,8 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements I
 		WidgetBuilderUtils.createLabel(group, Messages.ConfigurationImportWizardPageLabel, SWT.LEFT, 1).setToolTipText(
 				Messages.ConfigurationImportWizardPageTooltip);
 		gridData = WidgetBuilderUtils.createGridDataFillH(2);
-		configurations = WidgetBuilderUtils.createCombo(group, SWT.BORDER | SWT.READ_ONLY, gridData, items, ZEROSTR, null, null,
-				this);
+		configurations = WidgetBuilderUtils.createCombo(group, SWT.BORDER | SWT.READ_ONLY, gridData, items,
+				JAXBRMUIConstants.ZEROSTR, null, null, this);
 		setControl(group);
 	}
 
@@ -99,7 +99,7 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements I
 	public void loadConfigurations() {
 		JAXBRMConfigurationSelectionFactory.loadExtensions(fRMJAXBResourceManagers);
 		List<String> names = new ArrayList<String>();
-		names.add(ZEROSTR);
+		names.add(JAXBRMUIConstants.ZEROSTR);
 		List<URL> locations = new ArrayList<URL>();
 		locations.add(null);
 		for (Map.Entry<String, URL> e : fRMJAXBResourceManagers.entrySet()) {

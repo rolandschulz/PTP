@@ -33,7 +33,10 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	 * .lang.String)
 	 */
 	public IRemoteConnection getConnection(String name) {
-		return fLocalConnection;
+		if (name.equals(fLocalConnection.getName())) {
+			return fLocalConnection;
+		}
+		return null;
 	}
 
 	/*

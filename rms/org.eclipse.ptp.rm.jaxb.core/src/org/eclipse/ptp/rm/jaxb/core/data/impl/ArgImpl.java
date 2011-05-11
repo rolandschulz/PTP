@@ -12,8 +12,8 @@ package org.eclipse.ptp.rm.jaxb.core.data.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 
 /**
@@ -25,7 +25,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
  * @author arossi
  * 
  */
-public class ArgImpl implements IJAXBNonNLSConstants {
+public class ArgImpl {
 
 	private final String uuid;
 	private final ArgType arg;
@@ -89,17 +89,17 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 	 */
 	public static String toString(String uuid, List<ArgType> args, IVariableMap map) {
 		if (args.isEmpty()) {
-			return ZEROSTR;
+			return JAXBRMConstants.ZEROSTR;
 		}
 		StringBuffer b = new StringBuffer();
 		String resolved = getResolved(uuid, args.get(0), map);
-		if (!ZEROSTR.equals(resolved)) {
+		if (!JAXBRMConstants.ZEROSTR.equals(resolved)) {
 			b.append(resolved);
 		}
 		for (int i = 1; i < args.size(); i++) {
 			resolved = getResolved(uuid, args.get(i), map);
-			if (!ZEROSTR.equals(resolved)) {
-				b.append(SP).append(resolved);
+			if (!JAXBRMConstants.ZEROSTR.equals(resolved)) {
+				b.append(JAXBRMConstants.SP).append(resolved);
 			}
 		}
 		return b.toString();
@@ -121,7 +121,7 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 	 */
 	private static String getResolved(String uuid, ArgType arg, IVariableMap map) {
 		if (arg == null) {
-			return ZEROSTR;
+			return JAXBRMConstants.ZEROSTR;
 		}
 		if (!arg.isResolve()) {
 			return arg.getContent();
@@ -135,7 +135,7 @@ public class ArgImpl implements IJAXBNonNLSConstants {
 			undefined = undefined.trim();
 			undefined = map.getString(uuid, undefined);
 			if (dereferenced != null && dereferenced.matches(undefined)) {
-				return ZEROSTR;
+				return JAXBRMConstants.ZEROSTR;
 			}
 		}
 		return dereferenced;

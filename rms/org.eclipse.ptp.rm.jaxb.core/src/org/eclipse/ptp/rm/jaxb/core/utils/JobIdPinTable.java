@@ -1,9 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2011 University of Illinois All rights reserved. This program
+ * and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html 
+ * 	
+ * Contributors: 
+ * 	Albert L. Rossi - design and implementation
+ ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core.utils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 
 /**
  * A condition variable for job ids.
@@ -11,7 +20,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
  * @author arossi
  * 
  */
-public class JobIdPinTable implements IJAXBNonNLSConstants {
+public class JobIdPinTable {
 	private final Map<String, Thread> map;
 
 	public JobIdPinTable() {
@@ -33,7 +42,7 @@ public class JobIdPinTable implements IJAXBNonNLSConstants {
 					break;
 				}
 				try {
-					map.wait(STANDARD_WAIT);
+					map.wait(JAXBRMConstants.STANDARD_WAIT);
 				} catch (InterruptedException ignored) {
 				}
 			}
@@ -57,7 +66,7 @@ public class JobIdPinTable implements IJAXBNonNLSConstants {
 					break;
 				}
 				try {
-					map.wait(STANDARD_WAIT);
+					map.wait(JAXBRMConstants.STANDARD_WAIT);
 				} catch (InterruptedException ignored) {
 				}
 			}

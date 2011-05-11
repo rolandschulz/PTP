@@ -14,10 +14,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 import org.eclipse.ptp.rm.jaxb.core.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.IUpdateModel;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetActionUtils;
@@ -31,7 +31,7 @@ import org.eclipse.ui.progress.UIJob;
  * @author arossi
  * 
  */
-public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSConstants {
+public abstract class AbstractUpdateModel implements IUpdateModel {
 
 	/**
 	 * Used with ModifyListeners so as to avoid a save on every keystroke.
@@ -40,7 +40,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 	 */
 	protected class ValidateJob extends UIJob {
 		public ValidateJob() {
-			super(VALIDATE);
+			super(JAXBRMUIConstants.VALIDATE);
 		}
 
 		@Override
@@ -72,7 +72,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel, IJAXBNonNLSCo
 	 */
 	protected AbstractUpdateModel(String name, ValueUpdateHandler handler) {
 		this.name = name;
-		canSave = (name != null && !ZEROSTR.equals(name));
+		canSave = (name != null && !JAXBRMUIConstants.ZEROSTR.equals(name));
 		this.handler = handler;
 		refreshing = false;
 		validateJob = new ValidateJob();

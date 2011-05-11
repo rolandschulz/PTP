@@ -22,8 +22,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
@@ -178,6 +180,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * TODO: use the force
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 100);
 		if (!(syncNeeded(delta))) {
 			return;
 		}
@@ -231,7 +234,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			if (fSyncConnection == null) {
 				// Open a remote sync connection
 				fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(),
-																this.getProject().getLocation().toString(),	this.getLocation());
+														this.getProject().getLocation().toString(),	this.getLocation(), progress);
 			}
 
 			// Open remote connection if necessary
@@ -251,8 +254,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 			// Sync local and remote. For now, do both ways each time.
 			// TODO: Sync more efficiently and appropriately to the situation.
-			fSyncConnection.syncLocalToRemote();
-			fSyncConnection.syncRemoteToLocal();
+			fSyncConnection.syncLocalToRemote(progress);
+			fSyncConnection.syncRemoteToLocal(progress);
 
 			finishedSyncTaskId = willFinishTaskId;
 		} catch (final RemoteSyncException e) {

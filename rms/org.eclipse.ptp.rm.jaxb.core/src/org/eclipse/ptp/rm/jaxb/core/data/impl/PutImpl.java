@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 import org.eclipse.ptp.rm.jaxb.core.data.PutType;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -58,8 +59,8 @@ public class PutImpl extends AbstractAssign {
 			for (EntryType e : entries) {
 				String k = getKey(e, values);
 				if (k == null) {
-					throw new IllegalStateException(Messages.StreamParserInconsistentMapValues + e.getKey() + CM + e.getKeyGroup()
-							+ CM + e.getKeyIndex());
+					throw new IllegalStateException(Messages.StreamParserInconsistentMapValues + e.getKey() + JAXBRMConstants.CM
+							+ e.getKeyGroup() + JAXBRMConstants.CM + e.getKeyIndex());
 				}
 				String v = (String) getValue(e, values);
 				map.put(k, v);

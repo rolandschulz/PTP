@@ -52,7 +52,6 @@ import org.eclipse.ptp.rm.lml.internal.core.model.NodedisplayAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable;
 import org.eclipse.ptp.rm.lml.internal.core.nodedisplay.LMLCheck;
 import org.eclipse.ptp.rm.lml.internal.core.nodedisplay.LMLCheck.SchemeAndData;
-import org.eclipse.ptp.rm.lml.ui.providers.BorderLayout.BorderData;
 import org.eclipse.ptp.rm.lml.ui.views.NodedisplayView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;

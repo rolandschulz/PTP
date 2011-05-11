@@ -13,8 +13,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
@@ -35,7 +35,7 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  * 
  */
 public class JAXBResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration implements
-		IJAXBResourceManagerConfiguration, IJAXBNonNLSConstants {
+		IJAXBResourceManagerConfiguration {
 
 	private ResourceManagerData rmdata;
 	private RMVariableMap map;
@@ -78,8 +78,8 @@ public class JAXBResourceManagerConfiguration extends AbstractRemoteResourceMana
 	 *         tree.
 	 */
 	public URL getRMConfigurationURL() {
-		String loc = getString(RM_XSD_URL, ZEROSTR);
-		if (ZEROSTR.equals(loc)) {
+		String loc = getString(JAXBRMConstants.RM_XSD_URL, JAXBRMConstants.ZEROSTR);
+		if (JAXBRMConstants.ZEROSTR.equals(loc)) {
 			return null;
 		}
 		try {
@@ -111,11 +111,11 @@ public class JAXBResourceManagerConfiguration extends AbstractRemoteResourceMana
 	public void setDefaultNameAndDesc() {
 		String name = getName();
 		if (name == null) {
-			name = JAXB;
+			name = JAXBRMConstants.JAXB;
 		}
 		String conn = getConnectionName();
-		if (conn != null && !conn.equals(ZEROSTR)) {
-			name += AT + conn;
+		if (conn != null && !conn.equals(JAXBRMConstants.ZEROSTR)) {
+			name += JAXBRMConstants.AT + conn;
 		}
 		setName(name);
 		setDescription(Messages.JAXBServiceProvider_defaultDescription);
@@ -131,7 +131,7 @@ public class JAXBResourceManagerConfiguration extends AbstractRemoteResourceMana
 		URL current = getRMConfigurationURL();
 		if (location != null && current != location) {
 			String url = location.toExternalForm();
-			putString(RM_XSD_URL, url);
+			putString(JAXBRMConstants.RM_XSD_URL, url);
 			clearRMData();
 		}
 	}
@@ -143,8 +143,8 @@ public class JAXBResourceManagerConfiguration extends AbstractRemoteResourceMana
 		rmdata = null;
 		setRemoteServicesId(null);
 		setConnectionName(null);
-		setInvocationOptions(ZEROSTR);
-		setLocalAddress(ZEROSTR);
+		setInvocationOptions(JAXBRMConstants.ZEROSTR);
+		setLocalAddress(JAXBRMConstants.ZEROSTR);
 	}
 
 	/**

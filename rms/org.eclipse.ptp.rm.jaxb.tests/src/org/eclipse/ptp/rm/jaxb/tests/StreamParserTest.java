@@ -19,8 +19,8 @@ import java.util.UUID;
 
 import junit.framework.TestCase;
 
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
 import org.eclipse.ptp.rm.jaxb.core.IStreamParserTokenizer;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
@@ -31,7 +31,7 @@ import org.eclipse.ptp.rm.jaxb.core.runnable.command.ConfigurableRegexTokenizer;
 import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
-public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
+public class StreamParserTest extends TestCase {
 
 	protected class Range {
 
@@ -75,8 +75,8 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 
 		private int maybeInterpretLength(String n) {
 			int i = -1;
-			if (n.indexOf(LEN) >= 0) {
-				String[] lenExp = n.split(HYPH);
+			if (n.indexOf(JAXBRMConstants.LEN) >= 0) {
+				String[] lenExp = n.split(JAXBRMConstants.HYPH);
 				if (lenExp.length == 2) {
 					i = len - Integer.parseInt(lenExp[1]);
 				} else {
@@ -91,9 +91,9 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		private void parse(String expression) {
 			List<String> from = new ArrayList<String>();
 			List<String> to = new ArrayList<String>();
-			String[] commas = expression.split(CM);
+			String[] commas = expression.split(JAXBRMConstants.CM);
 			for (int i = 0; i < commas.length; i++) {
-				String[] colon = commas[i].split(CO);
+				String[] colon = commas[i].split(JAXBRMConstants.CO);
 				if (colon.length == 2) {
 					from.add(colon[0]);
 					to.add(colon[1]);
@@ -113,7 +113,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		}
 	}
 
-	private static final String tokxml = DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
+	private static final String tokxml = JAXBRMConstants.DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
 
 	private String uuid;
 	private String lineRange;
@@ -189,13 +189,13 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	public void test02OpenMPI() {
-		target = ATTRIBUTE;
+		target = JAXBRMConstants.ATTRIBUTE;
 		runTokenizer(startup.get(2).getStdoutParser(), getOpenMPIOut());
 		Map<String, Object> d = rmVarMap.getDiscovered();
 		for (Object o : d.values()) {
 			AttributeType ja = (AttributeType) o;
 			if (verbose) {
-				System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+				System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
 				System.out.println("name " + ja.getName()); //$NON-NLS-1$
 				System.out.println("value " + ja.getValue()); //$NON-NLS-1$
 				System.out.println("tooltip " + ja.getTooltip()); //$NON-NLS-1$
@@ -213,7 +213,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			if (o instanceof PropertyType) {
 				PropertyType p = (PropertyType) o;
 				if (verbose) {
-					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+					System.out.println("DISCOVERED JAXBRMConstants.PROPERTY:"); //$NON-NLS-1$
 					System.out.println("name " + p.getName()); //$NON-NLS-1$
 					System.out.println("value " + p.getValue()); //$NON-NLS-1$
 					System.out.println("*********************************"); //$NON-NLS-1$
@@ -221,7 +221,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			} else if (o instanceof AttributeType) {
 				AttributeType ja = (AttributeType) o;
 				if (verbose) {
-					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+					System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
 					System.out.println("name " + ja.getName()); //$NON-NLS-1$
 					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
 					System.out.println("*********************************"); //$NON-NLS-1$
@@ -231,13 +231,13 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	public void test04ImplicitOrdering() {
-		target = ATTRIBUTE;
+		target = JAXBRMConstants.ATTRIBUTE;
 		runTokenizer(startup.get(4).getStdoutParser(), getImplicitOrdering());
 		Map<String, Object> d = rmVarMap.getDiscovered();
 		for (Object o : d.values()) {
 			AttributeType ja = (AttributeType) o;
 			if (verbose) {
-				System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+				System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
 				System.out.println("name " + ja.getName()); //$NON-NLS-1$
 				System.out.println("type " + ja.getType()); //$NON-NLS-1$
 				System.out.println("tooltip " + ja.getTooltip()); //$NON-NLS-1$
@@ -255,7 +255,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			if (o instanceof PropertyType) {
 				PropertyType p = (PropertyType) o;
 				if (verbose) {
-					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+					System.out.println("DISCOVERED JAXBRMConstants.PROPERTY:"); //$NON-NLS-1$
 					System.out.println("name " + p.getName()); //$NON-NLS-1$
 					System.out.println("value " + p.getValue()); //$NON-NLS-1$
 					System.out.println("*********************************"); //$NON-NLS-1$
@@ -263,7 +263,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			} else if (o instanceof AttributeType) {
 				AttributeType ja = (AttributeType) o;
 				if (verbose) {
-					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+					System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
 					System.out.println("name " + ja.getName()); //$NON-NLS-1$
 					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
 					System.out.println("*********************************"); //$NON-NLS-1$
@@ -273,13 +273,13 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	public void test06PropertyDefsSingleLine() {
-		target = PROPERTY;
+		target = JAXBRMConstants.PROPERTY;
 		runTokenizer(startup.get(6).getStdoutParser(), getPropertyDefs());
 		Map<String, Object> d = rmVarMap.getDiscovered();
 		for (Object o : d.values()) {
 			PropertyType p = (PropertyType) o;
 			if (verbose) {
-				System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+				System.out.println("DISCOVERED JAXBRMConstants.PROPERTY:"); //$NON-NLS-1$
 				System.out.println("name " + p.getName()); //$NON-NLS-1$
 				System.out.println("value " + p.getValue()); //$NON-NLS-1$
 				System.out.println("*********************************"); //$NON-NLS-1$
@@ -308,7 +308,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			if (o instanceof PropertyType) {
 				PropertyType p = (PropertyType) o;
 				if (verbose) {
-					System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+					System.out.println("DISCOVERED JAXBRMConstants.PROPERTY:"); //$NON-NLS-1$
 					System.out.println("name " + p.getName()); //$NON-NLS-1$
 					System.out.println("value " + p.getValue()); //$NON-NLS-1$
 					System.out.println("*********************************"); //$NON-NLS-1$
@@ -316,7 +316,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 			} else if (o instanceof AttributeType) {
 				AttributeType ja = (AttributeType) o;
 				if (verbose) {
-					System.out.println("DISCOVERED ATTRIBUTE:"); //$NON-NLS-1$
+					System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
 					System.out.println("name " + ja.getName()); //$NON-NLS-1$
 					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
 					System.out.println("*********************************"); //$NON-NLS-1$
@@ -326,13 +326,13 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	public void test09Merged() {
-		target = PROPERTY;
+		target = JAXBRMConstants.PROPERTY;
 		runTokenizer(startup.get(9).getStdoutParser(), getMergedOrdering());
 		Map<String, Object> d = rmVarMap.getDiscovered();
 		for (Object o : d.values()) {
 			PropertyType p = (PropertyType) o;
 			if (verbose) {
-				System.out.println("DISCOVERED PROPERTY:"); //$NON-NLS-1$
+				System.out.println("DISCOVERED JAXBRMConstants.PROPERTY:"); //$NON-NLS-1$
 				System.out.println("name " + p.getName()); //$NON-NLS-1$
 				System.out.println("value " + p.getValue()); //$NON-NLS-1$
 				System.out.println("default " + p.getDefault()); //$NON-NLS-1$
@@ -378,7 +378,7 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		runTokenizer(getStatus.getStdoutParser(), getQstat());
 		p = (PropertyType) rmVarMap.getVariables().get(this.target);
 		assertNotNull(p);
-		System.out.println(p.getName() + CM + SP + p.getValue());
+		System.out.println(p.getName() + JAXBRMConstants.CM + JAXBRMConstants.SP + p.getValue());
 	}
 
 	public void testRange() {
@@ -422,16 +422,17 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	private static InputStream getImplicitOrdering() {
-		String content = "jobAttribute_1" + LINE_SEP + "java.lang.String" + LINE_SEP + LINE_SEP + LINE_SEP + "value_1" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ "jobAttribute_2" + LINE_SEP + "java.lang.String" + LINE_SEP + "meaingless attribute" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ "ignore this attribute" + LINE_SEP + "value_2" //$NON-NLS-1$ //$NON-NLS-2$
-				+ LINE_SEP;
+		String content = "jobAttribute_1" + JAXBRMConstants.LINE_SEP + "java.lang.String" + JAXBRMConstants.LINE_SEP + JAXBRMConstants.LINE_SEP + JAXBRMConstants.LINE_SEP + "value_1" + JAXBRMConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ "jobAttribute_2" + JAXBRMConstants.LINE_SEP + "java.lang.String" + JAXBRMConstants.LINE_SEP + "meaingless attribute" + JAXBRMConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ "ignore this attribute" + JAXBRMConstants.LINE_SEP + "value_2" //$NON-NLS-1$ //$NON-NLS-2$
+				+ JAXBRMConstants.LINE_SEP;
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
 	private static InputStream getImplicitWithTags() {
-		String content = "PROPERTY" + LINE_SEP + "value:423.4" + LINE_SEP + "name:x" + LINE_SEP + "ATTRIBUTE" + LINE_SEP + "name:y" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-				+ LINE_SEP + "value:-130.42" + LINE_SEP + "PROPERTY" + LINE_SEP + "name:z" + LINE_SEP + "value:-1.7" + LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		String content = "JAXBRMConstants.PROPERTY" + JAXBRMConstants.LINE_SEP + "value:423.4" + JAXBRMConstants.LINE_SEP + "name:x" + JAXBRMConstants.LINE_SEP + "JAXBRMConstants.ATTRIBUTE" + JAXBRMConstants.LINE_SEP + "name:y" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				+ JAXBRMConstants.LINE_SEP
+				+ "value:-130.42" + JAXBRMConstants.LINE_SEP + "JAXBRMConstants.PROPERTY" + JAXBRMConstants.LINE_SEP + "name:z" + JAXBRMConstants.LINE_SEP + "value:-1.7" + JAXBRMConstants.LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
@@ -439,58 +440,59 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 		String content = "blah blah xxxx blah blah xxxx blah blah xxxx blah blah xx" //$NON-NLS-1$
 				+ "<job>304823:RUNNING</job>fooblah blah xxxx\n  blah blah xxxx blah blah xxxx blah " //$NON-NLS-1$
 				+ " blah x\nx<job>312042:DONE</job>blah xxxx blah blah xxxx blah b" //$NON-NLS-1$
-				+ "blah blah xxxx foobarfoobr 231028388 <job>338831:SUSPENDED" //$NON-NLS-1$
+				+ "blah blah xxxx foobarfoobr 231028388 <job>338831:SUJAXBRMConstants.SPENDED" //$NON-NLS-1$
 				+ "</job>fooroiqEXIT\npoiewmr<job>318388:QUEUED</job>blah blah xxxx"; //$NON-NLS-1$
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
 	private static InputStream getMergedOrdering() {
-		String content = "name:foo0;value:bar0" + LINE_SEP + "name:foo1;value:bar1" + LINE_SEP + "name:foo0;default:baz0" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ LINE_SEP;
+		String content = "name:foo0;value:bar0" + JAXBRMConstants.LINE_SEP + "name:foo1;value:bar1" + JAXBRMConstants.LINE_SEP + "name:foo0;default:baz0" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ JAXBRMConstants.LINE_SEP;
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
 	private static InputStream getNoiseBeforeJobId() {
-		String content = "abe and lincoln will be down for 3 hours Saturday May 14, 2013 from 00:00:00 to 03:00:00" + LINE_SEP //$NON-NLS-1$
-				+ "There is currently no way to know what your shell is.  Please look in /etc/passwd" + LINE_SEP //$NON-NLS-1$
-				+ "To get your default account, click your heels three times and say, 'There's no place like home!'" + LINE_SEP //$NON-NLS-1$
-				+ "429324.honest1" + LINE_SEP; //$NON-NLS-1$
+		String content = "abe and lincoln will be down for 3 hours Saturday May 14, 2013 from 00:00:00 to 03:00:00" + JAXBRMConstants.LINE_SEP //$NON-NLS-1$
+				+ "There is currently no way to know what your shell is.  Please look in /etc/passwd" + JAXBRMConstants.LINE_SEP //$NON-NLS-1$
+				+ "To get your default account, click your heels three times and say, 'There's no place like home!'" + JAXBRMConstants.LINE_SEP //$NON-NLS-1$
+				+ "429324.honest1" + JAXBRMConstants.LINE_SEP; //$NON-NLS-1$
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
 	private static InputStream getOpenMPIOut() {
 		String content = "mca:mca:base:param:mca_component_disable_dlopen:status:writable" //$NON-NLS-1$
-				+ LINE_SEP
+				+ JAXBRMConstants.LINE_SEP
 				+ "mca:mca:base:param:mca_component_disable_dlopen:help:Whether to attempt to disable opening dynamic components or not" //$NON-NLS-1$
-				+ LINE_SEP
+				+ JAXBRMConstants.LINE_SEP
 				+ "mca:mca:base:param:mca_component_disable_dlopen:deprecated:no" //$NON-NLS-1$
-				+ LINE_SEP
+				+ JAXBRMConstants.LINE_SEP
 				+ "mca:mpi:base:param:mpi_param_check:value:1" //$NON-NLS-1$
-				+ LINE_SEP
+				+ JAXBRMConstants.LINE_SEP
 				+ "mca:mpi:base:param:mpi_param_check:data_source:default value" //$NON-NLS-1$
-				+ LINE_SEP
+				+ JAXBRMConstants.LINE_SEP
 				+ "mca:mpi:base:param:mpi_param_check:status:read-only" //$NON-NLS-1$
-				+ LINE_SEP
+				+ JAXBRMConstants.LINE_SEP
 				+ "mca:mpi:base:param:mpi_param_check:help:Whether you want MPI API parameters checked at run-time or not.  Possible values are 0 (no checking) and 1 (perform checking at run-time)" //$NON-NLS-1$
-				+ LINE_SEP
+				+ JAXBRMConstants.LINE_SEP
 				+ "mca:mpi:base:param:mpi_param_check:deprecated:no" //$NON-NLS-1$
-				+ LINE_SEP
+				+ JAXBRMConstants.LINE_SEP
 				+ "mca:mpi:base:param:mpi_yield_when_idle:value:-1" //$NON-NLS-1$
-				+ LINE_SEP
+				+ JAXBRMConstants.LINE_SEP
 				+ "mca:mpi:base:param:mpi_yield_when_idle:data_source:default value" //$NON-NLS-1$
-				+ LINE_SEP
+				+ JAXBRMConstants.LINE_SEP
 				+ "mca:mpi:base:param:mpi_yield_when_idle:status:writable" //$NON-NLS-1$
-				+ LINE_SEP
+				+ JAXBRMConstants.LINE_SEP
 				+ "mca:mpi:base:param:mpi_yield_when_idle:help:Yield the processor when waiting for MPI communication (for MPI processes, will default to 1 when oversubscribing nodes)" //$NON-NLS-1$
-				+ LINE_SEP + "mca:mpi:base:param:mpi_yield_when_idle:deprecated:no" + LINE_SEP //$NON-NLS-1$
-				+ "mca:mpi:base:param:mpi_event_tick_rate:value:-1" + LINE_SEP; //$NON-NLS-1$
+				+ JAXBRMConstants.LINE_SEP + "mca:mpi:base:param:mpi_yield_when_idle:deprecated:no" + JAXBRMConstants.LINE_SEP //$NON-NLS-1$
+				+ "mca:mpi:base:param:mpi_event_tick_rate:value:-1" + JAXBRMConstants.LINE_SEP; //$NON-NLS-1$
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
 	private static InputStream getPropertyDefs() {
-		String content = "<name>pnameA</name><value>pvalueA</value>" + LINE_SEP + "<name>pnameB</name><value>pvalueB</value>" //$NON-NLS-1$ //$NON-NLS-2$
-				+ LINE_SEP + "<name>pnameC</name><value>pvalueC</value>" + LINE_SEP + "<name>pnameD</name><value>pvalueD</value>" //$NON-NLS-1$ //$NON-NLS-2$
-				+ LINE_SEP + "<value>pvalueW</value><name>pnameW</name>" + LINE_SEP; //$NON-NLS-1$
+		String content = "<name>pnameA</name><value>pvalueA</value>" + JAXBRMConstants.LINE_SEP + "<name>pnameB</name><value>pvalueB</value>" //$NON-NLS-1$ //$NON-NLS-2$
+				+ JAXBRMConstants.LINE_SEP
+				+ "<name>pnameC</name><value>pvalueC</value>" + JAXBRMConstants.LINE_SEP + "<name>pnameD</name><value>pvalueD</value>" //$NON-NLS-1$ //$NON-NLS-2$
+				+ JAXBRMConstants.LINE_SEP + "<value>pvalueW</value><name>pnameW</name>" + JAXBRMConstants.LINE_SEP; //$NON-NLS-1$
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
@@ -500,16 +502,17 @@ public class StreamParserTest extends TestCase implements IJAXBNonNLSConstants {
 	}
 
 	private static InputStream getQstatOut() {
-		String content = "normal" + LINE_SEP + "iacat2" + LINE_SEP + "indprio" + LINE_SEP + "lincoln_nomss" + LINE_SEP + "cap1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-				+ LINE_SEP + "lincoln_debug" + LINE_SEP + "long" + LINE_SEP + "iacat" + LINE_SEP + "industrial" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				+ "lincoln" + LINE_SEP + "wide" + LINE_SEP + "nomss" + LINE_SEP + "debug" + LINE_SEP + "iacat3" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-				+ "lincoln_cuda3.2" + LINE_SEP + "fernsler" + LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$
+		String content = "normal" + JAXBRMConstants.LINE_SEP + "iacat2" + JAXBRMConstants.LINE_SEP + "indprio" + JAXBRMConstants.LINE_SEP + "lincoln_nomss" + JAXBRMConstants.LINE_SEP + "cap1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				+ JAXBRMConstants.LINE_SEP
+				+ "lincoln_debug" + JAXBRMConstants.LINE_SEP + "long" + JAXBRMConstants.LINE_SEP + "iacat" + JAXBRMConstants.LINE_SEP + "industrial" + JAXBRMConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ "lincoln" + JAXBRMConstants.LINE_SEP + "wide" + JAXBRMConstants.LINE_SEP + "nomss" + JAXBRMConstants.LINE_SEP + "debug" + JAXBRMConstants.LINE_SEP + "iacat3" + JAXBRMConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				+ "lincoln_cuda3.2" + JAXBRMConstants.LINE_SEP + "fernsler" + JAXBRMConstants.LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
 	private static InputStream getStaggered() {
-		String content = "value:1" + LINE_SEP + "value:2" + LINE_SEP + "name:1" + LINE_SEP + "name:2" + LINE_SEP + "name:3" + LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-				+ "name:4" + LINE_SEP + "value:3" + LINE_SEP + "value:4" + LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String content = "value:1" + JAXBRMConstants.LINE_SEP + "value:2" + JAXBRMConstants.LINE_SEP + "name:1" + JAXBRMConstants.LINE_SEP + "name:2" + JAXBRMConstants.LINE_SEP + "name:3" + JAXBRMConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				+ "name:4" + JAXBRMConstants.LINE_SEP + "value:3" + JAXBRMConstants.LINE_SEP + "value:4" + JAXBRMConstants.LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return new ByteArrayInputStream(content.getBytes());
 	}
 }

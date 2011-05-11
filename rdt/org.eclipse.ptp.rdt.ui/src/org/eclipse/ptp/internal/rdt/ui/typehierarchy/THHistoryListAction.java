@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.typehierarchy.THHistoryListAction
- * Version: 1.6
+ * Version: 1.7
  */
 package org.eclipse.ptp.internal.rdt.ui.typehierarchy;
 
@@ -105,7 +105,7 @@ public class THHistoryListAction extends Action {
 
 			LayoutUtil.doDefaultLayout(inner, new DialogField[] { fHistoryList }, true, 0, 0);
 			LayoutUtil.setHeightHint(fHistoryList.getListControl(null), convertHeightInCharsToPixels(12));
-			LayoutUtil.setHorizontalGrabbing(fHistoryList.getListControl(null));
+			LayoutUtil.setHorizontalGrabbing(fHistoryList.getListControl(null), true);
 
 			applyDialogFont(composite);		
 			return composite;

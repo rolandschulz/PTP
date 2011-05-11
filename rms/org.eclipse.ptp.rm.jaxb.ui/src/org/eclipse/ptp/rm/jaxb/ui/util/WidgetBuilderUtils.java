@@ -27,7 +27,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
 import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
@@ -72,7 +72,7 @@ import org.eclipse.swt.widgets.TreeColumn;
  * @author arossi
  * 
  */
-public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
+public class WidgetBuilderUtils {
 
 	private static final FontRegistry fonts = new FontRegistry();
 
@@ -98,9 +98,9 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	public static void applyMonospace(Text text) {
 		// Courier exists on Mac, Linux, Windows ...
 		FontType fd = new FontType();
-		fd.setName(COURIER);
+		fd.setName(JAXBRMUIConstants.COURIER);
 		fd.setSize(14);
-		fd.setStyle(NORMAL);
+		fd.setStyle(JAXBRMUIConstants.NORMAL);
 		Font font = getFont(fd);
 		if (font != null) {
 			text.setFont(font);
@@ -122,7 +122,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			button.setText(label);
 		}
 		if (layoutData == null) {
-			layoutData = createGridData(DEFAULT, 1);
+			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
 		}
 		button.setLayoutData(layoutData);
 		if (null != listener) {
@@ -187,7 +187,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			combo.setItems(items);
 		}
 		if (data == null) {
-			data = createGridData(DEFAULT, 1);
+			data = createGridData(JAXBRMUIConstants.DEFAULT, 1);
 		}
 		combo.setLayoutData(data);
 		if (initialValue != null) {
@@ -209,7 +209,8 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @return composite
 	 */
 	public static Composite createComposite(Composite parent, Integer columns) {
-		GridLayout layout = createGridLayout(columns, false, DEFAULT, 1, DEFAULT, DEFAULT);
+		GridLayout layout = createGridLayout(columns, false, JAXBRMUIConstants.DEFAULT, 1, JAXBRMUIConstants.DEFAULT,
+				JAXBRMUIConstants.DEFAULT);
 		return createComposite(parent, SWT.NONE, layout, null);
 	}
 
@@ -226,7 +227,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			composite.setLayout(layout);
 		}
 		if (layoutData == null) {
-			layoutData = createGridData(DEFAULT, 1);
+			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
 		}
 		composite.setData(layoutData);
 		return composite;
@@ -362,8 +363,9 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 */
 	public static GridData createGridData(Integer style, Boolean grabExcessHorizontal, Boolean grabExcessVertical,
 			Integer widthHint, Integer heightHint, Integer horizontalSpan, Integer verticalSpan) {
-		return createGridData(style, grabExcessHorizontal, grabExcessVertical, widthHint, heightHint, DEFAULT, DEFAULT,
-				horizontalSpan, verticalSpan, DEFAULT, DEFAULT, DEFAULT, DEFAULT);
+		return createGridData(style, grabExcessHorizontal, grabExcessVertical, widthHint, heightHint, JAXBRMUIConstants.DEFAULT,
+				JAXBRMUIConstants.DEFAULT, horizontalSpan, verticalSpan, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT,
+				JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT);
 	}
 
 	/**
@@ -387,7 +389,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			Integer verticalSpan, Integer horizonalAlign, Integer verticalAlign, Integer horizontalIndent, Integer verticalIndent) {
 		GridData data = null;
 		if (null != style) {
-			if (style == DEFAULT) {
+			if (style == JAXBRMUIConstants.DEFAULT) {
 				data = new GridData();
 			} else {
 				data = new GridData(style);
@@ -402,34 +404,34 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		if (grabExcessVertical != null) {
 			data.grabExcessVerticalSpace = grabExcessVertical;
 		}
-		if (null != widthHint && widthHint != DEFAULT) {
+		if (null != widthHint && widthHint != JAXBRMUIConstants.DEFAULT) {
 			data.widthHint = widthHint;
 		}
-		if (null != heightHint && heightHint != DEFAULT) {
+		if (null != heightHint && heightHint != JAXBRMUIConstants.DEFAULT) {
 			data.heightHint = heightHint;
 		}
-		if (null != minimumWidth && minimumWidth != DEFAULT) {
+		if (null != minimumWidth && minimumWidth != JAXBRMUIConstants.DEFAULT) {
 			data.minimumWidth = minimumWidth;
 		}
-		if (null != minimumHeight && minimumHeight != DEFAULT) {
+		if (null != minimumHeight && minimumHeight != JAXBRMUIConstants.DEFAULT) {
 			data.minimumHeight = minimumHeight;
 		}
-		if (null != horizontalSpan && horizontalSpan != DEFAULT) {
+		if (null != horizontalSpan && horizontalSpan != JAXBRMUIConstants.DEFAULT) {
 			data.horizontalSpan = horizontalSpan;
 		}
-		if (null != verticalSpan && verticalSpan != DEFAULT) {
+		if (null != verticalSpan && verticalSpan != JAXBRMUIConstants.DEFAULT) {
 			data.verticalSpan = verticalSpan;
 		}
-		if (null != horizonalAlign && horizonalAlign != DEFAULT) {
+		if (null != horizonalAlign && horizonalAlign != JAXBRMUIConstants.DEFAULT) {
 			data.horizontalAlignment = horizonalAlign;
 		}
-		if (null != verticalAlign && verticalAlign != DEFAULT) {
+		if (null != verticalAlign && verticalAlign != JAXBRMUIConstants.DEFAULT) {
 			data.verticalAlignment = verticalAlign;
 		}
-		if (null != horizontalIndent && horizontalIndent != DEFAULT) {
+		if (null != horizontalIndent && horizontalIndent != JAXBRMUIConstants.DEFAULT) {
 			data.horizontalIndent = horizontalIndent;
 		}
-		if (null != verticalIndent && verticalIndent != DEFAULT) {
+		if (null != verticalIndent && verticalIndent != JAXBRMUIConstants.DEFAULT) {
 			data.verticalIndent = verticalIndent;
 		}
 		return data;
@@ -441,7 +443,8 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @return grid data
 	 */
 	public static GridData createGridData(Integer style, Integer cols) {
-		return createGridData(style, false, false, DEFAULT, DEFAULT, cols, DEFAULT);
+		return createGridData(style, false, false, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT, cols,
+				JAXBRMUIConstants.DEFAULT);
 	}
 
 	/**
@@ -454,7 +457,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @return grid data
 	 */
 	public static GridData createGridDataFill(Integer widthHint, Integer heightHint, Integer cols) {
-		return createGridData(GridData.FILL_BOTH, true, true, widthHint, heightHint, cols, DEFAULT);
+		return createGridData(GridData.FILL_BOTH, true, true, widthHint, heightHint, cols, JAXBRMUIConstants.DEFAULT);
 	}
 
 	/**
@@ -464,7 +467,8 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @return grid data
 	 */
 	public static GridData createGridDataFillH(Integer cols) {
-		return createGridData(GridData.FILL_HORIZONTAL, true, false, DEFAULT, DEFAULT, cols, DEFAULT);
+		return createGridData(GridData.FILL_HORIZONTAL, true, false, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT, cols,
+				JAXBRMUIConstants.DEFAULT);
 	}
 
 	/**
@@ -473,7 +477,8 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @return grid layout
 	 */
 	public static GridLayout createGridLayout(Integer columns, Boolean makeColumnsEqualWidth) {
-		return createGridLayout(columns, makeColumnsEqualWidth, DEFAULT, DEFAULT, DEFAULT, DEFAULT);
+		return createGridLayout(columns, makeColumnsEqualWidth, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT,
+				JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT);
 	}
 
 	/**
@@ -488,7 +493,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	public static GridLayout createGridLayout(Integer columns, Boolean makeColumnsEqualWidth, Integer horizontalSpacing,
 			Integer verticalSpacing, Integer marginWidth, Integer marginHeight) {
 		return createGridLayout(columns, makeColumnsEqualWidth, horizontalSpacing, verticalSpacing, marginWidth, marginHeight,
-				DEFAULT, DEFAULT, DEFAULT, DEFAULT);
+				JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT);
 	}
 
 	/**
@@ -514,28 +519,28 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		if (makeColumnsEqualWidth != null) {
 			gridLayout.makeColumnsEqualWidth = makeColumnsEqualWidth;
 		}
-		if (null != horizontalSpacing && horizontalSpacing != DEFAULT) {
+		if (null != horizontalSpacing && horizontalSpacing != JAXBRMUIConstants.DEFAULT) {
 			gridLayout.horizontalSpacing = horizontalSpacing;
 		}
-		if (null != verticalSpacing && verticalSpacing != DEFAULT) {
+		if (null != verticalSpacing && verticalSpacing != JAXBRMUIConstants.DEFAULT) {
 			gridLayout.verticalSpacing = verticalSpacing;
 		}
-		if (null != marginWidth && marginWidth != DEFAULT) {
+		if (null != marginWidth && marginWidth != JAXBRMUIConstants.DEFAULT) {
 			gridLayout.marginWidth = marginWidth;
 		}
-		if (null != marginHeight && marginHeight != DEFAULT) {
+		if (null != marginHeight && marginHeight != JAXBRMUIConstants.DEFAULT) {
 			gridLayout.marginHeight = marginHeight;
 		}
-		if (null != marginLeft && marginLeft != DEFAULT) {
+		if (null != marginLeft && marginLeft != JAXBRMUIConstants.DEFAULT) {
 			gridLayout.marginLeft = marginLeft;
 		}
-		if (null != marginRight && marginRight != DEFAULT) {
+		if (null != marginRight && marginRight != JAXBRMUIConstants.DEFAULT) {
 			gridLayout.marginRight = marginRight;
 		}
-		if (null != marginTop && marginTop != DEFAULT) {
+		if (null != marginTop && marginTop != JAXBRMUIConstants.DEFAULT) {
 			gridLayout.marginTop = marginTop;
 		}
-		if (null != marginBottom && marginBottom != DEFAULT) {
+		if (null != marginBottom && marginBottom != JAXBRMUIConstants.DEFAULT) {
 			gridLayout.marginBottom = marginBottom;
 		}
 		return gridLayout;
@@ -567,7 +572,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			group.setLayout(layout);
 		}
 		if (layoutData == null) {
-			layoutData = createGridData(DEFAULT, 1);
+			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
 		}
 		group.setLayoutData(layoutData);
 		if (text != null) {
@@ -584,7 +589,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @return label
 	 */
 	public static Label createLabel(Composite container, String text, Integer style, Integer columnSpan) {
-		GridData data = createGridData(DEFAULT, columnSpan);
+		GridData data = createGridData(JAXBRMUIConstants.DEFAULT, columnSpan);
 		return createLabel(container, text, style, data);
 	}
 
@@ -598,11 +603,11 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	public static Label createLabel(Composite container, String text, Integer style, Object layoutData) {
 		Label label = new Label(container, style);
 		if (text == null) {
-			text = ZEROSTR;
+			text = JAXBRMUIConstants.ZEROSTR;
 		}
 		label.setText(text.trim());
 		if (layoutData == null) {
-			layoutData = createGridData(DEFAULT, 1);
+			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
 		}
 		if (layoutData != null) {
 			label.setLayoutData(layoutData);
@@ -732,17 +737,19 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		}
 
 		Spinner s = new Spinner(parent, SWT.NONE);
-		if (maximum != null) {
-			s.setMaximum(maximum);
+		if (maximum == null) {
+			maximum = Integer.MAX_VALUE;
 		}
-		if (minimum != null) {
-			s.setMinimum(minimum);
+		if (minimum == null) {
+			minimum = 0;
 		}
+		s.setMaximum(maximum);
+		s.setMinimum(minimum);
 		if (initialValue != null) {
 			s.setSelection(initialValue);
 		}
 		if (layoutData == null) {
-			layoutData = createGridData(DEFAULT, 1);
+			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
 		}
 		s.setLayoutData(layoutData);
 		if (listener != null) {
@@ -780,7 +787,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 				cols = gd.horizontalSpan;
 			}
 		} else {
-			layoutData = createGridData(DEFAULT, cols);
+			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, cols);
 		}
 		if (style == null) {
 			style = SWT.None;
@@ -821,7 +828,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			ModifyListener listener, Color color) {
 		Text text = new Text(parent, style);
 		if (layoutData == null) {
-			layoutData = createGridData(DEFAULT, 1);
+			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
 		}
 		text.setLayoutData(layoutData);
 		if (readOnly != null) {
@@ -853,7 +860,7 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 				cols = gd.horizontalSpan;
 			}
 		} else {
-			layoutData = createGridData(DEFAULT, cols);
+			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, cols);
 		}
 		if (style == null) {
 			style = SWT.None;
@@ -877,75 +884,75 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 */
 	public static Color getColor(String color) {
 		int swtColor = SWT.COLOR_BLACK;
-		if (COLOR_BLACK.equals(color)) {
+		if (JAXBRMUIConstants.COLOR_BLACK.equals(color)) {
 			swtColor = SWT.COLOR_BLACK;
-		} else if (COLOR_WHITE.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_WHITE.equals(color)) {
 			swtColor = SWT.COLOR_WHITE;
-		} else if (COLOR_RED.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_RED.equals(color)) {
 			swtColor = SWT.COLOR_RED;
-		} else if (COLOR_DARK_RED.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_DARK_RED.equals(color)) {
 			swtColor = SWT.COLOR_DARK_RED;
-		} else if (COLOR_GREEN.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_GREEN.equals(color)) {
 			swtColor = SWT.COLOR_GREEN;
-		} else if (COLOR_DARK_GREEN.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_DARK_GREEN.equals(color)) {
 			swtColor = SWT.COLOR_DARK_GREEN;
-		} else if (COLOR_YELLOW.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_YELLOW.equals(color)) {
 			swtColor = SWT.COLOR_YELLOW;
-		} else if (COLOR_DARK_YELLOW.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_DARK_YELLOW.equals(color)) {
 			swtColor = SWT.COLOR_DARK_YELLOW;
-		} else if (COLOR_BLUE.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_BLUE.equals(color)) {
 			swtColor = SWT.COLOR_BLUE;
-		} else if (COLOR_DARK_BLUE.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_DARK_BLUE.equals(color)) {
 			swtColor = SWT.COLOR_DARK_BLUE;
-		} else if (COLOR_MAGENTA.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_MAGENTA.equals(color)) {
 			swtColor = SWT.COLOR_MAGENTA;
-		} else if (COLOR_DARK_MAGENTA.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_DARK_MAGENTA.equals(color)) {
 			swtColor = SWT.COLOR_DARK_MAGENTA;
-		} else if (COLOR_CYAN.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_CYAN.equals(color)) {
 			swtColor = SWT.COLOR_CYAN;
-		} else if (COLOR_DARK_CYAN.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_DARK_CYAN.equals(color)) {
 			swtColor = SWT.COLOR_DARK_CYAN;
-		} else if (COLOR_GRAY.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_GRAY.equals(color)) {
 			swtColor = SWT.COLOR_GRAY;
-		} else if (COLOR_DARK_GRAY.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_DARK_GRAY.equals(color)) {
 			swtColor = SWT.COLOR_DARK_GRAY;
-		} else if (COLOR_INFO_BACKGROUND.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_INFO_BACKGROUND.equals(color)) {
 			swtColor = SWT.COLOR_INFO_BACKGROUND;
-		} else if (COLOR_INFO_FOREGROUND.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_INFO_FOREGROUND.equals(color)) {
 			swtColor = SWT.COLOR_INFO_FOREGROUND;
-		} else if (COLOR_LIST_BACKGROUND.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_LIST_BACKGROUND.equals(color)) {
 			swtColor = SWT.COLOR_LIST_BACKGROUND;
-		} else if (COLOR_LIST_FOREGROUND.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_LIST_FOREGROUND.equals(color)) {
 			swtColor = SWT.COLOR_LIST_FOREGROUND;
-		} else if (COLOR_LIST_SELECTION.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_LIST_SELECTION.equals(color)) {
 			swtColor = SWT.COLOR_LIST_SELECTION;
-		} else if (COLOR_LIST_SELECTION_TEXT.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_LIST_SELECTION_TEXT.equals(color)) {
 			swtColor = SWT.COLOR_LIST_SELECTION_TEXT;
-		} else if (COLOR_TITLE_BACKGROUND.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_TITLE_BACKGROUND.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_BACKGROUND;
-		} else if (COLOR_TITLE_BACKGROUND_GRADIENT.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_TITLE_BACKGROUND_GRADIENT.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_BACKGROUND_GRADIENT;
-		} else if (COLOR_TITLE_FOREGROUND.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_TITLE_FOREGROUND.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_FOREGROUND;
-		} else if (COLOR_TITLE_INACTIVE_BACKGROUND.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_TITLE_INACTIVE_BACKGROUND.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_INACTIVE_BACKGROUND;
-		} else if (COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT;
-		} else if (COLOR_TITLE_INACTIVE_FOREGROUND.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_TITLE_INACTIVE_FOREGROUND.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_INACTIVE_FOREGROUND;
-		} else if (COLOR_WIDGET_BACKGROUND.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_WIDGET_BACKGROUND.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_BACKGROUND;
-		} else if (COLOR_WIDGET_BORDER.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_WIDGET_BORDER.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_BORDER;
-		} else if (COLOR_WIDGET_DARK_SHADOW.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_WIDGET_DARK_SHADOW.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_DARK_SHADOW;
-		} else if (COLOR_WIDGET_FOREGROUND.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_WIDGET_FOREGROUND.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_FOREGROUND;
-		} else if (COLOR_WIDGET_HIGHLIGHT_SHADOW.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_WIDGET_HIGHLIGHT_SHADOW.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW;
-		} else if (COLOR_WIDGET_LIGHT_SHADOW.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_WIDGET_LIGHT_SHADOW.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_LIGHT_SHADOW;
-		} else if (COLOR_WIDGET_NORMAL_SHADOW.equals(color)) {
+		} else if (JAXBRMUIConstants.COLOR_WIDGET_NORMAL_SHADOW.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_NORMAL_SHADOW;
 		}
 		/*
@@ -987,16 +994,16 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 	 * @return SWT code
 	 */
 	public static int getStyle(String style) {
-		if (style == null || ZEROSTR.equals(style)) {
+		if (style == null || JAXBRMUIConstants.ZEROSTR.equals(style)) {
 			return SWT.NONE;
 		}
-		return getStyle(style.split(REGPIP));
+		return getStyle(style.split(JAXBRMUIConstants.REGPIP));
 	}
 
 	/**
 	 * For consistency in treating <code>null</code> or undefined defaults on
-	 * loading, this method ensures the first element of the combo is a ZEROSTR.
-	 * It also removes blank items.
+	 * loading, this method ensures the first element of the combo is a
+	 * JAXBRMUIConstants.ZEROSTR. It also removes blank items.
 	 * 
 	 * @param items
 	 * @return adjusted array of combo items
@@ -1006,11 +1013,11 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		List<String> list = new ArrayList(Arrays.asList(items));
 		for (Iterator<String> s = list.iterator(); s.hasNext();) {
 			String item = s.next().trim();
-			if (ZEROSTR.equals(item) || LINE_SEP.equals(item)) {
+			if (JAXBRMUIConstants.ZEROSTR.equals(item) || JAXBRMUIConstants.LINE_SEP.equals(item)) {
 				s.remove();
 			}
 		}
-		list.add(0, ZEROSTR);
+		list.add(0, JAXBRMUIConstants.ZEROSTR);
 		return list.toArray(new String[0]);
 	}
 
@@ -1025,8 +1032,8 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 		if (text == null) {
 			return null;
 		}
-		if (ZEROSTR.equals(text)) {
-			return ZEROSTR;
+		if (JAXBRMUIConstants.ZEROSTR.equals(text)) {
+			return JAXBRMUIConstants.ZEROSTR;
 		}
 		StringBuffer newLine = new StringBuffer();
 		int strln = text.length();
@@ -1037,9 +1044,9 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			case '\t':
 			case '\n':
 			case '\r':
-				if (lastChar != SP.charAt(0)) {
-					newLine.append(SP);
-					lastChar = SP.charAt(0);
+				if (lastChar != JAXBRMUIConstants.SP.charAt(0)) {
+					newLine.append(JAXBRMUIConstants.SP);
+					lastChar = JAXBRMUIConstants.SP.charAt(0);
 				}
 				break;
 			default:
@@ -1132,238 +1139,238 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 
 		for (String s : style) {
 			s = s.trim();
-			if (ARROW.equals(s)) {
+			if (JAXBRMUIConstants.ARROW.equals(s)) {
 				swt |= SWT.ARROW;
 			}
-			if (BACKGROUND.equals(s)) {
+			if (JAXBRMUIConstants.BACKGROUND.equals(s)) {
 				swt |= SWT.BACKGROUND;
 			}
-			if (BALLOON.equals(s)) {
+			if (JAXBRMUIConstants.BALLOON.equals(s)) {
 				swt |= SWT.BALLOON;
 			}
-			if (BAR.equals(s)) {
+			if (JAXBRMUIConstants.BAR.equals(s)) {
 				swt |= SWT.BAR;
 			}
-			if (BEGINNING.equals(s)) {
+			if (JAXBRMUIConstants.BEGINNING.equals(s)) {
 				swt |= SWT.BEGINNING;
 			}
-			if (BORDER.equals(s)) {
+			if (JAXBRMUIConstants.BORDER.equals(s)) {
 				swt |= SWT.BORDER;
 			}
-			if (BORDER_DASH.equals(s)) {
+			if (JAXBRMUIConstants.BORDER_DASH.equals(s)) {
 				swt |= SWT.BORDER_DASH;
 			}
-			if (BORDER_DOT.equals(s)) {
+			if (JAXBRMUIConstants.BORDER_DOT.equals(s)) {
 				swt |= SWT.BORDER_DOT;
 			}
-			if (BORDER_SOLID.equals(s)) {
+			if (JAXBRMUIConstants.BORDER_SOLID.equals(s)) {
 				swt |= SWT.BORDER_SOLID;
 			}
-			if (BOTTOM.equals(s)) {
+			if (JAXBRMUIConstants.BOTTOM.equals(s)) {
 				swt |= SWT.BOTTOM;
 			}
-			if (CASCADE.equals(s)) {
+			if (JAXBRMUIConstants.CASCADE.equals(s)) {
 				swt |= SWT.CASCADE;
 			}
-			if (CENTER.equals(s)) {
+			if (JAXBRMUIConstants.CENTER.equals(s)) {
 				swt |= SWT.CENTER;
 			}
-			if (CHECK.equals(s)) {
+			if (JAXBRMUIConstants.CHECK.equals(s)) {
 				swt |= SWT.CHECK;
 			}
-			if (DIALOG_TRIM.equals(s)) {
+			if (JAXBRMUIConstants.DIALOG_TRIM.equals(s)) {
 				swt |= SWT.DIALOG_TRIM;
 			}
-			if (DOWN.equals(s)) {
+			if (JAXBRMUIConstants.DOWN.equals(s)) {
 				swt |= SWT.DOWN;
 			}
-			if (DROP_DOWN.equals(s)) {
+			if (JAXBRMUIConstants.DROP_DOWN.equals(s)) {
 				swt |= SWT.DROP_DOWN;
 			}
-			if (FILL.equals(s)) {
+			if (JAXBRMUIConstants.FILL.equals(s)) {
 				swt |= SWT.FILL;
 			}
-			if (FILL_BOTH.equals(s)) {
+			if (JAXBRMUIConstants.FILL_BOTH.equals(s)) {
 				swt |= GridData.FILL_BOTH;
 			}
-			if (FILL_EVEN_ODD.equals(s)) {
+			if (JAXBRMUIConstants.FILL_EVEN_ODD.equals(s)) {
 				swt |= SWT.FILL_EVEN_ODD;
 			}
-			if (FILL_HORIZONTAL.equals(s)) {
+			if (JAXBRMUIConstants.FILL_HORIZONTAL.equals(s)) {
 				swt |= GridData.FILL_HORIZONTAL;
 			}
-			if (FILL_VERTICAL.equals(s)) {
+			if (JAXBRMUIConstants.FILL_VERTICAL.equals(s)) {
 				swt |= GridData.FILL_VERTICAL;
 			}
-			if (FILL_WINDING.equals(s)) {
+			if (JAXBRMUIConstants.FILL_WINDING.equals(s)) {
 				swt |= SWT.FILL_WINDING;
 			}
-			if (FOREGROUND.equals(s)) {
+			if (JAXBRMUIConstants.FOREGROUND.equals(s)) {
 				swt |= SWT.FOREGROUND;
 			}
-			if (FULL_SELECTION.equals(s)) {
+			if (JAXBRMUIConstants.FULL_SELECTION.equals(s)) {
 				swt |= SWT.FULL_SELECTION;
 			}
-			if (H_SCROLL.equals(s)) {
+			if (JAXBRMUIConstants.H_SCROLL.equals(s)) {
 				swt |= SWT.H_SCROLL;
 			}
-			if (HORIZONTAL.equals(s)) {
+			if (JAXBRMUIConstants.HORIZONTAL.equals(s)) {
 				swt |= SWT.HORIZONTAL;
 			}
-			if (LEAD.equals(s)) {
+			if (JAXBRMUIConstants.LEAD.equals(s)) {
 				swt |= SWT.LEAD;
 			}
-			if (LEFT.equals(s)) {
+			if (JAXBRMUIConstants.LEFT.equals(s)) {
 				swt |= SWT.LEFT;
 			}
-			if (LEFT_TO_RIGHT.equals(s)) {
+			if (JAXBRMUIConstants.LEFT_TO_RIGHT.equals(s)) {
 				swt |= SWT.LEFT_TO_RIGHT;
 			}
-			if (LINE_CUSTOM.equals(s)) {
+			if (JAXBRMUIConstants.LINE_CUSTOM.equals(s)) {
 				swt |= SWT.LINE_CUSTOM;
 			}
-			if (LINE_DASH.equals(s)) {
+			if (JAXBRMUIConstants.LINE_DASH.equals(s)) {
 				swt |= SWT.LINE_DASH;
 			}
-			if (LINE_DASHDOT.equals(s)) {
+			if (JAXBRMUIConstants.LINE_DASHDOT.equals(s)) {
 				swt |= SWT.LINE_DASHDOT;
 			}
-			if (LINE_DASHDOTDOT.equals(s)) {
+			if (JAXBRMUIConstants.LINE_DASHDOTDOT.equals(s)) {
 				swt |= SWT.LINE_DASHDOTDOT;
 			}
-			if (LINE_DOT.equals(s)) {
+			if (JAXBRMUIConstants.LINE_DOT.equals(s)) {
 				swt |= SWT.LINE_DOT;
 			}
-			if (LINE_SOLID.equals(s)) {
+			if (JAXBRMUIConstants.LINE_SOLID.equals(s)) {
 				swt |= SWT.LINE_SOLID;
 			}
-			if (MODELESS.equals(s)) {
+			if (JAXBRMUIConstants.MODELESS.equals(s)) {
 				swt |= SWT.MODELESS;
 			}
-			if (MULTI.equals(s)) {
+			if (JAXBRMUIConstants.MULTI.equals(s)) {
 				swt |= SWT.MULTI;
 			}
-			if (NO.equals(s)) {
+			if (JAXBRMUIConstants.NO.equals(s)) {
 				swt |= SWT.NO;
 			}
-			if (NO_BACKGROUND.equals(s)) {
+			if (JAXBRMUIConstants.NO_BACKGROUND.equals(s)) {
 				swt |= SWT.NO_BACKGROUND;
 			}
-			if (NO_FOCUS.equals(s)) {
+			if (JAXBRMUIConstants.NO_FOCUS.equals(s)) {
 				swt |= SWT.NO_FOCUS;
 			}
-			if (NO_MERGE_PAINTS.equals(s)) {
+			if (JAXBRMUIConstants.NO_MERGE_PAINTS.equals(s)) {
 				swt |= SWT.NO_MERGE_PAINTS;
 			}
-			if (NO_RADIO_GROUP.equals(s)) {
+			if (JAXBRMUIConstants.NO_RADIO_GROUP.equals(s)) {
 				swt |= SWT.NO_RADIO_GROUP;
 			}
-			if (NO_REDRAW_RESIZE.equals(s)) {
+			if (JAXBRMUIConstants.NO_REDRAW_RESIZE.equals(s)) {
 				swt |= SWT.NO_REDRAW_RESIZE;
 			}
-			if (NO_SCROLL.equals(s)) {
+			if (JAXBRMUIConstants.NO_SCROLL.equals(s)) {
 				swt |= SWT.NO_SCROLL;
 			}
-			if (NO_TRIM.equals(s)) {
+			if (JAXBRMUIConstants.NO_TRIM.equals(s)) {
 				swt |= SWT.NO_TRIM;
 			}
-			if (NONE.equals(s)) {
+			if (JAXBRMUIConstants.NONE.equals(s)) {
 				swt |= SWT.NONE;
 			}
-			if (NORMAL.equals(s)) {
+			if (JAXBRMUIConstants.NORMAL.equals(s)) {
 				swt |= SWT.NORMAL;
 			}
-			if (ON_TOP.equals(s)) {
+			if (JAXBRMUIConstants.ON_TOP.equals(s)) {
 				swt |= SWT.ON_TOP;
 			}
-			if (OPEN.equals(s)) {
+			if (JAXBRMUIConstants.OPEN.equals(s)) {
 				swt |= SWT.OPEN;
 			}
-			if (POP_UP.equals(s)) {
+			if (JAXBRMUIConstants.POP_UP.equals(s)) {
 				swt |= SWT.POP_UP;
 			}
-			if (PRIMARY_MODAL.equals(s)) {
+			if (JAXBRMUIConstants.PRIMARY_MODAL.equals(s)) {
 				swt |= SWT.PRIMARY_MODAL;
 			}
-			if (PUSH.equals(s)) {
+			if (JAXBRMUIConstants.PUSH.equals(s)) {
 				swt |= SWT.PUSH;
 			}
-			if (RADIO.equals(s)) {
+			if (JAXBRMUIConstants.RADIO.equals(s)) {
 				swt |= SWT.RADIO;
 			}
-			if (READ_ONLY.equals(s)) {
+			if (JAXBRMUIConstants.READ_ONLY.equals(s)) {
 				swt |= SWT.READ_ONLY;
 			}
-			if (RESIZE.equals(s)) {
+			if (JAXBRMUIConstants.RESIZE.equals(s)) {
 				swt |= SWT.RESIZE;
 			}
-			if (RIGHT.equals(s)) {
+			if (JAXBRMUIConstants.RIGHT.equals(s)) {
 				swt |= SWT.RIGHT;
 			}
-			if (RIGHT_TO_LEFT.equals(s)) {
+			if (JAXBRMUIConstants.RIGHT_TO_LEFT.equals(s)) {
 				swt |= SWT.RIGHT_TO_LEFT;
 			}
-			if (SCROLL_LINE.equals(s)) {
+			if (JAXBRMUIConstants.SCROLL_LINE.equals(s)) {
 				swt |= SWT.SCROLL_LINE;
 			}
-			if (SCROLL_LOCK.equals(s)) {
+			if (JAXBRMUIConstants.SCROLL_LOCK.equals(s)) {
 				swt |= SWT.SCROLL_LOCK;
 			}
-			if (SCROLL_PAGE.equals(s)) {
+			if (JAXBRMUIConstants.SCROLL_PAGE.equals(s)) {
 				swt |= SWT.SCROLL_PAGE;
 			}
-			if (SHADOW_ETCHED_IN.equals(s)) {
+			if (JAXBRMUIConstants.SHADOW_ETCHED_IN.equals(s)) {
 				swt |= SWT.SHADOW_ETCHED_IN;
 			}
-			if (SHADOW_ETCHED_OUT.equals(s)) {
+			if (JAXBRMUIConstants.SHADOW_ETCHED_OUT.equals(s)) {
 				swt |= SWT.SHADOW_ETCHED_OUT;
 			}
-			if (SHADOW_IN.equals(s)) {
+			if (JAXBRMUIConstants.SHADOW_IN.equals(s)) {
 				swt |= SWT.SHADOW_IN;
 			}
-			if (SHADOW_NONE.equals(s)) {
+			if (JAXBRMUIConstants.SHADOW_NONE.equals(s)) {
 				swt |= SWT.SHADOW_NONE;
 			}
-			if (SHADOW_OUT.equals(s)) {
+			if (JAXBRMUIConstants.SHADOW_OUT.equals(s)) {
 				swt |= SWT.SHADOW_OUT;
 			}
-			if (SHELL_TRIM.equals(s)) {
+			if (JAXBRMUIConstants.SHELL_TRIM.equals(s)) {
 				swt |= SWT.SHELL_TRIM;
 			}
-			if (SHORT.equals(s)) {
+			if (JAXBRMUIConstants.SHORT.equals(s)) {
 				swt |= SWT.SHORT;
 			}
-			if (SIMPLE.equals(s)) {
+			if (JAXBRMUIConstants.SIMPLE.equals(s)) {
 				swt |= SWT.SIMPLE;
 			}
-			if (SINGLE.equals(s)) {
+			if (JAXBRMUIConstants.SINGLE.equals(s)) {
 				swt |= SWT.SINGLE;
 			}
-			if (SMOOTH.equals(s)) {
+			if (JAXBRMUIConstants.SMOOTH.equals(s)) {
 				swt |= SWT.SMOOTH;
 			}
-			if (TITLE.equals(s)) {
+			if (JAXBRMUIConstants.TITLE.equals(s)) {
 				swt |= SWT.TITLE;
 			}
-			if (TOGGLE.equals(s)) {
+			if (JAXBRMUIConstants.TOGGLE.equals(s)) {
 				swt |= SWT.TOGGLE;
 			}
-			if (TOP.equals(s)) {
+			if (JAXBRMUIConstants.TOP.equals(s)) {
 				swt |= SWT.TOP;
 			}
-			if (UP.equals(s)) {
+			if (JAXBRMUIConstants.UP.equals(s)) {
 				swt |= SWT.UP;
 			}
-			if (V_SCROLL.equals(s)) {
+			if (JAXBRMUIConstants.V_SCROLL.equals(s)) {
 				swt |= SWT.V_SCROLL;
 			}
-			if (VERTICAL.equals(s)) {
+			if (JAXBRMUIConstants.VERTICAL.equals(s)) {
 				swt |= SWT.VERTICAL;
 			}
-			if (WRAP.equals(s)) {
+			if (JAXBRMUIConstants.WRAP.equals(s)) {
 				swt |= SWT.WRAP;
 			}
-			if (YES.equals(s)) {
+			if (JAXBRMUIConstants.YES.equals(s)) {
 				swt |= SWT.YES;
 			}
 		}
@@ -1420,20 +1427,20 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			if (tt != null) {
 				column.setToolTipText(tt);
 			}
-			if (UNDEFINED != columnDescriptor.getWidth()) {
+			if (JAXBRMUIConstants.UNDEFINED != columnDescriptor.getWidth()) {
 				column.setWidth(columnDescriptor.getWidth());
 			}
 			if (null != columnDescriptor.getAlignment()) {
 				column.setAlignment(getStyle(columnDescriptor.getAlignment()));
 			}
-			if (COLUMN_NAME.equals(name)) {
+			if (JAXBRMUIConstants.COLUMN_NAME.equals(name)) {
 				if (sortOnName != null) {
 					if (sortOnName) {
 						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
 					}
 				}
 			}
-			if (COLUMN_VALUE.equals(columnDescriptor.getName())) {
+			if (JAXBRMUIConstants.COLUMN_VALUE.equals(columnDescriptor.getName())) {
 				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
 			}
 		}
@@ -1466,20 +1473,20 @@ public class WidgetBuilderUtils implements IJAXBUINonNLSConstants {
 			if (tt != null) {
 				column.setToolTipText(tt);
 			}
-			if (UNDEFINED != columnDescriptor.getWidth()) {
+			if (JAXBRMUIConstants.UNDEFINED != columnDescriptor.getWidth()) {
 				column.setWidth(columnDescriptor.getWidth());
 			}
 			if (null != columnDescriptor.getAlignment()) {
 				column.setAlignment(getStyle(columnDescriptor.getAlignment()));
 			}
-			if (COLUMN_NAME.equals(name)) {
+			if (JAXBRMUIConstants.COLUMN_NAME.equals(name)) {
 				if (sortOnName != null) {
 					if (sortOnName) {
 						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
 					}
 				}
 			}
-			if (COLUMN_VALUE.equals(columnDescriptor.getName())) {
+			if (JAXBRMUIConstants.COLUMN_VALUE.equals(columnDescriptor.getName())) {
 				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
 			}
 		}

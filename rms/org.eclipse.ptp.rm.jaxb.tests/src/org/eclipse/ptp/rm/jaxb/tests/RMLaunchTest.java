@@ -38,7 +38,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerConfiguration;
@@ -49,7 +49,7 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider;
 
-public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
+public class RMLaunchTest extends TestCase {
 
 	private class TestLaunchConfiguration implements ILaunchConfiguration {
 
@@ -214,7 +214,7 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		}
 	}
 
-	private static final String xml = DATA + "test-pbs.xml"; //$NON-NLS-1$
+	private static final String xml = JAXBRMConstants.DATA + "test-pbs.xml"; //$NON-NLS-1$
 	private JAXBResourceManagerConfiguration rmConfig;
 	private JAXBResourceManager rm;
 	private ILaunchConfiguration launchConfig;
@@ -278,7 +278,7 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		assert (localServices != null);
 		IRemoteConnectionManager localConnectionManager = localServices.getConnectionManager();
 		assert (localConnectionManager != null);
-		IRemoteConnection localConnection = localConnectionManager.getConnection(ZEROSTR);
+		IRemoteConnection localConnection = localConnectionManager.getConnection(JAXBRMConstants.ZEROSTR);
 		assert (localConnection != null);
 		rmConfig.setRemoteServicesId(localServices.getId());
 		rmConfig.setConnectionName(localConnection.getName());
@@ -301,8 +301,8 @@ public class RMLaunchTest extends TestCase implements IJAXBNonNLSConstants {
 		env.put("Resource_List.nodes", "1:ppn=8"); //$NON-NLS-1$ //$NON-NLS-2$
 		env.put("Resource_List.walltime", "00:10:00"); //$NON-NLS-1$ //$NON-NLS-2$
 		env.put("export_all", true); //$NON-NLS-1$
-		env.put(MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
-		env.put(MPI_ARGS, "-machinefile $PBS_NODEFILE -np 8"); //$NON-NLS-1$ 
+		env.put(JAXBRMConstants.MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
+		env.put(JAXBRMConstants.MPI_ARGS, "-machinefile $PBS_NODEFILE -np 8"); //$NON-NLS-1$ 
 		RMVariableMap rmVarMap = rm.getJAXBConfiguration().getRMVariableMap();
 		PropertyType queues = (PropertyType) rmVarMap.getVariables().get("available_queues"); //$NON-NLS-1$ 
 		if (queues != null) {

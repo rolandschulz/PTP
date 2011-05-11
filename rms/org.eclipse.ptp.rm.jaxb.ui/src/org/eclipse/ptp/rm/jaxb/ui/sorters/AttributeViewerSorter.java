@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.jaxb.ui.sorters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel;
-import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
 
 /**
  * Sorts the viewer on the name column. Clicking a second time on the column
@@ -21,7 +21,7 @@ import org.eclipse.ptp.rm.jaxb.ui.IJAXBUINonNLSConstants;
  * @author arossi
  * 
  */
-public class AttributeViewerSorter extends ViewerSorter implements IJAXBUINonNLSConstants {
+public class AttributeViewerSorter extends ViewerSorter {
 	protected int toggle = 1;
 
 	/*
@@ -38,8 +38,8 @@ public class AttributeViewerSorter extends ViewerSorter implements IJAXBUINonNLS
 		if (o1 instanceof ICellEditorUpdateModel && o2 instanceof ICellEditorUpdateModel) {
 			ICellEditorUpdateModel c1 = (ICellEditorUpdateModel) o1;
 			ICellEditorUpdateModel c2 = (ICellEditorUpdateModel) o2;
-			String name1 = c1.getDisplayValue(COLUMN_NAME);
-			String name2 = c2.getDisplayValue(COLUMN_NAME);
+			String name1 = c1.getDisplayValue(JAXBRMUIConstants.COLUMN_NAME);
+			String name2 = c2.getDisplayValue(JAXBRMUIConstants.COLUMN_NAME);
 			result = name1.compareTo(name2);
 		}
 

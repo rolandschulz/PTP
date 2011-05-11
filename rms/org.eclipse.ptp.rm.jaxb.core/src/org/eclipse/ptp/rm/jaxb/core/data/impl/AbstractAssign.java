@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.eclipse.ptp.rm.jaxb.core.IAssign;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBNonNLSConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AddType;
 import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
@@ -31,7 +31,7 @@ import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
  * @author arossi
  * 
  */
-public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
+public abstract class AbstractAssign implements IAssign {
 
 	protected String uuid;
 	protected String field;
@@ -226,12 +226,12 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 * @throws Throwable
 	 */
 	static Object get(Object target, String field) throws Throwable {
-		String name = GET + field.substring(0, 1).toUpperCase() + field.substring(1);
+		String name = JAXBRMConstants.GET + field.substring(0, 1).toUpperCase() + field.substring(1);
 		Method method = null;
 		try {
 			method = target.getClass().getMethod(name, (Class[]) null);
 		} catch (Throwable t) {
-			name = IS + field.substring(0, 1).toUpperCase() + field.substring(1);
+			name = JAXBRMConstants.IS + field.substring(0, 1).toUpperCase() + field.substring(1);
 			method = target.getClass().getMethod(name, (Class[]) null);
 		}
 		return method.invoke(target, (Object[]) null);
@@ -257,24 +257,24 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 */
 	static Object normalizedValue(Object target, String uuid, String expression, boolean convert, RMVariableMap map)
 			throws Throwable {
-		if (expression.startsWith(PD)) {
+		if (expression.startsWith(JAXBRMConstants.PD)) {
 			if (target == null) {
 				return null;
 			}
 			String field = expression.substring(1);
 			return AbstractAssign.get(target, field);
-		} else if (expression.indexOf(OPENV) >= 0) {
+		} else if (expression.indexOf(JAXBRMConstants.OPENV) >= 0) {
 			expression = map.getString(uuid, expression);
 			return map.getString(uuid, expression);
 		} else if (convert) {
-			if (TRUE.equalsIgnoreCase(expression)) {
+			if (JAXBRMConstants.TRUE.equalsIgnoreCase(expression)) {
 				return true;
 			}
-			if (FALSE.equalsIgnoreCase(expression)) {
+			if (JAXBRMConstants.FALSE.equalsIgnoreCase(expression)) {
 				return false;
 			}
 			try {
-				if (expression.indexOf(DOT) >= 0) {
+				if (expression.indexOf(JAXBRMConstants.DOT) >= 0) {
 					return new Double(expression);
 				}
 				return new Integer(expression);
@@ -298,7 +298,7 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 	 * @throws Throwable
 	 */
 	static void set(Object target, String field, Object[] values) throws Throwable {
-		String name = SET + field.substring(0, 1).toUpperCase() + field.substring(1);
+		String name = JAXBRMConstants.SET + field.substring(0, 1).toUpperCase() + field.substring(1);
 		Method[] methods = target.getClass().getMethods();
 		Method setter = null;
 		for (Method m : methods) {
@@ -307,14 +307,14 @@ public abstract class AbstractAssign implements IAssign, IJAXBNonNLSConstants {
 			}
 		}
 		if (setter == null) {
-			throw new NoSuchMethodException(name + CO + SP + target);
+			throw new NoSuchMethodException(name + JAXBRMConstants.CO + JAXBRMConstants.SP + target);
 		}
 		if (values[0] != null) {
 			Class<?>[] mclzz = setter.getParameterTypes();
 			// better have 1 parameter
 			Class<?> param = mclzz[0];
 			Class<?> valueClass = values[0].getClass();
-			Throwable t = new IllegalArgumentException(name + SP + valueClass);
+			Throwable t = new IllegalArgumentException(name + JAXBRMConstants.SP + valueClass);
 			if (!param.equals(Object.class) && !param.isAssignableFrom(values[0].getClass())) {
 				if (valueClass.equals(String.class)) {
 					if (param.equals(Boolean.class)) {

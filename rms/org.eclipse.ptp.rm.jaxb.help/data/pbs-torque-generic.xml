@@ -502,7 +502,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<arg>${rm:@jobId#name}</arg>
 		</terminate-job>
 		<launch-tab>
-			<basic>
+			<dynamic>
 				<title>Basic PBS Settings</title>
 				<!-- STDOUT/STDERR remote path group -->
 				<composite group="true">
@@ -510,7 +510,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false"/>
 					</layout>
 					<layout-data>
-						<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="4" widthHint="400"/>
+						<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="4" widthHint="300"/>
 					</layout-data>
 					<widget type="label" style="SWT.LEFT">
 						<tooltip>${rm:remote_path_tooltip#default}</tooltip>
@@ -518,7 +518,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					</widget>
 					<widget type="text" style="SWT.BORDER" saveValueTo="stdout_remote_path">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="175"/>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
@@ -530,7 +530,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					</widget>
 					<widget type="text" style="SWT.BORDER" saveValueTo="stderr_remote_path">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="175"/>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
@@ -684,7 +684,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					</widget>
 					<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
@@ -694,15 +694,15 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<fixed-text>${rm:mpiCores#description}</fixed-text>
 					</widget>
 				</composite>
-			</basic>
-			<advanced>
+			</dynamic>
+			<dynamic>
 				<title>Advanced PBS Settings</title>
 				<composite>
 					<layout>
 						<grid-layout numColumns="1"/>
 					</layout>
 					<layout-data>
-						<grid-data widthHint="600" heightHint="600" horizontalSpan="1"/>
+						<grid-data widthHint="600" heightHint="900" horizontalSpan="1"/>
 					</layout-data>
 					<!-- STDOUT/STDERR remote path group -->
 					<composite group="true">
@@ -786,8 +786,8 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</viewer>
 					</composite>
 				</composite>
-			</advanced>
-			<custom-controller>Import PBS Script</custom-controller>
+			</dynamic>
+			<import>Import PBS Script</import>
 		</launch-tab>
 	</control-data>
 	<monitor-data schedulerType="PBS"/>

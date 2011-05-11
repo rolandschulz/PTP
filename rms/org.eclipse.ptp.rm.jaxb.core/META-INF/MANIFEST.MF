@@ -23,13 +23,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.variables;bundle-version="3.2.400"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.rm.jaxb.core,
- org.eclipse.ptp.rm.jaxb.core.data,
- org.eclipse.ptp.rm.jaxb.core.data.impl,
- org.eclipse.ptp.rm.jaxb.core.exceptions,
- org.eclipse.ptp.rm.jaxb.core.messages,
- org.eclipse.ptp.rm.jaxb.core.rm,
- org.eclipse.ptp.rm.jaxb.core.runnable,
- org.eclipse.ptp.rm.jaxb.core.runnable.command,
- org.eclipse.ptp.rm.jaxb.core.utils,
- org.eclipse.ptp.rm.jaxb.core.variables
+Export-Package: org.eclipse.ptp.rm.jaxb.core;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.ui",
+ org.eclipse.ptp.rm.jaxb.core.data;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.ui",
+ org.eclipse.ptp.rm.jaxb.core.data.impl;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.ui",
+ org.eclipse.ptp.rm.jaxb.core.exceptions;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.ui",
+ org.eclipse.ptp.rm.jaxb.core.messages;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.ui",
+ org.eclipse.ptp.rm.jaxb.core.rm;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.ui",
+ org.eclipse.ptp.rm.jaxb.core.runnable;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.ui",
+ org.eclipse.ptp.rm.jaxb.core.runnable.command;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.ui",
+ org.eclipse.ptp.rm.jaxb.core.utils;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.ui",
+ org.eclipse.ptp.rm.jaxb.core.variables;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.ui"
