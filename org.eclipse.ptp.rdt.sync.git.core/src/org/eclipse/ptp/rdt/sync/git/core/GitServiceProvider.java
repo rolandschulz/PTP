@@ -265,7 +265,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	
 				// Open remote connection if necessary
 				if (this.getRemoteConnection().isOpen() == false) {
-					this.getRemoteConnection().open(monitor);
+					this.getRemoteConnection().open(progress);
 				}
 	
 				// This synchronization operation will include all tasks up to current syncTaskId
