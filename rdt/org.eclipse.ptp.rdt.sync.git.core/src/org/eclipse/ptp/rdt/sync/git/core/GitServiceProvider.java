@@ -296,7 +296,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			
 			IProject project = this.getProject();
 			if (project != null) {
-				project.refreshLocal(IResource.DEPTH_INFINITE, null);
+				project.refreshLocal(IResource.DEPTH_INFINITE, progress);
 			}
 		} finally {
 			if (monitor != null)
