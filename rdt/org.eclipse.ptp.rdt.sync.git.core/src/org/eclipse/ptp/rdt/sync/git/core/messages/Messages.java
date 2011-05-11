@@ -3,7 +3,7 @@ package org.eclipse.ptp.rdt.sync.git.core.messages;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.sync.git.core.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.sync.git.core.messages.messages"; //$NON-NLS-1$
 	public static String CR_CreateInstanceError;
 	public static String GRSC_CommitMessage;
 	public static String GRSC_GitAddFailure;
