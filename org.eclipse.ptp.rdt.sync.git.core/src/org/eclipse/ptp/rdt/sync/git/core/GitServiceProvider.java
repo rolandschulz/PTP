@@ -181,7 +181,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 100);
-		if (!(syncNeeded(delta))) {
+        // TODO: Note that here SyncFlag.FORCE is interpreted as sync always, even if not needed for delta. This is different
+		// from the original intent of FORCE, which was to do an immediate, blocking sync. We may need to split those two
+		// functions and introduce more flags.
+		// TODO: Also, note that we are not using the individual "sync to local" and "sync to remote" flags yet.
+		// Example: Why sync if sync not needed for delta? The RemoteMakeBuilder forces a sync before and after building. In some
+		// cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
+		if ((syncFlags == SyncFlag.NO_FORCE) && (!(syncNeeded(delta)))) {
 			return;
 		}
 		
@@ -300,6 +306,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 	// Are any of the changes in delta relevant for sync'ing?
 	private boolean syncNeeded(IResourceDelta delta) {
+		if (delta == null) {
+			return false;
+		}
 		String[] relevantChangedResources = getRelevantChangedResources(delta);
 		if (relevantChangedResources.length == 0) {
 			return false;
