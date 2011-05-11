@@ -44,4 +44,10 @@
             name="%SyncService.name">
       </service>
    </extension>
+   <extension
+         point="org.eclipse.cdt.core.UNCPathConverter">
+      <UNCPathConverter
+            class="org.eclipse.ptp.rdt.sync.core.SyncUNCPathConverter">
+      </UNCPathConverter>
+   </extension>
 </plugin>
