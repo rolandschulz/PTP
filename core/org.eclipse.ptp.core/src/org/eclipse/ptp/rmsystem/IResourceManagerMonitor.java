@@ -20,6 +20,16 @@ import org.eclipse.ptp.core.listeners.IJobListener;
  */
 public interface IResourceManagerMonitor {
 	/**
+	 * Notify monitor that job should be treated specially.
+	 * 
+	 * @param jobId
+	 *            ID of job to be treated specially
+	 * @param status
+	 *            current status of job
+	 */
+	public void addJob(String jobId, IJobStatus status);
+
+	/**
 	 * Add a listener for job events
 	 * 
 	 * @param listener
@@ -37,6 +47,14 @@ public interface IResourceManagerMonitor {
 	 * @return resource manager configuration
 	 */
 	public IResourceManagerComponentConfiguration getMonitorConfiguration();
+
+	/**
+	 * Notify monitor that job should no longer be treated specially
+	 * 
+	 * @param jobId
+	 *            ID of job to remove
+	 */
+	public void removeJob(String jobId);
 
 	/**
 	 * Remove a listener for job events
@@ -63,5 +81,15 @@ public interface IResourceManagerMonitor {
 	 *             this exception is thrown if the stop command fails
 	 */
 	public void stop() throws CoreException;
+
+	/**
+	 * Notify monitor that status of job has changed.
+	 * 
+	 * @param jobId
+	 *            ID of job to be updated
+	 * @param status
+	 *            new status of job
+	 */
+	public void updateJob(String jobId, IJobStatus status);
 
 }

@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 
 /**
  * JAXB resource manager monitor used for testing. Currently unimplemented
@@ -24,7 +25,19 @@ public class JAXBResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	}
 
 	@Override
+	protected void doAddJob(String jobId, IJobStatus status) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	protected void doDispose() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void doRemoveJob(String jobId) {
 		// TODO Auto-generated method stub
 
 	}
@@ -37,6 +50,12 @@ public class JAXBResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void doUpdateJob(String jobId, IJobStatus status) {
 		// TODO Auto-generated method stub
 
 	}

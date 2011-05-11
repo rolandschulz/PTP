@@ -48,6 +48,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	private final AbstractResourceManagerControl fResourceManagerControl;
 	private final AbstractResourceManagerMonitor fResourceManagerMonitor;
 	private final ModelManager fModelManager = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
+
 	private AbstractResourceManagerConfiguration fConfig;
 	private String fState;
 
@@ -62,6 +63,20 @@ public abstract class AbstractResourceManager implements IResourceManager {
 		fPResourceManager = new PResourceManager(fModelManager.getUniverse(), this);
 		fModelManager.getUniverse().addResourceManager(fPResourceManager);
 		fState = STOPPED_STATE;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#addJob(java.lang.String,
+	 * org.eclipse.ptp.rmsystem.IJobStatus)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public void addJob(String jobId, IJobStatus status) {
+		fResourceManagerMonitor.addJob(jobId, status);
 	}
 
 	/*
@@ -256,6 +271,20 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJob(java.lang.
+	 * String)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public void removeJob(String jobId) {
+		fResourceManagerMonitor.removeJob(jobId);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJobListener(org
 	 * .eclipse.ptp.core.listeners.IJobListener)
 	 */
@@ -381,6 +410,20 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 */
 	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
 		return fResourceManagerControl.submitJob(configuration, mode, monitor);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#updateJob(java.lang.
+	 * String, org.eclipse.ptp.rmsystem.IJobStatus)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public void updateJob(String jobId, IJobStatus status) {
+		fResourceManagerMonitor.updateJob(jobId, status);
 	}
 
 	/**

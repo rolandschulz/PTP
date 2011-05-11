@@ -16,9 +16,6 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/**
- * 
- */
 package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
@@ -39,10 +36,22 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	private final ListenerList fJobListeners = new ListenerList();
 	private final ModelManager fModelManager = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
 	private final AbstractResourceManagerConfiguration fConfig;
+
 	private IResourceManager fResourceManager = null;
 
 	public AbstractResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		fConfig = config;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#addJob(java.lang.String,
+	 * org.eclipse.ptp.rmsystem.IJobStatus)
+	 */
+	public void addJob(String jobId, IJobStatus status) {
+		doAddJob(jobId, status);
 	}
 
 	/*
@@ -97,6 +106,17 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJob(java.lang.
+	 * String)
+	 */
+	public void removeJob(String jobId) {
+		doRemoveJob(jobId);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#removeJobListener(org
 	 * .eclipse.ptp.core.listeners.IJobListener)
 	 */
@@ -127,10 +147,39 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 		doShutdown();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#updateJob(java.lang.
+	 * String, org.eclipse.ptp.rmsystem.IJobStatus)
+	 */
+	public void updateJob(String jobId, IJobStatus status) {
+		doUpdateJob(jobId, status);
+	}
+
+	/**
+	 * Notify monitor that job should be treated specially.
+	 * 
+	 * @param jobId
+	 *            ID of job to be treated specially
+	 * @param status
+	 *            current status of job
+	 */
+	protected abstract void doAddJob(String jobId, IJobStatus status);
+
 	/**
 	 * Perform any activities prior to disposing of the resource manager.
 	 */
 	protected abstract void doDispose();
+
+	/**
+	 * Notify monitor that job should no longer be treated specially
+	 * 
+	 * @param jobId
+	 *            ID of job to remove
+	 */
+	protected abstract void doRemoveJob(String jobId);
 
 	/**
 	 * Stop the resource manager subsystem.
@@ -146,6 +195,16 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	 * @throws CoreException
 	 */
 	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
+
+	/**
+	 * Notify monitor that status of job has changed.
+	 * 
+	 * @param jobId
+	 *            ID of job to be updated
+	 * @param status
+	 *            new status of job
+	 */
+	protected abstract void doUpdateJob(String jobId, IJobStatus status);
 
 	/**
 	 * Notify listeners when a job has changed.
