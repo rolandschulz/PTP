@@ -21,8 +21,11 @@ import org.eclipse.cdt.managedbuilder.core.IMultiConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.internal.core.MultiConfiguration;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractSingleBuildPage;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -43,6 +46,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private IRemoteConnection fSelectedConnection;
@@ -314,8 +318,9 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 */
 	private boolean isConfigAltered(IConfiguration config, PageSettings settings) {
 		PageSettings systemSettings = this.loadSettings(config);
-		// TODO: null return?
-		if (settings.equals(systemSettings)) {
+		if (systemSettings == null) {
+			return true; // Is logged inside loadSettings
+		} else if (settings.equals(systemSettings)) {
 			return false;
 		} else {
 			return true;
@@ -346,13 +351,16 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
         // Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
         // the BuildConfigurationManager relies on the data being up-to-date.
-        String syncProvider = BuildConfigurationManager.getBuildScenarioForBuildConfiguration(config).getSyncProvider();
+        BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+        String syncProvider = bcm.getBuildScenarioForBuildConfiguration(config).getSyncProvider();
         BuildScenario buildScenario = new BuildScenario(syncProvider, settings.connection, settings.rootLocation);
-        BuildConfigurationManager.setBuildScenarioForBuildConfiguration(buildScenario, config);
+        bcm.setBuildScenarioForBuildConfiguration(buildScenario, config);
         try {
-                BuildConfigurationManager.saveConfigurationData();
+                bcm.saveConfigurationData();
         } catch (IOException e) {
-                // TODO What to do in this case?
+        	IStatus status = new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, "Error saving configuration data: " +  //$NON-NLS-1$
+        																										e.getMessage(), e);
+        	StatusManager.getManager().handle(status, StatusManager.SHOW);
         }
 	}
 	
@@ -389,7 +397,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		if (settings == null) {
 			settings = this.loadSettings(getCfg());
 			if (settings == null) {
-				// Log: should never happen
+				return; // Is logged inside loadSettings
 			}
 			fConfigToPageSettings.put(getCfg().getId(), settings);
 		}
@@ -441,9 +449,10 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * @return Configuration settings or null if config not found in BuildConfigurationManager
 	 */
 	private PageSettings loadSettings(IConfiguration config) {
-		BuildScenario buildScenario = BuildConfigurationManager.getBuildScenarioForBuildConfiguration(config);
+		BuildScenario buildScenario = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(config);
 		if (buildScenario == null) {
-			// Should never happen - need to log
+	       	IStatus status = new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, "Error loading configuration data"); //$NON-NLS-1$
+	       	StatusManager.getManager().handle(status, StatusManager.SHOW);
 			return null;
 		}
 		PageSettings settings = new PageSettings();
@@ -491,7 +500,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		PageSettings settings = this.loadSettings(getCfg());
 		if (settings == null) {
-			// TODO: What to do in this case?
+			// Handled inside loadSettings
 		}
 		fConfigToPageSettings.put(getCfg().getId(), settings);
 		this.setValues(getCfg());
