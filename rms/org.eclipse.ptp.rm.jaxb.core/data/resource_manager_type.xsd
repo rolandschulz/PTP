@@ -1081,15 +1081,21 @@
 		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="monitor-type">
-		<xs:annotation>
-			<xs:documentation>
-				This is a minimal definition.
-			</xs:documentation>
-		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property-type"/>
+			<xs:element name="driver" type="rm:monitor-driver-type"/>
 		</xs:sequence>
 		<xs:attribute name="schedulerType" type="xs:string"/>
 		<xs:attribute name="refreshFrequencyInSeconds" type="xs:int" default="60"/>
+	</xs:complexType>
+	<xs:complexType name="monitor-driver-type">
+	  <xs:choice>
+	     <xs:element name="url" type="xs:string"/>
+	     <xs:sequence>
+	         <xs:element name="name" type="xs:string"/>
+	         <xs:element name="path" minOccurs="0" type="xs:string"/>
+	         <xs:element name="args" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
+	     </xs:sequence>
+	  </xs:choice>
 	</xs:complexType>
 </xs:schema>
