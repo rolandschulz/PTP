@@ -47,10 +47,6 @@ public class RemoteServicesDelegate {
 		assert (localServices != null);
 		localConnectionManager = localServices.getConnectionManager();
 		assert (localConnectionManager != null);
-		/*
-		 * Since it's a local service, it doesn't matter which parameter is
-		 * passed
-		 */
 		localConnection = localConnectionManager.getConnection("Local");//$NON-NLS-1$
 		assert (localConnection != null);
 		localFileManager = localServices.getFileManager(localConnection);
