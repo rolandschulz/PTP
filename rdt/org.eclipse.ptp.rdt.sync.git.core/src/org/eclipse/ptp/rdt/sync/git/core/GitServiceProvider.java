@@ -182,12 +182,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 100);
 		try {
-			/* A synchronize with SyncFlag.FORCE gurantees that both directories are in sync.
+			/* A synchronize with SyncFlag.FORCE guarantees that both directories are in sync.
 			 * 
-			 * More precise: it gurantees that all changes written to disk at the moment of the call are guranteed to be 
-			 * synchronized between both directories. No gurantess are given for changes occoring during the synchronize call.
+			 * More precise: it guarantees that all changes written to disk at the moment of the call are guaranteed to be 
+			 * synchronized between both directories. No guarantees are given for changes occurring during the synchronize call.
 			 * 
-			 * To satify this gurantee, this call needs to make sure that both the current delta and all outstanding sync requests
+			 * To satisfy this guarantee, this call needs to make sure that both the current delta and all outstanding sync requests
 			 * finish before this call returns.
 			 * 
 			 *  Example: Why sync if current delta is empty? The RemoteMakeBuilder forces a sync before and after building. 

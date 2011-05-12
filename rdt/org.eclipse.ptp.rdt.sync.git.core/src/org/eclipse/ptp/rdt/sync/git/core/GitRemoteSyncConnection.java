@@ -468,8 +468,8 @@ public class GitRemoteSyncConnection {
 	/**
 	 * Many of the listed exceptions appear to be unrecoverable, caused by errors in the initial setup. It is vital, though, that
 	 * failed syncs are reported and handled. So all exceptions are checked exceptions, embedded in a RemoteSyncException.
-	 * @param monitor 
-	 * 
+	 *
+	 * @param monitor  
 	 * @throws RemoteSyncException
 	 *             for various problems sync'ing. The specific exception is nested within the RemoteSyncException. 
 	 * TODO: Consider possible platform dependency.
