@@ -25,13 +25,24 @@ public class Messages extends NLS {
 	public static String ResourceRefreshJob_1;
 	public static String BCM_WorkspaceConfigDes;
 	public static String BCM_ScenarioToServiceConfigError;
+
+	public static String BCM_SetWorkspaceConfigDescriptionError;
 	public static String BCM_InitError;
 
 	public static String BCM_InitializationError;
+
 	public static String BCM_TemplateError;
 	public static String BCM_ProviderError;
 	public static String BCM_BuildInfoError;
 	public static String BCM_AncestorError;
+
+	public static String BCM_CreateWorkspaceConfigError;
+
+	public static String BCM_CreateWorkspaceConfigFailure;
+
+	public static String BCM_LocalConnectionError;
+
+	public static String BCM_LocalServiceError;
 	public static String BCM_ProjectError;
 
 	static {

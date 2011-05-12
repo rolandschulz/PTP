@@ -115,8 +115,7 @@ public class BuildConfigurationManager {
 	
 	private void handleInitError(Throwable e) {
 		fInstance = null;
-		IStatus status = new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.BCM_InitializationError, e);
-		RDTSyncCorePlugin.log(status);
+		RDTSyncCorePlugin.log(Messages.BCM_InitializationError, e);
 	}
 	
 	/**
@@ -631,8 +630,7 @@ public class BuildConfigurationManager {
 
 	/**
 	 * Create a local build configuration. The corresponding build scenario has no sync provider and points to the project's
-	 * working directory. We take a conservative approach. Failure at any point means we abort the attempt to create a local
-	 * configuration.
+	 * working directory.
 	 *
 	 * On project creation, CDT removes superfluous configurations. Thus, we place the functionality here, to be invoked at some
 	 * point after initial project creation.
@@ -646,59 +644,74 @@ public class BuildConfigurationManager {
 		if (buildInfo == null) {
 			return;
 		}
+
+		// For recording of problems during attempt
+		Throwable creationException = null;
+		String creationError = null;
+		boolean configAdded = false;
+
 		ManagedProject managedProject = (ManagedProject) buildInfo.getManagedProject();
 		Configuration localConfigParent = (Configuration) buildInfo.getDefaultConfiguration();
 		String localConfigId = ManagedBuildManager.calculateChildId(localConfigParent.getId(), null);
 		Configuration localConfig = new Configuration(managedProject, localConfigParent, localConfigId, true, false);
-		if (localConfig != null) {
-			CConfigurationData localConfigData = localConfig.getConfigurationData();
-			ICProjectDescription projectDes = CoreModel.getDefault().getProjectDescription(project);
-			ICConfigurationDescription localConfigDes = null;
-			try {
-				localConfigDes = projectDes.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, localConfigData);
-			} catch (WriteAccessException e) {
-				// Nothing to do
-			} catch (CoreException e) {
-				// Nothing to do
-			}
+		CConfigurationData localConfigData = localConfig.getConfigurationData();
+		ICProjectDescription projectDes = CoreModel.getDefault().getProjectDescription(project);
+		ICConfigurationDescription localConfigDes = null;
+		try {
+			localConfigDes = projectDes.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, localConfigData);
+		} catch (WriteAccessException e) {
+			creationException = e;
+		} catch (CoreException e) {
+			creationException = e;
+		}
 
-			if (localConfigDes != null) {
-				boolean configAdded = false;
-				localConfig.setConfigurationDescription(localConfigDes);
-				localConfigDes.setName(LOCAL_CONFIGURATION_NAME);
-				localConfigDes.setDescription(LOCAL_CONFIGURATION_DES);
-				localConfig.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
-				IRemoteServices localService = PTPRemoteCorePlugin.getDefault().
-				getRemoteServices("org.eclipse.ptp.remote.LocalServices", null); //$NON-NLS-1$
-				if (localService != null) {
-					IRemoteConnection localConnection = localService.getConnectionManager().getConnection("Local"); //$NON-NLS-1$
-					if (localConnection != null) {
-						BuildScenario localBuildScenario = new BuildScenario(null, localConnection, project.getLocation().toString());
-						this.setBuildScenarioForBuildConfigurationInternal(localBuildScenario, localConfig);
-						configAdded = true;
-					}
-				}
-				if (!configAdded) {
-					projectDes.removeConfiguration(localConfigDes);
+		if (localConfigDes != null) {
+			localConfig.setConfigurationDescription(localConfigDes);
+			localConfigDes.setName(LOCAL_CONFIGURATION_NAME);
+			localConfigDes.setDescription(LOCAL_CONFIGURATION_DES);
+			localConfig.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
+			IRemoteServices localService = PTPRemoteCorePlugin.getDefault().
+			getRemoteServices("org.eclipse.ptp.remote.LocalServices", null); //$NON-NLS-1$
+			if (localService != null) {
+				IRemoteConnection localConnection = localService.getConnectionManager().getConnection("Local"); //$NON-NLS-1$
+				if (localConnection != null) {
+					BuildScenario localBuildScenario = new BuildScenario(null, localConnection, project.getLocation().toString());
+					this.setBuildScenarioForBuildConfigurationInternal(localBuildScenario, localConfig);
+					configAdded = true;
 				} else {
-					try {
-						// ManagedBuildManager.resetConfiguration(project, localConfig);
-						CoreModel.getDefault().setProjectDescription(project, projectDes, true, null);
-						// ManagedBuildManager.addExtensionConfiguration(localConfig);
-						// ManagedBuildManager.saveBuildInfo(project, true);
-					} catch (CoreException e) {
-						projectDes.removeConfiguration(localConfigDes);
-						configAdded = false;
-					}
+					creationError = Messages.BCM_LocalConnectionError;
 				}
-				if (configAdded) {
-					try {
-						this.saveConfigurationData();
-					} catch (IOException e) {
-						projectDes.removeConfiguration(localConfigDes);
-					}
+			} else {
+				creationError = Messages.BCM_LocalServiceError;
+			}
+			if (!configAdded) {
+				projectDes.removeConfiguration(localConfigDes);
+			} else {
+				try {
+					CoreModel.getDefault().setProjectDescription(project, projectDes, true, null);
+				} catch (CoreException e) {
+					projectDes.removeConfiguration(localConfigDes);
+					configAdded = false;
+					creationException = e;
+					creationError = Messages.BCM_SetWorkspaceConfigDescriptionError;
 				}
 			}
+			if (configAdded) {
+				try {
+					this.saveConfigurationData();
+				} catch (IOException e) {
+					projectDes.removeConfiguration(localConfigDes);
+				}
+			}
+		} else {
+			creationError = Messages.BCM_CreateWorkspaceConfigError;
+		}
+
+		if (!configAdded) {
+			if (creationError == null && creationException != null) {
+				creationError = creationException.getMessage();
+			}
+			RDTSyncCorePlugin.log(Messages.BCM_CreateWorkspaceConfigFailure + creationError, creationException);
 		}
 	}
 }
