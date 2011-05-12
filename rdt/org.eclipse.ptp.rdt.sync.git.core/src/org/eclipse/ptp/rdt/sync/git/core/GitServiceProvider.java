@@ -280,8 +280,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	
 				// Sync local and remote. For now, do both ways each time.
 				// TODO: Sync more efficiently and appropriately to the situation.
-				fSyncConnection.syncLocalToRemote(progress);
-				fSyncConnection.syncRemoteToLocal(progress);
+				fSyncConnection.syncLocalToRemote(progress.newChild(40));
+				fSyncConnection.syncRemoteToLocal(progress.newChild(40));
 	
 				finishedSyncTaskId = willFinishTaskId;
 			} catch (final RemoteSyncException e) {
@@ -296,7 +296,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			
 			IProject project = this.getProject();
 			if (project != null) {
-				project.refreshLocal(IResource.DEPTH_INFINITE, progress);
+				project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(20));
 			}
 		} finally {
 			if (monitor != null)
