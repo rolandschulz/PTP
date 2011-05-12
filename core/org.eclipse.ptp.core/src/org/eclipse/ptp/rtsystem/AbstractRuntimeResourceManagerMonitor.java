@@ -56,6 +56,7 @@ import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
@@ -244,6 +245,42 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	 */
 	public AbstractRuntimeResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doAddJob(java
+	 * .lang.String, org.eclipse.ptp.rmsystem.IJobStatus)
+	 */
+	@Override
+	public void doAddJob(String jobId, IJobStatus status) {
+		// All jobs are special
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doRemoveJob(java
+	 * .lang.String)
+	 */
+	@Override
+	public void doRemoveJob(String jobId) {
+		// All jobs are special
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doUpdateJob(java
+	 * .lang.String, org.eclipse.ptp.rmsystem.IJobStatus)
+	 */
+	@Override
+	public void doUpdateJob(String jobId, IJobStatus status) {
+		// No need to update
 	}
 
 	/*
