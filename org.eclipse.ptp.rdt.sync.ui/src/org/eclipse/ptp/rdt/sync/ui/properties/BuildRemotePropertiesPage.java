@@ -18,7 +18,6 @@ import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICResourceDescription;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IMultiConfiguration;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.internal.core.MultiConfiguration;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractSingleBuildPage;
 import org.eclipse.core.runtime.IStatus;
@@ -59,7 +58,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		IRemoteConnection connection;
 		IRemoteServices remoteProvider;
 		String rootLocation;
-		String buildLocation;
 		
 		public boolean equals(PageSettings otherSettings) {
 			if (this.connection != otherSettings.connection) {
@@ -69,9 +67,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 				return false;
 			}
 			if (!(this.rootLocation.equals(otherSettings.rootLocation))) {
-				return false;
-			}
-			if (!(this.buildLocation.equals(otherSettings.buildLocation))) {
 				return false;
 			}
 			
@@ -92,7 +87,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private Combo fProviderCombo;
 	private Combo fConnectionCombo;
 	private Text fRootLocationText;
-	private Text fBuildLocationText;
 	private Composite composite;
 
 	/**
@@ -209,23 +203,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			}
 		});
 		
-		// Build subdirectory label and text box
-		Label buildLocationLabel = new Label(composite, SWT.LEFT);
-		buildLocationLabel.setText(Messages.BRPPage_BuildSubdirLabel);
-
-		fBuildLocationText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 1;
-		gd.grabExcessHorizontalSpace = true;
-		gd.widthHint = 250;
-		fBuildLocationText.setLayoutData(gd);
-		fBuildLocationText.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,
-				// PATH_PROPERTY, fLocationText.getText());
-			}
-		});
-		
 		fConfigBeforeSwitch = getCfg();
 		this.setValues(getCfg());
 		fWidgetsReady = true;
@@ -336,19 +313,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * 				new settings
 	 */
 	private void saveConfig(IConfiguration config, PageSettings settings) {
-        // Change build path and save new configuration
-        String buildPath = settings.rootLocation;
-        if (buildPath.endsWith("/")) { //$NON-NLS-1$
-                buildPath = buildPath.substring(0, buildPath.length() - 1);
-        }
-        if (settings.buildLocation.startsWith("/")) { //$NON-NLS-1$
-                buildPath = buildPath + settings.buildLocation;
-        } else {
-                buildPath = buildPath + "/" + settings.buildLocation; //$NON-NLS-1$
-        }
-        config.getToolChain().getBuilder().setBuildPath(buildPath);
-        ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
-
         // Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
         // the BuildConfigurationManager relies on the data being up-to-date.
         BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
@@ -409,7 +373,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(settings.connection));
 		handleConnectionSelected();
 		fRootLocationText.setText(settings.rootLocation);
-		fBuildLocationText.setText(settings.buildLocation);
 	}
 	
 	/**
@@ -460,11 +423,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		settings.connection = buildScenario.getRemoteConnection();
 		settings.rootLocation = buildScenario.getLocation();
 
-		String buildSubDir = config.getToolChain().getBuilder().getBuildPath();
-		// TODO: Check that it really is a subdirectory, but it is not clear what to do if it is not.
-		buildSubDir = buildSubDir.substring(buildScenario.getLocation().length());
-		settings.buildLocation = buildSubDir;
-
 		return settings;
 	}
 
@@ -485,7 +443,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		settings.remoteProvider = fComboIndexToRemoteServicesProviderMap.get(remoteServicesIndex);
 		settings.connection = fComboIndexToRemoteConnectionMap.get(connectionIndex);
 		settings.rootLocation = fRootLocationText.getText();
-		settings.buildLocation = fBuildLocationText.getText();
 		
 		fConfigToPageSettings.put(config.getId(), settings);
 	}
