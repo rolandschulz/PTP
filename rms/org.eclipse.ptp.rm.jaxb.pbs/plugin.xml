@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/pbs-torque-generic.xml"
+            name="PBS-Torque-Batch-Generic">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/pbs-torque-interactive.xml"
+            name="PBS-Torque-Interactive-Generic">
+      </JAXBResourceManagerConfiguration>
+   </extension>
+
+</plugin>
