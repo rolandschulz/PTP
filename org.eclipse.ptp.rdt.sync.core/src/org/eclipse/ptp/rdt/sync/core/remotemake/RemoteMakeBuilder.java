@@ -233,7 +233,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				if (last == null) {
 					last = new Integer(100);
 				}
-				StreamMonitor streamMon = new StreamMonitor(new SubProgressMonitor(monitor, 100), cos, last.intValue());
+				StreamMonitor streamMon = new StreamMonitor(new SubProgressMonitor(monitor, 80), cos, last.intValue());
 				ErrorParserManager epm = new ErrorParserManager(getProject(), workingDirectory, this, configuration.getErrorParserList());
 				epm.setOutputStream(streamMon);
 				final OutputStream stdout = epm.getOutputStream();
@@ -373,7 +373,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					
 					// Synchronize before building
 					if (syncProvider != null) {
-						syncProvider.synchronize(null, monitor, SyncFlag.FORCE);
+						syncProvider.synchronize(null, new SubProgressMonitor(monitor, 10), SyncFlag.FORCE);
 					}
 					
 					// Before launching give visual cues via the monitor
@@ -452,7 +452,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 						
 						// Synchronize after building
 						if (syncProvider != null) {
-							syncProvider.synchronize(null, monitor, SyncFlag.FORCE);
+							syncProvider.synchronize(null, new SubProgressMonitor(monitor, 10), SyncFlag.FORCE);
 						}
 
 						// create a Job for the refresh
