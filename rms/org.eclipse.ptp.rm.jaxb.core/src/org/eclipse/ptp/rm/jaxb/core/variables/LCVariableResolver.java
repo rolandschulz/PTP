@@ -38,7 +38,7 @@ public class LCVariableResolver implements IDynamicVariableResolver {
 	 * name=primitive value.
 	 */
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
-		if (active != null) {
+		if (active != null && argument != null) {
 			String[] split = argument.split(JAXBRMConstants.PDRX);
 			if (split.length > 1) {
 				if (split[1].equals(JAXBRMConstants.VALUE)) {

@@ -43,17 +43,19 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 	 * takes.
 	 */
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
-		String[] parts = argument.split(JAXBRMConstants.PDRX);
-		Object value = active.get(parts[0]);
-		if (value != null) {
-			if (parts.length == 2) {
-				try {
-					return invokeGetter(value, parts[1]);
-				} catch (Throwable t) {
-					throw CoreExceptionUtils.newException(Messages.RMVariableResolver_derefError, t);
+		if (active != null && argument != null) {
+			String[] parts = argument.split(JAXBRMConstants.PDRX);
+			Object value = active.get(parts[0]);
+			if (value != null) {
+				if (parts.length == 2) {
+					try {
+						return invokeGetter(value, parts[1]);
+					} catch (Throwable t) {
+						throw CoreExceptionUtils.newException(Messages.RMVariableResolver_derefError, t);
+					}
+				} else {
+					return String.valueOf(value);
 				}
-			} else {
-				return String.valueOf(value);
 			}
 		}
 		return null;

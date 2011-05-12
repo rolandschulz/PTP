@@ -77,7 +77,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${rm:Resource_List.mem#tooltip}</tooltip>
+						<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
 						<fixed-text>Total Memory Needed: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
@@ -89,13 +89,13 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${rm:Resource_List.mem#description}</fixed-text>
+						<fixed-text>${ptp_rm:Resource_List.mem#description}</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
+						<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
 						<fixed-text>Wallclock Time: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
@@ -107,7 +107,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${rm:Resource_List.walltime#description}</fixed-text>
+						<fixed-text>${ptp_rm:Resource_List.walltime#description}</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -124,7 +124,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${rm:mpiCommand#description}</fixed-text>
+						<fixed-text>${ptp_rm:mpiCommand#description}</fixed-text>
 					</widget>
 					<!-- row 4 -->
 					<widget type="label" style="SWT.LEFT">
@@ -142,7 +142,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${rm:mpiCores#description}</fixed-text>
+						<fixed-text>${ptp_rm:mpiCores#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>

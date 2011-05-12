@@ -13,7 +13,7 @@
    <control-data>
       <property name="queues" visible="false"/>
       <property name="stdout" visible="false">
-         <default>${rm:directory#value}/${rm:@jobId#name}.ember.out</default>
+         <default>${ptp_rm:directory#value}/${ptp_rm:@jobId#name}.ember.out</default>
       </property>
       <attribute name="mpiCommand" type="choice">
          <description>Which mpi command to use.</description>
@@ -246,112 +246,112 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
             <arg>#!/bin/bash</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -A">#PBS -A ${rm:Account_Name#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -A">#PBS -A ${ptp_rm:Account_Name#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -c">#PBS -c ${rm:Checkpoint#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -c">#PBS -c ${ptp_rm:Checkpoint#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -W depend=">#PBS -W depend=${rm:depend#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -W depend=">#PBS -W depend=${ptp_rm:depend#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -q">#PBS -q ${rm:destination#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -q">#PBS -q ${ptp_rm:destination#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -C">#PBS -C ${rm:line#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -C">#PBS -C ${ptp_rm:line#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -e">#PBS -e ${rm:Error_Path#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -e">#PBS -e ${ptp_rm:Error_Path#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -V">#PBS -V ${rm:export_all#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -V">#PBS -V ${ptp_rm:export_all#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -W group_list=">#PBS -W group_list=${rm:group_list#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -W group_list=">#PBS -W group_list=${ptp_rm:group_list#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -h">#PBS -h ${rm:Hold_Types#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -h">#PBS -h ${ptp_rm:Hold_Types#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -N">#PBS -N ${rm:Job_Name#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -N">#PBS -N ${ptp_rm:Job_Name#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -j">#PBS -j ${rm:Join_Path#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -j">#PBS -j ${ptp_rm:Join_Path#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -k">#PBS -k ${rm:Keep_Files#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -k">#PBS -k ${ptp_rm:Keep_Files#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -m">#PBS -m ${rm:Mail_Points#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -m">#PBS -m ${ptp_rm:Mail_Points#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -M">#PBS -M ${rm:Mail_Users#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -M">#PBS -M ${ptp_rm:Mail_Users#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -o">#PBS -o ${rm:Output_Path#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -o">#PBS -o ${ptp_rm:Output_Path#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -p">#PBS -p ${rm:Priority#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -p">#PBS -p ${ptp_rm:Priority#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -r">#PBS -r ${rm:Rerunnable#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -r">#PBS -r ${ptp_rm:Rerunnable#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l arch=">#PBS -l arch=${rm:Resource_List.arch#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l arch=">#PBS -l arch=${ptp_rm:Resource_List.arch#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l cput=">#PBS -l cput=${rm:Resource_List.cput#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l cput=">#PBS -l cput=${ptp_rm:Resource_List.cput#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l file=">#PBS -l file=${rm:Resource_List.file#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l file=">#PBS -l file=${ptp_rm:Resource_List.file#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l host=">#PBS -l host=${rm:Resource_List.host#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l host=">#PBS -l host=${ptp_rm:Resource_List.host#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l mem=">#PBS -l mem=${rm:Resource_List.mem#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l mem=">#PBS -l mem=${ptp_rm:Resource_List.mem#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l nice=">#PBS -l nice=${rm:Resource_List.nice#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l nice=">#PBS -l nice=${ptp_rm:Resource_List.nice#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l nodes=">#PBS -l nodes=${rm:Resource_List.nodes#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l nodes=">#PBS -l nodes=${ptp_rm:Resource_List.nodes#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l ompthreads=">#PBS -l ompthreads=${rm:Resource_List.ompthreads#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l ompthreads=">#PBS -l ompthreads=${ptp_rm:Resource_List.ompthreads#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l pcput=">#PBS -l pcput=${rm:Resource_List.pcput#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l pcput=">#PBS -l pcput=${ptp_rm:Resource_List.pcput#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l pmem=">#PBS -l pmem=${rm:Resource_List.pmem#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l pmem=">#PBS -l pmem=${ptp_rm:Resource_List.pmem#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l pvmem=">#PBS -l pvmem=${rm:Resource_List.pvmem#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l pvmem=">#PBS -l pvmem=${ptp_rm:Resource_List.pvmem#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l vmem=">#PBS -l vmem=${rm:Resource_List.vmem#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l vmem=">#PBS -l vmem=${ptp_rm:Resource_List.vmem#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -l walltime=">#PBS -l walltime=${rm:Resource_List.walltime#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -l walltime=">#PBS -l walltime=${ptp_rm:Resource_List.walltime#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -S">#PBS -S ${rm:Shell_Path_List#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -S">#PBS -S ${ptp_rm:Shell_Path_List#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -W stagein=">#PBS -W stagein=${rm:stagein#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -W stagein=">#PBS -W stagein=${ptp_rm:stagein#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -W stageout=">#PBS -W stageout=${rm:stageout#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -W stageout=">#PBS -W stageout=${ptp_rm:stageout#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -u">#PBS -u ${rm:User_List#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -u">#PBS -u ${ptp_rm:User_List#value}</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="#PBS -v">#PBS -v ${rm:Variable_List#value}</arg>
+            <arg isUndefinedIfMatches="#PBS -v">#PBS -v ${ptp_rm:Variable_List#value}</arg>
          </line>
          <line>
-            <arg>MPI_ARGS="-np ${rm:mpiCores#value}"</arg>
+            <arg>MPI_ARGS="-np ${ptp_rm:mpiCores#value}"</arg>
          </line>
          <line>
             <arg resolve="false">if [ "-np" == "$MPI_ARGS" ] ; then</arg>
@@ -363,10 +363,10 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
             <arg resolve="false">fi</arg>
          </line>
          <line>
-            <arg>OUT=${rm:Job_Name#value}.out</arg>
+            <arg>OUT=${ptp_rm:Job_Name#value}.out</arg>
          </line>
          <line>
-            <arg>MPI_COMMAND=${rm:mpiCommand#value}</arg>
+            <arg>MPI_COMMAND=${ptp_rm:mpiCommand#value}</arg>
          </line>
          <line>
             <arg resolve="false">if [ -n "${MPI_COMMAND}" ] ; then</arg>
@@ -378,11 +378,11 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
             <arg resolve="false">fi</arg>
          </line>
          <line>
-            <arg isUndefinedIfMatches="cd">cd ${rm:directory#value}</arg>
+            <arg isUndefinedIfMatches="cd">cd ${ptp_rm:directory#value}</arg>
          </line>
          <line>
             <arg resolve="false">${MPI_COMMAND} </arg>
-            <arg>${rm:executablePath#value} ${rm:progArgs#value}</arg>
+            <arg>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</arg>
             <arg resolve="false">&gt;&amp; ${PBS_JOBID}.out</arg>
          </line>
          <line>
@@ -406,7 +406,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
       </start-up-command>
       <submit-batch name="submit-batch" waitForId="true">
          <arg>qsub</arg>
-         <arg>${rm:managed_file_for_script#value}</arg>
+         <arg>${ptp_rm:managed_file_for_script#value}</arg>
          <stdout-parser delim="\n" all="true" save="1">
             <target ref="@jobId">
                <match>
@@ -423,7 +423,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
       </submit-batch>
       <get-job-status name="get-job-status" ignoreExitStatus="true">
          <arg>qstat</arg>
-         <arg>${rm:@jobId#name}</arg>
+         <arg>${ptp_rm:@jobId#name}</arg>
          <stdout-parser delim="\n">
             <target ref="@jobId">
                <match>
@@ -489,7 +489,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
       </get-job-status>
       <terminate-job name="cancel">
          <arg>qdel</arg>
-         <arg>${rm:@jobId#name}</arg>
+         <arg>${ptp_rm:@jobId#name}</arg>
       </terminate-job>
       <launch-tab>
          <basic>
@@ -523,7 +523,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <tooltip>${rm:Job_Name#tooltip}</tooltip>
+                  <tooltip>${ptp_rm:Job_Name#tooltip}</tooltip>
                   <fixed-text>Job Name: </fixed-text>
                </widget>
                <widget type="text" style="SWT.BORDER" saveValueTo="Job_Name">
@@ -535,14 +535,14 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <fixed-text>${rm:Job_Name#description}</fixed-text>
+                  <fixed-text>${ptp_rm:Job_Name#description}</fixed-text>
                </widget>
                <!-- row 2 -->
                <widget type="label" style="SWT.LEFT">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <tooltip>${rm:destination#tooltip}</tooltip>
+                  <tooltip>${ptp_rm:destination#tooltip}</tooltip>
                   <fixed-text>Queue: </fixed-text>
                </widget>
                <widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
@@ -555,14 +555,14 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <fixed-text>${rm:destination#description}</fixed-text>
+                  <fixed-text>${ptp_rm:destination#description}</fixed-text>
                </widget>
                <!-- row 3 -->
                <widget type="label" style="SWT.LEFT">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <tooltip>${rm:Resource_List.nodes#tooltip}</tooltip>
+                  <tooltip>${ptp_rm:Resource_List.nodes#tooltip}</tooltip>
                   <fixed-text>Number of nodes: </fixed-text>
                </widget>
                <widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.nodes">
@@ -574,14 +574,14 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <fixed-text>${rm:Resource_List.nodes#description}</fixed-text>
+                  <fixed-text>${ptp_rm:Resource_List.nodes#description}</fixed-text>
                </widget>
                <!-- row 4 -->
                <widget type="label" style="SWT.LEFT">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <tooltip>${rm:Resource_List.mem#tooltip}</tooltip>
+                  <tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
                   <fixed-text>Total Memory Needed: </fixed-text>
                </widget>
                <widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
@@ -593,14 +593,14 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <fixed-text>${rm:Resource_List.mem#description}</fixed-text>
+                  <fixed-text>${ptp_rm:Resource_List.mem#description}</fixed-text>
                </widget>
                <!-- row 5 -->
                <widget type="label" style="SWT.LEFT">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
+                  <tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
                   <fixed-text>Wallclock Time: </fixed-text>
                </widget>
                <widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
@@ -612,7 +612,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <fixed-text>${rm:Resource_List.walltime#description}</fixed-text>
+                  <fixed-text>${ptp_rm:Resource_List.walltime#description}</fixed-text>
                </widget>
                <!-- row 6 -->
                <widget type="label" style="SWT.LEFT">
@@ -630,7 +630,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <fixed-text>${rm:mpiCommand#description}</fixed-text>
+                  <fixed-text>${ptp_rm:mpiCommand#description}</fixed-text>
                </widget>
                <!-- row 7 -->
                <widget type="label" style="SWT.LEFT">
@@ -648,7 +648,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                   <layout-data>
                      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                   </layout-data>
-                  <fixed-text>${rm:mpiCores#description}</fixed-text>
+                  <fixed-text>${ptp_rm:mpiCores#description}</fixed-text>
                </widget>
             </composite>
          </basic>
@@ -669,7 +669,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                      <layout-data>
                         <grid-data horizontalAlign="SWT.BEGINNING"/>
                      </layout-data>
-                     <tooltip>${rm:destination#tooltip}</tooltip>
+                     <tooltip>${ptp_rm:destination#tooltip}</tooltip>
                      <fixed-text>Queue: </fixed-text>
                   </widget>
                   <widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
@@ -683,8 +683,8 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                         <grid-data widthHint="600" heightHint="75" horizontalSpan="3"/>
                      </layout-data>
                      <dynamic-text>
-                        <arg>${rm:allAttributes#value}</arg>
-                        <arg isUndefinedIfMatches=" destination=''"> destination='${rm:destination#value}'</arg>
+                        <arg>${ptp_rm:allAttributes#value}</arg>
+                        <arg isUndefinedIfMatches=" destination=''"> destination='${ptp_rm:destination#value}'</arg>
                      </dynamic-text>
                   </widget>
                </composite>

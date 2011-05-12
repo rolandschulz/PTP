@@ -33,13 +33,13 @@
          point="org.eclipse.core.variables.dynamicVariables">
       <variable
             description="Dynamic resource manager configuration variable"
-            name="rm"
+            name="ptp_rm"
             resolver="org.eclipse.ptp.rm.jaxb.core.variables.RMVariableResolver"
             supportsArgument="true">
       </variable>
       <variable
             description="Dynamic variable backed by LaunchConfiguration"
-            name="lc"
+            name="ptp_lc"
             resolver="org.eclipse.ptp.rm.jaxb.core.variables.LCVariableResolver">
       </variable>
    </extension>

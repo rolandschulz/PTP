@@ -13,7 +13,7 @@
 	<control-data>
 		<property name="queues" visible="false"/>
 		<property name="mpiPrefix" visible="false">
-			<default>${rm:mpiCommand#value} -np ${rm:mpiCores#value}</default>
+			<default>${ptp_rm:mpiCommand#value} -np ${ptp_rm:mpiCores#value}</default>
 		</property>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
@@ -56,11 +56,11 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		<submit-interactive name="submit-interactive" waitForId="true" keepOpen="true" flags="ALLOCATE_PTY">
 			<arg>qsub</arg>
 			<arg>-I</arg>
-			<arg>-q ${rm:destination#value}</arg>
-			<arg>-l nodes=1,mem=${rm:Resource_List.mem#value},walltime=${rm:Resource_List.walltime#value}</arg>
+			<arg>-q ${ptp_rm:destination#value}</arg>
+			<arg>-l nodes=1,mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			<arg>-V</arg>
-			<input isUndefinedIfMatches=".+ -np">${rm:mpiPrefix#value}</input>
-			<input>${rm:executablePath#value} ${rm:progArgs#value}</input>
+			<input isUndefinedIfMatches=".+ -np">${ptp_rm:mpiPrefix#value}</input>
+			<input>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</input>
 			<stdout-parser delim="\n">
 			   <target ref="@jobId">
                <match>
@@ -91,7 +91,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					<match>
 						<expression>.+</expression>
 						<set field="name">
-							<entry value="${rm:@jobId#name}"/>
+							<entry value="${ptp_rm:@jobId#name}"/>
 						</set>
 						<set field="value">
 							<entry value="FAILED"/>
@@ -102,7 +102,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		</submit-interactive>
 		<terminate-job name="cancel" ignoreExitStatus="true">
          <arg>qdel</arg>
-         <arg>${rm:@jobId#name}</arg>
+         <arg>${ptp_rm:@jobId#name}</arg>
       </terminate-job>
 		<launch-tab>
 			<dynamic>
@@ -116,7 +116,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"/>
 						</layout-data>
-						<tooltip>${rm:destination#tooltip}</tooltip>
+						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 						<fixed-text>Queue: </fixed-text>
 					</widget>
 					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
@@ -155,7 +155,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${rm:Resource_List.mem#tooltip}</tooltip>
+						<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
 						<fixed-text>Total Memory Needed: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
@@ -167,14 +167,14 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${rm:Resource_List.mem#description}</fixed-text>
+						<fixed-text>${ptp_rm:Resource_List.mem#description}</fixed-text>
 					</widget>
 					<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${rm:Resource_List.walltime#tooltip}</tooltip>
+						<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
 						<fixed-text>Wallclock Time: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
@@ -186,7 +186,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${rm:Resource_List.walltime#description}</fixed-text>
+						<fixed-text>${ptp_rm:Resource_List.walltime#description}</fixed-text>
 					</widget>
 					<!-- row 3 -->
 					<widget type="label" style="SWT.LEFT">
@@ -204,7 +204,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${rm:mpiCommand#description}</fixed-text>
+						<fixed-text>${ptp_rm:mpiCommand#description}</fixed-text>
 					</widget>
 					<!-- row 4 -->
 					<widget type="label" style="SWT.LEFT">
@@ -222,7 +222,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${rm:mpiCores#description}</fixed-text>
+						<fixed-text>${ptp_rm:mpiCores#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>

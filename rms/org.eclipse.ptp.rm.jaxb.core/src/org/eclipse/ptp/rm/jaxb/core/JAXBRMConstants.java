@@ -53,10 +53,9 @@ public class JAXBRMConstants {
 	public static final String OPENP = "(";//$NON-NLS-1$
 	public static final String OPENSQ = "[";//$NON-NLS-1$
 	public static final String OPENV = "${";//$NON-NLS-1$
-	public static final String OPENVRM = "${rm:";//$NON-NLS-1$
-	public static final String OPENVLT = "${lt:";//$NON-NLS-1$
-	public static final String VRM = "rm:";//$NON-NLS-1$
-	public static final String VLC = "lc:";//$NON-NLS-1$
+	public static final String OPENVRM = "${ptp_rm:";//$NON-NLS-1$
+	public static final String VRM = "ptp_rm:";//$NON-NLS-1$
+	public static final String VLC = "ptp_lc:";//$NON-NLS-1$
 	public static final String CLOSP = ")";//$NON-NLS-1$
 	public static final String CLOSSQ = "]";//$NON-NLS-1$
 	public static final String CLOSV = "}";//$NON-NLS-1$
