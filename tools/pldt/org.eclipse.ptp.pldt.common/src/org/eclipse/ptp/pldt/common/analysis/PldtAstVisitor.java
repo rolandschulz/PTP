@@ -21,6 +21,7 @@ import org.eclipse.cdt.core.dom.ast.ASTVisitor;
 import org.eclipse.cdt.core.dom.ast.IASTDeclaration;
 import org.eclipse.cdt.core.dom.ast.IASTExpression;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
+import org.eclipse.cdt.core.dom.ast.IASTFunctionCallExpression;
 import org.eclipse.cdt.core.dom.ast.IASTIdExpression;
 import org.eclipse.cdt.core.dom.ast.IASTLiteralExpression;
 import org.eclipse.cdt.core.dom.ast.IASTMacroExpansion;
@@ -59,7 +60,7 @@ import org.eclipse.ui.PlatformUI;
  * @since 4.0
  * 
  */
-public class PldtAstVisitor extends CASTVisitor {
+public abstract class PldtAstVisitor extends CASTVisitor {
 
 	/**
 	 * @since 4.0
@@ -74,7 +75,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	private static/* final */boolean traceOn = false;
 
 	private static boolean dontAskToModifyIncludePathAgain = false;
-	protected boolean allowPrefixOnlyMatch = false;
+	protected boolean allowPrefixOnlyMatch = true;
 
 	/**
 	 * List of include paths that we'll probably want to consider in the work that this visitor does.
@@ -132,6 +133,46 @@ public class PldtAstVisitor extends CASTVisitor {
 	}
 
 	/**
+	 * Visit an ast node of type IASTExpression. Most things tend to fall into this visit method. <br>
+	 * Version from MPI originally that seems best for all. Handles recognition within macro expansions
+	 * */
+	public int visit(IASTExpression expression) {
+		if (expression instanceof IASTFunctionCallExpression) {
+			IASTExpression astExpr = ((IASTFunctionCallExpression) expression)
+					.getFunctionNameExpression();
+			String signature = astExpr.getRawSignature();
+			// note: getRawSig is the name BEFORE being processed by preprocessor!
+			// but it seems to be empty if it's different.
+
+			// can we get post-pre-processor name here?
+			if (astExpr instanceof IASTIdExpression) {
+				IASTName tempFN = ((IASTIdExpression) astExpr).getName();
+				IBinding tempBIND = tempFN.resolveBinding();
+				String tempNAME = tempBIND.getName();
+				if (traceOn)
+					System.out.println("MCAV name: " + tempNAME + " rawsig: " + signature); //$NON-NLS-1$ //$NON-NLS-2$
+				// if e.g. preprocessor substitution used, use that for function name
+				boolean preProcUsed = !signature.equals(tempNAME);
+				if (preProcUsed) {
+					signature = tempNAME;
+				}
+			}
+			// still is IASTFunctionCallExpression
+			if (matchesPrefix(signature)) {
+				if (astExpr instanceof IASTIdExpression) {
+					IASTName funcName = ((IASTIdExpression) astExpr).getName();
+					// IBinding binding = funcName.resolveBinding();
+					// String name=binding.getName();// name ok for stdMake
+					processFuncName(funcName, astExpr);
+				}
+			}
+		} else if (expression instanceof IASTLiteralExpression) {
+			processMacroLiteral((IASTLiteralExpression) expression);
+		}
+		return PROCESS_CONTINUE;
+	}
+
+	/**
 	 * Skip decls that are included.
 	 * 
 	 * @param declaration
@@ -149,8 +190,8 @@ public class PldtAstVisitor extends CASTVisitor {
 	 * marked as an Artifact. If so, append it to the scanReturn object that
 	 * this visitor is populating.
 	 * 
-	 * An artifact is a function name that was found in the MPI include path,
-	 * as defined in the MPI preferences.
+	 * An artifact is a function name (or other identifier) that was found in the include path, or matched with prefix,
+	 * as defined in the preferences.
 	 * 
 	 * @param astExpr
 	 * @param funcName
@@ -158,7 +199,9 @@ public class PldtAstVisitor extends CASTVisitor {
 	public void processFuncName(IASTName funcName, IASTExpression astExpr) {
 		// IASTTranslationUnit tu = funcName.getTranslationUnit();
 		String strName = funcName.toString();
-		if ((this.allowPrefixOnlyMatch && matchesPrefix(strName)) || isArtifact(funcName)) { // brt C++ test 2/16/10
+
+		final boolean usePref = this.allowPrefixOnlyMatch;
+		if ((usePref && matchesPrefix(strName)) || (!usePref && isArtifact(funcName))) { // brt C++ test 2/16/10
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
 			if (sourceInfo != null) {
 				if (traceOn)
@@ -188,7 +231,8 @@ public class PldtAstVisitor extends CASTVisitor {
 		IASTName funcName = ((IASTIdExpression) astExpr).getName();
 		// IASTTranslationUnit tu = funcName.getTranslationUnit();
 		String strName = funcName.toString();
-		if ((this.allowPrefixOnlyMatch && matchesPrefix(strName)) || isArtifact(funcName)) {
+		final boolean usePref = this.allowPrefixOnlyMatch;// only to make next line short/readable
+		if ((usePref && matchesPrefix(strName)) || (!usePref && isArtifact(funcName))) {
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
 			if (sourceInfo != null) {
 				// System.out.println("found MPI artifact: " + funcName.toString());
@@ -233,9 +277,8 @@ public class PldtAstVisitor extends CASTVisitor {
 				return true;
 			} else {
 				if (traceOn) {
-					System.out
-							.println(name
-									+ " was found in " + path + " but  PLDT preferences have been set to only include: " + includes_.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+					System.out.println(name + " was found in " + path
+							+ " but  PLDT preferences have been set to only include: " + includes_.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				// add them here?
 				if (allowIncludePathAdd()) {
@@ -338,7 +381,7 @@ public class PldtAstVisitor extends CASTVisitor {
 			else if (locations[0] instanceof IASTMacroExpansion) {
 				IASTMacroExpansion me = (IASTMacroExpansion) locations[0];
 				astFileLocation = me.asFileLocation();
-			}
+			} // will it be a (new, replacing IASTMacroExpansion) IASTMacroExpansionLocation now??
 			if (astFileLocation != null) {
 				sourceInfo = new SourceInfo();
 				sourceInfo.setStartingLine(astFileLocation.getStartingLineNumber());
@@ -585,14 +628,14 @@ public class PldtAstVisitor extends CASTVisitor {
 	/**
 	 * will be overridden where needed; note that for C code, the test for if
 	 * the prefix matches has already been done before this is called so this
-	 * test isn't necessary. FIXME improve this convoluted logic
+	 * test isn't necessary. In this case the subclass should implement it and always return true,
+	 * but with increased use of "recognize artifact by prefix only" this becomes more important.
+	 * FIXME improve this convoluted logic
 	 * 
 	 * @param name
 	 * @return
 	 * @since 4.0
 	 */
-	public boolean matchesPrefix(String name) {
-		return true;
-	}
+	abstract public boolean matchesPrefix(String name);
 
 }
