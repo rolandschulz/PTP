@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,10 +20,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.managedbuilder.xlc.ui.messages.Messages;
-import org.eclipse.rse.core.model.IHost;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -44,20 +45,26 @@ public class RemoteXLCompilerPropertyPage extends XLCompilerPropertyPage {
 		IProject thisProject = ((IResource) (getElement().getAdapter(IResource.class))).getProject();
 		if (RemoteNature.hasRemoteNature(thisProject)) {
 			createPathEditor4RemoteProject();
-
 		} else {
 			super.createPathEditor();
 		}
 	}
 	
+		
 	/**
-	 * Get the remote host of the given project
+	 * Get the remote connection of a given project
 	 * @param project
-	 * @return
-	 * @since 2.1
+	 * @since 3.0
 	 */
-	protected IHost getRemoteHost(IProject project) {
-		return RSEUtils.getAnyConnection(project.getLocationURI());
+	protected IRemoteConnection getRemoteConnection(IProject project) {
+		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(null);
+		for (IRemoteServices provider:providers){
+			IRemoteConnection connection = provider.getConnectionManager().getConnection(project.getLocationURI());
+			if (connection != null) {
+				return connection;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -68,14 +75,14 @@ public class RemoteXLCompilerPropertyPage extends XLCompilerPropertyPage {
 		Composite parent = getFieldEditorParent();
 		final IProject thisProject = ((IResource) (getElement().getAdapter(IResource.class))).getProject();
 
-		IHost projectHost = getRemoteHost(thisProject);
+		IRemoteConnection projectConnection = getRemoteConnection(thisProject);
 
-		if (projectHost != null) {
+		if (projectConnection != null) {
 
-			final String projectHostName = projectHost.getHostName();
+			final String projectConnectionName = projectConnection.getName();
 
 			fPathEditor = new RemoteDirectoryFieldEditor(PreferenceConstants.P_XL_COMPILER_ROOT, Messages.getString(
-					"REMOTEXLCompilerPropertyPage_0", projectHost.getHostName()), parent, projectHost) { //$NON-NLS-1$
+					"REMOTEXLCompilerPropertyPage_0", projectConnection.getName()), parent, projectConnection) { //$NON-NLS-1$
 				@Override
 				protected boolean doCheckState() {
 					// try to get a connected connection, if the host connection
@@ -85,17 +92,17 @@ public class RemoteXLCompilerPropertyPage extends XLCompilerPropertyPage {
 					// browse
 					// button, a connection dialog will be pop up if the host
 					// connection is disconnected.
-					IHost projectConnectedHost = getRemoteHost(thisProject);
-					if (projectConnectedHost == null) {
+					IRemoteConnection projectConnectedConnection = getRemoteConnection(thisProject);
+					if (projectConnectedConnection == null) {
 
 						setMessage(
-								Messages.getString("XLCompilerPropertyPage_DisconnectedErrorMsg", projectHostName), IMessageProvider.WARNING); //$NON-NLS-1$
+								Messages.getString("XLCompilerPropertyPage_DisconnectedErrorMsg", projectConnectionName), IMessageProvider.WARNING); //$NON-NLS-1$
 
 					}
 					// always return true, as we don't want to fail cases when
 					// compiler path is not existed
 					else if (!super.doCheckState()) {
-						setMessage(Messages.getString("XLCompilerPropertyPage_ErrorMsg", projectHostName), IMessageProvider.WARNING); //$NON-NLS-1$
+						setMessage(Messages.getString("XLCompilerPropertyPage_ErrorMsg", projectConnectedConnection.getName()), IMessageProvider.WARNING); //$NON-NLS-1$
 					} else {
 						setMessage(originalMessage);
 					}
