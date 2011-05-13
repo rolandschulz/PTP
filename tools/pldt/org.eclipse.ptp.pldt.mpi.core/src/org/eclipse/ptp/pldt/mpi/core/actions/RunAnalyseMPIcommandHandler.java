@@ -72,7 +72,7 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 				// null IASTTranslationUnit when we're doing C/C++ means we should quit.
 				// but want to continue to see if this is a fortran file we are analyzing.
 				if (atu == null) {// this is null for Fortran file during JUnit testing.
-					System.out.println("RunAnalyseMPICommandHandler.doArtifactAnalysis(), atu is null (testing?)");
+					System.out.println("RunAnalyseMPICommandHandler.doArtifactAnalysis(), atu is null (Fortran testing?)");
 					return msr;
 				}
 			}
