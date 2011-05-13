@@ -361,9 +361,9 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					// Replace the remote environment with the one specified by the build properties.
 					// It will already be a modified list that originated with the remote environment and was then
 					// modified by the user, so we'll respect the user's edits and replace the environment entirely.
-					remoteEnvMap.clear();
-
-					remoteEnvMap.putAll(envMap);
+//					remoteEnvMap.clear();
+//
+//					remoteEnvMap.putAll(envMap);
 					
 					// set the directory in which to run the command
 					IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
