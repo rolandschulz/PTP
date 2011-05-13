@@ -6,8 +6,6 @@ import org.eclipse.core.commands.ExecutionException;
 
 public class HideTableColumnAction extends AbstractHandler {
 
-
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		System.out.println("Ich bin hier");
 		return null;

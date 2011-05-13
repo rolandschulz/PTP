@@ -109,22 +109,21 @@ public class NodesView extends LMLViewPart {
 		if (!composite.isDisposed()) {
 			if (fLguiItem != null) {
 				this.setPartName(fLguiItem.getNodedisplayAccess().toString());
-				nodedisplayView = new NodedisplayView(fLguiItem, fLguiItem.getNodedisplayAccess().getNodedisplays().get(0), composite);
+				nodedisplayView = new NodedisplayView(fLguiItem, fLguiItem.getNodedisplayAccess().getNodedisplays().get(0),
+						composite);
 				composite.layout();
 			} else {
 				setPartName("NodedisplayView");
 			}
 			composite.addDisposeListener(new DisposeListener() {
 
-				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					lmlManager.removeView(gid);
-					
+
 				}
-				
+
 			});
 		}
-		
 
 	}
 

@@ -41,24 +41,21 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.progress.UIJob;
 
 public class ViewManager {
-	
+
 	public class ViewListener implements IViewListener {
 
-		@Override
 		public void handleEvent(ILguiAddedEvent e) {
 			deleteOldViews();
 			selectedLgui = e.getLguiItem();
 			generateNewViews();
-			
+
 			selectedLgui.getObjectStatus().addComponent(new EventForwarder());
 		}
 
-		@Override
 		public void handleEvent(ILguiRemovedEvent e) {
-				
+
 		}
 
-		@Override
 		public void handleEvent(ILguiSelectedEvent e) {
 			deleteOldViews();
 			selectedLgui = e.getLguiItem();
@@ -67,24 +64,22 @@ public class ViewManager {
 			}
 		}
 
-		@Override
 		public void handleEvent(IViewAddedEvent e) {
 			addView(e.getGid(), e.getType());
 		}
 
-		@Override
 		public void handleEvent(IViewDisposedEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
+
 	}
-	
-public class RunNodedisplayUIJob extends UIJob {
-		
+
+	public class RunNodedisplayUIJob extends UIJob {
+
 		private String gid = null;
 		private IViewPart view = null;
-		
+
 		public RunNodedisplayUIJob(String gid, IViewPart view) {
 			super(gid);
 			this.gid = gid;
@@ -93,17 +88,17 @@ public class RunNodedisplayUIJob extends UIJob {
 
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
-			((NodesView)view).generateNodesdisplay(gid);
+			((NodesView) view).generateNodesdisplay(gid);
 			return Status.OK_STATUS;
 		}
-		
+
 	}
-	
+
 	public class RunTableUIJob extends UIJob {
-		
+
 		private String gid = null;
 		private IViewPart view = null;
-		
+
 		public RunTableUIJob(String gid, IViewPart view) {
 			super(gid);
 			this.gid = gid;
@@ -115,40 +110,39 @@ public class RunNodedisplayUIJob extends UIJob {
 			((TableView) view).generateTable(gid);
 			return Status.OK_STATUS;
 		}
-		
+
 	}
-	
+
 	protected ILguiItem selectedLgui = null;
-	
+
 	public ILMLManager lmlManager = null;
-	
+
 	public IViewListener viewListener = new ViewListener();
-	
+
 	public IWorkbenchPage activePage = null;
-	
+
 	public int i = 0;
-	
+
 	public int j = 0;
-	
-	
+
 	public ViewManager() {
 		lmlManager = LMLCorePlugin.getDefault().getLMLManager();
 		lmlManager.addListener(viewListener);
 	}
-	
+
 	public void shutDown() {
 		lmlManager.removeListener(viewListener);
 	}
-	
+
 	private void deleteOldViews() {
 		if (selectedLgui == null) {
 			return;
 		}
 		activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
 		IViewReference[] views = activePage.getViewReferences();
-		
+
 		for (IViewReference view : views) {
-			if(!view.getPartName().equals("LML")) {
+			if (!view.getPartName().equals("LML")) {
 				if (view.getView(false) instanceof LMLViewPart) {
 					((LMLViewPart) view.getView(false)).prepareDispose();
 				}
@@ -159,7 +153,7 @@ public class RunNodedisplayUIJob extends UIJob {
 		i = 0;
 		j = 0;
 	}
-	
+
 	private void generateTable(String gid) {
 		try {
 			IViewPart view = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(i), activePage.VIEW_VISIBLE);
@@ -171,7 +165,7 @@ public class RunNodedisplayUIJob extends UIJob {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void generateNodedisplay(String gid) {
 		try {
 			IViewPart view = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(j), activePage.VIEW_VISIBLE);
@@ -183,10 +177,10 @@ public class RunNodedisplayUIJob extends UIJob {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void generateNewViews() {
 		activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
-		String[] activeTableLayoutsGid = selectedLgui.getLayoutAccess().getActiveTableLayoutsGid(); 
+		String[] activeTableLayoutsGid = selectedLgui.getLayoutAccess().getActiveTableLayoutsGid();
 		for (String gid : activeTableLayoutsGid) {
 			generateTable(gid);
 		}

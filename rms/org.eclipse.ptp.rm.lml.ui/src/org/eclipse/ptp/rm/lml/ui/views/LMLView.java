@@ -41,8 +41,8 @@ import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.ui.actions.AddLguiAction;
 import org.eclipse.ptp.rm.lml.ui.actions.RemoveLguiAction;
-import org.eclipse.ptp.rm.lml.ui.actions.UpdateLguiAction;
 import org.eclipse.ptp.rm.lml.ui.actions.ShowViewAction;
+import org.eclipse.ptp.rm.lml.ui.actions.UpdateLguiAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -62,7 +62,6 @@ public class LMLView extends ViewPart {
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILguiListener# handleEvent
 		 * (org.eclipse.ptp.core.events.ILguiAddedEvent)
 		 */
-		@Override
 		public synchronized void handleEvent(ILguiAddedEvent e) {
 			fSelected = e.getLguiItem();
 			createList();
@@ -74,28 +73,24 @@ public class LMLView extends ViewPart {
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILguiListener# handleEvent
 		 * (org.eclipse.ptp.core.events.ILguiRemovedEvent)
 		 */
-		@Override
 		public synchronized void handleEvent(ILguiRemovedEvent e) {
 			fSelected = e.getLguiItem();
 			createList();
 		}
 
-		@Override
 		public void handleEvent(ILguiSelectedEvent e) {
 			fSelected = e.getLguiItem();
 			createList();
 
 		}
 
-		@Override
 		public void handleEvent(IViewAddedEvent e) {
-			
+
 		}
 
-		@Override
 		public void handleEvent(IViewDisposedEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 	}
@@ -133,6 +128,7 @@ public class LMLView extends ViewPart {
 	public void createPartControl(Composite parent) {
 		viewer = new ListViewer(parent, SWT.SINGLE);
 		viewer.setLabelProvider(new LabelProvider() {
+			@Override
 			public String getText(Object element) {
 				return element.toString();
 			}
@@ -215,14 +211,14 @@ public class LMLView extends ViewPart {
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		MenuManager subMenu = new MenuManager("Show View...");
 		if (inContextForLgui) {
-			String [] gids = lmlManager.getSelectedLguiItem().getLayoutAccess().getInactiveComponents();
+			String[] gids = lmlManager.getSelectedLguiItem().getLayoutAccess().getInactiveComponents();
 			for (String gid : gids) {
 				subMenu.add(new ShowViewAction(gid));
 			}
 		}
 		manager.add(subMenu);
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		
+
 	}
 
 }

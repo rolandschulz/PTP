@@ -19,10 +19,7 @@ package org.eclipse.ptp.rm.lml.ui.views;
 //import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
-//import org.eclipse.jface.viewers.ISelectionChangedListener;
-//import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-//import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.lml.core.ILMLManager;
@@ -39,7 +36,6 @@ import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
 import org.eclipse.ptp.rm.lml.internal.core.model.Cell;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
-//import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -74,17 +70,14 @@ public class TableView extends LMLViewPart {
 			this.viewer = viewer;
 		}
 
-		@Override
 		public void dispose() {
 
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			this.rows = (Row[]) newInput;
 		}
 
-		@Override
 		public void updateElement(Object parent, int index) {
 			Object element;
 			if (parent instanceof Row) {
@@ -97,12 +90,10 @@ public class TableView extends LMLViewPart {
 
 		}
 
-		@Override
 		public void updateChildCount(Object element, int currentChildCount) {
 
 		}
 
-		@Override
 		public Object getParent(Object element) {
 			if (element instanceof Cell) {
 				return ((Cell) element).row;
@@ -134,36 +125,36 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(ISelectedObjectChangeEvent event) {
 			if (!composite.isDisposed()) {
 				tree.deselectAll();
-			
-			Row[] rows = null;
-			if (viewer.getInput() instanceof Row[]) {
-				rows = (Row[]) viewer.getInput();
-			}
-			int index = -1;
-			for (int i = 0; i < rows.length; i++) {
-				if (rows[i].oid.equals(event.getOid())) {
-					index = i;
-					break;
+
+				Row[] rows = null;
+				if (viewer.getInput() instanceof Row[]) {
+					rows = (Row[]) viewer.getInput();
 				}
-			}
-			if (index > -1) {
-				tree.select(tree.getItem(index));
-			}
+				int index = -1;
+				for (int i = 0; i < rows.length; i++) {
+					if (rows[i].oid.equals(event.getOid())) {
+						index = i;
+						break;
+					}
+				}
+				if (index > -1) {
+					tree.select(tree.getItem(index));
+				}
 			}
 
 		}
 
 		public void handleEvent(IMarkObjectEvent event) {
 			selectedOid = event.getOid();
-			if(!composite.isDisposed()) {
+			if (!composite.isDisposed()) {
 				viewer.refresh();
 			}
-			
+
 		}
 
 		public void handleEvent(IUnmarkObjectEvent event) {
 			selectedOid = null;
-			if(!composite.isDisposed()) {
+			if (!composite.isDisposed()) {
 				viewer.refresh();
 			}
 		}
@@ -172,7 +163,7 @@ public class TableView extends LMLViewPart {
 			if (!composite.isDisposed()) {
 				tree.deselectAll();
 			}
-			
+
 		}
 	}
 
@@ -188,10 +179,10 @@ public class TableView extends LMLViewPart {
 	private final ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager();
 	private TreeItem selectedItem = null;
 	private String selectedOid = null;
-	
-//	private Action addItemAction;
-//	private Action deleteItemAction;
-//	private Action selectAllAction;
+
+	// private Action addItemAction;
+	// private Action deleteItemAction;
+	// private Action selectAllAction;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -200,25 +191,20 @@ public class TableView extends LMLViewPart {
 
 		viewer = new TreeViewer(composite, SWT.SINGLE | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.VIRTUAL);
 		viewer.setLabelProvider(new ITableLabelProvider() {
-			@Override
 			public void addListener(ILabelProviderListener listener) {
 			}
 
-			@Override
 			public void dispose() {
 			}
 
-			@Override
 			public boolean isLabelProperty(Object element, String property) {
 				return false;
 			}
 
-			@Override
 			public void removeListener(ILabelProviderListener listener) {
 
 			}
 
-			@Override
 			public Image getColumnImage(Object element, int columnIndex) {
 				if (columnIndex == 0) {
 					Display display = treeColumns[columnIndex].getDisplay();
@@ -240,7 +226,6 @@ public class TableView extends LMLViewPart {
 				return null;
 			}
 
-			@Override
 			public String getColumnText(Object element, int columnIndex) {
 				if (columnIndex == 0 || ((Row) element).cells[columnIndex - 1] == null) {
 					return null;
@@ -249,7 +234,7 @@ public class TableView extends LMLViewPart {
 			}
 
 		});
-		
+
 		viewer.setContentProvider(new ContentProvider(viewer));
 		lmlManager.addListener(lmlListener, this.getClass().getName());
 		tree = viewer.getTree();
@@ -274,12 +259,11 @@ public class TableView extends LMLViewPart {
 		createTable();
 		composite.addDisposeListener(new DisposeListener() {
 
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				lmlManager.removeView(gid);
-				
+
 			}
-			
+
 		});
 	}
 
@@ -315,82 +299,83 @@ public class TableView extends LMLViewPart {
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
 		createColumns();
-//		createActions();
-//		createMenu();
-//		createToolbar();
+		// createActions();
+		// createMenu();
+		// createToolbar();
 		input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
 		viewer.setInput(input);
 		viewer.getTree().setItemCount(input.length);
 	}
 
-
-//	private void createActions() {
-//		addItemAction = new Action("Add...") {
-//			@Override
-//			public void run() {
-//				addItem();
-//			}
-//
-//			private void addItem() {
-//				System.out.println("Add");
-//			}
-//		};
-//		addItemAction.setImageDescriptor(getImageDescriptor("parallel.gif"));
-//		
-//		deleteItemAction = new Action("Delete...") {
-//			@Override
-//			public void run() {
-//				deleteItem();
-//			}
-//
-//			private void deleteItem() {
-//				System.out.println("Delete");
-//			}
-//		};
-//		deleteItemAction.setImageDescriptor(getImageDescriptor("legend.gif"));
-//		
-//		selectAllAction = new Action("Select all...") {
-//			@Override
-//			public void run() {
-//				selectAll();
-//			}
-//
-//			private void selectAll() {
-//				System.out.println("Select all");
-//			}
-//		};
-//		
-//		viewer.addSelectionChangedListener(new ISelectionChangedListener(){
-//			public void selectionChanged(SelectionChangedEvent event) {
-//				updateActionEnablement();
-//			}
-//		});
-//	}
-//
-//	private void updateActionEnablement() {
-//		IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
-//		deleteItemAction.setEnabled(sel.size() > 0);
-//	}
-//	
-//	public void createMenu(){
-//		IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
-//		System.out.println(menuManager);
-//		menuManager.add(selectAllAction);
-//	}
-//	
-//	private void createToolbar() {
-//		IToolBarManager toolbarManager = getViewSite().getActionBars().getToolBarManager();
-//		toolbarManager.add(addItemAction);
-//		toolbarManager.add(deleteItemAction);
-//	}
-//
-//	private ImageDescriptor getImageDescriptor(String relativePath) {
-//		String iconPath = "icons/";
-//        LMLUIPlugin plugin = LMLUIPlugin.getDefault();
-//		URL url = plugin.getBundle().getEntry(iconPath + relativePath);
-//		return ImageDescriptor.createFromURL(url);
-//
-//	}
+	// private void createActions() {
+	// addItemAction = new Action("Add...") {
+	// @Override
+	// public void run() {
+	// addItem();
+	// }
+	//
+	// private void addItem() {
+	// System.out.println("Add");
+	// }
+	// };
+	// addItemAction.setImageDescriptor(getImageDescriptor("parallel.gif"));
+	//
+	// deleteItemAction = new Action("Delete...") {
+	// @Override
+	// public void run() {
+	// deleteItem();
+	// }
+	//
+	// private void deleteItem() {
+	// System.out.println("Delete");
+	// }
+	// };
+	// deleteItemAction.setImageDescriptor(getImageDescriptor("legend.gif"));
+	//
+	// selectAllAction = new Action("Select all...") {
+	// @Override
+	// public void run() {
+	// selectAll();
+	// }
+	//
+	// private void selectAll() {
+	// System.out.println("Select all");
+	// }
+	// };
+	//
+	// viewer.addSelectionChangedListener(new ISelectionChangedListener(){
+	// public void selectionChanged(SelectionChangedEvent event) {
+	// updateActionEnablement();
+	// }
+	// });
+	// }
+	//
+	// private void updateActionEnablement() {
+	// IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
+	// deleteItemAction.setEnabled(sel.size() > 0);
+	// }
+	//
+	// public void createMenu(){
+	// IMenuManager menuManager =
+	// getViewSite().getActionBars().getMenuManager();
+	// System.out.println(menuManager);
+	// menuManager.add(selectAllAction);
+	// }
+	//
+	// private void createToolbar() {
+	// IToolBarManager toolbarManager =
+	// getViewSite().getActionBars().getToolBarManager();
+	// toolbarManager.add(addItemAction);
+	// toolbarManager.add(deleteItemAction);
+	// }
+	//
+	// private ImageDescriptor getImageDescriptor(String relativePath) {
+	// String iconPath = "icons/";
+	// LMLUIPlugin plugin = LMLUIPlugin.getDefault();
+	// URL url = plugin.getBundle().getEntry(iconPath + relativePath);
+	// return ImageDescriptor.createFromURL(url);
+	//
+	// }
 
 	private int getColumnAlignment(String alignment) {
 		if (alignment.equals("LEFT")) {

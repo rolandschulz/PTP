@@ -261,12 +261,11 @@ public class LMLManager implements ILMLManager {
 		}
 	}
 
-	@Override
 	public void addView(String gid) {
 		String type = fSelectedLguiItem.getLayoutAccess().setComponentActive(gid, true);
 		fireAddView(gid, type);
 	}
-	
+
 	private void fireAddView(String gid, String type) {
 		IViewAddedEvent event = new ViewAddedEvent(gid, type);
 		for (Object listener : viewListeners.getListeners()) {
@@ -274,7 +273,6 @@ public class LMLManager implements ILMLManager {
 		}
 	}
 
-	@Override
 	public void removeView(String gid) {
 		fSelectedLguiItem.getLayoutAccess().setComponentActive(gid, false);
 		fireremoveView(gid);
