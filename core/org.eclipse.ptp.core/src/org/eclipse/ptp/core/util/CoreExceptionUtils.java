@@ -18,6 +18,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
  * Convenience methods for handling CoreExceptions and Status.ERROR.
  * 
  * @author arossi
+ * @since 5.0
  */
 public class CoreExceptionUtils {
 

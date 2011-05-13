@@ -20,9 +20,10 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.messages.Messages;
 
 /**
@@ -148,22 +149,21 @@ public class RemoteServicesDelegate {
 	public static void copy(IRemoteFileManager from, String source, IRemoteFileManager to, String target, IProgressMonitor progress)
 			throws CoreException {
 		if (from == null) {
-			throw CoreExceptionUtils.newException(Messages.Copy_Operation_NullSourceFileManager, null);
+			throw newException(Messages.Copy_Operation_NullSourceFileManager, null);
 		}
 		if (to == null) {
-			throw CoreExceptionUtils.newException(Messages.Copy_Operation_NullTargetFileManager, null);
+			throw newException(Messages.Copy_Operation_NullTargetFileManager, null);
 		}
 		if (source == null) {
-			throw CoreExceptionUtils.newException(Messages.Copy_Operation_NullSource, null);
+			throw newException(Messages.Copy_Operation_NullSource, null);
 		}
 		if (target == null) {
-			throw CoreExceptionUtils.newException(Messages.Copy_Operation_NullTarget, null);
+			throw newException(Messages.Copy_Operation_NullTarget, null);
 		}
 
 		IFileStore lres = from.getResource(source);
 		if (!lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5)).exists()) {
-			throw CoreExceptionUtils.newException(Messages.Copy_Operation_Local_resource_does_not_exist + COSP + lres.getName(),
-					null);
+			throw newException(Messages.Copy_Operation_Local_resource_does_not_exist + COSP + lres.getName(), null);
 		}
 		IFileStore rres = to.getResource(target);
 		lres.copy(rres, EFS.OVERWRITE, new SubProgressMonitor(progress, 5));
@@ -186,10 +186,10 @@ public class RemoteServicesDelegate {
 	public static boolean isStable(IRemoteFileManager manager, String path, int intervalInSecs, IProgressMonitor progress)
 			throws CoreException {
 		if (manager == null) {
-			throw CoreExceptionUtils.newException(Messages.Read_Operation_NullSourceFileManager, null);
+			throw newException(Messages.Read_Operation_NullSourceFileManager, null);
 		}
 		if (path == null) {
-			throw CoreExceptionUtils.newException(Messages.Read_Operation_NullPath, null);
+			throw newException(Messages.Read_Operation_NullPath, null);
 		}
 
 		IFileStore lres = manager.getResource(path);
@@ -218,15 +218,15 @@ public class RemoteServicesDelegate {
 	 */
 	public static String read(IRemoteFileManager manager, String path, IProgressMonitor progress) throws CoreException {
 		if (manager == null) {
-			throw CoreExceptionUtils.newException(Messages.Read_Operation_NullSourceFileManager, null);
+			throw newException(Messages.Read_Operation_NullSourceFileManager, null);
 		}
 		if (path == null) {
-			throw CoreExceptionUtils.newException(Messages.Read_Operation_NullPath, null);
+			throw newException(Messages.Read_Operation_NullPath, null);
 		}
 
 		IFileStore lres = manager.getResource(path);
 		if (!lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5)).exists()) {
-			throw CoreExceptionUtils.newException(Messages.Read_Operation_resource_does_not_exist + COSP + lres.getName(), null);
+			throw newException(Messages.Read_Operation_resource_does_not_exist + COSP + lres.getName(), null);
 		}
 		BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE, progress));
 		StringBuffer sb = new StringBuffer();
@@ -247,7 +247,7 @@ public class RemoteServicesDelegate {
 				sb.append(new String(buffer, 0, rcvd));
 			}
 		} catch (IOException ioe) {
-			throw CoreExceptionUtils.newException(Messages.Read_OperationFailed + path, null);
+			throw newException(Messages.Read_OperationFailed + path, null);
 		} finally {
 			try {
 				is.close();
@@ -274,10 +274,10 @@ public class RemoteServicesDelegate {
 			return;
 		}
 		if (manager == null) {
-			throw CoreExceptionUtils.newException(Messages.Write_Operation_NullSourceFileManager, null);
+			throw newException(Messages.Write_Operation_NullSourceFileManager, null);
 		}
 		if (path == null) {
-			throw CoreExceptionUtils.newException(Messages.Write_Operation_NullPath, null);
+			throw newException(Messages.Write_Operation_NullPath, null);
 		}
 
 		IFileStore lres = manager.getResource(path);
@@ -286,7 +286,7 @@ public class RemoteServicesDelegate {
 			os.write(contents.getBytes());
 			os.flush();
 		} catch (IOException ioe) {
-			throw CoreExceptionUtils.newException(Messages.Write_OperationFailed + path, ioe);
+			throw newException(Messages.Write_OperationFailed + path, ioe);
 		} finally {
 			try {
 				os.close();
@@ -294,5 +294,30 @@ public class RemoteServicesDelegate {
 				PTPRemoteCorePlugin.log(ioe);
 			}
 		}
+	}
+
+	/**
+	 * Replicated from core to avoid dependencies.
+	 * 
+	 * @param message
+	 * @param t
+	 * @return error status object
+	 */
+	private static IStatus getErrorStatus(String message, Throwable t) {
+		if (t != null) {
+			PTPRemoteCorePlugin.log(t);
+		}
+		return new Status(Status.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), Status.ERROR, message, t);
+	}
+
+	/**
+	 * Replicated from core to avoid dependencies.
+	 * 
+	 * @param message
+	 * @param t
+	 * @return exception
+	 */
+	private static CoreException newException(String message, Throwable t) {
+		return new CoreException(getErrorStatus(message, t));
 	}
 }
