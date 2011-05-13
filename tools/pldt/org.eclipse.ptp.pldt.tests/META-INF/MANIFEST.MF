@@ -12,9 +12,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.pldt.common,
  org.eclipse.ptp.pldt.mpi.core,
  org.eclipse.ptp.pldt.openmp.core,
- org.eclipse.ptp.pldt.openmp.analysis;bundle-version="4.0.0",
- org.eclipse.ptp.pldt.openmp.ui.pv;bundle-version="4.0.0",
- org.eclipse.ptp.pldt.mpi.analysis;bundle-version="4.0.0"
+ org.eclipse.ptp.pldt.openmp.analysis,
+ org.eclipse.ptp.pldt.openmp.ui.pv,
+ org.eclipse.ptp.pldt.mpi.analysis,
+ org.eclipse.ptp.pldt.upc
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Activator: org.eclipse.ptp.pldt.tests.Activator
