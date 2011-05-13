@@ -178,9 +178,10 @@ public class GitRemoteSyncConnection {
 	* @param monitor 
 	* @throws IOException
 	* @throws RemoteExecutionException
+	* @throws RemoteSyncException 
 	* @return whether or not this repo already existed
 	*/
-	private boolean doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private boolean doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		String command = "git init"; //$NON-NLS-1$
 		CommandResults commandResults = null;
 
@@ -213,11 +214,12 @@ public class GitRemoteSyncConnection {
 	 *
 	 * @return whether or not there are changes to be committed.
 	 */
-	private boolean prepareRemoteForCommit(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private boolean prepareRemoteForCommit(IProgressMonitor monitor) throws IOException, RemoteExecutionException,
+																												RemoteSyncException {
 		return prepareRemoteForCommit(monitor, false); // Default to not including untracked files
 	}
 	private boolean prepareRemoteForCommit(IProgressMonitor monitor, boolean includeUntrackedFiles) throws IOException,
-																										RemoteExecutionException {
+																					RemoteExecutionException, RemoteSyncException {
 		Set<String> filesToAdd = new HashSet<String>();
 		Set<String> filesToDelete = new HashSet<String>();
 		boolean needToCommit = false;
@@ -244,7 +246,7 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Do a "git commit" on the remote host
 	 */
-	private void commitRemoteFiles(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private void commitRemoteFiles(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		final String command = "git commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 		CommandResults commandResults = null;
 		
@@ -263,7 +265,7 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Do a "git rm <Files>" on the remote host
 	 */
-	private void deleteRemoteFiles(Set<String> filesToDelete, IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private void deleteRemoteFiles(Set<String> filesToDelete, IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		String command = "git rm"; //$NON-NLS-1$
 		for (String fileName : filesToDelete) {
 			command = command.concat(" "); //$NON-NLS-1$
@@ -286,7 +288,7 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Do a "git add <Files>" on the remote host
 	 */
-	private void addRemoteFiles(Set<String> filesToAdd, IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private void addRemoteFiles(Set<String> filesToAdd, IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		String command = "git add"; //$NON-NLS-1$
 		for (String fileName : filesToAdd) {
 			command = command.concat(" "); //$NON-NLS-1$
@@ -311,7 +313,7 @@ public class GitRemoteSyncConnection {
 	 */
 	private void getRemoteFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, IProgressMonitor monitor,
 																									boolean includeUntrackedFiles)
-																					throws IOException, RemoteExecutionException {
+																throws IOException, RemoteExecutionException, RemoteSyncException {
 		final String command;
 		if (includeUntrackedFiles) {
 			command = "git ls-files -t --modified --others --deleted"; //$NON-NLS-1$
