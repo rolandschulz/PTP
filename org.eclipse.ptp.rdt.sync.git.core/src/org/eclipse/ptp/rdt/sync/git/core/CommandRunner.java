@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.git.core;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -182,18 +181,12 @@ public class CommandRunner {
 	 *             if execution of remote command is interrupted.
 	 * @throws RemoteConnectionException
 	 * 			   if connection closed and cannot be opened. 
-	 * TODO: Expand to work with multiple platforms (assumes UNIX \n line endings.)
-	 * TODO: Make robust against buffer overflows - use threads.
 	 */
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, String command, String remoteDirectory,
 														IProgressMonitor monitor) throws 
 																IOException, InterruptedException, RemoteConnectionException {
 		if (!conn.isOpen()) {
-			try {
-				conn.open(monitor);
-			} catch (RemoteConnectionException e) {
-				throw e;
-			}
+			conn.open(monitor);
 		}
 
 		// Setup a new process
@@ -210,78 +203,29 @@ public class CommandRunner {
 
 		// Run process and stream readers
 		IRemoteProcess rp = null;
-		StreamReader outputStreamReader = null;
-		StreamReader errorStreamReader = null;
 		int exitCode;
-		try {
-			rp = rpb.start();
-			outputStreamReader = new StreamReader(rp.getInputStream());
-			errorStreamReader = new StreamReader(rp.getErrorStream());
-			outputStreamReader.start();
-			errorStreamReader.start();
-			exitCode = rp.waitFor();
-			
-			// Notify callers of stream IO errors
-			IOException outputStreamError = outputStreamReader.getIOException();
-			IOException errorStreamError = errorStreamReader.getIOException();
-			if (outputStreamError != null) {
-				throw outputStreamError;
-			} else if (errorStreamError != null) {
-				throw errorStreamError;
-			}
-		} catch (final IOException e) {
-			throw e;
-		} catch (final InterruptedException e) {
-			throw e;
-		}
+		OutputStream output = new ByteArrayOutputStream();
+		OutputStream error = new ByteArrayOutputStream();
+	
+
+		rp = rpb.start();
+		StreamCopyThread getOutput = new StreamCopyThread(rp.getInputStream(), output);
+		StreamCopyThread getError = new StreamCopyThread(rp.getErrorStream(), error);
+		getOutput.start();
+		getError.start();
+		exitCode = rp.waitFor();
+		getOutput.halt();
+		getError.halt();
 		
-		// Successful execution - compile and return results
 		final CommandResults commandResults = new CommandResults();
 		commandResults.setExitCode(exitCode);
-		commandResults.setStdout(outputStreamReader.getResult());
-		commandResults.setStderr(errorStreamReader.getResult());
+		commandResults.setStdout(output.toString());
+		commandResults.setStderr(error.toString());
 		return commandResults;
 	}
 
 	// Enforce as static
 	private CommandRunner() {
 		throw new AssertionError(Messages.CR_CreateInstanceError);
-	}
-	
-	private static class StreamReader extends Thread {
-		private String result = ""; //$NON-NLS-1$
-		private final InputStream stream;
-		private IOException ioException = null;
-
-		public StreamReader(InputStream s) {
-			stream = s;
-		}
-
-		public void run() {
-			BufferedReader streamReader = new BufferedReader(new InputStreamReader(stream));
-			try {
-				String line;
-				while ((line = streamReader.readLine()) != null) {
-					result += line;
-					result += "\n"; //$NON-NLS-1$
-				}
-			} catch (final IOException e) {
-				ioException = e;
-			} finally {
-				try {
-					streamReader.close();
-				} catch (IOException e) {
-					// Ignore
-				}
-			}
-		}
-
-		public IOException getIOException() {
-			return ioException;
-		}
-
-		public String getResult() {
-			return result;
-		}
 	}
 }
