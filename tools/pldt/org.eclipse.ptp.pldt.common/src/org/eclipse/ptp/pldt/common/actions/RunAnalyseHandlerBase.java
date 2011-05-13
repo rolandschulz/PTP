@@ -529,9 +529,9 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 			}
 
 			return ast;
-		} catch (CoreException e) {
-			CommonPlugin.log(IStatus.ERROR,
-					"RunAnalyseMPICommandHandler.getAST():Error getting AST (from index) for project " + tu.getCProject()); //$NON-NLS-1$
+		} catch (Exception e) {
+			String msg = "RunAnalyseHandlerBase.getAST(): Error getting AST (from index) for project " + tu.getCProject();//$NON-NLS-1$
+			CommonPlugin.log(IStatus.ERROR, msg);
 			return null;
 		}
 
