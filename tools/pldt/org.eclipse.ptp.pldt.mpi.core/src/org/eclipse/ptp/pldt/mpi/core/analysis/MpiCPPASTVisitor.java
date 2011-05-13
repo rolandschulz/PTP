@@ -78,7 +78,9 @@ public class MpiCPPASTVisitor extends PldtAstVisitor {
 	}
 
 	/**
-	 * Visit an expression node
+	 * Visit an expression node <br>
+	 * Not sure we handle artifacts within macro expansions here correctly. That's done in PldtAstVisitor but this overrides its
+	 * visit method because of C++ specifics.
 	 * 
 	 * @see org.eclipse.cdt.core.dom.ast.ASTVisitor#visit(org.eclipse.cdt.core.dom.ast.IASTExpression)
 	 */
