@@ -29,7 +29,7 @@ public class SourceInfo
 	private int constructType;
 
 	/**
-	 * explicit default contstructor with no info; assumed to
+	 * explicit default constructor with no info; assumed to
 	 * be filled in with set methods.
 	 * 
 	 */
