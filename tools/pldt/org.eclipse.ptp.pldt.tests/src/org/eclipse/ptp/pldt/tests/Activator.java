@@ -6,6 +6,7 @@ import org.osgi.framework.BundleContext;
 //http://wiki.eclipse.org/Eclipse_Plug-in_Development_FAQ#How_do_I_read_from_a_file_that_I.27ve_included_in_my_bundle.2Fplug-in.3F
 //your BundleActivator implementation will probably look something
 //like the following
+
 public class Activator implements BundleActivator {
 	private static Activator instance;
 
