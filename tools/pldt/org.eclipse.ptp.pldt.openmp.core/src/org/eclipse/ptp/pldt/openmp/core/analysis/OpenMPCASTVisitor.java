@@ -12,11 +12,6 @@ package org.eclipse.ptp.pldt.openmp.core.analysis;
 
 import java.util.List;
 
-import org.eclipse.cdt.core.dom.ast.IASTExpression;
-import org.eclipse.cdt.core.dom.ast.IASTFunctionCallExpression;
-import org.eclipse.cdt.core.dom.ast.IASTIdExpression;
-import org.eclipse.cdt.core.dom.ast.IASTLiteralExpression;
-import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
 import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
@@ -42,9 +37,6 @@ public class OpenMPCASTVisitor extends PldtAstVisitor
 		ARTIFACT_CONSTANT = Messages.OpenMPCASTVisitor_OpenMP_Constant;
 	}
 
-	public void newAPI() {
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -52,21 +44,8 @@ public class OpenMPCASTVisitor extends PldtAstVisitor
 	 */
 	private static final String PREFIX = "omp_"; //$NON-NLS-1$
 
-	public int visit(IASTExpression expression)
-	{
-		if (expression instanceof IASTFunctionCallExpression) {
-			IASTExpression astExpr = ((IASTFunctionCallExpression) expression).getFunctionNameExpression();
-			String signature = astExpr.getRawSignature();
-			// System.out.println("func signature=" + signature);
-			if (signature.startsWith(PREFIX)) {
-				if (astExpr instanceof IASTIdExpression) {
-					IASTName funcName = ((IASTIdExpression) astExpr).getName();
-					processFuncName(funcName, astExpr);
-				}
-			}
-		} else if (expression instanceof IASTLiteralExpression) {
-			processMacroLiteral((IASTLiteralExpression) expression);
-		}
-		return PROCESS_CONTINUE;
+	@Override
+	public boolean matchesPrefix(String name) {
+		return name.startsWith(PREFIX);
 	}
 }
