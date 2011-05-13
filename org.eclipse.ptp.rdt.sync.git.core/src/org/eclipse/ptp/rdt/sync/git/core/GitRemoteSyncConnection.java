@@ -160,10 +160,13 @@ public class GitRemoteSyncConnection {
 		}
 		
 		// Initialize remote directory if necessary
-		doRemoteInit(monitor);
+		boolean existingGitRepo = doRemoteInit(monitor);
 
-		// Commit remote files if necessary
-		doRemoteCommit(monitor);
+		// Prepare remote site for committing (stage files using git) and then commit remote files if necessary
+		boolean needToCommitRemote = prepareRemoteForCommit(monitor, !existingGitRepo); // Include untracked files for new git repos
+		if (needToCommitRemote) {
+			commitRemoteFiles(monitor);
+		}
 
 		return git;
 	}
@@ -171,11 +174,13 @@ public class GitRemoteSyncConnection {
 	/**
 	* Create and configure remote repository if it is not already present. Note that "git init" is "safe" on a repo already
 	* created, so we can simply rerun it each time.
-	 * @param monitor 
+	*
+	* @param monitor 
 	* @throws IOException
 	* @throws RemoteExecutionException
+	* @return whether or not this repo already existed
 	*/
-	private void doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private boolean doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
 		String command = "git init"; //$NON-NLS-1$
 		CommandResults commandResults = null;
 
@@ -190,19 +195,34 @@ public class GitRemoteSyncConnection {
 		if (commandResults.getExitCode() != 0) {
 			throw new RemoteExecutionException(Messages.GRSC_GitInitFailure + commandResults.getStderr());
 		}
+		
+		// Pattern matching is error prone, of course, so make this more likely to return false. This will cause all files to be
+		// added, which is better than leaving all files untracked. This is better for users without knowledge of git, who would
+		// likely not be connecting to a previous git repo.
+		if (commandResults.getStdout().contains("existing")) { //$NON-NLS-1$
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/*
-	 * Do a commit on the remote repository. First we add and delete files from the git index as needed, and then we call "git commit"
-	 * TODO: Modified files already added by "git add" will not be found by "getRemoteFileStatus". Thus, a commit may not happen even
+	 * Run "git add" and "git rm" as needed to prepare remote repo for commit. Return whether or not anything needs to be committed.
+	 * TODO: Modified files already added by "git add" will not be found by "getRemoteFileStatus". Thus, this may return false even
 	 * though there are outstanding changes. Note that this can only occur by accessing the repo outside of Eclipse.
+	 *
+	 * @return whether or not there are changes to be committed.
 	 */
-	private void doRemoteCommit(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private boolean prepareRemoteForCommit(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+		return prepareRemoteForCommit(monitor, false); // Default to not including untracked files
+	}
+	private boolean prepareRemoteForCommit(IProgressMonitor monitor, boolean includeUntrackedFiles) throws IOException,
+																										RemoteExecutionException {
 		Set<String> filesToAdd = new HashSet<String>();
 		Set<String> filesToDelete = new HashSet<String>();
 		boolean needToCommit = false;
 		
-		getRemoteFileStatus(filesToAdd, filesToDelete, monitor);
+		getRemoteFileStatus(filesToAdd, filesToDelete, monitor, includeUntrackedFiles);
 		for (String fileName : filesToDelete) {
 			if (filesToAdd.contains(fileName)) {
 				filesToAdd.remove(fileName);
@@ -217,9 +237,8 @@ public class GitRemoteSyncConnection {
 			needToCommit = true;
 		}
 		
-		if (needToCommit) {
-			commitRemoteFiles(monitor);
-		}
+
+		return needToCommit;
 	}
 	
 	/*
@@ -290,9 +309,15 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Use "git ls-files" to obtain a list of files that need to be added or deleted from the git index. 
 	 */
-	private void getRemoteFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, IProgressMonitor monitor)
+	private void getRemoteFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, IProgressMonitor monitor,
+																									boolean includeUntrackedFiles)
 																					throws IOException, RemoteExecutionException {
-		final String command = "git ls-files -t --modified --others --deleted"; //$NON-NLS-1$
+		final String command;
+		if (includeUntrackedFiles) {
+			command = "git ls-files -t --modified --others --deleted"; //$NON-NLS-1$
+		} else {
+			command = "git ls-files -t --modified --deleted"; //$NON-NLS-1$
+		}
 		CommandResults commandResults = null;
 		
 		try {
@@ -529,7 +554,7 @@ public class GitRemoteSyncConnection {
 
 		try {
 			// First, commit in case any changes have occurred remotely.
-			doRemoteCommit(monitor);
+			prepareRemoteForCommit(monitor);
 	
 			// Next, fetch the remote repository
 			transport.fetch(new EclipseGitProgressTransformer(monitor), null);
