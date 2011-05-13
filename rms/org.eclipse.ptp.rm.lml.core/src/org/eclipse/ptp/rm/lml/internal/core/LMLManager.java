@@ -25,6 +25,8 @@ import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.IViewAddedEvent;
+import org.eclipse.ptp.rm.lml.core.events.IViewDisposedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
@@ -37,6 +39,8 @@ import org.eclipse.ptp.rm.lml.internal.core.events.SelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.TableColumnChangeEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.UnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.UnselectObjectEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.ViewAddedEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.ViewDisposedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
 
 /**
@@ -254,6 +258,32 @@ public class LMLManager implements ILMLManager {
 		IUnselectedObjectEvent event = new UnselectObjectEvent(oid);
 		for (Object listener : lmlListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
+		}
+	}
+
+	@Override
+	public void addView(String gid) {
+		String type = fSelectedLguiItem.getLayoutAccess().setComponentActive(gid, true);
+		fireAddView(gid, type);
+	}
+	
+	private void fireAddView(String gid, String type) {
+		IViewAddedEvent event = new ViewAddedEvent(gid, type);
+		for (Object listener : viewListeners.getListeners()) {
+			((IViewListener) listener).handleEvent(event);
+		}
+	}
+
+	@Override
+	public void removeView(String gid) {
+		fSelectedLguiItem.getLayoutAccess().setComponentActive(gid, false);
+		fireremoveView(gid);
+	}
+
+	private void fireremoveView(String gid) {
+		IViewDisposedEvent event = new ViewDisposedEvent();
+		for (Object listener : viewListeners.getListeners()) {
+			((IViewListener) listener).handleEvent(event);
 		}
 	}
 }

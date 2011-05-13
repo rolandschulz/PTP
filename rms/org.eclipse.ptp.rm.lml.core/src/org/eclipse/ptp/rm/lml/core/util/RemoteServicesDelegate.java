@@ -57,9 +57,9 @@ public class RemoteServicesDelegate implements ILMLCoreConstants {
 		 * passed
 		 */
 		localConnection = localConnectionManager.getConnection(ZEROSTR);
-		assert (localConnection != null);
+		assert (localConnection != null) : "Ich bin nicht erfuellt - 1";
 		localFileManager = localServices.getFileManager(localConnection);
-		assert (localFileManager != null);
+		assert (localFileManager != null) : "Ich bin nicht erfuellt - 2";
 
 		if (remoteServicesId != null) {
 			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, new NullProgressMonitor());

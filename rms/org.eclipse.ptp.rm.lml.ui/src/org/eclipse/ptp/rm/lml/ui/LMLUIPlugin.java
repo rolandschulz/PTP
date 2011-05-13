@@ -126,7 +126,7 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 
 	// Resource bundle.
 	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations = new HashMap<String, IRuntimeModelPresentation>();
-	private ViewManager lguiManager = null;
+	private ViewManager viewManager = null;
 
 	public LMLUIPlugin() {
 		super();		
@@ -139,8 +139,8 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 	 * 
 	 * @return RM manager
 	 */
-	public ViewManager getLguiManager() {
-		return lguiManager;
+	public ViewManager getViewManager() {
+		return viewManager;
 	}
 	
 	/**
@@ -165,7 +165,7 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		DebugUtil.configurePluginDebugOptions();
-		lguiManager = new ViewManager();
+		viewManager = new ViewManager();
 	}
 
 	/*
@@ -178,8 +178,8 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		lguiManager.shutDown();
-		lguiManager = null;
+		viewManager.shutDown();
+		viewManager = null;
 		plugin = null;
 	}
 

@@ -25,6 +25,8 @@ import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
@@ -104,13 +106,25 @@ public class NodesView extends LMLViewPart {
 
 	private void createNodedisplayView() {
 
-		if (fLguiItem != null) {
-			this.setPartName(fLguiItem.getNodedisplayAccess().toString());
-			nodedisplayView = new NodedisplayView(fLguiItem, fLguiItem.getNodedisplayAccess().getNodedisplays().get(0), composite);
-			composite.layout();
-		} else {
-			setPartName("NodedisplayView");
+		if (!composite.isDisposed()) {
+			if (fLguiItem != null) {
+				this.setPartName(fLguiItem.getNodedisplayAccess().toString());
+				nodedisplayView = new NodedisplayView(fLguiItem, fLguiItem.getNodedisplayAccess().getNodedisplays().get(0), composite);
+				composite.layout();
+			} else {
+				setPartName("NodedisplayView");
+			}
+			composite.addDisposeListener(new DisposeListener() {
+
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					lmlManager.removeView(gid);
+					
+				}
+				
+			});
 		}
+		
 
 	}
 

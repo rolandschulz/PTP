@@ -78,5 +78,5 @@ public interface ILguiItem  {
 	public void updateXML();
 	
 	public void addJob();
-
+	
 }

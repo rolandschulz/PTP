@@ -802,4 +802,39 @@ public class LayoutAccess extends LguiHandler{
 		return nodedisplayID.toArray(new String[nodedisplayID.size()]);
 	}
 	
+	public String[] getInactiveComponents() {
+		List<ComponentlayoutType> objects = getComponentLayouts();
+		ArrayList<String> inactive = new ArrayList<String>();
+		for (ComponentlayoutType object : objects) {
+			if(!object.isActive()) {
+				inactive.add(object.getGid());
+			}
+		}
+		return inactive.toArray(new String[inactive.size()]);
+	}
+	
+	private ComponentlayoutType getComponent(String gid) {
+		List<ComponentlayoutType> objects = getComponentLayouts();
+		for (ComponentlayoutType object : objects) {
+			if (object.getGid().equals(gid)) {
+				return object;
+			}
+		}
+		return null;
+	}
+
+	public String setComponentActive(String gid, boolean active) {
+		String type = null;
+		ComponentlayoutType component = getComponent(gid); 
+		if (component != null) {
+			if (component instanceof TablelayoutType) {
+				type = "table";
+			} else if (component instanceof NodedisplaylayoutType) {
+				type = "nodedisplay";
+			}
+			component.setActive(active);
+		}
+		return type;
+	}
+	
 }

@@ -26,13 +26,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.remote.ui.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
-import org.eclipse.ptp.rm.lml.core.util.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
-import org.eclipse.ptp.rm.lml.ui.util.RemoteUIServicesUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -46,14 +44,11 @@ public class AddLguiAction extends Action {
 		this.shell = shell;
 	}
 
-	public void dispose() {
-	}
-
 	public void run() {
-		RemoteServicesDelegate remote = new RemoteServicesDelegate(null	, null);
+		RemoteServicesDelegate remote = new RemoteServicesDelegate(null, null);
 		URI uri = null;
 		try {
-			uri = RemoteUIServicesUtils.browse(shell, new URI("file:///home/"), remote, false, false);
+			uri = RemoteUIServicesUtils.browse(shell, new URI("file:///home/"), remote, false, false, false);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -66,10 +61,6 @@ public class AddLguiAction extends Action {
 				LMLCorePlugin.getDefault().getLMLManager().selectLgui(uri);
 			}
 		} 
-	}
-
-	public void selectionChanged(IAction action, ISelection selection) {
-	
 	}
 
 }

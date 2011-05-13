@@ -3,6 +3,8 @@ package org.eclipse.ptp.rm.lml.core.listeners;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiSelectedEvent;
+import org.eclipse.ptp.rm.lml.core.events.IViewAddedEvent;
+import org.eclipse.ptp.rm.lml.core.events.IViewDisposedEvent;
 
 
 /**
@@ -29,4 +31,8 @@ public interface IViewListener extends IListener{
 	 * @param e an ILguiSelectedEvent 
 	 */
 	public void handleEvent(ILguiSelectedEvent e);
+	
+	public void handleEvent(IViewAddedEvent e);
+	
+	public void handleEvent(IViewDisposedEvent e);
 }

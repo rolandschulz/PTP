@@ -77,5 +77,9 @@ public interface ILMLManager{
 	public void unmarkObject(String oid);
 
 	public void unselectObject(String oid);
+
+	public void addView(String gid);
+
+	public void removeView(String gid);
 	
 }

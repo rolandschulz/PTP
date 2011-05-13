@@ -11,6 +11,8 @@
 
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -115,7 +117,6 @@ public class OverviewAccess extends LguiHandler{
 		}
 		return layouts;
 	}
-	
 	
 }
 

@@ -42,5 +42,40 @@
             name="%Perspective.name">
       </perspective>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="org.eclipse.ptp.rm.lml.ui.menu.category1"
+            name="Menu">
+      </category>
+      <command
+            categoryId="org.eclipse.ptp.rm.lml.ui.menu.category1"
+            defaultHandler="org.eclipse.ptp.rm.lml.ui.actions.HideTableColumnAction"
+            id="org.eclipse.ptp.rm.lml.ui.menu.command1"
+            name="Menu">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.eclipse.ptp.rm.lml.ui.menu.command1"
+            icon="icons/parallel.gif">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ptp.rm.lml.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.eclipse.ptp.rm.lml.ui.toolbar1">
+            <command
+                  commandId="org.eclipse.ptp.rm.lml.ui.menu.command1"
+                  id="org.eclipse.ptp.rm.lml.ui.menu.toolbar1.command1"
+                  style="pulldown"
+                  tooltip="Send them a message!">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
 
 </plugin>

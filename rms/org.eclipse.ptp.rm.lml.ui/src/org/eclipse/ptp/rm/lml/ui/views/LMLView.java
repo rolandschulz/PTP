@@ -35,11 +35,14 @@ import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiSelectedEvent;
+import org.eclipse.ptp.rm.lml.core.events.IViewAddedEvent;
+import org.eclipse.ptp.rm.lml.core.events.IViewDisposedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.ui.actions.AddLguiAction;
 import org.eclipse.ptp.rm.lml.ui.actions.RemoveLguiAction;
 import org.eclipse.ptp.rm.lml.ui.actions.UpdateLguiAction;
+import org.eclipse.ptp.rm.lml.ui.actions.ShowViewAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -47,6 +50,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
 public class LMLView extends ViewPart {
@@ -58,6 +62,7 @@ public class LMLView extends ViewPart {
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILguiListener# handleEvent
 		 * (org.eclipse.ptp.core.events.ILguiAddedEvent)
 		 */
+		@Override
 		public synchronized void handleEvent(ILguiAddedEvent e) {
 			fSelected = e.getLguiItem();
 			createList();
@@ -69,15 +74,28 @@ public class LMLView extends ViewPart {
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILguiListener# handleEvent
 		 * (org.eclipse.ptp.core.events.ILguiRemovedEvent)
 		 */
+		@Override
 		public synchronized void handleEvent(ILguiRemovedEvent e) {
 			fSelected = e.getLguiItem();
 			createList();
 		}
 
+		@Override
 		public void handleEvent(ILguiSelectedEvent e) {
 			fSelected = e.getLguiItem();
 			createList();
 
+		}
+
+		@Override
+		public void handleEvent(IViewAddedEvent e) {
+			
+		}
+
+		@Override
+		public void handleEvent(IViewDisposedEvent e) {
+			// TODO Auto-generated method stub
+			
 		}
 
 	}
@@ -189,13 +207,22 @@ public class LMLView extends ViewPart {
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		manager.add(addLguiAction);
 		boolean inContextForLgui = selection.size() > 0;
-		boolean inContextForRemoveLgui = inContextForLgui;
-		boolean inContextForUpdateLgui = inContextForLgui;
 		manager.add(removeLguiAction);
-		removeLguiAction.setEnabled(inContextForRemoveLgui);
-		manager.add(new Separator());
+		removeLguiAction.setEnabled(inContextForLgui);
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		manager.add(updateLguiAction);
-		updateLguiAction.setEnabled(inContextForUpdateLgui);
+		updateLguiAction.setEnabled(inContextForLgui);
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		MenuManager subMenu = new MenuManager("Show View...");
+		if (inContextForLgui) {
+			String [] gids = lmlManager.getSelectedLguiItem().getLayoutAccess().getInactiveComponents();
+			for (String gid : gids) {
+				subMenu.add(new ShowViewAction(gid));
+			}
+		}
+		manager.add(subMenu);
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		
 	}
 
 }
