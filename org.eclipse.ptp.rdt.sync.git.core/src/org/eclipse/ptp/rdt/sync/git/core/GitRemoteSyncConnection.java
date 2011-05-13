@@ -171,11 +171,12 @@ public class GitRemoteSyncConnection {
 	/**
 	* Create and configure remote repository if it is not already present. Note that "git init" is "safe" on a repo already
 	* created, so we can simply rerun it each time.
-	 * @param monitor 
+	* @param monitor 
 	* @throws IOException
 	* @throws RemoteExecutionException
+	* @throws RemoteSyncException 
 	*/
-	private void doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private void doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		String command = "git init"; //$NON-NLS-1$
 		CommandResults commandResults = null;
 
@@ -197,7 +198,7 @@ public class GitRemoteSyncConnection {
 	 * TODO: Modified files already added by "git add" will not be found by "getRemoteFileStatus". Thus, a commit may not happen even
 	 * though there are outstanding changes. Note that this can only occur by accessing the repo outside of Eclipse.
 	 */
-	private void doRemoteCommit(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private void doRemoteCommit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		Set<String> filesToAdd = new HashSet<String>();
 		Set<String> filesToDelete = new HashSet<String>();
 		boolean needToCommit = false;
@@ -225,7 +226,7 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Do a "git commit" on the remote host
 	 */
-	private void commitRemoteFiles(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private void commitRemoteFiles(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		final String command = "git commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 		CommandResults commandResults = null;
 		
@@ -244,7 +245,7 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Do a "git rm <Files>" on the remote host
 	 */
-	private void deleteRemoteFiles(Set<String> filesToDelete, IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private void deleteRemoteFiles(Set<String> filesToDelete, IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		String command = "git rm"; //$NON-NLS-1$
 		for (String fileName : filesToDelete) {
 			command = command.concat(" "); //$NON-NLS-1$
@@ -267,7 +268,7 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Do a "git add <Files>" on the remote host
 	 */
-	private void addRemoteFiles(Set<String> filesToAdd, IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+	private void addRemoteFiles(Set<String> filesToAdd, IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		String command = "git add"; //$NON-NLS-1$
 		for (String fileName : filesToAdd) {
 			command = command.concat(" "); //$NON-NLS-1$
@@ -291,7 +292,7 @@ public class GitRemoteSyncConnection {
 	 * Use "git ls-files" to obtain a list of files that need to be added or deleted from the git index. 
 	 */
 	private void getRemoteFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, IProgressMonitor monitor)
-																					throws IOException, RemoteExecutionException {
+																					throws IOException, RemoteExecutionException, RemoteSyncException {
 		final String command = "git ls-files -t --modified --others --deleted"; //$NON-NLS-1$
 		CommandResults commandResults = null;
 		
