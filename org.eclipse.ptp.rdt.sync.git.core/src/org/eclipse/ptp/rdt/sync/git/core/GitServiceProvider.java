@@ -323,6 +323,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		} else {
 			message = e.getCause().getMessage();
 		}
+		e.printStackTrace();
 		message = Messages.GSP_SyncErrorMessage + this.getProject().getName() + message;
 		status = new Status(severity, Activator.PLUGIN_ID, message, e);
 		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
