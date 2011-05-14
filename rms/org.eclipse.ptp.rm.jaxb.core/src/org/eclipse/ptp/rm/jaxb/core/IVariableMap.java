@@ -16,7 +16,7 @@ import java.util.Map;
  * 
  * Implementations:
  * 
- * @see org.eclipse.ptp.rm.jaxb.ui.variables.LCVariableMap
+ * @see org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap
  * @see org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap
  * 
  * @author arossi

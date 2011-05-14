@@ -23,7 +23,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -235,32 +237,43 @@ public class RMLaunchTest extends TestCase {
 	}
 
 	public void testResourceManager() {
-		try {
-			emulateConfigureWizard();
-			rm = new LMLJAXBResourceManager(rmConfig, new JAXBResourceManagerControl(rmConfig), new LMLJAXBResourceManagerMonitor(
-					rmConfig));
-			PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
-			rm.start(new NullProgressMonitor());
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException ignored) {
-			}
-			emulateLaunchTab();
-			String jobId = rm.submitJob(launchConfig, ILaunchManager.RUN_MODE, new NullProgressMonitor());
-			System.out.println("SUBMITTED: " + jobId); //$NON-NLS-1$
-			IJobStatus status = rm.getJobStatus(jobId);
-			System.out.println("STATUS: " + status.getState()); //$NON-NLS-1$
-			if (status != null) {
-				status.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener() {
-					public void streamAppended(String text, IStreamMonitor monitor) {
-						System.out.println(text);
+		Job j = new Job("testResourceManager") { //$NON-NLS-1$
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					emulateConfigureWizard();
+					rm = new LMLJAXBResourceManager(rmConfig, new JAXBResourceManagerControl(rmConfig),
+							new LMLJAXBResourceManagerMonitor(rmConfig));
+					PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
+					rm.start(monitor);
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException ignored) {
 					}
-				});
+					emulateLaunchTab();
+					String jobId = rm.submitJob(launchConfig, ILaunchManager.RUN_MODE, monitor);
+					System.out.println("SUBMITTED: " + jobId); //$NON-NLS-1$
+					IJobStatus status = rm.getJobStatus(jobId);
+					System.out.println("STATUS: " + status.getState()); //$NON-NLS-1$
+					if (status != null) {
+						status.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener() {
+							public void streamAppended(String text, IStreamMonitor monitor) {
+								System.out.println(text);
+							}
+						});
+					}
+					rm.stop();
+				} catch (Throwable t) {
+					t.printStackTrace();
+					assertNotNull(t);
+				}
+				return Status.OK_STATUS;
 			}
-			rm.stop();
-		} catch (Throwable t) {
-			t.printStackTrace();
-			assertNotNull(t);
+		};
+		j.schedule();
+		try {
+			j.join();
+		} catch (InterruptedException ignored) {
 		}
 	}
 

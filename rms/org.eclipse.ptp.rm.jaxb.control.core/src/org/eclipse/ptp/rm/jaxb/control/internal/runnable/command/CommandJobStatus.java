@@ -9,13 +9,16 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
@@ -44,20 +47,33 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @author arossi
 	 */
-	private class FileReadyChecker extends Thread {
+	private class FileReadyChecker extends Job {
 		private boolean ready;
 		private int block;
 		private String path;
 
+		/**
+		 * @param name
+		 */
+		public FileReadyChecker(String name) {
+			super(name);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
+		 * IProgressMonitor)
+		 */
 		@Override
-		public void run() {
+		protected IStatus run(IProgressMonitor monitor) {
 			ready = false;
 			long timeout = block * 1000;
-			RemoteServicesDelegate d = control.getRemoteServicesDelegate();
+			RemoteServicesDelegate d = control.getRemoteServicesDelegate(monitor);
 			long start = System.currentTimeMillis();
 			while (!ready) {
 				try {
-					ready = RemoteServicesDelegate.isStable(d.getRemoteFileManager(), path, 3, new NullProgressMonitor());
+					ready = RemoteServicesDelegate.isStable(d.getRemoteFileManager(), path, 3, monitor);
 				} catch (Throwable t) {
 					JAXBControlCorePlugin.log(t);
 				}
@@ -73,6 +89,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 					}
 				}
 			}
+			return Status.OK_STATUS;
 		}
 	}
 
@@ -544,10 +561,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @return thread running the check
 	 */
 	private FileReadyChecker checkForReady(final String path, final int block) {
-		FileReadyChecker t = new FileReadyChecker();
+		FileReadyChecker t = new FileReadyChecker(path);
 		t.block = block;
 		t.path = path;
-		t.start();
+		t.schedule();
 		return t;
 	}
 

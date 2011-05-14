@@ -125,10 +125,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
+	 * @param monitor
 	 * @return wrapper object for remote services, connections and file managers
 	 */
-	public RemoteServicesDelegate getRemoteServicesDelegate() {
-		return new RemoteServicesDelegate(config.getRemoteServicesId(), config.getConnectionName());
+	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) {
+		return new RemoteServicesDelegate(config.getRemoteServicesId(), config.getConnectionName(), monitor);
 	}
 
 	/*
@@ -342,7 +343,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			monitor.beginTask(IResourceManager.STARTING_STATE, 10);
 		}
 		try {
-			initialize();
+			initialize(monitor);
 			worked(monitor, 2);
 			getResourceManager().setState(IResourceManager.STARTING_STATE);
 		} catch (CoreException ce) {
@@ -418,7 +419,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			/*
 			 * overwrite property/attribute values based on user choices
 			 */
-			updatePropertyValuesFromTab(configuration);
+			updatePropertyValuesFromTab(configuration, monitor);
 			worked(monitor, 2);
 
 			/*
@@ -514,14 +515,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws RemoteConnectionException
 	 */
 	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException {
-		IRemoteConnection conn = getRemoteServicesDelegate().getLocalConnection();
+		IRemoteConnection conn = getRemoteServicesDelegate(monitor).getLocalConnection();
 		if (!conn.isOpen()) {
 			conn.open(monitor);
 			if (!conn.isOpen()) {
 				throw new RemoteConnectionException(Messages.LocalConnectionError);
 			}
 		}
-		conn = getRemoteServicesDelegate().getRemoteConnection();
+		conn = getRemoteServicesDelegate(monitor).getRemoteConnection();
 		if (!conn.isOpen()) {
 			conn.open(monitor);
 			if (!conn.isOpen()) {
@@ -608,8 +609,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		if (command == null) {
-			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + JAXBControlConstants.SP + uuid + JAXBControlConstants.SP
-					+ mode, null);
+			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + JAXBControlConstants.SP + uuid
+					+ JAXBControlConstants.SP + mode, null);
 		}
 
 		/*
@@ -651,7 +652,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/**
 	 * Sets the maps and data tree.
 	 */
-	private void initialize() throws Throwable {
+	private void initialize(IProgressMonitor monitor) throws Throwable {
 		launchEnv = new TreeMap<String, String>();
 		jobTable = new HashMap<String, ICommandJob>();
 		pinTable = new JobIdPinTable();
@@ -662,7 +663,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		IJAXBResourceManagerConfiguration base = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
 		rmVarMap = (RMVariableMap) base.getRMVariableMap();
 		controlData = base.getResourceManagerData().getControlData();
-		setFixedConfigurationProperties();
+		setFixedConfigurationProperties(monitor);
 		launchEnv.clear();
 		appendLaunchEnv = true;
 
@@ -769,7 +770,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (files == null || files.getFile().isEmpty()) {
 			return true;
 		}
-		ManagedFilesJob job = new ManagedFilesJob(uuid, files, getRemoteServicesDelegate(), rmVarMap);
+		ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
 		job.schedule();
 		try {
 			job.join();
@@ -888,8 +889,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * User name and service address. Set in case the script needs these
 	 * variables.
 	 */
-	private void setFixedConfigurationProperties() {
-		IRemoteConnection rc = getRemoteServicesDelegate().getRemoteConnection();
+	private void setFixedConfigurationProperties(IProgressMonitor monitor) {
+		IRemoteConnection rc = getRemoteServicesDelegate(monitor).getRemoteConnection();
 		rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
 		rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 	}
@@ -902,7 +903,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws CoreException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration) throws CoreException {
+	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		Map lcattr = configuration.getAttributes();
 		for (Object key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
@@ -945,9 +946,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		rmVarMap.maybeOverwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, configuration);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
-		rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, configuration);
+		rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
+				configuration);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
-		setFixedConfigurationProperties();
+		setFixedConfigurationProperties(monitor);
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));

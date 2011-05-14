@@ -12,9 +12,14 @@ package org.eclipse.ptp.rm.jaxb.control.ui.launch;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.ui.IFireContentsChangedEnabled;
@@ -203,15 +208,33 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, final IResourceManager rm, IPQueue queue,
+			ILaunchConfiguration configuration) {
 		if (!voidRMConfig) {
+			Job j = new Job(Messages.TabInitialization) {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate(monitor);
+						lcMap.initialize(rmConfig.getRMVariableMap());
+						updateHandler.clear();
+					} catch (Throwable t) {
+						JAXBControlUIPlugin.log(t);
+						return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
+					}
+					return Status.OK_STATUS;
+				}
+			};
+
+			j.schedule();
 			try {
-				delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate();
-				lcMap.initialize(rmConfig.getRMVariableMap());
-				updateHandler.clear();
-			} catch (Throwable t) {
-				JAXBControlUIPlugin.log(t);
-				return new RMLaunchValidation(false, t.getMessage());
+				j.join();
+			} catch (InterruptedException ignore) {
+			}
+
+			IStatus result = j.getResult();
+			if (result.getSeverity() == IStatus.ERROR) {
+				return new RMLaunchValidation(false, result.getMessage());
 			}
 		}
 		RMLaunchValidation validation = super.initializeFrom(control, rm, queue, configuration);

@@ -50,6 +50,7 @@ public class Messages extends NLS {
 	public static String VoidLaunchTabMessage;
 	public static String VoidLaunchTabTitle;
 	public static String IllegalVariableValueType;
+	public static String TabInitialization;
 
 	static {
 		// initialize resource bundle

@@ -16,11 +16,16 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
@@ -29,17 +34,119 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
+import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 
-public class ManagedFilesTest extends TestCase {
+public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerControl {
 
 	private static final String xml = JAXBControlConstants.DATA + "test-pbs.xml"; //$NON-NLS-1$
 	private static ControlType controlData;
 	private static Map<String, Object> env;
 	private static Map<String, String> live;
 	private static boolean verbose = false;
-
-	private RemoteServicesDelegate delegate;
 	private RMVariableMap rmVarMap;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#control(java.lang.String
+	 * , java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#dispose()
+	 */
+	public void dispose() {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getAppendEnv()
+	 */
+	public boolean getAppendEnv() {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration
+	 * ()
+	 */
+	public IResourceManagerComponentConfiguration getControlConfiguration() {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getEnvironment()
+	 */
+	public IVariableMap getEnvironment() {
+		return rmVarMap;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
+	 * .String)
+	 */
+	public IJobStatus getJobStatus(String jobId) {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getLaunchEnv()
+	 */
+	public Map<String, String> getLaunchEnv() {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#
+	 * getRemoteServicesDelegate(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) {
+		return new RemoteServicesDelegate(null, null, monitor);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getState()
+	 */
+	public String getState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged
+	 * (java.lang.String)
+	 */
+	public void jobStateChanged(String jobId) {
+		// TODO Auto-generated method stub
+
+	}
 
 	@Override
 	public void setUp() {
@@ -59,9 +166,36 @@ public class ManagedFilesTest extends TestCase {
 			assertNotNull(t);
 		}
 		setTestValues();
-		if (getName().equals("testManagedFiles")) {//$NON-NLS-1$
-			initializeConnections();
-		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#start(org.eclipse.core
+	 * .runtime.IProgressMonitor)
+	 */
+	public void start(IProgressMonitor monitor) throws CoreException {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#stop()
+	 */
+	public void stop() throws CoreException {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#submitJob(org.eclipse
+	 * .debug.core.ILaunchConfiguration, java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
+		return null;
 	}
 
 	@Override
@@ -81,7 +215,7 @@ public class ManagedFilesTest extends TestCase {
 		files = maybeAddManagedFileForScript(files);
 		assertNotNull(files);
 		try {
-			ManagedFilesJob job = new ManagedFilesJob(null, files, delegate, rmVarMap);
+			ManagedFilesJob job = new ManagedFilesJob(null, files, this);
 			job.schedule();
 			try {
 				job.join();
@@ -107,10 +241,6 @@ public class ManagedFilesTest extends TestCase {
 
 		PropertyType contents = (PropertyType) env.get(JAXBControlConstants.SCRIPT);
 		assertNotNull(contents);
-	}
-
-	private void initializeConnections() {
-		delegate = new RemoteServicesDelegate(null, null);
 	}
 
 	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files) {

@@ -24,9 +24,10 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
@@ -45,10 +46,12 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 public class ManagedFilesJob extends Job {
 
 	private final String uuid;
-	private final String stagingDir;
+	private final IJAXBResourceManagerControl control;
 	private final List<ManagedFileType> files;
-	private final RemoteServicesDelegate delegate;
-	private final IVariableMap rmVarMap;
+
+	private RemoteServicesDelegate delegate;
+	private IVariableMap rmVarMap;
+	private String stagingDir;
 	private boolean success;
 
 	/**
@@ -57,18 +60,15 @@ public class ManagedFilesJob extends Job {
 	 *            internal job identifier (the job has not yet been submitted)
 	 * @param files
 	 *            JAXB data element
-	 * @param delegate
-	 *            wrapper containing remote service, connection and file manager
-	 *            information
+	 * @param control
+	 *            callback to resource manager control
 	 * @throws CoreException
 	 */
-	public ManagedFilesJob(String uuid, ManagedFilesType files, RemoteServicesDelegate delegate, IVariableMap rmVarMap)
-			throws CoreException {
+	public ManagedFilesJob(String uuid, ManagedFilesType files, IJAXBResourceManagerControl control) throws CoreException {
 		super(Messages.ManagedFilesJob);
 		this.uuid = uuid;
-		this.delegate = delegate;
-		this.rmVarMap = rmVarMap;
-		stagingDir = rmVarMap.getString(uuid, files.getFileStagingLocation());
+		this.control = control;
+		stagingDir = files.getFileStagingLocation();
 		this.files = files.getFile();
 	}
 
@@ -87,6 +87,10 @@ public class ManagedFilesJob extends Job {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		rmVarMap = control.getEnvironment();
+		delegate = control.getRemoteServicesDelegate(monitor);
+		stagingDir = rmVarMap.getString(uuid, stagingDir);
+
 		boolean localTarget = delegate.getLocalFileManager() == delegate.getRemoteFileManager();
 		success = false;
 		SubMonitor progress = SubMonitor.convert(monitor, files.size() * 10);

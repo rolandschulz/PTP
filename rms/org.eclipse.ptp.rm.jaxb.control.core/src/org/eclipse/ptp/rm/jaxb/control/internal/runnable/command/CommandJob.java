@@ -36,8 +36,8 @@ import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.control.data.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
@@ -366,7 +366,7 @@ public class CommandJob extends Job implements ICommandJob {
 				status = null;
 				active = false;
 			}
-			IRemoteProcessBuilder builder = prepareCommand();
+			IRemoteProcessBuilder builder = prepareCommand(monitor);
 			prepareEnv(builder);
 
 			process = null;
@@ -537,16 +537,17 @@ public class CommandJob extends Job implements ICommandJob {
 	 * Resolves the command arguments against the current environment, then gets
 	 * the process builder from the remote connection.
 	 * 
+	 * @param monitor
 	 * @return the process builder
 	 * @throws CoreException
 	 */
-	private IRemoteProcessBuilder prepareCommand() throws CoreException {
+	private IRemoteProcessBuilder prepareCommand(IProgressMonitor monitor) throws CoreException {
 		List<ArgType> args = command.getArg();
 		if (args == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
 		}
 		String[] cmdArgs = ArgImpl.getArgs(uuid, args, rmVarMap);
-		RemoteServicesDelegate delegate = control.getRemoteServicesDelegate();
+		RemoteServicesDelegate delegate = control.getRemoteServicesDelegate(monitor);
 		return delegate.getRemoteServices().getProcessBuilder(delegate.getRemoteConnection(), cmdArgs);
 	}
 

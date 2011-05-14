@@ -25,6 +25,7 @@ package org.eclipse.ptp.rm.lml.ui.actions;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.ui.RemoteUIServicesUtils;
@@ -36,7 +37,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class AddLguiAction extends Action {
-	
+
 	private final Shell shell;
 
 	public AddLguiAction(Shell shell) {
@@ -44,8 +45,9 @@ public class AddLguiAction extends Action {
 		this.shell = shell;
 	}
 
+	@Override
 	public void run() {
-		RemoteServicesDelegate remote = new RemoteServicesDelegate(null, null);
+		RemoteServicesDelegate remote = new RemoteServicesDelegate(null, null, new NullProgressMonitor());
 		URI uri = null;
 		try {
 			uri = RemoteUIServicesUtils.browse(shell, new URI("file:///home/"), remote, false, false, false);
@@ -53,14 +55,15 @@ public class AddLguiAction extends Action {
 			e.printStackTrace();
 		}
 		boolean existingLgui = LMLCorePlugin.getDefault().getLMLManager().addLgui(uri);
-		if (existingLgui && !LMLCorePlugin.getDefault().getLMLManager().getSelectedLguiItem().getXmlFile().getPath().equals(uri.getPath())) {
+		if (existingLgui
+				&& !LMLCorePlugin.getDefault().getLMLManager().getSelectedLguiItem().getXmlFile().getPath().equals(uri.getPath())) {
 			MessageBox messageBox = new MessageBox(LMLUIPlugin.getDisplay().getActiveShell(), SWT.OK | SWT.CANCEL);
 			messageBox.setMessage("The LML file " + uri.getPath() + " is already loaded. Should this file be selected?");
 			int rc = messageBox.open();
 			if (rc == SWT.OK) {
 				LMLCorePlugin.getDefault().getLMLManager().selectLgui(uri);
 			}
-		} 
+		}
 	}
 
 }

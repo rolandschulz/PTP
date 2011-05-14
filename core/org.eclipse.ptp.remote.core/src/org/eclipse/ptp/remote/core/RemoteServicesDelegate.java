@@ -21,7 +21,6 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.remote.core.messages.Messages;
@@ -63,8 +62,9 @@ public class RemoteServicesDelegate {
 	 *            e.g., "local", "remotetools", "rse"
 	 * @param remoteConnectionName
 	 *            e.g., "ember.ncsa.illinois.edu"
+	 * @param monitor
 	 */
-	public RemoteServicesDelegate(String remoteServicesId, String remoteConnectionName) {
+	public RemoteServicesDelegate(String remoteServicesId, String remoteConnectionName, IProgressMonitor monitor) {
 		localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		assert (localServices != null);
 		localConnectionManager = localServices.getConnectionManager();
@@ -75,7 +75,7 @@ public class RemoteServicesDelegate {
 		assert (localFileManager != null);
 
 		if (remoteServicesId != null) {
-			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, new NullProgressMonitor());
+			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, monitor);
 			assert (null != remoteServices);
 			remoteConnectionManager = remoteServices.getConnectionManager();
 			assert (null != remoteConnectionManager);

@@ -25,10 +25,14 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.rm.jaxb.control.data.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.control.exceptions.UnsatisfiedMatchException;
@@ -304,22 +308,41 @@ public class WidgetActionUtils {
 		if (fileManager == null) {
 			return false;
 		}
-		IFileStore rres = fileManager.getResource(value);
-		IFileInfo info = rres.fetchInfo(EFS.NONE, new NullProgressMonitor());
-		if (!info.exists()) {
+		final IFileStore rres = fileManager.getResource(value);
+		final IFileInfo[] info = new IFileInfo[1];
+		Job j = new Job(value) {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					info[0] = rres.fetchInfo(EFS.NONE, monitor);
+				} catch (CoreException t) {
+					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+
+		j.schedule();
+
+		try {
+			j.join();
+		} catch (InterruptedException ignored) {
+		}
+
+		if (!info[0].exists()) {
 			return false;
 		}
-		if (match.isIsDirectory() != info.isDirectory()) {
+		if (match.isIsDirectory() != info[0].isDirectory()) {
 			return false;
 		}
 		Long len = match.getLength();
-		if (len != null && len != info.getLength()) {
+		if (len != null && len != info[0].getLength()) {
 			return false;
 		}
 		String date = match.getLastModifiedAfter();
 		if (date != null) {
 			Long t = getTimeInMillis(date);
-			if (t != null && t > info.getLastModified()) {
+			if (t != null && t > info[0].getLastModified()) {
 				return false;
 			}
 		}
@@ -327,14 +350,14 @@ public class WidgetActionUtils {
 		date = match.getLastModifiedBefore();
 		if (date != null) {
 			Long t = getTimeInMillis(date);
-			if (t != null && t < info.getLastModified()) {
+			if (t != null && t < info[0].getLastModified()) {
 				return false;
 			}
 		}
 
 		String attributes = match.getEfsAttributes();
 		int a = getEfsAttributeValue(attributes);
-		if (!info.getAttribute(a)) {
+		if (!info[0].getAttribute(a)) {
 			return false;
 		}
 
