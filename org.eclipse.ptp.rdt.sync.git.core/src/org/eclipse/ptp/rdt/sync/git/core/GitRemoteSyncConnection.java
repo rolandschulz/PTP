@@ -387,7 +387,6 @@ public class GitRemoteSyncConnection {
 	 * 
 	 * @param remoteConfig
 	 * 				the remote configuration for our local Git repo
-	 * @return the transport
 	 * @throws RuntimeException
 	 *             if the requested transport is not supported by JGit.
 	 */
