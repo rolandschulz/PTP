@@ -22,11 +22,11 @@
       
       <wizard
             category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
-            class="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertToRemoteWizard"
+            class="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertToSyncProjectWizard"
             finalPerspective="org.eclipse.cdt.ui.CPerspective"
             hasPages="true"
             icon="icons/obj16/convert-normal.gif"
-            id="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertToMakeWizard"
+            id="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertToSyncProjectWizard"
             name="%WizardConvertRemoteProject.name"
             >
          <description>
