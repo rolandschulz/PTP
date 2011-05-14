@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.git.ui.messages.Messages;
@@ -73,6 +74,18 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private Combo fConnectionCombo;
 	private Text fLocationText;
 
+	private IWizardContainer container;
+
+	/**
+	 * Attempt to open a connection.
+	 */
+	private void checkConnection() {
+		IRemoteUIConnectionManager mgr = getUIConnectionManager();
+		if (mgr != null) {
+			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), null, fSelectedConnection);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -82,6 +95,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * org.eclipse.jface.operation.IRunnableContext)
 	 */
 	public void createConfigurationArea(Composite parent, IRunnableContext context) {
+		this.container = (IWizardContainer)context;
 		final Composite configArea = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -114,6 +128,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 
 		for (int k = 0; k < providers.length; k++) {
 			fProviderCombo.add(providers[k].getName(), k);
+			if  (providers[k].getName().equals("Remote Tools")) { //$NON-NLS-1$
+				toSelect = k;
+			}
 			fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
 		}
 
@@ -170,6 +187,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 			public void modifyText(ModifyEvent e) {
 				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,
 				// PATH_PROPERTY, fLocationText.getText());
+				update();
 			}
 		});
 
@@ -200,46 +218,6 @@ public class GitParticipant implements ISynchronizeParticipant {
 				}
 			}
 		});
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getProvider(org.eclipse
-	 * .core.resources.IProject)
-	 */
-	public ISyncServiceProvider getProvider(IProject project) {
-		ServiceModelManager smm = ServiceModelManager.getInstance();
-		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		GitServiceProvider provider = (GitServiceProvider) smm.getServiceProvider(syncService
-				.getProviderDescriptor(GitServiceProvider.ID));
-		provider.setLocation(fLocationText.getText());
-		provider.setRemoteConnection(fSelectedConnection);
-		provider.setRemoteServices(fSelectedProvider);
-		provider.setProject(project);
-		return provider;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#isConfigComplete()
-	 */
-	public boolean isConfigComplete() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/**
-	 * Attempt to open a connection.
-	 */
-	private void checkConnection() {
-		IRemoteUIConnectionManager mgr = getUIConnectionManager();
-		if (mgr != null) {
-			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), null, fSelectedConnection);
-		}
 	}
 
 	/**
@@ -273,6 +251,42 @@ public class GitParticipant implements ISynchronizeParticipant {
 		}
 		return ""; //$NON-NLS-1$
 	}
+	
+	/** 
+	 * @see ISynchronizeParticipant#getErrorMessage()
+	 */
+	public String getErrorMessage() {
+		if (fSelectedProvider == null) 
+			return Messages.GitParticipant_0;
+		if (fSelectedConnection == null) 
+			return Messages.GitParticipant_1;
+		if (fLocationText.getText().length() == 0 ) 
+			return Messages.GitParticipant_2;
+		IRemoteFileManager fileManager = fSelectedProvider.getFileManager(fSelectedConnection);
+		if ( fileManager.toURI(fLocationText.getText()) == null) 
+			return Messages.GitParticipant_3;
+		// should we check permissions of: fileManager.getResource(fLocationText.getText()).getParent() ?
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getProvider(org.eclipse
+	 * .core.resources.IProject)
+	 */
+	public ISyncServiceProvider getProvider(IProject project) {
+		ServiceModelManager smm = ServiceModelManager.getInstance();
+		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
+		GitServiceProvider provider = (GitServiceProvider) smm.getServiceProvider(syncService
+				.getProviderDescriptor(GitServiceProvider.ID));
+		provider.setLocation(fLocationText.getText());
+		provider.setRemoteConnection(fSelectedConnection);
+		provider.setRemoteServices(fSelectedProvider);
+		provider.setProject(project);
+		return provider;
+	}
 
 	/**
 	 * @return
@@ -291,6 +305,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		fLocationText.setText(getDefaultPathDisplayString());
+		update();
 	}
 
 	/**
@@ -302,6 +317,17 @@ public class GitParticipant implements ISynchronizeParticipant {
 		populateConnectionCombo(fConnectionCombo);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		handleConnectionSelected();
+		update();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#isConfigComplete()
+	 */
+	public boolean isConfigComplete() {
+		return getErrorMessage() == null;
 	}
 
 	/**
@@ -321,6 +347,11 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(0);
 	}
 
+	private void update() {
+		container.updateMessage();
+		container.updateButtons();
+	}
+
 	/**
 	 * @param button
 	 */
@@ -328,5 +359,4 @@ public class GitParticipant implements ISynchronizeParticipant {
 		IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
 		button.setEnabled(connectionManager != null);
 	}
-
 }

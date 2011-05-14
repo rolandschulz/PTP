@@ -107,7 +107,7 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 */
 	@Override
 	protected boolean isCustomPageComplete() {
-		return fbVisited;
+		return fbVisited  && getErrorMessage()==null && fSelectedProvider.getParticipant().isConfigComplete();
 	}
 
 	/*
@@ -163,15 +163,14 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 		// populate the combo with a list of providers
 		ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
 
-		fProviderCombo.add("Select synchronize provider...", 0); //$NON-NLS-1$
 		for (int k = 0; k < providers.length; k++) {
-			fProviderCombo.add(providers[k].getName(), k + 1);
+			fProviderCombo.add(providers[k].getName(), k);
 			fComboIndexToDescriptorMap.put(k, providers[k]);
 			addProviderControl(providers[k]);
 		}
 
 		fProviderCombo.select(0);
-		fSelectedProvider = null;
+		handleProviderSelected();
 	}
 
 	/*
@@ -209,7 +208,10 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 * @see org.eclipse.jface.dialogs.IDialogPage#getErrorMessage()
 	 */
 	public String getErrorMessage() {
-		return null;
+		if (fSelectedProvider==null)
+			return "A syncronization provider must be selected"; //$NON-NLS-1$
+		else 
+			return fSelectedProvider.getParticipant().getErrorMessage();
 	}
 
 	/*
@@ -306,20 +308,21 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 * Handle synchronize provider selected.
 	 */
 	private void handleProviderSelected() {
-		int index = fProviderCombo.getSelectionIndex() - 1;
-		if (index >= 0) {
-			fProviderStack.topControl = fProviderControls.get(index);
-			fSelectedProvider = fComboIndexToDescriptorMap.get(index);
-		} else {
-			fProviderStack.topControl = null;
-			fSelectedProvider = null;
-		}
+		int index = fProviderCombo.getSelectionIndex();
+		fProviderStack.topControl = fProviderControls.get(index);
+		fSelectedProvider = fComboIndexToDescriptorMap.get(index);
 		fProviderArea.layout();
+		update();
 		if (fSelectedProvider != null) {
 			MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY, fSelectedProvider.getParticipant());
 		} else {
 			MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY, null);
 		}
+	}
+
+	private void update() {
+		getWizard().getContainer().updateMessage();
+		getWizard().getContainer().updateButtons();
 	}
 
 	private void addProviderControl(ISynchronizeParticipantDescriptor desc) {
