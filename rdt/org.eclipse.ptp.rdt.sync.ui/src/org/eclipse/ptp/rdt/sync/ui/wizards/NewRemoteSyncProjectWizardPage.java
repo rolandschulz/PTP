@@ -175,8 +175,8 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 			handleProviderSelected();
 		} else {
 			fProviderCombo.select(0);
+			fSelectedProvider = null;
 		}
-		fSelectedProvider = null;
 	}
 
 	/*
