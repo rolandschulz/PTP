@@ -19,11 +19,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
@@ -45,7 +45,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.dialogs.IDEResourceInfoUtils;
-import org.eclipse.ptp.rdt.ui.messages.Messages;
 
 /**
  * Allows the user to select a provider of Remote Services for a
@@ -451,7 +450,7 @@ public class RemoteProjectContentsLocationArea {
 								String correctPath = fLocationText.getText();
 								String selectedPath = fileMgr.browseDirectory(
 										fLocationText.getShell(),
-										"Project Location (" + fSelectedConnection.getName() + ")", correctPath, IRemoteUIConstants.NONE); //$NON-NLS-1$ //$NON-NLS-2$
+										Messages.getString("RemoteProjectContentsLocationArea.5", fSelectedConnection.getName()), correctPath, IRemoteUIConstants.NONE); //$NON-NLS-1$
 								if (selectedPath != null) {
 									fLocationText.setText(selectedPath);
 								}

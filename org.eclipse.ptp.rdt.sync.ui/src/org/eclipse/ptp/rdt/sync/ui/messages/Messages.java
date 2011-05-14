@@ -28,6 +28,7 @@ public class Messages extends NLS {
 	public static String NullServiceProvider_config;
 	public static String NewModelProjectWizard_0;
 	public static String NewModelProjectWizard_1;
+	public static String NewRemoteSyncProjectWizardPage_syncProvider;
 	public static String CDTCommonProjectWizard_0;
 	public static String CDTCommonProjectWizard_1;
 	public static String CDTCommonProjectWizard_creatingProject;

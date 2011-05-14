@@ -137,7 +137,7 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 
 		// Label for "Provider:"
 		Label providerLabel = new Label(comp, SWT.LEFT);
-		providerLabel.setText("Synchronization Provider:"); //$NON-NLS-1$
+		providerLabel.setText(Messages.NewRemoteSyncProjectWizardPage_syncProvider);
 
 		// combo for providers
 		fProviderCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -197,8 +197,9 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 * @see org.eclipse.jface.dialogs.IDialogPage#getDescription()
 	 */
 	public String getDescription() {
-		if (fDescription == null)
+		if (fDescription == null) {
 			fDescription = Messages.RemoteSyncWizardPage_description;
+		}
 		return fDescription;
 	}
 
@@ -220,8 +221,9 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 * @see org.eclipse.jface.dialogs.IDialogPage#getImage()
 	 */
 	public Image getImage() {
-		if (fImage == null && fImageDescriptor != null)
+		if (fImage == null && fImageDescriptor != null) {
 			fImage = fImageDescriptor.createImage();
+		}
 
 		if (fImage == null && wizard != null) {
 			fImage = wizard.getDefaultPageImage();
@@ -246,8 +248,9 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 * @see org.eclipse.jface.dialogs.IDialogPage#getTitle()
 	 */
 	public String getTitle() {
-		if (fTitle == null)
+		if (fTitle == null) {
 			fTitle = Messages.RemoteSyncWizardPage_0;
+		}
 		return fTitle;
 	}
 
@@ -314,7 +317,8 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 		fProviderArea.layout();
 		update();
 		if (fSelectedProvider != null) {
-			MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY, fSelectedProvider.getParticipant());
+			MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY,
+					fSelectedProvider.getParticipant());
 		} else {
 			MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY, null);
 		}

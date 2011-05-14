@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,30 +10,30 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.managedbuilder.xlc.ui.properties;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
-import org.eclipse.rse.core.filters.ISystemFilterReference;
-import org.eclipse.rse.core.model.IHost;
-import org.eclipse.rse.core.subsystems.ISubSystem;
-import org.eclipse.rse.core.subsystems.ISubSystemConfiguration;
-import org.eclipse.rse.files.ui.dialogs.SystemRemoteFolderDialog;
-import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
-import org.eclipse.rse.subsystems.files.core.model.RemoteFileUtility;
-import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
-import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFileSubSystem;
+import org.eclipse.ptp.rdt.managedbuilder.xlc.ui.messages.Messages;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 /**
  * A field editor for a remote directory path type preference.
  * 
- * @since 2.0
+ * @since 3.0
  */
 public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 
-	protected IHost connectionHost;
-	private IRemoteFile currentRemoteFile;
-	private String currentRemoteFilename;
+	/**
+	 * @since 3.0
+	 */
+	protected IRemoteConnection fRemoteConnection;
+	private IFileStore fCurrentRemoteFileStore;
+	private String fCurrentRemoteFilename;
 
 	/**
 	 * Creates a directory field editor.
@@ -46,10 +46,11 @@ public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 	 *            the parent of the field editor's control
 	 * @param IHost
 	 *            the remote file system connection host
+	 * @since 3.0
 	 */
-	public RemoteDirectoryFieldEditor(String name, String labelText, Composite parent, IHost connectionHost) {
+	public RemoteDirectoryFieldEditor(String name, String labelText, Composite parent, IRemoteConnection connection) {
 		super(name, labelText, parent);
-		this.connectionHost = connectionHost;
+		fRemoteConnection = connection;
 	}
 
 	/*
@@ -75,60 +76,32 @@ public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 	 * @param path
 	 * @return
 	 */
-	public String browseRemoteLocation(Shell shell, String path) {
-		SystemRemoteFolderDialog dlg = new SystemRemoteFolderDialog(shell);
-		// disable creating new connection button
-		dlg.setShowNewConnectionPrompt(false);
-
-		if (connectionHost != null) {
-			// set the host as the only host(disable connection switching)
-			dlg.setDefaultSystemConnection(connectionHost, true);
-			updateCurrentRemoteFile();
-			if (currentRemoteFile != null) {
-				dlg.setPreSelection(currentRemoteFile);
-			}
-
-		}
-
-		dlg.open();
-
-		Object output = dlg.getOutputObject();
-
-		if (output instanceof ISystemFilterReference) {
-			ISystemFilterReference ref = (ISystemFilterReference) output;
-			ISubSystem targetSubSystem = ref.getSubSystem();
-			ISubSystemConfiguration factory = targetSubSystem.getSubSystemConfiguration();
-			if (factory.supportsDropInFilters()) {
-				output = targetSubSystem.getTargetForFilter(ref);
+	public String browseRemoteLocation(Shell shell, String path) {		
+		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices());
+		if (remoteUIServices != null) {
+			IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
+			if (fileMgr != null) {
+				fileMgr.setConnection(fRemoteConnection);
+				String correctPath = path;
+				String selectedPath = fileMgr.browseDirectory(
+						shell,
+						Messages.getString("RemoteDirectoryFieldEditor_0", fRemoteConnection.getName()), correctPath, IRemoteUIConstants.NONE); //$NON-NLS-1$
+				return selectedPath;
 			}
 		}
-		String outputLocation = null;
-		if (output instanceof IRemoteFile) {
-			IRemoteFile rmtFile = (IRemoteFile) output;
-			outputLocation = rmtFile.getAbsolutePath();
-		}
-		return outputLocation;
+		return null;
 	}
 
-	// synchronize the remote file object with remote file name
+	// synchronize the remote file store with remote file name
 	private void updateCurrentRemoteFile() {
 		String dirName = getTextControl().getText();
 		// only get remoteFile object when we get a new dir name
-		if (currentRemoteFilename == null || !currentRemoteFilename.equals(dirName)) {
-			currentRemoteFilename = dirName;
-			// reset currentRemoteFile first
-			currentRemoteFile = null;
-			if (connectionHost != null) {
-				IRemoteFileSubSystem remoteFileSubSystem = RemoteFileUtility.getFileSubSystem(connectionHost);
-				if (remoteFileSubSystem != null) {
-					try {
-
-						currentRemoteFile = remoteFileSubSystem.getRemoteFileObject(currentRemoteFilename,
-								new NullProgressMonitor());
-					} catch (SystemMessageException e) {
-
-					}
-				}
+		if (fCurrentRemoteFilename == null || !fCurrentRemoteFilename.equals(dirName)) {
+			fCurrentRemoteFilename = dirName;
+			// reset currentRemoteFileStore first
+			fCurrentRemoteFileStore = null;
+			if (fRemoteConnection != null) {
+				fCurrentRemoteFileStore = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection).getResource(dirName);
 			}
 		}
 
@@ -140,10 +113,9 @@ public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 	 */
 	@Override
 	protected boolean doCheckState() {
-
 		updateCurrentRemoteFile();
-		if (currentRemoteFile != null) {
-			if (currentRemoteFile.exists()) {
+		if (fCurrentRemoteFileStore != null) {
+			if (fCurrentRemoteFileStore.fetchInfo().exists()) {
 				return true;
 			} else {
 				return false;
@@ -151,7 +123,6 @@ public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 		} else {
 			return false;
 		}
-
 	}
 
 }
