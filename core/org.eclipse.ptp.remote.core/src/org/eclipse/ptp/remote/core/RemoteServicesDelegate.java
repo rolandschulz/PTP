@@ -149,21 +149,22 @@ public class RemoteServicesDelegate {
 	public static void copy(IRemoteFileManager from, String source, IRemoteFileManager to, String target, IProgressMonitor progress)
 			throws CoreException {
 		if (from == null) {
-			throw newException(Messages.Copy_Operation_NullSourceFileManager, null);
+			throw newException(Messages.RemoteServicesDelegate_Copy_Operation_NullSourceFileManager, null);
 		}
 		if (to == null) {
-			throw newException(Messages.Copy_Operation_NullTargetFileManager, null);
+			throw newException(Messages.RemoteServicesDelegate_Copy_Operation_NullTargetFileManager, null);
 		}
 		if (source == null) {
-			throw newException(Messages.Copy_Operation_NullSource, null);
+			throw newException(Messages.RemoteServicesDelegate_Copy_Operation_NullSource, null);
 		}
 		if (target == null) {
-			throw newException(Messages.Copy_Operation_NullTarget, null);
+			throw newException(Messages.RemoteServicesDelegate_Copy_Operation_NullTarget, null);
 		}
 
 		IFileStore lres = from.getResource(source);
 		if (!lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5)).exists()) {
-			throw newException(Messages.Copy_Operation_Local_resource_does_not_exist + COSP + lres.getName(), null);
+			throw newException(
+					Messages.RemoteServicesDelegate_Copy_Operation_Local_resource_does_not_exist + COSP + lres.getName(), null);
 		}
 		IFileStore rres = to.getResource(target);
 		lres.copy(rres, EFS.OVERWRITE, new SubProgressMonitor(progress, 5));
@@ -186,10 +187,10 @@ public class RemoteServicesDelegate {
 	public static boolean isStable(IRemoteFileManager manager, String path, int intervalInSecs, IProgressMonitor progress)
 			throws CoreException {
 		if (manager == null) {
-			throw newException(Messages.Read_Operation_NullSourceFileManager, null);
+			throw newException(Messages.RemoteServicesDelegate_Read_Operation_NullSourceFileManager, null);
 		}
 		if (path == null) {
-			throw newException(Messages.Read_Operation_NullPath, null);
+			throw newException(Messages.RemoteServicesDelegate_Read_Operation_NullPath, null);
 		}
 
 		IFileStore lres = manager.getResource(path);
@@ -218,15 +219,15 @@ public class RemoteServicesDelegate {
 	 */
 	public static String read(IRemoteFileManager manager, String path, IProgressMonitor progress) throws CoreException {
 		if (manager == null) {
-			throw newException(Messages.Read_Operation_NullSourceFileManager, null);
+			throw newException(Messages.RemoteServicesDelegate_Read_Operation_NullSourceFileManager, null);
 		}
 		if (path == null) {
-			throw newException(Messages.Read_Operation_NullPath, null);
+			throw newException(Messages.RemoteServicesDelegate_Read_Operation_NullPath, null);
 		}
 
 		IFileStore lres = manager.getResource(path);
 		if (!lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5)).exists()) {
-			throw newException(Messages.Read_Operation_resource_does_not_exist + COSP + lres.getName(), null);
+			throw newException(Messages.RemoteServicesDelegate_Read_Operation_resource_does_not_exist + COSP + lres.getName(), null);
 		}
 		BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE, progress));
 		StringBuffer sb = new StringBuffer();
@@ -247,7 +248,7 @@ public class RemoteServicesDelegate {
 				sb.append(new String(buffer, 0, rcvd));
 			}
 		} catch (IOException ioe) {
-			throw newException(Messages.Read_OperationFailed + path, null);
+			throw newException(Messages.RemoteServicesDelegate_Read_OperationFailed + path, null);
 		} finally {
 			try {
 				is.close();
@@ -274,10 +275,10 @@ public class RemoteServicesDelegate {
 			return;
 		}
 		if (manager == null) {
-			throw newException(Messages.Write_Operation_NullSourceFileManager, null);
+			throw newException(Messages.RemoteServicesDelegate_Write_Operation_NullSourceFileManager, null);
 		}
 		if (path == null) {
-			throw newException(Messages.Write_Operation_NullPath, null);
+			throw newException(Messages.RemoteServicesDelegate_Write_Operation_NullPath, null);
 		}
 
 		IFileStore lres = manager.getResource(path);
@@ -286,7 +287,7 @@ public class RemoteServicesDelegate {
 			os.write(contents.getBytes());
 			os.flush();
 		} catch (IOException ioe) {
-			throw newException(Messages.Write_OperationFailed + path, ioe);
+			throw newException(Messages.RemoteServicesDelegate_Write_OperationFailed + path, ioe);
 		} finally {
 			try {
 				os.close();

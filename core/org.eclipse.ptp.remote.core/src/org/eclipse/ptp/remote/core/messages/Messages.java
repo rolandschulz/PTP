@@ -21,18 +21,18 @@ public class Messages extends NLS {
 	public static String RemoteServicesProxy_0;
 	public static String RemoteServicesProxy_1;
 
-	public static String Copy_Operation_NullSourceFileManager;
-	public static String Copy_Operation_NullTargetFileManager;
-	public static String Copy_Operation_NullSource;
-	public static String Copy_Operation_NullTarget;
-	public static String Copy_Operation_Local_resource_does_not_exist;
-	public static String Write_Operation_NullSourceFileManager;
-	public static String Write_Operation_NullPath;
-	public static String Write_OperationFailed;
-	public static String Read_Operation_NullSourceFileManager;
-	public static String Read_Operation_NullPath;
-	public static String Read_Operation_resource_does_not_exist;
-	public static String Read_OperationFailed;
+	public static String RemoteServicesDelegate_Copy_Operation_NullSourceFileManager;
+	public static String RemoteServicesDelegate_Copy_Operation_NullTargetFileManager;
+	public static String RemoteServicesDelegate_Copy_Operation_NullSource;
+	public static String RemoteServicesDelegate_Copy_Operation_NullTarget;
+	public static String RemoteServicesDelegate_Copy_Operation_Local_resource_does_not_exist;
+	public static String RemoteServicesDelegate_Write_Operation_NullSourceFileManager;
+	public static String RemoteServicesDelegate_Write_Operation_NullPath;
+	public static String RemoteServicesDelegate_Write_OperationFailed;
+	public static String RemoteServicesDelegate_Read_Operation_NullSourceFileManager;
+	public static String RemoteServicesDelegate_Read_Operation_NullPath;
+	public static String RemoteServicesDelegate_Read_Operation_resource_does_not_exist;
+	public static String RemoteServicesDelegate_Read_OperationFailed;
 
 	static {
 		// initialize resource bundle
