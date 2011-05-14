@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,16 +19,11 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
- * Wizard that enables the conversion of existing projects to RDT projects
+ * Wizard that enables the conversion of existing projects to synchronized
+ * projects
  * 
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
- * of a work in progress. There is no guarantee that this API will work or that
- * it will remain the same. Please do not use this API without consulting with
- * the RDT team.
- * 
- * @author vkong
  */
-public class ConvertToRemoteWizard extends ConversionWizard {
+public class ConvertToSyncProjectWizard extends ConversionWizard {
 
 	/*
 	 * (non-Javadoc)
@@ -49,12 +44,12 @@ public class ConvertToRemoteWizard extends ConversionWizard {
 
 	@Override
 	public void addPages() {
-		addPage(mainPage = new ConvertToRemoteWizardPage(getPrefix()));
+		addPage(mainPage = new ConvertToSyncProjectWizardPage(getPrefix()));
 	}
 
 	@Override
 	public String getProjectID() {
-		return "org.eclipse.ptp.rdt.remote"; //$NON-NLS-1$
+		return "org.eclipse.ptp.rdt.sync"; //$NON-NLS-1$
 	}
 
 	/*
