@@ -201,9 +201,9 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 			// configurations.
 			// Do this last (except for adding local configuration) so that
 			// project is not flagged as initialized prematurely.
-			BuildConfigurationManager.initProject(project, serviceConfig, buildScenario);
+			BuildConfigurationManager.getInstance().initProject(project, serviceConfig, buildScenario);
 			try {
-				BuildConfigurationManager.saveConfigurationData();
+				BuildConfigurationManager.getInstance().saveConfigurationData();
 			} catch (IOException e) {
 				// TODO: What to do in this case?
 			}
