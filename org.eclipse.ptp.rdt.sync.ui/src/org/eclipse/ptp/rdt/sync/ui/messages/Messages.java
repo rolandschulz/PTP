@@ -41,6 +41,7 @@ public class Messages extends NLS {
 	public static String WizardProjectConversion_title;
 	public static String WizardProjectConversion_description;
 	public static String ConvertToRemoteWizardPage_0;
+	public static String ConvertToSyncProjectWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_convertingToSyncProject;
 	public static String RemoteBuildServiceFileLocationWidget_1;
 	public static String IndexFileLocationWidget_1;

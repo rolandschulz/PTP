@@ -171,6 +171,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 				}
 				// refresh list of connections
 				populateConnectionCombo(fConnectionCombo);
+				update();
 			}
 		});
 
@@ -190,6 +191,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 				update();
 			}
 		});
+		handleConnectionSelected();
 
 		// new connection button
 		fBrowseButton = new Button(configArea, SWT.PUSH);

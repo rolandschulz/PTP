@@ -83,69 +83,63 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 		super(pageName);
 	}
 
-	/**
-	 * Method getWzTitleResource returns the correct Title Label for this class
-	 * overriding the default in the superclass.
-	 */
-	@Override
-	protected String getWzTitleResource() {
-		return "Convert to a synchronized project"; //$NON-NLS-1$
+	private void addProviderControl(ISynchronizeParticipantDescriptor desc) {
+		Composite comp = null;
+		ISynchronizeParticipant part = desc.getParticipant();
+		if (part != null) {
+			comp = new Composite(fProviderArea, SWT.NONE);
+			comp.setLayout(new GridLayout(1, false));
+			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			part.createConfigurationArea(comp, getWizard().getContainer());
+		}
+		fProviderControls.add(comp);
 	}
 
-	/**
-	 * Method getWzDescriptionResource returns the correct description Label for
-	 * this class overriding the default in the superclass.
-	 */
 	@Override
-	protected String getWzDescriptionResource() {
-		return "Converts a managed or unmanaged project to a synchronized project by adding a sync nature"; //$NON-NLS-1$
-	}
+	protected void addToMainPage(Composite container) {
+		Composite comp = new Composite(container, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 3;
+		comp.setLayout(layout);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		comp.setLayoutData(gd);
 
-	/**
-	 * Returns true for: - non-hidden projects - non-RDT projects - projects
-	 * that does not have remote systems temporary nature - projects that are
-	 * located remotely
-	 */
-	@Override
-	public boolean isCandidate(IProject project) {
-		boolean a = false;
-		boolean b = false;
-		boolean c = false;
-		a = !project.isHidden();
-		try {
-			b = project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID);
-			c = !project.hasNature(RemoteSyncNature.NATURE_ID);
-		} catch (CoreException e) {
-			RDTSyncUIPlugin.log(e);
+		// Label for "Provider:"
+		Label providerLabel = new Label(comp, SWT.LEFT);
+		providerLabel.setText(Messages.NewRemoteSyncProjectWizardPage_syncProvider);
+
+		// combo for providers
+		fProviderCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		// set layout to grab horizontal space
+		fProviderCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		fProviderCombo.setLayoutData(gd);
+		fProviderCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				handleProviderSelected();
+			}
+		});
+
+		fProviderArea = new Group(comp, SWT.SHADOW_ETCHED_IN);
+		fProviderStack = new StackLayout();
+		fProviderArea.setLayout(fProviderStack);
+		GridData providerAreaData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		providerAreaData.horizontalSpan = 3;
+		fProviderArea.setLayoutData(providerAreaData);
+
+		// populate the combo with a list of providers
+		ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
+
+		for (int k = 0; k < providers.length; k++) {
+			fProviderCombo.add(providers[k].getName(), k);
+			fComboIndexToDescriptorMap.put(k, providers[k]);
+			addProviderControl(providers[k]);
 		}
 
-		return a && b && c;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage#convertProject
-	 * (org.eclipse.core.resources.IProject, java.lang.String,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	public void convertProject(IProject project, String bsId, IProgressMonitor monitor) throws CoreException {
-		convertProject(project, monitor);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage#convertProject
-	 * (org.eclipse.core.resources.IProject,
-	 * org.eclipse.core.runtime.IProgressMonitor, java.lang.String)
-	 */
-	@Override
-	public void convertProject(IProject project, IProgressMonitor monitor, String projectID) throws CoreException {
-		convertProject(project, monitor);
+		fProviderCombo.select(0);
+		handleProviderSelected();
 	}
 
 	/**
@@ -213,58 +207,30 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage#convertProject
+	 * (org.eclipse.core.resources.IProject,
+	 * org.eclipse.core.runtime.IProgressMonitor, java.lang.String)
+	 */
 	@Override
-	protected void addToMainPage(Composite container) {
-		Composite comp = new Composite(container, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 3;
-		comp.setLayout(layout);
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		comp.setLayoutData(gd);
+	public void convertProject(IProject project, IProgressMonitor monitor, String projectID) throws CoreException {
+		convertProject(project, monitor);
+	}
 
-		// Label for "Provider:"
-		Label providerLabel = new Label(comp, SWT.LEFT);
-		providerLabel.setText(Messages.NewRemoteSyncProjectWizardPage_syncProvider);
-
-		// combo for providers
-		fProviderCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
-		// set layout to grab horizontal space
-		fProviderCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-		gd = new GridData();
-		gd.horizontalSpan = 2;
-		fProviderCombo.setLayoutData(gd);
-		fProviderCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleProviderSelected();
-			}
-		});
-
-		fProviderArea = new Group(comp, SWT.SHADOW_ETCHED_IN);
-		fProviderStack = new StackLayout();
-		fProviderArea.setLayout(fProviderStack);
-		GridData providerAreaData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		providerAreaData.horizontalSpan = 3;
-		fProviderArea.setLayoutData(providerAreaData);
-
-		// populate the combo with a list of providers
-		ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
-
-		fProviderCombo.add(Messages.NewRemoteSyncProjectWizardPage_selectSyncProvider, 0);
-		for (int k = 0; k < providers.length; k++) {
-			fProviderCombo.add(providers[k].getName(), k + 1);
-			fComboIndexToDescriptorMap.put(k, providers[k]);
-			addProviderControl(providers[k]);
-		}
-
-		if (providers.length == 1) {
-			fProviderCombo.select(1);
-			handleProviderSelected();
-		} else {
-			fProviderCombo.select(0);
-			fSelectedProvider = null;
-		}
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage#convertProject
+	 * (org.eclipse.core.resources.IProject, java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public void convertProject(IProject project, String bsId, IProgressMonitor monitor) throws CoreException {
+		convertProject(project, monitor);
 	}
 
 	@Override
@@ -293,33 +259,6 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 	}
 
 	/**
-	 * Handle synchronize provider selected.
-	 */
-	private void handleProviderSelected() {
-		int index = fProviderCombo.getSelectionIndex() - 1;
-		if (index >= 0) {
-			fProviderStack.topControl = fProviderControls.get(index);
-			fSelectedProvider = fComboIndexToDescriptorMap.get(index);
-		} else {
-			fProviderStack.topControl = null;
-			fSelectedProvider = null;
-		}
-		fProviderArea.layout();
-	}
-
-	private void addProviderControl(ISynchronizeParticipantDescriptor desc) {
-		Composite comp = null;
-		ISynchronizeParticipant part = desc.getParticipant();
-		if (part != null) {
-			comp = new Composite(fProviderArea, SWT.NONE);
-			comp.setLayout(new GridLayout(1, false));
-			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			part.createConfigurationArea(comp, getWizard().getContainer());
-		}
-		fProviderControls.add(comp);
-	}
-
-	/**
 	 * Creates a name for the service configuration based on the remote
 	 * connection name. If multiple names exist, appends a qualifier to the
 	 * name.
@@ -341,4 +280,84 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 
 		return newConfigName;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IDialogPage#getErrorMessage()
+	 */
+	public String getErrorMessage() {
+		String errMsg = null;
+		if (super.getErrorMessage()!=null) {
+			errMsg = super.getErrorMessage();
+		} else if (fSelectedProvider==null) {
+			errMsg = Messages.ConvertToSyncProjectWizardPage_0; 
+		} else {
+			errMsg = fSelectedProvider.getParticipant().getErrorMessage();
+		}
+		setPageComplete(super.validatePage() && errMsg==null);
+		return errMsg;
+	}
+
+	/**
+	 * Method getWzDescriptionResource returns the correct description Label for
+	 * this class overriding the default in the superclass.
+	 */
+	@Override
+	protected String getWzDescriptionResource() {
+		return "Converts a managed or unmanaged project to a synchronized project by adding a sync nature"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Method getWzTitleResource returns the correct Title Label for this class
+	 * overriding the default in the superclass.
+	 */
+	@Override
+	protected String getWzTitleResource() {
+		return "Convert to a synchronized project"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Handle synchronize provider selected.
+	 */
+	private void handleProviderSelected() {
+		int index = fProviderCombo.getSelectionIndex();
+		fProviderStack.topControl = fProviderControls.get(index);
+		fSelectedProvider = fComboIndexToDescriptorMap.get(index);
+		fProviderArea.layout();
+		update();
+	}
+	
+	/**
+	 * Returns true for: - non-hidden projects - non-RDT projects - projects
+	 * that does not have remote systems temporary nature - projects that are
+	 * located remotely
+	 */
+	@Override
+	public boolean isCandidate(IProject project) {
+		boolean a = false;
+		boolean b = false;
+		boolean c = false;
+		a = !project.isHidden();
+		try {
+			b = project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID);
+			c = !project.hasNature(RemoteSyncNature.NATURE_ID);
+		} catch (CoreException e) {
+			RDTSyncUIPlugin.log(e);
+		}
+
+		return a && b && c;
+	}
+
+	/*
+	@Override
+	public boolean validatePage() {
+		return super.validatePage();// && getErrorMessage()==null;
+	}*/
+	
+	private void update() {
+		getWizard().getContainer().updateMessage();
+	}
+	
+	
 }
