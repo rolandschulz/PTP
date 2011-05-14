@@ -2,38 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.ptp.services.ui.providerContributors">
-      <providerContributor
-            class="org.eclipse.ptp.ui.wizards.RMProviderContributor"
-            id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider">
-      </providerContributor>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.launch.rmLaunchConfigurations">
-      <launchConfiguration
-            class="org.eclipse.ptp.rm.jaxb.ui.launch.JAXBRMLaunchConfigurationFactory"
-            id="org.eclipse.ptp.rm.jaxb.ui.launchConfiguration">
-      </launchConfiguration>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.ui.rmConfigurationWizards">
-      <configurationWizard
-            class="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMControlConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.jaxb.control">
-      </configurationWizard>
-      <configurationWizard
-            class="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMMonitorConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.jaxb.monitor">
-      </configurationWizard>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.ui.rmConfigurationSelections">
-      <configurationSelection
-            class="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMConfigurationSelectionFactory"
-            id="org.eclipse.ptp.rm.jaxb.JAXBServiceProvider">
-      </configurationSelection>
-   </extension>
-   <extension
          point="org.eclipse.ui.importWizards">
       <category
             id="org.eclipse.ptp.rm.ResourceManagers"

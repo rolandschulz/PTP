@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.swt.widgets.Display;
@@ -80,7 +80,7 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 	 */
 	@Override
 	public boolean performFinish() {
-		new UIJob(JAXBRMUIConstants.RESOURCE_MANAGERS) {
+		new UIJob(JAXBUIConstants.RESOURCE_MANAGERS) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				SubMonitor subMon = SubMonitor.convert(monitor);
@@ -94,11 +94,11 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 								return Status.OK_STATUS;
 							}
 
-							IFile newConfig = project.getFile(name + JAXBRMUIConstants.DOT_XML);
+							IFile newConfig = project.getFile(name + JAXBUIConstants.DOT_XML);
 							int createTry = 1;
 							while (newConfig.exists()) {
-								newConfig = project.getFile(name + JAXBRMUIConstants.SP + JAXBRMUIConstants.OPENP + createTry++
-										+ JAXBRMUIConstants.CLOSP + JAXBRMUIConstants.DOT_XML);
+								newConfig = project.getFile(name + JAXBUIConstants.SP + JAXBUIConstants.OPENP + createTry++
+										+ JAXBUIConstants.CLOSP + JAXBUIConstants.DOT_XML);
 							}
 							newConfig.create(selection.openStream(), IResource.NONE, subMon.newChild(10));
 						} catch (CoreException io) {
@@ -124,7 +124,7 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 	private static IProject checkResourceManagersProject(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor);
 		try {
-			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBRMUIConstants.RESOURCE_MANAGERS);
+			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBUIConstants.RESOURCE_MANAGERS);
 			if (!project.exists()) {
 				boolean create = MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
 						Messages.ResourceManagersNotExist_title,

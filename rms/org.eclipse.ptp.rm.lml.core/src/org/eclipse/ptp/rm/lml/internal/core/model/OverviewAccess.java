@@ -11,8 +11,6 @@
 
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,42 +25,30 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectsType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SplitlayoutType;
 
-public class OverviewAccess extends LguiHandler{
-	
+public class OverviewAccess extends LguiHandler {
+
 	public OverviewAccess(ILguiItem lguiItem, LguiType lgui) {
 		super(lguiItem, lgui);
 	}
-	
+
 	/**
-	 * Getting a list with all elements of type ObjectsType from LguiType.
-	 * @return list of elements(ObjectsType)
+	 * Getting a list of all elements of type AbsLayout.
+	 * 
+	 * @return list of elements(AbsLayout)
 	 */
-	public List<ObjectsType> getObjects() {
-		List<ObjectsType> objects = new LinkedList<ObjectsType>();
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
-			if (tag.getValue() instanceof ObjectsType) {
-				objects.add((ObjectsType) tag.getValue());
+	public List<AbslayoutType> getAbslayouts() {
+		List<AbslayoutType> layouts = new LinkedList<AbslayoutType>();
+		for (LayoutType tag : getLayouts()) {
+			if (tag instanceof AbslayoutType) {
+				layouts.add((AbslayoutType) tag);
 			}
 		}
-		return objects;
+		return layouts;
 	}
-	
-	/**
-	 * Getting a list of all elements of type InformationsType from LguiType.
-	 * @return list of elements(InfomationsType)
-	 */
-	public List<InformationType> getInformations() {
-		List<InformationType> informations = new LinkedList<InformationType>();
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
-			if (tag.getValue() instanceof InformationType) {
-				informations.add((InformationType) tag.getValue());
-			}
-		}
-		return informations;
-	}
-	
+
 	/**
 	 * Getting a list of all elements of type GobjectType from LguiType.
+	 * 
 	 * @return list of elements(GobjectsType)
 	 */
 	public List<GobjectType> getGraphicalObjects() {
@@ -75,9 +61,24 @@ public class OverviewAccess extends LguiHandler{
 		return objects;
 	}
 
-	
+	/**
+	 * Getting a list of all elements of type InformationsType from LguiType.
+	 * 
+	 * @return list of elements(InfomationsType)
+	 */
+	public List<InformationType> getInformations() {
+		List<InformationType> informations = new LinkedList<InformationType>();
+		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+			if (tag.getValue() instanceof InformationType) {
+				informations.add((InformationType) tag.getValue());
+			}
+		}
+		return informations;
+	}
+
 	/**
 	 * Getting a list of all elements of type LayoutType.
+	 * 
 	 * @return list of elements(LayoutType)
 	 */
 	public List<LayoutType> getLayouts() {
@@ -89,9 +90,25 @@ public class OverviewAccess extends LguiHandler{
 		}
 		return layouts;
 	}
-	
+
+	/**
+	 * Getting a list with all elements of type ObjectsType from LguiType.
+	 * 
+	 * @return list of elements(ObjectsType)
+	 */
+	public List<ObjectsType> getObjects() {
+		List<ObjectsType> objects = new LinkedList<ObjectsType>();
+		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+			if (tag.getValue() instanceof ObjectsType) {
+				objects.add((ObjectsType) tag.getValue());
+			}
+		}
+		return objects;
+	}
+
 	/**
 	 * Getting a list of all elements of type Splitlayout.
+	 * 
 	 * @return list of elements(Splitlayout)
 	 */
 	public List<SplitlayoutType> getSplitlayouts() {
@@ -103,20 +120,5 @@ public class OverviewAccess extends LguiHandler{
 		}
 		return tables;
 	}
-	
-	/**
-	 * Getting a list of all elements of type AbsLayout.
-	 * @return list of elements(AbsLayout)
-	 */
-	public List<AbslayoutType> getAbslayouts() {
-		List<AbslayoutType> layouts = new LinkedList<AbslayoutType>();
-		for (LayoutType tag : getLayouts()) {
-			if (tag instanceof AbslayoutType) {
-				layouts.add((AbslayoutType) tag);
-			}
-		}
-		return layouts;
-	}
-	
-}
 
+}

@@ -17,7 +17,11 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
+import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob;
+import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
+import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
+import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
@@ -25,14 +29,10 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
-import org.eclipse.ptp.rm.jaxb.core.runnable.ManagedFilesJob;
-import org.eclipse.ptp.rm.jaxb.core.runnable.ScriptHandler;
-import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
-import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 
 public class ManagedFilesTest extends TestCase {
 
-	private static final String xml = JAXBRMConstants.DATA + "test-pbs.xml"; //$NON-NLS-1$
+	private static final String xml = JAXBControlConstants.DATA + "test-pbs.xml"; //$NON-NLS-1$
 	private static ControlType controlData;
 	private static Map<String, Object> env;
 	private static Map<String, String> live;
@@ -72,7 +72,7 @@ public class ManagedFilesTest extends TestCase {
 	public void testManagedFiles() {
 		composeScript();
 		if (verbose) {
-			PropertyType contents = (PropertyType) env.get(JAXBRMConstants.SCRIPT);
+			PropertyType contents = (PropertyType) env.get(JAXBControlConstants.SCRIPT);
 			if (contents != null) {
 				System.out.println(contents.getValue());
 			}
@@ -97,7 +97,7 @@ public class ManagedFilesTest extends TestCase {
 	private void composeScript() {
 		ScriptType script = controlData.getScript();
 		assertNotNull(script);
-		ScriptHandler job = new ScriptHandler(null, script, rmVarMap, live);
+		ScriptHandler job = new ScriptHandler(null, script, rmVarMap, live, false);
 		job.schedule();
 		try {
 			job.join();
@@ -105,7 +105,7 @@ public class ManagedFilesTest extends TestCase {
 			t.printStackTrace();
 		}
 
-		PropertyType contents = (PropertyType) env.get(JAXBRMConstants.SCRIPT);
+		PropertyType contents = (PropertyType) env.get(JAXBControlConstants.SCRIPT);
 		assertNotNull(contents);
 	}
 
@@ -114,18 +114,18 @@ public class ManagedFilesTest extends TestCase {
 	}
 
 	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files) {
-		PropertyType scriptVar = (PropertyType) rmVarMap.get(JAXBRMConstants.SCRIPT);
-		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(JAXBRMConstants.SCRIPT_PATH);
+		PropertyType scriptVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT);
+		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
-				files.setFileStagingLocation(JAXBRMConstants.ECLIPSESETTINGS);
+				files.setFileStagingLocation(JAXBControlConstants.ECLIPSESETTINGS);
 			}
 			List<ManagedFileType> fileList = files.getFile();
 			ManagedFileType scriptFile = null;
 			if (!fileList.isEmpty()) {
 				for (ManagedFileType f : fileList) {
-					if (f.getName().equals(JAXBRMConstants.SCRIPT_FILE)) {
+					if (f.getName().equals(JAXBControlConstants.SCRIPT_FILE)) {
 						scriptFile = f;
 						break;
 					}
@@ -133,7 +133,7 @@ public class ManagedFilesTest extends TestCase {
 			}
 			if (scriptFile == null) {
 				scriptFile = new ManagedFileType();
-				scriptFile.setName(JAXBRMConstants.SCRIPT_FILE);
+				scriptFile.setName(JAXBControlConstants.SCRIPT_FILE);
 				fileList.add(scriptFile);
 			}
 			scriptFile.setResolveContents(false);
@@ -142,8 +142,8 @@ public class ManagedFilesTest extends TestCase {
 				scriptFile.setPath(String.valueOf(scriptPathVar.getValue()));
 				scriptFile.setDeleteAfterUse(false);
 			} else {
-				scriptFile.setContents(JAXBRMConstants.OPENVRM + JAXBRMConstants.SCRIPT + JAXBRMConstants.PD
-						+ JAXBRMConstants.VALUE + JAXBRMConstants.CLOSV);
+				scriptFile.setContents(JAXBControlConstants.OPENVRM + JAXBControlConstants.SCRIPT + JAXBControlConstants.PD
+						+ JAXBControlConstants.VALUE + JAXBControlConstants.CLOSV);
 				scriptFile.setDeleteAfterUse(true);
 			}
 		}
@@ -167,12 +167,12 @@ public class ManagedFilesTest extends TestCase {
 				((AttributeType) target).setValue(value);
 			}
 		}
-		putValue(JAXBRMConstants.CONTROL_USER_VAR, "fooUser"); //$NON-NLS-1$
-		putValue(JAXBRMConstants.CONTROL_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
-		putValue(JAXBRMConstants.DIRECTORY, "/u/ncsa/arossi/test"); //$NON-NLS-1$ 
-		putValue(JAXBRMConstants.MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
-		putValue(JAXBRMConstants.MPI_ARGS, "-np 8"); //$NON-NLS-1$ 
-		putValue(JAXBRMConstants.EXEC_PATH, "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ 
+		putValue(JAXBControlConstants.CONTROL_USER_VAR, "fooUser"); //$NON-NLS-1$
+		putValue(JAXBControlConstants.CONTROL_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
+		putValue(JAXBControlConstants.DIRECTORY, "/u/ncsa/arossi/test"); //$NON-NLS-1$ 
+		putValue(JAXBControlConstants.MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
+		putValue(JAXBControlConstants.MPI_ARGS, "-np 8"); //$NON-NLS-1$ 
+		putValue(JAXBControlConstants.EXEC_PATH, "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ 
 		if (verbose) {
 			RMDataTest.print(rmVarMap);
 		}

@@ -38,13 +38,14 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
+import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManager;
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerControl;
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerMonitor;
-import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
+import org.eclipse.ptp.rm.lml_jaxb.internal.core.LMLJAXBResourceManager;
+import org.eclipse.ptp.rm.lml_jaxb.internal.core.LMLJAXBResourceManagerMonitor;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider;
@@ -214,9 +215,9 @@ public class RMLaunchTest extends TestCase {
 		}
 	}
 
-	private static final String xml = JAXBRMConstants.DATA + "test-pbs.xml"; //$NON-NLS-1$
+	private static final String xml = JAXBCoreConstants.DATA + "test-pbs.xml"; //$NON-NLS-1$
 	private JAXBResourceManagerConfiguration rmConfig;
-	private JAXBResourceManager rm;
+	private LMLJAXBResourceManager rm;
 	private ILaunchConfiguration launchConfig;
 
 	@Override
@@ -236,7 +237,7 @@ public class RMLaunchTest extends TestCase {
 	public void testResourceManager() {
 		try {
 			emulateConfigureWizard();
-			rm = new JAXBResourceManager(rmConfig, new JAXBResourceManagerControl(rmConfig), new JAXBResourceManagerMonitor(
+			rm = new LMLJAXBResourceManager(rmConfig, new JAXBResourceManagerControl(rmConfig), new LMLJAXBResourceManagerMonitor(
 					rmConfig));
 			PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
 			rm.start(new NullProgressMonitor());
@@ -278,7 +279,7 @@ public class RMLaunchTest extends TestCase {
 		assert (localServices != null);
 		IRemoteConnectionManager localConnectionManager = localServices.getConnectionManager();
 		assert (localConnectionManager != null);
-		IRemoteConnection localConnection = localConnectionManager.getConnection(JAXBRMConstants.ZEROSTR);
+		IRemoteConnection localConnection = localConnectionManager.getConnection(JAXBCoreConstants.ZEROSTR);
 		assert (localConnection != null);
 		rmConfig.setRemoteServicesId(localServices.getId());
 		rmConfig.setConnectionName(localConnection.getName());
@@ -301,9 +302,9 @@ public class RMLaunchTest extends TestCase {
 		env.put("Resource_List.nodes", "1:ppn=8"); //$NON-NLS-1$ //$NON-NLS-2$
 		env.put("Resource_List.walltime", "00:10:00"); //$NON-NLS-1$ //$NON-NLS-2$
 		env.put("export_all", true); //$NON-NLS-1$
-		env.put(JAXBRMConstants.MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
-		env.put(JAXBRMConstants.MPI_ARGS, "-machinefile $PBS_NODEFILE -np 8"); //$NON-NLS-1$ 
-		RMVariableMap rmVarMap = rm.getJAXBConfiguration().getRMVariableMap();
+		env.put(JAXBControlConstants.MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
+		env.put(JAXBControlConstants.MPI_ARGS, "-machinefile $PBS_NODEFILE -np 8"); //$NON-NLS-1$ 
+		IVariableMap rmVarMap = rm.getJAXBConfiguration().getRMVariableMap();
 		PropertyType queues = (PropertyType) rmVarMap.getVariables().get("available_queues"); //$NON-NLS-1$ 
 		if (queues != null) {
 			List<String> q = (List<String>) queues.getValue();

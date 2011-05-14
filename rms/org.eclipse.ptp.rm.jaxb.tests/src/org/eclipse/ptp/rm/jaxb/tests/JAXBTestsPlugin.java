@@ -26,9 +26,8 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.JAXBRMConstants;
-import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.core.utils.JAXBInitializationUtils;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.xml.sax.SAXException;
@@ -130,7 +129,7 @@ public class JAXBTestsPlugin extends Plugin {
 		URL url = null;
 		if (getDefault() != null) {
 			Bundle bundle = getDefault().getBundle();
-			url = FileLocator.find(bundle, new Path(JAXBRMConstants.PATH_SEP + resource), null);
+			url = FileLocator.find(bundle, new Path(JAXBCoreConstants.PATH_SEP + resource), null);
 		} else {
 			url = new File(resource).toURL();
 		}
@@ -186,7 +185,7 @@ public class JAXBTestsPlugin extends Plugin {
 	 * @param e
 	 */
 	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, Messages.JAXBCorePlugin_Exception_InternalError, e));
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
 	}
 
 	public static void validate(String xml) throws SAXException, IOException, URISyntaxException {

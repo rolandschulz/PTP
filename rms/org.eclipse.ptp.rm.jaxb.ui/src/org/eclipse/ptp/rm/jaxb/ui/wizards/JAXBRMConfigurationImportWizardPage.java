@@ -16,8 +16,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.JAXBExtensionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -69,7 +70,7 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements S
 				Messages.ConfigurationImportWizardPageTooltip);
 		gridData = WidgetBuilderUtils.createGridDataFillH(2);
 		configurations = WidgetBuilderUtils.createCombo(group, SWT.BORDER | SWT.READ_ONLY, gridData, items,
-				JAXBRMUIConstants.ZEROSTR, null, null, this);
+				JAXBUIConstants.ZEROSTR, null, null, this);
 		setControl(group);
 	}
 
@@ -97,9 +98,9 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements S
 	 * Populate the combo box and URL data with the available extensions.
 	 */
 	public void loadConfigurations() {
-		JAXBRMConfigurationSelectionFactory.loadExtensions(fRMJAXBResourceManagers);
+		JAXBExtensionUtils.loadExtensions(fRMJAXBResourceManagers);
 		List<String> names = new ArrayList<String>();
-		names.add(JAXBRMUIConstants.ZEROSTR);
+		names.add(JAXBUIConstants.ZEROSTR);
 		List<URL> locations = new ArrayList<URL>();
 		locations.add(null);
 		for (Map.Entry<String, URL> e : fRMJAXBResourceManagers.entrySet()) {

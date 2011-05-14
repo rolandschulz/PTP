@@ -708,5 +708,9 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
          <custom-controller>Import PBS Script</custom-controller>
       </launch-tab>
    </control-data>
-   <monitor-data schedulerType="PBS"/>
+   <monitor-data schedulerType="PBS">
+      <driver>
+         <name></name>
+      </driver>
+   </monitor-data>
 </resource-manager-builder>

@@ -45,69 +45,6 @@ public class RMProviderContributor implements IServiceProviderContributor {
 	private static Map<String, RMConfigurationWizardPageFactory> fRMConfigurationWizardPageFactories = null;
 	private static Map<String, RMConfigurationSelectionFactory> fRMConfigurationSelectionFactories = null;
 
-	public static RMConfigurationSelectionFactory getRMConfigurationSelectionFactory(String id) {
-		getRMConfigurationSelectionFactories();
-		return fRMConfigurationSelectionFactories.get(id);
-	}
-
-	public static RMConfigurationWizardPageFactory getRMConfigurationWizardPageFactory(String id) {
-		getRMConfigurationWizardPageFactories();
-		return fRMConfigurationWizardPageFactories.get(id);
-	}
-
-	private static void getRMConfigurationSelectionFactories() {
-		if (fRMConfigurationSelectionFactories == null) {
-			fRMConfigurationSelectionFactories = new HashMap<String, RMConfigurationSelectionFactory>();
-
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry.getExtensionPoint(SELECTION_EXTENSION_POINT);
-
-			if (extensionPoint != null) {
-				for (IExtension ext : extensionPoint.getExtensions()) {
-					for (IConfigurationElement ce : ext.getConfigurationElements()) {
-						String id = ce.getAttribute(ID_ATTRIBUTE);
-						if (ce.getAttribute(CLASS_ATTRIBUTE) != null) {
-							try {
-								RMConfigurationSelectionFactory factory = (RMConfigurationSelectionFactory) ce
-										.createExecutableExtension(CLASS_ATTRIBUTE);
-								factory.setId(id);
-								fRMConfigurationSelectionFactories.put(id, factory);
-							} catch (Exception e) {
-								PTPCorePlugin.log(e);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private static void getRMConfigurationWizardPageFactories() {
-		if (fRMConfigurationWizardPageFactories == null) {
-			fRMConfigurationWizardPageFactories = new HashMap<String, RMConfigurationWizardPageFactory>();
-
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry.getExtensionPoint(WIZARD_EXTENSION_POINT);
-
-			if (extensionPoint != null) {
-				for (IExtension ext : extensionPoint.getExtensions()) {
-					for (IConfigurationElement ce : ext.getConfigurationElements()) {
-						String id = ce.getAttribute(ID_ATTRIBUTE);
-						if (ce.getAttribute(CLASS_ATTRIBUTE) != null) {
-							try {
-								RMConfigurationWizardPageFactory factory = (RMConfigurationWizardPageFactory) ce
-										.createExecutableExtension(CLASS_ATTRIBUTE);
-								fRMConfigurationWizardPageFactories.put(id, factory);
-							} catch (Exception e) {
-								PTPCorePlugin.log(e);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -195,4 +132,66 @@ public class RMProviderContributor implements IServiceProviderContributor {
 		return wizardPages.toArray(new RMConfigurationWizardPage[0]);
 	}
 
+	public static RMConfigurationSelectionFactory getRMConfigurationSelectionFactory(String id) {
+		getRMConfigurationSelectionFactories();
+		return fRMConfigurationSelectionFactories.get(id);
+	}
+
+	public static RMConfigurationWizardPageFactory getRMConfigurationWizardPageFactory(String id) {
+		getRMConfigurationWizardPageFactories();
+		return fRMConfigurationWizardPageFactories.get(id);
+	}
+
+	private static void getRMConfigurationSelectionFactories() {
+		if (fRMConfigurationSelectionFactories == null) {
+			fRMConfigurationSelectionFactories = new HashMap<String, RMConfigurationSelectionFactory>();
+
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry.getExtensionPoint(SELECTION_EXTENSION_POINT);
+
+			if (extensionPoint != null) {
+				for (IExtension ext : extensionPoint.getExtensions()) {
+					for (IConfigurationElement ce : ext.getConfigurationElements()) {
+						String id = ce.getAttribute(ID_ATTRIBUTE);
+						if (ce.getAttribute(CLASS_ATTRIBUTE) != null) {
+							try {
+								RMConfigurationSelectionFactory factory = (RMConfigurationSelectionFactory) ce
+										.createExecutableExtension(CLASS_ATTRIBUTE);
+								factory.setId(id);
+								fRMConfigurationSelectionFactories.put(id, factory);
+							} catch (Exception e) {
+								PTPCorePlugin.log(e);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private static void getRMConfigurationWizardPageFactories() {
+		if (fRMConfigurationWizardPageFactories == null) {
+			fRMConfigurationWizardPageFactories = new HashMap<String, RMConfigurationWizardPageFactory>();
+
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry.getExtensionPoint(WIZARD_EXTENSION_POINT);
+
+			if (extensionPoint != null) {
+				for (IExtension ext : extensionPoint.getExtensions()) {
+					for (IConfigurationElement ce : ext.getConfigurationElements()) {
+						String id = ce.getAttribute(ID_ATTRIBUTE);
+						if (ce.getAttribute(CLASS_ATTRIBUTE) != null) {
+							try {
+								RMConfigurationWizardPageFactory factory = (RMConfigurationWizardPageFactory) ce
+										.createExecutableExtension(CLASS_ATTRIBUTE);
+								fRMConfigurationWizardPageFactories.put(id, factory);
+							} catch (Exception e) {
+								PTPCorePlugin.log(e);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }

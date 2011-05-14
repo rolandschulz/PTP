@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -126,7 +125,7 @@ public class JAXBCorePlugin extends Plugin {
 		URL url = null;
 		if (getDefault() != null) {
 			Bundle bundle = getDefault().getBundle();
-			url = FileLocator.find(bundle, new Path(JAXBRMConstants.PATH_SEP + resource), null);
+			url = FileLocator.find(bundle, new Path(JAXBCoreConstants.PATH_SEP + resource), null);
 		} else {
 			url = new File(resource).toURI().toURL();
 		}
@@ -169,6 +168,6 @@ public class JAXBCorePlugin extends Plugin {
 	 * @param e
 	 */
 	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, Messages.JAXBCorePlugin_Exception_InternalError, e));
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
 	}
 }

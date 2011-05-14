@@ -12,7 +12,6 @@ package org.eclipse.ptp.rm.jaxb.core;
 import java.util.Map;
 
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.core.variables.RMVariableMap;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
@@ -32,12 +31,7 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	/**
 	 * @return resource manager environment
 	 */
-	public RMVariableMap getEnvironment();
-
-	/**
-	 * @return table of jobs with open processes
-	 */
-	public Map<String, ICommandJob> getJobTable();
+	public IVariableMap getEnvironment();
 
 	/**
 	 * @return the user-defined environment (from the Environment Tab)
@@ -53,11 +47,6 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	 * @return state of resource manager
 	 */
 	public String getState();
-
-	/**
-	 * @return resource manager status map
-	 */
-	public ICommandJobStatusMap getStatusMap();
 
 	/**
 	 * For callbacks to the resource manager from internal jobs.

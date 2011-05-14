@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
-import org.eclipse.ptp.rm.jaxb.core.rm.JAXBResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
@@ -21,9 +20,17 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
 public interface IJAXBResourceManager extends IResourceManager {
 
 	/**
+	 * Exported abstract call.
+	 * 
+	 * @param jobId
+	 *            of job whose state has changed
+	 */
+	public void fireJobChanged(String jobId);
+
+	/**
 	 * @return the control sub-manager.
 	 */
-	public JAXBResourceManagerControl getControl();
+	public IJAXBResourceManagerControl getControl();
 
 	/**
 	 * @return the associated configuration

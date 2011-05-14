@@ -395,5 +395,9 @@
 			</stdout-parser>
 		</get-job-status>
 	</control-data>
-	<monitor-data/>
+	<monitor-data schedulerType="test">
+      <driver>
+         <name></name>
+      </driver>
+   </monitor-data>
 </resource-manager-builder>

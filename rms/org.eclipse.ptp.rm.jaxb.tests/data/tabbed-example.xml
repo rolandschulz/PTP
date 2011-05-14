@@ -242,5 +242,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			</dynamic>
 		</launch-tab>
 	</control-data>
-	<monitor-data schedulerType="MyMonitor"/>
+	<monitor-data schedulerType="Tabbed">
+      <driver>
+         <name></name>
+      </driver>
+   </monitor-data>
 </resource-manager-builder>

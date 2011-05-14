@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
-import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -98,11 +97,12 @@ public class JAXBUIPlugin extends AbstractUIPlugin {
 	 * @return unique identifier string
 	 */
 	public static String getUniqueIdentifier() {
-		if (getDefault() == null)
+		if (getDefault() == null) {
 			// If the default instance is not yet initialized,
 			// return a static identifier. This identifier must
 			// match the plugin id defined in plugin.xml
 			return PLUGIN_ID;
+		}
 		return getDefault().getBundle().getSymbolicName();
 	}
 
@@ -130,6 +130,6 @@ public class JAXBUIPlugin extends AbstractUIPlugin {
 	 * @param e
 	 */
 	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, Messages.JAXBUIPlugin_Exception_InternalError, e));
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
 	}
 }

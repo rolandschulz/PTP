@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.rm.jaxb.control.JAXBPreferenceManager">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.core.variables.dynamicVariables">
+      <variable
+            description="Dynamic resource manager configuration variable"
+            name="ptp_rm"
+            resolver="org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableResolver">
+      </variable>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer">
+      <streamParserTokenizer
+            class="org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.ConfigurableRegexTokenizer"
+            id="org.eclipse.ptp.rm.jaxb.configurableRegexTokenizer"
+            name="Configurable Regex Tokenizer">
+      </streamParserTokenizer>
+   </extension>
+
+</plugin>

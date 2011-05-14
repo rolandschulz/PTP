@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.core.variables.dynamicVariables">
+      <variable
+            description="Dynamic variable backed by LaunchConfiguration"
+            name="ptp_lc"
+            resolver="org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableResolver">
+      </variable>
+   </extension>
+
+</plugin>

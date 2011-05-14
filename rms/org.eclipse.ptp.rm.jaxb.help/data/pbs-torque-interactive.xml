@@ -228,5 +228,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			</dynamic>
 		</launch-tab>
 	</control-data>
-	<monitor-data schedulerType="PBS"/>
+	<monitor-data schedulerType="PBS">
+      <driver>
+         <name></name>
+      </driver>
+   </monitor-data>
 </resource-manager-builder>

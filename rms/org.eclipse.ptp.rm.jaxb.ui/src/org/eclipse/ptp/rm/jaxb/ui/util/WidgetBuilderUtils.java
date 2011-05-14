@@ -6,7 +6,6 @@
  * 	
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
- *  M Venkataramana - set up editing: http://eclipse.dzone.com/users/venkat_r_m
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
@@ -17,29 +16,15 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.FontRegistry;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TreeViewerColumn;
-import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBRMUIConstants;
-import org.eclipse.ptp.rm.jaxb.ui.cell.AttributeViewerEditingSupport;
-import org.eclipse.ptp.rm.jaxb.ui.providers.TableDataContentProvider;
-import org.eclipse.ptp.rm.jaxb.ui.providers.TreeDataContentProvider;
-import org.eclipse.ptp.rm.jaxb.ui.providers.ViewerDataCellLabelProvider;
-import org.eclipse.ptp.rm.jaxb.ui.sorters.AttributeViewerSorter;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -64,7 +49,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
 
 /**
  * Convenience methods for constructing and configuring widgets.
@@ -98,9 +82,9 @@ public class WidgetBuilderUtils {
 	public static void applyMonospace(Text text) {
 		// Courier exists on Mac, Linux, Windows ...
 		FontType fd = new FontType();
-		fd.setName(JAXBRMUIConstants.COURIER);
+		fd.setName(JAXBUIConstants.COURIER);
 		fd.setSize(14);
-		fd.setStyle(JAXBRMUIConstants.NORMAL);
+		fd.setStyle(JAXBUIConstants.NORMAL);
 		Font font = getFont(fd);
 		if (font != null) {
 			text.setFont(font);
@@ -122,7 +106,7 @@ public class WidgetBuilderUtils {
 			button.setText(label);
 		}
 		if (layoutData == null) {
-			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
+			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
 		}
 		button.setLayoutData(layoutData);
 		if (null != listener) {
@@ -187,7 +171,7 @@ public class WidgetBuilderUtils {
 			combo.setItems(items);
 		}
 		if (data == null) {
-			data = createGridData(JAXBRMUIConstants.DEFAULT, 1);
+			data = createGridData(JAXBUIConstants.DEFAULT, 1);
 		}
 		combo.setLayoutData(data);
 		if (initialValue != null) {
@@ -209,8 +193,8 @@ public class WidgetBuilderUtils {
 	 * @return composite
 	 */
 	public static Composite createComposite(Composite parent, Integer columns) {
-		GridLayout layout = createGridLayout(columns, false, JAXBRMUIConstants.DEFAULT, 1, JAXBRMUIConstants.DEFAULT,
-				JAXBRMUIConstants.DEFAULT);
+		GridLayout layout = createGridLayout(columns, false, JAXBUIConstants.DEFAULT, 1, JAXBUIConstants.DEFAULT,
+				JAXBUIConstants.DEFAULT);
 		return createComposite(parent, SWT.NONE, layout, null);
 	}
 
@@ -227,7 +211,7 @@ public class WidgetBuilderUtils {
 			composite.setLayout(layout);
 		}
 		if (layoutData == null) {
-			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
+			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
 		}
 		composite.setData(layoutData);
 		return composite;
@@ -363,9 +347,9 @@ public class WidgetBuilderUtils {
 	 */
 	public static GridData createGridData(Integer style, Boolean grabExcessHorizontal, Boolean grabExcessVertical,
 			Integer widthHint, Integer heightHint, Integer horizontalSpan, Integer verticalSpan) {
-		return createGridData(style, grabExcessHorizontal, grabExcessVertical, widthHint, heightHint, JAXBRMUIConstants.DEFAULT,
-				JAXBRMUIConstants.DEFAULT, horizontalSpan, verticalSpan, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT,
-				JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT);
+		return createGridData(style, grabExcessHorizontal, grabExcessVertical, widthHint, heightHint, JAXBUIConstants.DEFAULT,
+				JAXBUIConstants.DEFAULT, horizontalSpan, verticalSpan, JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT,
+				JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT);
 	}
 
 	/**
@@ -389,7 +373,7 @@ public class WidgetBuilderUtils {
 			Integer verticalSpan, Integer horizonalAlign, Integer verticalAlign, Integer horizontalIndent, Integer verticalIndent) {
 		GridData data = null;
 		if (null != style) {
-			if (style == JAXBRMUIConstants.DEFAULT) {
+			if (style == JAXBUIConstants.DEFAULT) {
 				data = new GridData();
 			} else {
 				data = new GridData(style);
@@ -404,34 +388,34 @@ public class WidgetBuilderUtils {
 		if (grabExcessVertical != null) {
 			data.grabExcessVerticalSpace = grabExcessVertical;
 		}
-		if (null != widthHint && widthHint != JAXBRMUIConstants.DEFAULT) {
+		if (null != widthHint && widthHint != JAXBUIConstants.DEFAULT) {
 			data.widthHint = widthHint;
 		}
-		if (null != heightHint && heightHint != JAXBRMUIConstants.DEFAULT) {
+		if (null != heightHint && heightHint != JAXBUIConstants.DEFAULT) {
 			data.heightHint = heightHint;
 		}
-		if (null != minimumWidth && minimumWidth != JAXBRMUIConstants.DEFAULT) {
+		if (null != minimumWidth && minimumWidth != JAXBUIConstants.DEFAULT) {
 			data.minimumWidth = minimumWidth;
 		}
-		if (null != minimumHeight && minimumHeight != JAXBRMUIConstants.DEFAULT) {
+		if (null != minimumHeight && minimumHeight != JAXBUIConstants.DEFAULT) {
 			data.minimumHeight = minimumHeight;
 		}
-		if (null != horizontalSpan && horizontalSpan != JAXBRMUIConstants.DEFAULT) {
+		if (null != horizontalSpan && horizontalSpan != JAXBUIConstants.DEFAULT) {
 			data.horizontalSpan = horizontalSpan;
 		}
-		if (null != verticalSpan && verticalSpan != JAXBRMUIConstants.DEFAULT) {
+		if (null != verticalSpan && verticalSpan != JAXBUIConstants.DEFAULT) {
 			data.verticalSpan = verticalSpan;
 		}
-		if (null != horizonalAlign && horizonalAlign != JAXBRMUIConstants.DEFAULT) {
+		if (null != horizonalAlign && horizonalAlign != JAXBUIConstants.DEFAULT) {
 			data.horizontalAlignment = horizonalAlign;
 		}
-		if (null != verticalAlign && verticalAlign != JAXBRMUIConstants.DEFAULT) {
+		if (null != verticalAlign && verticalAlign != JAXBUIConstants.DEFAULT) {
 			data.verticalAlignment = verticalAlign;
 		}
-		if (null != horizontalIndent && horizontalIndent != JAXBRMUIConstants.DEFAULT) {
+		if (null != horizontalIndent && horizontalIndent != JAXBUIConstants.DEFAULT) {
 			data.horizontalIndent = horizontalIndent;
 		}
-		if (null != verticalIndent && verticalIndent != JAXBRMUIConstants.DEFAULT) {
+		if (null != verticalIndent && verticalIndent != JAXBUIConstants.DEFAULT) {
 			data.verticalIndent = verticalIndent;
 		}
 		return data;
@@ -443,8 +427,8 @@ public class WidgetBuilderUtils {
 	 * @return grid data
 	 */
 	public static GridData createGridData(Integer style, Integer cols) {
-		return createGridData(style, false, false, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT, cols,
-				JAXBRMUIConstants.DEFAULT);
+		return createGridData(style, false, false, JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT, cols,
+				JAXBUIConstants.DEFAULT);
 	}
 
 	/**
@@ -457,7 +441,7 @@ public class WidgetBuilderUtils {
 	 * @return grid data
 	 */
 	public static GridData createGridDataFill(Integer widthHint, Integer heightHint, Integer cols) {
-		return createGridData(GridData.FILL_BOTH, true, true, widthHint, heightHint, cols, JAXBRMUIConstants.DEFAULT);
+		return createGridData(GridData.FILL_BOTH, true, true, widthHint, heightHint, cols, JAXBUIConstants.DEFAULT);
 	}
 
 	/**
@@ -467,8 +451,8 @@ public class WidgetBuilderUtils {
 	 * @return grid data
 	 */
 	public static GridData createGridDataFillH(Integer cols) {
-		return createGridData(GridData.FILL_HORIZONTAL, true, false, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT, cols,
-				JAXBRMUIConstants.DEFAULT);
+		return createGridData(GridData.FILL_HORIZONTAL, true, false, JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT, cols,
+				JAXBUIConstants.DEFAULT);
 	}
 
 	/**
@@ -477,8 +461,8 @@ public class WidgetBuilderUtils {
 	 * @return grid layout
 	 */
 	public static GridLayout createGridLayout(Integer columns, Boolean makeColumnsEqualWidth) {
-		return createGridLayout(columns, makeColumnsEqualWidth, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT,
-				JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT);
+		return createGridLayout(columns, makeColumnsEqualWidth, JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT,
+				JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT);
 	}
 
 	/**
@@ -493,7 +477,7 @@ public class WidgetBuilderUtils {
 	public static GridLayout createGridLayout(Integer columns, Boolean makeColumnsEqualWidth, Integer horizontalSpacing,
 			Integer verticalSpacing, Integer marginWidth, Integer marginHeight) {
 		return createGridLayout(columns, makeColumnsEqualWidth, horizontalSpacing, verticalSpacing, marginWidth, marginHeight,
-				JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT, JAXBRMUIConstants.DEFAULT);
+				JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT);
 	}
 
 	/**
@@ -519,28 +503,28 @@ public class WidgetBuilderUtils {
 		if (makeColumnsEqualWidth != null) {
 			gridLayout.makeColumnsEqualWidth = makeColumnsEqualWidth;
 		}
-		if (null != horizontalSpacing && horizontalSpacing != JAXBRMUIConstants.DEFAULT) {
+		if (null != horizontalSpacing && horizontalSpacing != JAXBUIConstants.DEFAULT) {
 			gridLayout.horizontalSpacing = horizontalSpacing;
 		}
-		if (null != verticalSpacing && verticalSpacing != JAXBRMUIConstants.DEFAULT) {
+		if (null != verticalSpacing && verticalSpacing != JAXBUIConstants.DEFAULT) {
 			gridLayout.verticalSpacing = verticalSpacing;
 		}
-		if (null != marginWidth && marginWidth != JAXBRMUIConstants.DEFAULT) {
+		if (null != marginWidth && marginWidth != JAXBUIConstants.DEFAULT) {
 			gridLayout.marginWidth = marginWidth;
 		}
-		if (null != marginHeight && marginHeight != JAXBRMUIConstants.DEFAULT) {
+		if (null != marginHeight && marginHeight != JAXBUIConstants.DEFAULT) {
 			gridLayout.marginHeight = marginHeight;
 		}
-		if (null != marginLeft && marginLeft != JAXBRMUIConstants.DEFAULT) {
+		if (null != marginLeft && marginLeft != JAXBUIConstants.DEFAULT) {
 			gridLayout.marginLeft = marginLeft;
 		}
-		if (null != marginRight && marginRight != JAXBRMUIConstants.DEFAULT) {
+		if (null != marginRight && marginRight != JAXBUIConstants.DEFAULT) {
 			gridLayout.marginRight = marginRight;
 		}
-		if (null != marginTop && marginTop != JAXBRMUIConstants.DEFAULT) {
+		if (null != marginTop && marginTop != JAXBUIConstants.DEFAULT) {
 			gridLayout.marginTop = marginTop;
 		}
-		if (null != marginBottom && marginBottom != JAXBRMUIConstants.DEFAULT) {
+		if (null != marginBottom && marginBottom != JAXBUIConstants.DEFAULT) {
 			gridLayout.marginBottom = marginBottom;
 		}
 		return gridLayout;
@@ -572,7 +556,7 @@ public class WidgetBuilderUtils {
 			group.setLayout(layout);
 		}
 		if (layoutData == null) {
-			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
+			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
 		}
 		group.setLayoutData(layoutData);
 		if (text != null) {
@@ -589,7 +573,7 @@ public class WidgetBuilderUtils {
 	 * @return label
 	 */
 	public static Label createLabel(Composite container, String text, Integer style, Integer columnSpan) {
-		GridData data = createGridData(JAXBRMUIConstants.DEFAULT, columnSpan);
+		GridData data = createGridData(JAXBUIConstants.DEFAULT, columnSpan);
 		return createLabel(container, text, style, data);
 	}
 
@@ -603,11 +587,11 @@ public class WidgetBuilderUtils {
 	public static Label createLabel(Composite container, String text, Integer style, Object layoutData) {
 		Label label = new Label(container, style);
 		if (text == null) {
-			text = JAXBRMUIConstants.ZEROSTR;
+			text = JAXBUIConstants.ZEROSTR;
 		}
 		label.setText(text.trim());
 		if (layoutData == null) {
-			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
+			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
 		}
 		if (layoutData != null) {
 			label.setLayoutData(layoutData);
@@ -749,7 +733,7 @@ public class WidgetBuilderUtils {
 			s.setSelection(initialValue);
 		}
 		if (layoutData == null) {
-			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
+			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
 		}
 		s.setLayoutData(layoutData);
 		if (listener != null) {
@@ -787,7 +771,7 @@ public class WidgetBuilderUtils {
 				cols = gd.horizontalSpan;
 			}
 		} else {
-			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, cols);
+			layoutData = createGridData(JAXBUIConstants.DEFAULT, cols);
 		}
 		if (style == null) {
 			style = SWT.None;
@@ -828,7 +812,7 @@ public class WidgetBuilderUtils {
 			ModifyListener listener, Color color) {
 		Text text = new Text(parent, style);
 		if (layoutData == null) {
-			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, 1);
+			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
 		}
 		text.setLayoutData(layoutData);
 		if (readOnly != null) {
@@ -860,7 +844,7 @@ public class WidgetBuilderUtils {
 				cols = gd.horizontalSpan;
 			}
 		} else {
-			layoutData = createGridData(JAXBRMUIConstants.DEFAULT, cols);
+			layoutData = createGridData(JAXBUIConstants.DEFAULT, cols);
 		}
 		if (style == null) {
 			style = SWT.None;
@@ -884,75 +868,75 @@ public class WidgetBuilderUtils {
 	 */
 	public static Color getColor(String color) {
 		int swtColor = SWT.COLOR_BLACK;
-		if (JAXBRMUIConstants.COLOR_BLACK.equals(color)) {
+		if (JAXBUIConstants.COLOR_BLACK.equals(color)) {
 			swtColor = SWT.COLOR_BLACK;
-		} else if (JAXBRMUIConstants.COLOR_WHITE.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_WHITE.equals(color)) {
 			swtColor = SWT.COLOR_WHITE;
-		} else if (JAXBRMUIConstants.COLOR_RED.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_RED.equals(color)) {
 			swtColor = SWT.COLOR_RED;
-		} else if (JAXBRMUIConstants.COLOR_DARK_RED.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_DARK_RED.equals(color)) {
 			swtColor = SWT.COLOR_DARK_RED;
-		} else if (JAXBRMUIConstants.COLOR_GREEN.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_GREEN.equals(color)) {
 			swtColor = SWT.COLOR_GREEN;
-		} else if (JAXBRMUIConstants.COLOR_DARK_GREEN.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_DARK_GREEN.equals(color)) {
 			swtColor = SWT.COLOR_DARK_GREEN;
-		} else if (JAXBRMUIConstants.COLOR_YELLOW.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_YELLOW.equals(color)) {
 			swtColor = SWT.COLOR_YELLOW;
-		} else if (JAXBRMUIConstants.COLOR_DARK_YELLOW.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_DARK_YELLOW.equals(color)) {
 			swtColor = SWT.COLOR_DARK_YELLOW;
-		} else if (JAXBRMUIConstants.COLOR_BLUE.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_BLUE.equals(color)) {
 			swtColor = SWT.COLOR_BLUE;
-		} else if (JAXBRMUIConstants.COLOR_DARK_BLUE.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_DARK_BLUE.equals(color)) {
 			swtColor = SWT.COLOR_DARK_BLUE;
-		} else if (JAXBRMUIConstants.COLOR_MAGENTA.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_MAGENTA.equals(color)) {
 			swtColor = SWT.COLOR_MAGENTA;
-		} else if (JAXBRMUIConstants.COLOR_DARK_MAGENTA.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_DARK_MAGENTA.equals(color)) {
 			swtColor = SWT.COLOR_DARK_MAGENTA;
-		} else if (JAXBRMUIConstants.COLOR_CYAN.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_CYAN.equals(color)) {
 			swtColor = SWT.COLOR_CYAN;
-		} else if (JAXBRMUIConstants.COLOR_DARK_CYAN.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_DARK_CYAN.equals(color)) {
 			swtColor = SWT.COLOR_DARK_CYAN;
-		} else if (JAXBRMUIConstants.COLOR_GRAY.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_GRAY.equals(color)) {
 			swtColor = SWT.COLOR_GRAY;
-		} else if (JAXBRMUIConstants.COLOR_DARK_GRAY.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_DARK_GRAY.equals(color)) {
 			swtColor = SWT.COLOR_DARK_GRAY;
-		} else if (JAXBRMUIConstants.COLOR_INFO_BACKGROUND.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_INFO_BACKGROUND.equals(color)) {
 			swtColor = SWT.COLOR_INFO_BACKGROUND;
-		} else if (JAXBRMUIConstants.COLOR_INFO_FOREGROUND.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_INFO_FOREGROUND.equals(color)) {
 			swtColor = SWT.COLOR_INFO_FOREGROUND;
-		} else if (JAXBRMUIConstants.COLOR_LIST_BACKGROUND.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_LIST_BACKGROUND.equals(color)) {
 			swtColor = SWT.COLOR_LIST_BACKGROUND;
-		} else if (JAXBRMUIConstants.COLOR_LIST_FOREGROUND.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_LIST_FOREGROUND.equals(color)) {
 			swtColor = SWT.COLOR_LIST_FOREGROUND;
-		} else if (JAXBRMUIConstants.COLOR_LIST_SELECTION.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_LIST_SELECTION.equals(color)) {
 			swtColor = SWT.COLOR_LIST_SELECTION;
-		} else if (JAXBRMUIConstants.COLOR_LIST_SELECTION_TEXT.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_LIST_SELECTION_TEXT.equals(color)) {
 			swtColor = SWT.COLOR_LIST_SELECTION_TEXT;
-		} else if (JAXBRMUIConstants.COLOR_TITLE_BACKGROUND.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_TITLE_BACKGROUND.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_BACKGROUND;
-		} else if (JAXBRMUIConstants.COLOR_TITLE_BACKGROUND_GRADIENT.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_TITLE_BACKGROUND_GRADIENT.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_BACKGROUND_GRADIENT;
-		} else if (JAXBRMUIConstants.COLOR_TITLE_FOREGROUND.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_TITLE_FOREGROUND.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_FOREGROUND;
-		} else if (JAXBRMUIConstants.COLOR_TITLE_INACTIVE_BACKGROUND.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_TITLE_INACTIVE_BACKGROUND.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_INACTIVE_BACKGROUND;
-		} else if (JAXBRMUIConstants.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT;
-		} else if (JAXBRMUIConstants.COLOR_TITLE_INACTIVE_FOREGROUND.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_TITLE_INACTIVE_FOREGROUND.equals(color)) {
 			swtColor = SWT.COLOR_TITLE_INACTIVE_FOREGROUND;
-		} else if (JAXBRMUIConstants.COLOR_WIDGET_BACKGROUND.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_WIDGET_BACKGROUND.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_BACKGROUND;
-		} else if (JAXBRMUIConstants.COLOR_WIDGET_BORDER.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_WIDGET_BORDER.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_BORDER;
-		} else if (JAXBRMUIConstants.COLOR_WIDGET_DARK_SHADOW.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_WIDGET_DARK_SHADOW.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_DARK_SHADOW;
-		} else if (JAXBRMUIConstants.COLOR_WIDGET_FOREGROUND.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_WIDGET_FOREGROUND.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_FOREGROUND;
-		} else if (JAXBRMUIConstants.COLOR_WIDGET_HIGHLIGHT_SHADOW.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_WIDGET_HIGHLIGHT_SHADOW.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW;
-		} else if (JAXBRMUIConstants.COLOR_WIDGET_LIGHT_SHADOW.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_WIDGET_LIGHT_SHADOW.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_LIGHT_SHADOW;
-		} else if (JAXBRMUIConstants.COLOR_WIDGET_NORMAL_SHADOW.equals(color)) {
+		} else if (JAXBUIConstants.COLOR_WIDGET_NORMAL_SHADOW.equals(color)) {
 			swtColor = SWT.COLOR_WIDGET_NORMAL_SHADOW;
 		}
 		/*
@@ -994,10 +978,10 @@ public class WidgetBuilderUtils {
 	 * @return SWT code
 	 */
 	public static int getStyle(String style) {
-		if (style == null || JAXBRMUIConstants.ZEROSTR.equals(style)) {
+		if (style == null || JAXBUIConstants.ZEROSTR.equals(style)) {
 			return SWT.NONE;
 		}
-		return getStyle(style.split(JAXBRMUIConstants.REGPIP));
+		return getStyle(style.split(JAXBUIConstants.REGPIP));
 	}
 
 	/**
@@ -1013,11 +997,11 @@ public class WidgetBuilderUtils {
 		List<String> list = new ArrayList(Arrays.asList(items));
 		for (Iterator<String> s = list.iterator(); s.hasNext();) {
 			String item = s.next().trim();
-			if (JAXBRMUIConstants.ZEROSTR.equals(item) || JAXBRMUIConstants.LINE_SEP.equals(item)) {
+			if (JAXBUIConstants.ZEROSTR.equals(item) || JAXBUIConstants.LINE_SEP.equals(item)) {
 				s.remove();
 			}
 		}
-		list.add(0, JAXBRMUIConstants.ZEROSTR);
+		list.add(0, JAXBUIConstants.ZEROSTR);
 		return list.toArray(new String[0]);
 	}
 
@@ -1032,8 +1016,8 @@ public class WidgetBuilderUtils {
 		if (text == null) {
 			return null;
 		}
-		if (JAXBRMUIConstants.ZEROSTR.equals(text)) {
-			return JAXBRMUIConstants.ZEROSTR;
+		if (JAXBUIConstants.ZEROSTR.equals(text)) {
+			return JAXBUIConstants.ZEROSTR;
 		}
 		StringBuffer newLine = new StringBuffer();
 		int strln = text.length();
@@ -1044,9 +1028,9 @@ public class WidgetBuilderUtils {
 			case '\t':
 			case '\n':
 			case '\r':
-				if (lastChar != JAXBRMUIConstants.SP.charAt(0)) {
-					newLine.append(JAXBRMUIConstants.SP);
-					lastChar = JAXBRMUIConstants.SP.charAt(0);
+				if (lastChar != JAXBUIConstants.SP.charAt(0)) {
+					newLine.append(JAXBUIConstants.SP);
+					lastChar = JAXBUIConstants.SP.charAt(0);
 				}
 				break;
 			default:
@@ -1055,75 +1039,6 @@ public class WidgetBuilderUtils {
 			}
 		}
 		return newLine.toString();
-	}
-
-	/**
-	 * Configures the CheckboxTableViewer. Calls
-	 * {@link #setupCommon(ColumnViewer, List, ISelectionChangedListener, boolean)}
-	 * and
-	 * {@link #setupSpecific(CheckboxTableViewer, List, Boolean, boolean, boolean)}
-	 * .
-	 * 
-	 * @param viewer
-	 * @param columnData
-	 *            JAXB data element describing viewer columns
-	 * @param listener
-	 * @param sortByName
-	 * @param tooltip
-	 * @param headerVisible
-	 * @param linesVisible
-	 */
-	public static void setupAttributeTable(final CheckboxTableViewer viewer, List<ColumnDataType> columnData,
-			ISelectionChangedListener listener, boolean sortByName, boolean tooltip, boolean headerVisible, boolean linesVisible) {
-		setupSpecific(viewer, columnData, sortByName, headerVisible, linesVisible);
-		setupCommon(viewer, columnData, listener, tooltip);
-	}
-
-	/**
-	 * Configures the CheckboxTreeViewer. Calls
-	 * {@link #setupCommon(ColumnViewer, List, ISelectionChangedListener, boolean)}
-	 * and
-	 * {@link #setupSpecific(CheckboxTreeViewer, List, Boolean, boolean, boolean)}
-	 * .
-	 * 
-	 * @param viewer
-	 * @param columnData
-	 *            JAXB data element describing viewer columns
-	 * @param listener
-	 * @param sortByName
-	 * @param tooltip
-	 * @param headerVisible
-	 * @param linesVisible
-	 */
-	public static void setupAttributeTree(final CheckboxTreeViewer viewer, List<ColumnDataType> columnData,
-			ISelectionChangedListener listener, boolean sortByName, boolean tooltip, boolean headerVisible, boolean linesVisible) {
-		setupSpecific(viewer, columnData, sortByName, headerVisible, linesVisible);
-		setupCommon(viewer, columnData, listener, tooltip);
-	}
-
-	/**
-	 * Creates adapter with sorter for viewer.
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.ui.sorters.AttributeViewerSorter
-	 * 
-	 * @param viewer
-	 * @return adapter for the name column
-	 */
-	private static SelectionAdapter getAttributeViewerSelectionAdapter(final ColumnViewer viewer) {
-		return new SelectionAdapter() {
-			private boolean toggle = false;
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-
-				AttributeViewerSorter sorter = new AttributeViewerSorter();
-				if (toggle) {
-					sorter.toggle();
-				}
-				viewer.setSorter(sorter);
-				toggle = !toggle;
-			}
-		};
 	}
 
 	/**
@@ -1139,359 +1054,241 @@ public class WidgetBuilderUtils {
 
 		for (String s : style) {
 			s = s.trim();
-			if (JAXBRMUIConstants.ARROW.equals(s)) {
+			if (JAXBUIConstants.ARROW.equals(s)) {
 				swt |= SWT.ARROW;
 			}
-			if (JAXBRMUIConstants.BACKGROUND.equals(s)) {
+			if (JAXBUIConstants.BACKGROUND.equals(s)) {
 				swt |= SWT.BACKGROUND;
 			}
-			if (JAXBRMUIConstants.BALLOON.equals(s)) {
+			if (JAXBUIConstants.BALLOON.equals(s)) {
 				swt |= SWT.BALLOON;
 			}
-			if (JAXBRMUIConstants.BAR.equals(s)) {
+			if (JAXBUIConstants.BAR.equals(s)) {
 				swt |= SWT.BAR;
 			}
-			if (JAXBRMUIConstants.BEGINNING.equals(s)) {
+			if (JAXBUIConstants.BEGINNING.equals(s)) {
 				swt |= SWT.BEGINNING;
 			}
-			if (JAXBRMUIConstants.BORDER.equals(s)) {
+			if (JAXBUIConstants.BORDER.equals(s)) {
 				swt |= SWT.BORDER;
 			}
-			if (JAXBRMUIConstants.BORDER_DASH.equals(s)) {
+			if (JAXBUIConstants.BORDER_DASH.equals(s)) {
 				swt |= SWT.BORDER_DASH;
 			}
-			if (JAXBRMUIConstants.BORDER_DOT.equals(s)) {
+			if (JAXBUIConstants.BORDER_DOT.equals(s)) {
 				swt |= SWT.BORDER_DOT;
 			}
-			if (JAXBRMUIConstants.BORDER_SOLID.equals(s)) {
+			if (JAXBUIConstants.BORDER_SOLID.equals(s)) {
 				swt |= SWT.BORDER_SOLID;
 			}
-			if (JAXBRMUIConstants.BOTTOM.equals(s)) {
+			if (JAXBUIConstants.BOTTOM.equals(s)) {
 				swt |= SWT.BOTTOM;
 			}
-			if (JAXBRMUIConstants.CASCADE.equals(s)) {
+			if (JAXBUIConstants.CASCADE.equals(s)) {
 				swt |= SWT.CASCADE;
 			}
-			if (JAXBRMUIConstants.CENTER.equals(s)) {
+			if (JAXBUIConstants.CENTER.equals(s)) {
 				swt |= SWT.CENTER;
 			}
-			if (JAXBRMUIConstants.CHECK.equals(s)) {
+			if (JAXBUIConstants.CHECK.equals(s)) {
 				swt |= SWT.CHECK;
 			}
-			if (JAXBRMUIConstants.DIALOG_TRIM.equals(s)) {
+			if (JAXBUIConstants.DIALOG_TRIM.equals(s)) {
 				swt |= SWT.DIALOG_TRIM;
 			}
-			if (JAXBRMUIConstants.DOWN.equals(s)) {
+			if (JAXBUIConstants.DOWN.equals(s)) {
 				swt |= SWT.DOWN;
 			}
-			if (JAXBRMUIConstants.DROP_DOWN.equals(s)) {
+			if (JAXBUIConstants.DROP_DOWN.equals(s)) {
 				swt |= SWT.DROP_DOWN;
 			}
-			if (JAXBRMUIConstants.FILL.equals(s)) {
+			if (JAXBUIConstants.FILL.equals(s)) {
 				swt |= SWT.FILL;
 			}
-			if (JAXBRMUIConstants.FILL_BOTH.equals(s)) {
+			if (JAXBUIConstants.FILL_BOTH.equals(s)) {
 				swt |= GridData.FILL_BOTH;
 			}
-			if (JAXBRMUIConstants.FILL_EVEN_ODD.equals(s)) {
+			if (JAXBUIConstants.FILL_EVEN_ODD.equals(s)) {
 				swt |= SWT.FILL_EVEN_ODD;
 			}
-			if (JAXBRMUIConstants.FILL_HORIZONTAL.equals(s)) {
+			if (JAXBUIConstants.FILL_HORIZONTAL.equals(s)) {
 				swt |= GridData.FILL_HORIZONTAL;
 			}
-			if (JAXBRMUIConstants.FILL_VERTICAL.equals(s)) {
+			if (JAXBUIConstants.FILL_VERTICAL.equals(s)) {
 				swt |= GridData.FILL_VERTICAL;
 			}
-			if (JAXBRMUIConstants.FILL_WINDING.equals(s)) {
+			if (JAXBUIConstants.FILL_WINDING.equals(s)) {
 				swt |= SWT.FILL_WINDING;
 			}
-			if (JAXBRMUIConstants.FOREGROUND.equals(s)) {
+			if (JAXBUIConstants.FOREGROUND.equals(s)) {
 				swt |= SWT.FOREGROUND;
 			}
-			if (JAXBRMUIConstants.FULL_SELECTION.equals(s)) {
+			if (JAXBUIConstants.FULL_SELECTION.equals(s)) {
 				swt |= SWT.FULL_SELECTION;
 			}
-			if (JAXBRMUIConstants.H_SCROLL.equals(s)) {
+			if (JAXBUIConstants.H_SCROLL.equals(s)) {
 				swt |= SWT.H_SCROLL;
 			}
-			if (JAXBRMUIConstants.HORIZONTAL.equals(s)) {
+			if (JAXBUIConstants.HORIZONTAL.equals(s)) {
 				swt |= SWT.HORIZONTAL;
 			}
-			if (JAXBRMUIConstants.LEAD.equals(s)) {
+			if (JAXBUIConstants.LEAD.equals(s)) {
 				swt |= SWT.LEAD;
 			}
-			if (JAXBRMUIConstants.LEFT.equals(s)) {
+			if (JAXBUIConstants.LEFT.equals(s)) {
 				swt |= SWT.LEFT;
 			}
-			if (JAXBRMUIConstants.LEFT_TO_RIGHT.equals(s)) {
+			if (JAXBUIConstants.LEFT_TO_RIGHT.equals(s)) {
 				swt |= SWT.LEFT_TO_RIGHT;
 			}
-			if (JAXBRMUIConstants.LINE_CUSTOM.equals(s)) {
+			if (JAXBUIConstants.LINE_CUSTOM.equals(s)) {
 				swt |= SWT.LINE_CUSTOM;
 			}
-			if (JAXBRMUIConstants.LINE_DASH.equals(s)) {
+			if (JAXBUIConstants.LINE_DASH.equals(s)) {
 				swt |= SWT.LINE_DASH;
 			}
-			if (JAXBRMUIConstants.LINE_DASHDOT.equals(s)) {
+			if (JAXBUIConstants.LINE_DASHDOT.equals(s)) {
 				swt |= SWT.LINE_DASHDOT;
 			}
-			if (JAXBRMUIConstants.LINE_DASHDOTDOT.equals(s)) {
+			if (JAXBUIConstants.LINE_DASHDOTDOT.equals(s)) {
 				swt |= SWT.LINE_DASHDOTDOT;
 			}
-			if (JAXBRMUIConstants.LINE_DOT.equals(s)) {
+			if (JAXBUIConstants.LINE_DOT.equals(s)) {
 				swt |= SWT.LINE_DOT;
 			}
-			if (JAXBRMUIConstants.LINE_SOLID.equals(s)) {
+			if (JAXBUIConstants.LINE_SOLID.equals(s)) {
 				swt |= SWT.LINE_SOLID;
 			}
-			if (JAXBRMUIConstants.MODELESS.equals(s)) {
+			if (JAXBUIConstants.MODELESS.equals(s)) {
 				swt |= SWT.MODELESS;
 			}
-			if (JAXBRMUIConstants.MULTI.equals(s)) {
+			if (JAXBUIConstants.MULTI.equals(s)) {
 				swt |= SWT.MULTI;
 			}
-			if (JAXBRMUIConstants.NO.equals(s)) {
+			if (JAXBUIConstants.NO.equals(s)) {
 				swt |= SWT.NO;
 			}
-			if (JAXBRMUIConstants.NO_BACKGROUND.equals(s)) {
+			if (JAXBUIConstants.NO_BACKGROUND.equals(s)) {
 				swt |= SWT.NO_BACKGROUND;
 			}
-			if (JAXBRMUIConstants.NO_FOCUS.equals(s)) {
+			if (JAXBUIConstants.NO_FOCUS.equals(s)) {
 				swt |= SWT.NO_FOCUS;
 			}
-			if (JAXBRMUIConstants.NO_MERGE_PAINTS.equals(s)) {
+			if (JAXBUIConstants.NO_MERGE_PAINTS.equals(s)) {
 				swt |= SWT.NO_MERGE_PAINTS;
 			}
-			if (JAXBRMUIConstants.NO_RADIO_GROUP.equals(s)) {
+			if (JAXBUIConstants.NO_RADIO_GROUP.equals(s)) {
 				swt |= SWT.NO_RADIO_GROUP;
 			}
-			if (JAXBRMUIConstants.NO_REDRAW_RESIZE.equals(s)) {
+			if (JAXBUIConstants.NO_REDRAW_RESIZE.equals(s)) {
 				swt |= SWT.NO_REDRAW_RESIZE;
 			}
-			if (JAXBRMUIConstants.NO_SCROLL.equals(s)) {
+			if (JAXBUIConstants.NO_SCROLL.equals(s)) {
 				swt |= SWT.NO_SCROLL;
 			}
-			if (JAXBRMUIConstants.NO_TRIM.equals(s)) {
+			if (JAXBUIConstants.NO_TRIM.equals(s)) {
 				swt |= SWT.NO_TRIM;
 			}
-			if (JAXBRMUIConstants.NONE.equals(s)) {
+			if (JAXBUIConstants.NONE.equals(s)) {
 				swt |= SWT.NONE;
 			}
-			if (JAXBRMUIConstants.NORMAL.equals(s)) {
+			if (JAXBUIConstants.NORMAL.equals(s)) {
 				swt |= SWT.NORMAL;
 			}
-			if (JAXBRMUIConstants.ON_TOP.equals(s)) {
+			if (JAXBUIConstants.ON_TOP.equals(s)) {
 				swt |= SWT.ON_TOP;
 			}
-			if (JAXBRMUIConstants.OPEN.equals(s)) {
+			if (JAXBUIConstants.OPEN.equals(s)) {
 				swt |= SWT.OPEN;
 			}
-			if (JAXBRMUIConstants.POP_UP.equals(s)) {
+			if (JAXBUIConstants.POP_UP.equals(s)) {
 				swt |= SWT.POP_UP;
 			}
-			if (JAXBRMUIConstants.PRIMARY_MODAL.equals(s)) {
+			if (JAXBUIConstants.PRIMARY_MODAL.equals(s)) {
 				swt |= SWT.PRIMARY_MODAL;
 			}
-			if (JAXBRMUIConstants.PUSH.equals(s)) {
+			if (JAXBUIConstants.PUSH.equals(s)) {
 				swt |= SWT.PUSH;
 			}
-			if (JAXBRMUIConstants.RADIO.equals(s)) {
+			if (JAXBUIConstants.RADIO.equals(s)) {
 				swt |= SWT.RADIO;
 			}
-			if (JAXBRMUIConstants.READ_ONLY.equals(s)) {
+			if (JAXBUIConstants.READ_ONLY.equals(s)) {
 				swt |= SWT.READ_ONLY;
 			}
-			if (JAXBRMUIConstants.RESIZE.equals(s)) {
+			if (JAXBUIConstants.RESIZE.equals(s)) {
 				swt |= SWT.RESIZE;
 			}
-			if (JAXBRMUIConstants.RIGHT.equals(s)) {
+			if (JAXBUIConstants.RIGHT.equals(s)) {
 				swt |= SWT.RIGHT;
 			}
-			if (JAXBRMUIConstants.RIGHT_TO_LEFT.equals(s)) {
+			if (JAXBUIConstants.RIGHT_TO_LEFT.equals(s)) {
 				swt |= SWT.RIGHT_TO_LEFT;
 			}
-			if (JAXBRMUIConstants.SCROLL_LINE.equals(s)) {
+			if (JAXBUIConstants.SCROLL_LINE.equals(s)) {
 				swt |= SWT.SCROLL_LINE;
 			}
-			if (JAXBRMUIConstants.SCROLL_LOCK.equals(s)) {
+			if (JAXBUIConstants.SCROLL_LOCK.equals(s)) {
 				swt |= SWT.SCROLL_LOCK;
 			}
-			if (JAXBRMUIConstants.SCROLL_PAGE.equals(s)) {
+			if (JAXBUIConstants.SCROLL_PAGE.equals(s)) {
 				swt |= SWT.SCROLL_PAGE;
 			}
-			if (JAXBRMUIConstants.SHADOW_ETCHED_IN.equals(s)) {
+			if (JAXBUIConstants.SHADOW_ETCHED_IN.equals(s)) {
 				swt |= SWT.SHADOW_ETCHED_IN;
 			}
-			if (JAXBRMUIConstants.SHADOW_ETCHED_OUT.equals(s)) {
+			if (JAXBUIConstants.SHADOW_ETCHED_OUT.equals(s)) {
 				swt |= SWT.SHADOW_ETCHED_OUT;
 			}
-			if (JAXBRMUIConstants.SHADOW_IN.equals(s)) {
+			if (JAXBUIConstants.SHADOW_IN.equals(s)) {
 				swt |= SWT.SHADOW_IN;
 			}
-			if (JAXBRMUIConstants.SHADOW_NONE.equals(s)) {
+			if (JAXBUIConstants.SHADOW_NONE.equals(s)) {
 				swt |= SWT.SHADOW_NONE;
 			}
-			if (JAXBRMUIConstants.SHADOW_OUT.equals(s)) {
+			if (JAXBUIConstants.SHADOW_OUT.equals(s)) {
 				swt |= SWT.SHADOW_OUT;
 			}
-			if (JAXBRMUIConstants.SHELL_TRIM.equals(s)) {
+			if (JAXBUIConstants.SHELL_TRIM.equals(s)) {
 				swt |= SWT.SHELL_TRIM;
 			}
-			if (JAXBRMUIConstants.SHORT.equals(s)) {
+			if (JAXBUIConstants.SHORT.equals(s)) {
 				swt |= SWT.SHORT;
 			}
-			if (JAXBRMUIConstants.SIMPLE.equals(s)) {
+			if (JAXBUIConstants.SIMPLE.equals(s)) {
 				swt |= SWT.SIMPLE;
 			}
-			if (JAXBRMUIConstants.SINGLE.equals(s)) {
+			if (JAXBUIConstants.SINGLE.equals(s)) {
 				swt |= SWT.SINGLE;
 			}
-			if (JAXBRMUIConstants.SMOOTH.equals(s)) {
+			if (JAXBUIConstants.SMOOTH.equals(s)) {
 				swt |= SWT.SMOOTH;
 			}
-			if (JAXBRMUIConstants.TITLE.equals(s)) {
+			if (JAXBUIConstants.TITLE.equals(s)) {
 				swt |= SWT.TITLE;
 			}
-			if (JAXBRMUIConstants.TOGGLE.equals(s)) {
+			if (JAXBUIConstants.TOGGLE.equals(s)) {
 				swt |= SWT.TOGGLE;
 			}
-			if (JAXBRMUIConstants.TOP.equals(s)) {
+			if (JAXBUIConstants.TOP.equals(s)) {
 				swt |= SWT.TOP;
 			}
-			if (JAXBRMUIConstants.UP.equals(s)) {
+			if (JAXBUIConstants.UP.equals(s)) {
 				swt |= SWT.UP;
 			}
-			if (JAXBRMUIConstants.V_SCROLL.equals(s)) {
+			if (JAXBUIConstants.V_SCROLL.equals(s)) {
 				swt |= SWT.V_SCROLL;
 			}
-			if (JAXBRMUIConstants.VERTICAL.equals(s)) {
+			if (JAXBUIConstants.VERTICAL.equals(s)) {
 				swt |= SWT.VERTICAL;
 			}
-			if (JAXBRMUIConstants.WRAP.equals(s)) {
+			if (JAXBUIConstants.WRAP.equals(s)) {
 				swt |= SWT.WRAP;
 			}
-			if (JAXBRMUIConstants.YES.equals(s)) {
+			if (JAXBUIConstants.YES.equals(s)) {
 				swt |= SWT.YES;
 			}
 		}
 		return swt;
-	}
-
-	/**
-	 * Configure parts of viewer common to Table and Tree types.
-	 * 
-	 * @param viewer
-	 * @param columnData
-	 *            JAXB data element describing viewer columns
-	 * @param listener
-	 * @param tooltip
-	 */
-	private static void setupCommon(final ColumnViewer viewer, List<ColumnDataType> columnData, ISelectionChangedListener listener,
-			boolean tooltip) {
-		String[] columnProperties = new String[columnData.size()];
-		for (int i = 0; i < columnData.size(); i++) {
-			ColumnDataType columnDescriptor = columnData.get(i);
-			columnProperties[i] = columnDescriptor.getName();
-		}
-		viewer.setColumnProperties(columnProperties);
-		if (tooltip) {
-			ColumnViewerToolTipSupport.enableFor(viewer);
-		}
-		if (listener != null) {
-			viewer.addSelectionChangedListener(listener);
-		}
-		viewer.setLabelProvider(new ViewerDataCellLabelProvider(columnData));
-	}
-
-	/**
-	 * Configure parts of viewer specific to Table type.
-	 * 
-	 * @param viewer
-	 * @param columnData
-	 *            JAXB data element describing viewer columns
-	 * @param sortOnName
-	 * @param headerVisible
-	 * @param linesVisible
-	 */
-	private static void setupSpecific(final CheckboxTableViewer viewer, List<ColumnDataType> columnData, Boolean sortOnName,
-			boolean headerVisible, boolean linesVisible) {
-		for (int i = 0; i < columnData.size(); i++) {
-			ColumnDataType columnDescriptor = columnData.get(i);
-			TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
-			TableColumn column = viewerColumn.getColumn();
-			String name = columnDescriptor.getName();
-			column.setText(name);
-			column.setMoveable(columnDescriptor.isMoveable());
-			column.setResizable(columnDescriptor.isResizable());
-			String tt = columnDescriptor.getTooltip();
-			if (tt != null) {
-				column.setToolTipText(tt);
-			}
-			if (JAXBRMUIConstants.UNDEFINED != columnDescriptor.getWidth()) {
-				column.setWidth(columnDescriptor.getWidth());
-			}
-			if (null != columnDescriptor.getAlignment()) {
-				column.setAlignment(getStyle(columnDescriptor.getAlignment()));
-			}
-			if (JAXBRMUIConstants.COLUMN_NAME.equals(name)) {
-				if (sortOnName != null) {
-					if (sortOnName) {
-						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
-					}
-				}
-			}
-			if (JAXBRMUIConstants.COLUMN_VALUE.equals(columnDescriptor.getName())) {
-				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
-			}
-		}
-		viewer.setContentProvider(new TableDataContentProvider());
-		viewer.getTable().setHeaderVisible(headerVisible);
-		viewer.getTable().setLinesVisible(linesVisible);
-	}
-
-	/**
-	 * Configure parts of viewer specific to Tree type.
-	 * 
-	 * @param viewer
-	 * @param columnData
-	 *            JAXB data element describing viewer columns
-	 * @param sortOnName
-	 * @param headerVisible
-	 * @param linesVisible
-	 */
-	private static void setupSpecific(final CheckboxTreeViewer viewer, List<ColumnDataType> columnData, Boolean sortOnName,
-			boolean headerVisible, boolean linesVisible) {
-		for (int i = 0; i < columnData.size(); i++) {
-			ColumnDataType columnDescriptor = columnData.get(i);
-			TreeViewerColumn viewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
-			TreeColumn column = viewerColumn.getColumn();
-			String name = columnDescriptor.getName();
-			column.setText(name);
-			column.setMoveable(columnDescriptor.isMoveable());
-			column.setResizable(columnDescriptor.isResizable());
-			String tt = columnDescriptor.getTooltip();
-			if (tt != null) {
-				column.setToolTipText(tt);
-			}
-			if (JAXBRMUIConstants.UNDEFINED != columnDescriptor.getWidth()) {
-				column.setWidth(columnDescriptor.getWidth());
-			}
-			if (null != columnDescriptor.getAlignment()) {
-				column.setAlignment(getStyle(columnDescriptor.getAlignment()));
-			}
-			if (JAXBRMUIConstants.COLUMN_NAME.equals(name)) {
-				if (sortOnName != null) {
-					if (sortOnName) {
-						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
-					}
-				}
-			}
-			if (JAXBRMUIConstants.COLUMN_VALUE.equals(columnDescriptor.getName())) {
-				viewerColumn.setEditingSupport(new AttributeViewerEditingSupport(viewer));
-			}
-		}
-		viewer.setContentProvider(new TreeDataContentProvider());
-		viewer.getTree().setHeaderVisible(headerVisible);
-		viewer.getTree().setLinesVisible(linesVisible);
 	}
 }
