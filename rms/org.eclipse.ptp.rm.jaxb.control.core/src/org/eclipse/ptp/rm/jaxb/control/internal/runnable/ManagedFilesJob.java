@@ -87,8 +87,13 @@ public class ManagedFilesJob extends Job {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		try {
+			delegate = control.getRemoteServicesDelegate(monitor);
+		} catch (Throwable t) {
+			return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
+		}
+
 		rmVarMap = control.getEnvironment();
-		delegate = control.getRemoteServicesDelegate(monitor);
 		stagingDir = rmVarMap.getString(uuid, stagingDir);
 
 		boolean localTarget = delegate.getLocalFileManager() == delegate.getRemoteFileManager();
@@ -108,7 +113,7 @@ public class ManagedFilesJob extends Job {
 				}
 				String pathSep = localTarget ? JAXBControlConstants.PATH_SEP : JAXBControlConstants.REMOTE_PATH_SEP;
 				String target = stagingDir + pathSep + fileName;
-				copyFileToRemoteHost(localFile.getAbsolutePath(), target, progress);
+				copyFileToRemoteHost(localFile.getAbsolutePath(), target, progress.newChild(5));
 				if (file.isDeleteAfterUse()) {
 					localFile.delete();
 				}

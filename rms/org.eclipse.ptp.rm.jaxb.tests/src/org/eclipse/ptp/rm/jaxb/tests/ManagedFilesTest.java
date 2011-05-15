@@ -122,8 +122,10 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#
 	 * getRemoteServicesDelegate(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) {
-		return new RemoteServicesDelegate(null, null, monitor);
+	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
+		RemoteServicesDelegate d = new RemoteServicesDelegate(null, null);
+		d.initialize(monitor);
+		return d;
 	}
 
 	/*

@@ -11,6 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
@@ -40,12 +41,13 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	public Map<String, String> getLaunchEnv();
 
 	/**
-	 * connection information for this resource manager
+	 * Connection information for this resource manager
 	 * 
 	 * @param monitor
 	 * @return
+	 * @throws CoreException
 	 */
-	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor);
+	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * @return state of resource manager

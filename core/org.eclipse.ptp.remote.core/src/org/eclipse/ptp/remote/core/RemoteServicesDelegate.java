@@ -42,56 +42,28 @@ public class RemoteServicesDelegate {
 	private static final int UNDEFINED = -1;
 	private static final int COPY_BUFFER_SIZE = 64 * 1024;
 
-	private final IRemoteServices remoteServices;
-	private final IRemoteServices localServices;
-	private final IRemoteConnectionManager remoteConnectionManager;
-	private final IRemoteConnectionManager localConnectionManager;
-	private final IRemoteConnection remoteConnection;
-	private final IRemoteConnection localConnection;
-	private final IRemoteFileManager remoteFileManager;
-	private final IRemoteFileManager localFileManager;
-	private final URI localHome;
-	private final URI remoteHome;
+	private final String remoteServicesId;
+	private final String remoteConnectionName;
+	private IRemoteServices remoteServices;
+	private IRemoteServices localServices;
+	private IRemoteConnectionManager remoteConnectionManager;
+	private IRemoteConnectionManager localConnectionManager;
+	private IRemoteConnection remoteConnection;
+	private IRemoteConnection localConnection;
+	private IRemoteFileManager remoteFileManager;
+	private IRemoteFileManager localFileManager;
+	private URI localHome;
+	private URI remoteHome;
 
 	/**
-	 * On the basis of the passed in identifiers, constructs the local and
-	 * remote services, connection manager, connection, file manager and home
-	 * URIs.
-	 * 
 	 * @param remoteServicesId
 	 *            e.g., "local", "remotetools", "rse"
 	 * @param remoteConnectionName
 	 *            e.g., "ember.ncsa.illinois.edu"
-	 * @param monitor
 	 */
-	public RemoteServicesDelegate(String remoteServicesId, String remoteConnectionName, IProgressMonitor monitor) {
-		localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
-		assert (localServices != null);
-		localConnectionManager = localServices.getConnectionManager();
-		assert (localConnectionManager != null);
-		localConnection = localConnectionManager.getConnection("Local");//$NON-NLS-1$
-		assert (localConnection != null);
-		localFileManager = localServices.getFileManager(localConnection);
-		assert (localFileManager != null);
-
-		if (remoteServicesId != null) {
-			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, monitor);
-			assert (null != remoteServices);
-			remoteConnectionManager = remoteServices.getConnectionManager();
-			assert (null != remoteConnectionManager);
-			remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
-			assert (null != remoteConnection);
-			remoteFileManager = remoteServices.getFileManager(remoteConnection);
-			assert (null != remoteFileManager);
-		} else {
-			remoteServices = localServices;
-			remoteConnectionManager = localConnectionManager;
-			remoteConnection = localConnection;
-			remoteFileManager = localFileManager;
-		}
-
-		localHome = localFileManager.toURI(localConnection.getWorkingDirectory());
-		remoteHome = remoteFileManager.toURI(remoteConnection.getWorkingDirectory());
+	public RemoteServicesDelegate(String remoteServicesId, String remoteConnectionName) {
+		this.remoteServicesId = remoteServicesId;
+		this.remoteConnectionName = remoteConnectionName;
 	}
 
 	public IRemoteConnection getLocalConnection() {
@@ -132,6 +104,63 @@ public class RemoteServicesDelegate {
 
 	public IRemoteServices getRemoteServices() {
 		return remoteServices;
+	}
+
+	/**
+	 * On the basis of the passed in identifiers, constructs the local and
+	 * remote services, connection manager, connection, file manager and home
+	 * URIs.
+	 * 
+	 * @param monitor
+	 * @throws CoreException
+	 */
+	public void initialize(IProgressMonitor monitor) throws CoreException {
+		try {
+			localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+			if (localServices == null) {
+				throw new NullPointerException("localServices"); //$NON-NLS-1$
+			}
+			localConnectionManager = localServices.getConnectionManager();
+			if (localConnectionManager == null) {
+				throw new NullPointerException("localConnectionManager");//$NON-NLS-1$
+			}
+			localConnection = localConnectionManager.getConnection("Local");//$NON-NLS-1$
+			if (localConnection == null) {
+				throw new NullPointerException("localConnection");//$NON-NLS-1$
+			}
+			localFileManager = localServices.getFileManager(localConnection);
+			if (localFileManager == null) {
+				throw new NullPointerException("localFileManager");//$NON-NLS-1$
+			}
+
+			if (remoteServicesId != null) {
+				remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, monitor);
+				if (remoteServices == null) {
+					throw new NullPointerException("remoteServices");//$NON-NLS-1$
+				}
+				remoteConnectionManager = remoteServices.getConnectionManager();
+				if (remoteConnectionManager == null) {
+					throw new NullPointerException("remoteConnectionManager");//$NON-NLS-1$
+				}
+				remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
+				if (remoteConnection == null) {
+					throw new NullPointerException("remoteConnection");//$NON-NLS-1$
+				}
+				remoteFileManager = remoteServices.getFileManager(remoteConnection);
+				if (remoteFileManager == null) {
+					throw new NullPointerException("remoteFileManager");//$NON-NLS-1$
+				}
+			} else {
+				remoteServices = localServices;
+				remoteConnectionManager = localConnectionManager;
+				remoteConnection = localConnection;
+				remoteFileManager = localFileManager;
+			}
+			localHome = localFileManager.toURI(localConnection.getWorkingDirectory());
+			remoteHome = remoteFileManager.toURI(remoteConnection.getWorkingDirectory());
+		} catch (Throwable t) {
+			throw newException("RemoteServicesDelegate.initialize " + remoteServicesId + COSP + remoteConnection, t); //$NON-NLS-1$
+		}
 	}
 
 	/**

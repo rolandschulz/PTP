@@ -81,7 +81,6 @@ public class ScriptHandler extends Job {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		scriptValue = composeScript(monitor);
 		if (map instanceof RMVariableMap) {
 			RMVariableMap rmMap = (RMVariableMap) map;
@@ -91,7 +90,6 @@ public class ScriptHandler extends Job {
 			p.setVisible(false);
 			rmMap.put(JAXBControlConstants.SCRIPT, p);
 		}
-		progress.done();
 		return Status.OK_STATUS;
 	}
 

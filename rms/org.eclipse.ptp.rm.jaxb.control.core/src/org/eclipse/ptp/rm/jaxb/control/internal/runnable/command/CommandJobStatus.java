@@ -9,12 +9,15 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
+import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
@@ -69,8 +72,19 @@ public class CommandJobStatus implements ICommandJobStatus {
 		protected IStatus run(IProgressMonitor monitor) {
 			ready = false;
 			long timeout = block * 1000;
-			RemoteServicesDelegate d = control.getRemoteServicesDelegate(monitor);
+			RemoteServicesDelegate d = null;
+			SubMonitor progress = SubMonitor.convert(monitor, 120);
+			try {
+				d = control.getRemoteServicesDelegate(progress.newChild(20));
+			} catch (CoreException ce) {
+				return CoreExceptionUtils.getErrorStatus(ce.getMessage(), ce);
+			} finally {
+				progress.done();
+			}
 			long start = System.currentTimeMillis();
+			long last = 0;
+			long elapsed = 0;
+			double increment = 0;
 			while (!ready) {
 				try {
 					ready = RemoteServicesDelegate.isStable(d.getRemoteFileManager(), path, 3, monitor);
@@ -78,9 +92,13 @@ public class CommandJobStatus implements ICommandJobStatus {
 					JAXBControlCorePlugin.log(t);
 				}
 
-				if (System.currentTimeMillis() - start >= timeout) {
+				elapsed = System.currentTimeMillis() - start;
+				if (elapsed >= timeout) {
 					break;
 				}
+				increment = ((double) (elapsed - last) / timeout) * 100;
+				last = elapsed;
+				progress.worked((int) increment);
 
 				synchronized (this) {
 					try {
@@ -89,6 +107,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 					}
 				}
 			}
+			progress.done();
 			return Status.OK_STATUS;
 		}
 	}

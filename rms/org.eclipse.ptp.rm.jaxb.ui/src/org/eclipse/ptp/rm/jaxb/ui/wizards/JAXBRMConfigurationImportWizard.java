@@ -83,7 +83,7 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 		new UIJob(JAXBUIConstants.RESOURCE_MANAGERS) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				SubMonitor subMon = SubMonitor.convert(monitor);
+				SubMonitor subMon = SubMonitor.convert(monitor, 20);
 				try {
 					URL selection = mainPage.getSelectedConfiguration();
 					if (selection != null) {
@@ -109,9 +109,7 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 					}
 					return Status.OK_STATUS;
 				} finally {
-					if (monitor != null) {
-						monitor.done();
-					}
+					subMon.done();
 				}
 			}
 		}.schedule();
@@ -122,7 +120,7 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 	 * By convention, "resourceManagers" project in the user's workspace.
 	 */
 	private static IProject checkResourceManagersProject(IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMon = SubMonitor.convert(monitor);
+		SubMonitor subMon = SubMonitor.convert(monitor, 20);
 		try {
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBUIConstants.RESOURCE_MANAGERS);
 			if (!project.exists()) {
@@ -139,9 +137,7 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 			}
 			return project;
 		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
+			subMon.done();
 		}
 	}
 }

@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
@@ -184,7 +185,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 *            the calling resource manager
 	 */
 	public CommandJob(String jobUUID, CommandType command, boolean batch, IJAXBResourceManager rm) {
-		super(command.getName());
+		super(command.getName() + JAXBControlConstants.CO + JAXBControlConstants.SP + (jobUUID == null ? rm.getName() : jobUUID));
 		this.command = command;
 		this.batch = batch;
 		this.rm = rm;
@@ -302,54 +303,61 @@ public class CommandJob extends Job implements ICommandJob {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		jobThread = Thread.currentThread();
-		boolean input = !command.getInput().isEmpty();
-		if (input) {
-			ICommandJob job = control.getJobTable().get(getName());
-			if (job != null && job.isActive()) {
-				IRemoteProcess process = job.getProcess();
-				if (process != null && !process.isCompleted()) {
-					return writeInputToProcess(process);
-				} else {
-					job.terminate();
-				}
-			}
-		}
-
-		status = execute(monitor);
-
-		/*
-		 * When there is a UUID defined for this command, set the status for it.
-		 * If the submit job lacks a jobId on the standard streams, then we
-		 * assign it the UUID (it is most probably interactive); else we wait
-		 * for the id to be set by the tokenizer. NOTE that the caller should
-		 * now join on all commands with this property (05.01.2011). Open
-		 * connection jobs should have their jobId tokenizers set a RUNNING
-		 * state.
-		 */
-		jobStatus = null;
-		String waitUntil = keepOpen ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
-		ICommandJob parent = keepOpen ? this : null;
-		if (uuid != null) {
-			if (waitForId) {
-				jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
-				jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap());
-			} else {
-				String state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
-				jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
-			}
-
-			jobStatus.setProxy(getProxy());
-
-			if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
-				if (input) {
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
+		try {
+			jobThread = Thread.currentThread();
+			boolean input = !command.getInput().isEmpty();
+			if (input) {
+				ICommandJob job = control.getJobTable().get(getName());
+				if (job != null && job.isActive()) {
+					IRemoteProcess process = job.getProcess();
 					if (process != null && !process.isCompleted()) {
-						status = writeInputToProcess(process);
+						progress.done();
+						return writeInputToProcess(process);
+					} else {
+						job.terminate();
 					}
 				}
-			} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
-				terminate();
 			}
+			progress.worked(25);
+
+			status = execute(progress.newChild(50));
+
+			/*
+			 * When there is a UUID defined for this command, set the status for
+			 * it. If the submit job lacks a jobId on the standard streams, then
+			 * we assign it the UUID (it is most probably interactive); else we
+			 * wait for the id to be set by the tokenizer. NOTE that the caller
+			 * should now join on all commands with this property (05.01.2011).
+			 * Open connection jobs should have their jobId tokenizers set a
+			 * RUNNING state.
+			 */
+			jobStatus = null;
+			String waitUntil = keepOpen ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
+			ICommandJob parent = keepOpen ? this : null;
+			if (uuid != null) {
+				if (waitForId) {
+					jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
+					jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap());
+				} else {
+					String state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
+					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
+				}
+
+				jobStatus.setProxy(getProxy());
+
+				if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
+					if (input) {
+						if (process != null && !process.isCompleted()) {
+							status = writeInputToProcess(process);
+						}
+					}
+				} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
+					terminate();
+				}
+			}
+		} finally {
+			progress.done();
 		}
 		return status;
 	}
@@ -361,13 +369,15 @@ public class CommandJob extends Job implements ICommandJob {
 	 * for the process, then joins on the consumers.x
 	 */
 	private IStatus execute(IProgressMonitor monitor) {
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		try {
 			synchronized (this) {
 				status = null;
 				active = false;
 			}
-			IRemoteProcessBuilder builder = prepareCommand(monitor);
+			IRemoteProcessBuilder builder = prepareCommand(progress.newChild(10));
 			prepareEnv(builder);
+			progress.worked(10);
 
 			process = null;
 			try {
@@ -375,7 +385,7 @@ public class CommandJob extends Job implements ICommandJob {
 			} catch (IOException t) {
 				throw CoreExceptionUtils.newException(Messages.CouldNotLaunch + builder.command(), t);
 			}
-
+			progress.worked(30);
 			maybeInitializeTokenizers(builder);
 			setOutStreamRedirection(process);
 			setErrStreamRedirection(process);
@@ -384,9 +394,11 @@ public class CommandJob extends Job implements ICommandJob {
 			synchronized (this) {
 				active = true;
 			}
+			progress.worked(20);
 
 			if (keepOpen) {
 				control.getJobTable().put(getName(), this);
+				progress.done();
 				return Status.OK_STATUS;
 			}
 
@@ -395,6 +407,8 @@ public class CommandJob extends Job implements ICommandJob {
 				exit = process.waitFor();
 			} catch (InterruptedException ignored) {
 			}
+
+			progress.worked(20);
 
 			if (exit != 0 && !ignoreExitStatus) {
 				String t = error.toString();
@@ -408,7 +422,10 @@ public class CommandJob extends Job implements ICommandJob {
 			return ce.getStatus();
 		} catch (Throwable t) {
 			return CoreExceptionUtils.getErrorStatus(Messages.ProcessRunError, t);
+		} finally {
+			progress.done();
 		}
+
 		synchronized (this) {
 			active = false;
 		}

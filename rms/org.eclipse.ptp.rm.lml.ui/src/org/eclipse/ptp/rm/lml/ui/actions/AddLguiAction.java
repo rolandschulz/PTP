@@ -25,6 +25,7 @@ package org.eclipse.ptp.rm.lml.ui.actions;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
@@ -47,7 +48,13 @@ public class AddLguiAction extends Action {
 
 	@Override
 	public void run() {
-		RemoteServicesDelegate remote = new RemoteServicesDelegate(null, null, new NullProgressMonitor());
+		RemoteServicesDelegate remote = new RemoteServicesDelegate(null, null);
+		try {
+			remote.initialize(new NullProgressMonitor());
+		} catch (CoreException t) {
+			t.printStackTrace();
+			return;
+		}
 		URI uri = null;
 		try {
 			uri = RemoteUIServicesUtils.browse(shell, new URI("file:///home/"), remote, false, false, false);
