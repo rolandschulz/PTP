@@ -361,6 +361,9 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					// Replace the remote environment with the one specified by the build properties.
 					// It will already be a modified list that originated with the remote environment and was then
 					// modified by the user, so we'll respect the user's edits and replace the environment entirely.
+					
+					//deactivated for now. Because it doesn't work that it is the one originated from the remote enviroment
+					//instead it is the local enviroment. Has to be fixed and than can be reactivated.
 //					remoteEnvMap.clear();
 //
 //					remoteEnvMap.putAll(envMap);
