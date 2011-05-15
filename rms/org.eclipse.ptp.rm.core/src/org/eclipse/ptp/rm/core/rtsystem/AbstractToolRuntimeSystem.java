@@ -91,8 +91,9 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * 
 	 * @author dfferber TODO: Is this JobRunner really required? Why not
 	 *         dispatching the jobs immediately?
+	 * @since 3.0
 	 */
-	private class JobRunner implements Runnable {
+	protected class JobRunner implements Runnable {
 		public void run() {
 			DebugUtil
 					.trace(DebugUtil.JOB_TRACING, "RTS {0}: started job thread", getResourceManager().getConfiguration().getName()); //$NON-NLS-1$
