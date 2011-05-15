@@ -28,15 +28,15 @@
 	
 	<!-- PLATFORM VERSIONS MUST BE UPDATED FOR NEW PLATFORM VERSION -->
 	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
-	<property name="platformVersion" value="S-3.7M7-201104280848"/>
-	<property name="platformBaseName" value="eclipse-platform-3.7M7"/>
-	<property name="icuBaseZip" value="com.ibm.icu.base-3.7M7.zip"/>
+	<property name="platformVersion" value="S-3.7RC1-201105122000"/>
+	<property name="platformBaseName" value="eclipse-platform-3.7RC1"/>
+	<property name="icuBaseZip" value="com.ibm.icu.base-3.7RC1.zip"/>
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.4.2.v20110208.jar"/>
 	
 	<property name="coreRuntimeVersion" value="3.7.0.v20110110"/>
 	<property name="coreRuntimeJar" value="org.eclipse.core.runtime_${coreRuntimeVersion}.jar"/>
 	
-	<property name="equinoxVersion" value="3.6.0.v20110427"/>
+	<property name="equinoxVersion" value="3.6.0.v20110506"/>
 	<property name="equinoxJar" value="org.eclipse.equinox.common_${equinoxVersion}.jar"/>
 	
 	<property name="filesystemVersion" value="1.3.100.v20110423-0524"/>
