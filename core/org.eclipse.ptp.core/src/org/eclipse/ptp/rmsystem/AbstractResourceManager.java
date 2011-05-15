@@ -368,11 +368,11 @@ public abstract class AbstractResourceManager implements IResourceManager {
 			try {
 				doStartup(subMon.newChild(100));
 			} catch (CoreException e) {
-				doShutdown(); // make sure both components are shut down
 				setState(ERROR_STATE);
 				throw e;
 			}
 			if (monitor.isCanceled()) {
+				doShutdown(); // make sure both components are shut down
 				setState(STOPPED_STATE);
 			}
 		}
@@ -436,9 +436,14 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	}
 
 	/**
-	 * Stop the resource manager subsystem.
+	 * Stop the resource manager control and monitor subsystems. This should
+	 * only be overridden if the implementor is providing different control and
+	 * monitor implementations.
 	 * 
 	 * @throws CoreException
+	 *             this exception should be thrown if the shutdown encountered
+	 *             an error for any reason. This will not halt shutdown of the
+	 *             resource manager, but may produce a message to the user.
 	 */
 	protected void doShutdown() throws CoreException {
 		CoreException exception = null;
@@ -455,10 +460,17 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	}
 
 	/**
-	 * Start the resource manager subsystem.
+	 * Start the resource manager control and monitor subsystems. This should
+	 * only be overridden if the implementor is providing different control and
+	 * monitor implementations.
 	 * 
 	 * @param monitor
+	 *            progress monitor indicating startup progress and for
+	 *            cancelling startup
 	 * @throws CoreException
+	 *             this exception should be thrown if the startup encountered an
+	 *             error for any reason. This will halt shutdown of the resource
+	 *             manager, and may produce a message to the user.
 	 */
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);

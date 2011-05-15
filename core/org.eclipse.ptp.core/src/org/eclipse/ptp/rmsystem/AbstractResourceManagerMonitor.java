@@ -182,17 +182,38 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	protected abstract void doRemoveJob(String jobId);
 
 	/**
-	 * Stop the resource manager subsystem.
+	 * Stop the resource manager subsystem. This must be callable at any time
+	 * (including if the resource manager is not started). It should take any
+	 * actions necessary to shut down the subsystem. Implementations should not
+	 * modify the resource manager state, this will be handled by the main
+	 * resource manager class.
 	 * 
 	 * @throws CoreException
+	 *             this exception should be thrown if the shutdown encountered
+	 *             an error for any reason. This will not halt shutdown of the
+	 *             resource manager, but may produce a message to the user.
 	 */
 	protected abstract void doShutdown() throws CoreException;
 
 	/**
-	 * Start the resource manager subsystem.
+	 * Start the resource manager subsystem. This should perform any actions
+	 * necessary to start the subsystem. Implementations should not modify the
+	 * resource manager state, this will be handled by the main resource manager
+	 * class. If the subsystem fails to start, implementations should throw a
+	 * CoreException with a description of what went wrong.
+	 * 
+	 * The progress monitor is primarily for indicating startup status to the
+	 * user. If the user cancels the progress monitor, the implementation should
+	 * assume the resource manager has not started and {@link #doShutdown()}
+	 * will be called soon after.
 	 * 
 	 * @param monitor
+	 *            progress monitor indicating startup progress and for
+	 *            cancelling startup
 	 * @throws CoreException
+	 *             this exception should be thrown if the startup encountered an
+	 *             error for any reason. This will halt shutdown of the resource
+	 *             manager, and may produce a message to the user.
 	 */
 	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
 
