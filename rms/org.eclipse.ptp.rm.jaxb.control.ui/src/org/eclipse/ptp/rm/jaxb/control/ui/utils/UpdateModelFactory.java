@@ -154,7 +154,10 @@ public class UpdateModelFactory {
 	 * 
 	 */
 	private enum CellEditorType {
-		TEXT, COMBO, SPINNER, CHECK;
+		TEXT,
+		COMBO,
+		SPINNER,
+		CHECK;
 
 		/**
 		 * Determine the CellEditor from the Property or Attribute type or
@@ -372,8 +375,8 @@ public class UpdateModelFactory {
 	/**
 	 * Constructs the viewer update model.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.ui.model.ViewerUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler
 	 * 
 	 * @param viewer
 	 *            SWT object to which this model is bound
@@ -611,7 +614,7 @@ public class UpdateModelFactory {
 	 * @see org.eclipse.jface.viewers.TextCellEditor
 	 * @see org.eclipse.jface.viewers.CheckboxCellEditor
 	 * @see org.eclipse.jface.viewers.ComboBoxCellEditor
-	 * @see org.eclipse.ptp.rm.jaxb.ui.cell.SpinnerCellEditor
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.cell.SpinnerCellEditor
 	 * 
 	 * @param cd
 	 *            internal object holding model description
@@ -659,7 +662,7 @@ public class UpdateModelFactory {
 	 * {@link #createEditor(CellDescriptor, Object, Composite)}.
 	 * 
 	 * @see org.eclipse.jface.viewers.CellEditor
-	 * @see org.eclipse.ptp.rm.jaxb.ui.model.TableRowUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.TableRowUpdateModel
 	 * 
 	 * @param data
 	 *            Property or Attribute
@@ -696,7 +699,7 @@ public class UpdateModelFactory {
 	 * {@link #createEditor(CellDescriptor, Object, Composite)}.
 	 * 
 	 * @see org.eclipse.jface.viewers.CellEditor
-	 * @see org.eclipse.ptp.rm.jaxb.ui.model.ValueTreeNodeUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel
 	 * 
 	 * @param data
 	 *            Property or Attribute

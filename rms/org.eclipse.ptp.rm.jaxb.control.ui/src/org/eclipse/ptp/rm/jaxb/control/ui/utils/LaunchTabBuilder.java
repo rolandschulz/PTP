@@ -62,7 +62,7 @@ import org.eclipse.swt.widgets.Widget;
  * Configuration Tab, as well as building and registering the related model
  * objects and listeners.
  * 
- * @see org.eclipse.ptp.rm.jaxb.ui.launch.JAXBDynamicLaunchConfigurationTab
+ * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab
  * 
  * @author arossi
  * 
@@ -116,7 +116,7 @@ public class LaunchTabBuilder {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.ui.model.ViewerUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.utils.UpdateModelFactory#createModel(ColumnViewer,
 	 *      AttributeViewer, JAXBDynamicLaunchConfigurationTab)
 	 * 
@@ -373,10 +373,10 @@ public class LaunchTabBuilder {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.ui.model.CellEditorUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.ui.model.TableRowUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.ui.model.ValueTreeNodeUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.ui.model.InfoTreeNodeModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.CellEditorUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.TableRowUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.InfoTreeNodeModel
 	 * 
 	 * @param viewer
 	 *            to which to add the rows

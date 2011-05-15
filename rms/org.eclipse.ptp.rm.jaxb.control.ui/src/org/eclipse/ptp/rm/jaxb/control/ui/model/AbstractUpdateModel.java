@@ -130,7 +130,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	/**
 	 * Delegates to the handler update method.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.ui.handlers.ValueUpdateHandler#handleUpdate(Object,
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler#handleUpdate(Object,
 	 *      Object)
 	 * 
 	 * @param value
