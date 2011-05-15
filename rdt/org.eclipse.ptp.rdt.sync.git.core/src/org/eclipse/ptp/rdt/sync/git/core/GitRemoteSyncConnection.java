@@ -21,22 +21,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;
-import org.eclipse.jgit.api.errors.CheckoutConflictException;
-import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidMergeHeadsException;
-import org.eclipse.jgit.api.errors.NoFilepatternException;
-import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.api.errors.NoMessageException;
-import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.errors.NotSupportedException;
 import org.eclipse.jgit.errors.TransportException;
 import org.eclipse.jgit.errors.UnmergedPathException;
-import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
@@ -51,6 +44,7 @@ import org.eclipse.jgit.transport.TransportGitSsh;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
+import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
@@ -81,14 +75,14 @@ public class GitRemoteSyncConnection {
 	 *             on problems building the remote repository. Specific exception nested. Upon such an exception, the instance is
 	 *             invalid and should not be used.
 	 */
-	public GitRemoteSyncConnection(IRemoteConnection conn, String localDir, String remoteDir) throws RemoteSyncException {
+	public GitRemoteSyncConnection(IRemoteConnection conn, String localDir, String remoteDir, IProgressMonitor monitor) throws RemoteSyncException {
 		connection = conn;
 		localDirectory = localDir;
 		remoteDirectory = remoteDir;
 
 		// Build repo, creating it if it is not already present.
 		try {
-			buildRepo();
+			buildRepo(monitor);
 		} catch (final CoreException e) {
 			throw new RemoteSyncException(e);
 		} catch (final IOException e) {
@@ -132,6 +126,7 @@ public class GitRemoteSyncConnection {
 
 	/**
 	 * 
+	 * @param monitor 
 	 * @param localDirectory
 	 * @param remoteHost
 	 * @return the repository
@@ -147,77 +142,45 @@ public class GitRemoteSyncConnection {
 	 * 		   For example, if the repo is created but the initial commit fails.
 	 * TODO: Consider evaluating the output of "git init".
 	 */
-	private Git buildRepo() throws CoreException, IOException, RemoteExecutionException, RemoteSyncException {
+	private Git buildRepo(IProgressMonitor monitor) throws CoreException, IOException, RemoteExecutionException, RemoteSyncException {
 		final File localDir = new File(localDirectory);
 		final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-		Repository repository = null;
-
-		try {
-			repository = repoBuilder.setWorkTree(localDir).build();
-		} catch (final IOException e) {
-			throw e;
-		}
+		Repository repository = repoBuilder.setWorkTree(localDir).build();
 		git = new Git(repository);
 
 		// Create and configure local repository if it is not already present. Set the git instance.
 		if (repoReady() == false) {
-			try {
-				repository.create(false);
-			} catch (final IOException e) {
-				throw e;
-			}
+			repository.create(false);
 
 			// An initial commit to create the master branch.
-			try {
-				doCommit();
-			} catch (final RemoteSyncException e) {
-				throw e;
-			}
+			doCommit();
 		}
 
 		// Create remote directory if necessary.
-		try {
-			CommandRunner.createRemoteDirectory(connection, remoteDirectory);
-		} catch (final CoreException e) {
-			throw e;
-		}
+		CommandRunner.createRemoteDirectory(connection, remoteDirectory, monitor);
 		
 		// Initialize remote directory if necessary
-		try {
-			doRemoteInit();
-		} catch (final IOException e) {
-			throw e;
-		} catch (final RemoteExecutionException e) {
-			throw e;
-		}
+		doRemoteInit(monitor);
 
 		// Commit remote files if necessary
-		try {
-			doRemoteCommit();
-		} catch (final IOException e) {
-			throw e;
-		} catch (final RemoteExecutionException e) {
-			throw e;
-		}
+		doRemoteCommit(monitor);
 
-		return new Git(repository);
+		return git;
 	}
 	
 	/**
 	* Create and configure remote repository if it is not already present. Note that "git init" is "safe" on a repo already
 	* created, so we can simply rerun it each time.
+	 * @param monitor 
 	* @throws IOException
 	* @throws RemoteExecutionException
 	*/
-	private void doRemoteInit() throws IOException, RemoteExecutionException {
-		String command = null;
+	private void doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
+		String command = "git init"; //$NON-NLS-1$
 		CommandResults commandResults = null;
 
-		command = "git init"; //$NON-NLS-1$
 		try {
-			commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, null);
-		} catch (final IOException e) {
-			throw e;
+			commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, monitor);
 		} catch (final InterruptedException e) {
 			throw new RemoteExecutionException(e);
 		} catch (RemoteConnectionException e) {
@@ -225,7 +188,7 @@ public class GitRemoteSyncConnection {
 		}
 
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteExecutionException("remote git init failed with message: " + //$NON-NLS-1$
+			throw new RemoteExecutionException(Messages.GitRemoteSyncConnection_1 + 
 																						commandResults.getStderr());
 		}
 	}
@@ -235,55 +198,47 @@ public class GitRemoteSyncConnection {
 	 * TODO: Modified files already added by "git add" will not be found by "getRemoteFileStatus". Thus, a commit may not happen even
 	 * though there are outstanding changes. Note that this can only occur by accessing the repo outside of Eclipse.
 	 */
-	private void doRemoteCommit() throws IOException, RemoteExecutionException {
+	private void doRemoteCommit(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
 		Set<String> filesToAdd = new HashSet<String>();
 		Set<String> filesToDelete = new HashSet<String>();
 		boolean needToCommit = false;
 		
-		try {
-			getRemoteFileStatus(filesToAdd, filesToDelete);
-			for (String fileName : filesToDelete) {
-				if (filesToAdd.contains(fileName)) {
-					filesToAdd.remove(fileName);
-				}
+		getRemoteFileStatus(filesToAdd, filesToDelete, monitor);
+		for (String fileName : filesToDelete) {
+			if (filesToAdd.contains(fileName)) {
+				filesToAdd.remove(fileName);
 			}
-			if (filesToAdd.size() > 0) {
-				addRemoteFiles(filesToAdd);
-				needToCommit = true;
-			}
-			if (filesToDelete.size() > 0) {
-				deleteRemoteFiles(filesToDelete);
-				needToCommit = true;
-			}
-			
-			if (needToCommit) {
-				commitRemoteFiles();
-			}
-		} catch (IOException e) {
-			throw e;
-		} catch (RemoteExecutionException e) {
-			throw e;
+		}
+		if (filesToAdd.size() > 0) {
+			addRemoteFiles(filesToAdd, monitor);
+			needToCommit = true;
+		}
+		if (filesToDelete.size() > 0) {
+			deleteRemoteFiles(filesToDelete, monitor);
+			needToCommit = true;
+		}
+		
+		if (needToCommit) {
+			commitRemoteFiles(monitor);
 		}
 	}
 	
 	/*
 	 * Do a "git commit" on the remote host
 	 */
-	private void commitRemoteFiles() throws IOException, RemoteExecutionException {
+	private void commitRemoteFiles(IProgressMonitor monitor) throws IOException, RemoteExecutionException {
 		final String command = "git commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 		CommandResults commandResults = null;
 		
 		try {
-			commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, null);
-		} catch (final IOException e) {
-			throw e;
+			commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, monitor);
 		} catch (final InterruptedException e) {
 			throw new RemoteExecutionException(e);
 		} catch (RemoteConnectionException e) {
 			throw new RemoteExecutionException(e);
 		}
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteExecutionException("remote git commit failed with message: " + //$NON-NLS-1$
+			throw new RemoteExecutionException(Messages.GitRemoteSyncConnection_2 + 
 																						 commandResults.getStderr());
 		}
 	}
@@ -291,7 +246,7 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Do a "git rm <Files>" on the remote host
 	 */
-	private void deleteRemoteFiles(Set<String> filesToDelete) throws IOException, RemoteExecutionException {
+	private void deleteRemoteFiles(Set<String> filesToDelete, IProgressMonitor monitor) throws IOException, RemoteExecutionException {
 		String command = "git rm"; //$NON-NLS-1$
 		for (String fileName : filesToDelete) {
 			command = command.concat(" "); //$NON-NLS-1$
@@ -300,16 +255,14 @@ public class GitRemoteSyncConnection {
 		
 		CommandResults commandResults = null;
 		try {
-			commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, null);
-		} catch (final IOException e) {
-			throw e;
+			commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, monitor);
 		} catch (final InterruptedException e) {
 			throw new RemoteExecutionException(e);
 		} catch (RemoteConnectionException e) {
 			throw new RemoteExecutionException(e);
 		}
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteExecutionException("remote git rm failed with message: " + //$NON-NLS-1$
+			throw new RemoteExecutionException(Messages.GitRemoteSyncConnection_3 + 
 																						 commandResults.getStderr());
 		}
 	}
@@ -317,7 +270,7 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Do a "git add <Files>" on the remote host
 	 */
-	private void addRemoteFiles(Set<String> filesToAdd) throws IOException, RemoteExecutionException {
+	private void addRemoteFiles(Set<String> filesToAdd, IProgressMonitor monitor) throws IOException, RemoteExecutionException {
 		String command = "git add"; //$NON-NLS-1$
 		for (String fileName : filesToAdd) {
 			command = command.concat(" "); //$NON-NLS-1$
@@ -326,16 +279,14 @@ public class GitRemoteSyncConnection {
 		
 		CommandResults commandResults = null;
 		try {
-			commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, null);
-		} catch (final IOException e) {
-			throw e;
+			commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, monitor);
 		} catch (final InterruptedException e) {
 			throw new RemoteExecutionException(e);
 		} catch (RemoteConnectionException e) {
 			throw new RemoteExecutionException(e);
 		}
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteExecutionException("remote git add failed with message: " + //$NON-NLS-1$
+			throw new RemoteExecutionException(Messages.GitRemoteSyncConnection_4 + 
 																						 commandResults.getStderr());
 		}
 	}
@@ -343,22 +294,20 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Use "git ls-files" to obtain a list of files that need to be added or deleted from the git index. 
 	 */
-	private void getRemoteFileStatus(Set<String> filesToAdd, Set<String> filesToDelete)
+	private void getRemoteFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, IProgressMonitor monitor)
 																					throws IOException, RemoteExecutionException {
 		final String command = "git ls-files -t --modified --others --deleted"; //$NON-NLS-1$
 		CommandResults commandResults = null;
 		
 		try {
-			commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, null);
-		} catch (final IOException e) {
-			throw e;
+			commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, monitor);
 		} catch (final InterruptedException e) {
 			throw new RemoteExecutionException(e);
 		} catch (RemoteConnectionException e) {
 			throw new RemoteExecutionException(e);
 		}
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteExecutionException("remote git ls-files failed with message: " + //$NON-NLS-1$
+			throw new RemoteExecutionException(Messages.GitRemoteSyncConnection_5 + 
 																						 commandResults.getStderr());
 		}
 		
@@ -416,7 +365,6 @@ public class GitRemoteSyncConnection {
 	 * 
 	 * @param remoteConfig
 	 * 				the remote configuration for our local Git repo
-	 * @return the transport
 	 * @throws RuntimeException
 	 *             if the requested transport is not supported by JGit.
 	 */
@@ -474,15 +422,11 @@ public class GitRemoteSyncConnection {
 		addCommand.addFilepattern("."); //$NON-NLS-1$
 		try {
 			addCommand.call();
-		} catch (final NoFilepatternException e) {
-			throw new RemoteSyncException(e);
-		}
 
-		final CommitCommand commitCommand = git.commit();
-		commitCommand.setAll(true);
-		commitCommand.setMessage(commitMessage);
+			final CommitCommand commitCommand = git.commit();
+			commitCommand.setAll(true);
+			commitCommand.setMessage(commitMessage);
 
-		try {
 			commitCommand.call();
 		} catch (final GitAPIException e) {
 			throw new RemoteSyncException(e);
@@ -528,33 +472,30 @@ public class GitRemoteSyncConnection {
 	/**
 	 * Many of the listed exceptions appear to be unrecoverable, caused by errors in the initial setup. It is vital, though, that
 	 * failed syncs are reported and handled. So all exceptions are checked exceptions, embedded in a RemoteSyncException.
+	 * @param monitor 
 	 * 
 	 * @throws RemoteSyncException
 	 *             for various problems sync'ing. The specific exception is nested within the RemoteSyncException. 
 	 * TODO: Consider possible platform dependency.
 	 */
-	public void syncLocalToRemote() throws RemoteSyncException {
+	public void syncLocalToRemote(IProgressMonitor monitor) throws RemoteSyncException {
 		// First commit changes to the local repository.
-		try {
-			doCommit();
-		} catch (final RemoteSyncException e) {
-			throw e;
-		}
+		doCommit();
 
 		// Then push them to the remote site.
 		try {
-			transport.push(NullProgressMonitor.INSTANCE, null);
-		} catch (final NotSupportedException e) {
-			throw new RemoteSyncException(e);
-		} catch (final TransportException e) {
-			throw new RemoteSyncException(e);
-		}
+			transport.push(new EclipseGitProgressTransformer(monitor), null);
+			
+			// Now remotely merge changes with master branch
+			CommandResults mergeResults;
+			final String command = "git merge " + remotePushBranch; //$NON-NLS-1$
+			
+			mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, monitor);
 
-		// Now remotely merge changes with master branch
-		CommandResults mergeResults;
-		final String command = "git merge " + remotePushBranch; //$NON-NLS-1$
-		try {
-			mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, null);
+			if (mergeResults.getExitCode() != 0) {
+				throw new RemoteSyncException(new RemoteExecutionException(Messages.GitRemoteSyncConnection_0 +  
+																										mergeResults.getStderr()));
+			}
 		} catch (final IOException e) {
 			throw new RemoteSyncException(e);
 		} catch (final InterruptedException e) {
@@ -563,20 +504,17 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		}
 
-		if (mergeResults.getExitCode() != 0) {
-			throw new RemoteSyncException(new RemoteExecutionException("Remote merge failed with message: " +  //$NON-NLS-1$
-																									mergeResults.getStderr()));
-		}
 	}
 
 	/**
+	 * @param monitor 
 	 * @throws RemoteSyncException
 	 *             for various problems sync'ing. The specific exception is nested within the RemoteSyncException. Many of the
 	 *             listed exceptions appear to be unrecoverable, caused by errors in the initial setup. It is vital, though, that
 	 *             failed syncs are reported and handled. So all exceptions are checked exceptions, embedded in a
 	 *             RemoteSyncException.
 	 */
-	public void syncRemoteToLocal() throws RemoteSyncException {
+	public void syncRemoteToLocal(IProgressMonitor monitor) throws RemoteSyncException {
 
 		// TODO: Figure out why pull doesn't work and why we have to fetch and merge instead.
 		// PullCommand pullCommand = gitConnection.getGit().pull().
@@ -594,46 +532,25 @@ public class GitRemoteSyncConnection {
 		// throw new RemoteSyncException(e);
 		// }
 
-		// First, commit in case any changes have occurred remotely.
 		try {
-			doRemoteCommit();
+			// First, commit in case any changes have occurred remotely.
+			doRemoteCommit(monitor);
+	
+			// Next, fetch the remote repository
+			transport.fetch(new EclipseGitProgressTransformer(monitor), null);
+	
+			// Now merge. Before merging we set the head for merging to master.
+			Ref masterRef = 
+					git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+	
+			final MergeCommand mergeCommand = git.merge().include(masterRef);
+			
+			mergeCommand.call();
 		} catch (IOException e) {
 			throw new RemoteSyncException(e);
+		} catch (GitAPIException e) {
+			throw new RemoteSyncException(e);
 		} catch (RemoteExecutionException e) {
-			throw new RemoteSyncException(e);
-		}
-		
-		// Next, fetch the remote repository
-		try {
-			transport.fetch(NullProgressMonitor.INSTANCE, null);
-		} catch (final NotSupportedException e) {
-			throw new RemoteSyncException(e);
-		} catch (final TransportException e) {
-			throw new RemoteSyncException(e);
-		}
-
-		// Now merge. Before merging we set the head for merging to master.
-		Ref masterRef = null;
-		try {
-			masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (final IOException e) {
-			throw new RemoteSyncException(e);
-		}
-
-		final MergeCommand mergeCommand = git.merge().include(masterRef);
-		try {
-			mergeCommand.call();
-		} catch (final NoHeadException e) {
-			throw new RemoteSyncException(e);
-		} catch (final ConcurrentRefUpdateException e) {
-			throw new RemoteSyncException(e);
-		} catch (final CheckoutConflictException e) {
-			throw new RemoteSyncException(e);
-		} catch (final InvalidMergeHeadsException e) {
-			throw new RemoteSyncException(e);
-		} catch (final WrongRepositoryStateException e) {
-			throw new RemoteSyncException(e);
-		} catch (final NoMessageException e) {
 			throw new RemoteSyncException(e);
 		}
 	}
