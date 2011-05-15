@@ -22,6 +22,7 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -145,11 +146,12 @@ public class CommandRunner {
 	 * 
 	 * @param conn
 	 * @param remoteDir
+	 * @param monitor 
 	 * @throws CoreException
 	 *             on problem creating the remote directory.
 	 * @return whether the directory was already PRESENT
 	 */
-	public static DirectoryStatus createRemoteDirectory(IRemoteConnection conn, String remoteDir) throws CoreException {
+	public static DirectoryStatus createRemoteDirectory(IRemoteConnection conn, String remoteDir, IProgressMonitor monitor) throws CoreException {
 		final IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
 		final IFileStore fileStore = fileManager.getResource(remoteDir);
 		final IFileInfo fileInfo = fileStore.fetchInfo();
@@ -162,11 +164,7 @@ public class CommandRunner {
 			}
 		}
 
-		try {
-			fileStore.mkdir(EFS.NONE, null);
-		} catch (final CoreException e) {
-			throw e;
-		}
+		fileStore.mkdir(EFS.NONE, monitor);
 
 		return DirectoryStatus.NOT_PRESENT;
 	}
@@ -265,6 +263,6 @@ public class CommandRunner {
 
 	// Enforce as static
 	private CommandRunner() {
-		throw new AssertionError("Cannot create instances of static class CommandRunner"); //$NON-NLS-1$
+		throw new AssertionError(Messages.CommandRunner_0); 
 	}
 }

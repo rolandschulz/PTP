@@ -28,10 +28,10 @@ import org.osgi.framework.Bundle;
  * 
  */
 public class RDTPluginImages {
-	public static final IPath ICONS_PATH = new Path("$nl$/icons"); //$NON-NLS-1$
 
-	// The plugin registry
-	private static ImageRegistry imageRegistry = new ImageRegistry(RDTSyncUIPlugin.getStandardDisplay());
+	public static final String T_WIZBAN = "wizban/"; //$NON-NLS-1$
+
+	public static final ImageDescriptor DESC_WIZBAN_NEW_REMOTE_C_PROJ = create(T_WIZBAN, "newremote_proj_wiz.gif"); //$NON-NLS-1$
 
 	// Subdirectory (under the package containing this class) where 16 color
 	// images are
@@ -43,25 +43,6 @@ public class RDTPluginImages {
 		} catch (MalformedURLException e) {
 			RDTSyncUIPlugin.log(e);
 		}
-	}
-	private static final String NAME_PREFIX = RDTSyncUIPlugin.PLUGIN_ID + '.';
-	private static final int NAME_PREFIX_LENGTH = NAME_PREFIX.length();
-
-	public static final String T_OBJ = "obj16/"; //$NON-NLS-1$
-	public static final String T_WIZBAN = "wizban/"; //$NON-NLS-1$
-	public static final String T_LCL = "lcl16/"; //$NON-NLS-1$
-	public static final String T_DLCL = "dlcl16/"; //$NON-NLS-1$
-	public static final String T_ELCL = "elcl16/"; //$NON-NLS-1$
-	public static final String T_TOOL = "tool16/"; //$NON-NLS-1$
-	public static final String T_VIEW = "view16/"; //$NON-NLS-1$
-	public static final String T_OVR = "ovr16/"; //$NON-NLS-1$
-
-	public static final ImageDescriptor DESC_WIZBAN_NEW_REMOTE_C_PROJ = create(T_WIZBAN, "newremote_proj_wiz.gif"); //$NON-NLS-1$
-	public static final ImageDescriptor DESC_WIZBAN_EXPORT_C_SETTINGS = create(T_WIZBAN, "exportc_settings_wiz.gif"); //$NON-NLS-1$
-	public static final ImageDescriptor DESC_WIZBAN_IMPORT_C_SETTINGS = create(T_WIZBAN, "importc_settings_wiz.gif"); //$NON-NLS-1$
-
-	public static Image get(String key) {
-		return imageRegistry.get(key);
 	}
 
 	private static ImageDescriptor create(String prefix, String name) {
@@ -77,78 +58,5 @@ public class RDTPluginImages {
 			RDTSyncUIPlugin.log(e);
 			return null;
 		}
-	}
-
-	/*
-	 * Creates an image descriptor for the given path in a bundle. The path can
-	 * contain variables like $NL$. If no image could be found,
-	 * <code>useMissingImageDescriptor</code> decides if either the 'missing
-	 * image descriptor' is returned or <code>null</code>. Added for 3.1.1.
-	 */
-	public static ImageDescriptor createImageDescriptor(Bundle bundle, IPath path, boolean useMissingImageDescriptor) {
-		URL url = FileLocator.find(bundle, path, null);
-		if (url != null) {
-			return ImageDescriptor.createFromURL(url);
-		}
-		if (useMissingImageDescriptor) {
-			return ImageDescriptor.getMissingImageDescriptor();
-		}
-		return null;
-	}
-
-	/**
-	 * Sets the three image descriptors for enabled, disabled, and hovered to an
-	 * action. The actions are retrieved from the *tool16 folders.
-	 * 
-	 * @param action
-	 *            the action
-	 * @param iconName
-	 *            the icon name
-	 */
-	public static void setToolImageDescriptors(IAction action, String iconName) {
-		setImageDescriptors(action, T_TOOL, iconName);
-	}
-
-	/**
-	 * Sets the three image descriptors for enabled, disabled, and hovered to an
-	 * action. The actions are retrieved from the *lcl16 folders.
-	 * 
-	 * @param action
-	 *            the action
-	 * @param iconName
-	 *            the icon name
-	 */
-	public static void setLocalImageDescriptors(IAction action, String iconName) {
-		setImageDescriptors(action, T_LCL, iconName);
-	}
-
-	/**
-	 * Sets all available image descriptors for the given action.
-	 */
-	public static void setImageDescriptors(IAction action, String type, String relPath) {
-		if (relPath.startsWith(NAME_PREFIX)) {
-			relPath = relPath.substring(NAME_PREFIX_LENGTH);
-		}
-		action.setDisabledImageDescriptor(create("d" + type, relPath)); //$NON-NLS-1$
-		//		action.setHoverImageDescriptor(create("c" + type, relPath)); //$NON-NLS-1$
-		action.setImageDescriptor(create("e" + type, relPath)); //$NON-NLS-1$
-
-		// We are still not sure about this, let see TF results first.
-		// Use the managed version so that we ensure that there is no resource
-		// handle leaks
-		// Let the widget itself manage the disabled/hover attribution. This was
-		// a huge leak
-		// ImageDescriptor desc = getImageRegistry().getDescriptor(relPath);
-		// if(desc == null) {
-		// desc = createManaged(T + "c" + type, relPath);
-		// }
-		// action.setImageDescriptor(desc);
-	}
-
-	/**
-	 * Helper method to access the image registry from the CUIPlugin class.
-	 */
-	static ImageRegistry getImageRegistry() {
-		return imageRegistry;
 	}
 }

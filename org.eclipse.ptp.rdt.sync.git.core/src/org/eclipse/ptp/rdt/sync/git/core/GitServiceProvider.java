@@ -12,6 +12,7 @@ package org.eclipse.ptp.rdt.sync.git.core;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.resources.IProject;
@@ -20,8 +21,12 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
@@ -121,7 +126,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setLocation(String location) {
 		if (fLocation != null) {
-			throw new RuntimeException("Changing of remote location is not supported."); //$NON-NLS-1$
+			throw new RuntimeException(Messages.GitServiceProvider_3); 
 		}
 		fLocation = location;
 		putString(GIT_LOCATION, location);
@@ -135,7 +140,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setProject(IProject project) {
 		if (fProject != null) {
-			throw new RuntimeException("Changing of project is not supported."); //$NON-NLS-1$
+			throw new RuntimeException(Messages.GitServiceProvider_4); 
 		}
 		fProject = project;
 		putString(GIT_PROJECT_NAME, project.getName());
@@ -150,7 +155,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setRemoteConnection(IRemoteConnection conn) {
 		if (fConnection != null) {
-			throw new RuntimeException("Changing of remote connection is not supported."); //$NON-NLS-1$
+			throw new RuntimeException(Messages.GitServiceProvider_5); 
 		}
 		fConnection = conn;
 		putString(GIT_CONNECTION_NAME, conn.getName());
@@ -176,109 +181,119 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		
-		// TODO: Note that here SyncFlag.FORCE is interpreted as sync always, even if not needed otherwise. This is different
-		// from the original intent of FORCE, which was to do an immediate, blocking sync. We may need to split those two
-		// functions and introduce more flags.
-		// TODO: Also, note that we are not using the individual "sync to local" and "sync to remote" flags yet.
-		if ((syncFlags == SyncFlag.NO_FORCE) && (!(syncNeeded(delta)))) {
-			return;
-		}
-		
-		int mySyncTaskId;
-		synchronized (syncTaskId) {
-			syncTaskId++;    
-			mySyncTaskId=syncTaskId;
-			//suggestion for Deltas: add delta to list of deltas
-		}
-		
-		if (syncLock.hasQueuedThreads() && syncFlags == SyncFlag.NO_FORCE)
-			return;   //the queued Thread will do the work for us. And we don't have to wait because of NO_FORCE
-		
-		syncLock.lock();
+		SubMonitor progress = SubMonitor.convert(monitor, Messages.GitServiceProvider_0, 100);
 		try {
-			if (mySyncTaskId<=finishedSyncTaskId)  //some other thread has already done the work for us 
+			
+			// TODO: Note that here SyncFlag.FORCE is interpreted as sync always, even if not needed otherwise. This is different
+			// from the original intent of FORCE, which was to do an immediate, blocking sync. We may need to split those two
+			// functions and introduce more flags.
+			// TODO: Also, note that we are not using the individual "sync to local" and "sync to remote" flags yet.
+			if ((syncFlags == SyncFlag.NO_FORCE) && (!(syncNeeded(delta)))) {
 				return;
-
-			
-			// TODO: Use delta information
-			// switch (delta.getKind()) {
-			// case IResourceDelta.ADDED:
-			// System.out.println("ensureSync kind=ADDED");
-			// break;
-			// case IResourceDelta.REMOVED:
-			// System.out.println("ensureSync kind=REMOVED");
-			// break;
-			// case IResourceDelta.CHANGED:
-			// System.out.println("ensureSync kind=CHANGED");
-			// break;
-			// default:
-			// System.out.println("ensureSync kind=OTHER");
-			// }
-			// for (IResourceDelta child : delta.getAffectedChildren()) {
-			// IResource resource = child.getResource();
-			// if (resource instanceof IProject) {
-			// System.out.println("ensureSync project=" + child.getResource().getName());
-			// synchronize(child, monitor,
-			// force);
-			// } else if (resource instanceof IFolder) {
-			// System.out.println("ensureSync folder=" +
-			// child.getResource().getName());
-			// synchronize(child, monitor, force);
-			// } else if (resource instanceof IFile) {
-			// System.out.println("ensureSync file=" + child.getResource().getName());
-			// }
-			// }
-
-			// TODO: Review exception handling
-			if (fSyncConnection == null) {
-				// Open a remote sync connection
-				try {
-					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(),
-							this.getProject().getLocation().toString(),	this.getLocation());
-				} catch (final RemoteSyncException e) {
-					throw e;
-				}
-			}
-
-			// Open remote connection if necessary
-			if (this.getRemoteConnection().isOpen() == false) {
-				try {
-					this.getRemoteConnection().open(monitor);
-				} catch (final RemoteConnectionException e) {
-					throw new RemoteSyncException(e);
-				}
 			}
 			
-			int willFinishTaskId;
+			int mySyncTaskId;
 			synchronized (syncTaskId) {
-				willFinishTaskId = syncTaskId;  //This synchronization operation will include all tasks up to current syncTaskId 
-			                                    //syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
-												//we might synchronize even more than that if a file is already saved but syncTaskId wasn't increased yet
-												//thus we cannot guarantee a maximum but we can guarantee syncTaskId as a minimum
-				//suggestion for Deltas: make local copy of list of deltas, remove list of deltas
+				syncTaskId++;    
+				mySyncTaskId=syncTaskId;
+				//suggestion for Deltas: add delta to list of deltas
 			}
-
-			// Sync local and remote. For now, do both ways each time.
-			// TODO: Sync more efficiently and appropriately to the situation.
+			
+			if (syncLock.hasQueuedThreads() && syncFlags == SyncFlag.NO_FORCE)
+				return;   //the queued Thread will do the work for us. And we don't have to wait because of NO_FORCE
+			
+		
 			try {
-				fSyncConnection.syncLocalToRemote();
-			} catch (final RemoteSyncException e) {
-				throw e;
+				while (!syncLock.tryLock(50, TimeUnit.MILLISECONDS)) {
+					if (progress.isCanceled()) {
+						throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.GitServiceProvider_1));
+					}
+				}
+			} catch (InterruptedException e1) {
+				throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.GitServiceProvider_2));
 			}
-
+			
+			
 			try {
-				fSyncConnection.syncRemoteToLocal();
-			} catch (final RemoteSyncException e) {
-				throw e;
+				if (mySyncTaskId<=finishedSyncTaskId)  //some other thread has already done the work for us 
+					return;
+	
+				
+				// TODO: Use delta information
+				// switch (delta.getKind()) {
+				// case IResourceDelta.ADDED:
+				// System.out.println("ensureSync kind=ADDED");
+				// break;
+				// case IResourceDelta.REMOVED:
+				// System.out.println("ensureSync kind=REMOVED");
+				// break;
+				// case IResourceDelta.CHANGED:
+				// System.out.println("ensureSync kind=CHANGED");
+				// break;
+				// default:
+				// System.out.println("ensureSync kind=OTHER");
+				// }
+				// for (IResourceDelta child : delta.getAffectedChildren()) {
+				// IResource resource = child.getResource();
+				// if (resource instanceof IProject) {
+				// System.out.println("ensureSync project=" + child.getResource().getName());
+				// synchronize(child, monitor,
+				// force);
+				// } else if (resource instanceof IFolder) {
+				// System.out.println("ensureSync folder=" +
+				// child.getResource().getName());
+				// synchronize(child, monitor, force);
+				// } else if (resource instanceof IFile) {
+				// System.out.println("ensureSync file=" + child.getResource().getName());
+				// }
+				// }
+	
+				// TODO: Review exception handling
+				if (fSyncConnection == null) {
+					// Open a remote sync connection
+					try {
+						fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(),
+								this.getProject().getLocation().toString(),	this.getLocation(), progress);
+					} catch (final RemoteSyncException e) {
+						throw e;
+					}
+				}
+	
+				// Open remote connection if necessary
+				if (this.getRemoteConnection().isOpen() == false) {
+					try {
+						this.getRemoteConnection().open(progress);
+					} catch (final RemoteConnectionException e) {
+						throw new RemoteSyncException(e);
+					}
+				}
+				
+				int willFinishTaskId;
+				synchronized (syncTaskId) {
+					willFinishTaskId = syncTaskId;  //This synchronization operation will include all tasks up to current syncTaskId 
+				                                    //syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
+													//we might synchronize even more than that if a file is already saved but syncTaskId wasn't increased yet
+													//thus we cannot guarantee a maximum but we can guarantee syncTaskId as a minimum
+					//suggestion for Deltas: make local copy of list of deltas, remove list of deltas
+				}
+	
+				// Sync local and remote. For now, do both ways each time.
+				// TODO: Sync more efficiently and appropriately to the situation.
+				fSyncConnection.syncLocalToRemote(progress.newChild(40));
+				fSyncConnection.syncRemoteToLocal(progress.newChild(40));
+				
+				finishedSyncTaskId = willFinishTaskId;
+	
+			} finally {
+				syncLock.unlock();
 			}
-			finishedSyncTaskId = willFinishTaskId;
-
+			IProject project = this.getProject();
+			if (project != null) {
+				project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(20));
+			}
 		} finally {
-			syncLock.unlock();
-		}
-		IProject project = this.getProject();
-		if (project != null) {
-			project.refreshLocal(IResource.DEPTH_INFINITE, null);
+			if (monitor != null)
+				monitor.done();
 		}
 	}
 	
