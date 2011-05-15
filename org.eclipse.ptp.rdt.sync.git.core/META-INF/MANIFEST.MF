@@ -27,5 +27,6 @@ Import-Package: com.jcraft.jsch,
  org.eclipse.jgit.storage.file,
  org.eclipse.jgit.transport,
  org.eclipse.jgit.util,
+ org.eclipse.jgit.util.io,
  org.eclipse.ptp.rdt.core.serviceproviders,
  org.eclipse.ptp.remote.remotetools.core
