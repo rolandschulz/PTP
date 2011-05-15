@@ -577,6 +577,13 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 		}
 		return ""; //$NON-NLS-1$
 	}
+	
+	/** 
+	 * @see ISynchronizeParticipant#getErrorMessage()
+	 */
+	public String getErrorMessage() {
+		return null;
+	}
 
 	/**
 	 * @return
@@ -632,5 +639,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 		IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
 		button.setEnabled(connectionManager != null);
 	}
+
+
 
 }

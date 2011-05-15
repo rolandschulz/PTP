@@ -30,6 +30,13 @@ public interface ISynchronizeParticipant {
 	public void createConfigurationArea(Composite parent, IRunnableContext context);
 
 	/**
+	 * Returns the current error message for this participant.
+	 * 
+	 * @return the error message, or <code>null</code> if none
+	 */
+	public String getErrorMessage();
+
+	/**
 	 * Get the configured sync service provider for the supplied project. Only
 	 * valid if {@link isConfigComplete()} is true.
 	 * 
@@ -38,7 +45,7 @@ public interface ISynchronizeParticipant {
 	 * @return configured sync service provider
 	 */
 	public ISyncServiceProvider getProvider(IProject project);
-
+	
 	/**
 	 * Check if the configuration is complete
 	 * 
