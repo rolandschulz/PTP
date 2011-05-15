@@ -123,7 +123,7 @@ public class RemoteConnectionWidget extends Composite {
 	private IRemoteServices[] fRemoteServices;
 	private IRemoteConnection fSelectedConnection;
 	private IRemoteServices fSelectedServices;
-	private IRunnableContext fContext;
+	private final IRunnableContext fContext;
 
 	private String[] fAttrHints;
 	private String[] fAttrHintValues;
@@ -131,8 +131,9 @@ public class RemoteConnectionWidget extends Composite {
 	private final ListenerList fSelectionListeners = new ListenerList();
 	private final WidgetListener fWidgetListener = new WidgetListener();
 
-	public RemoteConnectionWidget(Composite parent, int style, String title) {
+	public RemoteConnectionWidget(Composite parent, int style, String title, IRunnableContext context) {
 		super(parent, style);
+		fContext = context;
 
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = 0;
@@ -473,9 +474,4 @@ public class RemoteConnectionWidget extends Composite {
 		fWidgetListener.setEnabled(enabled);
 		return defServices.getId();
 	}
-
-	protected void setRunnableContext(IRunnableContext context) {
-		fContext = context;
-	}
-
 }

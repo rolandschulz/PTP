@@ -319,6 +319,115 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		getWidgetListener().setEnabled(enabled);
 	}
 
+	/**
+	 * Create the contents of the wizard page.
+	 * 
+	 * @param parent
+	 * @param colSpan
+	 */
+	private Composite createContents(Composite parent) {
+		ScrolledPageContent pageContent = new ScrolledPageContent(parent);
+		GridLayout layout = new GridLayout();
+		// layout.numColumns = 4;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+
+		Composite composite = pageContent.getBody();
+		composite.setLayout(layout);
+
+		if (fEnableUseDefault) {
+			useDefaultButton = new Button(composite, SWT.CHECK);
+			useDefaultButton.setText(fUseDefaultMessage);
+			useDefaultButton.addSelectionListener(getWidgetListener());
+		}
+
+		connectionWidget = new RemoteConnectionWidget(composite, SWT.NONE, null, getWizard().getContainer());
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		connectionWidget.setLayoutData(gd);
+		connectionWidget.addSelectionListener(getWidgetListener());
+
+		/*
+		 * Advanced options
+		 */
+		advancedOptions = new ExpandableComposite(composite, SWT.NONE, ExpandableComposite.TWISTIE
+				| ExpandableComposite.CLIENT_INDENT);
+		advancedOptions.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_AdvancedOptions);
+		advancedOptions.addExpansionListener(new ExpansionAdapter() {
+			@Override
+			public void expansionStateChanged(ExpansionEvent e) {
+				ScrolledPageContent parent = getParentScrolledComposite((ExpandableComposite) e.getSource());
+				if (parent != null) {
+					parent.reflow(true);
+				}
+			}
+		});
+		advancedOptions.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
+
+		Group mxGroup = new Group(advancedOptions, SWT.SHADOW_ETCHED_IN);
+		advancedOptions.setClient(mxGroup);
+		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
+		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
+		mxGroup.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_3);
+
+		noneButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_4,
+				"mxGroup", listener); //$NON-NLS-1$
+		noneButton.addSelectionListener(getWidgetListener());
+
+		/*
+		 * Local address
+		 */
+		Composite addrComp = new Composite(mxGroup, SWT.NONE);
+		GridLayout addrLayout = new GridLayout();
+		addrLayout.numColumns = 2;
+		addrLayout.marginWidth = 0;
+		addrLayout.marginLeft = 15;
+		addrComp.setLayout(addrLayout);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		addrComp.setLayoutData(gd);
+
+		Label label = new Label(addrComp, SWT.NONE);
+		label.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_5);
+		gd = new GridData();
+		gd.horizontalSpan = 1;
+		label.setLayoutData(gd);
+
+		localAddrCombo = new Combo(addrComp, SWT.DROP_DOWN);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 1;
+		localAddrCombo.setLayoutData(gd);
+		localAddrCombo.addModifyListener(getWidgetListener());
+		localAddrCombo.addSelectionListener(getWidgetListener());
+
+		portForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_6,
+				"mxGroup", listener); //$NON-NLS-1$
+		portForwardingButton.addSelectionListener(getWidgetListener());
+
+		getDataSource().justValidate();
+		updateControls();
+
+		return pageContent;
+	}
+
+	/**
+	 * In some nameserver configurations, getCanonicalHostName() will return the
+	 * inverse mapping of the IP address (e.g. 1.1.0.192.in-addr.arpa). In this
+	 * case we just use the IP address.
+	 * 
+	 * @param hostname
+	 *            host name to be fixed
+	 * @return fixed host name
+	 */
+	private String fixHostName(String hostname) {
+		try {
+			if (hostname.endsWith(".in-addr.arpa")) { //$NON-NLS-1$
+				return InetAddress.getLocalHost().getHostAddress();
+			}
+		} catch (UnknownHostException e) {
+			// Should not happen
+		}
+		return hostname;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -571,114 +680,5 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		}
 		gd.horizontalSpan = space;
 		return gd;
-	}
-
-	/**
-	 * Create the contents of the wizard page.
-	 * 
-	 * @param parent
-	 * @param colSpan
-	 */
-	private Composite createContents(Composite parent) {
-		ScrolledPageContent pageContent = new ScrolledPageContent(parent);
-		GridLayout layout = new GridLayout();
-		// layout.numColumns = 4;
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-
-		Composite composite = pageContent.getBody();
-		composite.setLayout(layout);
-
-		if (fEnableUseDefault) {
-			useDefaultButton = new Button(composite, SWT.CHECK);
-			useDefaultButton.setText(fUseDefaultMessage);
-			useDefaultButton.addSelectionListener(getWidgetListener());
-		}
-
-		connectionWidget = new RemoteConnectionWidget(composite, SWT.NONE, null);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		connectionWidget.setLayoutData(gd);
-		connectionWidget.addSelectionListener(getWidgetListener());
-
-		/*
-		 * Advanced options
-		 */
-		advancedOptions = new ExpandableComposite(composite, SWT.NONE, ExpandableComposite.TWISTIE
-				| ExpandableComposite.CLIENT_INDENT);
-		advancedOptions.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_AdvancedOptions);
-		advancedOptions.addExpansionListener(new ExpansionAdapter() {
-			@Override
-			public void expansionStateChanged(ExpansionEvent e) {
-				ScrolledPageContent parent = getParentScrolledComposite((ExpandableComposite) e.getSource());
-				if (parent != null) {
-					parent.reflow(true);
-				}
-			}
-		});
-		advancedOptions.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-
-		Group mxGroup = new Group(advancedOptions, SWT.SHADOW_ETCHED_IN);
-		advancedOptions.setClient(mxGroup);
-		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
-		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		mxGroup.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_3);
-
-		noneButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_4,
-				"mxGroup", listener); //$NON-NLS-1$
-		noneButton.addSelectionListener(getWidgetListener());
-
-		/*
-		 * Local address
-		 */
-		Composite addrComp = new Composite(mxGroup, SWT.NONE);
-		GridLayout addrLayout = new GridLayout();
-		addrLayout.numColumns = 2;
-		addrLayout.marginWidth = 0;
-		addrLayout.marginLeft = 15;
-		addrComp.setLayout(addrLayout);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		addrComp.setLayoutData(gd);
-
-		Label label = new Label(addrComp, SWT.NONE);
-		label.setText(Messages.AbstractRemoteResourceManagerConfigurationWizardPage_5);
-		gd = new GridData();
-		gd.horizontalSpan = 1;
-		label.setLayoutData(gd);
-
-		localAddrCombo = new Combo(addrComp, SWT.DROP_DOWN);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 1;
-		localAddrCombo.setLayoutData(gd);
-		localAddrCombo.addModifyListener(getWidgetListener());
-		localAddrCombo.addSelectionListener(getWidgetListener());
-
-		portForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemoteResourceManagerConfigurationWizardPage_6,
-				"mxGroup", listener); //$NON-NLS-1$
-		portForwardingButton.addSelectionListener(getWidgetListener());
-
-		getDataSource().justValidate();
-		updateControls();
-
-		return pageContent;
-	}
-
-	/**
-	 * In some nameserver configurations, getCanonicalHostName() will return the
-	 * inverse mapping of the IP address (e.g. 1.1.0.192.in-addr.arpa). In this
-	 * case we just use the IP address.
-	 * 
-	 * @param hostname
-	 *            host name to be fixed
-	 * @return fixed host name
-	 */
-	private String fixHostName(String hostname) {
-		try {
-			if (hostname.endsWith(".in-addr.arpa")) { //$NON-NLS-1$
-				return InetAddress.getLocalHost().getHostAddress();
-			}
-		} catch (UnknownHostException e) {
-			// Should not happen
-		}
-		return hostname;
 	}
 }
