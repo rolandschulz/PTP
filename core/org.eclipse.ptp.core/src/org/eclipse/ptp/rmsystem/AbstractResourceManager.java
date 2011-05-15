@@ -368,6 +368,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 			try {
 				doStartup(subMon.newChild(100));
 			} catch (CoreException e) {
+				doShutdown(); // make sure both components are shut down
 				setState(ERROR_STATE);
 				throw e;
 			}
