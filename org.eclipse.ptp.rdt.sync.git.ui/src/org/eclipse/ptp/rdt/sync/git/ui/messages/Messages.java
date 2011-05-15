@@ -13,8 +13,13 @@ package org.eclipse.ptp.rdt.sync.git.ui.messages;
 
 import org.eclipse.osgi.util.NLS;
 
+@SuppressWarnings("javadoc")
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.sync.git.ui.messages.messages"; //$NON-NLS-1$
+	public static String GitParticipant_0;
+	public static String GitParticipant_1;
+	public static String GitParticipant_2;
+	public static String GitParticipant_3;
 	public static String GitParticipant_browse;
 	public static String GitParticipant_connection;
 	public static String GitParticipant_location;

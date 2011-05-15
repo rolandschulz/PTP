@@ -12,6 +12,7 @@ package org.eclipse.ptp.rdt.sync.ui.messages;
 
 import org.eclipse.osgi.util.NLS;
 
+@SuppressWarnings("javadoc")
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.sync.ui.messages.messages"; //$NON-NLS-1$
 	public static String RemoteIncludeDialog_browse;
@@ -41,6 +42,7 @@ public class Messages extends NLS {
 	public static String WizardProjectConversion_title;
 	public static String WizardProjectConversion_description;
 	public static String ConvertToRemoteWizardPage_0;
+	public static String ConvertToSyncProjectWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_convertingToSyncProject;
 	public static String RemoteBuildServiceFileLocationWidget_1;
 	public static String IndexFileLocationWidget_1;
