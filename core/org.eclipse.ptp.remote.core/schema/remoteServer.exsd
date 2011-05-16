@@ -63,6 +63,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="continuous" type="boolean" use="required">
+            <annotation>
+               <documentation>
+                  Flag indicating if the server will be running continously until terminated or runs once to completion. Continuously running servers require a &quot;success string&quot; to indicate that they have successfully started operating.
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
