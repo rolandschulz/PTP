@@ -58,7 +58,6 @@ public class Messages extends NLS {
 	public static String BRPPage_RemoteProviderLabel;
 	public static String BRPPage_ConnectionLabel;
 	public static String BRPPage_RootLocation;
-	public static String BRPPage_BuildSubdirLabel;
 	public static String BRPPage_BrowseButton;
 	public static String BRPPage_ConnectionButton;
 
