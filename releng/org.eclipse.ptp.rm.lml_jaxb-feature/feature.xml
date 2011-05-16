@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.ptp.rm.jaxb"
+      id="org.eclipse.ptp.rm.lml_jaxb"
       label="%featureName"
       version="5.0.0.qualifier"
       provider-name="%providerName"
-      plugin="org.eclipse.ptp.rm.jaxb.core"
       image="eclipse_update_120.jpg">
 
    <description url="http://eclipse.org/ptp">
@@ -24,14 +23,7 @@
    </url>
 
    <plugin
-         id="org.eclipse.ptp.rm.lml_jaxb.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.rm.lml_jaxb.ui"
+         id="org.eclipse.ptp.rm.lml_jaxb"
          download-size="0"
          install-size="0"
          version="0.0.0"

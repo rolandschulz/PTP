@@ -576,11 +576,7 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml_jaxb.core"/>
-			<param name="tagbranch" value="${ptpTagBranch}"/>
-		</antcall>
-		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml_jaxb.ui"/>
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml_jaxb"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
@@ -588,7 +584,19 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml.monitor.core"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml.monitor.ui"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>		
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml.da"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml.da.server"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
