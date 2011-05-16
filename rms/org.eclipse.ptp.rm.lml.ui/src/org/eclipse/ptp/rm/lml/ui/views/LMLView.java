@@ -21,6 +21,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.ui.views;
 
+import java.util.Map;
+
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -89,8 +91,6 @@ public class LMLView extends ViewPart {
 		}
 
 		public void handleEvent(IViewDisposedEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 	}
@@ -110,7 +110,6 @@ public class LMLView extends ViewPart {
 	/**
 	 * 
 	 */
-	public Composite composite;
 	public ListViewer viewer;
 	private AddLguiAction addLguiAction;
 	private RemoveLguiAction removeLguiAction;
@@ -127,7 +126,6 @@ public class LMLView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		composite = parent;
 		viewer = new ListViewer(parent, SWT.SINGLE);
 		viewer.setLabelProvider(new LabelProvider() {
 			@Override
@@ -159,11 +157,9 @@ public class LMLView extends ViewPart {
 	}
 
 	private void createList() {
-		if (!composite.isDisposed()) {
-			list = viewer.getList();
-			list.removeAll();
-			list.removeSelectionListener(listListener);
-		
+		list = viewer.getList();
+		list.removeAll();
+		list.removeSelectionListener(listListener);
 
 		createContextMenu();
 		if (fSelected != null) {
@@ -173,7 +169,6 @@ public class LMLView extends ViewPart {
 			list.setSelection(lmlManager.getSelectedLguiIndex(fSelected.toString()));
 		}
 		list.addSelectionListener(listListener);
-		}
 	}
 
 	@Override
@@ -216,8 +211,8 @@ public class LMLView extends ViewPart {
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		MenuManager subMenu = new MenuManager("Show View...");
 		if (inContextForLgui) {
-			String[] gids = lmlManager.getSelectedLguiItem().getLayoutAccess().getInactiveComponents();
-			for (String gid : gids) {
+			Map<String, String> gids = lmlManager.getSelectedLguiItem().getLayoutAccess().getInactiveComponents();
+			for (Map.Entry<String, String> gid : gids.entrySet()) {
 				subMenu.add(new ShowViewAction(gid));
 			}
 		}

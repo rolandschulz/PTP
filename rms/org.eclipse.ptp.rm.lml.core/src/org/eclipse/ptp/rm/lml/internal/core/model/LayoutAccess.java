@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -802,15 +803,22 @@ public class LayoutAccess extends LguiHandler{
 		return nodedisplayID.toArray(new String[nodedisplayID.size()]);
 	}
 	
-	public String[] getInactiveComponents() {
+	public Map<String, String> getInactiveComponents() {
 		List<ComponentlayoutType> objects = getComponentLayouts();
 		ArrayList<String> inactive = new ArrayList<String>();
+		Map<String,String> inactiveMap = new HashMap<String, String>();
 		for (ComponentlayoutType object : objects) {
 			if(!object.isActive()) {
+				if (object.getClass().getSimpleName().equals("TablelayoutType")) {
+					inactiveMap.put(lguiItem.getTableHandler().getTable(object.getGid()).getTitle(), object.getGid());
+				} else if (object.getClass().getSimpleName().equals("NodedisplaylayoutType")) {
+					inactiveMap.put(lguiItem.getNodedisplayAccess().getNodedisplayById(object.getGid()).getTitle(), object.getGid());
+				}
 				inactive.add(object.getGid());
 			}
 		}
-		return inactive.toArray(new String[inactive.size()]);
+//		return inactive.toArray(new String[inactive.size()]);
+		return inactiveMap;
 	}
 	
 	private ComponentlayoutType getComponent(String gid) {
