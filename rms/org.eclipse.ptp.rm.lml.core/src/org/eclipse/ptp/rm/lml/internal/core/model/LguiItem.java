@@ -348,7 +348,7 @@ public class LguiItem implements ILguiItem {
 	@Override
 	public String toString() {
 		if (getXmlFile().getPath() == null) {
-			return "es gibt hier nix";
+			return null;
 		}
 		return getXmlFile().getPath();
 	}

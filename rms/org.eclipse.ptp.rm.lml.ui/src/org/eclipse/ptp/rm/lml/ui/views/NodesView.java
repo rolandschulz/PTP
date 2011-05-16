@@ -12,8 +12,7 @@
 package org.eclipse.ptp.rm.lml.ui.views;
 
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.lml.core.ILMLManager;
-import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
@@ -70,7 +69,7 @@ public class NodesView extends LMLViewPart {
 	public ILguiItem fLguiItem = null;
 	private String gid = null;
 	private final ILMLListener lguiListener = new LguiListener();
-	private final ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager();
+	private final LMLManager lmlManager = LMLManager.getInstance();
 
 	/**
 	 * 

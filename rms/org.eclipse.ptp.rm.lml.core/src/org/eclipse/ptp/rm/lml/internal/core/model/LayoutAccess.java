@@ -817,7 +817,6 @@ public class LayoutAccess extends LguiHandler{
 				inactive.add(object.getGid());
 			}
 		}
-//		return inactive.toArray(new String[inactive.size()]);
 		return inactiveMap;
 	}
 	

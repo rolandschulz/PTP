@@ -1,7 +1,6 @@
 package org.eclipse.ptp.rm.lml.ui.providers;
 
-import org.eclipse.ptp.rm.lml.core.ILMLManager;
-import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable;
 
@@ -15,13 +14,13 @@ import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable;
  */
 public class EventForwarder implements Updatable{
 
-	private ILMLManager lmlmanager;//Default LMLManager attribute
+	private LMLManager lmlmanager;//Default LMLManager attribute
 	
 	private ObjectType lastchanged;//Contains the ObjectType-instance, which was changed the last time
 	private boolean wasmouseover, wasmousedown;//Corresponding state of lastchanged
 	
 	public EventForwarder(){
-		lmlmanager=LMLCorePlugin.getDefault().getLMLManager();
+		lmlmanager = LMLManager.getInstance();
 	}
 	
 	

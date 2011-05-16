@@ -11,12 +11,6 @@
 
 package org.eclipse.ptp.rm.lml.ui.views;
 
-//import java.net.URL;
-//
-//import org.eclipse.jface.action.Action;
-//import org.eclipse.jface.action.IMenuManager;
-//import org.eclipse.jface.action.IToolBarManager;
-//import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -25,8 +19,7 @@ import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.lml.core.ILMLManager;
-import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
@@ -179,7 +172,7 @@ public class TableView extends LMLViewPart {
 	public ILguiItem fSelectedLguiItem = null;
 	public String gid = null;
 	private final ILMLListener lmlListener = new LMLTableListListener();
-	private final ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager();
+	private final LMLManager lmlManager = LMLManager.getInstance();
 	private TreeItem selectedItem = null;
 	private String selectedOid = null;
 
@@ -382,7 +375,7 @@ public class TableView extends LMLViewPart {
 				}
 				fSelectedLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, tree.getSortDirection());
 				tree.setSortDirection(tree.getSortDirection());
-				LMLCorePlugin.getDefault().getLMLManager().sortLgui();
+				lmlManager.sortLgui();
 			}
 		};
 

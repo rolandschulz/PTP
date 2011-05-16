@@ -26,7 +26,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 
@@ -43,12 +43,12 @@ public class RemoveLguiAction extends Action{
 	}
 
 	public void run() {
-		String lguiName = LMLCorePlugin.getDefault().getLMLManager().getSelectedLguiItem().toString();
+		String lguiName = LMLManager.getInstance().getSelectedLguiItem().toString();
 		boolean remove = MessageDialog.openConfirm(shell, Messages.RemoveLguiAction_0,
 				Messages.RemoveLguiAction_1 + lguiName);
 		
 		if (remove) {
-			LMLCorePlugin.getDefault().getLMLManager().removeLgui(lguiName);
+			LMLManager.getInstance().removeLgui(lguiName);
 		}
 	}
 

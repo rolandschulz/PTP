@@ -32,8 +32,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.lml.core.ILMLManager;
-import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiSelectedEvent;
@@ -91,6 +90,7 @@ public class LMLView extends ViewPart {
 		}
 
 		public void handleEvent(IViewDisposedEvent e) {
+
 		}
 
 	}
@@ -110,12 +110,13 @@ public class LMLView extends ViewPart {
 	/**
 	 * 
 	 */
+	public Composite composite;
 	public ListViewer viewer;
 	private AddLguiAction addLguiAction;
 	private RemoveLguiAction removeLguiAction;
 	private UpdateLguiAction updateLguiAction;
 	private ILguiItem fSelected = null;
-	private final ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager();
+	private final LMLManager lmlManager = LMLManager.getInstance();
 	private LMLViewListener lmlViewListener = null;
 	private List list = null;
 	private final ListSelectionListener listListener = new ListSelectionListener();
@@ -184,7 +185,7 @@ public class LMLView extends ViewPart {
 		final Shell shell = getSite().getShell();
 		addLguiAction = new AddLguiAction(shell);
 		removeLguiAction = new RemoveLguiAction(shell);
-		updateLguiAction = new UpdateLguiAction(shell);
+		updateLguiAction = new UpdateLguiAction();
 
 		MenuManager menuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuManager.setRemoveAllWhenShown(true);
@@ -211,7 +212,7 @@ public class LMLView extends ViewPart {
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		MenuManager subMenu = new MenuManager("Show View...");
 		if (inContextForLgui) {
-			Map<String, String> gids = lmlManager.getSelectedLguiItem().getLayoutAccess().getInactiveComponents();
+			Map<String, String> gids = LMLManager.getInstance().getSelectedLguiItem().getLayoutAccess().getInactiveComponents();
 			for (Map.Entry<String, String> gid : gids.entrySet()) {
 				subMenu.add(new ShowViewAction(gid));
 			}

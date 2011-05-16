@@ -1,6 +1,6 @@
 package org.eclipse.ptp.rm.lml.core.events;
 
-import org.eclipse.ptp.rm.lml.core.ILMLManager;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
 /**
@@ -19,5 +19,5 @@ public interface IJobListSortedEvent {
 	 * Getting the involved LMLManager.
 	 * @return the involved LMLManager
 	 */
-	public ILMLManager getLMLManager();
+	public LMLManager getLMLManager();
 }

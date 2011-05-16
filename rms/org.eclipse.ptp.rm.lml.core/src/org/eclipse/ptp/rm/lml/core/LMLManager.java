@@ -8,7 +8,7 @@
  * Contributors:
  * 		Claudia Knobloch, FZ Juelich
  */
-package org.eclipse.ptp.rm.lml.internal.core;
+package org.eclipse.ptp.rm.lml.core;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.ptp.rm.lml.core.ILMLManager;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiSelectedEvent;
@@ -46,10 +45,10 @@ import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
 /**
  * Class of the interface ILMLManager
  */
-public class LMLManager implements ILMLManager {
+public class LMLManager {
 
 	/*
-	 * Map of all ILguioItems
+	 * Map of all ILguiItems
 	 */
 	protected final Map<String, ILguiItem> LGUIS = new HashMap<String, ILguiItem>();
 
@@ -66,6 +65,19 @@ public class LMLManager implements ILMLManager {
 	private final ListenerList viewListeners = new ListenerList();
 
 	private final Map<String, IListener> listeners = new HashMap<String, IListener>();
+	
+	private static LMLManager manager;
+	
+	private LMLManager() {
+		manager = this;
+	}
+	
+	public static LMLManager getInstance() {
+		if (manager == null) {
+			manager = new LMLManager();
+		}
+		return manager;
+	}
 
 	public void addListener(IViewListener listener) {
 		viewListeners.add(listener);

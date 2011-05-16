@@ -1,6 +1,6 @@
 package org.eclipse.ptp.rm.lml.internal.core.events;
 
-import org.eclipse.ptp.rm.lml.core.ILMLManager;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
@@ -8,7 +8,7 @@ public class TableColumnChangeEvent implements ITableColumnChangeEvent{
 	/*
 	 * The associated LMLManager
 	 */
-	private final ILMLManager lmlManager;
+	private final LMLManager lmlManager;
 	
 	/*
 	 * The associated ILguiItem
@@ -20,7 +20,7 @@ public class TableColumnChangeEvent implements ITableColumnChangeEvent{
 	 * @param lmlManager the associated LMLManager
 	 * @param lguiItem the associated ILguiItem
 	 */
-	public TableColumnChangeEvent(ILMLManager lmlManager, ILguiItem lguiItem) {
+	public TableColumnChangeEvent(LMLManager lmlManager, ILguiItem lguiItem) {
 		this.lmlManager = lmlManager;
 		this.lguiItem = lguiItem;
 	}
@@ -41,7 +41,7 @@ public class TableColumnChangeEvent implements ITableColumnChangeEvent{
 	 * @see
 	 * org.eclipse.ptp.rm.lml.core.elements.IJobListSortedEvent#getLMLManager()
 	 */
-	public ILMLManager getLMLManager() {
+	public LMLManager getLMLManager() {
 		return lmlManager;
 	}
 

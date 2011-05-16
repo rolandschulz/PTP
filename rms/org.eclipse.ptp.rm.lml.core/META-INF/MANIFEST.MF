@@ -9,7 +9,6 @@ Export-Package: org.eclipse.ptp.rm.lml.core,
  org.eclipse.ptp.rm.lml.core.listeners,
  org.eclipse.ptp.rm.lml.core.model,
  org.eclipse.ptp.rm.lml.core.util,
- org.eclipse.ptp.rm.lml.internal.core,
  org.eclipse.ptp.rm.lml.internal.core.elements,
  org.eclipse.ptp.rm.lml.internal.core.model,
  org.eclipse.ptp.rm.lml.internal.core.nodedisplay

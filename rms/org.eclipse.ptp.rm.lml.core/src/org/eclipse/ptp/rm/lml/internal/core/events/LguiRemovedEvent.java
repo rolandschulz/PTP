@@ -19,7 +19,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.internal.core.events;
 
-import org.eclipse.ptp.rm.lml.core.ILMLManager;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
@@ -32,7 +32,7 @@ public class LguiRemovedEvent implements ILguiRemovedEvent{
 	/*
 	 * The associated LMLManager
 	 */
-	private final ILMLManager lmlManager;
+	private final LMLManager lmlManager;
 	
 	/*
 	 * The associated ILguiItem
@@ -44,7 +44,7 @@ public class LguiRemovedEvent implements ILguiRemovedEvent{
 	 * @param lmlManager the associated LMLManager
 	 * @param lguiItem the associated ILguiItem
 	 */
-	public LguiRemovedEvent(ILMLManager lmlManager, ILguiItem lguiItem) {
+	public LguiRemovedEvent(LMLManager lmlManager, ILguiItem lguiItem) {
 		this.lmlManager = lmlManager;
 		this.lguiItem = lguiItem;
 	}
@@ -65,7 +65,7 @@ public class LguiRemovedEvent implements ILguiRemovedEvent{
 	 * @see
 	 * org.eclipse.ptp.rm.lml.core.elements.ILguiRemovedEvent#getLMLManager()
 	 */
-	public ILMLManager getLMLManager() {
+	public LMLManager getLMLManager() {
 		return lmlManager;
 	}
 

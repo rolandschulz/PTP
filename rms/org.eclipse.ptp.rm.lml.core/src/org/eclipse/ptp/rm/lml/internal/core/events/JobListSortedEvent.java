@@ -1,6 +1,6 @@
 package org.eclipse.ptp.rm.lml.internal.core.events;
 
-import org.eclipse.ptp.rm.lml.core.ILMLManager;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
@@ -13,7 +13,7 @@ public class JobListSortedEvent implements IJobListSortedEvent{
 	/*
 	 * The associated LMLManager
 	 */
-	private final ILMLManager lmlManager;
+	private final LMLManager lmlManager;
 	
 	/*
 	 * The associated ILguiItem
@@ -25,7 +25,7 @@ public class JobListSortedEvent implements IJobListSortedEvent{
 	 * @param lmlManager the associated LMLManager
 	 * @param lguiItem the associated ILguiItem
 	 */
-	public JobListSortedEvent(ILMLManager lmlManager, ILguiItem lguiItem) {
+	public JobListSortedEvent(LMLManager lmlManager, ILguiItem lguiItem) {
 		this.lmlManager = lmlManager;
 		this.lguiItem = lguiItem;
 	}
@@ -46,7 +46,7 @@ public class JobListSortedEvent implements IJobListSortedEvent{
 	 * @see
 	 * org.eclipse.ptp.rm.lml.core.elements.IJobListSortedEvent#getLMLManager()
 	 */
-	public ILMLManager getLMLManager() {
+	public LMLManager getLMLManager() {
 		return lmlManager;
 	}
 

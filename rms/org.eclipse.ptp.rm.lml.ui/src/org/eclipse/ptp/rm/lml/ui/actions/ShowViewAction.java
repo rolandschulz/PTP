@@ -3,7 +3,7 @@ package org.eclipse.ptp.rm.lml.ui.actions;
 import java.util.Map;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 
 public class ShowViewAction extends Action{
 	
@@ -15,7 +15,7 @@ public class ShowViewAction extends Action{
 	}
 	
 	public void run() {
-		LMLCorePlugin.getDefault().getLMLManager().addView(gid);
+		LMLManager.getInstance().addView(gid);
 	}
 
 }

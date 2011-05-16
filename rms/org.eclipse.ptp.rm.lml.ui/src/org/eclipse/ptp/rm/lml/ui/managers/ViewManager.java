@@ -17,8 +17,7 @@ package org.eclipse.ptp.rm.lml.ui.managers;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.rm.lml.core.ILMLManager;
-import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiSelectedEvent;
@@ -115,7 +114,7 @@ public class ViewManager {
 
 	protected ILguiItem selectedLgui = null;
 
-	public ILMLManager lmlManager = null;
+	public LMLManager lmlManager = null;
 
 	public IViewListener viewListener = new ViewListener();
 
@@ -126,7 +125,7 @@ public class ViewManager {
 	public int j = 0;
 
 	public ViewManager() {
-		lmlManager = LMLCorePlugin.getDefault().getLMLManager();
+		lmlManager = LMLManager.getInstance();
 		lmlManager.addListener(viewListener);
 	}
 

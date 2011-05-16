@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rm.lml.ui.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
 
@@ -29,10 +29,10 @@ public class ShowTableColumnAction extends Action {
 	}
 
 	public void run() {
-		ILguiItem lguiItem = LMLCorePlugin.getDefault().getLMLManager().getSelectedLguiItem();
+		ILguiItem lguiItem = LMLManager.getInstance().getSelectedLguiItem();
 		lguiItem.getTableHandler().changeTableColumnsWidth(view.getWidths(), gid);
 		lguiItem.getTableHandler().changeTableColumnsOrder(gid, view.getRemoveColumnOrder());
-		LMLCorePlugin.getDefault().getLMLManager().setTableColumnActive(gid, title);
+		LMLManager.getInstance().setTableColumnActive(gid, title);
 	}
 
 

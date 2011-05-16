@@ -46,7 +46,6 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.lml.core.messages.Messages;
 import org.eclipse.ptp.rm.lml.core.util.DebugUtil;
-import org.eclipse.ptp.rm.lml.internal.core.LMLManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.xml.sax.SAXException;
@@ -141,10 +140,6 @@ public class LMLCorePlugin extends Plugin {
 	 * Resource bundle
 	 */
 	private ResourceBundle resourceBundle;
-	/*
-	 * ModelManager for this Eclipse session
-	 */
-	private ILMLManager lmlManager;
 
 	/**
 	 * The constructor.
@@ -170,15 +165,6 @@ public class LMLCorePlugin extends Plugin {
 	 */
 	public SimpleDateFormat getSimpleDateFormat(int length) {
 		return length == simpleDateFormat1.toPattern().length() ? simpleDateFormat1 : simpleDateFormat2;
-	}
-
-	/**
-	 * Get the model manager
-	 * 
-	 * @return the model manager
-	 */
-	public ILMLManager getLMLManager() {
-		return lmlManager;
 	}
 
 	/**
@@ -309,7 +295,6 @@ public class LMLCorePlugin extends Plugin {
 			public void doneSaving(ISaveContext saveContext) {
 			}
 		});
-		lmlManager = new LMLManager();
 	}
 
 	/**
