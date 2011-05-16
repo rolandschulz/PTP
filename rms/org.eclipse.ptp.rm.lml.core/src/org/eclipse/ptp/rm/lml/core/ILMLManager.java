@@ -66,7 +66,9 @@ public interface ILMLManager{
 	
 	public void removeLgui(String title);
 
-	public void setTableColumnActive(String gid, String text);
+	public void setTableColumnActive(String gid, String title);
+	
+	public void setTableColumnNonActive(String gid, String title);
 
 	public void selectObject(String oid);
 	

@@ -199,8 +199,13 @@ public class LMLManager implements ILMLManager {
 		listeners.remove("ViewManager");
 	}
 
-	public void setTableColumnActive(String gid, String text) {
-		fSelectedLguiItem.getTableHandler().setTableColumnActive(gid, text, true);
+	public void setTableColumnActive(String gid, String title) {
+		fSelectedLguiItem.getTableHandler().setTableColumnActive(gid, title, true);
+		fireChangeTableColumn();
+	}
+	
+	public void setTableColumnNonActive(String gid, String title) {
+		fSelectedLguiItem.getTableHandler().setTableColumnActive(gid, title, false);
 		fireChangeTableColumn();
 	}
 
