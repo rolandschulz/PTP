@@ -48,11 +48,15 @@ import org.osgi.framework.Bundle;
  */
 public abstract class AbstractRemoteServerRunner extends Job {
 	private static String LAUNCH_COMMAND_VAR = "launch_command"; //$NON-NLS-1$
+	private static String UNPACK_COMMAND_VAR = "unpack_command"; //$NON-NLS-1$
 	private static String PAYLOAD_VAR = "payload"; //$NON-NLS-1$
 	private static String WORKING_DIR_VAR = "working_dir"; //$NON-NLS-1$
-	private static String VERIFY_COMMAND_VAR = "verify_command"; //$NON-NLS-1$
-	private static String VERIFY_FAIL_MESSAGE_VAR = "verify_fail_message"; //$NON-NLS-1$
-	private static String VERIFY_PATTERN_VAR = "verify_pattern"; //$NON-NLS-1$
+	private static String VERIFY_LAUNCH_COMMAND_VAR = "verify_launch_command"; //$NON-NLS-1$
+	private static String VERIFY_LAUNCH_FAIL_MESSAGE_VAR = "verify_launch_fail_message"; //$NON-NLS-1$
+	private static String VERIFY_LAUNCH_PATTERN_VAR = "verify_launch_pattern"; //$NON-NLS-1$
+	private static String VERIFY_UNPACK_COMMAND_VAR = "verify_unpack_command"; //$NON-NLS-1$
+	private static String VERIFY_UNPACK_FAIL_MESSAGE_VAR = "verify_unpack_fail_message"; //$NON-NLS-1$
+	private static String VERIFY_UNPACK_PATTERN_VAR = "verify_unpack_pattern"; //$NON-NLS-1$
 
 	public enum ServerState {
 		/**
@@ -95,6 +99,15 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * Get the unpack command for this server
+	 * 
+	 * @return unpack command
+	 */
+	public String getUnpackCommand() {
+		return fVars.get(UNPACK_COMMAND_VAR);
+	}
+
+	/**
 	 * Get the payload. The payload is copied to the remote system using the
 	 * supplied connection if it doesn't exist.
 	 * 
@@ -134,30 +147,57 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * @since 5.0 Gets the verify command.
+	 * @since 5.0 Gets the verify launch command.
 	 * 
-	 * @return the verify command
+	 * @return the verify launch command
 	 */
-	public String getVerifyCommand() {
-		return fVars.get(VERIFY_COMMAND_VAR);
+	public String getVerifyLaunchCommand() {
+		return fVars.get(VERIFY_LAUNCH_COMMAND_VAR);
 	}
 
 	/**
-	 * @since 5.0 Gets the verify fail message.
+	 * @since 5.0 Gets the verify launch fail message.
 	 * 
-	 * @return the verify fail message
+	 * @return the verify launch fail message
 	 */
-	public String getVerifyFailMessage() {
-		return fVars.get(VERIFY_FAIL_MESSAGE_VAR);
+	public String getVerifyLaunchFailMessage() {
+		return fVars.get(VERIFY_LAUNCH_FAIL_MESSAGE_VAR);
 	}
 
 	/**
-	 * @since 5.0 Gets the verify pattern.
+	 * @since 5.0 Gets the verify launch pattern.
 	 * 
-	 * @return the verify pattern
+	 * @return the verify launch pattern
 	 */
-	public String getVerifyPattern() {
-		return fVars.get(VERIFY_PATTERN_VAR);
+	public String getVerifyLaunchPattern() {
+		return fVars.get(VERIFY_LAUNCH_PATTERN_VAR);
+	}
+
+	/**
+	 * @since 5.0 Gets the verify unpack command.
+	 * 
+	 * @return the verify unpack command
+	 */
+	public String getVerifyUnpackCommand() {
+		return fVars.get(VERIFY_UNPACK_COMMAND_VAR);
+	}
+
+	/**
+	 * @since 5.0 Gets the verify unpack fail message.
+	 * 
+	 * @return the verify unpack fail message
+	 */
+	public String getVerifyUnpackFailMessage() {
+		return fVars.get(VERIFY_UNPACK_FAIL_MESSAGE_VAR);
+	}
+
+	/**
+	 * @since 5.0 Gets the verify unpack pattern.
+	 * 
+	 * @return the verify unpack pattern
+	 */
+	public String getVerifyUnpackPattern() {
+		return fVars.get(VERIFY_UNPACK_PATTERN_VAR);
 	}
 
 	/**
@@ -207,6 +247,16 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * Set the command used to unpack the payload
+	 * 
+	 * @param command
+	 *            unpack command
+	 */
+	public void setUnpackCommand(String command) {
+		fVars.put(UNPACK_COMMAND_VAR, command);
+	}
+
+	/**
 	 * Set the name of the payload
 	 * 
 	 * @param file
@@ -242,31 +292,61 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	/**
 	 * @since 5.0 Sets the verify command.
 	 * 
-	 * @param fVerifyCommand
+	 * @param verifyCommand
 	 *            the new verify command
 	 */
-	public void setVerifyCommand(String fVerifyCommand) {
-		fVars.put(VERIFY_COMMAND_VAR, fVerifyCommand);
+	public void setVerifyLaunchCommand(String verifyCommand) {
+		fVars.put(VERIFY_LAUNCH_COMMAND_VAR, verifyCommand);
 	}
 
 	/**
 	 * @since 5.0 Sets the verify fail message.
 	 * 
-	 * @param fVerifyFailMessage
+	 * @param verifyFailMessage
 	 *            the new verify fail message
 	 */
-	public void setVerifyFailMessage(String fVerifyFailMessage) {
-		fVars.put(VERIFY_FAIL_MESSAGE_VAR, fVerifyFailMessage);
+	public void setVerifyLaunchFailMessage(String verifyFailMessage) {
+		fVars.put(VERIFY_LAUNCH_FAIL_MESSAGE_VAR, verifyFailMessage);
 	}
 
 	/**
 	 * @since 5.0 Sets the verify pattern.
 	 * 
-	 * @param fVerifyPattern
+	 * @param verifyPattern
 	 *            the new verify pattern
 	 */
-	public void setVerifyPattern(String fVerifyPattern) {
-		fVars.put(VERIFY_PATTERN_VAR, fVerifyPattern);
+	public void setVerifyLaunchPattern(String verifyPattern) {
+		fVars.put(VERIFY_LAUNCH_PATTERN_VAR, verifyPattern);
+	}
+
+	/**
+	 * @since 5.0 Sets the verify unpack command.
+	 * 
+	 * @param verifyCommand
+	 *            the new verify command
+	 */
+	public void setVerifyUnpackCommand(String verifyCommand) {
+		fVars.put(VERIFY_UNPACK_COMMAND_VAR, verifyCommand);
+	}
+
+	/**
+	 * @since 5.0 Sets the verify unpack fail message.
+	 * 
+	 * @param verifyFailMessage
+	 *            the new verify fail message
+	 */
+	public void setVerifyUnpackFailMessage(String verifyFailMessage) {
+		fVars.put(VERIFY_UNPACK_FAIL_MESSAGE_VAR, verifyFailMessage);
+	}
+
+	/**
+	 * @since 5.0 Sets the verify unpack pattern.
+	 * 
+	 * @param verifyPattern
+	 *            the new verify pattern
+	 */
+	public void setVerifyUnpackPattern(String verifyPattern) {
+		fVars.put(VERIFY_UNPACK_PATTERN_VAR, verifyPattern);
 	}
 
 	/**
@@ -313,9 +393,10 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				}
 
 				// Check if the valid java version is installed on the server
-				if ((getVerifyCommand() != null && getVerifyCommand().length() != 0) && !isValidVersionInstalled(subMon)) {
-					if (getVerifyFailMessage() != null && getVerifyFailMessage().length() != 0) {
-						throw new IOException(NLS.bind(getVerifyFailMessage(),
+				if ((getVerifyLaunchCommand() != null && getVerifyLaunchCommand().length() != 0)
+						&& !isValidVersionInstalled(subMon)) {
+					if (getVerifyLaunchFailMessage() != null && getVerifyLaunchFailMessage().length() != 0) {
+						throw new IOException(NLS.bind(getVerifyLaunchFailMessage(),
 								new Object[] { fServerName, fRemoteConnection.getName() }));
 					}
 					throw new IOException(Messages.AbstractRemoteServerRunner_12);
@@ -404,7 +485,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				sb.append(s);
 			}
 			// compile the pattern for search
-			Pattern pattern = Pattern.compile(getVerifyPattern());
+			Pattern pattern = Pattern.compile(getVerifyLaunchPattern());
 			// get a matcher object
 			Matcher m = pattern.matcher(sb.toString());
 
@@ -498,7 +579,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		subMon.subTask(Messages.AbstractRemoteServerRunner_13);
 		try {
 			// specify the verify command to check the software version
-			List<String> verifyArgs = Arrays.asList(getVerifyCommand().split(" ")); //$NON-NLS-1$
+			List<String> verifyArgs = Arrays.asList(getVerifyLaunchCommand().split(" ")); //$NON-NLS-1$
 			IRemoteProcessBuilder builder = getRemoteConnection().getRemoteServices().getProcessBuilder(getRemoteConnection(),
 					verifyArgs);
 			builder.redirectErrorStream(true);

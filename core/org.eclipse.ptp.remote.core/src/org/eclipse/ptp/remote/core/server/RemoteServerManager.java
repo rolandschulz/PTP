@@ -27,11 +27,15 @@ public class RemoteServerManager {
 	private final static Map<String, AbstractRemoteServerRunner> fServerMap = new HashMap<String, AbstractRemoteServerRunner>();
 	private static final String ATTR_ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_LAUNCH_COMMAND = "launchCommand"; //$NON-NLS-1$
+	private static final String ATTR_UNPACK_COMMAND = "unpackCommand"; //$NON-NLS-1$
 	private static final String ATTR_PAYLOAD = "payload"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
-	private static final String ATTR_VERIFYCOMMAND = "verifyCommand"; //$NON-NLS-1$
-	private static final String ATTR_VERIFYPATTERN = "verifyPattern"; //$NON-NLS-1$
-	private static final String ATTR_VERIFYFAILMESSAGE = "verifyFailMessage"; //$NON-NLS-1$
+	private static final String ATTR_VERIFY_LAUNCH_COMMAND = "verifyLaunchCommand"; //$NON-NLS-1$
+	private static final String ATTR_VERIFY_LAUNCH_PATTERN = "verifyLaunchPattern"; //$NON-NLS-1$
+	private static final String ATTR_VERIFY_LAUNCH_FAILMESSAGE = "verifyLaunchFailMessage"; //$NON-NLS-1$
+	private static final String ATTR_VERIFY_UNPACK_COMMAND = "verifyUnpackCommand"; //$NON-NLS-1$
+	private static final String ATTR_VERIFY_UNPACK_PATTERN = "verifyUnpackPattern"; //$NON-NLS-1$
+	private static final String ATTR_VERIFY_UNPACK_FAILMESSAGE = "verifyUnpackFailMessage"; //$NON-NLS-1$
 
 	/**
 	 * Create the remote server give its id.
@@ -59,10 +63,14 @@ public class RemoteServerManager {
 							server = (AbstractRemoteServerRunner) exec;
 							server.setBundleId(ce.getContributor().getName());
 							server.setLaunchCommand(ce.getAttribute(ATTR_LAUNCH_COMMAND));
+							server.setUnpackCommand(ce.getAttribute(ATTR_UNPACK_COMMAND));
 							server.setPayload(ce.getAttribute(ATTR_PAYLOAD));
-							server.setVerifyCommand(ce.getAttribute(ATTR_VERIFYCOMMAND));
-							server.setVerifyPattern(ce.getAttribute(ATTR_VERIFYPATTERN));
-							server.setVerifyFailMessage(ce.getAttribute(ATTR_VERIFYFAILMESSAGE));
+							server.setVerifyLaunchCommand(ce.getAttribute(ATTR_VERIFY_LAUNCH_COMMAND));
+							server.setVerifyLaunchPattern(ce.getAttribute(ATTR_VERIFY_LAUNCH_PATTERN));
+							server.setVerifyLaunchFailMessage(ce.getAttribute(ATTR_VERIFY_LAUNCH_FAILMESSAGE));
+							server.setVerifyUnpackCommand(ce.getAttribute(ATTR_VERIFY_UNPACK_COMMAND));
+							server.setVerifyUnpackPattern(ce.getAttribute(ATTR_VERIFY_UNPACK_PATTERN));
+							server.setVerifyUnpackFailMessage(ce.getAttribute(ATTR_VERIFY_UNPACK_FAILMESSAGE));
 
 							return server;
 						}
