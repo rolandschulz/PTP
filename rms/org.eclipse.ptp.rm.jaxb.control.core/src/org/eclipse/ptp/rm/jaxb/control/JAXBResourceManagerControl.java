@@ -53,7 +53,6 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
@@ -77,7 +76,6 @@ import org.eclipse.ui.progress.IProgressConstants;
 public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl {
 
 	private final IJAXBResourceManagerConfiguration config;
-	private final IResourceManagerMonitor monitor;
 	private Map<String, String> launchEnv;
 	private Map<String, ICommandJob> jobTable;
 	private ICommandJobStatusMap jobStatusMap;
@@ -93,7 +91,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	public JAXBResourceManagerControl(AbstractResourceManagerConfiguration jaxbServiceProvider) {
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
-		monitor = getResourceManager().getMonitor();
 	}
 
 	/**
@@ -254,7 +251,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					if (status.stateChanged()) {
 						jobStateChanged(jobId);
 					}
-					handleMonitorUpdate(jobId, status);
 					return status;
 				}
 
@@ -304,7 +300,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				jobStateChanged(jobId);
 			}
 
-			handleMonitorUpdate(jobId, status);
 			return status;
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
@@ -452,9 +447,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			rmVarMap.remove(JAXBControlConstants.SCRIPT_PATH);
 			rmVarMap.remove(JAXBControlConstants.SCRIPT);
 
-			if (monitor != null) {
-				getResourceManager().addJob(jobId, status);
-			}
 			return status;
 		} finally {
 			pinTable.release(uuid);
@@ -629,24 +621,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private void doOnStartUp() throws CoreException {
 		List<CommandType> onStartUp = controlData.getStartUpCommand();
 		runCommands(onStartUp);
-	}
-
-	/**
-	 * Wraps monitor call to update to check for final state.
-	 * 
-	 * @param jobId
-	 * @param status
-	 */
-	private void handleMonitorUpdate(String jobId, ICommandJobStatus status) {
-		if (monitor != null) {
-			getResourceManager().getMonitor().updateJob(jobId, status);
-			if (status.getState().equals(IJobStatus.COMPLETED)) {
-				getResourceManager().getMonitor().removeJob(jobId);
-			}
-		} else {
-			System.out.println(Messages.RefreshedJobStatusMessage + jobId + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ status.getState());
-		}
 	}
 
 	/**
