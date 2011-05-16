@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
+      <configurationWizard
+            class="org.eclipse.ptp.rm.lml.monitor.ui.wizards.LMLRMMonitorConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.rm.lml.monitor">
+      </configurationWizard>
+   </extension>
+
+</plugin>

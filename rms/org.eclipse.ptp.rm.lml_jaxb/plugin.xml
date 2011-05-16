@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.services.core.providers">
+      <provider
+            class="org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider"
+            id="org.eclipse.ptp.rm.lml_jaxb"
+            name="LML_JAXB"
+            serviceId="org.eclipse.ptp.core.LaunchService">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.core.resourceManagers">
+      <resourceManager
+            class="org.eclipse.ptp.rm.lml_jaxb.core.LMLJAXBResourceManagerFactory"
+            id="org.eclipse.ptp.rm.lml_jaxb">
+         <resourceManagerControl
+             id="org.eclipse.ptp.rm.jaxb.control">
+         </resourceManagerControl>
+         <resourceManagerMonitor
+            id="org.eclipse.ptp.rm.lml.monitor">
+         </resourceManagerMonitor>
+      </resourceManager>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.services.ui.providerContributors">
+      <providerContributor
+            class="org.eclipse.ptp.ui.wizards.RMProviderContributor"
+            id="org.eclipse.ptp.rm.lml_jaxb">
+      </providerContributor>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmConfigurationSelections">
+      <configurationSelection
+            class="org.eclipse.ptp.rm.jaxb.control.ui.wizards.JAXBRMConfigurationSelectionFactory"
+            id="org.eclipse.ptp.rm.lml_jaxb">
+      </configurationSelection>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.launch.rmLaunchConfigurations">
+      <launchConfiguration
+            class="org.eclipse.ptp.rm.lml_jaxb.launch.LMLJAXBRMLaunchConfigurationFactory"
+            id="org.eclipse.ptp.rm.lml_jaxb.ui.launchConfiguration">
+      </launchConfiguration>
+   </extension>
+</plugin>
