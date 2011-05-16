@@ -46,8 +46,8 @@ import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
-import org.eclipse.ptp.rm.lml_jaxb.internal.core.LMLJAXBResourceManager;
-import org.eclipse.ptp.rm.lml_jaxb.internal.core.LMLJAXBResourceManagerMonitor;
+import org.eclipse.ptp.rm.lml.monitor.core.LMLResourceManagerMonitor;
+import org.eclipse.ptp.rm.lml_jaxb.core.LMLJAXBResourceManager;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider;
@@ -243,7 +243,7 @@ public class RMLaunchTest extends TestCase {
 				try {
 					emulateConfigureWizard();
 					rm = new LMLJAXBResourceManager(rmConfig, new JAXBResourceManagerControl(rmConfig),
-							new LMLJAXBResourceManagerMonitor(rmConfig));
+							new LMLResourceManagerMonitor(rmConfig));
 					PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
 					rm.start(monitor);
 					try {
