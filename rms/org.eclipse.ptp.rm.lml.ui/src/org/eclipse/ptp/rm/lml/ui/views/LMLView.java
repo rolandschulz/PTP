@@ -110,6 +110,7 @@ public class LMLView extends ViewPart {
 	/**
 	 * 
 	 */
+	public Composite composite;
 	public ListViewer viewer;
 	private AddLguiAction addLguiAction;
 	private RemoveLguiAction removeLguiAction;
@@ -126,6 +127,7 @@ public class LMLView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
+		composite = parent;
 		viewer = new ListViewer(parent, SWT.SINGLE);
 		viewer.setLabelProvider(new LabelProvider() {
 			@Override
@@ -157,9 +159,11 @@ public class LMLView extends ViewPart {
 	}
 
 	private void createList() {
-		list = viewer.getList();
-		list.removeAll();
-		list.removeSelectionListener(listListener);
+		if (!composite.isDisposed()) {
+			list = viewer.getList();
+			list.removeAll();
+			list.removeSelectionListener(listListener);
+		
 
 		createContextMenu();
 		if (fSelected != null) {
@@ -169,6 +173,7 @@ public class LMLView extends ViewPart {
 			list.setSelection(lmlManager.getSelectedLguiIndex(fSelected.toString()));
 		}
 		list.addSelectionListener(listListener);
+		}
 	}
 
 	@Override

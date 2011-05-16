@@ -17,6 +17,9 @@ package org.eclipse.ptp.rm.lml.ui.views;
 //import org.eclipse.jface.action.IMenuManager;
 //import org.eclipse.jface.action.IToolBarManager;
 //import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -36,6 +39,8 @@ import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
 import org.eclipse.ptp.rm.lml.internal.core.model.Cell;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
+import org.eclipse.ptp.rm.lml.ui.actions.HideTableColumnAction;
+import org.eclipse.ptp.rm.lml.ui.actions.ShowTableColumnAction;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -46,8 +51,6 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -103,7 +106,7 @@ public class TableView extends LMLViewPart {
 
 	}
 
-	private final class LMLJobsListListener implements ILMLListener {
+	private final class LMLTableListListener implements ILMLListener {
 
 		/*
 		 * (non-Javadoc)
@@ -175,14 +178,10 @@ public class TableView extends LMLViewPart {
 	public int sizeViewer;
 	public ILguiItem fSelectedLguiItem = null;
 	public String gid = null;
-	private final ILMLListener lmlListener = new LMLJobsListListener();
+	private final ILMLListener lmlListener = new LMLTableListListener();
 	private final ILMLManager lmlManager = LMLCorePlugin.getDefault().getLMLManager();
 	private TreeItem selectedItem = null;
 	private String selectedOid = null;
-
-	// private Action addItemAction;
-	// private Action deleteItemAction;
-	// private Action selectAllAction;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -299,84 +298,34 @@ public class TableView extends LMLViewPart {
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
 		createColumns();
-		// createActions();
-		// createMenu();
-		// createToolbar();
+		createMenu();
 		input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
 		viewer.setInput(input);
 		viewer.getTree().setItemCount(input.length);
 	}
 
-	// private void createActions() {
-	// addItemAction = new Action("Add...") {
-	// @Override
-	// public void run() {
-	// addItem();
-	// }
-	//
-	// private void addItem() {
-	// System.out.println("Add");
-	// }
-	// };
-	// addItemAction.setImageDescriptor(getImageDescriptor("parallel.gif"));
-	//
-	// deleteItemAction = new Action("Delete...") {
-	// @Override
-	// public void run() {
-	// deleteItem();
-	// }
-	//
-	// private void deleteItem() {
-	// System.out.println("Delete");
-	// }
-	// };
-	// deleteItemAction.setImageDescriptor(getImageDescriptor("legend.gif"));
-	//
-	// selectAllAction = new Action("Select all...") {
-	// @Override
-	// public void run() {
-	// selectAll();
-	// }
-	//
-	// private void selectAll() {
-	// System.out.println("Select all");
-	// }
-	// };
-	//
-	// viewer.addSelectionChangedListener(new ISelectionChangedListener(){
-	// public void selectionChanged(SelectionChangedEvent event) {
-	// updateActionEnablement();
-	// }
-	// });
-	// }
-	//
-	// private void updateActionEnablement() {
-	// IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
-	// deleteItemAction.setEnabled(sel.size() > 0);
-	// }
-	//
-	// public void createMenu(){
-	// IMenuManager menuManager =
-	// getViewSite().getActionBars().getMenuManager();
-	// System.out.println(menuManager);
-	// menuManager.add(selectAllAction);
-	// }
-	//
-	// private void createToolbar() {
-	// IToolBarManager toolbarManager =
-	// getViewSite().getActionBars().getToolBarManager();
-	// toolbarManager.add(addItemAction);
-	// toolbarManager.add(deleteItemAction);
-	// }
-	//
-	// private ImageDescriptor getImageDescriptor(String relativePath) {
-	// String iconPath = "icons/";
-	// LMLUIPlugin plugin = LMLUIPlugin.getDefault();
-	// URL url = plugin.getBundle().getEntry(iconPath + relativePath);
-	// return ImageDescriptor.createFromURL(url);
-	//
-	// }
-
+	private void createMenu() {
+		IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
+		
+		IMenuManager subMenuShow = new MenuManager("Show column...");
+		String[] columnNonActive = fSelectedLguiItem.getTableHandler().getTableColumnNonActive(gid);
+		for (String column : columnNonActive) {
+			IAction action = new ShowTableColumnAction(gid, column, this);
+			subMenuShow.add(action);
+		}
+		menuManager.add(subMenuShow);
+		
+		IMenuManager subMenuHide = new MenuManager("Hide column...");
+		String[] columnActive = fSelectedLguiItem.getTableHandler().getTableColumnActive(gid);
+		for (String column : columnActive) {
+			IAction action = new HideTableColumnAction(gid, column, this);
+			subMenuHide.add(action);
+		}
+		menuManager.add(subMenuHide);
+		
+		getViewSite().getActionBars().updateActionBars();
+	}
+	
 	private int getColumnAlignment(String alignment) {
 		if (alignment.equals("LEFT")) {
 			return SWT.LEAD;
@@ -384,8 +333,7 @@ public class TableView extends LMLViewPart {
 		if (alignment.equals("RIGHT")) {
 			return SWT.TRAIL;
 		}
-
-		return 0;
+		return SWT.LEAD;
 	}
 
 	/**
@@ -413,13 +361,6 @@ public class TableView extends LMLViewPart {
 			treeColumn.setText(tableColumnLayouts[i].getTitle());
 			treeColumn.setWidth(tableColumnLayouts[i].getWidth());
 			treeColumn.setMoveable(true);
-			treeColumn.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					TreeColumn column = (TreeColumn) e.getSource();
-					System.out.println(column.getText());
-				}
-			});
 			treeColumns[i] = treeColumn;
 		}
 
@@ -504,12 +445,8 @@ public class TableView extends LMLViewPart {
 
 	}
 
-	private Double[] getWidths() {
+	public Double[] getWidths() {
 		Double[] widths = new Double[treeColumns.length];
-		int widthTable = 0;
-		for (int i = 0; i < treeColumns.length; i++) {
-			widthTable += treeColumns[i].getWidth();
-		}
 		Double widthColumn = Integer.valueOf(sizeViewer).doubleValue() / treeColumns.length;
 		for (int i = 0; i < treeColumns.length; i++) {
 			widths[i] = widthColumn / treeColumns[i].getWidth();
@@ -528,6 +465,10 @@ public class TableView extends LMLViewPart {
 			}
 		}
 		return orderNew;
+	}
+	
+	public int[] getRemoveColumnOrder() {
+		return removingColumn(tree.getColumnOrder());
 	}
 
 	private void redrawColumns() {

@@ -10,31 +10,30 @@
  */
 package org.eclipse.ptp.rm.lml.ui.actions;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.action.Action;
 import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.ui.views.TableView;
 
-public class ShowTableColumnAction extends AbstractHandler {
+public class ShowTableColumnAction extends Action {
 
 	private final String gid;
+	private final String title;
+	private TableView view;
 
-	public ShowTableColumnAction(String gid, String name) {
+	public ShowTableColumnAction(String gid, String title, TableView view) {
+		super(title);
 		this.gid = gid;
+		this.title = title;
+		this.view = view;
 	}
 
 	public void run() {
-		// TODO Remove
-		MessageDialog.openInformation(Display.getCurrent().getActiveShell(), "Click!",
-				"There will be an update and an additional tablecolumn () will be seen");
-		LMLCorePlugin.getDefault().getLMLManager().setTableColumnActive(gid, "");
+		ILguiItem lguiItem = LMLCorePlugin.getDefault().getLMLManager().getSelectedLguiItem();
+		lguiItem.getTableHandler().changeTableColumnsWidth(view.getWidths(), gid);
+		lguiItem.getTableHandler().changeTableColumnsOrder(gid, view.getRemoveColumnOrder());
+		LMLCorePlugin.getDefault().getLMLManager().setTableColumnActive(gid, title);
 	}
 
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }
