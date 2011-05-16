@@ -2,6 +2,13 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
+         point="org.eclipse.ptp.ui.rmConfigurationWizards">
+      <configurationWizard
+            class="org.eclipse.ptp.rm.jaxb.control.ui.wizards.JAXBRMControlConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.rm.jaxb.control">
+      </configurationWizard>
+   </extension>
+   <extension
          point="org.eclipse.core.variables.dynamicVariables">
       <variable
             description="Dynamic variable backed by LaunchConfiguration"
