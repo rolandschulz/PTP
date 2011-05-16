@@ -252,6 +252,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					if (status.stateChanged()) {
 						jobStateChanged(jobId);
 					}
+					handleMonitorUpdate(jobId, status);
 					return status;
 				}
 
@@ -304,6 +305,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			// XXX eliminate when monitoring is in place
 			System.out.println(Messages.RefreshedJobStatusMessage + jobId + JAXBControlConstants.CM + JAXBControlConstants.SP
 					+ status.getState());
+			handleMonitorUpdate(jobId, status);
 			return status;
 		} catch (CoreException ce) {
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
@@ -450,6 +452,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			rmVarMap.remove(jobId);
 			rmVarMap.remove(JAXBControlConstants.SCRIPT_PATH);
 			rmVarMap.remove(JAXBControlConstants.SCRIPT);
+			getResourceManager().addJob(jobId, status);
 			return status;
 		} finally {
 			pinTable.release(uuid);
@@ -624,6 +627,19 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private void doOnStartUp() throws CoreException {
 		List<CommandType> onStartUp = controlData.getStartUpCommand();
 		runCommands(onStartUp);
+	}
+
+	/**
+	 * Wraps monitor call to update to check for final state.
+	 * 
+	 * @param jobId
+	 * @param status
+	 */
+	private void handleMonitorUpdate(String jobId, ICommandJobStatus status) {
+		getResourceManager().getMonitor().updateJob(jobId, status);
+		if (status.getState().equals(IJobStatus.COMPLETED)) {
+			getResourceManager().getMonitor().removeJob(jobId);
+		}
 	}
 
 	/**
