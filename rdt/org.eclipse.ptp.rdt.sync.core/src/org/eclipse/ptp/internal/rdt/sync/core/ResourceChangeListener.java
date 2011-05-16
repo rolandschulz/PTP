@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
@@ -85,18 +86,20 @@ public class ResourceChangeListener {
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
 				IProject project = delta.getResource().getProject();
 				if (project != null && RemoteSyncNature.hasNature(project)) {
-					if (!(BuildConfigurationManager.isInitialized(project))) {
+					BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+					if (!(bcm.isInitialized(project))) {
 						return;
 					}
 					IConfiguration buildConfig = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
-					IServiceConfiguration serviceConfig = BuildConfigurationManager.getConfigurationForBuildConfiguration(buildConfig);
-					// TODO: serviceConfig should never be null. We should log if this ever happens...
+					IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(buildConfig);
 					if (serviceConfig != null) {
 						ISyncServiceProvider provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(fSyncService);
 						if (provider != null) {
 							SynchronizeJob job = new SynchronizeJob(event.getDelta(), provider);
 							job.schedule();
-						}
+						} 
+					} else {
+						RDTSyncCorePlugin.log(Messages.RCL_NoServiceConfigError);
 					}
 				}
 			}

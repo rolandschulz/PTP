@@ -21,8 +21,11 @@ import org.eclipse.cdt.managedbuilder.core.IMultiConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.internal.core.MultiConfiguration;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractSingleBuildPage;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -43,6 +46,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private IRemoteConnection fSelectedConnection;
@@ -55,7 +59,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		IRemoteConnection connection;
 		IRemoteServices remoteProvider;
 		String rootLocation;
-		String buildLocation;
 		
 		public boolean equals(PageSettings otherSettings) {
 			if (this.connection != otherSettings.connection) {
@@ -65,9 +68,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 				return false;
 			}
 			if (!(this.rootLocation.equals(otherSettings.rootLocation))) {
-				return false;
-			}
-			if (!(this.buildLocation.equals(otherSettings.buildLocation))) {
 				return false;
 			}
 			
@@ -88,7 +88,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private Combo fProviderCombo;
 	private Combo fConnectionCombo;
 	private Text fRootLocationText;
-	private Text fBuildLocationText;
 	private Composite composite;
 
 	/**
@@ -205,23 +204,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			}
 		});
 		
-		// Build subdirectory label and text box
-		Label buildLocationLabel = new Label(composite, SWT.LEFT);
-		buildLocationLabel.setText(Messages.BRPPage_BuildSubdirLabel);
-
-		fBuildLocationText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 1;
-		gd.grabExcessHorizontalSpace = true;
-		gd.widthHint = 250;
-		fBuildLocationText.setLayoutData(gd);
-		fBuildLocationText.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,
-				// PATH_PROPERTY, fLocationText.getText());
-			}
-		});
-		
 		fConfigBeforeSwitch = getCfg();
 		this.setValues(getCfg());
 		fWidgetsReady = true;
@@ -314,8 +296,9 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 */
 	private boolean isConfigAltered(IConfiguration config, PageSettings settings) {
 		PageSettings systemSettings = this.loadSettings(config);
-		// TODO: null return?
-		if (settings.equals(systemSettings)) {
+		if (systemSettings == null) {
+			return true; // Is logged inside loadSettings
+		} else if (settings.equals(systemSettings)) {
 			return false;
 		} else {
 			return true;
@@ -331,28 +314,22 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * 				new settings
 	 */
 	private void saveConfig(IConfiguration config, PageSettings settings) {
-        // Change build path and save new configuration
-        String buildPath = settings.rootLocation;
-        if (buildPath.endsWith("/")) { //$NON-NLS-1$
-                buildPath = buildPath.substring(0, buildPath.length() - 1);
-        }
-        if (settings.buildLocation.startsWith("/")) { //$NON-NLS-1$
-                buildPath = buildPath + settings.buildLocation;
-        } else {
-                buildPath = buildPath + "/" + settings.buildLocation; //$NON-NLS-1$
-        }
-        config.getToolChain().getBuilder().setBuildPath(buildPath);
-        ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
+		// Set build path in build configuration to appropriate directory
+		config.getToolChain().getBuilder().setBuildPath(settings.rootLocation);
+		ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
 
         // Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
         // the BuildConfigurationManager relies on the data being up-to-date.
-        String syncProvider = BuildConfigurationManager.getBuildScenarioForBuildConfiguration(config).getSyncProvider();
+        BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+        String syncProvider = bcm.getBuildScenarioForBuildConfiguration(config).getSyncProvider();
         BuildScenario buildScenario = new BuildScenario(syncProvider, settings.connection, settings.rootLocation);
-        BuildConfigurationManager.setBuildScenarioForBuildConfiguration(buildScenario, config);
+        bcm.setBuildScenarioForBuildConfiguration(buildScenario, config);
         try {
-                BuildConfigurationManager.saveConfigurationData();
+                bcm.saveConfigurationData();
         } catch (IOException e) {
-                // TODO What to do in this case?
+        	IStatus status = new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, "Error saving configuration data: " +  //$NON-NLS-1$
+        																										e.getMessage(), e);
+        	StatusManager.getManager().handle(status, StatusManager.SHOW);
         }
 	}
 	
@@ -389,7 +366,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		if (settings == null) {
 			settings = this.loadSettings(getCfg());
 			if (settings == null) {
-				// Log: should never happen
+				return; // Is logged inside loadSettings
 			}
 			fConfigToPageSettings.put(getCfg().getId(), settings);
 		}
@@ -401,7 +378,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(settings.connection));
 		handleConnectionSelected();
 		fRootLocationText.setText(settings.rootLocation);
-		fBuildLocationText.setText(settings.buildLocation);
 	}
 	
 	/**
@@ -441,20 +417,16 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * @return Configuration settings or null if config not found in BuildConfigurationManager
 	 */
 	private PageSettings loadSettings(IConfiguration config) {
-		BuildScenario buildScenario = BuildConfigurationManager.getBuildScenarioForBuildConfiguration(config);
+		BuildScenario buildScenario = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(config);
 		if (buildScenario == null) {
-			// Should never happen - need to log
+	       	IStatus status = new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, "Error loading configuration data"); //$NON-NLS-1$
+	       	StatusManager.getManager().handle(status, StatusManager.SHOW);
 			return null;
 		}
 		PageSettings settings = new PageSettings();
 		settings.remoteProvider = buildScenario.getRemoteConnection().getRemoteServices();
 		settings.connection = buildScenario.getRemoteConnection();
 		settings.rootLocation = buildScenario.getLocation();
-
-		String buildSubDir = config.getToolChain().getBuilder().getBuildPath();
-		// TODO: Check that it really is a subdirectory, but it is not clear what to do if it is not.
-		buildSubDir = buildSubDir.substring(buildScenario.getLocation().length());
-		settings.buildLocation = buildSubDir;
 
 		return settings;
 	}
@@ -476,7 +448,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		settings.remoteProvider = fComboIndexToRemoteServicesProviderMap.get(remoteServicesIndex);
 		settings.connection = fComboIndexToRemoteConnectionMap.get(connectionIndex);
 		settings.rootLocation = fRootLocationText.getText();
-		settings.buildLocation = fBuildLocationText.getText();
 		
 		fConfigToPageSettings.put(config.getId(), settings);
 	}
@@ -491,7 +462,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		PageSettings settings = this.loadSettings(getCfg());
 		if (settings == null) {
-			// TODO: What to do in this case?
+			// Handled inside loadSettings
 		}
 		fConfigToPageSettings.put(getCfg().getId(), settings);
 		this.setValues(getCfg());
