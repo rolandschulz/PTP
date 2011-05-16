@@ -11,7 +11,7 @@
  *                       also included the unmarshaling call here so the 
  *                       data is available to the other wizard pages.
  */
-package org.eclipse.ptp.rm.jaxb.control.ui.wizards;
+package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
 import java.net.URL;
 import java.util.HashMap;

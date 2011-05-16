@@ -33,7 +33,7 @@
    <extension
          point="org.eclipse.ptp.ui.rmConfigurationSelections">
       <configurationSelection
-            class="org.eclipse.ptp.rm.jaxb.control.ui.wizards.JAXBRMConfigurationSelectionFactory"
+            class="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMConfigurationSelectionFactory"
             id="org.eclipse.ptp.rm.lml_jaxb">
       </configurationSelection>
    </extension>
