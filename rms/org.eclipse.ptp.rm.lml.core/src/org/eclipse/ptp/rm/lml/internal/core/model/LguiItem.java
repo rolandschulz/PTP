@@ -10,6 +10,7 @@
  */
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -58,33 +59,42 @@ public class LguiItem implements ILguiItem {
 	 * List of encapsulated classes, which handle parts of the lml-hierarchy
 	 */
 	private final HashMap<Class<? extends ILguiHandler>, ILguiHandler> lguiHandlers = new HashMap<Class<? extends ILguiHandler>, ILguiHandler>();
+	
+	/**************************************************************************************************************
+	 * Constructors
+	 **************************************************************************************************************/
 
-	// private ListenerList listeners = new ListenerList();
 	/**
-	 * Create a manager for a LguiType-instance.
+	 * Constructor with LML-model as argument
 	 * 
-	 * @param pmodel
-	 *            LML-data-model, which is managed by this class
+	 * @param lgui
+	 *            LML-model
 	 */
-	public LguiItem(LguiType pmodel) {
-
-		lgui = pmodel;
-
-		// globally accessible libraries, they encapsulate modules, which manage
-		// lml-datamodels
-
+	public LguiItem(LguiType lgui) {
+		this.lgui = lgui;
 		createLguiHandlers();
 	}
 
 	/**
-	 * Constructor with one argument, an URL. Within the constructor the method
+	 * Constructor which get an InputStream as argument 
+	 * 
+	 * @param stream InputStream
+	 */
+	public LguiItem(InputStream stream) {
+		
+		lgui = parseLML(stream);
+		createLguiHandlers();
+		setCid();
+	}
+
+	/**
+	 * Constructor with one argument, an URI. Within the constructor the method
 	 * for parsing an XML-file into LguiItem is called.
 	 * 
 	 * @param xmlFile
 	 *            the source of the XML file.
 	 */
 	public LguiItem(URI xmlFile) {
-
 		this.xmlFile = xmlFile;
 		try {
 			lgui = parseLML(xmlFile);
@@ -95,108 +105,11 @@ public class LguiItem implements ILguiItem {
 		createLguiHandlers();
 		setCid();
 	}
-
-	/**
-	 * The instance lgui is filled with a new data-model. This method creates
-	 * all modules, which handle the data. These modules can then be accessed by
-	 * corresponding getter-functions.
-	 */
-	private void createLguiHandlers() {
-		lguiHandlers.put(OverviewAccess.class, new OverviewAccess(this, lgui));
-		lguiHandlers.put(LayoutAccess.class, new LayoutAccess(this, lgui));// component-id
-																			// =>
-																			// component-layout
-		lguiHandlers.put(OIDToObject.class, new OIDToObject(this, lgui));// get
-																			// object-instance
-																			// for
-																			// object-ids
-																			// and
-																			// colors
-																			// for
-																			// ids
-		lguiHandlers.put(ObjectStatus.class, new ObjectStatus(this, lgui));// get
-																			// current
-																			// interaction
-																			// status
-																			// for
-																			// objects
-		lguiHandlers.put(OIDToInformation.class, new OIDToInformation(this, lgui));// Get
-																					// infos
-																					// for
-																					// objects
-		lguiHandlers.put(TableHandler.class, new TableHandler(this, lgui));
-		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this, lgui));// access
-																						// to
-																						// layouts
-																						// of
-																						// nodedisplays
-
-	}
-
-	/*
-	 * Methods for operating with the system
-	 */
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getXMLFile()
-	 */
-	public URI getXmlFile() {
-		return xmlFile;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#toString
-	 */
-	@Override
-	public String toString() {
-		if (getXmlFile().getPath() == null) {
-			return "es gibt hier nix";
-		}
-		return getXmlFile().getPath();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getVersion()
-	 */
-	public String getVersion() {
-		return lgui.getVersion();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#isLayout()
-	 */
-	public boolean isLayout() {
-		return lgui.isLayout();
-	}
-
-	public LguiType getLguiType() {
-		return lgui;
-	}
-
-	private void setCid() {
-		for (TableType table : getTableHandler().getTables()) {
-			for (RowType row : table.getRow()) {
-				int cid = 1;
-				for (CellType cell : row.getCell()) {
-					if (cell.getCid() == null) {
-						cell.setCid(BigInteger.valueOf(cid));
-					} else {
-						cid = cell.getCid().intValue();
-					}
-					cid++;
-				}
-			}
-		}
-	}
-
+	
+	/**************************************************************************************************************
+	 * Parsing methods
+	 **************************************************************************************************************/
+	
 	/**
 	 * Parsing an XML file. The method generates from an XML file an instance of
 	 * LguiType.
@@ -222,23 +135,22 @@ public class LguiItem implements ILguiItem {
 		return lml;
 
 	}
-
+	
 	/**
 	 * Parsing an XML file. The method generates from an XML file an instance of
 	 * LguiType.
 	 * 
-	 * @param xml
-	 *            the URL source of the XML file
+	 * @param stream
+	 *            the input stream of the XML file
 	 * @return the generated LguiType
-	 * @throws MalformedURLException
 	 * @throws JAXBException
 	 */
-	private static LguiType parseLML(URL xml) throws MalformedURLException {
+	private LguiType parseLML(InputStream stream) {
 		LguiType lml = null;
 		try {
 			Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
 
-			JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(xml);
+			JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
 
 			lml = doc.getValue();
 		} catch (JAXBException e) {
@@ -246,8 +158,46 @@ public class LguiItem implements ILguiItem {
 		}
 
 		return lml;
-
 	}
+	
+	/**************************************************************************************************************
+	 * Further methods for setting up
+	 **************************************************************************************************************/
+
+	/**
+	 * The instance lgui is filled with a new data-model. This method creates
+	 * all modules, which handle the data. These modules can then be accessed by
+	 * corresponding getter-functions.
+	 */
+	private void createLguiHandlers() {
+		lguiHandlers.put(OverviewAccess.class, new OverviewAccess(this, lgui));
+		lguiHandlers.put(LayoutAccess.class, new LayoutAccess(this, lgui));
+		lguiHandlers.put(OIDToObject.class, new OIDToObject(this, lgui));
+		lguiHandlers.put(ObjectStatus.class, new ObjectStatus(this, lgui));
+		lguiHandlers.put(OIDToInformation.class, new OIDToInformation(this, lgui));
+		lguiHandlers.put(TableHandler.class, new TableHandler(this, lgui));
+		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this, lgui));
+	}
+	
+	private void setCid() {
+		for (TableType table : getTableHandler().getTables()) {
+			for (RowType row : table.getRow()) {
+				int cid = 1;
+				for (CellType cell : row.getCell()) {
+					if (cell.getCid() == null) {
+						cell.setCid(BigInteger.valueOf(cid));
+					} else {
+						cid = cell.getCid().intValue();
+					}
+					cid++;
+				}
+			}
+		}
+	}
+	
+	/**************************************************************************************************************
+	 * Getting LguiHandlers
+	 **************************************************************************************************************/
 
 	public OverviewAccess getOverviewAccess() {
 		if (lguiHandlers.get(OverviewAccess.class) == null) {
@@ -262,27 +212,7 @@ public class LguiItem implements ILguiItem {
 		}
 		return (TableHandler) lguiHandlers.get(TableHandler.class);
 	}
-
-	/**
-	 * Add a lml-data-listener. It listens for data-changes.
-	 * 
-	 * @param listener
-	 *            new listening instance
-	 */
-	public void addListener(ILguiListener listener) {
-		listeners.add(listener);
-	}
-
-	/**
-	 * Remove a lml-data-listener.
-	 * 
-	 * @param listener
-	 *            listening instance
-	 */
-	public void removeListener(ILguiListener listener) {
-		listeners.remove(listener);
-	}
-
+	
 	/**
 	 * @return a class, which provides an index for fast access to objects
 	 *         within the objects tag of LML. You can pass the id of the objects
@@ -338,15 +268,17 @@ public class LguiItem implements ILguiItem {
 		return (LayoutAccess) lguiHandlers.get(LayoutAccess.class);
 	}
 
+	/**************************************************************************************************************
+	 * Update
+	 **************************************************************************************************************/
+	
 	/**
 	 * Inform all listeners, that something changed in the data-model. Handlers
 	 * should use this event to update their model-references. Otherwise
 	 * inconsistent return-values will be the result.
 	 */
 	public void updateData() {
-
 		updateData(lgui);
-
 	}
 
 	/**
@@ -357,13 +289,11 @@ public class LguiItem implements ILguiItem {
 	 * @param lgui
 	 *            new lml-data-model
 	 */
-	public void updateData(LguiType pmodel) {
+	public void updateData(LguiType lgui) {
 
-		lgui = pmodel;
+		this.lgui = lgui;
 
 		LguiUpdatedEvent event = new LguiUpdatedEvent(this);
-
-		// Inform all listener
 		for (ILguiListener l : listeners) {
 			l.handleEvent(event);
 		}
@@ -374,7 +304,6 @@ public class LguiItem implements ILguiItem {
 		try {
 			xmlFile = new URI(xmlFile.toString());
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -397,6 +326,84 @@ public class LguiItem implements ILguiItem {
 			listener.handleEvent(e);
 		}
 	}
+
+	/**************************************************************************************************************
+	 * Further methods
+	 **************************************************************************************************************/
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getXMLFile()
+	 */
+	public URI getXmlFile() {
+		return xmlFile;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#toString
+	 */
+	@Override
+	public String toString() {
+		if (getXmlFile().getPath() == null) {
+			return "es gibt hier nix";
+		}
+		return getXmlFile().getPath();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getVersion()
+	 */
+	public String getVersion() {
+		return lgui.getVersion();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#isLayout()
+	 */
+	public boolean isLayout() {
+		return lgui.isLayout();
+	}
+
+	public LguiType getLguiType() {
+		return lgui;
+	}
+
+	
+
+
+
+	
+
+	/**
+	 * Add a lml-data-listener. It listens for data-changes.
+	 * 
+	 * @param listener
+	 *            new listening instance
+	 */
+	public void addListener(ILguiListener listener) {
+		listeners.add(listener);
+	}
+
+	/**
+	 * Remove a lml-data-listener.
+	 * 
+	 * @param listener
+	 *            listening instance
+	 */
+	public void removeListener(ILguiListener listener) {
+		listeners.remove(listener);
+	}
+
+	
+
+	
 
 	public void addJob() {
 		LguiType newLgui = lgui;
