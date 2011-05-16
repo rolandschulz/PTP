@@ -17,6 +17,8 @@ public class Messages extends NLS {
 
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.sync.core.messages.messages"; //$NON-NLS-1$
 
+	public static String RCL_NoServiceConfigError;
+
 	public static String RemoteCIndexServiceProvider_0;
 	public static String RemoteRunSiProvider_taskName;
 	public static String ResourceChangeListener_jobName;
@@ -24,11 +26,24 @@ public class Messages extends NLS {
 	public static String ResourceRefreshJob_1;
 	public static String BCM_WorkspaceConfigDes;
 	public static String BCM_ScenarioToServiceConfigError;
+
+	public static String BCM_SetWorkspaceConfigDescriptionError;
 	public static String BCM_InitError;
+
+	public static String BCM_InitializationError;
+
 	public static String BCM_TemplateError;
 	public static String BCM_ProviderError;
 	public static String BCM_BuildInfoError;
 	public static String BCM_AncestorError;
+
+	public static String BCM_CreateWorkspaceConfigError;
+
+	public static String BCM_CreateWorkspaceConfigFailure;
+
+	public static String BCM_LocalConnectionError;
+
+	public static String BCM_LocalServiceError;
 	public static String BCM_ProjectError;
 
 	static {

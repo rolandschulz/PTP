@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.git.core;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,6 +22,9 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jgit.util.io.StreamCopyThread;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -95,7 +98,6 @@ public class CommandRunner {
 		if (localDir.exists() == false) {
 			return DirectoryStatus.NOT_PRESENT;
 		}
-
 		else if (localDir.isDirectory()) {
 			return DirectoryStatus.PRESENT;
 		}
@@ -181,23 +183,17 @@ public class CommandRunner {
 	 *             if execution of remote command is interrupted.
 	 * @throws RemoteConnectionException
 	 * 			   if connection closed and cannot be opened. 
-	 * TODO: Expand to work with multiple platforms (assumes UNIX \n line endings.)
-	 * TODO: Make robust against buffer overflows - use threads.
+	 * @throws RemoteSyncException 
+	 * 			   if other error
 	 */
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, String command, String remoteDirectory,
 														IProgressMonitor monitor) throws 
-																IOException, InterruptedException, RemoteConnectionException {
+																IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
 		if (!conn.isOpen()) {
-			try {
-				conn.open(monitor);
-			} catch (RemoteConnectionException e) {
-				throw e;
-			}
+			conn.open(monitor);
 		}
 
-		final CommandResults commandResults = new CommandResults();
-		// Run the command and wait for it to complete.
-		// final List<String> commandStrings = Arrays.asList(command.split("\\s+")); //$NON-NLS-1$
+		// Setup a new process
 		final List<String> commandList = new LinkedList<String>();
 		commandList.add("sh"); //$NON-NLS-1$
 		commandList.add("-c"); //$NON-NLS-1$
@@ -205,64 +201,39 @@ public class CommandRunner {
 
 		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandList);
 		final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
-		if (rfm != null) {
-			rpb.directory(rfm.getResource(remoteDirectory));
-		}
+		rpb.directory(rfm.getResource(remoteDirectory));
 
-		IRemoteProcess rp = null;
-		try {
-			rp = rpb.start();
-		} catch (final IOException e) {
-			throw e;
-		}
+		// Run process and stream readers
+		OutputStream output = new ByteArrayOutputStream();
+		OutputStream error = new ByteArrayOutputStream();
+	
 
-		// Read and store stdout and stderr.
-		BufferedReader commandOutputReader = null;
-		BufferedReader commandErrorReader = null;
-		commandOutputReader = new BufferedReader(new InputStreamReader(rp.getInputStream()));
-		commandErrorReader = new BufferedReader(new InputStreamReader(rp.getErrorStream()));
-
-		String output = ""; //$NON-NLS-1$
-		try {
-			String line;
-			while ((line = commandOutputReader.readLine()) != null) {
-				output += line;
-				output += "\n"; //$NON-NLS-1$
+		IRemoteProcess rp = rpb.start();
+		StreamCopyThread getOutput = new StreamCopyThread(rp.getInputStream(), output);
+		StreamCopyThread getError = new StreamCopyThread(rp.getErrorStream(), error);
+		getOutput.start();
+		getError.start();
+		//wait for EOF with the change for the ProcessMonitor to cancel
+		for (;;) {
+			getOutput.join(250);
+			if (!getOutput.isAlive()) break;
+			if (monitor.isCanceled()) {
+				throw new RemoteSyncException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.CommandRunner_0));
 			}
-		} catch (final IOException e) {
-			throw e;
-		} finally {
-			commandOutputReader.close();
 		}
-
-		String error = ""; //$NON-NLS-1$
-		try {
-			String line;
-			while ((line = commandErrorReader.readLine()) != null) {
-				error += line;
-				error += "\n"; //$NON-NLS-1$
-			}
-		} catch (final IOException e) {
-			throw e;
-		} finally {
-			commandErrorReader.close();
-		}
+		//rp and getError should be finished as soon as getOutput is finished
+		int exitCode = rp.waitFor();
+		getError.halt();
 		
-		int exitCode;
-		try {
-			exitCode = rp.waitFor();
-		} catch (final InterruptedException e) {
-			throw e;
-		}
+		final CommandResults commandResults = new CommandResults();
 		commandResults.setExitCode(exitCode);
-
-		commandResults.setStdout(output);
-		commandResults.setStderr(error);
+		commandResults.setStdout(output.toString());
+		commandResults.setStderr(error.toString());
 		return commandResults;
 	}
 
 	// Enforce as static
 	private CommandRunner() {
-		throw new AssertionError(Messages.CommandRunner_0); 
+		throw new AssertionError(Messages.CR_CreateInstanceError);
 	}
 }

@@ -24,7 +24,9 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteMakeNature;
@@ -42,6 +44,7 @@ import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * An operation which handles configuring the remote portions of the Remote
@@ -71,8 +74,7 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		try {
 			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
 		} catch (CoreException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			StatusManager.getManager().handle(e1, RDTSyncUIPlugin.PLUGIN_ID);
 		}
 		
 		// BUild the service configuration
@@ -116,11 +118,12 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 
 		// Add information about remote location to the initial build configurations.
 		// Do this last (except for adding local configuration) so that project is not flagged as initialized prematurely.
-		BuildConfigurationManager.initProject(project, serviceConfig, buildScenario);
+		BuildConfigurationManager.getInstance().initProject(project, serviceConfig, buildScenario);
 		try {
-			BuildConfigurationManager.saveConfigurationData();
+			BuildConfigurationManager.getInstance().saveConfigurationData();
 		} catch (IOException e) {
-			// TODO: What to do in this case?
+			StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
+																									StatusManager.SHOW);
 		}
 		monitor.done();
 	}
