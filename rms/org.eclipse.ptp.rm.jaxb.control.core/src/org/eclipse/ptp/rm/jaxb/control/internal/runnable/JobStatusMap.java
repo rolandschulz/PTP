@@ -17,6 +17,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
 
 /**
  * Class for handling status of submitted jobs.
@@ -27,12 +28,14 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 
 	private final IResourceManagerControl control;
+	private final IResourceManagerMonitor monitor;
 	private final Map<String, ICommandJobStatus> map;
 	private Thread t;
 	private boolean running = false;
 
-	public JobStatusMap(IResourceManagerControl control) {
+	public JobStatusMap(IResourceManagerControl control, IResourceManagerMonitor monitor) {
 		this.control = control;
+		this.monitor = monitor;
 		map = new HashMap<String, ICommandJobStatus>();
 	}
 
@@ -44,8 +47,15 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	 * .String, org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus)
 	 */
 	public void addJobStatus(String jobId, ICommandJobStatus status) {
+		boolean notifyAdd = false;
 		synchronized (map) {
+			if (!map.containsKey(jobId)) {
+				notifyAdd = true;
+			}
 			map.put(jobId, status);
+		}
+		if (notifyAdd && monitor != null) {
+			monitor.addJob(jobId, status);
 		}
 	}
 

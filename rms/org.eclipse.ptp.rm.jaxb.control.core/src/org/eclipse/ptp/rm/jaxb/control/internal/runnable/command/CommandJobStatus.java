@@ -542,7 +542,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				if (!isReached(state, waitUntil)) {
 					env.put(jobId, p);
 					map.addJobStatus(jobId, this);
-					control.jobStateChanged(jobId);
+					control.jobStateChanged(jobId, this);
 				}
 			}
 		}

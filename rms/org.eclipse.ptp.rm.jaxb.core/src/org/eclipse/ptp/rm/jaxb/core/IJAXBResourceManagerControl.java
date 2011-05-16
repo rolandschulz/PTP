@@ -14,6 +14,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
@@ -57,5 +58,5 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	/**
 	 * For callbacks to the resource manager from internal jobs.
 	 */
-	public void jobStateChanged(String jobId);
+	public void jobStateChanged(String jobId, IJobStatus status);
 }

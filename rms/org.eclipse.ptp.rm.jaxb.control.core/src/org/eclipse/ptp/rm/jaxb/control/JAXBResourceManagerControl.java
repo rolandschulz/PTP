@@ -53,6 +53,7 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
@@ -68,7 +69,9 @@ import org.eclipse.ui.progress.IProgressConstants;
  * <br>
  * The logic of this manager is generic; the specific commands used, files
  * staged, and script constructed (if any) are all configured via the resource
- * manager XML.
+ * manager XML. <br>
+ * <br>
+ * Currently, it is the control which handles updating the monitor component.
  * 
  * @author arossi
  * 
@@ -76,6 +79,7 @@ import org.eclipse.ui.progress.IProgressConstants;
 public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl {
 
 	private final IJAXBResourceManagerConfiguration config;
+	private final IResourceManagerMonitor monitor;
 	private Map<String, String> launchEnv;
 	private Map<String, ICommandJob> jobTable;
 	private ICommandJobStatusMap jobStatusMap;
@@ -91,6 +95,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	public JAXBResourceManagerControl(AbstractResourceManagerConfiguration jaxbServiceProvider) {
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
+		monitor = getResourceManager().getMonitor();
 	}
 
 	/**
@@ -166,8 +171,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged
 	 * (java.lang.String)
 	 */
-	public void jobStateChanged(String jobId) {
+	public void jobStateChanged(String jobId, IJobStatus status) {
 		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
+		if (monitor != null) {
+			monitor.updateJob(jobId, status);
+		}
 	}
 
 	/*
@@ -249,7 +257,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					 */
 					status = jobStatusMap.terminated(jobId);
 					if (status.stateChanged()) {
-						jobStateChanged(jobId);
+						jobStateChanged(jobId, status);
 					}
 					return status;
 				}
@@ -297,7 +305,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 
 			if (status.stateChanged()) {
-				jobStateChanged(jobId);
+				jobStateChanged(jobId, status);
 			}
 
 			return status;
@@ -609,7 +617,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			status.setState(IJobStatus.CANCELED);
 			String jobId = status.getJobId();
 			maybeForceExternalTermination(jobId);
-			jobStateChanged(jobId);
+			jobStateChanged(jobId, status);
 		}
 	}
 
@@ -644,7 +652,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * start daemon
 		 */
-		jobStatusMap = new JobStatusMap(this);
+		jobStatusMap = new JobStatusMap(this, this.monitor);
 		((Thread) jobStatusMap).start();
 	}
 
