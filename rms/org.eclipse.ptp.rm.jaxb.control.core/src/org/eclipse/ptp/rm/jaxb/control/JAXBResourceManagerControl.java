@@ -79,7 +79,7 @@ import org.eclipse.ui.progress.IProgressConstants;
 public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl {
 
 	private final IJAXBResourceManagerConfiguration config;
-	private final IResourceManagerMonitor monitor;
+	private IResourceManagerMonitor monitor;
 	private Map<String, String> launchEnv;
 	private Map<String, ICommandJob> jobTable;
 	private ICommandJobStatusMap jobStatusMap;
@@ -95,7 +95,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	public JAXBResourceManagerControl(AbstractResourceManagerConfiguration jaxbServiceProvider) {
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
-		monitor = getResourceManager().getMonitor();
 	}
 
 	/**
@@ -648,6 +647,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		setFixedConfigurationProperties(monitor);
 		launchEnv.clear();
 		appendLaunchEnv = true;
+		this.monitor = getResourceManager().getMonitor();
 
 		/*
 		 * start daemon
