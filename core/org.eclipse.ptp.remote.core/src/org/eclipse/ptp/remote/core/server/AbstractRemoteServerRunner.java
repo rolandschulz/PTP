@@ -631,7 +631,9 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            line of stderr output from server
 	 * @return true if the server has started
 	 */
-	protected abstract boolean doVerifyServerRunningFromStderr(String output);
+	protected boolean doVerifyServerRunningFromStderr(String output) {
+		return false;
+	}
 
 	/**
 	 * Called with each line of stdout from the server. Implementers can use
@@ -641,7 +643,9 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            line of stdout output from server
 	 * @return true if the server has started
 	 */
-	protected abstract boolean doVerifyServerRunningFromStdout(String output);
+	protected boolean doVerifyServerRunningFromStdout(String output) {
+		return false;
+	}
 
 	/*
 	 * (non-Javadoc)
