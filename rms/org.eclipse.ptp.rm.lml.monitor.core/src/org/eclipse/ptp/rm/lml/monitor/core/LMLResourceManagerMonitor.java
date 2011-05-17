@@ -14,16 +14,17 @@ import java.io.IOException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.core.server.RemoteServerManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
@@ -33,47 +34,30 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
  * LML JAXB resource manager monitor
  */
 public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
+	private static final int JOB_SCHEDULE_FREQUENCY = 60000; // needs to be
+																// parameter
 	private final IJAXBResourceManagerConfiguration fConfig;
 	private MonitorJob fMonitorJob = null;
 
 	private class MonitorJob extends Job {
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.runtime.jobs.Job#canceling()
-		 */
-		@Override
-		protected void canceling() {
-			if (fProcess != null && !fProcess.isCompleted()) {
-				fProcess.destroy();
-			}
-			super.canceling();
-		}
-
-		private final IRemoteConnection fConnection;
-		private final IRemoteProcessBuilder fProcessBuilder;
-		private IRemoteProcess fProcess = null;
+		private final LMLDAServer fServer;
 
 		public MonitorJob(String name, IRemoteConnection conn) {
 			super(name);
-			fConnection = conn;
-			fProcessBuilder = fConnection.getRemoteServices().getProcessBuilder(conn, "");
+			setSystem(true);
+			fServer = (LMLDAServer) RemoteServerManager.getServer(LMLDAServer.SERVER_ID, conn);
+			fServer.setWorkDir(new Path(conn.getWorkingDirectory()).append(".eclipsesettings").toString()); //$NON-NLS-1$
 		}
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			try {
-				fProcess = fProcessBuilder.start();
+				fServer.startServer(monitor);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-			try {
-				fProcess.waitFor();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			fServer.waitForServerFinish(monitor);
+			if (!monitor.isCanceled()) {
+				schedule(JOB_SCHEDULE_FREQUENCY);
 			}
 			return Status.OK_STATUS;
 		}
