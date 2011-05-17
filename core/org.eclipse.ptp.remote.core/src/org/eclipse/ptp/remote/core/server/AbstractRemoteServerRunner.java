@@ -737,7 +737,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				return Status.CANCEL_STATUS;
 			}
 
-			if (!fContinuous) {
+			if (fContinuous) {
 				final BufferedReader stdout = new BufferedReader(new InputStreamReader(fRemoteProcess.getInputStream()));
 				new Thread(new Runnable() {
 					public void run() {
