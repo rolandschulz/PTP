@@ -214,7 +214,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			worked(progress, 30);
 		} finally {
 			pinTable.release(jobId);
-			progress.done();
 		}
 	}
 
@@ -360,8 +359,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			doOnStartUp();
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
-		} finally {
-			progress.done();
 		}
 	}
 
@@ -466,7 +463,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		} finally {
 			pinTable.release(uuid);
 			pinTable.release(jobId);
-			progress.done();
 		}
 	}
 
@@ -500,24 +496,20 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException, CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
-		try {
-			RemoteServicesDelegate d = getRemoteServicesDelegate(progress.newChild(50));
-			IRemoteConnection conn = d.getLocalConnection();
+		RemoteServicesDelegate d = getRemoteServicesDelegate(progress.newChild(50));
+		IRemoteConnection conn = d.getLocalConnection();
+		if (!conn.isOpen()) {
+			conn.open(progress.newChild(25));
 			if (!conn.isOpen()) {
-				conn.open(progress.newChild(25));
-				if (!conn.isOpen()) {
-					throw new RemoteConnectionException(Messages.LocalConnectionError);
-				}
+				throw new RemoteConnectionException(Messages.LocalConnectionError);
 			}
-			conn = d.getRemoteConnection();
+		}
+		conn = d.getRemoteConnection();
+		if (!conn.isOpen()) {
+			conn.open(progress.newChild(25));
 			if (!conn.isOpen()) {
-				conn.open(progress.newChild(25));
-				if (!conn.isOpen()) {
-					throw new RemoteConnectionException(Messages.RemoteConnectionError + conn.getAddress());
-				}
+				throw new RemoteConnectionException(Messages.RemoteConnectionError + conn.getAddress());
 			}
-		} finally {
-			progress.done();
 		}
 	}
 
@@ -898,66 +890,60 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 40);
-		try {
-			Map lcattr = configuration.getAttributes();
-			for (Object key : lcattr.keySet()) {
-				Object value = lcattr.get(key);
+		Map lcattr = configuration.getAttributes();
+		for (Object key : lcattr.keySet()) {
+			Object value = lcattr.get(key);
+			Object target = rmVarMap.get(key.toString());
+			if (target instanceof PropertyType) {
+				PropertyType p = (PropertyType) target;
+				p.setValue(value.toString());
+			} else if (target instanceof AttributeType) {
+				AttributeType ja = (AttributeType) target;
+				ja.setValue(value);
+			}
+		}
+
+		progress.worked(10);
+
+		/*
+		 * The non-selected variables have been excluded from the launch
+		 * configuration; but we need to null out the superset values here that
+		 * are undefined. We also need to take care of the tailF redirect
+		 * variables (which are not visible but are set in the launch tab by an
+		 * option checkbox).
+		 */
+		for (String key : rmVarMap.getVariables().keySet()) {
+			if (!lcattr.containsKey(key)) {
 				Object target = rmVarMap.get(key.toString());
 				if (target instanceof PropertyType) {
 					PropertyType p = (PropertyType) target;
-					p.setValue(value.toString());
+					if (p.isVisible()) {
+						p.setValue(null);
+					}
 				} else if (target instanceof AttributeType) {
 					AttributeType ja = (AttributeType) target;
-					ja.setValue(value);
-				}
-			}
-
-			progress.worked(10);
-
-			/*
-			 * The non-selected variables have been excluded from the launch
-			 * configuration; but we need to null out the superset values here
-			 * that are undefined. We also need to take care of the tailF
-			 * redirect variables (which are not visible but are set in the
-			 * launch tab by an option checkbox).
-			 */
-			for (String key : rmVarMap.getVariables().keySet()) {
-				if (!lcattr.containsKey(key)) {
-					Object target = rmVarMap.get(key.toString());
-					if (target instanceof PropertyType) {
-						PropertyType p = (PropertyType) target;
-						if (p.isVisible()) {
-							p.setValue(null);
-						}
-					} else if (target instanceof AttributeType) {
-						AttributeType ja = (AttributeType) target;
-						if (ja.isVisible()) {
-							ja.setValue(null);
-						}
+					if (ja.isVisible()) {
+						ja.setValue(null);
 					}
 				}
 			}
-
-			progress.worked(10);
-
-			/*
-			 * pull these out of the configuration; they are needed for the
-			 * script
-			 */
-			rmVarMap.maybeOverwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, configuration);
-			rmVarMap.maybeOverwrite(JAXBControlConstants.DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR,
-					configuration);
-			rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
-					configuration);
-			rmVarMap.maybeOverwrite(JAXBControlConstants.PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
-			setFixedConfigurationProperties(progress.newChild(10));
-
-			launchEnv.clear();
-			launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));
-			appendLaunchEnv = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, appendLaunchEnv);
-		} finally {
-			progress.done();
 		}
+
+		progress.worked(10);
+
+		/*
+		 * pull these out of the configuration; they are needed for the script
+		 */
+		rmVarMap.maybeOverwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, configuration);
+		rmVarMap.maybeOverwrite(JAXBControlConstants.DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
+		rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
+				configuration);
+		rmVarMap.maybeOverwrite(JAXBControlConstants.PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
+		setFixedConfigurationProperties(progress.newChild(10));
+
+		launchEnv.clear();
+		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));
+		appendLaunchEnv = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, appendLaunchEnv);
 	}
 
 	/**

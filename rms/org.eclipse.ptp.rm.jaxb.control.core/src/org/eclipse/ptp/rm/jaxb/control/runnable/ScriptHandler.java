@@ -139,7 +139,6 @@ public class ScriptHandler extends Job {
 			}
 			progress.worked(1);
 		}
-		progress.done();
 		return buffer.toString();
 	}
 

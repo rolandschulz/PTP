@@ -366,7 +366,7 @@ public class CommandJob extends Job implements ICommandJob {
 				}
 			}
 		} finally {
-			progress.done();
+			monitor.done();
 		}
 		return status;
 	}
@@ -431,8 +431,6 @@ public class CommandJob extends Job implements ICommandJob {
 			return ce.getStatus();
 		} catch (Throwable t) {
 			return CoreExceptionUtils.getErrorStatus(Messages.ProcessRunError, t);
-		} finally {
-			progress.done();
 		}
 
 		synchronized (this) {

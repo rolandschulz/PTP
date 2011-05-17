@@ -132,13 +132,13 @@ public class ManagedFilesJob extends Job {
 				p.setVisible(false);
 				rmVarMap.put(p.getName(), p);
 			} catch (Throwable t) {
-				progress.done();
+				monitor.done();
 				return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
 			}
 			progress.worked(5);
 		}
-		progress.done();
 		success = true;
+		monitor.done();
 		return Status.OK_STATUS;
 	}
 
@@ -153,18 +153,12 @@ public class ManagedFilesJob extends Job {
 	 * @throws CoreException
 	 */
 	private void copyFileToRemoteHost(String localPath, String remotePath, IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 15);
-		try {
-			progress.newChild(5);
-			/*
-			 * EFS.NONE means mkdir -p on the parent directory (EFS.SHALLOW is
-			 * mkdir parent, UNDEFINED is no mkdir).
-			 */
-			RemoteServicesDelegate.copy(delegate.getLocalFileManager(), localPath, delegate.getRemoteFileManager(), remotePath,
-					EFS.NONE, progress);
-		} finally {
-			progress.done();
-		}
+		/*
+		 * EFS.NONE means mkdir -p on the parent directory (EFS.SHALLOW is mkdir
+		 * parent, UNDEFINED is no mkdir).
+		 */
+		RemoteServicesDelegate.copy(delegate.getLocalFileManager(), localPath, delegate.getRemoteFileManager(), remotePath,
+				EFS.NONE, monitor);
 	}
 
 	/**

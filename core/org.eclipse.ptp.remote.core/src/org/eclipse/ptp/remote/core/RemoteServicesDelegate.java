@@ -193,25 +193,19 @@ public class RemoteServicesDelegate {
 			throw newException(Messages.RemoteServicesDelegate_Copy_Operation_NullTarget, null);
 		}
 		SubMonitor subProgress = SubMonitor.convert(progress, (15));
-		try {
-			IFileStore lres = from.getResource(source);
-			if (!lres.fetchInfo(EFS.NONE, subProgress.newChild(5)).exists()) {
-				throw newException(
-						Messages.RemoteServicesDelegate_Copy_Operation_Local_resource_does_not_exist + COSP + lres.getName(), null);
-			}
-			if (mkParent != UNDEFINED) {
-				to.getResource(target).getParent().mkdir(mkParent, subProgress.newChild(5));
-			}
-			if (subProgress.isCanceled()) {
-				return;
-			}
-			IFileStore rres = to.getResource(target);
-			lres.copy(rres, EFS.OVERWRITE, subProgress.newChild(5));
-		} finally {
-			if (progress != null) {
-				progress.done();
-			}
+		IFileStore lres = from.getResource(source);
+		if (!lres.fetchInfo(EFS.NONE, subProgress.newChild(5)).exists()) {
+			throw newException(
+					Messages.RemoteServicesDelegate_Copy_Operation_Local_resource_does_not_exist + COSP + lres.getName(), null);
 		}
+		if (mkParent != UNDEFINED) {
+			to.getResource(target).getParent().mkdir(mkParent, subProgress.newChild(5));
+		}
+		if (subProgress.isCanceled()) {
+			return;
+		}
+		IFileStore rres = to.getResource(target);
+		lres.copy(rres, EFS.OVERWRITE, subProgress.newChild(5));
 	}
 
 	/**
@@ -239,31 +233,24 @@ public class RemoteServicesDelegate {
 
 		IFileStore lres = manager.getResource(path);
 		SubMonitor subProgress = SubMonitor.convert(progress, (10));
-		try {
-			IFileInfo info = lres.fetchInfo(EFS.NONE, subProgress.newChild(5));
-			if (subProgress.isCanceled()) {
-				return false;
-			}
-			if (!info.exists()) {
-				return false;
-			}
-			long l0 = info.getLength();
-			try {
-				Thread.sleep(1000 * intervalInSecs);
-			} catch (InterruptedException ignored) {
-			}
-			info = lres.fetchInfo(EFS.NONE, subProgress.newChild(5));
-			if (subProgress.isCanceled()) {
-				return false;
-			}
-			long l1 = info.getLength();
-
-			return l0 == l1;
-		} finally {
-			if (progress != null) {
-				progress.done();
-			}
+		IFileInfo info = lres.fetchInfo(EFS.NONE, subProgress.newChild(5));
+		if (subProgress.isCanceled()) {
+			return false;
 		}
+		if (!info.exists()) {
+			return false;
+		}
+		long l0 = info.getLength();
+		try {
+			Thread.sleep(1000 * intervalInSecs);
+		} catch (InterruptedException ignored) {
+		}
+		info = lres.fetchInfo(EFS.NONE, subProgress.newChild(5));
+		if (subProgress.isCanceled()) {
+			return false;
+		}
+		long l1 = info.getLength();
+		return l0 == l1;
 	}
 
 	/**
@@ -318,10 +305,6 @@ public class RemoteServicesDelegate {
 				is.close();
 			} catch (IOException ioe) {
 				PTPRemoteCorePlugin.log(ioe);
-			}
-
-			if (progress != null) {
-				progress.done();
 			}
 		}
 		return sb.toString();

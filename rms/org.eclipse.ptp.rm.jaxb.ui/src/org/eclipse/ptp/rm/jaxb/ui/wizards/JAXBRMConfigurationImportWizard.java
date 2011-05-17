@@ -109,7 +109,7 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 					}
 					return Status.OK_STATUS;
 				} finally {
-					subMon.done();
+					monitor.done();
 				}
 			}
 		}.schedule();
@@ -121,23 +121,19 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 	 */
 	private static IProject checkResourceManagersProject(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 20);
-		try {
-			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBUIConstants.RESOURCE_MANAGERS);
-			if (!project.exists()) {
-				boolean create = MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
-						Messages.ResourceManagersNotExist_title,
-						Messages.JAXBRMConfigurationImportWizard_createResourceManagersProject);
-				if (!create) {
-					return null;
-				}
-				project.create(subMon.newChild(10));
-				if (!project.isOpen()) {
-					project.open(subMon.newChild(10));
-				}
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBUIConstants.RESOURCE_MANAGERS);
+		if (!project.exists()) {
+			boolean create = MessageDialog
+					.openQuestion(Display.getDefault().getActiveShell(), Messages.ResourceManagersNotExist_title,
+							Messages.JAXBRMConfigurationImportWizard_createResourceManagersProject);
+			if (!create) {
+				return null;
 			}
-			return project;
-		} finally {
-			subMon.done();
+			project.create(subMon.newChild(10));
+			if (!project.isOpen()) {
+				project.open(subMon.newChild(10));
+			}
 		}
+		return project;
 	}
 }
