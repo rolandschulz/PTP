@@ -41,7 +41,7 @@ public class UPCCASTVisitor extends PldtAstVisitor {
 	/**
 	 * @since 4.0
 	 */
-	public UPCCASTVisitor(List upcIncludes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr) {
+	public UPCCASTVisitor(List<String> upcIncludes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr) {
 		super(upcIncludes, fileName, allowPrefixOnlyMatch, msr);
 		ARTIFACT_CALL = Messages.UPCCASTVisitor_upc_call;
 		ARTIFACT_CONSTANT = Messages.UPCCASTVisitor_upc_constant;

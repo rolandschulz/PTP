@@ -41,8 +41,7 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 		this.shouldVisitTranslationUnit = true;
 	}
 
-	@SuppressWarnings("unchecked")
-	public MpiCASTVisitor(List mpiIncludes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr) {
+	public MpiCASTVisitor(List<String> mpiIncludes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr) {
 		super(mpiIncludes, fileName, allowPrefixOnlyMatch, msr);
 		ARTIFACT_CALL = Messages.getString("MpiCASTVisitor.mpiCall"); //$NON-NLS-1$
 		ARTIFACT_CONSTANT = Messages.getString("MpiCASTVisitor.mpiConstant"); //$NON-NLS-1$
@@ -100,6 +99,9 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 		return ARTIFACT_NAME;
 	}
 
+	/**
+	 * @since 5.0
+	 */
 	@Override
 	public boolean matchesPrefix(String name) {
 		return name.startsWith(PREFIX);
