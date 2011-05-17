@@ -81,7 +81,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 			} catch (CoreException ce) {
 				return CoreExceptionUtils.getErrorStatus(ce.getMessage(), ce);
 			} finally {
-				monitor.done();
+				if (monitor != null) {
+					monitor.done();
+				}
 			}
 			long start = System.currentTimeMillis();
 			long last = 0;
@@ -113,7 +115,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 					}
 				}
 			}
-			monitor.done();
+			if (monitor != null) {
+				monitor.done();
+			}
 			return Status.OK_STATUS;
 		}
 	}

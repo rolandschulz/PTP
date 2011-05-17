@@ -109,7 +109,9 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 					}
 					return Status.OK_STATUS;
 				} finally {
-					monitor.done();
+					if (monitor != null) {
+						monitor.done();
+					}
 				}
 			}
 		}.schedule();

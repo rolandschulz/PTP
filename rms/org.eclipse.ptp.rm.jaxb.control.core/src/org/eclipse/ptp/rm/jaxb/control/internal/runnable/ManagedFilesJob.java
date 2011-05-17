@@ -132,13 +132,17 @@ public class ManagedFilesJob extends Job {
 				p.setVisible(false);
 				rmVarMap.put(p.getName(), p);
 			} catch (Throwable t) {
-				monitor.done();
+				if (monitor != null) {
+					monitor.done();
+				}
 				return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
 			}
 			progress.worked(5);
 		}
 		success = true;
-		monitor.done();
+		if (monitor != null) {
+			monitor.done();
+		}
 		return Status.OK_STATUS;
 	}
 

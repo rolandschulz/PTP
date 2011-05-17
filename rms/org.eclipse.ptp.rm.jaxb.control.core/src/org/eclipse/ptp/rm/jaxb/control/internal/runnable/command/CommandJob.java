@@ -366,7 +366,9 @@ public class CommandJob extends Job implements ICommandJob {
 				}
 			}
 		} finally {
-			monitor.done();
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
 		return status;
 	}
