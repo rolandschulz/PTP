@@ -596,11 +596,11 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doGetJobStatus(java.
-	 * lang.String)
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doGetJobStatus
+	 * (java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
+	protected IJobStatus doGetJobStatus(String jobId, IProgressMonitor monitor) throws CoreException {
 		synchronized (fJobStatus) {
 			return fJobStatus.get(jobId);
 		}

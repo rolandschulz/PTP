@@ -36,7 +36,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 		fJobId = jobId;
 		rm.addJobListener(this);
 		initializeAttributes(attributes);
-		fTerminated = rm.getJobStatus(jobId).getState().equals(IJobStatus.COMPLETED);
+		fTerminated = rm.getJobStatus(jobId, null).getState().equals(IJobStatus.COMPLETED);
 		launch.addProcess(this);
 	}
 
@@ -62,11 +62,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	}
 
 	public IStreamsProxy getStreamsProxy() {
-		IJobStatus status = fResourceManager.getJobStatus(fJobId);
-		if (status != null) {
-			return status.getStreamsProxy();
-		}
-		return null;
+		return fResourceManager.getJobStatus(fJobId, null).getStreamsProxy();
 	}
 
 	public void setAttribute(String key, String value) {
@@ -151,7 +147,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	 */
 	public void handleEvent(IJobChangedEvent e) {
 		IResourceManager rm = e.getSource();
-		IJobStatus status = rm.getJobStatus(e.getJobId());
+		IJobStatus status = rm.getJobStatus(e.getJobId(), null);
 		if (status.getState().equals(IJobStatus.COMPLETED)) {
 			terminated();
 		}

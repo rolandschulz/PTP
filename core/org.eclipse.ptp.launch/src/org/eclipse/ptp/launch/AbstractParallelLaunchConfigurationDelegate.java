@@ -151,62 +151,77 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 */
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-			IResourceManager rm = fLaunch.getResourceManager();
-			String jobId = fLaunch.getJobId();
-			fSubLock.lock();
+			SubMonitor subMon = SubMonitor.convert(monitor, 100);
 			try {
-				while (rm.getJobStatus(jobId).getState().equals(IJobStatus.SUBMITTED)) {
+				IResourceManager rm = fLaunch.getResourceManager();
+				String jobId = fLaunch.getJobId();
+				fSubLock.lock();
+				try {
+					while (rm.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
+							&& !subMon.isCanceled()) {
+						try {
+							fSubCondition.await(100, TimeUnit.MILLISECONDS);
+						} catch (InterruptedException e) {
+							// Expect to be interrupted if monitor is canceled
+						}
+					}
+				} finally {
+					fSubLock.unlock();
+				}
+
+				if (!subMon.isCanceled()) {
+					doCompleteJobLaunch(fLaunch, fDebugger);
+
+					fSubLock.lock();
 					try {
-						fSubCondition.await(100, TimeUnit.MILLISECONDS);
-					} catch (InterruptedException e) {
-						// Expect to be interrupted if monitor is canceled
+						while (!rm.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
+								&& !subMon.isCanceled()) {
+							try {
+								fSubCondition.await(100, TimeUnit.MILLISECONDS);
+							} catch (InterruptedException e) {
+								// Expect to be interrupted if monitor is
+								// canceled
+							}
+						}
+					} finally {
+						fSubLock.unlock();
+					}
+
+					if (!subMon.isCanceled()) {
+						/*
+						 * When the job terminates, do any post launch data
+						 * synchronization.
+						 */
+						// If needed, copy data back.
+						try {
+							// Get the list of paths to be copied back.
+							doPostLaunchSynchronization(fLaunch.getLaunchConfiguration());
+						} catch (CoreException e) {
+							PTPLaunchPlugin.log(e);
+						}
+
+						/*
+						 * Clean up any launch activities.
+						 */
+						doCleanupLaunch(fLaunch);
+
+						/*
+						 * Remove job submission
+						 */
+						synchronized (jobSubmissions) {
+							jobSubmissions.remove(jobId);
+							if (jobSubmissions.size() == 0) {
+								rm.removeJobListener(fJobListener);
+							}
+						}
 					}
 				}
+				return Status.OK_STATUS;
 			} finally {
-				fSubLock.unlock();
-			}
-
-			doCompleteJobLaunch(fLaunch, fDebugger);
-
-			fSubLock.lock();
-			try {
-				while (!rm.getJobStatus(jobId).getState().equals(IJobStatus.COMPLETED)) {
-					try {
-						fSubCondition.await(100, TimeUnit.MILLISECONDS);
-					} catch (InterruptedException e) {
-						// Expect to be interrupted if monitor is canceled
-					}
-				}
-			} finally {
-				fSubLock.unlock();
-			}
-
-			/*
-			 * When the job terminates, do any post launch data synchronization.
-			 */
-			// If needed, copy data back.
-			try {
-				// Get the list of paths to be copied back.
-				doPostLaunchSynchronization(fLaunch.getLaunchConfiguration());
-			} catch (CoreException e) {
-				PTPLaunchPlugin.log(e);
-			}
-
-			/*
-			 * Clean up any launch activities.
-			 */
-			doCleanupLaunch(fLaunch);
-
-			/*
-			 * Remove job submission
-			 */
-			synchronized (jobSubmissions) {
-				jobSubmissions.remove(jobId);
-				if (jobSubmissions.size() == 0) {
-					rm.removeJobListener(fJobListener);
+				if (monitor != null) {
+					monitor.done();
 				}
 			}
-			return Status.OK_STATUS;
 		}
 	}
 
@@ -909,7 +924,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			}
 			rm.addJobListener(fJobListener);
 			String jobId = rm.submitJob(configuration, mode, progress.newChild(5));
-			if (rm.getJobStatus(jobId).equals(IJobStatus.UNDETERMINED)) {
+			if (rm.getJobStatus(jobId, progress.newChild(50)).equals(IJobStatus.UNDETERMINED)) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
 			}

@@ -79,10 +79,10 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
 	 * .String)
 	 */
-	public IJobStatus getJobStatus(String jobId) {
+	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) {
 		IJobStatus status = null;
 		try {
-			status = doGetJobStatus(jobId);
+			status = doGetJobStatus(jobId, monitor);
 		} catch (CoreException e) {
 		}
 		if (status == null) {
@@ -185,7 +185,7 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 * 
 	 * @throws CoreException
 	 */
-	protected abstract IJobStatus doGetJobStatus(String jobId) throws CoreException;
+	protected abstract IJobStatus doGetJobStatus(String jobId, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Stop the resource manager subsystem. This must be callable at any time

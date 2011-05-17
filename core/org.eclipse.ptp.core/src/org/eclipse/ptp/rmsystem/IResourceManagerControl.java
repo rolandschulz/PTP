@@ -72,13 +72,18 @@ public interface IResourceManagerControl {
 	public IResourceManagerComponentConfiguration getControlConfiguration();
 
 	/**
-	 * Get the status of the job
+	 * Get the status of the job. The could potentially be a long running
+	 * operation. If the progress monitor is canceled, the method will return an
+	 * undetermined status.
 	 * 
 	 * @param jobId
 	 *            ID of job used to obtain status
-	 * @return status of the job
+	 * @param monitor
+	 *            progress monitor for monitoring or canceling the operation
+	 * @return status of the job or undetermined status if the progress monitor
+	 *         is canceled
 	 */
-	public IJobStatus getJobStatus(String jobId);
+	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor);
 
 	/**
 	 * Start the resource manager. Clients should not call this directly. Call

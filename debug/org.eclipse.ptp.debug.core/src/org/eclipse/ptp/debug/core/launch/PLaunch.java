@@ -88,7 +88,7 @@ public class PLaunch extends Launch implements IPLaunch {
 	@Override
 	public boolean isTerminated() {
 		if (fResourceManager != null && fJobId != null) {
-			return fResourceManager.getJobStatus(fJobId).getState().equals(IJobStatus.COMPLETED);
+			return fResourceManager.getJobStatus(fJobId, null).getState().equals(IJobStatus.COMPLETED);
 		}
 		return super.isTerminated();
 	}
