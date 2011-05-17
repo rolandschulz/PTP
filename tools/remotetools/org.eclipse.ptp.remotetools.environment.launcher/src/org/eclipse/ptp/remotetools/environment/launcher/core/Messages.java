@@ -34,14 +34,6 @@ public class Messages extends NLS {
 
 	public static String RemoteLaunchDelegate_RemoteDirectory_MustBeAbsolute;
 
-	public static String ExecutionConfiguration_Error_MissingExecutable;
-
-	public static String ExecutionConfiguration_Error_MissingLocalRemoteDirectory;
-
-	public static String ExecutionConfiguration_Error_MissingProject;
-
-	public static String ExecutionConfiguration_Error_MissingRemoteWorkingDirectory;
-
 	public static String RemoteLaunchDelegate_SynchronizationRules_InternalError;
 	static {
 		// initialize resource bundle

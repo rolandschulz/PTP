@@ -31,10 +31,8 @@ public class Messages extends NLS {
 	public static String PreferencePage_LabelConnectionAddress;
 	public static String PreferencePage_LabelLoginUserName;
 	public static String PreferencePage_HeaderLaunch;
-	public static String PreferencePage_LabelSystemWorkspace;
 	public static String PreferencePage_Description;
 	public static String PreferencePage_Title;
-	public static String ConfigurationPage_0;
 
 	public static String ConfigurationPage_LabelLocalhost;
 	public static String ConfigurationPage_LabelRemoteHost;
@@ -56,7 +54,6 @@ public class Messages extends NLS {
 	public static String ConfigurationPage_DialogDescription;
 	public static String ConfigurationPage_DialogTitle;
 	public static String ConfigurationPage_LabelTargetName;
-	public static String ConfigurationPage_LabelSystemWorkspace;
 	public static String ConfigurationPage_CipherType;
 	public static String Environment_Info;
 

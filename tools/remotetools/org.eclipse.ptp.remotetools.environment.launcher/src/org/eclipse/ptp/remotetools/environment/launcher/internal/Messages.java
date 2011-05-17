@@ -30,7 +30,6 @@ public class Messages extends NLS {
 	public static String DownloadRuleAction_FailedFetchRemoteAttributes;
 	public static String DownloadRuleAction_FailedLocalDiretoryIsNotDirectory;
 	public static String DownloadRuleAction_FailedRemotePathDoesNotExit;
-	public static String DownloadRuleAction_FailedRemotePathNoDirectoryNorFile;
 	public static String DownloadRuleAction_FailedSetDownloadFile;
 	public static String DownloadRuleAction_FailedSetLocalDirectoryAttributes;
 	public static String DownloadRuleAction_FailedSetLocalFileAttributes;
@@ -96,7 +95,6 @@ public class Messages extends NLS {
 	public static String RemoteLaunchProcess_UploadWorkingDirectory_TitleUploadDisabled;
 	public static String RemoteLaunchProcess_DownloadWorkingDirectory_TitleDownloadDisabled;
 	public static String RemoteLaunchProcess_DownloadWorkingDirectory_Title;
-	public static String RemoteLaunchProcess_DownloadWorkingDirectory_IgnoreInactive;
 	public static String RemoteLaunchProcess_DownloadWorkingDirectory_IgnoreInvalid;
 	public static String RemoteLaunchProcess_DownloadWorkingDirectory_FailedRule;
 
@@ -125,7 +123,7 @@ public class Messages extends NLS {
 	public static String UploadRuleAction_7;
 	public static String UploadRuleAction_8;
 	public static String UploadRuleAction_9;
-	
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
