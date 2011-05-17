@@ -89,7 +89,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 			double increment = 0;
 			while (!ready) {
 				try {
-					ready = RemoteServicesDelegate.isStable(d.getRemoteFileManager(), path, 3, monitor);
+					ready = RemoteServicesDelegate.isStable(d.getRemoteFileManager(), path, 3, progress.newChild(20));
 				} catch (Throwable t) {
 					JAXBControlCorePlugin.log(t);
 				}
