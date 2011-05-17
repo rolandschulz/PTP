@@ -114,17 +114,6 @@ public class LocalProcess extends AbstractRemoteProcess {
 	 */
 	@Override
 	public void destroy() {
-		/*
-		 * Close streams to avoid fd leak. See bug #345164
-		 */
-		try {
-			procStderr.close();
-		} catch (IOException e) {
-		}
-		try {
-			procStdout.close();
-		} catch (IOException e) {
-		}
 		localProcess.destroy();
 	}
 
