@@ -30,6 +30,7 @@ public class RemoteServerManager {
 	private static final String ATTR_UNPACK_COMMAND = "unpackCommand"; //$NON-NLS-1$
 	private static final String ATTR_PAYLOAD = "payload"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
+	private static final String ATTR_CONTINUOUS = "continuous"; //$NON-NLS-1$
 	private static final String ATTR_VERIFY_LAUNCH_COMMAND = "verifyLaunchCommand"; //$NON-NLS-1$
 	private static final String ATTR_VERIFY_LAUNCH_PATTERN = "verifyLaunchPattern"; //$NON-NLS-1$
 	private static final String ATTR_VERIFY_LAUNCH_FAILMESSAGE = "verifyLaunchFailMessage"; //$NON-NLS-1$
@@ -65,13 +66,13 @@ public class RemoteServerManager {
 							server.setLaunchCommand(ce.getAttribute(ATTR_LAUNCH_COMMAND));
 							server.setUnpackCommand(ce.getAttribute(ATTR_UNPACK_COMMAND));
 							server.setPayload(ce.getAttribute(ATTR_PAYLOAD));
+							server.setContinuous(Boolean.parseBoolean(ce.getAttribute(ATTR_CONTINUOUS)));
 							server.setVerifyLaunchCommand(ce.getAttribute(ATTR_VERIFY_LAUNCH_COMMAND));
 							server.setVerifyLaunchPattern(ce.getAttribute(ATTR_VERIFY_LAUNCH_PATTERN));
 							server.setVerifyLaunchFailMessage(ce.getAttribute(ATTR_VERIFY_LAUNCH_FAILMESSAGE));
 							server.setVerifyUnpackCommand(ce.getAttribute(ATTR_VERIFY_UNPACK_COMMAND));
 							server.setVerifyUnpackPattern(ce.getAttribute(ATTR_VERIFY_UNPACK_PATTERN));
 							server.setVerifyUnpackFailMessage(ce.getAttribute(ATTR_VERIFY_UNPACK_FAILMESSAGE));
-
 							return server;
 						}
 					} catch (CoreException e) {
