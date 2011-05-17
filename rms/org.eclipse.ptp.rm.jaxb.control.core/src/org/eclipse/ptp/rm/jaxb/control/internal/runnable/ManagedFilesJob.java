@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -113,9 +114,13 @@ public class ManagedFilesJob extends Job {
 				}
 				String pathSep = localTarget ? JAXBControlConstants.PATH_SEP : JAXBControlConstants.REMOTE_PATH_SEP;
 				String target = stagingDir + pathSep + fileName;
-				copyFileToRemoteHost(localFile.getAbsolutePath(), target, progress.newChild(5));
+				SubMonitor m = progress.newChild(5);
+				copyFileToRemoteHost(localFile.getAbsolutePath(), target, m);
 				if (file.isDeleteAfterUse()) {
 					localFile.delete();
+				}
+				if (m.isCanceled()) {
+					break;
 				}
 				PropertyType p = new PropertyType();
 				p.setName(file.getName());
@@ -151,8 +156,12 @@ public class ManagedFilesJob extends Job {
 		SubMonitor progress = SubMonitor.convert(monitor, 15);
 		try {
 			progress.newChild(5);
+			/*
+			 * EFS.NONE means mkdir -p on the parent directory (EFS.SHALLOW is
+			 * mkdir parent, UNDEFINED is no mkdir).
+			 */
 			RemoteServicesDelegate.copy(delegate.getLocalFileManager(), localPath, delegate.getRemoteFileManager(), remotePath,
-					progress);
+					EFS.NONE, progress);
 		} finally {
 			progress.done();
 		}

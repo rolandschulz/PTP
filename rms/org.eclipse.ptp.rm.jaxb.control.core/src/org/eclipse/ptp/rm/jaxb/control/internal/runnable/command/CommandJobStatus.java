@@ -28,6 +28,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rmsystem.IJobStatus;
@@ -99,6 +100,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 				increment = ((double) (elapsed - last) / timeout) * 100;
 				last = elapsed;
 				progress.worked((int) increment);
+
+				if (progress.isCanceled()) {
+					break;
+				}
 
 				synchronized (this) {
 					try {
@@ -304,7 +309,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 			}
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
 				path = rmVarMap.getString(path);
-				remoteOutputPath = path.replaceAll(JAXBControlConstants.JOB_ID_TAG, jobId);
+				if (jobId != null) {
+					remoteOutputPath = path.replaceAll(JAXBControlConstants.JOB_ID_TAG, jobId);
+				} else {
+					remoteOutputPath = path;
+				}
 			}
 		}
 		o = rmVarMap.get(JAXBControlConstants.STDERR_REMOTE_FILE);
@@ -316,7 +325,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 			}
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
 				path = rmVarMap.getString(path);
-				remoteErrorPath = path.replaceAll(JAXBControlConstants.JOB_ID_TAG, jobId);
+				if (jobId != null) {
+					remoteErrorPath = path.replaceAll(JAXBControlConstants.JOB_ID_TAG, jobId);
+				} else {
+					remoteErrorPath = path;
+				}
 			}
 		}
 	}
@@ -509,13 +522,15 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * .String, java.lang.String,
 	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl)
 	 */
-	public void waitForJobId(String uuid, String waitUntil, ICommandJobStatusMap map) {
+	public void waitForJobId(String uuid, String waitUntil, ICommandJobStatusMap map, IProgressMonitor monitor)
+			throws CoreException {
 		IVariableMap env = control.getEnvironment();
 		if (env == null) {
 			return;
 		}
+
 		synchronized (this) {
-			while (waitEnabled && (jobId == null || !isReached(state, waitUntil))) {
+			while (!monitor.isCanceled() && waitEnabled && (jobId == null || !isReached(state, waitUntil))) {
 				try {
 					wait(1000);
 				} catch (InterruptedException ignored) {
@@ -529,6 +544,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 				String v = (String) p.getValue();
 				if (v != null) {
 					setState(v);
+				}
+
+				if (jobId == null) {
+					if (stateDetail == FAILED) {
+						throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
+					}
 				}
 
 				if (jobId == null || p == null || !stateChanged()) {

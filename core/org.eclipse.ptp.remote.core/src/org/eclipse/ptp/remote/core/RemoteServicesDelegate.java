@@ -172,11 +172,14 @@ public class RemoteServicesDelegate {
 	 *            manager for target resource
 	 * @param target
 	 *            destination file
+	 * @param mkParent
+	 *            EFS.NONE = mkdir -p on the parent directory; EFS.SHALLOW =
+	 *            mkdir parent; UNDEFINED = no mkdir
 	 * @param progress
 	 * @throws CoreException
 	 */
-	public static void copy(IRemoteFileManager from, String source, IRemoteFileManager to, String target, IProgressMonitor progress)
-			throws CoreException {
+	public static void copy(IRemoteFileManager from, String source, IRemoteFileManager to, String target, int mkParent,
+			IProgressMonitor progress) throws CoreException {
 		if (from == null) {
 			throw newException(Messages.RemoteServicesDelegate_Copy_Operation_NullSourceFileManager, null);
 		}
@@ -194,6 +197,9 @@ public class RemoteServicesDelegate {
 		if (!lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5)).exists()) {
 			throw newException(
 					Messages.RemoteServicesDelegate_Copy_Operation_Local_resource_does_not_exist + COSP + lres.getName(), null);
+		}
+		if (mkParent != UNDEFINED) {
+			to.getResource(target).getParent().mkdir(mkParent, new SubProgressMonitor(progress, 5));
 		}
 		IFileStore rres = to.getResource(target);
 		lres.copy(rres, EFS.OVERWRITE, new SubProgressMonitor(progress, 5));

@@ -338,7 +338,12 @@ public class CommandJob extends Job implements ICommandJob {
 			if (uuid != null) {
 				if (waitForId) {
 					jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
-					jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap());
+					try {
+						jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap(), progress.newChild(20));
+					} catch (CoreException failed) {
+						status = CoreExceptionUtils.getErrorStatus(failed.getMessage(), failed);
+						return status;
+					}
 				} else {
 					String state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
 					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
@@ -410,7 +415,7 @@ public class CommandJob extends Job implements ICommandJob {
 
 			progress.worked(20);
 
-			if (exit != 0 && !ignoreExitStatus) {
+			if (exit != 0 && !ignoreExitStatus && status == null) {
 				String t = error.toString();
 				error.setLength(0);
 				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (JAXBControlConstants.ZEROSTR + exit)

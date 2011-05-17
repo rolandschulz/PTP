@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
@@ -111,6 +113,9 @@ public interface ICommandJobStatus extends IJobStatus {
 	 *            wait until this state is reached.
 	 * @param map
 	 *            callback to map for waits with intermediate states
+	 * @oaram monitor
+	 * @throws CoreException
 	 */
-	public void waitForJobId(String uuid, String waitUntil, ICommandJobStatusMap map);
+	public void waitForJobId(String uuid, String waitUntil, ICommandJobStatusMap map, IProgressMonitor monitor)
+			throws CoreException;
 }
