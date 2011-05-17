@@ -87,6 +87,9 @@ my %mapping = (
     "totaltasks"                             => "totaltasks",
     "spec"                                   => "spec",
 
+    "status"                                 => "status",
+    "detailedstatus"                         => "detailedstatus",
+
 # unknown attributes
     "group"                                  => "group",
     );
@@ -123,6 +126,9 @@ foreach $jobid (sort(keys(%jobs))) {
     $jobs{$jobid}{exec_host}  = "-" if(!exists($jobs{$jobid}{exec_host}));
     $jobs{$jobid}{totaltasks} = $jobs{$jobid}{"Resource_List.nodes"} if(!exists($jobs{$jobid}{totaltasks}));
     $jobs{$jobid}{spec}       = $jobs{$jobid}{"Resource_List.nodes"} if(!exists($jobs{$jobid}{spec}));
+    # check state
+    ($jobs{$jobid}{status},$jobs{$jobid}{detailedstatus}) = &get_state($jobs{$jobid}{job_state},
+								       $jobs{$jobid}{Hold_Types}); 
 }
 
 open(OUT,"> $filename") || die "cannot open file $filename";
@@ -167,6 +173,40 @@ foreach $key (sort(keys(%notfoundkeys))) {
 }
 
 
+sub get_state {
+    my($job_state,$Hold_types)=@_;
+    my($state,$detailed_state);
+
+    $state="UNDETERMINED";$detailed_state="";
+
+    if($job_state eq "C") {
+	$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
+    }
+    if($job_state eq "H") {
+	$state="SUBMITTED";
+	$detailed_state="USER_ON_HOLD"   if($Hold_types eq "u");
+	$detailed_state="SYSTEM_ON_HOLD" if($Hold_types eq "s");
+	$detailed_state="USER_SYSTEM_ON_HOLD" if($Hold_types=~"(us|su)");
+	$detailed_state="SYSTEM_ON_HOLD" if($Hold_types eq "o");
+    }
+    if($job_state eq "E") {
+	$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
+    }    
+    if($job_state eq "Q") {
+	$state="SUBMITTED";$detailed_state="";
+    }    
+    if($job_state eq "W") {
+	$state="SUBMITTED";$detailed_state="";
+    }    
+    if($job_state eq "T") {
+	$state="SUBMITTED";$detailed_state="";
+    }    
+    if($job_state eq "R") {
+	$state="RUNNING";$detailed_state="";
+    }    
+
+    return($state,$detailed_state);
+}
 
 sub modify {
     my($key,$mkey,$value)=@_;

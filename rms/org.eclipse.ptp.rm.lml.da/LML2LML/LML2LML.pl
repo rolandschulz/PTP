@@ -116,10 +116,35 @@ my $system_type = "unknown";
 my ($tid,$tlayoutref);
 #print Dumper($filehandler_layout->{DATA}->{TABLELAYOUT});
 foreach $tid (keys(%{$filehandler_layout->{DATA}->{TABLELAYOUT}})) {
-    my($table_handler,$numids,$idlistref,$cnt);
-    $tlayoutref=$filehandler_layout->{DATA}->{TABLELAYOUT}->{$tid};
+    my($table_handler,$tlayoutref_gid,$tableref,$numids,$idlistref,$cnt,$active);
+
+    $tlayoutref     = $filehandler_layout->{DATA}->{TABLELAYOUT}->{$tid};
+    $tlayoutref_gid = $filehandler_layout->{DATA}->{TABLELAYOUT}->{$tid}->{gid};
+
+    # check if layout if is active
+    $active=1;    
+    if(exists($filehandler_layout->{DATA}->{TABLELAYOUT}->{$tid}->{'active'})) {
+	$active=0 if($filehandler_layout->{DATA}->{TABLELAYOUT}->{$tid}->{'active'} eq "false");
+    }
+    next if(!$active);
+
+    # check if table (columns) is given
+    $tableref=undef;
+    if(exists($filehandler_layout->{DATA}->{TABLE})) {
+	if(exists($filehandler_layout->{DATA}->{TABLE}->{$tlayoutref_gid})) {
+	    $tableref=$filehandler_layout->{DATA}->{TABLE}->{$tlayoutref_gid};
+	}
+    }
+    if(!$tableref) {
+	print STDERR "$0: no table information given in request for table $tlayoutref_gid, skipping ...\n";
+	next;
+    }
+    
+    # create table handler and process request
     $table_handler = LML_gen_table->new($opt_verbose,$opt_timings);
-    $numids=$table_handler->process($tlayoutref,$filehandler_LML);
+    $numids=$table_handler->process($tlayoutref,$tableref,$filehandler_LML);
+
+    # add elements, objects, and info to output LML files
     $idlistref=$table_handler->get_ids();
     print "Table Layout: $tid processed ($numids objects found)\n"  if($opt_verbose);
     $cnt=&copy_objects_of_elements($filehandler_LML,$filehandler_out,$idlistref,"OBJECT");
@@ -137,24 +162,43 @@ foreach $tid (keys(%{$filehandler_layout->{DATA}->{TABLELAYOUT}})) {
 ############################
 # process nodedisplay layout
 ############################
+
 #print Dumper($filehandler_layout->{DATA});
 #print Dumper($filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT});
-my ($nid,$nlayoutref);
+my ($nid,$nlayoutref,$ndcnt);
+$ndcnt=1;
 foreach $nid (keys(%{$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}})) {
-    my($nd_handler,$numids,$idlistref,$cnt,$nlayoutref_gid,$nschemeref);
-    $nd_handler = LML_gen_nodedisplay->new($opt_verbose,$opt_timings);
+    my($nd_handler,$numids,$idlistref,$cnt,$nlayoutref_gid,$nschemeref,,$active);
+
     $nlayoutref=$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}->{$nid};
     $nlayoutref_gid=$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}->{$nid}->{gid};
+
+    # check if layout if is active
+    $active=1;    
+    if(exists($filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}->{$nid}->{'active'})) {
+	$active=0 if($filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}->{$nid}->{'active'} eq "false");
+    }
+    next if(!$active);
+
+    # check if scheme is given
     $nschemeref=undef;
     if(exists($filehandler_layout->{DATA}->{NODEDISPLAY})) {
 	if(exists($filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid})) {
-	    $nschemeref=$filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid}->{schemeroot};
+	    if($nlayoutref_gid!~/__dummy_nd__/) {
+		$nschemeref=$filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid}->{schemeroot};
+	    } else {
+		# generate a new not dummy gid
+		$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}->{$nid}->{gid}="nd_$ndcnt";
+		$cnt++;
+	    }
 	}
     }
-#    print "WF: nschemeref ",Dumper($nschemeref);
 
+    # create nd handler and process request
+    $nd_handler = LML_gen_nodedisplay->new($opt_verbose,$opt_timings);
     $numids=$nd_handler->process($nlayoutref,$nschemeref,$filehandler_LML);
 
+    # add elements, objects, and info to output LML files
     $idlistref=$nd_handler->get_ids();
     print "Nodedisplay Layout: $nid processed ($numids objects found)\n"  if($opt_verbose);
     $cnt=&copy_objects_of_elements($filehandler_LML,$filehandler_out,$idlistref,"OBJECT");

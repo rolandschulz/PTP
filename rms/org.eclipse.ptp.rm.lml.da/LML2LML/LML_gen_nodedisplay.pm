@@ -55,14 +55,14 @@ sub process {
     my $schemefromrequest  = shift;
     my $filehandler_LML  = shift;
     my ($numids,$gid,$idlistref);
-    my ($schemeroot,$dataroot);
+    my ($schemeroot,$dataroot,$usescheme);
     $numids=0;
     $self->{LAYOUT}    = $layoutref; 
     $self->{LMLFH}     = $filehandler_LML; 
     $gid               = $layoutref->{gid};
 
+    # check if schme is given
     $self->{SCHEMEFROMREQUEST} =  $schemefromrequest; 
-
 
     # internal structure
     $self->{SCHEMEROOT} = $schemeroot = LML_ndtree->new();
@@ -76,6 +76,9 @@ sub process {
 	    print "ERROR: could not init internal data structures, system type: $self->{SYSTEMTYPE}, aborting ...\n";
 	    return(-1);
 	}
+	# init data tree with empty root nodes
+	$self->_add_empty_root_elements();
+
     } elsif($self->{SYSTEMTYPE} eq "Cluster") {
 
 	# user define scheme given
@@ -85,6 +88,9 @@ sub process {
 		print "ERROR: could not init internal data structures, system type: $self->{SYSTEMTYPE}, aborting ...\n";
 		return(-1);
 	    }
+
+	    # init data tree with empty root nodes
+	    $self->_add_empty_root_elements();
 	    
 	} else {
 	    # standard one-level tree, mapping of node names
@@ -99,13 +105,12 @@ sub process {
 	print "ERROR: not supported system type: $self->{SYSTEMTYPE}, aborting ...\n";
 	return(-1);
     }
+
     # add regular expression to each level of node display scheme for fast pattern scan of nodenames
     $self->_add_regexp_to_scheme();
+
     # adjust min,max attribute if only one is given
     $self->_update_scheme_attr();
-    
-    # init data tree with empty root nodes
-    $self->_add_empty_root_elements();
 
 
     $idlistref=[];
@@ -127,13 +132,13 @@ sub _insert_run_jobs {
     
     keys(%{$self->{LMLFH}->{DATA}->{OBJECT}}); # reset iterator
     while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
-#	last; # WF
 	next if($ref->{type} ne 'job');
 	$inforef=$self->{LMLFH}->{DATA}->{INFODATA}->{$key};
 	next if($inforef->{state} ne 'Running');
 	$nodelist=$self->_remap_nodes($inforef->{nodelist});
 	$self->insert_job_into_nodedisplay($self->{SCHEMEROOT},$self->{DATAROOT},$nodelist,$key);
 	push(@idlist,$key);
+#	last; # WF
     }
     return(\@idlist);
 }
@@ -149,7 +154,7 @@ sub get_lml_nodedisplay {
     $ds->{title}=$layoutref->{id};
     $ds->{schemeroot}=$self->{SCHEMEROOT};
     $ds->{dataroot}=$self->{DATAROOT};
-    
+
     return($ds);
 
 }
@@ -386,6 +391,7 @@ sub _init_trees_cluster  {
 			      oid     => 'empty' });
 	$start+=$numnodes;
     }
+
     return(1);
 }
 
@@ -505,7 +511,6 @@ sub _init_trees_bg  {
 			  min     => 0,
 			  max     => 3,
 			  mask    => '-%01d' });
-
 
     return(1);
 }

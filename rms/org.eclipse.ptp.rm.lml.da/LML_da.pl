@@ -12,11 +12,11 @@
 
 use FindBin;
 use lib "$FindBin::RealBin/lib";
-use XML::Simple;
 use Data::Dumper;
 use Getopt::Long;
 use Time::Local;
 use Time::HiRes qw ( time );
+use LML_da_workflow_obj;
 
 use strict;
 
@@ -56,11 +56,13 @@ print STDERR "-"x90,"\n" if($opt_verbose);
 # read config file
 print STDERR "$0: configfile=$opt_configfile\n" if($opt_verbose);
 $tstart=time;
-my $confxml=$xs->XMLin($opt_configfile,
-		       KeyAttr => {step => "+id"},
-		       ForceArray => 1);
+my $workflow_obj = LML_da_workflow_obj->new($opt_verbose,0);
+$workflow_obj->read_xml_fast($opt_configfile);
+my $confxml=$workflow_obj->{DATA};
 $tdiff=time-$tstart;
 printf(STDERR "$0: parsing XML configfile in %6.4f sec\n",$tdiff) if($opt_verbose);
+
+
 
 # init global vars
 my $vardefs=$confxml->{'vardefs'}->[0];

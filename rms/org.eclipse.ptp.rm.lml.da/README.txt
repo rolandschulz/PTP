@@ -13,7 +13,7 @@
 LML_da: LML data access tool
 -----------------------------
 
-W.Frings, Forschungszentrum Juelich GmbH,  3 May 2011
+W.Frings, Forschungszentrum Juelich GmbH, 17 May 2011
 
 Introduction
 ------------
@@ -374,3 +374,9 @@ ChangeLog:
      - calls LML_da on the remote site 
      - auto-configuration of LML_da (selecting handler for rms on remote site) 
      - handling of temporary files and directories
+
+1.04:
+   - pattern matching in generation of table
+   - rms:TORQUE: job status according PTP job status 
+   - removed dependency to XML-Parser module
+   - bugfix in gen_nodedisplay

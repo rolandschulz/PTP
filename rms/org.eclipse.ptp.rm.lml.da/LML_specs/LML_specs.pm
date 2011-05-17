@@ -8,26 +8,50 @@
 #* Contributors:
 #*    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
 #*******************************************************************************/ 
-
 package LML_specs;
 
 use strict;
 
-# [type, req, info]
+# [type, req, info, description ]
 # type:
 #    k    -> keywords
 #    s    -> string
 #    d    -> integer
 #    D    -> Date
+#    f    -> float
 # req:
-#    M    -> Mandatory
+#    M    -> Mandatory (also in job list table)
+#    m    -> Mandatory
 #    O    -> Optional
+# description: 
+#    -> string
 
 $LML_specs::LMLattributes = {
     "job" => {
-	         "owner"          => ["s","M", undef],
-	         "group"          => ["s","M", undef],
-	         "state"          => ["k","M",{
+	         "owner"          => ["s","M", undef, "uid of owner of job"],
+	         "group"          => ["s","M", undef, "gid of owner of job"],
+	         "status"         => ["k","M",{
+		                                "UNDETERMINED" => 1,
+						"SUBMITTED"    => 1,
+						"RUNNING"      => 1,
+						"SUSPENDED"    => 1,
+						"COMPLETED"    => 1,
+				      }, "Primary status of job" 
+		                     ],
+	         "detailedstatus" => ["k","M",{
+		     "QUEUED_ACTIVE"        => 1, 
+						"SYSTEM_ON_HOLD"       => 1, # Submitted
+						"USER_ON_HOLD"         => 1, # Submitted
+						"USER_SYSTEM_ON_HOLD"  => 1, # Submitted
+						"SYSTEM_SUSPENDED"     => 1, # Suspended
+						"USER_SUSPENDED"       => 1, # Suspended
+						"USER_SYSTEM_SUSPENDED"=> 1, # Suspended
+						"FAILED"               => 1, # Completed
+						"CANCELED"             => 1, # Completed
+						"JOB_OUTERR_READY"     => 1, # Completed
+				      }, "Detailed status of job" 
+		                     ],
+	         "state"          => ["k","O",{
 		                                "Running"    => 1,
 						"Completed"  => 1,
 						"Idle"       => 1,
@@ -35,49 +59,49 @@ $LML_specs::LMLattributes = {
 						"Removed"    => 1,
 						"User Hold"  => 1,
 						"System Hold"=> 1,
-				      }
+				      }, "Status of Job" 
 		                     ],
-		 "wall"         => ["d","M",undef],
-		 "wallsoft"     => ["d","O",undef],
-		 "queuedate"    => ["D","M",undef], 
-		 "dispatchdate" => ["D","O",undef],
-		 "enddate"      => ["D","O",undef],
-		 "name"         => ["s","O",undef],
-		 "step"         => ["s","M",undef],
-		 "comment"      => ["s","O",undef],
-		 "totalcores"   => ["i","M",undef],
-		 "totaltasks"   => ["i","M",undef],
-		 "nodelist"     => ["s","M",undef],
-		 "queue"        => ["s","M",undef],
-		 "dependency"   => ["s","O",undef],
-		 "executable"   => ["s","O",undef],
+		 "wall"         => ["d","m",undef, "requested wall time for this job (s)" ],
+		 "wallsoft"     => ["d","O",undef, "requested wall time for this job (s), soft limit" ],
+		 "queuedate"    => ["D","m",undef, "date job was inserted in queue (submit)"], 
+		 "dispatchdate" => ["D","O",undef, "date job changed to running state"],
+		 "enddate"      => ["D","O",undef, "date when job will if running to wall limit"],
+		 "name"         => ["s","O",undef, "used defined name of job" ],
+		 "step"         => ["s","M",undef, "unique job id" ],
+		 "comment"      => ["s","O",undef, "comment" ],
+		 "totalcores"   => ["d","M",undef, "total number of machine cores requested"],
+		 "totaltasks"   => ["d","M",undef, "total number of (MPI) tasks"],
+		 "nodelist"     => ["s","M",undef, "node on ehich a job is running" ],
+		 "queue"        => ["s","M",undef, "queue"],
+		 "dependency"   => ["s","O",undef, "dependency string"],
+		 "executable"   => ["s","O",undef, "path and name of executable"],
 # LL optional
-		 "classprio"    => ["d","O",undef], 
-		 "groupprio"    => ["d","O",undef], 
-		 "userprio"     => ["d","O",undef], 
-		 "favored"      => ["s","O",undef], 
-		 "restart"      => ["s","O",undef], 
+		 "classprio"    => ["d","O",undef, ""], 
+		 "groupprio"    => ["d","O",undef, ""], 
+		 "userprio"     => ["d","O",undef, ""], 
+		 "favored"      => ["s","O",undef, ""], 
+		 "restart"      => ["s","O",undef, ""], 
 # BG/P optional
-		 "bgp_partalloc"      => ["s","O",undef],
-		 "bgp_size_alloc"     => ["s","O",undef],
-		 "bgp_size_req"       => ["s","O",undef],
-		 "bgp_shape_alloc"    => ["s","O",undef],
-		 "bgp_shape_req"      => ["s","O",undef],
-		 "bgp_state"          => ["s","O",undef],
-		 "bgp_type"           => ["s","O",undef],
+		 "bgp_partalloc"      => ["s","O",undef, ""],
+		 "bgp_size_alloc"     => ["s","O",undef, ""],
+		 "bgp_size_req"       => ["s","O",undef, ""],
+		 "bgp_shape_alloc"    => ["s","O",undef, ""],
+		 "bgp_shape_req"      => ["s","O",undef, ""],
+		 "bgp_state"          => ["s","O",undef, ""],
+		 "bgp_type"           => ["s","O",undef, ""],
    },
     "node" => {
-	         "id"             => ["s","M", undef],
-	         "ncores"         => ["i","M", undef],
-	         "physmem"        => ["i","M", undef],
-	         "availmem"       => ["i","M", undef],
+	         "id"             => ["s","M", undef, ""],
+	         "ncores"         => ["i","M", undef, ""],
+	         "physmem"        => ["i","M", undef, ""],
+	         "availmem"       => ["i","M", undef, ""],
 	         "state"          => ["k","M",{
 		                                "Running"    => 1,
 						"Idle"       => 1,
 						"Drained"    => 1,
 						"Down"       => 1,
 						"Unknown"    => 1,
-				      }
+				      }, ""
 		                     ],
     }
 };

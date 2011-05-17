@@ -55,8 +55,9 @@ sub new {
 #                 {TABLE}->{$id}->{id}
 #                               ->{title}
 #                               ->{column}->{$cid}->{id}
-#                                                ->{name}
-#                                                ->{sort}
+#                                                 ->{name}
+#                                                 ->{sort}
+#                                                 ->{pattern}=[[include|exclude, regexp], ...]
 #                               ->{row}->{$id}->{cell}->[value,value,...]
 #
 #                 {NODEDISPLAYLAYOUT}->{$id}->{id}
@@ -155,7 +156,6 @@ sub get_stat {
 sub read_lml_fast {
     my($self) = shift;
     my $infile  = shift;
-    my $type    = shift;
     my($xmlin);
     my $rc=0;
 
@@ -175,7 +175,6 @@ sub read_lml_fast {
     }
 
 
-    $self->{DATA}->{SEARCHTYPE}=$type;
     $tstart=time;
 
     # light-weight self written xml parser, only working for simple XML files  
@@ -224,7 +223,6 @@ sub read_lml_fast {
 }
 
 
-# from lib/LLview_parse_xml.pm
 sub lml_start {
     my $self=shift; # object reference
     my $o   =shift;
@@ -245,48 +243,10 @@ sub lml_start {
 	}
 	return(1);
     }
-    # Objects
-    if($name eq "objects") {
-	return(1);
-    }
-    if($name eq "object") {
-	$id=$attr{id};
-	if(exists($o->{OBJECT}->{$id})) {
-	    print "LML_file_obj: WARNING objects with id >$id< exists, skipping\n";
-	    return(0);
-    	}
-	foreach $k (sort keys %attr) {
-	    $o->{OBJECT}->{$id}->{$k}=$attr{$k};
-	}
-	return(1);
-    }
 
-    # Request
-    if($name eq "request") {
-	foreach $k (sort keys %attr) {
-	    $o->{OBJECT}->{request}->{$k}=$attr{$k};
-	}
-	return(1);
-    }
 
-    # Information
-    if($name eq "information") {
-	return(1);
-    }
-    if($name eq "info") {
-	$oid=$attr{oid};
-	$o->{LASTINFOID}=$oid;
-	$o->{LASTINFOTYPE}=$o->{OBJECT}->{$oid}->{type};
-	if(exists($o->{INFO}->{$oid})) {
-	    print "LML_file_obj: WARNING info with id >$id< exists, skipping\n";
-	    return(0);
-    	}
-	foreach $k (sort keys %attr) {
-#	    print "$k: $attr{$k}\n";
-	    $o->{INFO}->{$oid}->{$k}=$attr{$k};
-	}
-	return(1);
-    }
+# general tags, used in more than one tags
+###########################################################################################
     if($name eq "data") {
 	if($o->{LASTINFOID}) {
 	    $id=$o->{LASTINFOID};
@@ -305,16 +265,69 @@ sub lml_start {
 	    $o->{NODEDISPLAY}->{$id}->{dataroot}->{_level}=-1;
 	    push(@{$o->{NODEDISPLAYSTACK}},$o->{NODEDISPLAY}->{$id}->{dataroot});
 	}
+	return(1);
     }
-    if($name eq "scheme") {
-	if($o->{LASTNODEDISPLAYID}) {
-	    $id=$o->{LASTNODEDISPLAYID};
-	    $o->{NODEDISPLAY}->{$id}->{schemeroot}=LML_ndtree->new("schemeroot");
-	    $o->{NODEDISPLAY}->{$id}->{schemeroot}->{_level}=-1;
-	    push(@{$o->{NODEDISPLAYSTACK}},$o->{NODEDISPLAY}->{$id}->{schemeroot});
+
+# handling request tags
+###########################################################################################
+    if($name eq "request") {
+	foreach $k (sort keys %attr) {
+	    $o->{OBJECT}->{request}->{$k}=$attr{$k};
 	}
+	return(1);
     }
-    # Tablelayout
+
+# handling objects tags
+###########################################################################################
+    if($name eq "objects") {
+	return(1);
+    }
+    if($name eq "object") {
+	$id=$attr{id};
+	if(exists($o->{OBJECT}->{$id})) {
+	    print "LML_file_obj: WARNING objects with id >$id< exists, skipping\n";
+	    return(0);
+    	}
+	foreach $k (sort keys %attr) {
+	    $o->{OBJECT}->{$id}->{$k}=$attr{$k};
+	}
+	return(1);
+    }
+
+# handling information tags
+###########################################################################################
+    if($name eq "information") {
+	return(1);
+    }
+    if($name eq "info") {
+	$oid=$attr{oid};
+	$o->{LASTINFOID}=$oid;
+	$o->{LASTINFOTYPE}=$o->{OBJECT}->{$oid}->{type};
+	if(exists($o->{INFO}->{$oid})) {
+	    print "LML_file_obj: WARNING info with id >$id< exists, skipping\n";
+	    return(0);
+    	}
+	foreach $k (sort keys %attr) {
+#	    print "$k: $attr{$k}\n";
+	    $o->{INFO}->{$oid}->{$k}=$attr{$k};
+	}
+	return(1);
+    }
+
+# handling tables
+###########################################################################################
+    if($name eq "table") {
+	$id=$attr{id};
+	$o->{LASTTABLEID}=$id;
+	if(exists($o->{TABLE}->{$id})) {
+	    print "LML_file_obj: WARNING Table with id >$id< exists, skipping\n";
+	    return(0);
+    	}
+	foreach $k (sort keys %attr) {
+	    $o->{TABLE}->{$id}->{$k}=$attr{$k};
+	}
+	return(1);
+    }
     if($name eq "tablelayout") {
 	$id=$attr{id};
 	$o->{LASTTABLELAYOUTID}=$id;
@@ -323,29 +336,68 @@ sub lml_start {
 	    return(0);
     	}
 	foreach $k (sort keys %attr) {
-#	    print "$k: $attr{$k}\n";
 	    $o->{TABLELAYOUT}->{$id}->{$k}=$attr{$k};
 	}
 	return(1);
     }
-
     if($name eq "column") {
-	$id=$o->{LASTTABLELAYOUTID};
-	$cid=$attr{cid};
-	$v=$attr{value};
-
-	if(exists($o->{TABLELAYOUT}->{$id}->{column}->{$cid})) {
-	    print "LML_file_obj: WARNING column in tablelayout with id >$cid<  exists, skipping\n";
-	    return(0);
-    	}
-	foreach $k (sort keys %attr) {
-#	    print "$k: $attr{$k}\n";
-	    $o->{TABLELAYOUT}->{$id}->{column}->{$cid}->{$k}=$attr{$k};
+	if($o->{LASTTABLEID}) {
+	    $id=$o->{LASTTABLEID};
+	    $cid=$attr{id};
+	    $o->{LASTCOLUMNID}=$cid;
+	    $v=$attr{value};
+	    if(exists($o->{TABLE}->{$id}->{column}->{$cid})) {
+		print "LML_file_obj: WARNING column in table with id >$cid<  exists, skipping\n";
+		return(0);
+	    }
+	    foreach $k (sort keys %attr) {
+		$o->{TABLE}->{$id}->{column}->{$cid}->{$k}=$attr{$k};
+	    }
+	}
+	if($o->{LASTTABLELAYOUTID}) {
+	    $id=$o->{LASTTABLELAYOUTID};
+	    $cid=$attr{cid};
+	    $o->{LASTCOLUMNID}=$cid;
+	    $v=$attr{value};
+	    if(exists($o->{TABLELAYOUT}->{$id}->{column}->{$cid})) {
+		print "LML_file_obj: WARNING column in tablelayout with id >$cid<  exists, skipping\n";
+		return(0);
+	    }
+	    foreach $k (sort keys %attr) {
+		$o->{TABLELAYOUT}->{$id}->{column}->{$cid}->{$k}=$attr{$k};
+	    }
 	}
 	return(1);
     }
-
-    # nodedisplaylayout
+    if($name eq "pattern") {
+	if($o->{LASTTABLEID}) {
+	    $id=$o->{LASTTABLEID};
+	    if($o->{LASTCOLUMNID}) {
+		$cid=$o->{LASTCOLUMNID};
+		$o->{LASTPATTERNLIST}=$o->{TABLE}->{$id}->{column}->{$cid}->{pattern}=[];
+	    }
+    	}
+	return(1);
+    }
+    if($name eq "exclude") {
+	if($o->{LASTPATTERNLIST}) {
+	    if(exists($attr{'regexp'})) {
+		push(@{$o->{LASTPATTERNLIST}},['exclude',$attr{'regexp'}]);
+	    }
+	}
+	return(1);
+    }
+    if($name eq "include") {
+	if($o->{LASTPATTERNLIST}) {
+	    if(exists($attr{'regexp'})) {
+		push(@{$o->{LASTPATTERNLIST}},['include',$attr{'regexp'}]);
+	    }
+	}
+	return(1);
+    }
+    
+# handling nodedisplays
+###########################################################################################
     if($name eq "nodedisplay") {
 	$id=$attr{id};
 	$o->{LASTNODEDISPLAYID}=$id;
@@ -358,7 +410,6 @@ sub lml_start {
 	}
 	return(1);
     }
-    # nodedisplaylayout
     if($name eq "nodedisplaylayout") {
 	$id=$attr{id};
 	if(exists($o->{NODEDISPLAYLAYOUT}->{$id})) {
@@ -373,12 +424,23 @@ sub lml_start {
 	push(@{$o->{NODEDISPLAYSTACK}},$o->{NODEDISPLAYLAYOUT}->{$id}->{tree});
 	return(1);
     }
+    if($name eq "scheme") {
+	if($o->{LASTNODEDISPLAYID}) {
+	    $id=$o->{LASTNODEDISPLAYID};
+	    $o->{NODEDISPLAY}->{$id}->{schemeroot}=LML_ndtree->new("schemeroot");
+	    $o->{NODEDISPLAY}->{$id}->{schemeroot}->{_level}=-1;
+	    push(@{$o->{NODEDISPLAYSTACK}},$o->{NODEDISPLAY}->{$id}->{schemeroot});
+	}
+	return(1);
+    }
     if(($name=~/el\d/) || ($name eq 'img') ) {
 	my $lastelem=$o->{NODEDISPLAYSTACK}->[-1];
 	my $treenode=$lastelem->new_child(\%attr,$name);
 	push(@{$o->{NODEDISPLAYSTACK}},$treenode);
 	return(1);
     }
+
+    # unknown element
     print "LML_file_obj: WARNING unknown tag >$name< \n";
    
 }
@@ -398,12 +460,24 @@ sub lml_end {
     if(($name=~/el\d/) || ($name eq 'img') || ($name eq 'scheme')) {
 	pop(@{$o->{NODEDISPLAYSTACK}});
     }
-    if($name=~/nodedisplaylayout\d/) {
+    if($name=~/nodedisplaylayout/) {
 	pop(@{$o->{NODEDISPLAYSTACK}});
     }
-    if($name=~/nodedisplay\d/) {
+    if($name=~/nodedisplay/) {
 	pop(@{$o->{NODEDISPLAYSTACK}});
 	$o->{LASTNODEDISPLAYID} = undef;
+    }
+    if($name=~/table/) {
+	$o->{LASTTABLEID} = undef;
+    }
+    if($name=~/tablelayout/) {
+	$o->{LASTTABLELAYOUTID} = undef;
+    }
+    if($name=~/column/) {
+	$o->{LASTCOLUMNID} = undef;
+    }
+    if($name=~/pattern/) {
+	$o->{LASTPATTERNLIST} = undef;
     }
     if($name=~/info/) {
 	$o->{LASTINFOID} = undef;
@@ -416,7 +490,7 @@ sub lml_end {
 sub write_lml {
     my($self) = shift;
     my $outfile  = shift;
-    my($k,$rc,$id,$c,$key);
+    my($k,$rc,$id,$c,$key,$ref);
     my $tstart=time;
     $rc=1;
 
@@ -458,13 +532,30 @@ sub write_lml {
 
 	foreach $id (sort keys %{$self->{DATA}->{TABLE}}) {
 	    my $table=$self->{DATA}->{TABLE}->{$id};
-	    printf(OUT "<table title=\"%s\" id=\"%s\">\n", $table->{title}, $table->{id});
+	    printf(OUT "<table ");
+	    for $key ("id", "gid","name","contenttype","description","title") {
+		printf(OUT " %s=\"%s\"",$key,  $table->{$key}) if (exists($table->{$key}));
+	    }
+	    printf(OUT ">\n");
+
  	    foreach $k (sort keys %{$table->{column}}) {
+#		print "$id $k ",Dumper($table->{column}->{$k});
 		printf(OUT "<column");
-		for $key ("id","name","sort") {
-		    printf(OUT " %s=\"%s\"",$key,  $table->{column}->{$k}->{$key});
+		for $key ("id","name","sort","description","type") {
+		    printf(OUT " %s=\"%s\"",$key,  $table->{column}->{$k}->{$key}) if (exists($table->{column}->{$k}->{$key}));
 		}
-		printf(OUT "/>\n");
+		if(exists($table->{column}->{$k}->{pattern})) {
+		    printf(OUT ">\n");
+		    printf(OUT " <pattern>\n");
+		    foreach $ref (@{$table->{column}->{$k}->{pattern}}) {
+			printf(OUT " <%s regexp=\"%s\"/>\n",$ref->[0],$ref->[1]);
+		    }
+		    
+		    printf(OUT " </pattern>\n");
+		    printf(OUT "</column>\n");
+		} else {
+		    printf(OUT "/>\n");
+		}
 	    }
  	    foreach $k (sort keys %{$table->{row}}) {
 		printf(OUT "<row  %s=\"%s\">\n","oid",$k);
@@ -481,7 +572,11 @@ sub write_lml {
 
 	foreach $id (sort keys %{$self->{DATA}->{TABLELAYOUT}}) {
 	    my $tablelayout=$self->{DATA}->{TABLELAYOUT}->{$id};
-	    printf(OUT "<tablelayout id=\"%s\" gid=\"%s\">\n", $tablelayout->{id}, $tablelayout->{gid});
+	    printf(OUT "<tablelayout ");
+	    for $key ("id","gid","active") {
+		printf(OUT " %s=\"%s\"",$key,  $tablelayout->{$key}) if (exists($tablelayout->{$key}));
+	    }
+	    printf(OUT ">\n");
  	    foreach $k (sort {$a <=> $b} keys %{$tablelayout->{column}}) {
 		printf(OUT "<column");
 		for $key ("cid","pos","width","active","key") {
@@ -500,7 +595,11 @@ sub write_lml {
 
 	foreach $id (sort keys %{$self->{DATA}->{NODEDISPLAYLAYOUT}}) {
 	    my $ndlayout=$self->{DATA}->{NODEDISPLAYLAYOUT}->{$id};
-	    printf(OUT "<nodedisplaylayout id=\"%s\" gid=\"%s\">\n", $ndlayout->{id}, $ndlayout->{gid});
+	    printf(OUT "<nodedisplaylayout ");
+	    for $key ("id","gid","active") {
+		printf(OUT " %s=\"%s\"",$key,  $ndlayout->{$key}) if (exists($ndlayout->{$key}));
+	    }
+	    printf(OUT ">\n");
 	    print OUT $ndlayout->{tree}->get_xml_tree(0);
 	    printf(OUT "</nodedisplaylayout>\n");
 	}
@@ -511,12 +610,16 @@ sub write_lml {
 	foreach $id (sort keys %{$self->{DATA}->{NODEDISPLAY}}) {
 	    my $nd=$self->{DATA}->{NODEDISPLAY}->{$id};
 	    printf(OUT "<nodedisplay id=\"%s\" title=\"%s\">\n", $nd->{id}, $nd->{title});
-	    print OUT "<scheme>\n";
-	    print OUT $nd->{schemeroot}->get_xml_tree(1);
-	    print OUT "</scheme>\n";
-	    print OUT "<data>\n";
-	    print OUT $nd->{dataroot}->get_xml_tree(1);
-	    print OUT "</data>\n";
+	    if(exists($nd->{schemeroot})) {
+		print OUT "<scheme>\n";
+		print OUT $nd->{schemeroot}->get_xml_tree(1);
+		print OUT "</scheme>\n";
+	    }
+	    if(exists($nd->{dataroot})) {
+		print OUT "<data>\n";
+		print OUT $nd->{dataroot}->get_xml_tree(1);
+		print OUT "</data>\n";
+	    }
 	    printf(OUT "</nodedisplay>\n");
 	}
     }
@@ -530,6 +633,86 @@ sub write_lml {
     
     return($rc);
     
+}
+
+sub check_lml {
+    my($self) = shift;
+   
+    {
+	my($type,%types,$id);
+	if($self->{DATA}->{TABLELAYOUT}) {
+	    foreach $id (keys %{$self->{DATA}->{TABLELAYOUT}}) {
+		$self->_check_lml_tablelayout_width($self->{DATA}->{TABLELAYOUT}->{$id});
+		$self->_check_lml_tablelayout_pos($self->{DATA}->{TABLELAYOUT}->{$id});
+	    }
+	}
+    }
+    return(1);
+} 
+
+sub _check_lml_tablelayout_width {
+    my($self) = shift;
+    my($tlayoutref) = @_;
+    my($cid, $numcolumns, $wsum, $wsumweight);
+
+    $numcolumns=scalar keys(%{$tlayoutref->{column}});
+    
+    $wsum=0.0;
+    foreach $cid (sort {$a <=> $b} (keys(%{$tlayoutref->{column}}))) {
+	$tlayoutref->{column}->{$cid}->{width}=1.0 if(!exists($tlayoutref->{column}->{$cid}->{width}));
+	$tlayoutref->{column}->{$cid}->{width}=1.0 if($tlayoutref->{column}->{$cid}->{width}<=0);
+	$wsum+=$tlayoutref->{column}->{$cid}->{width};
+    }
+    if($wsum>0)  {$wsumweight=1.0/$wsum;}
+    else         {$wsumweight=1.0;}
+    foreach $cid (sort {$a <=> $b} (keys(%{$tlayoutref->{column}}))) {
+	$tlayoutref->{column}->{$cid}->{width}*=$wsumweight;
+    }
+    
+    return(1);
+} 
+
+sub _check_lml_tablelayout_pos {
+    my($self) = shift;
+    my($tlayoutref) = @_;
+    my($cid, $numcolumns, $pos);
+
+    $numcolumns=scalar keys(%{$tlayoutref->{column}});
+    
+    $pos=0;
+    foreach $cid (sort {&_sort_tlayout_pos($tlayoutref,$a,$b)} (keys(%{$tlayoutref->{column}}))) {
+	$tlayoutref->{column}->{$cid}->{pos}=$pos;
+	$pos++;
+    }
+   
+    return(1);
+} 
+
+
+sub _sort_tlayout_pos {
+    my($tlayoutref,$aa,$bb)=@_;
+
+    # pos attribute
+    my $apos=1e20;
+    my $bpos=1e20;
+    $apos=$tlayoutref->{column}->{$aa}->{pos} if(exists($tlayoutref->{column}->{$aa}->{pos}));
+    $bpos=$tlayoutref->{column}->{$bb}->{pos} if(exists($tlayoutref->{column}->{$bb}->{pos}));
+
+    # active attribute
+    my $aactive="false";
+    my $bactive="false";
+    $aactive=$tlayoutref->{column}->{$aa}->{active} if(exists($tlayoutref->{column}->{$aa}->{active}));
+    $bactive=$tlayoutref->{column}->{$bb}->{active} if(exists($tlayoutref->{column}->{$bb}->{active}));
+
+    if($apos != $bpos) {
+	return($apos <=> $bpos);
+    } else {
+	if($aactive != $bactive) {
+	    return($aactive cmp $bactive);	    
+	} else {
+	    return($aa <=> $bb);	    
+	}
+    }
 }
     
 1;

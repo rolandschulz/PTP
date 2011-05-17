@@ -11,11 +11,13 @@
 #*******************************************************************************/ 
 use FindBin;
 use lib "$FindBin::RealBin/lib";
-use XML::Simple;
 use Data::Dumper;
 use Getopt::Long;
 use Time::Local;
 use Time::HiRes qw ( time );
+use LML_file_obj;
+use LML_da_workflow_obj;
+use Storable qw(dclone); 
 
 use strict;
 
@@ -29,9 +31,6 @@ my $version="1.03";
 my ($tstart,$tdiff,$rc);
 
 
-# Init XML-Parser
-my $xs=XML::Simple->new();
-
 #
 # Usage: LML_da_driver.pl [<options>] <request-file> <output-file>
 #   or   LML_da_driver.pl [<options>] < <request-file> > <output-file>
@@ -43,7 +42,7 @@ my $xs=XML::Simple->new();
 #    - designed to run on remote system in user mode
 #    - determine system and select corrensponding query scripts
 #
-# 2. running from a LML raw file
+# 2. runnung from a LML raw file
 #    - designed to run on a web server as backend to 
 #      web server scripts 
 #    - raw file must be speciied by rawfile parameter
@@ -97,7 +96,7 @@ if( ($#ARGV > 1) || ($#ARGV == 0 ) ) {
     $outputfile  = $ARGV[1];
 } else {
     # in/output file specified over stdin/stdout
-    $requestfile = "-"; # notation of XML::Simple
+    $requestfile = "-"; 
     $outputfile  = "-";
 }
 
@@ -137,10 +136,12 @@ if($opt_rawfile) {
 # read config file
 print STDERR "$0: requestfile=$requestfile\n" if($opt_verbose);
 $tstart=time;
-my $requestxml=$xs->XMLin($requestfile, ForceArray => 1, KeyAttr => {});
+
+my $filehandler_request = LML_file_obj->new($opt_verbose,1);
+$filehandler_request->read_lml_fast($requestfile);
 $tdiff=time-$tstart;
 printf(STDERR "$0: parsing XML requestfile in %6.4f sec\n",$tdiff) if($opt_verbose);
-if(!$requestxml) {
+if(!$filehandler_request) {
     printf(STDERR "$0: could not parse requestfile $requestfile, exiting ...\n");
     exit(1);
 }
@@ -180,14 +181,14 @@ if($rawfile) {
     my $rms="undef";
     my %cmds=();
     print STDERR "$0: check_for rms ...\n"  if($opt_verbose);
-    if(exists($requestxml->{request})) {
-	if(exists($requestxml->{request}->[0]->{rms})) {
-	    $rms=$requestxml->{request}->[0]->{rms};
+    if(exists($filehandler_request->{DATA}->{request})) {
+	if(exists($filehandler_request->{DATA}->{request}->[0]->{rms})) {
+	    $rms=$filehandler_request->{DATA}->{request}->[0]->{rms};
 	    print STDERR "$0: check_for rms, got hint from request ... ($rms)\n" if($opt_verbose);
 	    my($key);
-	    foreach $key (keys(%{$requestxml->{request}->[0]}) ) {
+	    foreach $key (keys(%{$filehandler_request->{DATA}->{request}->[0]}) ) {
 		next if ($key !~/^cmd_/);
-		$cmds{$key}=$requestxml->{request}->[0]->{$key};
+		$cmds{$key}=$filehandler_request->{DATA}->{request}->[0]->{$key};
 		print STDERR "$0: check_for rms, got hint from for cmd $key ... ($cmds{$key})\n"  if($opt_verbose);
 	    }
 	}
@@ -211,9 +212,9 @@ if($rawfile) {
 #########################
 # check if default layout should used (by request)
 my $usedefaultlayout=0;
-if(exists($requestxml->{request})) {
-    if(exists($requestxml->{request}->[0]->{getDefaultData})) {
-	if($requestxml->{request}->[0]->{getDefaultData}=~/^true$/i) {
+if(exists($filehandler_request->{DATA}->{request})) {
+    if(exists($filehandler_request->{DATA}->{request}->[0]->{getDefaultData})) {
+	if($filehandler_request->{DATA}->{request}->[0]->{getDefaultData}=~/^true$/i) {
 	    $usedefaultlayout=1;
 	}
     }
@@ -222,24 +223,23 @@ if(exists($requestxml->{request})) {
 my $layoutfound=0;
 if(!$usedefaultlayout) {
     my $key;
-    foreach $key (keys(%{$requestxml})) {
-	$layoutfound=1 if ($key=~/layout/);
+    foreach $key (keys(%{$filehandler_request->{DATA}})) {
+	$layoutfound=1 if ($key=~/LAYOUT$/);
     }
     $usedefaultlayout=1 if(!$layoutfound);
 }
 print STDERR "$0: layoutfound=$layoutfound usedefaultlayout=$usedefaultlayout\n" if($opt_verbose);
 
-my $layoutxml;
+my $filehandler_layout;
 if($usedefaultlayout) {
-    $layoutxml=&create_default_layout($requestxml);
+    $filehandler_layout=&create_default_layout($filehandler_request);
 } else {
-    $layoutxml=&create_layout_from_request($requestxml);
+    $filehandler_layout=&create_layout_from_request($filehandler_request);
 }
 
 # write layout to tmpdir
-open(OUT, "> $tmpdir/layout.xml") || die "could not open for write '$tmpdir/layout.xml'";
-print OUT XMLout($layoutxml, RootName => "lml:lgui");
-close(OUT); 
+$filehandler_layout->write_lml("$tmpdir/layout.xml");
+
 
 #########################
 # add step: LML2LML
@@ -248,7 +248,7 @@ $step="LML2LML";
 my $demo="";
 $demo="-demo" if $opt_demo;
 &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			   "LML2LML/LML2LML.pl -v $demo -layout \$tmpdir/layout.xml".
+			   "$^X LML2LML/LML2LML.pl -v $demo -layout \$tmpdir/layout.xml".
 			   " -output \$stepoutfile \$stepinfile");
 $laststep=$step;
 
@@ -256,10 +256,9 @@ $laststep=$step;
 # Dump?
 #########################
 if($opt_dump) {
-    print STDERR Dumper($requestxml);
+    print STDERR Dumper($filehandler_request->{DATA});
     print STDERR Dumper($workflowxml);
-    print STDERR Dumper($layoutxml);
-#    print STDERR XMLout($requestxml, RootName => "lml:lgui");
+    print STDERR Dumper($filehandler_layout->{DATA});
     exit(1);
 }
 
@@ -267,10 +266,12 @@ if($opt_dump) {
 # execute Workflow
 #########################
 # write workflow to tmpdir
-open(OUT, "> $tmpdir/workflow.xml");
-print OUT XMLout($workflowxml, RootName => "LML_da_workflow");
-close(OUT); 
-my $cmd="./LML_da.pl";
+
+my $workflow_obj = LML_da_workflow_obj->new($opt_verbose,0);
+$workflow_obj->{DATA}=$workflowxml;
+$workflow_obj->write_xml("$tmpdir/workflow.xml");
+
+my $cmd="$^X ./LML_da.pl";
 $cmd .= " -v"  if($opt_verbose);
 $cmd .= " -c $tmpdir/workflow.xml";
 $cmd .= " > $tmpdir/LML_da.log";
@@ -382,29 +383,33 @@ sub add_exec_step_to_workflow {
 	push(@{$stepref->{cmd}},$cmdref);
     }
     
-    push(@{$datastructref->{step}},$stepref);
+    $datastructref->{step}->{$id}=$stepref;
     return($datastructref);
 }
 
 #####################################################################
 sub create_default_layout {
-    my($requestref)=@_;
-    my($layoutref);
-    # read from file, will be later include system dependent layout fields
-    $layoutref=$xs->XMLin("$FindBin::RealBin/samples/layout_default.xml", 
-			  ForceArray => 1, KeyAttr => {} );
+    my($filehandler_request)=@_;
 
-    return($layoutref);
+    my $filehandler_layout = LML_file_obj->new($opt_verbose,1);
+    $filehandler_layout->read_lml_fast("$FindBin::RealBin/samples/layout_default.xml");
+    $filehandler_layout->check_lml();
+    return($filehandler_layout);
 }
 
 sub create_layout_from_request {
-    my($requestref)=@_;
-    my($layoutref);
-    # copy complete structure, including request
-    # will be later include more sophistcate checks
-    $layoutref=$requestref;
+    my($filehandler_request)=@_;
+    my($key);
 
-    return($layoutref);
+    my $filehandler_layout = LML_file_obj->new($opt_verbose,1);
+    $filehandler_layout -> init_file_obj();
+    foreach $key ("TABLELAYOUT","TABLE","NODEDISPLAYLAYOUT","NODEDISPLAY","OBJECT") {
+	if (exists($filehandler_request->{DATA}->{$key})) {
+	    $filehandler_layout->{DATA}->{$key}=dclone($filehandler_request->{DATA}->{$key});
+	}
+    }
+    $filehandler_layout->check_lml();
+    return($filehandler_layout);
 }
 
 
@@ -469,14 +474,14 @@ sub generate_step_rms_torque {
     }
     $step="getdata";
     &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs rms/TORQUE/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
-			       "$envs rms/TORQUE/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
-			       "$envs rms/TORQUE/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
+			       "$envs $^X rms/TORQUE/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
+			       "$envs $^X rms/TORQUE/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
+			       "$envs $^X rms/TORQUE/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
     $laststep=$step;
 
     $step="combineLML";
     &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "\$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
+			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
 			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_LML.xml \$tmpdir/nodes_LML.xml");
     $laststep=$step;
 
@@ -547,14 +552,14 @@ sub generate_step_rms_LL {
 
     $step="getdata";
     &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs rms/LL/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
-			       "$envs rms/LL/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
-			       "$envs rms/LL/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
+			       "$envs $^X rms/LL/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
+			       "$envs $^X rms/LL/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
+			       "$envs $^X rms/LL/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
     $laststep=$step;
 
     $step="combineLML";
     &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "\$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
+			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
 			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_LML.xml \$tmpdir/nodes_LML.xml");
     $laststep=$step;
 
