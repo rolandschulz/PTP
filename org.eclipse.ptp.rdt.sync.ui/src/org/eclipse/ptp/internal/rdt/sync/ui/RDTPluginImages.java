@@ -13,26 +13,14 @@ package org.eclipse.ptp.internal.rdt.sync.ui;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
-import org.eclipse.swt.graphics.Image;
-import org.osgi.framework.Bundle;
 
 /**
  * @author crecoskie
  * 
  */
 public class RDTPluginImages {
-
-	public static final String T_WIZBAN = "wizban/"; //$NON-NLS-1$
-
-	public static final ImageDescriptor DESC_WIZBAN_NEW_REMOTE_C_PROJ = create(T_WIZBAN, "newremote_proj_wiz.gif"); //$NON-NLS-1$
-
 	// Subdirectory (under the package containing this class) where 16 color
 	// images are
 	private static URL fgIconBaseURL;
@@ -44,6 +32,12 @@ public class RDTPluginImages {
 			RDTSyncUIPlugin.log(e);
 		}
 	}
+	private static final String T_WIZBAN = "wizban/"; //$NON-NLS-1$
+
+	/**
+	 * new sync project icon
+	 */
+	public static final ImageDescriptor DESC_WIZBAN_NEW_REMOTE_C_PROJ = create(T_WIZBAN, "newremote_proj_wiz.gif"); //$NON-NLS-1$
 
 	private static ImageDescriptor create(String prefix, String name) {
 		return ImageDescriptor.createFromURL(makeIconFileURL(prefix, name));
