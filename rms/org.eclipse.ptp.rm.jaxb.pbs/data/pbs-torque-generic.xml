@@ -13,9 +13,7 @@
 	<control-data>
 		<property name="queues" visible="false"/>
 		<!-- needed by RM internals for fetch; name is fixed by convention -->
-		<property name="stdout_remote_path" visible="true">
-			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o@jobId</default>
-		</property>
+		<property name="stdout_remote_path" visible="false"/>
 		<!-- needed by RM internals for fetch; name is fixed by convention -->
 		<property name="stderr_remote_path" visible="false"/>
 		<property name="remote_path_tooltip" visible="false">
