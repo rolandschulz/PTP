@@ -410,7 +410,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		assert (localServices != null);
 		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
 		assert (lconnMgr != null);
-		IRemoteConnection lconn = lconnMgr.getConnection(""); //$NON-NLS-1$ // Since it's a local service, doesn't matter which parameter is passed 
+		IRemoteConnection lconn = lconnMgr.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
 		assert (lconn != null);
 		IRemoteFileManager localFileManager = localServices.getFileManager(lconn);
 		assert (localFileManager != null);

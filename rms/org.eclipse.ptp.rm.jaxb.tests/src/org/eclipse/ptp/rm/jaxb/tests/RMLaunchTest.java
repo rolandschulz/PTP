@@ -292,7 +292,7 @@ public class RMLaunchTest extends TestCase {
 		assert (localServices != null);
 		IRemoteConnectionManager localConnectionManager = localServices.getConnectionManager();
 		assert (localConnectionManager != null);
-		IRemoteConnection localConnection = localConnectionManager.getConnection(JAXBCoreConstants.ZEROSTR);
+		IRemoteConnection localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
 		assert (localConnection != null);
 		rmConfig.setRemoteServicesId(localServices.getId());
 		rmConfig.setConnectionName(localConnection.getName());

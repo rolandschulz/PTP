@@ -52,11 +52,7 @@ public class RemoteServicesDelegate implements ILMLCoreConstants {
 		assert (localServices != null);
 		localConnectionManager = localServices.getConnectionManager();
 		assert (localConnectionManager != null);
-		/*
-		 * Since it's a local service, it doesn't matter which parameter is
-		 * passed
-		 */
-		localConnection = localConnectionManager.getConnection(ZEROSTR);
+		localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
 		assert (localConnection != null) : "Ich bin nicht erfuellt - 1";
 		localFileManager = localServices.getFileManager(localConnection);
 		assert (localFileManager != null) : "Ich bin nicht erfuellt - 2";

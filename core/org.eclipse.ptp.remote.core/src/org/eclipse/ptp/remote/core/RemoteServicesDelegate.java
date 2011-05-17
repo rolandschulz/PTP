@@ -124,7 +124,7 @@ public class RemoteServicesDelegate {
 			if (localConnectionManager == null) {
 				throw new NullPointerException("localConnectionManager");//$NON-NLS-1$
 			}
-			localConnection = localConnectionManager.getConnection("Local");//$NON-NLS-1$
+			localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
 			if (localConnection == null) {
 				throw new NullPointerException("localConnection");//$NON-NLS-1$
 			}
@@ -208,7 +208,9 @@ public class RemoteServicesDelegate {
 			IFileStore rres = to.getResource(target);
 			lres.copy(rres, EFS.OVERWRITE, subProgress.newChild(5));
 		} finally {
-			subProgress.done();
+			if (progress != null) {
+				progress.done();
+			}
 		}
 	}
 
@@ -258,7 +260,9 @@ public class RemoteServicesDelegate {
 
 			return l0 == l1;
 		} finally {
-			subProgress.done();
+			if (progress != null) {
+				progress.done();
+			}
 		}
 	}
 
@@ -316,7 +320,9 @@ public class RemoteServicesDelegate {
 				PTPRemoteCorePlugin.log(ioe);
 			}
 
-			subProgress.done();
+			if (progress != null) {
+				progress.done();
+			}
 		}
 		return sb.toString();
 	}

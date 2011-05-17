@@ -16,6 +16,13 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public interface IRemoteConnectionManager {
 	/**
+	 * The name of the connection for the default remote services
+	 * 
+	 * @since 5.0
+	 */
+	public static String DEFAULT_CONNECTION_NAME = "Local"; //$NON-NLS-1$
+
+	/**
 	 * Gets the remote connection corresponding to the supplied name.
 	 * 
 	 * @param name

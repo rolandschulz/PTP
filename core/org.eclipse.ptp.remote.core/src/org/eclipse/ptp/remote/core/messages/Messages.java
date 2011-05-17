@@ -14,7 +14,6 @@ public class Messages extends NLS {
 	public static String AbstractRemoteServerRunner_6;
 	public static String AbstractRemoteServerRunner_7;
 	public static String AbstractRemoteServerRunner_9;
-	public static String LocalConnection_0;
 	public static String LocalConnection_1;
 	public static String LocalConnection_2;
 	public static String PTPRemoteCorePlugin_0;

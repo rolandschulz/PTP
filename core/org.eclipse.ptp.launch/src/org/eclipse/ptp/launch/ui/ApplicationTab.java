@@ -549,7 +549,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		IRemoteUIServices localUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(localServices);
 		if (localServices != null && localUIServices != null) {
 			IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
-			IRemoteConnection lconn = lconnMgr.getConnection(""); //$NON-NLS-1$
+			IRemoteConnection lconn = lconnMgr.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
 			IRemoteUIFileManager localUIFileMgr = localUIServices.getUIFileManager();
 			localUIFileMgr.setConnection(lconn);
 			String path = localUIFileMgr.browseFile(getShell(), Messages.ApplicationTab_7, initPath, 0);
