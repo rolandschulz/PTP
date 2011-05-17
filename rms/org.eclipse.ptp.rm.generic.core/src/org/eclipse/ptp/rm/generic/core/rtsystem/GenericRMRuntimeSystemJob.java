@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.generic.core.rtsystem;
 
+import java.io.IOException;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -312,6 +313,13 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		try {
 			getProcess().waitFor();
 		} catch (InterruptedException e) {
+			// Ignore
+		}
+
+		try {
+			getProcess().getErrorStream().close();
+			getProcess().getInputStream().close();
+		} catch (IOException e) {
 			// Ignore
 		}
 

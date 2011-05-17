@@ -308,20 +308,28 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		}
 		BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		try {
-			process.waitFor();
-		} catch (InterruptedException e) {
-			// Ignore
+			try {
+				process.waitFor();
+			} catch (InterruptedException e) {
+				// Ignore
+			}
+			if (process.exitValue() != 0) {
+				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(
+						Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedWithCode, Integer.valueOf(process.exitValue()))));
+			}
+			String hostname = br.readLine();
+			if (hostname == null) {
+				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(),
+						Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedParse));
+			}
+			return hostname;
+		} finally {
+			try {
+				br.close();
+			} catch (IOException e) {
+				// Ignore
+			}
 		}
-		if (process.exitValue() != 0) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(
-					Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedWithCode, Integer.valueOf(process.exitValue()))));
-		}
-		String hostname = br.readLine();
-		if (hostname == null) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(),
-					Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedParse));
-		}
-		return hostname;
 	}
 
 	private void parseOmpiInfo(BufferedReader output, OmpiInfo info) throws CoreException {

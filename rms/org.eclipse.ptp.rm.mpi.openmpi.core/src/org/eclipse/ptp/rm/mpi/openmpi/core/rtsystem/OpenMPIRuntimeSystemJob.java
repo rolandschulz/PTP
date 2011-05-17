@@ -645,6 +645,13 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			// Ignore
 		}
 
+		try {
+			getProcess().getErrorStream().close();
+			getProcess().getInputStream().close();
+		} catch (IOException e) {
+			// Ignore
+		}
+
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: completely finished", getJobID()); //$NON-NLS-1$
 	}
 

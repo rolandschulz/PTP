@@ -278,6 +278,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 							while ((output = out_reader.readLine()) != null) {
 								System.out.println(getConfiguration().getName() + ": " + output); //$NON-NLS-1$
 							}
+							out_reader.close();
 						} catch (IOException e) {
 							// Ignore
 						}
@@ -291,6 +292,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 							while ((line = err_reader.readLine()) != null) {
 								System.err.println(getConfiguration().getName() + ": " + line); //$NON-NLS-1$
 							}
+							err_reader.close();
 						} catch (IOException e) {
 							// Ignore
 						}

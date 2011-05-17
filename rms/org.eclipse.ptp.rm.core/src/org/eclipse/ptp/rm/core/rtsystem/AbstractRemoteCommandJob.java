@@ -200,21 +200,14 @@ abstract public class AbstractRemoteCommandJob extends Job {
 			return new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, e.getLocalizedMessage());
 		} finally {
 			if (fJobProcess != null) {
+				try {
+					fJobProcess.getInputStream().close();
+				} catch (IOException e) {
+					// Ignore
+				}
 				fJobProcess.destroy();
 				fJobProcess = null;
 			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.jobs.Job#canceling()
-	 */
-	@Override
-	protected void canceling() {
-		if (fJobProcess != null) {
-			fJobProcess.destroy();
 		}
 	}
 }

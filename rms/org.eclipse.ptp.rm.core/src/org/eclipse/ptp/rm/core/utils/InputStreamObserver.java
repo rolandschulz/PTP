@@ -18,28 +18,28 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.PTPCorePlugin;
 
 /**
- * A thread that forwards data from an inputstream to a {@link IInputStreamListener}.
+ * A thread that forwards data from an inputstream to a
+ * {@link IInputStreamListener}.
  * <p>
  * This is a general facility that allows to forward data received from an
  * inputstream to a listener object.
- *
+ * 
  * Copied and adapted from remote tools. Multiple listeners are now supported.
- *
+ * 
  * @author Daniel Felix Ferber
  */
 public class InputStreamObserver extends Thread {
-	boolean closed = false;
+	private boolean closed = false;
 	/*
-	 * TODO: Open issues
-	 * - Does access to 'killed' attribute need synchronized access?
-	 * - On sockets, often one byte is read one after the other, instead of
-	 *   blocks of bytes. Maybe adding some delay might force to read
-	 *   more than one byte.
+	 * TODO: Open issues - Does access to 'killed' attribute need synchronized
+	 * access? - On sockets, often one byte is read one after the other, instead
+	 * of blocks of bytes. Maybe adding some delay might force to read more than
+	 * one byte.
 	 */
 	/**
 	 * Stream that is been observed and read.
 	 */
-	private InputStream input;
+	private final InputStream input;
 
 	/**
 	 * Signals that observer should stop running.
@@ -49,7 +49,7 @@ public class InputStreamObserver extends Thread {
 	/**
 	 * Listeners that are called when data is received.
 	 */
-	ListenerList listeners = new ListenerList();
+	private final ListenerList listeners = new ListenerList();
 
 	private static final int BUFFER_SIZE = 100;
 
@@ -76,8 +76,9 @@ public class InputStreamObserver extends Thread {
 	}
 
 	/**
-	 * Stop observing data and terminate thread.
-	 * Since InputStream cannot be interrupted, it will not interrupt immediately, but only when next input is received.
+	 * Stop observing data and terminate thread. Since InputStream cannot be
+	 * interrupted, it will not interrupt immediately, but only when next input
+	 * is received.
 	 */
 	public synchronized void kill() {
 		killed = true;
@@ -85,20 +86,22 @@ public class InputStreamObserver extends Thread {
 	}
 
 	protected void log(String s) {
-		//		PTPCorePlugin.log(s);
+		// PTPCorePlugin.log(s);
 	}
 
 	protected void log(Throwable e) {
 		PTPCorePlugin.log(e);
 	}
 
-	void streamClosed() {
-		if (closed) return;
+	private void streamClosed() {
+		if (closed) {
+			return;
+		}
 		log("Stream closed"); //$NON-NLS-1$
 		closed = true;
 		for (Object listener : listeners.getListeners()) {
 			try {
-				((IInputStreamListener)listener).streamClosed();
+				((IInputStreamListener) listener).streamClosed();
 			} catch (Exception e) {
 				log(e);
 				listeners.remove(listener);
@@ -106,12 +109,14 @@ public class InputStreamObserver extends Thread {
 		}
 	}
 
-	void streamError(Exception e) {
-		if (closed) return;
+	private void streamError(Exception e) {
+		if (closed) {
+			return;
+		}
 		log("Recovered from exception: " + e.getMessage()); //$NON-NLS-1$
 		for (Object listener : listeners.getListeners()) {
 			try {
-				((IInputStreamListener)listener).streamError(e);
+				((IInputStreamListener) listener).streamError(e);
 			} catch (Exception ee) {
 				log(ee);
 				listeners.remove(listener);
@@ -119,12 +124,14 @@ public class InputStreamObserver extends Thread {
 		}
 	}
 
-	void newBytes(byte buffer[], int length) {
-		if (closed) return;
+	private void newBytes(byte buffer[], int length) {
+		if (closed) {
+			return;
+		}
 		log("Received: " + Integer.toString(length) + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
 		for (Object listener : listeners.getListeners()) {
 			try {
-				((IInputStreamListener)listener).newBytes(buffer, length);
+				((IInputStreamListener) listener).newBytes(buffer, length);
 			} catch (Exception e) {
 				log(e);
 				listeners.remove(listener);
@@ -171,7 +178,7 @@ public class InputStreamObserver extends Thread {
 					streamClosed();
 					break;
 				}
-				
+
 				streamError(e);
 				break;
 			}

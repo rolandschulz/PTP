@@ -22,8 +22,8 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class SDMRunner extends Job {
 	public enum SDMMasterState {
@@ -145,6 +145,11 @@ public class SDMRunner extends Job {
 						} catch (IOException e) {
 							// Ignore
 						}
+						try {
+							out_reader.close();
+						} catch (IOException e) {
+							// Ignore
+						}
 					}
 				}, Messages.SDMRunner_13).start();
 			}
@@ -157,6 +162,11 @@ public class SDMRunner extends Job {
 							while ((line = err_reader.readLine()) != null) {
 								System.err.println(Messages.SDMRunner_14 + line);
 							}
+						} catch (IOException e) {
+							// Ignore
+						}
+						try {
+							err_reader.close();
 						} catch (IOException e) {
 							// Ignore
 						}
