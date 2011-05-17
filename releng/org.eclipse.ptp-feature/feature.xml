@@ -104,6 +104,14 @@
          id="org.eclipse.ptp.rm.lml"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp.rm.jaxb.pbs"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rm.lml_jaxb"
+         version="0.0.0"/>
+
    <plugin
          id="org.eclipse.ptp"
          download-size="0"
