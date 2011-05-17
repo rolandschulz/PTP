@@ -379,7 +379,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 			throw new CoreException(new Status(IStatus.ERROR, getUniqueIdentifier(), Messages.PTPLaunchPlugin_3));
 		}
 		if (!fileManager.getResource(path).fetchInfo().exists()) {
-			throw new CoreException(new Status(IStatus.INFO, getUniqueIdentifier(), NLS.bind(Messages.PTPLaunchPlugin_5,
+			throw new CoreException(new Status(IStatus.ERROR, getUniqueIdentifier(), NLS.bind(Messages.PTPLaunchPlugin_5,
 					new Object[] { path })));
 		}
 		return new Path(path);
