@@ -9,7 +9,9 @@ package org.eclipse.ptp.remote.core.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,17 +49,6 @@ import org.osgi.framework.Bundle;
  * @since 5.0
  */
 public abstract class AbstractRemoteServerRunner extends Job {
-	private static String LAUNCH_COMMAND_VAR = "launch_command"; //$NON-NLS-1$
-	private static String UNPACK_COMMAND_VAR = "unpack_command"; //$NON-NLS-1$
-	private static String PAYLOAD_VAR = "payload"; //$NON-NLS-1$
-	private static String WORKING_DIR_VAR = "working_dir"; //$NON-NLS-1$
-	private static String VERIFY_LAUNCH_COMMAND_VAR = "verify_launch_command"; //$NON-NLS-1$
-	private static String VERIFY_LAUNCH_FAIL_MESSAGE_VAR = "verify_launch_fail_message"; //$NON-NLS-1$
-	private static String VERIFY_LAUNCH_PATTERN_VAR = "verify_launch_pattern"; //$NON-NLS-1$
-	private static String VERIFY_UNPACK_COMMAND_VAR = "verify_unpack_command"; //$NON-NLS-1$
-	private static String VERIFY_UNPACK_FAIL_MESSAGE_VAR = "verify_unpack_fail_message"; //$NON-NLS-1$
-	private static String VERIFY_UNPACK_PATTERN_VAR = "verify_unpack_pattern"; //$NON-NLS-1$
-
 	public enum ServerState {
 		/**
 		 * @since 5.0
@@ -67,16 +58,29 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		RUNNING
 	}
 
+	private static String LAUNCH_COMMAND_VAR = "launch_command"; //$NON-NLS-1$
+	private static String UNPACK_COMMAND_VAR = "unpack_command"; //$NON-NLS-1$
+	private static String PAYLOAD_VAR = "payload"; //$NON-NLS-1$
+	private static String WORKING_DIR_VAR = "working_dir"; //$NON-NLS-1$
+	private static String VERIFY_LAUNCH_COMMAND_VAR = "verify_launch_command"; //$NON-NLS-1$
+	private static String VERIFY_LAUNCH_FAIL_MESSAGE_VAR = "verify_launch_fail_message"; //$NON-NLS-1$
+	private static String VERIFY_LAUNCH_PATTERN_VAR = "verify_launch_pattern"; //$NON-NLS-1$
+	private static String VERIFY_UNPACK_COMMAND_VAR = "verify_unpack_command"; //$NON-NLS-1$
+	private static String VERIFY_UNPACK_FAIL_MESSAGE_VAR = "verify_unpack_fail_message"; //$NON-NLS-1$
+
+	private static String VERIFY_UNPACK_PATTERN_VAR = "verify_unpack_pattern"; //$NON-NLS-1$
+
 	private final boolean DEBUG = true;
 
 	private final Map<String, String> fEnv = new HashMap<String, String>();
 	private final Map<String, String> fVars = new HashMap<String, String>();
 	private final String fServerName;
 
-	private ServerState fServerState = ServerState.STOPPED;
+	private volatile ServerState fServerState = ServerState.STOPPED;
 	private IRemoteProcess fRemoteProcess;
 	private IRemoteConnection fRemoteConnection;
 	private Bundle fBundle;
+	private boolean fContinuous = true;
 
 	public AbstractRemoteServerRunner(String name) {
 		super(name);
@@ -90,6 +94,26 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * Get the error stream of the remote process. This should only be used for
+	 * non-continuous processes.
+	 * 
+	 * @return InputStream
+	 */
+	public InputStream getErrorStream() {
+		return fRemoteProcess.getErrorStream();
+	}
+
+	/**
+	 * Get the input stream of the remote process. This should only be used for
+	 * non-continuous processes.
+	 * 
+	 * @return InputStream
+	 */
+	public InputStream getInputStream() {
+		return fRemoteProcess.getInputStream();
+	}
+
+	/**
 	 * Get the launch command for this server
 	 * 
 	 * @return launch command
@@ -99,12 +123,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Get the unpack command for this server
+	 * Get the output stream of the remote process. This should only be used for
+	 * non-continuous processes.
 	 * 
-	 * @return unpack command
+	 * @return OutputStream
 	 */
-	public String getUnpackCommand() {
-		return fVars.get(UNPACK_COMMAND_VAR);
+	public OutputStream getOutputStream() {
+		return fRemoteProcess.getOutputStream();
 	}
 
 	/**
@@ -131,8 +156,17 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * 
 	 * @return server state
 	 */
-	public synchronized ServerState getServerState() {
+	public ServerState getServerState() {
 		return fServerState;
+	}
+
+	/**
+	 * Get the unpack command for this server
+	 * 
+	 * @return unpack command
+	 */
+	public String getUnpackCommand() {
+		return fVars.get(UNPACK_COMMAND_VAR);
 	}
 
 	/**
@@ -220,6 +254,16 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * Set flag to indicate job is continuous or only runs once.
+	 * 
+	 * @param continuous
+	 *            true if the job runs continuously
+	 */
+	public void setContinuous(boolean continuous) {
+		fContinuous = continuous;
+	}
+
+	/**
 	 * Set the environment prior to launching the server.
 	 * 
 	 * @param env
@@ -247,16 +291,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Set the command used to unpack the payload
-	 * 
-	 * @param command
-	 *            unpack command
-	 */
-	public void setUnpackCommand(String command) {
-		fVars.put(UNPACK_COMMAND_VAR, command);
-	}
-
-	/**
 	 * Set the name of the payload
 	 * 
 	 * @param file
@@ -275,6 +309,16 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	public void setRemoteConnection(IRemoteConnection conn) {
 		fRemoteConnection = conn;
 		setName(fServerName + " (" + conn.getName() + ")");//$NON-NLS-1$//$NON-NLS-2$
+	}
+
+	/**
+	 * Set the command used to unpack the payload
+	 * 
+	 * @param command
+	 *            unpack command
+	 */
+	public void setUnpackCommand(String command) {
+		fVars.put(UNPACK_COMMAND_VAR, command);
 	}
 
 	/**
@@ -370,7 +414,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @throws IOException
 	 *             if the launch fails
 	 */
-	public synchronized void startServer(IProgressMonitor monitor) throws IOException {
+	public void startServer(IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
 			if (fRemoteConnection != null && fServerState != ServerState.RUNNING) {
@@ -414,6 +458,34 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * Wait for the server to finished. Will do nothing if the server is
+	 * stopped.
+	 * 
+	 * @param monitor
+	 *            progress monitor to cancel waiting
+	 * @since 5.0
+	 */
+	public void waitForServerFinish(IProgressMonitor monitor) {
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		try {
+			if (getServerState() != ServerState.STOPPED) {
+				while (!subMon.isCanceled() && getServerState() != ServerState.STOPPED) {
+					synchronized (this) {
+						try {
+							wait(100);
+						} catch (InterruptedException e) {
+						}
+					}
+				}
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/**
 	 * Wait for the server to start up for at most "timeout" ms. Will do nothing
 	 * if the server is stopped.
 	 * 
@@ -422,12 +494,14 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            wait forever.
 	 * @since 5.0
 	 */
-	public synchronized void waitForServerStart(int timeout) {
+	public void waitForServerStart(int timeout) {
 		if (getServerState() == ServerState.STARTING) {
 			int dec = timeout > 0 ? 1000 : 0;
 			while (timeout >= 0 && getServerState() != ServerState.RUNNING) {
 				try {
-					wait(1000);
+					synchronized (this) {
+						wait(1000);
+					}
 					timeout -= dec;
 				} catch (InterruptedException e) {
 				}
@@ -443,14 +517,16 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            progress monitor to cancel waiting
 	 * @since 5.0
 	 */
-	public synchronized void waitForServerStart(IProgressMonitor monitor) {
+	public void waitForServerStart(IProgressMonitor monitor) {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
 			if (getServerState() == ServerState.STARTING) {
 				while (!subMon.isCanceled() && getServerState() != ServerState.RUNNING) {
-					try {
-						wait(100);
-					} catch (InterruptedException e) {
+					synchronized (this) {
+						try {
+							wait(100);
+						} catch (InterruptedException e) {
+						}
 					}
 				}
 			}
@@ -590,16 +666,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.jobs.Job#canceling()
-	 */
-	@Override
-	protected void canceling() {
-		terminateServer();
-	}
-
 	/**
 	 * Called on termination of the server process
 	 * 
@@ -608,20 +674,20 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	protected abstract void doServerFinished(IProgressMonitor monitor);
 
 	/**
-	 * Called just prior to the server starting
-	 * 
-	 * @return false if start should be aborted
-	 * @since 5.0
-	 */
-	protected abstract boolean doServerStarting(IProgressMonitor monitor);
-
-	/**
 	 * Called once the server starts
 	 * 
 	 * @return false if server should be aborted
 	 * @since 5.0
 	 */
 	protected abstract boolean doServerStarted(IProgressMonitor monitor);
+
+	/**
+	 * Called just prior to the server starting
+	 * 
+	 * @return false if start should be aborted
+	 * @since 5.0
+	 */
+	protected abstract boolean doServerStarting(IProgressMonitor monitor);
 
 	/**
 	 * Called with each line of stderr from the server. Implementers can use
@@ -656,7 +722,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		assert getLaunchCommand() != null;
-		assert fRemoteProcess == null;
 
 		final SubMonitor subMon = SubMonitor.convert(monitor, 100);
 
@@ -671,55 +736,57 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				return Status.CANCEL_STATUS;
 			}
 
-			final BufferedReader stdout = new BufferedReader(new InputStreamReader(fRemoteProcess.getInputStream()));
-			new Thread(new Runnable() {
-				public void run() {
-					try {
-						while (getServerState() != ServerState.STOPPED) {
-							String output = stdout.readLine();
-							if (output != null) {
-								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStdout(output)) {
-									if (!doServerStarted(subMon.newChild(10))) {
-										fRemoteProcess.destroy();
+			if (!fContinuous) {
+				final BufferedReader stdout = new BufferedReader(new InputStreamReader(fRemoteProcess.getInputStream()));
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							while (getServerState() != ServerState.STOPPED) {
+								String output = stdout.readLine();
+								if (output != null) {
+									if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStdout(output)) {
+										if (!doServerStarted(subMon.newChild(10))) {
+											fRemoteProcess.destroy();
+										}
+										setServerState(ServerState.RUNNING);
 									}
-									setServerState(ServerState.RUNNING);
-								}
-								if (DebugUtil.SERVER_TRACING) {
-									System.out.println("SERVER: " + output); //$NON-NLS-1$
+									if (DebugUtil.SERVER_TRACING) {
+										System.out.println("SERVER: " + output); //$NON-NLS-1$
+									}
 								}
 							}
+						} catch (IOException e) {
+							// Ignore
 						}
-					} catch (IOException e) {
-						// Ignore
 					}
-				}
-			}, "dstore server stdout").start(); //$NON-NLS-1$
+				}, "dstore server stdout").start(); //$NON-NLS-1$
 
-			final BufferedReader stderr = new BufferedReader(new InputStreamReader(fRemoteProcess.getErrorStream()));
-			new Thread(new Runnable() {
-				public void run() {
-					try {
-						while (getServerState() != ServerState.STOPPED) {
-							String output = stderr.readLine();
-							if (output != null) {
-								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStderr(output)) {
-									if (!doServerStarted(subMon.newChild(10))) {
-										fRemoteProcess.destroy();
+				final BufferedReader stderr = new BufferedReader(new InputStreamReader(fRemoteProcess.getErrorStream()));
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							while (getServerState() != ServerState.STOPPED) {
+								String output = stderr.readLine();
+								if (output != null) {
+									if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStderr(output)) {
+										if (!doServerStarted(subMon.newChild(10))) {
+											fRemoteProcess.destroy();
+										}
+										setServerState(ServerState.RUNNING);
 									}
-									setServerState(ServerState.RUNNING);
+									PTPRemoteCorePlugin
+											.getDefault()
+											.getLog()
+											.log(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), fServerName
+													+ ": " + output)); //$NON-NLS-1$
 								}
-								PTPRemoteCorePlugin
-										.getDefault()
-										.getLog()
-										.log(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), fServerName
-												+ ": " + output)); //$NON-NLS-1$
 							}
+						} catch (IOException e) {
+							// Ignore
 						}
-					} catch (IOException e) {
-						// Ignore
 					}
-				}
-			}, "dstore server stderr").start(); //$NON-NLS-1$
+				}, "dstore server stderr").start(); //$NON-NLS-1$
+			}
 
 			subMon.worked(40);
 			subMon.subTask(Messages.AbstractRemoteServerRunner_1);
@@ -735,6 +802,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 						// Ignore interrupt;
 					}
 				}
+			}
+
+			/*
+			 * Kill process if user cancels
+			 */
+			if (!fRemoteProcess.isCompleted()) {
+				fRemoteProcess.destroy();
 			}
 
 			try {
@@ -758,10 +832,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		} catch (IOException e) {
 			return new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), e.getMessage(), null);
 		} finally {
-			synchronized (this) {
-				fRemoteProcess = null;
-				doServerFinished(subMon.newChild(1));
-			}
+			doServerFinished(subMon.newChild(1));
 			setServerState(ServerState.STOPPED);
 			if (monitor != null) {
 				monitor.done();
@@ -775,20 +846,22 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @param state
 	 *            new server state
 	 */
-	protected synchronized void setServerState(ServerState state) {
+	protected void setServerState(ServerState state) {
 		if (fServerState != state) {
 			if (DebugUtil.SERVER_TRACING) {
 				System.out.println("SERVER RUNNER: " + state.toString()); //$NON-NLS-1$
 			}
 			fServerState = state;
-			this.notifyAll();
+			synchronized (this) {
+				notifyAll();
+			}
 		}
 	}
 
 	/**
 	 * Terminate the server
 	 */
-	protected synchronized void terminateServer() {
+	protected void terminateServer() {
 		if (fServerState == ServerState.RUNNING && fRemoteProcess != null) {
 			fRemoteProcess.destroy();
 		}
