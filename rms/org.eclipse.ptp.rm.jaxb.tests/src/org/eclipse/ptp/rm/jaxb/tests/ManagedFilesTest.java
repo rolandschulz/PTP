@@ -134,7 +134,6 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getState()
 	 */
 	public String getState() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -143,11 +142,9 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged
-	 * (java.lang.String)
+	 * (java.lang.String, org.eclipse.ptp.rmsystem.IJobStatus)
 	 */
-	public void jobStateChanged(String jobId) {
-		// TODO Auto-generated method stub
-
+	public void jobStateChanged(String jobId, IJobStatus status) {
 	}
 
 	@Override
