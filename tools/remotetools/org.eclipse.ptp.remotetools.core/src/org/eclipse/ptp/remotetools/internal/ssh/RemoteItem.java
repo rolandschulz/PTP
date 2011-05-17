@@ -15,7 +15,6 @@ package org.eclipse.ptp.remotetools.internal.ssh;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
@@ -25,7 +24,7 @@ import com.jcraft.jsch.SftpATTRS;
 
 /**
  * @author Richard Maciel
- *
+ * 
  */
 class RemoteItem implements IRemoteItem {
 
@@ -43,30 +42,33 @@ class RemoteItem implements IRemoteItem {
 	protected int groupID;
 	protected int changes;
 	protected boolean isDirectory;
-	
+
 	protected final int PERMISSION = 1;
 	protected final int MODIFICATION_TIME = 2;
-	
+
 	protected RemoteItem() {
 	}
-	
-	RemoteItem(FileTools fileTools, String path)	{
+
+	RemoteItem(FileTools fileTools, String path) {
 		this.fileTools = fileTools;
 		this.path = path;
 	}
-	
+
 	RemoteItem(FileTools fileTools, String path, SftpATTRS attrs) {
 		this.fileTools = fileTools;
 		this.path = path;
-		
+
 		RemoteFileAttributes remoteAttrs = new RemoteFileAttributes(attrs);
 		parseAttrs(remoteAttrs);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#commitAttributes()
 	 */
-	public void commitAttributes(IProgressMonitor monitor) throws RemoteConnectionException, CancelException, RemoteOperationException {
+	public void commitAttributes(IProgressMonitor monitor) throws RemoteConnectionException, CancelException,
+			RemoteOperationException {
 		fileTools.test();
 		if ((changes & PERMISSION) != 0) {
 			fileTools.chmod(permissions, path, monitor);
@@ -76,85 +78,107 @@ class RemoteItem implements IRemoteItem {
 			fileTools.setMtime(path, modificationTime, monitor);
 			changes &= ~MODIFICATION_TIME;
 		}
-//		changes = 0;
+		// changes = 0;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#exists()
 	 */
 	public boolean exists() {
 		return exist;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#getAccessTime()
 	 */
 	public long getAccessTime() {
-		return (long)accessTime*1000;
+		return (long) accessTime * 1000;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#getModificationTime()
 	 */
 	public long getModificationTime() {
-		return (long)modificationTime*1000;
+		return (long) modificationTime * 1000;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItemProperties#getPathname()
 	 */
 	public String getPath() {
 		return path;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#getSize()
 	 */
 	public long getSize() {
 		return size;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#isDirectory()
 	 */
 	public boolean isDirectory() {
 		return isDirectory;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#isExecutable()
 	 */
 	public boolean isExecutable() {
 		return isExecutable;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteItemProperties#isReadableByUser()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteItemProperties#isReadableByUser()
 	 */
 	public boolean isReadable() {
 		return isReadable;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteItemProperties#isWritableByUser()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteItemProperties#isWritableByUser()
 	 */
 	public boolean isWritable() {
 		return isWritable;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#refreshAttributes()
 	 */
-	public void refreshAttributes(IProgressMonitor monitor) throws RemoteConnectionException, RemoteOperationException, CancelException {
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
+	public void refreshAttributes(IProgressMonitor monitor) throws RemoteConnectionException, RemoteOperationException,
+			CancelException {
 		fileTools.test();
 		RemoteFileAttributes attrs = fileTools.fetchRemoteAttr(path, monitor);
 		parseAttrs(attrs);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#setExecutable(boolean)
 	 */
 	public void setExecutable(boolean flag) {
@@ -166,7 +190,7 @@ class RemoteItem implements IRemoteItem {
 				permissions &= ~0100;
 			}
 		}
-		if(fileTools.getCachedGroupIDSet().contains(new Integer(groupID))) {
+		if (fileTools.getCachedGroupIDSet().contains(new Integer(groupID))) {
 			if (flag) {
 				permissions |= 0010;
 			} else {
@@ -182,19 +206,24 @@ class RemoteItem implements IRemoteItem {
 			changes |= PERMISSION;
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#setModificationTime(long)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteItem#setModificationTime(long)
 	 */
 	public void setModificationTime(long time) {
 		int oldModificationTime = modificationTime;
-		modificationTime = (int)(time/1000);
+		modificationTime = (int) (time / 1000);
 		if (oldModificationTime != modificationTime) {
 			changes |= MODIFICATION_TIME;
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#setReadable(boolean)
 	 */
 	public void setReadable(boolean flag) {
@@ -207,7 +236,7 @@ class RemoteItem implements IRemoteItem {
 			}
 		}
 		Set<Integer> groupIDSet = fileTools.getCachedGroupIDSet();
-		if(groupIDSet.contains(new Integer(groupID))) {
+		if (groupIDSet.contains(new Integer(groupID))) {
 			if (flag) {
 				permissions |= 0040;
 			} else {
@@ -224,7 +253,9 @@ class RemoteItem implements IRemoteItem {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#setWriteable(boolean)
 	 */
 	public void setWriteable(boolean flag) {
@@ -237,7 +268,7 @@ class RemoteItem implements IRemoteItem {
 			}
 		}
 		Set<Integer> groupIDSet = fileTools.getCachedGroupIDSet();
-		if(groupIDSet.contains(new Integer(groupID))) {
+		if (groupIDSet.contains(new Integer(groupID))) {
 			if (flag) {
 				permissions |= 0020;
 			} else {
@@ -254,9 +285,12 @@ class RemoteItem implements IRemoteItem {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		if (exist) {
 			return path + (isDirectory ? "(d)" : "(f)"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -272,62 +306,62 @@ class RemoteItem implements IRemoteItem {
 		if (attrs == null) {
 			exist = false;
 			return;
-		} 
-		
+		}
+
 		exist = true;
 		changes = 0;
 
-		assert(isDirectory == attrs.isDir());
+		assert (isDirectory == attrs.isDir());
 		isDirectory = attrs.isDir();
-		
+
 		userID = attrs.getUId();
 		groupID = attrs.getGId();
 		permissions = attrs.getPermissions();
-		
+
 		isReadable = false;
 		isWritable = false;
 		isExecutable = false;
-		
-		if(userID == fileTools.getCachedUserID()) {
+
+		if (userID == fileTools.getCachedUserID()) {
 			if ((permissions & 0400) != 0) {
 				isReadable = true;
 			}
 			if ((permissions & 0200) != 0) {
 				isWritable = true;
-			} 
+			}
 			if ((permissions & 0100) != 0) {
 				isExecutable = true;
 			}
-		} 
-				
+		}
+
 		Set<Integer> groupIDSet = fileTools.getCachedGroupIDSet();
-		if(groupIDSet.contains(new Integer(groupID))) {
+		if (groupIDSet.contains(new Integer(groupID))) {
 			if ((permissions & 0040) != 0) {
 				isReadable = true;
 			}
 			if ((permissions & 0020) != 0) {
 				isWritable = true;
-			} 
+			}
 			if ((permissions & 0010) != 0) {
 				isExecutable = true;
 			}
 		}
-			
+
 		if ((permissions & 0004) != 0) {
 			isReadable = true;
 		}
 		if ((permissions & 0002) != 0) {
 			isWritable = true;
-		} 
+		}
 		if ((permissions & 0001) != 0) {
 			isExecutable = true;
 		}
-		
+
 		size = attrs.getSize();
 		accessTime = attrs.getATime();
 		modificationTime = attrs.getMTime();
 	}
-	
+
 	protected void copyAttributesFrom(RemoteItem other) {
 		this.path = other.path;
 		this.isReadable = other.isReadable;
