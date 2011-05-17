@@ -12,6 +12,7 @@
 package org.eclipse.ptp.rm.lml.ui.views;
 
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -50,9 +51,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -295,6 +298,21 @@ public class TableView extends LMLViewPart {
 		input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
 		viewer.setInput(input);
 		viewer.getTree().setItemCount(input.length);
+		
+		// Part from MonitorJobListView
+		MenuManager contextMenu = new MenuManager();
+		contextMenu.setRemoveAllWhenShown(true);
+		contextMenu.addMenuListener(new IMenuListener() {
+			
+			public void menuAboutToShow(IMenuManager manager) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		Control control = viewer.getControl();
+		Menu menu = contextMenu.createContextMenu(control);
+		control.setMenu(menu);
+		getSite().registerContextMenu(contextMenu, viewer);
 	}
 
 	private void createMenu() {

@@ -10,6 +10,7 @@
  */
 package org.eclipse.ptp.rm.lml.core.model;
 
+import java.io.InputStream;
 import java.net.URI;
 
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
@@ -76,6 +77,8 @@ public interface ILguiItem  {
 	public void updateData();
 	
 	public void updateXML();
+	
+	public void update(InputStream stream);
 	
 	public void addJob();
 	

@@ -10,6 +10,7 @@
  */
 package org.eclipse.ptp.rm.lml.core;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +78,31 @@ public class LMLManager {
 			manager = new LMLManager();
 		}
 		return manager;
+	}
+	
+	public void register(String name, InputStream stream) {
+		if (!LGUIS.containsKey(name)) {
+			fSelectedLguiItem = new LguiItem(stream);
+			synchronized (LGUIS) {
+				LGUIS.put(name, fSelectedLguiItem);
+			}
+			fireNewLgui();
+		}
+		open(name);
+		update(stream);
+	}
+	
+	public void open(String name) {
+		// TODO load all data
+		if (LGUIS.containsKey(name)) {
+			fSelectedLguiItem = LGUIS.get(name);
+			fireSelectedLgui();
+		}
+	}
+	
+	public void close(String name) {
+		// TODO save data
+		fSelectedLguiItem = null;
 	}
 
 	public void addListener(IViewListener listener) {
@@ -238,6 +264,11 @@ public class LMLManager {
 		for (Object listener : lmlListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
+	}
+	
+	public void update(InputStream stream) {
+		fSelectedLguiItem.update(stream);
+		fireNewLgui();
 	}
 
 	public void update() {

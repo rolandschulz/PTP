@@ -21,5 +21,7 @@ Export-Package: org.eclipse.ptp.rm.lml.ui,
  org.eclipse.ptp.rm.lml.ui.managers,
  org.eclipse.ptp.rm.lml.ui.views
 Bundle-ClassPath: lmlui.jar
-Import-Package: org.eclipse.ptp.ui,
+Import-Package: org.eclipse.ptp.rm.jaxb.ui.actions,
+ org.eclipse.ptp.rm.jaxb.ui.data,
+ org.eclipse.ptp.ui,
  org.eclipse.ui.console
