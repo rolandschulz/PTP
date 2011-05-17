@@ -496,11 +496,12 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	public void waitForServerStart(int timeout) {
 		if (getServerState() == ServerState.STARTING) {
+			int waitVal = timeout < 1000 ? timeout : 1000;
 			int dec = timeout > 0 ? 1000 : 0;
 			while (timeout >= 0 && getServerState() != ServerState.RUNNING) {
 				try {
 					synchronized (this) {
-						wait(1000);
+						wait(waitVal);
 					}
 					timeout -= dec;
 				} catch (InterruptedException e) {
@@ -755,6 +756,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 									}
 								}
 							}
+							stdout.close();
 						} catch (IOException e) {
 							// Ignore
 						}
@@ -781,6 +783,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 													+ ": " + output)); //$NON-NLS-1$
 								}
 							}
+							stderr.close();
 						} catch (IOException e) {
 							// Ignore
 						}
