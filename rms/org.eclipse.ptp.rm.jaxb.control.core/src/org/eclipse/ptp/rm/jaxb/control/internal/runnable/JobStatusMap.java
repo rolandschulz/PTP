@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.jaxb.control.internal.runnable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
@@ -129,7 +130,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 				}
 
 				for (String jobId : map.keySet()) {
-					IJobStatus status = control.getJobStatus(jobId);
+					IJobStatus status = control.getJobStatus(jobId, null);
 					String state = status.getState();
 					if (IJobStatus.COMPLETED.equals(state)) {
 						toPrune.put(jobId, jobId);
@@ -137,7 +138,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 				}
 
 				for (String jobId : toPrune.keySet()) {
-					remove(jobId, true);
+					remove(jobId, true, null);
 				}
 				toPrune.clear();
 			}
@@ -145,7 +146,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 
 		synchronized (map) {
 			for (String jobId : map.keySet()) {
-				doTerminated(jobId, false);
+				doTerminated(jobId, false, null);
 			}
 			map.clear();
 		}
@@ -158,10 +159,10 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#terminated(java.lang
 	 * .String)
 	 */
-	public ICommandJobStatus terminated(String jobId) {
+	public ICommandJobStatus terminated(String jobId, IProgressMonitor monitor) {
 		ICommandJobStatus status = null;
 		synchronized (map) {
-			status = doTerminated(jobId, true);
+			status = doTerminated(jobId, true, monitor);
 		}
 		return status;
 	}
@@ -173,17 +174,20 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	 *            either internal UUID or scheduler id for the job.
 	 * @param block
 	 *            wait for the remote files
+	 * @param monitor
+	 *            progress monitor
+	 * @return job status
 	 */
-	private ICommandJobStatus doTerminated(String jobId, boolean block) {
+	private ICommandJobStatus doTerminated(String jobId, boolean block, IProgressMonitor monitor) {
 		ICommandJobStatus status = map.get(jobId);
 		if (status != null) {
 			String d = status.getStateDetail();
 			block = block && !IJobStatus.CANCELED.equals(d) && !IJobStatus.FAILED.equals(d);
 			if (!status.isInteractive()) {
 				if (block) {
-					status.maybeWaitForHandlerFiles(JAXBControlConstants.READY_FILE_BLOCK);
+					status.maybeWaitForHandlerFiles(JAXBControlConstants.READY_FILE_BLOCK, monitor);
 				} else {
-					status.maybeWaitForHandlerFiles(0);
+					status.maybeWaitForHandlerFiles(0, monitor);
 				}
 			}
 			status.cancel();
@@ -209,9 +213,12 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	 *            either internal UUID or scheduler id for the job.
 	 * @param block
 	 *            wait for the remote files
+	 * @param monitor
+	 *            progress monitor
+	 * @return job status
 	 */
-	private ICommandJobStatus remove(String jobId, boolean block) {
-		ICommandJobStatus status = doTerminated(jobId, block);
+	private ICommandJobStatus remove(String jobId, boolean block, IProgressMonitor monitor) {
+		ICommandJobStatus status = doTerminated(jobId, block, monitor);
 		map.remove(jobId);
 		return status;
 	}

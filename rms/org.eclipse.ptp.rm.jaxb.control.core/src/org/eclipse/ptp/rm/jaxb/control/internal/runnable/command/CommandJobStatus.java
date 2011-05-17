@@ -55,6 +55,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 		private boolean ready;
 		private int block;
 		private String path;
+		private IProgressMonitor callerMonitor;
 
 		/**
 		 * @param name
@@ -101,7 +102,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				last = elapsed;
 				progress.worked((int) increment);
 
-				if (progress.isCanceled()) {
+				if (progress.isCanceled() || this.callerMonitor.isCanceled()) {
 					break;
 				}
 
@@ -350,7 +351,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#maybeWaitForHandlerFiles
 	 * (int)
 	 */
-	public void maybeWaitForHandlerFiles(int blockForSecs) {
+	public void maybeWaitForHandlerFiles(int blockForSecs, IProgressMonitor monitor) {
 		if (fFilesChecked) {
 			return;
 		}
@@ -358,12 +359,14 @@ public class CommandJobStatus implements ICommandJobStatus {
 		FileReadyChecker tout = null;
 		FileReadyChecker terr = null;
 
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+
 		if (remoteOutputPath != null) {
-			tout = checkForReady(remoteOutputPath, blockForSecs);
+			tout = checkForReady(remoteOutputPath, blockForSecs, progress.newChild(5));
 		}
 
 		if (remoteErrorPath != null) {
-			terr = checkForReady(remoteErrorPath, blockForSecs);
+			terr = checkForReady(remoteErrorPath, blockForSecs, progress.newChild(5));
 		}
 
 		if (tout == null && terr == null) {
@@ -600,12 +603,14 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @param path
 	 * @param blockInSeconds
+	 * @param monitor
 	 * @return thread running the check
 	 */
-	private FileReadyChecker checkForReady(final String path, final int block) {
+	private FileReadyChecker checkForReady(String path, int block, IProgressMonitor monitor) {
 		FileReadyChecker t = new FileReadyChecker(path);
 		t.block = block;
 		t.path = path;
+		t.callerMonitor = monitor;
 		t.schedule();
 		return t;
 	}

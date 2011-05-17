@@ -34,11 +34,6 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
  * LML JAXB resource manager monitor
  */
 public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
-	private static final int JOB_SCHEDULE_FREQUENCY = 60000; // needs to be
-																// parameter
-	private final IJAXBResourceManagerConfiguration fConfig;
-	private MonitorJob fMonitorJob = null;
-
 	private class MonitorJob extends Job {
 		private final LMLDAServer fServer;
 
@@ -62,6 +57,12 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 			return Status.OK_STATUS;
 		}
 	}
+
+	private static final int JOB_SCHEDULE_FREQUENCY = 60000; // needs to be
+	// parameter
+	private final IJAXBResourceManagerConfiguration fConfig;
+
+	private MonitorJob fMonitorJob = null;
 
 	public LMLResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);

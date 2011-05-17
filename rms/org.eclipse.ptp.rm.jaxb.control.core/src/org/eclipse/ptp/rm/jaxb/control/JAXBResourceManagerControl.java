@@ -234,12 +234,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * (java.lang.String)
 	 */
 	@Override
-	protected IJobStatus doGetJobStatus(String jobId) throws CoreException {
+	protected IJobStatus doGetJobStatus(String jobId, IProgressMonitor monitor) throws CoreException {
 		try {
-			if (!resourceManagerIsActive()) {
+			if (!resourceManagerIsActive() || (monitor != null && monitor.isCanceled())) {
 				return new CommandJobStatus(getResourceManager().getUniqueName(), jobId, IJobStatus.COMPLETED, null, this);
 			}
 			pinTable.pin(jobId);
+
+			SubMonitor progress = SubMonitor.convert(monitor, 100);
 
 			/*
 			 * First check to see when the last call was made; throttle requests
@@ -254,7 +256,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					 * calls (regarding remote file state); it will be pruned by
 					 * the daemon
 					 */
-					status = jobStatusMap.terminated(jobId);
+					status = jobStatusMap.terminated(jobId, progress.newChild(50));
 					if (status.stateChanged()) {
 						jobStateChanged(jobId, status);
 					}
@@ -294,13 +296,19 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.setState(state);
 			}
 
+			if (progress.isCanceled()) {
+				status.setState(IJobStatus.CANCELED);
+				jobStateChanged(jobId, status);
+				return status;
+			}
+
 			if (IJobStatus.COMPLETED.equals(state)) {
 				/*
 				 * leave the status in the map in case there are further calls
 				 * (regarding remote file state); it will be pruned by the
 				 * daemon
 				 */
-				status = jobStatusMap.terminated(jobId);
+				status = jobStatusMap.terminated(jobId, progress.newChild(50));
 			}
 
 			if (status.stateChanged()) {

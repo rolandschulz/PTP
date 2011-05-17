@@ -253,7 +253,7 @@ public class RMLaunchTest extends TestCase {
 					emulateLaunchTab();
 					String jobId = rm.submitJob(launchConfig, ILaunchManager.RUN_MODE, monitor);
 					System.out.println("SUBMITTED: " + jobId); //$NON-NLS-1$
-					IJobStatus status = rm.getJobStatus(jobId);
+					IJobStatus status = rm.getJobStatus(jobId, null);
 					System.out.println("STATUS: " + status.getState()); //$NON-NLS-1$
 					if (status != null) {
 						status.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener() {

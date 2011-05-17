@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 /**
  * @author arossi
  * 
@@ -44,7 +46,9 @@ public interface ICommandJobStatusMap extends Runnable {
 	/**
 	 * @param jobId
 	 *            either internal UUID or scheduler id for the job.
+	 * @param monitor
+	 *            progress monitor
 	 * @return object containing status info and stream proxy
 	 */
-	public ICommandJobStatus terminated(String jobId);
+	public ICommandJobStatus terminated(String jobId, IProgressMonitor monitor);
 }

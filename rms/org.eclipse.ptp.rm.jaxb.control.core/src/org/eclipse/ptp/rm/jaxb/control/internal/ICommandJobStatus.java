@@ -67,8 +67,10 @@ public interface ICommandJobStatus extends IJobStatus {
 	 * 
 	 * @param blockForSecs
 	 *            will continue trying for this long before returning
+	 * @param monitor
+	 *            progress monitor for potential cancellation
 	 */
-	public void maybeWaitForHandlerFiles(int blockForSecs);
+	public void maybeWaitForHandlerFiles(int blockForSecs, IProgressMonitor monitor);
 
 	/**
 	 * @param configuration
