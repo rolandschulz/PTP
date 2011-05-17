@@ -202,6 +202,9 @@ public class RemoteServicesDelegate {
 			if (mkParent != UNDEFINED) {
 				to.getResource(target).getParent().mkdir(mkParent, subProgress.newChild(5));
 			}
+			if (subProgress.isCanceled()) {
+				return;
+			}
 			IFileStore rres = to.getResource(target);
 			lres.copy(rres, EFS.OVERWRITE, subProgress.newChild(5));
 		} finally {
@@ -236,6 +239,9 @@ public class RemoteServicesDelegate {
 		SubMonitor subProgress = SubMonitor.convert(progress, (10));
 		try {
 			IFileInfo info = lres.fetchInfo(EFS.NONE, subProgress.newChild(5));
+			if (subProgress.isCanceled()) {
+				return false;
+			}
 			if (!info.exists()) {
 				return false;
 			}
@@ -245,6 +251,9 @@ public class RemoteServicesDelegate {
 			} catch (InterruptedException ignored) {
 			}
 			info = lres.fetchInfo(EFS.NONE, subProgress.newChild(5));
+			if (subProgress.isCanceled()) {
+				return false;
+			}
 			long l1 = info.getLength();
 
 			return l0 == l1;
@@ -336,16 +345,18 @@ public class RemoteServicesDelegate {
 
 		IFileStore lres = manager.getResource(path);
 		BufferedOutputStream os = new BufferedOutputStream(lres.openOutputStream(EFS.NONE, progress));
-		try {
-			os.write(contents.getBytes());
-			os.flush();
-		} catch (IOException ioe) {
-			throw newException(Messages.RemoteServicesDelegate_Write_OperationFailed + path, ioe);
-		} finally {
+		if (!progress.isCanceled()) {
 			try {
-				os.close();
+				os.write(contents.getBytes());
+				os.flush();
 			} catch (IOException ioe) {
-				PTPRemoteCorePlugin.log(ioe);
+				throw newException(Messages.RemoteServicesDelegate_Write_OperationFailed + path, ioe);
+			} finally {
+				try {
+					os.close();
+				} catch (IOException ioe) {
+					PTPRemoteCorePlugin.log(ioe);
+				}
 			}
 		}
 	}
