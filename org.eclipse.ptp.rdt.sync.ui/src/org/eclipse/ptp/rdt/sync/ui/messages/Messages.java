@@ -60,6 +60,10 @@ public class Messages extends NLS {
 	public static String BRPPage_RootLocation;
 	public static String BRPPage_BrowseButton;
 	public static String BRPPage_ConnectionButton;
+	public static String GitParticipant_0;
+	public static String GitParticipant_1;
+	public static String GitParticipant_2;
+	public static String GitParticipant_3;
 
 	static {
 		// initialize resource bundle
