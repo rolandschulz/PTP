@@ -832,16 +832,16 @@ public class GemUtilities {
 					}
 					taskStatus = TaskStatus.IDLE;
 
-					// Place the focus on the correct view
+					// Activate the correct view based on preference settings
 					final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
 					final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
 					if (activeView.equals(PreferenceConstants.GEM_ANALYZER)) {
-						analyzer.setFocus();
+						analyzer.activate();
 					} else if (activeView.equals(PreferenceConstants.GEM_BROWSER)) {
-						browser.setFocus();
+						browser.activate();
 					}
 					else {
-						console.setFocus();
+						console.activate();
 					}
 				}
 			}
