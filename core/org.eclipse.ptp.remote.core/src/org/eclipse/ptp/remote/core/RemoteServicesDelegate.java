@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.remote.core.messages.Messages;
 
 /**
@@ -194,15 +194,16 @@ public class RemoteServicesDelegate {
 		}
 
 		IFileStore lres = from.getResource(source);
-		if (!lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5)).exists()) {
+		SubMonitor subProgress = SubMonitor.convert(progress, (15));
+		if (!lres.fetchInfo(EFS.NONE, subProgress.newChild(5)).exists()) {
 			throw newException(
 					Messages.RemoteServicesDelegate_Copy_Operation_Local_resource_does_not_exist + COSP + lres.getName(), null);
 		}
 		if (mkParent != UNDEFINED) {
-			to.getResource(target).getParent().mkdir(mkParent, new SubProgressMonitor(progress, 5));
+			to.getResource(target).getParent().mkdir(mkParent, subProgress.newChild(5));
 		}
 		IFileStore rres = to.getResource(target);
-		lres.copy(rres, EFS.OVERWRITE, new SubProgressMonitor(progress, 5));
+		lres.copy(rres, EFS.OVERWRITE, subProgress.newChild(5));
 	}
 
 	/**
@@ -229,7 +230,8 @@ public class RemoteServicesDelegate {
 		}
 
 		IFileStore lres = manager.getResource(path);
-		IFileInfo info = lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5));
+		SubMonitor subProgress = SubMonitor.convert(progress, (10));
+		IFileInfo info = lres.fetchInfo(EFS.NONE, subProgress.newChild(5));
 		if (!info.exists()) {
 			return false;
 		}
@@ -238,7 +240,7 @@ public class RemoteServicesDelegate {
 			Thread.sleep(1000 * intervalInSecs);
 		} catch (InterruptedException ignored) {
 		}
-		info = lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5));
+		info = lres.fetchInfo(EFS.NONE, subProgress.newChild(5));
 		long l1 = info.getLength();
 		return l0 == l1;
 	}
@@ -261,7 +263,8 @@ public class RemoteServicesDelegate {
 		}
 
 		IFileStore lres = manager.getResource(path);
-		if (!lres.fetchInfo(EFS.NONE, new SubProgressMonitor(progress, 5)).exists()) {
+		SubMonitor subProgress = SubMonitor.convert(progress, (100));
+		if (!lres.fetchInfo(EFS.NONE, subProgress.newChild(5)).exists()) {
 			throw newException(Messages.RemoteServicesDelegate_Read_Operation_resource_does_not_exist + COSP + lres.getName(), null);
 		}
 		BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE, progress));
@@ -280,7 +283,12 @@ public class RemoteServicesDelegate {
 				if (rcvd == UNDEFINED) {
 					break;
 				}
+
 				sb.append(new String(buffer, 0, rcvd));
+
+				if (subProgress.isCanceled()) {
+					break;
+				}
 			}
 		} catch (IOException ioe) {
 			throw newException(Messages.RemoteServicesDelegate_Read_OperationFailed + path, null);
