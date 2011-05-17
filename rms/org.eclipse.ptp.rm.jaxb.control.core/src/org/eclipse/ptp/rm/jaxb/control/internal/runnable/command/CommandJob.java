@@ -49,6 +49,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.internal.utils.EnvironmentVariableUtils;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
@@ -155,7 +156,6 @@ public class CommandJob extends Job implements ICommandJob {
 	private final IVariableMap rmVarMap;
 	private final int flags;
 	private final boolean waitForId;
-	private final boolean ignoreExitStatus;
 	private final boolean batch;
 	private final boolean keepOpen;
 	private final StringBuffer error;
@@ -173,6 +173,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private ICommandJobStatus jobStatus;
 	private IStatus status;
 	private boolean active;
+	private boolean ignoreExitStatus;
 
 	/**
 	 * @param jobUUID
@@ -341,7 +342,10 @@ public class CommandJob extends Job implements ICommandJob {
 					try {
 						jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap(), progress.newChild(20));
 					} catch (CoreException failed) {
-						status = CoreExceptionUtils.getErrorStatus(failed.getMessage(), failed);
+						status = CoreExceptionUtils.getErrorStatus(
+								failed.getMessage() + JAXBCoreConstants.LINE_SEP + error.toString(), null);
+						ignoreExitStatus = true;
+						error.setLength(0);
 						return status;
 					}
 				} else {
@@ -415,11 +419,11 @@ public class CommandJob extends Job implements ICommandJob {
 
 			progress.worked(20);
 
-			if (exit != 0 && !ignoreExitStatus && status == null) {
-				String t = error.toString();
+			if (exit != 0 && !ignoreExitStatus) {
+				String message = error.toString();
 				error.setLength(0);
 				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (JAXBControlConstants.ZEROSTR + exit)
-						+ JAXBControlConstants.SP + JAXBControlConstants.CO + t, null);
+						+ JAXBControlConstants.LINE_SEP + message, null);
 			}
 
 			joinConsumers();
@@ -640,7 +644,7 @@ public class CommandJob extends Job implements ICommandJob {
 		}
 		proxy.getErrorStreamMonitor().addListener(new IStreamListener() {
 			public void streamAppended(String text, IStreamMonitor monitor) {
-				JAXBControlCorePlugin.log(text);
+				error.append(text);
 			}
 		});
 	}
