@@ -43,8 +43,8 @@
 				The top-level control elements define the properties and attributes, files to be staged, job script to be generated, commands
 				specific to the resource manager, and the layout of the Launch Tab.
 				The resource manager implementation constructs a variable map
-				serving as the resource manager "environment"; variables are dereferenced in the configuration file via ${rm:name} or
-				${rm:name#getterName}; all properties and attributes defined in the configuration are mapped. The following hard-coded variables
+				serving as the resource manager "environment"; variables are dereferenced in the configuration file via ${ptp_rm:name} or
+				${ptp_rm:name#getterName}; all properties and attributes defined in the configuration are mapped. The following hard-coded variables
 				are also added at runtime:
 				<!-- from runtime configuration information -->
 				control.user.name
