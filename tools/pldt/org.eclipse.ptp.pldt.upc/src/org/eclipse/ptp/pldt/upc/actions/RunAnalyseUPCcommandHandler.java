@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2008,2010 IBM Corporation.
+ * Copyright (c) 2008,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,9 +21,9 @@ import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
 import org.eclipse.ptp.pldt.common.util.ViewActivator;
 import org.eclipse.ptp.pldt.upc.UPCArtifactMarkingVisitor;
-import org.eclipse.ptp.pldt.upc.UPCIDs;
 import org.eclipse.ptp.pldt.upc.UPCPlugin;
 import org.eclipse.ptp.pldt.upc.analysis.UPCCASTVisitor;
+import org.eclipse.ptp.pldt.upc.internal.UPCIDs;
 
 /**
  * The "Find UPC Artifacts" action/command

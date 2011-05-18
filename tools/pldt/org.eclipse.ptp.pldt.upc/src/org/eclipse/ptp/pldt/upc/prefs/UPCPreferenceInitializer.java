@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2010 IBM Corporation.
+ * Copyright (c) 2010,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,8 +13,8 @@ package org.eclipse.ptp.pldt.upc.prefs;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.pldt.upc.UPCIDs;
 import org.eclipse.ptp.pldt.upc.UPCPlugin;
+import org.eclipse.ptp.pldt.upc.internal.UPCIDs;
 
 /**
  * Class used to initialize default preference values.

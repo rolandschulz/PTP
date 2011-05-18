@@ -21,10 +21,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
 import org.eclipse.ptp.pldt.common.util.ViewActivator;
-import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable.BarrierInfo;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIBarrierMatching.ErrorMessage;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIBarrierMatching.PathNode;
+import org.eclipse.ptp.pldt.mpi.analysis.internal.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 
 /**

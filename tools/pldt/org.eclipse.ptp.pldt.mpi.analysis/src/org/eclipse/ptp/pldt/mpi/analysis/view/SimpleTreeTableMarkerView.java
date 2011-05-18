@@ -60,7 +60,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.pldt.common.ArtifactManager;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.IArtifact;
-import org.eclipse.ptp.pldt.mpi.analysis.IDs;
+import org.eclipse.ptp.pldt.mpi.analysis.internal.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;

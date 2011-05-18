@@ -9,6 +9,7 @@ Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.pldt.mpi.analysis,
  org.eclipse.ptp.pldt.mpi.analysis.actions,
  org.eclipse.ptp.pldt.mpi.analysis.analysis,
+ org.eclipse.ptp.pldt.mpi.analysis.internal;x-friends:="org.eclipse.ptp.pldt.tests",
  org.eclipse.ptp.pldt.mpi.analysis.view
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

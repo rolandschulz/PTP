@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
 import org.eclipse.ptp.pldt.common.util.ViewActivater;
-import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable.BarrierInfo;
+import org.eclipse.ptp.pldt.mpi.analysis.internal.IDs;
 
 public class MatchingSet {
 	protected BarrierTable btable_ = null;

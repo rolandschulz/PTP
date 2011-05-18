@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.pldt.upc;
+package org.eclipse.ptp.pldt.upc.internal;
 
 import org.eclipse.ptp.pldt.upc.messages.Messages;
 

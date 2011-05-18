@@ -18,7 +18,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ArtifactMarkingVisitor;
-import org.eclipse.ptp.pldt.mpi.analysis.IDs;
+import org.eclipse.ptp.pldt.mpi.analysis.internal.IDs;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 public class MPIArtifactMarkingVisitor extends ArtifactMarkingVisitor {

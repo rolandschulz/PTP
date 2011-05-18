@@ -20,6 +20,7 @@ Export-Package: org.eclipse.ptp.pldt.upc,
  org.eclipse.ptp.pldt.upc.actions,
  org.eclipse.ptp.pldt.upc.analysis,
  org.eclipse.ptp.pldt.upc.editorHelp,
+ org.eclipse.ptp.pldt.upc.internal;x-friends:="org.eclipse.ptp.pldt.tests,org.eclipse.ptp.pldt.wizards",
  org.eclipse.ptp.pldt.upc.prefs,
  org.eclipse.ptp.pldt.upc.views
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

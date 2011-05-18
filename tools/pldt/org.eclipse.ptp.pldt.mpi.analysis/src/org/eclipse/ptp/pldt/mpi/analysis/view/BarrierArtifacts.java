@@ -20,11 +20,11 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
-import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPICallGraphNode;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable.BarrierInfo;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
+import org.eclipse.ptp.pldt.mpi.analysis.internal.IDs;
 
 public class BarrierArtifacts {
 	private ICallGraph CG_;

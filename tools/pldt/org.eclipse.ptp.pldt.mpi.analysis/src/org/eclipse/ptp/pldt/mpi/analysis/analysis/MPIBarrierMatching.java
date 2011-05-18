@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007,2010 IBM Corporation.
+ * Copyright (c) 2007,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,12 +36,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
-import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierExpression.BarrierExpressionOP;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable.BarrierInfo;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.IControlFlowGraph;
+import org.eclipse.ptp.pldt.mpi.analysis.internal.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 import org.eclipse.ptp.pldt.mpi.analysis.popup.actions.ShowMatchSet;
 

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2008,2010 IBM Corporation.
+ * Copyright (c) 2008,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.pldt.upc.internal.UPCIDs;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 

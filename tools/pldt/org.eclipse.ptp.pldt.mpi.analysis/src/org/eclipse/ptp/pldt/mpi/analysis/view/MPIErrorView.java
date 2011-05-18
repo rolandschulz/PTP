@@ -12,7 +12,7 @@
 package org.eclipse.ptp.pldt.mpi.analysis.view;
 
 import org.eclipse.ptp.pldt.mpi.analysis.Activator;
-import org.eclipse.ptp.pldt.mpi.analysis.IDs;
+import org.eclipse.ptp.pldt.mpi.analysis.internal.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 
 /**
