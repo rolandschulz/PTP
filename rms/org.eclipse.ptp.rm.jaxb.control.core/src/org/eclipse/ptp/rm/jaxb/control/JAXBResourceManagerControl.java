@@ -698,11 +698,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			scriptFile.setUniqueIdPrefix(true);
 			if (scriptPathVar != null) {
 				scriptFile.setPath(String.valueOf(scriptPathVar.getValue()));
-				scriptFile.setDeleteAfterUse(false);
+				scriptFile.setDeleteSourceAfterUse(false);
 			} else {
 				scriptFile.setContents(JAXBControlConstants.OPENVRM + JAXBControlConstants.SCRIPT + JAXBControlConstants.PD
 						+ JAXBControlConstants.VALUE + JAXBControlConstants.CLOSV);
-				scriptFile.setDeleteAfterUse(true);
+				scriptFile.setDeleteSourceAfterUse(true);
 			}
 			// can always set the target to be cleaned up XXX
 		}

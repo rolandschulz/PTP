@@ -269,11 +269,11 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 			scriptFile.setUniqueIdPrefix(true);
 			if (scriptPathVar != null) {
 				scriptFile.setPath(String.valueOf(scriptPathVar.getValue()));
-				scriptFile.setDeleteAfterUse(false);
+				scriptFile.setDeleteSourceAfterUse(false);
 			} else {
 				scriptFile.setContents(JAXBControlConstants.OPENVRM + JAXBControlConstants.SCRIPT + JAXBControlConstants.PD
 						+ JAXBControlConstants.VALUE + JAXBControlConstants.CLOSV);
-				scriptFile.setDeleteAfterUse(true);
+				scriptFile.setDeleteSourceAfterUse(true);
 			}
 		}
 		return files;

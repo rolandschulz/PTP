@@ -116,7 +116,7 @@ public class ManagedFilesJob extends Job {
 				String target = stagingDir + pathSep + fileName;
 				SubMonitor m = progress.newChild(5);
 				copyFileToRemoteHost(localFile.getAbsolutePath(), target, m);
-				if (file.isDeleteAfterUse()) {
+				if (file.isDeleteSourceAfterUse()) {
 					localFile.delete();
 				}
 				if (m.isCanceled()) {
