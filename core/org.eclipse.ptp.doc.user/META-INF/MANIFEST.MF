@@ -4,7 +4,6 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.help; singleton:=true
 Bundle-Version: 5.0.0.qualifier
 Bundle-ClassPath: ptpHelp.jar
-Bundle-Activator: org.eclipse.ptp.help.HelpPlugin
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
