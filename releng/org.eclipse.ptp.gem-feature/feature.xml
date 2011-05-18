@@ -3,8 +3,7 @@
       id="org.eclipse.ptp.gem"
       label="%featureName"
       version="5.0.0.qualifier"
-      provider-name="%featureProvider"
-      plugin="org.eclipse.ptp.gem">
+      provider-name="%featureProvider">
 
    <description url="http://eclipse.org/ptp">
       %description
