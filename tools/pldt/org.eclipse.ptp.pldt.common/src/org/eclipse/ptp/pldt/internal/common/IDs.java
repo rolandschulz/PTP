@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.pldt.common;
+package org.eclipse.ptp.pldt.internal.common;
 
 /**
  * Misc. IDs for preferences, markers, etc.

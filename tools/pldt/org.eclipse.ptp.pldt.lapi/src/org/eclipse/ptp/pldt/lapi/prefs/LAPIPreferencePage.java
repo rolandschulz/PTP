@@ -16,7 +16,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PathEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.pldt.lapi.Activator;
-import org.eclipse.ptp.pldt.lapi.IDs;
+import org.eclipse.ptp.pldt.lapi.internal.core.IDs;
 import org.eclipse.ptp.pldt.lapi.messages.Messages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;

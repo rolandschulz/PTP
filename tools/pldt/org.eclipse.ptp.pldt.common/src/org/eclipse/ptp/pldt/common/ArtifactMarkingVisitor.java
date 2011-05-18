@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation.
+ * Copyright (c) 2005, 2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,6 +27,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.pldt.internal.common.IDs;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**

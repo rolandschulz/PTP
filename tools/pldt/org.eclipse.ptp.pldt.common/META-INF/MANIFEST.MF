@@ -22,7 +22,8 @@ Export-Package: org.eclipse.ptp.pldt.common,
  org.eclipse.ptp.pldt.common.analysis,
  org.eclipse.ptp.pldt.common.editorHelp,
  org.eclipse.ptp.pldt.common.util,
- org.eclipse.ptp.pldt.common.views
+ org.eclipse.ptp.pldt.common.views,
+ org.eclipse.ptp.pldt.internal.common;x-friends:="org.eclipse.ptp.pldt.tests"
 Bundle-ClassPath: .
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

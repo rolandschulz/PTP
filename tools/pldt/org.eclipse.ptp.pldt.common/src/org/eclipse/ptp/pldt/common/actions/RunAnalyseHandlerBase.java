@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation.
+ * Copyright (c) 2005, 2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,10 +43,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
-import org.eclipse.ptp.pldt.common.IDs;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.messages.Messages;
 import org.eclipse.ptp.pldt.common.util.AnalysisUtil;
+import org.eclipse.ptp.pldt.internal.common.IDs;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;

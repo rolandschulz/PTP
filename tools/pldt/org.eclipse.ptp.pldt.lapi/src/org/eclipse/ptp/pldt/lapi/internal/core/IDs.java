@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.pldt.lapi;
+package org.eclipse.ptp.pldt.lapi.internal.core;
 
 import org.eclipse.ptp.pldt.lapi.messages.Messages;
 
@@ -16,8 +16,6 @@ import org.eclipse.ptp.pldt.lapi.messages.Messages;
  * Constants to be used in this plug-in
  * 
  * @since 5.0
- * @deprecated
- * @see org.eclipse.ptp.pldt.lapi.internal.core
  */
 public interface IDs {
 	String API_NAME = "LAPI"; //$NON-NLS-1$
