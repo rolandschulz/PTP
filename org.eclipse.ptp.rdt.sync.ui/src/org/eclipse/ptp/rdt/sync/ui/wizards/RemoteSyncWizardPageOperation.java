@@ -29,16 +29,16 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.ptp.rdt.sync.core.resources.RemoteMakeNature;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.remotemake.RemoteMakeBuilder;
+import org.eclipse.ptp.rdt.sync.core.resources.RemoteMakeNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
-import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
@@ -76,7 +76,7 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		} catch (CoreException e1) {
 			StatusManager.getManager().handle(e1, RDTSyncUIPlugin.PLUGIN_ID);
 		}
-		
+
 		// BUild the service configuration
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 		IServiceConfiguration serviceConfig = smm.newServiceConfiguration(getConfigName(project.getName()));
@@ -84,8 +84,8 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		serviceConfig.setServiceProvider(syncService, participant.getProvider(project));
 
 		IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
-		IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
-		RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
+		IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(SyncBuildServiceProvider.ID);
+		SyncBuildServiceProvider rbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
 		if (rbsp != null) {
 			IRemoteConnection remoteConnection = participant.getProvider(project).getRemoteConnection();
 			rbsp.setRemoteToolsConnection(remoteConnection);
@@ -101,8 +101,7 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 
 		// Create build scenario based on initial remote location information
 		ISyncServiceProvider provider = participant.getProvider(project);
-		BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
-				provider.getLocation());
+		BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(), provider.getLocation());
 
 		// For each build configuration, set the build directory appropriately.
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
@@ -116,14 +115,16 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
 
-		// Add information about remote location to the initial build configurations.
-		// Do this last (except for adding local configuration) so that project is not flagged as initialized prematurely.
+		// Add information about remote location to the initial build
+		// configurations.
+		// Do this last (except for adding local configuration) so that project
+		// is not flagged as initialized prematurely.
 		BuildConfigurationManager.getInstance().initProject(project, serviceConfig, buildScenario);
 		try {
 			BuildConfigurationManager.getInstance().saveConfigurationData();
 		} catch (IOException e) {
 			StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
-																									StatusManager.SHOW);
+					StatusManager.SHOW);
 		}
 		monitor.done();
 	}
