@@ -14,8 +14,8 @@ package org.eclipse.ptp.pldt.wizards.wizardPages;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
+import org.eclipse.ptp.pldt.mpi.internal.core.MpiIDs;
 
 /**
  * 

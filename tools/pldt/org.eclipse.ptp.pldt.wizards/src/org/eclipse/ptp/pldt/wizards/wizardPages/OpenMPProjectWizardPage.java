@@ -22,8 +22,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.pldt.openmp.core.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
+import org.eclipse.ptp.pldt.openmp.core.internal.OpenMPIDs;
 import org.eclipse.ptp.pldt.wizards.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -133,6 +133,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 
 		// access the preference store from the OpenMP plugin
 		preferenceStore = OpenMPPlugin.getDefault().getPreferenceStore();
+		boolean allowPrefixOnlyMatch = preferenceStore.getBoolean(OpenMPIDs.OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE);
 		String mip = preferenceStore.getString(prefIDincludes);
 		if (traceOn)
 			System.out.println("Got OpenMP include pref from other plugin: " + mip); //$NON-NLS-1$
@@ -140,7 +141,8 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		// Set the defaults here in the wizard page constructor and just
 		// overwrite them if the user changes them.
 		defaultOpenMPIncludePath = preferenceStore.getString(prefIDincludes);
-		if (defaultOpenMPIncludePath.length() == 0) {
+		// don't ask for OpenMP preferences to be set if allowprefixonlymatch is in effect; not used
+		if (!allowPrefixOnlyMatch && defaultOpenMPIncludePath.length() == 0) {
 			// warn if no OpenMP preferences have been set
 			String newIncludePath = showNoPrefs("OpenMP", prefIDincludes); //$NON-NLS-1$
 			defaultOpenMPIncludePath = newIncludePath;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corp. and others.
+ * Copyright (c) 2006, 2011 IBM Corp. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 import org.eclipse.ptp.pldt.mpi.core.prefs.MPIPreferencePage;
+import org.eclipse.ptp.pldt.mpi.internal.core.MpiIDs;
 import org.eclipse.ptp.pldt.wizards.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -151,7 +151,9 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		// Note that if the user doesn't set include path, we can't make a guess at what the lib path etc is.
 		// However, this workaround (encourage setting of mpi include path) is used since mpi settings page
 		// in wizard dialog is blank if this value is not set.
-		if ( /* !allowPrefixOnlyMatch && */defaultMpiIncludePath.length() == 0) {
+		// if (traceOn)
+		System.out.println("MPWP: allowPrefixOnlyMatch=" + allowPrefixOnlyMatch);
+		if (!allowPrefixOnlyMatch && defaultMpiIncludePath.length() == 0) {
 			// warn if no MPI preferences have been set and allow user to set them right there
 			String newMip = showNoPrefs(Messages.MPIProjectWizardPage_mpi, prefIDincludes);
 			defaultMpiIncludePath = newMip;

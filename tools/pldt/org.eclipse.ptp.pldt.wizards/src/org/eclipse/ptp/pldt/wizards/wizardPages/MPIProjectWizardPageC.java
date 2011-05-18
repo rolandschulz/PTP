@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006,2010 IBM Corp. and others.
+ * Copyright (c) 2006,2011 IBM Corp. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 package org.eclipse.ptp.pldt.wizards.wizardPages;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
+import org.eclipse.ptp.pldt.mpi.internal.core.MpiIDs;
 
 /**
  * Wizard Page for collecting info about MPI C project - specifics for C vs C++
