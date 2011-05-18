@@ -42,6 +42,10 @@ public class Messages extends NLS {
 	public static String BCM_LocalServiceError;
 	public static String BCM_ProjectError;
 
+	public static String SyncBuildServiceProvider_configDir;
+
+	public static String SyncBuildServiceProvider_name;
+
 	static {
 		initializeMessages(BUNDLE_NAME, Messages.class);
 	}
