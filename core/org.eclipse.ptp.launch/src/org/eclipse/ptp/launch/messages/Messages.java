@@ -57,7 +57,6 @@ public class Messages extends NLS {
 	public static String ApplicationTab_Console;
 
 	public static String ResourcesTab_Resources;
-	public static String ResourcesTab_Launch_Attributes;
 	public static String ResourcesTab_No_Resource_Manager;
 	public static String ResourcesTab_No_Launch_Configuration;
 	public static String ResourcesTab_Resource_Manager_Not_Started;
@@ -89,16 +88,9 @@ public class Messages extends NLS {
 	public static String WorkingDirectoryBlock_Working_directory_colon;
 	public static String WorkingDirectoryBlock_Use_default_working_directory;
 	public static String WorkingDirectoryBlock_Local_directory;
-	public static String WorkingDirectoryBlock_Workspace;
-	public static String WorkingDirectoryBlock_Select_workspace_relative_working_directory;
-	public static String WorkingDirectoryBlock_Select_working_directory_for_launch_configuration;
-	public static String WorkingDirectoryBlock_Working_directory_does_not_exist;
-	public static String WorkingDirectoryBlock_Working_directory_is_not_a_directory;
-	public static String WorkingDirectoryBlock_Project_or_folder_does_not_exist;
 
 	public static String ParallelLaunchConfigurationDelegate_0;
 	public static String ParallelLaunchConfigurationDelegate_1;
-	public static String ParallelLaunchConfigurationDelegate_2;
 	public static String ParallelLaunchConfigurationDelegate_3;
 	public static String ParallelLaunchConfigurationDelegate_4;
 	public static String ParallelLaunchConfigurationDelegate_5;
@@ -113,28 +105,19 @@ public class Messages extends NLS {
 	public static String AbstractParallelLaunchConfigurationDelegate_0;
 	public static String AbstractParallelLaunchConfigurationDelegate_1;
 
-	public static String AbstractParallelLaunchConfigurationDelegate_2;
 	public static String AbstractParallelLaunchConfigurationDelegate_Project_not_specified;
 	public static String AbstractParallelLaunchConfigurationDelegate_Project_does_not_exist_or_is_not_a_project;
-	public static String AbstractParallelLaunchConfigurationDelegate_Application_file_not_specified;
 	public static String AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist;
-	public static String AbstractParallelLaunchConfigurationDelegate_Working_directory_does_not_exist;
-	public static String AbstractParallelLaunchConfigurationDelegate_Path_not_found;
 	public static String AbstractParallelLaunchConfigurationDelegate_No_ResourceManager;
 	public static String AbstractParallelLaunchConfigurationDelegate_Debugger_path_not_found;
-	public static String AbstractParallelLaunchConfigurationDelegate_Program_is_not_a_recongnized_executable;
 	public static String AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user;
 	public static String AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist;
-	public static String AbstractParallelLaunchConfigurationDelegate_Could_not_retrieve_local_resource_info;
 	public static String AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist;
-	public static String AbstractParallelLaunchConfigurationDelegate_Could_not_retrieve_remote_resource_info;
 
 	public static String AbstractParallelLaunchConfigurationDelegate_debuggerPathNotSpecified;
 	public static String AbstractParallelLaunchConfigurationDelegate_Error_converting_rules;
 	public static String AbstractParallelLaunchConfigurationDelegate_Parallel_launcher_does_not_support;
 	public static String AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus;
-
-	public static String AbstractParallelLaunchConfigurationDelegate_Unsupported_resource_manager_type;
 
 	public static String PTPLaunchPlugin_0;
 	public static String PTPLaunchPlugin_1;
@@ -142,21 +125,8 @@ public class Messages extends NLS {
 	public static String PTPLaunchPlugin_3;
 	public static String PTPLaunchPlugin_4;
 	public static String PTPLaunchPlugin_5;
-	public static String PTPLaunchPlugin_6;
 
 	public static String PTPLaunchPlugin_Operation_cancelled_by_user;
-
-	public static String LauncherExecutionTab_ArgumentsFrame_CommandLineLabel;
-	public static String LauncherExecutionTab_ArgumentsFrame_Title;
-	public static String LauncherExecutionTab_ObserverFrame_BashCommandsAfterLabel;
-	public static String LauncherExecutionTab_ObserverFrame_BashCommandsBeforeLAbel;
-	public static String LauncherExecutionTab_ObserverFrame_ObserverCombo_DefaultNoneOption;
-	public static String LauncherExecutionTab_ObserverFrame_ParserLabel;
-	public static String LauncherExecutionTab_ObserverFrame_Title;
-	public static String LauncherExecutionTab_Tab_Title;
-	public static String LauncherExecutionTab_Validation_ObserverAndNoConsole;
-
-	public static String DownloadBackAction_0;
 
 	public static String DownloadBackRule_0;
 
@@ -166,10 +136,6 @@ public class Messages extends NLS {
 	public static String DownloadRule_3;
 	public static String DownloadRule_4;
 	public static String DownloadRule_5;
-	public static String DownloadRule_6;
-
-	public static String DownloadRuleAction_0;
-	public static String DownloadRuleAction_1;
 
 	public static String DownloadRuleDialog_AddFileDialog_Message;
 	public static String DownloadRuleDialog_AddFileDialog_Title;
@@ -243,10 +209,6 @@ public class Messages extends NLS {
 	public static String UploadRule_3;
 	public static String UploadRule_4;
 	public static String UploadRule_5;
-	public static String UploadRule_6;
-
-	public static String UploadRuleAction_0;
-	public static String UploadRuleAction_1;
 
 	public static String UploadRuleDialog_FileButtonsFrame_AddDirectoryButton;
 	public static String UploadRuleDialog_FileButtonsFrame_AddFilesButton;

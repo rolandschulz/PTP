@@ -50,7 +50,6 @@ public class Messages extends NLS {
 	public static String AbstractProxyRuntimeSystem_ReplacingEnvNotSupported;
 	public static String AbstractResourceManager_1;
 	public static String AbstractRuntimeResourceManager_1;
-	public static String AbstractRuntimeResourceManager_11;
 	public static String AbstractRuntimeResourceManager_12;
 	public static String AbstractRuntimeResourceManager_5;
 	public static String AbstractRuntimeResourceManager_2;
@@ -123,7 +122,6 @@ public class Messages extends NLS {
 	public static String NodeAttributes_0;
 	public static String NodeAttributes_1;
 	public static String NodeAttributes_2;
-	public static String PMachine_0;
 	public static String PNode_1;
 	public static String ProcessAttributes_0;
 	public static String ProcessAttributes_2;
@@ -140,9 +138,6 @@ public class Messages extends NLS {
 	public static String ResourceManagerAttributes_2;
 	public static String ResourceManagerAttributes_3;
 	public static String ResourceManagerAttributes_4;
-	public static String ResourceManagerPersistence_0;
-	public static String ResourceManagerPersistence_1;
-	public static String ResourceManagerPersistence_2;
 	public static String StringSetAttribute_0;
 	public static String StringSetAttribute_1;
 
