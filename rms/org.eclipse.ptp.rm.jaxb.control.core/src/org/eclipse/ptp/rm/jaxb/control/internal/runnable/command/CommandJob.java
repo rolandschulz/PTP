@@ -397,7 +397,7 @@ public class CommandJob extends Job implements ICommandJob {
 				throw CoreExceptionUtils.newException(Messages.CouldNotLaunch + builder.command(), t);
 			}
 			progress.worked(30);
-			maybeInitializeTokenizers(builder);
+			maybeInitializeTokenizers(builder, monitor);
 			setOutStreamRedirection(process);
 			setErrStreamRedirection(process);
 			startConsumers(process);
@@ -518,9 +518,10 @@ public class CommandJob extends Job implements ICommandJob {
 	 * If there is a custom extension tokenizer, it will be instantiated here.
 	 * 
 	 * @param builder
+	 * @param monitor
 	 * @throws CoreException
 	 */
-	private void maybeInitializeTokenizers(IRemoteProcessBuilder builder) throws CoreException {
+	private void maybeInitializeTokenizers(IRemoteProcessBuilder builder, IProgressMonitor monitor) throws CoreException {
 		TokenizerType t = null;
 
 		if (builder.redirectErrorStream()) {
@@ -537,7 +538,7 @@ public class CommandJob extends Job implements ICommandJob {
 				if (type != null) {
 					stdoutTokenizer = getTokenizer(type);
 				} else {
-					stdoutTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap);
+					stdoutTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap, monitor);
 				}
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
@@ -551,7 +552,7 @@ public class CommandJob extends Job implements ICommandJob {
 				if (type != null) {
 					stderrTokenizer = getTokenizer(type);
 				} else {
-					stderrTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap);
+					stderrTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap, monitor);
 				}
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);

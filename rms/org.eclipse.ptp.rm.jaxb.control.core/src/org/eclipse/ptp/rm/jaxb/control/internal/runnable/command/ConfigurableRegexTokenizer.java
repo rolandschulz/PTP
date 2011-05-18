@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.data.RegexImpl;
@@ -72,12 +73,12 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	private final int maxLen;
 	private final Integer save;
 	private final boolean all;
-	private boolean includeDelim;
 	private final boolean applyToAll;
 	private final List<IMatchable> toMatch;
+	private final IProgressMonitor commandMonitor;
 	private RegexImpl exitOn;
 	private RegexImpl exitAfter;
-
+	private boolean includeDelim;
 	private Throwable error;
 	private InputStream in;
 
@@ -95,8 +96,12 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	 *            JAXB data element
 	 * @param rmVarMap
 	 *            resource manager environment
+	 * @param commandMonitor
+	 *            so that the operation can be canceled in the case of a thrown
+	 *            exception
 	 */
-	public ConfigurableRegexTokenizer(String uuid, TokenizerType tokenizer, IVariableMap rmVarMap) {
+	public ConfigurableRegexTokenizer(String uuid, TokenizerType tokenizer, IVariableMap rmVarMap, IProgressMonitor commandMonitor) {
+		this.commandMonitor = commandMonitor;
 		String d = tokenizer.getDelim();
 		if (d != null) {
 			delim = getChar(d);
