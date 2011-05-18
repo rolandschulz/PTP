@@ -45,6 +45,18 @@
    <feature url="features/org.eclipse.ptp.rm.pbs_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.pbs" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
+   <feature url="features/org.eclipse.ptp.rm.jaxb_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.jaxb" version="@ptpBranchVersion@.@timeStamp@">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.jaxb.pbs_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.jaxb.pbs" version="@ptpBranchVersion@.@timeStamp@">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.lml_jaxb_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.lml_jaxb" version="@ptpBranchVersion@.@timeStamp@">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.lml_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.lml" version="@ptpBranchVersion@.@timeStamp@">
+      <category name="Parallel Tools Platform"/>
+   </feature>
    <feature url="features/org.eclipse.ptp.rm.slurm_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.slurm" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
