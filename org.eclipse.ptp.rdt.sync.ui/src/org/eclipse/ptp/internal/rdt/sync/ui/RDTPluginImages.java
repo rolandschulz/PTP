@@ -13,15 +13,8 @@ package org.eclipse.ptp.internal.rdt.sync.ui;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
-import org.eclipse.swt.graphics.Image;
-import org.osgi.framework.Bundle;
 
 /**
  * @author crecoskie

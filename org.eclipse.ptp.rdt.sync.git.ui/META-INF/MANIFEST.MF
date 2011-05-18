@@ -12,9 +12,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remote.ui,
  org.eclipse.ptp.rdt.sync.git.core,
- org.eclipse.ptp.services.core
+ org.eclipse.ptp.services.core,
+ org.eclipse.ptp.rdt.core;bundle-version="3.1.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: %plugin.provider
 Bundle-Localization: plugin
-Import-Package: org.eclipse.ptp.rdt.core.serviceproviders
