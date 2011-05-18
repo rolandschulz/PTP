@@ -34,13 +34,13 @@ import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
@@ -157,8 +157,8 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 			serviceConfig.setServiceProvider(syncService, participant.getProvider(project));
 
 			IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
-			IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
-			RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
+			IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(SyncBuildServiceProvider.ID);
+			SyncBuildServiceProvider rbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
 			if (rbsp != null) {
 				IRemoteConnection remoteConnection = participant.getProvider(project).getRemoteConnection();
 				rbsp.setRemoteToolsConnection(remoteConnection);
@@ -286,16 +286,17 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 	 * 
 	 * @see org.eclipse.jface.dialogs.IDialogPage#getErrorMessage()
 	 */
+	@Override
 	public String getErrorMessage() {
 		String errMsg = null;
-		if (super.getErrorMessage()!=null) {
+		if (super.getErrorMessage() != null) {
 			errMsg = super.getErrorMessage();
-		} else if (fSelectedProvider==null) {
-			errMsg = Messages.ConvertToSyncProjectWizardPage_0; 
+		} else if (fSelectedProvider == null) {
+			errMsg = Messages.ConvertToSyncProjectWizardPage_0;
 		} else {
 			errMsg = fSelectedProvider.getParticipant().getErrorMessage();
 		}
-		setPageComplete(super.validatePage() && errMsg==null);
+		setPageComplete(super.validatePage() && errMsg == null);
 		return errMsg;
 	}
 
@@ -327,7 +328,7 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 		fProviderArea.layout();
 		update();
 	}
-	
+
 	/**
 	 * Returns true for: - non-hidden projects - non-RDT projects - projects
 	 * that does not have remote systems temporary nature - projects that are
@@ -350,14 +351,12 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 	}
 
 	/*
-	@Override
-	public boolean validatePage() {
-		return super.validatePage();// && getErrorMessage()==null;
-	}*/
-	
+	 * @Override public boolean validatePage() { return super.validatePage();//
+	 * && getErrorMessage()==null; }
+	 */
+
 	private void update() {
 		getWizard().getContainer().updateMessage();
 	}
-	
-	
+
 }
