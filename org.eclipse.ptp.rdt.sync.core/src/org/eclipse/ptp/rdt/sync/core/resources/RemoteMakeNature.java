@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.core.RDTLog;
+import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.remotemake.RemoteMakeBuilder;
 
 /**
@@ -49,8 +49,9 @@ public class RemoteMakeNature implements IProjectNature {
 		IProjectDescription description = project.getDescription();
 		String[] prevNatures = description.getNatureIds();
 		for (int i = 0; i < prevNatures.length; i++) {
-			if (NATURE_ID.equals(prevNatures[i]))
+			if (NATURE_ID.equals(prevNatures[i])) {
 				return;
+			}
 		}
 		String[] newNatures = new String[prevNatures.length + 1];
 		System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
@@ -169,8 +170,9 @@ public class RemoteMakeNature implements IProjectNature {
 		// add nature
 		String[] prevNatures = description.getNatureIds();
 		for (int i = 0; i < prevNatures.length; i++) {
-			if (NATURE_ID.equals(prevNatures[i]))
+			if (NATURE_ID.equals(prevNatures[i])) {
 				return;
+			}
 		}
 		String[] newNatures = new String[prevNatures.length + 1];
 		System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
@@ -298,7 +300,7 @@ public class RemoteMakeNature implements IProjectNature {
 		try {
 			return project.hasNature(NATURE_ID);
 		} catch (CoreException e) {
-			RDTLog.logError(e);
+			RDTSyncCorePlugin.log(e);
 			return false;
 		}
 	}
