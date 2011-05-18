@@ -164,6 +164,12 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 		} catch (Throwable t) {
 			error = t;
 			/*
+			 * attempt to stop any waiting or joining on the executing process
+			 */
+			if (commandMonitor != null) {
+				commandMonitor.setCanceled(true);
+			}
+			/*
 			 * we do not close the out here because it probably is a standard
 			 * stream
 			 */

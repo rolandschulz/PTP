@@ -353,6 +353,11 @@ public class CommandJob extends Job implements ICommandJob {
 					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
 				}
 
+				if (monitor.isCanceled()) {
+					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, IJobStatus.CANCELED, parent, control);
+					return status;
+				}
+
 				jobStatus.setProxy(getProxy());
 
 				if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
