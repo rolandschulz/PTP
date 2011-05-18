@@ -67,6 +67,8 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	public LMLResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
 		fConfig = (IJAXBResourceManagerConfiguration) config;
+		
+		// TODO Creating LguiItem
 	}
 
 	@Override

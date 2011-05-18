@@ -15,9 +15,12 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -33,6 +36,8 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiUpdatedEvent;
+import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 
 /**
  * Class of the interface ILguiItem
@@ -57,7 +62,12 @@ public class LguiItem implements ILguiItem {
 	/**
 	 * List of encapsulated classes, which handle parts of the lml-hierarchy
 	 */
-	private final HashMap<Class<? extends ILguiHandler>, ILguiHandler> lguiHandlers = new HashMap<Class<? extends ILguiHandler>, ILguiHandler>();
+	private final Map<Class<? extends ILguiHandler>, ILguiHandler> lguiHandlers = Collections.synchronizedMap(new HashMap<Class<? extends ILguiHandler>, ILguiHandler>());
+	
+	/*
+	 * List of Jobs
+	 */
+	private final Map<String, JobStatusData> jobList = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
 	
 	/**************************************************************************************************************
 	 * Constructors
@@ -333,6 +343,24 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**************************************************************************************************************
+	 * Job related methods
+	 **************************************************************************************************************/
+	
+
+	public void addJob(IJobStatus jobStatus) {
+		
+	}
+	
+	public void updateJob(IJobStatus jobStatus) {
+		
+	}
+	
+	public void removeJob(IJobStatus jobStatus) {
+		
+	}
+	
+	
+	/**************************************************************************************************************
 	 * Further methods
 	 **************************************************************************************************************/
 	
@@ -404,20 +432,6 @@ public class LguiItem implements ILguiItem {
 	 */
 	public void removeListener(ILguiListener listener) {
 		listeners.remove(listener);
-	}
-
-	
-
-	
-
-	/**************************************************************************************************************
-	 * Parsing methods
-	 **************************************************************************************************************/
-
-	public void addJob() {
-		LguiType newLgui = lgui;
-		lgui.getObjectsAndRelationsAndInformation();
-		updateData(newLgui);
 	}
 
 }

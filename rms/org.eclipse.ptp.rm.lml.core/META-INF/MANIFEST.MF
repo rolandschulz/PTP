@@ -11,6 +11,7 @@ Export-Package: org.eclipse.ptp.rm.lml.core,
  org.eclipse.ptp.rm.lml.core.util,
  org.eclipse.ptp.rm.lml.internal.core.elements,
  org.eclipse.ptp.rm.lml.internal.core.model,
+ org.eclipse.ptp.rm.lml.internal.core.model.jobs,
  org.eclipse.ptp.rm.lml.internal.core.nodedisplay
 Bundle-Activator: org.eclipse.ptp.rm.lml.core.LMLCorePlugin
 Bundle-ActivationPolicy: lazy
@@ -22,4 +23,6 @@ Require-Bundle: org.eclipse.core.runtime,
  javax.xml.stream;bundle-version="1.0.1",
  javax.xml.bind;bundle-version="2.1.9",
  com.sun.xml.bind;bundle-version="2.1.9"
-Import-Package: org.eclipse.ptp.rm.jaxb.ui.data
+Import-Package: org.eclipse.ptp.rm.jaxb.ui.data,
+ org.eclipse.ptp.rmsystem,
+ org.eclipse.ui

@@ -21,6 +21,7 @@ import org.eclipse.ptp.rm.lml.internal.core.model.OIDToObject;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus;
 import org.eclipse.ptp.rm.lml.internal.core.model.OverviewAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.TableHandler;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 
 
 /**
@@ -80,6 +81,9 @@ public interface ILguiItem  {
 	
 	public void update(InputStream stream);
 	
-	public void addJob();
+	public void addJob(IJobStatus jobStatus);
 	
+	public void updateJob(IJobStatus jobStatus);
+	
+	public void removeJob(IJobStatus jobStatus);
 }
