@@ -138,11 +138,6 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 		clear = WidgetBuilderUtils.createPushButton(comp, Messages.ClearScript, this);
 
 		/*
-		 * path buttons/text
-		 */
-		maybeAddPathControls(control, ((IJAXBResourceManager) rm).getControl().getEnvironment());
-
-		/*
 		 * text editor
 		 */
 		layout = WidgetBuilderUtils.createGridLayout(1, true);
@@ -162,6 +157,11 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 				MessageDialog.openWarning(parent.getShell(), Messages.ReadOnlyWarning_title, Messages.ReadOnlyWarning);
 			}
 		});
+
+		/*
+		 * path buttons/text
+		 */
+		maybeAddPathControls(control, ((IJAXBResourceManager) rm).getControl().getEnvironment());
 
 		size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		selected = null;
