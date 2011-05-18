@@ -20,15 +20,10 @@ public class Messages extends NLS {
 	private static final String BUNDLE_ID = "org.eclipse.ptp.remote.rse.core.messages.messages"; //$NON-NLS-1$
 
 	public static String Activator_0;
-
-	public static String RSEConnection_close;
 	public static String RSEConnection_noPortFwd;
 	public static String RSEConnection_noShellService;
-
 	public static String RSEProcessBuilder_0;
 
-	public static String RSEServices_0;
-	
 	static {
 		// load message values from bundle file
 		NLS.initializeMessages(BUNDLE_ID, Messages.class);

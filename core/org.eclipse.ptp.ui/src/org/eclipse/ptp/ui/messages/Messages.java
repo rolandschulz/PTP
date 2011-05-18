@@ -26,9 +26,7 @@ public class Messages extends NLS {
 	public static String JobManager_1;
 	public static String LegendDialog_Starting;
 	public static String LegendDialog_Started;
-	public static String LegendDialog_Stopping;
 	public static String LegendDialog_Stopped;
-	public static String LegendDialog_Suspended;
 	public static String LegendDialog_ErrorRM;
 	public static String LegendDialog_UpM;
 	public static String LegendDialog_DownM;
@@ -105,19 +103,8 @@ public class Messages extends NLS {
 	public static String ResourceManagerView_UnableToStop;
 	public static String ResourceManagerWorkbenchAdapter_0;
 	public static String ResourceManagerWorkbenchAdapter_1;
-	public static String RMConfigurationWizard_0;
-	public static String RMConfigurationWizard_1;
-	public static String RMConfigurationWizard_2;
-	public static String RMConfigurationWizard_3;
-	public static String RMConfigurationWizard_4;
-	public static String RMConfigurationWizard_5;
-	public static String RMConfigurationWizard_6;
-	public static String RMConfigurationWizard_7;
-	public static String RMConfigurationWizard_8;
 	public static String RMPreferencesPage_0;
 	public static String RMPreferencesPage_1;
-	public static String RMServicesConfigurationWizard_0;
-	public static String RMServicesConfigurationWizard_1;
 	public static String RMServicesConfigurationWizard_2;
 	public static String RMServicesConfigurationWizard_3;
 	public static String RMServicesConfigurationWizard_4;
@@ -130,8 +117,6 @@ public class Messages extends NLS {
 	public static String RMServicesConfigurationWizard_11;
 	public static String RMServicesConfigurationWizard_12;
 	public static String RMServicesConfigurationWizard_13;
-	public static String RMServicesConfigurationWizard_15;
-	public static String RMServicesConfigurationWizard_16;
 	public static String SelectDefaultResourceManagerAction_0;
 	public static String StartResourceManagersObjectActionDelegate_0;
 	public static String StartResourceManagersObjectActionDelegate_1;

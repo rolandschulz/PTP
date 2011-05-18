@@ -24,13 +24,8 @@ import org.eclipse.osgi.util.NLS;
 public class AttributeNames extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.remotetools.environment.generichost.conf.attribute_names"; //$NON-NLS-1$
 
-	public static String CONNECTION_ADDRESS;
 	public static String CONNECTION_PORT;
 	public static String CONNECTION_TIMEOUT;
-	public static String KEY_PASSPHRASE;
-	public static String KEY_PATH;
-	public static String LOGIN_PASSWORD;
-	public static String LOGIN_USERNAME;
 
 	static {
 		// initialize resource bundle

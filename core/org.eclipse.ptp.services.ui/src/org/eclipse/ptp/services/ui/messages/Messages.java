@@ -15,8 +15,8 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String BUNDLE_NAME= "org.eclipse.ptp.services.ui.messages.messages";//$NON-NLS-1$
-	
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.services.ui.messages.messages";//$NON-NLS-1$
+
 	public static String AddServiceConfigurationWidget_0;
 	public static String AddServiceConfigurationWidget_1;
 	public static String AddServiceConfigurationWidget_2;
@@ -33,8 +33,6 @@ public class Messages extends NLS {
 
 	public static String RemoveServiceConfigurationAction_0;
 	public static String RemoveServiceConfigurationAction_1;
-
-	public static String SelectActiveServiceConfigurationAction_0;
 
 	public static String ServiceConfigurationExportWizard_0;
 	public static String ServiceConfigurationExportWizard_1;
@@ -65,11 +63,7 @@ public class Messages extends NLS {
 	public static String ServiceConfigurationImportWizard_12;
 	public static String ServiceConfigurationImportWizard_13;
 
-	public static String ServiceConfigurationPreferencePage_0;
-	public static String ServiceConfigurationPreferencePage_1;
-
 	public static String ServiceConfigurationPreferencePage_10;
-	public static String ServiceConfigurationPreferencePage_2;
 	public static String ServiceConfigurationPreferencePage_3;
 	public static String ServiceConfigurationPreferencePage_4;
 	public static String ServiceConfigurationPreferencePage_5;
@@ -81,11 +75,10 @@ public class Messages extends NLS {
 	public static String ServiceConfigurationPropertyPage_0;
 	public static String ServiceConfigurationPropertyPage_1;
 	public static String ServiceConfigurationPropertyPage_2;
-	
+
 	public static String ServiceConfigurationSelectionDialog_0;
 	public static String ServiceConfigurationSelectionDialog_1;
 
-	public static String ServiceConfigurationSelectionWidget_0;
 	public static String ServiceConfigurationSelectionWidget_1;
 	public static String ServiceConfigurationSelectionWidget_2;
 	public static String ServiceConfigurationSelectionWidget_3;
@@ -107,7 +100,7 @@ public class Messages extends NLS {
 	public static String ServiceConfigurationSelectionWizardPage_3;
 	public static String ServiceConfigurationSelectionWizardPage_4;
 	public static String ServiceConfigurationSelectionWizardPage_5;
-	
+
 	public static String ServiceConfigurationWidget_0;
 	public static String ServiceConfigurationWidget_1;
 	public static String ServiceConfigurationWidget_2;
@@ -128,24 +121,23 @@ public class Messages extends NLS {
 	public static String ServiceModelWidget_2;
 	public static String ServiceModelWidget_3;
 	public static String ServiceModelWidget_4;
-	public static String ServiceModelWidget_5;
 	public static String ServiceModelWidget_6;
 	public static String ServiceModelWidget_7;
 
 	public static String ServiceModelWidget_8;
-	
+
 	public static String ServiceProviderConfigurationDialog_0;
 	public static String ServiceProviderConfigurationDialog_title;
 
 	public static String ServiceSelectionDialog_0;
 	public static String ServiceSelectionDialog_1;
-	
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
 	private Messages() {
-	}	
+	}
 
 }

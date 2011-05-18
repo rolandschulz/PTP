@@ -15,23 +15,16 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * @author Daniel Felix Ferber
- *
+ * 
  * @since 3.0
  */
-public class Messages extends NLS
-{
+public class Messages extends NLS {
 	private static final String BUNDLE_ID = "org.eclipse.ptp.remote.remotetools.core.messages.messages"; //$NON-NLS-1$
 
-	public static String TargetControl_create_MonitorConnecting;
-	public static String TargetControl_resume_CannotResume;
-	public static String TargetControl_stop_CannotPause;
 	public static String RemoteToolsConnection_connectionNotOpen;
 	public static String RemoteToolsConnection_remotePort;
 	public static String RemoteToolsConnection_open;
 	public static String RemoteToolsConnection_forwarding;
-	public static String RemoteToolsConnection_close;
-	public static String RemoteToolsConnectionManager_1;
-	public static String RemoteToolsConnectionManager_2;
 
 	public static String RemoteToolsConnectionManager_cannotRemoveOpenConnection;
 
@@ -45,13 +38,11 @@ public class Messages extends NLS
 	public static String RemoteToolsFileStore_6;
 	public static String RemoteToolsFileStore_7;
 	public static String RemoteToolsFileStore_8;
-	public static String RemoteToolsFileStore_9;
 	public static String RemoteToolsFileStore_10;
-	public static String RemoteToolsFileStore_11;
 	public static String RemoteToolsFileStore_12;
 	public static String RemoteToolsFileStore_13;
 	public static String RemoteToolsFileStore_14;
-	
+
 	static {
 		// load message values from bundle file
 		NLS.initializeMessages(BUNDLE_ID, Messages.class);
@@ -61,5 +52,3 @@ public class Messages extends NLS
 		// cannot create new instance
 	}
 }
-
-	

@@ -79,16 +79,18 @@ public class XMLReader implements IParser {
 			while ((ret = read(cbuf, 0, 1)) != -1) {
 			}
 
-			if (ret > 0)
+			if (ret > 0) {
 				return cbuf[0];
-			else
+			} else {
 				return -1;
+			}
 		}
 
 		@Override
 		public int read(char cbuf[], int offset, int length) throws IOException {
-			if (emptyInput != null)
+			if (emptyInput != null) {
 				return emptyInput.read(cbuf, offset, length);
+			}
 			int ret = super.read(cbuf, offset, length);
 			int skip = 0;
 			if (totalBytesRead == 0 && ret < 1) { /*
@@ -105,8 +107,9 @@ public class XMLReader implements IParser {
 					skip++;
 					continue;
 				}
-				if (skip > 0)
+				if (skip > 0) {
 					cbuf[i - skip] = cbuf[i];
+				}
 			}
 			ret -= skip;
 			totalBytesRead += ret;
@@ -151,14 +154,16 @@ public class XMLReader implements IParser {
 			}
 		}
 
-		if (DEBUG)
+		if (DEBUG) {
 			System.out.println(elementList.size());
+		}
 		return elementList;
 	}
 
 	protected Map<String, String> populateInput(Node node, Map<String, String> input) {
-		if (input == null)
+		if (input == null) {
 			input = new HashMap<String, String>();
+		}
 
 		// if (node.getNodeType() == Node.ELEMENT_NODE)
 		// System.out.println(node.getNodeName());
@@ -168,11 +173,13 @@ public class XMLReader implements IParser {
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node childNode = childNodes.item(i);
 
-			if (childNode.getNodeType() == Node.ELEMENT_NODE)
-				if (childNode.getChildNodes().getLength() > 1)
+			if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+				if (childNode.getChildNodes().getLength() > 1) {
 					populateInput(childNode, input);
-				else
+				} else {
 					input.put(childNode.getNodeName().toLowerCase(), childNode.getTextContent());
+				}
+			}
 
 			// if (childNode.getNodeType() == Node.ELEMENT_NODE)
 			// System.out.println("\t" + childNode.getNodeName().toLowerCase() +
@@ -230,8 +237,9 @@ public class XMLReader implements IParser {
 
 			// System.err.println("trying to set: "+ newkey + " :: " +
 			// newvalue);
-			if (keymatched)
+			if (keymatched) {
 				element.setAttribute(newkey, newvalue, false);
+			}
 		}
 
 		return element;

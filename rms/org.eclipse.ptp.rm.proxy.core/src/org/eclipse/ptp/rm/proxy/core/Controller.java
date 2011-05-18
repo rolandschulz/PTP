@@ -37,10 +37,10 @@ import java.util.regex.Pattern;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
-import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.rm.proxy.core.element.ElementManager;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
 import org.eclipse.ptp.rm.proxy.core.event.IEventFactory;
+import org.eclipse.ptp.rm.proxy.core.messages.Messages;
 import org.eclipse.ptp.rm.proxy.core.parser.IParser;
 import org.eclipse.ptp.utils.core.RangeSet;
 
@@ -183,13 +183,16 @@ public class Controller {
 		Future<Set<IElement>> ret = fPool.submit(parseThread);
 		byte buf[] = new byte[1024];
 		int length;
-		while ((length = err.read(buf)) > -1)
-			if (errorHandler != null)
+		while ((length = err.read(buf)) > -1) {
+			if (errorHandler != null) {
 				errorHandler.handle(Level.WARNING, command + ": " + new String(buf, 0, length)); //$NON-NLS-1$
+			}
+		}
 		p.waitFor();
 		int exitValue = p.exitValue();
-		if (exitValue != 0 && errorHandler != null)
+		if (exitValue != 0 && errorHandler != null) {
 			errorHandler.handle(Level.ERROR, MessageFormat.format(Messages.getString("Controller.0"), command, exitValue)); //$NON-NLS-1$
+		}
 		return ret.get();
 	}
 
@@ -208,8 +211,9 @@ public class Controller {
 	 *            baseID
 	 */
 	public void setBaseID(int baseID) {
-		if (parentController != null)
+		if (parentController != null) {
 			throw new AssertionError("Illegal to specify baseID and parentController!"); //$NON-NLS-1$
+		}
 		this.baseID = baseID;
 	}
 
@@ -330,14 +334,16 @@ public class Controller {
 			/*
 			 * special processing of new job event - alr 10/11/2010
 			 */
-			if (eventArgumentsHandler != null)
+			if (eventArgumentsHandler != null) {
 				eventArgumentsHandler.handle(newEventArgs);
+			}
 			events.add(eventFactory.createNewEvent(newEventArgs.toArray(new String[0])));
 		}
 		RangeSet removedIDs = removedElements.getElementIDsAsRange();
-		if (removedIDs.size() > 0)
+		if (removedIDs.size() > 0) {
 			// System.err.println("eventArgsRemoveRange -> " + removedIDs);
 			events.add(eventFactory.createRemoveEvent(new String[] { removedIDs.toString() }));
+		}
 
 		if (changedElements.size() > 0) {
 			List<String> changedArgs = changedElements.serialize(ProtocolKeyMap, ProtocolValueMap);
@@ -349,24 +355,28 @@ public class Controller {
 	}
 
 	private Set<IElement> filterElements(Set<IElement> elements) {
-		if (filter == null)
+		if (filter == null) {
 			return elements;
+		}
 		Set<IElement> ret = new HashSet<IElement>();
-		for (IElement t : elements)
+		for (IElement t : elements) {
 			// System.err.println("filter:"+filter.pattern+","+filter.key+","+t.getAttribute(filter.key));
-			if (filter.pattern.matcher(t.getAttribute(filter.key)).matches())
+			if (filter.pattern.matcher(t.getAttribute(filter.key)).matches()) {
 				ret.add(t);
+			}
+		}
 		return ret;
 	}
 
 	private int getParentIDFromKey(String parentKey) {
 		// get ParentID
 		int parentID = 0;
-		if (parentController != null)
+		if (parentController != null) {
 			parentID = parentController.currentElements.getElementIDByKey(parentKey);
-		// System.err.println(parentKey+":"+parentID);
-		else
+			// System.err.println(parentKey+":"+parentID);
+		} else {
 			parentID = baseID;
+		}
 		return parentID;
 	}
 

@@ -43,8 +43,6 @@ public class Messages extends NLS {
 	public static String LocalConnectionError;
 	public static String StreamParserInconsistentPropertyWarning;
 
-	public static String RefreshedJobStatusMessage;
-
 	public static String JAXBServiceProvider_defaultDescription;
 
 	static {

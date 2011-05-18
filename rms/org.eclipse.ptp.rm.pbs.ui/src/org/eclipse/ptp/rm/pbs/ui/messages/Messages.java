@@ -46,13 +46,11 @@ public class Messages extends NLS {
 	public static String PBSConfigurationWizardPage_name;
 	public static String PBSConfigurationWizardPage_title;
 
-	public static String PBSResourceManager;
 	public static String PBSResourceManagerConfigurationWizardPage_description;
 	public static String PBSResourceManagerConfigurationWizardPage_name;
 	public static String PBSResourceManagerConfigurationWizardPage_title;
 
 	public static String PBSRMLaunchConfigDeleteButton_title;
-	public static String PBSRMLaunchConfigDeleteChoose_message;
 	public static String PBSRMLaunchConfigDeleteError_message;
 	public static String PBSRMLaunchConfigDeleteError_title;
 	public static String PBSRMLaunchConfigEditButton_title;

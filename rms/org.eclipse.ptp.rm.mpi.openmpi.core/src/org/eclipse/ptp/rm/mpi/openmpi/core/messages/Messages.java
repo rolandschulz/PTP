@@ -58,19 +58,15 @@ public class Messages extends NLS {
 	public static String OpenMPIResourceManagerConfiguration_defaultName;
 
 	public static String OpenMPIDiscoverJob_defaultQueueName;
-	public static String OpenMPIDiscoverJob_Exception_DiscoverCommandFailed;
 	public static String OpenMPIDiscoverJob_Exception_DiscoverCommandFailedParseHostFile;
 	public static String OpenMPIDiscoverJob_Exception_DiscoverCommandFailedReadHostFile;
 	public static String OpenMPIDiscoverJob_Exception_DiscoverCommandHostFileEmpty;
-	public static String OpenMPIDiscoverJob_Exception_DiscoverCommandHostFileNotFound;
 	public static String OpenMPIDiscoverJob_Exception_DiscoverCommandHostFilePathNotAbsolute;
 	public static String OpenMPIDiscoverJob_Exception_DiscoverCommandInternalError;
 	public static String OpenMPIDiscoverJob_Exception_DiscoverCommandMissingHostFilePath;
-	public static String OpenMPIDiscoverJob_Exception_HostFileErrors;
 	public static String OpenMPIDiscoverJob_Exception_HostFileParseError;
 	public static String OpenMPIDiscoverJob_Exception_HostnameCommandFailed;
 	public static String OpenMPIDiscoverJob_Exception_HostnameCommandFailedParse;
-	public static String OpenMPIDiscoverJob_Exception_HostnameCommandFailedParseOutput;
 	public static String OpenMPIDiscoverJob_Exception_HostnameCommandFailedWithCode;
 	public static String OpenMPIDiscoverJob_Exception_IgnoredInvalidParameter;
 	public static String OpenMPIDiscoverJob_Exception_InvalidMaxSlotsParameter;
@@ -96,12 +92,7 @@ public class Messages extends NLS {
 	public static String OpenMPIRuntimeSystem_JobName;
 
 	public static String OpenMPIRuntimeSystem_NoDefaultQueue;
-	public static String OpenMPIRuntimeSystemJob_Exception_FailedParse;
-	public static String OpenMPIRuntimeSystemJob_Exception_HostnamesDoNotMatch;
-	public static String OpenMPIRuntimeSystemJob_Exception_FailedExecute0;
-	public static String OpenMPIRuntimeSystemJob_ProcessName;
 	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithExitValue;
-	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithSignal;
 	public static String OpenMPIRuntimeSystemJob_Exception_ExecutionFailureDetected;
 
 	public static String OpenMPILaunchConfigurationDefaults_Exception_FailedReadFile;

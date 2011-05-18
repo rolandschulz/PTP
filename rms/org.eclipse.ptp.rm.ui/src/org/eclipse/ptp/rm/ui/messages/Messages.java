@@ -21,17 +21,11 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.ui.messages.messages"; //$NON-NLS-1$
 
 	public static String AbstractRemotePreferencePage_0;
-	public static String AbstractRemotePreferencePage_1;
-	public static String AbstractRemotePreferencePage_2;
-	public static String AbstractRemotePreferencePage_3;
 	public static String AbstractRemotePreferencePage_4;
 	public static String AbstractRemotePreferencePage_5;
 	public static String AbstractRemotePreferencePage_6;
-	public static String AbstractRemotePreferencePage_7;
 	public static String AbstractRemotePreferencePage_8;
 	public static String AbstractRemotePreferencePage_9;
-	public static String AbstractRemotePreferencePage_10;
-	public static String AbstractRemotePreferencePage_11;
 
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_0;
 	public static String AbstractRemoteProxyResourceManagerConfigurationWizardPage_1;
@@ -52,9 +46,6 @@ public class Messages extends NLS {
 
 	public static String DefaultProxyOptions_ExtraCommandLineArgs;
 
-	public static String AbstractRemoteResourceManagerConfigurationWizardPage_0;
-	public static String AbstractRemoteResourceManagerConfigurationWizardPage_1;
-	public static String AbstractRemoteResourceManagerConfigurationWizardPage_2;
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_3;
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_4;
 	public static String AbstractRemoteResourceManagerConfigurationWizardPage_5;

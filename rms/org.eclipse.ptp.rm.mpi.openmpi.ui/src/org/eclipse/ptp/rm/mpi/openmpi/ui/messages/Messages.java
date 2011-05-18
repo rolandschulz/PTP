@@ -50,9 +50,6 @@ public class Messages extends NLS {
 	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyPrefix;
 	public static String BasicOpenMpiRMLaunchConfigurationDynamicTab_Validation_NoProcess;
 
-	public static String OpenMPI12PreferencePage_Title;
-	public static String OpenMPI13PreferencePage_Title;
-
 	public static String OpenMPIConfigurationWizardPage_Description;
 	public static String OpenMPIConfigurationWizardPage_Label_Version;
 	public static String OpenMPIConfigurationWizardPage_Name;
@@ -62,7 +59,6 @@ public class Messages extends NLS {
 	public static String OpenMPIConfigurationWizardPage_VersionCombo_Version12;
 	public static String OpenMPIConfigurationWizardPage_VersionCombo_Version13;
 	public static String OpenMPIConfigurationWizardPage_VersionCombo_Version14;
-	public static String OpenMPIConfigurationWizardPage_Version_Auto;
 	public static String OpenMPIRMConfigurationWizardPage_Description;
 	public static String OpenMPIRMConfigurationWizardPage_Title;
 

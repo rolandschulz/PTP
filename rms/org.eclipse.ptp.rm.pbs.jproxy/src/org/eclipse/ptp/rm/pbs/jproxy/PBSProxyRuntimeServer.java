@@ -306,10 +306,11 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 				p.waitFor();
 				server = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
 			}
-			if (server == null || server.split(" ").length < 2) //$NON-NLS-1$
+			if (server == null || server.split(" ").length < 2) { //$NON-NLS-1$
 				server = "UNKNOWN"; //$NON-NLS-1$
-			else
+			} else {
 				server = server.split(" ")[1]; //$NON-NLS-1$
+			}
 			sendEvent(getEventFactory().newProxyRuntimeNewMachineEvent(transID,
 					new String[] { Integer.toString(resourceManagerID), "1", Integer.toString(machineID), //$NON-NLS-1$
 							"2", //$NON-NLS-1$
@@ -416,10 +417,11 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 			String[] keyValue = argument.split("=", 2); //$NON-NLS-1$
 			String key = keyValue[0];
 			String value = keyValue[1];
-			if (key.equals("jobSubId")) //$NON-NLS-1$
+			if (key.equals("jobSubId")) { //$NON-NLS-1$
 				jobSubId = value;
-			else if (key.equals("script")) //$NON-NLS-1$
+			} else if (key.equals("script")) { //$NON-NLS-1$
 				script = normalize(value);
+			}
 		}
 
 		if (jobSubId == null) {
@@ -462,8 +464,9 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 				// Check that is was succesful
 				if (p.exitValue() == 0) {
 					String batchId = parseBatchId(out.toString());
-					if (batchId != null)
+					if (batchId != null) {
 						jobIdBindings.put(batchId, jobSubId);
+					}
 					sendEvent(getEventFactory().newOKEvent(transID));
 				} else {
 					sendSubmitJobError(transID, jobSubId, out.toString());
@@ -516,13 +519,14 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 			Process p = new ProcessBuilder(args).redirectErrorStream(true).start();
 
 			p.waitFor();
-			if (p.exitValue() == 0)
+			if (p.exitValue() == 0) {
 				sendEvent(getEventFactory().newOKEvent(transID));
-			else {
+			} else {
 				BufferedReader err = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				String line, errMsg = ""; //$NON-NLS-1$
-				while ((line = err.readLine()) != null)
+				while ((line = err.readLine()) != null) {
 					errMsg += line;
+				}
 				err.close();
 				sendTerminateJobError(transID, id, errMsg);
 				System.out.println("qdel finished with exit status " + p.exitValue()); //$NON-NLS-1$
@@ -537,9 +541,10 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 	}
 
 	private String getUser() {
-		if (debugReadFromFiles)
+		if (debugReadFromFiles) {
 			user = debugUser;
-		if (user == null)
+		}
+		if (user == null) {
 			try {
 				Process p = Runtime.getRuntime().exec("whoami"); //$NON-NLS-1$
 				p.waitFor();
@@ -551,6 +556,7 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 				// Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
 		return user;
 	}
 
@@ -593,20 +599,21 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 	protected static Map<String, Object> parseArguments(String args[]) {
 		Map<String, Object> argsMap = new HashMap<String, Object>();
 
-		for (int i = 0; i < args.length; i++)
-			if (args[i].startsWith("--port")) //$NON-NLS-1$
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].startsWith("--port")) { //$NON-NLS-1$
 				try {
 					int port = new Integer(args[i].substring(7));
 					argsMap.put("port", port); //$NON-NLS-1$
 				} catch (NumberFormatException e) {
-					System.out.println(org.eclipse.ptp.rm.pbs.jproxy.Messages.getString("AbstractProxyRuntimeServer_0") //$NON-NLS-1$
-							+ args[i + 1].substring(7));
+					System.out.println(Messages.getString(Messages.getString("PBSProxyRuntimeServer.10")) + args[i + 1].substring(7)); //$NON-NLS-1$
 				}
-			else if (args[i].startsWith("--host")) { //$NON-NLS-1$
+			} else if (args[i].startsWith("--host")) { //$NON-NLS-1$
 				String host = args[i].substring(7);
-				if (host != null)
+				if (host != null) {
 					argsMap.put("host", host); //$NON-NLS-1$
+				}
 			}
+		}
 
 		return argsMap;
 	}
@@ -624,8 +631,9 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 	 */
 	private static String parseBatchId(String out) throws Throwable {
 		String[] lines = out.split("\n"); //$NON-NLS-1$
-		if (lines == null || lines.length == 0)
+		if (lines == null || lines.length == 0) {
 			return null;
+		}
 		return lines[lines.length - 1];
 	}
 
@@ -643,10 +651,12 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 					} catch (IOException ioe) {
 						return;
 					}
-					if (numBytes == EOF)
+					if (numBytes == EOF) {
 						break;
-					if (output != null)
+					}
+					if (output != null) {
 						output.append(buffer, 0, numBytes);
+					}
 				}
 
 				try {

@@ -22,7 +22,7 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * @author greg
- *
+ * 
  */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.core.pdi.messages.messages"; //$NON-NLS-1$
@@ -69,7 +69,6 @@ public class Messages extends NLS {
 	public static String AIFFactory_0;
 	public static String AIFFactory_1;
 	public static String AIFFactory_10;
-	public static String AIFFactory_11;
 	public static String AIFFactory_12;
 	public static String AIFFactory_13;
 	public static String AIFFactory_14;
@@ -81,9 +80,7 @@ public class Messages extends NLS {
 	public static String AIFFactory_2;
 	public static String AIFFactory_20;
 	public static String AIFFactory_21;
-	public static String AIFFactory_3;
 	public static String AIFFactory_4;
-	public static String AIFFactory_5;
 	public static String AIFFactory_6;
 	public static String AIFFactory_7;
 	public static String AIFFactory_8;

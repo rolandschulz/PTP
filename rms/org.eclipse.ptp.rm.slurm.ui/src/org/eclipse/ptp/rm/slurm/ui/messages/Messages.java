@@ -45,24 +45,10 @@ public class Messages extends NLS {
 	public static String SLURMConfigurationWizardPage_select;
 	public static String SLURMConfigurationWizardPage_connection_error;
 	public static String SLURMConfigurationWizardPage_connection_error_msg;
-	
+
 	public static String SLURMConfigurationWizardPage_numProcsInvalid;
 	public static String SLURMConfigurationWizardPage_numNodesInvalid;
 	public static String SLURMConfigurationWizardPage_timeLimitInvalid;
-
-	public static String SLURMPreferencesPage_group_slurmd;
-	public static String SLURMPreferencesPage_slurmdFile_text;
-	public static String SLURMPreferencesPage_Select_SLURMd_FILE;
-	public static String SLURMPreferencesPage_Incorrect_SLURMd_file;
-	public static String SLURMPreferencesPage_slurmdArgs_text;
-	public static String SLURMPreferencesPage_slurmdFull_text;
-	public static String SLURMPreferencesPage_group_proxy;
-	public static String SLURMPreferencesPage_slurmServer_text;
-	public static String SLURMPreferencesPage_Select_SLURM_PROXY_FILE;
-	public static String SLURMPreferencesPage_Incorrect_server_file;
-	public static String SLURMPreferencesPage_manual;
-	public static String SLURMPreferencesPage_browseButton;
-	
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
@@ -72,4 +58,3 @@ public class Messages extends NLS {
 		// Prevent instances.
 	}
 }
-

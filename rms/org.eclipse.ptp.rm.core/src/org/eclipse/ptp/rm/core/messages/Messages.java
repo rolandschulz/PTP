@@ -18,7 +18,6 @@ public class Messages extends NLS {
 	public static String AbstractRMDefaults_Exception_FailedReadFile;
 	public static String AbstractRMDefaults_FailedParseInteger;
 	public static String AbstractRMDefaults_MissingValue;
-	public static String AbstractRemoteProxyRuntimeClient_0;
 	public static String AbstractRemoteProxyRuntimeClient_1;
 	public static String AbstractRemoteProxyRuntimeClient_2;
 	public static String AbstractRemoteProxyRuntimeClient_3;
@@ -34,9 +33,6 @@ public class Messages extends NLS {
 	public static String AbstractRemoteProxyRuntimeClient_13;
 	public static String AbstractRemoteProxyRuntimeClient_14;
 	public static String AbstractRemoteProxyRuntimeClient_15;
-	public static String AbstractRemoteCommandJob_Exception_CommandFailed;
-	public static String AbstractRemoteCommandJob_Exception_InternalError;
-	public static String AbstractToolRuntimeSystem_0;
 	public static String AbstractToolRuntimeSystem_1;
 	public static String AbstractToolRuntimeSystem_2;
 
@@ -53,7 +49,6 @@ public class Messages extends NLS {
 	public static String AbstractToolRuntimeSystemJob_Exception_ExecuteCommand;
 	public static String AbstractToolRuntimeSystemJob_Exception_ExecutionFinished;
 	public static String AbstractToolRuntimeSystemJob_Exception_ExecutionStarted;
-	public static String AbstractToolRuntimeSystemJob_Exception_LaunchApplication;
 	public static String AbstractToolRuntimeSystemJob_Exception_PrepareExecution;
 	public static String AbstractToolRuntimeSystemJob_Exception_WaitExecution;
 	public static String AbstractToolRuntimeSystemJob_Success;

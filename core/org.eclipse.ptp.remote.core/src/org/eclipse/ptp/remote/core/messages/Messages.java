@@ -5,7 +5,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.remote.core.messages.messages"; //$NON-NLS-1$
 	public static String AbstractRemoteServerRunner_1;
-	public static String AbstractRemoteServerRunner_10;
 	public static String AbstractRemoteServerRunner_11;
 	public static String AbstractRemoteServerRunner_12;
 	public static String AbstractRemoteServerRunner_13;
@@ -13,7 +12,6 @@ public class Messages extends NLS {
 	public static String AbstractRemoteServerRunner_5;
 	public static String AbstractRemoteServerRunner_6;
 	public static String AbstractRemoteServerRunner_7;
-	public static String AbstractRemoteServerRunner_9;
 	public static String LocalConnection_1;
 	public static String LocalConnection_2;
 	public static String PTPRemoteCorePlugin_0;

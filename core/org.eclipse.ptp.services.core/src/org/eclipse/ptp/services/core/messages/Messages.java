@@ -14,20 +14,14 @@ package org.eclipse.ptp.services.core.messages;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME= "org.eclipse.ptp.services.core.messages.messages";//$NON-NLS-1$
-	
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.services.core.messages.messages";//$NON-NLS-1$
+
 	public static String ServiceModelManager_0;
-	public static String ServiceModelManager_1;
-
 	public static String ServiceModelManager_2;
-
 	public static String ServiceModelManager_3;
-
 	public static String ServiceProvider_0;
 	public static String ServiceProvider_1;
-
 	public static String Services_invalidServiceId;
-	public static String Services_saveServiceError;
 
 	static {
 		// initialize resource bundle
@@ -35,6 +29,6 @@ public class Messages extends NLS {
 	}
 
 	private Messages() {
-	}		
+	}
 
 }

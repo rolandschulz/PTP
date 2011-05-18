@@ -182,9 +182,6 @@ public class Messages extends NLS {
 	public static String ToggleBreakpointAdapter_Missing_resource_1;
 	public static String ToggleBreakpointAdapter_Invalid_line_1;
 	public static String ToggleBreakpointAdapter_Operation_is_not_supported_1;
-	public static String ToggleBreakpointRulerAction_0;
-	public static String ToggleBreakpointRulerAction_1;
-	public static String ToggleBreakpointRulerAction_2;
 	public static String SignalPropertyPage_0;
 	public static String SignalPropertyPage_1;
 	public static String SignalPropertyPage_2;

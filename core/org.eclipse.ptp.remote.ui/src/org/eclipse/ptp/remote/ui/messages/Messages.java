@@ -20,9 +20,6 @@ public class Messages extends NLS {
 	public static String LocalUIConnectionManager_1;
 	public static String LocalUIConnectionManager_2;
 	public static String LocalUIConnectionManager_3;
-	public static String PTPRemoteUIPlugin_0;
-	public static String PTPRemoteUIPlugin_1;
-	public static String PTPRemoteUIPlugin_2;
 	public static String PTPRemoteUIPlugin_3;
 	public static String PTPRemoteUIPlugin_4;
 	public static String RemoteConnectionWidget_connectionName;
@@ -35,8 +32,6 @@ public class Messages extends NLS {
 	public static String RemoteDirectoryWidget_1;
 	public static String RemoteDirectoryWidget_2;
 	public static String RemoteDirectoryWidget_3;
-	public static String RemoteResourceBrowser_1;
-	public static String RemoteResourceBrowser_2;
 	public static String RemoteResourceBrowser_resourceTitle;
 	public static String RemoteResourceBrowser_fileTitle;
 	public static String RemoteResourceBrowser_directoryTitle;
