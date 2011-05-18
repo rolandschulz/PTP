@@ -406,7 +406,7 @@ public class StreamParserTest extends TestCase {
 	}
 
 	private void runTokenizer(TokenizerType tokenizer, InputStream stream) {
-		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(uuid, tokenizer, rmVarMap);
+		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(uuid, tokenizer, rmVarMap, null);
 		t.setInputStream(stream);
 		Thread thr = new Thread(t);
 		thr.start();
@@ -483,7 +483,8 @@ public class StreamParserTest extends TestCase {
 				+ "mca:mpi:base:param:mpi_yield_when_idle:status:writable" //$NON-NLS-1$
 				+ JAXBControlConstants.LINE_SEP
 				+ "mca:mpi:base:param:mpi_yield_when_idle:help:Yield the processor when waiting for MPI communication (for MPI processes, will default to 1 when oversubscribing nodes)" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP + "mca:mpi:base:param:mpi_yield_when_idle:deprecated:no" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mpi:base:param:mpi_yield_when_idle:deprecated:no" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$
 				+ "mca:mpi:base:param:mpi_event_tick_rate:value:-1" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$
 		return new ByteArrayInputStream(content.getBytes());
 	}

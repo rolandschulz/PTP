@@ -270,10 +270,9 @@ public class CommandJob extends Job implements ICommandJob {
 				if (proxy != null) {
 					proxy.close();
 				}
-				try {
-					joinConsumers();
-				} catch (CoreException ce) {
-					JAXBControlCorePlugin.log(ce);
+				CoreException e = joinConsumers();
+				if (e != null) {
+					JAXBControlCorePlugin.log(e);
 				}
 			}
 			if (jobThread != null && jobThread != Thread.currentThread()) {
@@ -354,7 +353,6 @@ public class CommandJob extends Job implements ICommandJob {
 				}
 
 				if (monitor.isCanceled()) {
-					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, IJobStatus.CANCELED, parent, control);
 					return status;
 				}
 
@@ -426,14 +424,17 @@ public class CommandJob extends Job implements ICommandJob {
 
 			progress.worked(20);
 
+			CoreException e = joinConsumers();
+
 			if (exit != 0 && !ignoreExitStatus) {
+				if (e != null) {
+					error.append(e.getMessage()).append(JAXBControlConstants.LINE_SEP);
+				}
 				String message = error.toString();
 				error.setLength(0);
 				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (JAXBControlConstants.ZEROSTR + exit)
 						+ JAXBControlConstants.LINE_SEP + message, null);
 			}
-
-			joinConsumers();
 		} catch (CoreException ce) {
 			return ce.getStatus();
 		} catch (Throwable t) {
@@ -474,9 +475,9 @@ public class CommandJob extends Job implements ICommandJob {
 	/**
 	 * Wait for any stream consumer threads to exit.
 	 * 
-	 * @throws CoreException
+	 * @return CoreException
 	 */
-	private void joinConsumers() throws CoreException {
+	private CoreException joinConsumers() {
 		Throwable t = null;
 
 		if (outSplitter != null) {
@@ -510,8 +511,10 @@ public class CommandJob extends Job implements ICommandJob {
 		}
 
 		if (t != null) {
-			throw CoreExceptionUtils.newException(Messages.ParserInternalError, t);
+			return CoreExceptionUtils.newException(Messages.ParserInternalError + JAXBControlConstants.CO + JAXBControlConstants.SP
+					+ t.toString(), t);
 		}
+		return null;
 	}
 
 	/**

@@ -61,6 +61,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
  * @see org.eclipse.ptp.rm.jaxb.control.internal.data.PutImpl
  * @see org.eclipse.ptp.rm.jaxb.control.internal.data.SetImpl
  * @see org.eclipse.ptp.rm.jaxb.control.internal.data.TestImpl
+ * @see org.eclipse.ptp.rm.jaxb.control.internal.data.ThrowImpl
  * 
  * @author arossi
  * 

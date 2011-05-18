@@ -22,6 +22,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 import org.eclipse.ptp.rm.jaxb.core.data.PutType;
 import org.eclipse.ptp.rm.jaxb.core.data.SetType;
+import org.eclipse.ptp.rm.jaxb.core.data.ThrowType;
 
 /**
  * Base class for the wrappers around the data objects providing information as
@@ -213,6 +214,11 @@ public abstract class AbstractAssign implements IAssign {
 			list.add(new SetImpl(uuid, set, rmVarMap));
 			return;
 		}
+		if (assign instanceof ThrowType) {
+			ThrowType thr = (ThrowType) assign;
+			list.add(new ThrowImpl(uuid, thr, rmVarMap));
+			return;
+		}
 	}
 
 	/**
@@ -226,6 +232,9 @@ public abstract class AbstractAssign implements IAssign {
 	 * @throws Throwable
 	 */
 	static Object get(Object target, String field) throws Throwable {
+		if (field == null) {
+			return null;
+		}
 		String name = JAXBControlConstants.GET + field.substring(0, 1).toUpperCase() + field.substring(1);
 		Method method = null;
 		try {
@@ -309,7 +318,7 @@ public abstract class AbstractAssign implements IAssign {
 		if (setter == null) {
 			throw new NoSuchMethodException(name + JAXBControlConstants.CO + JAXBControlConstants.SP + target);
 		}
-		if (values[0] != null) {
+		if (values != null && values[0] != null) {
 			Class<?>[] mclzz = setter.getParameterTypes();
 			// better have 1 parameter
 			Class<?> param = mclzz[0];

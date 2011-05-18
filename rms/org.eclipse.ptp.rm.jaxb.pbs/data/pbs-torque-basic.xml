@@ -428,21 +428,13 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 							<entry value="SUBMITTED"/>
 						</set>
 					</match>
-					<match>
-						<expression>.*Job not submitted.*</expression>
-						<set field="value">
-							<entry value="FAILED"/>
-						</set>
-					</match>
 				</target>
 			</stdout-parser>
 			<stderr-parser delim="\n">
 				<target ref="@jobId">
 					<match>
 						<expression>.*Job not submitted.*</expression>
-						<set field="value">
-							<entry value="FAILED"/>
-						</set>
+						<throw message="Job Submit Failed"/>
 					</match>
 				</target>
 			</stderr-parser>
