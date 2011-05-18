@@ -20,12 +20,11 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.pldt.common.IDs;
-import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
+import org.eclipse.ptp.pldt.internal.common.IDs;
 import org.eclipse.ptp.pldt.mpi.core.actions.RunAnalyseMPIcommandHandler;
-import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
+import org.eclipse.ptp.pldt.mpi.internal.core.MpiIDs;
 import org.eclipse.ptp.pldt.openmp.core.actions.RunAnalyseOpenMPcommandHandler;
-import org.eclipse.ptp.pldt.tests.PldtBaseTestFramework.ArtifactWithLine;
+import org.eclipse.ptp.pldt.openmp.core.internal.OpenMPIDs;
 
 /**
  * @author Beth Tibbitts
@@ -154,7 +153,7 @@ public class TestFortran extends PldtBaseTestFramework {
 
 		racm.runResource(new NullProgressMonitor(), ce, 0, includes);
 
-		IMarker[] markers = file.findMarkers(OpenMPPlugin.MARKER_ID, true, IResource.DEPTH_INFINITE);
+		IMarker[] markers = file.findMarkers(OpenMPIDs.MARKER_ID, true, IResource.DEPTH_INFINITE);
 		assertNotNull(markers);
 		System.out.println("numMarkers: " + markers.length);
 		for (int i = 0; i < markers.length; i++) {

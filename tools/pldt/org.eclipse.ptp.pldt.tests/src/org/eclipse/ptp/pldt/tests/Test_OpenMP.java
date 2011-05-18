@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation
+ * Copyright (c) 2010,2011 IBM Corporation
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,10 +25,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ArtifactManager;
 import org.eclipse.ptp.pldt.common.IArtifact;
-import org.eclipse.ptp.pldt.common.IDs;
+import org.eclipse.ptp.pldt.internal.common.IDs;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTOMPPragma;
-import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.ptp.pldt.openmp.core.actions.RunAnalyseOpenMPcommandHandler;
+import org.eclipse.ptp.pldt.openmp.core.internal.OpenMPIDs;
 
 /**
  * @author beth
@@ -65,7 +65,7 @@ public class Test_OpenMP extends PldtBaseTestFramework {
 
 		racm.runResource(new NullProgressMonitor(), ce, 0, includes);
 
-		IMarker[] markers = file.findMarkers(OpenMPPlugin.MARKER_ID, true, IResource.DEPTH_INFINITE);
+		IMarker[] markers = file.findMarkers(OpenMPIDs.MARKER_ID, true, IResource.DEPTH_INFINITE);
 		assertNotNull(markers);
 		System.out.println("numMarkers: " + markers.length);
 		// need to sort markers, since they are not returned in a pre-determined order??
@@ -145,7 +145,7 @@ public class Test_OpenMP extends PldtBaseTestFramework {
 
 		racm.runResource(new NullProgressMonitor(), ce, 0, includes);
 
-		IMarker[] markers = file.findMarkers(OpenMPPlugin.MARKER_ID, true, IResource.DEPTH_INFINITE);
+		IMarker[] markers = file.findMarkers(OpenMPIDs.MARKER_ID, true, IResource.DEPTH_INFINITE);
 		assertNotNull(markers);
 		System.out.println("numMarkers: " + markers.length);
 		// need to sort markers, since they are not returned in a pre-determined order??

@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.pldt.common.IDs;
+import org.eclipse.ptp.pldt.internal.common.IDs;
 import org.osgi.framework.Bundle;
 
 /**

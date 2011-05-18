@@ -20,11 +20,11 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.pldt.common.IDs;
-import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
+import org.eclipse.ptp.pldt.internal.common.IDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
-import org.eclipse.ptp.pldt.upc.UPCIDs;
+import org.eclipse.ptp.pldt.mpi.internal.core.MpiIDs;
 import org.eclipse.ptp.pldt.upc.actions.RunAnalyseUPCcommandHandler;
+import org.eclipse.ptp.pldt.upc.internal.UPCIDs;
 
 /**
  * @author beth
@@ -101,7 +101,6 @@ public class Test_UPC extends PldtBaseTestFramework {
 			System.out.println("    " + expectedArts[i].getName() + " = " + markerArts[i].getName());
 			assertEquals(expectedArts[i].getName(), markerArts[i].getName());
 
-			boolean test = markerArts[i].equals(expectedArts[i]);
 			// the following never works, so we'll be happy enough with the two assertEquals above.
 			// assertEquals(expectedArts[i], markerArts[i]);
 

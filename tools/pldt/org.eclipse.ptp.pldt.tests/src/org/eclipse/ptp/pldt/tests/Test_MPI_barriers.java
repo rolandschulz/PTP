@@ -27,9 +27,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ptp.pldt.common.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.actions.RunAnalyseMPIAnalysiscommandHandler;
-import org.eclipse.ptp.pldt.tests.PldtBaseTestFramework.ArtifactWithLine;
 
 /**
  * 
@@ -124,7 +122,7 @@ public class Test_MPI_barriers extends PldtBaseTestFramework {
 			assertFalse("No barrier errors should be found in " + filename, error);
 		}
 
-		String barrierMarkerID = org.eclipse.ptp.pldt.mpi.analysis.IDs.barrierMarkerID;
+		String barrierMarkerID = org.eclipse.ptp.pldt.mpi.analysis.internal.IDs.barrierMarkerID;
 
 		// =================================
 		IMarker[] markers = file.findMarkers(barrierMarkerID, true, IResource.DEPTH_INFINITE);
@@ -169,9 +167,9 @@ public class Test_MPI_barriers extends PldtBaseTestFramework {
 	public void barrierSetTest(String filename, IFile file, BarrierSetBasics bsb) throws CoreException {
 		IMarker[] markers;
 		// Barrier Sets
-		final String barrierSetMarkerID = org.eclipse.ptp.pldt.mpi.analysis.IDs.matchingSetMarkerID;
-		final String barrierParentID = org.eclipse.ptp.pldt.mpi.analysis.IDs.parentIDAttr;
-		final String barrierMyID = org.eclipse.ptp.pldt.mpi.analysis.IDs.myIDAttr;
+		final String barrierSetMarkerID = org.eclipse.ptp.pldt.mpi.analysis.internal.IDs.matchingSetMarkerID;
+		final String barrierParentID = org.eclipse.ptp.pldt.mpi.analysis.internal.IDs.parentIDAttr;
+		final String barrierMyID = org.eclipse.ptp.pldt.mpi.analysis.internal.IDs.myIDAttr;
 
 		markers = file.findMarkers(barrierSetMarkerID, true, IResource.DEPTH_INFINITE);
 		// assertNotNull("2 Barrier Markers should be found",markers);
@@ -199,7 +197,7 @@ public class Test_MPI_barriers extends PldtBaseTestFramework {
 		assertEquals("Number of barrier sets", bsb.getNumSets(), setRoots.size());
 
 		// list what's in each set
-		for (Iterator iterator = setRoots.iterator(); iterator.hasNext();) {
+		for (Iterator<IMarker> iterator = setRoots.iterator(); iterator.hasNext();) {
 			IMarker iMarker = (IMarker) iterator.next();
 			int setParentID = ((Integer) iMarker.getAttribute(barrierMyID)).intValue();
 			int setParentLineNo = ((Integer) iMarker.getAttribute(IMarker.LINE_NUMBER)).intValue();
@@ -247,7 +245,7 @@ public class Test_MPI_barriers extends PldtBaseTestFramework {
 			map = marker.getAttributes();
 			Set keyset = map.keySet();
 			System.out.println("Marker has " + keyset.size() + " values");
-			for (Iterator iterator = keyset.iterator(); iterator.hasNext();) {
+			for (Iterator<String> iterator = keyset.iterator(); iterator.hasNext();) {
 				String key = (String) iterator.next();
 				Object obj = marker.getAttribute(key);
 				String value = obj.toString();

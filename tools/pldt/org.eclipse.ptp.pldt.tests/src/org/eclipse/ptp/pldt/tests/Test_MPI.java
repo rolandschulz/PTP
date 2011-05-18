@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation
+ * Copyright (c) 2010,2011 IBM Corporation
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,10 +20,10 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.pldt.common.IDs;
-import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
+import org.eclipse.ptp.pldt.internal.common.IDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 import org.eclipse.ptp.pldt.mpi.core.actions.RunAnalyseMPIcommandHandler;
+import org.eclipse.ptp.pldt.mpi.internal.core.MpiIDs;
 
 /**
  * @author beth
