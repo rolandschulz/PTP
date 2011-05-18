@@ -33,6 +33,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.JobStatusMap;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob;
+import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob.Operation;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.utils.JobIdPinTable;
@@ -401,13 +402,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 */
 			updatePropertyValuesFromTab(configuration, progress.newChild(5));
 
-			/*
-			 * create the script if necessary; adds the contents to env as
-			 * "${rm:script}". If a custom script has been selected for use, the
-			 * SCRIPT_PATH property will have been passed in with the launch
-			 * configuration; if so, the following returns immediately.
-			 */
-			maybeHandleScript(uuid, controlData.getScript());
+			boolean delScript = maybeHandleScript(uuid, controlData.getScript());
 			worked(progress, 20);
 
 			ManagedFilesType files = controlData.getManagedFiles();
@@ -417,7 +412,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 * its as its content (${rm:script#value}), or to its path
 			 * (SCRIPT_PATH) must exist.
 			 */
-			files = maybeAddManagedFileForScript(files);
+			files = maybeAddManagedFileForScript(files, delScript);
 			worked(progress, 5);
 
 			if (!maybeTransferManagedFiles(uuid, files)) {
@@ -669,9 +664,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * 
 	 * @param files
 	 *            the set of managed files for this submission
+	 * @param delete
+	 *            whether the script target should be deleted after submission
 	 * @return the set of managed files, possibly with the script file added
 	 */
-	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files) {
+	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files, boolean delete) {
 		PropertyType scriptVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT);
 		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
@@ -704,7 +701,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 						+ JAXBControlConstants.VALUE + JAXBControlConstants.CLOSV);
 				scriptFile.setDeleteSourceAfterUse(true);
 			}
-			// can always set the target to be cleaned up XXX
+			scriptFile.setDeleteTargetAfterUse(delete);
 		}
 		return files;
 	}
@@ -714,9 +711,19 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * 
 	 * @param uuid
 	 * @param files
+	 * @throws CoreException
 	 */
-	private void maybeCleanupManagedFiles(String uuid, ManagedFilesType files) {
-
+	private void maybeCleanupManagedFiles(String uuid, ManagedFilesType files) throws CoreException {
+		if (files == null || files.getFile().isEmpty()) {
+			return;
+		}
+		ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
+		job.setOperation(Operation.DELETE);
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException ignored) {
+		}
 	}
 
 	/**
@@ -764,14 +771,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @param script
 	 *            configuration object describing how to construct the script
 	 *            from the environment
+	 * @return whether the script target should be deleted
 	 */
-	private void maybeHandleScript(String uuid, ScriptType script) {
+	private boolean maybeHandleScript(String uuid, ScriptType script) {
 		PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
 		if (p != null && p.getValue() != null) {
-			return;
+			return false;
 		}
 		if (script == null) {
-			return;
+			return false;
 		}
 		ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv, false);
 		job.schedule();
@@ -779,6 +787,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			job.join();
 		} catch (InterruptedException ignored) {
 		}
+		return script.isDeleteAfterSubmit();
 	}
 
 	/**
@@ -813,6 +822,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			return true;
 		}
 		ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
+		job.setOperation(Operation.COPY);
 		job.schedule();
 		try {
 			job.join();

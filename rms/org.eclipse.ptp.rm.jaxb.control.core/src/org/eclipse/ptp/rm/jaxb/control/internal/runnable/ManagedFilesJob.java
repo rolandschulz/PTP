@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -38,13 +39,20 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 /**
  * A managed file is a client-side file which needs to be moved to the resource
  * to which the job will be submitted. This class wraps the Job runnable for
- * staging these files. All files in the list are copied serially to the target
- * resource.
+ * staging these files. <br>
+ * <br>
+ * There are two possible operations, copy and delete. In the former case, all
+ * files in the list are copied serially to the target resource; in the latter,
+ * only those files with delete of the target marked as true are deleted.
  * 
  * @author arossi
  * 
  */
 public class ManagedFilesJob extends Job {
+
+	public enum Operation {
+		COPY, DELETE
+	};
 
 	private final String uuid;
 	private final IJAXBResourceManagerControl control;
@@ -54,6 +62,7 @@ public class ManagedFilesJob extends Job {
 	private IVariableMap rmVarMap;
 	private String stagingDir;
 	private boolean success;
+	private Operation operation;
 
 	/**
 	 * 
@@ -81,6 +90,15 @@ public class ManagedFilesJob extends Job {
 	}
 
 	/**
+	 * Either copy or delete
+	 * 
+	 * @param operation
+	 */
+	public void setOperation(Operation operation) {
+		this.operation = operation;
+	}
+
+	/**
 	 * First checks to see if the file references in-memory content, and if so,
 	 * writes out a temporary source file. It then copies the file and places a
 	 * property in the environment mapping the name of the ManagedFile object
@@ -95,55 +113,22 @@ public class ManagedFilesJob extends Job {
 		}
 
 		rmVarMap = control.getEnvironment();
-		stagingDir = rmVarMap.getString(uuid, stagingDir);
-
-		boolean localTarget = delegate.getLocalFileManager() == delegate.getRemoteFileManager();
 		success = false;
-		SubMonitor progress = SubMonitor.convert(monitor, files.size() * 10);
-		/*
-		 * for now we handle the files serially. NOTE: no support for Windows as
-		 * target ...
-		 */
-		for (ManagedFileType file : files) {
-			try {
-				File localFile = maybeWriteFile(file);
-				progress.worked(5);
-				String fileName = localFile.getName();
-				if (file.isUniqueIdPrefix()) {
-					fileName = UUID.randomUUID() + fileName;
-				}
-				String pathSep = localTarget ? JAXBControlConstants.PATH_SEP : JAXBControlConstants.REMOTE_PATH_SEP;
-				String target = stagingDir + pathSep + fileName;
-				SubMonitor m = progress.newChild(5);
-				copyFileToRemoteHost(localFile.getAbsolutePath(), target, m);
-				if (file.isDeleteSourceAfterUse()) {
-					localFile.delete();
-				}
-				if (m.isCanceled()) {
-					break;
-				}
-				PropertyType p = new PropertyType();
-				p.setName(file.getName());
-				if (localTarget) {
-					p.setValue(new File(System.getProperty(JAXBControlConstants.JAVA_USER_HOME), target).getAbsolutePath());
-				} else {
-					p.setValue(target);
-				}
-				p.setVisible(false);
-				rmVarMap.put(p.getName(), p);
-			} catch (Throwable t) {
-				if (monitor != null) {
-					monitor.done();
-				}
-				return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
+		try {
+			if (operation == Operation.COPY) {
+				doCopy(monitor);
+			} else if (operation == Operation.DELETE) {
+				doDelete(monitor);
 			}
-			progress.worked(5);
+			success = true;
+			return Status.OK_STATUS;
+		} catch (Throwable t) {
+			return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-		success = true;
-		if (monitor != null) {
-			monitor.done();
-		}
-		return Status.OK_STATUS;
 	}
 
 	/**
@@ -163,6 +148,77 @@ public class ManagedFilesJob extends Job {
 		 */
 		RemoteServicesDelegate.copy(delegate.getLocalFileManager(), localPath, delegate.getRemoteFileManager(), remotePath,
 				EFS.NONE, monitor);
+	}
+
+	/**
+	 * Executes copy operation.
+	 * 
+	 * @param monitor
+	 */
+	private void doCopy(IProgressMonitor monitor) throws Throwable {
+		stagingDir = rmVarMap.getString(uuid, stagingDir);
+		boolean localTarget = delegate.getLocalFileManager() == delegate.getRemoteFileManager();
+		SubMonitor progress = SubMonitor.convert(monitor, files.size() * 10);
+		/*
+		 * for now we handle the files serially. NOTE: no support for Windows as
+		 * target ...
+		 */
+		for (ManagedFileType file : files) {
+			File localFile = maybeWriteFile(file);
+			progress.worked(5);
+			String fileName = localFile.getName();
+			if (file.isUniqueIdPrefix()) {
+				fileName = UUID.randomUUID() + fileName;
+			}
+			String pathSep = localTarget ? JAXBControlConstants.PATH_SEP : JAXBControlConstants.REMOTE_PATH_SEP;
+			String target = stagingDir + pathSep + fileName;
+			SubMonitor m = progress.newChild(5);
+			copyFileToRemoteHost(localFile.getAbsolutePath(), target, m);
+			if (file.isDeleteSourceAfterUse()) {
+				localFile.delete();
+			}
+			if (m.isCanceled()) {
+				break;
+			}
+			PropertyType p = new PropertyType();
+			p.setName(file.getName());
+			if (localTarget) {
+				p.setValue(new File(System.getProperty(JAXBControlConstants.JAVA_USER_HOME), target).getAbsolutePath());
+			} else {
+				p.setValue(target);
+			}
+			p.setVisible(false);
+			rmVarMap.put(p.getName(), p);
+			progress.worked(5);
+		}
+	}
+
+	/**
+	 * Deletes files where delete target is indicated.
+	 * 
+	 * @param monitor
+	 */
+	private void doDelete(IProgressMonitor monitor) {
+		SubMonitor progress = SubMonitor.convert(monitor, files.size() * 15);
+		/*
+		 * for now we handle the files serially. NOTE: no support for Windows as
+		 * target ...
+		 */
+		for (ManagedFileType file : files) {
+			if (!file.isDeleteTargetAfterUse()) {
+				progress.worked(15);
+				continue;
+			}
+			PropertyType p = (PropertyType) rmVarMap.get(file.getName());
+			IFileStore store = delegate.getRemoteFileManager().getResource(String.valueOf(p.getValue()));
+			try {
+				if (store.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
+					store.delete(EFS.NONE, progress.newChild(10));
+				}
+			} catch (CoreException t) {
+				JAXBControlCorePlugin.log(t);
+			}
+		}
 	}
 
 	/**
