@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation.
+ * Copyright (c) 2005, 2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,9 +16,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
-import org.eclipse.ptp.pldt.mpi.core.Messages;
-import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
+import org.eclipse.ptp.pldt.mpi.core.messages.Messages;
+import org.eclipse.ptp.pldt.mpi.internal.core.MpiIDs;
 
 /**
  * This dom-walker collects "artifacts" related to the specific domain <br>
@@ -43,8 +43,8 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 
 	public MpiCASTVisitor(List<String> mpiIncludes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr) {
 		super(mpiIncludes, fileName, allowPrefixOnlyMatch, msr);
-		ARTIFACT_CALL = Messages.getString("MpiCASTVisitor.mpiCall"); //$NON-NLS-1$
-		ARTIFACT_CONSTANT = Messages.getString("MpiCASTVisitor.mpiConstant"); //$NON-NLS-1$
+		ARTIFACT_CALL = Messages.MpiCASTVisitor_mpiCall;
+		ARTIFACT_CONSTANT = Messages.MpiCASTVisitor_mpiConstant;
 		ARTIFACT_NAME = "MPI"; //$NON-NLS-1$
 
 		traceOn = CommonPlugin.getTraceOn();

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation.
+ * Copyright (c) 2005, 2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,9 +17,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PathEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.pldt.mpi.core.Messages;
-import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
+import org.eclipse.ptp.pldt.mpi.core.messages.Messages;
+import org.eclipse.ptp.pldt.mpi.internal.core.MpiIDs;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -45,13 +45,12 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class MPIPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
-	private static final String MPI_INCLUDES_PREFERENCE_LABEL = Messages.getString("MPIPreferencePage.mpiIncludePaths"); //$NON-NLS-1$
-	private static final String MPI_INCLUDES_PREFERENCE_BROWSE = Messages.getString("MPIPreferencePage.pleaseChooseAdirectory"); //$NON-NLS-1$
-	private static final String MPI_BUILD_COMMAND_LABEL = Messages.getString("MPIPreferencePage.mpiBuildCommand"); //$NON-NLS-1$
-	private static final String MPI_CPP_BUILD_COMMAND_LABEL = Messages.getString("MPIPreferencePage.mpiCppBuildCommand"); //$NON-NLS-1$
-	private static final String PROMPT_FOR_OTHERS_LABEL = Messages.getString("MPIPreferencePage.promptToIncludeOtherLocations"); //$NON-NLS-1$
-	private static final String MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL = Messages
-			.getString("MPIPreferencePage.recognizeAPISByPrefixAlone"); //$NON-NLS-1$
+	private static final String MPI_INCLUDES_PREFERENCE_LABEL = Messages.MPIPreferencePage_mpiIncludePaths;
+	private static final String MPI_INCLUDES_PREFERENCE_BROWSE = Messages.MPIPreferencePage_pleaseChooseAdirectory;
+	private static final String MPI_BUILD_COMMAND_LABEL = Messages.MPIPreferencePage_mpiBuildCommand;
+	private static final String MPI_CPP_BUILD_COMMAND_LABEL = Messages.MPIPreferencePage_mpiCppBuildCommand;
+	private static final String PROMPT_FOR_OTHERS_LABEL = Messages.MPIPreferencePage_promptToIncludeOtherLocations;
+	private static final String MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL = Messages.MPIPreferencePage_recognizeAPISByPrefixAlone;
 
 	public MPIPreferencePage()
 	{

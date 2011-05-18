@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005,2008 IBM Corporation.
+ * Copyright (c) 2005,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,9 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.pldt.mpi.core;
+package org.eclipse.ptp.pldt.mpi.internal.core;
+
+import org.eclipse.ptp.pldt.mpi.core.messages.Messages;
 
 /**
  * Misc. IDs for preferences, markers, etc.
@@ -34,7 +36,7 @@ public interface MpiIDs
 	public static final String NEWLINE = "theNewLineNo"; //$NON-NLS-1$
 
 	/** Preference page name for MPI Includes field label */
-	static public final String MPI_INCLUDES = Messages.getString("MpiIDs.MPI_INCLUDES"); //$NON-NLS-1$
+	static public final String MPI_INCLUDES = Messages.MpiIDs_MPI_INCLUDES;
 	/** Preference setting for default mpi build command */
 	public static final String MPI_BUILD_CMD = "mpiBuildCommand"; //$NON-NLS-1$
 	/** Preference setting for default c++ mpi build command */

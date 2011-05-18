@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation.
+ * Copyright (c) 2005, 2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,8 +22,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.pldt.common.editorHelp.CHelpBookImpl;
 import org.eclipse.ptp.pldt.common.editorHelp.FunctionSummaryImpl;
-import org.eclipse.ptp.pldt.mpi.core.Messages;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
+import org.eclipse.ptp.pldt.mpi.core.messages.Messages;
 import org.osgi.framework.Bundle;
 
 /**
@@ -33,7 +33,7 @@ import org.osgi.framework.Bundle;
  * 
  */
 public class MpiCHelpBook extends CHelpBookImpl {
-	private static final String TITLE = Messages.getString("MpiCHelpBook_MPI_C_HELP_BOOK_TITLE"); //$NON-NLS-1$
+	private static final String TITLE = Messages.MpiCHelpBook_MPI_C_HELP_BOOK_TITLE;
 
 	/**
 	 * builds the list of function summaries by parsing an XML file

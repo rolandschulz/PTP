@@ -1,9 +1,19 @@
+/**********************************************************************
+ * Copyright (c) 2011 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.pldt.mpi.core.views;
 
 import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
-import org.eclipse.ptp.pldt.mpi.core.Messages;
-import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
+import org.eclipse.ptp.pldt.mpi.core.messages.Messages;
+import org.eclipse.ptp.pldt.mpi.internal.core.MpiIDs;
 
 /**
  * An MPI artifact view based on SimpleTableView <br>
@@ -14,7 +24,7 @@ import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 public class MPITableView extends SimpleTableMarkerView {
 	public MPITableView() {
 
-		super(MpiPlugin.getDefault(), Messages.getString("MPITableView_ARTIFACT"), Messages.getString("MPITableView_ARTIFACTS"), //$NON-NLS-1$ //$NON-NLS-2$
-				Messages.getString("MPITableView_CONSTRUCT"), MpiIDs.MARKER_ID); //$NON-NLS-1$
+		super(MpiPlugin.getDefault(), Messages.MPITableView_ARTIFACT, Messages.MPITableView_ARTIFACTS,
+				Messages.MPITableView_CONSTRUCT, MpiIDs.MARKER_ID);
 	}
 }

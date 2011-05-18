@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation.
+ * Copyright (c) 2005, 2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTUsingDirective;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
-import org.eclipse.ptp.pldt.mpi.core.Messages;
+import org.eclipse.ptp.pldt.mpi.core.messages.Messages;
 
 /**
  * This dom-walker collects artifacts (currently function calls and constants),
@@ -52,8 +52,8 @@ public class MpiCPPASTVisitor extends PldtAstVisitor {
 	public MpiCPPASTVisitor(List<String> mpiIncludes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr) {
 		super(mpiIncludes, fileName, allowPrefixOnlyMatch, msr);
 		usingNamespaceMPI = false;
-		ARTIFACT_CALL = Messages.getString("MpiCPPASTVisitor.mpiCall"); //$NON-NLS-1$
-		ARTIFACT_CONSTANT = Messages.getString("MpiCPPASTVisitor.mpiConstant"); //$NON-NLS-1$
+		ARTIFACT_CALL = Messages.MpiCPPASTVisitor_mpiCall;
+		ARTIFACT_CONSTANT = Messages.MpiCPPASTVisitor_mpiConstant;
 	}
 
 	public int visit(IASTDeclaration declaration) {
