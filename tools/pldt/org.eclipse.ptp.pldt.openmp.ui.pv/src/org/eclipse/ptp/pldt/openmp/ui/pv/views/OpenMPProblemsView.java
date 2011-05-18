@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006,2010 IBM Corp. 
+ * Copyright (c) 2006,2011 IBM Corp. 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,23 +13,6 @@ package org.eclipse.ptp.pldt.openmp.ui.pv.views;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import org.eclipse.ptp.pldt.openmp.analysis.OpenMPError;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.part.*;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.*;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.*;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.SWT;
 
 import org.eclipse.cdt.core.parser.ParserUtil;
 import org.eclipse.core.resources.IFile;
@@ -46,10 +29,46 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.ptp.pldt.openmp.analysis.OpenMPError;
 import org.eclipse.ptp.pldt.openmp.ui.pv.PvPlugin;
+import org.eclipse.ptp.pldt.openmp.ui.pv.internal.IDs;
 import org.eclipse.ptp.pldt.openmp.ui.pv.messages.Messages;
-import org.eclipse.ptp.pldt.openmp.ui.pv.views.ProblemMarkerAttrIds;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * OpenMP Problems View
@@ -63,7 +82,7 @@ public class OpenMPProblemsView extends ViewPart {
 	private Action doubleClickAction;
 	private Action removeMarkerAction;
 
-	private String markerID_ = PvPlugin.MARKER_ID;
+	private String markerID_ = IDs.MARKER_ID;
 	protected UpdateVisitor visitor_ = new UpdateVisitor();
 
 	private String iconName_ = "icons/openMPproblem.gif"; //$NON-NLS-1$

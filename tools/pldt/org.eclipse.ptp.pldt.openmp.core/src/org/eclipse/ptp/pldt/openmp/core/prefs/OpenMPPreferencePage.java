@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005,2010 IBM Corporation.
+ * Copyright (c) 2005,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,8 +15,8 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PathEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.pldt.openmp.internal.core.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
+import org.eclipse.ptp.pldt.openmp.core.internal.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -76,7 +76,7 @@ public class OpenMPPreferencePage extends FieldEditorPreferencePage implements I
 				OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL, getFieldEditorParent());
 		addField(bPrefix);
 
-		PathEditor pathEditor = new PathEditor(OpenMPPlugin.OPEN_MP_INCLUDES, INCLUDES_PREFERENCE_LABEL,
+		PathEditor pathEditor = new PathEditor(OpenMPIDs.OPEN_MP_INCLUDES, INCLUDES_PREFERENCE_LABEL,
 				INCLUDES_PREFERENCE_BROWSE, getFieldEditorParent());
 		addField(pathEditor);
 	}

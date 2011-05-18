@@ -12,8 +12,8 @@ package org.eclipse.ptp.pldt.openmp.core.prefs;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.pldt.openmp.internal.core.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
+import org.eclipse.ptp.pldt.openmp.core.internal.OpenMPIDs;
 
 /**
  * Class used to initialize default preference values.

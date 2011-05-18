@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005,2010 IBM Corporation.
+ * Copyright (c) 2005,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
+import org.eclipse.ptp.pldt.openmp.core.internal.OpenMPIDs;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -29,15 +29,6 @@ public class OpenMPPlugin extends AbstractUIPlugin {
 	// The shared instance.
 	private static OpenMPPlugin plugin;
 	public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.openmp.core"; //$NON-NLS-1$
-
-	// Constants
-	// preference page name for OpenMP
-	public static final String OPEN_MP_INCLUDES = Messages.OpenMPPlugin_OpenMP_includes;
-
-	public static final String MARKER_ID = "org.eclipse.ptp.pldt.openmp.core.openMPMarker"; //$NON-NLS-1$
-
-	// artifact view id
-	public static final String VIEW_ID = "org.eclipse.ptp.pldt.openmp.core.views.OpenMPArtifactView"; //$NON-NLS-1$
 
 	/**
 	 * The constructor.
@@ -87,7 +78,7 @@ public class OpenMPPlugin extends AbstractUIPlugin {
 	 */
 	public List<String> getIncludeDirs()
 	{
-		String stringList = getPluginPreferences().getString(OPEN_MP_INCLUDES);
+		String stringList = getPluginPreferences().getString(OpenMPIDs.OPEN_MP_INCLUDES);
 		StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
 		List<String> dirs = new ArrayList<String>();
 		while (st.hasMoreElements()) {

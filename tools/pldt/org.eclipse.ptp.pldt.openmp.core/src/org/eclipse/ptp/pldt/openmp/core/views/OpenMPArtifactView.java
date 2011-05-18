@@ -28,6 +28,7 @@ import org.eclipse.ptp.pldt.common.ArtifactManager;
 import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTOMPPragma;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
+import org.eclipse.ptp.pldt.openmp.core.internal.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
@@ -51,7 +52,7 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
 				Messages.OpenMPArtifactView_OpenMP_Artifact,
 				Messages.OpenMPArtifactView_OpenMP_Artifacts,
 				Messages.OpenMPArtifactView_Construct,
-				OpenMPPlugin.MARKER_ID);
+				OpenMPIDs.MARKER_ID);
 
 	}
 

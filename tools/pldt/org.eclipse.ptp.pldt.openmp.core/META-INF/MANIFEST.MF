@@ -24,5 +24,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Export-Package: org.eclipse.ptp.pldt.openmp.core,
  org.eclipse.ptp.pldt.openmp.core.actions,
+ org.eclipse.ptp.pldt.openmp.core.internal;x-friends:="org.eclipse.ptp.pldt.wizards,org.eclipse.ptp.pldt.tests",
  org.eclipse.ptp.pldt.openmp.core.prefs
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

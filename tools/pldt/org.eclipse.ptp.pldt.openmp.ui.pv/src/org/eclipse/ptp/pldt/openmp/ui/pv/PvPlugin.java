@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corp. 
+ * Copyright (c) 2010,2011 IBM Corp. 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.ui.pv;
 
-import org.eclipse.ui.plugin.*;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -21,10 +21,6 @@ public class PvPlugin extends AbstractUIPlugin {
 
 	// The shared instance.
 	private static PvPlugin plugin;
-
-	public static final String MARKER_ID = "org.eclipse.ptp.pldt.openmp.ui.pv.openMPProblemMarker"; //$NON-NLS-1$
-
-	public static final String VIEW_ID = "org.eclipse.ptp.pldt.openmp.ui.pv.views.OpenMPProblemsView"; //$NON-NLS-1$
 
 	/**
 	 * The constructor.

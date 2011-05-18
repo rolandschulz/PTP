@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007,2010 IBM Corporation.
+ * Copyright (c) 2007,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,9 +41,9 @@ import org.eclipse.ptp.pldt.openmp.core.OpenMPArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPScanReturn;
 import org.eclipse.ptp.pldt.openmp.core.analysis.OpenMPCASTVisitor;
+import org.eclipse.ptp.pldt.openmp.core.internal.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
-import org.eclipse.ptp.pldt.openmp.internal.core.OpenMPIDs;
-import org.eclipse.ptp.pldt.openmp.ui.pv.PvPlugin;
+import org.eclipse.ptp.pldt.openmp.ui.pv.internal.IDs;
 import org.eclipse.ptp.pldt.openmp.ui.pv.views.ProblemMarkerAttrIds;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
@@ -60,7 +60,7 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 	 * Constructor for the "Run Analysis" action
 	 */
 	public RunAnalyseOpenMPcommandHandler() {
-		super("OpenMP", new OpenMPArtifactMarkingVisitor(OpenMPPlugin.MARKER_ID), OpenMPPlugin.MARKER_ID); //$NON-NLS-1$
+		super("OpenMP", new OpenMPArtifactMarkingVisitor(OpenMPIDs.MARKER_ID), OpenMPIDs.MARKER_ID); //$NON-NLS-1$
 	}
 
 	/**
@@ -82,7 +82,8 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		try {
 			lang = tu.getLanguage();
 
-			atu = tu.getAST();
+			// atu = tu.getAST();
+			atu = getAST(tu); // use index; was tu.getAST(); otherwise fortran fails?
 			String languageID = lang.getId();
 
 			if (languageID.equals(GCCLanguage.ID) || languageID.equals(GPPLanguage.ID)) {
@@ -272,12 +273,12 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 
 	@Override
 	protected void activateArtifactView() {
-		ViewActivator.activateView(OpenMPPlugin.VIEW_ID);
+		ViewActivator.activateView(OpenMPIDs.VIEW_ID);
 	}
 
 	@Override
 	protected void activateProblemsView() {
-		ViewActivator.activateView(PvPlugin.VIEW_ID);
+		ViewActivator.activateView(IDs.VIEW_ID);
 	}
 
 }
