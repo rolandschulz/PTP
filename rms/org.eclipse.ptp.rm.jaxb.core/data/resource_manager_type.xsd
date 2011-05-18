@@ -247,6 +247,7 @@
 			<xs:element name="line" maxOccurs="unbounded" type="rm:line-type"/>
 		</xs:sequence>
 		<xs:attribute name="insertEnvironmentAfter" type="xs:int" default="-1"/>
+		<xs:attribute name="deleteAfterSubmit" type="xs:boolean" default="true"/>
 	</xs:complexType>
 	<xs:complexType name="line-type">
 		<xs:sequence>
@@ -346,7 +347,8 @@
 		<xs:attribute name="name" use="required"/>
 		<xs:attribute name="uniqueIdPrefix" type="xs:boolean" default="false"/>
 		<xs:attribute name="resolveContents" type="xs:boolean" default="true"/>
-		<xs:attribute name="deleteAfterUse" type="xs:boolean" default="false"/>
+		<xs:attribute name="deleteSourceAfterUse" type="xs:boolean" default="false"/>
+		<xs:attribute name="deleteTargetAfterUse" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="file-match-type">
 		<xs:attribute name="efsAttributes" type="xs:string">
@@ -932,6 +934,7 @@
 				<xs:element name="append" type="rm:append-type"/>
 				<xs:element name="put" type="rm:put-type"/>
 				<xs:element name="set" type="rm:set-type"/>
+				<xs:element name="throw" type="rm:throw-type"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="moveToTop" type="xs:boolean" default="false">
@@ -975,6 +978,18 @@
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
 	</xs:complexType>
+	<xs:complexType name="throw-type">
+      <xs:annotation>
+         <xs:documentation>
+            Throws an exception with the given message; o
+         </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="entry" minOccurs="0" type="rm:entry-type"/>
+      </xs:sequence>
+      <xs:attribute name="field" type="xs:string"/>
+      <xs:attribute name="message" type="xs:string"/>
+   </xs:complexType>
 	<xs:complexType name="add-type">
 		<xs:annotation>
 			<xs:documentation>
@@ -1047,6 +1062,7 @@
 				<xs:element name="append" type="rm:append-type"/>
 				<xs:element name="put" type="rm:put-type"/>
 				<xs:element name="set" type="rm:set-type"/>
+				<xs:element name="throw" type="rm:throw-type"/>
 			</xs:choice>
 			<xs:element name="else" minOccurs="0">
 				<xs:complexType>
@@ -1055,6 +1071,7 @@
 						<xs:element name="append" type="rm:append-type"/>
 						<xs:element name="put" type="rm:put-type"/>
 						<xs:element name="set" type="rm:set-type"/>
+						<xs:element name="throw" type="rm:throw-type"/>
 					</xs:choice>
 				</xs:complexType>
 			</xs:element>

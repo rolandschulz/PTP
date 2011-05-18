@@ -420,7 +420,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			files = maybeAddManagedFileForScript(files);
 			worked(progress, 5);
 
-			if (!maybeHandleManagedFiles(uuid, files)) {
+			if (!maybeTransferManagedFiles(uuid, files)) {
 				throw CoreExceptionUtils.newException(Messages.CannotCompleteSubmitFailedStaging, null);
 			}
 			worked(progress, 20);
@@ -450,6 +450,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			jobStatusMap.addJobStatus(status.getJobId(), status);
 			status.setLaunchConfig(configuration);
+			worked(progress, 5);
+
+			/*
+			 * if the staged files can be removed, delete them
+			 */
+			maybeCleanupManagedFiles(uuid, files);
 			worked(progress, 5);
 
 			/*
@@ -698,8 +704,19 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 						+ JAXBControlConstants.VALUE + JAXBControlConstants.CLOSV);
 				scriptFile.setDeleteAfterUse(true);
 			}
+			// can always set the target to be cleaned up XXX
 		}
 		return files;
+	}
+
+	/**
+	 * Looks for cleanup flag and removes the remote file if indicated.
+	 * 
+	 * @param uuid
+	 * @param files
+	 */
+	private void maybeCleanupManagedFiles(String uuid, ManagedFilesType files) {
+
 	}
 
 	/**
@@ -736,29 +753,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		rmVarMap.remove(jobId);
-	}
-
-	/**
-	 * Write content to file if indicated, and stage to host.
-	 * 
-	 * @param uuid
-	 *            temporary internal id for as yet unsubmitted job
-	 * @param files
-	 *            the set of managed files for this submission
-	 * @return whether the necessary staging completed without error
-	 * @throws CoreException
-	 */
-	private boolean maybeHandleManagedFiles(String uuid, ManagedFilesType files) throws CoreException {
-		if (files == null || files.getFile().isEmpty()) {
-			return true;
-		}
-		ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
-		job.schedule();
-		try {
-			job.join();
-		} catch (InterruptedException ignored) {
-		}
-		return job.getSuccess();
 	}
 
 	/**
@@ -802,6 +796,29 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			killed = status.cancel();
 		}
 		return killed;
+	}
+
+	/**
+	 * Write content to file if indicated, and stage to host.
+	 * 
+	 * @param uuid
+	 *            temporary internal id for as yet unsubmitted job
+	 * @param files
+	 *            the set of managed files for this submission
+	 * @return whether the necessary staging completed without error
+	 * @throws CoreException
+	 */
+	private boolean maybeTransferManagedFiles(String uuid, ManagedFilesType files) throws CoreException {
+		if (files == null || files.getFile().isEmpty()) {
+			return true;
+		}
+		ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException ignored) {
+		}
+		return job.getSuccess();
 	}
 
 	/**
