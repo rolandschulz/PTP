@@ -117,7 +117,7 @@ public class NodesView extends LMLViewPart {
 			composite.addDisposeListener(new DisposeListener() {
 
 				public void widgetDisposed(DisposeEvent e) {
-					lmlManager.removeView(gid);
+					// lmlManager.removeView(gid);
 
 				}
 

@@ -255,7 +255,7 @@ public class TableView extends LMLViewPart {
 		composite.addDisposeListener(new DisposeListener() {
 
 			public void widgetDisposed(DisposeEvent e) {
-				lmlManager.removeView(gid);
+				// lmlManager.removeView(gid);
 
 			}
 
@@ -298,15 +298,15 @@ public class TableView extends LMLViewPart {
 		input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
 		viewer.setInput(input);
 		viewer.getTree().setItemCount(input.length);
-		
+
 		// Part from MonitorJobListView
 		MenuManager contextMenu = new MenuManager();
 		contextMenu.setRemoveAllWhenShown(true);
 		contextMenu.addMenuListener(new IMenuListener() {
-			
+
 			public void menuAboutToShow(IMenuManager manager) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 		Control control = viewer.getControl();
@@ -317,7 +317,7 @@ public class TableView extends LMLViewPart {
 
 	private void createMenu() {
 		IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
-		
+
 		IMenuManager subMenuShow = new MenuManager("Show column...");
 		String[] columnNonActive = fSelectedLguiItem.getTableHandler().getTableColumnNonActive(gid);
 		for (String column : columnNonActive) {
@@ -325,7 +325,7 @@ public class TableView extends LMLViewPart {
 			subMenuShow.add(action);
 		}
 		menuManager.add(subMenuShow);
-		
+
 		IMenuManager subMenuHide = new MenuManager("Hide column...");
 		String[] columnActive = fSelectedLguiItem.getTableHandler().getTableColumnActive(gid);
 		for (String column : columnActive) {
@@ -333,10 +333,10 @@ public class TableView extends LMLViewPart {
 			subMenuHide.add(action);
 		}
 		menuManager.add(subMenuHide);
-		
+
 		getViewSite().getActionBars().updateActionBars();
 	}
-	
+
 	private int getColumnAlignment(String alignment) {
 		if (alignment.equals("LEFT")) {
 			return SWT.LEAD;
@@ -477,7 +477,7 @@ public class TableView extends LMLViewPart {
 		}
 		return orderNew;
 	}
-	
+
 	public int[] getRemoveColumnOrder() {
 		return removingColumn(tree.getColumnOrder());
 	}
