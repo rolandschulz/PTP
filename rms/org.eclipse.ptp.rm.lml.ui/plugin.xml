@@ -59,87 +59,79 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             adaptable="false"
-            id="org.eclipse.ptp.rm.jaxb.ui.persistentStatusContribution"
+            id="org.eclipse.ptp.rm.lml.ui.persistentStatusContribution"
             objectClass="org.eclipse.ptp.rm.lml.internal.core.model.Row">
          <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.RemoveJob"
+               class="org.eclipse.ptp.rm.lml.ui.actions.SuspendJob"
                enablesFor="+"
-               id="org.eclipse.ptp.rm.jaxb.ui.RemoveJob"
-               label="Remove Job Entry"
-               menubarPath="table"
-               tooltip="Permanently remove job entry from table.">
-         </action>
-         <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.CancelJob"
-               enablesFor="+"
-               id="org.eclipse.ptp.rm.jaxb.ui.CancelJob"
-               label="Cancel Job"
-               menubarPath="job"
-               tooltip="Terminate the job.">
-         </action>
-         <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.SuspendJob"
-               enablesFor="+"
-               id="org.eclipse.ptp.rm.jaxb.ui.SuspendJob"
+               id="org.eclipse.ptp.rm.lml.ui.actions.SuspendJob"
                label="Suspend Job"
                menubarPath="job"
                tooltip="Suspend the job.">
          </action>
          <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.ResumeJob"
+               class="org.eclipse.ptp.rm.lml.ui.actions.GetOutput"
                enablesFor="+"
-               id="org.eclipse.ptp.rm.jaxb.ui.ResumeJob"
-               label="Resume Job"
-               menubarPath="job"
-               tooltip="Resume the job.">
-         </action>
-         <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.HoldJob"
-               enablesFor="+"
-               id="org.eclipse.ptp.rm.jaxb.ui.HoldJob"
-               label="Hold Job"
-               menubarPath="job"
-               tooltip="Hold the job.">
-         </action>
-         <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.ReleaseJob"
-               enablesFor="+"
-               id="org.eclipse.ptp.rm.jaxb.ui.ReleaseJob"
-               label="Release Job"
-               menubarPath="job"
-               tooltip="Release the job.">
-         </action>
-         <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.RefreshJobStatus"
-               enablesFor="+"
-               id="org.eclipse.ptp.rm.jaxb.ui.actions.refreshJobStatus"
-               label="Refresh Job Status"
-               menubarPath="status"
-               tooltip="Refresh the state and state detail for this job.">
-         </action>
-         <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.GetOutput"
-               enablesFor="+"
-               id="org.eclipse.ptp.rm.jaxb.ui.GetOutput"
+               id="org.eclipse.ptp.rm.lml.ui.actions.GetOutput"
                label="Get Job Output"
                menubarPath="file"
                tooltip="Display the job output in a console.">
          </action>
          <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.GetError"
+               class="org.eclipse.ptp.rm.lml.ui.actions.GetError"
                enablesFor="+"
-               id="org.eclipse.ptp.rm.jaxb.ui.GetError"
+               id="org.eclipse.ptp.rm.lml.ui.actions.GetError"
                label="Get Job Error"
                menubarPath="file"
                tooltip="Display the job error in a console.">
          </action>
          <action
-               class="org.eclipse.ptp.rm.jaxb.ui.actions.GetOutput"
+               class="org.eclipse.ptp.rm.lml.ui.actions.RefreshJobStatus"
                enablesFor="+"
-               id="org.eclipse.ptp.rm.jaxb.ui.GetOutput"
-               label="Get Job Output"
-               menubarPath="file"
-               tooltip="Display the job output in a console">
+               id="org.eclipse.ptp.rm.lml.ui.actions.RefreshJobStatus"
+               label="Refresh Job Status"
+               menubarPath="status"
+               tooltip="Refresh the state and state detail for this job.">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.ui.actions.ReleaseJob"
+               enablesFor="+"
+               id="org.eclipse.ptp.rm.lml.ui.actions.ReleaseJob"
+               label="Release Job"
+               menubarPath="job"
+               tooltip="Release the job.">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.ui.actions.HoldJob"
+               enablesFor="+"
+               id="org.eclipse.ptp.rm.lml.ui.actions.HoldJob"
+               label="Hold Job"
+               menubarPath="job"
+               tooltip="Hold the job.">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.ui.actions.CancelJob"
+               enablesFor="+"
+               id="org.eclipse.ptp.rm.lml.ui.actions.CancelJob"
+               label="Cancel Job"
+               menubarPath="job"
+               tooltip="Terminate the job.">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.ui.actions.RemoveJob"
+               enablesFor="+"
+               id="org.eclipse.ptp.rm.lml.ui.actions.RemoveJob"
+               label="Remove Job Entry"
+               menubarPath="table"
+               tooltip="Permanently remove job entry from table.">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.ui.actions.ResumeJob"
+               enablesFor="+"
+               id="org.eclipse.ptp.rm.lml.ui.actions.ResumeJob"
+               label="Resume Job"
+               menubarPath="job"
+               tooltip="Resume the job.">
          </action>
       </objectContribution>
    </extension>
