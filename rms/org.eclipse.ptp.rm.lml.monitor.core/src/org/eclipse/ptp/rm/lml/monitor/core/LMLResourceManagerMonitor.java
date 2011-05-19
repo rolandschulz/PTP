@@ -48,7 +48,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		protected IStatus run(IProgressMonitor monitor) {
 			try {
 				fServer.startServer(monitor);
-				LMLManager.getInstance().register(getResourceManager().getResourceManagerId(), fServer.getInputStream(),
+				LMLManager.getInstance().register(getResourceManager().getUniqueName(), fServer.getInputStream(),
 						fServer.getOutputStream());
 			} catch (IOException e) {
 			}
