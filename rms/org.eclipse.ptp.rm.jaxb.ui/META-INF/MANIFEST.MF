@@ -25,3 +25,4 @@ Export-Package: org.eclipse.ptp.rm.jaxb.ui;x-friends:="org.eclipse.ptp.rm.jaxb.c
  org.eclipse.ptp.rm.jaxb.ui.messages;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.ui.monitor",
  org.eclipse.ptp.rm.jaxb.ui.util;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.ui.monitor",
  org.eclipse.ptp.rm.jaxb.ui.wizards;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.ui.monitor"
+Bundle-Localization: plugin

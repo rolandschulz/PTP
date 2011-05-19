@@ -1,6 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JAXBPBS
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.jaxb.pbs;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.ptp.rm.jaxb.core;bundle-version="1.0.0"
+Bundle-Vendor: %pluginProvider
+Bundle-Localization: plugin

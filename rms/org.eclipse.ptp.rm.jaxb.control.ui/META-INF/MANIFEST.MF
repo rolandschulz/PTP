@@ -29,3 +29,4 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.rm.jaxb.control.ui.launch;x-friends:="org.eclipse.ptp.rm.lml_jaxb",
  org.eclipse.ptp.rm.jaxb.control.ui.wizards;x-friends:="org.eclipse.ptp.rm.lml_jaxb"
 Bundle-Vendor: %pluginProvider
+Bundle-Localization: plugin

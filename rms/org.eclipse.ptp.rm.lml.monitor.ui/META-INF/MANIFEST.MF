@@ -28,3 +28,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: %pluginProvider
 Export-Package: org.eclipse.ptp.rm.lml.monitor.ui.wizards
+Bundle-Localization: plugin
