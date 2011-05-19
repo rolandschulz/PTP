@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,9 @@
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.cdt.core.model.ICElement;
@@ -46,7 +48,6 @@ import org.eclipse.rse.core.model.IHost;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.ISearchResult;
 import org.eclipse.search.ui.ISearchResultListener;
-import org.eclipse.ui.IMemento;
 
 /**
  * A C/C++ indexing service provider that does nothing.
@@ -147,6 +148,12 @@ public class NullCIndexServiceProvider extends
 			public ICElement[] findDefinitions(Scope scope, ICProject project, IWorkingCopy workingCopy, int selectionStart,
 					int selectionLength, IProgressMonitor pm) throws CoreException {
 				return new ICElement[0];
+			}
+
+			public Map<String, ICElement[]> findOverriders(Scope scope,
+					ICElement input, IProgressMonitor pm) {
+				// TODO Auto-generated method stub
+				return new HashMap<String, ICElement[]>();
 			}
 			
 		}; 
