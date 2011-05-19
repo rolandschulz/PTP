@@ -74,6 +74,12 @@ public class LguiItem implements ILguiItem {
 	 **************************************************************************************************************/
 
 	/**
+	 * Empty Constructor.
+	 */
+	public LguiItem() {		
+	}
+	
+	/**
 	 * Constructor with LML-model as argument
 	 * 
 	 * @param lgui
@@ -91,7 +97,6 @@ public class LguiItem implements ILguiItem {
 	 *            InputStream
 	 */
 	public LguiItem(InputStream stream) {
-
 		lgui = parseLML(stream);
 		createLguiHandlers();
 		setCid();

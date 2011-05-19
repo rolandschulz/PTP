@@ -1,6 +1,7 @@
 package org.eclipse.ptp.rm.lml.ui.views;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
@@ -8,6 +9,7 @@ import org.eclipse.ptp.rm.lml.ui.providers.DisplayNode;
 import org.eclipse.ptp.rm.lml.ui.providers.LguiWidget;
 import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayComp;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -23,9 +25,10 @@ public class NodedisplayView extends LguiWidget{
 
 	private Nodedisplay model;//LML-Data-model for this view
 	
+	private ScrolledComposite scrollpane;//creates scrollbars surrounding nodedisplay
 	private NodedisplayComp root;//root nodedisplay which is currently shown
 	
-	private Stack<String> zoomstack=new Stack<String>();//Saves zoom-levels to zoom out later, saves full-implicit name of nodes to create Displaynodes from these ids
+	private Deque<String> zoomstack=new ArrayDeque<String>();//Saves zoom-levels to zoom out later, saves full-implicit name of nodes to create Displaynodes from these ids
 	
 	//Cursors for showing processing
 	private Cursor waitcursor;//Cursor to show while processing
@@ -46,6 +49,7 @@ public class NodedisplayView extends LguiWidget{
 		
 		setLayout(new FillLayout());
 		
+		scrollpane=new ScrolledComposite(this, SWT.H_SCROLL | SWT.V_SCROLL);
 		root=new NodedisplayComp(lgui, model, this, SWT.None);
 		
 		//Create cursors
@@ -54,10 +58,17 @@ public class NodedisplayView extends LguiWidget{
 	}
 	
 	/**
+	 * @return access to scrollpane, which contains the root-nodedisplay
+	 */
+	public ScrolledComposite getScrollPane(){
+		return scrollpane;
+	}
+	
+	/**
 	 * The stack which saves the last zoom-levels is restarted
 	 */
 	public void restartZoom(){
-		zoomstack=new Stack<String>();
+		zoomstack=new ArrayDeque<String>();
 	}
 	
 	/**
@@ -131,7 +142,9 @@ public class NodedisplayView extends LguiWidget{
 		}
 		else newcomp=new NodedisplayComp(lgui, model, this, SWT.None);//if impname is null => go up to root-level
 		root=newcomp;
+		
 		this.layout();
+		root.layout();
 		
 		return true;
 	}

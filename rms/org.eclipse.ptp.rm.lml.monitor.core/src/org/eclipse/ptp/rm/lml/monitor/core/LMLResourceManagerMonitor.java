@@ -10,6 +10,8 @@
 package org.eclipse.ptp.rm.lml.monitor.core;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -24,6 +26,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.server.RemoteServerManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
@@ -36,7 +39,7 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
 public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	private class MonitorJob extends Job {
 		private final LMLDAServer fServer;
-
+		
 		public MonitorJob(String name, IRemoteConnection conn) {
 			super(name);
 			setSystem(true);
@@ -63,12 +66,20 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	private final IJAXBResourceManagerConfiguration fConfig;
 
 	private MonitorJob fMonitorJob = null;
+	
+	private final LMLManager lmlManager;
+	
+	private InputStream input;
+	
+	private OutputStream output;
+
 
 	public LMLResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
 		fConfig = (IJAXBResourceManagerConfiguration) config;
-		
-		// TODO Creating LguiItem
+
+		lmlManager = LMLManager.getInstance();
+		lmlManager.addLgui(getResourceManager().getUniqueName());
 	}
 
 	@Override
@@ -104,6 +115,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		/*
 		 * Initialize LML classes
 		 */
+		lmlManager.register(getResourceManager().getUniqueName(), input, output);
 
 		/*
 		 * Open connection and launch periodic job

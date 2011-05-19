@@ -57,7 +57,7 @@ public class LMLManager {
 	/*
 	 * The current considered ILguiItem
 	 */
-	private ILguiItem fSelectedLguiItem = null;
+	private ILguiItem fLguiItem = null;
 
 	/*
 	 * A list of all listeners on the ILguiItem
@@ -78,6 +78,17 @@ public class LMLManager {
 	 * An instance of this class.
 	 */
 	private static LMLManager manager;
+	
+	
+	/*
+	 * InputStream
+	 */
+	private InputStream input;
+	
+	/*
+	 * OutputStream
+	 */
+	private OutputStream output;
 	
 	/**************************************************************************************************************
 	 * Constructors
@@ -109,39 +120,52 @@ public class LMLManager {
 	 **************************************************************************************************************/
 
 	public void register(String name, InputStream stream) {
-		//that is 
-		if (!LGUIS.containsKey(name)) {
-			fSelectedLguiItem = new LguiItem(stream);
-			synchronized (LGUIS) {
-				LGUIS.put(name, fSelectedLguiItem);
-			}
-			fireNewLgui();
-		}
-		open(name);
-		update(stream);
+		// TODO implement
 	}
 	
-	public void register(String name, InputStream inStream, OutputStream outStream) {
-		
+	public void register(String name, InputStream input, OutputStream output) {
+		if(!LGUIS.containsKey(name)) {
+			ILguiItem lgui = new LguiItem();
+			synchronized (LGUIS) {
+				LGUIS.put(name, lgui);
+			}
+		}
+		fLguiItem = LGUIS.get(name);
+		this.input = input;
+		this.output = output;
+	}
+	
+	public OutputStream getCurrentLayout() {
+		// TODO Carstens part
+		return null;
 	}
 	
 	public void open(String name) {
 		// TODO load all data
 		if (LGUIS.containsKey(name)) {
-			fSelectedLguiItem = LGUIS.get(name);
+			fLguiItem = LGUIS.get(name);
 			fireSelectedLgui();
 		}
 	}
 	
 	public void close(String name) {
 		// TODO save data
-		fSelectedLguiItem = null;
+		fLguiItem = null;
 	}
 	
 	/**************************************************************************************************************
 	 * Lgui handling methods
 	 **************************************************************************************************************/
 
+	public void addLgui(String name) {
+		if (!LGUIS.containsKey(name)) {
+			ILguiItem lgui = new LguiItem();
+			synchronized (LGUIS) {
+				LGUIS.put(name, lgui);
+			}
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -149,9 +173,9 @@ public class LMLManager {
 	 */
 	public boolean addLgui(URI xmlFile) {
 		if (!LGUIS.containsKey(xmlFile.getPath())) {
-			fSelectedLguiItem = new LguiItem(xmlFile);
+			fLguiItem = new LguiItem(xmlFile);
 			synchronized (LGUIS) {
-				LGUIS.put(xmlFile.getPath(), fSelectedLguiItem);
+				LGUIS.put(xmlFile.getPath(), fLguiItem);
 			}
 			fireNewLgui();
 			return false;
@@ -180,7 +204,7 @@ public class LMLManager {
 	 * @see org.eclipse.ptp.rm.lml.core.ILMLManager#getSelectedLguiItem()
 	 */
 	public ILguiItem getSelectedLguiItem() {
-		return fSelectedLguiItem;
+		return fLguiItem;
 	}
 	
 	private String getSelectedLguiTitle(int index) {
@@ -189,12 +213,12 @@ public class LMLManager {
 	}
 	
 	public void selectLgui(int index) {
-		fSelectedLguiItem = LGUIS.get(getSelectedLguiTitle(index));
+		fLguiItem = LGUIS.get(getSelectedLguiTitle(index));
 		fireSelectedLgui();
 	}
 
 	public void selectLgui(URI xmlFile) {
-		fSelectedLguiItem = LGUIS.get(xmlFile.getPath());
+		fLguiItem = LGUIS.get(xmlFile.getPath());
 		fireSelectedLgui();
 	}
 
@@ -212,20 +236,20 @@ public class LMLManager {
 	public void removeLgui(String title) {
 		LGUIS.remove(title);
 		if (LGUIS.isEmpty()) {
-			fSelectedLguiItem = null;
+			fLguiItem = null;
 		} else {
-			fSelectedLguiItem = LGUIS.get(getLguis()[0]);
+			fLguiItem = LGUIS.get(getLguis()[0]);
 		}
 		fireSelectedLgui();
 	}
 	
 	public void update(InputStream stream) {
-		fSelectedLguiItem.update(stream);
+		fLguiItem.update(stream);
 		fireNewLgui();
 	}
 
 	public void update() {
-		fSelectedLguiItem.updateXML();
+		fLguiItem.updateXML();
 		fireNewLgui();
 	}
 
@@ -268,12 +292,12 @@ public class LMLManager {
 
 	
 	public void setTableColumnActive(String gid, String title) {
-		fSelectedLguiItem.getTableHandler().setTableColumnActive(gid, title, true);
+		fLguiItem.getTableHandler().setTableColumnActive(gid, title, true);
 		fireChangeTableColumn();
 	}
 	
 	public void setTableColumnNonActive(String gid, String title) {
-		fSelectedLguiItem.getTableHandler().setTableColumnActive(gid, title, false);
+		fLguiItem.getTableHandler().setTableColumnActive(gid, title, false);
 		fireChangeTableColumn();
 	}
 
@@ -290,12 +314,12 @@ public class LMLManager {
 	}
 	
 	public void addComponent(String gid) {
-		String type = fSelectedLguiItem.getLayoutAccess().setComponentActive(gid, true);
+		String type = fLguiItem.getLayoutAccess().setComponentActive(gid, true);
 		fireAddView(gid, type);
 	}
 
 	public void removeComponent(String gid) {
-		fSelectedLguiItem.getLayoutAccess().setComponentActive(gid, false);
+		fLguiItem.getLayoutAccess().setComponentActive(gid, false);
 		fireremoveView(gid);
 	}	
 	
@@ -312,7 +336,7 @@ public class LMLManager {
 	 * Method is called when a new ILguiItem was generated.
 	 */
 	private void fireNewLgui() {
-		ILguiAddedEvent event = new LguiAddedEvent(this, fSelectedLguiItem);
+		ILguiAddedEvent event = new LguiAddedEvent(this, fLguiItem);
 		for (Object listener : viewListeners.getListeners()) {
 			((IViewListener) listener).handleEvent(event);
 		}
@@ -326,7 +350,7 @@ public class LMLManager {
 	}
 
 	private void fireSelectedLgui() {
-		ILguiSelectedEvent event = new LguiSelectedEvent(this, fSelectedLguiItem);
+		ILguiSelectedEvent event = new LguiSelectedEvent(this, fLguiItem);
 		for (Object listener : viewListeners.getListeners()) {
 			((IViewListener) listener).handleEvent(event);
 		}
@@ -356,7 +380,7 @@ public class LMLManager {
 	}
 	
 	private void fireChangeTableColumn() {
-		ITableColumnChangeEvent event = new TableColumnChangeEvent(this, fSelectedLguiItem);
+		ITableColumnChangeEvent event = new TableColumnChangeEvent(this, fLguiItem);
 		for (Object listener : lmlListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
@@ -381,7 +405,7 @@ public class LMLManager {
 	 * Method is called when an ILguiItem was sorted.
 	 */
 	private void fireSortedLgui() {
-		IJobListSortedEvent event = new JobListSortedEvent(this, fSelectedLguiItem);
+		IJobListSortedEvent event = new JobListSortedEvent(this, fLguiItem);
 		for (Object listener : lmlListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
