@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.ptp.internal.rdt.core.subsystems;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.model.ICElement;
@@ -170,6 +171,17 @@ public interface ICIndexSubsystem {
 	 * @return the ICElements corresponding to each known definition of the subject.
 	 */
 	public ICElement[] getCHDefinitions(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength, IProgressMonitor pm);
+	
+	/**
+	 * Find the overrider of the given subject ICElement.
+	 * @param scope
+	 * @param subject
+	 * @param monitor
+	 * @return the overrider in the <code>Map<String, ICElement[]></code>, which has linkageid as the key and 
+	 * <code>ICElement[]</code> as the value for overrider.
+	 * @since 4.0
+	 */
+	public Map<String, ICElement[]> findOverriders(Scope scope, ICElement subject, IProgressMonitor monitor);
 	
 	/**
 	 * Runs the following search query and returns the results.

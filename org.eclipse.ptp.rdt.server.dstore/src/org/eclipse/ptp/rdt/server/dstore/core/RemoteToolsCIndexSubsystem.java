@@ -430,6 +430,19 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		}
 		return (ICElement[]) result;
 	}
+	
+	/**
+	 * @since 2.0
+	 */
+	public Map<String, ICElement[]> findOverriders(Scope scope, ICElement subject, IProgressMonitor monitor) {
+    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + subject, 100); //$NON-NLS-1$
+    	String path = EFSExtensionManager.getDefault().getPathFromURI(subject.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_OVERRIDERS, new Object[] { scope, getHostName(), subject, path }, null);
+		if (result == null) {
+			return new HashMap<String, ICElement[]>();
+		}
+		return (Map<String, ICElement[]>) result;
+	}
 
 	/*
 	 * (non-Javadoc)

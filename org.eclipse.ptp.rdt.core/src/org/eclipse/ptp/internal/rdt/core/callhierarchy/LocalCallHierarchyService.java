@@ -15,7 +15,9 @@ package org.eclipse.ptp.internal.rdt.core.callhierarchy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.dom.ast.IASTName;
@@ -327,5 +329,33 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 			return true;
 		}
 		return false;
+	}
+
+	public Map<String, ICElement[]> findOverriders(Scope scope,
+			ICElement input, IProgressMonitor pm) throws CoreException, InterruptedException {
+		final ITranslationUnit tu= CModelUtil.getTranslationUnit(input);
+		final ICProject project= tu.getCProject();
+		final IIndex index= CCorePlugin.getIndexManager().getIndex(project, IIndexManager.ADD_DEPENDENCIES | IIndexManager.ADD_DEPENDENT);
+		Map<String, ICElement[]> result = new HashMap<String, ICElement[]>();
+		index.acquireReadLock();
+		try{
+			IIndexName methodName= IndexQueries.elementToName(index, input);
+			if (methodName != null) {
+				ICProjectFactory projectFactory = new LocalCProjectFactory();
+				IBinding methodBinding= index.findBinding(methodName);
+				if (methodBinding instanceof ICPPMethod) {
+					ICElement[] defs= findOverriders(index, (ICPPMethod) methodBinding, project, projectFactory);
+					if (defs != null && defs.length > 0) {
+						result.put(methodBinding.getLinkage().getLinkageID()+"", defs); //$NON-NLS-1$
+					}
+				}
+			}
+		}
+		finally {
+			index.releaseReadLock();
+		}
+		return result;
+
+
 	}
 }
