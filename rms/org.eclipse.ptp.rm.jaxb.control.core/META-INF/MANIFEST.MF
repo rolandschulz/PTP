@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JAXBControlCore
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.jaxb.control.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin
@@ -27,3 +27,4 @@ Export-Package: org.eclipse.ptp.rm.jaxb.control;x-friends:="org.eclipse.ptp.rm.j
  org.eclipse.ptp.rm.jaxb.control.internal.utils;x-friends:="org.eclipse.ptp.rm.jaxb.tests",
  org.eclipse.ptp.rm.jaxb.control.internal.variables;x-friends:="org.eclipse.ptp.rm.jaxb.tests",
  org.eclipse.ptp.rm.jaxb.control.runnable;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.lml_jaxb,org.eclipse.ptp.rm.jaxb.tests"
+Bundle-Vendor: %pluginProvider

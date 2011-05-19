@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JAXBControlUi
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.jaxb.control.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin
@@ -28,3 +28,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.rm.jaxb.control.ui.launch;x-friends:="org.eclipse.ptp.rm.lml_jaxb",
  org.eclipse.ptp.rm.jaxb.control.ui.wizards;x-friends:="org.eclipse.ptp.rm.lml_jaxb"
+Bundle-Vendor: %pluginProvider
