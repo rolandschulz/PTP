@@ -20,6 +20,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
@@ -98,7 +99,12 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 			action.setEnabled(false);
 			return;
 		}
-		status = (JobStatusData) ((IStructuredSelection) selection).getFirstElement();
+		Row row = (Row) ((IStructuredSelection) selection).getFirstElement();
+		status = row.status;
+		if (status == null) {
+			action.setEnabled(false);
+				return;
+		}
 		if (getReady()) {
 			action.setEnabled(true);
 		} else {
