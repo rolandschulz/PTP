@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.cdt.core.dom.ast.IEnumerator;
@@ -33,6 +35,7 @@ import org.eclipse.cdt.core.index.IIndexLocationConverter;
 import org.eclipse.cdt.core.index.IIndexName;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.core.model.IMethod;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.ClassTypeHelper;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.dstore.core.model.DataStore;
@@ -187,7 +190,7 @@ public class RemoteCHQueries {
 	/**
 	 * Searches for overriders of method and converts them to ICElement, returns null, if there are none.
 	 */
-	static ICElement[] findOverriders(IIndex index, ICPPMethod binding, IIndexLocationConverter converter, ICProject project, ICProjectFactory projectFactory)	throws CoreException {
+	private static ICElement[] findOverriders(IIndex index, ICPPMethod binding, IIndexLocationConverter converter, ICProject project, ICProjectFactory projectFactory)	throws CoreException {
 		IBinding[] virtualOverriders= ClassTypeHelper.findOverriders(index, binding);
 		if (virtualOverriders.length > 0) {
 			ArrayList<ICElement> list= new ArrayList<ICElement>();
@@ -230,6 +233,48 @@ public class RemoteCHQueries {
 		
 		return new RemoteIndexFileLocation(null, newURI);
 	}
+	
+	/* -- ST-Origin --
+	 * Source folder: org.eclipse.cdt.ui/src
+	 * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHContentProvider
+	 * Version: 1.21
+	 */
+	public static Map<String, ICElement[]> handleGetOverriders(IIndex project_index, ICElement subject, String path, DataStore _dataStore, IIndexLocationConverter converter) throws InterruptedException, CoreException {
+		
+		
+		
+
+		UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock", _dataStore); //$NON-NLS-1$
+		
+		project_index.acquireReadLock();
+		Map<String, ICElement[]> result = new HashMap<String, ICElement[]>();
+		try {
+			
+			if (subject instanceof IMethod) {
+				IIndexName methodName= IndexQueries.remoteElementToName(project_index, subject, path);
+				if (methodName != null) {
+					IBinding methodBinding= project_index.findBinding(methodName);
+					if (methodBinding instanceof ICPPMethod) {
+						final ICProject project = subject.getCProject();
+						ICProjectFactory projectFactory = new RemoteCProjectFactory();
+						ICElement[] defs= findOverriders(project_index, (ICPPMethod) methodBinding, converter, project, projectFactory);
+						if (defs != null && defs.length > 0) {
+							result.put(methodBinding.getLinkage().getLinkageID()+"", defs); //$NON-NLS-1$
+						}
+					}
+				}
+			}
+		}
+		finally {
+			project_index.releaseReadLock();
+		}
+		
+		
+		return result;
+		
+	}
+	
+	
 	
 
 }
