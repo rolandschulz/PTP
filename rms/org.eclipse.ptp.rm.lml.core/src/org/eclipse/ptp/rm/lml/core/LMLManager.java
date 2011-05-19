@@ -135,9 +135,8 @@ public class LMLManager {
 		this.output = output;
 	}
 	
-	public OutputStream getCurrentLayout() {
-		// TODO Carstens part
-		return null;
+	public void getCurrentLayout() {
+		output = fLguiItem.getCurrentLayout();
 	}
 	
 	public void open(String name) {

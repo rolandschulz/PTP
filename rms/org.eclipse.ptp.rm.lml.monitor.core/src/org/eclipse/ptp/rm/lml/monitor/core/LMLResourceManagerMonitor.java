@@ -79,7 +79,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		fConfig = (IJAXBResourceManagerConfiguration) config;
 
 		lmlManager = LMLManager.getInstance();
-		lmlManager.addLgui(getResourceManager().getUniqueName());
+		lmlManager.addLgui(config.getResourceManagerId());
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		/*
 		 * Initialize LML classes
 		 */
-		lmlManager.register(getResourceManager().getUniqueName(), input, output);
+		lmlManager.register(getResourceManager().getResourceManagerId(), input, output);
 
 		/*
 		 * Open connection and launch periodic job

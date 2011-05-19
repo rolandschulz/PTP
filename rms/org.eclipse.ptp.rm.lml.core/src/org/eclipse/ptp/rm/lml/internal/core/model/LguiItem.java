@@ -11,12 +11,14 @@
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -25,16 +27,34 @@ import java.util.TreeMap;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 
 import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiHandler;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.internal.core.elements.AbslayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ChartType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ChartgroupType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.DataType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.InfoboxType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
+import org.eclipse.ptp.rm.lml.internal.core.elements.PaneType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SplitlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.TextboxType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarType;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rmsystem.IJobStatus;
@@ -68,6 +88,11 @@ public class LguiItem implements ILguiItem {
 	 * List of Jobs
 	 */
 	private final Map<String, JobStatusData> jobList = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
+	
+	/*
+	 * ObjectFactory
+	 */
+	private static ObjectFactory objectFactory = new ObjectFactory();
 	
 	/**************************************************************************************************************
 	 * Constructors
@@ -346,7 +371,172 @@ public class LguiItem implements ILguiItem {
 		lgui = parseLML(stream);
 		update();		
 	}
+	
+	/**************************************************************************************************************
+	 * Layout
+	 **************************************************************************************************************/
+	public OutputStream getCurrentLayout() {
+		return null;
+	}
+	
+	/**
+	 * Remove all real data from modell
+	 * return only layout-information and data, which is needed to make 
+	 * lml-model valid
+	 * @param model lml-modell with data and layout-information
+	 * @return
+	 */
+	private LguiType getLayoutFromModell() {
+		if (lgui == null) {
+			         return null;
+		}
+		LguiType result = objectFactory.createLguiType();
+		HashSet<String> neededComponents = new HashSet<String>();
+		
+		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+			Object value = tag.getValue();
+			
+			//add normal global layouts 
+			if (value instanceof LayoutType) {
+				result.getObjectsAndRelationsAndInformation().add(tag);
+				
+				if (value instanceof SplitlayoutType) {
+					SplitlayoutType splitLayout = (SplitlayoutType) value;
+					//Collect needed components from layout recursively
+					if (splitLayout.getLeft() != null) {
+						collectComponents(splitLayout.getLeft(), neededComponents);
+						collectComponents(splitLayout.getRight(), neededComponents);
+					}
+				} else if (value instanceof AbslayoutType) {
+					
+					AbslayoutType absLayout = (AbslayoutType) value;
+					//Just traverse comp-list for gid-attributes
+					for (ComponentType comp : absLayout.getComp()) {
+						neededComponents.add(comp.getGid());
+					}
+				}
+				
+			} else if (value instanceof ComponentlayoutType) {
+				if (((ComponentlayoutType) value).isActive()) {
+					result.getObjectsAndRelationsAndInformation().add(tag);
 
+					ComponentlayoutType componentLayout = (ComponentlayoutType) value;
+					neededComponents.add(componentLayout.getGid());
+				}
+			}
+			
+		}
+		HashMap<String, GobjectType> idToGobject = new HashMap<String, GobjectType>();
+		//Search needed components in data-tag to discover, which type the needed components have
+		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {			
+			Object value = tag.getValue();
+			//is it a graphical object?
+			if (value instanceof GobjectType) {
+				GobjectType gObject = (GobjectType) value;
+				if (neededComponents.contains(gObject.getId()) ){
+					idToGobject.put(gObject.getId(), gObject);
+				}
+			}
+		}
+		//Add all gobjects in idtoGobject to the result, so that lml-modell is valid
+		for (GobjectType gObject : idToGobject.values()) {
+			JAXBElement<GobjectType> min = minimizeGobjectType(gObject);
+			result.getObjectsAndRelationsAndInformation().add(min);
+		}
+		//Set layout-attribute
+		result.setLayout(true);
+		
+		return result;
+	}
+	
+	/**
+	 * Search for gid-attributes of a pane and put it into neededComponents
+	 * Recursively search all graphical objects referenced by this pane
+	 * 
+	 * @param p part of SplitLayout, which is scanned for gid-attributes
+	 * @param neededComponents resulting Hashset
+	 */
+	private static void collectComponents(PaneType pane, HashSet<String> neededComponents) {
+		
+		if (pane.getGid()!=null) {
+			neededComponents.add(pane.getGid());
+		} else 	if (pane.getBottom() != null) {//top and bottom components?
+			collectComponents(pane.getBottom(), neededComponents);
+			collectComponents(pane.getTop(), neededComponents);
+		} else {//Left and right
+			collectComponents(pane.getLeft(), neededComponents);
+			collectComponents(pane.getRight(), neededComponents);
+		}
+	}
+	
+	/**
+	 * Take a graphical object and minimize the data so that this instance is valid against
+	 * the LML-Schema but at the same time as small as possible.
+	 * 
+	 * @param gObject
+	 * @return a copy of gobj with minimal size, only attributes in GobjectType are copied 
+	 * 			 and lower special elements which are needed to make lml-model valid
+	 */
+	private static JAXBElement<GobjectType> minimizeGobjectType(GobjectType gObject){
+		
+		String qName="table";
+		Class<GobjectType> classGobject = (Class<GobjectType>) gObject.getClass();		
+		
+		GobjectType value = objectFactory.createGobjectType();
+		
+		if (gObject instanceof TableType) {
+			TableType tableType = objectFactory.createTableType();
+			value = tableType;
+			qName="table";
+		} else if (gObject instanceof UsagebarType) {
+			UsagebarType usagebarType = objectFactory.createUsagebarType();
+			usagebarType.setCpucount(BigInteger.valueOf(0));
+			value = usagebarType;
+			qName = "usagebar";
+		} else if (gObject instanceof TextboxType) {
+			TextboxType textboxType = objectFactory.createTextboxType();
+			textboxType.setText("");
+			value = textboxType;
+			qName = "text";
+		} else if (gObject instanceof InfoboxType) {
+			InfoboxType infoboxType = objectFactory.createInfoboxType();
+			value = infoboxType;
+			qName = "infobox";
+		} else if (gObject instanceof Nodedisplay) {//Create minimal nodedisplay
+			Nodedisplay nodedisplay = objectFactory.createNodedisplay();
+			value = nodedisplay;
+			SchemeType scheme = objectFactory.createSchemeType();
+			scheme.getEl1().add(objectFactory.createSchemeElement1());
+			nodedisplay.setScheme(scheme);
+			DataType data = objectFactory.createDataType();
+			data.getEl1().add(objectFactory.createDataElement1());
+			nodedisplay.setData(data);
+			qName = "nodedisplay";
+		} else if (gObject instanceof ChartType) {
+			ChartType chartType = objectFactory.createChartType();
+			value = chartType;			
+			qName = "chart";
+		} else if (gObject instanceof ChartgroupType) {
+			ChartgroupType chartgroupType = objectFactory.createChartgroupType();
+			//Add lower chart-elements to the minimized chart-group
+			ChartgroupType origin = (ChartgroupType) gObject;
+			//Go through all charts minimize them and add them to ut
+			for (ChartType chartType : origin.getChart()) {
+				ChartType min = (ChartType) (minimizeGobjectType(chartType).getValue());
+				chartgroupType.getChart().add(min);
+			}
+			value = chartgroupType;
+			qName = "chartgroup";
+		}
+		
+		value.setDescription(gObject.getDescription());
+		value.setId(gObject.getId());
+		value.setTitle(gObject.getTitle());
+		
+		JAXBElement<GobjectType> result = new JAXBElement<GobjectType>(new QName(qName), classGobject, value);
+		return result;
+	}
+	
 	/**************************************************************************************************************
 	 * Job related methods
 	 **************************************************************************************************************/
@@ -411,13 +601,7 @@ public class LguiItem implements ILguiItem {
 
 	public LguiType getLguiType() {
 		return lgui;
-	}
-
-	
-
-
-
-	
+	}	
 
 	/**
 	 * Add a lml-data-listener. It listens for data-changes.

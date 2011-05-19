@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rm.lml.core.model;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
@@ -86,4 +87,6 @@ public interface ILguiItem  {
 	public void updateJob(IJobStatus jobStatus);
 	
 	public void removeJob(IJobStatus jobStatus);
+	
+	public OutputStream getCurrentLayout();
 }
