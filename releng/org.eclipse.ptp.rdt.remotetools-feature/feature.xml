@@ -3,7 +3,8 @@
       id="org.eclipse.ptp.rdt.remotetools"
       label="%featureName"
       version="5.0.0.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      plugin="org.eclipse.ptp.rdt.server.dstore">
 
    <description>
       %description

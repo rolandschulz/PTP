@@ -3,7 +3,8 @@
       id="org.eclipse.ptp.services"
       label="%featureName"
       version="5.0.0.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      plugin="org.eclipse.ptp.services.core">
 
    <description url="http://www.example.com/description">
       %description
