@@ -118,39 +118,21 @@ public class LMLManager {
 	/**************************************************************************************************************
 	 * Communication methods
 	 **************************************************************************************************************/
-
-	public void register(String name, InputStream stream) {
-		// TODO implement
-	}
 	
 	public void register(String name, InputStream input, OutputStream output) {
-//		if(!LGUIS.containsKey(name)) {
-//			ILguiItem lgui = new LguiItem();
-//			synchronized (LGUIS) {
-//				LGUIS.put(name, lgui);
-//			}
-//		}
-//		fLguiItem = LGUIS.get(name);
-//		this.input = input;
-//		this.output = output;
-		// TODO find a solution
+		if (!LGUIS.containsKey(name)) {
+			synchronized (LGUIS) {
+				LGUIS.put(name, new LguiItem());
+			}
+		}
+		ILguiItem lguiItem = LGUIS.get(name);
+		lguiItem.getCurrentLayout(output);
+		lguiItem.update(input);
+		fireNewLgui();
 	}
 	
 	public void getCurrentLayout() {
 		fLguiItem.getCurrentLayout(output);
-	}
-	
-	public void open(String name) {
-		// TODO load all data
-		if (LGUIS.containsKey(name)) {
-			fLguiItem = LGUIS.get(name);
-			fireSelectedLgui();
-		}
-	}
-	
-	public void close(String name) {
-		// TODO save data
-		fLguiItem = null;
 	}
 	
 	/**************************************************************************************************************

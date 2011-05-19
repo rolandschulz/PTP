@@ -347,7 +347,6 @@ public class LguiItem implements ILguiItem {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-
 		try {
 			lgui = parseLML(xmlFile);
 		} catch (MalformedURLException e) {
@@ -361,7 +360,6 @@ public class LguiItem implements ILguiItem {
 	}
 
 	public void update() {
-
 		ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
 		for (ILguiListener listener : listeners) {
 			listener.handleEvent(e);
@@ -370,7 +368,11 @@ public class LguiItem implements ILguiItem {
 	
 	public void update(InputStream stream) {
 		lgui = parseLML(stream);
-		update();		
+		update(); 
+	}
+	
+	public boolean isEmpty() {
+		return lgui.getObjectsAndRelationsAndInformation().isEmpty();
 	}
 	
 	/**************************************************************************************************************
@@ -379,6 +381,11 @@ public class LguiItem implements ILguiItem {
 	public void getCurrentLayout(OutputStream output) {
 		LguiType layoutLgui = getLayoutFromModell();
 		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
+		try {
+			marshaller.marshal(layoutLgui, output);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
