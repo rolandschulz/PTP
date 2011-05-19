@@ -31,6 +31,7 @@ import java.util.ResourceBundle;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -60,6 +61,12 @@ public class LMLCorePlugin extends Plugin {
 	 * Unmarshaller for JAXB-generator
 	 */
 	private static Unmarshaller unmarshaller;
+	
+	
+	/*
+	 * Marshaller for JAXB-model
+	 */
+	private static Marshaller marshaller;
 
 	/*
 	 * DateFormat for (EEE MMM d HH:mm:ss yyyy)
@@ -175,6 +182,10 @@ public class LMLCorePlugin extends Plugin {
 	public Unmarshaller getUnmarshaller() {
 		return unmarshaller;
 	}
+	
+	public Marshaller getMarshaller() {
+		return marshaller;
+	}
 
 	/**
 	 * For the generation of instances from classes by JAXB a unmarshaller is
@@ -211,6 +222,15 @@ public class LMLCorePlugin extends Plugin {
 			unmarshaller.setSchema(mySchema);
 
 		}
+	}
+	
+	
+	private void createMarshaller() throws JAXBException {
+		URL xsd = getBundle().getEntry("/schema/lgui.xsd");
+
+		JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements",
+				LMLCorePlugin.class.getClassLoader());
+		marshaller = jc.createMarshaller();
 	}
 
 	/**

@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
@@ -375,8 +376,9 @@ public class LguiItem implements ILguiItem {
 	/**************************************************************************************************************
 	 * Layout
 	 **************************************************************************************************************/
-	public OutputStream getCurrentLayout() {
-		return null;
+	public void getCurrentLayout(OutputStream output) {
+		LguiType layoutLgui = getLayoutFromModell();
+		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
 	}
 	
 	/**

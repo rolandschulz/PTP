@@ -88,5 +88,5 @@ public interface ILguiItem  {
 	
 	public void removeJob(IJobStatus jobStatus);
 	
-	public OutputStream getCurrentLayout();
+	public void getCurrentLayout(OutputStream output);
 }

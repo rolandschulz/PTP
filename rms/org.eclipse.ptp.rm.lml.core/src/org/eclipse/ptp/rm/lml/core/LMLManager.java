@@ -124,19 +124,20 @@ public class LMLManager {
 	}
 	
 	public void register(String name, InputStream input, OutputStream output) {
-		if(!LGUIS.containsKey(name)) {
-			ILguiItem lgui = new LguiItem();
-			synchronized (LGUIS) {
-				LGUIS.put(name, lgui);
-			}
-		}
-		fLguiItem = LGUIS.get(name);
-		this.input = input;
-		this.output = output;
+//		if(!LGUIS.containsKey(name)) {
+//			ILguiItem lgui = new LguiItem();
+//			synchronized (LGUIS) {
+//				LGUIS.put(name, lgui);
+//			}
+//		}
+//		fLguiItem = LGUIS.get(name);
+//		this.input = input;
+//		this.output = output;
+		// TODO find a solution
 	}
 	
 	public void getCurrentLayout() {
-		output = fLguiItem.getCurrentLayout();
+		fLguiItem.getCurrentLayout(output);
 	}
 	
 	public void open(String name) {
@@ -158,10 +159,12 @@ public class LMLManager {
 
 	public void addLgui(String name) {
 		if (!LGUIS.containsKey(name)) {
-			ILguiItem lgui = new LguiItem();
+			fLguiItem = new LguiItem();
 			synchronized (LGUIS) {
-				LGUIS.put(name, lgui);
+				LGUIS.put(name, fLguiItem);
 			}
+		} else {
+			fLguiItem = LGUIS.get(name);
 		}
 	}
 	
