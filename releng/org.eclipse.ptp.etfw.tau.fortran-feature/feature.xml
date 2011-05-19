@@ -3,8 +3,10 @@
       id="org.eclipse.ptp.etfw.tau.fortran"
       label="%featureName"
       version="5.0.0.qualifier"
+      plugin="org.eclipse.ptp.etfw.tau.selinstfort"
       provider-name="%providerName"
-      plugin="org.eclipse.ptp.etfw.tau.selinstfort">
+      license-feature="org.eclipse.ptp.license"
+      license-feature-version="1.0.0.qualifier">
 
    <description>
       %description

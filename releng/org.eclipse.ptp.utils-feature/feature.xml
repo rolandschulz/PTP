@@ -3,8 +3,10 @@
       id="org.eclipse.ptp.utils"
       label="%featureName"
       version="5.0.0.qualifier"
+      plugin="org.eclipse.ptp.utils.core"
       provider-name="%providerName"
-      plugin="org.eclipse.ptp.utils.core">
+      license-feature="org.eclipse.ptp.license"
+      license-feature-version="1.0.0.qualifier">
 
    <description>
       %description
