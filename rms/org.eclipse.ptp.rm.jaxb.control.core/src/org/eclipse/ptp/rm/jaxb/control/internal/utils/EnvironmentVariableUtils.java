@@ -45,7 +45,7 @@ public class EnvironmentVariableUtils {
 	 */
 	public static void addVariable(String uuid, NameValuePairType var, Map<String, String> env, IVariableMap map) {
 		String key = var.getValue();
-		String value = getValue(uuid, key, map);
+		String value = map.getString(uuid, key);
 		if (value != null && !JAXBControlConstants.ZEROSTR.equals(value)) {
 			env.put(var.getName(), value);
 		}
@@ -109,7 +109,8 @@ public class EnvironmentVariableUtils {
 	 */
 	private static void export(String name, String value, StringBuffer buffer) {
 		buffer.append(JAXBControlConstants.EXPORT).append(JAXBControlConstants.SP).append(name).append(JAXBControlConstants.EQ)
-				.append(JAXBControlConstants.QT).append(value).append(JAXBControlConstants.QT).append(JAXBControlConstants.REMOTE_LINE_SEP);
+				.append(JAXBControlConstants.QT).append(value).append(JAXBControlConstants.QT)
+				.append(JAXBControlConstants.REMOTE_LINE_SEP);
 	}
 
 	/**
@@ -128,23 +129,6 @@ public class EnvironmentVariableUtils {
 	}
 
 	/**
-	 * Convert the name to a resource-manager map resolver reference, and
-	 * resolve.
-	 * 
-	 * @param uuid
-	 *            an internal or resource-specific job id.
-	 * @param key
-	 *            the attribute or property name
-	 * @param map
-	 *            resource manager active environment map
-	 * @return the resolved value
-	 */
-	private static String getValue(String uuid, String key, IVariableMap map) {
-		String name = JAXBControlConstants.OPENVRM + key + JAXBControlConstants.PD + JAXBControlConstants.VALUE + JAXBControlConstants.CLOSVAL;
-		return map.getString(uuid, name);
-	}
-
-	/**
 	 * Construct the c-shell setenv command.
 	 * 
 	 * @param name
@@ -156,6 +140,7 @@ public class EnvironmentVariableUtils {
 	 */
 	private static void setenv(String name, String value, StringBuffer buffer) {
 		buffer.append(JAXBControlConstants.SETENV).append(JAXBControlConstants.SP).append(name).append(JAXBControlConstants.SP)
-				.append(JAXBControlConstants.QT).append(value).append(JAXBControlConstants.QT).append(JAXBControlConstants.REMOTE_LINE_SEP);
+				.append(JAXBControlConstants.QT).append(value).append(JAXBControlConstants.QT)
+				.append(JAXBControlConstants.REMOTE_LINE_SEP);
 	}
 }

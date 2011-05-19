@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui;
 
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 
@@ -59,8 +59,8 @@ public interface IUpdateModel {
 	/**
 	 * @param validator
 	 *            used to validate the value entered by the user
-	 * @param remoteFileManager
-	 *            from the resource manager's services
+	 * @param tab
+	 *            parent tab (from which to get the remote services delegate)
 	 */
-	public void setValidator(ValidatorType validator, IRemoteFileManager remoteFileManager);
+	public void setValidator(ValidatorType validator, JAXBControllerLaunchConfigurationTab tab);
 }

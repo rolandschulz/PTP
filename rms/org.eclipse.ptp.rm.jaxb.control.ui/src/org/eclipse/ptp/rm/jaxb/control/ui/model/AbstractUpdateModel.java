@@ -14,9 +14,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
@@ -58,7 +60,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	protected ValueUpdateHandler handler;
 	protected boolean refreshing;
 	protected ValidatorType validator;
-	protected IRemoteFileManager remoteFileManager;
+	protected JAXBControllerLaunchConfigurationTab tab;
 	protected String defaultValue;
 	protected Object mapValue;
 
@@ -117,14 +119,17 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	}
 
 	/**
-	 * @validator JAXB data element describing either regex or efs validation
+	 * @param validator
+	 *            JAXB data element describing either regex or efs validation
 	 *            for the widget value.
-	 * @remoteFileManager provided in case the validation is to be done on a
-	 *                    file path.
+	 * @param tab
+	 *            provided in case the validation is to be done on a file path;
+	 *            the delegate must be retrieved lazily as the tab is
+	 *            initialized after the widgets are constructed
 	 */
-	public void setValidator(ValidatorType validator, IRemoteFileManager remoteFileManager) {
+	public void setValidator(ValidatorType validator, JAXBControllerLaunchConfigurationTab tab) {
 		this.validator = validator;
-		this.remoteFileManager = remoteFileManager;
+		this.tab = tab;
 	}
 
 	/**
@@ -149,7 +154,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 		Object value = getValueFromControl();
 		if (validator != null) {
 			try {
-				WidgetActionUtils.validate(String.valueOf(value), validator, remoteFileManager);
+				WidgetActionUtils.validate(String.valueOf(value), validator, getRemoteFileManager());
 			} catch (Exception t) {
 				WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.ValidationError,
 						Messages.ValidationError_title, false);
@@ -159,5 +164,20 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 		}
 		lcMap.put(name, value);
 		handleUpdate(value);
+	}
+
+	/**
+	 * Retrieves manager lazily from tab.
+	 * 
+	 * @return remote file manager, or <code>null</code> if undefined
+	 */
+	private IRemoteFileManager getRemoteFileManager() {
+		if (tab != null) {
+			RemoteServicesDelegate d = tab.getDelegate();
+			if (d != null) {
+				return d.getRemoteFileManager();
+			}
+		}
+		return null;
 	}
 }

@@ -9,7 +9,7 @@
 <!-- * Albert L. Rossi - design and implementation -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-torque-generic">
+	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-torque-basic">
 	<control-data>
 		<property name="queues" visible="false"/>
 		<!-- needed by RM internals for fetch; name is fixed by convention -->
@@ -670,132 +670,39 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					</widget>
 				</composite>
 				<!-- STDOUT/STDERR remote path group -->
-				<composite group="true">
-					<layout>
-						<grid-layout numColumns="4" makeColumnsEqualWidth="false"/>
-					</layout>
-					<layout-data>
-						<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="4" widthHint="300"/>
-					</layout-data>
-					<widget type="label" style="SWT.LEFT">
-						<tooltip>${ptp_rm:remote_path_tooltip#default}</tooltip>
-						<fixed-text>Remote Output Path:</fixed-text>
-					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="stdout_remote_path">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/>
-						</layout-data>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<fixed-text>Enable read upon job termination</fixed-text>
-					</widget>
-					<widget type="label" style="SWT.LEFT">
-						<tooltip>${ptp_rm:remote_path_tooltip#default}</tooltip>
-						<fixed-text>Remote Error Path:</fixed-text>
-					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="stderr_remote_path">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/>
-						</layout-data>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<fixed-text>Enable read upon job termination</fixed-text>
-					</widget>
-				</composite>
-			</dynamic>
-			<dynamic>
-				<title>Advanced PBS Settings</title>
-				<composite>
-					<layout>
-						<grid-layout numColumns="1"/>
-					</layout>
-					<layout-data>
-						<grid-data widthHint="600" heightHint="900" horizontalSpan="1"/>
-					</layout-data>
-					<!-- QUEUES remote path group -->
-					<composite group="true">
-						<layout>
-							<grid-layout numColumns="3" makeColumnsEqualWidth="false"/>
-						</layout>
-						<widget type="label" style="SWT.LEFT">
-							<layout-data>
-								<grid-data horizontalAlign="SWT.BEGINNING"/>
-							</layout-data>
-							<tooltip>${ptp_rm:destination#tooltip}</tooltip>
-							<fixed-text>Queue: </fixed-text>
-						</widget>
-						<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
-							<layout-data>
-								<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
-							</layout-data>
-							<items-from>queues</items-from>
-						</widget>
-					</composite>
-					<composite group="true">
-						<layout>
-							<grid-layout numColumns="1"/>
-						</layout>
-						<widget type="text" readOnly="true" style="SWT.LEFT | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
-							<layout-data>
-								<grid-data widthHint="600" heightHint="75" horizontalSpan="1"/>
-							</layout-data>
-							<dynamic-text>
-								<arg>${ptp_rm:allAttributes#value}</arg>
-								<arg isUndefinedIfMatches=" destination=''"> destination='${ptp_rm:destination#value}'</arg>
-							</dynamic-text>
-						</widget>
-						<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" sort="true" type="tree">
-							<layout-data>
-								<grid-data widthHint="600" heightHint="400" horizontalSpan="1"/>
-							</layout-data>
-							<column-data name="Name" width="175">
-								<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
-							</column-data>
-							<column-data name="Value" width="400">
-								<tooltip>Click to activate value widget.</tooltip>
-							</column-data>
-							<items allPredefined="true">
-								<exclude>destination</exclude>
-							</items>
-							<value pattern="@name='@value'"/>
-						</viewer>
-					</composite>
-					<!-- STDOUT/STDERR remote path group -->
-               <composite group="true">
-                  <layout>
-                     <grid-layout numColumns="4" makeColumnsEqualWidth="false"/>
-                  </layout>
+            <composite group="true">
+               <layout>
+                  <grid-layout numColumns="4" makeColumnsEqualWidth="false"/>
+               </layout>
+               <layout-data>
+                  <grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="4" widthHint="300"/>
+               </layout-data>
+               <widget type="label" style="SWT.LEFT">
+                  <tooltip>${ptp_rm:remote_path_tooltip#default}</tooltip>
+                  <fixed-text>Remote Output Path:</fixed-text>
+               </widget>
+               <widget type="text" style="SWT.BORDER" saveValueTo="stdout_remote_path">
                   <layout-data>
-                     <grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="4" widthHint="400"/>
+                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/>
                   </layout-data>
-                  <widget type="label" style="SWT.LEFT">
-                     <tooltip>${ptp_rm:remote_path_tooltip#default}</tooltip>
-                     <fixed-text>Remote Output Path:</fixed-text>
-                  </widget>
-                  <widget type="text" style="SWT.BORDER" saveValueTo="stdout_remote_path">
-                     <layout-data>
-                        <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="175"/>
-                     </layout-data>
-                  </widget>
-                  <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                     <fixed-text>Enable read upon job termination</fixed-text>
-                  </widget>
-                  <widget type="label" style="SWT.LEFT">
-                     <tooltip>${ptp_rm:remote_path_tooltip#default}</tooltip>
-                     <fixed-text>Remote Error Path:</fixed-text>
-                  </widget>
-                  <widget type="text" style="SWT.BORDER" saveValueTo="stderr_remote_path">
-                     <layout-data>
-                        <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="175"/>
-                     </layout-data>
-                  </widget>
-                  <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                     <fixed-text>Enable read upon job termination</fixed-text>
-                  </widget>
-               </composite>
-				</composite>
+               </widget>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                  <fixed-text>Enable read upon job termination</fixed-text>
+               </widget>
+               <widget type="label" style="SWT.LEFT">
+                  <tooltip>${ptp_rm:remote_path_tooltip#default}</tooltip>
+                  <fixed-text>Remote Error Path:</fixed-text>
+               </widget>
+               <widget type="text" style="SWT.BORDER" saveValueTo="stderr_remote_path">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                  <fixed-text>Enable read upon job termination</fixed-text>
+               </widget>
+            </composite>
 			</dynamic>
-			<import>Import PBS Script</import>
 		</launch-tab>
 	</control-data>
 	<monitor-data schedulerType="PBS">

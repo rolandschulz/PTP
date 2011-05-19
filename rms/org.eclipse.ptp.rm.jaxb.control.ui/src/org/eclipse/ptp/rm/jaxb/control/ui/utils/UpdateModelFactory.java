@@ -29,6 +29,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
 import org.eclipse.ptp.rm.jaxb.control.ui.cell.SpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ButtonUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ComboUpdateModel;
@@ -47,6 +48,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.TemplateType;
 import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -154,10 +156,7 @@ public class UpdateModelFactory {
 	 * 
 	 */
 	private enum CellEditorType {
-		TEXT,
-		COMBO,
-		SPINNER,
-		CHECK;
+		TEXT, COMBO, SPINNER, CHECK;
 
 		/**
 		 * Determine the CellEditor from the Property or Attribute type or
@@ -438,6 +437,12 @@ public class UpdateModelFactory {
 		} else if (control instanceof Button) {
 			model = new ButtonUpdateModel(name, handler, (Button) control);
 		}
+
+		String attr = widget.getSaveValueTo();
+
+		if (attr != null && !JAXBUIConstants.ZEROSTR.equals(attr)) {
+			maybeAddValidator(model, rmVarMap.get(attr), tab.getParent());
+		}
 		return model;
 	}
 
@@ -466,7 +471,22 @@ public class UpdateModelFactory {
 		} else {
 			model = createModel(data, (TreeViewer) viewer, columnData, tab);
 		}
+		maybeAddValidator(model, data, tab.getParent());
 		return model;
+	}
+
+	/**
+	 * Checks to see if there is a validator on the attribute and adds this to
+	 * the model.
+	 * 
+	 * @param model
+	 * @param data
+	 * @param delegate
+	 */
+	public static void maybeAddValidator(IUpdateModel model, Object data, JAXBControllerLaunchConfigurationTab tab) {
+		if (data != null && data instanceof AttributeType) {
+			model.setValidator(((AttributeType) data).getValidator(), tab);
+		}
 	}
 
 	/**

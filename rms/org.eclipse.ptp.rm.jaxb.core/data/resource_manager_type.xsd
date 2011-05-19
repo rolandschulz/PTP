@@ -714,7 +714,7 @@
 			<xs:element name="fixed-text" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						Display text set once from the environment on loading; e.g, ${rm:Job_Name#description}.
+						Display text set once from the environment on loading; e.g, ${ptp_rm:Job_Name#description}.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -892,7 +892,7 @@
 		<xs:attribute name="ref" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
-					The name of the object in the environment (either attribute or property; do not include here the "${rm:" / "}"
+					The name of the object in the environment (either attribute or property; do not include here the "${ptp_rm:" / "}"
 					used for resolving).
 				</xs:documentation>
 			</xs:annotation>
@@ -1052,7 +1052,7 @@
 			<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="2">
 				<xs:annotation>
 					<xs:documentation>
-						.*[${rm:}]*.* refers to a variable in the RM environment; "#FIELD" refers to the value of the given field on the
+						.*[${ptp_rm:}]*.* refers to a variable in the RM environment; "#FIELD" refers to the value of the given field on the
 						current target; other strings will be converted in conformity with the inferred type of the comparison.
 					</xs:documentation>
 				</xs:annotation>
