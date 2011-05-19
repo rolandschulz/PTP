@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -735,6 +735,20 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 		}
 		return (ICElement[]) result;
 	}
+	
+	/**
+	 * @since 3.1
+	 */
+	public Map<String, ICElement[]> findOverriders(Scope scope, ICElement subject, IProgressMonitor monitor) {
+    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + subject, 100); //$NON-NLS-1$
+    	String path = EFSExtensionManager.getDefault().getPathFromURI(subject.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_OVERRIDERS, new Object[] { scope, getHostName(), subject, path }, null);
+		if (result == null) {
+			return new HashMap<String, ICElement[]>();
+		}
+		return (Map<String, ICElement[]>) result;
+	}
+	
 	/**
 	 * @deprecated
 	 */
