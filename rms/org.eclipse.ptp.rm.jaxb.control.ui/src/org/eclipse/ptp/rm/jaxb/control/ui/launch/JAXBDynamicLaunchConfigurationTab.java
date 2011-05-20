@@ -124,7 +124,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
-		return new RMLaunchValidation(true, null);
+		return validateWidgets();
 	}
 
 	/*
@@ -240,6 +240,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			for (Viewer v : viewers) {
 				v.refresh();
 			}
+
 		} catch (Throwable t) {
 			JAXBControlUIPlugin.log(t);
 			return new RMLaunchValidation(false, t.getMessage());
@@ -258,7 +259,18 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
-		return new RMLaunchValidation(true, null);
+		return validateWidgets();
+	}
+
+	@Override
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+		if (control.isVisible()) {
+			RMLaunchValidation v = validateWidgets();
+			if (!v.isSuccess()) {
+				return v;
+			}
+		}
+		return super.performApply(configuration, rm, queue);
 	}
 
 	/*
@@ -424,5 +436,20 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		for (Viewer v : viewers) {
 			v.refresh();
 		}
+	}
+
+	/**
+	 * Runs the validator on the widgets, if they have one.
+	 * 
+	 * @return invalid on first failure; else valid;
+	 */
+	private RMLaunchValidation validateWidgets() {
+		for (IUpdateModel m : localWidgets.values()) {
+			String error = m.validate();
+			if (error != null) {
+				return new RMLaunchValidation(false, error);
+			}
+		}
+		return new RMLaunchValidation(true, null);
 	}
 }

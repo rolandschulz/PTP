@@ -19,11 +19,9 @@ import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
-import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
 
 /**
@@ -132,6 +130,22 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 		this.tab = tab;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel#validate()
+	 */
+	public String validate() {
+		if (validator != null) {
+			try {
+				WidgetActionUtils.validate(String.valueOf(getValueFromControl()), validator, getRemoteFileManager());
+			} catch (Exception t) {
+				return validator.getErrorMessage();
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Delegates to the handler update method.
 	 * 
@@ -146,22 +160,11 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	}
 
 	/**
-	 * Retrieves the value from the control, validates if there is a validator
-	 * set, then writes to the current environment map and calls the update
-	 * handler.
+	 * Retrieves the value from the control, then writes to the current
+	 * environment map and calls the update handler.
 	 */
 	protected void storeValue() {
 		Object value = getValueFromControl();
-		if (validator != null) {
-			try {
-				WidgetActionUtils.validate(String.valueOf(value), validator, getRemoteFileManager());
-			} catch (Exception t) {
-				WidgetActionUtils.errorMessage(Display.getCurrent().getActiveShell(), t, Messages.ValidationError,
-						Messages.ValidationError_title, false);
-				refreshValueFromMap();
-				return;
-			}
-		}
 		lcMap.put(name, value);
 		handleUpdate(value);
 	}

@@ -63,4 +63,11 @@ public interface IUpdateModel {
 	 *            parent tab (from which to get the remote services delegate)
 	 */
 	public void setValidator(ValidatorType validator, JAXBControllerLaunchConfigurationTab tab);
+
+	/**
+	 * Runs the validator, if there is one
+	 * 
+	 * @return error message if fails, else <code>null</code>
+	 */
+	public String validate();
 }
