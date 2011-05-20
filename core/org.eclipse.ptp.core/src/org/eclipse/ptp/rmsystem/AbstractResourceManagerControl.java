@@ -240,6 +240,10 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	protected abstract IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException;
 
+	protected void fireResourceManagerError(String message) {
+		getResourceManager().fireResourceManagerError(message);
+	}
+
 	protected ModelManager getModelManager() {
 		return fModelManager;
 	}

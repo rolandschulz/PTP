@@ -242,6 +242,10 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 		}
 	}
 
+	protected void fireResourceManagerError(String message) {
+		getResourceManager().fireResourceManagerError(message);
+	}
+
 	protected ModelManager getModelManager() {
 		return fModelManager;
 	}
@@ -250,11 +254,11 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 		return (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
 	}
 
-	protected IResourceManager getResourceManager() {
+	protected AbstractResourceManager getResourceManager() {
 		if (fResourceManager == null) {
 			fResourceManager = PTPCorePlugin.getDefault().getModelManager()
 					.getResourceManagerFromUniqueName(fConfig.getUniqueName());
 		}
-		return fResourceManager;
+		return (AbstractResourceManager) fResourceManager;
 	}
 }
