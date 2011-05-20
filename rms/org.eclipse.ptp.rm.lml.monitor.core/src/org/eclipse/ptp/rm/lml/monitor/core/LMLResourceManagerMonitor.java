@@ -50,22 +50,29 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor subMon = SubMonitor.convert(monitor, 100);
 			try {
-				fServer.startServer(subMon.newChild(50));
-				if (!subMon.isCanceled()) {
-					fServer.waitForServerStart(subMon.newChild(50));
+				try {
+					fServer.startServer(subMon.newChild(20));
 					if (!subMon.isCanceled()) {
-						LMLManager.getInstance().register(getResourceManager().getUniqueName(), fServer.getInputStream(),
-								fServer.getOutputStream());
+						fServer.waitForServerStart(subMon.newChild(20));
+						if (!subMon.isCanceled()) {
+							LMLManager.getInstance().register(getResourceManager().getUniqueName(), fServer.getInputStream(),
+									fServer.getOutputStream());
+						}
 					}
+				} catch (IOException e) {
+					fireResourceManagerError(e.getLocalizedMessage());
+					return new Status(IStatus.ERROR, LMLMonitorCorePlugin.PLUGIN_ID, e.getLocalizedMessage());
 				}
-			} catch (IOException e) {
-				return new Status(IStatus.ERROR, LMLMonitorCorePlugin.PLUGIN_ID, e.getLocalizedMessage());
+				fServer.waitForServerFinish(subMon.newChild(40));
+				if (!subMon.isCanceled()) {
+					schedule(JOB_SCHEDULE_FREQUENCY);
+				}
+				return Status.OK_STATUS;
+			} finally {
+				if (monitor != null) {
+					monitor.done();
+				}
 			}
-			fServer.waitForServerFinish(monitor);
-			if (!monitor.isCanceled()) {
-				schedule(JOB_SCHEDULE_FREQUENCY);
-			}
-			return Status.OK_STATUS;
 		}
 	}
 
@@ -109,7 +116,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	@Override
 	protected void doAddJob(String jobId, IJobStatus status) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
