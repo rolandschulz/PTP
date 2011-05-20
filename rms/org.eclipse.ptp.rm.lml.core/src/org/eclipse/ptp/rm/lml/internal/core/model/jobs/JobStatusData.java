@@ -10,7 +10,10 @@
 package org.eclipse.ptp.rm.lml.internal.core.model.jobs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ui.IMemento;
@@ -23,7 +26,8 @@ import org.eclipse.ui.IMemento;
  * 
  */
 
-// TODO extend with further variables - necessary for the complete jobs
+// TODO Save and restore
+
 public class JobStatusData {
 	public static final String ZEROSTR = "";//$NON-NLS-1$
 	public static final String COSP = ": ";//$NON-NLS-1$
@@ -34,6 +38,7 @@ public class JobStatusData {
 	public static final String INTERACTIVE = "interactive";//$NON-NLS-1$;
 	public static final String STATE = "state";//$NON-NLS-1$;
 	public static final String STATE_DETAIL = "state_detail";//$NON-NLS-1$;
+	public static final String ATTRIBUTES = "attributes";
 
 	private final String rmId;
 	private final String jobId;
@@ -44,6 +49,7 @@ public class JobStatusData {
 	private String stateDetail;
 	private boolean outReady;
 	private boolean errReady;
+	private Map <String, String> attributes = Collections.synchronizedMap(new TreeMap<String, String>()); 
 
 	private IJobStatus status; // for retrieving file contents
 

@@ -23,6 +23,7 @@ import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus;
 import org.eclipse.ptp.rm.lml.internal.core.model.OverviewAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.TableHandler;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ui.IMemento;
 
 
 /**
@@ -91,4 +92,8 @@ public interface ILguiItem  {
 	public void getCurrentLayout(OutputStream output);
 	
 	public boolean isEmpty();
+	
+//	public void save(IMemento memento);
+//	
+//	public void restore(IMemento memento);
 }

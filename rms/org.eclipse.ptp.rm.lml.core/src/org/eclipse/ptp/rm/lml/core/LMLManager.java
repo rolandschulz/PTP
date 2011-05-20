@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -43,6 +44,7 @@ import org.eclipse.ptp.rm.lml.internal.core.events.UnselectObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.ViewAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.ViewDisposedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
+import org.eclipse.ui.IMemento;
 
 /**
  * Class of the interface ILMLManager
@@ -79,16 +81,10 @@ public class LMLManager {
 	 */
 	private static LMLManager manager;
 	
-	
 	/*
-	 * InputStream
+	 * 
 	 */
-	private InputStream input;
-	
-	/*
-	 * OutputStream
-	 */
-	private OutputStream output;
+	public static final String LGUIITEM = "lguiitem";
 	
 	/**************************************************************************************************************
 	 * Constructors
@@ -113,6 +109,28 @@ public class LMLManager {
 	 * Job related methods
 	 **************************************************************************************************************/
 	
+
+	/**************************************************************************************************************
+	 * Saving and restoring
+	 **************************************************************************************************************/
+//	public void saveState(IMemento memento) {
+//		for (Entry<String, ILguiItem> entry : LGUIS.entrySet()) {
+//			memento.createChild(LGUIITEM, entry.getKey());
+//			entry.getValue().save(memento);
+//		}
+//	}
+//	
+//	public void restoreState(IMemento memento) {
+//		if (memento == null) {
+//			return;
+//		}
+//		IMemento[] mementoChilds = memento.getChildren(LGUIITEM);
+//		for (IMemento mementoChild : mementoChilds) {
+//			ILguiItem lguiItem = new LguiItem();
+//			LGUIS.put(mementoChild.getID(), lguiItem);
+//			lguiItem.restore(mementoChild);
+//		}
+//	}
 	
 	
 	/**************************************************************************************************************
@@ -129,10 +147,6 @@ public class LMLManager {
 		lguiItem.getCurrentLayout(output);
 		lguiItem.update(input);
 		fireNewLgui();
-	}
-	
-	public void getCurrentLayout() {
-		fLguiItem.getCurrentLayout(output);
 	}
 	
 	/**************************************************************************************************************

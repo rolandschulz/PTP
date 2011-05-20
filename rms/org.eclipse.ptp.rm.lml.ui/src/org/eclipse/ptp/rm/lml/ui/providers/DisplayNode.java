@@ -7,10 +7,10 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.DataElement;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement;
+import org.eclipse.ptp.rm.lml.internal.core.model.FastImpCheck;
+import org.eclipse.ptp.rm.lml.internal.core.model.LMLCheck;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
-import org.eclipse.ptp.rm.lml.internal.core.nodedisplay.FastImpCheck;
-import org.eclipse.ptp.rm.lml.internal.core.nodedisplay.LMLCheck;
-import org.eclipse.ptp.rm.lml.internal.core.nodedisplay.LMLCheck.SchemeAndData;
+import org.eclipse.ptp.rm.lml.internal.core.model.LMLCheck.SchemeAndData;
 
 /**
  * A node which is input for the nodedisplaytreepanel

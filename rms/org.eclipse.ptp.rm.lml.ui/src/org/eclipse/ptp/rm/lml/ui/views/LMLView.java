@@ -51,7 +51,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 public class LMLView extends ViewPart {
@@ -120,13 +123,21 @@ public class LMLView extends ViewPart {
 	private LMLViewListener lmlViewListener = null;
 	private List list = null;
 	private final ListSelectionListener listListener = new ListSelectionListener();
+	
+	private IMemento memento;
 
 	public LMLView() {
 
 	}
+	
+	public void init(IViewSite site, IMemento memento) throws PartInitException{
+		super.init(site, memento);
+		this.memento = memento;
+	}
 
 	@Override
 	public void createPartControl(Composite parent) {
+//		restoreState();
 		viewer = new ListViewer(parent, SWT.SINGLE);
 		viewer.setLabelProvider(new LabelProvider() {
 			@Override
@@ -156,6 +167,10 @@ public class LMLView extends ViewPart {
 		fSelected = lmlManager.getSelectedLguiItem();
 		createList();
 	}
+
+//	private void restoreState() {
+//		lmlManager.restoreState(memento);
+//	}
 
 	private void createList() {
 		list = viewer.getList();
@@ -219,7 +234,10 @@ public class LMLView extends ViewPart {
 		}
 		manager.add(subMenu);
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
 	}
+	
+//	public void saveState(IMemento memento) {
+//		lmlManager.saveState(memento);
+//	}
 
 }

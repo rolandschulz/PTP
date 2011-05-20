@@ -1,4 +1,4 @@
-package org.eclipse.ptp.rm.lml.internal.core.nodedisplay;
+package org.eclipse.ptp.rm.lml.internal.core.model;
 
 import java.net.URL;
 import java.util.ArrayList;

@@ -24,10 +24,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement;
 import org.eclipse.ptp.rm.lml.internal.core.elements.NodedisplaylayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement;
-import org.eclipse.ptp.rm.lml.internal.core.nodedisplay.FastImpCheck;
-import org.eclipse.ptp.rm.lml.internal.core.nodedisplay.LMLCheck;
-import org.eclipse.ptp.rm.lml.internal.core.nodedisplay.LMLCheck.SchemeAndData;
-import org.eclipse.ptp.rm.lml.internal.core.nodedisplay.Mask;
+import org.eclipse.ptp.rm.lml.internal.core.model.LMLCheck.SchemeAndData;
 
 /**
  * This handler grants access to nodedisplays. It includes several functions,

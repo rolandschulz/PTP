@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.lml.internal.core.model;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -22,6 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import javax.xml.bind.JAXBElement;
@@ -59,6 +61,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarType;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ui.IMemento;
 
 /**
  * Class of the interface ILguiItem
@@ -95,6 +98,19 @@ public class LguiItem implements ILguiItem {
 	 */
 	private static ObjectFactory objectFactory = new ObjectFactory();
 	
+	/*
+	 * String for the to saved layout.
+	 */
+	private String savedLayout = null;
+	
+	/*
+	 * 
+	 */
+	
+	public static final String LAYOUT = "layout";
+	
+	public static final String JOB = "job";
+	
 	/**************************************************************************************************************
 	 * Constructors
 	 **************************************************************************************************************/
@@ -114,18 +130,6 @@ public class LguiItem implements ILguiItem {
 	public LguiItem(LguiType lgui) {
 		this.lgui = lgui;
 		createLguiHandlers();
-	}
-
-	/**
-	 * Constructor which get an InputStream as argument
-	 * 
-	 * @param stream
-	 *            InputStream
-	 */
-	public LguiItem(InputStream stream) {
-		lgui = parseLML(stream);
-		createLguiHandlers();
-		setCid();
 	}
 
 	/**
@@ -235,6 +239,34 @@ public class LguiItem implements ILguiItem {
 			}
 		}
 	}
+	
+//	public void save(IMemento memento) {
+//		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
+//		LguiType lgui = getLayoutFromModell();
+//		System.out.println(lgui == null);
+//		StringWriter writer = new StringWriter();
+//		try {
+//			marshaller.marshal(lgui, writer);
+//		} catch (JAXBException e) {
+//			e.printStackTrace();
+//		}
+//		savedLayout = writer.toString();
+//		memento.putString(LAYOUT, savedLayout);
+//		for (Entry<String, JobStatusData> entry : jobList.entrySet()) {
+//			memento.createChild(JOB, entry.getKey());
+//			entry.getValue().save(memento);
+//		}
+//	}
+//	
+//	public void restore(IMemento memento) {
+//		savedLayout = memento.getString(LAYOUT);
+//		// TODO in LayoutType umbauen
+//		IMemento[] mementoChilds = memento.getChildren(JOB);
+//		for (IMemento mementoChild : mementoChilds) {
+//			jobList.put(mementoChild.getID(), new JobStatusData(memento));
+//		}
+//		
+//	}
 	
 	/**************************************************************************************************************
 	 * Getting LguiHandlers
@@ -388,6 +420,20 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 	
+	private LguiType firstRequest(){
+        ObjectFactory objectFactory = new ObjectFactory();
+
+        LguiType layoutLgui = objectFactory.createLguiType();
+        layoutLgui.setVersion("1");
+        layoutLgui.setLayout(true);
+
+        RequestType request = objectFactory.createRequestType();
+        request.setGetDefaultData(true);
+        layoutLgui.setRequest(request);
+        
+        return layoutLgui;
+    }
+	
 	/**
 	 * Remove all real data from modell
 	 * return only layout-information and data, which is needed to make 
@@ -397,7 +443,7 @@ public class LguiItem implements ILguiItem {
 	 */
 	private LguiType getLayoutFromModell() {
 		if (lgui == null) {
-			         return null;
+			return firstRequest();
 		}
 		LguiType result = objectFactory.createLguiType();
 		HashSet<String> neededComponents = new HashSet<String>();

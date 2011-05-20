@@ -11,8 +11,7 @@ Export-Package: org.eclipse.ptp.rm.lml.core,
  org.eclipse.ptp.rm.lml.core.util,
  org.eclipse.ptp.rm.lml.internal.core.elements,
  org.eclipse.ptp.rm.lml.internal.core.model,
- org.eclipse.ptp.rm.lml.internal.core.model.jobs,
- org.eclipse.ptp.rm.lml.internal.core.nodedisplay
+ org.eclipse.ptp.rm.lml.internal.core.model.jobs
 Bundle-Activator: org.eclipse.ptp.rm.lml.core.LMLCorePlugin
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
