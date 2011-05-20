@@ -443,9 +443,11 @@ public abstract class AbstractRemoteServerRunner extends Job {
 					}
 				}
 
-				// Check if the valid java version is installed on the server
+				/*
+				 * Check if the launch command is valid
+				 */
 				if ((getVerifyLaunchCommand() != null && getVerifyLaunchCommand().length() != 0)
-						&& !isValidVersionInstalled(subMon)) {
+						&& !isValidCommand(getVerifyLaunchCommand(), getVerifyLaunchPattern(), subMon.newChild(10))) {
 					if (getVerifyLaunchFailMessage() != null && getVerifyLaunchFailMessage().length() != 0) {
 						setServerState(ServerState.STOPPED);
 						throw new IOException(NLS.bind(getVerifyLaunchFailMessage(),
@@ -453,6 +455,20 @@ public abstract class AbstractRemoteServerRunner extends Job {
 					}
 					setServerState(ServerState.STOPPED);
 					throw new IOException(Messages.AbstractRemoteServerRunner_12);
+				}
+
+				/*
+				 * Check if the unpack command is valid
+				 */
+				if ((getVerifyUnpackCommand() != null && getVerifyUnpackCommand().length() != 0)
+						&& !isValidCommand(getVerifyUnpackCommand(), getVerifyUnpackPattern(), subMon.newChild(10))) {
+					if (getVerifyUnpackFailMessage() != null && getVerifyUnpackFailMessage().length() != 0) {
+						setServerState(ServerState.STOPPED);
+						throw new IOException(NLS.bind(getVerifyUnpackFailMessage(),
+								new Object[] { fServerName, fRemoteConnection.getName() }));
+					}
+					setServerState(ServerState.STOPPED);
+					throw new IOException(Messages.AbstractRemoteServerRunner_cannotRunUnpack);
 				}
 
 				if (!subMon.isCanceled()) {
@@ -542,21 +558,63 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Checks if the valid version installed on the remote server. It uses a
-	 * pattern which is define in the "plugin.xml" file to match with the output
+	 * Check if the payload exists on the remote machine, and if not, or if it
+	 * has changed then upload a copy.
+	 * 
+	 * @param conn
+	 *            remote connection
+	 * @param directory
+	 *            directory containing payload
+	 * @param monitor
+	 *            progress monitor
+	 * @throws IOException
+	 *             thrown if any errors occur
+	 */
+	private void checkAndUploadPayload(IFileStore directory, IProgressMonitor monitor) throws IOException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		try {
+			IFileStore server = directory.getChild(getPayload());
+			IFileInfo serverInfo = server.fetchInfo(EFS.NONE, subMon.newChild(10));
+			IFileStore local = null;
+			URL jarURL = FileLocator.find(fBundle, new Path(getPayload()), null);
+			if (jarURL != null) {
+				jarURL = FileLocator.toFileURL(jarURL);
+				local = EFS.getStore(URIUtil.toURI(jarURL));
+			}
+			if (local == null) {
+				throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_11,
+						new Object[] { getPayload(), fBundle.getSymbolicName() }));
+			}
+			IFileInfo localInfo = local.fetchInfo(EFS.NONE, subMon.newChild(10));
+			if (!serverInfo.exists() || serverInfo.getLength() != localInfo.getLength()) {
+				local.copy(server, EFS.OVERWRITE, subMon.newChild(70));
+			}
+		} catch (Exception e) {
+			throw new IOException(e.getMessage());
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/**
+	 * Checks if the command is valid. It uses a pattern which is define in the
+	 * "plugin.xml" file to match with the output
 	 * 
 	 * @param monitor
 	 *            monitor object
 	 * @return true, if the valid version is installed on the remote server
 	 */
-	private boolean isValidVersionInstalled(IProgressMonitor monitor) throws IOException {
-		SubMonitor subMon = SubMonitor.convert(monitor);
+	private boolean isValidCommand(String command, String verifyPattern, IProgressMonitor monitor) throws IOException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
 			StringBuilder sb = new StringBuilder();
 			String s;
 
 			// get the remote process that runs the verify command
-			IRemoteProcess p = runVerifyCommand(subMon);
+			IRemoteProcess p = runCommand(command, Messages.AbstractRemoteServerRunner_runningValidate, null, true,
+					subMon.newChild(100));
 			// get the buffer reader
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
@@ -565,7 +623,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				sb.append(s);
 			}
 			// compile the pattern for search
-			Pattern pattern = Pattern.compile(getVerifyLaunchPattern());
+			Pattern pattern = Pattern.compile(verifyPattern);
 			// get a matcher object
 			Matcher m = pattern.matcher(sb.toString());
 
@@ -592,14 +650,14 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @return remote process representing the server invocation
 	 * @throws IOException
 	 */
-	private IRemoteProcess launchServer(IRemoteConnection conn, IProgressMonitor monitor) throws IOException {
+	private IRemoteProcess launchServer(IProgressMonitor monitor) throws IOException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
-			SubMonitor subMon = SubMonitor.convert(monitor, 100);
 			/*
 			 * First check if the remote file exists or is a different size to
 			 * the local version and copy over if required.
 			 */
-			IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
+			IRemoteFileManager fileManager = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection);
 			IFileStore directory = fileManager.getResource(getWorkingDir());
 			/*
 			 * Create the directory if it doesn't exist (has no effect if the
@@ -607,35 +665,15 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 * exists and generate exception if it does.
 			 */
 			directory.mkdir(EFS.NONE, subMon.newChild(10));
-			IFileStore server = directory.getChild(getPayload());
-			IFileInfo serverInfo = server.fetchInfo(EFS.NONE, subMon.newChild(10));
-			IFileStore local = null;
-			URL jarURL = FileLocator.find(fBundle, new Path(getPayload()), null);
-			if (jarURL != null) {
-				jarURL = FileLocator.toFileURL(jarURL);
-				local = EFS.getStore(URIUtil.toURI(jarURL));
-			}
-			if (local == null) {
-				throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_11,
-						new Object[] { getPayload(), fBundle.getSymbolicName() }));
-			}
-			IFileInfo localInfo = local.fetchInfo(EFS.NONE, subMon.newChild(10));
-			if (!serverInfo.exists() || serverInfo.getLength() != localInfo.getLength()) {
-				local.copy(server, EFS.OVERWRITE, subMon.newChild(70));
-			}
+
+			checkAndUploadPayload(directory, subMon.newChild(30));
+
+			unpackPayload(directory, subMon.newChild(30));
 
 			/*
 			 * Now launch the server.
 			 */
-			subMon.subTask(Messages.AbstractRemoteServerRunner_5);
-			RemoteVariableManager varMgr = RemoteVariableManager.getInstance();
-			varMgr.setVars(fVars);
-			String launchCmd = varMgr.performStringSubstitution(getLaunchCommand());
-			List<String> launchArgs = Arrays.asList(launchCmd.split(" ")); //$NON-NLS-1$
-			IRemoteProcessBuilder builder = conn.getRemoteServices().getProcessBuilder(conn, launchArgs);
-			builder.directory(directory);
-			builder.environment().putAll(getEnv());
-			return builder.start();
+			return runCommand(getLaunchCommand(), Messages.AbstractRemoteServerRunner_5, directory, false, subMon.newChild(30));
 		} catch (Exception e) {
 			throw new IOException(e.getMessage());
 		} finally {
@@ -654,19 +692,42 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @throws Exception
 	 *             the exception
 	 */
-	private IRemoteProcess runVerifyCommand(IProgressMonitor monitor) throws IOException {
+	private IRemoteProcess runCommand(String command, String message, IFileStore directory, boolean redirect,
+			IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor);
-		subMon.subTask(Messages.AbstractRemoteServerRunner_13);
+		subMon.subTask(message);
 		try {
-			// specify the verify command to check the software version
-			List<String> verifyArgs = Arrays.asList(getVerifyLaunchCommand().split(" ")); //$NON-NLS-1$
-			IRemoteProcessBuilder builder = getRemoteConnection().getRemoteServices().getProcessBuilder(getRemoteConnection(),
-					verifyArgs);
-			builder.redirectErrorStream(true);
+			RemoteVariableManager varMgr = RemoteVariableManager.getInstance();
+			varMgr.setVars(fVars);
+			String cmdToRun = varMgr.performStringSubstitution(command);
+			List<String> cmdArgs = Arrays.asList(cmdToRun.split(" ")); //$NON-NLS-1$
+			IRemoteProcessBuilder builder = fRemoteConnection.getRemoteServices().getProcessBuilder(fRemoteConnection, cmdArgs);
+			if (directory != null) {
+				builder.directory(directory);
+			}
+			builder.redirectErrorStream(redirect);
 			builder.environment().putAll(getEnv());
 			return builder.start();
 		} finally {
-			monitor.done();
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/**
+	 * Run the unpack command on the remote machine.
+	 * 
+	 * @param conn
+	 *            remote connection
+	 * @param directory
+	 * @param monitor
+	 * @throws IOException
+	 */
+	private void unpackPayload(IFileStore directory, IProgressMonitor monitor) throws IOException {
+		String unpackCommand = getUnpackCommand();
+		if (unpackCommand != null && unpackCommand.length() != 0) {
+			runCommand(unpackCommand, Messages.AbstractRemoteServerRunner_unpackingPayload, directory, false, monitor);
 		}
 	}
 
@@ -734,7 +795,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				return Status.CANCEL_STATUS;
 			}
 
-			fRemoteProcess = launchServer(fRemoteConnection, subMon.newChild(50));
+			fRemoteProcess = launchServer(subMon.newChild(50));
 
 			if (subMon.isCanceled()) {
 				return Status.CANCEL_STATUS;
@@ -764,7 +825,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 							// Ignore
 						}
 					}
-				}, "dstore server stdout").start(); //$NON-NLS-1$
+				}, "server stdout").start(); //$NON-NLS-1$
 
 				final BufferedReader stderr = new BufferedReader(new InputStreamReader(fRemoteProcess.getErrorStream()));
 				new Thread(new Runnable() {
@@ -791,8 +852,26 @@ public abstract class AbstractRemoteServerRunner extends Job {
 							// Ignore
 						}
 					}
-				}, "dstore server stderr").start(); //$NON-NLS-1$
+				}, "server stderr").start(); //$NON-NLS-1$
 			} else {
+				if (DebugUtil.SERVER_TRACING) {
+					final BufferedReader stderr = new BufferedReader(new InputStreamReader(fRemoteProcess.getErrorStream()));
+					new Thread(new Runnable() {
+						public void run() {
+							try {
+								while (getServerState() != ServerState.STOPPED) {
+									String output = stderr.readLine();
+									if (output != null) {
+										System.err.println("SERVER: " + output); //$NON-NLS-1$
+									}
+								}
+								stderr.close();
+							} catch (IOException e) {
+								// Ignore
+							}
+						}
+					}, "server stderr").start(); //$NON-NLS-1$
+				}
 				setServerState(ServerState.RUNNING);
 			}
 
