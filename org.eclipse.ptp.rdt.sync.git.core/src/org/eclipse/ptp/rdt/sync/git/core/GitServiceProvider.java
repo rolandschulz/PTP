@@ -15,6 +15,8 @@ import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -356,10 +358,30 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			if (fileName.endsWith(".cproject") || fileName.endsWith(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
 				return true;
 			}
-			
+
+			if (this.isBinaryFile(fileName)) {
+				return true;
+			}
+
 			return false;
 		}
+
+		private boolean isBinaryFile(String fileName) {
+			try {
+				int resType = CoreModel.getDefault().create(getProject().getFile(fileName)).getElementType();
+				if (resType == ICElement.C_BINARY) {
+					return true;
+				} else {
+					return false;
+				}
+			} catch (NullPointerException e) {
+				System.err.println(fileName);
+				return false;
+			}
+		}
 	}
+
+
 
 	/*
 	 * (non-Javadoc)
