@@ -26,7 +26,7 @@ my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
 
-my $version="1.03";
+my $version="1.05";
  
 my ($tstart,$tdiff,$rc);
 
@@ -201,7 +201,7 @@ if($rawfile) {
 
     $step="addcolor";
     &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "\$instdir/LML_color/LML_color_obj.pl -colordefs \$instdir/LML_color/default.conf ".
+			       "$^X \$instdir/LML_color/LML_color_obj.pl -colordefs \$instdir/LML_color/default.conf ".
 			       "-o         \$stepoutfile \$stepinfile");
     $laststep=$step;
 

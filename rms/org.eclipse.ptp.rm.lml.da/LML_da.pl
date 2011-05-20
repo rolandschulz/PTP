@@ -34,9 +34,6 @@ my $version="1.0";
 my ($tstart,$tdiff,$rc);
 
 
-# Init XML-Parser
-my $xs=XML::Simple->new();
-
 # option handling
 my $opt_configfile="./LML_da_workflow.conf";
 my $opt_verbose=0;

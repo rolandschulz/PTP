@@ -15,7 +15,6 @@ my($debug)=0;
 
 use strict;
 use Data::Dumper;
-use XML::Simple;
 use Time::Local;
 use Time::HiRes qw ( time );
 use LML_da_util;

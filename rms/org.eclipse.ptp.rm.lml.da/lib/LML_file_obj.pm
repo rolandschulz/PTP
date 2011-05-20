@@ -25,7 +25,7 @@ sub new {
     my $class   = ref($proto) || $proto;
     my $verbose = shift;
     my $timings = shift;
-    printf("\t LML_file_obj: new %s\n",ref($proto)) if($debug>=3);
+    printf(STDERR "\t LML_file_obj: new %s\n",ref($proto)) if($debug>=3);
     $self->{DATA}      = {};
     $self->{VERBOSE}   = $verbose; 
     $self->{TIMINGS}   = $timings; 
@@ -191,6 +191,10 @@ sub read_lml_fast {
 	    next;
 	}
 	
+
+	# comment
+	next if($tag =~ /\!\-\-/);
+
 #	print "TAG: '$tag'\n";
 	if($tag=~/^<[\/\?](.*[^\s\>])/) {
 	    $tagname=$1;
@@ -215,7 +219,7 @@ sub read_lml_fast {
     }
 
     $tdiff=time-$tstart;
-    printf("LML_file_obj: parse XML in %6.4f sec\n",$tdiff) if($self->{VERBOSE});
+    printf(STDERR "LML_file_obj: parse XML in %6.4f sec\n",$tdiff) if($self->{VERBOSE});
 
 #    print Dumper($self->{DATA});
     return($rc);
@@ -449,7 +453,7 @@ sub lml_end {
     my $self=shift; # object reference
     my $o   =shift;
     my $name=shift;
-#    print "LML_file_obj: lml_end >$name< \n";
+#    print STDERR "LML_file_obj: lml_end >$name< \n";
 
     if($name=~/data/) {
 	if(!$self->{LASTINFOID}) {
@@ -483,7 +487,7 @@ sub lml_end {
 	$o->{LASTINFOID} = undef;
     }
 
-#    print Dumper($o->{NODEDISPLAYSTACK});
+#    print STDERR Dumper($o->{NODEDISPLAYSTACK});
 }
 
 
@@ -539,7 +543,7 @@ sub write_lml {
 	    printf(OUT ">\n");
 
  	    foreach $k (sort keys %{$table->{column}}) {
-#		print "$id $k ",Dumper($table->{column}->{$k});
+#		print STDERR "$id $k ",Dumper($table->{column}->{$k});
 		printf(OUT "<column");
 		for $key ("id","name","sort","description","type") {
 		    printf(OUT " %s=\"%s\"",$key,  $table->{column}->{$k}->{$key}) if (exists($table->{column}->{$k}->{$key}));

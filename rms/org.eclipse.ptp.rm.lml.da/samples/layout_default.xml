@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!---
  Copyright (c) 2011 Forschungszentrum Juelich GmbH.
  All rights reserved. This program and the accompanying materials
@@ -8,7 +9,7 @@
  Contributors:
     Wolfgang Frings (Forschungszentrum Juelich GmbH) 
 -->
-<?xml version="1.0" encoding="UTF-8"?>
+
 <lml:lgui xmlns:lml="http://www.llview.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.llview.de lgui.xsd " version="1.0"> 
 
@@ -26,14 +27,14 @@
 </nodedisplaylayout>
 
 <tablelayout id="tl_Run" gid="joblistrun" active="true">
- <column cid="1" pos="1" width="1" active="true" key="step" />
- <column cid="2" pos="2" width="1" active="true" key="owner" />
- <column cid="3" pos="3" width="1" active="true" key="queue" />
- <column cid="4" pos="4" width="1" active="true" key="wall" />
- <column cid="5" pos="5" width="1" active="true" key="queuedate" />
- <column cid="6" pos="6" width="1" active="true" key="dispatchdate" />
- <column cid="7" pos="7" width="1" active="true" key="totalcores" />
- <column cid="8" pos="8" width="3" active="true" key="state" />
+<column cid="1" pos="0" width="0.1" active="true" key="step"/>
+<column cid="2" pos="1" width="0.1" active="true" key="owner"/>
+<column cid="3" pos="2" width="0.1" active="true" key="queue"/>
+<column cid="4" pos="3" width="0.1" active="true" key="wall"/>
+<column cid="5" pos="4" width="0.1" active="true" key="queuedate"/>
+<column cid="6" pos="5" width="0.1" active="true" key="dispatchdate"/>
+<column cid="7" pos="6" width="0.1" active="true" key="totalcores"/>
+<column cid="8" pos="7" width="0.3" active="true" key="status"/>
 </tablelayout>
 
 <table title="Running" id="joblistrun"  contenttype="jobs" description="This is the table showing all running jobs">
@@ -44,18 +45,18 @@
 <column id="5" name="queuedate"/>
 <column id="6" name="dispatchdate"/>
 <column id="7" name="totalcores"/>
-<column id="8" name="state" type="mandatory">  <pattern>    <include regexp="Running"/>  </pattern> </column>
+<column id="8" name="status" type="mandatory">  <pattern>    <include regexp="RUNNING"/>  </pattern> </column>
 </table>
 
-<tablelayout id="tl_WAIT" gid="joblistwait" active="false">
- <column cid="1" pos="1" width="1" active="true" key="step" />
- <column cid="2" pos="2" width="1" active="true" key="owner" />
- <column cid="3" pos="3" width="1" active="true" key="queue" />
- <column cid="4" pos="4" width="1" active="true" key="wall" />
- <column cid="5" pos="5" width="1" active="true" key="queuedate" />
- <column cid="6" pos="6" width="1" active="true" key="dispatchdate" />
- <column cid="7" pos="7" width="1" active="true" key="totalcores" />
- <column cid="8" pos="8" width="3" active="true" key="state" />
+<tablelayout id="tl_WAIT" gid="joblistwait" active="true">
+<column cid="1" pos="0" width="0.1" active="true" key="step"/>
+<column cid="2" pos="1" width="0.1" active="true" key="owner"/>
+<column cid="3" pos="2" width="0.1" active="true" key="queue"/>
+<column cid="4" pos="3" width="0.1" active="true" key="wall"/>
+<column cid="5" pos="4" width="0.1" active="true" key="queuedate"/>
+<column cid="6" pos="5" width="0.1" active="true" key="dispatchdate"/>
+<column cid="7" pos="6" width="0.1" active="true" key="totalcores"/>
+<column cid="8" pos="7" width="0.3" active="true" key="status"/>
 </tablelayout>
 
 <table title="Waiting" id="joblistwait"  contenttype="jobs" description="This is the table showing all waiting jobs">
@@ -66,9 +67,8 @@
 <column id="5" name="queuedate"/>
 <column id="6" name="dispatchdate"/>
 <column id="7" name="totalcores"/>
-<column id="8" name="state" type="mandatory">  <pattern>    <include regexp="Idle"/>  </pattern> </column>
+<column id="8" name="status" type="mandatory">  <pattern>    <include regexp="SUBMITTED"/>  </pattern> </column>
 </table>
-
 
 <table title="Nodes" id="nodelist"  contenttype="nodes" description="This is the table contain all nodes of the system">
 <column id="1" name="id" sort="alpha" type="mandatory"></column>
@@ -77,11 +77,11 @@
 <column id="4" name="state" sort="alpha"/>
 </table>
 
-<tablelayout id="nodes" gid="nodelist" active="false">
- <column cid="1" pos="1" width="1" active="true" key="id" />
- <column cid="2" pos="2" width="1" active="true" key="ncores" />
- <column cid="3" pos="3" width="1" active="true" key="physmem" />
- <column cid="4" pos="4" width="1" active="true" key="state" />
+<tablelayout id="nodes" gid="nodelist" active="true">
+ <column cid="1" pos="0" width="0.25" active="true" key="id" />
+ <column cid="2" pos="1" width="0.25" active="true" key="ncores" />
+ <column cid="3" pos="2" width="0.25" active="true" key="physmem" />
+ <column cid="4" pos="3" width="0.25" active="true" key="state" />
 </tablelayout>
 
 

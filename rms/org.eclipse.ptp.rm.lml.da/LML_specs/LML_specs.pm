@@ -39,7 +39,7 @@ $LML_specs::LMLattributes = {
 				      }, "Primary status of job" 
 		                     ],
 	         "detailedstatus" => ["k","M",{
-		     "QUEUED_ACTIVE"        => 1, 
+		                                "QUEUED_ACTIVE"        => 1, 
 						"SYSTEM_ON_HOLD"       => 1, # Submitted
 						"USER_ON_HOLD"         => 1, # Submitted
 						"USER_SYSTEM_ON_HOLD"  => 1, # Submitted

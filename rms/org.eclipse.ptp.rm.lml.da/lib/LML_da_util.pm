@@ -62,8 +62,7 @@ sub substitute_recursive {
 }
 
 sub substitute {
-    my($strref,$hashref)=@_;
-    my($found,$c,@varlist1,@varlist2,$var);
+    my($strref,$hashref)=@_;    my($found,$c,@varlist1,@varlist2,$var);
     my($SUBSTITUTE_NOTFOUND);
     $c=0;
     $found=0;
@@ -129,6 +128,27 @@ sub substitute {
     return($found);
 }
 
+# just a replacement if perl module function is missing
+sub mask_to_regexp {
+    my($mask)=@_;
+    my($regexp);
+    my($pat,$repl);
+    $regexp=$mask;
+    # substitution typical patterns
+
+    # %d
+    $regexp=~s/%d/\\s*\([-+]?\\d+(?:_\\d+)*\)/gs;
+
+    # %03d
+    $regexp=~s/\%(\d+)d/\\s*\([-+]?\\d{$1}(?:_\\d+)*\)/gs;
+
+    # %s
+    $regexp=~s/\%s/\\s*\(\\S*\)/gs;
+
+    $regexp=~s/\%(\d+)s/\\s*\(\\S\{0,$1\}\)/gs;
+
+    return($regexp);
+}
 
 # UTILITY FUNCTIONS
 ###################

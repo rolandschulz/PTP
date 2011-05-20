@@ -72,7 +72,7 @@ foreach $filename (@filenames) {
 }
 
 # determine system type
-my $system_type = "unkown";
+my $system_type = "unknown";
 {
     my($key,$ref);
     while(($key,$ref)=each(%{$filehandler->{DATA}->{OBJECT}})) {

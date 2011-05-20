@@ -17,7 +17,19 @@ use Data::Dumper;
 
 
 ################################################################################################################
-# job insertion
+# insert_job_into_nodedisplay: Insert one job into data tree 
+#
+#  Parameters:
+#   schemeref: Reference to scheme tree 
+#   dataref:   Reference to data tree 
+#   nodelist:  List of nodes, as comma-separated list 
+#   oid:       Object-Id of job in LML description 
+# 
+#  Description:
+#   Insert into the data tree (parameter dataref) a job in that way, that all nodes n which the job is running gets 
+#   an oid reference to this job, The nodelist and te oid is given as parameter. The scheme describing the
+#   full system structure is also given as parameter.
+#  
 ################################################################################################################
 sub insert_job_into_nodedisplay  {
     my($self) = shift;
@@ -27,6 +39,8 @@ sub insert_job_into_nodedisplay  {
     my($oid) = shift;
     my($data,$node,$listref,@nodelistrefs,@nodelistrefs_reduced, $allcovered, $child);
 
+    # Transfer each node name of the nodelist to a list of ordering number for each level of the tree
+    # according to the mask or map attribute in th escheme definition
     foreach $node (sort(split(/\s*,\s*/,$nodelist))) {
 	$listref=$self->get_numbers_from_name($node,$schemeref);
 	if(!defined($listref)) {
@@ -36,25 +50,45 @@ sub insert_job_into_nodedisplay  {
 	push(@nodelistrefs,$listref);
     }
     
-    foreach $listref (@nodelistrefs) {
-	print "insert_job_into_nodedisplay, before: ",join(',',@{$listref}),"\n"  if($debug>=2); 
+    # Debugging
+    if($debug>=2) {
+	foreach $listref (@nodelistrefs) {
+	    print "insert_job_into_nodedisplay, before: ",join(',',@{$listref}),"\n"; 
+	}
     }
 
-    # for each system part
+    # Find and compress sets of nodenames, which covers a full subtree
+    # after this run nodelistrefs_reduced contains only location of full 
+    # covered tree nodes which
+    # This scan will run recursively on each subtree of the root node   
     foreach $child (@{$schemeref->{_childs}}) {
 	$allcovered=$self->_reduce_nodelist($child,\@nodelistrefs,\@nodelistrefs_reduced);
     }
 
     print "insert_job_into_nodedisplay, allcovered=$allcovered\n"  if($debug>=2); 
 
+    # Insert job into each node of the reduced list
     foreach $listref (@nodelistrefs_reduced) {
 	$self->_insert_jobnode_nodedisplay($dataref,$listref,$oid);
     }
 
-
     return(1);
 }
 
+################################################################################################################
+# _insert_jobnode_nodedisplay: Insert one jobnode into data tree
+#
+#  Parameters:
+#   dataref:   Reference to data tree 
+#   nodelistref:  Location of node  
+#   oid:       Object-Id of job in LML description 
+# 
+#  Description:
+#   Insert into the data tree (parameter dataref) a job in that way, that all nodes n which the job is running gets 
+#   an oid reference to this job, The nodelist and te oid is given as parameter. The scheme describing the
+#   full system structure is also given as parameter.
+#  
+################################################################################################################
 sub _insert_jobnode_nodedisplay {
     my($self) = shift;
     my($dataref)=shift;
@@ -216,6 +250,21 @@ sub _insert_jobnode_nodedisplay {
 }    
 
 
+################################################################################################################
+# _reduce_nodelist: reduce list of nodes, covering only full subtrees
+#
+#  Parameters:
+#   schemeref:        Reference to scheme tree 
+#   nodelistrefs:     Reference to list of locations 
+#   newnodelistrefs:  Reference to reduced list of locations 
+# 
+#  Description:
+#   Find and compress sets of nodenames, which covers a full subtree.
+#   This scan will run recursively on each subtree of the root node.   
+#
+#  Return value:
+#
+################################################################################################################
 sub _reduce_nodelist {
     my($self) = shift;
     my($schemeref)=shift;
@@ -224,26 +273,30 @@ sub _reduce_nodelist {
     my($rg,$child, $listref, @covered, $allcovered, $nodenum,@shortlists,@newshortlists, $lastfound);
     my $level=$schemeref->{_level};
     my $xspace=" "x$level;
-    
 
     print "_reduce_nodelist: $xspace # START level=$level scheme min..max=$schemeref->{ATTR}->{min}..$schemeref->{ATTR}->{max}\n" if($debug>=2); 
+
+    # Initialization
     for($nodenum=$schemeref->{ATTR}->{min};$nodenum<=$schemeref->{ATTR}->{max};$nodenum++) {
 	$covered[$nodenum]=0;
     }
 
-    # check which treenodes are given in nodelist, covered = {0 no nodes, 1 all nodes, 2 some nodes}  
+    # check which treenodes are given in nodelist, 
+    # for each node: 
+    #  covered[.] = {0 no nodes, 1 all nodes, 2 some nodes}  
     foreach $listref (@{$nodelistrefs}) {
 	$nodenum=$listref->[0];
+
 	# check only nodes which are described by this subtree of the scheme
 	next if($nodenum<$schemeref->{ATTR}->{min});
 	next if($nodenum>$schemeref->{ATTR}->{max});
 	print "_reduce_nodelist: $xspace # CHECK nodenum=$nodenum\n" if($debug>=2); 
 	if($#{$listref}==0) {
-	    # node full covered
-	    $covered[$nodenum]=1;
+	    $covered[$nodenum]=1; # node full covered
 	} else {
 	    my(@list);
 	    $covered[$nodenum]=2 if($covered[$nodenum]==0);
+
 	    # remove top elem and add it to sublist
 	    @list=@{$listref};shift(@list);push(@{$shortlists[$nodenum]},\@list);
 	}
@@ -367,7 +420,19 @@ sub reduce_list  {
 
 
 ################################################################################################################
-# help function
+# get_numbers_from_name: nodename to location numbers (main)
+#
+#  Parameters:
+#   name:       node name 
+#   schemeref:  Reference to scheme tree 
+# 
+#  Description:
+#   Maps nodename to a list of numbers, giving for each level of the scheme tree
+#   the ordering number of the node on that level
+#
+#  Return value:
+#   List of numbers
+#
 ################################################################################################################
 sub get_numbers_from_name  {
     my($self) = shift;
@@ -375,14 +440,30 @@ sub get_numbers_from_name  {
     my($schemeref) = shift;
     my($id,$listref,$format,$child);
    
+    # check for each child recursively if nodename matches to this tree
     foreach $child (@{$schemeref->{_childs}}) {
 	$listref=$self->_get_numbers_from_name($child,$name);
 	last if(defined($listref)); 
     }
-
+    
     return($listref);
 }
 
+################################################################################################################
+# _get_numbers_from_name: nodename to location numbers (recursive)
+#
+#  Parameters:
+#   name:       node name 
+#   schemeref:  Reference to scheme tree 
+# 
+#  Description:
+#   Maps nodename to a list of numbers, giving for each level of the scheme tree
+#   the ordering number of the node on that level
+#
+#  Return value:
+#   List of numbers
+#  
+################################################################################################################
 sub _get_numbers_from_name {
     my($self) = shift;
     my($schemeref)=shift;
@@ -391,29 +472,34 @@ sub _get_numbers_from_name {
     
     $listref=undef;
 
+    # get regexp match full node names to this level  
     $rg=$schemeref->{ATTR}->{_maskregall};
+
+    # ready if nodename matches to this level 
     if($name=~/^$rg$/) {
 	@list=$name=~/^$rg$/;
 	print "get_numbers_from_name: found on level ",$schemeref->{_level}+1," $name -> ",join(',',@list),"\n" if($debug>=2); 
 	$listref=\@list;
 	return(\@list);
     } else {
+	# search if nodename matches for one of the child nodes
 	foreach $child (@{$schemeref->{_childs}}) {
 	    $listref=$self->_get_numbers_from_name($child,$name);
 	    last if(defined($listref)); 
 	}
     }
-    # remap strings to number on that level
+
+    # remap strings to number on that level if map attribute is used instead of mask
+    # mapping is given as an hash attached to this tree node 
     if(defined($listref)) {
 	if(exists($schemeref->{ATTR}->{_map})) {
-	    
 	    if(exists($schemeref->{ATTR}->{_map}->{$listref->[$schemeref->{_level}-1]})) {
-#		print "_get_numbers_from_name: remap on level ",$schemeref->{_level}," $name -> ",$listref->[$schemeref->{_level}-1],"\n" if($debug>=2); 
 		$listref->[$schemeref->{_level}-1]=$schemeref->{ATTR}->{_map}->{$listref->[$schemeref->{_level}-1]};
 	    }
 	    
 	}
     }
+    
     return($listref);
 }
 

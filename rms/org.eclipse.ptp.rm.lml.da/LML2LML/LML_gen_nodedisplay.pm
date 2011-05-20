@@ -17,7 +17,8 @@ use strict;
 use Data::Dumper;
 use Time::Local;
 use Time::HiRes qw ( time );
-use String::Scanf;
+#use String::Scanf;
+use LML_da_util;
 
 use LML_ndtree;
 
@@ -115,6 +116,7 @@ sub process {
 
     $idlistref=[];
     print "LML_gen_nodedisplay::process: gid=$gid\n" if($self->{VERBOSE});
+#    print Dumper($self->{SCHEMEROOT});
     $idlistref=$self->_insert_run_jobs();
 
     $self->{IDLISTREF}=$idlistref;
@@ -129,7 +131,9 @@ sub process {
 sub _insert_run_jobs {
     my($self) = shift;
     my (@idlist,$key,$ref,$inforef,$nodelist);
-    
+    my($tstart,$tdiff,$jcount);
+
+    $tstart=time;$jcount=0;
     keys(%{$self->{LMLFH}->{DATA}->{OBJECT}}); # reset iterator
     while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
 	next if($ref->{type} ne 'job');
@@ -138,6 +142,12 @@ sub _insert_run_jobs {
 	$nodelist=$self->_remap_nodes($inforef->{nodelist});
 	$self->insert_job_into_nodedisplay($self->{SCHEMEROOT},$self->{DATAROOT},$nodelist,$key);
 	push(@idlist,$key);
+	$jcount++;
+	if($jcount%10==0) {
+	    $tdiff=time-$tstart;
+	    printf("$0: inserted %d jobs in %6.4f sec\n",$jcount,$tdiff) if($self->{VERBOSE});
+	}
+
 #	last; # WF
     }
     return(\@idlist);
@@ -211,7 +221,8 @@ sub __add_regexp_to_scheme {
     my($rg,$child,$key);
 
     if(exists($schemeref->{ATTR}->{mask})) {
-	$rg=String::Scanf::format_to_re($schemeref->{ATTR}->{mask});
+#	$rg=String::Scanf::format_to_re($schemeref->{ATTR}->{mask});
+	$rg=LML_da_util::mask_to_regexp($schemeref->{ATTR}->{mask});
     } elsif(exists($schemeref->{ATTR}->{map})) {
 	$rg="\(".join("\|",split('\s*,\s*',$schemeref->{ATTR}->{map}))."\)";
 	my $num=$schemeref->{ATTR}->{min};
@@ -266,6 +277,9 @@ sub _remap_nodes {
     my($self) = shift;
     my($nodelist)=shift;
     my($newnodelist,$spec,$node,$num,$newnode);
+    if($self->{SYSTEMTYPE} eq "BG/P") {
+	return($nodelist);
+    }
     foreach $spec (split(/\),?\(/,$nodelist)) {
 	# change form '(node,node num)' to (node-c<num>)
 	if($spec=~/\(?([^,]+),(\d+)\)?/) {
@@ -273,7 +287,7 @@ sub _remap_nodes {
 	} elsif($spec=~/^([^,]+)$/) {
 	    $node=$1;$num=0;	
 	} else {
-	    print "ERROR: _remap_nodes: unknown node '$node', skipping\n";
+	    print "ERROR: _remap_nodes: unknown node in spec '$spec', skipping\n";
 	}
 	
 	if(exists($self->{NODEMAPPING}->{$node})) {

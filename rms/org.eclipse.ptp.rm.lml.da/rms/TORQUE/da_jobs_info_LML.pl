@@ -212,6 +212,9 @@ sub modify {
     my($key,$mkey,$value)=@_;
     my $ret=$value;
 
+    if(!$ret) {
+	return(undef);
+    }
 
     if($mkey eq "owner") {
 	$ret=~s/\@.*//gs;
