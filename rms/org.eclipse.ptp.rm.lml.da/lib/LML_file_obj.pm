@@ -168,7 +168,7 @@ sub read_lml_fast {
     }
     close(IN);
     my $tdiff=time-$tstart;
-    printf("LML_file_obj: read  XML in %6.4f sec\n",$tdiff) if($self->{VERBOSE});
+    printf(STDERR "LML_file_obj: read  XML in %6.4f sec\n",$tdiff) if($self->{VERBOSE});
 
     if(!$xmlin) {
 	print STDERR "$0: ERROR: empty file $infile, leaving ...\n";return(0);
@@ -253,7 +253,7 @@ sub lml_start {
 	    $k=$attr{key};
 	    $v=$attr{value};
 	    if(exists($o->{INFODATA}->{$id}->{$k})) {
-		print "LML_file_obj: WARNING infodata with id >$id< and key >$k< exists, skipping\n";
+		print STDERR "LML_file_obj: WARNING infodata with id >$id< and key >$k< exists, skipping\n";
 		return(0);
 	    }
 	    $o->{INFODATA}->{$id}->{$k}=$v;
@@ -285,7 +285,7 @@ sub lml_start {
     if($name eq "object") {
 	$id=$attr{id};
 	if(exists($o->{OBJECT}->{$id})) {
-	    print "LML_file_obj: WARNING objects with id >$id< exists, skipping\n";
+	    print STDERR "LML_file_obj: WARNING objects with id >$id< exists, skipping\n";
 	    return(0);
     	}
 	foreach $k (sort keys %attr) {
@@ -304,7 +304,7 @@ sub lml_start {
 	$o->{LASTINFOID}=$oid;
 	$o->{LASTINFOTYPE}=$o->{OBJECT}->{$oid}->{type};
 	if(exists($o->{INFO}->{$oid})) {
-	    print "LML_file_obj: WARNING info with id >$id< exists, skipping\n";
+	    print STDERR "LML_file_obj: WARNING info with id >$id< exists, skipping\n";
 	    return(0);
     	}
 	foreach $k (sort keys %attr) {
@@ -320,7 +320,7 @@ sub lml_start {
 	$id=$attr{id};
 	$o->{LASTTABLEID}=$id;
 	if(exists($o->{TABLE}->{$id})) {
-	    print "LML_file_obj: WARNING Table with id >$id< exists, skipping\n";
+	    print STDERR "LML_file_obj: WARNING Table with id >$id< exists, skipping\n";
 	    return(0);
     	}
 	foreach $k (sort keys %attr) {
@@ -332,7 +332,7 @@ sub lml_start {
 	$id=$attr{id};
 	$o->{LASTTABLELAYOUTID}=$id;
 	if(exists($o->{TABLELAYOUT}->{$id})) {
-	    print "LML_file_obj: WARNING Tablelayout with id >$id< exists, skipping\n";
+	    print STDERR "LML_file_obj: WARNING Tablelayout with id >$id< exists, skipping\n";
 	    return(0);
     	}
 	foreach $k (sort keys %attr) {
@@ -347,7 +347,7 @@ sub lml_start {
 	    $o->{LASTCOLUMNID}=$cid;
 	    $v=$attr{value};
 	    if(exists($o->{TABLE}->{$id}->{column}->{$cid})) {
-		print "LML_file_obj: WARNING column in table with id >$cid<  exists, skipping\n";
+		print STDERR "LML_file_obj: WARNING column in table with id >$cid<  exists, skipping\n";
 		return(0);
 	    }
 	    foreach $k (sort keys %attr) {
@@ -360,7 +360,7 @@ sub lml_start {
 	    $o->{LASTCOLUMNID}=$cid;
 	    $v=$attr{value};
 	    if(exists($o->{TABLELAYOUT}->{$id}->{column}->{$cid})) {
-		print "LML_file_obj: WARNING column in tablelayout with id >$cid<  exists, skipping\n";
+		print STDERR "LML_file_obj: WARNING column in tablelayout with id >$cid<  exists, skipping\n";
 		return(0);
 	    }
 	    foreach $k (sort keys %attr) {
@@ -402,7 +402,7 @@ sub lml_start {
 	$id=$attr{id};
 	$o->{LASTNODEDISPLAYID}=$id;
 	if(exists($o->{NODEDISPLAY}->{$id})) {
-	    print "LML_file_obj: WARNING Nodedisplay with id >$id< exists, skipping\n";
+	    print STDERR "LML_file_obj: WARNING Nodedisplay with id >$id< exists, skipping\n";
 	    return(0);
     	}
 	foreach $k (sort keys %attr) {
@@ -413,7 +413,7 @@ sub lml_start {
     if($name eq "nodedisplaylayout") {
 	$id=$attr{id};
 	if(exists($o->{NODEDISPLAYLAYOUT}->{$id})) {
-	    print "LML_file_obj: WARNING Nodedisplaylayout with id >$id< exists, skipping\n";
+	    print STDERR "LML_file_obj: WARNING Nodedisplaylayout with id >$id< exists, skipping\n";
 	    return(0);
     	}
 	foreach $k (sort keys %attr) {
@@ -441,7 +441,7 @@ sub lml_start {
     }
 
     # unknown element
-    print "LML_file_obj: WARNING unknown tag >$name< \n";
+    print STDERR "LML_file_obj: WARNING unknown tag >$name< \n";
    
 }
 
@@ -629,7 +629,7 @@ sub write_lml {
     close(OUT);
 
     my $tdiff=time-$tstart;
-    printf("LML_file_obj: wrote  XML in %6.4f sec to %s\n",$tdiff,$outfile) if($self->{TIMINGS});
+    printf(STDERR "LML_file_obj: wrote  XML in %6.4f sec to %s\n",$tdiff,$outfile) if($self->{TIMINGS});
     
     return($rc);
     
