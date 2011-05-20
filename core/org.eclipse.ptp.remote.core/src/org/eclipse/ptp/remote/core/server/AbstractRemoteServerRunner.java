@@ -67,7 +67,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	private static String VERIFY_LAUNCH_PATTERN_VAR = "verify_launch_pattern"; //$NON-NLS-1$
 	private static String VERIFY_UNPACK_COMMAND_VAR = "verify_unpack_command"; //$NON-NLS-1$
 	private static String VERIFY_UNPACK_FAIL_MESSAGE_VAR = "verify_unpack_fail_message"; //$NON-NLS-1$
-
 	private static String VERIFY_UNPACK_PATTERN_VAR = "verify_unpack_pattern"; //$NON-NLS-1$
 
 	private final boolean DEBUG = true;
@@ -95,22 +94,30 @@ public abstract class AbstractRemoteServerRunner extends Job {
 
 	/**
 	 * Get the error stream of the remote process. This should only be used for
-	 * non-continuous processes.
+	 * non-continuous processes and is only valid for servers in the RUNNING
+	 * state.
 	 * 
 	 * @return InputStream
 	 */
 	public InputStream getErrorStream() {
-		return fRemoteProcess.getErrorStream();
+		if (fRemoteProcess != null) {
+			return fRemoteProcess.getErrorStream();
+		}
+		return null;
 	}
 
 	/**
 	 * Get the input stream of the remote process. This should only be used for
-	 * non-continuous processes.
+	 * non-continuous processes and is only valid for servers in the RUNNING
+	 * state.
 	 * 
 	 * @return InputStream
 	 */
 	public InputStream getInputStream() {
-		return fRemoteProcess.getInputStream();
+		if (fRemoteProcess != null) {
+			return fRemoteProcess.getInputStream();
+		}
+		return null;
 	}
 
 	/**
@@ -440,9 +447,11 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				if ((getVerifyLaunchCommand() != null && getVerifyLaunchCommand().length() != 0)
 						&& !isValidVersionInstalled(subMon)) {
 					if (getVerifyLaunchFailMessage() != null && getVerifyLaunchFailMessage().length() != 0) {
+						setServerState(ServerState.STOPPED);
 						throw new IOException(NLS.bind(getVerifyLaunchFailMessage(),
 								new Object[] { fServerName, fRemoteConnection.getName() }));
 					}
+					setServerState(ServerState.STOPPED);
 					throw new IOException(Messages.AbstractRemoteServerRunner_12);
 				}
 
@@ -468,13 +477,11 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	public void waitForServerFinish(IProgressMonitor monitor) {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
-			if (getServerState() != ServerState.STOPPED) {
-				while (!subMon.isCanceled() && getServerState() != ServerState.STOPPED) {
-					synchronized (this) {
-						try {
-							wait(100);
-						} catch (InterruptedException e) {
-						}
+			while (getServerState() != ServerState.STOPPED && !subMon.isCanceled()) {
+				synchronized (this) {
+					try {
+						wait(100);
+					} catch (InterruptedException e) {
 					}
 				}
 			}
@@ -495,17 +502,15 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @since 5.0
 	 */
 	public void waitForServerStart(int timeout) {
-		if (getServerState() == ServerState.STARTING) {
-			int waitVal = timeout < 1000 ? timeout : 1000;
-			int dec = timeout > 0 ? 1000 : 0;
-			while (timeout >= 0 && getServerState() != ServerState.RUNNING) {
-				try {
-					synchronized (this) {
-						wait(waitVal);
-					}
-					timeout -= dec;
-				} catch (InterruptedException e) {
+		int waitVal = timeout < 1000 ? timeout : 1000;
+		int dec = timeout > 0 ? 1000 : 0;
+		while (getServerState() == ServerState.STARTING && timeout >= 0) {
+			try {
+				synchronized (this) {
+					wait(waitVal);
 				}
+				timeout -= dec;
+			} catch (InterruptedException e) {
 			}
 		}
 	}
@@ -521,13 +526,11 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	public void waitForServerStart(IProgressMonitor monitor) {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
-			if (getServerState() == ServerState.STARTING) {
-				while (!subMon.isCanceled() && getServerState() != ServerState.RUNNING) {
-					synchronized (this) {
-						try {
-							wait(100);
-						} catch (InterruptedException e) {
-						}
+			while (getServerState() == ServerState.STARTING && !subMon.isCanceled()) {
+				synchronized (this) {
+					try {
+						wait(100);
+					} catch (InterruptedException e) {
 					}
 				}
 			}
@@ -789,6 +792,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 						}
 					}
 				}, "dstore server stderr").start(); //$NON-NLS-1$
+			} else {
+				setServerState(ServerState.RUNNING);
 			}
 
 			subMon.worked(40);
