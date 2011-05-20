@@ -53,6 +53,7 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
@@ -350,6 +351,9 @@ public class CommandJob extends Job implements ICommandJob {
 				} else {
 					String state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
 					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
+					PropertyType p = (PropertyType) rmVarMap.get(uuid);
+					p.setName(uuid);
+					p.setValue(state);
 				}
 
 				if (monitor.isCanceled()) {
@@ -409,6 +413,11 @@ public class CommandJob extends Job implements ICommandJob {
 				active = true;
 			}
 			progress.worked(20);
+
+			if (!waitForId) {
+				progress.done();
+				return Status.OK_STATUS;
+			}
 
 			if (keepOpen) {
 				control.getJobTable().put(getName(), this);

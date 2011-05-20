@@ -164,7 +164,6 @@ public class CommandJobStatus implements ICommandJobStatus {
 		setState(state);
 		this.open = open;
 		this.control = control;
-		assert (null != control);
 		waitEnabled = true;
 		lastUpdateRequest = 0;
 	}
