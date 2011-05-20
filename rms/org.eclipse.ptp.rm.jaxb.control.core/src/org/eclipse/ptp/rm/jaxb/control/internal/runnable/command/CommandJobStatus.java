@@ -556,9 +556,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 				if (jobId == null) {
 					if (stateDetail == FAILED) {
 						throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
+					} else {
+						continue;
 					}
-				} else {
-					continue;
 				}
 
 				if (p == null || !stateChanged()) {
