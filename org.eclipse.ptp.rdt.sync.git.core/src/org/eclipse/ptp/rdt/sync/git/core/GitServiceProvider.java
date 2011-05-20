@@ -227,40 +227,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					return;
 				}
 	
-				// TODO: Use delta information
-				// switch (delta.getKind()) {
-				// case IResourceDelta.ADDED:
-				// System.out.println("ensureSync kind=ADDED");
-				// break;
-				// case IResourceDelta.REMOVED:
-				// System.out.println("ensureSync kind=REMOVED");
-				// break;
-				// case IResourceDelta.CHANGED:
-				// System.out.println("ensureSync kind=CHANGED");
-				// break;
-				// default:
-				// System.out.println("ensureSync kind=OTHER");
-				// }
-				// for (IResourceDelta child : delta.getAffectedChildren()) {
-				// IResource resource = child.getResource();
-				// if (resource instanceof IProject) {
-				// System.out.println("ensureSync project=" + child.getResource().getName());
-				// synchronize(child, monitor,
-				// force);
-				// } else if (resource instanceof IFolder) {
-				// System.out.println("ensureSync folder=" +
-				// child.getResource().getName());
-				// synchronize(child, monitor, force);
-				// } else if (resource instanceof IFile) {
-				// System.out.println("ensureSync file=" + child.getResource().getName());
-				// }
-				// }
-	
 				// TODO: Review exception handling
 				if (fSyncConnection == null) {
 					// Open a remote sync connection
 					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(),
-															this.getProject().getLocation().toString(),	this.getLocation(), progress);
+															this.getProject().getLocation().toString(),	this.getLocation(),
+															new FileFilter(), progress);
 				}
 	
 				// Open remote connection if necessary
@@ -375,6 +347,16 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		} else if (path.endsWith("/.git/")){ //$NON-NLS-1$
 			return true;
 		} else {
+			return false;
+		}
+	}
+	
+	private class FileFilter implements SyncFileFilter {
+		public boolean shouldIgnore(String fileName) {
+			if (fileName.endsWith(".cproject") || fileName.endsWith(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
+				return true;
+			}
+			
 			return false;
 		}
 	}
