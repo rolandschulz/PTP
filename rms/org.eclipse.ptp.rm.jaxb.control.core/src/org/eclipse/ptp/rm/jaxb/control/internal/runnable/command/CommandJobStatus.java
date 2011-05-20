@@ -267,6 +267,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @return state of the job (not of the submission process).
 	 */
 	public synchronized String getState() {
+		checkProcessStateForTermination();
 		return state;
 	}
 
@@ -274,6 +275,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @return more specific state identifier.
 	 */
 	public synchronized String getStateDetail() {
+		checkProcessStateForTermination();
 		return stateDetail;
 	}
 
@@ -616,6 +618,17 @@ public class CommandJobStatus implements ICommandJobStatus {
 		t.callerMonitor = monitor;
 		t.schedule();
 		return t;
+	}
+
+	/**
+	 * If interactive, check to see if the process has completed.
+	 */
+	private void checkProcessStateForTermination() {
+		if (process != null) {
+			if (process.isCompleted()) {
+				setState(process.exitValue() == 0 ? COMPLETED : FAILED);
+			}
+		}
 	}
 
 	/**

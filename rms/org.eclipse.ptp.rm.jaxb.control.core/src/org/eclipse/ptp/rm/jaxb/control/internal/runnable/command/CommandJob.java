@@ -360,6 +360,9 @@ public class CommandJob extends Job implements ICommandJob {
 					return status;
 				}
 
+				if (!batch) {
+					jobStatus.setProcess(process);
+				}
 				jobStatus.setProxy(getProxy());
 
 				if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
