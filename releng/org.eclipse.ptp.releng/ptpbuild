@@ -16,14 +16,15 @@
 LANG=en_US
 TAG=HEAD
 CDT_TAG=HEAD
+VERBOSE=false
 
 # main staging directory
 BUILD_DIR=/opt/public/download-staging.priv/tools/ptp/releng
 
-args=`getopt c:d:t: $*`
+args=`getopt vc:d:t: $*`
 
 if [ $? != 0 ]; then
-	echo "usage: ptpbuild [-t tag] [-c cdt_tag] [-d build_dir] [build_args]"
+	echo "usage: ptpbuild [-v] [-t tag] [-c cdt_tag] [-d build_dir] [build_args]"
 	exit 1
 fi
 
@@ -32,6 +33,7 @@ for i
 do
 	case "$i"
 	in
+	-v) VERBOSE=true; shift;;
 	-c) CDT_TAG="$2"; shift; shift;;
 	-d) BUILD_DIR="$2"; shift; shift;;
 	-t) TAG="$2"; shift; shift;;
@@ -44,21 +46,26 @@ BUILD_LOG=$BUILD_DIR/ptpbuild_${TAG}_`date +%Y%m%d%H%M`.log
 touch $BUILD_LOG
 chmod a+r $BUILD_LOG
 
-{
-# create the releng staging directory and go there
-mkdir -p $BUILD_DIR && cd $BUILD_DIR
+do_build() {
+	# create the releng staging directory and go there
+	mkdir -p $1 && cd $1
 
-# remove the old build
-rm -fr org.eclipse.ptp_${TAG}
+	# remove the old build
+	rm -fr org.eclipse.ptp_${2}
 
-# Check out the releng project
-cvs -d /cvsroot/tools co -r $TAG -d org.eclipse.ptp_${TAG} org.eclipse.ptp/releng/org.eclipse.ptp.releng
+	# Check out the releng project
+	cvs -d /cvsroot/tools co -r $2 -d org.eclipse.ptp_${2} org.eclipse.ptp/releng/org.eclipse.ptp.releng
 
-# run the main script
-cd org.eclipse.ptp_${TAG}
-sh build.sh $*
+	# run the main script
+	cd org.eclipse.ptp_${2}
+	sh build.sh $3
+}
 
-} >$BUILD_LOG 2>&1
+if [ $VERBOSE = true ]; then
+	do_build $BUILD_DIR $TAG "$*" 2>&1 | tee $BUILD_LOG
+else
+	do_build $BUILD_DIR $TAG "$*" > $BUILD_LOG 2>&1
+fi
 
 if grep -q 'BUILD FAILED' $BUILD_LOG; then
 	echo "BUILD FAILED. See $BUILD_LOG for details."
