@@ -55,12 +55,12 @@ public final class LMLRMMonitorConfigurationWizardPage extends AbstractRemoteRes
 		Composite comp = super.doCreateContents(parent);
 		try {
 			SiteType site = getBaseConfiguration().getResourceManagerData().getSiteData();
-			if (site != null && site.getControlConnection() != null && getConfiguration().getRemoteServicesId() == null) {
+			if (site != null && site.getMonitorConnection() != null && getConfiguration().getRemoteServicesId() == null) {
 				/*
 				 * Configuration has not be initialized, so initialize now with
 				 * values from XML
 				 */
-				URI uri = new URI(site.getControlConnection());
+				URI uri = new URI(site.getMonitorConnection());
 				IRemoteServices services = PTPRemoteUIPlugin.getDefault().getRemoteServices(uri, getWizard().getContainer());
 				if (services != null) {
 					getConfiguration().setRemoteServicesId(services.getId());
