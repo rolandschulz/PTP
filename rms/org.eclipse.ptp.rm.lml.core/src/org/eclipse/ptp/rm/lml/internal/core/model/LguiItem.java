@@ -10,13 +10,13 @@
  */
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,31 +86,32 @@ public class LguiItem implements ILguiItem {
 	/**
 	 * List of encapsulated classes, which handle parts of the lml-hierarchy
 	 */
-	private final Map<Class<? extends ILguiHandler>, ILguiHandler> lguiHandlers = Collections.synchronizedMap(new HashMap<Class<? extends ILguiHandler>, ILguiHandler>());
-	
+	private final Map<Class<? extends ILguiHandler>, ILguiHandler> lguiHandlers = Collections
+			.synchronizedMap(new HashMap<Class<? extends ILguiHandler>, ILguiHandler>());
+
 	/*
 	 * List of Jobs
 	 */
 	private final Map<String, JobStatusData> jobList = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
-	
+
 	/*
 	 * ObjectFactory
 	 */
 	private static ObjectFactory objectFactory = new ObjectFactory();
-	
+
 	/*
 	 * String for the to saved layout.
 	 */
 	private String savedLayout = null;
-	
+
 	/*
 	 * 
 	 */
-	
+
 	public static final String LAYOUT = "layout";
-	
+
 	public static final String JOB = "job";
-	
+
 	/**************************************************************************************************************
 	 * Constructors
 	 **************************************************************************************************************/
@@ -121,7 +122,7 @@ public class LguiItem implements ILguiItem {
 	public LguiItem(String name) {
 		this.name = name;
 	}
-	
+
 	/**
 	 * Constructor with LML-model as argument
 	 * 
@@ -149,11 +150,11 @@ public class LguiItem implements ILguiItem {
 		createLguiHandlers();
 		setCid();
 	}
-	
+
 	/**************************************************************************************************************
 	 * Parsing methods
 	 **************************************************************************************************************/
-	
+
 	/**
 	 * Parsing an XML file. The method generates from an XML file an instance of
 	 * LguiType.
@@ -179,7 +180,7 @@ public class LguiItem implements ILguiItem {
 		return lml;
 
 	}
-	
+
 	/**
 	 * Parsing an XML file. The method generates from an XML file an instance of
 	 * LguiType.
@@ -203,7 +204,7 @@ public class LguiItem implements ILguiItem {
 
 		return lml;
 	}
-	
+
 	/**************************************************************************************************************
 	 * Further methods for setting up
 	 **************************************************************************************************************/
@@ -222,7 +223,7 @@ public class LguiItem implements ILguiItem {
 		lguiHandlers.put(TableHandler.class, new TableHandler(this, lgui));
 		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this, lgui));
 	}
-	
+
 	private void setCid() {
 		for (TableType table : getTableHandler().getTables()) {
 			for (RowType row : table.getRow()) {
@@ -238,7 +239,7 @@ public class LguiItem implements ILguiItem {
 			}
 		}
 	}
-	
+
 	public void save(IMemento memento) {
 		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
 		LguiType lgui = getLayoutFromModell();
@@ -256,7 +257,7 @@ public class LguiItem implements ILguiItem {
 			entry.getValue().save(memento);
 		}
 	}
-	
+
 	public void restore(IMemento memento) {
 		savedLayout = memento.getString(LAYOUT);
 		// TODO in LayoutType umbauen
@@ -264,9 +265,9 @@ public class LguiItem implements ILguiItem {
 		for (IMemento mementoChild : mementoChilds) {
 			jobList.put(mementoChild.getID(), new JobStatusData(memento));
 		}
-		
+
 	}
-	
+
 	/**************************************************************************************************************
 	 * Getting LguiHandlers
 	 **************************************************************************************************************/
@@ -284,7 +285,7 @@ public class LguiItem implements ILguiItem {
 		}
 		return (TableHandler) lguiHandlers.get(TableHandler.class);
 	}
-	
+
 	/**
 	 * @return a class, which provides an index for fast access to objects
 	 *         within the objects tag of LML. You can pass the id of the objects
@@ -343,7 +344,7 @@ public class LguiItem implements ILguiItem {
 	/**************************************************************************************************************
 	 * Update
 	 **************************************************************************************************************/
-	
+
 	/**
 	 * Inform all listeners, that something changed in the data-model. Handlers
 	 * should use this event to update their model-references. Otherwise
@@ -371,24 +372,24 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-//	public void updateXML() {
-//		lgui = null;
-//		try {
-//			xmlFile = new URI(xmlFile.toString());
-//		} catch (URISyntaxException e) {
-//			e.printStackTrace();
-//		}
-//		try {
-//			lgui = parseLML(xmlFile);
-//		} catch (MalformedURLException e) {
-//			e.printStackTrace();
-//		}
-//
-//		ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
-//		for (ILguiListener listener : listeners) {
-//			listener.handleEvent(e);
-//		}
-//	}
+	// public void updateXML() {
+	// lgui = null;
+	// try {
+	// xmlFile = new URI(xmlFile.toString());
+	// } catch (URISyntaxException e) {
+	// e.printStackTrace();
+	// }
+	// try {
+	// lgui = parseLML(xmlFile);
+	// } catch (MalformedURLException e) {
+	// e.printStackTrace();
+	// }
+	//
+	// ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
+	// for (ILguiListener listener : listeners) {
+	// listener.handleEvent(e);
+	// }
+	// }
 
 	public void update() {
 		ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
@@ -396,16 +397,16 @@ public class LguiItem implements ILguiItem {
 			listener.handleEvent(e);
 		}
 	}
-	
+
 	public void update(InputStream stream) {
 		lgui = parseLML(stream);
-		update(); 
+		update();
 	}
-	
+
 	public boolean isEmpty() {
 		return lgui.getObjectsAndRelationsAndInformation().isEmpty();
 	}
-	
+
 	/**************************************************************************************************************
 	 * Layout
 	 **************************************************************************************************************/
@@ -414,30 +415,34 @@ public class LguiItem implements ILguiItem {
 		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
 		try {
 			marshaller.marshal(layoutLgui, output);
+			output.close(); // Must close to flush stream
 		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	private LguiType firstRequest(){
-        ObjectFactory objectFactory = new ObjectFactory();
 
-        LguiType layoutLgui = objectFactory.createLguiType();
-        layoutLgui.setVersion("1");
-        layoutLgui.setLayout(true);
+	private LguiType firstRequest() {
+		ObjectFactory objectFactory = new ObjectFactory();
 
-        RequestType request = objectFactory.createRequestType();
-        request.setGetDefaultData(true);
-        layoutLgui.setRequest(request);
-        
-        return layoutLgui;
-    }
-	
+		LguiType layoutLgui = objectFactory.createLguiType();
+		layoutLgui.setVersion("1");
+		layoutLgui.setLayout(true);
+
+		RequestType request = objectFactory.createRequestType();
+		request.setGetDefaultData(true);
+		layoutLgui.setRequest(request);
+
+		return layoutLgui;
+	}
+
 	/**
-	 * Remove all real data from modell
-	 * return only layout-information and data, which is needed to make 
-	 * lml-model valid
-	 * @param model lml-modell with data and layout-information
+	 * Remove all real data from modell return only layout-information and data,
+	 * which is needed to make lml-model valid
+	 * 
+	 * @param model
+	 *            lml-modell with data and layout-information
 	 * @return
 	 */
 	private LguiType getLayoutFromModell() {
@@ -446,30 +451,30 @@ public class LguiItem implements ILguiItem {
 		}
 		LguiType result = objectFactory.createLguiType();
 		HashSet<String> neededComponents = new HashSet<String>();
-		
+
 		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
 			Object value = tag.getValue();
-			
-			//add normal global layouts 
+
+			// add normal global layouts
 			if (value instanceof LayoutType) {
 				result.getObjectsAndRelationsAndInformation().add(tag);
-				
+
 				if (value instanceof SplitlayoutType) {
 					SplitlayoutType splitLayout = (SplitlayoutType) value;
-					//Collect needed components from layout recursively
+					// Collect needed components from layout recursively
 					if (splitLayout.getLeft() != null) {
 						collectComponents(splitLayout.getLeft(), neededComponents);
 						collectComponents(splitLayout.getRight(), neededComponents);
 					}
 				} else if (value instanceof AbslayoutType) {
-					
+
 					AbslayoutType absLayout = (AbslayoutType) value;
-					//Just traverse comp-list for gid-attributes
+					// Just traverse comp-list for gid-attributes
 					for (ComponentType comp : absLayout.getComp()) {
 						neededComponents.add(comp.getGid());
 					}
 				}
-				
+
 			} else if (value instanceof ComponentlayoutType) {
 				if (((ComponentlayoutType) value).isActive()) {
 					result.getObjectsAndRelationsAndInformation().add(tag);
@@ -478,70 +483,75 @@ public class LguiItem implements ILguiItem {
 					neededComponents.add(componentLayout.getGid());
 				}
 			}
-			
+
 		}
 		HashMap<String, GobjectType> idToGobject = new HashMap<String, GobjectType>();
-		//Search needed components in data-tag to discover, which type the needed components have
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {			
+		// Search needed components in data-tag to discover, which type the
+		// needed components have
+		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
 			Object value = tag.getValue();
-			//is it a graphical object?
+			// is it a graphical object?
 			if (value instanceof GobjectType) {
 				GobjectType gObject = (GobjectType) value;
-				if (neededComponents.contains(gObject.getId()) ){
+				if (neededComponents.contains(gObject.getId())) {
 					idToGobject.put(gObject.getId(), gObject);
 				}
 			}
 		}
-		//Add all gobjects in idtoGobject to the result, so that lml-modell is valid
+		// Add all gobjects in idtoGobject to the result, so that lml-modell is
+		// valid
 		for (GobjectType gObject : idToGobject.values()) {
 			JAXBElement<GobjectType> min = minimizeGobjectType(gObject);
 			result.getObjectsAndRelationsAndInformation().add(min);
 		}
-		//Set layout-attribute
+		// Set layout-attribute
 		result.setLayout(true);
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Search for gid-attributes of a pane and put it into neededComponents
 	 * Recursively search all graphical objects referenced by this pane
 	 * 
-	 * @param p part of SplitLayout, which is scanned for gid-attributes
-	 * @param neededComponents resulting Hashset
+	 * @param p
+	 *            part of SplitLayout, which is scanned for gid-attributes
+	 * @param neededComponents
+	 *            resulting Hashset
 	 */
 	private static void collectComponents(PaneType pane, HashSet<String> neededComponents) {
-		
-		if (pane.getGid()!=null) {
+
+		if (pane.getGid() != null) {
 			neededComponents.add(pane.getGid());
-		} else 	if (pane.getBottom() != null) {//top and bottom components?
+		} else if (pane.getBottom() != null) {// top and bottom components?
 			collectComponents(pane.getBottom(), neededComponents);
 			collectComponents(pane.getTop(), neededComponents);
-		} else {//Left and right
+		} else {// Left and right
 			collectComponents(pane.getLeft(), neededComponents);
 			collectComponents(pane.getRight(), neededComponents);
 		}
 	}
-	
+
 	/**
-	 * Take a graphical object and minimize the data so that this instance is valid against
-	 * the LML-Schema but at the same time as small as possible.
+	 * Take a graphical object and minimize the data so that this instance is
+	 * valid against the LML-Schema but at the same time as small as possible.
 	 * 
 	 * @param gObject
-	 * @return a copy of gobj with minimal size, only attributes in GobjectType are copied 
-	 * 			 and lower special elements which are needed to make lml-model valid
+	 * @return a copy of gobj with minimal size, only attributes in GobjectType
+	 *         are copied and lower special elements which are needed to make
+	 *         lml-model valid
 	 */
-	private static JAXBElement<GobjectType> minimizeGobjectType(GobjectType gObject){
-		
-		String qName="table";
-		Class<GobjectType> classGobject = (Class<GobjectType>) gObject.getClass();		
-		
+	private static JAXBElement<GobjectType> minimizeGobjectType(GobjectType gObject) {
+
+		String qName = "table";
+		Class<GobjectType> classGobject = (Class<GobjectType>) gObject.getClass();
+
 		GobjectType value = objectFactory.createGobjectType();
-		
+
 		if (gObject instanceof TableType) {
 			TableType tableType = objectFactory.createTableType();
 			value = tableType;
-			qName="table";
+			qName = "table";
 		} else if (gObject instanceof UsagebarType) {
 			UsagebarType usagebarType = objectFactory.createUsagebarType();
 			usagebarType.setCpucount(BigInteger.valueOf(0));
@@ -556,7 +566,8 @@ public class LguiItem implements ILguiItem {
 			InfoboxType infoboxType = objectFactory.createInfoboxType();
 			value = infoboxType;
 			qName = "infobox";
-		} else if (gObject instanceof Nodedisplay) {//Create minimal nodedisplay
+		} else if (gObject instanceof Nodedisplay) {// Create minimal
+													// nodedisplay
 			Nodedisplay nodedisplay = objectFactory.createNodedisplay();
 			value = nodedisplay;
 			SchemeType scheme = objectFactory.createSchemeType();
@@ -568,13 +579,13 @@ public class LguiItem implements ILguiItem {
 			qName = "nodedisplay";
 		} else if (gObject instanceof ChartType) {
 			ChartType chartType = objectFactory.createChartType();
-			value = chartType;			
+			value = chartType;
 			qName = "chart";
 		} else if (gObject instanceof ChartgroupType) {
 			ChartgroupType chartgroupType = objectFactory.createChartgroupType();
-			//Add lower chart-elements to the minimized chart-group
+			// Add lower chart-elements to the minimized chart-group
 			ChartgroupType origin = (ChartgroupType) gObject;
-			//Go through all charts minimize them and add them to ut
+			// Go through all charts minimize them and add them to ut
 			for (ChartType chartType : origin.getChart()) {
 				ChartType min = (ChartType) (minimizeGobjectType(chartType).getValue());
 				chartgroupType.getChart().add(min);
@@ -582,33 +593,31 @@ public class LguiItem implements ILguiItem {
 			value = chartgroupType;
 			qName = "chartgroup";
 		}
-		
+
 		value.setDescription(gObject.getDescription());
 		value.setId(gObject.getId());
 		value.setTitle(gObject.getTitle());
-		
+
 		JAXBElement<GobjectType> result = new JAXBElement<GobjectType>(new QName(qName), classGobject, value);
 		return result;
 	}
-	
+
 	/**************************************************************************************************************
 	 * Job related methods
 	 **************************************************************************************************************/
-	
 
 	public void addJob(IJobStatus jobStatus) {
-		
+
 	}
-	
+
 	public void updateJob(IJobStatus jobStatus) {
-		
+
 	}
-	
+
 	public void removeJob(IJobStatus jobStatus) {
-		
+
 	}
-	
-	
+
 	/**************************************************************************************************************
 	 * Further methods
 	 **************************************************************************************************************/
@@ -620,7 +629,7 @@ public class LguiItem implements ILguiItem {
 	 */
 	@Override
 	public String toString() {
-		return name; 
+		return name;
 	}
 
 	/*
@@ -643,7 +652,7 @@ public class LguiItem implements ILguiItem {
 
 	public LguiType getLguiType() {
 		return lgui;
-	}	
+	}
 
 	/**
 	 * Add a lml-data-listener. It listens for data-changes.
