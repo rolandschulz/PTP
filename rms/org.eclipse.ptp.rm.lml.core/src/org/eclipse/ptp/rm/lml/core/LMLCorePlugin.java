@@ -61,8 +61,7 @@ public class LMLCorePlugin extends Plugin {
 	 * Unmarshaller for JAXB-generator
 	 */
 	private static Unmarshaller unmarshaller;
-	
-	
+
 	/*
 	 * Marshaller for JAXB-model
 	 */
@@ -180,10 +179,31 @@ public class LMLCorePlugin extends Plugin {
 	 * @return the JAXB unmarshaller
 	 */
 	public Unmarshaller getUnmarshaller() {
+		if (unmarshaller == null) {
+			try {
+				createUnmarshaller();
+			} catch (JAXBException e) {
+				log(e);
+			} catch (MalformedURLException e) {
+				log(e);
+			}
+		}
 		return unmarshaller;
 	}
-	
+
+	/**
+	 * Get the JAXB marshaller
+	 * 
+	 * @return the JAXB marshaller
+	 */
 	public Marshaller getMarshaller() {
+		if (marshaller == null) {
+			try {
+				createMarshaller();
+			} catch (JAXBException e) {
+				log(e);
+			}
+		}
 		return marshaller;
 	}
 
@@ -223,8 +243,7 @@ public class LMLCorePlugin extends Plugin {
 
 		}
 	}
-	
-	
+
 	private void createMarshaller() throws JAXBException {
 		URL xsd = getBundle().getEntry("/schema/lgui.xsd");
 
