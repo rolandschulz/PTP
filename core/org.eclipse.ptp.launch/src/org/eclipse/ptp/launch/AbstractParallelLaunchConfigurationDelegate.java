@@ -660,12 +660,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			 * directory has been set.
 			 */
 			String workPath = getWorkingDirectory(configuration);
-			if (workPath == null) {
-				IPath path = verifyExecutablePath(configuration, monitor).removeLastSegments(1);
-				ILaunchConfigurationWorkingCopy workingCopy = configuration.getWorkingCopy();
-				setWorkingDirectory(workingCopy, path.toString());
-				workingCopy.doSave();
-			} else {
+			if (workPath != null) {
 				verifyResource(workPath, configuration, monitor);
 			}
 			if (progress.isCanceled()) {

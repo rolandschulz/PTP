@@ -324,7 +324,11 @@ public class SDMDebugger implements IPDebugger {
 		if (wd == null || wd.equals("")) { //$NON-NLS-1$
 			wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
 			if (wd == null || wd.equals("")) { //$NON-NLS-1$
-				throw newCoreException(Messages.SDMDebugger_NoWorkingDir);
+				String execPath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, (String) null);
+				if (execPath == null) {
+					throw newCoreException(Messages.SDMDebugger_NoWorkingDir);
+				}
+				wd = new Path(execPath).removeLastSegments(1).toString();
 			}
 		}
 		return wd;

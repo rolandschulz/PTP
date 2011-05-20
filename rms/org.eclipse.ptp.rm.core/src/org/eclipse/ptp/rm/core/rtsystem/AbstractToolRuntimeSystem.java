@@ -994,9 +994,10 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		 * Collect attributes from Arguments tab
 		 */
 		String wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
-		if (wd != null) {
-			attrs.add(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
+		if (wd == null && exePath != null) {
+			wd = new Path(exePath).removeLastSegments(1).toString();
 		}
+		attrs.add(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
 
 		String[] args = getProgramArguments(configuration, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS);
 		if (args != null) {
