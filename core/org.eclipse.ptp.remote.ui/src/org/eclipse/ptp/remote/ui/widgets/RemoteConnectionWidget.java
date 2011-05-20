@@ -417,7 +417,7 @@ public class RemoteConnectionWidget extends Composite {
 		int selected = 0;
 		for (int i = 0; i < connections.length; i++) {
 			connectionCombo.add(connections[i].getName());
-			if (conn != null && connections[i].equals(conn)) {
+			if (conn != null && connections[i].getName().equals(conn.getName())) {
 				selected = i;
 			}
 		}
