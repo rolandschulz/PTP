@@ -13,7 +13,7 @@
               unpackCommand="tar xvf ${payload}"
               verifyLaunchCommand="perl -V:version"
               verifyLaunchFailMessage="{0}: Invalid perl version or perl not installed on &quot;{1}&quot;"
-              verifyLaunchPattern="^version=&apos;5\.[0-9]+\.[0-9]+&apos;$">
+              verifyLaunchPattern="^version=&apos;5\.[0-9]+\.[0-9]+&apos;;$">
         </remoteServer>
      </extension>
 </plugin>
