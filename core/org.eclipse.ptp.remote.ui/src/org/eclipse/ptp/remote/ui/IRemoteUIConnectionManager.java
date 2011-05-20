@@ -55,7 +55,7 @@ public interface IRemoteUIConnectionManager {
 	 * @param attrHintValues
 	 *            array containing default values for each attribute specified
 	 *            in attrHints
-	 * @return
+	 * @return the newly created connection
 	 * @since 5.0
 	 */
 	public IRemoteConnection newConnection(Shell shell, String[] attrHints, String[] attrHintValues);
