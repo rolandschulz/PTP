@@ -71,7 +71,7 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * Source of the XML-file from which the LguiType was generated.
 	 */
-	private URI xmlFile;
+	private String name;
 
 	/*
 	 * The generated LguiType
@@ -118,7 +118,8 @@ public class LguiItem implements ILguiItem {
 	/**
 	 * Empty Constructor.
 	 */
-	public LguiItem() {		
+	public LguiItem(String name) {
+		this.name = name;
 	}
 	
 	/**
@@ -140,13 +141,11 @@ public class LguiItem implements ILguiItem {
 	 *            the source of the XML file.
 	 */
 	public LguiItem(URI xmlFile) {
-		this.xmlFile = xmlFile;
 		try {
 			lgui = parseLML(xmlFile);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-
 		createLguiHandlers();
 		setCid();
 	}
@@ -240,33 +239,33 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 	
-//	public void save(IMemento memento) {
-//		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
-//		LguiType lgui = getLayoutFromModell();
-//		System.out.println(lgui == null);
-//		StringWriter writer = new StringWriter();
-//		try {
-//			marshaller.marshal(lgui, writer);
-//		} catch (JAXBException e) {
-//			e.printStackTrace();
-//		}
-//		savedLayout = writer.toString();
-//		memento.putString(LAYOUT, savedLayout);
-//		for (Entry<String, JobStatusData> entry : jobList.entrySet()) {
-//			memento.createChild(JOB, entry.getKey());
-//			entry.getValue().save(memento);
-//		}
-//	}
-//	
-//	public void restore(IMemento memento) {
-//		savedLayout = memento.getString(LAYOUT);
-//		// TODO in LayoutType umbauen
-//		IMemento[] mementoChilds = memento.getChildren(JOB);
-//		for (IMemento mementoChild : mementoChilds) {
-//			jobList.put(mementoChild.getID(), new JobStatusData(memento));
-//		}
-//		
-//	}
+	public void save(IMemento memento) {
+		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
+		LguiType lgui = getLayoutFromModell();
+		System.out.println(lgui == null);
+		StringWriter writer = new StringWriter();
+		try {
+			marshaller.marshal(lgui, writer);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+		savedLayout = writer.toString();
+		memento.putString(LAYOUT, savedLayout);
+		for (Entry<String, JobStatusData> entry : jobList.entrySet()) {
+			memento.createChild(JOB, entry.getKey());
+			entry.getValue().save(memento);
+		}
+	}
+	
+	public void restore(IMemento memento) {
+		savedLayout = memento.getString(LAYOUT);
+		// TODO in LayoutType umbauen
+		IMemento[] mementoChilds = memento.getChildren(JOB);
+		for (IMemento mementoChild : mementoChilds) {
+			jobList.put(mementoChild.getID(), new JobStatusData(memento));
+		}
+		
+	}
 	
 	/**************************************************************************************************************
 	 * Getting LguiHandlers
@@ -372,24 +371,24 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	public void updateXML() {
-		lgui = null;
-		try {
-			xmlFile = new URI(xmlFile.toString());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		try {
-			lgui = parseLML(xmlFile);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-
-		ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
-		for (ILguiListener listener : listeners) {
-			listener.handleEvent(e);
-		}
-	}
+//	public void updateXML() {
+//		lgui = null;
+//		try {
+//			xmlFile = new URI(xmlFile.toString());
+//		} catch (URISyntaxException e) {
+//			e.printStackTrace();
+//		}
+//		try {
+//			lgui = parseLML(xmlFile);
+//		} catch (MalformedURLException e) {
+//			e.printStackTrace();
+//		}
+//
+//		ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
+//		for (ILguiListener listener : listeners) {
+//			listener.handleEvent(e);
+//		}
+//	}
 
 	public void update() {
 		ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
@@ -613,15 +612,6 @@ public class LguiItem implements ILguiItem {
 	/**************************************************************************************************************
 	 * Further methods
 	 **************************************************************************************************************/
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getXMLFile()
-	 */
-	public URI getXmlFile() {
-		return xmlFile;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -630,10 +620,7 @@ public class LguiItem implements ILguiItem {
 	 */
 	@Override
 	public String toString() {
-		if (getXmlFile().getPath() == null) {
-			return null;
-		}
-		return getXmlFile().getPath();
+		return name; 
 	}
 
 	/*

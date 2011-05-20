@@ -113,24 +113,26 @@ public class LMLManager {
 	/**************************************************************************************************************
 	 * Saving and restoring
 	 **************************************************************************************************************/
-//	public void saveState(IMemento memento) {
-//		for (Entry<String, ILguiItem> entry : LGUIS.entrySet()) {
-//			memento.createChild(LGUIITEM, entry.getKey());
+	public void saveState(IMemento memento) {
+		for (Entry<String, ILguiItem> entry : LGUIS.entrySet()) {
+			memento.createChild(LGUIITEM, entry.getKey());
+			System.out.println(entry.getKey());
 //			entry.getValue().save(memento);
-//		}
-//	}
-//	
-//	public void restoreState(IMemento memento) {
-//		if (memento == null) {
-//			return;
-//		}
-//		IMemento[] mementoChilds = memento.getChildren(LGUIITEM);
-//		for (IMemento mementoChild : mementoChilds) {
-//			ILguiItem lguiItem = new LguiItem();
-//			LGUIS.put(mementoChild.getID(), lguiItem);
+		}
+	}
+	
+	public void restoreState(IMemento memento) {
+		if (memento == null) {
+			return;
+		}
+		IMemento[] mementoChilds = memento.getChildren(LGUIITEM);
+		for (IMemento mementoChild : mementoChilds) {
+			System.out.println(mementoChild.getID());
+			ILguiItem lguiItem = new LguiItem(mementoChild.getID());
+			LGUIS.put(mementoChild.getID(), lguiItem);
 //			lguiItem.restore(mementoChild);
-//		}
-//	}
+		}
+	}
 	
 	
 	/**************************************************************************************************************
@@ -140,7 +142,7 @@ public class LMLManager {
 	public void register(String name, InputStream input, OutputStream output) {
 		if (!LGUIS.containsKey(name)) {
 			synchronized (LGUIS) {
-				LGUIS.put(name, new LguiItem());
+				LGUIS.put(name, new LguiItem(name));
 			}
 		}
 		ILguiItem lguiItem = LGUIS.get(name);
@@ -155,7 +157,7 @@ public class LMLManager {
 
 	public void addLgui(String name) {
 		if (!LGUIS.containsKey(name)) {
-			fLguiItem = new LguiItem();
+			fLguiItem = new LguiItem(name);
 			synchronized (LGUIS) {
 				LGUIS.put(name, fLguiItem);
 			}
@@ -178,6 +180,7 @@ public class LMLManager {
 			fireNewLgui();
 			return false;
 		} else {
+			fLguiItem = LGUIS.get(xmlFile);
 			return true;
 		}
 	}
@@ -247,7 +250,7 @@ public class LMLManager {
 	}
 
 	public void update() {
-		fLguiItem.updateXML();
+//		fLguiItem.updateXML();
 		fireNewLgui();
 	}
 

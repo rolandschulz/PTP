@@ -31,13 +31,13 @@ import org.eclipse.ui.IMemento;
  * @author Claudia Knobloch
  */
 public interface ILguiItem  {
-	
-	/**
-	 * Getting the source of the XML file from whcih the corresponding LguiType has been generated. 
-	 * @return the source of the XML file
-	 */
-	public URI getXmlFile();
-	
+//	
+//	/**
+//	 * Getting the source of the XML file from whcih the corresponding LguiType has been generated. 
+//	 * @return the source of the XML file
+//	 */
+//	public URI getXmlFile();
+//	
 	/**
 	 * Getting a string representing the ILguiItem.
 	 * @return string 
@@ -78,9 +78,9 @@ public interface ILguiItem  {
 	 * Otherwise inconsistent return-values will be the result.
 	 */
 	public void updateData();
-	
-	public void updateXML();
-	
+//	
+//	public void updateXML();
+//	
 	public void update(InputStream stream);
 	
 	public void addJob(IJobStatus jobStatus);
@@ -93,7 +93,7 @@ public interface ILguiItem  {
 	
 	public boolean isEmpty();
 	
-//	public void save(IMemento memento);
-//	
-//	public void restore(IMemento memento);
+	public void save(IMemento memento);
+	
+	public void restore(IMemento memento);
 }
