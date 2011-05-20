@@ -261,7 +261,8 @@ public class GemUtilities {
 		final boolean unixSocketsPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_UNIXSOCKETS);
 		final boolean verbosePreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_VERBOSE);
 		final String hostName = pstore.getString(PreferenceConstants.GEM_PREF_HOSTNAME);
-		String ispExePath = pstore.getString(PreferenceConstants.GEM_PREF_ISPEXE_PATH);
+		String ispExePath = pstore.getString((isRemoteProject() ? PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH
+				: PreferenceConstants.GEM_PREF_ISPEXE_PATH));
 		ispExePath += (ispExePath == "") ? "" : "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		final String cmdArgs = pstore.getString(PreferenceConstants.GEM_PREF_ARGS);
 
@@ -356,7 +357,12 @@ public class GemUtilities {
 
 		// Deal with C compile
 		if (fileExtension.equals("c")) { //$NON-NLS-1$
-			final String ispccPath = GemPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.GEM_PREF_ISPCC_PATH);
+			final String ispccPath = GemPlugin
+					.getDefault()
+					.getPreferenceStore()
+					.getString(
+							(isRemoteProject() ? PreferenceConstants.GEM_PREF_REMOTE_ISPCC_PATH
+									: PreferenceConstants.GEM_PREF_ISPCC_PATH));
 			stringBuffer.append(ispccPath);
 			stringBuffer.append(ispccPath == "" ? "" : "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			stringBuffer.append("ispcc -o "); //$NON-NLS-1$
@@ -367,7 +373,9 @@ public class GemUtilities {
 			exitValue = runCommand(ispccStr, true);
 		} else { // Deal with C++ compile
 			final String ispCppPath = GemPlugin.getDefault().getPreferenceStore()
-					.getString(PreferenceConstants.GEM_PREF_ISPCPP_PATH);
+					.getString(
+							(isRemoteProject() ? PreferenceConstants.GEM_PREF_REMOTE_ISPCPP_PATH
+									: PreferenceConstants.GEM_PREF_ISPCPP_PATH));
 			stringBuffer.append(ispCppPath);
 			stringBuffer.append((ispCppPath == "") ? "" : "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			stringBuffer.append("ispCC -o "); //$NON-NLS-1$
@@ -411,12 +419,14 @@ public class GemUtilities {
 	 * Returns a string representing the version of ISP being used.
 	 * 
 	 * @param none
-	 * @return String The patured stdout string representing the version of ISP
+	 * @return String The captured String from stdout representing the version of ISP
 	 *         installed on the target machine.
 	 */
 	public static String getIspVersion() {
 		// Get the location of ISP
-		String exePath = GemPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.GEM_PREF_ISPEXE_PATH);
+		String exePath = GemPlugin.getDefault().getPreferenceStore()
+				.getString((isRemoteProject() ? PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH
+						: PreferenceConstants.GEM_PREF_ISPEXE_PATH));
 
 		// Run isp -v to get version number
 		exePath += (exePath == "") ? "" : "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

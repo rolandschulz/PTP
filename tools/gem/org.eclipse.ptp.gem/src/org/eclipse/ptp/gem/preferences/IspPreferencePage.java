@@ -90,10 +90,24 @@ public class IspPreferencePage extends FieldEditorPreferencePage implements IWor
 		addField(new DirectoryFieldEditor(PreferenceConstants.GEM_PREF_ISPCPP_PATH, Messages.IspPreferencePage_14, gemPathsGroup));
 		addField(new DirectoryFieldEditor(PreferenceConstants.GEM_PREF_HBV_PATH, Messages.IspPreferencePage_15, gemPathsGroup));
 
+		// Vertical spacer
+		new Label(fieldEditorParent, SWT.NULL).setLayoutData(new GridData(SWT.FILL, SWT.NULL, true, false, 3, 1));
+
+		// Create group for GEM-path FieldEditors
+		final Group remoteGemPathsGroup = new Group(fieldEditorParent, SWT.NULL);
+		remoteGemPathsGroup.setText(Messages.IspPreferencePage_18);
+		addField(new DirectoryFieldEditor(PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH, Messages.IspPreferencePage_19,
+				remoteGemPathsGroup));
+		addField(new DirectoryFieldEditor(PreferenceConstants.GEM_PREF_REMOTE_ISPCC_PATH, Messages.IspPreferencePage_20,
+				remoteGemPathsGroup));
+		addField(new DirectoryFieldEditor(PreferenceConstants.GEM_PREF_REMOTE_ISPCPP_PATH, Messages.IspPreferencePage_21,
+				remoteGemPathsGroup));
+
 		// Do the grid layout work for each group.
 		doLayoutAndData(prefsGroup, 1, 300);
 		doLayoutAndData(miscGroup, 3, 300);
 		doLayoutAndData(gemPathsGroup, 3, 300);
+		doLayoutAndData(remoteGemPathsGroup, 3, 300);
 
 		// Help button setup
 		final Button helpButton = new Button(fieldEditorParent, SWT.PUSH);

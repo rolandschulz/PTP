@@ -59,6 +59,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		pstore.setDefault(PreferenceConstants.GEM_PREF_ISPCC_PATH, ""); //$NON-NLS-1$
 		pstore.setDefault(PreferenceConstants.GEM_PREF_HBV_PATH, ""); //$NON-NLS-1$
 
+		// Remote ISP paths, scripts and file names
+		pstore.setDefault(PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH, ""); //$NON-NLS-1$
+		pstore.setDefault(PreferenceConstants.GEM_PREF_REMOTE_ISPCPP_PATH, ""); //$NON-NLS-1$
+		pstore.setDefault(PreferenceConstants.GEM_PREF_REMOTE_ISPCC_PATH, ""); //$NON-NLS-1$
+
 		// Hidden preference for the order MPI calls are stepped
 		pstore.setDefault(PreferenceConstants.GEM_PREF_STEP_ORDER, "issueOrder"); //$NON-NLS-1$
 

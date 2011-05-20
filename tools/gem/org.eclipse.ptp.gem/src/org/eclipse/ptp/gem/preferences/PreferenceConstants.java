@@ -48,6 +48,11 @@ public class PreferenceConstants {
 	public static final String GEM_PREF_ISPCPP_PATH = "ispcppPath"; //$NON-NLS-1$
 	public static final String GEM_PREF_HBV_PATH = "hbvPath"; //$NON-NLS-1$
 
+	// Remote ISP paths, scripts and file names
+	public static final String GEM_PREF_REMOTE_ISPEXE_PATH = "remoteIspPath"; //$NON-NLS-1$
+	public static final String GEM_PREF_REMOTE_ISPCC_PATH = "remoteIspccPath"; //$NON-NLS-1$
+	public static final String GEM_PREF_REMOTE_ISPCPP_PATH = "remoteIspcppPath"; //$NON-NLS-1$
+
 	// Hidden preference for the order MPI calls are stepped
 	public static final String GEM_PREF_STEP_ORDER = "stepOrderPreference"; //$NON-NLS-1$
 

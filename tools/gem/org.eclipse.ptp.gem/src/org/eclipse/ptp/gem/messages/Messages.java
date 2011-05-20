@@ -172,7 +172,11 @@ public class Messages extends NLS {
 	public static String IspPreferencePage_15;
 	public static String IspPreferencePage_16;
 	public static String IspPreferencePage_17;
+	public static String IspPreferencePage_18;
+	public static String IspPreferencePage_19;
 	public static String IspPreferencePage_2;
+	public static String IspPreferencePage_20;
+	public static String IspPreferencePage_21;
 	public static String IspPreferencePage_3;
 	public static String IspPreferencePage_4;
 	public static String IspPreferencePage_5;
