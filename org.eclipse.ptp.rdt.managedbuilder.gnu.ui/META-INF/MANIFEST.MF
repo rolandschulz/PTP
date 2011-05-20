@@ -19,3 +19,4 @@ Export-Package: org.eclipse.ptp.rdt.managedbuilder.gnu.ui.preferences,
  org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery;uses:="org.eclipse.cdt.make.core.scannerconfig,org.eclipse.core.resources,org.eclipse.ptp.rdt.core.remotemake",
  org.eclipse.ptp.rdt.managedbuiler.gnu.ui;uses:="org.osgi.framework,org.eclipse.ui.plugin"
 Bundle-Localization: plugin
+Bundle-Vendor: %pluginProvider

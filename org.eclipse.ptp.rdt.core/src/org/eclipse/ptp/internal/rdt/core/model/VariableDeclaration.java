@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,9 @@
 
 package org.eclipse.ptp.internal.rdt.core.model;
 
+import org.eclipse.cdt.core.dom.ast.ASTTypeUtil;
 import org.eclipse.cdt.core.dom.ast.DOMException;
+import org.eclipse.cdt.core.dom.ast.IType;
 import org.eclipse.cdt.core.dom.ast.IVariable;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
@@ -21,7 +23,7 @@ import org.eclipse.cdt.core.model.IVariableDeclaration;
 public class VariableDeclaration extends SourceManipulation implements IVariableDeclaration {
 	private static final long serialVersionUID = 1L;
 
-	protected String fTypeName;
+	protected String fTypeName=""; //$NON-NLS-1$
 	protected boolean fIsStatic;
 	protected boolean fIsConst;
 	protected boolean fIsVolatile;
@@ -44,6 +46,10 @@ public class VariableDeclaration extends SourceManipulation implements IVariable
 
 	protected VariableDeclaration(Parent parent, int type, IVariable binding) throws DOMException {
 		super(parent, type, binding.getName());
+		IType astType = binding.getType();
+		if(astType!=null){
+			setTypeName(ASTTypeUtil.getType(astType, false));
+		}
 		fIsStatic = binding.isStatic();
 	}
 
