@@ -549,6 +549,20 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		String str = getName() + " [" + getUsername() + "@" + getAddress(); //$NON-NLS-1$ //$NON-NLS-2$
+		if (getPort() >= 0) {
+			str += ":" + getPort(); //$NON-NLS-1$
+		}
+		return str + "]"; //$NON-NLS-1$
+	}
+
 	/**
 	 * Get the result of executing a pwd command.
 	 * 
