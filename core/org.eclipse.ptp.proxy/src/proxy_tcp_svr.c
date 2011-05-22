@@ -288,6 +288,7 @@ proxy_tcp_svr_finish(proxy_svr *svr)
 	}
 
 	proxy_tcp_destroy_conn(conn);
+	proxy_end();
 }
 
 /**
