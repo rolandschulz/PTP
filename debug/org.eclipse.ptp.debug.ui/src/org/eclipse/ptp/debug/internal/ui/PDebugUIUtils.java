@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.debug.ui.ICDebugUIConstants;
 import org.eclipse.cdt.internal.core.model.ExternalTranslationUnit;
 import org.eclipse.cdt.internal.ui.util.ExternalEditorInput;
 import org.eclipse.cdt.ui.CUIPlugin;
@@ -38,7 +39,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.sourcelookup.CommonSourceNotFoundEditorInput;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -60,7 +60,9 @@ import org.eclipse.ui.part.FileEditorInput;
  * 
  */
 public class PDebugUIUtils {
-	/** Show tasks with standard format
+	/**
+	 * Show tasks with standard format
+	 * 
 	 * @param array
 	 * @return
 	 */
@@ -82,8 +84,9 @@ public class PDebugUIUtils {
 				}
 				continue;
 			}
-			if (isContinue)
+			if (isContinue) {
 				msg += "-" + preTask; //$NON-NLS-1$
+			}
 			msg += "," + array[i]; //$NON-NLS-1$
 			isContinue = false;
 			preTask = array[i];
@@ -91,7 +94,9 @@ public class PDebugUIUtils {
 		return msg;
 	}
 
-	/** Find region by given offset in given document
+	/**
+	 * Find region by given offset in given document
+	 * 
 	 * @param document
 	 * @param offset
 	 * @return
@@ -102,70 +107,76 @@ public class PDebugUIUtils {
 		try {
 			int pos = offset;
 			char c;
-			while(pos >= 0) {
+			while (pos >= 0) {
 				c = document.getChar(pos);
-				//TODO check java char?
-				if (!Character.isJavaIdentifierPart(c))
+				// TODO check java char?
+				if (!Character.isJavaIdentifierPart(c)) {
 					break;
+				}
 				--pos;
 			}
 			start = pos;
 			pos = offset;
 			int length = document.getLength();
-			while(pos < length) {
+			while (pos < length) {
 				c = document.getChar(pos);
-				//TODO check java char?
-				if (!Character.isJavaIdentifierPart(c))
+				// TODO check java char?
+				if (!Character.isJavaIdentifierPart(c)) {
 					break;
+				}
 				++pos;
 			}
 			end = pos;
-		}
-		catch(BadLocationException x) {
+		} catch (BadLocationException x) {
 		}
 		if (start > -1 && end > -1) {
-			if (start == offset && end == offset)
+			if (start == offset && end == offset) {
 				return new Region(offset, 0);
-			else if (start == offset)
+			} else if (start == offset) {
 				return new Region(start, end - start);
-			else
+			} else {
 				return new Region(start + 1, end - start - 1);
+			}
 		}
 		return null;
 	}
-	
-	/** Get current stack frame
+
+	/**
+	 * Get current stack frame
+	 * 
 	 * @return
 	 */
 	public static IPStackFrame getCurrentStackFrame() {
 		IAdaptable context = DebugUITools.getDebugContext();
-		return ( context != null ) ? (IPStackFrame)context.getAdapter( IPStackFrame.class ) : null;
+		return (context != null) ? (IPStackFrame) context.getAdapter(IPStackFrame.class) : null;
 	}
-	
+
 	public static String getEditorId(IEditorInput input, Object element) {
+		if (element instanceof PSourceNotFoundElement) {
+			return ICDebugUIConstants.CSOURCENOTFOUND_EDITOR_ID;
+		}
 		if (input != null) {
 			return getEditorId(input);
 		}
 		return null;
 	}
-	
+
 	public static String getEditorId(Object element) {
 		String name = null;
 		if (element instanceof IFile) {
-			name = ((IFile)element).getName();
+			name = ((IFile) element).getName();
 		}
 		if (element instanceof IEditorInput) {
-			name = ((IEditorInput)element).getName();
+			name = ((IEditorInput) element).getName();
 		}
-		if (name == null) {
-			return IDebugUIConstants.ID_COMMON_SOURCE_NOT_FOUND_EDITOR;
+		if (name != null) {
+			IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
+			IEditorDescriptor descriptor = registry.getDefaultEditor(name);
+			return (descriptor != null) ? descriptor.getId() : CUIPlugin.EDITOR_ID;
 		}
-		
-		IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
-		IEditorDescriptor descriptor = registry.getDefaultEditor(name);
-		return (descriptor != null) ? descriptor.getId() : CUIPlugin.EDITOR_ID;
+		return ICDebugUIConstants.CSOURCENOTFOUND_EDITOR_ID;
 	}
-	
+
 	public static IEditorInput getEditorInput(Object element) {
 		if (element instanceof IMarker) {
 			IResource resource = ((IMarker) element).getResource();
@@ -187,8 +198,9 @@ public class PDebugUIUtils {
 						IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(path);
 						if (files.length > 0) {
 							file = files[0];
-							
-							// now try to match any finding to the project in the breakpoint
+
+							// now try to match any finding to the project in
+							// the breakpoint
 							IProject project = b.getMarker().getResource().getProject();
 							for (IFile f : files) {
 								if (f.getProject().equals(project)) {
@@ -196,52 +208,54 @@ public class PDebugUIUtils {
 									break;
 								}
 							}
-						}
-						else {
+						} else {
 							File fsfile = new File(handle);
 							if (fsfile.isFile() && fsfile.exists()) {
-								// create an ExternalEditorInput with an external tu so when you
-								// open the file from the breakpoints view it opens in the
+								// create an ExternalEditorInput with an
+								// external tu so when you
+								// open the file from the breakpoints view it
+								// opens in the
 								// proper editor.
 								IProject project = b.getMarker().getResource().getProject();
 								if (project != null) {
 									ICProject cproject = CoreModel.getDefault().create(project);
 									String id = CoreModel.getRegistedContentTypeId(project, path.lastSegment());
 									ExternalTranslationUnit tu = new ExternalTranslationUnit(cproject, URIUtil.toURI(path), id);
-									return new ExternalEditorInput( tu );
-								}
-								else {
+									return new ExternalEditorInput(tu);
+								} else {
 									return new ExternalEditorInput(path);
 								}
 							}
 						}
 					}
 				}
-			} 
-			catch (CoreException e) {
+			} catch (CoreException e) {
 			}
-			if (file == null)
+			if (file == null) {
 				file = (IFile) b.getMarker().getResource().getAdapter(IFile.class);
-			if (file != null)
+			}
+			if (file != null) {
 				return new FileEditorInput(file);
+			}
 		}
 		if (element instanceof FileStorage || element instanceof LocalFileStorage) {
 			return new ExternalEditorInput(((IStorage) element).getFullPath());
 		}
 		if (element instanceof PSourceNotFoundElement) {
-			return new CommonSourceNotFoundEditorInput((PSourceNotFoundElement) element);
+			return new CommonSourceNotFoundEditorInput(element);
 		}
 		return null;
 	}
-	
-	
-	//self testing
+
+	// self testing
 	public static void main(String[] args) {
 		TaskSet tasks = new TaskSet(0);
 		System.out.println(showBitList(tasks));
 	}
-	
-	/** Show tasks with standard format
+
+	/**
+	 * Show tasks with standard format
+	 * 
 	 * @param tasks
 	 * @return
 	 */

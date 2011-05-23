@@ -299,7 +299,7 @@
 				id="org.eclipse.ptp.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
 				class="org.eclipse.ptp.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
 				enablesFor="1"
-				icon="icons/tool/stepinto_normal.gif"
+				icon="icons/tool/stepinto_group_normal.png"
 				helpContextId="toggle_instruction_step_mode_action_context"
 				label="%ToggleInstructionStepModeAction.label"
 				menubarPath="renderGroup"
