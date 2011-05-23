@@ -16,6 +16,10 @@
 		<property name="e3" visible="true"/>
 		<property name="e4" visible="true"/>
 		<property name="e5" visible="true"/>
+		<property name="path1" visible="true"/>
+      <property name="path2" visible="true"/>
+      <property name="path3" visible="true"/>
+      <property name="path4" visible="true"/>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
@@ -70,6 +74,18 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<line>
 				<arg>e5 = ${ptp_rm:e5#value}</arg>
 			</line>
+			<line>
+            <arg>path1 = ${ptp_rm:path1#value}</arg>
+         </line>
+         <line>
+            <arg>path2 = ${ptp_rm:path2#value}</arg>
+         </line>
+         <line>
+            <arg>path3 = ${ptp_rm:path3#value}</arg>
+         </line>
+         <line>
+            <arg>path4 = ${ptp_rm:path4#value}</arg>
+         </line>
 		</script>
 		<submit-interactive name="submit-interactive">
 			<arg>echo</arg>
@@ -183,7 +199,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 				</composite>
 			</dynamic>
-			<dynamic sharedEnvironment="true">
+			<dynamic sharedEnvironment="false">
 				<title>Paths</title>
 				<composite>
 					<layout>
@@ -195,7 +211,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>Browse URI: </fixed-text>
 					</widget>
-					<widget type="browse" uri="true" style="SWT.BORDER" readOnly="false" title="Browse">
+					<widget type="browse" uri="true" style="SWT.BORDER" readOnly="false" title="Browse" saveValueTo="path1">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
@@ -210,7 +226,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>Browse Dir Path: </fixed-text>
 					</widget>
-					<widget type="browse" uri="false" directory="true" style="SWT.BORDER" readOnly="true" title="Browse">
+					<widget type="browse" uri="false" directory="true" style="SWT.BORDER" readOnly="true" title="Browse" saveValueTo="path2">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
@@ -225,7 +241,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>Browse Local File: </fixed-text>
 					</widget>
-					<widget type="browse" style="SWT.BORDER | SWT.H_SCROLL" readOnly="true" localOnly="true" title="Browse">
+					<widget type="browse" style="SWT.BORDER | SWT.H_SCROLL" readOnly="true" localOnly="true" title="Browse" saveValueTo="path3">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
@@ -240,7 +256,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>Browse Local Dir URI: </fixed-text>
 					</widget>
-					<widget type="browse" directory="true" uri="true" style="SWT.BORDER" readOnly="true" localOnly="true" title="Browse">
+					<widget type="browse" directory="true" uri="true" style="SWT.BORDER" readOnly="true" localOnly="true" title="Browse" saveValueTo="path4">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
@@ -267,11 +283,13 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<tooltip>Click to activate value widget.</tooltip>
 						</column-data>
 						<items>
+						   <include>mpiCores</include>
 							<include>e1</include>
 							<include>e2</include>
 							<include>e3</include>
 							<include>e4</include>
 							<include>e5</include>
+							
 						</items>
 						<value pattern="export @name='@value'" separator="; "/>
 					</viewer>

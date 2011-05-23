@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.launch;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -53,7 +53,7 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	protected boolean voidRMConfig;
 	protected TabFolder tabFolder;
 
-	private final List<AbstractJAXBLaunchConfigurationTab> tabControllers = new ArrayList<AbstractJAXBLaunchConfigurationTab>();
+	private final LinkedList<AbstractJAXBLaunchConfigurationTab> tabControllers = new LinkedList<AbstractJAXBLaunchConfigurationTab>();
 	private Composite control;
 
 	/**
@@ -74,7 +74,8 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
-		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+		List<AbstractJAXBLaunchConfigurationTab> controllers = getControllers();
+		for (AbstractJAXBLaunchConfigurationTab tabControl : controllers) {
 			RMLaunchValidation validation = tabControl.canSave(control, rm, queue);
 			if (!validation.isSuccess()) {
 				return validation;
@@ -150,7 +151,8 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 */
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
-		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+		List<AbstractJAXBLaunchConfigurationTab> controllers = getControllers();
+		for (AbstractJAXBLaunchConfigurationTab tabControl : controllers) {
 			RMLaunchValidation validation = tabControl.initializeFrom(control, rm, queue, configuration);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
@@ -169,7 +171,8 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
-		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+		List<AbstractJAXBLaunchConfigurationTab> controllers = getControllers();
+		for (AbstractJAXBLaunchConfigurationTab tabControl : controllers) {
 			RMLaunchValidation validation = tabControl.isValid(launchConfig, rm, queue);
 			if (!validation.isSuccess()) {
 				return validation;
@@ -189,7 +192,8 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 */
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
-		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+		List<AbstractJAXBLaunchConfigurationTab> controllers = getControllers();
+		for (AbstractJAXBLaunchConfigurationTab tabControl : controllers) {
 			RMLaunchValidation validation = tabControl.performApply(configuration, rm, queue);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
@@ -209,7 +213,8 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 */
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
-		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+		List<AbstractJAXBLaunchConfigurationTab> controllers = getControllers();
+		for (AbstractJAXBLaunchConfigurationTab tabControl : controllers) {
 			RMLaunchValidation validation = tabControl.setDefaults(configuration, rm, queue);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
@@ -227,9 +232,18 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	}
 
 	/**
+	 * Makes the visible tab last.
+	 * 
 	 * @return list of child tabs.
 	 */
-	protected List<AbstractJAXBLaunchConfigurationTab> getControllers() {
+	protected synchronized List<AbstractJAXBLaunchConfigurationTab> getControllers() {
+		for (int i = 0; i < tabControllers.size(); i++) {
+			AbstractJAXBLaunchConfigurationTab last = tabControllers.getLast();
+			if (last.getControl().isVisible()) {
+				break;
+			}
+			tabControllers.addFirst(tabControllers.removeLast());
+		}
 		return tabControllers;
 	}
 }
