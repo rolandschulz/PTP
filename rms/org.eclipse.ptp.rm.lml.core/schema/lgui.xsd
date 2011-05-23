@@ -1,29 +1,48 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--
-LML - LLView markup language
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		LML - LLView markup language Copyright (C) 2010, Forschungszentrum
+		Juelich GmbH, Federal Republic of Germany. All rights reserved.
 
-
-Copyright (c) 2011 Forschungszentrum Juelich GmbH
-
-All rights reserved. This program and the accompanying materials
-
-are made available under the terms of the Eclipse Public License v1.0
-
-which accompanies this distribution and is available at
-
-http://www.eclipse.org/legal/epl-v10.html
--->
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
-	<include schemaLocation="layout.xsd"/>
-	<include schemaLocation="nodedisplay.xsd"/>
-	<include schemaLocation="relation.xsd"/>
-	<include schemaLocation="chart.xsd"/>
-	<include schemaLocation="textboxes.xsd"/>
-	<include schemaLocation="usagebar.xsd"/>
-	<include schemaLocation="table.xsd"/>
-	<include schemaLocation="entities.xsd"/>
-	<include schemaLocation="layout.xsd"/>
-	<include schemaLocation="request.xsd"/>
+		Redistribution and use in source and binary forms, with or without
+		modification, are permitted provided that the following conditions are
+		met: Redistributions of source code must retain the above copyright
+		notice, this list of conditions and the following disclaimer. -
+		Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer. -
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution. -
+		Any publications that result from the use of this software shall
+		reasonably refer to the Research Centre's development. - All
+		advertising materials mentioning features or use of this software must
+		display the following acknowledgement: This product includes software
+		developed by Forschungszentrum Juelich GmbH, Federal Republic of
+		Germany. - Forschungszentrum Juelich GmbH is not obligated to provide
+		the user with any support, consulting, training or assistance of any
+		kind with regard to the use, operation and performance of this
+		software or to provide the user with any updates, revisions or new
+		versions. THIS SOFTWARE IS PROVIDED BY FORSCHUNGSZENTRUM JUELICH GMBH
+		"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+		LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+		A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+		FORSCHUNGSZENTRUM JUELICH GMBH BE LIABLE FOR ANY SPECIAL, DIRECT OR
+		CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+		USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+		OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE
+		ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE.
+	-->
+<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:lml="http://www.llview.de">
+	<include schemaLocation="layout.xsd"></include>
+	<include schemaLocation="nodedisplay.xsd"></include>
+	<include schemaLocation="relation.xsd"></include>
+	<include schemaLocation="chart.xsd"></include>
+	<include schemaLocation="textboxes.xsd"></include>
+	<include schemaLocation="usagebar.xsd"></include>
+	<include schemaLocation="table.xsd"></include>
+	<include schemaLocation="entities.xsd"></include>
+	<include schemaLocation="layout.xsd"></include>
+	<include schemaLocation="request.xsd"></include>
 	<annotation>
 		<documentation>Defines root-object of lml.
 			Other objects like table,
@@ -41,44 +60,53 @@ http://www.eclipse.org/legal/epl-v10.html
 		</annotation>
 
 		<!-- table of content elements -->
-		<sequence maxOccurs="1" minOccurs="0">
+		<sequence minOccurs="0" maxOccurs="1">
 
-			<element maxOccurs="1" minOccurs="0" name="request" type="lml:RequestType"/>
+			<element name="request" type="lml:RequestType" minOccurs="0"
+				maxOccurs="1" />
 
 
-			<sequence maxOccurs="unbounded" minOccurs="0">
+			<sequence minOccurs="0" maxOccurs="unbounded">
 
 				<!--  graphical objects -->
-				<sequence maxOccurs="1" minOccurs="0">
+				<sequence minOccurs="0" maxOccurs="1">
 
-					<element maxOccurs="1" minOccurs="0" name="objects" type="lml:objects_type">
+					<element name="objects" type="lml:objects_type" minOccurs="0"
+						maxOccurs="1">
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="relations" type="lml:relations_type">
+					<element name="relations" type="lml:relations_type"
+						minOccurs="0" maxOccurs="1">
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="information" type="lml:information_type">
+					<element name="information" type="lml:information_type"
+						minOccurs="0" maxOccurs="1">
 					</element>
 
-					<element maxOccurs="1" minOccurs="0" name="table" type="lml:table_type">
+					<element name="table" type="lml:table_type" minOccurs="0"
+						maxOccurs="1">
 
 						<!-- cid-attributes must refer to an existing columnID -->
 						<key name="columnID">
-							<selector xpath="column"/>
-							<field xpath="@id"/>
+							<selector xpath="column" />
+							<field xpath="@id" />
 						</key>
 
 						<keyref name="cellRef" refer="lml:columnID">
-							<selector xpath="row/cell"/>
-							<field xpath="@cid"/>
+							<selector xpath="row/cell" />
+							<field xpath="@cid" />
 						</keyref>
 
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="usagebar" type="lml:usagebar_type">
+					<element name="usagebar" type="lml:usagebar_type"
+						minOccurs="0" maxOccurs="1">
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="text" type="lml:textbox_type">
+					<element name="text" type="lml:textbox_type" minOccurs="0"
+						maxOccurs="1">
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="infobox" type="lml:infobox_type">
+					<element name="infobox" type="lml:infobox_type" minOccurs="0"
+						maxOccurs="1">
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="nodedisplay" type="lml:nodedisplay">
+					<element name="nodedisplay" type="lml:nodedisplay"
+						minOccurs="0" maxOccurs="1">
 
 						<!--
 							tagnames within scheme-tag are keys <key name="tagnameKey">
@@ -105,46 +133,54 @@ http://www.eclipse.org/legal/epl-v10.html
 						-->
 
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="chart" type="lml:chart_type">
+					<element name="chart" type="lml:chart_type" minOccurs="0"
+						maxOccurs="1">
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="chartgroup" type="lml:chartgroup_type">
+					<element name="chartgroup" type="lml:chartgroup_type"
+						minOccurs="0" maxOccurs="1">
 					</element>
 				</sequence>
 
 				<!-- layouts -->
 
-				<sequence maxOccurs="1" minOccurs="0">
-					<element maxOccurs="1" minOccurs="0" name="splitlayout" type="lml:splitlayout_type">
+				<sequence minOccurs="0" maxOccurs="1">
+					<element name="splitlayout" type="lml:splitlayout_type"
+						minOccurs="0" maxOccurs="1">
 
 						<!--  every gobj can only be shown once -->
 						<unique name="gidOnlyOnceInSplitLayout">
-							<selector xpath=".//*"/>
-							<field xpath="@gid"/>
+							<selector xpath=".//*" />
+							<field xpath="@gid" />
 						</unique>
 
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="abslayout" type="lml:abslayout_type">
+					<element name="abslayout" type="lml:abslayout_type"
+						minOccurs="0" maxOccurs="1">
 						<!--  every gobj can only be shown once -->
 						<unique name="gidOnlyOnceInabsLayout">
-							<selector xpath="comp"/>
-							<field xpath="@gid"/>
+							<selector xpath="comp" />
+							<field xpath="@gid" />
 						</unique>
 
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="nodedisplaylayout" type="lml:nodedisplaylayout_type">
+					<element name="nodedisplaylayout" type="lml:nodedisplaylayout_type"
+						minOccurs="0" maxOccurs="1">
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="usagebarlayout" type="lml:usagebarlayout_type">
+					<element name="usagebarlayout" type="lml:usagebarlayout_type"
+						minOccurs="0" maxOccurs="1">
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="chartlayout" type="lml:chartlayout_type">
+					<element name="chartlayout" type="lml:chartlayout_type"
+						minOccurs="0" maxOccurs="1">
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="tablelayout" type="lml:tablelayout_type">
+					<element name="tablelayout" type="lml:tablelayout_type"
+						minOccurs="0" maxOccurs="1">
 						<!--
 							pos-attributes must be unique in every tablelayout. no position
 							can be occupied by two columns
 						-->
 						<unique name="PosUnique">
-							<selector xpath="column"/>
-							<field xpath="@pos"/>
+							<selector xpath="column" />
+							<field xpath="@pos" />
 						</unique>
 
 						<!--
@@ -152,22 +188,25 @@ http://www.eclipse.org/legal/epl-v10.html
 							definitions for columns are not allowed
 						-->
 						<unique name="CidUnique">
-							<selector xpath="column"/>
-							<field xpath="@cid"/>
+							<selector xpath="column" />
+							<field xpath="@cid" />
 						</unique>
 
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="infoboxlayout" type="lml:infoboxlayout_type">
+					<element name="infoboxlayout" type="lml:infoboxlayout_type"
+						minOccurs="0" maxOccurs="1">
 					</element>
-					<element maxOccurs="1" minOccurs="0" name="textlayout" type="lml:infoboxlayout_type">
+					<element name="textlayout" type="lml:infoboxlayout_type"
+						minOccurs="0" maxOccurs="1">
 					</element>
 				</sequence>
 
 			</sequence>
 
 		</sequence>
-		<attribute name="version" type="string"/>
-		<attribute default="false" name="layout" type="boolean" use="optional">
+		<attribute name="version" type="string"></attribute>
+		<attribute name="layout" use="optional" default="false"
+			type="boolean">
 			<annotation>
 				<documentation>This attribute defines, if this lml-file mainly
 					contains layout-information.
@@ -191,44 +230,45 @@ http://www.eclipse.org/legal/epl-v10.html
 
 		<!-- All graphical-objects have to have unique ids-->
 		<key name="graphObjKey">
-			<selector xpath="table|usagebar|text|infobox|nodedisplay|.//chart|chartgroup"/>
-			<field xpath="@id"/>
+			<selector
+				xpath="table|usagebar|text|infobox|nodedisplay|.//chart|chartgroup" />
+			<field xpath="@id" />
 		</key>
 
 		<!-- nodedisplayref-tags refer to a nodedisplay -->
 		<key name="nodedisplayKey">
-			<selector xpath="nodedisplay"/>
-			<field xpath="@id"/>
+			<selector xpath="nodedisplay" />
+			<field xpath="@id" />
 		</key>
 
 		<key name="usagebarKey">
-			<selector xpath="usagebar"/>
-			<field xpath="@id"/>
+			<selector xpath="usagebar" />
+			<field xpath="@id" />
 		</key>
 
 		<key name="chartKey">
-			<selector xpath=".//chart"/>
-			<field xpath="@id"/>
+			<selector xpath=".//chart" />
+			<field xpath="@id" />
 		</key>
 
 		<key name="tableKey">
-			<selector xpath="table"/>
-			<field xpath="@id"/>
+			<selector xpath="table" />
+			<field xpath="@id" />
 		</key>
 
 		<key name="infoboxKey">
-			<selector xpath="infobox"/>
-			<field xpath="@id"/>
+			<selector xpath="infobox" />
+			<field xpath="@id" />
 		</key>
 
 		<key name="textKey">
-			<selector xpath="text"/>
-			<field xpath="@id"/>
+			<selector xpath="text" />
+			<field xpath="@id" />
 		</key>
 
 		<key name="layoutIDs">
-			<selector xpath="splitlayout|abslayout"/>
-			<field xpath="@id"/>
+			<selector xpath="splitlayout|abslayout" />
+			<field xpath="@id" />
 		</key>
 
 		<!--
@@ -239,228 +279,229 @@ http://www.eclipse.org/legal/epl-v10.html
 			nodedisplaylayouts
 		-->
 		<key name="nodedisplaylayoutkey">
-			<selector xpath="nodedisplaylayout"/>
-			<field xpath="@id"/>
+			<selector xpath="nodedisplaylayout" />
+			<field xpath="@id" />
 		</key>
 		<!-- nodedisplaylayouts only refer to nodedisplays through gid -->
 		<keyref name="nodedisplaylayoutgid" refer="lml:nodedisplayKey">
-			<selector xpath="nodedisplaylayout"/>
-			<field xpath="@gid"/>
+			<selector xpath="nodedisplaylayout" />
+			<field xpath="@gid" />
 		</keyref>
 
 		<!--
 			id of usagebarlayout must identify layout among other usagebarlayout
 		-->
 		<key name="usagebarlayoutkey">
-			<selector xpath="usagebarlayout"/>
-			<field xpath="@id"/>
+			<selector xpath="usagebarlayout" />
+			<field xpath="@id" />
 		</key>
 		<!-- usagebarlayouts only refer to usagebars through gid -->
 		<keyref name="usagebarlayoutgid" refer="lml:usagebarKey">
-			<selector xpath="usagebarlayout"/>
-			<field xpath="@gid"/>
+			<selector xpath="usagebarlayout" />
+			<field xpath="@gid" />
 		</keyref>
 
 		<!-- id of chartlayout must identify layout among other chartlayout -->
 		<key name="chartlayoutkey">
-			<selector xpath="chartlayout"/>
-			<field xpath="@id"/>
+			<selector xpath="chartlayout" />
+			<field xpath="@id" />
 		</key>
 		<!-- chartlayouts only refer to charts through gid -->
 		<keyref name="chartlayoutgid" refer="lml:chartKey">
-			<selector xpath="chartlayout"/>
-			<field xpath="@gid"/>
+			<selector xpath="chartlayout" />
+			<field xpath="@gid" />
 		</keyref>
 
 		<!-- id of tablelayout must identify layout among other tablelayouts -->
 		<key name="tablelayoutkey">
-			<selector xpath="tablelayout"/>
-			<field xpath="@id"/>
+			<selector xpath="tablelayout" />
+			<field xpath="@id" />
 		</key>
 		<!-- tablelayouts only refer to tables through gid -->
 		<keyref name="tablelayoutgid" refer="lml:tableKey">
-			<selector xpath="tablelayout"/>
-			<field xpath="@gid"/>
+			<selector xpath="tablelayout" />
+			<field xpath="@gid" />
 		</keyref>
 
 		<!--
 			id of infoboxlayout must identify layout among other infoboxlayouts
 		-->
 		<key name="infoboxlayoutkey">
-			<selector xpath="infoboxlayout"/>
-			<field xpath="@id"/>
+			<selector xpath="infoboxlayout" />
+			<field xpath="@id" />
 		</key>
 		<!-- infoboxlayouts only refer to infoboxes through gid -->
 		<keyref name="infoboxlayoutgid" refer="lml:infoboxKey">
-			<selector xpath="infoboxlayout"/>
-			<field xpath="@gid"/>
+			<selector xpath="infoboxlayout" />
+			<field xpath="@gid" />
 		</keyref>
 
 		<!-- id of textlayout must identify layout among other textlayouts -->
 		<key name="textlayoutkey">
-			<selector xpath="textlayout"/>
-			<field xpath="@id"/>
+			<selector xpath="textlayout" />
+			<field xpath="@id" />
 		</key>
 		<!-- textlayouts only refer to text-objects through gid -->
 		<keyref name="textlayoutgid" refer="lml:textKey">
-			<selector xpath="textlayout"/>
-			<field xpath="@gid"/>
+			<selector xpath="textlayout" />
+			<field xpath="@gid" />
 		</keyref>
 
 
 
 		<!-- layout references -->
 		<keyref name="gidAttributesReference" refer="lml:graphObjKey">
-			<selector xpath=".//left|.//right|.//top|.//bottom|.//comp"/>
-			<field xpath="@gid"/>
+			<selector xpath=".//left|.//right|.//top|.//bottom|.//comp" />
+			<field xpath="@gid" />
 		</keyref>
 
 		<keyref name="nodedisplayRef" refer="lml:nodedisplayKey">
-			<selector xpath="nodedisplay"/>
-			<field xpath="@refto"/>
+			<selector xpath="nodedisplay" />
+			<field xpath="@refto" />
 		</keyref>
 
 		<keyref name="nodeNameRef1" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1"/>
-			<field xpath="@name"/>
+			<selector xpath="nodedisplay/data/el1" />
+			<field xpath="@name" />
 		</keyref>
 
 		<keyref name="nodeNameRef2" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2"/>
-			<field xpath="@name"/>
+			<selector xpath="nodedisplay/data/el1/el2" />
+			<field xpath="@name" />
 		</keyref>
 
 		<keyref name="nodeNameRef3" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3"/>
-			<field xpath="@name"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3" />
+			<field xpath="@name" />
 		</keyref>
 
 		<keyref name="nodeNameRef4" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4"/>
-			<field xpath="@name"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4" />
+			<field xpath="@name" />
 		</keyref>
 
 		<keyref name="nodeNameRef5" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5"/>
-			<field xpath="@name"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5" />
+			<field xpath="@name" />
 		</keyref>
 
 		<keyref name="nodeNameRef6" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6"/>
-			<field xpath="@name"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6" />
+			<field xpath="@name" />
 		</keyref>
 
 		<keyref name="nodeNameRef7" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7"/>
-			<field xpath="@name"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7" />
+			<field xpath="@name" />
 		</keyref>
 
 		<keyref name="nodeNameRef8" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8"/>
-			<field xpath="@name"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8" />
+			<field xpath="@name" />
 		</keyref>
 
 		<keyref name="nodeNameRef9" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8/el9"/>
-			<field xpath="@name"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8/el9" />
+			<field xpath="@name" />
 		</keyref>
 
 		<keyref name="nodeNameRef10" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8/el9/el10"/>
-			<field xpath="@name"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8/el9/el10" />
+			<field xpath="@name" />
 		</keyref>
 
 
 		<!-- IDs of objects in object-tag -->
 		<key name="objectId">
-			<selector xpath="objects/object"/>
-			<field xpath="@id"/>
+			<selector xpath="objects/object" />
+			<field xpath="@id" />
 		</key>
 
 		<!-- IDs for relations must be unique -->
 		<unique name="relidsUnique">
-			<selector xpath="relations/rel"/>
-			<field xpath="@id"/>
+			<selector xpath="relations/rel" />
+			<field xpath="@id" />
 		</unique>
 
 		<keyref name="relationkeyids" refer="lml:objectId">
-			<selector xpath="relations/rel"/>
-			<field xpath="@keyid"/>
+			<selector xpath="relations/rel" />
+			<field xpath="@keyid" />
 		</keyref>
 
 		<keyref name="relationElementids" refer="lml:objectId">
-			<selector xpath="relations/rel/el"/>
-			<field xpath="@refid"/>
+			<selector xpath="relations/rel/el" />
+			<field xpath="@refid" />
 		</keyref>
 
 		<keyref name="infoRef" refer="lml:objectId">
-			<selector xpath="information/info"/>
-			<field xpath="@oid"/>
+			<selector xpath="information/info" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="rowRef" refer="lml:objectId">
-			<selector xpath="table/row"/>
-			<field xpath="@id"/>
+			<selector xpath="table/row" />
+			<field xpath="@id" />
 		</keyref>
 
 		<keyref name="usageJobRef" refer="lml:objectId">
-			<selector xpath="usagebar/job"/>
-			<field xpath="@oid"/>
+			<selector xpath="usagebar/job" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="chartJobRef" refer="lml:objectId">
-			<selector xpath="chart/data/r | chart/data/p | chartgroup/chart/data/r | chartgroup/chart/data/p"/>
-			<field xpath="@oid"/>
+			<selector
+				xpath="chart/data/r | chart/data/p | chartgroup/chart/data/r | chartgroup/chart/data/p" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="nodeDisplayJobRef1" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1"/>
-			<field xpath="@oid"/>
+			<selector xpath="nodedisplay/data/el1" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="nodeDisplayJobRef2" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2"/>
-			<field xpath="@oid"/>
+			<selector xpath="nodedisplay/data/el1/el2" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="nodeDisplayJobRef3" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3"/>
-			<field xpath="@oid"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="nodeDisplayJobRef4" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4"/>
-			<field xpath="@oid"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="nodeDisplayJobRef5" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5"/>
-			<field xpath="@oid"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="nodeDisplayJobRef6" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6"/>
-			<field xpath="@oid"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="nodeDisplayJobRef7" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7"/>
-			<field xpath="@oid"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="nodeDisplayJobRef8" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8"/>
-			<field xpath="@oid"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="nodeDisplayJobRef9" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8/el9"/>
-			<field xpath="@oid"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8/el9" />
+			<field xpath="@oid" />
 		</keyref>
 
 		<keyref name="nodeDisplayJobRef10" refer="lml:objectId">
-			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8/el9/el10"/>
-			<field xpath="@oid"/>
+			<selector xpath="nodedisplay/data/el1/el2/el3/el4/el5/el6/el7/el8/el9/el10" />
+			<field xpath="@oid" />
 		</keyref>
 
 
@@ -475,9 +516,9 @@ http://www.eclipse.org/legal/epl-v10.html
 				by extending all graphical objects from this type.
 			</documentation>
 		</annotation>
-		<attribute name="id" type="string" use="required"/>
-		<attribute name="title" type="string"/>
-		<attribute name="description" type="string"/>
+		<attribute name="id" type="string" use="required"></attribute>
+		<attribute name="title" type="string"></attribute>
+		<attribute name="description" type="string"></attribute>
 	</complexType>
 
 </schema>

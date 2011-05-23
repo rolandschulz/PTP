@@ -1,39 +1,101 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--
-LML - LLView markup language
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+          LML - LLView markup language 
+
+   Copyright (C) 2010, Forschungszentrum Juelich GmbH, Federal Republic of
+   Germany. All rights reserved.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+
+   Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+     - Redistributions of source code must retain the above copyright notice,
+       this list of conditions and the following disclaimer.
+
+     - Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+
+     - Any publications that result from the use of this software shall
+       reasonably refer to the Research Centre's development.
+
+     - All advertising materials mentioning features or use of this software
+       must display the following acknowledgement:
+
+           This product includes software developed by Forschungszentrum
+           Juelich GmbH, Federal Republic of Germany.
+
+     - Forschungszentrum Juelich GmbH is not obligated to provide the user with
+       any support, consulting, training or assistance of any kind with regard
+       to the use, operation and performance of this software or to provide
+       the user with any updates, revisions or new versions.
 
 
-Copyright (c) 2011 Forschungszentrum Juelich GmbH
+   THIS SOFTWARE IS PROVIDED BY FORSCHUNGSZENTRUM JUELICH GMBH "AS IS" AND ANY
+   EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   DISCLAIMED. IN NO EVENT SHALL FORSCHUNGSZENTRUM JUELICH GMBH BE LIABLE FOR
+   ANY SPECIAL, DIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+   RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+   CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+   CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE.
+ -->
+<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
 
-All rights reserved. This program and the accompanying materials
-
-are made available under the terms of the Eclipse Public License v1.0
-
-which accompanies this distribution and is available at
-
-http://www.eclipse.org/legal/epl-v10.html
--->
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
-
-    <include schemaLocation="lgui.xsd"/>
+    <include schemaLocation="lgui.xsd"></include>
     <complexType name="column_type">
-        <annotation>
-        	<documentation>Describes one column of table.</documentation>
-        </annotation>
-        <attribute name="name" type="NCName" use="required"/>
-    	<attribute name="sort" type="lml:sorting_type"/>
-    	<attribute name="description" type="string"/>
-    	<attribute name="id" type="positiveInteger" use="required"/>
+    	<annotation>
+    		<documentation>
+    			Describes one column of table.
+    		</documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="pattern" type="lml:pattern_type"
+    			minOccurs="0" maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					The pattern-tag defines regular expressions,
+    					which describe the allowed values of a column.
+    					For a status-column in a job-table you could
+    					define, that values of this column are taken
+    					from {RUNNING, SUSPENDED, STOPPED}. This is also
+    					used to insert new jobs into job-tables. If a
+    					job is "running" and the status-column allows
+    					running jobs, this job should be inserted into
+    					this table.
+    				</documentation>
+    			</annotation>
+    		</element>
+    	</sequence>
+    	<attribute name="name" type="NCName" use="required"></attribute>
+    	<attribute name="sort" type="lml:sorting_type"></attribute>
+    	<attribute name="description" type="string"></attribute>
+    	<attribute name="id" type="positiveInteger" use="required"></attribute>
+    	<attribute name="type" default="optional">
+            <annotation>
+            	<documentation>This attribute defines the use of this column. If optional (default) cells of this column can be left out in rows.
+If mandatory they have to be defined.</documentation>
+            </annotation>
+            <simpleType>
+    			<restriction base="string">
+    				<enumeration value="mandatory"></enumeration>
+    				<enumeration value="optional"></enumeration>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
     </complexType>
 
     <simpleType name="sorting_type">
         <annotation>
-        	<documentation>Defines allowed ways of how columns are sorted.</documentation>
+        	<documentation>Defines allowed ways of how columns are sorted. If value is date, the values have to match the regular expression ^\d{4}\-\d{2}\-\d{2}\s*(\d{2}:\d{2}(:\d{2})?)?$
+A valid example is: "2011-04-13 09:56:44"</documentation>
         </annotation>
         <restriction base="string">
-    		<enumeration value="numeric"/>
-    		<enumeration value="alpha"/>
-    		<enumeration value="date"/>
+    		<enumeration value="numeric"></enumeration>
+    		<enumeration value="alpha"></enumeration>
+    		<enumeration value="date"></enumeration>
     	</restriction>
     </simpleType>
 
@@ -45,9 +107,8 @@ Otherwise order of cells define connections to columns.</documentation>
         <attribute name="cid" type="positiveInteger">
     		<annotation>
     			<documentation>Is cid not defined, order of columns and cells will define which cell is connected to which column.</documentation>
-    		</annotation>
-</attribute>
-    	<attribute name="value" type="string"/>
+    		</annotation></attribute>
+    	<attribute name="value" type="string"></attribute>
     </complexType>
 
 
@@ -56,13 +117,12 @@ Otherwise order of cells define connections to columns.</documentation>
         	<documentation>One row in final table.</documentation>
         </annotation>
         <sequence>
-    		<element maxOccurs="unbounded" minOccurs="0" name="cell" type="lml:cell_type"/>
+    		<element name="cell" type="lml:cell_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     	<attribute name="oid" type="NCName">
     		<annotation>
     			<documentation>Reference to object-tag</documentation>
-    		</annotation>
-</attribute>
+    		</annotation></attribute>
     </complexType>
 
 
@@ -75,23 +135,65 @@ Otherwise order of cells define connections to columns.</documentation>
     		</documentation>
     	</annotation>
     	<complexContent>
-    		<extension base="lml:gobject_type">    		
+    		<extension base="lml:gobject_type">
     			<sequence>
-		    		<element maxOccurs="unbounded" minOccurs="0" name="column" type="lml:column_type">
-		    		</element>
-		    		<element maxOccurs="unbounded" minOccurs="0" name="row" type="lml:row_type">
-		    			
-		    			<!-- for one column only one cell in a row -->
-	        			<unique name="cellCIDUnique">
-	        				<selector xpath="cell"/>
-	        				<field xpath="@cid"/>
-	        			</unique>
-		    			
-		    		</element>
-		    	</sequence>
+    				<element name="column" type="lml:column_type"
+    					minOccurs="0" maxOccurs="unbounded">
+    				</element>
+    				<element name="row" type="lml:row_type"
+    					minOccurs="0" maxOccurs="unbounded">
+
+    					<!-- for one column only one cell in a row -->
+    					<unique name="cellCIDUnique">
+    						<selector xpath="cell" />
+    						<field xpath="@cid" />
+    					</unique>
+
+    				</element>
+    			</sequence>
+    			<attribute name="contenttype" default="other">
+                    <annotation>
+                    	<documentation>This attribute defines the table's content type. E.g. the value jobs defines this table to contain job-information.</documentation>
+                    </annotation>
+                    <simpleType>
+    					<restriction base="string">
+    						<enumeration value="jobs"></enumeration>
+    						<enumeration value="nodes"></enumeration>
+    						<enumeration value="users"></enumeration>
+    						<enumeration value="groups"></enumeration>
+    						<enumeration value="classes"></enumeration>
+    						<enumeration value="queues"></enumeration>
+    						<enumeration value="other"></enumeration>
+    					</restriction>
+    				</simpleType>
+    			</attribute>
     		</extension>
     	</complexContent>
     </complexType>
 
 
+    
+    
+
+    <complexType name="pattern_type">
+        <annotation>
+        	<documentation>A pattern element consists of include and exclude tags. Values of the corresponding column
+can be checked by the defined regular expressions. They must pass the regexp-checks in
+the following way: Go through all include/exclude tags. A value must be valid against the 
+include-regexps and must not match with the exclude-regexps. Therefore the order of tags
+is important.
+</documentation>
+        </annotation>
+        <sequence minOccurs="1" maxOccurs="unbounded">
+    		<element name="include" type="lml:pattern_match_type" minOccurs="0" maxOccurs="1"></element>
+    		<element name="exclude" type="lml:pattern_match_type" minOccurs="0" maxOccurs="1"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="pattern_match_type">
+    	<attribute name="regexp" type="string">
+    		<annotation>
+    			<documentation>This attribute takes regular expressions of any kind.</documentation>
+    		</annotation></attribute>
+    </complexType>
 </schema>

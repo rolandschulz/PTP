@@ -1,22 +1,52 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--
-LML - LLView markup language
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+          LML - LLView markup language 
+
+   Copyright (C) 2010, Forschungszentrum Juelich GmbH, Federal Republic of
+   Germany. All rights reserved.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+
+   Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+     - Redistributions of source code must retain the above copyright notice,
+       this list of conditions and the following disclaimer.
+
+     - Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+
+     - Any publications that result from the use of this software shall
+       reasonably refer to the Research Centre's development.
+
+     - All advertising materials mentioning features or use of this software
+       must display the following acknowledgement:
+
+           This product includes software developed by Forschungszentrum
+           Juelich GmbH, Federal Republic of Germany.
+
+     - Forschungszentrum Juelich GmbH is not obligated to provide the user with
+       any support, consulting, training or assistance of any kind with regard
+       to the use, operation and performance of this software or to provide
+       the user with any updates, revisions or new versions.
 
 
-Copyright (c) 2011 Forschungszentrum Juelich GmbH
+   THIS SOFTWARE IS PROVIDED BY FORSCHUNGSZENTRUM JUELICH GMBH "AS IS" AND ANY
+   EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   DISCLAIMED. IN NO EVENT SHALL FORSCHUNGSZENTRUM JUELICH GMBH BE LIABLE FOR
+   ANY SPECIAL, DIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+   RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+   CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+   CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE.
+ -->
+<schema targetNamespace="http://www.llview.de"
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:lml="http://www.llview.de">
 
-All rights reserved. This program and the accompanying materials
-
-are made available under the terms of the Eclipse Public License v1.0
-
-which accompanies this distribution and is available at
-
-http://www.eclipse.org/legal/epl-v10.html
--->
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
-
-    <include schemaLocation=""/>
-    <include schemaLocation="lgui.xsd"/>
+    <include schemaLocation="lgui.xsd"></include>
     <complexType name="element_type">
     	<annotation>
     		<documentation>
@@ -36,8 +66,8 @@ http://www.eclipse.org/legal/epl-v10.html
     			</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="max" type="nonNegativeInteger"/>
-    	<attribute name="list" type="lml:list_type"/>
+    	<attribute name="max" type="nonNegativeInteger"></attribute>
+    	<attribute name="list" type="lml:list_type"></attribute>
     </complexType>
 
 
@@ -48,14 +78,14 @@ http://www.eclipse.org/legal/epl-v10.html
         	<documentation>Scheme description of batch-system. Describes an empty instance of the actual batch system.</documentation>
         </annotation>
         <sequence>
-    		<element maxOccurs="unbounded" minOccurs="1" name="el1" type="lml:scheme_element1"/>
+    		<element name="el1" type="lml:scheme_element1" minOccurs="1" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 
 
     <complexType name="data_type">
     	<sequence>
-    		<element maxOccurs="unbounded" minOccurs="1" name="el1" type="lml:data_element1"/>
+    		<element name="el1" type="lml:data_element1" minOccurs="1" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 
@@ -77,8 +107,8 @@ http://www.eclipse.org/legal/epl-v10.html
 
     					<!-- defines unique tag-names within nodedisplay/scheme -->
     					<key name="schemetagKey">
-    						<selector xpath=".//el"/>
-    						<field xpath="@tagname"/>
+    						<selector xpath=".//el" />
+    						<field xpath="@tagname" />
     					</key>
 
     				</element>
@@ -97,7 +127,7 @@ http://www.eclipse.org/legal/epl-v10.html
 
     				</element>
     			</sequence>
-    			<attribute name="refto" type="string"/>
+    			<attribute name="refto" type="string"></attribute>
     		</extension>
     	</complexContent>
     </complexType>
@@ -106,7 +136,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:scheme_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el2" type="lml:scheme_element2"/>
+    				<element name="el2" type="lml:scheme_element2" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -114,7 +144,7 @@ http://www.eclipse.org/legal/epl-v10.html
     
     <complexType name="scheme_element10">
     	<complexContent>
-    		<extension base="lml:scheme_element"/>
+    		<extension base="lml:scheme_element"></extension>
     	</complexContent>
     </complexType>
 
@@ -122,7 +152,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:scheme_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el10" type="lml:scheme_element10"/>
+    				<element name="el10" type="lml:scheme_element10" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -132,7 +162,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:scheme_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el9" type="lml:scheme_element9"/>
+    				<element name="el9" type="lml:scheme_element9" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -142,7 +172,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:scheme_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el8" type="lml:scheme_element8"/>
+    				<element name="el8" type="lml:scheme_element8" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -152,7 +182,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:scheme_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el7" type="lml:scheme_element7"/>
+    				<element name="el7" type="lml:scheme_element7" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -162,7 +192,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:scheme_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el6" type="lml:scheme_element6"/>
+    				<element name="el6" type="lml:scheme_element6" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -172,7 +202,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:scheme_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el5" type="lml:scheme_element5"/>
+    				<element name="el5" type="lml:scheme_element5" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -182,7 +212,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:scheme_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el4" type="lml:scheme_element4"/>
+    				<element name="el4" type="lml:scheme_element4" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -192,7 +222,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:scheme_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el3" type="lml:scheme_element3"/>
+    				<element name="el3" type="lml:scheme_element3" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -203,7 +233,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:data_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el2" type="lml:data_element2"/>
+    				<element name="el2" type="lml:data_element2" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -211,7 +241,7 @@ http://www.eclipse.org/legal/epl-v10.html
     
     <complexType name="data_element10">
     	<complexContent>
-    		<extension base="lml:data_element"/>
+    		<extension base="lml:data_element"></extension>
     	</complexContent>
     </complexType>
 
@@ -219,7 +249,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:data_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el10" type="lml:data_element10"/>
+    				<element name="el10" type="lml:data_element10" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -229,7 +259,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:data_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el9" type="lml:data_element9"/>
+    				<element name="el9" type="lml:data_element9" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -239,7 +269,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:data_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el8" type="lml:data_element8"/>
+    				<element name="el8" type="lml:data_element8" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -249,7 +279,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:data_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el7" type="lml:data_element7"/>
+    				<element name="el7" type="lml:data_element7" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -259,7 +289,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:data_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el6" type="lml:data_element6"/>
+    				<element name="el6" type="lml:data_element6" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -269,7 +299,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:data_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el5" type="lml:data_element5"/>
+    				<element name="el5" type="lml:data_element5" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -279,7 +309,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:data_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el4" type="lml:data_element4"/>
+    				<element name="el4" type="lml:data_element4" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -289,7 +319,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:data_element">
     			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el3" type="lml:data_element3"/>
+    				<element name="el3" type="lml:data_element3" minOccurs="0" maxOccurs="unbounded"></element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -338,7 +368,7 @@ http://www.eclipse.org/legal/epl-v10.html
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="refid" type="string"/>
+    			<attribute name="refid" type="string"></attribute>
     		</extension>
     	</complexContent>
     </complexType>
@@ -353,8 +383,8 @@ http://www.eclipse.org/legal/epl-v10.html
     	</annotation>
     	<complexContent>
     		<extension base="lml:element_type">
-    			<attribute name="tagname" type="NCName"/>
-    			<attribute default="%d-" name="mask">
+    			<attribute name="tagname" type="NCName"></attribute>
+    			<attribute name="mask" default="%d-">
     				<annotation>
     					<documentation>
     						If mask is not defined, default-mask is
@@ -366,12 +396,14 @@ http://www.eclipse.org/legal/epl-v10.html
     				</annotation>
     				<simpleType>
     					<restriction base="string">
-    						<pattern value="(([^%])*%(\-|\+|\s|\#)*0(\-|\+|\s|\#)*(\d)+d([^%])*)|(([^%])*%(\-|\+|\s|\#)*d([^%\d])+)|(([^%])*%(\-|\+|\s|\#)*1d([^%])*)">
+    						<pattern
+    							value="(([^%])*%(\-|\+|\s|\#)*0(\-|\+|\s|\#)*(\d)+d([^%])*)|(([^%])*%(\-|\+|\s|\#)*d([^%\d])+)|(([^%])*%(\-|\+|\s|\#)*1d([^%])*)">
     						</pattern>
     					</restriction>
     				</simpleType>
     			</attribute>
-    			<attribute default="1" name="step" type="positiveInteger">
+    			<attribute name="step" type="positiveInteger"
+    				default="1">
     				<annotation>
     					<documentation>
     						default-step-width is 1. This is the value,
@@ -382,8 +414,7 @@ http://www.eclipse.org/legal/epl-v10.html
     			<attribute name="map" type="lml:namemapping_type">
     				<annotation>
     					<documentation>Map names as implicit names to these components. mask and map can not be used together. map defines special names for all elements within this list. names must be separated by commas.</documentation>
-    				</annotation>
-</attribute>
+    				</annotation></attribute>
     		</extension>
     	</complexContent>
     </complexType>
@@ -394,7 +425,7 @@ http://www.eclipse.org/legal/epl-v10.html
         	<documentation>Type for list-attribute in scheme- or data-tag. It allowes the definition of several positive integer-values seperated by commas.</documentation>
         </annotation>
         <restriction base="string">
-    		<pattern value="\s*\d+\s*(\s*,\s*\d+)*"/>
+    		<pattern value="\s*\d+\s*(\s*,\s*\d+)*"></pattern>
     	</restriction>
     </simpleType>
 
@@ -403,7 +434,7 @@ http://www.eclipse.org/legal/epl-v10.html
         	<documentation>This type is used to map special names to elements of the nodedisplay. Usually a digit has to be printed with a mask-atttribute, but if the name does not contain a digit, this type will be used to define those special names.</documentation>
         </annotation>
         <restriction base="string">
-    		<pattern value=".*(,.*)*"/>
+    		<pattern value=".*(,.*)*"></pattern>
     	</restriction>
     </simpleType>
 </schema>
