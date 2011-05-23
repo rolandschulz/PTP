@@ -18,11 +18,13 @@
 package org.eclipse.ptp.internal.rdt.ui.callhierarchy;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.eclipse.cdt.core.dom.ast.IEnumerator;
 import org.eclipse.cdt.core.index.IIndexFile;
 import org.eclipse.cdt.core.index.IIndexName;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.IMethod;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.IVariable;
 import org.eclipse.cdt.internal.corext.util.CModelUtil;
@@ -147,23 +149,31 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 		/* -- ST-Origin --
 		 * Source folder: org.eclipse.cdt.ui/src
 		 * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHContentProvider
-		 * Version: 1.17
+		 * Version: 1.21
 		 */
-		/* won't be able to port CHContentProvider 1.21 change, todo: create a new remote index service to handle this query.
 		if (!fComputeReferencedBy && element instanceof IMethod) {
-			IIndexName methodName= IndexUI.elementToName(index, element);
-			if (methodName != null) {
-				IBinding methodBinding= index.findBinding(methodName);
-				if (methodBinding instanceof ICPPMethod) {
-					ICElement[] defs= CHQueries.findOverriders(index, (ICPPMethod) methodBinding);
-					if (defs != null && defs.length > 0) {
-						return new Object[] { new CHMultiDefNode(null, tu, 0, defs, methodBinding.getLinkage().getLinkageID()) };
-					}
+
+			IProject project = input.getCProject().getProject();
+			IServiceModelManager smm = ServiceModelManager.getInstance();
+			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
+	
+			IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
+	
+			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
+			Map<String, ICElement[]> overriders=null;
+			if (serviceProvider instanceof IIndexServiceProvider) {
+				Scope scope = new Scope(project);
+				ICallHierarchyService chService = ((IIndexServiceProvider) serviceProvider).getCallHierarchyService();
+				overriders = chService.findOverriders(scope, input, NPM);
+			}
+			if (overriders != null && overriders.size() > 0) {
+				String linkageIDStr = overriders.keySet().iterator().next();
+				int linkageID = Integer.parseInt(linkageIDStr);
+				if(linkageID!=-1){
+					return new Object[] { new CHMultiDefNode(null, tu, 0, overriders.get(linkageIDStr), linkageID) };
 				}
 			}
 		}
-		*/
-
 		return new Object[] { new CHNode(null, tu, 0, element, -1) };
 	}
 

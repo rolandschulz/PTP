@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.cdt.core.dom.ast.DOMException;
@@ -27,11 +28,6 @@ import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.IBinding;
-import org.eclipse.cdt.core.dom.ast.IEnumerator;
-import org.eclipse.cdt.core.dom.ast.IFunction;
-import org.eclipse.cdt.core.dom.ast.IVariable;
-import org.eclipse.cdt.core.dom.ast.c.ICExternalBinding;
-import org.eclipse.cdt.core.dom.ast.cpp.ICPPMethod;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPSpecialization;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexFile;
@@ -43,7 +39,6 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.ClassTypeHelper;
 import org.eclipse.cdt.internal.core.index.IWritableIndex;
 import org.eclipse.cdt.internal.core.indexer.StandaloneFastIndexer;
 import org.eclipse.cdt.internal.core.parser.util.ContentAssistMatcherFactory;
@@ -68,7 +63,6 @@ import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IndexIncludeValue;
-import org.eclipse.ptp.internal.rdt.core.index.DummyName;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 import org.eclipse.ptp.internal.rdt.core.model.CModelBuilder2;
 import org.eclipse.ptp.internal.rdt.core.model.CProject;
@@ -123,7 +117,7 @@ public class CDTMiner extends Miner {
 	public static final String C_CALL_HIERARCHY_GET_CALLERS = "C_CALL_HIERARCHY_GET_CALLERS"; //$NON-NLS-1$
 	public static final String C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT = "C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT"; //$NON-NLS-1$
 	public static final String C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY = "C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY"; //$NON-NLS-1$
-
+	public static final String C_CALL_HIERARCHY_GET_OVERRIDERS = "C_CALL_HIERARCHY_GET_OVERRIDERS"; //$NON-NLS-1$
 	// search service
 	public static final String C_SEARCH_RUN_QUERY = "C_SEARCH_RUN_QUERY"; //$NON-NLS-1$
 	public static final String C_SEARCH_RUN_QUERY2 = "C_SEARCH_RUN_QUERY2"; //$NON-NLS-1$
@@ -394,6 +388,31 @@ public class CDTMiner extends Miner {
 				
 				
 				handleGetDefinitions(scopeName, hostName, subject, path, status);
+				
+				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Finished getting definitions.", _dataStore); //$NON-NLS-1$
+				
+			} catch (IOException e) {
+				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			} catch (ClassNotFoundException e) {
+				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			}
+		}
+		
+
+		else if(name.equals(C_CALL_HIERARCHY_GET_OVERRIDERS)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				String scheme = getString(theCommand, 2);
+				String rootPath = getString(theCommand, 3);
+				String mappedPath = getString(theCommand, 4);
+				String hostName = getString(theCommand, 5);
+				ICElement subject = (ICElement) Serializer.deserialize(getString(theCommand, 6));
+				String path = getString(theCommand, 7);
+				
+				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Getting definitions...", _dataStore); //$NON-NLS-1$
+				
+				
+				handleGetOverriders(scopeName, hostName, subject, path, status);
 				
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Finished getting definitions.", _dataStore); //$NON-NLS-1$
 				
@@ -1433,7 +1452,7 @@ public class CDTMiner extends Miner {
 		createCommandDescriptor(schemaRoot, "Get Calls", C_CALL_HIERARCHY_GET_CALLS, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Get definitions from element", C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Get definitions from working copy", C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY, false); //$NON-NLS-1$
-		
+		createCommandDescriptor(schemaRoot, "Get overriders from element", C_CALL_HIERARCHY_GET_OVERRIDERS, false); //$NON-NLS-1$
 		// search
 		createCommandDescriptor(schemaRoot, "Run query", C_SEARCH_RUN_QUERY, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Run query2", C_SEARCH_RUN_QUERY2, false); //$NON-NLS-1$
@@ -1461,6 +1480,11 @@ public class CDTMiner extends Miner {
 		_dataStore.refresh(schemaRoot);
 	}
 	
+	/* -- ST-Origin --
+	 * Source folder: org.eclipse.cdt.ui/src
+	 * Class: org.eclipse.cdt.internal.ui.callhierarchy.CallHierarchyUI
+	 * Version: 1.25
+	 */
 	//CallHierarchyUI -> public static ICElement[] findDefinitions(ICElement input)
 	protected void handleGetDefinitions(String scopeName, String hostName, ICElement subject, String path, DataElement status) {
 		try {
@@ -1556,6 +1580,12 @@ public class CDTMiner extends Miner {
 			statusDone(status);
 		}
 	}
+	
+	/* -- ST-Origin --
+	 * Source folder: org.eclipse.cdt.ui/src
+	 * Class: org.eclipse.cdt.internal.ui.callhierarchy.CallHierarchyUI
+	 * Version: 1.25
+	 */
 	//CallHierarchyUI -> private static ICElement[] findDefinitions(ICProject project, IEditorInput editorInput, ITextSelection sel)
 	private static ICElement[] findDefinitions(IIndex index, ITranslationUnit workingCopy, int selectionStart, int selectionLength, IIndexLocationConverter converter) throws CoreException {
 		
@@ -1621,6 +1651,36 @@ public class CDTMiner extends Miner {
 			binding= original;
 		}
 		return new ICElement[]{};
+	}
+	
+	
+	protected void handleGetOverriders(String scopeName, String hostName, ICElement subject, String path, DataElement status) {
+		
+		UniversalServerUtilities.logDebugMessage(LOG_TAG, "Getting overriders for subject " + subject.getElementName(), _dataStore); //$NON-NLS-1$
+		UniversalServerUtilities.logDebugMessage(LOG_TAG, "scope: " + scopeName, _dataStore); //$NON-NLS-1$
+		UniversalServerUtilities.logDebugMessage(LOG_TAG, "path: " + subject.getLocationURI(), _dataStore); //$NON-NLS-1$
+
+		
+		try {
+			
+			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Getting index", _dataStore); //$NON-NLS-1$
+			String scheme = subject.getLocationURI().getScheme();
+
+			// search the index for the name
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
+			
+			Map<String, ICElement[]> result =  RemoteCHQueries.handleGetOverriders(index, subject, path, _dataStore, getLocationConverter(scheme, hostName));
+			
+			// create the result object
+			String resultString = Serializer.serialize(result);
+			status.getDataStore().createObject(status, T_CALL_HIERARCHY_RESULT, resultString);
+		} catch (Exception e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		finally {
+			
+			statusDone(status);
+		}
 	}
 
 	private static boolean needToFindDefinition(ICElement elem) {
