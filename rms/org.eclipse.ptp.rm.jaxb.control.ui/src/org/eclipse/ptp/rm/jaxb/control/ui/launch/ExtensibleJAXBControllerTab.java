@@ -9,8 +9,10 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.launch;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -54,6 +56,7 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	protected TabFolder tabFolder;
 
 	private final LinkedList<AbstractJAXBLaunchConfigurationTab> tabControllers = new LinkedList<AbstractJAXBLaunchConfigurationTab>();
+	private final Map<String, AbstractJAXBLaunchConfigurationTab> controllerIndex = new HashMap<String, AbstractJAXBLaunchConfigurationTab>();
 	private Composite control;
 
 	/**
@@ -139,7 +142,8 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	}
 
 	/*
-	 * Calls initializeFrom on child tabs. (non-Javadoc)
+	 * Calls initializeFrom on child tabs, then sets the shared environment.
+	 * (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
@@ -155,6 +159,9 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
 			}
+		}
+		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+			tabControl.setUpSharedEnvironment(controllerIndex);
 		}
 		return resultValidation;
 	}
@@ -223,6 +230,7 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 */
 	protected void addDynamicTab(AbstractJAXBLaunchConfigurationTab tabController) {
 		tabControllers.add(tabController);
+		controllerIndex.put(tabController.getText(), tabController);
 		tabController.addContentsChangedListener(this);
 	}
 

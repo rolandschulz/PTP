@@ -44,7 +44,8 @@
 				specific to the resource manager, and the layout of the Launch Tab.
 				The resource manager implementation constructs a variable map
 				serving as the resource manager "environment"; variables are dereferenced in the configuration file via ${ptp_rm:name} or
-				${ptp_rm:name#getterName}; all properties and attributes defined in the configuration are mapped. The following hard-coded variables
+				${ptp_rm:name#getterName}; all properties and attributes defined in the configuration are mapped. The following hard-coded
+				variables
 				are also added at runtime:
 				<!-- from runtime configuration information -->
 				control.user.name
@@ -403,12 +404,14 @@
 				<xs:element name="composite" type="rm:composite-type"/>
 			</xs:choice>
 		</xs:sequence>
-		<xs:attribute name="sharedEnvironment" type="xs:boolean" default="false">
+		<xs:attribute name="includeWidgetValuesFrom" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
-					The default means that each tab is a separate view or selection into the global env, and it is this subset which
-					will be passed on the launch command. Setting this property to true means that the tab will pass all selected elements of the
-					entire shared environment to the resource manager at launch.
+					This is a comma-delimited list of the titles (names) of launch tabs comprising the set of widgets contributing
+					their values to the configuration set from the current launch tab. For instance, if this tab were called "A" and it gave
+					includeWidgetValuesFrom as "B,D", then when the user activated any buttons which update the configuration from this tab, the
+					values of the widgets set in tabs B and D (but not C) will be included in the configured values. Leaving this undefined means that
+					only the widgets on the tab contribute to the configuration.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -892,7 +895,8 @@
 		<xs:attribute name="ref" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
-					The name of the object in the environment (either attribute or property; do not include here the "${ptp_rm:" / "}"
+					The name of the object in the environment (either attribute or property; do not include here the "${ptp_rm:" /
+					"}"
 					used for resolving).
 				</xs:documentation>
 			</xs:annotation>
@@ -979,17 +983,17 @@
 		<xs:attribute name="field" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="throw-type">
-      <xs:annotation>
-         <xs:documentation>
-            Throws an exception with the given message; o
-         </xs:documentation>
-      </xs:annotation>
-      <xs:sequence>
-         <xs:element name="entry" minOccurs="0" type="rm:entry-type"/>
-      </xs:sequence>
-      <xs:attribute name="field" type="xs:string"/>
-      <xs:attribute name="message" type="xs:string"/>
-   </xs:complexType>
+		<xs:annotation>
+			<xs:documentation>
+				Throws an exception with the given message; o
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="entry" minOccurs="0" type="rm:entry-type"/>
+		</xs:sequence>
+		<xs:attribute name="field" type="xs:string"/>
+		<xs:attribute name="message" type="xs:string"/>
+	</xs:complexType>
 	<xs:complexType name="add-type">
 		<xs:annotation>
 			<xs:documentation>
@@ -1052,7 +1056,8 @@
 			<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="2">
 				<xs:annotation>
 					<xs:documentation>
-						.*[${ptp_rm:}]*.* refers to a variable in the RM environment; "#FIELD" refers to the value of the given field on the
+						.*[${ptp_rm:}]*.* refers to a variable in the RM environment; "#FIELD" refers to the value of the given field on
+						the
 						current target; other strings will be converted in conformity with the inferred type of the comparison.
 					</xs:documentation>
 				</xs:annotation>
@@ -1106,13 +1111,13 @@
 		<xs:attribute name="refreshFrequencyInSeconds" type="xs:int" default="60"/>
 	</xs:complexType>
 	<xs:complexType name="monitor-driver-type">
-	  <xs:choice>
-	     <xs:element name="url" type="xs:string"/>
-	     <xs:sequence>
-	         <xs:element name="name" type="xs:string"/>
-	         <xs:element name="path" minOccurs="0" type="xs:string"/>
-	         <xs:element name="args" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
-	     </xs:sequence>
-	  </xs:choice>
+		<xs:choice>
+			<xs:element name="url" type="xs:string"/>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string"/>
+				<xs:element name="path" minOccurs="0" type="xs:string"/>
+				<xs:element name="args" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
+			</xs:sequence>
+		</xs:choice>
 	</xs:complexType>
 </xs:schema>

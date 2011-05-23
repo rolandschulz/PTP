@@ -39,6 +39,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
@@ -84,7 +85,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	private final ValueUpdateHandler updateHandler;
 	private final List<Viewer> viewers;
 	private final Map<Object, IUpdateModel> localWidgets;
-	private final boolean shared;
+	private final String[] shared;
+	private final Collection<IUpdateModel> sharedModels;
 
 	private ILaunchConfiguration listenerConfiguration;
 
@@ -103,7 +105,13 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			TabControllerType controller, JAXBControllerLaunchConfigurationTab parentTab) {
 		super(parentTab, dialog);
 		this.controller = controller;
-		shared = controller.isSharedEnvironment();
+		String s = controller.getIncludeWidgetValuesFrom();
+		if (s == null) {
+			shared = new String[0];
+		} else {
+			shared = s.split(JAXBUIConstants.CM);
+		}
+		sharedModels = new ArrayList<IUpdateModel>();
 		String title = controller.getTitle();
 		if (title != null) {
 			this.title = title;
@@ -288,6 +296,25 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/*
+	 * Pull out the local maps from each and set them into the shared array.
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
+	 * #setUpSharedEnvironment(java.util.List)
+	 */
+	@Override
+	public void setUpSharedEnvironment(Map<String, AbstractJAXBLaunchConfigurationTab> controllers) {
+		sharedModels.clear();
+		for (String title : shared) {
+			AbstractJAXBLaunchConfigurationTab tab = controllers.get(title);
+			if (tab instanceof JAXBDynamicLaunchConfigurationTab) {
+				sharedModels.addAll(((JAXBDynamicLaunchConfigurationTab) tab).localWidgets.values());
+			}
+		}
+	}
+
+	/*
 	 * Tab acts a listener for viewScript button. (non-Javadoc)
 	 * 
 	 * @see
@@ -374,17 +401,14 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/**
-	 * Determines whether the set of widgets is local or global.
+	 * Gathers widgets to include in the local mapping.
 	 * 
 	 * @return the set of widgets to be accessed for values.
 	 */
 	private Collection<IUpdateModel> getModels() {
-		Collection<IUpdateModel> models = null;
-		if (shared) {
-			models = updateHandler.getControlToModelMap().values();
-		} else {
-			models = localWidgets.values();
-		}
+		Collection<IUpdateModel> models = new ArrayList<IUpdateModel>();
+		models.addAll(sharedModels);
+		models.addAll(localWidgets.values());
 		return models;
 	}
 

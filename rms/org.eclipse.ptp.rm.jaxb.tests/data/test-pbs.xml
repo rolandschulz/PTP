@@ -493,7 +493,6 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
       </terminate-job>
       <launch-tab>
          <basic>
-            <!-- <basic sharedEnvironment="true"> -->
             <title>Basic PBS Settings</title>
             <composite group="true">
                <layout>

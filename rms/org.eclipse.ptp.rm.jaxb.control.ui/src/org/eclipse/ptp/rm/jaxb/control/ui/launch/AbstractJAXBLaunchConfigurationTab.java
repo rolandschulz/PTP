@@ -124,6 +124,16 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	}
 
 	/**
+	 * Set up shared environment, if any; adapter method which does nothing
+	 * 
+	 * @param controllers
+	 *            from the parent tab, mapped to their titles
+	 */
+	public void setUpSharedEnvironment(Map<String, AbstractJAXBLaunchConfigurationTab> controllers) {
+		// does nothing
+	}
+
+	/**
 	 * Tab-specific handling of local variable map.
 	 */
 	protected abstract void doRefreshLocal();

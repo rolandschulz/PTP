@@ -101,7 +101,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<environment name="VAR_5" value="${ptp_rm:e5#value}"/>
 		</submit-interactive>
 		<launch-tab>
-			<dynamic sharedEnvironment="true">
+			<dynamic includeWidgetValuesFrom="Environment,Paths">
 				<title>Settings</title>
 				<composite>
 					<layout>
@@ -199,7 +199,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 				</composite>
 			</dynamic>
-			<dynamic sharedEnvironment="false">
+			<dynamic>
 				<title>Paths</title>
 				<composite>
 					<layout>
@@ -266,7 +266,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 				</composite>
 			</dynamic>
-			<dynamic sharedEnvironment="true">
+			<dynamic includeWidgetValuesFrom="Settings">
 				<title>Environment</title>
 				<composite group="true">
 					<layout>
@@ -283,7 +283,6 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<tooltip>Click to activate value widget.</tooltip>
 						</column-data>
 						<items>
-						   <include>mpiCores</include>
 							<include>e1</include>
 							<include>e2</include>
 							<include>e3</include>
