@@ -20,7 +20,7 @@ import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 public class JAXBControlUIConstants extends JAXBUIConstants {
 
 	public static final String VALIDATE = "ValidateJob";//$NON-NLS-1$
-	public static final long VALIDATE_TIMER = 500;
+	public static final long VALIDATE_TIMER = 100;
 
 	public static final String NAME_TAG = AT + NAME;
 	public static final String VALUE_TAG = AT + VALUE;
