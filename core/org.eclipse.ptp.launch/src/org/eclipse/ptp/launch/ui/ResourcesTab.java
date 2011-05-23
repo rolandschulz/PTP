@@ -131,7 +131,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		resourceManagerCombo = new Combo(comp, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		resourceManagerCombo.setLayoutData(gd);
-		resourceManagerCombo.add("Please select a resource mananger");
+		resourceManagerCombo.add(Messages.ResourcesTab_pleaseSelectRM);
 		resourceManagers.add(null);
 		for (IResourceManager rm : rms) {
 			resourceManagerCombo.add(rm.getName());

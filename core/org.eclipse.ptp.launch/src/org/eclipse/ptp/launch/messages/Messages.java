@@ -59,6 +59,8 @@ public class Messages extends NLS {
 	public static String ResourcesTab_Resources;
 	public static String ResourcesTab_No_Resource_Manager;
 	public static String ResourcesTab_No_Launch_Configuration;
+
+	public static String ResourcesTab_pleaseSelectRM;
 	public static String ResourcesTab_Resource_Manager_Not_Started;
 
 	public static String RuntimeProcess_0;
