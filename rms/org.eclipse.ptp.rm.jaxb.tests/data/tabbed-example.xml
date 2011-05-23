@@ -85,7 +85,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<environment name="VAR_5" value="${ptp_rm:e5#value}"/>
 		</submit-interactive>
 		<launch-tab>
-			<dynamic sharedEnvironment="false">
+			<dynamic sharedEnvironment="true">
 				<title>Settings</title>
 				<composite>
 					<layout>
@@ -183,7 +183,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 				</composite>
 			</dynamic>
-			<dynamic sharedEnvironment="false">
+			<dynamic sharedEnvironment="true">
 				<title>Paths</title>
 				<composite>
 					<layout>
@@ -250,7 +250,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 				</composite>
 			</dynamic>
-			<dynamic sharedEnvironment="false">
+			<dynamic sharedEnvironment="true">
 				<title>Environment</title>
 				<composite group="true">
 					<layout>

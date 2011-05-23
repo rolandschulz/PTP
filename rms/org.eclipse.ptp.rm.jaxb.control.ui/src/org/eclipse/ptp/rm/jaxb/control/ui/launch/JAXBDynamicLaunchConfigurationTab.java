@@ -347,9 +347,11 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		}
 	}
 
-	/*
+	/**
 	 * Adds the View Script and Restore Defaults buttons to the bottom of the
 	 * control pane.
+	 * 
+	 * @param control
 	 */
 	private void createViewScriptGroup(final Composite control) {
 		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true, 5, 5, 2, 2);
@@ -371,7 +373,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		});
 	}
 
-	/*
+	/**
 	 * Determines whether the set of widgets is local or global.
 	 * 
 	 * @return the set of widgets to be accessed for values.
@@ -386,11 +388,15 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		return models;
 	}
 
-	/*
+	/**
 	 * After refreshing the local map, it swaps in the map to be the active
 	 * environment, adds any environment variables from the Environment Tab,
 	 * then schedules a script handler job. Swaps the previous map back into the
 	 * active environement when the handler returns.
+	 * 
+	 * @param config
+	 * @return the script
+	 * @throws Throwable
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private synchronized String realizeLocalScript(ILaunchConfiguration config) throws Throwable {
@@ -410,14 +416,14 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		return value;
 	}
 
-	/*
-	 * First resets default values from the LCVariableMap on widgets and
-	 * selected rows in the viewers, then has the viewers rewrite their
-	 * templated strings. The update handler is called to refresh all the
-	 * widgets from the map, and then the viewers are refreshed.
+	/**
+	 * Runs only on local widgets. First resets default values from the
+	 * LCVariableMap on widgets and selected rows in the viewers, then has the
+	 * viewers rewrite their templated strings. The update handler is called to
+	 * refresh all the widgets from the map, and then the viewers are refreshed.
 	 */
 	private synchronized void resetDefaults() {
-		Collection<IUpdateModel> models = getModels();
+		Collection<IUpdateModel> models = localWidgets.values();
 		for (IUpdateModel m : models) {
 			if (m instanceof ICellEditorUpdateModel) {
 				if (((ICellEditorUpdateModel) m).isChecked()) {
