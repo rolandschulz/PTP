@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -72,8 +74,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	private Combo resourceManagerCombo = null;
 
 	private IResourceManager resourceManager = null;
-	private final Map<Integer, IResourceManager> resourceManagers = new HashMap<Integer, IResourceManager>();
-	private final HashMap<IResourceManager, Integer> resourceManagerIndices = new HashMap<IResourceManager, Integer>();
+	private final List<IResourceManager> resourceManagers = new ArrayList<IResourceManager>();
 	// The composite that holds the RM's attributes for the launch configuration
 	private ScrolledComposite launchAttrsScrollComposite;
 
@@ -130,10 +131,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		resourceManagerCombo = new Combo(comp, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		resourceManagerCombo.setLayoutData(gd);
-		for (int i = 0; i < rms.length; i++) {
-			resourceManagerCombo.add(rms[i].getName());
-			resourceManagers.put(i, rms[i]);
-			resourceManagerIndices.put(rms[i], i);
+		resourceManagerCombo.add("Please select a resource mananger");
+		resourceManagers.add(null);
+		for (IResourceManager rm : rms) {
+			resourceManagerCombo.add(rm.getName());
+			resourceManagers.add(rm);
 		}
 		resourceManagerCombo.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -150,21 +152,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		resourceManagerCombo.deselectAll();
 
 		createVerticalSpacer(comp, 2);
-
-		/*
-		 * This is unnecessary, and creates an additional embedding which can be
-		 * ugly.
-		 */
-		// The composite that holds the RM's attributes for the launch
-		// configuration
-		// Group attrGroup = new Group(comp, SWT.NONE);
-		// attrGroup.setText(Messages.ResourcesTab_Launch_Attributes);
-		// gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		// gd.horizontalSpan = numColumns;
-		// attrGroup.setLayoutData(gd);
-		// GridLayout gridLayout = new GridLayout();
-		// gridLayout.numColumns = 1;
-		// attrGroup.setLayout(gridLayout);
 
 		final ScrolledComposite scrollComp = createLaunchAttributeControlComposite(comp, numColumns);
 		setLaunchAttrsScrollComposite(scrollComp);
@@ -211,27 +198,28 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		super.initializeFrom(configuration);
 
 		resourceManager = getResourceManager(configuration);
-		if (resourceManager == null) {
-			setErrorMessage(Messages.ApplicationTab_No_Resource_Manager_Available);
-			return;
-		}
-
 		setResourceManagerComboSelection(resourceManager);
+
+		/*
+		 * Check if there is launch configuration for the RM
+		 */
+		if (resourceManager != null) {
+			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(resourceManager);
+			final Composite launchComp = getLaunchAttrsScrollComposite();
+			if (rmDynamicTab == null || launchComp == null) {
+				setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
+				return;
+			}
+		}
+
+		/*
+		 * Update the dynamic portions of the launch configuration tab.
+		 */
+		updateLaunchAttributeControls(resourceManager, null, getLaunchConfiguration());
+
 		if (resourceManager == null) {
 			setErrorMessage(Messages.ApplicationTab_No_Resource_Manager_Available);
-			return;
 		}
-
-		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(resourceManager);
-		final Composite launchComp = getLaunchAttrsScrollComposite();
-		if (rmDynamicTab == null || launchComp == null) {
-			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
-			return;
-		}
-
-		// Update the dynamic portions of the launch configuration
-		// tab.
-		updateLaunchAttributeControls(resourceManager, null, getLaunchConfiguration());
 	}
 
 	/*
@@ -439,10 +427,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 *            manager
 	 */
 	private void setResourceManagerComboSelection(IResourceManager rm) {
-		final Integer results = resourceManagerIndices.get(rm);
 		int i = 0;
-		if (results != null) {
-			i = results.intValue();
+		if (rm != null) {
+			i = resourceManagers.lastIndexOf(rm);
 		}
 		resourceManagerCombo.select(i);
 		rmSelectionChanged();
@@ -463,20 +450,22 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		for (Control child : launchAttrsScrollComp.getChildren()) {
 			child.dispose();
 		}
-		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
-		if (rmDynamicTab != null) {
-			try {
-				rmDynamicTab.createControl(launchAttrsScrollComp, rm, queue);
-				final Control dynControl = rmDynamicTab.getControl();
-				launchAttrsScrollComp.setContent(dynControl);
-				Point size = dynControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				launchAttrsScrollComp.setMinSize(size);
-				rmDynamicTab.initializeFrom(launchAttrsScrollComp, rm, queue, launchConfiguration);
-			} catch (CoreException e) {
-				setErrorMessage(e.getMessage());
-				PTPLaunchPlugin.errorDialog(e.getMessage(), e);
+		if (rm != null) {
+			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
+			if (rmDynamicTab != null) {
+				try {
+					rmDynamicTab.createControl(launchAttrsScrollComp, rm, queue);
+					final Control dynControl = rmDynamicTab.getControl();
+					launchAttrsScrollComp.setContent(dynControl);
+					Point size = dynControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+					launchAttrsScrollComp.setMinSize(size);
+					rmDynamicTab.initializeFrom(launchAttrsScrollComp, rm, queue, launchConfiguration);
+				} catch (CoreException e) {
+					setErrorMessage(e.getMessage());
+					PTPLaunchPlugin.errorDialog(e.getMessage(), e);
+				}
 			}
+			launchAttrsScrollComp.layout(true);
 		}
-		launchAttrsScrollComp.layout(true);
 	}
 }
