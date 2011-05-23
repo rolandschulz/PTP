@@ -134,6 +134,13 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	}
 
 	/**
+	 * In case button activations need to take place when the tab changes
+	 */
+	public void setVisible() {
+		// does nothing
+	}
+
+	/**
 	 * Tab-specific handling of local variable map.
 	 */
 	protected abstract void doRefreshLocal();

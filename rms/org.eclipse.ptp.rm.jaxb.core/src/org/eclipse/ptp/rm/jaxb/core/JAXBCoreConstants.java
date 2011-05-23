@@ -105,6 +105,7 @@ public class JAXBCoreConstants {
 	public static final String VALUE = "value";//$NON-NLS-1$
 	public static final String sDEFAULT = "default";//$NON-NLS-1$
 	public static final String LOCAL = "local";//$NON-NLS-1$
+	public static final String VISIBLE = "visible";//$NON-NLS-1$
 
 	/* TYPE MATCHING */
 	public static final String NT = "nt";//$NON-NLS-1$

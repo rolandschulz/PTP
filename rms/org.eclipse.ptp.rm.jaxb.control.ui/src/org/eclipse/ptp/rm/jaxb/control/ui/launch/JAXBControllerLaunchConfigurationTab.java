@@ -256,6 +256,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	public void widgetSelected(SelectionEvent e) {
 		AbstractJAXBLaunchConfigurationTab t = getControllers().get(tabFolder.getSelectionIndex());
 		resize(t.getSize());
+		t.setVisible();
 	}
 
 	/**

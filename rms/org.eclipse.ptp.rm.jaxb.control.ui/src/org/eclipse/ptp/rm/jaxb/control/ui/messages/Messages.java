@@ -24,6 +24,7 @@ public class Messages extends NLS {
 	public static String RemoteScriptPath;
 	public static String DefaultDynamicTab_title;
 	public static String ViewScript;
+	public static String ViewConfig;
 	public static String ErrorOnLoadTitle;
 	public static String ErrorOnLoadFromStore;
 	public static String WidgetSelectedError;
@@ -33,9 +34,10 @@ public class Messages extends NLS {
 	public static String DefaultValues;
 	public static String ToggleShowHideSelectedAttributes;
 	public static String DialogClose;
+	public static String DisplayConfig;
 	public static String DisplayScript;
-	public static String DisplayScriptError;
-	public static String DisplayScriptErrorTitle;
+	public static String DisplayError;
+	public static String DisplayErrorTitle;
 	public static String ViewerLabelProviderColumnError;
 	public static String ScriptNotSupportedWarning;
 	public static String ScriptNotSupportedWarning_title;

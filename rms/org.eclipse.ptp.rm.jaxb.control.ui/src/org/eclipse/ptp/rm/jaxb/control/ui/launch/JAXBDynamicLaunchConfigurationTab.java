@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
@@ -40,6 +44,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
@@ -48,6 +53,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -315,6 +321,24 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/*
+	 * Sets a property in the configuration marking this tab as visible. This is
+	 * mainly in order to trigger activation of the Apply button. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
+	 * #setVisible()
+	 */
+	@Override
+	public void setVisible() {
+		try {
+			listenerConfiguration.getWorkingCopy().setAttribute(JAXBUIConstants.VISIBLE, this.toString());
+			fireContentsChanged();
+		} catch (CoreException t) {
+			JAXBUIPlugin.log(t);
+		}
+	}
+
+	/*
 	 * Tab acts a listener for viewScript button. (non-Javadoc)
 	 * 
 	 * @see
@@ -336,17 +360,25 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * .events.SelectionEvent)
 	 */
 	public void widgetSelected(SelectionEvent e) {
+		Button b = (Button) e.getSource();
 		Shell shell = Display.getDefault().getActiveShell();
+		String title = JAXBUIConstants.ZEROSTR;
 		try {
-			if (!parentTab.hasScript()) {
+			String text = JAXBUIConstants.ZEROSTR;
+			if (Messages.ViewConfig.equals(b.getText())) {
+				text = displayConfigurationContents(listenerConfiguration);
+				title = Messages.DisplayConfig;
+			} else if (!parentTab.hasScript()) {
 				MessageDialog.openWarning(shell, Messages.ScriptNotSupportedWarning_title, Messages.ScriptNotSupportedWarning
 						+ JAXBControlUIConstants.LINE_SEP);
 				return;
+			} else {
+				text = realizeLocalScript(listenerConfiguration);
+				title = Messages.DisplayScript;
 			}
-			String text = realizeLocalScript(listenerConfiguration);
-			new ScrollingEditableMessageDialog(shell, Messages.DisplayScript, text, true).open();
+			new ScrollingEditableMessageDialog(shell, title, text, true).open();
 		} catch (Throwable t) {
-			WidgetActionUtils.errorMessage(shell, t, Messages.DisplayScriptError, Messages.DisplayScriptErrorTitle, false);
+			WidgetActionUtils.errorMessage(shell, t, Messages.DisplayError, Messages.DisplayErrorTitle, false);
 		}
 	}
 
@@ -381,13 +413,15 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @param control
 	 */
 	private void createViewScriptGroup(final Composite control) {
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(2, true, 5, 5, 2, 2);
-		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 2);
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(3, true, 5, 5, 2, 2);
+		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 3);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
 
 		if (parentTab.hasScript()) {
 			WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, this);
 		}
+
+		WidgetBuilderUtils.createPushButton(grp, Messages.ViewConfig, this);
 
 		WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -398,6 +432,42 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				resetDefaults();
 			}
 		});
+	}
+
+	/**
+	 * Creates a contents string from the current configuration.
+	 * 
+	 * @param config
+	 *            current
+	 * @return string representing contents
+	 * @throws Throwable
+	 */
+	private synchronized String displayConfigurationContents(final ILaunchConfiguration config) throws Throwable {
+		final StringBuffer buffer = new StringBuffer();
+		refreshLocal(config);
+		Job job = new Job(JAXBControlUIConstants.ZEROSTR) {
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					Map<Object, Object> attr = config.getAttributes();
+					for (Map.Entry e : attr.entrySet()) {
+						buffer.append(e.getKey()).append(JAXBControlUIConstants.EQ).append(e.getValue())
+								.append(JAXBControlUIConstants.LINE_SEP);
+					}
+				} catch (CoreException t) {
+					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
+				}
+				return Status.OK_STATUS;
+			}
+
+		};
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException ignored) {
+		}
+		return buffer.toString();
 	}
 
 	/**
