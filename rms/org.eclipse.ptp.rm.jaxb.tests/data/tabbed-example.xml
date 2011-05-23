@@ -289,7 +289,6 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<include>e3</include>
 							<include>e4</include>
 							<include>e5</include>
-							
 						</items>
 						<value pattern="export @name='@value'" separator="; "/>
 					</viewer>

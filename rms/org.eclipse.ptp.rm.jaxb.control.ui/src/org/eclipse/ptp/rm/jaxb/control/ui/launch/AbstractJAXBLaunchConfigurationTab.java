@@ -90,7 +90,7 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 * configuration unless this tab is the origin of the change; hence we check
 	 * to see if the tab is visible.<br>
 	 * <br>
-	 * If write to configuration is indicated, the the local map is refreshed,
+	 * If write to configuration is indicated, then the local map is refreshed,
 	 * swapped in to the active map, and then flushed to the configuration.
 	 * 
 	 * @param configuration
