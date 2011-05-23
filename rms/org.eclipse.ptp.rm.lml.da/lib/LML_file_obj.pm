@@ -248,6 +248,20 @@ sub lml_start {
 	return(1);
     }
 
+    if($name eq "ns2:lguiType") {
+	foreach $k (sort keys %attr) {
+	    $o->{LMLLGUI}->{$k}=$attr{$k};
+	}
+	return(1);
+    }
+
+    if($name eq "ns2:lgui") {
+	foreach $k (sort keys %attr) {
+	    $o->{LMLLGUI}->{$k}=$attr{$k};
+	}
+	return(1);
+    }
+
 
 # general tags, used in more than one tags
 ###########################################################################################
@@ -633,7 +647,7 @@ sub write_lml {
     close(OUT);
 
     my $tdiff=time-$tstart;
-    printf(STDERR "LML_file_obj: wrote  XML in %6.4f sec to %s\n",$tdiff,$outfile) if($self->{TIMINGS});
+    printf(STDERR "LML_file_obj: wrote  XML in %6.4f sec to %s\n",$tdiff,$outfile) if($self->{VERBOSE});
     
     return($rc);
     
@@ -711,7 +725,7 @@ sub _sort_tlayout_pos {
     if($apos != $bpos) {
 	return($apos <=> $bpos);
     } else {
-	if($aactive != $bactive) {
+	if($aactive ne $bactive) {
 	    return($aactive cmp $bactive);	    
 	} else {
 	    return($aa <=> $bb);	    

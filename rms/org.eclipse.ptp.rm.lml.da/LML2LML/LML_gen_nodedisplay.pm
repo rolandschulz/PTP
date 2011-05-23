@@ -79,6 +79,9 @@ sub process {
 	}
 	# init data tree with empty root nodes
 	$self->_add_empty_root_elements();
+	
+	$self->_adjust_layout_bg();
+
 
     } elsif($self->{SYSTEMTYPE} eq "Cluster") {
 
@@ -415,8 +418,7 @@ sub _adjust_layout_cluster  {
     my($id,$subid,$treenode,$child,$ncores,$start,$numchilds);
     my $rc=1;
     my $default_nodes_per_row=32;
-   
-
+  
     $treenode=$self->{LAYOUT}->{tree};
 
     $numchilds=scalar @{$treenode->{_childs}};
@@ -440,6 +442,209 @@ sub _adjust_layout_cluster  {
 
     return($rc);
 }
+
+sub _adjust_layout_bg  {
+    my($self) = shift;
+    my($root_layout,$root_scheme,$treenode,$ltreenode,$streenode,$num,$min,$max,$lmin,$lmax);
+    my $rc=1;
+    my $maxlevel=4;
+  
+    $root_layout=$self->{LAYOUT}->{tree};
+    $root_scheme=$self->{SCHEMEROOT};
+
+    # ROWS
+    ######
+    $streenode=$root_scheme->get_child({_name => "el1" });
+    $ltreenode=$root_layout->get_child({_name => "el0" });
+
+    # get number of rows (in el1 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+	
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for BG system (rows) ...\n";return(0);
+    }
+    
+    if(!$ltreenode) {
+	$ltreenode=$root_layout->new_child();
+    }
+    # set size attributes
+    $ltreenode->{ATTR}->{rows}=$num;
+    $ltreenode->{ATTR}->{cols}=1;
+
+    # set some default layout attributes
+    $ltreenode->{ATTR}->{maxlevel} = $maxlevel      if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $ltreenode->{ATTR}->{vgap} = 5                  if(!exists($ltreenode->{ATTR}->{vgap}));
+    $ltreenode->{ATTR}->{hgap} = 0                  if(!exists($ltreenode->{ATTR}->{hgap}));       
+    $ltreenode->{ATTR}->{fontsize} = 10             if(!exists($ltreenode->{ATTR}->{fontsize}));   
+    $ltreenode->{ATTR}->{border}   = 0              if(!exists($ltreenode->{ATTR}->{border}));     
+    $ltreenode->{ATTR}->{fontfamily} = "Monospaced" if(!exists($ltreenode->{ATTR}->{fontfamily})); 
+    $ltreenode->{ATTR}->{showtitle}  = "false"      if(!exists($ltreenode->{ATTR}->{showtitle}));  
+    $ltreenode->{ATTR}->{background} = "#777"       if(!exists($ltreenode->{ATTR}->{background})); 
+    $ltreenode->{ATTR}->{mouseborder}= 0            if(!exists($ltreenode->{ATTR}->{mouseborder})); 
+    $ltreenode->{ATTR}->{transparent}= "false"      if(!exists($ltreenode->{ATTR}->{transparent}));
+    $lmin=$min;$lmax=$max;
+
+    # RACKS
+    #######
+    $streenode=$streenode->get_child({_name => "el2" });
+
+    # get number of rack (in el2 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for BG system (racks) ...\n";return(0);
+    }
+    
+    $treenode=$ltreenode->get_child({_name => "el1" });
+    if(!$treenode) {
+	$treenode=$ltreenode->new_child();
+    } 
+    $ltreenode=$treenode;
+
+    # set size attributes
+    $ltreenode->{ATTR}->{rows}=1;       $ltreenode->{ATTR}->{cols}=$num;
+    $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
+
+    # set some default layout attributes
+    $ltreenode->{ATTR}->{maxlevel} = $maxlevel     if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $ltreenode->{ATTR}->{showtitle}  = "true"      if(!exists($ltreenode->{ATTR}->{showtitle}));  
+    $lmin=$min;$lmax=$max;
+
+    # midplanes
+    ###########
+    $streenode=$streenode->get_child({_name => "el3" });
+
+    # get number of midplanes (in el3 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for BG system (midplanes) ...\n";return(0);
+    }
+    
+    $treenode=$ltreenode->get_child({_name => "el2" });
+    if(!$treenode) {
+	$treenode=$ltreenode->new_child();
+    } 
+    $ltreenode=$treenode;
+
+    # set size attributes
+    $ltreenode->{ATTR}->{rows}=$num;    $ltreenode->{ATTR}->{cols}=1;
+    $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
+
+    # set some default layout attributes
+    $ltreenode->{ATTR}->{maxlevel}         = $maxlevel     if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $ltreenode->{ATTR}->{showtitle}        = "true"        if(!exists($ltreenode->{ATTR}->{showtitle}));  
+    $ltreenode->{ATTR}->{highestrowfirst}  = "true"        if(!exists($ltreenode->{ATTR}->{highestrowfirst}));  
+    $ltreenode->{ATTR}->{showfulltitle}    = "true"        if(!exists($ltreenode->{ATTR}->{showfulltitle}));  
+    $lmin=$min;$lmax=$max;
+
+
+    # nodeboards
+    ############
+    $streenode=$streenode->get_child({_name => "el4" });
+
+    # get number of midplanes (in el4 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for BG system (nodeboards) ...\n";return(0);
+    }
+    
+    $treenode=$ltreenode->get_child({_name => "el3" });
+    if(!$treenode) {
+	$treenode=$ltreenode->new_child();
+    } 
+    $ltreenode=$treenode;
+
+    # set size attributes
+    $ltreenode->{ATTR}->{rows}=4;       $ltreenode->{ATTR}->{cols}=4;
+    $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
+
+    # set some default layout attributes
+    $ltreenode->{ATTR}->{maxlevel}         = $maxlevel     if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $ltreenode->{ATTR}->{showtitle}        = "true"        if(!exists($ltreenode->{ATTR}->{showtitle}));  
+    $ltreenode->{ATTR}->{fontsize}         = 8             if(!exists($ltreenode->{ATTR}->{fontsize}));   
+    $ltreenode->{ATTR}->{vgap}             = 0             if(!exists($ltreenode->{ATTR}->{vgap}));
+    $ltreenode->{ATTR}->{hgap}             = 0             if(!exists($ltreenode->{ATTR}->{hgap}));       
+    $ltreenode->{ATTR}->{highestrowfirst}  = "true"        if(!exists($ltreenode->{ATTR}->{highestrowfirst}));  
+    $ltreenode->{ATTR}->{showfulltitle}    = "true"        if(!exists($ltreenode->{ATTR}->{showfulltitle}));  
+    $lmin=$min;$lmax=$max;
+
+    # cpu-nodes
+    ############
+    $streenode=$streenode->get_child({_name => "el5" });
+
+    # get number of midplanes (in el5 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for BG system (cpu-nodes) ...\n";return(0);
+    }
+    
+    $treenode=$ltreenode->get_child({_name => "el4" });
+    if(!$treenode) {
+	$treenode=$ltreenode->new_child();
+    } 
+    $ltreenode=$treenode;
+
+    # set size attributes
+    if($num%8==0) {
+	$ltreenode->{ATTR}->{rows}=$num/8;
+    } else {
+	$ltreenode->{ATTR}->{rows}=int($num/8)+1;
+    }
+    $ltreenode->{ATTR}->{cols}=8;
+    $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
+
+    # set some default layout attributes
+    $ltreenode->{ATTR}->{maxlevel}         = $maxlevel     if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $lmin=$min;$lmax=$max;
+
+    # cores
+    #######
+    $streenode=$streenode->get_child({_name => "el6" });
+
+    # get number of midplanes (in el6 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for BG system (cores) ...\n";return(0);
+    }
+    
+    $treenode=$ltreenode->get_child({_name => "el5" });
+    if(!$treenode) {
+	$treenode=$ltreenode->new_child();
+    } 
+    $ltreenode=$treenode;
+
+    # set size attributes
+    $ltreenode->{ATTR}->{rows}=1;       $ltreenode->{ATTR}->{cols}=4;
+    $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
+
+    # set some default layout attributes
+    $ltreenode->{ATTR}->{maxlevel}         = $maxlevel     if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $lmin=$min;$lmax=$max;
+
+
+#    print "$0: LAYOUT: ",Dumper($root_layout);
+#    print "$0: SCHEME: ",Dumper($root_scheme);
+
+    return($rc);
+}
+
 
 ###############################################
 # BG/P related

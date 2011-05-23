@@ -77,7 +77,7 @@
 <column id="4" name="state" sort="alpha"/>
 </table>
 
-<tablelayout id="nodes" gid="nodelist" active="true">
+<tablelayout id="nodes" gid="nodelist" active="false">
  <column cid="1" pos="0" width="0.25" active="true" key="id" />
  <column cid="2" pos="1" width="0.25" active="true" key="ncores" />
  <column cid="3" pos="2" width="0.25" active="true" key="physmem" />

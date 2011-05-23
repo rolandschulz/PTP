@@ -380,3 +380,8 @@ ChangeLog:
    - rms:TORQUE: job status according PTP job status 
    - removed dependency to XML-Parser module
    - bugfix in gen_nodedisplay
+
+1.05:
+   - bug fixes 
+     - calling perl from perl with correct path
+     - parsing PTP related namespace in XML file

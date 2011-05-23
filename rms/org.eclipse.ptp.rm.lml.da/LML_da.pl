@@ -33,7 +33,6 @@ my $version="1.0";
 # time measurement
 my ($tstart,$tdiff,$rc);
 
-
 # option handling
 my $opt_configfile="./LML_da_workflow.conf";
 my $opt_verbose=0;

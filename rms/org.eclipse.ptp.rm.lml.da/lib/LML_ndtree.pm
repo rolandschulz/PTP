@@ -81,6 +81,31 @@ sub duplicate_child  {
     return($newchild);
 }
 
+sub get_child  {
+    my($self) = shift;
+    my($specref) = shift;
+    my($childnr);
+
+    if(!$specref) {
+	$childnr=0;
+    } else {
+	if(exists($specref->{_num})) {
+	    $childnr=$specref->{_num};
+	}
+	if(exists($specref->{_name})) {
+	    for($childnr=0;$childnr<=$#{$self->{_childs}};$childnr++) {
+		last if($self->{_childs}->[$childnr]->{_name} eq $specref->{_name});
+	    }
+	}
+    }
+    
+    if($childnr<=$#{$self->{_childs}}) {
+	return($self->{_childs}->[$childnr]);
+    } else {
+	return(undef);
+    }
+}
+
 
 
 sub insert_attr_into_tree  {
