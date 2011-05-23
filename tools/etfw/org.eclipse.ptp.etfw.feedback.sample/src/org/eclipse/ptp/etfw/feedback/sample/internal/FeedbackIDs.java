@@ -20,14 +20,6 @@ package org.eclipse.ptp.etfw.feedback.sample.internal;
  */
 public interface FeedbackIDs
 {
-	/**
-	 * Preference page name - note this is referencing (by copying) value from main
-	 * feedback plug-in. <br>
-	 * Not sure how much it is used here, so we are maintaining the
-	 * isolation of the plug-ins by just duplicating it here.
-	 * 
-	 */
-	String FEEDBACK_PREF_NAME = "Feedback";//$NON-NLS-1$
 
 	/** View ID */
 	String FEEDBACK_VIEW_ID = "org.eclipse.ptp.etfw.feedback.views.feedbackView"; //$NON-NLS-1$
