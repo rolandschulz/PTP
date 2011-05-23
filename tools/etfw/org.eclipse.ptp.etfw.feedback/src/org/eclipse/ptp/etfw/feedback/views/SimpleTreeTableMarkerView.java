@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2009,2010 IBM Corporation.
+ * Copyright (c) 2009,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,7 +62,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.etfw.feedback.AbstractFeedbackAction;
 import org.eclipse.ptp.etfw.feedback.Activator;
-import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
+import org.eclipse.ptp.etfw.feedback.internal.FeedbackIDs;
 import org.eclipse.ptp.etfw.feedback.messages.Messages;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 import org.eclipse.swt.SWT;
@@ -95,10 +95,9 @@ import org.osgi.framework.Bundle;
  * grouping. Some actual parent markers are used in some cases.
  * 
  * <p>
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
- * of a work in progress. There is no guarantee that this API will work or that
- * it will remain the same. We do not recommending using this API without consulting with
- * the etfw.feedback team.
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part of a work in progress. There is no guarantee that
+ * this API will work or that it will remain the same. We do not recommending using this API without consulting with the
+ * etfw.feedback team.
  * 
  * 
  */
@@ -256,18 +255,16 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	public static final int CONSTANT = 2;
 
 	/** types of constructs, for the default case */
-	public static final String[] CONSTRUCT_TYPE_NAMES = { Messages.SimpleTreeTableMarkerView_none, Messages.SimpleTreeTableMarkerView_functionCall, Messages.SimpleTreeTableMarkerView_constant };
+	public static final String[] CONSTRUCT_TYPE_NAMES = { Messages.SimpleTreeTableMarkerView_none,
+			Messages.SimpleTreeTableMarkerView_functionCall, Messages.SimpleTreeTableMarkerView_constant };
 
 	/**
 	 * Simple Artifact Table View constructor
 	 * <p>
-	 * Everything can be null, and defaults will be taken, or read from
-	 * plugin.xml for the view.
+	 * Everything can be null, and defaults will be taken, or read from plugin.xml for the view.
 	 * <p>
-	 * Note: if a null plugIn instance is provided, the default plugin (this
-	 * one) will not be able to find resources (e.g. icon images) if the derived
-	 * class is in its own plug-in, and its icons are, too. BRT 11/2/09: this
-	 * ctor is called
+	 * Note: if a null plugIn instance is provided, the default plugin (this one) will not be able to find resources (e.g. icon
+	 * images) if the derived class is in its own plug-in, and its icons are, too. BRT 11/2/09: this ctor is called
 	 */
 	public SimpleTreeTableMarkerView(AbstractUIPlugin thePlugin, String thingname, String thingnames, String columnName,
 			String markerID, String parentMarkerAttrName) {
@@ -364,7 +361,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 	/**
 	 * Find info from the view info in the manifest. This includes the icon
-	 * name and the view id (used as marker id if none given on ctor) 
+	 * name and the view id (used as marker id if none given on ctor)
 	 * 
 	 */
 	protected void findViewInfo() {
@@ -887,7 +884,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 * 
 		 */
 		public String getColumnText(Object obj, int index) {
-			final boolean traceText=false;
+			final boolean traceText = false;
 			if (obj == null) {
 				System.out.println("STTMV: LabelProv obj is null; index=" + index); //$NON-NLS-1$
 				return "STTMV obj null"; //$NON-NLS-1$
@@ -909,52 +906,53 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				return "!marker";// HACK //$NON-NLS-1$
 			}
 			IMarker marker = (IMarker) obj;
-			 
-			if(!marker.exists()) {
-				// probably marker is being deleted.  Ignore, and need
+
+			if (!marker.exists()) {
+				// probably marker is being deleted. Ignore, and need
 				// to investigate why we aren't ignoring *that* resource change.
 				return "";
 			}
 			IFeedbackItem item = getFeedbackItem(marker);
-		
+
 			try {
 				// Get column text value from the feedback item now, via attr lookup
-				//  (not from the marker attr)
+				// (not from the marker attr)
 				String attrname = markerAttrNames_[index];
-				
+
 				String itemVal = item.getAttr(attrname);
 				if (traceText) {
 					if (index == 0)
 						System.out.println(" ");
-					
-					if(traceText)System.out.println("col " + index + " attrname=" + attrname + " IFeedbackItem val=" + itemVal);
+
+					if (traceText)
+						System.out.println("col " + index + " attrname=" + attrname + " IFeedbackItem val=" + itemVal);
 				}
-				 if(itemVal!=null) {
-					 if(attrname.equals("filename")) {
-						 // temporary until we find a better way.
-						 // Preference value to show full path or not???
-						 itemVal=lastSegmentOnly(itemVal);
-					 }
-					 return itemVal;
-				 }
-				 String value=itemVal;
-				 if((itemVal==null) ||(itemVal.length()==0)) {
-					 itemVal="["+attrname+"]";
-				 }
-				 return value;
+				if (itemVal != null) {
+					if (attrname.equals("filename")) {
+						// temporary until we find a better way.
+						// Preference value to show full path or not???
+						itemVal = lastSegmentOnly(itemVal);
+					}
+					return itemVal;
+				}
+				String value = itemVal;
+				if ((itemVal == null) || (itemVal.length() == 0)) {
+					itemVal = "[" + attrname + "]";
+				}
+				return value;
 
 			} catch (Exception ce) {
 				return ("STTMV error"); //$NON-NLS-1$
 			}
-			
+
 		}
-		
+
 		/**
 		 */
 		String lastSegmentOnly(String filename) {
 			if (filename.contains(Path.SEPARATOR + "")) { //$NON-NLS-1$
 				IPath path = new Path(filename);
-				//String pathname = path.removeLastSegments(1).toString();
+				// String pathname = path.removeLastSegments(1).toString();
 				filename = path.segment(path.segmentCount() - 1);
 			}
 			return filename;
@@ -962,19 +960,20 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 		/**
 		 * Get the feedback item from the marker object
+		 * 
 		 * @param marker
 		 */
 		private IFeedbackItem getFeedbackItem(IMarker marker) {
-			IFeedbackItem item=null;
+			IFeedbackItem item = null;
 			Object obji = null;
 			try {
 				obji = marker.getAttribute(FeedbackIDs.FEEDBACK_ATTR_ITEM);
-				if(obji instanceof IFeedbackItem) {
-					item = (IFeedbackItem) obji;					
+				if (obji instanceof IFeedbackItem) {
+					item = (IFeedbackItem) obji;
 				}
 			} catch (CoreException e) {
 				// TODO Auto-generated catch block
-				boolean exists=marker.exists();
+				boolean exists = marker.exists();
 				e.printStackTrace();// happens when deleting markers. ??
 			}
 			return item;
@@ -1008,10 +1007,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 *            the marker object that this artifact is represented by
 		 * @return image for marker
 		 *         <p>
-		 *         Note: if a null plugIn instance is provided on the view ctor,
-		 *         the default plugin (this one) will not be able to find
-		 *         resources (e.g. icon images) if the derived class is in its
-		 *         own plug-in, and its icons are, too.
+		 *         Note: if a null plugIn instance is provided on the view ctor, the default plugin (this one) will not be able to
+		 *         find resources (e.g. icon images) if the derived class is in its own plug-in, and its icons are, too.
 		 * 
 		 */
 		protected Image getCustomImage(Object obj) {
@@ -1527,7 +1524,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					MessageDialog.openInformation(null, title, info);
 				}// end if selectedMarker!=null
 				else {
-					MessageDialog.openInformation(null, title, Messages.SimpleTreeTableMarkerView_no + thingname_ + Messages.SimpleTreeTableMarkerView_selected);
+					MessageDialog.openInformation(null, title, Messages.SimpleTreeTableMarkerView_no + thingname_
+							+ Messages.SimpleTreeTableMarkerView_selected);
 				}
 				// ------------------
 			}
@@ -1545,11 +1543,14 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		filterAction = new Action() {
 			@Override
 			public void run() {
-				showMessage(Messages.SimpleTreeTableMarkerView_filter + thingnames_ + Messages.SimpleTreeTableMarkerView_determineWhich + thingnames_ + Messages.SimpleTreeTableMarkerView_areShownInThisViewPeriod);
+				showMessage(Messages.SimpleTreeTableMarkerView_filter + thingnames_
+						+ Messages.SimpleTreeTableMarkerView_determineWhich + thingnames_
+						+ Messages.SimpleTreeTableMarkerView_areShownInThisViewPeriod);
 			}
 		};
 		filterAction.setText(Messages.SimpleTreeTableMarkerView_filter + thingnames_);
-		filterAction.setToolTipText(Messages.SimpleTreeTableMarkerView_filterWhich + thingnames_ + Messages.SimpleTreeTableMarkerView_areShownInThisView);
+		filterAction.setToolTipText(Messages.SimpleTreeTableMarkerView_filterWhich + thingnames_
+				+ Messages.SimpleTreeTableMarkerView_areShownInThisView);
 	}
 
 	/**
@@ -1591,7 +1592,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					}
 				} catch (Exception e) {
 					System.out.println("STTMV.doubleclickAction: Error positioning editor page from marker line number"); //$NON-NLS-1$
-					showStatusMessage(Messages.SimpleTreeTableMarkerView_errorPositioningEditorFromMarkerLineNumber, "error marker goto"); //$NON-NLS-2$
+					showStatusMessage(Messages.SimpleTreeTableMarkerView_errorPositioningEditorFromMarkerLineNumber,
+							"error marker goto"); //$NON-NLS-2$
 					e.printStackTrace();
 				}
 				maintainExpandCollapseStatus();
@@ -1613,11 +1615,10 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					public void run(IProgressMonitor monitor) throws CoreException {
 						try {
 							int depth = IResource.DEPTH_INFINITE;
-							
-							IMarker[] m=wsResource.findMarkers(markerID_, true, depth);
-							int size=m.length;
-							
-							
+
+							IMarker[] m = wsResource.findMarkers(markerID_, true, depth);
+							int size = m.length;
+
 							wsResource.deleteMarkers(markerID_, false, depth);
 							wsResource.findMarkers(markerID_, true, depth);
 							if (traceOn)
@@ -1703,7 +1704,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 						feedbackAction.run(selectedMarker_);
 					}// end if selectedMarker!=null
 					else {
-						MessageDialog.openInformation(null, Messages.SimpleTreeTableMarkerView_selectAnItemInTheView, Messages.SimpleTreeTableMarkerView_NoFeedbackItemSelected);
+						MessageDialog.openInformation(null, Messages.SimpleTreeTableMarkerView_selectAnItemInTheView,
+								Messages.SimpleTreeTableMarkerView_NoFeedbackItemSelected);
 					}
 				}
 			};

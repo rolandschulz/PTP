@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2009,2010 IBM Corporation.
+ * Copyright (c) 2009,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,10 +18,9 @@ import org.eclipse.core.resources.IFile;
 /**
  * The interface for the parser that will provide IFeedbackItems for the view.
  * <p>
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
- * of a work in progress. There is no guarantee that this API will work or that
- * it will remain the same. We do not recommending using this API without
- * consulting with the etfw.feedback team.
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part of a work in progress. There is no guarantee that
+ * this API will work or that it will remain the same. We do not recommending using this API without consulting with the
+ * etfw.feedback team.
  * 
  * @author beth tibbitts
  * 

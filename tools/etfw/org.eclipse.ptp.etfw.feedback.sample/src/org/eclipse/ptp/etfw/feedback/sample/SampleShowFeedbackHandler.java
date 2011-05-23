@@ -17,7 +17,7 @@ import org.eclipse.ptp.etfw.feedback.actions.handlers.ShowFeedbackHandler;
  * Handler to handle actions from this plug-in to show its data in the Feedback View
  * 
  * @author beth tibbitts
- *
+ * 
  */
 public class SampleShowFeedbackHandler extends ShowFeedbackHandler {
 

@@ -14,16 +14,14 @@ package org.eclipse.ptp.etfw.feedback.sample;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
 import org.eclipse.ptp.etfw.feedback.preferences.PreferenceConstants;
+import org.eclipse.ptp.etfw.feedback.sample.internal.FeedbackIDs;
 import org.eclipse.ptp.etfw.feedback.views.SimpleTreeTableMarkerView;
-
-
 
 /**
  * Expose xlC compiler transformation information in an eclipse view
  * 
- * @author beth 
+ * @author beth
  * 
  */
 public class SampleFeedbackView extends SimpleTreeTableMarkerView {
@@ -33,74 +31,73 @@ public class SampleFeedbackView extends SimpleTreeTableMarkerView {
 	 * are created for each unique parentID, thus "categorizing" the items
 	 * automatically
 	 */
-	private static boolean CREATE_PARENT_NODES=true;
-	
+	private static boolean CREATE_PARENT_NODES = true;
 
 	/**
 	 * Attribute names, used to store info in the marker, corresponding to each column in the view.
 	 * Use these constants or values of your own.
 	 * To add/remove a column, modify this: (1)
 	 */
-	private static String[] attrNames=new String[] {
-		FeedbackIDs.FEEDBACK_ATTR_NAME,
-		FeedbackIDs.FEEDBACK_ATTR_FILENAME,
-		FeedbackIDs.FEEDBACK_ATTR_ID,
-		FeedbackIDs.FEEDBACK_ATTR_FUNCTION_CALLEE,
-		IMarker.LINE_NUMBER, // Note: currently column 5 (index=4) must be an int value, presumably line number.
-		                     // This restriction will be lifted and generalized later.
-		/*IMarker.CHAR_START,IMarker.CHAR_END*/
-		FeedbackIDs.FEEDBACK_ATTR_DESC};
-	/** To add/remove a column, modify this: (2)*/
-	private static String[] colNames=new String[] {"Type/Name","File",  "ID", "blank", "LineNo",
-		/*"Char start","Char end"*/ "Description*" };
-	/** To add/remove a column, modify this: (3)*/
-	private static int[] widths = new int[] { 160, 100, 50, 50, 80, 200  };
-	
+	private static String[] attrNames = new String[] {
+			FeedbackIDs.FEEDBACK_ATTR_NAME,
+			FeedbackIDs.FEEDBACK_ATTR_FILENAME,
+			FeedbackIDs.FEEDBACK_ATTR_ID,
+			FeedbackIDs.FEEDBACK_ATTR_FUNCTION_CALLEE,
+			IMarker.LINE_NUMBER, // Note: currently column 5 (index=4) must be an int value, presumably line number.
+									// This restriction will be lifted and generalized later.
+			/* IMarker.CHAR_START,IMarker.CHAR_END */
+			FeedbackIDs.FEEDBACK_ATTR_DESC };
+	/** To add/remove a column, modify this: (2) */
+	private static String[] colNames = new String[] { "Type/Name", "File", "ID", "blank", "LineNo",
+			/* "Char start","Char end" */"Description*" };
+	/** To add/remove a column, modify this: (3) */
+	private static int[] widths = new int[] { 160, 100, 50, 50, 80, 200 };
+
 	protected IPreferenceStore preferenceStore;
 	protected boolean maintainExpandCollapseState;
-	
-	
+
 	/**
 	 * Use the ctor that allows an arbitrary number of extra columns.
 	 * This ctor is called (1). FIXME need to generalize the name "Xform" used here?
 	 */
 	public SampleFeedbackView() {
-		super(Activator.getDefault(), "XForm", "XForms", attrNames,colNames,widths,
-				Activator.MARKER_ID, "parent",CREATE_PARENT_NODES);
+		super(Activator.getDefault(), "XForm", "XForms", attrNames, colNames, widths,
+				Activator.MARKER_ID, "parent", CREATE_PARENT_NODES);
 		preferenceStore = Activator.getDefault().getPreferenceStore();
-		maintainExpandCollapseState=preferenceStore.getBoolean(PreferenceConstants.P_MAINTAIN_EXPAND_COLLAPSE_STATE);
+		maintainExpandCollapseState = preferenceStore.getBoolean(PreferenceConstants.P_MAINTAIN_EXPAND_COLLAPSE_STATE);
 
 	}
 
 	/**
-	 * Provide something for the "Info" popup action, based on the marker
-	 * <br>Since we didn't use the Artifact, Artifact Manager, etc in the base class we need something to look useful here.
+	 * Provide something for the "Info" popup action, based on the marker <br>
+	 * Since we didn't use the Artifact, Artifact Manager, etc in the base class we need something to look useful here.
 	 */
 	@Override
 	public String extractMarkerInfo(IMarker marker) {
-		StringBuffer infoBuffer= new StringBuffer();
+		StringBuffer infoBuffer = new StringBuffer();
 		String filename = marker.getResource().getName();
-		String name=getStrAttr(marker, FeedbackIDs.FEEDBACK_ATTR_NAME);
+		String name = getStrAttr(marker, FeedbackIDs.FEEDBACK_ATTR_NAME);
 		infoBuffer.append("\nThis information provided by SampleFeedbackView.extractMarkerInfo()");
 		infoBuffer.append("\nFile name: ").append(filename);
-		
-		infoBuffer.append("\nLine number: ").append(getStrAttr(marker,IMarker.LINE_NUMBER));
+
+		infoBuffer.append("\nLine number: ").append(getStrAttr(marker, IMarker.LINE_NUMBER));
 		infoBuffer.append("\nName: ").append(name);
-		String parent=getStrAttr(marker, FeedbackIDs.FEEDBACK_ATTR_PARENT);
+		String parent = getStrAttr(marker, FeedbackIDs.FEEDBACK_ATTR_PARENT);
 		infoBuffer.append("\nParent (Item type): ").append(parent);
-		infoBuffer.append("\nDescription: ").append(getStrAttr(marker,FeedbackIDs.FEEDBACK_ATTR_DESC));
+		infoBuffer.append("\nDescription: ").append(getStrAttr(marker, FeedbackIDs.FEEDBACK_ATTR_DESC));
 		return infoBuffer.toString();
 	}
+
 	public String getStrAttr(IMarker marker, String attrName) {
 		try {
-		String str=marker.getAttribute(attrName).toString();
-		
-		return str;
-		}catch(CoreException e) {
-			System.out.println("Exception getting marker attr in CompilerXFormTreeTableView.getStrAttr() "+e.getMessage());  
+			String str = marker.getAttribute(attrName).toString();
+
+			return str;
+		} catch (CoreException e) {
+			System.out.println("Exception getting marker attr in CompilerXFormTreeTableView.getStrAttr() " + e.getMessage());
 			return "*error*";
 		}
-		
+
 	}
 
 	/**

@@ -19,22 +19,21 @@ import org.eclipse.ptp.etfw.feedback.sample.Activator;
 
 /**
  * A sample action that can be added to the ETFw Feedback view
+ * 
  * @author beth
- *
+ * 
  */
 public class SampleFeedbackAction extends AbstractFeedbackAction {
 
-	
-
 	public void run(IMarker marker) {
-		String name="(unknown)";
+		String name = "(unknown)";
 		try {
-			name = (String)marker.getAttribute("name");
+			name = (String) marker.getAttribute("name");
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		MessageDialog.openInformation(null, "Sample action", "Do something interesting here with marker: "+name);
+		MessageDialog.openInformation(null, "Sample action", "Do something interesting here with marker: " + name);
 
 	}
 
@@ -42,7 +41,6 @@ public class SampleFeedbackAction extends AbstractFeedbackAction {
 		MessageDialog.openInformation(null, "Sample action", "Do something interesting here with IFeedbackItem");
 
 	}
-
 
 	public String getToolTip() {
 		return "SampleFeedbackAction tooltip";

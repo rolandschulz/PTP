@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2009,2010 IBM Corporation.
+ * Copyright (c) 2009,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,6 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.etfw.feedback.Activator;
 import org.eclipse.ptp.etfw.feedback.messages.Messages;
-
-
 
 /**
  * Class used to initialize default preference values.

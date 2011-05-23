@@ -41,20 +41,21 @@ import org.xml.sax.SAXException;
 
 /**
  * Sample parser to return items for the ETFw Feedback view
+ * 
  * @author beth
- *
+ * 
  */
 public class SampleFeedbackParser extends AbstractFeedbackParser {
-	private boolean traceOn=false;
-	private List<IFeedbackItem> items=new ArrayList<IFeedbackItem>();
-
+	private boolean traceOn = false;
+	private List<IFeedbackItem> items = new ArrayList<IFeedbackItem>();
 
 	public List<IFeedbackItem> getFeedbackItems(IFile ifile) {
-		if(traceOn)System.out.println("Reading xml file: "+ifile.getLocation());
+		if (traceOn)
+			System.out.println("Reading xml file: " + ifile.getLocation());
 
-		items=new ArrayList<IFeedbackItem>();
+		items = new ArrayList<IFeedbackItem>();
 		try {
-			items=parse(ifile);
+			items = parse(ifile);
 		} catch (XPathExpressionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -68,22 +69,21 @@ public class SampleFeedbackParser extends AbstractFeedbackParser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return items;
 	}
 
 	/**
 	 * @deprecated use getFeedbackItems(IFile) instead
 	 */
-	public List<IFeedbackItem> getFeedbackItems(File file) {		
+	public List<IFeedbackItem> getFeedbackItems(File file) {
 		// this is probably twisted around, too much converting back and forth
-		IWorkspace workspace =ResourcesPlugin.getWorkspace();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IPath location = Path.fromOSString(file.getAbsolutePath());
 		IFile ifile = workspace.getRoot().getFileForLocation(location);
 		List<IFeedbackItem> items = getFeedbackItems(ifile);
 		return items;
 	}
-
 
 	/**
 	 * Marker ID for markers added by this feedback parser.
@@ -92,13 +92,14 @@ public class SampleFeedbackParser extends AbstractFeedbackParser {
 	public String getMarkerID() {
 		return Activator.MARKER_ID;
 	}
+
 	public String getViewID() {
 		return Activator.VIEW_ID;
 	}
 
-
 	/**
 	 * Populate objects from the xml file given
+	 * 
 	 * @param xmlfile
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
@@ -108,12 +109,12 @@ public class SampleFeedbackParser extends AbstractFeedbackParser {
 	public List<IFeedbackItem> parse(IFile ifile) throws ParserConfigurationException, SAXException, IOException,
 			XPathExpressionException {
 		List<IFeedbackItem> items = new ArrayList<IFeedbackItem>();
-		
+
 		// We will look for file in same dir as xml file; save its locn here
 		IPath p = ifile.getFullPath();
 		p = p.removeLastSegments(1);
 		String filepath = p.toPortableString() + IPath.SEPARATOR;
-		
+
 		DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
 		domFactory.setNamespaceAware(true); // never forget this!
 		Document document = super.getXMLDocument(ifile);
@@ -160,21 +161,21 @@ public class SampleFeedbackParser extends AbstractFeedbackParser {
 	/**
 	 * For testing only:
 	 * try to create an IFile/IResource from the info we have
+	 * 
 	 * @param fname
 	 */
 	private void tryCreateFile(String fname, IFile xmlFile) {
-		System.out.println("xmlFile: "+xmlFile);
-		IProject proj=xmlFile.getProject();
-		IResource foundRes=proj.findMember(fname);
-		boolean exists=foundRes.exists();
+		System.out.println("xmlFile: " + xmlFile);
+		IProject proj = xmlFile.getProject();
+		IResource foundRes = proj.findMember(fname);
+		boolean exists = foundRes.exists();
 		IPath path = foundRes.getFullPath();
 		String s = path.toString();
-		String s2=path.toPortableString();
-		String s3=path.toOSString();
-		IResource recreatedRes=getResourceInProject(proj,fname);
-		exists=recreatedRes.exists();
-		
-	}
+		String s2 = path.toPortableString();
+		String s3 = path.toOSString();
+		IResource recreatedRes = getResourceInProject(proj, fname);
+		exists = recreatedRes.exists();
 
+	}
 
 }
