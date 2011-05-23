@@ -740,7 +740,7 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/doc/org.eclipse.ptp.help"/>
+			<param name="tagmodule" value="org.eclipse.ptp/doc/org.eclipse.ptp.doc.user"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">

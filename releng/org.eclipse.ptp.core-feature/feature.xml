@@ -24,38 +24,6 @@
       <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
    </url>
 
-   <requires>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.ptp.services.core"/>
-      <import plugin="org.eclipse.ptp.utils.core"/>
-      <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.ui.console"/>
-      <import plugin="org.eclipse.ui.editors"/>
-      <import plugin="org.eclipse.ui.workbench.texteditor"/>
-      <import plugin="org.eclipse.search"/>
-      <import plugin="org.eclipse.debug.ui"/>
-      <import plugin="org.eclipse.cdt.ui"/>
-      <import plugin="org.eclipse.cdt.debug.core"/>
-      <import plugin="org.eclipse.cdt.core"/>
-      <import plugin="org.eclipse.ptp.remote.core"/>
-      <import plugin="org.eclipse.ptp.remote.ui"/>
-      <import plugin="org.eclipse.core.filesystem"/>
-      <import plugin="org.eclipse.ptp.proxy.protocol"/>
-      <import plugin="org.eclipse.core.filesystem"/>
-      <import plugin="org.eclipse.ptp.utils.ui"/>
-      <import plugin="org.eclipse.ui.forms"/>
-      <import plugin="org.eclipse.ui.views"/>
-      <import plugin="org.eclipse.ptp.services.ui"/>
-      <import plugin="org.eclipse.help"/>
-      <import plugin="org.eclipse.ui.intro"/>
-      <import plugin="org.eclipse.ui.intro.universal"/>
-      <import plugin="org.eclipse.osgi"/>
-      <import plugin="com.ibm.icu"/>
-   </requires>
-
    <plugin
          id="org.eclipse.ptp.core"
          download-size="0"
@@ -106,7 +74,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.help"
+         id="org.eclipse.ptp.doc.user"
          download-size="0"
          install-size="0"
          version="0.0.0"
