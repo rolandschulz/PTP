@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.lml.core;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -84,6 +85,10 @@ public class LMLManager {
 	/*
 	 * 
 	 */
+	public static final String SELECT = "selected";	
+	/*
+	 * 
+	 */
 	public static final String LGUIITEM = "lguiitem";
 	
 	/**************************************************************************************************************
@@ -116,22 +121,28 @@ public class LMLManager {
 	public void saveState(IMemento memento) {
 		for (Entry<String, ILguiItem> entry : LGUIS.entrySet()) {
 			memento.createChild(LGUIITEM, entry.getKey());
-			System.out.println(entry.getKey());
 //			entry.getValue().save(memento);
 		}
+		memento.putString(SELECT, fLguiItem.toString());
 	}
 	
-	public void restoreState(IMemento memento) {
+	public ILguiItem restoreState(IMemento memento) {
 		if (memento == null) {
-			return;
+			return null;
 		}
 		IMemento[] mementoChilds = memento.getChildren(LGUIITEM);
 		for (IMemento mementoChild : mementoChilds) {
-			System.out.println(mementoChild.getID());
 			ILguiItem lguiItem = new LguiItem(mementoChild.getID());
 			LGUIS.put(mementoChild.getID(), lguiItem);
 //			lguiItem.restore(mementoChild);
 		}
+		String nameSelected = memento.getString(SELECT);
+		if (!LGUIS.containsKey(nameSelected)) {
+			ILguiItem lguiItem = new LguiItem(nameSelected);
+			LGUIS.put(nameSelected, lguiItem);
+		}
+		fLguiItem = LGUIS.get(nameSelected);
+		return fLguiItem;
 	}
 	
 	
@@ -189,6 +200,11 @@ public class LMLManager {
 		Set<String> lguis = LGUIS.keySet();
 		return lguis.toArray(new String[lguis.size()]);
 	}
+	
+	public ILguiItem[] getLguiItems() {
+		Collection<ILguiItem> lguis = LGUIS.values();
+		return lguis.toArray(new ILguiItem[lguis.size()]);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -224,12 +240,13 @@ public class LMLManager {
 	}
 
 	public int getSelectedLguiIndex(String title) {
-		String[] lguis = LGUIS.keySet().toArray(new String[LGUIS.size()]);
 		int index = 0;
-		for (int i = 0; i < lguis.length; i++) {
-			if (title.equals(lguis[i])) {
+		int i = 0;
+		for (String key : LGUIS.keySet()) {
+			if (title.equals(key)) {
 				index = i;
 			}
+			i++;
 		}
 		return index;
 	}

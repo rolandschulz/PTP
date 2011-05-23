@@ -21,12 +21,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.ui.views;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.List;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -40,6 +44,7 @@ import org.eclipse.ptp.rm.lml.core.events.IViewAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewDisposedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
 import org.eclipse.ptp.rm.lml.ui.actions.AddLguiAction;
 import org.eclipse.ptp.rm.lml.ui.actions.RemoveLguiAction;
 import org.eclipse.ptp.rm.lml.ui.actions.ShowViewAction;
@@ -48,7 +53,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IMemento;
@@ -68,7 +72,8 @@ public class LMLView extends ViewPart {
 		 */
 		public synchronized void handleEvent(ILguiAddedEvent e) {
 			fSelected = e.getLguiItem();
-			createList();
+			lguis.add(fSelected);
+			viewer.refresh();
 		}
 
 		/*
@@ -79,12 +84,12 @@ public class LMLView extends ViewPart {
 		 */
 		public synchronized void handleEvent(ILguiRemovedEvent e) {
 			fSelected = e.getLguiItem();
-			createList();
+			viewer.refresh();
 		}
 
 		public void handleEvent(ILguiSelectedEvent e) {
 			fSelected = e.getLguiItem();
-			createList();
+			viewer.refresh();
 
 		}
 
@@ -98,17 +103,17 @@ public class LMLView extends ViewPart {
 
 	}
 
-	public final class ListSelectionListener implements SelectionListener {
-		public void widgetSelected(SelectionEvent e) {
-			int selectedItem = list.getSelectionIndex();
-			lmlManager.selectLgui(selectedItem);
-		}
-
-		public void widgetDefaultSelected(SelectionEvent e) {
-			lmlManager.selectLgui(0);
-		}
-
-	}
+//	public final class ListSelectionListener implements SelectionListener {
+//		public void widgetSelected(SelectionEvent e) {
+//			int selectedItem = list.getSelectionIndex();
+//			lmlManager.selectLgui(selectedItem);
+//		}
+//
+//		public void widgetDefaultSelected(SelectionEvent e) {
+//			lmlManager.selectLgui(0);
+//		}
+//
+//	}
 
 	/**
 	 * 
@@ -122,7 +127,8 @@ public class LMLView extends ViewPart {
 	private final LMLManager lmlManager = LMLManager.getInstance();
 	private LMLViewListener lmlViewListener = null;
 	private List list = null;
-	private final ListSelectionListener listListener = new ListSelectionListener();
+//	private final ListSelectionListener listListener = new ListSelectionListener();
+	private List<ILguiItem> lguis = new ArrayList<ILguiItem>();
 	
 	private IMemento memento;
 
@@ -142,19 +148,24 @@ public class LMLView extends ViewPart {
 		viewer.setLabelProvider(new LabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return element.toString();
+//				System.out.println(((ILguiItem)element).toString());
+				return ((ILguiItem)element).toString();
 			}
 		});
 		viewer.setContentProvider(new IStructuredContentProvider() {
-
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			}
-
-			public void dispose() {
+			
+			public void dispose() {				
 			}
-
-			public Object[] getElements(Object parent) {
-				return null;
+			
+			public Object[] getElements(Object inputElement) {
+				ArrayList<ILguiItem> input = (ArrayList<ILguiItem>) inputElement;
+				System.out.println(input.size());
+				for (ILguiItem item : input) {
+					System.out.println(item == null);
+				}
+				return input.toArray(new ILguiItem[input.size()]);
 			}
 		});
 
@@ -165,27 +176,17 @@ public class LMLView extends ViewPart {
 		}
 
 		fSelected = lmlManager.getSelectedLguiItem();
-		createList();
+
+		createContextMenu();
+		viewer.setInput(lguis);
+		viewer.refresh();
 	}
 
 //	private void restoreState() {
 //		lmlManager.restoreState(memento);
 //	}
 
-	private void createList() {
-		list = viewer.getList();
-		list.removeAll();
-		list.removeSelectionListener(listListener);
-
-		createContextMenu();
-		if (fSelected != null) {
-			for (String lgui : lmlManager.getLguis()) {
-				viewer.add(lgui);
-			}
-			list.setSelection(lmlManager.getSelectedLguiIndex(fSelected.toString()));
-		}
-		list.addSelectionListener(listListener);
-	}
+	
 
 	@Override
 	public void setFocus() {

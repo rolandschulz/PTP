@@ -142,6 +142,7 @@ public class LguiItem implements ILguiItem {
 	 *            the source of the XML file.
 	 */
 	public LguiItem(URI xmlFile) {
+		name = xmlFile.getPath();
 		try {
 			lgui = parseLML(xmlFile);
 		} catch (MalformedURLException e) {

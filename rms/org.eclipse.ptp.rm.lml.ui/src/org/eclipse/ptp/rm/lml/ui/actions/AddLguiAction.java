@@ -61,16 +61,7 @@ public class AddLguiAction extends Action {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-		boolean existingLgui = LMLManager.getInstance().addLgui(uri);
-		if (existingLgui
-				&& !LMLManager.getInstance().getSelectedLguiItem().getXmlFile().getPath().equals(uri.getPath())) {
-			MessageBox messageBox = new MessageBox(LMLUIPlugin.getDisplay().getActiveShell(), SWT.OK | SWT.CANCEL);
-			messageBox.setMessage("The LML file " + uri.getPath() + " is already loaded. Should this file be selected?");
-			int rc = messageBox.open();
-			if (rc == SWT.OK) {
-				LMLManager.getInstance().selectLgui(uri);
-			}
-		}
+		LMLManager.getInstance().addLgui(uri);
 	}
 
 }
