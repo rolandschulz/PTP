@@ -43,9 +43,9 @@ public class ProxyEventQueue {
 	 * @param e
 	 *            : The event to be enqueued
 	 */
-	public void addPriorityProxyEvent(IProxyEvent e) {
+	public synchronized void addPriorityProxyEvent(IProxyEvent e) {
 		priorityEventQueue.add(e);
-		notifyForEvent();
+		notify();
 	}
 
 	/**
@@ -55,9 +55,9 @@ public class ProxyEventQueue {
 	 * @param e
 	 *            : The event to be enqueued
 	 */
-	public void addProxyEvent(IProxyEvent e) {
+	public synchronized void addProxyEvent(IProxyEvent e) {
 		eventQueue.add(e);
-		notifyForEvent();
+		notify();
 	}
 
 	/**
@@ -69,9 +69,10 @@ public class ProxyEventQueue {
 	 */
 	public IProxyEvent getProxyEvent() {
 		IProxyEvent event;
-
-		if ((priorityEventQueue.size() == 0) && (eventQueue.size() == 0)) {
-			waitForEvent();
+		synchronized(this) {
+			if ((priorityEventQueue.peek() == null) && (eventQueue.peek() == null)) {
+				waitForEvent();
+			}
 		}
 		event = priorityEventQueue.poll();
 		if (event != null) {
@@ -82,13 +83,6 @@ public class ProxyEventQueue {
 			return event;
 		}
 		return null;
-	}
-
-	/**
-	 * Internal method to notify listeners that a new event is available
-	 */
-	private synchronized void notifyForEvent() {
-		notify();
 	}
 
 	/**
@@ -103,7 +97,7 @@ public class ProxyEventQueue {
 	/**
 	 * Internal method used to block thread while waiting for next event
 	 */
-	private synchronized void waitForEvent() {
+	private void waitForEvent() {
 		try {
 			wait();
 		} catch (InterruptedException e) {
