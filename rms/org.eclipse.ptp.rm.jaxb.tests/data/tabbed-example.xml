@@ -39,13 +39,30 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
 		</attribute>
+		<script>
+		   <line>QUEUE = ${ptp_rm:destination#value}</line>
+			<line>COMMAND = ${ptp_rm:mpiCommand#value}</line>
+			<line>CORES = ${ptp_rm:mpiCores#value}</line>
+			<line>MEM = ${ptp_rm:Resource_List.mem#value}</line>
+			<line>WALL = ${ptp_rm:Resource_List.walltime#value}</line>
+			<line>e1 = ${ptp_rm:e1#value}</line>
+			<line>e2 = ${ptp_rm:e2#value}</line>
+			<line>e3 = ${ptp_rm:e3#value}</line>
+			<line>e4 = ${ptp_rm:e4#value}</line>
+			<line>e5 = ${ptp_rm:e5#value}</line>
+		</script>
 		<submit-interactive name="submit-interactive">
-			<arg></arg>
-			<environment name="VAR_1" value="e1"/>
-			<environment name="VAR_2" value="e2"/>
-			<environment name="VAR_3" value="e3"/>
-			<environment name="VAR_4" value="e4"/>
-			<environment name="VAR_5" value="e5"/>
+			<arg>echo</arg>
+			<arg>$VAR_1</arg>
+			<arg>$VAR_2</arg>
+			<arg>$VAR_3</arg>
+			<arg>$VAR_4</arg>
+			<arg>$VAR_5</arg>
+			<environment name="VAR_1" value="${ptp_rm:e1#value}"/>
+			<environment name="VAR_2" value="${ptp_rm:e2#value}"/>
+			<environment name="VAR_3" value="${ptp_rm:e3#value}"/>
+			<environment name="VAR_4" value="${ptp_rm:e4#value}"/>
+			<environment name="VAR_5" value="${ptp_rm:e5#value}"/>
 		</submit-interactive>
 		<launch-tab>
 			<dynamic sharedEnvironment="true">
@@ -163,8 +180,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 						<sub-layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
-                  </sub-layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+						</sub-layout-data>
 					</widget>
 					<!-- row 5 -->
 					<widget type="label" style="SWT.LEFT">
@@ -193,8 +210,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 						<sub-layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
-                  </sub-layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+						</sub-layout-data>
 					</widget>
 					<!-- row 7 -->
 					<widget type="label" style="SWT.LEFT">
@@ -208,8 +225,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 						<sub-layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
-                  </sub-layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+						</sub-layout-data>
 					</widget>
 				</composite>
 			</dynamic>
@@ -243,8 +260,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		</launch-tab>
 	</control-data>
 	<monitor-data schedulerType="Tabbed">
-      <driver>
-         <name></name>
-      </driver>
-   </monitor-data>
+		<driver>
+			<name></name>
+		</driver>
+	</monitor-data>
 </resource-manager-builder>
