@@ -40,16 +40,36 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<default>00:30:00</default>
 		</attribute>
 		<script>
-		   <line>QUEUE = ${ptp_rm:destination#value}</line>
-			<line>COMMAND = ${ptp_rm:mpiCommand#value}</line>
-			<line>CORES = ${ptp_rm:mpiCores#value}</line>
-			<line>MEM = ${ptp_rm:Resource_List.mem#value}</line>
-			<line>WALL = ${ptp_rm:Resource_List.walltime#value}</line>
-			<line>e1 = ${ptp_rm:e1#value}</line>
-			<line>e2 = ${ptp_rm:e2#value}</line>
-			<line>e3 = ${ptp_rm:e3#value}</line>
-			<line>e4 = ${ptp_rm:e4#value}</line>
-			<line>e5 = ${ptp_rm:e5#value}</line>
+			<line>
+				<arg>QUEUE = ${ptp_rm:destination#value}</arg>
+			</line>
+			<line>
+				<arg>COMMAND = ${ptp_rm:mpiCommand#value}</arg>
+			</line>
+			<line>
+				<arg>CORES = ${ptp_rm:mpiCores#value}</arg>
+			</line>
+			<line>
+				<arg>MEM = ${ptp_rm:Resource_List.mem#value}</arg>
+			</line>
+			<line>
+				<arg>WALL = ${ptp_rm:Resource_List.walltime#value}</arg>
+			</line>
+			<line>
+				<arg>e1 = ${ptp_rm:e1#value}</arg>
+			</line>
+			<line>
+				<arg>e2 = ${ptp_rm:e2#value}</arg>
+			</line>
+			<line>
+				<arg>e3 = ${ptp_rm:e3#value}</arg>
+			</line>
+			<line>
+				<arg>e4 = ${ptp_rm:e4#value}</arg>
+			</line>
+			<line>
+				<arg>e5 = ${ptp_rm:e5#value}</arg>
+			</line>
 		</script>
 		<submit-interactive name="submit-interactive">
 			<arg>echo</arg>
@@ -65,7 +85,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<environment name="VAR_5" value="${ptp_rm:e5#value}"/>
 		</submit-interactive>
 		<launch-tab>
-			<dynamic sharedEnvironment="true">
+			<dynamic sharedEnvironment="false">
 				<title>Settings</title>
 				<composite>
 					<layout>
@@ -163,7 +183,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 				</composite>
 			</dynamic>
-			<dynamic sharedEnvironment="true">
+			<dynamic sharedEnvironment="false">
 				<title>Paths</title>
 				<composite>
 					<layout>
@@ -230,7 +250,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 				</composite>
 			</dynamic>
-			<dynamic sharedEnvironment="true">
+			<dynamic sharedEnvironment="false">
 				<title>Environment</title>
 				<composite group="true">
 					<layout>
