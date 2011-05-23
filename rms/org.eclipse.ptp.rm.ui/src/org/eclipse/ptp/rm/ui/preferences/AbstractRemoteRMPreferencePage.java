@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ui.preferences;
 
-
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -43,11 +42,11 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public abstract class AbstractRemoteRMPreferencePage extends PreferencePage implements IWorkbenchPreferencePage,
 		RMPreferenceConstants {
 	protected class WidgetListener extends SelectionAdapter implements IPropertyChangeListener {
-		
 
 		public void propertyChange(PropertyChangeEvent event) {
-			if (event.getProperty().equals(FieldEditor.IS_VALID))
+			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 				updatePreferencePage();
+			}
 		}
 
 		@Override
@@ -58,8 +57,6 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	}
 
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-	private String serverFile = EMPTY_STRING;
-	private boolean loading = true;
 
 	protected Button fNoneButton = null;
 	protected Button fPortForwardingButton = null;
@@ -158,20 +155,14 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	 * Load values from preference store
 	 */
 	private void loadSaved() {
-		loading = true;
-		
 		updateOptions(Preferences.getInt(getPreferenceQualifier(), RMPreferenceConstants.OPTIONS));
-		loading = false;
 	}
 
 	/**
 	 * Load default values from preference store
 	 */
 	private void loadDefaults() {
-		loading = true;
-
 		updateOptions(Preferences.getDefaultInt(getPreferenceQualifier(), RMPreferenceConstants.OPTIONS, 0));
-		loading = false;
 	}
 
 	/**
@@ -215,8 +206,9 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.BEGINNING;
 		button.setLayoutData(data);
-		if (null != listener)
+		if (null != listener) {
 			button.addSelectionListener(listener);
+		}
 		return button;
 	}
 
@@ -232,13 +224,6 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-
-		Group bGroup = new Group(composite, SWT.SHADOW_ETCHED_IN);
-		bGroup.setLayout(createGridLayout(1, true, 10, 10));
-		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		bGroup.setText(Messages.AbstractRemotePreferencePage_0);
-
-		
 
 		Group mxGroup = new Group(composite, SWT.SHADOW_ETCHED_IN);
 		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
@@ -288,13 +273,12 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	 * @return
 	 */
 	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
 			return null;
+		}
 
 		return text;
 	}
-
-
 
 	/**
 	 * @return
@@ -310,10 +294,11 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	 */
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
-		if (style == -1)
+		if (style == -1) {
 			gd = new GridData();
-		else
+		} else {
 			gd = new GridData(style);
+		}
 		gd.horizontalSpan = space;
 		return gd;
 	}
@@ -325,8 +310,9 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 		setErrorMessage(null);
 		setMessage(null);
 
-		if (!isValidSetting())
+		if (!isValidSetting()) {
 			return;
+		}
 
 		setValid(true);
 	}
