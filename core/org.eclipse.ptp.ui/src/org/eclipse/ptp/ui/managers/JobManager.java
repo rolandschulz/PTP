@@ -453,9 +453,13 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 * )
 	 */
 	public void setJob(IPJob job) {
-		String old_id = (cur_job == null) ? EMPTY_ID : cur_job.getID();
-		String new_id = (job == null) ? EMPTY_ID : job.getID();
+		String old_id = null;
+		if (cur_job != null) {
+			old_id = cur_job.getID();
+		}
+		String new_id = null;
 		if (job != null) {
+			new_id = job.getID();
 			addJob(job);
 		}
 		cur_job = job;

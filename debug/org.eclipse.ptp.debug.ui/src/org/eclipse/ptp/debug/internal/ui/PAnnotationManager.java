@@ -69,7 +69,6 @@ import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
-import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -118,8 +117,9 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @return
 	 */
 	public static PAnnotationManager getDefault() {
-		if (instance == null)
+		if (instance == null) {
 			instance = new PAnnotationManager(PTPDebugUIPlugin.getUIDebugManager());
+		}
 		return instance;
 	}
 
@@ -239,8 +239,9 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 				if (editor[0] == null) {
 					for (IEditorReference refs : page.getEditorReferences()) {
 						IEditorPart refEditor = refs.getEditor(false);
-						if (refEditor == null)
+						if (refEditor == null) {
 							continue;
+						}
 						IEditorInput editorInput = refEditor.getEditorInput();
 						if (editorInput instanceof IFileEditorInput) {
 							if (((IFileEditorInput) editorInput).getFile().equals(file)) {
@@ -317,8 +318,9 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @return
 	 */
 	protected IFile getFile(IEditorInput editorInput) {
-		if (editorInput instanceof IFileEditorInput)
+		if (editorInput instanceof IFileEditorInput) {
 			return ((IFileEditorInput) editorInput).getFile();
+		}
 		if (editorInput instanceof IStorageEditorInput) {
 			try {
 				return findFile(((IStorageEditorInput) editorInput).getStorage().getFullPath());
@@ -342,14 +344,16 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @return
 	 */
 	protected Position createPosition(int lineNumber, IDocument doc) {
-		if (doc == null)
+		if (doc == null) {
 			return null;
+		}
 		try {
 			IRegion region = doc.getLineInformation(lineNumber - 1);
 			int charStart = region.getOffset();
 			int length = region.getLength();
-			if (charStart < 0)
+			if (charStart < 0) {
 				return null;
+			}
 			return new Position(charStart, length);
 		} catch (BadLocationException ble) {
 			return null;
@@ -436,8 +440,9 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 		try {
 			IDocument document = provider.getDocument(input);
-			if (document != null)
+			if (document != null) {
 				return document.getLineInformation(lineNumber);
+			}
 		} catch (BadLocationException e) {
 		} finally {
 			provider.disconnect(input);
@@ -541,19 +546,23 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 */
 	protected void addUnregisterAnnotation(String job_id, int level, String filename, int lineNumber, TaskSet tasks)
 			throws CoreException {
-		if (tasks.isEmpty())
+		if (tasks.isEmpty()) {
 			return;
+		}
 
 		IFile file = findFile(getFilePath(job_id, filename));
-		if (file == null)
+		if (file == null) {
 			throw new CoreException(Status.CANCEL_STATUS);
+		}
 
 		IEditorPart editorPart = getEditorPart(file);
-		if (editorPart == null)
+		if (editorPart == null) {
 			throw new CoreException(Status.CANCEL_STATUS);
+		}
 		ITextEditor textEditor = getTextEditor(editorPart);
-		if (textEditor == null)
+		if (textEditor == null) {
 			throw new CoreException(Status.CANCEL_STATUS);
+		}
 
 		synchronized (LOCK) {
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
@@ -621,8 +630,9 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 */
 	protected boolean containsCurrentSet(TaskSet aTasks) {
 		String set_id = uiDebugManager.getCurrentSetId();
-		if (set_id.equals(IElementHandler.SET_ROOT_ID))
+		if (set_id.equals(IElementHandler.SET_ROOT_ID)) {
 			return true;
+		}
 		try {
 			TaskSet tasks = uiDebugManager.getTasks(set_id);
 			return (tasks != null && tasks.intersects(aTasks));
@@ -654,11 +664,13 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		if (!tasks.isEmpty()) {
 			IDocumentProvider docProvider = textEditor.getDocumentProvider();
 			IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
-			if (annotationModel == null)
+			if (annotationModel == null) {
 				throw new CoreException(Status.CANCEL_STATUS);
+			}
 			final Position position = createPosition(lineNumber, docProvider.getDocument(textEditor.getEditorInput()));
-			if (position == null)
+			if (position == null) {
 				throw new CoreException(Status.CANCEL_STATUS);
+			}
 
 			synchronized (LOCK) {
 				PInstructionPointerAnnotation2 annotation = findAnnotation(annotationGroup, position, type);
@@ -726,14 +738,16 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @throws CoreException
 	 */
 	protected void removeAnnotation(String job_id, TaskSet tasks) throws CoreException {
-		if (tasks == null || tasks.isEmpty())
+		if (tasks == null || tasks.isEmpty()) {
 			throw new CoreException(Status.CANCEL_STATUS);
+		}
 		synchronized (LOCK) {
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 			if (annotationGroup != null) {
 				removeAnnotation(annotationGroup, tasks);
-				if (annotationGroup.isEmpty())
+				if (annotationGroup.isEmpty()) {
 					removeAnnotationGroup(job_id);
+				}
 			}
 		}
 	}
@@ -788,13 +802,15 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	protected PInstructionPointerAnnotation2[] findAnnotations(AnnotationGroup annotationGroup, TaskSet tasks) {
 		synchronized (LOCK) {
 			List<PInstructionPointerAnnotation2> foundAnnotations = new ArrayList<PInstructionPointerAnnotation2>();
-			if (tasks.isEmpty())
+			if (tasks.isEmpty()) {
 				return new PInstructionPointerAnnotation2[0];
+			}
 
 			for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
 				if (!annotation.isMarkDeleted() && annotation.contains(tasks)) {
-					if (!foundAnnotations.contains(annotation))
+					if (!foundAnnotations.contains(annotation)) {
 						foundAnnotations.add(annotation);
+					}
 				}
 			}
 			return foundAnnotations.toArray(new PInstructionPointerAnnotation2[0]);
@@ -820,12 +836,14 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 					String annotationType = annotation.getType();
 					if (isRegister) {
 						if (annotationType.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT)
-								|| annotationType.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT))
+								|| annotationType.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT)) {
 							return annotation;
+						}
 					} else {
 						if (annotationType.equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT)
-								|| annotationType.equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY))
+								|| annotationType.equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY)) {
 							return annotation;
+						}
 					}
 				}
 			}
@@ -853,8 +871,9 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 				for (PInstructionPointerAnnotation2 annotation : findAnnotations(annotationGroup, tasks)) {
 					TaskSet cpTasks = tasks.copy();
 					cpTasks.and(annotation.getTasks());
-					if (cpTasks.isEmpty())
+					if (cpTasks.isEmpty()) {
 						continue;
+					}
 
 					updateExistedAnnotation(annotationGroup, annotation, cpTasks, false);
 					/*
@@ -876,8 +895,9 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 				for (PInstructionPointerAnnotation2 annotation : findAnnotations(annotationGroup, tasks)) {
 					TaskSet cpTasks = tasks.copy();
 					cpTasks.and(annotation.getTasks());
-					if (cpTasks.isEmpty())
+					if (cpTasks.isEmpty()) {
 						continue;
+					}
 
 					updateExistedAnnotation(annotationGroup, annotation, cpTasks, true);
 					/*
@@ -965,12 +985,13 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 									// the unregistered tasks, display SET_ANN
 									// simply only display SET_ANN when the
 									// current set only contain registered tasks
-									if (currentSet.isRootSet())
+									if (currentSet.isRootSet()) {
 										changeAnnotationType(annotation, IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT);
-									else
+									} else {
 										changeAnnotationType(annotation,
 												annotation.contains(tasks) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT
 														: IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
+									}
 								}
 							}
 						}
@@ -1011,7 +1032,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	}
 
 	private void doJobChangedEvent(int type, String cur_job_id, String pre_job_id, IProgressMonitor monitor) {
-		if (type == IJobChangedListener.REMOVED || (pre_job_id != null && !pre_job_id.equals(IElementManager.EMPTY_ID))) {
+		if (type == IJobChangedListener.REMOVED || pre_job_id != null) {
 			AnnotationGroup preAnnotationGroup = getAnnotationGroup(pre_job_id);
 			if (preAnnotationGroup != null) {
 				preAnnotationGroup.throwAllAnnotations();
@@ -1125,13 +1146,15 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	}
 
 	private void addAnnotationWithSourceFound(String jobId, TaskSet tasks, int low, int high) throws CoreException {
-		if (tasks.isEmpty())
+		if (tasks.isEmpty()) {
 			return;
+		}
 
 		IPSession session = uiDebugManager.getDebugSession(jobId);
 		if (session != null) {
-			if (!session.isReady())
+			if (!session.isReady()) {
 				return;
+			}
 
 			IPDIListStackFramesRequest request = session.getPDISession().getRequestFactory()
 					.getListStackFramesRequest(session.getPDISession(), tasks, low, high);
