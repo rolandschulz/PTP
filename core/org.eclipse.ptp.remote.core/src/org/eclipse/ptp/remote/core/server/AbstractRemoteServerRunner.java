@@ -567,10 +567,11 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 *            directory containing payload
 	 * @param monitor
 	 *            progress monitor
+	 * @return true if a new copy of the payload was uploaded, false otherwise
 	 * @throws IOException
 	 *             thrown if any errors occur
 	 */
-	private void checkAndUploadPayload(IFileStore directory, IProgressMonitor monitor) throws IOException {
+	private boolean checkAndUploadPayload(IFileStore directory, IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
 			IFileStore server = directory.getChild(getPayload());
@@ -588,7 +589,9 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			IFileInfo localInfo = local.fetchInfo(EFS.NONE, subMon.newChild(10));
 			if (!serverInfo.exists() || serverInfo.getLength() != localInfo.getLength()) {
 				local.copy(server, EFS.OVERWRITE, subMon.newChild(70));
+				return true;
 			}
+			return false;
 		} catch (Exception e) {
 			throw new IOException(e.getMessage());
 		} finally {
@@ -666,9 +669,9 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 */
 			directory.mkdir(EFS.NONE, subMon.newChild(10));
 
-			checkAndUploadPayload(directory, subMon.newChild(30));
-
-			unpackPayload(directory, subMon.newChild(30));
+			if (checkAndUploadPayload(directory, subMon.newChild(30))) {
+				unpackPayload(directory, subMon.newChild(30));
+			}
 
 			/*
 			 * Now launch the server.
