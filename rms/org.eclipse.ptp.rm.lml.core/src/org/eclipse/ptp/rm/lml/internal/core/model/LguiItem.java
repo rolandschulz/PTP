@@ -10,6 +10,7 @@
  */
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -402,6 +403,20 @@ public class LguiItem implements ILguiItem {
 	public void update(InputStream stream) {
 		lgui = parseLML(stream);
 		update();
+	}
+	
+	public void getRequestXml(FileOutputStream os) {
+		LguiType layoutLgui = getLayoutFromModell();
+		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
+		try {
+			marshaller.marshal(layoutLgui, os);
+			os.close();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	public boolean isEmpty() {

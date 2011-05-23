@@ -10,6 +10,8 @@
  */
 package org.eclipse.ptp.rm.lml.core;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
@@ -269,6 +271,16 @@ public class LMLManager {
 	public void update() {
 //		fLguiItem.updateXML();
 		fireNewLgui();
+	}
+	
+	public void getRequestXml() {
+		FileOutputStream os = null;
+		try {
+			os = new FileOutputStream("request.xml");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		fLguiItem.getRequestXml(os);
 	}
 
 	/**************************************************************************************************************
