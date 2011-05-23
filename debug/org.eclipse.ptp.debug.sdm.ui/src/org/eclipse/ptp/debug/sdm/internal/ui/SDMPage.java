@@ -11,7 +11,6 @@
 package org.eclipse.ptp.debug.sdm.internal.ui;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
@@ -24,7 +23,6 @@ import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
 import org.eclipse.ptp.debug.sdm.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
@@ -56,8 +54,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private IResourceManager resourceManager = null;
-	private boolean pathIsDirty = true;
-	private boolean pathIsValid = false;
 
 	protected Combo fSDMBackendCombo = null;
 	protected Text fRMDebuggerPathText = null;
@@ -124,7 +120,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		fRMDebuggerPathText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 		fRMDebuggerPathText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				pathIsDirty = true;
 				updateLaunchConfigurationDialog();
 			}
 		});
@@ -206,19 +201,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			setErrorMessage(Messages.SDMPage_4);
 		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
 			setErrorMessage(Messages.SDMPage_5);
-		} else {
-			if (pathIsDirty) {
-				if (!verifyPath(fRMDebuggerPathText.getText())) {
-					pathIsValid = false;
-				} else {
-					pathIsValid = true;
-				}
-				pathIsDirty = false;
-			}
-
-			if (!pathIsValid) {
-				setErrorMessage(Messages.SDMPage_6);
-			}
 		}
 		return (getErrorMessage() == null);
 	}
@@ -235,44 +217,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			setErrorMessage(Messages.SDMPage_7);
 		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
 			setErrorMessage(Messages.SDMPage_8);
-		} else {
-			if (pathIsDirty) {
-				if (!verifyPath(fRMDebuggerPathText.getText())) {
-					pathIsValid = false;
-				} else {
-					pathIsValid = true;
-				}
-				pathIsDirty = false;
-			}
-
-			if (!pathIsValid) {
-				setErrorMessage(Messages.SDMPage_9);
-			}
 		}
 		// setErrorMessage(errMsg);
 		return (getErrorMessage() == null);
-	}
-
-	/**
-	 * Verify that the supplied path exists on the remote system
-	 * 
-	 * @param path
-	 *            path to verify
-	 * @return true if path exists
-	 */
-	private boolean verifyPath(String path) {
-		IRemoteConnection rmConn = getRemoteConnection(resourceManager);
-		if (rmConn != null) {
-			IRemoteFileManager fileManager = getRemoteServices(resourceManager).getFileManager(rmConn);
-			if (fileManager != null && fileManager.getResource(path).fetchInfo().exists()) {
-				return true;
-			}
-			return false;
-		}
-		if (new Path(path).toFile().exists()) {
-			return true;
-		}
-		return false;
 	}
 
 	/*
@@ -309,35 +256,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		/*
 		 * We have just selected SDM as the debugger...
 		 */
-		String path = ""; //$NON-NLS-1$
-		/*
-		 * Guess that the sdm executable is in the same location as the proxy.
-		 */
-		try {
-			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
-					EMPTY_STRING);
-			IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-			if (rm != null) {
-				IResourceManagerConfiguration rmConfig = rm.getConfiguration();
-				if (rmConfig instanceof IRemoteResourceManagerConfiguration) {
-					IRemoteResourceManagerConfiguration remConfig = (IRemoteResourceManagerConfiguration) rmConfig;
-					String proxyPath = remConfig.getProxyServerPath();
-					if (proxyPath == null || proxyPath.equals(EMPTY_STRING)) {
-						IRemoteConnection conn = getRemoteConnection(rm);
-						if (conn != null) {
-							path = new Path(conn.getWorkingDirectory()).append("sdm").toString(); //$NON-NLS-1$/
-						}
-					} else {
-						path = new Path(proxyPath).removeLastSegments(1).append("sdm").toString(); //$NON-NLS-1$/
-					}
-				}
-			}
-		} catch (CoreException e) {
-		}
-
 		configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
 				Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE));
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, path);
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING);
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getAddress(configuration));
 	}
 
