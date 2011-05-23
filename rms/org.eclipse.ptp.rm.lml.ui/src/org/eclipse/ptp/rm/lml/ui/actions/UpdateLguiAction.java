@@ -12,6 +12,6 @@ public class UpdateLguiAction extends Action {
 
 	@Override
 	public void run() {
-		LMLManager.getInstance().update();
+		LMLManager.getInstance().getRequestXml();
 	}
 }

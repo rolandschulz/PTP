@@ -226,13 +226,8 @@ public class LMLManager {
 		return fLguiItem;
 	}
 	
-	private String getSelectedLguiTitle(int index) {
-		String[] lguis = LGUIS.keySet().toArray(new String[LGUIS.size()]);
-		return lguis[index];
-	}
-	
-	public void selectLgui(int index) {
-		fLguiItem = LGUIS.get(getSelectedLguiTitle(index));
+	public void selectLgui(String name) {
+		fLguiItem = LGUIS.get(name);
 		fireSelectedLgui();
 	}
 
