@@ -185,7 +185,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 
 	@Override
 	public void initializeFrom(ILaunchConfiguration config) {
-		setLaunchConfiguration(config);
+		super.initializeFrom(config);
 		ILaunchConfigurationTab dynamicTab = getDynamicTab();
 		if (dynamicTab != null) {
 			dynamicTab.initializeFrom(config);

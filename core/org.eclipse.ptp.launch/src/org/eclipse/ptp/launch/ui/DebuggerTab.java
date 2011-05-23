@@ -107,6 +107,30 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.launch.ui.AbstractDebuggerTab#activated(org.eclipse.debug
+	 * .core.ILaunchConfigurationWorkingCopy)
+	 */
+	@Override
+	public void activated(ILaunchConfigurationWorkingCopy workingCopy) {
+		setInitializing(true);
+		super.activated(workingCopy);
+		try {
+			/*
+			 * Only set default debugger if there is a resource manager
+			 * selected.
+			 */
+			String id = workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, EMPTY_STRING);
+			loadDebuggerComboBox(workingCopy, id, getResourceManager(workingCopy) == null);
+			initializeCommonControls(workingCopy);
+		} catch (CoreException e) {
+		}
+		setInitializing(false);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#isValid(org.eclipse
 	 * .debug.core.ILaunchConfiguration)
 	 */
