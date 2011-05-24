@@ -4,7 +4,7 @@
   	name="PTP overview intro Extension" path="overview/@">
 		<group style-id="content-group" id="orgeclipseptphelp-introLink-group">
        		<link label="Parallel Tools Platform"  id="orgeclipseptphelp-introLink" style-id="content-link"
-       		url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.eclipse.ptp.help/html/toc.html">
+       		url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.eclipse.ptp.doc.user/html/toc.html">
           		<text>Learn more about PTP, the Parallel Tools Platform.</text>
        		</link>
        	</group>

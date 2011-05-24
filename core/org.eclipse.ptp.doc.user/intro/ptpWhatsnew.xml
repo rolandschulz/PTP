@@ -3,7 +3,7 @@
   	<extensionContent id="orgeclipseptphelp-introExtension" style="css/sample.css" name="PTP whatsnew intro Extension" path="whatsnew/@">
 		<group style-id="content-group" id="orgeclipseptphelp-introLink-group">
        		<link label="Parallel Tools Platform" 
-       		url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.eclipse.ptp.help/html/00newNoteworthy.html" id="orgeclipseptphelp-introLink" style-id="content-link">
+       		url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.eclipse.ptp.doc.user/html/00newNoteworthy.html" id="orgeclipseptphelp-introLink" style-id="content-link">
           		<text>Find out the new features in PTP.</text>
        		</link>
        	</group>
