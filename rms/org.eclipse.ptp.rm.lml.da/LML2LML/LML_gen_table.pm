@@ -90,14 +90,6 @@ sub process {
 
     $idlistref=$self->_select_objs($objtype_pattern, $patternsref);
 
-#    if(uc($gid) eq "JOBLIST_RUN") {
-#	$idlistref=$self->_select_run_jobs();
-#    }
-
-#    if(uc($gid) eq "JOBLIST_WAIT") {
-#	$idlistref=$self->_select_wait_jobs();
-#    }
-
     $self->{IDLISTREF}=$idlistref;
     $numids=scalar @{$idlistref};
 #    print "LML_gen_table::process: idlist=(",join(',',sort(@{$idlistref})),")\n" if($self->{VERBOSE});
@@ -148,6 +140,7 @@ sub _select_objs {
     my($objtype_pattern,$patternsref)=@_;
     my (@idlist,$key,$ref,$skey,$found,$regexp);
     
+    keys(%{$self->{LMLFH}->{DATA}->{OBJECT}}); # reset iterator
     while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
 	# check against contenttype
 	next if($ref->{type} ne $objtype_pattern);
@@ -186,34 +179,6 @@ sub _update_valid_attributes {
     @validattr=(sort keys(%validattr));
     return(\@validattr);
 }
-
-sub _select_run_jobs {
-    my($self) = shift;
-    my (@idlist,$key,$ref);
-    
-    while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
-	next if($ref->{type} ne 'job');
-	next if($self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{state} ne 'Running');
-	push(@idlist,$key);
-    }
-    return(\@idlist);
-}
-
-
-
-sub _select_wait_jobs {
-    my($self) = shift;
-    my (@idlist,$key,$ref);
-    
-    while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
-	next if($ref->{type} ne 'job');
-	next if($self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{state} ne 'Idle');
-	push(@idlist,$key);
-    }
-    
-    return(\@idlist);
-}
-
 
 sub get_lml_table {
     my($self) = shift;

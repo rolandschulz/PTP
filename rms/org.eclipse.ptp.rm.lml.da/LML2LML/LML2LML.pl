@@ -143,20 +143,20 @@ foreach $tid (keys(%{$filehandler_layout->{DATA}->{TABLELAYOUT}})) {
     # create table handler and process request
     $table_handler = LML_gen_table->new($opt_verbose,$opt_timings);
     $numids=$table_handler->process($tlayoutref,$tableref,$filehandler_LML);
-
-    # add elements, objects, and info to output LML files
-    $idlistref=$table_handler->get_ids();
-    print "Table Layout: $tid processed ($numids objects found)\n"  if($opt_verbose);
-    $cnt=&copy_objects_of_elements($filehandler_LML,$filehandler_out,$idlistref,"OBJECT");
-    print "Table Layout: objects           of $tid copied ($cnt new objects)\n"  if($opt_verbose);
-    $cnt=&copy_objects_of_elements($filehandler_LML,$filehandler_out,$idlistref,"INFO");
-    print "Table Layout: info objects      of $tid copied ($cnt new objects)\n"  if($opt_verbose);
-    $cnt=&copy_objects_of_elements($filehandler_LML,$filehandler_out,$idlistref,"INFODATA");
-    print "Table Layout: info data objects of $tid copied ($cnt new objects)\n"  if($opt_verbose);
-
-    $filehandler_out->{DATA}->{TABLE}->{$tid}=$table_handler->get_lml_table();
-    $filehandler_out->{DATA}->{TABLELAYOUT}->{$tid}=$table_handler->get_lml_tablelayout();
-   
+    if($numids>0) {
+	# add elements, objects, and info to output LML files
+	$idlistref=$table_handler->get_ids();
+	print "Table Layout: $tid processed ($numids objects found)\n"  if($opt_verbose);
+	$cnt=&copy_objects_of_elements($filehandler_LML,$filehandler_out,$idlistref,"OBJECT");
+	print "Table Layout: objects           of $tid copied ($cnt new objects)\n"  if($opt_verbose);
+	$cnt=&copy_objects_of_elements($filehandler_LML,$filehandler_out,$idlistref,"INFO");
+	print "Table Layout: info objects      of $tid copied ($cnt new objects)\n"  if($opt_verbose);
+	$cnt=&copy_objects_of_elements($filehandler_LML,$filehandler_out,$idlistref,"INFODATA");
+	print "Table Layout: info data objects of $tid copied ($cnt new objects)\n"  if($opt_verbose);
+	
+	$filehandler_out->{DATA}->{TABLE}->{$tid}=$table_handler->get_lml_table();
+	$filehandler_out->{DATA}->{TABLELAYOUT}->{$tid}=$table_handler->get_lml_tablelayout();
+    }
 }
 
 ############################

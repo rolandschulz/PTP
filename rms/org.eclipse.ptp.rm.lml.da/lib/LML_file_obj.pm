@@ -248,6 +248,12 @@ sub lml_start {
 	return(1);
     }
 
+    if($name =~/(.*):lgui/) {
+	foreach $k (sort keys %attr) {
+	    $o->{LMLLGUI}->{$k}=$attr{$k};
+	}
+    }
+
     if($name eq "ns2:lguiType") {
 	foreach $k (sort keys %attr) {
 	    $o->{LMLLGUI}->{$k}=$attr{$k};
@@ -455,6 +461,15 @@ sub lml_start {
 	my $lastelem=$o->{NODEDISPLAYSTACK}->[-1];
 	my $treenode=$lastelem->new_child(\%attr,$name);
 	push(@{$o->{NODEDISPLAYSTACK}},$treenode);
+	return(1);
+    }
+
+# handling unused / not needed tags
+###########################################################################################
+    if($name eq "abslayout") {
+	return(1);
+    }
+    if($name eq "comp") {
 	return(1);
     }
 

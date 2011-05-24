@@ -141,7 +141,7 @@ sub _insert_run_jobs {
     while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
 	next if($ref->{type} ne 'job');
 	$inforef=$self->{LMLFH}->{DATA}->{INFODATA}->{$key};
-	next if($inforef->{state} ne 'Running');
+	next if($inforef->{status} ne 'RUNNING');
 	$nodelist=$self->_remap_nodes($inforef->{nodelist});
 	$self->insert_job_into_nodedisplay($self->{SCHEMEROOT},$self->{DATAROOT},$nodelist,$key);
 	push(@idlist,$key);
@@ -417,7 +417,7 @@ sub _adjust_layout_cluster  {
     my($numnodes)=@_;
     my($id,$subid,$treenode,$child,$ncores,$start,$numchilds);
     my $rc=1;
-    my $default_nodes_per_row=32;
+    my $default_nodes_per_row=8;
   
     $treenode=$self->{LAYOUT}->{tree};
 
@@ -434,7 +434,7 @@ sub _adjust_layout_cluster  {
 	}
 
 	if(!exists($child->{ATTR}->{maxlevel})) {
-	    $child->{ATTR}->{maxlevel}=1;
+	    $child->{ATTR}->{maxlevel}=2;
 	}
     } else {
 	# more sophisticated layout, tbd

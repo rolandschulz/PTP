@@ -44,7 +44,7 @@ sub insert_job_into_nodedisplay  {
     foreach $node (sort(split(/\s*,\s*/,$nodelist))) {
 	$listref=$self->get_numbers_from_name($node,$schemeref);
 	if(!defined($listref)) {
-	    print STDERR "insert_job_into_nodedisplay: Error: could not map node $node ($listref)\n";
+	    print STDERR "insert_job_into_nodedisplay: Error: could not map node $node\n";
 	    return(0)
 	}
 	push(@nodelistrefs,$listref);
@@ -476,6 +476,7 @@ sub _get_numbers_from_name {
     $rg=$schemeref->{ATTR}->{_maskregall};
 
     # ready if nodename matches to this level 
+#    print "get_numbers_from_name: check on level ",$schemeref->{_level}+1," $name -> $rg\n" if($debug>=2); 
     if($name=~/^$rg$/) {
 	@list=$name=~/^$rg$/;
 	print "get_numbers_from_name: found on level ",$schemeref->{_level}+1," $name -> ",join(',',@list),"\n" if($debug>=2); 

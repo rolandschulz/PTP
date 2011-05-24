@@ -385,3 +385,8 @@ ChangeLog:
    - bug fixes 
      - calling perl from perl with correct path
      - parsing PTP related namespace in XML file
+
+1.06:
+   - new adapter for OpenMPI
+   - bug fixes 
+     - name space handling in LML
