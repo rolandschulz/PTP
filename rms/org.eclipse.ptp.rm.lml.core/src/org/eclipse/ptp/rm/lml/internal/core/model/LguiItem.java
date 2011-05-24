@@ -454,8 +454,6 @@ public class LguiItem implements ILguiItem {
 		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
 		try {
 			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace+" lgui.xsd");
-			marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",new LMLNamespacePrefixMapper());
-
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			QName tagname = new QName(lmlNamespace, "lgui", "lml");
 
