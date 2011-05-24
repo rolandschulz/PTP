@@ -32,7 +32,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.etfw.feedback.internal.FeedbackIDs;
 import org.eclipse.ptp.etfw.feedback.messages.Messages;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 import org.eclipse.ptp.etfw.feedback.preferences.PreferenceConstants;

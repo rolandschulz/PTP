@@ -62,7 +62,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.etfw.feedback.AbstractFeedbackAction;
 import org.eclipse.ptp.etfw.feedback.Activator;
-import org.eclipse.ptp.etfw.feedback.internal.FeedbackIDs;
+import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
 import org.eclipse.ptp.etfw.feedback.messages.Messages;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 import org.eclipse.swt.SWT;

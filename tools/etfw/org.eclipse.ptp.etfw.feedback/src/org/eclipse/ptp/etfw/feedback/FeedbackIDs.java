@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback.internal;
+package org.eclipse.ptp.etfw.feedback;
 
 import org.eclipse.ptp.etfw.feedback.messages.Messages;
 

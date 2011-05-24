@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.etfw.feedback.Activator;
-import org.eclipse.ptp.etfw.feedback.internal.FeedbackIDs;
+import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
 import org.eclipse.ptp.etfw.feedback.messages.Messages;
 import org.eclipse.ptp.etfw.feedback.preferences.PreferenceConstants;
 
