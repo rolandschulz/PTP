@@ -608,7 +608,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		if (!fIsInitializing) {
 			/*
 			 * If a new connection is selected and port forwarding is supported,
-			 * default to using it.
+			 * default to using it. Only do this if we're not being initialized,
+			 * otherwise the saved settings are overridden.
 			 */
 			IRemoteConnection conn = connectionWidget.getConnection();
 			if (conn != null) {
