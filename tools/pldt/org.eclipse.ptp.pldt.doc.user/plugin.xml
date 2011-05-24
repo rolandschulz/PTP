@@ -10,28 +10,6 @@
       <toc
             file="toc.xml"
             primary="true"/>
-            <tocIcon
-                  altText="%tocIcon.altText"
-                  closedIcon="icons/analyze.gif"
-                  id="org.eclipse.ptp.pldt.doc.user.icon"
-                  openIcon="icons/analyze.gif"/>
    </extension>
 
-  <extension
-         point="org.eclipse.ui.intro.configExtension">
-      <configExtension
-            content="intro/pldtOverview.xml"
-            configId="org.eclipse.ui.intro.universalConfig">
-      </configExtension>
-   
-      <configExtension
-            configId="org.eclipse.ui.intro.universalConfig"
-            content="intro/pldtWhatsnew.xml">
-      </configExtension>
-  
-      <configExtension
-            configId="org.eclipse.ui.intro.universalConfig"
-            content="intro/pldtTutorial.xml">
-      </configExtension>
-   </extension>
 </plugin>
