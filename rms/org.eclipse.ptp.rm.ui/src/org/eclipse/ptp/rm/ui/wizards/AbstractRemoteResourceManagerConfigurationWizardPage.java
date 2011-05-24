@@ -175,6 +175,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 
 		@Override
 		protected void loadFromStorage() {
+			fIsInitializing = true;
 			String id = getConfiguration().getRemoteServicesId();
 			if (id != null) {
 				IRemoteServices services = getRemoteServices(id);
@@ -196,6 +197,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			}
 			fPortForward = (getConfiguration().getOptions() & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 			fUseDefault = getConfiguration().getUseDefault();
+			fIsInitializing = false;
 		}
 
 		@Override
@@ -246,6 +248,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 
 	private final IRemoteUIConnectionManager fUIConnectionManager = null;
 	private boolean fEnableUseDefault = false;
+	private boolean fIsInitializing = false;
 	private String fUseDefaultMessage;
 
 	protected Button noneButton = null;
@@ -602,15 +605,16 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @since 2.0
 	 */
 	protected void handleConnectionSelected() {
-		/*
-		 * If a new connection is selected and port forwarding is supported,
-		 * default to using it.
-		 */
-		IRemoteConnection conn = connectionWidget.getConnection();
-		if (conn != null) {
-			updatePortForwarding(conn, conn.supportsTCPPortForwarding());
+		if (!fIsInitializing) {
+			/*
+			 * If a new connection is selected and port forwarding is supported,
+			 * default to using it.
+			 */
+			IRemoteConnection conn = connectionWidget.getConnection();
+			if (conn != null) {
+				updatePortForwarding(conn, conn.supportsTCPPortForwarding());
+			}
 		}
-
 		getDataSource().storeAndValidate();
 		updateControls();
 	}
