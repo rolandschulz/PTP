@@ -390,3 +390,8 @@ ChangeLog:
    - new adapter for OpenMPI
    - bug fixes 
      - name space handling in LML
+
+1.07:
+   - bug fixes 
+     - built-in parser enhancement
+     - recognize empty scheme descriptions

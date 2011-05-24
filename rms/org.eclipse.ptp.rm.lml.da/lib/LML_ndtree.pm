@@ -178,6 +178,7 @@ sub get_xml_tree {
 	    $xmldata.="<$elname";
 	    foreach $subid (sort {$b cmp $a} (keys(%{$self->{ATTR}}))) {
 		next if($subid=~/\_/);
+		next if(!defined($self->{ATTR}->{$subid}));
 		$xmldata.=" $subid=\"".$self->{ATTR}->{$subid}."\"";
 	    }
 	    $xmldata.=">\n";

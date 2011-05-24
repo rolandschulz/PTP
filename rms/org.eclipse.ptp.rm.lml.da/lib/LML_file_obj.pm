@@ -200,7 +200,7 @@ sub read_lml_fast {
 	    $tagname=$1;
 #	    print "TAGE: '$tagname'\n";
 	    $self->lml_end($self->{DATA},$tagname,());
-	} elsif($tag=~/<([^\s]+)\s*$/) {
+	} elsif($tag=~/<([^\s\/]+)\s*$/) {
 	    $tagname=$1;
 #	    print "TAG0: '$tagname'\n";
 	    $self->lml_start($self->{DATA},$tagname,());
@@ -209,10 +209,16 @@ sub read_lml_fast {
 	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;
 #	    print "TAG1: '$tagname' rest='$rest'\n";
 	    $self->lml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
-	} elsif($tag=~/<([^\s]+)(\s(.*)\s?)\/$/) {
+	} elsif($tag=~/<([^\s\/]+)(\s(.*)\s?)\/$/) {
 	    $tagname=$1;
 	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;
 #	    print "TAG2: '$tagname' rest='$rest' closed\n";
+	    $self->lml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
+	    $self->lml_end($self->{DATA},$tagname,());
+	} elsif($tag=~/<([^\s\/]+)\/$/) {
+	    $tagname=$1;
+	    $rest="";
+#	    print "TAG2e: '$tagname' rest='$rest' closed\n";
 	    $self->lml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
 	    $self->lml_end($self->{DATA},$tagname,());
 	}

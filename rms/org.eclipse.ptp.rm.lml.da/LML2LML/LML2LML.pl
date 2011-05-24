@@ -165,7 +165,7 @@ foreach $tid (keys(%{$filehandler_layout->{DATA}->{TABLELAYOUT}})) {
 
 #print Dumper($filehandler_layout->{DATA});
 #print Dumper($filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT});
-my ($nid,$nlayoutref,$ndcnt);
+my ($nid,$nlayoutref,$ndcnt,$el1);
 $ndcnt=1;
 foreach $nid (keys(%{$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}})) {
     my($nd_handler,$numids,$idlistref,$cnt,$nlayoutref_gid,$nschemeref,,$active);
@@ -185,7 +185,12 @@ foreach $nid (keys(%{$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}})) {
     if(exists($filehandler_layout->{DATA}->{NODEDISPLAY})) {
 	if(exists($filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid})) {
 	    if($nlayoutref_gid!~/__dummy_nd__/) {
-		$nschemeref=$filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid}->{schemeroot};
+		# check if el1 with attribute min is available
+		if($el1=$filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid}->{schemeroot}->get_child({ _name => "el1" })) {
+		    if(exists($el1->{ATTR}->{min})) {
+			$nschemeref=$filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid}->{schemeroot};
+		    }
+		}
 	    } else {
 		# generate a new not dummy gid
 		$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}->{$nid}->{gid}="nd_$ndcnt";
