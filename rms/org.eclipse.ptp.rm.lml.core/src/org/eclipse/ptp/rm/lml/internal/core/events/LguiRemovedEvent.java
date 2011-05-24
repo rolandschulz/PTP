@@ -25,9 +25,10 @@ import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
 /**
  * Class of the interface ILguiRemovedEvent.
- * @author Claudia Knobloch
  */
 public class LguiRemovedEvent implements ILguiRemovedEvent{
+	
+	private final ILguiItem removedLguiItem;
 	
 	/*
 	 * The associated LMLManager
@@ -44,9 +45,10 @@ public class LguiRemovedEvent implements ILguiRemovedEvent{
 	 * @param lmlManager the associated LMLManager
 	 * @param lguiItem the associated ILguiItem
 	 */
-	public LguiRemovedEvent(LMLManager lmlManager, ILguiItem lguiItem) {
+	public LguiRemovedEvent(LMLManager lmlManager, ILguiItem lguiItem, ILguiItem removedLguiItem) {
 		this.lmlManager = lmlManager;
 		this.lguiItem = lguiItem;
+		this.removedLguiItem = removedLguiItem;
 	}
 
 	/*
@@ -67,6 +69,10 @@ public class LguiRemovedEvent implements ILguiRemovedEvent{
 	 */
 	public LMLManager getLMLManager() {
 		return lmlManager;
+	}
+
+	public ILguiItem getRemovedLguiItem() {
+		return removedLguiItem;
 	}
 
 }

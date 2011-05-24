@@ -4,7 +4,7 @@ import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
 public interface ILguiSelectedEvent {
-
+	
 	/**
 	 * Getting the involved IlguiItem.
 	 * @return the involved ILguiItem

@@ -52,7 +52,11 @@ public class ViewManager {
 		}
 
 		public void handleEvent(ILguiRemovedEvent e) {
-
+			deleteOldViews();
+			selectedLgui = e.getLguiItem();
+			if (selectedLgui != null) {
+				generateNewViews();
+			}
 		}
 
 		public void handleEvent(ILguiSelectedEvent e) {
@@ -68,8 +72,6 @@ public class ViewManager {
 		}
 
 		public void handleEvent(IViewDisposedEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 	}

@@ -114,14 +114,14 @@ public class NodesView extends LMLViewPart {
 			} else {
 				setPartName("NodedisplayView");
 			}
-			composite.addDisposeListener(new DisposeListener() {
-
-				public void widgetDisposed(DisposeEvent e) {
-					lmlManager.removeComponent(gid);
-
-				}
-
-			});
+//			composite.addDisposeListener(new DisposeListener() {
+//
+//				public void widgetDisposed(DisposeEvent e) {
+//					lmlManager.removeComponent(gid);
+//
+//				}
+//
+//			});
 		}
 
 	}

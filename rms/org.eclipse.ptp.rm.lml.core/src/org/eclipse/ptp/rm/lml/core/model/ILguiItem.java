@@ -84,7 +84,7 @@ public interface ILguiItem  {
 //	
 	public void update(InputStream stream);
 	
-	public void getRequestXml(FileOutputStream os);
+	public void getRequestXml(FileOutputStream output);
 	
 	public void addJob(IJobStatus jobStatus);
 	

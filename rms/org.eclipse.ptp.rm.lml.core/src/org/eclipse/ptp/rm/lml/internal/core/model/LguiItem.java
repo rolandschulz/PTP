@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
@@ -64,10 +65,22 @@ import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ui.IMemento;
 
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+
 /**
  * Class of the interface ILguiItem
  */
 public class LguiItem implements ILguiItem {
+	
+	
+	private static class LMLNamespacePrefixMapper extends NamespacePrefixMapper {
+		public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
+		        if( lmlNamespace.equals(namespaceUri) )
+		            return "lml";
+		        return suggestion;
+		    }
+		}
+
 
 	/*
 	 * Source of the XML-file from which the LguiType was generated.
@@ -108,6 +121,9 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * 
 	 */
+	
+	private static String lmlNamespace="http://www.llview.de";
+
 
 	public static final String LAYOUT = "layout";
 
@@ -405,12 +421,19 @@ public class LguiItem implements ILguiItem {
 		update();
 	}
 	
-	public void getRequestXml(FileOutputStream os) {
+	public void getRequestXml(FileOutputStream output) {
 		LguiType layoutLgui = getLayoutFromModell();
 		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
 		try {
-			marshaller.marshal(layoutLgui, os);
-			os.close();
+			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace+" lgui.xsd");
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			QName tagname = new QName(lmlNamespace, "lgui", "lml");
+
+			JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(tagname, LguiType.class, layoutLgui);
+			marshaller.marshal(rootElement, output);
+			output.close();
+		} catch (PropertyException e) {
+			e.printStackTrace();
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -430,8 +453,17 @@ public class LguiItem implements ILguiItem {
 		LguiType layoutLgui = getLayoutFromModell();
 		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
 		try {
-			marshaller.marshal(layoutLgui, output);
+			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace+" lgui.xsd");
+			marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",new LMLNamespacePrefixMapper());
+
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			QName tagname = new QName(lmlNamespace, "lgui", "lml");
+
+			JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(tagname, LguiType.class, layoutLgui);
+			marshaller.marshal(rootElement, output);
 			output.close(); // Must close to flush stream
+		} catch (PropertyException e) {
+			e.printStackTrace();
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

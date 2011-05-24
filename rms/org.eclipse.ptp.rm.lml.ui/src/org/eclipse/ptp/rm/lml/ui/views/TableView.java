@@ -295,12 +295,12 @@ public class TableView extends LMLViewPart {
 		this.gid = acitveTableLayoutGid;
 		fSelectedLguiItem = lmlManager.getSelectedLguiItem();
 		createTable();
-		composite.addDisposeListener(new DisposeListener() {
-			
-			public void widgetDisposed(DisposeEvent e) {
-				lmlManager.removeComponent(gid);
-			}
-		});
+//		composite.addDisposeListener(new DisposeListener() {
+//			
+//			public void widgetDisposed(DisposeEvent e) {
+//				lmlManager.removeComponent(gid);
+//			}
+//		});
 	}
 	
 	private void createTable() {

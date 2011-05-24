@@ -24,6 +24,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
+import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiSelectedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
@@ -38,6 +39,7 @@ import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.events.JobListSortedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiAddedEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.LguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiSelectedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.MarkObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.SelectedObjectChangeEvent;
@@ -249,13 +251,14 @@ public class LMLManager {
 	}
 
 	public void removeLgui(String title) {
+		ILguiItem item = LGUIS.get(title);
 		LGUIS.remove(title);
 		if (LGUIS.isEmpty()) {
 			fLguiItem = null;
 		} else {
 			fLguiItem = LGUIS.get(getLguis()[0]);
 		}
-		fireSelectedLgui();
+		fireRemovedLgui(item);
 	}
 	
 	public void update(InputStream stream) {
@@ -345,7 +348,7 @@ public class LMLManager {
 
 	public void removeComponent(String gid) {
 		fLguiItem.getLayoutAccess().setComponentActive(gid, false);
-		fireremoveView(gid);
+		fireRemoveView(gid);
 	}	
 	
 	public void unselectObject(String oid) {
@@ -366,8 +369,15 @@ public class LMLManager {
 			((IViewListener) listener).handleEvent(event);
 		}
 	}
+	
+	private void fireRemovedLgui(ILguiItem title) {
+		ILguiRemovedEvent event = new LguiRemovedEvent(this, fLguiItem, title);
+		for (Object listener : viewListeners.getListeners()) {
+			((IViewListener) listener).handleEvent(event);
+		}
+	}
 
-	private void fireremoveView(String gid) {
+	private void fireRemoveView(String gid) {
 		IViewDisposedEvent event = new ViewDisposedEvent();
 		for (Object listener : viewListeners.getListeners()) {
 			((IViewListener) listener).handleEvent(event);
