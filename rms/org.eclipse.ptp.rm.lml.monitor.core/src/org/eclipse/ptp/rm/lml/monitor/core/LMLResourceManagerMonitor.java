@@ -34,6 +34,7 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.ui.IRMSelectionListener;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.managers.RMManager;
 
 /**
@@ -87,7 +88,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		}
 
 		public void selectionChanged(ISelection selection) {
-			LMLManager.getInstance().selectLgui(RMManager.getInstance().getSelected());
+			LMLManager.getInstance().selectLgui(fRMManager.getSelected());
 		}
 	}
 
@@ -98,6 +99,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	private MonitorJob fMonitorJob = null;
 	private final RMListener fListener = new RMListener();
+	private final RMManager fRMManager = PTPUIPlugin.getDefault().getRMManager();
 
 	public LMLResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
@@ -150,7 +152,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	@Override
 	protected void doShutdown() throws CoreException {
-		RMManager.getInstance().removeRMSelectionListener(fListener);
+		fRMManager.removeRMSelectionListener(fListener);
 
 		synchronized (this) {
 			if (fMonitorJob != null) {
@@ -194,7 +196,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		/*
 		 * Register for notifications from RM view
 		 */
-		RMManager.getInstance().addRMSelectionListener(fListener);
+		fRMManager.addRMSelectionListener(fListener);
 	}
 
 	@Override
