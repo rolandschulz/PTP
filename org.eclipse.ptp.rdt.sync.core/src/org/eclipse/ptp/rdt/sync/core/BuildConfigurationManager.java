@@ -664,7 +664,7 @@ public class BuildConfigurationManager {
 
 		if (localConfigDes != null) {
 			localConfig.setConfigurationDescription(localConfigDes);
-			localConfigDes.setName(LOCAL_CONFIGURATION_NAME);
+			localConfigDes.setName(Messages.WorkspaceConfigName);
 			localConfigDes.setDescription(LOCAL_CONFIGURATION_DES);
 			localConfig.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
 			IRemoteServices localService = PTPRemoteCorePlugin.getDefault().
