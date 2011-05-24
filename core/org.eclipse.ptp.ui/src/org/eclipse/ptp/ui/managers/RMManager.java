@@ -19,9 +19,25 @@ import org.eclipse.ptp.internal.ui.RMSelectionPersistence;
 import org.eclipse.ptp.ui.IRMSelectionListener;
 
 public class RMManager {
+	private static RMManager fInstance;
+
 	protected String selectedRM = null;
 	protected ListenerList rmSelectionListeners = new ListenerList();
 	protected boolean loaded = false;
+
+	private RMManager() {
+		fInstance = this;
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public static RMManager getInstance() {
+		if (fInstance == null) {
+			fInstance = new RMManager();
+		}
+		return fInstance;
+	}
 
 	/**
 	 * Add listener

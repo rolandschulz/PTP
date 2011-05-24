@@ -136,9 +136,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 
 	// Resource bundle.
 	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations = new HashMap<String, IRuntimeModelPresentation>();
-	private IMachineManager machineManager = null;
-	private IJobManager jobManager = null;
-	private RMManager rmManager = null;
 
 	public PTPUIPlugin() {
 		super();
@@ -151,7 +148,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 * @return job manager
 	 */
 	public IJobManager getJobManager() {
-		return jobManager;
+		return JobManager.getInstance();
 	}
 
 	/**
@@ -160,7 +157,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 * @return machine manager
 	 */
 	public IMachineManager getMachineManager() {
-		return machineManager;
+		return MachineManager.getInstance();
 	}
 
 	/**
@@ -169,7 +166,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 * @return RM manager
 	 */
 	public RMManager getRMManager() {
-		return rmManager;
+		return RMManager.getInstance();
 	}
 
 	/**
@@ -195,9 +192,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		super.start(context);
 		DebugUtil.configurePluginDebugOptions();
 		retrieveRuntimeModelPresentations();
-		machineManager = new MachineManager();
-		jobManager = new JobManager();
-		rmManager = new RMManager();
 	}
 
 	/*
@@ -210,12 +204,9 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		machineManager.shutdown();
-		jobManager.shutdown();
-		rmManager.shutdown();
-		machineManager = null;
-		jobManager = null;
-		rmManager = null;
+		getMachineManager().shutdown();
+		getJobManager().shutdown();
+		getRMManager().shutdown();
 		plugin = null;
 	}
 

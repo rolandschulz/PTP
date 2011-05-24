@@ -52,9 +52,25 @@ import org.eclipse.swt.graphics.Image;
  * 
  */
 public class MachineManager extends AbstractElementManager implements IMachineManager {
+	private static MachineManager fInstance;
+
 	private final Map<String, IPMachine> machineList = new HashMap<String, IPMachine>();
 	protected IPMachine cur_machine = null;
 	protected final String DEFAULT_TITLE = Messages.MachineManager_0;
+
+	private MachineManager() {
+		fInstance = this;
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public static MachineManager getInstance() {
+		if (fInstance == null) {
+			fInstance = new MachineManager();
+		}
+		return fInstance;
+	}
 
 	/*
 	 * (non-Javadoc)
