@@ -135,7 +135,7 @@ plugin@org.eclipse.ptp.remotetools.utils=@ptpTag@,:pserver:anonymous@dev.eclipse
 
 ! PLDT Plugins
 plugin@org.eclipse.ptp.pldt.common=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.common
-plugin@org.eclipse.ptp.pldt.help=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.help
+plugin@org.eclipse.ptp.pldt.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.doc.user
 plugin@org.eclipse.ptp.pldt.lapi=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.lapi
 plugin@org.eclipse.ptp.pldt.mpi.analysis=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.mpi.analysis
 plugin@org.eclipse.ptp.pldt.mpi.analysis.cdt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.mpi.analysis.cdt
