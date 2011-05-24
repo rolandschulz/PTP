@@ -299,22 +299,9 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		advancedOptions.setEnabled(!useDefault);
 		if (!useDefault) {
 			final boolean portFwd = getDataSource().getPortForward();
-			boolean supportsPortForwarding = false;
 			IRemoteConnection conn = getDataSource().getConnection();
 			setPageComplete(conn != null);
-			if (conn != null) {
-				supportsPortForwarding = conn.supportsTCPPortForwarding();
-			}
-			if (localAddrCombo != null) {
-				localAddrCombo.setEnabled(!portFwd);
-			}
-			if (portForwardingButton != null) {
-				portForwardingButton.setEnabled(supportsPortForwarding);
-				portForwardingButton.setSelection(supportsPortForwarding ? portFwd : false);
-			}
-			if (noneButton != null) {
-				noneButton.setSelection(supportsPortForwarding ? !portFwd : true);
-			}
+			updatePortForwarding(conn, portFwd);
 		}
 		getWidgetListener().setEnabled(enabled);
 	}
@@ -426,6 +413,23 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			// Should not happen
 		}
 		return hostname;
+	}
+
+	private void updatePortForwarding(IRemoteConnection conn, boolean forward) {
+		boolean supportsPortForwarding = false;
+		if (conn != null) {
+			supportsPortForwarding = conn.supportsTCPPortForwarding();
+		}
+		if (localAddrCombo != null) {
+			localAddrCombo.setEnabled(!forward);
+		}
+		if (portForwardingButton != null) {
+			portForwardingButton.setEnabled(supportsPortForwarding);
+			portForwardingButton.setSelection(supportsPortForwarding ? forward : false);
+		}
+		if (noneButton != null) {
+			noneButton.setSelection(supportsPortForwarding ? !forward : true);
+		}
 	}
 
 	/*
@@ -598,6 +602,15 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @since 2.0
 	 */
 	protected void handleConnectionSelected() {
+		/*
+		 * If a new connection is selected and port forwarding is supported,
+		 * default to using it.
+		 */
+		IRemoteConnection conn = connectionWidget.getConnection();
+		if (conn != null) {
+			updatePortForwarding(conn, conn.supportsTCPPortForwarding());
+		}
+
 		getDataSource().storeAndValidate();
 		updateControls();
 	}
