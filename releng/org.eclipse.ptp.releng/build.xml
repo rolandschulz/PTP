@@ -796,6 +796,10 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.doc.user"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/tools/ppw/org.eclipse.ptp.etfw.ppw"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>

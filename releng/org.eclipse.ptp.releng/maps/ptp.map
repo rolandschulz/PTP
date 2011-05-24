@@ -155,6 +155,7 @@ plugin@org.eclipse.ptp.etfw.tau.selinst=@ptpTag@,:pserver:anonymous@dev.eclipse.
 plugin@org.eclipse.ptp.etfw.tau.selinstfort=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.tau.selinstfort
 plugin@org.eclipse.ptp.etfw.toolopts=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.toolopts
 plugin@org.eclipse.ptp.etfw.feedback=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.feedback
+plugin@org.eclipse.ptp.etfw.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.doc.user
 
 ! RDT Plugins
 plugin@org.eclipse.ptp.rdt.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core
