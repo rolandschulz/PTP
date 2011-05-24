@@ -175,7 +175,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 
 		@Override
 		protected void loadFromStorage() {
-			fIsInitializing = true;
 			String id = getConfiguration().getRemoteServicesId();
 			if (id != null) {
 				IRemoteServices services = getRemoteServices(id);
@@ -197,7 +196,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			}
 			fPortForward = (getConfiguration().getOptions() & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 			fUseDefault = getConfiguration().getUseDefault();
-			fIsInitializing = false;
 		}
 
 		@Override
@@ -248,8 +246,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 
 	private final IRemoteUIConnectionManager fUIConnectionManager = null;
 	private boolean fEnableUseDefault = false;
-	private boolean fIsInitializing = false;
 	private String fUseDefaultMessage;
+	private boolean fIsInitializing = false;
 
 	protected Button noneButton = null;
 	protected Button portForwardingButton = null;
@@ -316,6 +314,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @param colSpan
 	 */
 	private Composite createContents(Composite parent) {
+		fIsInitializing = true;
 		ScrolledPageContent pageContent = new ScrolledPageContent(parent);
 		GridLayout layout = new GridLayout();
 		// layout.numColumns = 4;
@@ -394,6 +393,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 
 		getDataSource().justValidate();
 		updateControls();
+		fIsInitializing = false;
 
 		return pageContent;
 	}
