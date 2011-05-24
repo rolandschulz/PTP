@@ -8,7 +8,7 @@
 
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="Running PBS Jobs" link_to="../org.eclipse.ptp.help/toc.xml#ptpPBS" topic="html/toc.html">
+<toc label="Running PBS Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpPBS" topic="html/toc.html">
       <topic href="html/toc.html" label="Contents"/> 
       <topic label="Introduction" href="html/PBSHelpPage.html#Introduction"/>
       <topic label="Requirements" href="html/PBSHelpPage.html#Requirements"/>
