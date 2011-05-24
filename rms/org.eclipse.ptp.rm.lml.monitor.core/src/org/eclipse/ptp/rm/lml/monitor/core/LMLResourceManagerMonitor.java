@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -28,9 +29,12 @@ import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfigurati
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
+import org.eclipse.ptp.rm.lml.monitor.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.ui.IRMSelectionListener;
+import org.eclipse.ptp.ui.managers.RMManager;
 
 /**
  * LML JAXB resource manager monitor
@@ -76,10 +80,24 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		}
 	}
 
-	private static final int JOB_SCHEDULE_FREQUENCY = 60000; // needs to be
-	// parameter
+	public class RMListener implements IRMSelectionListener {
+		public void setDefault(Object rm) {
+			// TODO Auto-generated method stub
+
+		}
+
+		public void selectionChanged(ISelection selection) {
+			LMLManager.getInstance().selectLgui(RMManager.getInstance().getSelected());
+		}
+	}
+
+	/*
+	 * needs to be parameter
+	 */
+	private static final int JOB_SCHEDULE_FREQUENCY = 60000;
 
 	private MonitorJob fMonitorJob = null;
+	private final RMListener fListener = new RMListener();
 
 	public LMLResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
@@ -132,6 +150,8 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	@Override
 	protected void doShutdown() throws CoreException {
+		RMManager.getInstance().removeRMSelectionListener(fListener);
+
 		synchronized (this) {
 			if (fMonitorJob != null) {
 				fMonitorJob.cancel();
@@ -161,15 +181,20 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 			}
 			if (!conn.isOpen()) {
 				throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
-						"Unable to open connection"));
+						Messages.LMLResourceManagerMonitor_unableToOpenConnection));
 			}
 			synchronized (this) {
 				if (fMonitorJob == null) {
-					fMonitorJob = new MonitorJob("LML Monitor Job", conn);
+					fMonitorJob = new MonitorJob(Messages.LMLResourceManagerMonitor_LMLMonitorJob, conn);
 					fMonitorJob.schedule();
 				}
 			}
 		}
+
+		/*
+		 * Register for notifications from RM view
+		 */
+		RMManager.getInstance().addRMSelectionListener(fListener);
 	}
 
 	@Override
