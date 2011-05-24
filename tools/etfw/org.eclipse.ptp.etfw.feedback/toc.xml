@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?NLS TYPE="org.eclipse.help.toc"?>
-
-<toc label="External Tools Framework (ETFw)" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpETFw" topic="html/toc.html">
- <topic href="html/toc.html" label="Contents">
- </topic>
-	<topic label="Feedback viewing - overview and sample"  href="html/maintopic.html"> 
-	</topic>
-</toc>
