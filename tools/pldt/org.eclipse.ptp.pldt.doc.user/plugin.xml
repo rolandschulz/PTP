@@ -13,7 +13,7 @@
             <tocIcon
                   altText="%tocIcon.altText"
                   closedIcon="icons/analyze.gif"
-                  id="org.eclipse.ptp.pldt.help.icon"
+                  id="org.eclipse.ptp.pldt.doc.user.icon"
                   openIcon="icons/analyze.gif"/>
    </extension>
 
