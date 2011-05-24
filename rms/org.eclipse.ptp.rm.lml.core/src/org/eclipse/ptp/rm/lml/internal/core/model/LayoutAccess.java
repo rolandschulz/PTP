@@ -61,10 +61,6 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarlayoutType;
  * Moreover with this class one is able to manipulate layout definitions
  * LML-Models can be transformed into layout-only definitions
  * There are functions, which allow to merge layouts to one lml-model
- *  
- *  
- * @author karbach
- *
  */
 public class LayoutAccess extends LguiHandler{	
 	//DefaultLayouts
@@ -359,7 +355,9 @@ public class LayoutAccess extends LguiHandler{
 		
 		if( gobj instanceof TableType ){
 			TableType tt=objectFactory.createTableType();
-			
+			TableType orig=(TableType)gobj;
+			tt.setContenttype(orig.getContenttype() );
+
 			value=tt;
 			
 			qname="table";
@@ -429,7 +427,6 @@ public class LayoutAccess extends LguiHandler{
 		value.setId(gobj.getId());
 		value.setTitle(gobj.getTitle());
 		
-		
 		JAXBElement<GobjectType> res=new JAXBElement<GobjectType>(new QName(qname), c, value  );
 		
 		return res;
@@ -444,6 +441,8 @@ public class LayoutAccess extends LguiHandler{
 	 * @return
 	 */
 	public static LguiType getLayoutFromModell(LguiType modell){
+		
+		final String dummystring="__dummy_nd__";//This is gid for all nodedisplaylayouts in requests => id for all nodedisplays
 		
 		LguiType res=objectFactory.createLguiType();
 		
@@ -482,6 +481,13 @@ public class LayoutAccess extends LguiHandler{
 
 					ComponentlayoutType complayout=(ComponentlayoutType)value;
 					neededComponents.add(complayout.getGid());
+					
+					//Workaround for nodedisplay
+					if( value instanceof NodedisplaylayoutType){
+						NodedisplaylayoutType nlayout=(NodedisplaylayoutType)value;
+						nlayout.setGid(dummystring);
+					}
+					
 				}
 			}
 			
@@ -504,6 +510,13 @@ public class LayoutAccess extends LguiHandler{
 		//Add all gobjects in idtoGobject to the result, so that lml-modell is valid
 		for(GobjectType gobj: idtoGobject.values()){
 			JAXBElement<GobjectType> min=minimizeGobjectType(gobj);
+			
+			//Workaround for nodedisplay
+			GobjectType newgobj = min.getValue();
+			if(newgobj instanceof Nodedisplay){
+				((Nodedisplay)newgobj).setId(dummystring);
+			}
+			
 			res.getObjectsAndRelationsAndInformation().add(min);
 		}
 		
