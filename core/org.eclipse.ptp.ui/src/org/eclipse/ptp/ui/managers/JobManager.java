@@ -59,8 +59,6 @@ import org.eclipse.swt.graphics.Image;
  */
 
 public class JobManager extends AbstractElementManager implements IJobManager {
-	private static JobManager fInstance;
-
 	private static String getProcessKey(IPJob job, int procJobRank) {
 		return job.getProcessName(procJobRank);
 	}
@@ -69,20 +67,6 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	protected IPJob cur_job = null;
 	protected IPQueue cur_queue = null;
 	protected final String DEFAULT_TITLE = Messages.JobManager_0;
-
-	private JobManager() {
-		fInstance = this;
-	}
-
-	/**
-	 * @since 5.0
-	 */
-	public static JobManager getInstance() {
-		if (fInstance == null) {
-			fInstance = new JobManager();
-		}
-		return fInstance;
-	}
 
 	/**
 	 * Add a new job to jobList. Check for any new processes and add these to
