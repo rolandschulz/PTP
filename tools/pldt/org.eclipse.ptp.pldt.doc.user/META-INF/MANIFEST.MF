@@ -1,13 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
-Bundle-SymbolicName: org.eclipse.ptp.pldt.help; singleton:=true
+Bundle-SymbolicName: org.eclipse.ptp.pldt.doc.user;singleton:=true
 Bundle-Version: 5.0.0.qualifier
 Bundle-ClassPath: .
-Bundle-Activator: org.eclipse.ptp.pldt.help.HelpPlugin
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.pldt.help
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.help
