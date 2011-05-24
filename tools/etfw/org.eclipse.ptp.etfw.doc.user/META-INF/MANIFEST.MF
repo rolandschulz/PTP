@@ -1,9 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: User
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.etfw.doc.user;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.help
+Bundle-Vendor: %pluginProvider
+Bundle-Localization: plugin
