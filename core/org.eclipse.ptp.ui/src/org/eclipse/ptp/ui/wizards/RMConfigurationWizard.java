@@ -224,12 +224,14 @@ public class RMConfigurationWizard extends Wizard implements IRMConfigurationWiz
 
 		private List fServiceProviderList;
 
+		private final Map<String, IServiceProvider> fProviderMap = new HashMap<String, IServiceProvider>();
 		private final ArrayList<ProviderInfo> fProviders = new ArrayList<ProviderInfo>();
 
 		public SelectServiceProviderPage(String pageName) {
 			super(pageName);
 			setTitle(pageName);
 			setDescription(Messages.RMServicesConfigurationWizard_7);
+			setPageComplete(false);
 		}
 
 		public void createControl(Composite parent) {
@@ -239,14 +241,6 @@ public class RMConfigurationWizard extends Wizard implements IRMConfigurationWiz
 			composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 			createServiceProviderChoiceControl(composite);
-
-			parent.getDisplay().asyncExec(new Runnable() {
-
-				public void run() {
-					fServiceProviderList.select(0);
-					handleProviderSelection();
-				}
-			});
 
 			setControl(composite);
 		}
@@ -296,9 +290,32 @@ public class RMConfigurationWizard extends Wizard implements IRMConfigurationWiz
 			});
 		}
 
+		/**
+		 * Get the service provider for a particular descriptor. We need to keep
+		 * a map of descriptors to service providers to avoid creating a new
+		 * service provider each time the user selects an item from the list.
+		 * This avoids problems with the wizard pages using different service
+		 * providers.
+		 * 
+		 * @param descriptor
+		 *            descriptor for the service provider
+		 * @return a unique service provider for each descriptor id
+		 */
+		private IServiceProvider getServiceProvider(IServiceProviderDescriptor descriptor) {
+			IServiceProvider provider = fProviderMap.get(descriptor.getId());
+			if (provider == null) {
+				provider = fServiceModelManager.getServiceProvider(descriptor);
+				fProviderMap.put(descriptor.getId(), provider);
+			}
+			return provider;
+		}
+
+		/**
+		 * Handle selection of an item from the list.
+		 */
 		private void handleProviderSelection() {
 			ProviderInfo providerInfo = fProviders.get(fServiceProviderList.getSelectionIndex());
-			IServiceProvider provider = fServiceModelManager.getServiceProvider(providerInfo.descriptor);
+			IServiceProvider provider = getServiceProvider(providerInfo.descriptor);
 			if (provider != null) {
 				fBaseConfiguration = ModelManager.getInstance().createBaseConfiguration(provider);
 				if (providerInfo.factory != null) {
