@@ -170,18 +170,13 @@ public class ViewManager {
 		IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
 		IViewReference[] views = activePage.getViewReferences();
 		for (IViewReference view : views) {
-			System.out.println("Here");
 			if (view.getPartName().equals("Resource Managers")) {
-				System.out.println("Ressource Managers");
-				
 			} else {
 				if (view.getView(false) instanceof LMLViewPart) {
-					System.out.println("LML");
 					((LMLViewPart) view.getView(false)).prepareDispose();
 				}
 				activePage.hideView(view);
 				view = null;
-				System.out.println();
 			} 
 		}
 		i = 0;
