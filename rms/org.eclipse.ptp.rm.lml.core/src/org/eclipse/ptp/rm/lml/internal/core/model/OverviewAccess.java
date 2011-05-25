@@ -16,6 +16,8 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
+import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
+import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.AbslayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
@@ -29,6 +31,12 @@ public class OverviewAccess extends LguiHandler {
 
 	public OverviewAccess(ILguiItem lguiItem, LguiType lgui) {
 		super(lguiItem, lgui);
+		
+		this.lguiItem.addListener(new ILguiListener() {
+			public void handleEvent(ILguiUpdatedEvent e) {
+				update(e.getLguiItem().getLguiType());
+			}
+		});
 	}
 
 	/**

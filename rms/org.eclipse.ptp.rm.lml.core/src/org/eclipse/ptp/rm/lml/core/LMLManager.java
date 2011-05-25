@@ -15,8 +15,10 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -85,6 +87,11 @@ public class LMLManager {
 	 * An instance of this class.
 	 */
 	private static LMLManager manager;
+	
+	/*
+	 * 
+	 */
+	private List<String> openLguis = new ArrayList<String>();
 	
 	/*
 	 * 
@@ -163,6 +170,11 @@ public class LMLManager {
 		ILguiItem lguiItem = LGUIS.get(name);
 		lguiItem.getCurrentLayout(output);
 		lguiItem.update(input);
+
+		if (!fLguiItem.toString().equals(name)) {
+			return;
+		}
+		// TODO Think about
 		fireNewLgui();
 	}
 	
@@ -170,15 +182,16 @@ public class LMLManager {
 	 * Lgui handling methods
 	 **************************************************************************************************************/
 
-	public void addLgui(String name) {
+	public void openLgui(String name) {
 		if (!LGUIS.containsKey(name)) {
-			fLguiItem = new LguiItem(name);
 			synchronized (LGUIS) {
-				LGUIS.put(name, fLguiItem);
+				LGUIS.put(name, new LguiItem(name));
 			}
-		} else {
-			fLguiItem = LGUIS.get(name);
 		}
+		fLguiItem = LGUIS.get(name);
+		openLguis.add(name);
+
+		
 	}
 	
 	/*
@@ -229,8 +242,25 @@ public class LMLManager {
 	}
 	
 	public void selectLgui(String name) {
+		if (!openLguis.contains(name)) {
+			if (!LGUIS.containsKey(name)) {
+				LGUIS.put(name, new LguiItem(name));
+			}
+			fLguiItem = null;
+			// TODO close all open views
+			return;
+		}
+		// is open
+		if (fLguiItem.toString().equals(name)) {
+			return;
+		}
+		// TODO close views
 		fLguiItem = LGUIS.get(name);
-		fireSelectedLgui();
+		// TODO open new views
+		
+		
+//		fLguiItem = LGUIS.get(name);
+//		fireSelectedLgui();
 	}
 
 	public void selectLgui(URI xmlFile) {

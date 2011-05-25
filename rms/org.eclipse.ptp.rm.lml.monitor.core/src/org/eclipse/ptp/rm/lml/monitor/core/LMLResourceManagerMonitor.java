@@ -167,7 +167,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		/*
 		 * Initialize LML classes
 		 */
-		LMLManager.getInstance().addLgui(getResourceManager().getUniqueName());
+		LMLManager.getInstance().openLgui(getResourceManager().getUniqueName());
 
 		/*
 		 * Open connection and launch periodic job

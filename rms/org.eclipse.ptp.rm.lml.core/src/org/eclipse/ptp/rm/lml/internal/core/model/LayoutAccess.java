@@ -813,6 +813,9 @@ public class LayoutAccess extends LguiHandler{
 				nodedisplayID.add(nodedisplayLayout.getGid());
 			}
 		}
+		if (nodedisplayID.isEmpty()) {
+			System.out.println("Problem");
+		}
 		return nodedisplayID.toArray(new String[nodedisplayID.size()]);
 	}
 	

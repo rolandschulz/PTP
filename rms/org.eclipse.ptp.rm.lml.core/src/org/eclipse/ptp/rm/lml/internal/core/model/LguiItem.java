@@ -195,7 +195,7 @@ public class LguiItem implements ILguiItem {
 			e.printStackTrace();
 		}
 
-		return lml;
+		return lml; 
 
 	}
 
@@ -209,6 +209,7 @@ public class LguiItem implements ILguiItem {
 	 * @throws JAXBException
 	 */
 	private LguiType parseLML(InputStream stream) {
+		LguiType old = lgui;
 		LguiType lml = null;
 		try {
 			Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
@@ -218,6 +219,7 @@ public class LguiItem implements ILguiItem {
 			lml = doc.getValue();
 		} catch (JAXBException e) {
 			e.printStackTrace();
+			lml = old;
 		}
 
 		return lml;
@@ -418,6 +420,10 @@ public class LguiItem implements ILguiItem {
 
 	public void update(InputStream stream) {
 		lgui = parseLML(stream);
+		if (listeners.isEmpty()) {
+			createLguiHandlers();
+		}
+		setCid();
 		update();
 	}
 	
