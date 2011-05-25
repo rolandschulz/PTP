@@ -8,5 +8,16 @@
             id="org.eclipse.ptp.rm.lml.monitor">
       </configurationWizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ptp.ui.views.resourceManagerView?after=additions">
+         <dynamic
+               class="org.eclipse.ptp.rm.lml.monitor.ui.menus.LLGuiOpenContributionItem"
+               id="org.eclipse.ptp.rm.lml.monitor.LLGuiOpenContributionItem">
+         </dynamic>
+      </menuContribution>
+   </extension>
 
 </plugin>
