@@ -4,7 +4,7 @@
 <!-- Define the top level topics                                                   -->
 <!-- ============================================================================= -->
 
-<toc label="PTP Developers Guide">
+<toc label="PTP Developer's Guide">
 	<!--topic label="Programmer&apos;s Guide" href="guide/guide.html">
 		<link toc="guide.xml" />
 		<anchor id="guide_additions"/>
