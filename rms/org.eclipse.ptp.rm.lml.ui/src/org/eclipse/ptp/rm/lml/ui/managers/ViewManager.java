@@ -168,18 +168,21 @@ public class ViewManager {
 			return;
 		}
 		IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
-		System.out.println(activePage);
 		IViewReference[] views = activePage.getViewReferences();
-
 		for (IViewReference view : views) {
+			System.out.println("Here");
 			if (view.getPartName().equals("Resource Managers")) {
-				return;
-			}
-			if (view.getView(false) instanceof LMLViewPart) {
-				((LMLViewPart) view.getView(false)).prepareDispose();
-			}
-			activePage.hideView(view);
-			view = null;
+				System.out.println("Ressource Managers");
+				
+			} else {
+				if (view.getView(false) instanceof LMLViewPart) {
+					System.out.println("LML");
+					((LMLViewPart) view.getView(false)).prepareDispose();
+				}
+				activePage.hideView(view);
+				view = null;
+				System.out.println();
+			} 
 		}
 		i = 0;
 		j = 0;
@@ -201,7 +204,6 @@ public class ViewManager {
 	private void generateNodedisplay(String gid) {
 		try {
 			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
-			System.out.println(activePage);
 			IViewPart view = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(j), activePage.VIEW_VISIBLE);
 			RunNodedisplayUIJob job = new RunNodedisplayUIJob(gid, view);
 			job.setUser(true);
