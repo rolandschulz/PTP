@@ -4,6 +4,8 @@
 <toc label="External Tools Framework (ETFw)" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpETFw" topic="html/toc.html">
  <topic href="html/toc.html" label="Contents">
  </topic>
-	<topic label="External Tools Framework"  href="html/maintopic.html"> 
+	<topic label="External Tools Framework Core"  href="html/core.html"> 
 	</topic>
+ <topic href="html/feedback.html" label="Feedback View">
+ </topic>
 </toc>
