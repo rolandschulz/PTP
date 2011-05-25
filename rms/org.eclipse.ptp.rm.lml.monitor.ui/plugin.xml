@@ -11,17 +11,16 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            allPopups="false"
-            locationURI="toolbar:org.eclipse.ptp.ui.views.resourceManagerView">
+            locationURI="menu:org.eclipse.ptp.ui.views.resourceManagerView">
          <menu
+               icon="icons/parallel_perspective.gif"
                id="org.eclipse.ptp.ui.views.resourceManagerView.closedLL.menu"
                label="%resourceManagerView.closedLL.label"
-               mnemonic="%resourceManagerView.closedLL.mnemonic"
-               tooltip="Re-open closed LLview tables">
+               tooltip="%resourceManagerView.closedLL.tooltip">
              <dynamic
                class="org.eclipse.ptp.rm.lml.monitor.ui.menus.LLGuiOpenContributionItem"
                id="org.eclipse.ptp.rm.lml.monitor.LLGuiOpenContributionItem">
-         </dynamic>
+             </dynamic>
         </menu>
       </menuContribution>
    </extension>
