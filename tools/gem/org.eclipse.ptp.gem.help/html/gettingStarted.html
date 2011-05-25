@@ -61,25 +61,37 @@ and launch your MPI apps all from the comfort of the Eclipse IDE.
 
 <h2>Verifying a MPI <ins>Managed Build</ins> Project</h2>
 
-<h3>STEP - 1:&nbsp;&nbsp;&nbsp;Set the Number of Processes to Verify With</h3>
-This would be the same number of processes that you would run your MPI application with using mpiexec or mpirun:<br/>
+<h3>STEP - 1:&nbsp;&nbsp;&nbsp;Make Sure all Prerequisites are Satisfied</h3>
+Please see the <a href="prereqs.html">GEM Prerequisites Page</a>. Particularly important, is the installation
+of <a href="http://www.cs.utah.edu/formal_verification/ISP-release/">In-situ Partial Order (ISP)</a>, the underlying
+formal verification engine GEM serves as a front-end for.
+
+<h3>STEP - 2:&nbsp;&nbsp;&nbsp;Set ISP Command Line Options</h3>
+You'll need to tell GEM where ISP and its scripts (both local and remote) are installed and which of its command line 
+options you would like to use. Please see the <a href="preferences.html#ispPrefs">ISP Preference Page</a> for detailed 
+instructions (image below).
+
+<h3>STEP - 3:&nbsp;&nbsp;&nbsp;Set the Number of Processes to Verify With</h3>
+<i>(the same number of processes that you would run your MPI application with normally</i><br/>
 To do this, please consult the help page detailing <a href="setNumProcs.html">Setting the number of processes</a>
 
-<h3>STEP - 2:&nbsp;&nbsp;&nbsp;Specify Command Line Arguments</h3>
+<h3>STEP - 4:&nbsp;&nbsp;&nbsp;Set Preference for Command Line Arguments Prompt</h3>
 
-Depending on whether or not the preference is set to collect command line arguments (please see the
-<a href="preferences.html#gemprefs">GEM Preference Page</a> for this) to pass to 
-your MPI application, a dialog may be opened prior to verification to collect this information.
-
-<br/><br/>
-<img src="images/gemPrefsCmdArgs.png">
-<br/><br/>
+Depending on whether or not this preference is set, a dialog (figure 1 below) may be opened prior to verification 
+(e.g. when GEM is run) to collect this information. Please see the <a href="preferences.html#gemPrefs">GEM Preference Page</a> 
+for this (figure 2 below).
 
 <br/><br/>
+<b>figure 1</b><br/><br/>
 <img src="images/comandLineArgsDialog.png">
 <br/><br/>
 
-<h3>STEP - 3:&nbsp;&nbsp;&nbsp;Choose Project to Formally Verify</h3>
+<br/><br/>
+<b>figure 2</b><br/><br/>
+<img src="images/gemPrefsCmdArgs.png">
+<br/><br/>
+
+<h3>STEP - 5:&nbsp;&nbsp;&nbsp;Choose Project to Formally Verify</h3>
 In this example, we&#39;ll verify the simple <tt><b>MPI Pi C</b></tt> project that you can create with the CDT New
 MPI Project Wizard.<br/>
 <i>NOTE: GEM&#39;s views may not be visible at first, but will be opened when a verification run is started.</i><br/><br/>
@@ -128,8 +140,8 @@ For using GEM on larger Makefile projects, please see the section below on
     </li>
 </ol>
 
-
-<h3>STEP - 4:&nbsp;&nbsp;&nbsp;Use GEM Views to Locate and Correct MPI Errors &#47; Problems</h3>
+<a name="step6"></a>
+<h3>STEP - 6:&nbsp;&nbsp;&nbsp;Use GEM Views to Locate and Correct MPI Errors &#47; Problems</h3>
 
 <p>
 
@@ -171,7 +183,7 @@ verification run will take (hence no actual Progress Monitor object).
 		<br/><br/>
 	</li>
 	<li>
-		The <b>Console View</b> is described and shown at the beginning of step 3 (above).
+		The <b>Console View</b> is described and shown at the beginning of <a href="#step6">step 6</a>.
 		<br/>
 		For detailed coverage of the <b>Console View</b> and how to use it, please refer to the
 		 <a href="consoleView.html"><b>Console View Documentation</b></a>.
