@@ -29,13 +29,11 @@ import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
 import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
-import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.ptp.rm.lml.ui.views.NodesView;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -47,32 +45,49 @@ public class ViewManager {
 
 	public class ViewListener implements IViewListener {
 
-		public void handleEvent(ILguiAddedEvent e) {
-			deleteOldViews();
-			selectedLgui = e.getLguiItem();
-			generateNewViews();
-//
-//			selectedLgui.getObjectStatus().addComponent(new EventForwarder());
+		public void handleEvent(final ILguiAddedEvent e) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					deleteOldViews();
+					selectedLgui = e.getLguiItem();
+					generateNewViews();
+				}
+			});
+			//
+			// selectedLgui.getObjectStatus().addComponent(new
+			// EventForwarder());
 		}
 
-		public void handleEvent(ILguiRemovedEvent e) {
-			deleteOldViews();
-			selectedLgui = e.getLguiItem();
-			if (selectedLgui != null) {
-				generateNewViews();
-			}
+		public void handleEvent(final ILguiRemovedEvent e) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					deleteOldViews();
+					selectedLgui = e.getLguiItem();
+					if (selectedLgui != null) {
+						generateNewViews();
+					}
+				}
+			});
 		}
 
-		public void handleEvent(ILguiSelectedEvent e) {
-			deleteOldViews();
-			selectedLgui = e.getLguiItem();
-			if (selectedLgui != null) {
-				generateNewViews();
-			}
+		public void handleEvent(final ILguiSelectedEvent e) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					deleteOldViews();
+					selectedLgui = e.getLguiItem();
+					if (selectedLgui != null) {
+						generateNewViews();
+					}
+				}
+			});
 		}
 
-		public void handleEvent(IViewAddedEvent e) {
-			addView(e.getGid(), e.getType());
+		public void handleEvent(final IViewAddedEvent e) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					addView(e.getGid(), e.getType());
+				}
+			});
 		}
 
 		public void handleEvent(IViewDisposedEvent e) {
@@ -117,14 +132,14 @@ public class ViewManager {
 		}
 
 	}
-	
+
 	public static IWorkbenchPage getPage() {
-		final IWorkbenchPage page[] = new IWorkbenchPage[]{null};
+		final IWorkbenchPage page[] = new IWorkbenchPage[] { null };
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-			
+
 			public void run() throws Exception {
 				System.out.println(PTPUIPlugin.getActivePage());
-                page[0] = PTPUIPlugin.getActivePage();
+				page[0] = PTPUIPlugin.getActivePage();
 			}
 		});
 		return page[0];
@@ -133,15 +148,13 @@ public class ViewManager {
 	protected ILguiItem selectedLgui = null;
 
 	public static LMLManager lmlManager = LMLManager.getInstance();
-	
-	public IViewListener viewListener = new ViewListener();
 
-	public IWorkbenchPage activePage = null;
+	public IViewListener viewListener = new ViewListener();
 
 	public int i = 0;
 
 	public int j = 0;
-	
+
 	public ViewManager() {
 		lmlManager.addListener(viewListener);
 	}
@@ -154,7 +167,7 @@ public class ViewManager {
 		if (selectedLgui == null) {
 			return;
 		}
-		activePage = getPage();
+		IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
 		System.out.println(activePage);
 		IViewReference[] views = activePage.getViewReferences();
 
@@ -163,7 +176,7 @@ public class ViewManager {
 				return;
 			}
 			if (view.getView(false) instanceof LMLViewPart) {
-					((LMLViewPart) view.getView(false)).prepareDispose();
+				((LMLViewPart) view.getView(false)).prepareDispose();
 			}
 			activePage.hideView(view);
 			view = null;
@@ -174,6 +187,7 @@ public class ViewManager {
 
 	private void generateTable(String gid) {
 		try {
+			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
 			IViewPart view = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(i), activePage.VIEW_VISIBLE);
 			RunTableUIJob job = new RunTableUIJob(gid, view);
 			job.setUser(true);
@@ -186,6 +200,7 @@ public class ViewManager {
 
 	private void generateNodedisplay(String gid) {
 		try {
+			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
 			System.out.println(activePage);
 			IViewPart view = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(j), activePage.VIEW_VISIBLE);
 			RunNodedisplayUIJob job = new RunNodedisplayUIJob(gid, view);
@@ -198,14 +213,11 @@ public class ViewManager {
 	}
 
 	private void generateNewViews() {
-		if (activePage == null) {
-			activePage = getPage();
-		}
-//		try {
-//			activePage = getPage();
-//		} catch (SWTException e) {
-//			e.printStackTrace();
-//		}
+		// try {
+		// activePage = getPage();
+		// } catch (SWTException e) {
+		// e.printStackTrace();
+		// }
 		String[] activeTableLayoutsGid = selectedLgui.getLayoutAccess().getActiveTableLayoutsGid();
 		for (String gid : activeTableLayoutsGid) {
 			generateTable(gid);
@@ -217,7 +229,6 @@ public class ViewManager {
 	}
 
 	private void addView(String gid, String type) {
-		activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
 		if (type.equals("table")) {
 			generateTable(gid);
 		} else if (type.equals("nodedisplay")) {
