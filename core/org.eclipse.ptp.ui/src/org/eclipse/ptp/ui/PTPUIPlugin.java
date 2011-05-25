@@ -216,9 +216,9 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		machineManager.shutdown();
-		jobManager.shutdown();
-		rmManager.shutdown();
+		getMachineManager().shutdown();
+		getJobManager().shutdown();
+		getRMManager().shutdown();
 		machineManager = null;
 		jobManager = null;
 		rmManager = null;
