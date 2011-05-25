@@ -77,9 +77,9 @@ public class RemoteConnectionWidget extends Composite {
 			if (isEnabled()) {
 				Object source = e.getSource();
 				if (source == remoteCombo) {
-					handleRemoteServiceSelected(null);
+					handleRemoteServiceSelected(null, true);
 				} else if (source == connectionCombo) {
-					handleConnectionSelected();
+					handleConnectionSelected(true);
 				}
 			}
 		}
@@ -220,7 +220,7 @@ public class RemoteConnectionWidget extends Composite {
 		if (remoteCombo != null) {
 			initializeRemoteServicesCombo(null);
 		}
-		handleRemoteServiceSelected(null);
+		handleRemoteServiceSelected(null, false);
 	}
 
 	/**
@@ -267,7 +267,7 @@ public class RemoteConnectionWidget extends Composite {
 	 *            connection to select
 	 */
 	public void setConnection(IRemoteConnection connection) {
-		handleRemoteServiceSelected(connection);
+		handleRemoteServiceSelected(connection, false);
 	}
 
 	/*
@@ -334,7 +334,7 @@ public class RemoteConnectionWidget extends Composite {
 	 * Handle the section of a new connection. Update connection option buttons
 	 * appropriately.
 	 */
-	protected void handleConnectionSelected() {
+	protected void handleConnectionSelected(boolean notify) {
 		final boolean enabled = fWidgetListener.isEnabled();
 		fWidgetListener.disable();
 		fSelectedConnection = null;
@@ -345,7 +345,9 @@ public class RemoteConnectionWidget extends Composite {
 		}
 		Event evt = new Event();
 		evt.widget = this;
-		notifyListeners(new SelectionEvent(evt));
+		if (notify) {
+			notifyListeners(new SelectionEvent(evt));
+		}
 		fWidgetListener.setEnabled(enabled);
 	}
 
@@ -358,7 +360,7 @@ public class RemoteConnectionWidget extends Composite {
 	 */
 	protected void handleNewRemoteConnectionSelected() {
 		if (getUIConnectionManager() != null) {
-			handleRemoteServiceSelected(getUIConnectionManager().newConnection(getShell(), fAttrHints, fAttrHintValues));
+			handleRemoteServiceSelected(getUIConnectionManager().newConnection(getShell(), fAttrHints, fAttrHintValues), true);
 		}
 	}
 
@@ -372,8 +374,11 @@ public class RemoteConnectionWidget extends Composite {
 	 * @param conn
 	 *            connection to select as current. If conn is null, select the
 	 *            first item in the list.
+	 * @param notify
+	 *            if true, notify handlers that the connection has changed. This
+	 *            should only happen if the user changes the connection.
 	 */
-	protected void handleRemoteServiceSelected(IRemoteConnection conn) {
+	protected void handleRemoteServiceSelected(IRemoteConnection conn, boolean notify) {
 		final boolean enabled = fWidgetListener.isEnabled();
 		fWidgetListener.disable();
 
@@ -430,7 +435,7 @@ public class RemoteConnectionWidget extends Composite {
 		 * A connection is always going to be selected when a remote service
 		 * provider is selected, so make sure the handlers get notified
 		 */
-		handleConnectionSelected();
+		handleConnectionSelected(notify);
 
 		/*
 		 * Enable 'new' button if new connections are supported

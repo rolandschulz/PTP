@@ -247,7 +247,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	private final IRemoteUIConnectionManager fUIConnectionManager = null;
 	private boolean fEnableUseDefault = false;
 	private String fUseDefaultMessage;
-	private boolean fIsInitializing = false;
 
 	protected Button noneButton = null;
 	protected Button portForwardingButton = null;
@@ -303,6 +302,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			IRemoteConnection conn = getDataSource().getConnection();
 			setPageComplete(conn != null);
 			updatePortForwarding(conn, portFwd);
+		} else {
+			setPageComplete(true);
 		}
 		getWidgetListener().setEnabled(enabled);
 	}
@@ -314,7 +315,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @param colSpan
 	 */
 	private Composite createContents(Composite parent) {
-		fIsInitializing = true;
 		ScrolledPageContent pageContent = new ScrolledPageContent(parent);
 		GridLayout layout = new GridLayout();
 		// layout.numColumns = 4;
@@ -393,7 +393,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 
 		getDataSource().justValidate();
 		updateControls();
-		fIsInitializing = false;
 
 		return pageContent;
 	}
@@ -605,17 +604,16 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @since 2.0
 	 */
 	protected void handleConnectionSelected() {
-		if (!fIsInitializing) {
-			/*
-			 * If a new connection is selected and port forwarding is supported,
-			 * default to using it. Only do this if we're not being initialized,
-			 * otherwise the saved settings are overridden.
-			 */
-			IRemoteConnection conn = connectionWidget.getConnection();
-			if (conn != null) {
-				updatePortForwarding(conn, conn.supportsTCPPortForwarding());
-			}
+		/*
+		 * If a new connection is selected and port forwarding is supported,
+		 * default to using it. Only do this if we're not being initialized,
+		 * otherwise the saved settings are overridden.
+		 */
+		IRemoteConnection conn = connectionWidget.getConnection();
+		if (conn != null) {
+			updatePortForwarding(conn, conn.supportsTCPPortForwarding());
 		}
+
 		getDataSource().storeAndValidate();
 		updateControls();
 	}
