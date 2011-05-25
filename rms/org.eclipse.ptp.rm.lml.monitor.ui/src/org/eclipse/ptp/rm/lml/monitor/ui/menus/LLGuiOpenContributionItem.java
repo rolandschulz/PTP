@@ -34,9 +34,11 @@ public class LLGuiOpenContributionItem extends CompoundContributionItem {
 	protected IContributionItem[] getContributionItems() {
 		List<IContributionItem> list = new ArrayList<IContributionItem>();
 		ILguiItem selected = lmlManager.getSelectedLguiItem();
-		Map<String, String> gids = selected.getLayoutAccess().getInactiveComponents();
-		for (Map.Entry<String, String> gid : gids.entrySet()) {
-			list.add(new ActionContributionItem(new ShowViewAction(gid)));
+		if (selected != null) {
+			Map<String, String> gids = selected.getLayoutAccess().getInactiveComponents();
+			for (Map.Entry<String, String> gid : gids.entrySet()) {
+				list.add(new ActionContributionItem(new ShowViewAction(gid)));
+			}
 		}
 		return list.toArray(new IContributionItem[0]);
 	}
