@@ -37,6 +37,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.ptp.rm.lml.internal.ui.LMLRuntimePerspectiveFactory"
+            fixed="true"
             icon="icons/parallel_perspective.gif"
             id="org.eclipse.ptp.rm.lml.ui.LMLRunPerspective"
             name="%Perspective.name">

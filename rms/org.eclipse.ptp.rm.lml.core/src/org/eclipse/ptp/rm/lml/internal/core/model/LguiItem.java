@@ -51,6 +51,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.InfoboxType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
+import org.eclipse.ptp.rm.lml.internal.core.elements.NodedisplaylayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
 import org.eclipse.ptp.rm.lml.internal.core.elements.PaneType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
@@ -249,6 +250,7 @@ public class LguiItem implements ILguiItem {
 			for (RowType row : table.getRow()) {
 				int cid = 1;
 				for (CellType cell : row.getCell()) {
+//					System.out.println("here");
 					if (cell.getCid() == null) {
 						cell.setCid(BigInteger.valueOf(cid));
 					} else {
@@ -262,8 +264,8 @@ public class LguiItem implements ILguiItem {
 
 	public void save(IMemento memento) {
 		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
-		LguiType lgui = getLayoutFromModell();
-		System.out.println(lgui == null);
+		LguiType lgui = getLayoutAccess().getLayoutFromModell();
+//		System.out.println(lgui == null);
 		StringWriter writer = new StringWriter();
 		try {
 			marshaller.marshal(lgui, writer);
@@ -392,25 +394,6 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	// public void updateXML() {
-	// lgui = null;
-	// try {
-	// xmlFile = new URI(xmlFile.toString());
-	// } catch (URISyntaxException e) {
-	// e.printStackTrace();
-	// }
-	// try {
-	// lgui = parseLML(xmlFile);
-	// } catch (MalformedURLException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
-	// for (ILguiListener listener : listeners) {
-	// listener.handleEvent(e);
-	// }
-	// }
-
 	public void update() {
 		ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
 		for (ILguiListener listener : listeners) {
@@ -423,8 +406,8 @@ public class LguiItem implements ILguiItem {
 		if (listeners.isEmpty()) {
 			createLguiHandlers();
 		}
-		setCid();
 		update();
+		setCid();
 	}
 	
 	public void getRequestXml(FileOutputStream output) {
@@ -501,6 +484,8 @@ public class LguiItem implements ILguiItem {
 		if (lgui == null) {
 			return firstRequest();
 		}
+		
+		final String dummystring="__dummy_nd__";
 		LguiType result = objectFactory.createLguiType();
 		HashSet<String> neededComponents = new HashSet<String>();
 
@@ -533,6 +518,11 @@ public class LguiItem implements ILguiItem {
 
 					ComponentlayoutType componentLayout = (ComponentlayoutType) value;
 					neededComponents.add(componentLayout.getGid());
+					
+//					if( value instanceof NodedisplaylayoutType){
+//						NodedisplaylayoutType nlayout=(NodedisplaylayoutType)value;
+//						nlayout.setGid(dummystring);
+//					}
 				}
 			}
 
@@ -554,6 +544,11 @@ public class LguiItem implements ILguiItem {
 		// valid
 		for (GobjectType gObject : idToGobject.values()) {
 			JAXBElement<GobjectType> min = minimizeGobjectType(gObject);
+			
+//			GobjectType newGobject = min.getValue();
+//			if (newGobject instanceof Nodedisplay) {
+//				((Nodedisplay) newGobject).setId(dummystring);
+//			}
 			result.getObjectsAndRelationsAndInformation().add(min);
 		}
 		// Set layout-attribute
@@ -602,6 +597,8 @@ public class LguiItem implements ILguiItem {
 
 		if (gObject instanceof TableType) {
 			TableType tableType = objectFactory.createTableType();
+			TableType origin = (TableType) gObject;
+			tableType.setContenttype(origin.getContenttype());
 			value = tableType;
 			qName = "table";
 		} else if (gObject instanceof UsagebarType) {

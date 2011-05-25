@@ -440,7 +440,7 @@ public class LayoutAccess extends LguiHandler{
 	 * @param modell lml-modell with data and layout-information
 	 * @return
 	 */
-	public static LguiType getLayoutFromModell(LguiType modell){
+	public LguiType getLayoutFromModell(){
 		
 		final String dummystring="__dummy_nd__";//This is gid for all nodedisplaylayouts in requests => id for all nodedisplays
 		
@@ -448,7 +448,7 @@ public class LayoutAccess extends LguiHandler{
 		
 		HashSet<String> neededComponents=new HashSet<String>();
 		
-		for(JAXBElement<?> tag: modell.getObjectsAndRelationsAndInformation()){
+		for(JAXBElement<?> tag: lgui.getObjectsAndRelationsAndInformation()){
 			
 			Object value=tag.getValue();
 			
@@ -495,7 +495,7 @@ public class LayoutAccess extends LguiHandler{
 		
 		HashMap<String, GobjectType> idtoGobject=new HashMap<String, GobjectType>();
 		//Search needed components in data-tag to discover, which type the needed components have
-		for(JAXBElement<?> tag: modell.getObjectsAndRelationsAndInformation()){
+		for(JAXBElement<?> tag: lgui.getObjectsAndRelationsAndInformation()){
 			
 			Object value=tag.getValue();
 			//is it a graphical object?

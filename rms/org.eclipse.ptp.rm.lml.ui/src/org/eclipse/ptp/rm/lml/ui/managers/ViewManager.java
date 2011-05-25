@@ -29,6 +29,7 @@ import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
 import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
+import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.ptp.rm.lml.ui.views.NodesView;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
@@ -48,24 +49,18 @@ public class ViewManager {
 		public void handleEvent(final ILguiAddedEvent e) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					deleteOldViews();
 					selectedLgui = e.getLguiItem();
 					generateNewViews();
+					selectedLgui.getObjectStatus().addComponent(new EventForwarder());
 				}
 			});
-			//
-			// selectedLgui.getObjectStatus().addComponent(new
-			// EventForwarder());
+			
 		}
 
 		public void handleEvent(final ILguiRemovedEvent e) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					deleteOldViews();
-					selectedLgui = e.getLguiItem();
-					if (selectedLgui != null) {
-						generateNewViews();
-					}
 				}
 			});
 		}

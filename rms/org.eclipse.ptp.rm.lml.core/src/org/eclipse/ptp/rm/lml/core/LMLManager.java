@@ -174,7 +174,8 @@ public class LMLManager {
 		if (!fLguiItem.toString().equals(name)) {
 			return;
 		}
-		// TODO Think about
+		// TODO Think about  - update
+		fireRemovedLgui(null);
 		fireNewLgui();
 	}
 	
@@ -242,25 +243,21 @@ public class LMLManager {
 	}
 	
 	public void selectLgui(String name) {
+		System.out.println(name);
 		if (!openLguis.contains(name)) {
 			if (!LGUIS.containsKey(name)) {
 				LGUIS.put(name, new LguiItem(name));
 			}
 			fLguiItem = null;
-			// TODO close all open views
+			fireRemovedLgui(null);
 			return;
 		}
-		// is open
 		if (fLguiItem.toString().equals(name)) {
 			return;
 		}
-		// TODO close views
+		fireRemovedLgui(null);
 		fLguiItem = LGUIS.get(name);
-		// TODO open new views
-		
-		
-//		fLguiItem = LGUIS.get(name);
-//		fireSelectedLgui();
+		fireNewLgui();
 	}
 
 	public void selectLgui(URI xmlFile) {
