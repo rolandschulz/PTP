@@ -432,7 +432,12 @@ public class LguiItem implements ILguiItem {
 	}
 
 	public boolean isEmpty() {
-		return lgui.getObjectsAndRelationsAndInformation().isEmpty();
+		if (lgui == null) {
+			return true;
+		} else {
+			return false;
+		}
+		
 	}
 
 	/**************************************************************************************************************

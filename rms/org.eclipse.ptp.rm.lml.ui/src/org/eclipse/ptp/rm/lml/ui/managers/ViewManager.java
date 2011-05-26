@@ -49,6 +49,7 @@ public class ViewManager {
 		public void handleEvent(final ILguiAddedEvent e) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
+					deleteOldViews();
 					selectedLgui = e.getLguiItem();
 					generateNewViews();
 					selectedLgui.getObjectStatus().addComponent(new EventForwarder());
