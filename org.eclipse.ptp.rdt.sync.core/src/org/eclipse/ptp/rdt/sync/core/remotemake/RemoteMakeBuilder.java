@@ -72,6 +72,7 @@ import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -97,7 +98,6 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  * 
  */
 public class RemoteMakeBuilder extends MakeBuilder {
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -654,6 +654,11 @@ public class RemoteMakeBuilder extends MakeBuilder {
 	 */
 	@Override
 	protected boolean shouldBuild(int kind, IMakeBuilderInfo info) {
+		IConfiguration defConfig = ManagedBuildManager.getBuildInfo(getProject()).getDefaultConfiguration();
+		if (defConfig.getName() == Messages.WorkspaceConfigName) {
+			return false;
+		}
+
 		IProject project = getProject();
 
 		IProjectDescription description = null;

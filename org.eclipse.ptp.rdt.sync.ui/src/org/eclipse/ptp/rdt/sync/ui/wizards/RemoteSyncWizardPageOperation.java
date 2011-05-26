@@ -32,6 +32,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.remotemake.CommonBuilder;
 import org.eclipse.ptp.rdt.sync.core.remotemake.RemoteMakeBuilder;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteMakeNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
@@ -72,6 +73,7 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		}
 
 		try {
+			RemoteMakeNature.updateProjectDescription(project, CommonBuilder.COMMON_BUILDER_ID, new NullProgressMonitor());
 			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
 		} catch (CoreException e1) {
 			StatusManager.getManager().handle(e1, RDTSyncUIPlugin.PLUGIN_ID);
