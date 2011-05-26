@@ -178,7 +178,7 @@ public class LMLManager {
 		if (!fLguiItem.toString().equals(name)) {
 			return;
 		}
-		if (lmlListeners.getListeners().length == 0) {
+		if (lmlListeners.getListeners().length == 5) {
 			fireNewLgui();
 		} else {
 			fireUpdatedLgui();
