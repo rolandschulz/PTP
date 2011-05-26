@@ -19,6 +19,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -88,7 +91,15 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		}
 
 		public void selectionChanged(ISelection selection) {
-			LMLManager.getInstance().selectLgui(fRMManager.getSelected());
+			String name = null;
+			if (!selection.isEmpty()) {
+				TreePath path = ((ITreeSelection) selection).getPaths()[0];
+				Object segment = path.getFirstSegment();
+				if (segment instanceof IPResourceManager) {
+					name = ((IPResourceManager) segment).getResourceManager().getUniqueName();
+				}
+			}
+			LMLManager.getInstance().selectLgui(name);
 		}
 	}
 
@@ -153,7 +164,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	@Override
 	protected void doShutdown() throws CoreException {
 		fRMManager.removeRMSelectionListener(fListener);
-		
+
 		LMLManager.getInstance().closeLgui(getResourceManager().getUniqueName());
 
 		synchronized (this) {
