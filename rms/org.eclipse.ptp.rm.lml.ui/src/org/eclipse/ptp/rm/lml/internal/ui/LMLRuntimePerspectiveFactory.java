@@ -37,6 +37,8 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 		lguiFolder.addView("org.eclipse.ptp.ui.views.resourceManagerView");
 
 		tableFolder.addPlaceholder(ILMLUIConstants.VIEW_TABLE + ":*");
+		tableFolder.addView(ILMLUIConstants.VIEW_TABLE);
 		machinesFolder.addPlaceholder(ILMLUIConstants.VIEW_PARALLELNODES + ":*");
+		machinesFolder.addView(ILMLUIConstants.VIEW_PARALLELNODES);
 	}
 }

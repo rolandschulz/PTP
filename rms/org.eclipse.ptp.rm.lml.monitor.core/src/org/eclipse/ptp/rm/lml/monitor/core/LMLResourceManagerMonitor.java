@@ -153,6 +153,8 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	@Override
 	protected void doShutdown() throws CoreException {
 		fRMManager.removeRMSelectionListener(fListener);
+		
+		LMLManager.getInstance().closeLgui(getResourceManager().getUniqueName());
 
 		synchronized (this) {
 			if (fMonitorJob != null) {

@@ -35,6 +35,7 @@ public class TableHandler extends LguiHandler {
 	public class TableListener implements ILguiListener {
 
 		public void handleEvent(ILguiUpdatedEvent e) {
+			update(e.getLguiItem().getLguiType());
 			gid = null;
 			cids = null;
 		}

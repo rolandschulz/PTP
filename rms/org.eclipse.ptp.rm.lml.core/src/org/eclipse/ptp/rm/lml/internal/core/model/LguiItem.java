@@ -519,10 +519,10 @@ public class LguiItem implements ILguiItem {
 					ComponentlayoutType componentLayout = (ComponentlayoutType) value;
 					neededComponents.add(componentLayout.getGid());
 					
-//					if( value instanceof NodedisplaylayoutType){
-//						NodedisplaylayoutType nlayout=(NodedisplaylayoutType)value;
-//						nlayout.setGid(dummystring);
-//					}
+					if( value instanceof NodedisplaylayoutType){
+						NodedisplaylayoutType nlayout=(NodedisplaylayoutType)value;
+						nlayout.setGid(dummystring);
+					}
 				}
 			}
 
@@ -545,10 +545,10 @@ public class LguiItem implements ILguiItem {
 		for (GobjectType gObject : idToGobject.values()) {
 			JAXBElement<GobjectType> min = minimizeGobjectType(gObject);
 			
-//			GobjectType newGobject = min.getValue();
-//			if (newGobject instanceof Nodedisplay) {
-//				((Nodedisplay) newGobject).setId(dummystring);
-//			}
+			GobjectType newGobject = min.getValue();
+			if (newGobject instanceof Nodedisplay) {
+				((Nodedisplay) newGobject).setId(dummystring);
+			}
 			result.getObjectsAndRelationsAndInformation().add(min);
 		}
 		// Set layout-attribute

@@ -19,6 +19,7 @@ import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
@@ -60,6 +61,11 @@ public class NodesView extends LMLViewPart {
 		public void handleEvent(IUnselectedObjectEvent event) {
 			ObjectType object = fLguiItem.getOIDToObject().getObjectById(event.getOid());
 			fLguiItem.getObjectStatus().mouseexit(object);
+		}
+
+		public void handleEvent(IViewUpdateEvent event) {
+			fLguiItem = lmlManager.getSelectedLguiItem();
+			createNodedisplayView();
 		}
 	}
 

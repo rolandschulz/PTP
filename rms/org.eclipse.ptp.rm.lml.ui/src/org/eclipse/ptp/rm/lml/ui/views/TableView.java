@@ -50,6 +50,7 @@ import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
@@ -115,7 +116,7 @@ public class TableView extends LMLViewPart {
 		}
 
 		public void handleEvent(ISelectedObjectChangeEvent event) {
-			if (!composite.isDisposed()) {
+			if (!composite.isDisposed() && viewer.getInput() != null) {
 				tree.deselectAll();
 
 				Row[] rows = null;
@@ -155,7 +156,12 @@ public class TableView extends LMLViewPart {
 			if (!composite.isDisposed()) {
 				tree.deselectAll();
 			}
+		}
 
+		public void handleEvent(IViewUpdateEvent event) {
+			input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
+			viewer.setInput(input);
+			viewer.getTree().setItemCount(input.length);
 		}
 	}
 	
@@ -487,8 +493,10 @@ public class TableView extends LMLViewPart {
 		
 	@Override
 	public void prepareDispose() {
-		fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(), gid);
-		fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, removingColumn(tree.getColumnOrder()));
+		if (viewer.getInput() != null) {
+			fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(), gid);
+			fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, removingColumn(tree.getColumnOrder()));
+		}
 		lmlManager.removeListener(lmlListener);
 	}
 

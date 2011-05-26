@@ -28,6 +28,7 @@ import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiSelectedEvent;
+import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
@@ -35,6 +36,7 @@ import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewDisposedEvent;
+import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
@@ -43,6 +45,7 @@ import org.eclipse.ptp.rm.lml.internal.core.events.JobListSortedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiSelectedEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.LguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.MarkObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.SelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.TableColumnChangeEvent;
@@ -50,6 +53,7 @@ import org.eclipse.ptp.rm.lml.internal.core.events.UnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.UnselectObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.ViewAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.ViewDisposedEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.ViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
 import org.eclipse.ui.IMemento;
 
@@ -174,9 +178,11 @@ public class LMLManager {
 		if (!fLguiItem.toString().equals(name)) {
 			return;
 		}
-		// TODO Think about  - update
-		fireRemovedLgui(null);
-		fireNewLgui();
+		if (lmlListeners.isEmpty()) {
+			fireNewLgui();
+		} else {
+			fireUpdatedLgui();
+		}
 	}
 	
 	/**************************************************************************************************************
@@ -191,8 +197,19 @@ public class LMLManager {
 		}
 		fLguiItem = LGUIS.get(name);
 		openLguis.add(name);
-
-		
+		if (!fLguiItem.isEmpty()) {
+			fireNewLgui();
+		}
+	}
+	
+	public void closeLgui(String name) {
+		if (openLguis.contains(name)) {
+			openLguis.remove(name);
+		}
+		if (!fLguiItem.toString().equals(name)) {
+			return;
+		}
+		fireRemovedLgui(LGUIS.get(name));
 	}
 	
 	/*
@@ -243,7 +260,6 @@ public class LMLManager {
 	}
 	
 	public void selectLgui(String name) {
-		System.out.println(name);
 		if (!openLguis.contains(name)) {
 			if (!LGUIS.containsKey(name)) {
 				LGUIS.put(name, new LguiItem(name));
@@ -426,6 +442,12 @@ public class LMLManager {
 		}
 	}
 	
+	private void fireUpdatedLgui() {
+		IViewUpdateEvent event = new ViewUpdateEvent();
+		for (Object listener : lmlListeners.getListeners()) {
+			((ILMLListener) listener).handleEvent(event);
+		}
+	}
 	
 	private void fireMarkObject(String oid) {
 		IMarkObjectEvent event = new MarkObjectEvent(oid);

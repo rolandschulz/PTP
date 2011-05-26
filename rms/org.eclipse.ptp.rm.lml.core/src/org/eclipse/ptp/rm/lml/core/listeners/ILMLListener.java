@@ -14,6 +14,7 @@ import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 
 /**
  * This interface manages the handling of different events.
@@ -37,5 +38,5 @@ public interface ILMLListener {
 
 	public void handleEvent(IUnselectedObjectEvent event);
 	
-
+	public void handleEvent(IViewUpdateEvent event);
 }

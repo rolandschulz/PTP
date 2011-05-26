@@ -61,6 +61,8 @@ public class ViewManager {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					deleteOldViews();
+					selectedLgui = null;
+					generateNewViews();
 				}
 			});
 		}
@@ -159,9 +161,7 @@ public class ViewManager {
 	}
 
 	private void deleteOldViews() {
-		if (selectedLgui == null) {
-			return;
-		}
+		
 		IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
 		IViewReference[] views = activePage.getViewReferences();
 		for (IViewReference view : views) {
@@ -205,18 +205,37 @@ public class ViewManager {
 	}
 
 	private void generateNewViews() {
-		// try {
-		// activePage = getPage();
-		// } catch (SWTException e) {
-		// e.printStackTrace();
-		// }
-		String[] activeTableLayoutsGid = selectedLgui.getLayoutAccess().getActiveTableLayoutsGid();
+		String[] activeTableLayoutsGid = new String[0]; 
+		if (selectedLgui != null) {
+			activeTableLayoutsGid = selectedLgui.getLayoutAccess().getActiveTableLayoutsGid();
+		}
 		for (String gid : activeTableLayoutsGid) {
 			generateTable(gid);
 		}
-		String[] activeNodedisplayLayoutGid = selectedLgui.getLayoutAccess().getActiveNodedisplayLayoutGid();
+		if (activeTableLayoutsGid.length == 0) {
+			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
+			try {
+				IViewPart view = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(i), activePage.VIEW_VISIBLE);
+			} catch (PartInitException e) {
+				e.printStackTrace();
+			}
+			i++;
+		}
+		String[] activeNodedisplayLayoutGid = new String[0];
+		if (selectedLgui !=  null) {
+			activeNodedisplayLayoutGid = selectedLgui.getLayoutAccess().getActiveNodedisplayLayoutGid();
+		}
 		for (String gid : activeNodedisplayLayoutGid) {
 			generateNodedisplay(gid);
+		}
+		if (activeNodedisplayLayoutGid.length == 0) {
+			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
+			try {
+				IViewPart view = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(j), activePage.VIEW_VISIBLE);
+			} catch (PartInitException e) {
+				e.printStackTrace();
+			}
+			j++;
 		}
 	}
 
