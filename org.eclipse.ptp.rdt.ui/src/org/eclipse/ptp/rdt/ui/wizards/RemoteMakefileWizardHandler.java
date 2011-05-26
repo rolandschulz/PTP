@@ -126,7 +126,7 @@ public class RemoteMakefileWizardHandler extends STDWizardHandler {
 			StorableEnvironment vars = EnvironmentVariableManager.fUserSupplier.getWorkspaceEnvironmentCopy();
 			vars.setAppendContributedEnvironment(false);
 			vars.setAppendEnvironment(false);
-//			EnvironmentVariableManager.fUserSupplier.setWorkspaceEnvironment(vars);
+			EnvironmentVariableManager.fUserSupplier.setWorkspaceEnvironment(vars);
 		} finally {
 			monitor.done();
 		}

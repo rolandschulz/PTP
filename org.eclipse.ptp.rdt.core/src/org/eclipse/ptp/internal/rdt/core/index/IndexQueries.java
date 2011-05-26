@@ -14,7 +14,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.viewsupport.IndexUI
- * Version: 1.38
+ * Version: 1.39
  */
 package org.eclipse.ptp.internal.rdt.core.index;
 
