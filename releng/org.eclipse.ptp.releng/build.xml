@@ -251,7 +251,7 @@
 
 		<!-- clean up some unnecessary files -->
 		<delete failonerror="false" quiet="true">
-			<fileset dir="${p2dir}" includes="artifacts.jar.pack.gz, content.jar.pack.gz, site.xml"/>
+			<fileset dir="${p2dir}" includes="artifacts.jar.pack.gz, content.jar.pack.gz"/>
 		</delete>
 
 		<!-- zip everything back up -->
