@@ -13,22 +13,8 @@ package org.eclipse.ptp.pldt.mpi.core.messages;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.mpi.core.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.mpi.core.messages.messages"; //$NON-NLS-1$
 
-	// private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
-
-	private Messages() {
-	}
-
-	/*
-	 * public static String getStringHIDE(String key) {
-	 * try {
-	 * return RESOURCE_BUNDLE.getString(key);
-	 * } catch (MissingResourceException e) {
-	 * return '!' + key + '!';
-	 * }
-	 * }
-	 */
 	public static String MpiCASTVisitor_mpiCall;
 	public static String MpiCASTVisitor_mpiConstant;
 	public static String MpiCHelpBook_MPI_C_HELP_BOOK_TITLE;
@@ -48,5 +34,8 @@ public class Messages extends NLS {
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	private Messages() {
 	}
 }
