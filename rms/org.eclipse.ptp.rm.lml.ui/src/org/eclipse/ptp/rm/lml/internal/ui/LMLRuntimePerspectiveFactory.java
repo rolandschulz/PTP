@@ -13,6 +13,8 @@ package org.eclipse.ptp.rm.lml.internal.ui;
 
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
 import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
+import org.eclipse.ptp.rm.lml.ui.managers.ViewManager;
+import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -42,17 +44,8 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 
 		tableFolder.addPlaceholder(ILMLUIConstants.VIEW_TABLE + ":*");
 		machinesFolder.addPlaceholder(ILMLUIConstants.VIEW_PARALLELNODES + ":*");
-		IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
-//		IViewPart view1 = null;
-//		IViewPart view2 = null;
-//		IViewPart view3 = null;
-//		try {
-//			view1 = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(1), activePage.VIEW_VISIBLE);
-//			view2 = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(2), activePage.VIEW_VISIBLE);
-//			view3 = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(3), activePage.VIEW_VISIBLE);
-//		} catch (PartInitException e) {
-//			e.printStackTrace();
-//		}
+		
+		new ViewManager(); 
 		
 	}
 }

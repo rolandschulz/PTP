@@ -69,17 +69,25 @@ public class NodesView extends LMLViewPart {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					fLguiItem = lmlManager.getSelectedLguiItem();
-					composite.setEnabled(false);
-					nodedisplayView.setEnabled(false);
-					nodedisplayView.dispose();
-					composite.layout();
-					nodedisplayView.setEnabled(true);
-					composite.setEnabled(true);
+					nodedisplayView.update();
+//					composite = new Composite(parent, SWT.NONE);
+//					composite.setLayout(new FillLayout());
+//					composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+//					if (!composite.isDisposed()) {
+//						if (fLguiItem != null) {
+//							nodedisplayView = new NodedisplayView(fLguiItem, fLguiItem.getNodedisplayAccess().getNodedisplays().get(0),
+//									composite);
+//							composite.layout();
+//						} 
+//					
+//					
+//					}
 				}
 			});
 		}
 	}
 
+	private Composite parent = null;
 	private Composite composite = null;
 	private Composite nodedisplayView = null;
 	public Viewer viewer;
@@ -97,6 +105,7 @@ public class NodesView extends LMLViewPart {
 
 	@Override
 	public void createPartControl(final Composite parent) {
+		this.parent = parent;
 		composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new FillLayout());
 		composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));

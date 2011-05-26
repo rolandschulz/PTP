@@ -131,17 +131,6 @@ public class ViewManager {
 
 	}
 
-	public static IWorkbenchPage getPage() {
-		final IWorkbenchPage page[] = new IWorkbenchPage[] { null };
-		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-
-			public void run() throws Exception {
-				System.out.println(PTPUIPlugin.getActivePage());
-				page[0] = PTPUIPlugin.getActivePage();
-			}
-		});
-		return page[0];
-	}
 
 	protected ILguiItem selectedLgui = null;
 
@@ -152,9 +141,27 @@ public class ViewManager {
 	public int i = 0;
 
 	public int j = 0;
+	
+	IViewPart viewTable1 = null;
+	IViewPart viewTable2 = null;
+	IViewPart viewTable3 = null;
+	IViewPart viewNodedisplay = null;
 
 	public ViewManager() {
 		lmlManager.addListener(viewListener);
+		UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+			public void run() throws Exception {
+				IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
+				try {
+					viewTable1 = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(1), activePage.VIEW_VISIBLE);
+					viewTable2 = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(2), activePage.VIEW_VISIBLE);
+					viewTable3 = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(3), activePage.VIEW_VISIBLE);
+					viewNodedisplay = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(4), activePage.VIEW_VISIBLE);
+				} catch (PartInitException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	public void shutDown() {

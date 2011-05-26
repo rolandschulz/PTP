@@ -82,9 +82,6 @@ import org.eclipse.swt.widgets.Listener;
  * no composites are created.
  * 
  * The look of the nodedisplay is defined by the lml-Nodedisplay-Layout.
- * 
- * 
- * @author karbach
  *
  */
 public class NodedisplayComp extends LguiWidget implements Updatable{ 
