@@ -151,8 +151,8 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		// Note that if the user doesn't set include path, we can't make a guess at what the lib path etc is.
 		// However, this workaround (encourage setting of mpi include path) is used since mpi settings page
 		// in wizard dialog is blank if this value is not set.
-		// if (traceOn)
-		System.out.println("MPWP: allowPrefixOnlyMatch=" + allowPrefixOnlyMatch);
+		if (traceOn)
+			System.out.println("MPWP: allowPrefixOnlyMatch=" + allowPrefixOnlyMatch);
 		if (!allowPrefixOnlyMatch && defaultMpiIncludePath.length() == 0) {
 			// warn if no MPI preferences have been set and allow user to set them right there
 			String newMip = showNoPrefs(Messages.MPIProjectWizardPage_mpi, prefIDincludes);
