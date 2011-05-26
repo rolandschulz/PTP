@@ -15,6 +15,8 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
+import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
+import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
@@ -85,6 +87,36 @@ public class NodesView extends LMLViewPart {
 				}
 			});
 		}
+
+		public void handleEvent(ILguiAddedEvent event) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					generateNodesdisplay();
+				}
+			});
+			
+		}
+
+		public void handleEvent(ILguiRemovedEvent event) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					fLguiItem = lmlManager.getSelectedLguiItem();
+					nodedisplayView.update();
+//					composite = new Composite(parent, SWT.NONE);
+//					composite.setLayout(new FillLayout());
+//					composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+//					if (!composite.isDisposed()) {
+//						if (fLguiItem != null) {
+//							nodedisplayView = new NodedisplayView(fLguiItem, fLguiItem.getNodedisplayAccess().getNodedisplays().get(0),
+//									composite);
+//							composite.layout();
+//						} 
+//					
+//					
+//					}
+				}
+			});
+		}
 	}
 
 	private Composite parent = null;
@@ -123,8 +155,8 @@ public class NodesView extends LMLViewPart {
 	public void setFocus() {
 	}
 
-	public void generateNodesdisplay(String gid) {
-		this.gid = gid;
+	public void generateNodesdisplay() {
+		gid = getViewSite().getId();
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		createNodedisplayView();
 	}

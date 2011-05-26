@@ -12,7 +12,7 @@
             category="org.eclipse.ptp.rm.lml.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.NodesView"
             icon="icons/parallel_perspective.gif"
-            id="org.eclipse.ptp.rm.lml.ui.views.NodesView"
+            id="__dummy_nd__1__"
             name="%NodediesplayView.name"
             restorable="false">
       </view>
@@ -24,12 +24,12 @@
             name="%LMLView.name">
       </view>
       <view
-            allowMultiple="false"
+            allowMultiple="falsee"
             category="org.eclipse.ptp.rm.lml.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
             icon="icons/parallel_perspective.gif"
-            id="org.eclipse.ptp.rm.lml.ui.views.TableView1"
-            name="%TableView.name"
+            id="joblistrun"
+            name="%TableView1.name"
             restorable="false">
       </view>
       <view
@@ -37,8 +37,8 @@
             category="org.eclipse.ptp.rm.lml.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
             icon="icons/parallel_perspective.gif"
-            id="org.eclipse.ptp.rm.lml.ui.views.TableView2"
-            name="%TableView.name"
+            id="joblistwait"
+            name="%TableView2.name"
             restorable="false">
       </view>
    </extension>

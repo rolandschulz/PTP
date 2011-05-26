@@ -69,9 +69,9 @@ public class LMLView extends ViewPart {
 		 * (org.eclipse.ptp.core.events.ILguiAddedEvent)
 		 */
 		public synchronized void handleEvent(ILguiAddedEvent e) {
-			fSelected = e.getLguiItem();
-			lguis.add(fSelected);
-			createList();
+//			fSelected = e.getLguiItem();
+//			lguis.add(fSelected);
+//			createList();
 		}
 
 		/*
@@ -81,9 +81,9 @@ public class LMLView extends ViewPart {
 		 * (org.eclipse.ptp.core.events.ILguiRemovedEvent)
 		 */
 		public synchronized void handleEvent(ILguiRemovedEvent e) {
-			fSelected = e.getLguiItem();
-			lguis.remove(e.getRemovedLguiItem());
-			createList();
+//			fSelected = e.getLguiItem();
+//			lguis.remove(e.getRemovedLguiItem());
+//			createList();
 		}
 
 		public void handleEvent(ILguiSelectedEvent e) {

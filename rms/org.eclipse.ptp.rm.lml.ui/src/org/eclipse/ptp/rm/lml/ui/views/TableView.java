@@ -46,6 +46,8 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
+import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
+import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
@@ -167,6 +169,23 @@ public class TableView extends LMLViewPart {
 					input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
 					viewer.setInput(input);
 					viewer.getTree().setItemCount(input.length);
+				}
+			});
+		}
+
+		public void handleEvent(ILguiAddedEvent event) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					generateTable();
+				}
+			});
+			
+		}
+
+		public void handleEvent(ILguiRemovedEvent event) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					disposeTable();
 				}
 			});
 		}
@@ -304,8 +323,8 @@ public class TableView extends LMLViewPart {
 
 	}
 
-	public void generateTable(String acitveTableLayoutGid) {
-		this.gid = acitveTableLayoutGid;
+	public void generateTable() {
+		gid = getViewSite().getId();
 		fSelectedLguiItem = lmlManager.getSelectedLguiItem();
 		createTable();
 //		composite.addDisposeListener(new DisposeListener() {

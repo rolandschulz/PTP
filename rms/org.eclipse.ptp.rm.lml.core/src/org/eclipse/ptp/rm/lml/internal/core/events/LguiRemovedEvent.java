@@ -19,60 +19,58 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.internal.core.events;
 
-import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
-import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
 /**
  * Class of the interface ILguiRemovedEvent.
  */
 public class LguiRemovedEvent implements ILguiRemovedEvent{
 	
-	private final ILguiItem removedLguiItem;
-	
-	/*
-	 * The associated LMLManager
-	 */
-	private final LMLManager lmlManager;
-	
-	/*
-	 * The associated ILguiItem
-	 */
-	private final ILguiItem lguiItem;
-	
-	/**
-	 * Constructor
-	 * @param lmlManager the associated LMLManager
-	 * @param lguiItem the associated ILguiItem
-	 */
-	public LguiRemovedEvent(LMLManager lmlManager, ILguiItem lguiItem, ILguiItem removedLguiItem) {
-		this.lmlManager = lmlManager;
-		this.lguiItem = lguiItem;
-		this.removedLguiItem = removedLguiItem;
+//	private final ILguiItem removedLguiItem;
+//	
+//	/*
+//	 * The associated LMLManager
+//	 */
+//	private final LMLManager lmlManager;
+//	
+//	/*
+//	 * The associated ILguiItem
+//	 */
+//	private final ILguiItem lguiItem;
+//	
+//	/**
+//	 * Constructor
+//	 * @param lmlManager the associated LMLManager
+//	 * @param lguiItem the associated ILguiItem
+//	 */
+	public LguiRemovedEvent() {
+//		this.lmlManager = lmlManager;
+//		this.lguiItem = lguiItem;
+//		this.removedLguiItem = removedLguiItem;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.elements.ILguiRemovedEvent#getLgui()
-	 */
-	public ILguiItem getLguiItem() {
-		return lguiItem;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.elements.ILguiRemovedEvent#getLMLManager()
-	 */
-	public LMLManager getLMLManager() {
-		return lmlManager;
-	}
-
-	public ILguiItem getRemovedLguiItem() {
-		return removedLguiItem;
-	}
+//
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see
+//	 * org.eclipse.ptp.rm.lml.core.elements.ILguiRemovedEvent#getLgui()
+//	 */
+//	public ILguiItem getLguiItem() {
+//		return lguiItem;
+//	}
+//	
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see
+//	 * org.eclipse.ptp.rm.lml.core.elements.ILguiRemovedEvent#getLMLManager()
+//	 */
+//	public LMLManager getLMLManager() {
+//		return lmlManager;
+//	}
+//
+//	public ILguiItem getRemovedLguiItem() {
+//		return removedLguiItem;
+//	}
 
 }

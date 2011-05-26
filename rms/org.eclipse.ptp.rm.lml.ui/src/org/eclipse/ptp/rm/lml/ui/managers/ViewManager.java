@@ -50,7 +50,7 @@ public class ViewManager {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					deleteOldViews();
-					selectedLgui = e.getLguiItem();
+//					selectedLgui = e.getLguiItem();
 //					generateNewViews();
 					selectedLgui.getObjectStatus().addComponent(new EventForwarder());
 				}
@@ -106,7 +106,7 @@ public class ViewManager {
 
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
-			((NodesView) view).generateNodesdisplay(gid);
+//			((NodesView) view).generateNodesdisplay(gid);
 			return Status.OK_STATUS;
 		}
 
@@ -125,7 +125,7 @@ public class ViewManager {
 
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
-			((TableView) view).generateTable(gid);
+//			((TableView) view).generateTable(gid);
 			return Status.OK_STATUS;
 		}
 

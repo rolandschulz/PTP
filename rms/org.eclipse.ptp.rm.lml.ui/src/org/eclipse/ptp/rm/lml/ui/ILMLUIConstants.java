@@ -27,11 +27,11 @@ public interface ILMLUIConstants extends ILMLCoreConstants{
 	public static final String PLUGIN_ID = LMLUIPlugin.getUniqueIdentifier();
 	public static final String PREFIX = PLUGIN_ID + "."; //$NON-NLS-1$
 	
-	public static final String VIEW_PARALLELNODES = PREFIX + "views.NodesView"; //$NON-NLS-1$
+	public static final String VIEW_PARALLELNODES = "__dummy_nd__1__"; //$NON-NLS-1$
 	public static final String VIEW_PARALLELNODES2 = PREFIX + "views.NodedisplayView";//$NON-NLS-1$
 	public static final String VIEW_PARALLELJOBS = PREFIX + "views.parallelJobsView"; //$NON-NLS-1$
-	public static final String VIEW_TABLE_1 = PREFIX + "views.TableView1"; //$NON-NLS-1$
-	public static final String VIEW_TABLE_2 = PREFIX + "views.TableView2"; //$NON-NLS-1$
+	public static final String VIEW_TABLE_1 = "joblistrun"; //$NON-NLS-1$
+	public static final String VIEW_TABLE_2 = "joblistwait"; //$NON-NLS-1$
 	public static final String VIEW_PARALLELProcess = PREFIX + "views.parallelProcessView"; //$NON-NLS-1$
 	public static final String VIEW_LML = PREFIX + "views.LMLView"; //$NON-NLS-1$
 	public static final String VIEW_JOB = PREFIX + "view.OwnJobView";//$NON-NLS-1$

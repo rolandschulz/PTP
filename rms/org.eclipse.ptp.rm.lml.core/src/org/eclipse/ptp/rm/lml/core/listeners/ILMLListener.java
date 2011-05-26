@@ -9,6 +9,8 @@
 package org.eclipse.ptp.rm.lml.core.listeners;
 
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
+import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
+import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
@@ -39,4 +41,8 @@ public interface ILMLListener {
 	public void handleEvent(IUnselectedObjectEvent event);
 	
 	public void handleEvent(IViewUpdateEvent event);
+	
+	public void handleEvent(ILguiAddedEvent event);
+	
+	public void handleEvent(ILguiRemovedEvent event);
 }

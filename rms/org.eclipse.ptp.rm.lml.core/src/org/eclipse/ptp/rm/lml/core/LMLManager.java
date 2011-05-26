@@ -106,6 +106,9 @@ public class LMLManager {
 	 */
 	public static final String LGUIITEM = "lguiitem";
 	
+	
+	private boolean isDisplayed = false;
+	
 	/**************************************************************************************************************
 	 * Constructors
 	 **************************************************************************************************************/
@@ -178,11 +181,12 @@ public class LMLManager {
 		if (!fLguiItem.toString().equals(name)) {
 			return;
 		}
-		if (lmlListeners.getListeners().length == 3) {
+		if (!isDisplayed) {
 			fireNewLgui();
 		} else {
 			fireUpdatedLgui();
 		}
+		
 	}
 	
 	/**************************************************************************************************************
@@ -260,6 +264,7 @@ public class LMLManager {
 	}
 	
 	public void selectLgui(String name) {
+		System.out.println(name);
 		if (!openLguis.contains(name)) {
 			if (!LGUIS.containsKey(name)) {
 				LGUIS.put(name, new LguiItem(name));
@@ -407,17 +412,26 @@ public class LMLManager {
 	 * Method is called when a new ILguiItem was generated.
 	 */
 	private void fireNewLgui() {
-		ILguiAddedEvent event = new LguiAddedEvent(this, fLguiItem);
-		for (Object listener : viewListeners.getListeners()) {
-			((IViewListener) listener).handleEvent(event);
+		ILguiAddedEvent event = new LguiAddedEvent();
+		for (Object listener : lmlListeners.getListeners()) {
+			((ILMLListener) listener).handleEvent(event);
 		}
+		isDisplayed = true;
+//		for (Object listener : viewListeners.getListeners()) {
+//			((IViewListener) listener).handleEvent(event);
+//		}
 	}
 	
 	private void fireRemovedLgui(ILguiItem title) {
-		ILguiRemovedEvent event = new LguiRemovedEvent(this, fLguiItem, title);
-		for (Object listener : viewListeners.getListeners()) {
-			((IViewListener) listener).handleEvent(event);
+		ILguiRemovedEvent event = new LguiRemovedEvent();
+		for (Object listener : lmlListeners.getListeners()) {
+			((ILMLListener) listener).handleEvent(event);
 		}
+//		
+//		for (Object listener : viewListeners.getListeners()) {
+//			((IViewListener) listener).handleEvent(event);
+//		}
+		isDisplayed = false;
 	}
 
 	private void fireRemoveView(String gid) {

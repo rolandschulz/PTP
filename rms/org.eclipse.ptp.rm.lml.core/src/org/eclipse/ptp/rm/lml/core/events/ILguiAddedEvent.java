@@ -13,23 +13,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.core.events;
 
-import org.eclipse.ptp.rm.lml.core.LMLManager;
-import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
-
 /**
  * Interface to manage the event that a LguiItem has been added.
- * @author Claudia Knobloch
  */
 public interface ILguiAddedEvent {
 	
-	/**
-	 * Getting the involved IlguiItem.
-	 * @return the involved ILguiItem
-	 */
-	public ILguiItem getLguiItem();
-	/**
-	 * Getting the involved LMLManager.
-	 * @return the involved LMLManager
-	 */
-	public LMLManager getLMLManager();
+//	/**
+//	 * Getting the involved IlguiItem.
+//	 * @return the involved ILguiItem
+//	 */
+//	public ILguiItem getLguiItem();
+//	/**
+//	 * Getting the involved LMLManager.
+//	 * @return the involved LMLManager
+//	 */
+//	public LMLManager getLMLManager();
 }

@@ -19,9 +19,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.internal.core.events;
 
-import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
-import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
 /**
  * Class of the interface ILguiAddedEvent.
@@ -29,44 +27,44 @@ import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
  */
 public class LguiAddedEvent implements ILguiAddedEvent{
 	
-	/*
-	 * The associated LMLManager
-	 */
-	private final LMLManager lmlManager;
-	
-	/*
-	 * The associated ILguiItem
-	 */
-	private final ILguiItem lguiItem;
-	
-	/**
-	 * Constructor
-	 * @param lmlManager the associated LMLManager
-	 * @param lguiItem the associated ILguiItem
-	 */
-	public LguiAddedEvent(LMLManager lmlManager, ILguiItem lguiItem) {
-		this.lmlManager = lmlManager;
-		this.lguiItem = lguiItem;
+//	/*
+//	 * The associated LMLManager
+//	 */
+//	private final LMLManager lmlManager;
+//	
+//	/*
+//	 * The associated ILguiItem
+//	 */
+//	private final ILguiItem lguiItem;
+//	
+//	/**
+//	 * Constructor
+//	 * @param lmlManager the associated LMLManager
+//	 * @param lguiItem the associated ILguiItem
+//	 */
+	public LguiAddedEvent() {
+//		this.lmlManager = lmlManager;
+//		this.lguiItem = lguiItem;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.elements.ILguiAddedEvent#getLgui()
-	 */
-	public ILguiItem getLguiItem() {
-		return lguiItem;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.elements.ILguiAddedEvent#getLMLManager()
-	 */
-	public LMLManager getLMLManager() {
-		return lmlManager;
-	}
+//
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see
+//	 * org.eclipse.ptp.rm.lml.core.elements.ILguiAddedEvent#getLgui()
+//	 */
+//	public ILguiItem getLguiItem() {
+//		return lguiItem;
+//	}
+//	
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see
+//	 * org.eclipse.ptp.rm.lml.core.elements.ILguiAddedEvent#getLMLManager()
+//	 */
+//	public LMLManager getLMLManager() {
+//		return lmlManager;
+//	}
 
 }
