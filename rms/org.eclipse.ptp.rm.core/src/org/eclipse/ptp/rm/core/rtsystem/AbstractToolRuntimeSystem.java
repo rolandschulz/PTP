@@ -53,6 +53,8 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
@@ -86,6 +88,31 @@ import org.eclipse.ui.progress.IProgressConstants;
  * @author Daniel Felix Ferber
  */
 public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
+	private class ConnectionChangeHandler implements IRemoteConnectionChangeListener {
+		public ConnectionChangeHandler() {
+			// Nothing
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener#
+		 * connectionChanged
+		 * (org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent)
+		 */
+		public void connectionChanged(IRemoteConnectionChangeEvent event) {
+			if (event.getType() == IRemoteConnectionChangeEvent.CONNECTION_ABORTED
+					|| event.getType() == IRemoteConnectionChangeEvent.CONNECTION_CLOSED) {
+				try {
+					getResourceManager().stop();
+				} catch (CoreException e) {
+					RMCorePlugin.log(e);
+				}
+			}
+		}
+
+	}
+
 	/**
 	 * Executes jobs from the queue.
 	 * 
@@ -177,6 +204,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 
 	private final AbstractToolResourceManager fResourceManager;
 	private final IPResourceManager fPResourceManager;
+	private final ConnectionChangeHandler fConnectionChangeHandler = new ConnectionChangeHandler();
 
 	/** Attribute definitions for the RTS. */
 	protected AttributeDefinitionManager attrMgr = new AttributeDefinitionManager();
@@ -538,46 +566,61 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	public void shutdown() throws CoreException {
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: shutdown", getResourceManager().getConfiguration().getName()); //$NON-NLS-1$
 
-		doShutdown();
-
-		stopEvents();
-
 		/*
-		 * Stop jobs that might be in the pending queue. Also stop the thread
-		 * that dispatches pending jobs.
-		 */
-		if (jobQueueThread != null) {
-			jobQueueThread.interrupt();
-			for (Job job : pendingJobQueue) {
-				job.cancel();
-			}
-		}
-
-		/*
-		 * Stop jobs that are running or that already finished.
-		 */
-		Iterator<Job> iterator = jobs.values().iterator();
-		while (iterator.hasNext()) {
-			Job job = iterator.next();
-			job.cancel();
-			iterator.remove();
-		}
-
-		synchronized (this) {
-			if (startupMonitor != null) {
-				startupMonitor.setCanceled(true);
-			}
-		}
-
-		/*
-		 * Close the the connection.
+		 * Remove listener to avoid re-entry
 		 */
 		if (connection != null) {
-			connection.close();
+			connection.removeConnectionChangeListener(fConnectionChangeHandler);
 		}
 
-		jobQueueThread = null;
-		fireRuntimeShutdownStateEvent(eventFactory.newRuntimeShutdownStateEvent());
+		try {
+			stopEvents();
+		} catch (CoreException e) {
+			// Ignore exception and shutdown anyway
+			RMCorePlugin.log(e);
+		}
+
+		try {
+			doShutdown();
+		} finally {
+
+			/*
+			 * Stop jobs that might be in the pending queue. Also stop the
+			 * thread that dispatches pending jobs.
+			 */
+			if (jobQueueThread != null) {
+				jobQueueThread.interrupt();
+				for (Job job : pendingJobQueue) {
+					job.cancel();
+				}
+			}
+
+			/*
+			 * Stop jobs that are running or that already finished.
+			 */
+			Iterator<Job> iterator = jobs.values().iterator();
+			while (iterator.hasNext()) {
+				Job job = iterator.next();
+				job.cancel();
+				iterator.remove();
+			}
+
+			synchronized (this) {
+				if (startupMonitor != null) {
+					startupMonitor.setCanceled(true);
+				}
+			}
+
+			/*
+			 * Close the the connection.
+			 */
+			if (connection != null) {
+				connection.close();
+			}
+
+			jobQueueThread = null;
+			fireRuntimeShutdownStateEvent(eventFactory.newRuntimeShutdownStateEvent());
+		}
 	}
 
 	/*
@@ -610,13 +653,6 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 			continousMonitorJob.schedule();
 		}
 		doStartEvents();
-	}
-
-	/**
-	 * @since 3.0
-	 */
-	protected void notifyMonitorFailed(AbstractRemoteCommandJob job, Exception exception) {
-		// Override if necessary
 	}
 
 	/*
@@ -712,6 +748,11 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 				jobQueueThread = new Thread(new JobRunner(), Messages.AbstractToolRuntimeSystem_JobQueueManagerThreadTitle);
 				jobQueueThread.start();
 			}
+
+			/*
+			 * Register for connection events
+			 */
+			connection.addConnectionChangeListener(fConnectionChangeHandler);
 
 			fireRuntimeRunningStateEvent(eventFactory.newRuntimeRunningStateEvent());
 		} finally {
@@ -1063,6 +1104,13 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 			}
 		}
 		return new String[0];
+	}
+
+	/**
+	 * @since 3.0
+	 */
+	protected void notifyMonitorFailed(AbstractRemoteCommandJob job, Exception exception) {
+		// Override if necessary
 	}
 
 	/**
