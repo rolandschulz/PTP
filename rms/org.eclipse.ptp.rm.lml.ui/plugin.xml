@@ -24,11 +24,20 @@
             name="%LMLView.name">
       </view>
       <view
-            allowMultiple="true"
+            allowMultiple="false"
             category="org.eclipse.ptp.rm.lml.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
             icon="icons/parallel_perspective.gif"
-            id="org.eclipse.ptp.rm.lml.ui.views.TableView"
+            id="org.eclipse.ptp.rm.lml.ui.views.TableView1"
+            name="%TableView.name"
+            restorable="false">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.ptp.rm.lml.ui.views"
+            class="org.eclipse.ptp.rm.lml.ui.views.TableView"
+            icon="icons/parallel_perspective.gif"
+            id="org.eclipse.ptp.rm.lml.ui.views.TableView2"
             name="%TableView.name"
             restorable="false">
       </view>

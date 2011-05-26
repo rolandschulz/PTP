@@ -51,7 +51,7 @@ public class ViewManager {
 				public void run() throws Exception {
 					deleteOldViews();
 					selectedLgui = e.getLguiItem();
-					generateNewViews();
+//					generateNewViews();
 					selectedLgui.getObjectStatus().addComponent(new EventForwarder());
 				}
 			});
@@ -63,7 +63,7 @@ public class ViewManager {
 				public void run() throws Exception {
 					deleteOldViews();
 					selectedLgui = null;
-					generateNewViews();
+//					generateNewViews();
 				}
 			});
 		}
@@ -74,7 +74,7 @@ public class ViewManager {
 					deleteOldViews();
 					selectedLgui = e.getLguiItem();
 					if (selectedLgui != null) {
-						generateNewViews();
+//						generateNewViews();
 					}
 				}
 			});
@@ -144,24 +144,24 @@ public class ViewManager {
 	
 	IViewPart viewTable1 = null;
 	IViewPart viewTable2 = null;
-	IViewPart viewTable3 = null;
+//	IViewPart viewTable3 = null;
 	IViewPart viewNodedisplay = null;
 
 	public ViewManager() {
 		lmlManager.addListener(viewListener);
-		UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
-			public void run() throws Exception {
-				IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
-				try {
-					viewTable1 = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(1), activePage.VIEW_VISIBLE);
-					viewTable2 = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(2), activePage.VIEW_VISIBLE);
-					viewTable3 = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(3), activePage.VIEW_VISIBLE);
-					viewNodedisplay = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(4), activePage.VIEW_VISIBLE);
-				} catch (PartInitException e) {
-					e.printStackTrace();
-				}
-			}
-		});
+//		UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+//			public void run() throws Exception {
+//				IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
+//				try {
+//					viewTable1 = activePage.showView(ILMLUIConstants.VIEW_TABLE, "tl_run", activePage.VIEW_VISIBLE);
+//					viewTable2 = activePage.showView(ILMLUIConstants.VIEW_TABLE, "tl_wait", activePage.VIEW_VISIBLE);
+////					viewTable3 = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(3), activePage.VIEW_VISIBLE);
+//					viewNodedisplay = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, "nodedisplay", activePage.VIEW_VISIBLE);
+//				} catch (PartInitException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
 	}
 
 	public void shutDown() {
@@ -186,72 +186,72 @@ public class ViewManager {
 		j = 0;
 	}
 
-	private void generateTable(String gid) {
-		try {
-			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
-			IViewPart view = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(i), activePage.VIEW_VISIBLE);
-			RunTableUIJob job = new RunTableUIJob(gid, view);
-			job.setUser(true);
-			job.schedule();
-			i++;
-		} catch (PartInitException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void generateNodedisplay(String gid) {
-		try {
-			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
-			IViewPart view = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(j), activePage.VIEW_VISIBLE);
-			RunNodedisplayUIJob job = new RunNodedisplayUIJob(gid, view);
-			job.setUser(true);
-			job.schedule();
-			j++;
-		} catch (PartInitException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void generateNewViews() {
-		String[] activeTableLayoutsGid = new String[0]; 
-		if (selectedLgui != null) {
-			activeTableLayoutsGid = selectedLgui.getLayoutAccess().getActiveTableLayoutsGid();
-		}
-		for (String gid : activeTableLayoutsGid) {
-			generateTable(gid);
-		}
-		if (activeTableLayoutsGid.length == 0) {
-			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
-			try {
-				IViewPart view = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(i), activePage.VIEW_VISIBLE);
-			} catch (PartInitException e) {
-				e.printStackTrace();
-			}
-			i++;
-		}
-		String[] activeNodedisplayLayoutGid = new String[0];
-		if (selectedLgui !=  null) {
-			activeNodedisplayLayoutGid = selectedLgui.getLayoutAccess().getActiveNodedisplayLayoutGid();
-		}
-		for (String gid : activeNodedisplayLayoutGid) {
-			generateNodedisplay(gid);
-		}
-		if (activeNodedisplayLayoutGid.length == 0) {
-			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
-			try {
-				IViewPart view = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(j), activePage.VIEW_VISIBLE);
-			} catch (PartInitException e) {
-				e.printStackTrace();
-			}
-			j++;
-		}
-	}
+//	private void generateTable(String gid) {
+//		try {
+//			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
+//			IViewPart view = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(i), activePage.VIEW_VISIBLE);
+//			RunTableUIJob job = new RunTableUIJob(gid, view);
+//			job.setUser(true);
+//			job.schedule();
+//			i++;
+//		} catch (PartInitException e) {
+//			e.printStackTrace();
+//		}
+//	}
+//
+//	private void generateNodedisplay(String gid) {
+//		try {
+//			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
+//			IViewPart view = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(j), activePage.VIEW_VISIBLE);
+//			RunNodedisplayUIJob job = new RunNodedisplayUIJob(gid, view);
+//			job.setUser(true);
+//			job.schedule();
+//			j++;
+//		} catch (PartInitException e) {
+//			e.printStackTrace();
+//		}
+//	}
+//
+//	private void generateNewViews() {
+//		String[] activeTableLayoutsGid = new String[0]; 
+//		if (selectedLgui != null) {
+//			activeTableLayoutsGid = selectedLgui.getLayoutAccess().getActiveTableLayoutsGid();
+//		}
+//		for (String gid : activeTableLayoutsGid) {
+//			generateTable(gid);
+//		}
+//		if (activeTableLayoutsGid.length == 0) {
+//			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
+//			try {
+//				IViewPart view = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(i), activePage.VIEW_VISIBLE);
+//			} catch (PartInitException e) {
+//				e.printStackTrace();
+//			}
+//			i++;
+//		}
+//		String[] activeNodedisplayLayoutGid = new String[0];
+//		if (selectedLgui !=  null) {
+//			activeNodedisplayLayoutGid = selectedLgui.getLayoutAccess().getActiveNodedisplayLayoutGid();
+//		}
+//		for (String gid : activeNodedisplayLayoutGid) {
+//			generateNodedisplay(gid);
+//		}
+//		if (activeNodedisplayLayoutGid.length == 0) {
+//			IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
+//			try {
+//				IViewPart view = activePage.showView(ILMLUIConstants.VIEW_PARALLELNODES, Integer.toString(j), activePage.VIEW_VISIBLE);
+//			} catch (PartInitException e) {
+//				e.printStackTrace();
+//			}
+//			j++;
+//		}
+//	}
 
 	private void addView(String gid, String type) {
 		if (type.equals("table")) {
-			generateTable(gid);
+//			generateTable(gid);
 		} else if (type.equals("nodedisplay")) {
-			generateNodedisplay(gid);
+//			generateNodedisplay(gid);
 		} else {
 			MessageBox messageBox = new MessageBox(LMLUIPlugin.getDisplay().getActiveShell(), SWT.OK | SWT.ERROR);
 			messageBox.setMessage("There is no graphical component with this id.");
