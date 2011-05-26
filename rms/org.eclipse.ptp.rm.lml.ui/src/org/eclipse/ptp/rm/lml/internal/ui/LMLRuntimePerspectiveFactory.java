@@ -12,9 +12,12 @@
 package org.eclipse.ptp.rm.lml.internal.ui;
 
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
+import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 
 public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 
@@ -37,8 +40,8 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 		lguiFolder.addView("org.eclipse.ptp.ui.views.resourceManagerView");
 
 		tableFolder.addPlaceholder(ILMLUIConstants.VIEW_TABLE + ":*");
-		tableFolder.addView(ILMLUIConstants.VIEW_TABLE);
 		machinesFolder.addPlaceholder(ILMLUIConstants.VIEW_PARALLELNODES + ":*");
-		machinesFolder.addView(ILMLUIConstants.VIEW_PARALLELNODES);
+		IWorkbenchPage activePage = LMLUIPlugin.getActiveWorkbenchWindow().getActivePage();
+//		IViewPart view1 = activePage.showView(ILMLUIConstants.VIEW_TABLE, Integer.toString(1), activePage.VIEW_VISIBLE);
 	}
 }

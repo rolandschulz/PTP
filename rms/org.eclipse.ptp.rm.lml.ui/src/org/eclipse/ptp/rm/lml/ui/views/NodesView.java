@@ -11,6 +11,7 @@
 
 package org.eclipse.ptp.rm.lml.ui.views;
 
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
@@ -23,6 +24,7 @@ import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
+import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -64,8 +66,13 @@ public class NodesView extends LMLViewPart {
 		}
 
 		public void handleEvent(IViewUpdateEvent event) {
-			fLguiItem = lmlManager.getSelectedLguiItem();
-			createNodedisplayView();
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					fLguiItem = lmlManager.getSelectedLguiItem();
+					nodedisplayView.dispose();
+					composite.layout();
+				}
+			});
 		}
 	}
 

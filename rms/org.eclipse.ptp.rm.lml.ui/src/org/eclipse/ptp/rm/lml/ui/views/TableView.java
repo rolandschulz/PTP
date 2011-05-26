@@ -30,6 +30,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -58,9 +59,11 @@ import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Cell;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
+import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.actions.HideTableColumnAction;
 import org.eclipse.ptp.rm.lml.ui.actions.ShowTableColumnAction;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
+import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -159,9 +162,13 @@ public class TableView extends LMLViewPart {
 		}
 
 		public void handleEvent(IViewUpdateEvent event) {
-			input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
-			viewer.setInput(input);
-			viewer.getTree().setItemCount(input.length);
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
+					viewer.setInput(input);
+					viewer.getTree().setItemCount(input.length);
+				}
+			});
 		}
 	}
 	
