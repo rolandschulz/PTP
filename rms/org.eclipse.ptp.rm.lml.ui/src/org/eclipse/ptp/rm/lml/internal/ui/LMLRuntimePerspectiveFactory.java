@@ -12,15 +12,10 @@
 package org.eclipse.ptp.rm.lml.internal.ui;
 
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
-import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
 import org.eclipse.ptp.rm.lml.ui.managers.ViewManager;
-import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 
 public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 
@@ -37,15 +32,15 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 
 		IFolderLayout lguiFolder = layout.createFolder("lguiFolder", IPageLayout.LEFT, (float) 0.4, editorArea); //$NON-NLS-1$
 		IFolderLayout tableFolder = layout.createFolder("jobsFolder", IPageLayout.BOTTOM, (float) 0.25, "lguiFolder"); //$NON-NLS-1$ //$NON-NLS-2$
-		IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, (float) 0, editorArea); //$NON-NLS-1$ //$NON-NLS-2$
-		
-//		lguiFolder.addView(ILMLUIConstants.VIEW_LML);
+		IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, 0, editorArea); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// lguiFolder.addView(ILMLUIConstants.VIEW_LML);
 		lguiFolder.addView("org.eclipse.ptp.ui.views.resourceManagerView");
 
-		tableFolder.addPlaceholder(ILMLUIConstants.VIEW_TABLE + ":*");
-		machinesFolder.addPlaceholder(ILMLUIConstants.VIEW_PARALLELNODES + ":*");
-		
-		new ViewManager(); 
-		
+		tableFolder.addView(ILMLUIConstants.VIEW_TABLE + ":*");
+		machinesFolder.addView(ILMLUIConstants.VIEW_PARALLELNODES + ":*");
+
+		new ViewManager();
+
 	}
 }
