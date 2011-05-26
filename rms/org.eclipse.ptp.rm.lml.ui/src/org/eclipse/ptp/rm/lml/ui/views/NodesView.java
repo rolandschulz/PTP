@@ -69,8 +69,12 @@ public class NodesView extends LMLViewPart {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					fLguiItem = lmlManager.getSelectedLguiItem();
+					composite.setEnabled(false);
+					nodedisplayView.setEnabled(false);
 					nodedisplayView.dispose();
 					composite.layout();
+					nodedisplayView.setEnabled(true);
+					composite.setEnabled(true);
 				}
 			});
 		}
