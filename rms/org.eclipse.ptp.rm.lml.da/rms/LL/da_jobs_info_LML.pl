@@ -186,6 +186,9 @@ my %mapping = (
     "totaltasks"                             => "totaltasks",
     "totalcores"                             => "totalcores",
 
+    "status"                                 => "status",
+    "detailedstatus"                         => "detailedstatus",
+
     );
 
 
@@ -231,6 +234,7 @@ foreach $jobid (sort(keys(%jobs))) {
     $jobs{$jobid}{exec_host}  = "-" if(!exists($jobs{$jobid}{exec_host}));
     $jobs{$jobid}{totaltasks} = 0 if(!exists($jobs{$jobid}{totaltasks}));
     $jobs{$jobid}{spec}       = 0 if(!exists($jobs{$jobid}{spec}));
+    ($jobs{$jobid}{status},$jobs{$jobid}{detailedstatus}) = &get_state($jobs{$jobid}{Status}); 
 }
 
 
@@ -277,34 +281,32 @@ foreach $key (sort(keys(%notfoundkeys))) {
 }
 
 sub get_state {
-    my($job_state,$Hold_types)=@_;
+    my($job_state)=@_;
     my($state,$detailed_state);
 
     $state="UNDETERMINED";$detailed_state="";
 
-    if($job_state eq "C") {
+    if($job_state eq "Completed") {
 	$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
     }
-    if($job_state eq "H") {
+    if($job_state eq "User Hold") {
 	$state="SUBMITTED";
-	$detailed_state="USER_ON_HOLD"   if($Hold_types eq "u");
-	$detailed_state="SYSTEM_ON_HOLD" if($Hold_types eq "s");
-	$detailed_state="USER_SYSTEM_ON_HOLD" if($Hold_types=~"(us|su)");
-	$detailed_state="SYSTEM_ON_HOLD" if($Hold_types eq "o");
+	$detailed_state="USER_ON_HOLD";
     }
-    if($job_state eq "E") {
+    if($job_state eq "System Hold") {
+	$state="SUBMITTED";
+	$detailed_state="SYSTEM_ON_HOLD";
+    }
+    if($job_state eq "Removed") {
 	$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
     }    
-    if($job_state eq "Q") {
+    if($job_state eq "Idle") {
 	$state="SUBMITTED";$detailed_state="";
     }    
-    if($job_state eq "W") {
-	$state="SUBMITTED";$detailed_state="";
+    if($job_state eq "Not Queued") {
+	$state="SUBMITTED";$detailed_state="JOB_NOT_QUEUED";
     }    
-    if($job_state eq "T") {
-	$state="SUBMITTED";$detailed_state="";
-    }    
-    if($job_state eq "R") {
+    if($job_state eq "Running") {
 	$state="RUNNING";$detailed_state="";
     }    
 

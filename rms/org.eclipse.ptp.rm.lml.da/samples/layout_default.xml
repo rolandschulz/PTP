@@ -37,7 +37,7 @@
 <column cid="8" pos="7" width="0.3" active="true" key="status"/>
 </tablelayout>
 
-<table title="Running" id="joblistrun"  contenttype="jobs" description="This is the table showing all running jobs">
+<table title="Running Jobs" id="joblistrun"  contenttype="jobs" description="This is the table showing all running jobs">
 <column id="1" name="step"/>
 <column id="2" name="owner">  <pattern>    <include regexp=".*"/>  </pattern></column>
 <column id="3" name="queue"/>
@@ -59,7 +59,7 @@
 <column cid="8" pos="7" width="0.3" active="true" key="status"/>
 </tablelayout>
 
-<table title="Waiting" id="joblistwait"  contenttype="jobs" description="This is the table showing all waiting jobs">
+<table title="Waiting Jobs" id="joblistwait"  contenttype="jobs" description="This is the table showing all waiting jobs">
 <column id="1" name="step"/>
 <column id="2" name="owner">  <pattern>    <include regexp=".*"/>  </pattern></column>
 <column id="3" name="queue"/>
@@ -69,20 +69,5 @@
 <column id="7" name="totalcores"/>
 <column id="8" name="status" type="mandatory">  <pattern>    <include regexp="SUBMITTED"/>  </pattern> </column>
 </table>
-
-<table title="Nodes" id="nodelist"  contenttype="nodes" description="This is the table contain all nodes of the system">
-<column id="1" name="id" sort="alpha" type="mandatory"></column>
-<column id="2" name="ncores"></column>
-<column id="3" name="physmem" sort="alpha"/>
-<column id="4" name="state" sort="alpha"/>
-</table>
-
-<tablelayout id="nodes" gid="nodelist" active="false">
- <column cid="1" pos="0" width="0.25" active="true" key="id" />
- <column cid="2" pos="1" width="0.25" active="true" key="ncores" />
- <column cid="3" pos="2" width="0.25" active="true" key="physmem" />
- <column cid="4" pos="3" width="0.25" active="true" key="state" />
-</tablelayout>
-
 
 </lml:lgui>

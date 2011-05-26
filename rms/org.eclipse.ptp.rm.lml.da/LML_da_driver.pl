@@ -26,7 +26,7 @@ my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
 
-my $version="1.07";
+my $version="1.08";
  
 my ($tstart,$tdiff,$rc);
 
@@ -61,7 +61,9 @@ my ($tstart,$tdiff,$rc);
 my $opt_rawfile=""; # unset
 my $opt_verbose=0;
 my $opt_quiet=0;
-my $opt_tmpdir="./tmp";
+my $hostname = `hostname`;chomp($hostname);
+my $ppid = $$;
+my $opt_tmpdir=sprintf("./tmp_%s_%d",$hostname,$ppid);
 my $opt_keeptmp=0;
 my $opt_dump=0;
 my $opt_demo=0;
@@ -87,7 +89,7 @@ print STDERR "-"x90,"\n" if($opt_verbose);
 my $requestfile  = "<unknown>";
 my $outputfile   = "<unknown>";
 if( ($#ARGV > 1) || ($#ARGV == 0 ) ) {
-    print STDERR "$0: wrong number of arguments (",($#ARGV+1),"), exiting ...\n";
+    &exit_witherror("-","$0: wrong number of arguments (",($#ARGV+1),"), exiting ...\n");
     usage($0);
     exit();
 } elsif ($#ARGV == 1) {
@@ -108,8 +110,7 @@ my $removetmpdir = 0; # remove only if directory was create
 if(! -d $tmpdir) {
     printf(STDERR "$0: temporary directory not found, create new directory $tmpdir ...\n") if($opt_verbose);
     if(!mkdir($tmpdir,0755)) {
-	printf(STDERR "$0: could not create $tmpdir ...$!\n");
-	exit(1);
+	&exit_witherror($outputfile,"$0: could not create $tmpdir ...$!\n");
     } else {
 	print STDERR "$0: tmpdir created ($tmpdir)\n"  if($opt_verbose);
     }
@@ -119,16 +120,14 @@ if(! -d $tmpdir) {
 # check request input file
 if ($requestfile ne "-") {
     if(! -f $requestfile) {
-	printf(STDERR "$0: requestfile $requestfile not found, exiting ...\n");
-	exit(1);
+	&exit_witherror($outputfile,"$0: requestfile $requestfile not found, exiting ...\n");
     }
 }
 
 # check rawfile
 if($opt_rawfile) {
     if(! -f $opt_rawfile) {
-	printf(STDERR "$0: rawfile $rawfile specified but not found, exiting ...\n");
-	exit(1);
+	&exit_witherror($outputfile,"$0: rawfile $rawfile specified but not found, exiting ...\n");
     }
     $rawfile=$opt_rawfile;
 }
@@ -142,8 +141,7 @@ $filehandler_request->read_lml_fast($requestfile);
 $tdiff=time-$tstart;
 printf(STDERR "$0: parsing XML requestfile in %6.4f sec\n",$tdiff) if($opt_verbose);
 if(!$filehandler_request) {
-    printf(STDERR "$0: could not parse requestfile $requestfile, exiting ...\n");
-    exit(1);
+    &exit_witherror($outputfile,"$0: could not parse requestfile $requestfile, exiting ...\n");
 }
 
 # init global vars
@@ -284,8 +282,7 @@ system($cmd);$rc=$?;
 $tdiff=time-$tstart;
 printf(STDERR "$0: %60s -> ready, time used %10.4ss\n","",$tdiff) if($opt_verbose);
 if($rc) {     
-    printf(STDERR "$0 failed executing: %s rc=%d\n",$cmd,$rc); 
-    exit($rc);
+    &exit_witherror($outputfile,"$0 failed executing: $cmd rc=$rc\n");
 }
 
 #########################
@@ -293,8 +290,7 @@ if($rc) {
 #########################
 my $stepoutfile="$tmpdir/datastep_${laststep}.xml";
 if(! -f $stepoutfile) {
-    printf(STDERR "$0 failed, no output generated in last step ... rc=%d\n",$rc); 
-    exit($rc);
+    &exit_witherror($outputfile,"$0 failed, no output generated in last step ... rc=$rc\n");
 }
 if($outputfile eq "-") {
     open(IN,$stepoutfile);
@@ -351,6 +347,41 @@ sub usage {
                 -quiet                   : prints no messages on stderr
 
 ";
+}
+
+# generate dummy LML output containing only error messages
+sub exit_witherror {
+    my($outputfile,$errormsg)=@_;
+    my $xmlout="";
+
+    $xmlout.="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
+    $xmlout.="<lml:lgui xmlns:lml=\"http://www.llview.de\"\n";
+    $xmlout.="          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
+    $xmlout.="          version=\"1\" xsi:schemaLocation=\"http://www.llview.de lgui.xsd\">\n";
+    $xmlout.=" <objects>\n";
+    $xmlout.="    <object id=\"sys000001\" name=\"error\" type=\"system\"/>\n";
+    $xmlout.="</objects>\n";
+
+    $xmlout.="<information>\n";
+    $xmlout.=" <info oid=\"sys000001\" type=\"short\">\n";
+    $xmlout.="  <data key=\"errormsg\" value=\"$errormsg\"/>\n";
+    $xmlout.=" </info>\n";
+    $xmlout.="</information>\n";
+
+    $xmlout.="</lml:lgui>\n";
+    
+    printf(STDERR "$errormsg\n");
+
+    if($outputfile eq "-") {
+	print $xmlout;
+    } else {
+	open(OUT," > $outputfile") || die "could not open for write '$outputfile'";
+	print OUT $xmlout;
+	close(OUT);
+    }
+
+    exit(1);
+
 }
 
 sub create_workflow {

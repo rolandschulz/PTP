@@ -70,7 +70,7 @@ sub process {
     $self->{DATAROOT}   = $dataroot   = LML_ndtree->new();
     
     # determine scheme of system
-    $self->{SYSTEMTYPE}=$self->_get_system_type();    
+    ($self->{SYSTEMTYPE},$self->{SYSTEMNAME})=$self->_get_system_type();    
     if($self->{SYSTEMTYPE} eq "BG/P") {
 	my($maxlx,$maxly,$maxlz,$maxpx,$maxpy,$maxpz)=$self->_get_system_size_bg();
 	if(!$self->_init_trees_bg($maxlx,$maxly,$maxlz,$maxpx,$maxpy,$maxpz)) {
@@ -164,7 +164,7 @@ sub get_lml_nodedisplay {
     my(@keylist,$key,$value);
 
     $ds->{id}=$layoutref->{gid};
-    $ds->{title}=$layoutref->{id};
+    $ds->{title}="system: ".$self->{SYSTEMNAME};
     $ds->{schemeroot}=$self->{SCHEMEROOT};
     $ds->{dataroot}=$self->{DATAROOT};
 
@@ -185,6 +185,7 @@ sub get_lml_nodedisplaylayout {
 sub _get_system_type {
     my($self) = shift;
     my $system_type = "unknown";
+    my $system_name = "unknown";
     my($key,$ref);
     keys(%{$self->{LMLFH}->{DATA}->{OBJECT}}); # reset iterator
     while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
@@ -194,10 +195,14 @@ sub _get_system_type {
 		$system_type=$ref->{type};
 		printf("_get_system_type: type is '%s'\n",$system_type) if($self->{VERBOSE});
 	    }
+	    if($ref->{hostname}) {
+		$system_name=$ref->{hostname};
+		printf("_get_system_type: name is '%s'\n",$system_name) if($self->{VERBOSE});
+	    }
 	    last; 
 	}
     }
-    return($system_type);
+    return($system_type,$system_name);
 }
 
 

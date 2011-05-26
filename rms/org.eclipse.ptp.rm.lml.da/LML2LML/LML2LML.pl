@@ -143,7 +143,7 @@ foreach $tid (keys(%{$filehandler_layout->{DATA}->{TABLELAYOUT}})) {
     # create table handler and process request
     $table_handler = LML_gen_table->new($opt_verbose,$opt_timings);
     $numids=$table_handler->process($tlayoutref,$tableref,$filehandler_LML);
-    if($numids>0) {
+    if($numids>=0) {
 	# add elements, objects, and info to output LML files
 	$idlistref=$table_handler->get_ids();
 	print "Table Layout: $tid processed ($numids objects found)\n"  if($opt_verbose);

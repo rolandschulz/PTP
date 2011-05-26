@@ -395,3 +395,12 @@ ChangeLog:
    - bug fixes 
      - built-in parser enhancement
      - recognize empty scheme descriptions
+
+1.08:
+   - default_layout adapted (titles, removed inactive tables)
+   - title for nodedisplay contains now hostname of remote system
+   - LML_da_drives handles now exit messages by generating LML 
+     file containing the messages
+   - bug fixes:	
+      - generates now no data cells for not active columns
+      - LL-drives handles now job status correctly
