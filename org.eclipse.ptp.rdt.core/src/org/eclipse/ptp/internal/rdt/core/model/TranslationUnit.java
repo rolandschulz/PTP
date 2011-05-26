@@ -181,7 +181,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.core/model
 	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
-	 * Version: 1.119
+	 * Version: 1.120
 	 */
 	private IncludeFileContentProvider getIncludeFileContentProvider(int style, IIndex index, int linkageID) {
 		final ASTFilePathResolver pathResolver = new RemoteIndexerInputAdapter();
@@ -208,7 +208,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.core/model
 	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
-	 * Version: 1.119
+	 * Version: 1.120
 	 */
 	public IASTTranslationUnit getAST(IIndex index, int style) throws CoreException {
 		checkState();
@@ -289,7 +289,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.core/model
 	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
-	 * Version: 1.119
+	 * Version: 1.120
 	 */
 	public IASTCompletionNode getCompletionNode(IIndex index, int style, int offset) throws CoreException {
 		checkState();
