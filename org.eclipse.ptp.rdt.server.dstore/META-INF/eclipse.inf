@@ -1,0 +1,2 @@
+# exclude children from packing and signing
+jarprocessor.exclude.children=true
