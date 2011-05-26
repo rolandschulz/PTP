@@ -57,15 +57,14 @@ import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
-import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Cell;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
+import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.actions.HideTableColumnAction;
 import org.eclipse.ptp.rm.lml.ui.actions.ShowTableColumnAction;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
-import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -73,8 +72,6 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -96,7 +93,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.progress.UIJob;
 
 public class TableView extends LMLViewPart {
-	
+
 	/**************************************************************************************************************
 	 * Listener class
 	 **************************************************************************************************************/
@@ -179,7 +176,7 @@ public class TableView extends LMLViewPart {
 					generateTable();
 				}
 			});
-			
+
 		}
 
 		public void handleEvent(ILguiRemovedEvent event) {
@@ -190,7 +187,6 @@ public class TableView extends LMLViewPart {
 			});
 		}
 	}
-	
 
 	/**************************************************************************************************************
 	 * Variables
@@ -208,12 +204,11 @@ public class TableView extends LMLViewPart {
 	private final LMLManager lmlManager = LMLManager.getInstance();
 	private TreeItem selectedItem = null;
 	private String selectedOid = null;
-	
+
 	private final Map<String, JobStatusData> jobs = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
-	
+
 	private static final int UNDEFINED = -1;
 	private static final int COPY_BUFFER_SIZE = 64 * 1024;
-
 
 	/**************************************************************************************************************
 	 * Methods creating the GUI
@@ -270,7 +265,7 @@ public class TableView extends LMLViewPart {
 
 		});
 		viewer.setContentProvider(new ILazyTreeContentProvider() {
-			
+
 			private Row[] rows;
 
 			public void dispose() {
@@ -305,7 +300,7 @@ public class TableView extends LMLViewPart {
 			}
 		});
 		lmlManager.addListener(lmlListener, this.getClass().getName());
-		
+
 		tree = viewer.getTree();
 		tree.addControlListener(new ControlAdapter() {
 			@Override
@@ -318,7 +313,7 @@ public class TableView extends LMLViewPart {
 				redrawColumns();
 			}
 		});
-		
+
 		viewer.setUseHashlookup(true);
 
 	}
@@ -327,30 +322,30 @@ public class TableView extends LMLViewPart {
 		gid = getViewSite().getId();
 		fSelectedLguiItem = lmlManager.getSelectedLguiItem();
 		createTable();
-//		composite.addDisposeListener(new DisposeListener() {
-//			
-//			public void widgetDisposed(DisposeEvent e) {
-//				lmlManager.removeComponent(gid);
-//			}
-//		});
+		// composite.addDisposeListener(new DisposeListener() {
+		//
+		// public void widgetDisposed(DisposeEvent e) {
+		// lmlManager.removeComponent(gid);
+		// }
+		// });
 	}
-	
+
 	private void createTable() {
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
 		createColumns();
-		createMenu(); //view menu
-		
+		createMenu(); // view menu
+
 		// Insert the input
 		input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
 		viewer.setInput(input);
 		viewer.getTree().setItemCount(input.length);
-		
+
 		// Part for the controlling Monitor - context menu
 		MenuManager contextMenu = new MenuManager();
 		contextMenu.setRemoveAllWhenShown(true);
 		contextMenu.addMenuListener(new IMenuListener() {
-			
+
 			public void menuAboutToShow(IMenuManager manager) {
 				fillContextMenu(manager);
 			}
@@ -360,7 +355,7 @@ public class TableView extends LMLViewPart {
 		control.setMenu(menu);
 		getSite().registerContextMenu(contextMenu, viewer);
 	}
-	
+
 	/**
 	 * 
 	 * @param tableViewer
@@ -470,16 +465,14 @@ public class TableView extends LMLViewPart {
 			}
 		});
 
-		
-
 	}
-	
+
 	/**
 	 * Creating a view menu.
 	 */
 	private void createMenu() {
 		IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
-		
+
 		IMenuManager subMenuShow = new MenuManager("Show column...");
 		String[] columnNonActive = fSelectedLguiItem.getTableHandler().getTableColumnNonActive(gid);
 		for (String column : columnNonActive) {
@@ -487,7 +480,7 @@ public class TableView extends LMLViewPart {
 			subMenuShow.add(action);
 		}
 		menuManager.add(subMenuShow);
-		
+
 		IMenuManager subMenuHide = new MenuManager("Hide column...");
 		String[] columnActive = fSelectedLguiItem.getTableHandler().getTableColumnActive(gid);
 		for (String column : columnActive) {
@@ -495,18 +488,17 @@ public class TableView extends LMLViewPart {
 			subMenuHide.add(action);
 		}
 		menuManager.add(subMenuHide);
-		
+
 		getViewSite().getActionBars().updateActionBars();
 	}
-	
 
 	private void fillContextMenu(IMenuManager manager) {
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		final boolean userJob = false;
-		
+
 		// TODO JobStarted by User - boolean variable
 		// TODO Filling the Menu in comparison with the result
-//		manager.add(new SuspendJob());
+		// manager.add(new SuspendJob());
 	}
 
 	@Override
@@ -516,7 +508,7 @@ public class TableView extends LMLViewPart {
 	/**************************************************************************************************************
 	 * Disposing the GUI or the table
 	 **************************************************************************************************************/
-		
+
 	@Override
 	public void prepareDispose() {
 		if (viewer.getInput() != null) {
@@ -542,7 +534,6 @@ public class TableView extends LMLViewPart {
 		viewer.getTree().setItemCount(0);
 		this.getViewSite().getActionBars().getMenuManager().removeAll();
 	}
-	
 
 	/**************************************************************************************************************
 	 * Methods from MonitorJobListView
@@ -556,7 +547,7 @@ public class TableView extends LMLViewPart {
 	public void removeJob(String jobId) {
 		jobs.remove(jobId);
 	}
-	
+
 	/**
 	 * Exercises a control operation on the remote job.
 	 * 
@@ -574,7 +565,7 @@ public class TableView extends LMLViewPart {
 			maybeUpdateJobState(job, autoStart, monitor);
 		}
 	}
-	
+
 	/**
 	 * Fetches the remote stdout/stderr contents. This is functionality imported
 	 * from JAXB core to avoid dependencies.
@@ -656,7 +647,7 @@ public class TableView extends LMLViewPart {
 
 		return sb.toString();
 	}
-	
+
 	/**
 	 * 
 	 * @param job
@@ -688,7 +679,7 @@ public class TableView extends LMLViewPart {
 			}
 		}.schedule();
 	}
-	
+
 	private boolean checkControl(IResourceManager manager, final IResourceManagerControl control, boolean autoStart)
 			throws CoreException {
 		boolean ok = false;
@@ -719,7 +710,7 @@ public class TableView extends LMLViewPart {
 		}
 		return ok;
 	}
-	
+
 	/**
 	 * Set the flags if this update carries ready info for the output files.
 	 * 
@@ -739,7 +730,7 @@ public class TableView extends LMLViewPart {
 	/**************************************************************************************************************
 	 * Further needed methods
 	 **************************************************************************************************************/
-	
+
 	private int getColumnAlignment(String alignment) {
 		if (alignment.equals("LEFT")) {
 			return SWT.LEAD;
@@ -771,7 +762,7 @@ public class TableView extends LMLViewPart {
 		}
 		return orderNew;
 	}
-	
+
 	public int[] getRemoveColumnOrder() {
 		return removingColumn(tree.getColumnOrder());
 	}
