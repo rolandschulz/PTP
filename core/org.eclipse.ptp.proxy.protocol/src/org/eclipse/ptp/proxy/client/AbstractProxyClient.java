@@ -367,6 +367,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 						 * prevent this thread from looping, exit on an
 						 * IOException.
 						 */
+						state = SessionState.SHUTTING_DOWN;
+						eventQueue.addPriorityProxyEvent(new ProxyShutdownEvent(0));
 						break;
 					}
 				}
