@@ -340,13 +340,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 	
-	// Paths that the Git sync provider can ignore. For now, only the ".git" directory is excluded. This function should expand
-	// later to include other paths, such as those in Git's ignore list.
+	// Paths that the Git sync provider can ignore.
 	private boolean irrelevantPath(IResourceDelta delta) {
 		String path = delta.getFullPath().toString();
 		if (path.endsWith("/.git")) { //$NON-NLS-1$
 			return true;
-		} else if (path.endsWith("/.git/")){ //$NON-NLS-1$
+		} else if (path.endsWith("/.settings")){ //$NON-NLS-1$
 			return true;
 		} else {
 			return false;
@@ -375,7 +374,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					return false;
 				}
 			} catch (NullPointerException e) {
-				System.err.println(fileName);
+				// CDT throws this exception for files not recognized. For now, be conservative and allow these files.
 				return false;
 			}
 		}
