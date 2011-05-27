@@ -67,6 +67,13 @@ public class RefreshJobStatus extends AbstractStatusAction {
 	 */
 	@Override
 	protected void validate(IAction action) {
+		for (Row row : selected) {
+			JobStatusData status = row.status;
+			if (status == null) {
+				action.setEnabled(false);
+				return;
+			}
+		}
 		action.setEnabled(true);
 	}
 }

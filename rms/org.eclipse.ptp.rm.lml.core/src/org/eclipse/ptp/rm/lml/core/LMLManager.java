@@ -53,6 +53,8 @@ import org.eclipse.ptp.rm.lml.internal.core.events.ViewAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.ViewDisposedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.ViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
+import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -94,6 +96,11 @@ public class LMLManager {
 	 * A list of all listeners.
 	 */
 	private final Map<String, IListener> listeners = new HashMap<String, IListener>();
+	
+	/*
+	 * A list of jobs started by the user.
+	 */
+	private final Map<String, Map< String, JobStatusData>> userJobList = new HashMap<String, Map<String,JobStatusData>>();
 
 	/*
 	 * An instance of this class.
@@ -133,6 +140,26 @@ public class LMLManager {
 	/**************************************************************************************************************
 	 * Job related methods
 	 **************************************************************************************************************/
+	
+	public void addUserJob(String name, String jobId, IJobStatus status) {
+		JobStatusData statusData = new JobStatusData(status);
+		userJobList.get(name).put(jobId,statusData);
+		
+		// TODO Showing it at one of the views
+	}
+	
+	public void updateUserJob(String name, String jobId, IJobStatus status) {
+		JobStatusData statusData = userJobList.get(name).get(jobId);
+		statusData.updateState(status);
+		
+		// TODO Checking if showing in another view and than showing it 
+	}
+	
+	public void removeUserJob(String name, String jobId) {
+		userJobList.get(name).remove(jobId);
+		
+		// TODO Changing one of the views
+	}
 
 	/**************************************************************************************************************
 	 * Saving and restoring
@@ -183,8 +210,10 @@ public class LMLManager {
 				} else {
 					fireUpdatedLgui();
 				}
-			}
+			} 
 		}
+		
+		// TODO Checking for jobs, updating the InfoTyp in JobStatusData
 	}
 
 	/**************************************************************************************************************
@@ -198,12 +227,17 @@ public class LMLManager {
 				item = new LguiItem(name);
 				LGUIS.put(name, item);
 			}
-//			openLguis.add(name);
 			fLguiItem = item;
 		}
 		if (!fLguiItem.isEmpty()) {
 			fireNewLgui();
 		}
+	
+		Map<String,JobStatusData> map = new HashMap<String, JobStatusData>();
+		// TODO Restoring the memento
+		// if there is no memento
+	
+		userJobList.put(name, map);
 	}
 
 	public void closeLgui(String name) {
@@ -212,12 +246,15 @@ public class LMLManager {
 			item = LGUIS.get(name);
 			if (item != null) {
 				LGUIS.remove(name);
-//				openLguis.remove(name);
 			}
 		}
 		if (fLguiItem != null && fLguiItem == item) {
 			fireRemovedLgui(item);
 		}
+		
+		Map<String,JobStatusData> list = userJobList.remove(name);
+		// TODO Save jobs to memento
+		
 	}
 
 	/*
@@ -273,7 +310,6 @@ public class LMLManager {
 
 	public void selectLgui(String name) {
 		fireRemovedLgui(null);
-//		if (name != null && openLguis.contains(name)) {
 		if (name != null) {
 			ILguiItem item = LGUIS.get(name);
 			if (fLguiItem != item) {

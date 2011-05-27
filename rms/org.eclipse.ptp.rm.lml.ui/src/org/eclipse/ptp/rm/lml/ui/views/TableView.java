@@ -163,6 +163,7 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(IViewUpdateEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
+					fSelectedLguiItem = lmlManager.getSelectedLguiItem();
 					setViewerInput();
 				}
 			});
@@ -171,7 +172,10 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(ILguiAddedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					generateTable();
+					fSelectedLguiItem = lmlManager.getSelectedLguiItem();
+					if (fSelectedLguiItem != null) {
+						createTable();
+					}
 				}
 			});
 
@@ -180,6 +184,8 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(ILguiRemovedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
+					fSelectedLguiItem = null;
+					setViewerInput();
 					disposeTable();
 				}
 			});
@@ -213,6 +219,7 @@ public class TableView extends LMLViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
+		gid = getViewSite().getId();
 		composite = new Composite(parent, SWT.None);
 		composite.setLayout(new FillLayout());
 
@@ -261,8 +268,9 @@ public class TableView extends LMLViewPart {
 			}
 
 		});
+		
 		viewer.setContentProvider(new ILazyTreeContentProvider() {
-
+			
 			private Row[] rows;
 
 			public void dispose() {
@@ -311,27 +319,14 @@ public class TableView extends LMLViewPart {
 		});
 
 		viewer.setUseHashlookup(true);
-
-	}
-
-	public void generateTable() {
-		gid = getViewSite().getId();
-		fSelectedLguiItem = lmlManager.getSelectedLguiItem();
-		if (fSelectedLguiItem != null) {
-			createTable();
-			// composite.addDisposeListener(new DisposeListener() {
-			//
-			// public void widgetDisposed(DisposeEvent e) {
-			// lmlManager.removeComponent(gid);
-			// }
-			// });
-		}
+		
 	}
 
 	private void createTable() {
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
 		if (fSelectedLguiItem.getTableHandler().isEmpty(gid)) {
+			System.out.println("Here");
 			return;
 		}
 		createColumns();
@@ -502,7 +497,7 @@ public class TableView extends LMLViewPart {
 	}
 
 	private void disposeTable() {
-		if (fSelectedLguiItem != null && !composite.isDisposed()) {
+		if (fSelectedLguiItem != null) {
 			TreeColumn[] oldColumns = tree.getColumns();
 			for (int i = 0; i < oldColumns.length; i++) {
 				Listener[] oldListeners = oldColumns[i].getListeners(SWT.Selection);
@@ -512,12 +507,9 @@ public class TableView extends LMLViewPart {
 				oldColumns[i].dispose();
 			}
 			treeColumns = null;
-		}
-		if (!composite.isDisposed()) {
-			viewer.setInput(null);
-			viewer.getTree().setItemCount(0);
 			this.getViewSite().getActionBars().getMenuManager().removeAll();
-		}
+		}	
+		
 	}
 
 	/**************************************************************************************************************

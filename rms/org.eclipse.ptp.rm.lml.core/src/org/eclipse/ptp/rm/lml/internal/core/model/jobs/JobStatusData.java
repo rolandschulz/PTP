@@ -15,8 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.ptp.rm.lml.internal.core.elements.InfoType;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.internal.progress.JobInfo;
 
 /**
  * Wrapper for job status which extracts the persistent properties and saves
@@ -38,7 +40,6 @@ public class JobStatusData {
 	public static final String INTERACTIVE = "interactive";//$NON-NLS-1$;
 	public static final String STATE = "state";//$NON-NLS-1$;
 	public static final String STATE_DETAIL = "state_detail";//$NON-NLS-1$;
-	public static final String ATTRIBUTES = "attributes";
 
 	private final String rmId;
 	private final String jobId;
@@ -49,7 +50,7 @@ public class JobStatusData {
 	private String stateDetail;
 	private boolean outReady;
 	private boolean errReady;
-	private Map <String, String> attributes = Collections.synchronizedMap(new TreeMap<String, String>()); 
+	private InfoType jobInfo; // TODO has to be restored
 
 	private IJobStatus status; // for retrieving file contents
 
@@ -88,6 +89,15 @@ public class JobStatusData {
 		interactive = memento.getBoolean(INTERACTIVE);
 		outReady = outputPath != null && IJobStatus.JOB_OUTERR_READY.equals(stateDetail);
 		errReady = errorPath != null && IJobStatus.JOB_OUTERR_READY.equals(stateDetail);
+	}
+	
+	
+	public void setJobInfo(InfoType jobInfo) {
+		this.jobInfo = jobInfo;
+	}
+	
+	public InfoType getJobInfo() {
+		return jobInfo;
 	}
 
 	/**

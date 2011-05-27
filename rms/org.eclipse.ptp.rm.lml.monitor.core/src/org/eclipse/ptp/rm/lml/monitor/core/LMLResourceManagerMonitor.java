@@ -111,6 +111,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	private MonitorJob fMonitorJob = null;
 	private final RMListener fListener = new RMListener();
 	private final RMManager fRMManager = PTPUIPlugin.getDefault().getRMManager();
+	private final LMLManager fLMLManager = LMLManager.getInstance();
 
 	public LMLResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
@@ -146,7 +147,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	@Override
 	protected void doAddJob(String jobId, IJobStatus status) {
-		// TODO Auto-generated method stub
+		fLMLManager.addUserJob(getResourceManager().getUniqueName(), jobId, status);
 	}
 
 	@Override
@@ -157,15 +158,14 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	@Override
 	protected void doRemoveJob(String jobId) {
-		// TODO Auto-generated method stub
-
+		fLMLManager.removeUserJob(getResourceManager().getUniqueName(), jobId);
 	}
 
 	@Override
 	protected void doShutdown() throws CoreException {
 		fRMManager.removeRMSelectionListener(fListener);
 
-		LMLManager.getInstance().closeLgui(getResourceManager().getUniqueName());
+		fLMLManager.closeLgui(getResourceManager().getUniqueName());
 
 		synchronized (this) {
 			if (fMonitorJob != null) {
@@ -214,7 +214,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	@Override
 	protected void doUpdateJob(String jobId, IJobStatus status) {
-		// TODO Auto-generated method stub
-
+		fLMLManager.updateUserJob(getResourceManager().getUniqueName(), jobId, status);
 	}
 }

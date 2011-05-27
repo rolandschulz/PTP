@@ -24,7 +24,7 @@
             name="%LMLView.name">
       </view>
       <view
-            allowMultiple="falsee"
+            allowMultiple="true"
             category="org.eclipse.ptp.rm.lml.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
             icon="icons/parallel_perspective.gif"
@@ -33,12 +33,12 @@
             restorable="false">
       </view>
       <view
-            allowMultiple="false"
+            allowMultiple="true"
             category="org.eclipse.ptp.rm.lml.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
             icon="icons/parallel_perspective.gif"
             id="joblistwait"
-            name="%TableView2.name"
+            name="%Tableview2.name"
             restorable="false">
       </view>
    </extension>
@@ -46,7 +46,6 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.ptp.rm.lml.internal.ui.LMLRuntimePerspectiveFactory"
-            fixed="true"
             icon="icons/parallel_perspective.gif"
             id="org.eclipse.ptp.rm.lml.ui.LMLRunPerspective"
             name="%Perspective.name">
@@ -58,10 +57,10 @@
             allPopups="false"
             locationURI="menu:org.eclipse.ptp.rm.lml.ui..views.TableView?afetr=additions">
          <menu
-               label="Hide column">
+               label="%menu.label">
          </menu>
          <menu
-               label="Show column">
+               label="%menu.label.0">
          </menu>
       </menuContribution>
    </extension>
@@ -75,73 +74,73 @@
                class="org.eclipse.ptp.rm.lml.ui.actions.SuspendJob"
                enablesFor="+"
                id="org.eclipse.ptp.rm.lml.ui.actions.SuspendJob"
-               label="Suspend Job"
+               label="%action.label"
                menubarPath="job"
-               tooltip="Suspend the job.">
+               tooltip="%action.tooltip">
          </action>
          <action
                class="org.eclipse.ptp.rm.lml.ui.actions.GetOutput"
                enablesFor="+"
                id="org.eclipse.ptp.rm.lml.ui.actions.GetOutput"
-               label="Get Job Output"
+               label="%action.label.0"
                menubarPath="file"
-               tooltip="Display the job output in a console.">
+               tooltip="%action.tooltip.0">
          </action>
          <action
                class="org.eclipse.ptp.rm.lml.ui.actions.GetError"
                enablesFor="+"
                id="org.eclipse.ptp.rm.lml.ui.actions.GetError"
-               label="Get Job Error"
+               label="%action.label.1"
                menubarPath="file"
-               tooltip="Display the job error in a console.">
+               tooltip="%action.tooltip.1">
          </action>
          <action
                class="org.eclipse.ptp.rm.lml.ui.actions.RefreshJobStatus"
                enablesFor="+"
                id="org.eclipse.ptp.rm.lml.ui.actions.RefreshJobStatus"
-               label="Refresh Job Status"
+               label="%action.label.2"
                menubarPath="status"
-               tooltip="Refresh the state and state detail for this job.">
+               tooltip="%action.tooltip.2">
          </action>
          <action
                class="org.eclipse.ptp.rm.lml.ui.actions.ReleaseJob"
                enablesFor="+"
                id="org.eclipse.ptp.rm.lml.ui.actions.ReleaseJob"
-               label="Release Job"
+               label="%action.label.3"
                menubarPath="job"
-               tooltip="Release the job.">
+               tooltip="%action.tooltip.3">
          </action>
          <action
                class="org.eclipse.ptp.rm.lml.ui.actions.HoldJob"
                enablesFor="+"
                id="org.eclipse.ptp.rm.lml.ui.actions.HoldJob"
-               label="Hold Job"
+               label="%action.label.4"
                menubarPath="job"
-               tooltip="Hold the job.">
+               tooltip="%action.tooltip.4">
          </action>
          <action
                class="org.eclipse.ptp.rm.lml.ui.actions.CancelJob"
                enablesFor="+"
                id="org.eclipse.ptp.rm.lml.ui.actions.CancelJob"
-               label="Cancel Job"
+               label="%action.label.5"
                menubarPath="job"
-               tooltip="Terminate the job.">
+               tooltip="%action.tooltip.5">
          </action>
          <action
                class="org.eclipse.ptp.rm.lml.ui.actions.RemoveJob"
                enablesFor="+"
                id="org.eclipse.ptp.rm.lml.ui.actions.RemoveJob"
-               label="Remove Job Entry"
+               label="%action.label.6"
                menubarPath="table"
-               tooltip="Permanently remove job entry from table.">
+               tooltip="%action.tooltip.6">
          </action>
          <action
                class="org.eclipse.ptp.rm.lml.ui.actions.ResumeJob"
                enablesFor="+"
                id="org.eclipse.ptp.rm.lml.ui.actions.ResumeJob"
-               label="Resume Job"
+               label="%action.label.7"
                menubarPath="job"
-               tooltip="Resume the job.">
+               tooltip="%action.tooltip.7">
          </action>
       </objectContribution>
    </extension>
