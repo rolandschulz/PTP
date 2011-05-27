@@ -8,20 +8,4 @@
             id="org.eclipse.ptp.rm.lml.monitor">
       </configurationWizard>
    </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:org.eclipse.ptp.ui.views.resourceManagerView">
-         <menu
-               icon="icons/parallel_perspective.gif"
-               id="org.eclipse.ptp.ui.views.resourceManagerView.closedLL.menu"
-               label="%resourceManagerView.closedLL.label"
-               tooltip="%resourceManagerView.closedLL.tooltip">
-             <dynamic
-               class="org.eclipse.ptp.rm.lml.monitor.ui.menus.LLGuiOpenContributionItem"
-               id="org.eclipse.ptp.rm.lml.monitor.LLGuiOpenContributionItem">
-             </dynamic>
-        </menu>
-      </menuContribution>
-   </extension>
 </plugin>
