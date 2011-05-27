@@ -19,6 +19,8 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -36,6 +38,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
@@ -185,8 +188,18 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 	public void update(IRemoteServices services, IRemoteConnection connection) {
 		fRemoteServices = services;
 		fRemoteConnection = connection;
+		if (!connection.isOpen()) {
+			boolean res = MessageDialog.openQuestion(getShell(), Messages.getString("RemoteBuildServiceFileLocationWidget.2"),  //$NON-NLS-1$
+					NLS.bind(Messages.getString("RemoteBuildServiceFileLocationWidget.3"), connection.getName()));  //$NON-NLS-1$
+			if (res) {
+				IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
+				uiServices.getUIConnectionManager().openConnectionWithProgress(getShell(), null, connection);
+			}
+		}
 		String defaultPath = getDefaultPath(fRemoteServices, fRemoteConnection);
-		text.setText(defaultPath);
+		if (defaultPath != null) {
+			text.setText(defaultPath);
+		}
 	}
 
 }
