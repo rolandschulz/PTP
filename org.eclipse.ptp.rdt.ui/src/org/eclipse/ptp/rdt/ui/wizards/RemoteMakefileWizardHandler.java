@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,9 @@ package org.eclipse.ptp.rdt.ui.wizards;
 
 import java.net.URI;
 
+
 import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescriptionManager;
 import org.eclipse.cdt.core.settings.model.extension.CConfigurationData;
@@ -123,10 +125,16 @@ public class RemoteMakefileWizardHandler extends STDWizardHandler {
 			doCustom(project);
 			
 			//turn off append local environment variables for remote projects
-			StorableEnvironment vars = EnvironmentVariableManager.fUserSupplier.getWorkspaceEnvironmentCopy();
-			vars.setAppendContributedEnvironment(false);
-			vars.setAppendEnvironment(false);
-			EnvironmentVariableManager.fUserSupplier.setWorkspaceEnvironment(vars);
+			ICConfigurationDescription c_cfgs[] = des.getConfigurations();
+			for (ICConfigurationDescription c_cfg : c_cfgs) {
+				StorableEnvironment vars = EnvironmentVariableManager.fUserSupplier.getEnvironment(c_cfg);
+				if(vars!=null){
+					vars.setAppendContributedEnvironment(false);
+					vars.setAppendEnvironment(false);
+				}
+			}
+			
+			
 		} finally {
 			monitor.done();
 		}
