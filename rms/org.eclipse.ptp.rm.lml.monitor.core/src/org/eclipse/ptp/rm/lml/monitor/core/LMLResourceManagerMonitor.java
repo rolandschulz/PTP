@@ -10,6 +10,8 @@
 package org.eclipse.ptp.rm.lml.monitor.core;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,6 +24,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -39,11 +42,32 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.ui.IRMSelectionListener;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.managers.RMManager;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.XMLMemento;
 
 /**
  * LML JAXB resource manager monitor
  */
 public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
+	public class RMListener implements IRMSelectionListener {
+		public void selectionChanged(ISelection selection) {
+			String name = null;
+			if (!selection.isEmpty()) {
+				TreePath path = ((ITreeSelection) selection).getPaths()[0];
+				Object segment = path.getFirstSegment();
+				if (segment instanceof IPResourceManager) {
+					name = ((IPResourceManager) segment).getResourceManager().getUniqueName();
+				}
+			}
+			LMLManager.getInstance().selectLgui(name);
+		}
+
+		public void setDefault(Object rm) {
+			// TODO Auto-generated method stub
+
+		}
+	}
+
 	private class MonitorJob extends Job {
 		private final LMLDAServer fServer;
 
@@ -84,24 +108,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		}
 	}
 
-	public class RMListener implements IRMSelectionListener {
-		public void setDefault(Object rm) {
-			// TODO Auto-generated method stub
-
-		}
-
-		public void selectionChanged(ISelection selection) {
-			String name = null;
-			if (!selection.isEmpty()) {
-				TreePath path = ((ITreeSelection) selection).getPaths()[0];
-				Object segment = path.getFirstSegment();
-				if (segment instanceof IPResourceManager) {
-					name = ((IPResourceManager) segment).getResourceManager().getUniqueName();
-				}
-			}
-			LMLManager.getInstance().selectLgui(name);
-		}
-	}
+	private static final String USER_JOBS = "user-jobs";//$NON-NLS-1$ 
 
 	/*
 	 * needs to be parameter
@@ -115,34 +122,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	public LMLResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
-	}
-
-	/**
-	 * Get the remote connection specified by the monitor configuration. This
-	 * may be the same as the control connection (if "use same" is selected) or
-	 * an independent connection.
-	 * 
-	 * @param monitor
-	 *            progress monitor
-	 * @return connection for the monitor
-	 */
-	private IRemoteConnection getRemoteConnection(IProgressMonitor monitor) {
-		AbstractRemoteResourceManagerConfiguration conf = (AbstractRemoteResourceManagerConfiguration) getMonitorConfiguration();
-		String id;
-		String name;
-		if (conf.getUseDefault()) {
-			id = getResourceManager().getControlConfiguration().getRemoteServicesId();
-			name = getResourceManager().getControlConfiguration().getConnectionName();
-		} else {
-			id = getMonitorConfiguration().getRemoteServicesId();
-			name = getMonitorConfiguration().getConnectionName();
-		}
-		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(id, monitor);
-		if (services != null) {
-			IRemoteConnectionManager connMgr = services.getConnectionManager();
-			return connMgr.getConnection(name);
-		}
-		return null;
 	}
 
 	@Override
@@ -165,7 +144,24 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	protected void doShutdown() throws CoreException {
 		fRMManager.removeRMSelectionListener(fListener);
 
-		fLMLManager.closeLgui(getResourceManager().getUniqueName());
+		/*
+		 * Give LML manager fresh memento to save
+		 */
+		XMLMemento memento = XMLMemento.createWriteRoot(USER_JOBS);
+		fLMLManager.closeLgui(getResourceManager().getUniqueName(), memento);
+
+		StringWriter writer = new StringWriter();
+		try {
+			memento.save(writer);
+		} catch (IOException t) {
+			throw CoreExceptionUtils.newException(t.getMessage(), t);
+		}
+
+		/*
+		 * Too late for API change to IResourceManagerComponentConfiguration
+		 * (05/27/2011 - alr) FIXME
+		 */
+		((AbstractResourceManagerConfiguration) getMonitorConfiguration()).putString(USER_JOBS, writer.toString());
 
 		synchronized (this) {
 			if (fMonitorJob != null) {
@@ -178,9 +174,20 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
 		/*
+		 * Too late for API change to IResourceManagerComponentConfiguration
+		 * (05/27/2011 - alr) FIXME
+		 */
+		String userJobs = ((AbstractResourceManagerConfiguration) getMonitorConfiguration()).getString(USER_JOBS, null);
+
+		IMemento memento = null;
+		if (userJobs != null) {
+			memento = XMLMemento.createReadRoot(new StringReader(userJobs));
+		}
+
+		/*
 		 * Initialize LML classes
 		 */
-		LMLManager.getInstance().openLgui(getResourceManager().getUniqueName());
+		fLMLManager.openLgui(getResourceManager().getUniqueName(), memento);
 
 		/*
 		 * Open connection and launch periodic job
@@ -215,5 +222,33 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	@Override
 	protected void doUpdateJob(String jobId, IJobStatus status) {
 		fLMLManager.updateUserJob(getResourceManager().getUniqueName(), jobId, status);
+	}
+
+	/**
+	 * Get the remote connection specified by the monitor configuration. This
+	 * may be the same as the control connection (if "use same" is selected) or
+	 * an independent connection.
+	 * 
+	 * @param monitor
+	 *            progress monitor
+	 * @return connection for the monitor
+	 */
+	private IRemoteConnection getRemoteConnection(IProgressMonitor monitor) {
+		AbstractRemoteResourceManagerConfiguration conf = (AbstractRemoteResourceManagerConfiguration) getMonitorConfiguration();
+		String id;
+		String name;
+		if (conf.getUseDefault()) {
+			id = getResourceManager().getControlConfiguration().getRemoteServicesId();
+			name = getResourceManager().getControlConfiguration().getConnectionName();
+		} else {
+			id = getMonitorConfiguration().getRemoteServicesId();
+			name = getMonitorConfiguration().getConnectionName();
+		}
+		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(id, monitor);
+		if (services != null) {
+			IRemoteConnectionManager connMgr = services.getConnectionManager();
+			return connMgr.getConnection(name);
+		}
+		return null;
 	}
 }
