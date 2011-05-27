@@ -28,10 +28,13 @@ import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.remotemake.RemoteMakeBuilder;
+import org.eclipse.ptp.rdt.sync.core.resources.RemoteMakeNature;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
@@ -56,6 +59,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * Converts existing CDT projects to sync projects.
@@ -147,6 +151,15 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 	 */
 	protected void convertProject(IProject project, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.ConvertToSyncProjectWizardPage_convertingToSyncProject, 3);
+		
+		// Add project natures
+		RemoteSyncNature.addNature(project, new NullProgressMonitor());
+		try {
+			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
+		} catch (CoreException e) {
+			StatusManager.getManager().handle(e, RDTSyncUIPlugin.PLUGIN_ID);
+		}
+
 		try {
 			ISynchronizeParticipant participant = fSelectedProvider.getParticipant();
 
@@ -175,8 +188,7 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 			// Create build scenario based on initial remote location
 			// information
 			ISyncServiceProvider provider = participant.getProvider(project);
-			BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
-					provider.getLocation());
+			BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(), provider.getLocation());
 
 			// For each build configuration, set the build directory
 			// appropriately.

@@ -201,7 +201,7 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 */
 	public String getErrorMessage() {
 		if (fSelectedProvider==null)
-			return "A syncronization provider must be selected"; //$NON-NLS-1$
+			return Messages.ConvertToSyncProjectWizardPage_0; 
 		else 
 			return fSelectedProvider.getParticipant().getErrorMessage();
 	}
