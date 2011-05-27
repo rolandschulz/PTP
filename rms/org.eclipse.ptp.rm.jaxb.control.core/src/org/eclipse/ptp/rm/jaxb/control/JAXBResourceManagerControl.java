@@ -25,8 +25,11 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
+import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
@@ -79,7 +82,35 @@ import org.eclipse.ui.progress.IProgressConstants;
  */
 public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl {
 
+	/*
+	 * copied from AbstractToolRuntimeSystem
+	 */
+	private class ConnectionChangeHandler implements IRemoteConnectionChangeListener {
+		public ConnectionChangeHandler() {
+			// Nothing
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener#
+		 * connectionChanged
+		 * (org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent)
+		 */
+		public void connectionChanged(IRemoteConnectionChangeEvent event) {
+			if (event.getType() == IRemoteConnectionChangeEvent.CONNECTION_ABORTED
+					|| event.getType() == IRemoteConnectionChangeEvent.CONNECTION_CLOSED) {
+				try {
+					getResourceManager().stop();
+				} catch (CoreException e) {
+					RMCorePlugin.log(e);
+				}
+			}
+		}
+	}
+
 	private final IJAXBResourceManagerConfiguration config;
+	private final ConnectionChangeHandler connectionChangeListener;
 	private IResourceManagerMonitor monitor;
 	private Map<String, String> launchEnv;
 	private Map<String, ICommandJob> jobTable;
@@ -96,6 +127,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	public JAXBResourceManagerControl(AbstractResourceManagerConfiguration jaxbServiceProvider) {
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
+		connectionChangeListener = new ConnectionChangeHandler();
 	}
 
 	/**
@@ -327,7 +359,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * Executes any shutdown commands, then calls halt on the status map thread.
 	 * NOTE: closing the RM does not terminate the remote connection it may be
-	 * using. (non-Javadoc)
+	 * using, but merely removes the listeners. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doShutdown()
 	 */
@@ -336,6 +368,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		doOnShutdown();
 		((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences();
 		jobStatusMap.halt();
+		RemoteServicesDelegate d = getRemoteServicesDelegate(null);
+		IRemoteConnection conn = d.getLocalConnection();
+		if (conn != null) {
+			conn.removeConnectionChangeListener(connectionChangeListener);
+		}
+		conn = d.getRemoteConnection();
+		if (conn != null) {
+			conn.removeConnectionChangeListener(connectionChangeListener);
+		}
 	}
 
 	/*
@@ -364,11 +405,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * The main command for job submission. (non-Javadoc) The environment is
-	 * reset on each call; a uuid tag is generated for the submission until a
-	 * resource-specific identifier is returned (there should be a stream
-	 * tokenizer associated with the job command in this case which sets the
-	 * uuid property).
+	 * The main command for job submission. (non-Javadoc) A uuid tag is
+	 * generated for the submission until a resource-specific identifier is
+	 * returned (there should be a stream tokenizer associated with the job
+	 * command in this case which sets the uuid property).
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doSubmitJob(org
@@ -489,7 +529,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/**
 	 * If there are special server connections to open, those need to be taken
 	 * care of by a command to be run on start-up; here we just check for open
-	 * connections.
+	 * connections and add a change listener to them.
 	 * 
 	 * @param monitor
 	 * @throws RemoteConnectionException
@@ -499,18 +539,24 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		RemoteServicesDelegate d = getRemoteServicesDelegate(progress.newChild(50));
 		IRemoteConnection conn = d.getLocalConnection();
-		if (!conn.isOpen()) {
-			conn.open(progress.newChild(25));
+		if (conn != null) {
 			if (!conn.isOpen()) {
-				throw new RemoteConnectionException(Messages.LocalConnectionError);
+				conn.open(progress.newChild(25));
+				if (!conn.isOpen()) {
+					throw new RemoteConnectionException(Messages.LocalConnectionError);
+				}
+				conn.addConnectionChangeListener(connectionChangeListener);
 			}
 		}
 		conn = d.getRemoteConnection();
-		if (!conn.isOpen()) {
-			conn.open(progress.newChild(25));
+		if (conn != null) {
 			if (!conn.isOpen()) {
-				throw new RemoteConnectionException(Messages.RemoteConnectionError + conn.getAddress());
+				conn.open(progress.newChild(25));
+				if (!conn.isOpen()) {
+					throw new RemoteConnectionException(Messages.RemoteConnectionError + conn.getAddress());
+				}
 			}
+			conn.addConnectionChangeListener(connectionChangeListener);
 		}
 	}
 
