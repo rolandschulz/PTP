@@ -38,7 +38,7 @@
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
             icon="icons/parallel_perspective.gif"
             id="joblistwait"
-            name="%Tableview2.name"
+            name="%TableView2.name"
             restorable="false">
       </view>
    </extension>
