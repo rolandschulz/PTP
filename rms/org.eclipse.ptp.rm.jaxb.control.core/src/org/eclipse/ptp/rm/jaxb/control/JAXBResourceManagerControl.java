@@ -29,7 +29,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
@@ -85,8 +84,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * copied from AbstractToolRuntimeSystem
 	 */
-	private class ConnectionChangeHandler implements IRemoteConnectionChangeListener {
-		public ConnectionChangeHandler() {
+	private class ConnectionChangeListener implements IRemoteConnectionChangeListener {
+		public ConnectionChangeListener() {
 			// Nothing
 		}
 
@@ -103,14 +102,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				try {
 					getResourceManager().stop();
 				} catch (CoreException e) {
-					RMCorePlugin.log(e);
+					JAXBControlCorePlugin.log(e);
 				}
 			}
 		}
 	}
 
 	private final IJAXBResourceManagerConfiguration config;
-	private final ConnectionChangeHandler connectionChangeListener;
+	private final ConnectionChangeListener connectionListener;
 	private IResourceManagerMonitor monitor;
 	private Map<String, String> launchEnv;
 	private Map<String, ICommandJob> jobTable;
@@ -127,7 +126,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	public JAXBResourceManagerControl(AbstractResourceManagerConfiguration jaxbServiceProvider) {
 		super(jaxbServiceProvider);
 		config = (IJAXBResourceManagerConfiguration) jaxbServiceProvider;
-		connectionChangeListener = new ConnectionChangeHandler();
+		connectionListener = new ConnectionChangeListener();
 	}
 
 	/**
@@ -369,13 +368,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences();
 		jobStatusMap.halt();
 		RemoteServicesDelegate d = getRemoteServicesDelegate(null);
-		IRemoteConnection conn = d.getLocalConnection();
+		IRemoteConnection conn = d.getRemoteConnection();
 		if (conn != null) {
-			conn.removeConnectionChangeListener(connectionChangeListener);
-		}
-		conn = d.getRemoteConnection();
-		if (conn != null) {
-			conn.removeConnectionChangeListener(connectionChangeListener);
+			conn.removeConnectionChangeListener(connectionListener);
 		}
 	}
 
@@ -528,8 +523,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	/**
 	 * If there are special server connections to open, those need to be taken
-	 * care of by a command to be run on start-up; here we just check for open
-	 * connections and add a change listener to them.
+	 * care of by a command to be run on start-up; here we just check for an
+	 * open connection and add a change listener to it.
 	 * 
 	 * @param monitor
 	 * @throws RemoteConnectionException
@@ -538,17 +533,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException, CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		RemoteServicesDelegate d = getRemoteServicesDelegate(progress.newChild(50));
-		IRemoteConnection conn = d.getLocalConnection();
-		if (conn != null) {
-			if (!conn.isOpen()) {
-				conn.open(progress.newChild(25));
-				if (!conn.isOpen()) {
-					throw new RemoteConnectionException(Messages.LocalConnectionError);
-				}
-				conn.addConnectionChangeListener(connectionChangeListener);
-			}
-		}
-		conn = d.getRemoteConnection();
+		IRemoteConnection conn = d.getRemoteConnection();
 		if (conn != null) {
 			if (!conn.isOpen()) {
 				conn.open(progress.newChild(25));
@@ -556,7 +541,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					throw new RemoteConnectionException(Messages.RemoteConnectionError + conn.getAddress());
 				}
 			}
-			conn.addConnectionChangeListener(connectionChangeListener);
+			conn.addConnectionChangeListener(connectionListener);
 		}
 	}
 
