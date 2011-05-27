@@ -50,8 +50,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
-	private IRemoteConnection fSelectedConnection;
-	private IRemoteServices fSelectedProvider;
+	private IRemoteConnection fSelectedConnection = null;
+	private IRemoteServices fSelectedProvider = null;
 	private IConfiguration fConfigBeforeSwitch = null;
 	private boolean fWidgetsReady = false;
 
@@ -228,6 +228,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private void handleServicesSelected() {
 		int selectionIndex = fProviderCombo.getSelectionIndex();
 		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
+		fSelectedConnection = null;
 		populateConnectionCombo(fConnectionCombo);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		update();
