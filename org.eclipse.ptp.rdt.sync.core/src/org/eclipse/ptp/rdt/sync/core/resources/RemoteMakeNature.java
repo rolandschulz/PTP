@@ -20,7 +20,7 @@ import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
-import org.eclipse.ptp.rdt.sync.core.remotemake.CommonBuilder;
+import org.eclipse.ptp.rdt.sync.core.remotemake.RemoteMakeBuilder;
 
 /**
  * Project nature for remote standard make projects.
@@ -211,7 +211,7 @@ public class RemoteMakeNature implements IProjectNature {
 	 * @throws CoreException
 	 */
 	public void addBuildSpec() throws CoreException {
-		addToBuildSpec(getProject(), CommonBuilder.REMOTE_MAKE_BUILDER_ID, null);
+		addToBuildSpec(getProject(), RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, null);
 	}
 
 	/*
@@ -222,8 +222,8 @@ public class RemoteMakeNature implements IProjectNature {
 	public void configure() throws CoreException {
 		addBuildSpec();
 		IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(MakeCorePlugin.getDefault().getPluginPreferences(),
-				CommonBuilder.REMOTE_MAKE_BUILDER_ID, false);
-		IMakeBuilderInfo projectInfo = MakeCorePlugin.createBuildInfo(getProject(), CommonBuilder.REMOTE_MAKE_BUILDER_ID);
+				RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, false);
+		IMakeBuilderInfo projectInfo = MakeCorePlugin.createBuildInfo(getProject(), RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID);
 		projectInfo.setBuildAttribute(IMakeCommonBuildInfo.BUILD_ARGUMENTS,
 				info.getBuildAttribute(IMakeCommonBuildInfo.BUILD_ARGUMENTS, "")); //$NON-NLS-1$
 		projectInfo.setBuildAttribute(IMakeCommonBuildInfo.BUILD_COMMAND,
@@ -257,7 +257,7 @@ public class RemoteMakeNature implements IProjectNature {
 	 * @throws CoreException
 	 */
 	public void removeBuildSpec() throws CoreException {
-		removeFromBuildSpec(getProject(), CommonBuilder.REMOTE_MAKE_BUILDER_ID, null);
+		removeFromBuildSpec(getProject(), RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, null);
 	}
 
 	/*
