@@ -28,6 +28,7 @@ import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
@@ -49,8 +50,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
-	private IRemoteConnection fSelectedConnection;
-	private IRemoteServices fSelectedProvider;
+	private IRemoteConnection fSelectedConnection = null;
+	private IRemoteServices fSelectedProvider = null;
 	private IConfiguration fConfigBeforeSwitch = null;
 	private boolean fWidgetsReady = false;
 
@@ -156,6 +157,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 				}
 				// refresh list of connections
 				populateConnectionCombo(fConnectionCombo);
+				update();
 			}
 		});
 
@@ -172,11 +174,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			public void modifyText(ModifyEvent e) {
 				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,
 				// PATH_PROPERTY, fLocationText.getText());
+				update();
 			}
 		});
 			
 
-		// new connection button
+		// browse button
 		fBrowseButton = new Button(composite, SWT.PUSH);
 		fBrowseButton.setText(Messages.BRPPage_BrowseButton);
 		fBrowseButton.addSelectionListener(new SelectionAdapter() {
@@ -216,6 +219,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		int selectionIndex = fConnectionCombo.getSelectionIndex();
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
+		update();
 	}
 	
 	/**
@@ -224,8 +228,10 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private void handleServicesSelected() {
 		int selectionIndex = fProviderCombo.getSelectionIndex();
 		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
+		fSelectedConnection = null;
 		populateConnectionCombo(fConnectionCombo);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
+		update();
 	}
 
 	/**
@@ -375,7 +381,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		// provider must be selected first. (Calling select invokes the "handle" listeners for each combo.)
 		fProviderCombo.select(fComboRemoteServicesProviderToIndexMap.get(settings.remoteProvider));
 		handleServicesSelected();
-		fConnectionCombo.select(fComboRemoteConnectionToIndexMap.get(settings.connection));
+		if (settings.connection!=null) {
+			Integer index = fComboRemoteConnectionToIndexMap.get(settings.connection);
+			if (index!=null) {
+				fConnectionCombo.select(index);
+			}
+		}
 		handleConnectionSelected();
 		fRootLocationText.setText(settings.rootLocation);
 	}
@@ -467,4 +478,32 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		fConfigToPageSettings.put(getCfg().getId(), settings);
 		this.setValues(getCfg());
 	}
+	
+	private void update() {
+		getContainer().updateMessage();
+		getContainer().updateButtons();
+		updateApplyButton();
+		enableConfigSelection(isValid());
+	}
+	
+	public String getErrorMessage() {
+		if (super.getErrorMessage() != null) 
+			return super.getErrorMessage();
+		if (fSelectedProvider == null) 
+			return Messages.GitParticipant_0;
+		if (fSelectedConnection == null) 
+			return Messages.GitParticipant_1;
+		if (fRootLocationText.getText().length() == 0 ) 
+			return Messages.GitParticipant_2;
+		IRemoteFileManager fileManager = fSelectedProvider.getFileManager(fSelectedConnection);
+		if ( fileManager.toURI(fRootLocationText.getText()) == null) 
+			return Messages.GitParticipant_3;
+		// should we check permissions of: fileManager.getResource(fLocationText.getText()).getParent() ?
+		return null;
+	}
+	
+	public boolean isValid() {
+		return super.isValid() && getErrorMessage()==null;
+	}
+	
 }
