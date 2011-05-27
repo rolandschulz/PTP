@@ -26,7 +26,11 @@ import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;
+import org.eclipse.jgit.api.RmCommand;
+import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.NotSupportedException;
 import org.eclipse.jgit.errors.TransportException;
 import org.eclipse.jgit.errors.UnmergedPathException;
@@ -59,6 +63,7 @@ public class GitRemoteSyncConnection {
 	private final static String commitMessage = Messages.GRSC_CommitMessage;
 	private final static String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final IRemoteConnection connection;
+	private final SyncFileFilter fileFilter;
 	private final String localDirectory;
 	private final String remoteDirectory;
 	private Git git;
@@ -75,8 +80,10 @@ public class GitRemoteSyncConnection {
 	 *             on problems building the remote repository. Specific exception nested. Upon such an exception, the instance is
 	 *             invalid and should not be used.
 	 */
-	public GitRemoteSyncConnection(IRemoteConnection conn, String localDir, String remoteDir, IProgressMonitor monitor) throws RemoteSyncException {
+	public GitRemoteSyncConnection(IRemoteConnection conn, String localDir, String remoteDir, SyncFileFilter filter,
+																			IProgressMonitor monitor) throws RemoteSyncException {
 		connection = conn;
+		fileFilter = filter;
 		localDirectory = localDir;
 		remoteDirectory = remoteDir;
 
@@ -348,6 +355,36 @@ public class GitRemoteSyncConnection {
 		}
 		statusReader.close();
 	}
+	
+	/*
+	 * Use "git ls-files" to obtain a list of files that need to be added or deleted from the git index. 
+	 */
+	private void getFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, boolean includeUntrackedFiles)
+																						throws RemoteSyncException {
+		StatusCommand statusCommand = git.status();
+		Status status;
+		try {
+			status = statusCommand.call();
+			filesToAdd.addAll(status.getAdded());
+			filesToAdd.addAll(status.getModified());
+			if (includeUntrackedFiles) {
+				filesToAdd.addAll(status.getUntracked());
+			}
+			filesToDelete.addAll(status.getMissing());
+		} catch (NoWorkTreeException e) {
+			throw new RemoteSyncException(e);
+		} catch (IOException e) {
+			throw new RemoteSyncException(e);
+		}
+		
+		Set<String> filesToBeIgnored = new HashSet<String>();
+		for (String fileName : filesToAdd) {
+			if (fileFilter.shouldIgnore(fileName)) {
+				filesToBeIgnored.add(fileName);
+			}
+		}
+		filesToAdd.removeAll(filesToBeIgnored);
+	}
 
 	// Subclass JGit's generic RemoteSession to set up running of remote commands using the available process builder.
 	public class PTPSession implements RemoteSession {
@@ -440,15 +477,29 @@ public class GitRemoteSyncConnection {
 	 *             on problems committing.
 	 */
 	private void doCommit() throws RemoteSyncException {
-		final AddCommand addCommand = git.add();
-		addCommand.addFilepattern("."); //$NON-NLS-1$
+		Set<String> filesToAdd = new HashSet<String>();
+		Set<String> filesToRemove = new HashSet<String>();
+		this.getFileStatus(filesToAdd, filesToRemove, true);
+		
 		try {
-			addCommand.call();
+			if (!(filesToAdd.isEmpty())) {
+				final AddCommand addCommand = git.add();
+				for (String fileName : filesToAdd) {
+					addCommand.addFilepattern(fileName);
+				}
+				addCommand.call();
+			}
+
+			if (!(filesToRemove.isEmpty())) {
+				final RmCommand rmCommand = git.rm();
+				for (String fileName : filesToRemove) {
+					rmCommand.addFilepattern(fileName);
+				}
+				rmCommand.call();
+			}
 
 			final CommitCommand commitCommand = git.commit();
-			commitCommand.setAll(true);
 			commitCommand.setMessage(commitMessage);
-
 			commitCommand.call();
 		} catch (final GitAPIException e) {
 			throw new RemoteSyncException(e);

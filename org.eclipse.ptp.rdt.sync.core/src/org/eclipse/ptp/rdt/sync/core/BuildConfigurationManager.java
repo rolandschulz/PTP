@@ -382,9 +382,6 @@ public class BuildConfigurationManager {
 	 * 						on problems writing configuration data to file
 	 */
 	public synchronized void saveConfigurationData() throws IOException {
-		IPath savePath = ServicesCorePlugin.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
-		File saveFile = savePath.toFile();
-		BufferedWriter writer = new BufferedWriter(new FileWriter(saveFile));
 		XMLMemento rootMemento = XMLMemento.createWriteRoot(BUILD_CONFIGURATION_ELEMENT_NAME);
 		
 		// First, save template service configurations
@@ -416,7 +413,9 @@ public class BuildConfigurationManager {
 			}
 		}
 		
-		rootMemento.save(writer);
+		IPath savePath = ServicesCorePlugin.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
+		File saveFile = savePath.toFile();
+		rootMemento.save(new FileWriter(saveFile));
 	}
 	
 	/**
@@ -665,7 +664,7 @@ public class BuildConfigurationManager {
 
 		if (localConfigDes != null) {
 			localConfig.setConfigurationDescription(localConfigDes);
-			localConfigDes.setName(LOCAL_CONFIGURATION_NAME);
+			localConfigDes.setName(Messages.WorkspaceConfigName);
 			localConfigDes.setDescription(LOCAL_CONFIGURATION_DES);
 			localConfig.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
 			IRemoteServices localService = PTPRemoteCorePlugin.getDefault().
