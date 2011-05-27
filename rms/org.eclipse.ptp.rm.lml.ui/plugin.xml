@@ -48,6 +48,37 @@
             name="%Perspective.name">
       </perspective>
    </extension>
+   	<extension
+		point="org.eclipse.ui.perspectiveExtensions">
+		<perspectiveExtension
+			targetID="org.eclipse.debug.ui.DebugPerspective">
+			<perspectiveShortcut
+				id="org.eclipse.ptp.rm.lml.ui.LMLRunPerspective">
+			</perspectiveShortcut>
+		</perspectiveExtension>
+		<perspectiveExtension
+			targetID="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+			<perspectiveShortcut
+				id="org.eclipse.ptp.rm.lml.ui.LMLRunPerspective">
+			</perspectiveShortcut>
+		</perspectiveExtension>
+		<perspectiveExtension
+			targetID="org.eclipse.ptp.rm.lml.ui.LMLRunPerspective">
+			<perspectiveShortcut
+				id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+			</perspectiveShortcut>
+			<perspectiveShortcut
+				id="org.eclipse.debug.ui.DebugPerspective">
+			</perspectiveShortcut>
+			<actionSet
+				id="org.eclipse.debug.ui.launchActionSet">
+			</actionSet>
+			<actionSet
+				id="org.eclipse.ptp.ui.actionSets">
+			</actionSet>
+		</perspectiveExtension>
+	</extension>
+   
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
