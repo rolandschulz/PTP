@@ -88,7 +88,7 @@ public class CommonBuilder extends ACBuilder {
 	private static final String TRACE_HEADER = "GeneratedmakefileBuilder trace [";	//$NON-NLS-1$
 	private static final String TYPE_CLEAN = "ManagedMakeBuilder.type.clean";	//$NON-NLS-1$
 	private static final String TYPE_INC = "ManagedMakeBuider.type.incremental";	//$NON-NLS-1$
-	public static final String COMMON_BUILDER_ID = "org.eclipse.ptp.rdt.sync.core.commonBuilder"; //$NON-NLS-1$
+	public static final String REMOTE_MAKE_BUILDER_ID = "org.eclipse.ptp.rdt.sync.core.remoteMakeBuilder"; //$NON-NLS-1$
 	public static boolean VERBOSE = false;
 
 	private static CfgBuildSet fBuildSet = new CfgBuildSet();

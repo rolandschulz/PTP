@@ -67,8 +67,9 @@
          point="org.eclipse.core.resources.builders">
       <builder
             callOnEmptyDelta="true"
-            hasNature="true"
-            isConfigurable="true">
+            hasNature="false"
+            isConfigurable="false"
+            supportsConfigurations="false">
          <run
                class="org.eclipse.ptp.rdt.sync.core.remotemake.RemoteMakeBuilder">
          </run>
