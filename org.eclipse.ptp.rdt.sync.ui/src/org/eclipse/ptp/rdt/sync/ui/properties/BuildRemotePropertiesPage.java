@@ -483,6 +483,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		getContainer().updateMessage();
 		getContainer().updateButtons();
 		updateApplyButton();
+		enableConfigSelection(isValid());
 	}
 	
 	public String getErrorMessage() {
