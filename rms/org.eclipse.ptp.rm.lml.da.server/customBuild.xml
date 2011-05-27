@@ -97,6 +97,10 @@
 	<!--   target.folder - destination folder                                  -->
 	<!-- ===================================================================== -->
 	<target name="pre.gather.bin.parts"/>
+
+	<target name="server.tar">
+		<tar destfile="${server.name}" basedir="${basedir}/../org.eclipse.ptp.rm.lml.da"/>
+	</target>
 	
 	<!-- ===================================================================== -->
 	<!-- Steps to do after the target gather.bin.parts                         -->
@@ -105,10 +109,6 @@
 	<!--   target.folder - destination folder                              	   -->
 	<!-- ===================================================================== -->
 	<target name="post.gather.bin.parts" depends="server.tar"/>
-
-	<target name="server.tar">
-		<tar destfile="${server.name}" basedir="${basedir}/../org.eclipse.ptp.rm.lml.da"/>
-	</target>
 	
 	<!-- ===================================================================== -->
 	<!-- Steps to do before the target gather.sources                          -->
