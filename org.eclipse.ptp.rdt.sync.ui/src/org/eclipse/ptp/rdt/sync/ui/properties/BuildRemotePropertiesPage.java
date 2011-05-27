@@ -482,6 +482,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private void update() {
 		getContainer().updateMessage();
 		getContainer().updateButtons();
+		updateApplyButton();
 	}
 	
 	public String getErrorMessage() {
