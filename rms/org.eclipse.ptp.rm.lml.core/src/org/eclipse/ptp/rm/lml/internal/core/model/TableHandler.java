@@ -470,4 +470,8 @@ public class TableHandler extends LguiHandler {
 		return tableData;
 	}
 
+	public boolean isEmpty(String gid) {
+		return (getTable(gid) == null);
+	}
+
 }

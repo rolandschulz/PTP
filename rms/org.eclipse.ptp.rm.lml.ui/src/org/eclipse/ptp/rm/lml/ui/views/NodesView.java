@@ -70,20 +70,9 @@ public class NodesView extends LMLViewPart {
 		public void handleEvent(IViewUpdateEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
+					nodedisplayView.setVisible(true);
 					fLguiItem = lmlManager.getSelectedLguiItem();
-					nodedisplayView.update();
-//					composite = new Composite(parent, SWT.NONE);
-//					composite.setLayout(new FillLayout());
-//					composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-//					if (!composite.isDisposed()) {
-//						if (fLguiItem != null) {
-//							nodedisplayView = new NodedisplayView(fLguiItem, fLguiItem.getNodedisplayAccess().getNodedisplays().get(0),
-//									composite);
-//							composite.layout();
-//						} 
-//					
-//					
-//					}
+					nodedisplayView.update(fLguiItem);
 				}
 			});
 		}
@@ -91,7 +80,9 @@ public class NodesView extends LMLViewPart {
 		public void handleEvent(ILguiAddedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					generateNodesdisplay();
+					nodedisplayView.setVisible(true);
+					fLguiItem = lmlManager.getSelectedLguiItem();
+					nodedisplayView.update(fLguiItem);
 				}
 			});
 			
@@ -100,20 +91,10 @@ public class NodesView extends LMLViewPart {
 		public void handleEvent(ILguiRemovedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					fLguiItem = lmlManager.getSelectedLguiItem();
-					nodedisplayView.update();
-//					composite = new Composite(parent, SWT.NONE);
-//					composite.setLayout(new FillLayout());
-//					composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-//					if (!composite.isDisposed()) {
-//						if (fLguiItem != null) {
-//							nodedisplayView = new NodedisplayView(fLguiItem, fLguiItem.getNodedisplayAccess().getNodedisplays().get(0),
-//									composite);
-//							composite.layout();
-//						} 
-//					
-//					
-//					}
+					fLguiItem = null;
+					if (!parent.isDisposed()) {
+						nodedisplayView.setVisible(false);
+					}
 				}
 			});
 		}
@@ -121,7 +102,7 @@ public class NodesView extends LMLViewPart {
 
 	private Composite parent = null;
 	private Composite composite = null;
-	private Composite nodedisplayView = null;
+	private NodedisplayView nodedisplayView = null;
 	public Viewer viewer;
 	public ILguiItem fLguiItem = null;
 	private String gid = null;
@@ -144,6 +125,9 @@ public class NodesView extends LMLViewPart {
 
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		lmlManager.addListener(lguiListener, this.getClass().getName());
+		gid = getViewSite().getId();
+		fLguiItem = lmlManager.getSelectedLguiItem();
+		createNodedisplayView();
 	}
 
 	/*
@@ -164,14 +148,8 @@ public class NodesView extends LMLViewPart {
 	private void createNodedisplayView() {
 
 		if (!composite.isDisposed()) {
-			if (fLguiItem != null) {
-				this.setPartName(fLguiItem.getNodedisplayAccess().toString());
-				nodedisplayView = new NodedisplayView(fLguiItem, fLguiItem.getNodedisplayAccess().getNodedisplays().get(0),
-						composite);
-				composite.layout();
-			} else {
-				setPartName("NodedisplayView");
-			}
+			nodedisplayView = new NodedisplayView(null, null, composite);
+			composite.layout();
 //			composite.addDisposeListener(new DisposeListener() {
 //
 //				public void widgetDisposed(DisposeEvent e) {

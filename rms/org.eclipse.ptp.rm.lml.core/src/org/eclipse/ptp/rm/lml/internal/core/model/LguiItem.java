@@ -264,7 +264,7 @@ public class LguiItem implements ILguiItem {
 
 	public void save(IMemento memento) {
 		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
-		LguiType lgui = getLayoutAccess().getLayoutFromModell();
+		LguiType lgui = getLayoutAccess().getLayoutFromModel();
 //		System.out.println(lgui == null);
 		StringWriter writer = new StringWriter();
 		try {
@@ -411,7 +411,12 @@ public class LguiItem implements ILguiItem {
 	}
 	
 	public void getRequestXml(FileOutputStream output) {
-		LguiType layoutLgui = getLayoutFromModell();
+		LguiType layoutLgui = null;
+		if (lgui == null) {
+			layoutLgui = firstRequest();
+		} else {
+			layoutLgui = getLayoutAccess().getLayoutFromModel();
+		} 
 		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
 		try {
 			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace+" lgui.xsd");
@@ -444,7 +449,12 @@ public class LguiItem implements ILguiItem {
 	 * Layout
 	 **************************************************************************************************************/
 	public void getCurrentLayout(OutputStream output) {
-		LguiType layoutLgui = getLayoutFromModell();
+		LguiType layoutLgui = null;
+		if (lgui == null) {
+			layoutLgui = firstRequest();
+		} else {
+			layoutLgui = getLayoutAccess().getLayoutFromModel();
+		} 
 		Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
 		try {
 			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace+" lgui.xsd");
@@ -477,184 +487,6 @@ public class LguiItem implements ILguiItem {
 		return layoutLgui;
 	}
 
-	/**
-	 * Remove all real data from modell return only layout-information and data,
-	 * which is needed to make lml-model valid
-	 * 
-	 * @param model
-	 *            lml-modell with data and layout-information
-	 * @return
-	 */
-	private LguiType getLayoutFromModell() {
-		if (lgui == null) {
-			return firstRequest();
-		}
-		
-		final String dummystring="__dummy_nd__";
-		LguiType result = objectFactory.createLguiType();
-		HashSet<String> neededComponents = new HashSet<String>();
-
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
-			Object value = tag.getValue();
-
-			// add normal global layouts
-			if (value instanceof LayoutType) {
-				result.getObjectsAndRelationsAndInformation().add(tag);
-
-				if (value instanceof SplitlayoutType) {
-					SplitlayoutType splitLayout = (SplitlayoutType) value;
-					// Collect needed components from layout recursively
-					if (splitLayout.getLeft() != null) {
-						collectComponents(splitLayout.getLeft(), neededComponents);
-						collectComponents(splitLayout.getRight(), neededComponents);
-					}
-				} else if (value instanceof AbslayoutType) {
-
-					AbslayoutType absLayout = (AbslayoutType) value;
-					// Just traverse comp-list for gid-attributes
-					for (ComponentType comp : absLayout.getComp()) {
-						neededComponents.add(comp.getGid());
-					}
-				}
-
-			} else if (value instanceof ComponentlayoutType) {
-				if (((ComponentlayoutType) value).isActive()) {
-					result.getObjectsAndRelationsAndInformation().add(tag);
-
-					ComponentlayoutType componentLayout = (ComponentlayoutType) value;
-					neededComponents.add(componentLayout.getGid());
-					
-					if( value instanceof NodedisplaylayoutType){
-						NodedisplaylayoutType nlayout=(NodedisplaylayoutType)value;
-						nlayout.setGid(dummystring);
-					}
-				}
-			}
-
-		}
-		HashMap<String, GobjectType> idToGobject = new HashMap<String, GobjectType>();
-		// Search needed components in data-tag to discover, which type the
-		// needed components have
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
-			Object value = tag.getValue();
-			// is it a graphical object?
-			if (value instanceof GobjectType) {
-				GobjectType gObject = (GobjectType) value;
-				if (neededComponents.contains(gObject.getId())) {
-					idToGobject.put(gObject.getId(), gObject);
-				}
-			}
-		}
-		// Add all gobjects in idtoGobject to the result, so that lml-modell is
-		// valid
-		for (GobjectType gObject : idToGobject.values()) {
-			JAXBElement<GobjectType> min = minimizeGobjectType(gObject);
-			
-			GobjectType newGobject = min.getValue();
-			if (newGobject instanceof Nodedisplay) {
-				((Nodedisplay) newGobject).setId(dummystring);
-			}
-			result.getObjectsAndRelationsAndInformation().add(min);
-		}
-		// Set layout-attribute
-		result.setLayout(true);
-
-		return result;
-	}
-
-	/**
-	 * Search for gid-attributes of a pane and put it into neededComponents
-	 * Recursively search all graphical objects referenced by this pane
-	 * 
-	 * @param p
-	 *            part of SplitLayout, which is scanned for gid-attributes
-	 * @param neededComponents
-	 *            resulting Hashset
-	 */
-	private static void collectComponents(PaneType pane, HashSet<String> neededComponents) {
-
-		if (pane.getGid() != null) {
-			neededComponents.add(pane.getGid());
-		} else if (pane.getBottom() != null) {// top and bottom components?
-			collectComponents(pane.getBottom(), neededComponents);
-			collectComponents(pane.getTop(), neededComponents);
-		} else {// Left and right
-			collectComponents(pane.getLeft(), neededComponents);
-			collectComponents(pane.getRight(), neededComponents);
-		}
-	}
-
-	/**
-	 * Take a graphical object and minimize the data so that this instance is
-	 * valid against the LML-Schema but at the same time as small as possible.
-	 * 
-	 * @param gObject
-	 * @return a copy of gobj with minimal size, only attributes in GobjectType
-	 *         are copied and lower special elements which are needed to make
-	 *         lml-model valid
-	 */
-	private static JAXBElement<GobjectType> minimizeGobjectType(GobjectType gObject) {
-
-		String qName = "table";
-		Class<GobjectType> classGobject = (Class<GobjectType>) gObject.getClass();
-
-		GobjectType value = objectFactory.createGobjectType();
-
-		if (gObject instanceof TableType) {
-			TableType tableType = objectFactory.createTableType();
-			TableType origin = (TableType) gObject;
-			tableType.setContenttype(origin.getContenttype());
-			value = tableType;
-			qName = "table";
-		} else if (gObject instanceof UsagebarType) {
-			UsagebarType usagebarType = objectFactory.createUsagebarType();
-			usagebarType.setCpucount(BigInteger.valueOf(0));
-			value = usagebarType;
-			qName = "usagebar";
-		} else if (gObject instanceof TextboxType) {
-			TextboxType textboxType = objectFactory.createTextboxType();
-			textboxType.setText("");
-			value = textboxType;
-			qName = "text";
-		} else if (gObject instanceof InfoboxType) {
-			InfoboxType infoboxType = objectFactory.createInfoboxType();
-			value = infoboxType;
-			qName = "infobox";
-		} else if (gObject instanceof Nodedisplay) {// Create minimal
-													// nodedisplay
-			Nodedisplay nodedisplay = objectFactory.createNodedisplay();
-			value = nodedisplay;
-			SchemeType scheme = objectFactory.createSchemeType();
-			scheme.getEl1().add(objectFactory.createSchemeElement1());
-			nodedisplay.setScheme(scheme);
-			DataType data = objectFactory.createDataType();
-			data.getEl1().add(objectFactory.createDataElement1());
-			nodedisplay.setData(data);
-			qName = "nodedisplay";
-		} else if (gObject instanceof ChartType) {
-			ChartType chartType = objectFactory.createChartType();
-			value = chartType;
-			qName = "chart";
-		} else if (gObject instanceof ChartgroupType) {
-			ChartgroupType chartgroupType = objectFactory.createChartgroupType();
-			// Add lower chart-elements to the minimized chart-group
-			ChartgroupType origin = (ChartgroupType) gObject;
-			// Go through all charts minimize them and add them to ut
-			for (ChartType chartType : origin.getChart()) {
-				ChartType min = (ChartType) (minimizeGobjectType(chartType).getValue());
-				chartgroupType.getChart().add(min);
-			}
-			value = chartgroupType;
-			qName = "chartgroup";
-		}
-
-		value.setDescription(gObject.getDescription());
-		value.setId(gObject.getId());
-		value.setTitle(gObject.getTitle());
-
-		JAXBElement<GobjectType> result = new JAXBElement<GobjectType>(new QName(qName), classGobject, value);
-		return result;
-	}
 
 	/**************************************************************************************************************
 	 * Job related methods

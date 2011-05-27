@@ -107,9 +107,7 @@ public class TableView extends LMLViewPart {
 		 * (org.eclipse.ptp.core.events.IJobListSortEvent)
 		 */
 		public void handleEvent(IJobListSortedEvent e) {
-			input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
-			viewer.setInput(input);
-			viewer.getTree().setItemCount(input.length);
+			setViewerInput();
 		}
 
 		public void handleEvent(ITableColumnChangeEvent e) {
@@ -126,10 +124,12 @@ public class TableView extends LMLViewPart {
 					rows = (Row[]) viewer.getInput();
 				}
 				int index = -1;
-				for (int i = 0; i < rows.length; i++) {
-					if (rows[i].oid.equals(event.getOid())) {
-						index = i;
-						break;
+				if (rows != null) {
+					for (int i = 0; i < rows.length; i++) {
+						if (rows[i].oid.equals(event.getOid())) {
+							index = i;
+							break;
+						}
 					}
 				}
 				if (index > -1) {
@@ -163,9 +163,7 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(IViewUpdateEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
-					viewer.setInput(input);
-					viewer.getTree().setItemCount(input.length);
+					setViewerInput();
 				}
 			});
 		}
@@ -192,7 +190,6 @@ public class TableView extends LMLViewPart {
 	 * Variables
 	 **************************************************************************************************************/
 
-	Row[] input = null;
 	private Composite composite;
 	private Tree tree;
 	private TreeColumn[] treeColumns;
@@ -305,12 +302,11 @@ public class TableView extends LMLViewPart {
 		tree.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent e) {
-				if (fSelectedLguiItem == null) {
-					return;
+				if (fSelectedLguiItem != null) {
+					fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(), gid);
+					fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, removingColumn(tree.getColumnOrder()));
+					redrawColumns();
 				}
-				fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(), gid);
-				fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, removingColumn(tree.getColumnOrder()));
-				redrawColumns();
 			}
 		});
 
@@ -321,35 +317,32 @@ public class TableView extends LMLViewPart {
 	public void generateTable() {
 		gid = getViewSite().getId();
 		fSelectedLguiItem = lmlManager.getSelectedLguiItem();
-		createTable();
-		// composite.addDisposeListener(new DisposeListener() {
-		//
-		// public void widgetDisposed(DisposeEvent e) {
-		// lmlManager.removeComponent(gid);
-		// }
-		// });
+		if (fSelectedLguiItem != null) {
+			createTable();
+			// composite.addDisposeListener(new DisposeListener() {
+			//
+			// public void widgetDisposed(DisposeEvent e) {
+			// lmlManager.removeComponent(gid);
+			// }
+			// });
+		}
 	}
 
 	private void createTable() {
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
+		if (fSelectedLguiItem.getTableHandler().isEmpty(gid)) {
+			return;
+		}
 		createColumns();
 		createMenu(); // view menu
 
 		// Insert the input
-		input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
-		viewer.setInput(input);
-		viewer.getTree().setItemCount(input.length);
+		setViewerInput();
 
 		// Part for the controlling Monitor - context menu
 		MenuManager contextMenu = new MenuManager();
 		contextMenu.setRemoveAllWhenShown(true);
-		contextMenu.addMenuListener(new IMenuListener() {
-
-			public void menuAboutToShow(IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
 		Control control = viewer.getControl();
 		Menu menu = contextMenu.createContextMenu(control);
 		control.setMenu(menu);
@@ -363,10 +356,9 @@ public class TableView extends LMLViewPart {
 	 */
 	private void createColumns() {
 		// Creating the columns
-		if (fSelectedLguiItem.isLayout()) {
+		if (fSelectedLguiItem.isLayout() ) {
 			return;
 		}
-		this.setPartName(fSelectedLguiItem.getTableHandler().getTableTitle(gid));
 		TreeColumn treeColumnImage = new TreeColumn(tree, SWT.LEAD, 0);
 		treeColumnImage.setWidth(40);
 		treeColumnImage.setMoveable(true);
@@ -492,15 +484,6 @@ public class TableView extends LMLViewPart {
 		getViewSite().getActionBars().updateActionBars();
 	}
 
-	private void fillContextMenu(IMenuManager manager) {
-		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-		final boolean userJob = false;
-
-		// TODO JobStarted by User - boolean variable
-		// TODO Filling the Menu in comparison with the result
-		// manager.add(new SuspendJob());
-	}
-
 	@Override
 	public void setFocus() {
 	}
@@ -511,7 +494,7 @@ public class TableView extends LMLViewPart {
 
 	@Override
 	public void prepareDispose() {
-		if (viewer.getInput() != null) {
+		if (viewer.getInput() != null && fSelectedLguiItem != null) {
 			fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(), gid);
 			fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, removingColumn(tree.getColumnOrder()));
 		}
@@ -519,7 +502,7 @@ public class TableView extends LMLViewPart {
 	}
 
 	private void disposeTable() {
-		if (fSelectedLguiItem != null) {
+		if (fSelectedLguiItem != null && !composite.isDisposed()) {
 			TreeColumn[] oldColumns = tree.getColumns();
 			for (int i = 0; i < oldColumns.length; i++) {
 				Listener[] oldListeners = oldColumns[i].getListeners(SWT.Selection);
@@ -530,9 +513,11 @@ public class TableView extends LMLViewPart {
 			}
 			treeColumns = null;
 		}
-		viewer.setInput(null);
-		viewer.getTree().setItemCount(0);
-		this.getViewSite().getActionBars().getMenuManager().removeAll();
+		if (!composite.isDisposed()) {
+			viewer.setInput(null);
+			viewer.getTree().setItemCount(0);
+			this.getViewSite().getActionBars().getMenuManager().removeAll();
+		}
 	}
 
 	/**************************************************************************************************************
@@ -772,6 +757,17 @@ public class TableView extends LMLViewPart {
 		int[] columnsWidth = fSelectedLguiItem.getTableHandler().getTableColumnsWidth(gid, sizeViewer);
 		for (int i = 0; i < columnsWidth.length; i++) {
 			treeColumns[i].setWidth(columnsWidth[i]);
+		}
+	}
+
+	private void setViewerInput() {
+		Row[] input = new Row[0];
+		if (fSelectedLguiItem != null) {
+			input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
+		}
+		if (!composite.isDisposed()) {
+			viewer.setInput(input);
+			viewer.getTree().setItemCount(input.length);
 		}
 	}
 }

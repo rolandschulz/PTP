@@ -33,6 +33,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.AbslayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ChartType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ChartgroupType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ChartlayoutType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
@@ -357,7 +358,13 @@ public class LayoutAccess extends LguiHandler{
 			TableType tt=objectFactory.createTableType();
 			TableType orig=(TableType)gobj;
 			tt.setContenttype(orig.getContenttype() );
-
+			//copy all columns with pattern to table
+			for(ColumnType col: orig.getColumn()){
+				if(col.getPattern() != null){
+					tt.getColumn().add(col);
+				}
+			}
+			
 			value=tt;
 			
 			qname="table";
@@ -440,7 +447,7 @@ public class LayoutAccess extends LguiHandler{
 	 * @param modell lml-modell with data and layout-information
 	 * @return
 	 */
-	public LguiType getLayoutFromModell(){
+	public LguiType getLayoutFromModel(){
 		
 		final String dummystring="__dummy_nd__";//This is gid for all nodedisplaylayouts in requests => id for all nodedisplays
 		
@@ -812,9 +819,6 @@ public class LayoutAccess extends LguiHandler{
 			if (nodedisplayLayout.isActive()) {
 				nodedisplayID.add(nodedisplayLayout.getGid());
 			}
-		}
-		if (nodedisplayID.isEmpty()) {
-			System.out.println("Problem");
 		}
 		return nodedisplayID.toArray(new String[nodedisplayID.size()]);
 	}

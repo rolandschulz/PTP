@@ -15,9 +15,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -62,8 +62,18 @@ public class LMLManager {
 
 	/*
 	 * Map of all ILguiItems
+	 * 
+	 * For every created Resource Manager instance there is an entry in this map;
+	 * as long as the Resource Manager instance is not removed an associates entry keeps
+	 * in this map
 	 */
 	protected final Map<String, ILguiItem> LGUIS = new HashMap<String, ILguiItem>();
+	
+	
+	/*
+	 * List of the currently running Resource Managers
+	 */
+//	private final List<String> openLguis = new LinkedList<String>();
 
 	/*
 	 * The current considered ILguiItem
@@ -89,11 +99,6 @@ public class LMLManager {
 	 * An instance of this class.
 	 */
 	private static LMLManager manager;
-
-	/*
-	 * 
-	 */
-	private final List<String> openLguis = new ArrayList<String>();
 
 	/*
 	 * 
@@ -164,24 +169,22 @@ public class LMLManager {
 	 **************************************************************************************************************/
 
 	public void register(String name, InputStream input, OutputStream output) {
-		if (!LGUIS.containsKey(name)) {
-			synchronized (LGUIS) {
-				LGUIS.put(name, new LguiItem(name));
+		ILguiItem lguiItem = null;
+		synchronized (LGUIS) {
+			lguiItem = LGUIS.get(name);
+		}
+		if (lguiItem != null) {
+			lguiItem.getCurrentLayout(output);
+			lguiItem.update(input);
+
+			if (fLguiItem == lguiItem) {
+				if (!isDisplayed) {
+					fireNewLgui();
+				} else {
+					fireUpdatedLgui();
+				}
 			}
 		}
-		ILguiItem lguiItem = LGUIS.get(name);
-		lguiItem.getCurrentLayout(output);
-		lguiItem.update(input);
-
-		if (!fLguiItem.toString().equals(name)) {
-			return;
-		}
-		if (!isDisplayed) {
-			fireNewLgui();
-		} else {
-			fireUpdatedLgui();
-		}
-
 	}
 
 	/**************************************************************************************************************
@@ -189,26 +192,32 @@ public class LMLManager {
 	 **************************************************************************************************************/
 
 	public void openLgui(String name) {
-		if (!LGUIS.containsKey(name)) {
-			synchronized (LGUIS) {
-				LGUIS.put(name, new LguiItem(name));
+		synchronized (LGUIS) {
+			ILguiItem item = LGUIS.get(name);
+			if (item == null) {
+				item = new LguiItem(name);
+				LGUIS.put(name, item);
 			}
+//			openLguis.add(name);
+			fLguiItem = item;
 		}
-		fLguiItem = LGUIS.get(name);
-		openLguis.add(name);
 		if (!fLguiItem.isEmpty()) {
 			fireNewLgui();
 		}
 	}
 
 	public void closeLgui(String name) {
-		if (openLguis.contains(name)) {
-			openLguis.remove(name);
+		ILguiItem item = null;
+		synchronized (LGUIS) {
+			item = LGUIS.get(name);
+			if (item != null) {
+				LGUIS.remove(name);
+//				openLguis.remove(name);
+			}
 		}
-		if (!fLguiItem.toString().equals(name)) {
-			return;
+		if (fLguiItem != null && fLguiItem == item) {
+			fireRemovedLgui(item);
 		}
-		fireRemovedLgui(LGUIS.get(name));
 	}
 
 	/*
@@ -231,13 +240,17 @@ public class LMLManager {
 	}
 
 	public String[] getLguis() {
-		Set<String> lguis = LGUIS.keySet();
-		return lguis.toArray(new String[lguis.size()]);
+		synchronized (LGUIS) {
+			Set<String> lguis = LGUIS.keySet();
+			return lguis.toArray(new String[lguis.size()]);
+		}
 	}
 
 	public ILguiItem[] getLguiItems() {
-		Collection<ILguiItem> lguis = LGUIS.values();
-		return lguis.toArray(new ILguiItem[lguis.size()]);
+		synchronized (LGUIS) {
+			Collection<ILguiItem> lguis = LGUIS.values();
+			return lguis.toArray(new ILguiItem[lguis.size()]);
+		}
 	}
 
 	/*
@@ -259,21 +272,17 @@ public class LMLManager {
 	}
 
 	public void selectLgui(String name) {
-		System.out.println(name);
-		if (name == null || !openLguis.contains(name)) {
-			if (name != null & !LGUIS.containsKey(name)) {
-				LGUIS.put(name, new LguiItem(name));
-			}
-			fLguiItem = null;
-			fireRemovedLgui(null);
-			return;
-		}
-		if (fLguiItem.toString().equals(name)) {
-			return;
-		}
 		fireRemovedLgui(null);
-		fLguiItem = LGUIS.get(name);
-		fireNewLgui();
+//		if (name != null && openLguis.contains(name)) {
+		if (name != null) {
+			ILguiItem item = LGUIS.get(name);
+			if (fLguiItem != item) {
+				fLguiItem = item;
+			}
+			fireNewLgui();
+			return;
+		}
+		fLguiItem = null;
 	}
 
 	public void selectLgui(URI xmlFile) {

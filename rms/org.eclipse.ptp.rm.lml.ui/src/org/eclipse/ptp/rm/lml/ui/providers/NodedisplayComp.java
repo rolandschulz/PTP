@@ -136,6 +136,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable{
 	//Saves rectpaintlistener, which is needed for fast painting of inner rectangles
 	private RectPaintListener rectpaintlistener=null;
 	
+	//The name of the special empty job
+	private final String emptyJobName="empty";
+	
 	/**
 	 * Class for comparing integer-values in ascending or descending way.
 	 * 
@@ -1053,6 +1056,25 @@ public class NodedisplayComp extends LguiWidget implements Updatable{
 		innerPanel.addListener(SWT.Paint, rectpaintlistener);
 	}
 	
+	/**
+	 * Check if given displaynode is connected to
+	 * empty jobs. 
+	 * @param dnode the displaynode, which is checked
+	 * @return true, if anything in request-chain is null or if object-id is "empty"
+	 */
+	private boolean isDisplayNodeEmpty(DisplayNode dnode){
+		if(dnode==null)
+			return true;
+		if(dnode.getConnectedObject() == null)
+			return true;
+		if(dnode.getConnectedObject().getId() == null)
+			return true;
+		if(dnode.getConnectedObject().getId().equals(emptyJobName) )
+			return true;
+		
+		return false;
+	}
+	
 	private void addMouseListenerToInnerPanel(){
 
 		innerPanel.addMouseMoveListener(new MouseMoveListener() {
@@ -1061,7 +1083,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable{
 
 				DisplayNode focussed=rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
 
-				if(focussed!=null){
+				if(focussed!=null && !isDisplayNodeEmpty(focussed) ){
 					lgui.getObjectStatus().mouseover(focussed.getConnectedObject());
 				}
 				else
@@ -1075,14 +1097,14 @@ public class NodedisplayComp extends LguiWidget implements Updatable{
 			public void mouseUp(MouseEvent e) {
 				DisplayNode focussed=rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
 
-				if(focussed!=null)
+				if(focussed!=null && !isDisplayNodeEmpty(focussed))
 					lgui.getObjectStatus().mouseup(focussed.getConnectedObject());
 			}
 
 			public void mouseDown(MouseEvent e) {
 				DisplayNode focussed=rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
 
-				if(focussed!=null)
+				if(focussed!=null && !isDisplayNodeEmpty(focussed))
 					lgui.getObjectStatus().mousedown(focussed.getConnectedObject());
 			}
 
