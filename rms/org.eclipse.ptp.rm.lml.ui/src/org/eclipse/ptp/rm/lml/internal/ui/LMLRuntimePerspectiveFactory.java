@@ -16,6 +16,7 @@ import org.eclipse.ptp.rm.lml.ui.managers.ViewManager;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.eclipse.ui.console.IConsoleConstants;
 
 public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 
@@ -30,16 +31,20 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 		String editorArea = layout.getEditorArea();
 		layout.setEditorAreaVisible(false);
 
-		IFolderLayout lguiFolder = layout.createFolder("lguiFolder", IPageLayout.LEFT, (float) 0.4, editorArea); //$NON-NLS-1$
-		IFolderLayout tableFolder = layout.createFolder("jobsFolder", IPageLayout.BOTTOM, (float) 0.25, "lguiFolder"); //$NON-NLS-1$ //$NON-NLS-2$
-		IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, 0, editorArea); //$NON-NLS-1$ //$NON-NLS-2$
+		IFolderLayout mainFolder = layout.createFolder("mainFolder", IPageLayout.LEFT, (float) 0.4, editorArea); //$NON-NLS-1$
+		IFolderLayout tableFolder = layout.createFolder("jobsFolder", IPageLayout.BOTTOM, (float) 0.2, "mainFolder"); //$NON-NLS-1$ //$NON-NLS-2$
+		IFolderLayout miscFolder = layout.createFolder("miscFolder", IPageLayout.BOTTOM, (float) 0.7, "jobsFolder"); //$NON-NLS-1$//$NON-NLS-2$
+		IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, 0, editorArea); //$NON-NLS-1$
 
 		// lguiFolder.addView(ILMLUIConstants.VIEW_LML);
-		lguiFolder.addView("org.eclipse.ptp.ui.views.resourceManagerView");
-
+		mainFolder.addView("org.eclipse.ptp.ui.views.resourceManagerView"); //$NON-NLS-1$
 		tableFolder.addView(ILMLUIConstants.VIEW_TABLE_1);
 		tableFolder.addView(ILMLUIConstants.VIEW_TABLE_2);
-		machinesFolder.addView(ILMLUIConstants.VIEW_PARALLELNODES + ":*");
+		machinesFolder.addView(ILMLUIConstants.VIEW_PARALLELNODES + ":*"); //$NON-NLS-1$
+		miscFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
+		miscFolder.addView(IPageLayout.ID_PROP_SHEET);
+		miscFolder.addView(IPageLayout.ID_PROBLEM_VIEW);
+		miscFolder.addView(IPageLayout.ID_TASK_LIST);
 
 		new ViewManager();
 	}
