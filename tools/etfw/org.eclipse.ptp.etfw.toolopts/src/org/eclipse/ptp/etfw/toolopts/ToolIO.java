@@ -33,11 +33,11 @@ public class ToolIO implements IAppInput{
 
 
 	public String getArgument(ILaunchConfiguration configuration) {//TODO: What is this doing?
-		String arg = "";
-		if(pathFlag!=null){
-			arg+=pathFlag+" ";
-		}
-		arg+=ID;
+//		String arg = "";
+//		if(pathFlag!=null){
+//			arg+=pathFlag+" ";
+//		}
+//		arg+=ID;
 		return null;
 	}
 	

@@ -274,9 +274,9 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 	public boolean performOk() {
 		//Preferences preferences = Activator.getDefault().getPluginPreferences();
 
-		InstanceScope is = new InstanceScope();
+		//InstanceScope is = new InstanceScope();
 		
-		IEclipsePreferences preferences = is.getNode(Activator.PLUGIN_ID);
+		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 		
 		if (toolGroups != null)
 			for (int i = 0; i < toolGroups.length; i++) {

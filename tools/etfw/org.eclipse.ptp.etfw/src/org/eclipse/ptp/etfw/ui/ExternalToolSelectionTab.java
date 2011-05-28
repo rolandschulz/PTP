@@ -249,7 +249,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		}
 
 		//Preferences preferences = Activator.getDefault().getPluginPreferences();
-		IEclipsePreferences preferences = new InstanceScope().getNode(Activator.PLUGIN_ID);
+		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 		
 		IPreferencesService service = Platform.getPreferencesService();
 		String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, "", null);
@@ -281,7 +281,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 	private void removeWorkflow() {
 		//Preferences preferences = Activator.getDefault().getPluginPreferences();
-		IEclipsePreferences preferences = new InstanceScope().getNode(Activator.PLUGIN_ID);
+		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 		IPreferencesService service = Platform.getPreferencesService();
 		String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, "", null);
 		//String fiList = preferences.getString(XMLLOCID);

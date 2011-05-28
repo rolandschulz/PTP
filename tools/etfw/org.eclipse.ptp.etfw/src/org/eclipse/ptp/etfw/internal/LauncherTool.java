@@ -131,7 +131,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 					// System.out.println(path.exists());
 					// System.out.println(path.getLocation().toString());
 					savePath = confWC.getAttribute(apppathattrib, (String) null);
-					confWC.setAttribute(apppathattrib, path.getLocation().toString());
+					confWC.setAttribute(apppathattrib, path.getLocationURI().getPath());
 				}
 			}
 

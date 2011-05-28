@@ -21,6 +21,8 @@ import org.eclipse.cdt.managedbuilder.core.IOption;
 import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
@@ -259,7 +261,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		// TODO: We have to do this because PTP puts its output in the build
 		// directory
 		if (configuration.getAttribute(EXTOOL_EXECUTABLE_PATH_TAG, (String) null) != null) {
-			outputLocation = thisProject.getFile(newname).getLocation().toOSString();
+			outputLocation = thisProject.getFile(newname).getLocationURI().getPath();//.toOSString();
 		}
 		return true;
 	}
@@ -330,7 +332,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		// TODO: We have to do this because PTP puts its output in the build
 		// directory
 		if (configuration.getAttribute(EXTOOL_EXECUTABLE_PATH_TAG, (String) null) != null) {
-			outputLocation = thisProject.getFile(newname).getLocation().toOSString();
+			outputLocation = thisProject.getFile(newname).getLocationURI().getPath();//.toOSString();
 		}
 
 		boolean confExists = false;
@@ -482,7 +484,14 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 
 		// TODO: Find out how to get build progress from within the managed
 		// build system!
-		while (!programPath.exists() || !programPath.getLocation().toFile().exists()) {
+		IFileStore pathStore=null;
+		try {
+			pathStore = EFS.getStore(programPath.getLocationURI());
+		} catch (CoreException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		while (!programPath.exists() || !pathStore.fetchInfo().exists()) {
 			if (monitor != null && monitor.isCanceled()) {
 				// ManagedBuildManager.setDefaultConfiguration(thisCProject.getProject(),olddefbuildconf);
 				restoreBuild();

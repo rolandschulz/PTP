@@ -97,7 +97,8 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 
 		thisProject = getProject(configuration);
 		thisCProject = CCorePlugin.getDefault().getCoreModel().create(thisProject);
-		projectLocation = thisCProject.getResource().getLocation().toOSString();
+		projectLocation = thisCProject.getResource().getLocationURI().getPath();
+		
 		outputLocation = projectLocation;
 
 		projectBinary = Messages.ToolStep_Unknown;
@@ -271,12 +272,12 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 
 	private String parseInput(ToolApp app) {
 		String input = ""; //$NON-NLS-1$
-		String oneIn = ""; //$NON-NLS-1$
+//		String oneIn = ""; //$NON-NLS-1$
 		if (app.inputArgs != null)
 			for (int i = 0; i < app.inputArgs.length; i++) {
-				oneIn = ""; //$NON-NLS-1$
-				if (app.inputArgs[i].pathFlag != null)
-					oneIn += app.inputArgs[i].pathFlag + " "; //$NON-NLS-1$
+//				oneIn = ""; //$NON-NLS-1$
+//				if (app.inputArgs[i].pathFlag != null)
+//					oneIn += app.inputArgs[i].pathFlag + " "; //$NON-NLS-1$
 				if (IOMap.containsKey(app.inputArgs[i].ID)) {
 					input += IOMap.get(app.inputArgs[i].ID);
 					/*

@@ -351,23 +351,23 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 						setErrorMessage("Program does not exist"); //$NON-NLS-1$
 						return false;
 					}
-					exePath = project.getFile(name).getLocation();
+					exePath = new Path(project.getFile(name).getLocationURI().getPath());
 				} else {
 					if (!exePath.toFile().exists()) {
 						setErrorMessage("Program does not exist"); //$NON-NLS-1$
 						return false;
 					}
 				}
-				try {
-					if (!isBinary(project, exePath)) {
-						setErrorMessage("Program is not a recognized executable."); //$NON-NLS-1$
-						return false;
-					}
-				} catch (CoreException e) {
-					LaunchUIPlugin.log(e);
-					setErrorMessage(e.getLocalizedMessage());
-					return false;
-				}
+//				try {
+//					if (!isBinary(project, exePath)) {
+//						setErrorMessage("Program is not a recognized executable."); //$NON-NLS-1$
+//						return false;
+//					}
+//				} catch (CoreException e) {
+//					LaunchUIPlugin.log(e);
+//					setErrorMessage(e.getLocalizedMessage());
+//					return false;
+//				}
 			}
 
 		} catch (CoreException e) {

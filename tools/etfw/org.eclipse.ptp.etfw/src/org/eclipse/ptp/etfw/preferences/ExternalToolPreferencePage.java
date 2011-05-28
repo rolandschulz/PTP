@@ -264,7 +264,7 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		 //Activator.getDefault().getPluginPreferences();
 
 		
-		IEclipsePreferences preferences = new InstanceScope().getNode(Activator.PLUGIN_ID);
+		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 		
 		String fiList = ""; //$NON-NLS-1$
 
