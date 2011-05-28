@@ -10,6 +10,7 @@
 package org.eclipse.ptp.rm.jaxb.control.ui.utils;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.cell.SpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab;
+import org.eclipse.ptp.rm.jaxb.control.ui.model.ButtonGroupUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ButtonUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ComboUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.SpinnerUpdateModel;
@@ -42,6 +44,7 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
+import org.eclipse.ptp.rm.jaxb.core.data.ButtonGroupType;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
@@ -372,6 +375,37 @@ public class UpdateModelFactory {
 	}
 
 	/**
+	 * Constructs button group update model.
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ButtonGroupUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler
+	 * 
+	 * @param bGroupDescriptor
+	 *            JAXB data element describing the button group.
+	 * @param bGroup
+	 *            SWT object to which this model is bound
+	 * @param tab
+	 *            launch tab being built (accessed for value handler)
+	 * @param rmVarMap
+	 *            resource manager environment
+	 * @return
+	 */
+	public static IUpdateModel createModel(ButtonGroupType bGroupDescriptor, Composite bGroup,
+			JAXBDynamicLaunchConfigurationTab tab, IVariableMap rmVarMap) {
+		List<WidgetType> bWidgets = bGroupDescriptor.getButton();
+		List<Button> buttons = new ArrayList<Button>();
+		for (WidgetType widget : bWidgets) {
+			Control control = createControl(bGroup, widget, tab, rmVarMap);
+			if (control instanceof Button) {
+				buttons.add((Button) control);
+			}
+		}
+		String name = bGroupDescriptor.getSaveValueTo();
+		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
+		return new ButtonGroupUpdateModel(name, handler, bGroup, buttons);
+	}
+
+	/**
 	 * Constructs the viewer update model.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel
@@ -390,8 +424,7 @@ public class UpdateModelFactory {
 		String name = descriptor.getName();
 		TemplateType template = descriptor.getValue();
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
-		ViewerUpdateModel model = new ViewerUpdateModel(name, handler, (ICheckable) viewer, template);
-		return model;
+		return new ViewerUpdateModel(name, handler, (ICheckable) viewer, template);
 	}
 
 	/**
@@ -404,6 +437,8 @@ public class UpdateModelFactory {
 	 *            bound
 	 * @param tab
 	 *            launch tab being built
+	 * @param rmVarMap
+	 *            resource manager environment
 	 * @return
 	 */
 	public static IUpdateModel createModel(Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab,
@@ -435,13 +470,11 @@ public class UpdateModelFactory {
 		} else if (control instanceof Spinner) {
 			model = new SpinnerUpdateModel(name, handler, (Spinner) control);
 		} else if (control instanceof Button) {
-			model = new ButtonUpdateModel(name, handler, (Button) control);
+			model = new ButtonUpdateModel(name, handler, (Button) control, widget.getTranslateBooleanAs());
 		}
 
-		String attr = widget.getSaveValueTo();
-
-		if (attr != null && !JAXBUIConstants.ZEROSTR.equals(attr)) {
-			maybeAddValidator(model, rmVarMap.get(attr), tab.getParent());
+		if (name != null && !JAXBUIConstants.ZEROSTR.equals(name)) {
+			maybeAddValidator(model, rmVarMap.get(name), tab.getParent());
 		}
 		return model;
 	}
@@ -473,20 +506,6 @@ public class UpdateModelFactory {
 		}
 		maybeAddValidator(model, data, tab.getParent());
 		return model;
-	}
-
-	/**
-	 * Checks to see if there is a validator on the attribute and adds this to
-	 * the model.
-	 * 
-	 * @param model
-	 * @param data
-	 * @param delegate
-	 */
-	public static void maybeAddValidator(IUpdateModel model, Object data, JAXBControllerLaunchConfigurationTab tab) {
-		if (data != null && data instanceof AttributeType) {
-			model.setValidator(((AttributeType) data).getValidator(), tab);
-		}
 	}
 
 	/**
@@ -764,5 +783,22 @@ public class UpdateModelFactory {
 	 */
 	private static Text createText(final Composite parent, final ControlDescriptor cd) {
 		return WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, JAXBControlUIConstants.ZEROSTR);
+	}
+
+	/**
+	 * Checks to see if there is a validator on the attribute and adds this to
+	 * the model.
+	 * 
+	 * @param model
+	 *            update model object to associate validator with
+	 * @param data
+	 *            JAXB property or attribute descriptor
+	 * @param tab
+	 *            launch tab being built
+	 */
+	private static void maybeAddValidator(IUpdateModel model, Object data, JAXBControllerLaunchConfigurationTab tab) {
+		if (data != null && data instanceof AttributeType) {
+			model.setValidator(((AttributeType) data).getValidator(), tab);
+		}
 	}
 }

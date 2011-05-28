@@ -103,10 +103,7 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	 * .swt.events.SelectionEvent)
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
-		if (refreshing) {
-			return;
-		}
-		storeValue();
+		widgetSelected(e);
 	}
 
 	/*

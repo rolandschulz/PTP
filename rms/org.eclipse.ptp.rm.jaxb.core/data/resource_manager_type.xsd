@@ -14,8 +14,9 @@
 	<xs:complexType name="resource-manager-data">
 		<xs:annotation>
 			<xs:documentation>
-				It is assumed that the xml instance of the schema will bear a name which sufficiently distinguishes it from others
-				of a similar type; e.g., pbs-torque-v_2.3.7_abe is specific to an installation on the host abe, ll-v_4.0 suits all installations of
+				It is assumed that an instance of the schema will bear a name which sufficiently distinguishes it from others
+				of a
+				similar type; e.g., pbs-torque-v_2.3.7_abe is specific to an installation on the host abe, ll-v_4.0 suits all installations of
 				LoadLeveler version 4, etc.
 			</xs:documentation>
 		</xs:annotation>
@@ -43,10 +44,10 @@
 				The top-level control elements define the properties and attributes, files to be staged, job script to be generated, commands
 				specific to the resource manager, and the layout of the Launch Tab.
 				The resource manager implementation constructs a variable map
-				serving as the resource manager "environment"; variables are dereferenced in the configuration file via ${ptp_rm:name} or
-				${ptp_rm:name#getterName}; all properties and attributes defined in the configuration are mapped. The following hard-coded
-				variables
-				are also added at runtime:
+				serving as the resource manager "environment"; variables are dereferenced in the configuration file via
+				${ptp_rm:name#getterName};
+				all properties and attributes defined in the configuration are mapped. The following hard-coded variables are also added at
+				runtime:
 				<!-- from runtime configuration information -->
 				control.user.name
 				control.address
@@ -575,6 +576,7 @@
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="composite" type="rm:composite-type"/>
 				<xs:element name="widget" type="rm:widget-type"/>
+				<xs:element name="button-group" type="rm:button-group-type"/>
 				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>
 		</xs:sequence>
@@ -591,6 +593,7 @@
 				<xs:element name="composite" type="rm:composite-type"/>
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="widget" type="rm:widget-type"/>
+				<xs:element name="button-group" type="rm:button-group-type"/>
 				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>
 		</xs:sequence>
@@ -619,10 +622,12 @@
 		<xs:attribute name="spacing" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="row-layout-type">
+	   <xs:attribute name="type" type="xs:string"/>
 		<xs:attribute name="center" type="xs:boolean" default="false"/>
 		<xs:attribute name="justify" type="xs:boolean" default="false"/>
 		<xs:attribute name="fill" type="xs:boolean" default="false"/>
 		<xs:attribute name="pack" type="xs:boolean" default="false"/>
+		<xs:attribute name="wrap" type="xs:boolean" default="false"/>
 		<xs:attribute name="marginHeight" type="xs:int"/>
 		<xs:attribute name="marginWidth" type="xs:int"/>
 		<xs:attribute name="marginTop" type="xs:int"/>
@@ -717,7 +722,8 @@
 			<xs:element name="fixed-text" minOccurs="0" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						Display text set once from the environment on loading; e.g, ${ptp_rm:Job_Name#description}.
+						Display text set once from the environment on loading; e.g, ${ptp_rm:Job_Name#description}. Used for labels and
+						text widgets.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -725,6 +731,7 @@
 				<xs:annotation>
 					<xs:documentation>
 						Changing display text; the args will be refreshed against the environment each time the Launch Tab is updated.
+						Only valid on text widgets.
 					</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
@@ -742,7 +749,7 @@
 					<xs:enumeration value="checkbox"/>
 					<xs:enumeration value="spinner"/>
 					<xs:enumeration value="combo"/>
-					<xs:enumeration value="radioButton"/>
+					<xs:enumeration value="radiobutton"/>
 					<xs:enumeration value="browse">
 						<xs:annotation>
 							<xs:documentation>
@@ -791,7 +798,42 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="translateBooleanAs" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					Use a comma-separated pair to indicate how to represent a boolean for this widget, if the widget type generates a
+					boolean value
+					(e.g., a checkbox); example: YES,NO would mean true yields the first string and false the second.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="foreground" type="xs:string"/>
+		<xs:attribute name="background" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="button-group-type">
+		<xs:annotation>
+			<xs:documentation>
+				This is a group containing only button widgets; when a button in the group is selected, its label value becomes
+				the value of the group and is written to the property or attribute indicated by saveValueTo.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="layout" minOccurs="0" type="rm:layout-type"/>
+			<xs:element name="title" minOccurs="0" type="xs:string"/>
+			<xs:element name="button" maxOccurs="unbounded" type="rm:widget-type">
+				<xs:annotation>
+					<xs:documentation>
+						The button type of widget must be chosen here or an error will be indicated. The "saveValueTo" attribute
+						on the
+						individual button will be ignored.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="group" type="xs:boolean" default="false"/>
+		<xs:attribute name="saveValueTo" type="xs:string"/>
+		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="attribute-viewer-type">

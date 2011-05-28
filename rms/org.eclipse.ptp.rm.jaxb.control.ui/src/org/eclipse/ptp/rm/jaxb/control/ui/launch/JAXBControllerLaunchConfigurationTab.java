@@ -123,7 +123,9 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 			}
 		}
 		super.createControl(parent, rm, queue);
-		tabFolder.addSelectionListener(this);
+		if (tabFolder != null) {
+			tabFolder.addSelectionListener(this);
+		}
 	}
 
 	/*

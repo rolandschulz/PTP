@@ -26,6 +26,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
+import org.eclipse.ptp.rm.jaxb.core.data.ButtonGroupType;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.CompositeType;
 import org.eclipse.ptp.rm.jaxb.core.data.FillLayoutType;
@@ -51,6 +52,7 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
@@ -110,7 +112,7 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Constructs the viewer, its row items and their update models, and add it
+	 * Constructs the viewer, its row items and their update models, and adds it
 	 * to the tree. Calls
 	 * {@link UpdateModelFactory#createModel(ColumnViewer, AttributeViewer, JAXBDynamicLaunchConfigurationTab)}
 	 * 
@@ -148,6 +150,33 @@ public class LaunchTabBuilder {
 			showHide.addSelectionListener(model);
 			model.setShowAll(showHide);
 			localWidgets.put(viewer, model);
+		}
+	}
+
+	/**
+	 * Constructs a button group and its model, and adds it to the tree. Calls
+	 * {@link UpdateModelFactory#createModel(Group, List, String, JAXBDynamicLaunchConfigurationTab, IVariableMap)}
+	 * 
+	 * @see UpdateModelFactory#createModel(Group, List, String,
+	 *      JAXBDynamicLaunchConfigurationTab, IVariableMap)
+	 * @param descriptor
+	 *            JAXB data element description the button group
+	 * @param parent
+	 *            control to which to add the viewer
+	 */
+	private void addButtonGroup(ButtonGroupType descriptor, Composite parent) {
+		Layout layout = createLayout(descriptor.getLayout());
+		Object data = createLayoutData(descriptor.getLayoutData());
+		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
+		Composite control = null;
+		if (descriptor.isGroup()) {
+			control = WidgetBuilderUtils.createGroup(parent, style, layout, data, descriptor.getTitle());
+		} else {
+			control = WidgetBuilderUtils.createComposite(parent, style, layout, data);
+		}
+		IUpdateModel model = UpdateModelFactory.createModel(descriptor, control, tab, rmVarMap);
+		if (model != null) {
+			localWidgets.put(control, model);
 		}
 	}
 
@@ -214,12 +243,35 @@ public class LaunchTabBuilder {
 	}
 
 	/**
+	 * Iterates through list and calls add for the type. Called by
+	 * {@link #addComposite(CompositeType, Composite)},
+	 * {@link #addItem(CTabFolder, TabItemType)},
+	 * 
+	 * @param children
+	 *            list of types
+	 */
+	private void addChildren(List<Object> children, Composite control) {
+		for (Object o : children) {
+			if (o instanceof TabFolderType) {
+				addFolder((TabFolderType) o, control);
+			} else if (o instanceof CompositeType) {
+				addComposite((CompositeType) o, control);
+			} else if (o instanceof WidgetType) {
+				addWidget(control, (WidgetType) o);
+			} else if (o instanceof ButtonGroupType) {
+				addButtonGroup((ButtonGroupType) o, control);
+			} else if (o instanceof AttributeViewerType) {
+				addAttributeViewer((AttributeViewerType) o, control);
+			}
+		}
+	}
+
+	/**
 	 * Adds an SWT Composite widget. Calls
 	 * {@link WidgetBuilderUtils#createComposite(Composite, Integer, Layout, Object)}
 	 * ,
 	 * {@link WidgetBuilderUtils#createGroup(Composite, Integer, Layout, Object, String)}
-	 * , {@link #addFolder(TabFolderType, Composite)},
-	 * {@link #addComposite(CompositeType, Composite)},
+	 * , {@link #addComposite(CompositeType, Composite)},
 	 * {@link #addWidget(Composite, Widget)}, or
 	 * {@link #addAttributeViewer(AttributeViewer, Composite)}.
 	 * 
@@ -241,24 +293,15 @@ public class LaunchTabBuilder {
 		Layout layout = createLayout(descriptor.getLayout());
 		Object data = createLayoutData(descriptor.getLayoutData());
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
+
 		Composite composite = null;
 		if (descriptor.isGroup()) {
 			composite = WidgetBuilderUtils.createGroup(parent, style, layout, data, descriptor.getTitle());
 		} else {
 			composite = WidgetBuilderUtils.createComposite(parent, style, layout, data);
 		}
-		List<Object> widget = descriptor.getTabFolderOrCompositeOrWidget();
-		for (Object o : widget) {
-			if (o instanceof TabFolderType) {
-				addFolder((TabFolderType) o, composite);
-			} else if (o instanceof CompositeType) {
-				addComposite((CompositeType) o, composite);
-			} else if (o instanceof WidgetType) {
-				addWidget(composite, (WidgetType) o);
-			} else if (o instanceof AttributeViewerType) {
-				addAttributeViewer((AttributeViewerType) o, composite);
-			}
-		}
+		addChildren(descriptor.getTabFolderOrCompositeOrWidget(), composite);
+
 		String attr = descriptor.getBackground();
 		if (attr != null) {
 			composite.setBackground(WidgetBuilderUtils.getColor(attr));
@@ -351,16 +394,8 @@ public class LaunchTabBuilder {
 			control.setFont(WidgetBuilderUtils.getFont(fd));
 		}
 
-		List<Object> children = descriptor.getCompositeOrTabFolderOrWidget();
-		for (Object o : children) {
-			if (o instanceof TabFolderType) {
-				addFolder((TabFolderType) o, control);
-			} else if (o instanceof CompositeType) {
-				addComposite((CompositeType) o, control);
-			} else if (o instanceof WidgetType) {
-				addWidget(control, (WidgetType) o);
-			}
-		}
+		addChildren(descriptor.getCompositeOrTabFolderOrWidget(), control);
+
 	}
 
 	/**
@@ -490,9 +525,10 @@ public class LaunchTabBuilder {
 						fillLayout.getMarginWidth(), fillLayout.getSpacing());
 			} else if (layout.getRowLayout() != null) {
 				RowLayoutType rowLayout = layout.getRowLayout();
-				return WidgetBuilderUtils.createRowLayout(rowLayout.isCenter(), rowLayout.isFill(), rowLayout.isJustify(),
-						rowLayout.isPack(), rowLayout.getMarginHeight(), rowLayout.getMarginWidth(), rowLayout.getMarginTop(),
-						rowLayout.getMarginBottom(), rowLayout.getMarginLeft(), rowLayout.getMarginRight(), rowLayout.getSpacing());
+				return WidgetBuilderUtils.createRowLayout(rowLayout.getType(), rowLayout.isCenter(), rowLayout.isFill(),
+						rowLayout.isJustify(), rowLayout.isPack(), rowLayout.isWrap(), rowLayout.getMarginHeight(),
+						rowLayout.getMarginWidth(), rowLayout.getMarginTop(), rowLayout.getMarginBottom(),
+						rowLayout.getMarginLeft(), rowLayout.getMarginRight(), rowLayout.getSpacing());
 			} else if (layout.getGridLayout() != null) {
 				GridLayoutType gridLayout = layout.getGridLayout();
 				return WidgetBuilderUtils.createGridLayout(gridLayout.getNumColumns(), gridLayout.isMakeColumnsEqualWidth(),

@@ -14,36 +14,35 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 /**
+ * 
+ * This is a group containing only button widgets; when a button in the group is
+ * selected, its label value becomes the value of the group and is written to
+ * the property or attribute indicated by saveValueTo.
+ * 
+ * 
  * <p>
- * Java class for composite-type complex type.
+ * Java class for button-group-type complex type.
  * 
  * <p>
  * The following schema fragment specifies the expected content contained within
  * this class.
  * 
  * <pre>
- * &lt;complexType name="composite-type">
+ * &lt;complexType name="button-group-type">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="layout" type="{http://org.eclipse.ptp/rm}layout-type" minOccurs="0"/>
  *         &lt;element name="layout-data" type="{http://org.eclipse.ptp/rm}layout-data-type" minOccurs="0"/>
- *         &lt;element name="font" type="{http://org.eclipse.ptp/rm}font-type" minOccurs="0"/>
+ *         &lt;element name="layout" type="{http://org.eclipse.ptp/rm}layout-type" minOccurs="0"/>
  *         &lt;element name="title" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;choice maxOccurs="unbounded">
- *           &lt;element name="tab-folder" type="{http://org.eclipse.ptp/rm}tab-folder-type"/>
- *           &lt;element name="composite" type="{http://org.eclipse.ptp/rm}composite-type"/>
- *           &lt;element name="widget" type="{http://org.eclipse.ptp/rm}widget-type"/>
- *           &lt;element name="button-group" type="{http://org.eclipse.ptp/rm}button-group-type"/>
- *           &lt;element name="viewer" type="{http://org.eclipse.ptp/rm}attribute-viewer-type"/>
- *         &lt;/choice>
+ *         &lt;element name="button" type="{http://org.eclipse.ptp/rm}widget-type" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *       &lt;attribute name="background" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="group" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
+ *       &lt;attribute name="saveValueTo" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="style" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -53,23 +52,21 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "composite-type", propOrder = { "layout", "layoutData", "font", "title", "tabFolderOrCompositeOrWidget" })
-public class CompositeType {
+@XmlType(name = "button-group-type", propOrder = { "layoutData", "layout", "title", "button" })
+public class ButtonGroupType {
 
-	protected LayoutType layout;
 	@XmlElement(name = "layout-data")
 	protected LayoutDataType layoutData;
-	protected FontType font;
+	protected LayoutType layout;
 	protected String title;
-	@XmlElements({ @XmlElement(name = "composite", type = CompositeType.class),
-			@XmlElement(name = "widget", type = WidgetType.class), @XmlElement(name = "viewer", type = AttributeViewerType.class),
-			@XmlElement(name = "button-group", type = ButtonGroupType.class),
-			@XmlElement(name = "tab-folder", type = TabFolderType.class) })
-	protected List<Object> tabFolderOrCompositeOrWidget;
+	@XmlElement(required = true)
+	protected List<WidgetType> button;
 	@XmlAttribute
 	protected String background;
 	@XmlAttribute
 	protected Boolean group;
+	@XmlAttribute
+	protected String saveValueTo;
 	@XmlAttribute
 	protected String style;
 
@@ -84,13 +81,33 @@ public class CompositeType {
 	}
 
 	/**
-	 * Gets the value of the font property.
+	 * Gets the value of the buttons property.
 	 * 
-	 * @return possible object is {@link FontType }
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a
+	 * snapshot. Therefore any modification you make to the returned list will
+	 * be present inside the JAXB object. This is why there is not a
+	 * <CODE>set</CODE> method for the buttons property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getButtons().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list
+	 * {@link WidgetType }
+	 * 
 	 * 
 	 */
-	public FontType getFont() {
-		return font;
+	public List<WidgetType> getButton() {
+		if (button == null) {
+			button = new ArrayList<WidgetType>();
+		}
+		return this.button;
 	}
 
 	/**
@@ -114,6 +131,16 @@ public class CompositeType {
 	}
 
 	/**
+	 * Gets the value of the saveValueTo property.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getSaveValueTo() {
+		return saveValueTo;
+	}
+
+	/**
 	 * Gets the value of the style property.
 	 * 
 	 * @return possible object is {@link String }
@@ -121,37 +148,6 @@ public class CompositeType {
 	 */
 	public String getStyle() {
 		return style;
-	}
-
-	/**
-	 * Gets the value of the tabFolderOrCompositeOrWidget property.
-	 * 
-	 * <p>
-	 * This accessor method returns a reference to the live list, not a
-	 * snapshot. Therefore any modification you make to the returned list will
-	 * be present inside the JAXB object. This is why there is not a
-	 * <CODE>set</CODE> method for the tabFolderOrCompositeOrWidget property.
-	 * 
-	 * <p>
-	 * For example, to add a new item, do as follows:
-	 * 
-	 * <pre>
-	 * getTabFolderOrCompositeOrWidget().add(newItem);
-	 * </pre>
-	 * 
-	 * 
-	 * <p>
-	 * Objects of the following type(s) are allowed in the list
-	 * {@link CompositeType } {@link WidgetType } {@link AttributeViewerType }
-	 * {@link ButtonGroupType } {@link TabFolderType }
-	 * 
-	 * 
-	 */
-	public List<Object> getTabFolderOrCompositeOrWidget() {
-		if (tabFolderOrCompositeOrWidget == null) {
-			tabFolderOrCompositeOrWidget = new ArrayList<Object>();
-		}
-		return this.tabFolderOrCompositeOrWidget;
 	}
 
 	/**
@@ -190,17 +186,6 @@ public class CompositeType {
 	}
 
 	/**
-	 * Sets the value of the font property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link FontType }
-	 * 
-	 */
-	public void setFont(FontType value) {
-		this.font = value;
-	}
-
-	/**
 	 * Sets the value of the group property.
 	 * 
 	 * @param value
@@ -231,6 +216,17 @@ public class CompositeType {
 	 */
 	public void setLayoutData(LayoutDataType value) {
 		this.layoutData = value;
+	}
+
+	/**
+	 * Sets the value of the saveValueTo property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setSaveValueTo(String value) {
+		this.saveValueTo = value;
 	}
 
 	/**

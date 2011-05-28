@@ -106,7 +106,7 @@ public class WidgetBuilderUtils {
 			button.setText(label);
 		}
 		if (layoutData == null) {
-			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
+			layoutData = createDefaultDataForLayout(parent.getLayout());
 		}
 		button.setLayoutData(layoutData);
 		if (null != listener) {
@@ -171,7 +171,7 @@ public class WidgetBuilderUtils {
 			combo.setItems(items);
 		}
 		if (data == null) {
-			data = createGridData(JAXBUIConstants.DEFAULT, 1);
+			data = createDefaultDataForLayout(parent.getLayout());
 		}
 		combo.setLayoutData(data);
 		if (initialValue != null) {
@@ -207,12 +207,7 @@ public class WidgetBuilderUtils {
 	 */
 	public static Composite createComposite(Composite parent, Integer style, Layout layout, Object layoutData) {
 		Composite composite = new Composite(parent, style);
-		if (layout != null) {
-			composite.setLayout(layout);
-		}
-		if (layoutData == null) {
-			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
-		}
+		composite.setLayout(layout);
 		composite.setData(layoutData);
 		return composite;
 	}
@@ -427,8 +422,7 @@ public class WidgetBuilderUtils {
 	 * @return grid data
 	 */
 	public static GridData createGridData(Integer style, Integer cols) {
-		return createGridData(style, false, false, JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT, cols,
-				JAXBUIConstants.DEFAULT);
+		return createGridData(style, false, false, JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT, cols, JAXBUIConstants.DEFAULT);
 	}
 
 	/**
@@ -552,12 +546,7 @@ public class WidgetBuilderUtils {
 	 */
 	public static Group createGroup(Composite parent, Integer style, Layout layout, Object layoutData, String text) {
 		Group group = new Group(parent, style);
-		if (layout != null) {
-			group.setLayout(layout);
-		}
-		if (layoutData == null) {
-			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
-		}
+		group.setLayout(layout);
 		group.setLayoutData(layoutData);
 		if (text != null) {
 			group.setText(text);
@@ -591,11 +580,9 @@ public class WidgetBuilderUtils {
 		}
 		label.setText(text.trim());
 		if (layoutData == null) {
-			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
+			layoutData = createDefaultDataForLayout(container.getLayout());
 		}
-		if (layoutData != null) {
-			label.setLayoutData(layoutData);
-		}
+		label.setLayoutData(layoutData);
 
 		return label;
 	}
@@ -610,7 +597,10 @@ public class WidgetBuilderUtils {
 	 */
 	public static Button createPushButton(Composite parent, String label, SelectionListener listener) {
 		Button button = SWTUtil.createPushButton(parent, label, null);
-		GridData data = createGridData(GridData.FILL_HORIZONTAL, 1);
+		Object data = createDefaultDataForLayout(parent.getLayout());
+		if (data instanceof GridData) {
+			((GridData) data).horizontalAlignment = SWT.FILL;
+		}
 		button.setLayoutData(data);
 		if (null != listener) {
 			button.addSelectionListener(listener);
@@ -656,6 +646,7 @@ public class WidgetBuilderUtils {
 	 * @param fill
 	 * @param justify
 	 * @param pack
+	 * @param wrap
 	 * @param marginHeight
 	 * @param marginWidth
 	 * @param marginTop
@@ -665,9 +656,13 @@ public class WidgetBuilderUtils {
 	 * @param spacing
 	 * @return row layout
 	 */
-	public static RowLayout createRowLayout(Boolean center, Boolean fill, Boolean justify, Boolean pack, Integer marginHeight,
-			Integer marginWidth, Integer marginTop, Integer marginBottom, Integer marginLeft, Integer marginRight, Integer spacing) {
+	public static RowLayout createRowLayout(String type, Boolean center, Boolean fill, Boolean justify, Boolean pack, Boolean wrap,
+			Integer marginHeight, Integer marginWidth, Integer marginTop, Integer marginBottom, Integer marginLeft,
+			Integer marginRight, Integer spacing) {
 		RowLayout layout = new RowLayout();
+		if (type != null) {
+			layout.type = getStyle(type);
+		}
 		if (center != null) {
 			layout.center = center;
 		}
@@ -679,6 +674,9 @@ public class WidgetBuilderUtils {
 		}
 		if (pack != null) {
 			layout.pack = pack;
+		}
+		if (wrap != null) {
+			layout.wrap = wrap;
 		}
 		if (marginHeight != null) {
 			layout.marginHeight = marginHeight;
@@ -733,7 +731,7 @@ public class WidgetBuilderUtils {
 			s.setSelection(initialValue);
 		}
 		if (layoutData == null) {
-			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
+			layoutData = createDefaultDataForLayout(parent.getLayout());
 		}
 		s.setLayoutData(layoutData);
 		if (listener != null) {
@@ -765,13 +763,12 @@ public class WidgetBuilderUtils {
 	 */
 	public static Table createTable(Composite parent, Integer style, Object layoutData) {
 		Integer cols = null;
-		if (layoutData != null) {
-			if (layoutData instanceof GridData) {
-				GridData gd = (GridData) layoutData;
-				cols = gd.horizontalSpan;
-			}
-		} else {
-			layoutData = createGridData(JAXBUIConstants.DEFAULT, cols);
+		if (layoutData == null) {
+			layoutData = createDefaultDataForLayout(parent.getLayout());
+		}
+		if (layoutData instanceof GridData) {
+			GridData gd = (GridData) layoutData;
+			cols = gd.horizontalSpan;
 		}
 		if (style == null) {
 			style = SWT.None;
@@ -812,7 +809,7 @@ public class WidgetBuilderUtils {
 			ModifyListener listener, Color color) {
 		Text text = new Text(parent, style);
 		if (layoutData == null) {
-			layoutData = createGridData(JAXBUIConstants.DEFAULT, 1);
+			layoutData = createDefaultDataForLayout(parent.getLayout());
 		}
 		text.setLayoutData(layoutData);
 		if (readOnly != null) {
@@ -838,13 +835,12 @@ public class WidgetBuilderUtils {
 	 */
 	public static Tree createTree(Composite parent, Integer style, Object layoutData) {
 		Integer cols = null;
-		if (layoutData != null) {
-			if (layoutData instanceof GridData) {
-				GridData gd = (GridData) layoutData;
-				cols = gd.horizontalSpan;
-			}
-		} else {
-			layoutData = createGridData(JAXBUIConstants.DEFAULT, cols);
+		if (layoutData == null) {
+			layoutData = createDefaultDataForLayout(parent.getLayout());
+		}
+		if (layoutData instanceof GridData) {
+			GridData gd = (GridData) layoutData;
+			cols = gd.horizontalSpan;
 		}
 		if (style == null) {
 			style = SWT.None;
@@ -1039,6 +1035,25 @@ public class WidgetBuilderUtils {
 			}
 		}
 		return newLine.toString();
+	}
+
+	/**
+	 * Makes sure the data type matches the layout of the widget or of its
+	 * parent.
+	 * 
+	 * @param layout
+	 *            of widget or parent if widget layout is undefined
+	 * @return appropriate data type
+	 */
+	private static Object createDefaultDataForLayout(Layout layout) {
+		if (layout instanceof GridLayout) {
+			return createGridData(JAXBUIConstants.DEFAULT, 1);
+		} else if (layout instanceof RowLayout) {
+			return new RowData();
+		} else if (layout instanceof FormLayout) {
+			return new FormData();
+		}
+		return null;
 	}
 
 	/**

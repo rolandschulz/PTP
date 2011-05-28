@@ -10,6 +10,7 @@
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
@@ -23,6 +24,7 @@ import org.eclipse.swt.widgets.Button;
 public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionListener {
 
 	private final Button button;
+	private final String[] valueMapping;
 
 	/**
 	 * @param name
@@ -33,11 +35,24 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 	 *            values
 	 * @param button
 	 *            the widget to which this model corresponds
+	 * @param translateBooleanAs
+	 *            a comma-delimite pair of strings corresponding to T,F to use
+	 *            as the value instead of the boolean (can be <code>null</code>)
 	 */
-	public ButtonUpdateModel(String name, ValueUpdateHandler handler, Button button) {
+	public ButtonUpdateModel(String name, ValueUpdateHandler handler, Button button, String translateBooleanAs) {
 		super(name, handler);
 		this.button = button;
 		button.addSelectionListener(this);
+		if (translateBooleanAs == null) {
+			valueMapping = null;
+		} else {
+			String[] pair = translateBooleanAs.split(JAXBUIConstants.CM);
+			if (pair.length == 2) {
+				valueMapping = pair;
+			} else {
+				valueMapping = null;
+			}
+		}
 	}
 
 	@Override
@@ -46,12 +61,16 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 	}
 
 	/*
-	 * @return Boolean value of the selection (non-Javadoc)
+	 * @return value of the selection; boolean or string (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#getValueFromControl()
 	 */
 	public Object getValueFromControl() {
-		return button.getSelection();
+		Boolean b = button.getSelection();
+		if (valueMapping != null) {
+			return b ? valueMapping[0] : valueMapping[1];
+		}
+		return b;
 	}
 
 	/*
@@ -67,7 +86,11 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 		boolean b = false;
 		if (mapValue != null) {
 			if (mapValue instanceof String) {
-				b = Boolean.parseBoolean((String) mapValue);
+				if (valueMapping != null) {
+					b = mapValue.equals(valueMapping[0]);
+				} else {
+					b = Boolean.parseBoolean((String) mapValue);
+				}
 			} else {
 				b = (Boolean) mapValue;
 			}
@@ -85,10 +108,7 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 	 * .swt.events.SelectionEvent)
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
-		if (refreshing) {
-			return;
-		}
-		storeValue();
+		widgetSelected(e);
 	}
 
 	/*

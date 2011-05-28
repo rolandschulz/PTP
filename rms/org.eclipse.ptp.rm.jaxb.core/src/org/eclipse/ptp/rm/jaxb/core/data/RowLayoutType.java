@@ -35,6 +35,8 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="marginWidth" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="pack" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="spacing" type="{http://www.w3.org/2001/XMLSchema}int" />
+ *       &lt;attribute name="type" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="wrap" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -68,6 +70,10 @@ public class RowLayoutType {
 	protected Boolean pack;
 	@XmlAttribute
 	protected Integer spacing;
+	@XmlAttribute
+	protected String type;
+	@XmlAttribute
+	protected Boolean wrap;
 
 	/**
 	 * Gets the value of the marginBottom property.
@@ -140,6 +146,16 @@ public class RowLayoutType {
 	}
 
 	/**
+	 * Gets the value of the type property.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getType() {
+		return type;
+	}
+
+	/**
 	 * Gets the value of the center property.
 	 * 
 	 * @return possible object is {@link Boolean }
@@ -192,6 +208,20 @@ public class RowLayoutType {
 			return false;
 		} else {
 			return pack;
+		}
+	}
+
+	/**
+	 * Gets the value of the wrap property.
+	 * 
+	 * @return possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isWrap() {
+		if (wrap == null) {
+			return false;
+		} else {
+			return wrap;
 		}
 	}
 
@@ -316,4 +346,25 @@ public class RowLayoutType {
 		this.spacing = value;
 	}
 
+	/**
+	 * Sets the value of the type property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setType(String value) {
+		this.type = value;
+	}
+
+	/**
+	 * Sets the value of the wrap property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setWrap(Boolean value) {
+		this.pack = value;
+	}
 }
