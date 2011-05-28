@@ -52,8 +52,6 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.core.BuildService"; //$NON-NLS-1$
 	public static final String NAME = Messages.getString("RemoteBuildServiceProvider.0"); //$NON-NLS-1$
 
-	private IRemoteConnection fRemoteConnection = null;
-
 	private static String getDefaultPath(IRemoteServices remoteServices, IRemoteConnection connection) {
 		if(!remoteServices.isInitialized()) {
 			remoteServices.initialize();
@@ -112,7 +110,8 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	 * #getConnection()
 	 */
 	public IRemoteConnection getConnection() {
-		if (fRemoteConnection == null && getRemoteConnectionName() != null) {
+		IRemoteConnection conn = null;
+		if (getRemoteConnectionName() != null) {
 			IRemoteServices services = getRemoteServices();
 			if (services != null) {
 				if(!services.isInitialized()) {
@@ -120,11 +119,11 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 				}
 				IRemoteConnectionManager manager = services.getConnectionManager();
 				if (manager != null) {
-					fRemoteConnection = manager.getConnection(getRemoteConnectionName());
+					conn = manager.getConnection(getRemoteConnectionName());
 
-					if (fRemoteConnection != null && !fRemoteConnection.isOpen()) {
+					if (conn != null && !conn.isOpen()) {
 						try {
-							fRemoteConnection.open(new NullProgressMonitor());
+							conn.open(new NullProgressMonitor());
 						} catch (RemoteConnectionException e) {
 							Activator.log(e);
 							return null;
@@ -133,7 +132,7 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 				}
 			}
 		}
-		return fRemoteConnection;
+		return conn;
 	}
 
 	/**
@@ -185,7 +184,6 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	 * @param connection
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
-		fRemoteConnection = connection;
 		String name = ""; //$NON-NLS-1$
 		if (connection != null) {
 			name = connection.getName();
