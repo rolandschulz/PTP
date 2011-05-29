@@ -73,8 +73,7 @@ public class JAXBCoreConstants {
 	public static final String RM_XSD = DATA + "resource_manager_type.xsd";//$NON-NLS-1$
 	public static final String JAXB = "JAXB";//$NON-NLS-1$
 	public static final String JAXB_CONTEXT = "org.eclipse.ptp.rm.jaxb.core.data";//$NON-NLS-1$
-	public static final String RM_XSD_PATH = "rm_schema_path";//$NON-NLS-1$
-	public static final String RM_XSD_URL = "rm_schema_url";//$NON-NLS-1$
+	public static final String RM_XML = "rm_config_xml";//$NON-NLS-1$
 	public static final String RESOURCE_MANAGERS = "resourceManagers";//$NON-NLS-1$
 	public static final String DOT_XML = ".xml";//$NON-NLS-1$
 	public static final String CONFIGURATION_FILE_ATTRIBUTE = "configurationFile"; //$NON-NLS-1$

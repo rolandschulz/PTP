@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
@@ -48,6 +51,40 @@ public class JAXBInitializationUtils {
 	}
 
 	/**
+	 * Streams the content from the url.
+	 * 
+	 * @param url
+	 *            location of XML resource
+	 * @return xml string
+	 */
+	public static String getRMConfigurationXML(URL url) {
+		StringBuffer buffer = new StringBuffer();
+		if (url != null) {
+			try {
+				InputStreamReader reader = new InputStreamReader(url.openStream());
+				char[] chars = new char[4096];
+				int read = 0;
+				while (true) {
+					try {
+						read = reader.read(chars, 0, chars.length);
+					} catch (EOFException eof) {
+						break;
+					}
+					if (read <= 0) {
+						break;
+					}
+					buffer.append(chars, 0, read);
+				}
+			} catch (IOException t) {
+				JAXBCorePlugin.log(t);
+				return null;
+			}
+			return buffer.toString();
+		}
+		return null;
+	}
+
+	/**
 	 * Retrieves Property and Attribute definitions from the data tree and adds
 	 * them to the environment map.
 	 * 
@@ -69,35 +106,46 @@ public class JAXBInitializationUtils {
 	 * Delegates to {@link #unmarshalResourceManagerData(URL)}
 	 * 
 	 * @param xml
-	 *            location of the configuration file.
+	 *            the configuration file.
 	 * @return the constructed data tree
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws URISyntaxException
 	 * @throws JAXBException
 	 */
-	public static ResourceManagerData initializeRMData(URL xml) throws IOException, SAXException, URISyntaxException, JAXBException {
+	public static ResourceManagerData initializeRMData(String xml) throws IOException, SAXException, URISyntaxException,
+			JAXBException {
 		return unmarshalResourceManagerData(xml);
+	}
+
+	/**
+	 * Delegates to {@link #getRMConfigurationXML(URL)},
+	 * {@link #initializeRMData(String)}
+	 * 
+	 * @param url
+	 *            of the XML for the configuration
+	 * @return xml for the configuration
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws URISyntaxException
+	 * @throws JAXBException
+	 */
+	public static ResourceManagerData initializeRMData(URL url) throws IOException, SAXException, URISyntaxException, JAXBException {
+		return initializeRMData(getRMConfigurationXML(url));
 	}
 
 	/**
 	 * Validates the XML against the internal XSD for JAXB resource managers.
 	 * 
-	 * @param instance
-	 *            location of the configuration file.
+	 * @param url
+	 *            of the configuration xml.
 	 * @throws SAXException
 	 *             if invalid
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public static void validate(URL instance) throws SAXException, IOException, URISyntaxException {
-		Source source = new StreamSource(instance.openStream());
-		try {
-			getValidator().validate(source);
-		} catch (SAXParseException sax) {
-			JAXBCorePlugin.log(printInfo(sax));
-			throw sax;
-		}
+	public static void validate(URL url) throws SAXException, IOException, URISyntaxException {
+		validate(new StreamSource(url.openStream()));
 	}
 
 	/**
@@ -146,7 +194,8 @@ public class JAXBInitializationUtils {
 	 */
 	private synchronized static Unmarshaller getUnmarshaller() throws JAXBException {
 		if (unmarshaller == null) {
-			JAXBContext jc = JAXBContext.newInstance(JAXBCoreConstants.JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
+			JAXBContext jc = JAXBContext
+					.newInstance(JAXBCoreConstants.JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
 			unmarshaller = jc.createUnmarshaller();
 		}
 		return unmarshaller;
@@ -191,7 +240,7 @@ public class JAXBInitializationUtils {
 	 * unmarshaller from it.
 	 * 
 	 * @param xml
-	 *            location of the configuration file.
+	 *            of the configuration file.
 	 * @return the constructed data tree
 	 * @throws JAXBException
 	 *             problem encountered during unmarshaling
@@ -200,11 +249,32 @@ public class JAXBInitializationUtils {
 	 *             validation error
 	 * @throws URISyntaxException
 	 */
-	private static ResourceManagerData unmarshalResourceManagerData(URL xml) throws JAXBException, IOException, SAXException,
+	private static ResourceManagerData unmarshalResourceManagerData(String xml) throws JAXBException, IOException, SAXException,
 			URISyntaxException {
-		validate(xml);
-		JAXBElement<?> o = (JAXBElement<?>) getUnmarshaller().unmarshal(xml.openStream());
+		Source source = new StreamSource(new StringReader(xml));
+		validate(source);
+		source = new StreamSource(new StringReader(xml));
+		JAXBElement<?> o = (JAXBElement<?>) getUnmarshaller().unmarshal(source);
 		ResourceManagerData rmdata = (ResourceManagerData) o.getValue();
 		return rmdata;
+	}
+
+	/**
+	 * Validates the XML against the internal XSD for JAXB resource managers.
+	 * 
+	 * @param source
+	 *            of the configuration xml.
+	 * @throws SAXException
+	 *             if invalid
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	private static void validate(Source source) throws SAXException, IOException, URISyntaxException {
+		try {
+			getValidator().validate(source);
+		} catch (SAXParseException sax) {
+			JAXBCorePlugin.log(printInfo(sax));
+			throw sax;
+		}
 	}
 }

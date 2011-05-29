@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.JAXBExtensionUtils;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.wizards.RMConfigurationSelectionFactory;
@@ -56,22 +57,23 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	public void setConfigurationName(String name, IResourceManagerConfiguration configuration) {
 		if (configuration instanceof IJAXBResourceManagerConfiguration) {
 			IJAXBResourceManagerConfiguration jaxbConfiguration = (IJAXBResourceManagerConfiguration) configuration;
-			jaxbConfiguration.setRMConfigurationURL(getJAXBResourceManagerConfiguration(name));
+			jaxbConfiguration.setRMConfigurationXML(getJAXBResourceManagerConfiguration(name));
 		}
 		configuration.setName(name);
 	}
 
 	/**
-	 * Looks up the configuration; called when the user selects a name from the
-	 * wizard list.
+	 * Looks up the configuration and returns it as an XML string; called when
+	 * the user selects a name from the wizard list.
 	 * 
 	 * @param name
-	 * @return location of the configuration
+	 * @return marshaled xml of the configuration
 	 */
-	private URL getJAXBResourceManagerConfiguration(String name) {
+	private String getJAXBResourceManagerConfiguration(String name) {
 		loadJAXBResourceManagers(false);
 		if (fRMJAXBResourceManagers != null) {
-			return fRMJAXBResourceManagers.get(name);
+			URL url = fRMJAXBResourceManagers.get(name);
+			return JAXBInitializationUtils.getRMConfigurationXML(url);
 		}
 		return null;
 	}

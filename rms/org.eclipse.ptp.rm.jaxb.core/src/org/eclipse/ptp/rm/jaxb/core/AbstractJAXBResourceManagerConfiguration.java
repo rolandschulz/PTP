@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -82,11 +79,9 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration#
 	 * setRMConfigurationURL(java.net.URL)
 	 */
-	public void setRMConfigurationURL(URL location) {
-		URL current = getRMConfigurationURL();
-		if (location != null && current != location) {
-			String url = location.toExternalForm();
-			putString(JAXBCoreConstants.RM_XSD_URL, url);
+	public void setRMConfigurationXML(String xml) {
+		if (xml != null) {
+			putString(JAXBCoreConstants.RM_XML, xml);
 			clearRMData();
 		}
 	}
@@ -103,19 +98,14 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	}
 
 	/**
-	 * @return the location of the configuration XML used to construct the data
-	 *         tree.
+	 * @return the configuration XML used to construct the data tree.
 	 */
-	private URL getRMConfigurationURL() {
-		String loc = getString(JAXBCoreConstants.RM_XSD_URL, JAXBCoreConstants.ZEROSTR);
-		if (JAXBCoreConstants.ZEROSTR.equals(loc)) {
+	private String getRMConfigurationXML() {
+		String xml = getString(JAXBCoreConstants.RM_XML, JAXBCoreConstants.ZEROSTR);
+		if (JAXBCoreConstants.ZEROSTR.equals(xml)) {
 			return null;
 		}
-		try {
-			return new URL(loc);
-		} catch (MalformedURLException e) {
-			return null;
-		}
+		return xml;
 	}
 
 	/**
@@ -125,12 +115,11 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	 *             exceptions
 	 */
 	private void realizeRMDataFromXML() throws Throwable {
-		URL location = getRMConfigurationURL();
-		if (location == null) {
+		String xml = getRMConfigurationXML();
+		if (xml == null) {
 			rmdata = null;
 		} else {
-			rmdata = JAXBInitializationUtils.initializeRMData(location);
+			rmdata = JAXBInitializationUtils.initializeRMData(xml);
 		}
 	}
-
 }
