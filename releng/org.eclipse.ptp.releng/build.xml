@@ -19,7 +19,7 @@
 		<!-- The following properties need to be updated to reflect the version we are building against. -->
 		<!-- NOTE: changing any of these will require corresponding changes in org.eclipse.ptp.rdt.core.remotejars/build.xml -->
 		<!-- Update for new Eclipse version -->
-		<property name="eclipseDist" value="/home/data/httpd/download.eclipse.org/eclipse/downloads/drops/S-3.7RC2-201105191138/eclipse-SDK-3.7RC2-linux-gtk.tar.gz"/>
+		<property name="eclipseDist" value="/home/data/httpd/download.eclipse.org/eclipse/downloads/drops/S-3.7RC3-201105261708/eclipse-SDK-3.7RC3-linux-gtk.tar.gz"/>
 		<!-- Update for new CDT version -->
 		<property name="cdtDist" value="/home/data/httpd/download.eclipse.org/tools/cdt/builds/8.0.0/I.I201105271433/cdt-master-8.0.0-I201105271433.zip"/>
 		<!-- Update for new RSE version -->
