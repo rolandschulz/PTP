@@ -128,7 +128,7 @@ public class ButtonGroupUpdateModel extends AbstractUpdateModel implements Selec
 		Button selected = (Button) e.getSource();
 		if (selected.getSelection()) {
 			selectedLabel = selected.getText();
-			if (lastSelected != null) {
+			if (lastSelected != null && lastSelected != selected) {
 				lastSelected.setSelection(false);
 			} else {
 				for (Button b : buttons) {

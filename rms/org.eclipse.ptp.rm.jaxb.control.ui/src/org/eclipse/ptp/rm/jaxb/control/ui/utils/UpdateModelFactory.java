@@ -619,7 +619,10 @@ public class UpdateModelFactory {
 		} else if (JAXBControlUIConstants.TEXT.equals(type)) {
 			c = createText(parent, cd);
 		} else if (JAXBControlUIConstants.RADIOBUTTON.equals(type)) {
-			c = WidgetBuilderUtils.createRadioButton(parent, cd.title, null, null);
+			if (cd.style == SWT.NONE) {
+				cd.style = SWT.RADIO | SWT.LEFT;
+			}
+			c = WidgetBuilderUtils.createRadioButton(parent, cd.style, cd.title, null, null);
 		} else if (JAXBControlUIConstants.CHECKBOX.equals(type)) {
 			c = WidgetBuilderUtils.createCheckButton(parent, cd.title, null);
 		} else if (JAXBControlUIConstants.SPINNER.equals(type)) {
