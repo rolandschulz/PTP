@@ -14,11 +14,11 @@
 		<property name="queues" visible="false"/>
 		<!-- needed by RM internals for fetch; name is fixed by convention -->
       <property name="stdout_remote_path" visible="true">
-         <default>${ptp_rm:control.working.dir#value}/${ptp_rm:Job_Name#value}.o@jobId</default>
+         <default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o@jobId</default>
       </property>
       <!-- needed by RM internals for fetch; name is fixed by convention -->
       <property name="stderr_remote_path" visible="true">
-         <default>${ptp_rm:control.working.dir#value}/${ptp_rm:Job_Name#value}.e@jobId</default>
+         <default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e@jobId</default>
       </property>
 		<property name="remote_path_tooltip" visible="false">
 			<default><![CDATA[Not the same as the PBS attribute for stdout or stderr; 
