@@ -21,6 +21,8 @@ import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.AbslayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.InfoType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.InfodataType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InformationType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
@@ -31,7 +33,7 @@ public class OverviewAccess extends LguiHandler {
 
 	public OverviewAccess(ILguiItem lguiItem, LguiType lgui) {
 		super(lguiItem, lgui);
-		
+
 		this.lguiItem.addListener(new ILguiListener() {
 			public void handleEvent(ILguiUpdatedEvent e) {
 				update(e.getLguiItem().getLguiType());
@@ -45,8 +47,8 @@ public class OverviewAccess extends LguiHandler {
 	 * @return list of elements(AbsLayout)
 	 */
 	public List<AbslayoutType> getAbslayouts() {
-		List<AbslayoutType> layouts = new LinkedList<AbslayoutType>();
-		for (LayoutType tag : getLayouts()) {
+		final List<AbslayoutType> layouts = new LinkedList<AbslayoutType>();
+		for (final LayoutType tag : getLayouts()) {
 			if (tag instanceof AbslayoutType) {
 				layouts.add((AbslayoutType) tag);
 			}
@@ -60,8 +62,8 @@ public class OverviewAccess extends LguiHandler {
 	 * @return list of elements(GobjectsType)
 	 */
 	public List<GobjectType> getGraphicalObjects() {
-		List<GobjectType> objects = new LinkedList<GobjectType>();
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+		final List<GobjectType> objects = new LinkedList<GobjectType>();
+		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
 			if (tag.getValue() instanceof GobjectType) {
 				objects.add((GobjectType) tag.getValue());
 			}
@@ -75,8 +77,8 @@ public class OverviewAccess extends LguiHandler {
 	 * @return list of elements(InfomationsType)
 	 */
 	public List<InformationType> getInformations() {
-		List<InformationType> informations = new LinkedList<InformationType>();
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+		final List<InformationType> informations = new LinkedList<InformationType>();
+		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
 			if (tag.getValue() instanceof InformationType) {
 				informations.add((InformationType) tag.getValue());
 			}
@@ -90,8 +92,8 @@ public class OverviewAccess extends LguiHandler {
 	 * @return list of elements(LayoutType)
 	 */
 	public List<LayoutType> getLayouts() {
-		List<LayoutType> layouts = new LinkedList<LayoutType>();
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+		final List<LayoutType> layouts = new LinkedList<LayoutType>();
+		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
 			if (tag.getValue() instanceof LayoutType) {
 				layouts.add((LayoutType) tag.getValue());
 			}
@@ -105,13 +107,29 @@ public class OverviewAccess extends LguiHandler {
 	 * @return list of elements(ObjectsType)
 	 */
 	public List<ObjectsType> getObjects() {
-		List<ObjectsType> objects = new LinkedList<ObjectsType>();
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+		final List<ObjectsType> objects = new LinkedList<ObjectsType>();
+		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
 			if (tag.getValue() instanceof ObjectsType) {
 				objects.add((ObjectsType) tag.getValue());
 			}
 		}
 		return objects;
+	}
+
+	public String getOIDByJobName(String jobName) {
+		final List<InformationType> listInformation = getInformations();
+		for (final InformationType information : listInformation) {
+			final List<InfoType> listInfo = information.getInfo();
+			for (final InfoType info : listInfo) {
+				final List<InfodataType> listData = info.getData();
+				for (final InfodataType data : listData) {
+					if (data.getKey().equals("name") && data.getValue().indexOf(jobName) != -1) {
+						return info.getOid();
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -120,8 +138,8 @@ public class OverviewAccess extends LguiHandler {
 	 * @return list of elements(Splitlayout)
 	 */
 	public List<SplitlayoutType> getSplitlayouts() {
-		List<SplitlayoutType> tables = new LinkedList<SplitlayoutType>();
-		for (LayoutType tag : getLayouts()) {
+		final List<SplitlayoutType> tables = new LinkedList<SplitlayoutType>();
+		for (final LayoutType tag : getLayouts()) {
 			if (tag instanceof SplitlayoutType) {
 				tables.add((SplitlayoutType) tag);
 			}

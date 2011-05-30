@@ -27,13 +27,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -65,6 +63,7 @@ import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.actions.HideTableColumnAction;
 import org.eclipse.ptp.rm.lml.ui.actions.ShowTableColumnAction;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
+import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -94,10 +93,6 @@ import org.eclipse.ui.progress.UIJob;
 
 public class TableView extends LMLViewPart {
 
-	/**************************************************************************************************************
-	 * Listener class
-	 **************************************************************************************************************/
-
 	private final class LMLTableListListener implements ILMLListener {
 
 		/*
@@ -110,9 +105,36 @@ public class TableView extends LMLViewPart {
 			setViewerInput();
 		}
 
-		public void handleEvent(ITableColumnChangeEvent e) {
-			disposeTable();
-			createTable();
+		public void handleEvent(ILguiAddedEvent event) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					fSelectedLguiItem = lmlManager.getSelectedLguiItem();
+					if (fSelectedLguiItem != null) {
+						createTable();
+						fSelectedLguiItem.getObjectStatus().addComponent(eventForwarder);
+					}
+				}
+			});
+
+		}
+
+		public void handleEvent(ILguiRemovedEvent event) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					fSelectedLguiItem.getObjectStatus().removeComponent(eventForwarder);
+					fSelectedLguiItem = null;
+					setViewerInput();
+					disposeTable();
+				}
+			});
+		}
+
+		public void handleEvent(IMarkObjectEvent event) {
+			selectedOid = event.getOid();
+			if (!composite.isDisposed()) {
+				viewer.refresh();
+			}
+
 		}
 
 		public void handleEvent(ISelectedObjectChangeEvent event) {
@@ -139,12 +161,9 @@ public class TableView extends LMLViewPart {
 
 		}
 
-		public void handleEvent(IMarkObjectEvent event) {
-			selectedOid = event.getOid();
-			if (!composite.isDisposed()) {
-				viewer.refresh();
-			}
-
+		public void handleEvent(ITableColumnChangeEvent e) {
+			disposeTable();
+			createTable();
 		}
 
 		public void handleEvent(IUnmarkObjectEvent event) {
@@ -168,33 +187,7 @@ public class TableView extends LMLViewPart {
 				}
 			});
 		}
-
-		public void handleEvent(ILguiAddedEvent event) {
-			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
-				public void run() throws Exception {
-					fSelectedLguiItem = lmlManager.getSelectedLguiItem();
-					if (fSelectedLguiItem != null) {
-						createTable();
-					}
-				}
-			});
-
-		}
-
-		public void handleEvent(ILguiRemovedEvent event) {
-			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
-				public void run() throws Exception {
-					fSelectedLguiItem = null;
-					setViewerInput();
-					disposeTable();
-				}
-			});
-		}
 	}
-
-	/**************************************************************************************************************
-	 * Variables
-	 **************************************************************************************************************/
 
 	private Composite composite;
 	private Tree tree;
@@ -208,14 +201,196 @@ public class TableView extends LMLViewPart {
 	private TreeItem selectedItem = null;
 	private String selectedOid = null;
 
+	private final EventForwarder eventForwarder = new EventForwarder();
+
 	private final Map<String, JobStatusData> jobs = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
 
 	private static final int UNDEFINED = -1;
 	private static final int COPY_BUFFER_SIZE = 64 * 1024;
 
-	/**************************************************************************************************************
-	 * Methods creating the GUI
-	 **************************************************************************************************************/
+	/**
+	 * Exercises a control operation on the remote job.
+	 * 
+	 * @param job
+	 * @param autoStart
+	 * @param operation
+	 * @throws CoreException
+	 */
+	public void callDoControl(JobStatusData job, boolean autoStart, String operation, IProgressMonitor monitor)
+			throws CoreException {
+		final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
+		final IResourceManagerControl control = rm.getControl();
+		if (checkControl(rm, control, autoStart)) {
+			control.control(job.getJobId(), operation, monitor);
+			maybeUpdateJobState(job, autoStart, monitor);
+		}
+	}
+
+	private boolean checkControl(IResourceManager manager, final IResourceManagerControl control, boolean autoStart)
+			throws CoreException {
+		boolean ok = false;
+		if (control != null) {
+			if (manager.getState().equals(IResourceManager.STARTED_STATE)) {
+				ok = true;
+			} else if (autoStart) {
+				final Job j = new Job(IResourceManager.STARTING_STATE + JobStatusData.COSP + manager.getName()) {
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						try {
+							control.start(monitor);
+						} catch (final CoreException t) {
+							return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				j.schedule();
+
+				try {
+					j.join();
+				} catch (final InterruptedException ignored) {
+				}
+
+				ok = j.getResult().getSeverity() == IStatus.OK;
+			}
+		}
+		return ok;
+	}
+
+	/**
+	 * 
+	 * @param tableViewer
+	 * @param fSelected
+	 */
+	private void createColumns() {
+		// Creating the columns
+		if (fSelectedLguiItem.isLayout()) {
+			return;
+		}
+		final TreeColumn treeColumnImage = new TreeColumn(tree, SWT.LEAD, 0);
+		treeColumnImage.setWidth(40);
+		treeColumnImage.setMoveable(true);
+		treeColumnImage.setResizable(false);
+
+		treeColumns = new TreeColumn[fSelectedLguiItem.getTableHandler().getNumberOfTableColumns(gid)];
+		sizeViewer = composite.getSize().x - 70;
+		final ITableColumnLayout[] tableColumnLayouts = fSelectedLguiItem.getTableHandler().getTableColumnLayout(gid, sizeViewer);
+
+		for (int i = 0; i < tableColumnLayouts.length; i++) {
+			final TreeColumn treeColumn = new TreeColumn(tree, getColumnAlignment(tableColumnLayouts[i].getStyle()));
+
+			treeColumn.setText(tableColumnLayouts[i].getTitle());
+			treeColumn.setWidth(tableColumnLayouts[i].getWidth());
+			treeColumn.setMoveable(true);
+			treeColumns[i] = treeColumn;
+		}
+
+		// Sorting of every column
+		final Listener sortListener = new Listener() {
+			public void handleEvent(Event e) {
+				final TreeColumn currentColumn = (TreeColumn) e.widget;
+
+				if (tree.getSortColumn() == currentColumn) {
+					tree.setSortDirection(tree.getSortDirection() == SWT.UP ? SWT.DOWN : SWT.UP);
+				} else {
+					tree.setSortColumn(currentColumn);
+					tree.setSortDirection(SWT.UP);
+				}
+				int sortIndex = 0;
+				for (int i = 0; i < treeColumns.length; i++) {
+					if (treeColumns[i] == tree.getSortColumn()) {
+						sortIndex = i;
+					}
+				}
+				fSelectedLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, tree.getSortDirection());
+				tree.setSortDirection(tree.getSortDirection());
+				lmlManager.sortLgui();
+			}
+		};
+		for (final TreeColumn treeColumn : treeColumns) {
+			treeColumn.addListener(SWT.Selection, sortListener);
+		}
+
+		// Mouse action (in combination with nodedisplay)
+		tree.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDown(MouseEvent e) {
+				if (e.button == 1) {
+					final TreeItem item = tree.getItem(new Point(e.x, e.y));
+					lmlManager.markObject(item.getData().toString());
+				}
+			}
+
+			@Override
+			public void mouseUp(MouseEvent e) {
+				if (e.button == 1) {
+					final TreeItem item = tree.getItem(new Point(e.x, e.y));
+					lmlManager.unmarkObject(item.getData().toString());
+				}
+			}
+
+		});
+		tree.addMouseMoveListener(new MouseMoveListener() {
+
+			public void mouseMove(MouseEvent e) {
+
+				final TreeItem item = tree.getItem(new Point(e.x, e.y));
+				if (item == null) {
+					return;
+				}
+
+				if (selectedItem != null && !selectedItem.equals(item)) {
+					lmlManager.unselectObject(selectedItem.getData().toString());
+				}
+				selectedItem = item;
+				lmlManager.selectObject(selectedItem.getData().toString());
+			}
+
+		});
+		tree.addMouseTrackListener(new MouseTrackListener() {
+
+			public void mouseEnter(MouseEvent e) {
+
+			}
+
+			public void mouseExit(MouseEvent e) {
+				if (selectedItem != null) {
+					lmlManager.unselectObject(selectedItem.getData().toString());
+					selectedItem = null;
+				}
+			}
+
+			public void mouseHover(MouseEvent e) {
+
+			}
+		});
+
+	}
+
+	/**
+	 * Creating a view menu.
+	 */
+	private void createMenu() {
+		final IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
+
+		final IMenuManager subMenuShow = new MenuManager("Show column...");
+		final String[] columnNonActive = fSelectedLguiItem.getTableHandler().getTableColumnNonActive(gid);
+		for (final String column : columnNonActive) {
+			final IAction action = new ShowTableColumnAction(gid, column, this);
+			subMenuShow.add(action);
+		}
+		menuManager.add(subMenuShow);
+
+		final IMenuManager subMenuHide = new MenuManager("Hide column...");
+		final String[] columnActive = fSelectedLguiItem.getTableHandler().getTableColumnActive(gid);
+		for (final String column : columnActive) {
+			final IAction action = new HideTableColumnAction(gid, column, this);
+			subMenuHide.add(action);
+		}
+		menuManager.add(subMenuHide);
+
+		getViewSite().getActionBars().updateActionBars();
+	}
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -231,21 +406,13 @@ public class TableView extends LMLViewPart {
 			public void dispose() {
 			}
 
-			public boolean isLabelProperty(Object element, String property) {
-				return false;
-			}
-
-			public void removeListener(ILabelProviderListener listener) {
-
-			}
-
 			public Image getColumnImage(Object element, int columnIndex) {
 				if (columnIndex == 0) {
-					Display display = treeColumns[columnIndex].getDisplay();
-					Image image = new Image(display, 12, 12);
-					GC gc = new GC(image);
-					if (selectedOid == null || ((Row) element).oid.equals(selectedOid)) {
-						LMLColor color = ((Row) element).color;
+					final Display display = treeColumns[columnIndex].getDisplay();
+					final Image image = new Image(display, 12, 12);
+					final GC gc = new GC(image);
+					if (((Row) element).oid != null && (selectedOid == null || ((Row) element).oid.equals(selectedOid))) {
+						final LMLColor color = ((Row) element).color;
 						gc.setBackground(new Color(display, color.getRed(), color.getGreen(), color.getBlue()));
 					} else {
 						gc.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
@@ -267,18 +434,37 @@ public class TableView extends LMLViewPart {
 				return ((Row) element).cells[columnIndex - 1].toString();
 			}
 
+			public boolean isLabelProperty(Object element, String property) {
+				return false;
+			}
+
+			public void removeListener(ILabelProviderListener listener) {
+
+			}
+
 		});
-		
+
 		viewer.setContentProvider(new ILazyTreeContentProvider() {
-			
+
 			private Row[] rows;
 
 			public void dispose() {
 
 			}
 
+			public Object getParent(Object element) {
+				if (element instanceof Cell) {
+					return ((Cell) element).row;
+				}
+				return rows;
+			}
+
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 				this.rows = (Row[]) newInput;
+			}
+
+			public void updateChildCount(Object element, int currentChildCount) {
+
 			}
 
 			public void updateElement(Object parent, int index) {
@@ -291,17 +477,6 @@ public class TableView extends LMLViewPart {
 				viewer.replace(parent, index, element);
 				updateChildCount(element, -1);
 
-			}
-
-			public void updateChildCount(Object element, int currentChildCount) {
-
-			}
-
-			public Object getParent(Object element) {
-				if (element instanceof Cell) {
-					return ((Cell) element).row;
-				}
-				return rows;
 			}
 		});
 		lmlManager.addListener(lmlListener, this.getClass().getName());
@@ -319,7 +494,7 @@ public class TableView extends LMLViewPart {
 		});
 
 		viewer.setUseHashlookup(true);
-		
+
 	}
 
 	private void createTable() {
@@ -336,211 +511,28 @@ public class TableView extends LMLViewPart {
 		setViewerInput();
 
 		// Part for the controlling Monitor - context menu
-		MenuManager contextMenu = new MenuManager();
+		final MenuManager contextMenu = new MenuManager();
 		contextMenu.setRemoveAllWhenShown(true);
-		Control control = viewer.getControl();
-		Menu menu = contextMenu.createContextMenu(control);
+		final Control control = viewer.getControl();
+		final Menu menu = contextMenu.createContextMenu(control);
 		control.setMenu(menu);
 		getSite().registerContextMenu(contextMenu, viewer);
 	}
 
-	/**
-	 * 
-	 * @param tableViewer
-	 * @param fSelected
-	 */
-	private void createColumns() {
-		// Creating the columns
-		if (fSelectedLguiItem.isLayout() ) {
-			return;
-		}
-		TreeColumn treeColumnImage = new TreeColumn(tree, SWT.LEAD, 0);
-		treeColumnImage.setWidth(40);
-		treeColumnImage.setMoveable(true);
-		treeColumnImage.setResizable(false);
-
-		treeColumns = new TreeColumn[fSelectedLguiItem.getTableHandler().getNumberOfTableColumns(gid)];
-		sizeViewer = composite.getSize().x - 70;
-		ITableColumnLayout[] tableColumnLayouts = fSelectedLguiItem.getTableHandler().getTableColumnLayout(gid, sizeViewer);
-
-		for (int i = 0; i < tableColumnLayouts.length; i++) {
-			TreeColumn treeColumn = new TreeColumn(tree, getColumnAlignment(tableColumnLayouts[i].getStyle()));
-
-			treeColumn.setText(tableColumnLayouts[i].getTitle());
-			treeColumn.setWidth(tableColumnLayouts[i].getWidth());
-			treeColumn.setMoveable(true);
-			treeColumns[i] = treeColumn;
-		}
-
-		// Sorting of every column
-		Listener sortListener = new Listener() {
-			public void handleEvent(Event e) {
-				TreeColumn currentColumn = (TreeColumn) e.widget;
-
-				if (tree.getSortColumn() == currentColumn) {
-					tree.setSortDirection(tree.getSortDirection() == SWT.UP ? SWT.DOWN : SWT.UP);
-				} else {
-					tree.setSortColumn(currentColumn);
-					tree.setSortDirection(SWT.UP);
-				}
-				int sortIndex = 0;
-				for (int i = 0; i < treeColumns.length; i++) {
-					if (treeColumns[i] == tree.getSortColumn()) {
-						sortIndex = i;
-					}
-				}
-				fSelectedLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, tree.getSortDirection());
-				tree.setSortDirection(tree.getSortDirection());
-				lmlManager.sortLgui();
-			}
-		};
-		for (int i = 0; i < treeColumns.length; i++) {
-			treeColumns[i].addListener(SWT.Selection, sortListener);
-		}
-
-		// Mouse action (in combination with nodedisplay)
-		tree.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseDown(MouseEvent e) {
-				if (e.button == 1) {
-					TreeItem item = tree.getItem(new Point(e.x, e.y));
-					lmlManager.markObject(item.getData().toString());
-				}
-			}
-
-			@Override
-			public void mouseUp(MouseEvent e) {
-				if (e.button == 1) {
-					TreeItem item = tree.getItem(new Point(e.x, e.y));
-					lmlManager.unmarkObject(item.getData().toString());
-				}
-			}
-
-		});
-		tree.addMouseMoveListener(new MouseMoveListener() {
-
-			public void mouseMove(MouseEvent e) {
-
-				TreeItem item = tree.getItem(new Point(e.x, e.y));
-				if (item == null) {
-					return;
-				}
-
-				if (selectedItem != null && !selectedItem.equals(item)) {
-					lmlManager.unselectObject(selectedItem.getData().toString());
-				}
-				selectedItem = item;
-				lmlManager.selectObject(selectedItem.getData().toString());
-			}
-
-		});
-		tree.addMouseTrackListener(new MouseTrackListener() {
-
-			public void mouseHover(MouseEvent e) {
-
-			}
-
-			public void mouseExit(MouseEvent e) {
-				if (selectedItem != null) {
-					lmlManager.unselectObject(selectedItem.getData().toString());
-					selectedItem = null;
-				}
-			}
-
-			public void mouseEnter(MouseEvent e) {
-
-			}
-		});
-
-	}
-
-	/**
-	 * Creating a view menu.
-	 */
-	private void createMenu() {
-		IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
-
-		IMenuManager subMenuShow = new MenuManager("Show column...");
-		String[] columnNonActive = fSelectedLguiItem.getTableHandler().getTableColumnNonActive(gid);
-		for (String column : columnNonActive) {
-			IAction action = new ShowTableColumnAction(gid, column, this);
-			subMenuShow.add(action);
-		}
-		menuManager.add(subMenuShow);
-
-		IMenuManager subMenuHide = new MenuManager("Hide column...");
-		String[] columnActive = fSelectedLguiItem.getTableHandler().getTableColumnActive(gid);
-		for (String column : columnActive) {
-			IAction action = new HideTableColumnAction(gid, column, this);
-			subMenuHide.add(action);
-		}
-		menuManager.add(subMenuHide);
-
-		getViewSite().getActionBars().updateActionBars();
-	}
-
-	@Override
-	public void setFocus() {
-	}
-
-	/**************************************************************************************************************
-	 * Disposing the GUI or the table
-	 **************************************************************************************************************/
-
-	@Override
-	public void prepareDispose() {
-		if (viewer.getInput() != null && fSelectedLguiItem != null) {
-			fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(), gid);
-			fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, removingColumn(tree.getColumnOrder()));
-		}
-		lmlManager.removeListener(lmlListener);
-	}
-
 	private void disposeTable() {
 		if (fSelectedLguiItem != null) {
-			TreeColumn[] oldColumns = tree.getColumns();
-			for (int i = 0; i < oldColumns.length; i++) {
-				Listener[] oldListeners = oldColumns[i].getListeners(SWT.Selection);
-				for (int j = 0; j < oldListeners.length; j++) {
-					oldColumns[i].removeListener(SWT.Selection, oldListeners[j]);
+			final TreeColumn[] oldColumns = tree.getColumns();
+			for (final TreeColumn oldColumn : oldColumns) {
+				final Listener[] oldListeners = oldColumn.getListeners(SWT.Selection);
+				for (final Listener oldListener : oldListeners) {
+					oldColumn.removeListener(SWT.Selection, oldListener);
 				}
-				oldColumns[i].dispose();
+				oldColumn.dispose();
 			}
 			treeColumns = null;
 			this.getViewSite().getActionBars().getMenuManager().removeAll();
-		}	
-		
-	}
-
-	/**************************************************************************************************************
-	 * Methods from MonitorJobListView
-	 **************************************************************************************************************/
-
-	/**
-	 * Delete job status entry and refresh.
-	 * 
-	 * @param jobId
-	 */
-	public void removeJob(String jobId) {
-		jobs.remove(jobId);
-	}
-
-	/**
-	 * Exercises a control operation on the remote job.
-	 * 
-	 * @param job
-	 * @param autoStart
-	 * @param operation
-	 * @throws CoreException
-	 */
-	public void callDoControl(JobStatusData job, boolean autoStart, String operation, IProgressMonitor monitor)
-			throws CoreException {
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
-		IResourceManagerControl control = rm.getControl();
-		if (checkControl(rm, control, autoStart)) {
-			control.control(job.getJobId(), operation, monitor);
-			maybeUpdateJobState(job, autoStart, monitor);
 		}
+
 	}
 
 	/**
@@ -561,32 +553,34 @@ public class TableView extends LMLViewPart {
 			return JobStatusData.ZEROSTR;
 		}
 		final StringBuffer sb = new StringBuffer();
-		Job j = new Job(path) {
+		final Job j = new Job(path) {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-				IResourceManagerControl control = rm.getControl();
-				SubMonitor progress = SubMonitor.convert(monitor, 100);
+				final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+				final IResourceManagerControl control = rm.getControl();
+				final SubMonitor progress = SubMonitor.convert(monitor, 100);
 				try {
 					if (checkControl(rm, control, autoStart)) {
-						String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
+						final String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
 						if (remoteServicesId != null) {
-							IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId,
+							final IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
+									remoteServicesId,
 									progress.newChild(25));
-							IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
-							String remoteConnectionName = control.getControlConfiguration().getConnectionName();
-							IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
-							IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
-							IFileStore lres = remoteFileManager.getResource(path);
-							BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE, progress.newChild(25)));
-							byte[] buffer = new byte[COPY_BUFFER_SIZE];
+							final IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
+							final String remoteConnectionName = control.getControlConfiguration().getConnectionName();
+							final IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
+							final IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
+							final IFileStore lres = remoteFileManager.getResource(path);
+							final BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE,
+									progress.newChild(25)));
+							final byte[] buffer = new byte[COPY_BUFFER_SIZE];
 							int rcvd = 0;
 							try {
 								while (true) {
 									try {
 										rcvd = is.read(buffer, 0, COPY_BUFFER_SIZE);
-									} catch (EOFException eof) {
+									} catch (final EOFException eof) {
 										break;
 									}
 
@@ -601,14 +595,14 @@ public class TableView extends LMLViewPart {
 							} finally {
 								try {
 									is.close();
-								} catch (IOException ioe) {
+								} catch (final IOException ioe) {
 									ioe.printStackTrace();
 								}
 								monitor.done();
 							}
 						}
 					}
-				} catch (Throwable t) {
+				} catch (final Throwable t) {
 					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
 				}
 				return Status.OK_STATUS;
@@ -619,73 +613,33 @@ public class TableView extends LMLViewPart {
 
 		try {
 			j.join();
-		} catch (InterruptedException ignored) {
+		} catch (final InterruptedException ignored) {
 		}
 
 		return sb.toString();
 	}
 
-	/**
-	 * 
-	 * @param job
-	 * @param autoStart
-	 * @param monitor
-	 * @throws CoreException
-	 */
-	public void maybeUpdateJobState(JobStatusData job, boolean autoStart, IProgressMonitor monitor) throws CoreException {
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
-		IResourceManagerControl control = rm.getControl();
-		if (checkControl(rm, control, autoStart)) {
-			IJobStatus refreshed = control.getJobStatus(job.getJobId(), monitor);
-			job.updateState(refreshed);
-			maybeCheckFiles(job);
-			refresh();
+	private int getColumnAlignment(String alignment) {
+		if (alignment.equals("LEFT")) {
+			return SWT.LEAD;
 		}
+		if (alignment.equals("RIGHT")) {
+			return SWT.TRAIL;
+		}
+		return SWT.LEAD;
 	}
 
-	/**
-	 * Refresh the viewer.
-	 */
-	public void refresh() {
-		new UIJob(Messages.JobListUpdate) {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				viewer.setInput(jobs.values());
-				viewer.refresh();
-				return Status.OK_STATUS;
-			}
-		}.schedule();
+	public int[] getRemoveColumnOrder() {
+		return removingColumn(tree.getColumnOrder());
 	}
 
-	private boolean checkControl(IResourceManager manager, final IResourceManagerControl control, boolean autoStart)
-			throws CoreException {
-		boolean ok = false;
-		if (control != null) {
-			if (manager.getState().equals(IResourceManager.STARTED_STATE)) {
-				ok = true;
-			} else if (autoStart) {
-				Job j = new Job(IResourceManager.STARTING_STATE + JobStatusData.COSP + manager.getName()) {
-					@Override
-					protected IStatus run(IProgressMonitor monitor) {
-						try {
-							control.start(monitor);
-						} catch (CoreException t) {
-							return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				j.schedule();
-
-				try {
-					j.join();
-				} catch (InterruptedException ignored) {
-				}
-
-				ok = j.getResult().getSeverity() == IStatus.OK;
-			}
+	public Double[] getWidths() {
+		final Double[] widths = new Double[treeColumns.length];
+		final Double widthColumn = Integer.valueOf(sizeViewer).doubleValue() / treeColumns.length;
+		for (int i = 0; i < treeColumns.length; i++) {
+			widths[i] = widthColumn / treeColumns[i].getWidth();
 		}
-		return ok;
+		return widths;
 	}
 
 	/**
@@ -704,31 +658,66 @@ public class TableView extends LMLViewPart {
 		}
 	}
 
-	/**************************************************************************************************************
-	 * Further needed methods
-	 **************************************************************************************************************/
-
-	private int getColumnAlignment(String alignment) {
-		if (alignment.equals("LEFT")) {
-			return SWT.LEAD;
+	/**
+	 * 
+	 * @param job
+	 * @param autoStart
+	 * @param monitor
+	 * @throws CoreException
+	 */
+	public void maybeUpdateJobState(JobStatusData job, boolean autoStart, IProgressMonitor monitor) throws CoreException {
+		final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
+		final IResourceManagerControl control = rm.getControl();
+		if (checkControl(rm, control, autoStart)) {
+			final IJobStatus refreshed = control.getJobStatus(job.getJobId(), monitor);
+			job.updateState(refreshed);
+			maybeCheckFiles(job);
+			refresh();
 		}
-		if (alignment.equals("RIGHT")) {
-			return SWT.TRAIL;
-		}
-		return SWT.LEAD;
 	}
 
-	public Double[] getWidths() {
-		Double[] widths = new Double[treeColumns.length];
-		Double widthColumn = Integer.valueOf(sizeViewer).doubleValue() / treeColumns.length;
-		for (int i = 0; i < treeColumns.length; i++) {
-			widths[i] = widthColumn / treeColumns[i].getWidth();
+	@Override
+	public void prepareDispose() {
+		if (viewer.getInput() != null && fSelectedLguiItem != null) {
+			fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(), gid);
+			fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, removingColumn(tree.getColumnOrder()));
 		}
-		return widths;
+		lmlManager.removeListener(lmlListener);
+	}
+
+	private void redrawColumns() {
+		sizeViewer = composite.getSize().x - 70;
+		final int[] columnsWidth = fSelectedLguiItem.getTableHandler().getTableColumnsWidth(gid, sizeViewer);
+		for (int i = 0; i < columnsWidth.length; i++) {
+			treeColumns[i].setWidth(columnsWidth[i]);
+		}
+	}
+
+	/**
+	 * Refresh the viewer.
+	 */
+	public void refresh() {
+		new UIJob(Messages.JobListUpdate) {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				viewer.setInput(jobs.values());
+				viewer.refresh();
+				return Status.OK_STATUS;
+			}
+		}.schedule();
+	}
+
+	/**
+	 * Delete job status entry and refresh.
+	 * 
+	 * @param jobId
+	 */
+	public void removeJob(String jobId) {
+		jobs.remove(jobId);
 	}
 
 	private int[] removingColumn(int[] order) {
-		int[] orderNew = new int[order.length - 1];
+		final int[] orderNew = new int[order.length - 1];
 		int dif = 0;
 		for (int i = 0; i < order.length; i++) {
 			if (order[i] != 0) {
@@ -740,22 +729,14 @@ public class TableView extends LMLViewPart {
 		return orderNew;
 	}
 
-	public int[] getRemoveColumnOrder() {
-		return removingColumn(tree.getColumnOrder());
-	}
-
-	private void redrawColumns() {
-		sizeViewer = composite.getSize().x - 70;
-		int[] columnsWidth = fSelectedLguiItem.getTableHandler().getTableColumnsWidth(gid, sizeViewer);
-		for (int i = 0; i < columnsWidth.length; i++) {
-			treeColumns[i].setWidth(columnsWidth[i]);
-		}
+	@Override
+	public void setFocus() {
 	}
 
 	private void setViewerInput() {
 		Row[] input = new Row[0];
 		if (fSelectedLguiItem != null) {
-			input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
+			input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid, fSelectedLguiItem.getUserJobMap(gid));
 		}
 		if (!composite.isDisposed()) {
 			viewer.setInput(input);

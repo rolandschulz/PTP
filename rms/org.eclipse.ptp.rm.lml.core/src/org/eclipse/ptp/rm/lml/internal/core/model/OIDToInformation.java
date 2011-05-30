@@ -58,6 +58,19 @@ public class OIDToInformation extends LguiHandler {
 		});
 	}
 
+	public InfoType getInfoByOid(String oid) {
+		final List<InformationType> listInformation = lguiItem.getOverviewAccess().getInformations();
+		for (final InformationType information : listInformation) {
+			final List<InfoType> listInfo = information.getInfo();
+			for (final InfoType info : listInfo) {
+				if (info.getOid().equals(oid)) {
+					return info;
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Extracts all info-tags from lml-model and saves them in oidtoinfo.
 	 */
@@ -65,30 +78,30 @@ public class OIDToInformation extends LguiHandler {
 
 		oidtoinfo = new HashMap<String, List<InfoType>>();
 
-		List<JAXBElement<?>> alltags = lgui.getObjectsAndRelationsAndInformation();
+		final List<JAXBElement<?>> alltags = lgui.getObjectsAndRelationsAndInformation();
 
-		for (JAXBElement<?> jaxbtag : alltags) {// over all information-tags
+		for (final JAXBElement<?> jaxbtag : alltags) {// over all information-tags
 
-			Object tag = jaxbtag.getValue();
+			final Object tag = jaxbtag.getValue();
 
 			if (!(tag instanceof InformationType)) {
 				continue;
 			}
 
-			InformationType ainfos = (InformationType) tag;
+			final InformationType ainfos = (InformationType) tag;
 
-			List<InfoType> realinfos = ainfos.getInfo();
+			final List<InfoType> realinfos = ainfos.getInfo();
 
-			for (InfoType ainfo : realinfos) { // over all info-tags
-												// (information/info)
+			for (final InfoType ainfo : realinfos) { // over all info-tags
+				// (information/info)
 
-				String oid = ainfo.getOid();
+				final String oid = ainfo.getOid();
 
 				if (oidtoinfo.containsKey(oid)) {// Already list existent
-					List<InfoType> oldlist = oidtoinfo.get(oid);
+					final List<InfoType> oldlist = oidtoinfo.get(oid);
 					oldlist.add(ainfo);
 				} else {// new list for oid
-					ArrayList<InfoType> newlist = new ArrayList<InfoType>();
+					final ArrayList<InfoType> newlist = new ArrayList<InfoType>();
 					newlist.add(ainfo);
 					oidtoinfo.put(oid, newlist);
 				}
@@ -96,63 +109,6 @@ public class OIDToInformation extends LguiHandler {
 
 		}
 
-	}
-
-	/**
-	 * Get all information of passed type defined in the lml-instance. example:
-	 * 
-	 * <pre>
-	 * {@code
-	 * <information>
-	 * 		<info oid="empty" type="short" description="additional infos for this job">
-	 * 			<data key="owner" value="noone" />
-	 * 			<data key="cpus" value="19840" />
-	 * 		</info>
-	 * 		
-	 * 		<info oid="job1" type="short" >
-	 * 			<data key="owner" value="carsten" />
-	 * 			<data key="cpus" value="1024" />
-	 * 		</info>
-	 * 		
-	 * 		<info oid="job1" type="long" >
-	 * 			<data key="owner" value="carsten" />
-	 * 			<data key="cpus" value="1024" />
-	 * 			<data key="starttime" value="05.04.2011" />
-	 * 			<data key="endtime" value="06.04.2011" />
-	 * 		</info>
-	 * 		
-	 * 		</information>
-	 * 		
-	 * }
-	 * </pre>
-	 * 
-	 * getInfosByType( "job1", "short") returns the second info-tag
-	 * getInfosByType( "empty", "short") returns the first info-tag
-	 * 
-	 * 
-	 * @param id
-	 *            identification for an object
-	 * @param type
-	 *            type of information
-	 * @return all infos of a type for object with given id, null if no infos
-	 *         there, empty list if no infos with this type exist
-	 */
-	public List<InfoType> getInfosByType(String id, String type) {
-
-		List<InfoType> allinfos = getInfosById(id);
-		if (allinfos == null) {
-			return null;
-		}
-
-		List<InfoType> res = new ArrayList<InfoType>();
-		// Get only infos with specific type
-		for (InfoType ainfo : allinfos) {
-			if (ainfo.getType().equals(type)) {
-				res.add(ainfo);
-			}
-		}
-
-		return res;
 	}
 
 	/**
@@ -199,6 +155,63 @@ public class OIDToInformation extends LguiHandler {
 	}
 
 	/**
+	 * Get all information of passed type defined in the lml-instance. example:
+	 * 
+	 * <pre>
+	 * {@code
+	 * <information>
+	 * 		<info oid="empty" type="short" description="additional infos for this job">
+	 * 			<data key="owner" value="noone" />
+	 * 			<data key="cpus" value="19840" />
+	 * 		</info>
+	 * 		
+	 * 		<info oid="job1" type="short" >
+	 * 			<data key="owner" value="carsten" />
+	 * 			<data key="cpus" value="1024" />
+	 * 		</info>
+	 * 		
+	 * 		<info oid="job1" type="long" >
+	 * 			<data key="owner" value="carsten" />
+	 * 			<data key="cpus" value="1024" />
+	 * 			<data key="starttime" value="05.04.2011" />
+	 * 			<data key="endtime" value="06.04.2011" />
+	 * 		</info>
+	 * 		
+	 * 		</information>
+	 * 		
+	 * }
+	 * </pre>
+	 * 
+	 * getInfosByType( "job1", "short") returns the second info-tag
+	 * getInfosByType( "empty", "short") returns the first info-tag
+	 * 
+	 * 
+	 * @param id
+	 *            identification for an object
+	 * @param type
+	 *            type of information
+	 * @return all infos of a type for object with given id, null if no infos
+	 *         there, empty list if no infos with this type exist
+	 */
+	public List<InfoType> getInfosByType(String id, String type) {
+
+		final List<InfoType> allinfos = getInfosById(id);
+		if (allinfos == null) {
+			return null;
+		}
+
+		final List<InfoType> res = new ArrayList<InfoType>();
+		// Get only infos with specific type
+		for (final InfoType ainfo : allinfos) {
+			if (ainfo.getType().equals(type)) {
+				res.add(ainfo);
+			}
+		}
+
+		return res;
+	}
+
+	/**
 	 * Call this method, if lml-model changed. The new model is passed to this
 	 * handler. All getter-functions accessing the handler will then return
 	 * data, which is collected from this new model
@@ -211,4 +224,5 @@ public class OIDToInformation extends LguiHandler {
 
 		getInformationFromModel();
 	}
+
 }

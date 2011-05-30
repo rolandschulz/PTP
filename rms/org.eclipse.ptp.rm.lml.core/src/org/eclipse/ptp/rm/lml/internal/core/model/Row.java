@@ -7,25 +7,30 @@ public class Row {
 	public JobStatusData status = null;
 	public LMLColor color = null;
 	public Cell[] cells;
-	
-	public Row(String oid) {
-		this.oid = oid;
+
+	public Row() {
+
 	}
-	
-	public String toString() {
-		return oid;
-	}
-	
-	public void setJobStatusData(JobStatusData status) {
-		this.status = status;
-	}
-	
+
 	public void setCells(Cell[] cells) {
 		this.cells = cells;
 	}
-	
-	public void  setColor(LMLColor color) {
+
+	public void setColor(LMLColor color) {
 		this.color = color;
+	}
+
+	public void setJobStatusData(JobStatusData status) {
+		this.status = status;
+	}
+
+	public void setOid(String oid) {
+		this.oid = oid;
+	}
+
+	@Override
+	public String toString() {
+		return oid;
 	}
 
 }

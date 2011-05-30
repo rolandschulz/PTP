@@ -13,7 +13,7 @@ package org.eclipse.ptp.rm.lml.core.model;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
+import java.util.Map;
 
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.internal.core.model.LayoutAccess;
@@ -23,80 +23,73 @@ import org.eclipse.ptp.rm.lml.internal.core.model.OIDToObject;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus;
 import org.eclipse.ptp.rm.lml.internal.core.model.OverviewAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.TableHandler;
-import org.eclipse.ptp.rmsystem.IJobStatus;
-import org.eclipse.ui.IMemento;
-
+import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 
 /**
- * Interface to manage the handling of an LguiType. It helps to work with LguiType without knowing the exact build of LguiType. 
- * @author Claudia Knobloch
+ * Interface to manage the handling of an LguiType. It helps to work with LguiType without knowing the exact build of LguiType.
  */
-public interface ILguiItem  {
-//	
-//	/**
-//	 * Getting the source of the XML file from whcih the corresponding LguiType has been generated. 
-//	 * @return the source of the XML file
-//	 */
-//	public URI getXmlFile();
-//	
-	/**
-	 * Getting a string representing the ILguiItem.
-	 * @return string 
-	 */
-	public String toString();
-	
+public interface ILguiItem {
+	public void addListener(ILguiListener listener);
+
+	public void addUserJob(String name, JobStatusData status);
+
+	public void getCurrentLayout(OutputStream output);
+
+	public LayoutAccess getLayoutAccess();
+
+	public NodedisplayAccess getNodedisplayAccess();
+
+	public ObjectStatus getObjectStatus();
+
+	public OIDToInformation getOIDToInformation();
+
+	public OIDToObject getOIDToObject();
+
+	public OverviewAccess getOverviewAccess();
+
+	public void getRequestXml(FileOutputStream output);
+
+	public TableHandler getTableHandler();
+
+	public Map<String, String> getUserJobMap(String gid);
+
 	/**
 	 * Getting the version of the LguiType:
+	 * 
 	 * @return version of the LguiType
 	 */
 	public String getVersion();
-	
+
+	public boolean isEmpty();
+
 	/**
 	 * Checking if any layout is present.
-	 * @return 
+	 * 
+	 * @return
 	 */
 	public boolean isLayout();
-	
-	public TableHandler getTableHandler();
-	
-	public OverviewAccess getOverviewAccess();
-	
-	public  void addListener(ILguiListener listener);
-	
-	public OIDToObject getOIDToObject();
-	
-	public ObjectStatus getObjectStatus();
-	
-	public OIDToInformation getOIDToInformation();
-	
-	public NodedisplayAccess getNodedisplayAccess();
-	
-	public LayoutAccess getLayoutAccess();
-	
+
+	public void removeUserJob(String name);
+
+	public void restoreUserJobs(Map<String, JobStatusData> map);
+
+	//
+	// /**
+	// * Getting the source of the XML file from whcih the corresponding LguiType has been generated.
+	// * @return the source of the XML file
+	// */
+	// public URI getXmlFile();
+	//
 	/**
-	 * Inform all listeners, that something changed in the data-model.
-	 * Handlers should use this event to update their model-references.
-	 * Otherwise inconsistent return-values will be the result.
+	 * Getting a string representing the ILguiItem.
+	 * 
+	 * @return string
 	 */
-	public void updateData();
-//	
-//	public void updateXML();
-//	
+	public String toString();
+
 	public void update(InputStream stream);
-	
-	public void getRequestXml(FileOutputStream output);
-	
-	public void addJob(IJobStatus jobStatus);
-	
-	public void updateJob(IJobStatus jobStatus);
-	
-	public void removeJob(IJobStatus jobStatus);
-	
-	public void getCurrentLayout(OutputStream output);
-	
-	public boolean isEmpty();
-	
-	public void save(IMemento memento);
-	
-	public void restore(IMemento memento);
+
+	public boolean update(String name, JobStatusData status);
+
+	public void updateData();
 }
