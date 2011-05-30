@@ -736,7 +736,7 @@ public class TableView extends LMLViewPart {
 	private void setViewerInput() {
 		Row[] input = new Row[0];
 		if (fSelectedLguiItem != null) {
-			input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid, fSelectedLguiItem.getUserJobMap(gid));
+			input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
 		}
 		if (!composite.isDisposed()) {
 			viewer.setInput(input);
