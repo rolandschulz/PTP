@@ -38,6 +38,9 @@ public class ButtonGroupUpdateModel extends AbstractUpdateModel implements Selec
 	 * @param name
 	 *            name of the model, which will correspond to the name of a
 	 *            Property or Attribute if the widget value is to be saved.
+	 * @param linkUpdateTo
+	 *            if a change in this property or attribute value overwrites
+	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
@@ -47,8 +50,9 @@ public class ButtonGroupUpdateModel extends AbstractUpdateModel implements Selec
 	 * @param button
 	 *            the button widgets to which this model corresponds
 	 */
-	public ButtonGroupUpdateModel(String name, ValueUpdateHandler handler, Composite control, List<Button> buttons) {
-		super(name, handler);
+	public ButtonGroupUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler, Composite control,
+			List<Button> buttons) {
+		super(name, linkUpdateTo, handler);
 		this.control = control;
 		this.buttons = buttons;
 		for (Button b : buttons) {
@@ -139,6 +143,7 @@ public class ButtonGroupUpdateModel extends AbstractUpdateModel implements Selec
 			}
 		}
 		lastSelected = selected;
-		storeValue();
+		Object value = storeValue();
+		handleUpdate(value);
 	}
 }

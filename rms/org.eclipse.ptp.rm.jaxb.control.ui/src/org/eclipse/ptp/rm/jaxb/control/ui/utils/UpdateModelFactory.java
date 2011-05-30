@@ -13,7 +13,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -83,6 +82,7 @@ public class UpdateModelFactory {
 	 */
 	private static class CellDescriptor {
 		private String name;
+		private List<String> linkUpdateTo;
 		private String tooltip;
 		private String description;
 		private String choice;
@@ -117,10 +117,12 @@ public class UpdateModelFactory {
 					tooltip = WidgetBuilderUtils.removeTabOrLineBreak(tooltip);
 				}
 				description = a.getDescription();
+				linkUpdateTo = a.getLinkUpdateTo();
 			} else if (data instanceof PropertyType) {
 				PropertyType p = (PropertyType) data;
 				name = p.getName();
 				readOnly = p.isReadOnly();
+				linkUpdateTo = p.getLinkUpdateTo();
 			}
 			if (description == null) {
 				description = JAXBControlUIConstants.ZEROSTR;
@@ -241,7 +243,9 @@ public class UpdateModelFactory {
 	 * 
 	 */
 	private static class ControlDescriptor {
+		private String widgetType;
 		private String title;
+		private List<String> linkUpdateTo;
 		private Object layoutData;
 		private Object subLayoutData;
 		private boolean readOnly;
@@ -278,6 +282,7 @@ public class UpdateModelFactory {
 		 *            JAXB data element describing widget
 		 */
 		private void setControlData(WidgetType widget) {
+			widgetType = widget.getType();
 			title = widget.getTitle();
 			LayoutDataType layout = widget.getLayoutData();
 			layoutData = LaunchTabBuilder.createLayoutData(layout);
@@ -299,10 +304,11 @@ public class UpdateModelFactory {
 		}
 
 		/**
-		 * Get the choice (Combo), min and max (Spinner) settings.
+		 * Get the choice (Combo), min and max (Spinner) settings, and
+		 * linkUpdateTo names.
 		 * 
 		 * @param data
-		 *            Attribute
+		 *            Attribute or Property
 		 */
 		private void setData(Object data) {
 			if (data instanceof AttributeType) {
@@ -310,6 +316,10 @@ public class UpdateModelFactory {
 				choice = a.getChoice();
 				min = a.getMin();
 				max = a.getMax();
+				linkUpdateTo = a.getLinkUpdateTo();
+			} else if (data instanceof PropertyType) {
+				PropertyType p = (PropertyType) data;
+				linkUpdateTo = p.getLinkUpdateTo();
 			}
 		}
 
@@ -331,18 +341,16 @@ public class UpdateModelFactory {
 			if (fixedText != null) {
 				fixedText = rmMap.getString(fixedText);
 			}
-
-			Map<String, Object> vars = rmMap.getVariables();
 			String s = widget.getSaveValueTo();
 			if (s != null) {
-				Object data = vars.get(s);
+				Object data = rmMap.get(s);
 				if (data != null) {
 					setData(data);
 				}
 			}
 			s = widget.getItemsFrom();
 			if (s != null) {
-				Object data = vars.get(s);
+				Object data = rmMap.get(s);
 				if (data != null) {
 					setValueListData(data);
 				}
@@ -395,14 +403,24 @@ public class UpdateModelFactory {
 		List<WidgetType> bWidgets = bGroupDescriptor.getButton();
 		List<Button> buttons = new ArrayList<Button>();
 		for (WidgetType widget : bWidgets) {
-			Control control = createControl(bGroup, widget, tab, rmVarMap);
+			ControlDescriptor cd = new ControlDescriptor(widget, rmVarMap);
+			Control control = createControl(bGroup, cd, tab);
 			if (control instanceof Button) {
 				buttons.add((Button) control);
 			}
 		}
 		String name = bGroupDescriptor.getSaveValueTo();
+		List<String> linkUpdateTo = null;
+		if (name != null) {
+			Object o = rmVarMap.get(name);
+			if (o instanceof PropertyType) {
+				linkUpdateTo = ((PropertyType) o).getLinkUpdateTo();
+			} else if (o instanceof AttributeType) {
+				linkUpdateTo = ((AttributeType) o).getLinkUpdateTo();
+			}
+		}
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
-		return new ButtonGroupUpdateModel(name, handler, bGroup, buttons);
+		return new ButtonGroupUpdateModel(name, linkUpdateTo, handler, bGroup, buttons);
 	}
 
 	/**
@@ -443,7 +461,8 @@ public class UpdateModelFactory {
 	 */
 	public static IUpdateModel createModel(Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab,
 			IVariableMap rmVarMap) {
-		Control control = createControl(parent, widget, tab, rmVarMap);
+		ControlDescriptor cd = new ControlDescriptor(widget, rmVarMap);
+		Control control = createControl(parent, cd, tab);
 		if (control instanceof Label) {
 			return null;
 		}
@@ -460,17 +479,17 @@ public class UpdateModelFactory {
 		IUpdateModel model = null;
 		if (control instanceof Text) {
 			if (name != null && !JAXBControlUIConstants.ZEROSTR.equals(name)) {
-				model = new TextUpdateModel(name, handler, (Text) control);
+				model = new TextUpdateModel(name, cd.linkUpdateTo, handler, (Text) control);
 			}
 			if (dynamic != null) {
 				model = new TextUpdateModel(dynamic, handler, (Text) control);
 			}
 		} else if (control instanceof Combo) {
-			model = new ComboUpdateModel(name, handler, (Combo) control);
+			model = new ComboUpdateModel(name, cd.linkUpdateTo, handler, (Combo) control);
 		} else if (control instanceof Spinner) {
-			model = new SpinnerUpdateModel(name, handler, (Spinner) control);
+			model = new SpinnerUpdateModel(name, cd.linkUpdateTo, handler, (Spinner) control);
 		} else if (control instanceof Button) {
-			model = new ButtonUpdateModel(name, handler, (Button) control, widget.getTranslateBooleanAs());
+			model = new ButtonUpdateModel(name, cd.linkUpdateTo, handler, (Button) control, widget.getTranslateBooleanAs());
 		}
 
 		if (name != null && !JAXBUIConstants.ZEROSTR.equals(name)) {
@@ -601,35 +620,32 @@ public class UpdateModelFactory {
 	 * 
 	 * @param parent
 	 *            to which the control belongs
-	 * @param widget
-	 *            JAXB data element describing the widget
+	 * @param cd
+	 *            control descriptor for the JAXB data element describing the
+	 *            widget
 	 * @param tab
 	 *            launch tab being built
 	 * @return the resulting control (<code>null</code> if the widget is a
 	 *         Label).
 	 */
-	private static Control createControl(final Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab,
-			IVariableMap rmVarMap) {
-		ControlDescriptor cd = new ControlDescriptor(widget, rmVarMap);
-		String type = widget.getType();
-
+	private static Control createControl(final Composite parent, ControlDescriptor cd, JAXBDynamicLaunchConfigurationTab tab) {
 		Control c = null;
-		if (JAXBControlUIConstants.LABEL.equals(type)) {
+		if (JAXBControlUIConstants.LABEL.equals(cd.widgetType)) {
 			c = WidgetBuilderUtils.createLabel(parent, cd.fixedText, cd.style, cd.layoutData);
-		} else if (JAXBControlUIConstants.TEXT.equals(type)) {
+		} else if (JAXBControlUIConstants.TEXT.equals(cd.widgetType)) {
 			c = createText(parent, cd);
-		} else if (JAXBControlUIConstants.RADIOBUTTON.equals(type)) {
+		} else if (JAXBControlUIConstants.RADIOBUTTON.equals(cd.widgetType)) {
 			if (cd.style == SWT.NONE) {
 				cd.style = SWT.RADIO | SWT.LEFT;
 			}
 			c = WidgetBuilderUtils.createRadioButton(parent, cd.style, cd.title, null, null);
-		} else if (JAXBControlUIConstants.CHECKBOX.equals(type)) {
+		} else if (JAXBControlUIConstants.CHECKBOX.equals(cd.widgetType)) {
 			c = WidgetBuilderUtils.createCheckButton(parent, cd.title, null);
-		} else if (JAXBControlUIConstants.SPINNER.equals(type)) {
+		} else if (JAXBControlUIConstants.SPINNER.equals(cd.widgetType)) {
 			c = WidgetBuilderUtils.createSpinner(parent, cd.layoutData, cd.title, cd.min, cd.max, cd.min, null);
-		} else if (JAXBControlUIConstants.COMBO.equals(type)) {
+		} else if (JAXBControlUIConstants.COMBO.equals(cd.widgetType)) {
 			c = createCombo(parent, cd);
-		} else if (JAXBControlUIConstants.BROWSE.equals(type)) {
+		} else if (JAXBControlUIConstants.BROWSE.equals(cd.widgetType)) {
 			c = createBrowse(parent, cd, tab);
 		}
 
@@ -724,9 +740,9 @@ public class UpdateModelFactory {
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		ICellEditorUpdateModel model = null;
 		if (data instanceof AttributeType) {
-			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, (AttributeType) data);
+			model = new TableRowUpdateModel(cd.name, cd.linkUpdateTo, handler, editor, cd.items, cd.readOnly, (AttributeType) data);
 		} else if (data instanceof PropertyType) {
-			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly);
+			model = new TableRowUpdateModel(cd.name, cd.linkUpdateTo, handler, editor, cd.items, cd.readOnly);
 		}
 		if (model != null) {
 			model.setBackground(cd.background);
@@ -763,9 +779,10 @@ public class UpdateModelFactory {
 		Object[] properties = viewer.getColumnProperties();
 		boolean inValueCol = properties.length == 2;
 		if (data instanceof AttributeType) {
-			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, inValueCol, (AttributeType) data);
+			model = new ValueTreeNodeUpdateModel(cd.name, cd.linkUpdateTo, handler, editor, cd.items, cd.readOnly, inValueCol,
+					(AttributeType) data);
 		} else if (data instanceof PropertyType) {
-			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, inValueCol);
+			model = new ValueTreeNodeUpdateModel(cd.name, cd.linkUpdateTo, handler, editor, cd.items, cd.readOnly, inValueCol);
 		}
 		if (model != null) {
 			model.setBackground(cd.background);

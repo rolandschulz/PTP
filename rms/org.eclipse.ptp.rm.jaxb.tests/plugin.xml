@@ -7,6 +7,10 @@
             configurationFile="data/tabbed-example.xml"
             name="Tabbed Example">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/pbs-test-local.xml"
+            name="PBS Local Test">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>

@@ -82,7 +82,8 @@ import org.eclipse.ui.progress.IProgressConstants;
 public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl {
 
 	/*
-	 * copied from AbstractToolRuntimeSystem
+	 * copied from AbstractToolRuntimeSystem; the RM should shut down when the
+	 * remote connection is closed
 	 */
 	private class ConnectionChangeListener implements IRemoteConnectionChangeListener {
 		public ConnectionChangeListener() {
@@ -936,6 +937,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		IRemoteConnection rc = getRemoteServicesDelegate(monitor).getRemoteConnection();
 		rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
 		rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
+		rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
 	}
 
 	/**

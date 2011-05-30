@@ -20,6 +20,9 @@
 		<property name="path2" visible="true"/>
 		<property name="path3" visible="true"/>
 		<property name="path4" visible="true"/>
+		<property name="linked" visible="true">
+		 <default>${ptp_rm:Resource_List.walltime#value}</default>
+		</property>
 		<attribute name="saveFiles" type="integer">
 			<description>Does nothing; for testing boolean value translation.</description>
 		</attribute>
@@ -90,6 +93,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<line>
 				<arg>path4 = ${ptp_rm:path4#value}</arg>
 			</line>
+			<line>
+            <arg>linked = ${ptp_rm:linked#value}</arg>
+         </line>
 		</script>
 		<submit-interactive name="submit-interactive">
 			<arg>echo</arg>
@@ -361,6 +367,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<include>e3</include>
 							<include>e4</include>
 							<include>e5</include>
+							<include>linked</include>
 						</items>
 						<value pattern="export @name='@value'" separator="; "/>
 					</viewer>

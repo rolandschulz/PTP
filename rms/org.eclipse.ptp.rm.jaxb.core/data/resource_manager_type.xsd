@@ -51,6 +51,7 @@
 				<!-- from runtime configuration information -->
 				control.user.name
 				control.address
+				control.working.dir
 				<!-- from the other Run Configuration tabs -->
 				executablePath
 				progArgs
@@ -130,6 +131,14 @@
 		<xs:sequence>
 			<xs:element name="default" minOccurs="0" type="xs:string"/>
 			<xs:element name="value" minOccurs="0"/>
+			<xs:element name="link-update-to" minOccurs="0" maxOccurs="unbounded" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						A change in the value of this property is propagated to the indicated properties or attributes such that their
+						current value is overwritten by it.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="type" type="xs:string" default="java.lang.String"/>
@@ -183,6 +192,14 @@
 			</xs:element>
 			<xs:element name="default" minOccurs="0" type="xs:string"/>
 			<xs:element name="value" minOccurs="0"/>
+			<xs:element name="link-update-to" minOccurs="0" maxOccurs="unbounded" type="xs:string">
+            <xs:annotation>
+               <xs:documentation>
+                  A change in the value of this attribute is propagated to the indicated properties or attributes such that their
+                  current value is overwritten by it.
+               </xs:documentation>
+            </xs:annotation>
+         </xs:element>
 			<xs:element name="validator" minOccurs="0" type="rm:validator-type">
 				<xs:annotation>
 					<xs:documentation>
@@ -622,7 +639,7 @@
 		<xs:attribute name="spacing" type="xs:int"/>
 	</xs:complexType>
 	<xs:complexType name="row-layout-type">
-	   <xs:attribute name="type" type="xs:string"/>
+		<xs:attribute name="type" type="xs:string"/>
 		<xs:attribute name="center" type="xs:boolean" default="false"/>
 		<xs:attribute name="justify" type="xs:boolean" default="false"/>
 		<xs:attribute name="fill" type="xs:boolean" default="false"/>

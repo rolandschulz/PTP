@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
+import java.util.List;
+
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.swt.events.SelectionEvent;
@@ -30,6 +32,9 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 	 * @param name
 	 *            name of the model, which will correspond to the name of a
 	 *            Property or Attribute if the widget value is to be saved.
+	 * @param linkUpdateTo
+	 *            if a change in this property or attribute value overwrites
+	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
@@ -39,8 +44,9 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 	 *            a comma-delimite pair of strings corresponding to T,F to use
 	 *            as the value instead of the boolean (can be <code>null</code>)
 	 */
-	public ButtonUpdateModel(String name, ValueUpdateHandler handler, Button button, String translateBooleanAs) {
-		super(name, handler);
+	public ButtonUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler, Button button,
+			String translateBooleanAs) {
+		super(name, linkUpdateTo, handler);
 		this.button = button;
 		button.addSelectionListener(this);
 		if (translateBooleanAs == null) {
@@ -123,6 +129,7 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 		if (refreshing) {
 			return;
 		}
-		storeValue();
+		Object value = storeValue();
+		handleUpdate(value);
 	}
 }

@@ -50,16 +50,9 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final String EXPORT = "export";//$NON-NLS-1$
 
 	public static final String CUSTOM = "custom";//$NON-NLS-1$
-	public static final String CONTROL_USER_NAME = "controlUserName";//$NON-NLS-1$
-	public static final String CONTROL_CONNECTION_NAME = "controlConnectionName";//$NON-NLS-1$
-	public static final String LOCALHOST = "localhost";//$NON-NLS-1$
-	public static final String CONTROL_PATH = "controlPath"; //$NON-NLS-1$
-	public static final String CONTROL_OPTIONS = "controlOptions"; //$NON-NLS-1$
-	public static final String CONTROL_INVOCATION_OPTIONS = "controlInvocationOptions"; //$NON-NLS-1$
-	public static final String CONTROL_ADDRESS = "controlAddress"; //$NON-NLS-1$
-	public static final String LOCAL_ADDRESS = "localAddress"; //$NON-NLS-1$
 	public static final String CONTROL_USER_VAR = "control.user.name";//$NON-NLS-1$
 	public static final String CONTROL_ADDRESS_VAR = "control.address";//$NON-NLS-1$
+	public static final String CONTROL_WORKING_DIR_VAR = "control.working.dir";//$NON-NLS-1$
 	public static final String ARPA = ".in-addr.arpa";//$NON-NLS-1$
 	public static final String ECLIPSESETTINGS = ".eclipsesettings";//$NON-NLS-1$
 	public static final String DEBUG_PACKAGE = "org.eclipse.debug";//$NON-NLS-1$

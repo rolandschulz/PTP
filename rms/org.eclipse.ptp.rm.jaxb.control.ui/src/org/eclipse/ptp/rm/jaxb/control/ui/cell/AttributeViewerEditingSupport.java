@@ -42,8 +42,7 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 	@Override
 	protected boolean canEdit(Object element) {
 		if (element instanceof ICellEditorUpdateModel) {
-			boolean b = ((ICellEditorUpdateModel) element).canEdit();
-			return b;
+			return ((ICellEditorUpdateModel) element).canEdit();
 		}
 		return false;
 	}
@@ -57,8 +56,7 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 		if (element instanceof ICellEditorUpdateModel) {
-			CellEditor editor = ((ICellEditorUpdateModel) element).getCellEditor();
-			return editor;
+			return ((ICellEditorUpdateModel) element).getCellEditor();
 		}
 		return null;
 	}
@@ -71,8 +69,7 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 	@Override
 	protected Object getValue(Object element) {
 		if (element instanceof ICellEditorUpdateModel) {
-			Object value = ((ICellEditorUpdateModel) element).getValueForEditor();
-			return value;
+			return ((ICellEditorUpdateModel) element).getValueForEditor();
 		}
 		return null;
 	}
@@ -86,7 +83,8 @@ public class AttributeViewerEditingSupport extends EditingSupport {
 	@Override
 	protected void setValue(Object element, Object value) {
 		if (element instanceof ICellEditorUpdateModel) {
-			((ICellEditorUpdateModel) element).setValueFromEditor(value);
+			ICellEditorUpdateModel model = (ICellEditorUpdateModel) element;
+			model.setValueFromEditor(value);
 			viewer.refresh();
 		}
 	}

@@ -41,7 +41,7 @@ public abstract class DynamicControlUpdateModel extends AbstractUpdateModel {
 	 *            values
 	 */
 	protected DynamicControlUpdateModel(List<ArgType> dynamic, ValueUpdateHandler handler) {
-		super(JAXBControlUIConstants.ZEROSTR, handler);
+		super(JAXBControlUIConstants.ZEROSTR, null, handler);
 		this.dynamic = dynamic;
 	}
 
@@ -51,12 +51,15 @@ public abstract class DynamicControlUpdateModel extends AbstractUpdateModel {
 	 * @param name
 	 *            name of the model, which will correspond to the name of a
 	 *            Property or Attribute if the widget value is to be saved.
+	 * @param linkUpdateTo
+	 *            if a change in this property or attribute value overwrites
+	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
 	 */
-	protected DynamicControlUpdateModel(String name, ValueUpdateHandler handler) {
-		super(name, handler);
+	protected DynamicControlUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler) {
+		super(name, linkUpdateTo, handler);
 	}
 
 	/**
@@ -64,17 +67,5 @@ public abstract class DynamicControlUpdateModel extends AbstractUpdateModel {
 	 */
 	protected String getResolvedDynamic() {
 		return ArgImpl.toString(null, dynamic, lcMap);
-	}
-
-	/*
-	 * Only saves for editable subclasses. (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#storeValue()
-	 */
-	@Override
-	protected void storeValue() {
-		if (canSave) {
-			super.storeValue();
-		}
 	}
 }

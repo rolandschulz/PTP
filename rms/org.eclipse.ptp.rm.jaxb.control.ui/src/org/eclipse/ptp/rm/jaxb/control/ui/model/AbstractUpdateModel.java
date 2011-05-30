@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -45,7 +47,8 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
-			storeValue();
+			Object value = storeValue();
+			handleUpdate(value);
 			return Status.OK_STATUS;
 		}
 	}
@@ -54,6 +57,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 
 	protected boolean canSave;
 	protected String name;
+	protected List<String> linkUpdateTo;
 	protected LCVariableMap lcMap;
 	protected ValueUpdateHandler handler;
 	protected boolean refreshing;
@@ -65,13 +69,17 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	/**
 	 * @param name
 	 *            name of the model, which will correspond to the name of a
-	 *            Property or Attribute if the widget value is to be saved.
+	 *            Property or Attribute if the widget value is to be saved
+	 * @param linkUpdateTo
+	 *            if a change in this property or attribute value overwrites
+	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
 	 */
-	protected AbstractUpdateModel(String name, ValueUpdateHandler handler) {
+	protected AbstractUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler) {
 		this.name = name;
+		this.linkUpdateTo = linkUpdateTo;
 		canSave = (name != null && !JAXBControlUIConstants.ZEROSTR.equals(name));
 		this.handler = handler;
 		refreshing = false;
@@ -107,6 +115,15 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 			restoreDefault();
 			refreshValueFromMap();
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel#isWritable()
+	 */
+	public boolean isWritable() {
+		return canSave;
 	}
 
 	/**
@@ -161,12 +178,26 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 
 	/**
 	 * Retrieves the value from the control, then writes to the current
-	 * environment map and calls the update handler.
+	 * environment map and calls the update handler. <br>
+	 * <br>
+	 * If the value is linked to another value, that value is also overwritten.
 	 */
-	protected void storeValue() {
+	protected Object storeValue() {
 		Object value = getValueFromControl();
 		lcMap.put(name, value);
-		handleUpdate(value);
+		if (linkUpdateTo != null) {
+			for (String link : linkUpdateTo) {
+				if (name.equals(link)) {
+					continue;
+				}
+				if (value == null || JAXBControlUIConstants.ZEROSTR.equals(value)) {
+					lcMap.put(link, lcMap.getDefault(link));
+				} else {
+					lcMap.put(link, value);
+				}
+			}
+		}
+		return value;
 	}
 
 	/**

@@ -42,7 +42,6 @@ public class TextUpdateModel extends DynamicControlUpdateModel implements Modify
 	public TextUpdateModel(List<ArgType> args, ValueUpdateHandler handler, Text text) {
 		super(args, handler);
 		this.text = text;
-		text.addModifyListener(this);
 	}
 
 	/**
@@ -51,14 +50,17 @@ public class TextUpdateModel extends DynamicControlUpdateModel implements Modify
 	 * @param name
 	 *            name of the model, which will correspond to the name of a
 	 *            Property or Attribute if the widget value is to be saved.
+	 * @param linkUpdateTo
+	 *            if a change in this property or attribute value overwrites
+	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
 	 * @param text
 	 *            the widget to which this model corresponds
 	 */
-	public TextUpdateModel(String name, ValueUpdateHandler handler, Text text) {
-		super(name, handler);
+	public TextUpdateModel(String name, List<String> linkValueTo, ValueUpdateHandler handler, Text text) {
+		super(name, linkValueTo, handler);
 		this.text = text;
 		text.addModifyListener(this);
 	}

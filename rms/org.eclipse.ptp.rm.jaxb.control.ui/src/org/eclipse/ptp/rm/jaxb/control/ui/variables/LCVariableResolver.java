@@ -33,9 +33,9 @@ public class LCVariableResolver implements IDynamicVariableResolver {
 
 	/**
 	 * Only looks the the first element of the reference. This is because
-	 * ${rm:name#field} gets replace to become ${lc:name#field}, but the LC map
-	 * itself is flattened from the RC name=Attribute or name=Property to
-	 * name=primitive value.
+	 * ${ptp_rm:name#field} gets replaced to become ${ptp_lc:name#field}, but
+	 * the LC map itself is flattened from the RC name=Attribute or
+	 * name=Property to name=primitive value.
 	 */
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
 		if (active != null && argument != null) {

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
@@ -51,6 +53,9 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * @param name
 	 *            of the model, which will correspond to the name of a Property
 	 *            or Attribute the value is to be saved to
+	 * @param linkUpdateTo
+	 *            if a change in this property or attribute value overwrites
+	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
@@ -67,9 +72,9 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * @param status
 	 *            the attribute's status value, if any
 	 */
-	protected CellEditorUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
-			String tooltip, String description, String status) {
-		super(name, handler);
+	protected CellEditorUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler, CellEditor editor,
+			String[] items, boolean readOnly, String tooltip, String description, String status) {
+		super(name, linkUpdateTo, handler);
 		this.editor = editor;
 		this.readOnly = readOnly;
 		this.items = items;
@@ -180,9 +185,8 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 		if (JAXBControlUIConstants.ZEROSTR.equals(value)) {
 			return JAXBControlUIConstants.ZEROSTR;
 		}
-		String result = pattern.replaceAll(JAXBControlUIConstants.NAME_TAG, name);
-		result = result.replaceAll(JAXBControlUIConstants.VALUE_TAG, value);
-		return result;
+		String result = replaceAll(pattern, JAXBControlUIConstants.NAME_TAG, name);
+		return replaceAll(result, JAXBControlUIConstants.VALUE_TAG, value);
 	}
 
 	/*
@@ -349,10 +353,10 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 
 	/*
 	 * Casts the value to its appropriate field. For combo boxes, also sets the
-	 * selection string from the index. Calls storeValue on the viewer to update
-	 * the viewer template string; this in turn calls #getReplacedValue on all
-	 * its cell models. Finishes with call to store value on the current cell
-	 * value.(non-Javadoc)
+	 * selection string from the index. Calls store value on the current cell
+	 * value. Finishes with calls to storeValue on the viewer to update the
+	 * viewer template string; this in turn calls #getReplacedValue on all its
+	 * cell models. (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setValueFromEditor(
@@ -390,8 +394,9 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 			}
 			mapValue = stringValue;
 		}
+		Object v = storeValue();
 		viewer.storeValue();
-		storeValue();
+		handleUpdate(v);
 	}
 
 	/*
@@ -417,5 +422,23 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 			return String.valueOf(integerValue);
 		}
 		return JAXBControlUIConstants.ZEROSTR;
+	}
+
+	private static String replaceAll(String sequence, String tag, String with) {
+		int i = 0;
+		int j = 0;
+		int ln = sequence.length();
+		StringBuffer buffer = new StringBuffer();
+		while (i < ln) {
+			j = sequence.indexOf(tag, i);
+			if (j < 0) {
+				j = ln;
+				break;
+			}
+			buffer.append(sequence.substring(i, j)).append(with);
+			i = j + tag.length();
+		}
+		buffer.append(sequence.substring(i, j));
+		return buffer.toString();
 	}
 }

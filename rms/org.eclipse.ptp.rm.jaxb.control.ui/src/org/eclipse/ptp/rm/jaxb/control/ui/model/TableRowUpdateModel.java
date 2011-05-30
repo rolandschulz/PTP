@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
@@ -28,6 +30,9 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 * @param name
 	 *            of the model, which will correspond to the name of a Property
 	 *            or Attribute the value is to be saved to
+	 * @param linkUpdateTo
+	 *            if a change in this property or attribute value overwrites
+	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
@@ -38,8 +43,9 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 * @param readOnly
 	 *            if this is a text box, whether it is editable
 	 */
-	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly) {
-		super(name, handler, editor, items, readOnly, JAXBControlUIConstants.ZEROSTR, JAXBControlUIConstants.ZEROSTR,
+	public TableRowUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler, CellEditor editor,
+			String[] items, boolean readOnly) {
+		super(name, linkUpdateTo, handler, editor, items, readOnly, JAXBControlUIConstants.ZEROSTR, JAXBControlUIConstants.ZEROSTR,
 				JAXBControlUIConstants.ZEROSTR);
 	}
 
@@ -49,6 +55,9 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 * @param name
 	 *            of the model, which will correspond to the name of a Property
 	 *            or Attribute the value is to be saved to
+	 * @param linkUpdateTo
+	 *            if a change in this property or attribute value overwrites
+	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
@@ -61,9 +70,9 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 * @param data
 	 *            the Attribute object
 	 */
-	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
-			AttributeType data) {
-		super(name, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus());
+	public TableRowUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler, CellEditor editor,
+			String[] items, boolean readOnly, AttributeType data) {
+		super(name, linkUpdateTo, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus());
 	}
 
 	/*

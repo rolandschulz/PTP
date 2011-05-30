@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
+import java.util.List;
+
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -28,14 +30,17 @@ public class SpinnerUpdateModel extends AbstractUpdateModel implements ModifyLis
 	 * @param name
 	 *            name of the model, which will correspond to the name of a
 	 *            Property or Attribute if the widget value is to be saved.
+	 * @param linkUpdateTo
+	 *            if a change in this property or attribute value overwrites
+	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
 	 * @param spinner
 	 *            the widget to which this model corresponds
 	 */
-	public SpinnerUpdateModel(String name, ValueUpdateHandler handler, Spinner spinner) {
-		super(name, handler);
+	public SpinnerUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler, Spinner spinner) {
+		super(name, linkUpdateTo, handler);
 		this.spinner = spinner;
 		spinner.addModifyListener(this);
 	}
@@ -66,7 +71,8 @@ public class SpinnerUpdateModel extends AbstractUpdateModel implements ModifyLis
 		if (refreshing) {
 			return;
 		}
-		storeValue();
+		Object value = storeValue();
+		handleUpdate(value);
 	}
 
 	/*

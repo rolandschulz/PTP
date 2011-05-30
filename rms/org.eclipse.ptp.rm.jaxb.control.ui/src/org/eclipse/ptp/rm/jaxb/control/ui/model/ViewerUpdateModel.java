@@ -84,7 +84,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 *            a single output string
 	 */
 	public ViewerUpdateModel(String name, ValueUpdateHandler handler, ICheckable viewer, TemplateType template) {
-		super(name, handler);
+		super(name, null, handler);
 		this.viewer = viewer;
 		this.columnViewer = (ColumnViewer) viewer;
 		pattern = template.getPattern();
@@ -109,6 +109,8 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		Object target = event.getElement();
 		if (!(target instanceof ICellEditorUpdateModel)) {
 			viewer.setChecked(target, false);
+		} else if (!viewer.getChecked(target)) {
+			lcMap.remove(((ICellEditorUpdateModel) target).getName());
 		}
 		storeValue();
 		handleUpdate(null);
@@ -252,7 +254,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void storeValue() {
+	public Object storeValue() {
 		templatedValue.setLength(0);
 		Collection<Object> input = (Collection<Object>) ((Viewer) viewer).getInput();
 		for (Object o : input) {
@@ -270,10 +272,12 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		templatedValue.delete(0, separator.length());
 		String t = templatedValue.toString().trim();
 		if (!JAXBControlUIConstants.ZEROSTR.equals(t)) {
+			t = lcMap.getString(t);
 			lcMap.put(name, t);
 		} else {
 			lcMap.remove(name);
 		}
+		return t;
 	}
 
 	/*
@@ -302,5 +306,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		} else {
 			columnViewer.removeFilter(filter);
 		}
+		columnViewer.refresh();
 	}
 }

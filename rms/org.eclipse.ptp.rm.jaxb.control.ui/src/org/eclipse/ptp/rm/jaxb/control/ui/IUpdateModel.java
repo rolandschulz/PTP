@@ -45,6 +45,14 @@ public interface IUpdateModel {
 	public void initialize(LCVariableMap lcMap);
 
 	/**
+	 * Whether the value of the associated control can be written to the
+	 * environment.
+	 * 
+	 * @return true is the value can be written
+	 */
+	public boolean isWritable();
+
+	/**
 	 * Update call triggered by the handler.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler

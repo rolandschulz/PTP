@@ -393,6 +393,9 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	@Override
 	protected void doRefreshLocal() {
 		for (IUpdateModel m : getModels()) {
+			if (!m.isWritable()) {
+				continue;
+			}
 			if (m instanceof ICellEditorUpdateModel) {
 				if (((ICellEditorUpdateModel) m).isChecked()) {
 					localMap.put(m.getName(), m.getValueFromControl());
@@ -452,8 +455,11 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				try {
 					Map<Object, Object> attr = config.getAttributes();
 					for (Map.Entry e : attr.entrySet()) {
-						buffer.append(e.getKey()).append(JAXBControlUIConstants.EQ).append(e.getValue())
-								.append(JAXBControlUIConstants.LINE_SEP);
+						Object v = e.getValue();
+						if (v != null && !JAXBControlUIConstants.ZEROSTR.equals(v)) {
+							buffer.append(e.getKey()).append(JAXBControlUIConstants.EQ).append(v)
+									.append(JAXBControlUIConstants.LINE_SEP);
+						}
 					}
 				} catch (CoreException t) {
 					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
