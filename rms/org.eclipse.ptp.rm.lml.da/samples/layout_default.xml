@@ -70,26 +70,4 @@
 <column id="8" name="status" type="mandatory">  <pattern>    <include regexp="SUBMITTED"/>  </pattern> </column>
 </table>
 
-<tablelayout id="tl_Further" gid="joblistfurther" active="true">
-<column cid="1" pos="0" width="0.1" active="true" key="step"/>
-<column cid="2" pos="1" width="0.1" active="true" key="owner"/>
-<column cid="3" pos="2" width="0.1" active="true" key="queue"/>
-<column cid="4" pos="3" width="0.1" active="true" key="wall"/>
-<column cid="5" pos="4" width="0.1" active="true" key="queuedate"/>
-<column cid="6" pos="5" width="0.1" active="true" key="dispatchdate"/>
-<column cid="7" pos="6" width="0.1" active="true" key="totalcores"/>
-<column cid="8" pos="7" width="0.3" active="true" key="status"/>
-</tablelayout>
-
-<table title="Further Jobs" id="joblistfurther"  contenttype="jobs" description="This is the table showing all further jobs">
-<column id="1" name="step"/>
-<column id="2" name="owner">  <pattern>    <include regexp=".*"/>  </pattern></column>
-<column id="3" name="queue"/>
-<column id="4" name="wall"/>
-<column id="5" name="queuedate"/>
-<column id="6" name="dispatchdate"/>
-<column id="7" name="totalcores"/>
-<column id="8" name="status" type="mandatory">  <pattern> <exclude regexp="SUBMITTED"/> <exclude regexp="RUNNING"/> </pattern> </column>
-</table>
-
 </lml:lgui>
