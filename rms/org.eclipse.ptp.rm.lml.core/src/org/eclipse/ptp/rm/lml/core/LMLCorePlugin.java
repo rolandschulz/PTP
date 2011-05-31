@@ -24,7 +24,6 @@ package org.eclipse.ptp.rm.lml.core;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -67,16 +66,6 @@ public class LMLCorePlugin extends Plugin {
 	 */
 	private static Marshaller marshaller;
 
-	/*
-	 * DateFormat for (EEE MMM d HH:mm:ss yyyy)
-	 */
-	private SimpleDateFormat simpleDateFormat1;
-
-	/*
-	 * DateFormat for (EEE MMM dd HH:mm:ss yyyy)
-	 */
-	private SimpleDateFormat simpleDateFormat2;
-
 	/**
 	 * Returns the shared instance.
 	 */
@@ -89,10 +78,10 @@ public class LMLCorePlugin extends Plugin {
 	 * found.
 	 */
 	public static String getResourceString(String key) {
-		ResourceBundle bundle = LMLCorePlugin.getDefault().getResourceBundle();
+		final ResourceBundle bundle = LMLCorePlugin.getDefault().getResourceBundle();
 		try {
 			return (bundle != null) ? bundle.getString(key) : key;
-		} catch (MissingResourceException e) {
+		} catch (final MissingResourceException e) {
 			return key;
 		}
 	}
@@ -157,54 +146,17 @@ public class LMLCorePlugin extends Plugin {
 
 		try {
 			resourceBundle = ResourceBundle.getBundle(PLUGIN_ID + ".ParallelPluginResources"); //$NON-NLS-1$
-		} catch (MissingResourceException x) {
+		} catch (final MissingResourceException x) {
 			resourceBundle = null;
 		}
 	}
 
-	/**
-	 * Getting the corresponding SimpleDateFormat to a given length:
-	 * 
-	 * @param length
-	 *            of a string
-	 * @return
-	 */
-	public SimpleDateFormat getSimpleDateFormat(int length) {
-		return length == simpleDateFormat1.toPattern().length() ? simpleDateFormat1 : simpleDateFormat2;
-	}
+	private void createMarshaller() throws JAXBException {
+		final URL xsd = getBundle().getEntry("/schema/lgui.xsd");
 
-	/**
-	 * Get the JAXB unmarshaller.
-	 * 
-	 * @return the JAXB unmarshaller
-	 */
-	public Unmarshaller getUnmarshaller() {
-		if (unmarshaller == null) {
-			try {
-				createUnmarshaller();
-			} catch (JAXBException e) {
-				log(e);
-			} catch (MalformedURLException e) {
-				log(e);
-			}
-		}
-		return unmarshaller;
-	}
-
-	/**
-	 * Get the JAXB marshaller
-	 * 
-	 * @return the JAXB marshaller
-	 */
-	public Marshaller getMarshaller() {
-		if (marshaller == null) {
-			try {
-				createMarshaller();
-			} catch (JAXBException e) {
-				log(e);
-			}
-		}
-		return marshaller;
+		final JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements",
+				LMLCorePlugin.class.getClassLoader());
+		marshaller = jc.createMarshaller();
 	}
 
 	/**
@@ -216,9 +168,9 @@ public class LMLCorePlugin extends Plugin {
 	 * @throws JAXBException
 	 */
 	private void createUnmarshaller() throws MalformedURLException, JAXBException {
-		URL xsd = getBundle().getEntry("/schema/lgui.xsd");
+		final URL xsd = getBundle().getEntry("/schema/lgui.xsd");
 
-		JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements",
+		final JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements",
 				LMLCorePlugin.class.getClassLoader());
 
 		unmarshaller = jc.createUnmarshaller();
@@ -227,12 +179,12 @@ public class LMLCorePlugin extends Plugin {
 		if (xsd != null) {
 
 			Schema mySchema;
-			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
 			try {
 
 				mySchema = sf.newSchema(xsd);
-			} catch (SAXException saxe) {
+			} catch (final SAXException saxe) {
 				// ...(error handling)
 				mySchema = null;
 
@@ -244,12 +196,20 @@ public class LMLCorePlugin extends Plugin {
 		}
 	}
 
-	private void createMarshaller() throws JAXBException {
-		URL xsd = getBundle().getEntry("/schema/lgui.xsd");
-
-		JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements",
-				LMLCorePlugin.class.getClassLoader());
-		marshaller = jc.createMarshaller();
+	/**
+	 * Get the JAXB marshaller
+	 * 
+	 * @return the JAXB marshaller
+	 */
+	public Marshaller getMarshaller() {
+		if (marshaller == null) {
+			try {
+				createMarshaller();
+			} catch (final JAXBException e) {
+				log(e);
+			}
+		}
+		return marshaller;
 	}
 
 	/**
@@ -257,6 +217,24 @@ public class LMLCorePlugin extends Plugin {
 	 */
 	public ResourceBundle getResourceBundle() {
 		return resourceBundle;
+	}
+
+	/**
+	 * Get the JAXB unmarshaller.
+	 * 
+	 * @return the JAXB unmarshaller
+	 */
+	public Unmarshaller getUnmarshaller() {
+		if (unmarshaller == null) {
+			try {
+				createUnmarshaller();
+			} catch (final JAXBException e) {
+				log(e);
+			} catch (final MalformedURLException e) {
+				log(e);
+			}
+		}
+		return unmarshaller;
 	}
 
 	/**
@@ -269,39 +247,38 @@ public class LMLCorePlugin extends Plugin {
 	 * @return path to "bin" directory in fragment
 	 */
 	public String locateFragmentFile(String fragment, String file) {
-		Bundle[] frags = Platform.getFragments(Platform.getBundle(LMLCorePlugin.PLUGIN_ID));
+		final Bundle[] frags = Platform.getFragments(Platform.getBundle(LMLCorePlugin.PLUGIN_ID));
 
 		if (frags != null) {
-			String os = Platform.getOS();
-			String arch = Platform.getOSArch();
-			String frag_os_arch = fragment + "." + os + "." + arch; //$NON-NLS-1$ //$NON-NLS-2$
+			final String os = Platform.getOS();
+			final String arch = Platform.getOSArch();
+			final String frag_os_arch = fragment + "." + os + "." + arch; //$NON-NLS-1$ //$NON-NLS-2$
 
-			for (int i = 0; i < frags.length; i++) {
-				Bundle frag = frags[i];
-				URL path = frag.getEntry("/"); //$NON-NLS-1$
+			for (final Bundle frag : frags) {
+				final URL path = frag.getEntry("/"); //$NON-NLS-1$
 				try {
-					URL local_path = FileLocator.toFileURL(path);
-					String str_path = local_path.getPath();
+					final URL local_path = FileLocator.toFileURL(path);
+					final String str_path = local_path.getPath();
 
 					/*
 					 * Check each fragment that matches our os and arch for a
 					 * bin directory.
 					 */
 
-					int idx = str_path.indexOf(frag_os_arch);
+					final int idx = str_path.indexOf(frag_os_arch);
 					if (idx > 0) {
 						/*
 						 * found it! This is the right fragment for our OS &
 						 * arch
 						 */
-						String file_path = str_path + "bin/" + file; //$NON-NLS-1$
-						File f = new File(file_path);
+						final String file_path = str_path + "bin/" + file; //$NON-NLS-1$
+						final File f = new File(file_path);
 						if (f.exists()) {
 							return file_path;
 						}
 					}
 
-				} catch (Exception e) {
+				} catch (final Exception e) {
 				}
 			}
 		}
@@ -317,21 +294,19 @@ public class LMLCorePlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		createUnmarshaller();
-		simpleDateFormat1 = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
-		simpleDateFormat2 = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy");
 		DebugUtil.configurePluginDebugOptions();
 		ResourcesPlugin.getWorkspace().addSaveParticipant(getUniqueIdentifier(), new ISaveParticipant() {
-			public void saving(ISaveContext saveContext) throws CoreException {
-				Preferences.savePreferences(getUniqueIdentifier());
-			}
-
-			public void rollback(ISaveContext saveContext) {
+			public void doneSaving(ISaveContext saveContext) {
 			}
 
 			public void prepareToSave(ISaveContext saveContext) throws CoreException {
 			}
 
-			public void doneSaving(ISaveContext saveContext) {
+			public void rollback(ISaveContext saveContext) {
+			}
+
+			public void saving(ISaveContext saveContext) throws CoreException {
+				Preferences.savePreferences(getUniqueIdentifier());
 			}
 		});
 	}

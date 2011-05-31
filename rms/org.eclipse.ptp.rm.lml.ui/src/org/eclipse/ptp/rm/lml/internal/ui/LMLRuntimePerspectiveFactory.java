@@ -12,7 +12,6 @@
 package org.eclipse.ptp.rm.lml.internal.ui;
 
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
-import org.eclipse.ptp.rm.lml.ui.managers.ViewManager;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -38,15 +37,14 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 
 		// lguiFolder.addView(ILMLUIConstants.VIEW_LML);
 		mainFolder.addView("org.eclipse.ptp.ui.views.resourceManagerView"); //$NON-NLS-1$
-		tableFolder.addView(ILMLUIConstants.VIEW_TABLE_1);
-		tableFolder.addView(ILMLUIConstants.VIEW_TABLE_2);
-		tableFolder.addView(ILMLUIConstants.VIEW_TABLE_3);
+		tableFolder.addView(ILMLUIConstants.VIEW_TABLE_1 + ":*");
+		tableFolder.addView(ILMLUIConstants.VIEW_TABLE_2 + ":*");
+		// tableFolder.addView(ILMLUIConstants.VIEW_TABLE_3);
 		machinesFolder.addView(ILMLUIConstants.VIEW_PARALLELNODES);
 		miscFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 		miscFolder.addView(IPageLayout.ID_PROP_SHEET);
 		miscFolder.addView(IPageLayout.ID_PROBLEM_VIEW);
 		miscFolder.addView(IPageLayout.ID_TASK_LIST);
 
-		new ViewManager();
 	}
 }

@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -148,7 +149,7 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * Map of other jobs.
 	 */
-	public Map<String, String> jobsFurtherMap = new HashMap<String, String>();
+	// public Map<String, String> jobsFurtherMap = new HashMap<String, String>();
 
 	public static final String LAYOUT = "layout";
 
@@ -165,16 +166,16 @@ public class LguiItem implements ILguiItem {
 		createLguiHandlers();
 	}
 
+	/**************************************************************************************************************
+	 * Parsing methods
+	 **************************************************************************************************************/
+
 	/**
 	 * Empty Constructor.
 	 */
 	public LguiItem(String name) {
 		this.name = name;
 	}
-
-	/**************************************************************************************************************
-	 * Parsing methods
-	 **************************************************************************************************************/
 
 	/**
 	 * Constructor with one argument, an URI. Within the constructor the method
@@ -234,21 +235,23 @@ public class LguiItem implements ILguiItem {
 	private Map<String, String> findMap(JobStatusData status) {
 		if (status.getState().equals("RUNNING")) {
 			return jobsRunningMap;
-		} else if (status.getState().equals("SUBMITTED")) {
+		} else {// if (status.getState().equals("SUBMITTED")) {
 			return jobsWaitingMap;
-		} else {
-			return jobsFurtherMap;
 		}
+		// } else {
+		// return jobsFurtherMap;
+		// }
 	}
 
 	private Map<String, String> findMap(String name) {
 		if (jobsRunningMap.containsKey(name)) {
 			return jobsRunningMap;
-		} else if (jobsWaitingMap.containsKey(name)) {
+		} else {// if (jobsWaitingMap.containsKey(name)) {
 			return jobsWaitingMap;
-		} else {
-			return jobsFurtherMap;
 		}
+		// else {
+		// return jobsFurtherMap;
+		// }
 	}
 
 	private LguiType firstRequest() {
@@ -305,6 +308,16 @@ public class LguiItem implements ILguiItem {
 
 	public LguiType getLguiType() {
 		return lgui;
+	}
+
+	private List<String> getListNullElements(Map<String, String> map) {
+		final List<String> list = new ArrayList<String>();
+		for (final Map.Entry<String, String> entry : map.entrySet()) {
+			if (entry.getValue() == null) {
+				list.add(entry.getKey());
+			}
+		}
+		return list;
 	}
 
 	/**
@@ -395,11 +408,12 @@ public class LguiItem implements ILguiItem {
 	public Map<String, String> getUserJobMap(String gid) {
 		if (gid.equals("joblistrun")) {
 			return jobsRunningMap;
-		} else if (gid.equals("joblistwait")) {
+		} else { // if (gid.equals("joblistwait")) {
 			return jobsWaitingMap;
-		} else {
-			return jobsFurtherMap;
 		}
+		// else {
+		// return jobsFurtherMap;
+		// }
 	}
 
 	/*
@@ -479,7 +493,7 @@ public class LguiItem implements ILguiItem {
 		final Map<String, String> revertMap = new HashMap<String, String>();
 		for (final Map.Entry<String, String> entry : map.entrySet()) {
 			if (entry.getValue() != null) {
-				revertMap.put(entry.getValue(), entry.getValue());
+				revertMap.put(entry.getValue(), entry.getKey());
 			}
 		}
 		return revertMap;
@@ -571,12 +585,12 @@ public class LguiItem implements ILguiItem {
 		// JobInfo to JobStatusData
 		updateJobData(jobsRunningMap);
 		updateJobData(jobsWaitingMap);
-		updateJobData(jobsFurtherMap);
+		// updateJobData(jobsFurtherMap);
 
 		// JobStatusData to Table
-		updateJobDate(revert(jobsRunningMap), "joblistrun");
-		updateJobDate(revert(jobsWaitingMap), "joblistwait");
-		updateJobDate(revert(jobsFurtherMap), "joblistfurther");
+		updateJobDate(revert(jobsRunningMap), getListNullElements(jobsRunningMap), "joblistrun");
+		updateJobDate(revert(jobsWaitingMap), getListNullElements(jobsWaitingMap), "joblistwait");
+		// updateJobDate(revert(jobsFurtherMap), "joblistfurther");
 	}
 
 	private void updateJobData(Map<String, String> map) {
@@ -596,18 +610,20 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	private void updateJobDate(Map<String, String> map, String gid) {
+	private void updateJobDate(Map<String, String> map, List<String> list, String gid) {
 		final TableType table = getTableHandler().getTable(gid);
+		if (table == null) {
+			return;
+		}
 		for (final RowType row : table.getRow()) {
 			map.remove(row.getOid());
 		}
 		if (map.size() > 0) {
 			for (final Map.Entry<String, String> entry : map.entrySet()) {
-				final List<ColumnType> columns = table.getColumn();
 				final InfoType info = lmlManager.getJobStatusDataInfo(toString(), entry.getValue());
 				final RowType row = new RowType();
 				row.setOid(entry.getKey());
-				for (final ColumnType column : columns) {
+				for (final ColumnType column : table.getColumn()) {
 					if (info != null) {
 						for (final InfodataType data : info.getData()) {
 							if (column.getName().equals(data.getKey())) {
@@ -630,6 +646,22 @@ public class LguiItem implements ILguiItem {
 
 				}
 
+				table.getRow().add(row);
+			}
+		}
+		if (list.size() > 0) {
+			for (final String entry : list) {
+				final JobStatusData data = lmlManager.getJobStatusData(toString(), entry);
+				final RowType row = new RowType();
+				for (final ColumnType column : table.getColumn()) {
+					if (column.getName().equals("owner") || column.getName().equals("status")) {
+						final CellType cell = new CellType();
+						cell.setCid(column.getId());
+						cell.setValue(data.getState());
+						row.getCell().add(cell);
+						break;
+					}
+				}
 				table.getRow().add(row);
 			}
 		}

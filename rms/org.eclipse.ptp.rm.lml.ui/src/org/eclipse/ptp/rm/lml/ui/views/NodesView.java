@@ -29,8 +29,6 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
@@ -46,66 +44,71 @@ public class NodesView extends LMLViewPart {
 		public void handleEvent(IJobListSortedEvent e) {
 		}
 
-		public void handleEvent(ITableColumnChangeEvent e) {
-
-		}
-
-		public void handleEvent(ISelectedObjectChangeEvent event) {
-			fLguiItem.getObjectStatus().mouseOver(event.getOid());
-		}
-
-		public void handleEvent(IMarkObjectEvent event) {
-			fLguiItem.getObjectStatus().mouseDown(event.getOid());
-		}
-
-		public void handleEvent(IUnmarkObjectEvent event) {
-			fLguiItem.getObjectStatus().mouseUp(event.getOid());
-		}
-
-		public void handleEvent(IUnselectedObjectEvent event) {
-			ObjectType object = fLguiItem.getOIDToObject().getObjectById(event.getOid());
-			fLguiItem.getObjectStatus().mouseexit(object);
-		}
-
-		public void handleEvent(IViewUpdateEvent event) {
-			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
-				public void run() throws Exception {
-					nodedisplayView.setVisible(true);
-					fLguiItem = lmlManager.getSelectedLguiItem();
-					nodedisplayView.update(fLguiItem);
-				}
-			});
-		}
-
 		public void handleEvent(ILguiAddedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					nodedisplayView.setVisible(true);
 					fLguiItem = lmlManager.getSelectedLguiItem();
 					nodedisplayView.update(fLguiItem);
+					nodedisplayView.setVisible(true);
 				}
 			});
-			
+
 		}
 
 		public void handleEvent(ILguiRemovedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
+					nodedisplayView.setVisible(false);
 					fLguiItem = null;
-					if (!parent.isDisposed()) {
-						nodedisplayView.setVisible(false);
-					}
+				}
+			});
+		}
+
+		public void handleEvent(IMarkObjectEvent event) {
+			if (fLguiItem != null) {
+				fLguiItem.getObjectStatus().mouseDown(event.getOid());
+			}
+		}
+
+		public void handleEvent(ISelectedObjectChangeEvent event) {
+			if (fLguiItem != null) {
+				fLguiItem.getObjectStatus().mouseOver(event.getOid());
+			}
+		}
+
+		public void handleEvent(ITableColumnChangeEvent e) {
+
+		}
+
+		public void handleEvent(IUnmarkObjectEvent event) {
+			if (fLguiItem != null) {
+				fLguiItem.getObjectStatus().mouseUp(event.getOid());
+			}
+		}
+
+		public void handleEvent(IUnselectedObjectEvent event) {
+			if (fLguiItem != null) {
+				final ObjectType object = fLguiItem.getOIDToObject().getObjectById(event.getOid());
+				fLguiItem.getObjectStatus().mouseexit(object);
+			}
+
+		}
+
+		public void handleEvent(IViewUpdateEvent event) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					fLguiItem = lmlManager.getSelectedLguiItem();
+					nodedisplayView.update(fLguiItem);
+					nodedisplayView.setVisible(true);
 				}
 			});
 		}
 	}
 
-	private Composite parent = null;
 	private Composite composite = null;
 	private NodedisplayView nodedisplayView = null;
 	public Viewer viewer;
 	public ILguiItem fLguiItem = null;
-	private String gid = null;
 	private final ILMLListener lguiListener = new LguiListener();
 	private final LMLManager lmlManager = LMLManager.getInstance();
 
@@ -116,18 +119,43 @@ public class NodesView extends LMLViewPart {
 		super();
 	}
 
+	private void createNodedisplayView() {
+
+		if (!composite.isDisposed()) {
+			nodedisplayView = new NodedisplayView(null, null, composite);
+			composite.layout();
+			// composite.addDisposeListener(new DisposeListener() {
+			//
+			// public void widgetDisposed(DisposeEvent e) {
+			// lmlManager.removeComponent(gid);
+			//
+			// }
+			//
+			// });
+		}
+
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
-		this.parent = parent;
 		composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new FillLayout());
 		composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		lmlManager.addListener(lguiListener, this.getClass().getName());
-		gid = getViewSite().getId();
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		createNodedisplayView();
+	}
+
+	public void generateNodesdisplay() {
+		fLguiItem = lmlManager.getSelectedLguiItem();
+		createNodedisplayView();
+	}
+
+	@Override
+	public void prepareDispose() {
+		lmlManager.removeListener(lguiListener);
 	}
 
 	/*
@@ -137,34 +165,6 @@ public class NodesView extends LMLViewPart {
 	 */
 	@Override
 	public void setFocus() {
-	}
-
-	public void generateNodesdisplay() {
-		gid = getViewSite().getId();
-		fLguiItem = lmlManager.getSelectedLguiItem();
-		createNodedisplayView();
-	}
-
-	private void createNodedisplayView() {
-
-		if (!composite.isDisposed()) {
-			nodedisplayView = new NodedisplayView(null, null, composite);
-			composite.layout();
-//			composite.addDisposeListener(new DisposeListener() {
-//
-//				public void widgetDisposed(DisposeEvent e) {
-//					lmlManager.removeComponent(gid);
-//
-//				}
-//
-//			});
-		}
-
-	}
-
-	@Override
-	public void prepareDispose() {
-		lmlManager.removeListener(lguiListener);
 	}
 
 }

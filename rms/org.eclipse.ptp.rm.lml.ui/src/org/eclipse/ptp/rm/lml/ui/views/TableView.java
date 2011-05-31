@@ -112,6 +112,7 @@ public class TableView extends LMLViewPart {
 					if (fSelectedLguiItem != null) {
 						createTable();
 						fSelectedLguiItem.getObjectStatus().addComponent(eventForwarder);
+						componentAdded = true;
 					}
 				}
 			});
@@ -121,7 +122,10 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(ILguiRemovedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					fSelectedLguiItem.getObjectStatus().removeComponent(eventForwarder);
+					if (componentAdded) {
+						fSelectedLguiItem.getObjectStatus().removeComponent(eventForwarder);
+						componentAdded = false;
+					}
 					fSelectedLguiItem = null;
 					setViewerInput();
 					disposeTable();
@@ -201,6 +205,8 @@ public class TableView extends LMLViewPart {
 	private TreeItem selectedItem = null;
 	private String selectedOid = null;
 
+	private boolean componentAdded = false;
+
 	private final EventForwarder eventForwarder = new EventForwarder();
 
 	private final Map<String, JobStatusData> jobs = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
@@ -275,6 +281,9 @@ public class TableView extends LMLViewPart {
 		treeColumns = new TreeColumn[fSelectedLguiItem.getTableHandler().getNumberOfTableColumns(gid)];
 		sizeViewer = composite.getSize().x - 70;
 		final ITableColumnLayout[] tableColumnLayouts = fSelectedLguiItem.getTableHandler().getTableColumnLayout(gid, sizeViewer);
+		if (tableColumnLayouts == null) {
+			return;
+		}
 
 		for (int i = 0; i < tableColumnLayouts.length; i++) {
 			final TreeColumn treeColumn = new TreeColumn(tree, getColumnAlignment(tableColumnLayouts[i].getStyle()));
@@ -500,11 +509,13 @@ public class TableView extends LMLViewPart {
 	private void createTable() {
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
+
+		createColumns();
+
 		if (fSelectedLguiItem.getTableHandler().isEmpty(gid)) {
-			System.out.println("Here");
 			return;
 		}
-		createColumns();
+
 		createMenu(); // view menu
 
 		// Insert the input
@@ -520,19 +531,16 @@ public class TableView extends LMLViewPart {
 	}
 
 	private void disposeTable() {
-		if (fSelectedLguiItem != null) {
-			final TreeColumn[] oldColumns = tree.getColumns();
-			for (final TreeColumn oldColumn : oldColumns) {
-				final Listener[] oldListeners = oldColumn.getListeners(SWT.Selection);
-				for (final Listener oldListener : oldListeners) {
-					oldColumn.removeListener(SWT.Selection, oldListener);
-				}
-				oldColumn.dispose();
+		final TreeColumn[] oldColumns = tree.getColumns();
+		for (final TreeColumn oldColumn : oldColumns) {
+			final Listener[] oldListeners = oldColumn.getListeners(SWT.Selection);
+			for (final Listener oldListener : oldListeners) {
+				oldColumn.removeListener(SWT.Selection, oldListener);
 			}
-			treeColumns = null;
-			this.getViewSite().getActionBars().getMenuManager().removeAll();
+			oldColumn.dispose();
 		}
-
+		treeColumns = new TreeColumn[0];
+		getViewSite().getActionBars().getMenuManager().removeAll();
 	}
 
 	/**

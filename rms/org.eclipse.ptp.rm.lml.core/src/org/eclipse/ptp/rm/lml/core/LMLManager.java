@@ -474,11 +474,12 @@ public class LMLManager {
 		fireRemovedLgui(null);
 		if (name != null) {
 			final ILguiItem item = LGUIS.get(name);
-			if (fLguiItem != item) {
+			if (item != null) {
 				fLguiItem = item;
+				fireNewLgui();
+				return;
 			}
-			fireNewLgui();
-			return;
+
 		}
 		fLguiItem = null;
 	}

@@ -193,9 +193,10 @@ public class TableHandler extends LguiHandler {
 		if (this.gid != gid) {
 			this.gid = gid;
 		}
-		TablelayoutType tableLayout = lguiItem.getLayoutAccess().getTableLayout(gid);
+		final TablelayoutType tableLayout = lguiItem.getLayoutAccess().getTableLayout(gid);
 		if (tableLayout.getColumn().size() <= 0) {
-			tableLayout = lguiItem.getLayoutAccess().getDefaultTableLayout(gid);
+			return null;
+			// tableLayout = lguiItem.getLayoutAccess().getDefaultTableLayout(gid);
 		}
 
 		getCidsToPosition();
