@@ -166,6 +166,10 @@ public class ModelManager implements IModelManager {
 	private static String CLASS_ATTRIBUTE = "class"; //$NON-NLS-1$
 	private static String EXTENSION_POINT = "org.eclipse.ptp.core.resourceManagers"; //$NON-NLS-1$
 
+	public static ModelManager getInstance() {
+		return fInstance;
+	}
+
 	private final IServiceModelEventListener fServiceEventListener = new IServiceModelEventListener() {
 
 		public void handleEvent(IServiceModelEvent event) {
@@ -235,15 +239,15 @@ public class ModelManager implements IModelManager {
 	private static final ModelManager fInstance = new ModelManager();
 
 	private final ListenerList fResourceManagerListeners = new ListenerList();
-
 	private final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
 	private final Map<String, IResourceManager> fResourceManagers = new HashMap<String, IResourceManager>();
 	private final IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
+
 	private final IPUniverse fUniverse = new PUniverse();
 
 	private Map<String, RMFactory> fResourceManagerFactories = null;
-
 	private Map<String, IResourceManagerControlFactory> fResourceManagerControlFactories = null;
+
 	private Map<String, IResourceManagerMonitorFactory> fResourceManagerMonitorFactories = null;
 
 	public ModelManager() {
@@ -708,10 +712,6 @@ public class ModelManager implements IModelManager {
 			Job job = new RMStartupJob(rm);
 			job.schedule();
 		}
-	}
-
-	public static ModelManager getInstance() {
-		return fInstance;
 	}
 
 }
