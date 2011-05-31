@@ -106,7 +106,7 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(IJobListSortedEvent e) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					// setViewerInput();
+					setViewerInput();
 				}
 			});
 
@@ -152,9 +152,9 @@ public class TableView extends LMLViewPart {
 			selectedOid = event.getOid();
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					// if (!composite.isDisposed()) {
-					// viewer.refresh();
-					// }
+					if (!composite.isDisposed()) {
+						viewer.refresh();
+					}
 				}
 			});
 		}
@@ -163,26 +163,26 @@ public class TableView extends LMLViewPart {
 			final String oid = event.getOid();
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					// if (!composite.isDisposed() && viewer.getInput() != null) {
-					// tree.deselectAll();
-					//
-					// Row[] rows = null;
-					// if (viewer.getInput() instanceof Row[]) {
-					// rows = (Row[]) viewer.getInput();
-					// }
-					// int index = -1;
-					// if (rows != null) {
-					// for (int i = 0; i < rows.length; i++) {
-					// if (rows[i].oid.equals(oid)) {
-					// index = i;
-					// break;
-					// }
-					// }
-					// }
-					// if (index > -1) {
-					// tree.select(tree.getItem(index));
-					// }
-					// }
+					if (!composite.isDisposed() && viewer.getInput() != null) {
+						tree.deselectAll();
+
+						Row[] rows = null;
+						if (viewer.getInput() instanceof Row[]) {
+							rows = (Row[]) viewer.getInput();
+						}
+						int index = -1;
+						if (rows != null) {
+							for (int i = 0; i < rows.length; i++) {
+								if (rows[i].oid.equals(oid)) {
+									index = i;
+									break;
+								}
+							}
+						}
+						if (index > -1) {
+							tree.select(tree.getItem(index));
+						}
+					}
 
 				}
 			});
@@ -192,8 +192,8 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(ITableColumnChangeEvent e) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					// disposeTable();
-					// createTable();
+					disposeTable();
+					createTable();
 				}
 			});
 
@@ -202,10 +202,10 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(IUnmarkObjectEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					// selectedOid = null;
-					// if (!composite.isDisposed()) {
-					// viewer.refresh();
-					// }
+					selectedOid = null;
+					if (!composite.isDisposed()) {
+						viewer.refresh();
+					}
 				}
 			});
 
@@ -214,9 +214,9 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(IUnselectedObjectEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					// if (!composite.isDisposed()) {
-					// tree.deselectAll();
-					// }
+					if (!composite.isDisposed()) {
+						tree.deselectAll();
+					}
 				}
 			});
 		}
@@ -258,6 +258,7 @@ public class TableView extends LMLViewPart {
 	private String selectedOid = null;
 
 	private boolean componentAdded = false;
+	private boolean isMouseDown = false;
 
 	private final EventForwarder eventForwarder = new EventForwarder();
 
@@ -378,6 +379,7 @@ public class TableView extends LMLViewPart {
 		tree.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
+				isMouseDown = true;
 				if (e.button == 1) {
 					final TreeItem item = tree.getItem(new Point(e.x, e.y));
 					if (!composite.isDisposed()) {
@@ -394,6 +396,7 @@ public class TableView extends LMLViewPart {
 						lmlManager.unmarkObject(item.getData().toString());
 					}
 				}
+				isMouseDown = false;
 			}
 
 		});
@@ -465,6 +468,7 @@ public class TableView extends LMLViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
+		gid = getViewSite().getId();
 		composite = new Composite(parent, SWT.None);
 		composite.setLayout(new FillLayout());
 
@@ -632,8 +636,7 @@ public class TableView extends LMLViewPart {
 						final String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
 						if (remoteServicesId != null) {
 							final IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
-									remoteServicesId,
-									progress.newChild(25));
+									remoteServicesId, progress.newChild(25));
 							final IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
 							final String remoteConnectionName = control.getControlConfiguration().getConnectionName();
 							final IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
@@ -811,13 +814,18 @@ public class TableView extends LMLViewPart {
 	}
 
 	private void setViewerInput() {
-		Row[] input = new Row[0];
-		if (fSelectedLguiItem != null) {
-			input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
-		}
-		if (!composite.isDisposed()) {
-			viewer.setInput(input);
-			viewer.getTree().setItemCount(input.length);
+		/*
+		 * Don't change input if mouse is down as this causes a SIGSEGV in SWT!
+		 */
+		if (!isMouseDown) {
+			Row[] input = new Row[0];
+			if (fSelectedLguiItem != null) {
+				input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
+			}
+			if (!composite.isDisposed()) {
+				viewer.setInput(input);
+				viewer.getTree().setItemCount(input.length);
+			}
 		}
 	}
 }
