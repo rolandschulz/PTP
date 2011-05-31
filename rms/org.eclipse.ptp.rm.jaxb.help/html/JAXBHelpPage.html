@@ -80,6 +80,8 @@
 			resource managers already provided with the PTP distribution, the
 			first section may be skipped.</b>
 	</p>
+	<hr>
+
 	<h2>
 		<a name="Configuring">Configuring the Resource Manager</a>
 	</h2>
@@ -92,10 +94,10 @@
 		configuration.
 	</p>
 
-	<h4>
+	<h3>
 		<a name="ResourceManagerData">The Resource Manager Data Type</a>
-	</h4>
-	<img alt="ResourceManagerData" src="images/01rm-data.png" />
+	</h3>
+	<img alt="ResourceManagerData" src="images/01rm-data.jpeg" />
 	<br>
 
 	<p>
@@ -133,16 +135,18 @@
 		"environment"; these variables are dereferenced in the configuration
 		file via
 		<code>
-			${rm:name#<i>fieldName</i>}
+			${ptp_rm:name#<i>fieldName</i>}
 		</code>
 		, e.g.,
-		<code>${rm:queues#value}</code>
+		<code>${ptp_rm:queues#value}</code>
 		(see further below on the fields for properties and attributes); all
 		properties and attributes defined in the configuration are mapped. The
 		following hard-coded properties are also added at runtime: <br> <br>
 		<code>control.user.name</code>
 		<br>
 		<code>control.address</code>
+		<br>
+		<code>control.workding.dir</code>
 		<br>
 		<code>executablePath</code>
 		<br>
@@ -173,12 +177,56 @@
 		as the process termination will be handled internally. However, in
 		some cases (such as PBS -I) which require the interactive job to run
 		as a pseudo-terminal, one may need this command in order to force its
-		termination.
+		termination externally.
 	</p>
 
+	<h3>
+		<a name="ControlType">The Control Data Type</a>
+	</h3>
+	<img alt="ControlData" src="images/02control.jpeg" />
+	<br>
+	<p>The majority of the XML definition is given over to the set-up
+		of the Resource Manager control. One can think of this section as
+		having four subdivisions:</p>
+	<ol>
+		<li>Configuration Variable Definitions (the «Environment»)</li>
+		<li>Files and Scripts</li>
+		<li>External Commands and their Stream Parsers</li>
+		<li>UI Configuration (Launch Tab)</li>
+	</ol>
+
+	<p>We will look at these each in turn.</p>
+
+	<h4>
+		<a name="PropertyAttributeType">Property and Attribute Types</a>
+	</h4>
+	<p>
+		A property is any variable necessary for the functioning of the
+		resource manager. Properties often (but not necessarily) are not
+		visible. The value for properties can be any primitive type, or lists
+		or maps of strings. If
+		<code>stdout</code>
+		and
+		<code>stderr</code>
+		from a scheduled job is to be delivered to the client, the properties
+		<i>stdout_remote_path</i> and <i>stderr_remote_path</i> should be
+		included in the resource manager property set.
+	</p>
+
+
+	<p>NOTE: the untyped "value" element on properties is for internal
+		use only; to give a predefined (primitive) value, use the "default"
+		element along with the "type" attribute.</p>
+
+	<p>
+		<a href="resource_manager_type.xsd">XML Resource Manager Schema</a><br>
+	</p>
+	<hr>
 	<h2>
 		<a name="Using">Using the Resource Manager</a>
 	</h2>
+
+	<hr>
 	<p>
 		<a href="toc.html">Back to Table of Contents</a>
 	</p>

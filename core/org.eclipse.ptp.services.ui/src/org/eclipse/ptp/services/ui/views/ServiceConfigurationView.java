@@ -32,29 +32,24 @@ import org.eclipse.ui.part.ViewPart;
 
 public class ServiceConfigurationView extends ViewPart {
 
-	/**
-	 * Listener for service configuration selection events.
-	 */
-	private class ServiceModelEventListener implements IServiceModelEventListener {
-		public void handleEvent(IServiceModelEvent event) {
-			refreshViewer();
-		}
-	}
-	
 	private class ServiceConfigurationLabelProvider extends WorkbenchLabelProvider {
-		
-		private Font selectedFont;
-		private Font unSelectedFont;
-		
+
+		private final Font selectedFont;
+		private final Font unSelectedFont;
+
 		public ServiceConfigurationLabelProvider(Font font) {
 			unSelectedFont = font;
 			FontData fd = font.getFontData()[0];
 			FontData selectedFontData = new FontData(fd.getName(), fd.getHeight(), SWT.BOLD);
-			selectedFont = (Font)new LocalResourceManager(JFaceResources.getResources()).get(FontDescriptor.createFrom(selectedFontData));
+			selectedFont = (Font) new LocalResourceManager(JFaceResources.getResources()).get(FontDescriptor
+					.createFrom(selectedFontData));
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.model.WorkbenchLabelProvider#getFont(java.lang.Object)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ui.model.WorkbenchLabelProvider#getFont(java.lang.Object)
 		 */
 		@Override
 		public Font getFont(Object element) {
@@ -64,7 +59,7 @@ public class ServiceConfigurationView extends ViewPart {
 			}
 			return unSelectedFont;
 		}
-		
+
 		private IServiceConfiguration getServiceConfiguration(Object parentElement) {
 			IServiceConfiguration conf = null;
 			if (parentElement instanceof IAdaptable) {
@@ -74,19 +69,32 @@ public class ServiceConfigurationView extends ViewPart {
 		}
 	}
 
+	/**
+	 * Listener for service configuration selection events.
+	 */
+	private class ServiceModelEventListener implements IServiceModelEventListener {
+		public void handleEvent(IServiceModelEvent event) {
+			refreshViewer();
+		}
+	}
+
 	private TreeViewer fViewer;
-	private IServiceModelManager fManager = ServiceModelManager.getInstance();
+	private final IServiceModelManager fManager = ServiceModelManager.getInstance();
 
 	public ServiceConfigurationView() {
-		fManager.addEventListener(new ServiceModelEventListener(), 
-				IServiceModelEvent.SERVICE_CONFIGURATION_SELECTED |
-				IServiceModelEvent.SERVICE_CONFIGURATION_ADDED |
-				IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED);
+		fManager.addEventListener(new ServiceModelEventListener(), IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED
+				| IServiceModelEvent.SERVICE_CONFIGURATION_SELECTED | IServiceModelEvent.SERVICE_CONFIGURATION_ADDED
+				| IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		fViewer = new TreeViewer(parent, SWT.MULTI);
 		fViewer.setContentProvider(new WorkbenchContentProvider());
@@ -105,9 +113,12 @@ public class ServiceConfigurationView extends ViewPart {
 		getSite().setSelectionProvider(fViewer);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
 	 */
+	@Override
 	public synchronized void dispose() {
 		super.dispose();
 	}
@@ -123,25 +134,29 @@ public class ServiceConfigurationView extends ViewPart {
 	 * Refresh the tree viewer when the model changes
 	 */
 	public void refreshViewer() {
-		fViewer.getControl().getDisplay().asyncExec(new Runnable(){
+		fViewer.getControl().getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				fViewer.refresh();
 			}
 		});
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
+	@Override
 	public void setFocus() {
 		fViewer.getControl().setFocus();
 	}
-	
+
 	/**
 	 * Create the popup menu
 	 */
 	private void createContextMenu() {
-		MenuManager menuManager = new MenuManager("#PopupMenu", "org.eclipse.ptp.services.ui.views.serviceConfigurationView.contextMenu"); //$NON-NLS-1$ //$NON-NLS-2$
+		MenuManager menuManager = new MenuManager(
+				"#PopupMenu", "org.eclipse.ptp.services.ui.views.serviceConfigurationView.contextMenu"); //$NON-NLS-1$ //$NON-NLS-2$
 		menuManager.setRemoveAllWhenShown(true);
 		Menu menu = menuManager.createContextMenu(fViewer.getControl());
 		fViewer.getControl().setMenu(menu);

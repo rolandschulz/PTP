@@ -123,8 +123,10 @@
 			<xs:documentation>
 				A property is any variable necessary for the functioning of the resource manager. Properties often (but not
 				necessarily) are not visible. The value for properties can by any primitive type, or lists or maps of strings. If stdout from a
-				scheduled job is to be delivered to the client, the "stdout" property should be included in the resource manager property set.
-				NOTE: the untyped "value" element on properties is for internal use only; to give a predefined (primitive) value, use the "default"
+				scheduled job is to be delivered to the client, stdout_remote_path and stderr_remote_path properties should be included in the
+				resource manager property set.
+				NOTE: the untyped "value" element on properties is for internal use only; to give a predefined
+				(primitive) value, use the "default"
 				element along with the "type" attribute.
 			</xs:documentation>
 		</xs:annotation>
@@ -193,13 +195,13 @@
 			<xs:element name="default" minOccurs="0" type="xs:string"/>
 			<xs:element name="value" minOccurs="0"/>
 			<xs:element name="link-update-to" minOccurs="0" maxOccurs="unbounded" type="xs:string">
-            <xs:annotation>
-               <xs:documentation>
-                  A change in the value of this attribute is propagated to the indicated properties or attributes such that their
-                  current value is overwritten by it.
-               </xs:documentation>
-            </xs:annotation>
-         </xs:element>
+				<xs:annotation>
+					<xs:documentation>
+						A change in the value of this attribute is propagated to the indicated properties or attributes such that their
+						current value is overwritten by it.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="validator" minOccurs="0" type="rm:validator-type">
 				<xs:annotation>
 					<xs:documentation>
