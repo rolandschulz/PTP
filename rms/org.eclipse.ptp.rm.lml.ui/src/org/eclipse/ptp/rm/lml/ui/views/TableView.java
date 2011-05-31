@@ -650,6 +650,10 @@ public class TableView extends LMLViewPart {
 		return widths;
 	}
 
+	public void init() {
+
+	}
+
 	/**
 	 * Set the flags if this update carries ready info for the output files.
 	 * 

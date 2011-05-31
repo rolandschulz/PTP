@@ -210,11 +210,13 @@ public class LguiItem implements ILguiItem {
 	 **************************************************************************************************************/
 
 	public void addUserJob(String name, JobStatusData status) {
+		final Map<String, String> map = findMap(status);
 		if (status.getJobInfo() == null) {
-			findMap(status).put(name, null);
+			map.put(name, null);
 		} else {
-			findMap(status).put(name, status.getJobInfo().getOid());
+			map.put(name, status.getJobInfo().getOid());
 		}
+
 	}
 
 	/**
@@ -235,23 +237,17 @@ public class LguiItem implements ILguiItem {
 	private Map<String, String> findMap(JobStatusData status) {
 		if (status.getState().equals("RUNNING")) {
 			return jobsRunningMap;
-		} else {// if (status.getState().equals("SUBMITTED")) {
+		} else {
 			return jobsWaitingMap;
 		}
-		// } else {
-		// return jobsFurtherMap;
-		// }
 	}
 
 	private Map<String, String> findMap(String name) {
 		if (jobsRunningMap.containsKey(name)) {
 			return jobsRunningMap;
-		} else {// if (jobsWaitingMap.containsKey(name)) {
+		} else {
 			return jobsWaitingMap;
 		}
-		// else {
-		// return jobsFurtherMap;
-		// }
 	}
 
 	private LguiType firstRequest() {
@@ -268,9 +264,6 @@ public class LguiItem implements ILguiItem {
 		return layoutLgui;
 	}
 
-	/**************************************************************************************************************
-	 * Layout
-	 **************************************************************************************************************/
 	public void getCurrentLayout(OutputStream output) {
 		LguiType layoutLgui = null;
 		if (lgui == null) {
@@ -408,12 +401,9 @@ public class LguiItem implements ILguiItem {
 	public Map<String, String> getUserJobMap(String gid) {
 		if (gid.equals("joblistrun")) {
 			return jobsRunningMap;
-		} else { // if (gid.equals("joblistwait")) {
+		} else {
 			return jobsWaitingMap;
 		}
-		// else {
-		// return jobsFurtherMap;
-		// }
 	}
 
 	/*
@@ -480,7 +470,8 @@ public class LguiItem implements ILguiItem {
 	}
 
 	public void removeUserJob(String name) {
-		findMap(name).remove(name);
+		final Map<String, String> map = findMap(name);
+		map.remove(name);
 	}
 
 	public void restoreUserJobs(Map<String, JobStatusData> map) {
