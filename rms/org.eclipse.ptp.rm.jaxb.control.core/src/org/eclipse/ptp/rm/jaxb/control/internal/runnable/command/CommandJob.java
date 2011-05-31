@@ -67,6 +67,10 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
  */
 public class CommandJob extends Job implements ICommandJob {
 
+	public enum JobMode {
+		BATCH, STATUS, INTERACTIVE
+	}
+
 	/**
 	 * Internal class used for multiplexing output streams between two different
 	 * endpoints, usually a tokenizer on the one hand and the stream proxy
@@ -157,7 +161,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private final IVariableMap rmVarMap;
 	private final int flags;
 	private final boolean waitForId;
-	private final boolean batch;
+	private final JobMode mode;
 	private final boolean keepOpen;
 	private final StringBuffer error;
 
@@ -181,15 +185,15 @@ public class CommandJob extends Job implements ICommandJob {
 	 *            either internal or resource specific identifier
 	 * @param command
 	 *            JAXB data element
-	 * @param batch
-	 *            whether submission is batch or interactive
+	 * @param mode
+	 *            whether submission is batch, interactive or status
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public CommandJob(String jobUUID, CommandType command, boolean batch, IJAXBResourceManager rm) {
+	public CommandJob(String jobUUID, CommandType command, JobMode mode, IJAXBResourceManager rm) {
 		super(command.getName() + JAXBControlConstants.CO + JAXBControlConstants.SP + (jobUUID == null ? rm.getName() : jobUUID));
 		this.command = command;
-		this.batch = batch;
+		this.mode = mode;
 		this.rm = rm;
 		this.control = (JAXBResourceManagerControl) rm.getControl();
 		this.rmVarMap = this.control.getEnvironment();
@@ -250,7 +254,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @return if job is batch
 	 */
 	public boolean isBatch() {
-		return batch;
+		return mode == JobMode.BATCH;
 	}
 
 	/*
@@ -349,18 +353,27 @@ public class CommandJob extends Job implements ICommandJob {
 						return status;
 					}
 				} else {
-					String state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
-					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
+					if (mode == JobMode.STATUS) {
+						CoreException e = joinConsumers();
+						if (e != null) {
+							return CoreExceptionUtils.getErrorStatus(e.getMessage(), e);
+						}
+					}
 					PropertyType p = (PropertyType) rmVarMap.get(uuid);
+					String state = (String) p.getValue();
+					if (state == null) {
+						state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
+						p.setValue(state);
+					}
 					p.setName(uuid);
-					p.setValue(state);
+					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
 				}
 
 				if (monitor.isCanceled()) {
 					return status;
 				}
 
-				if (!batch) {
+				if (!isBatch()) {
 					jobStatus.setProcess(process);
 				}
 				jobStatus.setProxy(getProxy());
@@ -526,6 +539,7 @@ public class CommandJob extends Job implements ICommandJob {
 			return CoreExceptionUtils.newException(Messages.ParserInternalError + JAXBControlConstants.CO + JAXBControlConstants.SP
 					+ t.toString(), t);
 		}
+
 		return null;
 	}
 

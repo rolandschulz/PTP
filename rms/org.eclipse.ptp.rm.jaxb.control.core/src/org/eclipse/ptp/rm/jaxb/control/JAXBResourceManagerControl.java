@@ -313,7 +313,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				p.setVisible(false);
 				p.setName(jobId);
 				rmVarMap.put(jobId, p);
-				runCommand(jobId, job, false, true);
+				runCommand(jobId, job, CommandJob.JobMode.STATUS, true);
 				p = (PropertyType) rmVarMap.remove(jobId);
 			}
 
@@ -495,7 +495,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			rmVarMap.remove(jobId);
 			rmVarMap.remove(JAXBControlConstants.SCRIPT_PATH);
 			rmVarMap.remove(JAXBControlConstants.SCRIPT);
-
 			return status;
 		} finally {
 			pinTable.release(uuid);
@@ -586,7 +585,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 		}
 
-		runCommand(jobId, job, false, true);
+		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, true);
 	}
 
 	/**
@@ -605,19 +604,19 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private ICommandJob doJobSubmitCommand(String uuid, String mode) throws CoreException {
 		CommandType command = null;
-		boolean batch = false;
+		CommandJob.JobMode jobMode = CommandJob.JobMode.INTERACTIVE;
 
 		if (ILaunchManager.RUN_MODE.equals(mode)) {
 			command = controlData.getSubmitBatch();
 			if (command != null) {
-				batch = true;
+				jobMode = CommandJob.JobMode.BATCH;
 			} else {
 				command = controlData.getSubmitInteractive();
 			}
 		} else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
 			command = controlData.getSubmitBatchDebug();
 			if (command != null) {
-				batch = true;
+				jobMode = CommandJob.JobMode.BATCH;
 			} else {
 				command = controlData.getSubmitInteractiveDebug();
 			}
@@ -632,7 +631,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * NOTE: changed this to join, because the waitForId is now part of the
 		 * run() method of the command itself (05.01.2011)
 		 */
-		return runCommand(uuid, command, batch, true);
+		return runCommand(uuid, command, jobMode, true);
 	}
 
 	/**
@@ -784,7 +783,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		try {
-			runCommand(jobId, job, false, true);
+			runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, true);
 		} catch (CoreException t) {
 			JAXBControlCorePlugin.log(t);
 		} finally {
@@ -884,19 +883,19 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @param command
 	 *            configuration object containing the command arguments and
 	 *            tokenizers
-	 * @param batch
-	 *            whether batch or interactive
+	 * @param mode
+	 *            whether batch, interactive, or a status job
 	 * @param join
 	 *            whether to launch serially or not
 	 * @return the runnable job object
 	 * @throws CoreException
 	 */
-	private ICommandJob runCommand(String uuid, CommandType command, boolean batch, boolean join) throws CoreException {
+	private ICommandJob runCommand(String uuid, CommandType command, CommandJob.JobMode mode, boolean join) throws CoreException {
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		ICommandJob job = new CommandJob(uuid, command, batch, (IJAXBResourceManager) getResourceManager());
+		ICommandJob job = new CommandJob(uuid, command, mode, (IJAXBResourceManager) getResourceManager());
 		((Job) job).setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 		job.schedule();
 
@@ -907,7 +906,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 			checkJobForError(job);
 		}
-
 		return job;
 	}
 
@@ -923,7 +921,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void runCommands(List<CommandType> cmds) throws CoreException {
 		for (CommandType cmd : cmds) {
-			runCommand(null, cmd, false, true);
+			runCommand(null, cmd, CommandJob.JobMode.INTERACTIVE, true);
 		}
 	}
 
