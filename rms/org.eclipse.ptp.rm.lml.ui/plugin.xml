@@ -38,14 +38,6 @@
             id="joblistwait"
             name="%TableView2.name">
       </view>
-      <view
-            allowMultiple="true"
-            category="org.eclipse.ptp.rm.lml.ui.views"
-            class="org.eclipse.ptp.rm.lml.ui.views.TableView"
-            icon="icons/parallel_perspective.gif"
-            id="joblistfurther"
-            name="%TableView3.name">
-      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
