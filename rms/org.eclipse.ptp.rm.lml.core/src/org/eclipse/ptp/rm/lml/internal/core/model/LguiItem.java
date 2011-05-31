@@ -149,7 +149,8 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * Map of other jobs.
 	 */
-	// public Map<String, String> jobsFurtherMap = new HashMap<String, String>();
+	// public Map<String, String> jobsFurtherMap = new HashMap<String,
+	// String>();
 
 	public static final String LAYOUT = "layout";
 
@@ -422,7 +423,6 @@ public class LguiItem implements ILguiItem {
 	}
 
 	public Map<String, String> getUserJobMap(String gid) {
-		System.out.println(gid);
 		if (gid.equals("joblistrun")) {
 			return jobsRunningMap;
 		} else {
