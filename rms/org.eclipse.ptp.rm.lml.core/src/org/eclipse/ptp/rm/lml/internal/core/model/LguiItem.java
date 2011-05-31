@@ -478,7 +478,9 @@ public class LguiItem implements ILguiItem {
 	private Map<String, String> revert(Map<String, String> map) {
 		final Map<String, String> revertMap = new HashMap<String, String>();
 		for (final Map.Entry<String, String> entry : map.entrySet()) {
-			revertMap.put(entry.getValue(), entry.getValue());
+			if (entry.getValue() != null) {
+				revertMap.put(entry.getValue(), entry.getValue());
+			}
 		}
 		return revertMap;
 	}

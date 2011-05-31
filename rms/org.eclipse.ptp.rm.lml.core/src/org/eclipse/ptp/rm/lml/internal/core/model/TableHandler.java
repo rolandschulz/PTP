@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
@@ -348,7 +347,7 @@ public class TableHandler extends LguiHandler {
 		return tableData;
 	}
 
-	public Row[] getTableDataWithColor(String gid, Map<String, String> userJobMap) {
+	public Row[] getTableDataWithColor(String gid) {
 		if (this.gid != gid) {
 			this.gid = gid;
 		}
