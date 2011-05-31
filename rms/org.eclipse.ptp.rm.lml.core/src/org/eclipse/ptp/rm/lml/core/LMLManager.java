@@ -453,7 +453,9 @@ public class LMLManager {
 				map.put(jobStatusData.getJobId(), jobStatusData);
 			}
 			for (final JobStatusData data : dataList) {
-
+				if (!data.getState().equals("COMPLETED")) {
+					// method call
+				}
 			}
 		}
 	}

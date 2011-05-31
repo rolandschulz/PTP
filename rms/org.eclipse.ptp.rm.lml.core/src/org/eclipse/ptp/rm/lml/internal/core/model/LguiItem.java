@@ -211,10 +211,17 @@ public class LguiItem implements ILguiItem {
 
 	public void addUserJob(String name, JobStatusData status) {
 		final Map<String, String> map = findMap(status);
+		final String gid = findGid(status);
 		if (status.getJobInfo() == null) {
 			map.put(name, null);
+			final List<String> list = new ArrayList<String>();
+			list.add(name);
+			updateJobDate(new HashMap<String, String>(), list, gid);
 		} else {
 			map.put(name, status.getJobInfo().getOid());
+			final Map<String, String> map2 = new HashMap<String, String>();
+			map2.put(status.getJobInfo().getOid(), name);
+			updateJobDate(map2, new ArrayList<String>(), gid);
 		}
 
 	}
@@ -232,6 +239,22 @@ public class LguiItem implements ILguiItem {
 		lguiHandlers.put(OIDToInformation.class, new OIDToInformation(this, lgui));
 		lguiHandlers.put(TableHandler.class, new TableHandler(this, lgui));
 		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this, lgui));
+	}
+
+	private String findGid(JobStatusData status) {
+		if (status.getState().equals("RUNNING")) {
+			return "joblistrun";
+		} else {
+			return "joblistwait";
+		}
+	}
+
+	private String findGid(String name) {
+		if (jobsRunningMap.containsKey(name)) {
+			return "joblistrun";
+		} else {
+			return "joblistwait";
+		}
 	}
 
 	private Map<String, String> findMap(JobStatusData status) {
@@ -470,8 +493,21 @@ public class LguiItem implements ILguiItem {
 	}
 
 	public void removeUserJob(String name) {
+		final String gid = findGid(name);
 		final Map<String, String> map = findMap(name);
-		map.remove(name);
+		final String oid = map.remove(name);
+
+		final List<RowType> oldRows = getTableHandler().getTable(gid).getRow();
+		final List<RowType> newRows = new ArrayList<RowType>();
+		for (final RowType row : oldRows) {
+			if (!row.getOid().equals(oid)) {
+				newRows.add(row);
+			}
+		}
+		oldRows.clear();
+		for (final RowType row : newRows) {
+			oldRows.add(row);
+		}
 	}
 
 	public void restoreUserJobs(Map<String, JobStatusData> map) {
