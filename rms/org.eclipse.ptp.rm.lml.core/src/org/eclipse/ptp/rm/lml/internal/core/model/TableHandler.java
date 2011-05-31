@@ -16,7 +16,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
@@ -29,6 +31,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TablelayoutType;
+import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 
 public class TableHandler extends LguiHandler {
 
@@ -352,6 +355,7 @@ public class TableHandler extends LguiHandler {
 		if (this.gid != gid) {
 			this.gid = gid;
 		}
+		final Map<String, String> map = lguiItem.revert(lguiItem.getUserJobMap(gid));
 		getCidsToPosition();
 		final TableType table = getTable(gid);
 		final Row[] tableData = new Row[table.getRow().size()];
@@ -361,6 +365,12 @@ public class TableHandler extends LguiHandler {
 			if (row.getOid() != null) {
 				tableData[i].setOid(row.getOid());
 				tableData[i].setColor(lguiItem.getOIDToObject().getColorById(row.getOid()));
+				if (map.containsKey(row.getOid())) {
+					final JobStatusData status = LMLManager.getInstance().getJobStatusData(lguiItem.toString(),
+							map.get(row.getOid()));
+					tableData[i].setJobStatusData(status);
+				}
+
 			}
 			final Cell[] tableDataRow = new Cell[cids.length];
 			for (int j = 0; j < cids.length; j++) {

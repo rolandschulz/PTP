@@ -452,6 +452,9 @@ public class LMLManager {
 			for (final JobStatusData jobStatusData : dataList) {
 				map.put(jobStatusData.getJobId(), jobStatusData);
 			}
+			for (final JobStatusData data : dataList) {
+
+			}
 		}
 	}
 

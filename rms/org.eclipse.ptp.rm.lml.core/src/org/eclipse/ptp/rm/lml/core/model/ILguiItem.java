@@ -73,6 +73,8 @@ public interface ILguiItem {
 
 	public void restoreUserJobs(Map<String, JobStatusData> map);
 
+	public Map<String, String> revert(Map<String, String> map);
+
 	//
 	// /**
 	// * Getting the source of the XML file from whcih the corresponding LguiType has been generated.
