@@ -21,7 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
@@ -37,6 +44,7 @@ import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
+import org.eclipse.ptp.rm.lml.core.messages.Messages;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoType;
 import org.eclipse.ptp.rm.lml.internal.core.events.JobListSortedEvent;
@@ -54,6 +62,8 @@ import org.eclipse.ptp.rm.lml.internal.core.events.ViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -176,6 +186,37 @@ public class LMLManager {
 		if (item == fLguiItem) {
 			fireUpdatedLgui();
 		}
+	}
+
+	private boolean checkControl(IResourceManager manager, final IResourceManagerControl control, boolean autoStart)
+			throws CoreException {
+		boolean ok = false;
+		if (control != null) {
+			if (manager.getState().equals(IResourceManager.STARTED_STATE)) {
+				ok = true;
+			} else if (autoStart) {
+				final Job j = new Job(IResourceManager.STARTING_STATE + JobStatusData.COSP + manager.getName()) {
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						try {
+							control.start(monitor);
+						} catch (final CoreException t) {
+							return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				j.schedule();
+
+				try {
+					j.join();
+				} catch (final InterruptedException ignored) {
+				}
+
+				ok = j.getResult().getSeverity() == IStatus.OK;
+			}
+		}
+		return ok;
 	}
 
 	public void closeLgui(String name, IMemento memento) {
@@ -358,6 +399,39 @@ public class LMLManager {
 		fireMarkObject(oid);
 	}
 
+	/**
+	 * Set the flags if this update carries ready info for the output files.
+	 * 
+	 * @param job
+	 */
+	private void maybeCheckFiles(JobStatusData job) {
+		if (IJobStatus.JOB_OUTERR_READY.equals(job.getStateDetail())) {
+			if (job.getOutputPath() != null) {
+				job.setOutReady(true);
+			}
+			if (job.getErrorPath() != null) {
+				job.setErrReady(true);
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @param job
+	 * @param autoStart
+	 * @param monitor
+	 * @throws CoreException
+	 */
+	public void maybeUpdateJobState(JobStatusData job, boolean autoStart, IProgressMonitor monitor) throws CoreException {
+		final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
+		final IResourceManagerControl control = rm.getControl();
+		if (checkControl(rm, control, autoStart)) {
+			final IJobStatus refreshed = control.getJobStatus(job.getJobId(), monitor);
+			job.updateState(refreshed);
+			maybeCheckFiles(job);
+		}
+	}
+
 	public void openLgui(String name, IMemento memento) {
 		synchronized (LGUIS) {
 			ILguiItem item = LGUIS.get(name);
@@ -379,6 +453,28 @@ public class LMLManager {
 		}
 	}
 
+	private void refreshJobStatus(JobStatusData data) {
+		final JobStatusData status = data;
+		final Job j = new Job(Messages.RefreshJobStatus) {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					maybeUpdateJobState(status, true, monitor);
+				} catch (final CoreException t) {
+					return CoreExceptionUtils.getErrorStatus(Messages.RefreshJobStatusError, t);
+				}
+				if (monitor != null && monitor.isCanceled()) {
+					return Status.CANCEL_STATUS;
+				}
+				return Status.OK_STATUS;
+			}
+
+		};
+
+		j.setUser(true);
+		j.schedule();
+	}
+
 	public void register(String name, InputStream input, OutputStream output) {
 		ILguiItem lguiItem = null;
 		synchronized (LGUIS) {
@@ -396,8 +492,6 @@ public class LMLManager {
 				}
 			}
 		}
-
-		// TODO Checking for jobs, updating the InfoTyp in JobStatusData
 	}
 
 	public void removeComponent(String gid) {
@@ -454,7 +548,7 @@ public class LMLManager {
 			}
 			for (final JobStatusData data : dataList) {
 				if (!data.getState().equals("COMPLETED")) {
-					// method call
+					refreshJobStatus(data);
 				}
 			}
 		}
