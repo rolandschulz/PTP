@@ -422,6 +422,7 @@ public class LguiItem implements ILguiItem {
 	}
 
 	public Map<String, String> getUserJobMap(String gid) {
+		System.out.println(gid);
 		if (gid.equals("joblistrun")) {
 			return jobsRunningMap;
 		} else {
