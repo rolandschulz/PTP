@@ -89,6 +89,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.progress.UIJob;
 
 public class TableView extends LMLViewPart {
@@ -104,7 +106,7 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(IJobListSortedEvent e) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					setViewerInput();
+					// setViewerInput();
 				}
 			});
 
@@ -113,6 +115,10 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(ILguiAddedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
+					if (composite == null) {
+						System.out.println("composite ist null");
+						return;
+					}
 					fSelectedLguiItem = lmlManager.getSelectedLguiItem();
 					if (fSelectedLguiItem != null) {
 						createTable();
@@ -127,6 +133,10 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(ILguiRemovedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
+					if (composite == null) {
+						System.out.println("composite ist null");
+						return;
+					}
 					if (componentAdded) {
 						fSelectedLguiItem.getObjectStatus().removeComponent(eventForwarder);
 						componentAdded = false;
@@ -142,9 +152,9 @@ public class TableView extends LMLViewPart {
 			selectedOid = event.getOid();
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					if (!composite.isDisposed()) {
-						viewer.refresh();
-					}
+					// if (!composite.isDisposed()) {
+					// viewer.refresh();
+					// }
 				}
 			});
 		}
@@ -153,26 +163,26 @@ public class TableView extends LMLViewPart {
 			final String oid = event.getOid();
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					if (!composite.isDisposed() && viewer.getInput() != null) {
-						tree.deselectAll();
-
-						Row[] rows = null;
-						if (viewer.getInput() instanceof Row[]) {
-							rows = (Row[]) viewer.getInput();
-						}
-						int index = -1;
-						if (rows != null) {
-							for (int i = 0; i < rows.length; i++) {
-								if (rows[i].oid.equals(oid)) {
-									index = i;
-									break;
-								}
-							}
-						}
-						if (index > -1) {
-							tree.select(tree.getItem(index));
-						}
-					}
+					// if (!composite.isDisposed() && viewer.getInput() != null) {
+					// tree.deselectAll();
+					//
+					// Row[] rows = null;
+					// if (viewer.getInput() instanceof Row[]) {
+					// rows = (Row[]) viewer.getInput();
+					// }
+					// int index = -1;
+					// if (rows != null) {
+					// for (int i = 0; i < rows.length; i++) {
+					// if (rows[i].oid.equals(oid)) {
+					// index = i;
+					// break;
+					// }
+					// }
+					// }
+					// if (index > -1) {
+					// tree.select(tree.getItem(index));
+					// }
+					// }
 
 				}
 			});
@@ -182,8 +192,8 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(ITableColumnChangeEvent e) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					disposeTable();
-					createTable();
+					// disposeTable();
+					// createTable();
 				}
 			});
 
@@ -192,10 +202,10 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(IUnmarkObjectEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					selectedOid = null;
-					if (!composite.isDisposed()) {
-						viewer.refresh();
-					}
+					// selectedOid = null;
+					// if (!composite.isDisposed()) {
+					// viewer.refresh();
+					// }
 				}
 			});
 
@@ -204,9 +214,9 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(IUnselectedObjectEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					if (!composite.isDisposed()) {
-						tree.deselectAll();
-					}
+					// if (!composite.isDisposed()) {
+					// tree.deselectAll();
+					// }
 				}
 			});
 		}
@@ -214,6 +224,10 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(IViewUpdateEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
+					if (composite == null) {
+						System.out.println("composite ist null");
+						return;
+					}
 					if (selectedItem != null) {
 						lmlManager.unmarkObject(selectedItem.getData().toString());
 						selectedItem = null;
@@ -311,17 +325,19 @@ public class TableView extends LMLViewPart {
 		if (fSelectedLguiItem.isLayout()) {
 			return;
 		}
+
+		sizeViewer = composite.getSize().x - 70;
+		final ITableColumnLayout[] tableColumnLayouts = fSelectedLguiItem.getTableHandler().getTableColumnLayout(gid, sizeViewer);
+		if (tableColumnLayouts == null) {
+			return;
+		}
+
 		final TreeColumn treeColumnImage = new TreeColumn(tree, SWT.LEAD, 0);
 		treeColumnImage.setWidth(40);
 		treeColumnImage.setMoveable(true);
 		treeColumnImage.setResizable(false);
 
 		treeColumns = new TreeColumn[fSelectedLguiItem.getTableHandler().getNumberOfTableColumns(gid)];
-		sizeViewer = composite.getSize().x - 70;
-		final ITableColumnLayout[] tableColumnLayouts = fSelectedLguiItem.getTableHandler().getTableColumnLayout(gid, sizeViewer);
-		if (tableColumnLayouts == null) {
-			return;
-		}
 
 		for (int i = 0; i < tableColumnLayouts.length; i++) {
 			final TreeColumn treeColumn = new TreeColumn(tree, getColumnAlignment(tableColumnLayouts[i].getStyle()));
@@ -449,7 +465,6 @@ public class TableView extends LMLViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		gid = getViewSite().getId();
 		composite = new Composite(parent, SWT.None);
 		composite.setLayout(new FillLayout());
 
@@ -534,7 +549,6 @@ public class TableView extends LMLViewPart {
 
 			}
 		});
-		lmlManager.addListener(lmlListener, this.getClass().getName());
 
 		tree = viewer.getTree();
 		tree.addControlListener(new ControlAdapter() {
@@ -549,19 +563,18 @@ public class TableView extends LMLViewPart {
 		});
 
 		viewer.setUseHashlookup(true);
+		tree.setLinesVisible(true);
+		tree.setHeaderVisible(true);
+
+		createTable();
 
 	}
 
 	private void createTable() {
-		tree.setLinesVisible(true);
-		tree.setHeaderVisible(true);
-
-		createColumns();
-
-		if (fSelectedLguiItem.getTableHandler().isEmpty(gid)) {
+		if (fSelectedLguiItem == null) {
 			return;
 		}
-
+		createColumns();
 		createMenu(); // view menu
 
 		// Insert the input
@@ -696,8 +709,14 @@ public class TableView extends LMLViewPart {
 		return widths;
 	}
 
-	public void init() {
-
+	@Override
+	public void init(IViewSite site) {
+		try {
+			super.init(site);
+		} catch (final PartInitException e) {
+			e.printStackTrace();
+		}
+		lmlManager.addListener(lmlListener, this.getClass().getName());
 	}
 
 	/**
