@@ -3,10 +3,6 @@
 <plugin>
    <extension
          point="org.eclipse.ui.views">
-      <category
-            id="org.eclipse.ptp.rm.lml.ui.views"
-            name="%ParallelViewCategory.name">
-      </category>
       <view
             allowMultiple="true"
             category="org.eclipse.ptp.rm.lml.ui.views"
