@@ -73,6 +73,10 @@ public class RefreshJobStatus extends AbstractStatusAction {
 				action.setEnabled(false);
 				return;
 			}
+			if (!operationSupported(status, JOB_STATUS)) {
+				action.setEnabled(false);
+				return;
+			}
 		}
 		action.setEnabled(true);
 	}

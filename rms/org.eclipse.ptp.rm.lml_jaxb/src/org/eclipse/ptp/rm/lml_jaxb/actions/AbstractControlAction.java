@@ -57,11 +57,6 @@ public abstract class AbstractControlAction extends AbstractStatusAction {
 		j.schedule();
 	}
 
-	protected boolean operationSupported(JobStatusData status) {
-
-		return true;
-	}
-
 	/*
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.ui.actions.AbstractStatusAction#validate(org.
@@ -80,7 +75,7 @@ public abstract class AbstractControlAction extends AbstractStatusAction {
 			} else if (!validateState(row.status)) {
 				action.setEnabled(false);
 				return;
-			} else if (!operationSupported(row.status)) {
+			} else if (!operationSupported(row.status, operation)) {
 				action.setEnabled(false);
 				return;
 			}
