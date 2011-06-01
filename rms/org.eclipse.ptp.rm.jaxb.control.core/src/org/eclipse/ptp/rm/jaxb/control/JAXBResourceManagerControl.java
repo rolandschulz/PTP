@@ -205,9 +205,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	public void jobStateChanged(String jobId, IJobStatus status) {
 		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
-		if (monitor != null) {
-			monitor.updateJob(jobId, status);
-		}
+		// getResourceManager().updateJob(jobId, status);
 	}
 
 	/*
