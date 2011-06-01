@@ -190,16 +190,17 @@ public class TableHandler extends LguiHandler {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getJobTableColumnLayout
-	 * (String tableType, int widthTable)
+	 * (String tableType)
 	 */
-	public ITableColumnLayout[] getTableColumnLayout(String gid, int widthTable) {
+	public ITableColumnLayout[] getTableColumnLayout(String gid) {
 		if (this.gid != gid) {
 			this.gid = gid;
 		}
 		final TablelayoutType tableLayout = lguiItem.getLayoutAccess().getTableLayout(gid);
 		if (tableLayout.getColumn().size() <= 0) {
 			return null;
-			// tableLayout = lguiItem.getLayoutAccess().getDefaultTableLayout(gid);
+			// tableLayout =
+			// lguiItem.getLayoutAccess().getDefaultTableLayout(gid);
 		}
 
 		getCidsToPosition();
@@ -207,29 +208,25 @@ public class TableHandler extends LguiHandler {
 		final ColumnlayoutType[] layoutColumns = lguiItem.getLayoutAccess().getLayoutColumsToCids(cids, gid);
 		final ITableColumnLayout[] tableColumnLayouts = new ITableColumnLayout[cids.length];
 
-		double sumWidthColumns = 0;
-		for (int i = 0; i < cids.length; i++) {
-			sumWidthColumns += layoutColumns[i].getWidth();
-		}
 		for (int i = 0; i < cids.length; i++) {
 			if (columns[i] == null) {
-				tableColumnLayouts[i] = new TableColumnLayout(layoutColumns[i].getKey(), (int) (layoutColumns[i].getWidth()
-						* widthTable / sumWidthColumns), "LEFT");
+				tableColumnLayouts[i] = new TableColumnLayout(layoutColumns[i].getKey(), (int) (layoutColumns[i].getWidth() * 100),
+						"LEFT"); //$NON-NLS-1$
 			} else {
 				String style;
 				switch (columns[i].getSort().value().charAt(0)) {
 				case 'a':
 				case 'd':
-					style = "LEFT";
+					style = "LEFT"; //$NON-NLS-1$
 					break;
 				case 'n':
-					style = "RIGHT";
+					style = "RIGHT"; //$NON-NLS-1$
 					break;
 				default:
-					style = "LEFT";
+					style = "LEFT"; //$NON-NLS-1$
 				}
-				tableColumnLayouts[i] = new TableColumnLayout(columns[i].getName(),
-						(int) (layoutColumns[i].getWidth() * widthTable / sumWidthColumns), style);
+				tableColumnLayouts[i] = new TableColumnLayout(columns[i].getName(), (int) (layoutColumns[i].getWidth() * 100),
+						style);
 			}
 		}
 		return tableColumnLayouts;
@@ -290,13 +287,13 @@ public class TableHandler extends LguiHandler {
 			switch (columns[i].getSort().value().charAt(0)) {
 			case 'a':
 			case 'd':
-				tableColumnStyles[i] = "LEFT";
+				tableColumnStyles[i] = "LEFT"; //$NON-NLS-1$
 				break;
 			case 'n':
-				tableColumnStyles[i] = "RIGHT";
+				tableColumnStyles[i] = "RIGHT"; //$NON-NLS-1$
 				break;
 			default:
-				tableColumnStyles[i] = "LEFT";
+				tableColumnStyles[i] = "LEFT"; //$NON-NLS-1$
 			}
 		}
 		return tableColumnStyles;
@@ -381,7 +378,7 @@ public class TableHandler extends LguiHandler {
 					}
 				}
 				if (tableDataRow[j] == null) {
-					tableDataRow[j] = new Cell("?", tableData[i]);
+					tableDataRow[j] = new Cell("?", tableData[i]); //$NON-NLS-1$
 				}
 			}
 			tableData[i].setCells(tableDataRow);
@@ -471,7 +468,7 @@ public class TableHandler extends LguiHandler {
 				}
 				if (!cellExisting) {
 					final CellType cell = new CellType();
-					cell.setValue("");
+					cell.setValue(""); //$NON-NLS-1$
 					cell.setCid(cid);
 					row.getCell().add(cell);
 				}
