@@ -8,7 +8,7 @@ Export-Package: org.eclipse.ptp.rm.lml.core;x-internal:=true,
  org.eclipse.ptp.rm.lml.core.events,
  org.eclipse.ptp.rm.lml.core.listeners,
  org.eclipse.ptp.rm.lml.core.model,
- org.eclipse.ptp.rm.lml.core.model.jobs;x-friends:="org.eclipse.ptp.rm.lml_jaxb",
+ org.eclipse.ptp.rm.lml.core.model.jobs;x-friends:="org.eclipse.ptp.rm.lml_jaxb,org.eclipse.ptp.rm.lml.ui",
  org.eclipse.ptp.rm.lml.core.util,
  org.eclipse.ptp.rm.lml.internal.core.elements,
  org.eclipse.ptp.rm.lml.internal.core.model

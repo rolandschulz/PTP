@@ -11,21 +11,13 @@
 
 package org.eclipse.ptp.rm.lml.ui.views;
 
-import java.io.BufferedInputStream;
-import java.io.EOFException;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.util.SafeRunnable;
@@ -39,13 +31,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.util.CoreExceptionUtils;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
@@ -67,9 +52,6 @@ import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
-import org.eclipse.ptp.rmsystem.IJobStatus;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -264,56 +246,122 @@ public class TableView extends LMLViewPart {
 
 	private final Map<String, JobStatusData> jobs = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
 
-	private static final int UNDEFINED = -1;
-	private static final int COPY_BUFFER_SIZE = 64 * 1024;
+	@Override
+	public void createPartControl(Composite parent) {
+		gid = getViewSite().getId();
+		composite = new Composite(parent, SWT.None);
+		treeColumnLayout = new TreeColumnLayout();
+		composite.setLayout(treeColumnLayout);
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-	/**
-	 * Exercises a control operation on the remote job.
-	 * 
-	 * @param job
-	 * @param autoStart
-	 * @param operation
-	 * @throws CoreException
-	 */
-	public void callDoControl(JobStatusData job, boolean autoStart, String operation, IProgressMonitor monitor)
-			throws CoreException {
-		final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
-		final IResourceManagerControl control = rm.getControl();
-		if (checkControl(rm, control, autoStart)) {
-			control.control(job.getJobId(), operation, monitor);
-			maybeUpdateJobState(job, autoStart, monitor);
-		}
+		viewer = new TreeViewer(composite, SWT.SINGLE | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.VIRTUAL);
+		viewer.getTree().setLayout(new TableLayout());
+		viewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
+		viewer.setContentProvider(new ILazyTreeContentProvider() {
+			private Row[] rows;
+
+			public void dispose() {
+				// Nothing
+			}
+
+			public Object getParent(Object element) {
+				if (element instanceof Cell) {
+					return ((Cell) element).row;
+				}
+				return rows;
+			}
+
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+				this.rows = (Row[]) newInput;
+			}
+
+			public void updateChildCount(Object element, int currentChildCount) {
+				// Nothing
+			}
+
+			public void updateElement(Object parent, int index) {
+				Object element;
+				if (parent instanceof Row) {
+					element = ((Row) parent).cells[index];
+				} else {
+					element = rows[index];
+				}
+				viewer.replace(parent, index, element);
+				updateChildCount(element, -1);
+			}
+		});
+		viewer.setUseHashlookup(true);
+
+		tree = viewer.getTree();
+
+		headerMenu = new Menu(composite);
+		// Part for the controlling Monitor - context menu
+		final MenuManager contextMenu = new MenuManager();
+		contextMenu.setRemoveAllWhenShown(true);
+		final Menu menu = contextMenu.createContextMenu(composite);
+		getSite().registerContextMenu(contextMenu, viewer);
+
+		tree.setLinesVisible(true);
+		tree.setHeaderVisible(true);
+		tree.addListener(SWT.MenuDetect, new Listener() {
+			public void handleEvent(Event event) {
+				Point pt = tree.getDisplay().map(null, tree, new Point(event.x, event.y));
+				Rectangle clientArea = tree.getClientArea();
+				boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + tree.getHeaderHeight());
+				tree.setMenu(header ? headerMenu : menu);
+			}
+		});
+
+		/*
+		 * Get the selected LguiItem (if there is one) so that the table will be
+		 * populated when the it is first created
+		 */
+		fSelectedLguiItem = lmlManager.getSelectedLguiItem();
+
+		createTable();
 	}
 
-	private boolean checkControl(IResourceManager manager, final IResourceManagerControl control, boolean autoStart)
-			throws CoreException {
-		boolean ok = false;
-		if (control != null) {
-			if (manager.getState().equals(IResourceManager.STARTED_STATE)) {
-				ok = true;
-			} else if (autoStart) {
-				final Job j = new Job(IResourceManager.STARTING_STATE + JobStatusData.COSP + manager.getName()) {
-					@Override
-					protected IStatus run(IProgressMonitor monitor) {
-						try {
-							control.start(monitor);
-						} catch (final CoreException t) {
-							return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				j.schedule();
-
-				try {
-					j.join();
-				} catch (final InterruptedException ignored) {
-				}
-
-				ok = j.getResult().getSeverity() == IStatus.OK;
-			}
+	@Override
+	public void init(IViewSite site) {
+		try {
+			super.init(site);
+		} catch (final PartInitException e) {
+			e.printStackTrace();
 		}
-		return ok;
+		lmlManager.addListener(lmlListener, this.getClass().getName());
+	}
+
+	@Override
+	public void prepareDispose() {
+		lmlManager.removeListener(lmlListener);
+	}
+
+	/**
+	 * Refresh the viewer.
+	 */
+	public void refresh() {
+		new UIJob(Messages.JobListUpdate) {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				viewer.setInput(jobs.values());
+				viewer.refresh();
+				return Status.OK_STATUS;
+			}
+		}.schedule();
+	}
+
+	/**
+	 * Delete job status entry and refresh.
+	 * 
+	 * @param jobId
+	 */
+	public void removeJob(String jobId) {
+		jobs.remove(jobId);
+	}
+
+	@Override
+	public void setFocus() {
+		viewer.getControl().setFocus();
 	}
 
 	/**
@@ -495,81 +543,6 @@ public class TableView extends LMLViewPart {
 
 	}
 
-	@Override
-	public void createPartControl(Composite parent) {
-		gid = getViewSite().getId();
-		composite = new Composite(parent, SWT.None);
-		treeColumnLayout = new TreeColumnLayout();
-		composite.setLayout(treeColumnLayout);
-		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-
-		viewer = new TreeViewer(composite, SWT.SINGLE | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.VIRTUAL);
-		viewer.getTree().setLayout(new TableLayout());
-		viewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
-		viewer.setContentProvider(new ILazyTreeContentProvider() {
-			private Row[] rows;
-
-			public void dispose() {
-				// Nothing
-			}
-
-			public Object getParent(Object element) {
-				if (element instanceof Cell) {
-					return ((Cell) element).row;
-				}
-				return rows;
-			}
-
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-				this.rows = (Row[]) newInput;
-			}
-
-			public void updateChildCount(Object element, int currentChildCount) {
-				// Nothing
-			}
-
-			public void updateElement(Object parent, int index) {
-				Object element;
-				if (parent instanceof Row) {
-					element = ((Row) parent).cells[index];
-				} else {
-					element = rows[index];
-				}
-				viewer.replace(parent, index, element);
-				updateChildCount(element, -1);
-			}
-		});
-		viewer.setUseHashlookup(true);
-
-		tree = viewer.getTree();
-
-		headerMenu = new Menu(composite);
-		// Part for the controlling Monitor - context menu
-		final MenuManager contextMenu = new MenuManager();
-		contextMenu.setRemoveAllWhenShown(true);
-		final Menu menu = contextMenu.createContextMenu(composite);
-		getSite().registerContextMenu(contextMenu, viewer);
-
-		tree.setLinesVisible(true);
-		tree.setHeaderVisible(true);
-		tree.addListener(SWT.MenuDetect, new Listener() {
-			public void handleEvent(Event event) {
-				Point pt = tree.getDisplay().map(null, tree, new Point(event.x, event.y));
-				Rectangle clientArea = tree.getClientArea();
-				boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + tree.getHeaderHeight());
-				tree.setMenu(header ? headerMenu : menu);
-			}
-		});
-
-		/*
-		 * Get the selected LguiItem (if there is one) so that the table will be
-		 * populated when the it is first created
-		 */
-		fSelectedLguiItem = lmlManager.getSelectedLguiItem();
-
-		createTable();
-	}
-
 	private void createTable() {
 		if (fSelectedLguiItem == null) {
 			return;
@@ -605,89 +578,6 @@ public class TableView extends LMLViewPart {
 		getViewSite().getActionBars().getMenuManager().removeAll();
 	}
 
-	/**
-	 * Fetches the remote stdout/stderr contents. This is functionality imported
-	 * from JAXB core to avoid dependencies.
-	 * 
-	 * @param rmId
-	 *            resource manager unique name
-	 * @param path
-	 *            of remote file.
-	 * @param autoStart
-	 *            start the resource manager if it is not started
-	 * @return contents of the file, or empty string if path is undefined.
-	 */
-	public String doRead(final String rmId, final String path, final boolean autoStart) throws CoreException {
-
-		if (path == null) {
-			return JobStatusData.ZEROSTR;
-		}
-		final StringBuffer sb = new StringBuffer();
-		final Job j = new Job(path) {
-
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-				final IResourceManagerControl control = rm.getControl();
-				final SubMonitor progress = SubMonitor.convert(monitor, 100);
-				try {
-					if (checkControl(rm, control, autoStart)) {
-						final String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
-						if (remoteServicesId != null) {
-							final IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
-									remoteServicesId, progress.newChild(25));
-							final IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
-							final String remoteConnectionName = control.getControlConfiguration().getConnectionName();
-							final IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
-							final IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
-							final IFileStore lres = remoteFileManager.getResource(path);
-							final BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE,
-									progress.newChild(25)));
-							final byte[] buffer = new byte[COPY_BUFFER_SIZE];
-							int rcvd = 0;
-							try {
-								while (true) {
-									try {
-										rcvd = is.read(buffer, 0, COPY_BUFFER_SIZE);
-									} catch (final EOFException eof) {
-										break;
-									}
-
-									if (rcvd == UNDEFINED) {
-										break;
-									}
-									if (progress.isCanceled()) {
-										break;
-									}
-									sb.append(new String(buffer, 0, rcvd));
-								}
-							} finally {
-								try {
-									is.close();
-								} catch (final IOException ioe) {
-									ioe.printStackTrace();
-								}
-								monitor.done();
-							}
-						}
-					}
-				} catch (final Throwable t) {
-					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
-				}
-				return Status.OK_STATUS;
-			}
-		};
-
-		j.schedule();
-
-		try {
-			j.join();
-		} catch (final InterruptedException ignored) {
-		}
-
-		return sb.toString();
-	}
-
 	private int getColumnAlignment(String alignment) {
 		if (alignment.equals("LEFT")) { //$NON-NLS-1$
 			return SWT.LEAD;
@@ -696,83 +586,6 @@ public class TableView extends LMLViewPart {
 			return SWT.TRAIL;
 		}
 		return SWT.LEAD;
-	}
-
-	@Override
-	public void init(IViewSite site) {
-		try {
-			super.init(site);
-		} catch (final PartInitException e) {
-			e.printStackTrace();
-		}
-		lmlManager.addListener(lmlListener, this.getClass().getName());
-	}
-
-	/**
-	 * Set the flags if this update carries ready info for the output files.
-	 * 
-	 * @param job
-	 */
-	private void maybeCheckFiles(JobStatusData job) {
-		if (IJobStatus.JOB_OUTERR_READY.equals(job.getStateDetail())) {
-			if (job.getOutputPath() != null) {
-				job.setOutReady(true);
-			}
-			if (job.getErrorPath() != null) {
-				job.setErrReady(true);
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param job
-	 * @param autoStart
-	 * @param monitor
-	 * @throws CoreException
-	 */
-	public void maybeUpdateJobState(JobStatusData job, boolean autoStart, IProgressMonitor monitor) throws CoreException {
-		final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
-		final IResourceManagerControl control = rm.getControl();
-		if (checkControl(rm, control, autoStart)) {
-			final IJobStatus refreshed = control.getJobStatus(job.getJobId(), monitor);
-			job.updateState(refreshed);
-			maybeCheckFiles(job);
-			refresh();
-		}
-	}
-
-	@Override
-	public void prepareDispose() {
-		lmlManager.removeListener(lmlListener);
-	}
-
-	/**
-	 * Refresh the viewer.
-	 */
-	public void refresh() {
-		new UIJob(Messages.JobListUpdate) {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				viewer.setInput(jobs.values());
-				viewer.refresh();
-				return Status.OK_STATUS;
-			}
-		}.schedule();
-	}
-
-	/**
-	 * Delete job status entry and refresh.
-	 * 
-	 * @param jobId
-	 */
-	public void removeJob(String jobId) {
-		jobs.remove(jobId);
-	}
-
-	@Override
-	public void setFocus() {
-		viewer.getControl().setFocus();
 	}
 
 	private void setViewerInput() {

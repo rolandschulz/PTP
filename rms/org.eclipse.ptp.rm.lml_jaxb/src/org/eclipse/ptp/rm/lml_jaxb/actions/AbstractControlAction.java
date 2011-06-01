@@ -42,7 +42,7 @@ public abstract class AbstractControlAction extends AbstractStatusAction {
 				for (Row row : selected) {
 					JobStatusData status = row.status;
 					try {
-						view.callDoControl(status, true, operation, monitor);
+						ActionUtils.callDoControl(status, true, operation, view, monitor);
 						if (monitor.isCanceled()) {
 						}
 					} catch (CoreException t) {

@@ -129,9 +129,9 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	 */
 	protected String getContents() throws CoreException {
 		if (error) {
-			return view.doRead(status.getRmId(), status.getErrorPath(), true);
+			return ActionUtils.doRead(status.getRmId(), status.getErrorPath(), true);
 		}
-		return view.doRead(status.getRmId(), status.getOutputPath(), true);
+		return ActionUtils.doRead(status.getRmId(), status.getOutputPath(), true);
 	}
 
 	/**
