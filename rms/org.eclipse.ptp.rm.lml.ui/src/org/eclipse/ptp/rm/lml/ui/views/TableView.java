@@ -79,9 +79,9 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -541,14 +541,23 @@ public class TableView extends LMLViewPart {
 		});
 		viewer.setUseHashlookup(true);
 
-		headerMenu = new Menu(composite);
-
 		tree = viewer.getTree();
+
+		headerMenu = new Menu(composite);
+		// Part for the controlling Monitor - context menu
+		final MenuManager contextMenu = new MenuManager();
+		contextMenu.setRemoveAllWhenShown(true);
+		final Menu menu = contextMenu.createContextMenu(composite);
+		getSite().registerContextMenu(contextMenu, viewer);
+
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
 		tree.addListener(SWT.MenuDetect, new Listener() {
 			public void handleEvent(Event event) {
-				tree.setMenu(headerMenu);
+				Point pt = tree.getDisplay().map(null, tree, new Point(event.x, event.y));
+				Rectangle clientArea = tree.getClientArea();
+				boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + tree.getHeaderHeight());
+				tree.setMenu(header ? headerMenu : menu);
 			}
 		});
 
@@ -569,14 +578,6 @@ public class TableView extends LMLViewPart {
 
 		// Insert the input
 		setViewerInput();
-
-		// Part for the controlling Monitor - context menu
-		final MenuManager contextMenu = new MenuManager();
-		contextMenu.setRemoveAllWhenShown(true);
-		final Control control = viewer.getControl();
-		final Menu menu = contextMenu.createContextMenu(control);
-		control.setMenu(menu);
-		getSite().registerContextMenu(contextMenu, viewer);
 
 		composite.layout();
 	}
