@@ -31,7 +31,6 @@
 			class="org.eclipse.ptp.launch.ui.ParallelLaunchConfigurationTabGroup"
 			id="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup">
     	    <launchMode
-               perspective="org.eclipse.ptp.ui.PTPRunPerspective"
                description="%ParallelLaunch.run"
                mode="run">
          	</launchMode>
