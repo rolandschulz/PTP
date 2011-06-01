@@ -419,7 +419,7 @@ public class TableView extends LMLViewPart {
 				isMouseDown = true;
 				if (e.button == 1) {
 					final TreeItem item = tree.getItem(new Point(e.x, e.y));
-					if (!composite.isDisposed()) {
+					if (item != null && !composite.isDisposed()) {
 						lmlManager.markObject(item.getData().toString());
 					}
 				}
@@ -429,7 +429,7 @@ public class TableView extends LMLViewPart {
 			public void mouseUp(MouseEvent e) {
 				if (e.button == 1) {
 					final TreeItem item = tree.getItem(new Point(e.x, e.y));
-					if (!composite.isDisposed()) {
+					if (item != null && !composite.isDisposed()) {
 						lmlManager.unmarkObject(item.getData().toString());
 					}
 				}
