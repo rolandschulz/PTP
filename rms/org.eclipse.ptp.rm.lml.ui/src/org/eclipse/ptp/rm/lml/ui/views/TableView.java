@@ -53,6 +53,8 @@ import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -312,6 +314,16 @@ public class TableView extends LMLViewPart {
 			}
 		});
 
+		tree.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(ControlEvent e) {
+				if (fSelectedLguiItem != null) {
+					fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(), gid);
+					fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, removeFirstColumn(tree.getColumnOrder()));
+				}
+			}
+		});
+
 		/*
 		 * Get the selected LguiItem (if there is one) so that the table will be
 		 * populated when the it is first created
@@ -319,6 +331,35 @@ public class TableView extends LMLViewPart {
 		fSelectedLguiItem = lmlManager.getSelectedLguiItem();
 
 		createTable();
+	}
+
+	/**
+	 * Recompute the column order array with the first column removed (since
+	 * this is not in the table data)
+	 * 
+	 * @param order
+	 *            column order array
+	 * @return new column order array with first column removed
+	 */
+	private int[] removeFirstColumn(int[] order) {
+		final int[] orderNew = new int[order.length - 1];
+		int dif = 0;
+		for (int i = 0; i < order.length; i++) {
+			if (order[i] != 0) {
+				orderNew[i - dif] = order[i] - 1;
+			} else {
+				dif = 1;
+			}
+		}
+		return orderNew;
+	}
+
+	private Double[] getWidths() {
+		final Double[] widths = new Double[treeColumns.length];
+		for (int i = 0; i < treeColumns.length; i++) {
+			widths[i] = Integer.valueOf(treeColumns[i].getWidth()).doubleValue();
+		}
+		return widths;
 	}
 
 	@Override
@@ -434,7 +475,10 @@ public class TableView extends LMLViewPart {
 			treeColumns[i] = treeColumn;
 		}
 
-		// Sorting of every column
+		/*
+		 * Sorting is done in the model as the table is virtual and has a lazy
+		 * content provider.
+		 */
 		final Listener sortListener = new Listener() {
 			public void handleEvent(Event e) {
 				final TreeColumn currentColumn = (TreeColumn) e.widget;
