@@ -56,7 +56,6 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerMonitor;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
@@ -111,7 +110,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	private final IJAXBResourceManagerConfiguration config;
 	private final ConnectionChangeListener connectionListener;
-	private IResourceManagerMonitor monitor;
+	// private IResourceManagerMonitor monitor;
 	private Map<String, String> launchEnv;
 	private Map<String, ICommandJob> jobTable;
 	private ICommandJobStatusMap jobStatusMap;
@@ -677,12 +676,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		setFixedConfigurationProperties(monitor);
 		launchEnv.clear();
 		appendLaunchEnv = true;
-		this.monitor = getResourceManager().getMonitor();
 
 		/*
 		 * start daemon
 		 */
-		jobStatusMap = new JobStatusMap(this, this.monitor);
+		jobStatusMap = new JobStatusMap(this, getResourceManager());
 		((Thread) jobStatusMap).start();
 	}
 
