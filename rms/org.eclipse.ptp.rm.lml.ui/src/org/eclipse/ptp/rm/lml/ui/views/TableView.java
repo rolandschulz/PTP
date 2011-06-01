@@ -582,6 +582,9 @@ public class TableView extends LMLViewPart {
 	}
 
 	private void disposeTable() {
+		/*
+		 * Remove columns
+		 */
 		final TreeColumn[] oldColumns = tree.getColumns();
 		for (final TreeColumn oldColumn : oldColumns) {
 			final Listener[] oldListeners = oldColumn.getListeners(SWT.Selection);
@@ -591,6 +594,13 @@ public class TableView extends LMLViewPart {
 			oldColumn.dispose();
 		}
 		treeColumns = new TreeColumn[0];
+
+		/*
+		 * Remove menu items
+		 */
+		for (MenuItem item : headerMenu.getItems()) {
+			item.dispose();
+		}
 		getViewSite().getActionBars().getMenuManager().removeAll();
 	}
 
