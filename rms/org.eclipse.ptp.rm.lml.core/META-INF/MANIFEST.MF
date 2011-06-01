@@ -4,7 +4,7 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.lml.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.ptp.rm.lml.core;x-internal:=true,
+Export-Package: org.eclipse.ptp.rm.lml.core,
  org.eclipse.ptp.rm.lml.core.events,
  org.eclipse.ptp.rm.lml.core.listeners,
  org.eclipse.ptp.rm.lml.core.model,
