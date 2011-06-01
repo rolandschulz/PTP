@@ -7,18 +7,14 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.lml.internal.core.model.jobs;
+package org.eclipse.ptp.rm.lml.core.model.jobs;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoType;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.internal.progress.JobInfo;
 
 /**
  * Wrapper for job status which extracts the persistent properties and saves
@@ -90,15 +86,6 @@ public class JobStatusData {
 		outReady = outputPath != null && IJobStatus.JOB_OUTERR_READY.equals(stateDetail);
 		errReady = errorPath != null && IJobStatus.JOB_OUTERR_READY.equals(stateDetail);
 	}
-	
-	
-	public void setJobInfo(InfoType jobInfo) {
-		this.jobInfo = jobInfo;
-	}
-	
-	public InfoType getJobInfo() {
-		return jobInfo;
-	}
 
 	/**
 	 * @return path to remote error file
@@ -119,6 +106,10 @@ public class JobStatusData {
 	 */
 	public String getJobId() {
 		return jobId;
+	}
+
+	public InfoType getJobInfo() {
+		return jobInfo;
 	}
 
 	/**
@@ -199,6 +190,10 @@ public class JobStatusData {
 	 */
 	public void setErrReady(boolean errReady) {
 		this.errReady = errReady;
+	}
+
+	public void setJobInfo(InfoType jobInfo) {
+		this.jobInfo = jobInfo;
 	}
 
 	/**

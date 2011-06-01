@@ -7,17 +7,17 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.lml.ui.actions;
+package org.eclipse.ptp.rm.lml_jaxb.actions;
 
 /**
- * Display the remote error file contents in a console.
+ * Display the remote output file contents in a console.
  * 
  * @author arossi
  * 
  */
-public class GetError extends AbstractConsoleAction {
+public class GetOutput extends AbstractConsoleAction {
 
-	public GetError() {
-		error = true;
+	public GetOutput() {
+		error = false;
 	}
 }

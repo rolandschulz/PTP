@@ -7,13 +7,13 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.lml.ui.actions;
+package org.eclipse.ptp.rm.lml_jaxb.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
-import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
-import org.eclipse.ptp.rm.lml.ui.messages.Messages;
+import org.eclipse.ptp.rm.lml_jaxb.messages.Messages;
 
 /**
  * Removes the job from the list.

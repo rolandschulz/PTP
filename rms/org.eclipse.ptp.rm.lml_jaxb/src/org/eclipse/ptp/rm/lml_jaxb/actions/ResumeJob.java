@@ -7,22 +7,22 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.lml.ui.actions;
+package org.eclipse.ptp.rm.lml_jaxb.actions;
 
-import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
+import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
- * Releases the job.
+ * Resumes the job.
  * 
  * @author arossi
  * 
  */
-public class ReleaseJob extends AbstractControlAction {
+public class ResumeJob extends AbstractControlAction {
 
-	public ReleaseJob() {
-		operation = IResourceManager.RELEASE_OPERATION;
+	public ResumeJob() {
+		operation = IResourceManager.RESUME_OPERATION;
 	}
 
 	/*
@@ -35,8 +35,8 @@ public class ReleaseJob extends AbstractControlAction {
 	 */
 	@Override
 	protected boolean validateState(JobStatusData status) {
-		String detail = status.getStateDetail();
-		if (!IJobStatus.USER_ON_HOLD.equals(detail) && !IJobStatus.SYSTEM_ON_HOLD.equals(detail)) {
+		String state = status.getState();
+		if (!IJobStatus.SUSPENDED.equals(state)) {
 			return false;
 		}
 		return true;

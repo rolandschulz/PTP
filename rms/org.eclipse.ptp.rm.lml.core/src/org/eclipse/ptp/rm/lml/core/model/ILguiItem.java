@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.util.Map;
 
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
+import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.LayoutAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.NodedisplayAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.OIDToInformation;
@@ -23,7 +24,6 @@ import org.eclipse.ptp.rm.lml.internal.core.model.OIDToObject;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus;
 import org.eclipse.ptp.rm.lml.internal.core.model.OverviewAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.TableHandler;
-import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 
 /**
  * Interface to manage the handling of an LguiType. It helps to work with LguiType without knowing the exact build of LguiType.

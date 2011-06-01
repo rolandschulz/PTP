@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.lml.ui.actions;
+package org.eclipse.ptp.rm.lml_jaxb.actions;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -16,41 +16,41 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
-import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
-import org.eclipse.ptp.rm.lml.ui.messages.Messages;
+import org.eclipse.ptp.rm.lml_jaxb.messages.Messages;
+import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
- * Refreshes the state of the job by invoking getJobStatus on the resource
- * manager control.
+ * Cancels the job.
  * 
  * @author arossi
  * 
  */
-public class RefreshJobStatus extends AbstractStatusAction {
+public class CancelJob extends AbstractStatusAction {
 	/*
 	 * Restarts the resource manager control if it is not running. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-		Job j = new Job(Messages.RefreshJobStatus) {
+		Job j = new Job(Messages.CancelJob) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				for (Row row : selected) {
 					JobStatusData status = row.status;
 					try {
-						view.maybeUpdateJobState(status, true, monitor);
+						view.callDoControl(status, true, IResourceManager.TERMINATE_OPERATION, monitor);
+						if (monitor.isCanceled()) {
+							break;
+						}
 					} catch (CoreException t) {
-						return CoreExceptionUtils.getErrorStatus(Messages.RefreshJobStatusError, t);
-					}
-					if (monitor != null && monitor.isCanceled()) {
-						return Status.CANCEL_STATUS;
+						return CoreExceptionUtils.getErrorStatus(Messages.CancelJobError, t);
 					}
 				}
 				return Status.OK_STATUS;
 			}
-
 		};
 
 		j.setUser(true);
@@ -70,6 +70,11 @@ public class RefreshJobStatus extends AbstractStatusAction {
 		for (Row row : selected) {
 			JobStatusData status = row.status;
 			if (status == null) {
+				action.setEnabled(false);
+				return;
+			}
+			String state = status.getState();
+			if (IJobStatus.COMPLETED.equals(state)) {
 				action.setEnabled(false);
 				return;
 			}

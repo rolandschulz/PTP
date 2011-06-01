@@ -23,6 +23,7 @@ import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
+import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnlayoutType;
@@ -31,7 +32,6 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TablelayoutType;
-import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 
 public class TableHandler extends LguiHandler {
 

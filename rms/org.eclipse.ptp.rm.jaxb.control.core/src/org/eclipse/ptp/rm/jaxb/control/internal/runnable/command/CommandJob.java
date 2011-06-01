@@ -457,8 +457,8 @@ public class CommandJob extends Job implements ICommandJob {
 				}
 				String message = error.toString();
 				error.setLength(0);
-				throw CoreExceptionUtils.newException(Messages.ProcessExitValueError + (JAXBControlConstants.ZEROSTR + exit)
-						+ JAXBControlConstants.LINE_SEP + message, null);
+				throw CoreExceptionUtils.newException(builder.command() + Messages.ProcessExitValueError
+						+ (JAXBControlConstants.ZEROSTR + exit) + JAXBControlConstants.LINE_SEP + message, null);
 			}
 		} catch (CoreException ce) {
 			return ce.getStatus();
@@ -536,8 +536,7 @@ public class CommandJob extends Job implements ICommandJob {
 		}
 
 		if (t != null) {
-			return CoreExceptionUtils.newException(Messages.ParserInternalError + JAXBControlConstants.CO + JAXBControlConstants.SP
-					+ t.toString(), t);
+			return CoreExceptionUtils.newException(t.getMessage(), t);
 		}
 
 		return null;

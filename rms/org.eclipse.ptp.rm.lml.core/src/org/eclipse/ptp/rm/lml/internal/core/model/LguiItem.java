@@ -38,6 +38,7 @@ import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiHandler;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoType;
@@ -48,7 +49,6 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiUpdatedEvent;
-import org.eclipse.ptp.rm.lml.internal.core.model.jobs.JobStatusData;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 

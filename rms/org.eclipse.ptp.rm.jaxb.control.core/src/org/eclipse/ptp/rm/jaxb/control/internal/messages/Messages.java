@@ -29,7 +29,6 @@ public class Messages extends NLS {
 	public static String CouldNotLaunch;
 	public static String StdoutParserError;
 	public static String StderrParserError;
-	public static String ParserInternalError;
 	public static String ProcessExitValueError;
 	public static String CannotCompleteSubmitFailedStaging;
 	public static String ReadSegmentError;
