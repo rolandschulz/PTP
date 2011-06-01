@@ -446,9 +446,11 @@ public class LMLManager {
 
 		restoreJobStatusData(map, memento);
 		userJobList.put(name, map);
-		fLguiItem.restoreUserJobs(map);
 
 		if (!fLguiItem.isEmpty()) {
+			if (!map.isEmpty()) {
+				fLguiItem.restoreUserJobs(map);
+			}
 			fireNewLgui();
 		}
 	}

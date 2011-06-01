@@ -330,7 +330,7 @@ public class TableView extends LMLViewPart {
 			return;
 		}
 
-		int numCols = fSelectedLguiItem.getTableHandler().getNumberOfTableColumns(gid);
+		final int numCols = fSelectedLguiItem.getTableHandler().getNumberOfTableColumns(gid);
 		treeColumns = new TreeColumn[numCols];
 		savedColumnWidths = new int[numCols];
 
