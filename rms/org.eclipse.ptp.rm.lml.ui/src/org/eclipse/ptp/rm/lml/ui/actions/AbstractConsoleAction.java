@@ -51,7 +51,7 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	 */
 	public void run(IAction action) {
 		if (status != null) {
-			Job j = new Job(Messages.RefreshJobStatus) {
+			Job j = new Job(Messages.ReadOutputFile) {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					IOConsoleOutputStream stream = null;
@@ -63,7 +63,7 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 						stream = console.newOutputStream();
 						stream.write(contents.getBytes());
 					} catch (Throwable t) {
-						return CoreExceptionUtils.getErrorStatus(Messages.RefreshJobStatusError, t);
+						return CoreExceptionUtils.getErrorStatus(Messages.ReadOutputFileError, t);
 					} finally {
 						try {
 							if (stream != null) {
@@ -103,7 +103,7 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 		status = row.status;
 		if (status == null) {
 			action.setEnabled(false);
-				return;
+			return;
 		}
 		if (getReady()) {
 			action.setEnabled(true);

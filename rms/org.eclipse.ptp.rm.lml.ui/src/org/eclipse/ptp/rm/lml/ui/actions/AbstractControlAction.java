@@ -36,7 +36,7 @@ public abstract class AbstractControlAction extends AbstractStatusAction {
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-		Job j = new Job("RefreshJobStatus") {
+		Job j = new Job(operation) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				for (Row row : selected) {
@@ -46,7 +46,7 @@ public abstract class AbstractControlAction extends AbstractStatusAction {
 						if (monitor.isCanceled()) {
 						}
 					} catch (CoreException t) {
-						return CoreExceptionUtils.getErrorStatus("RefreshJobStatusError", t);
+						return CoreExceptionUtils.getErrorStatus(operation, t);
 					}
 				}
 				return Status.OK_STATUS;
@@ -69,7 +69,7 @@ public abstract class AbstractControlAction extends AbstractStatusAction {
 			if (row.status == null) {
 				action.setEnabled(false);
 				return;
-			} else 	if (row.status.isInteractive()) {
+			} else if (row.status.isInteractive()) {
 				action.setEnabled(false);
 				return;
 			} else if (!validateState(row.status)) {

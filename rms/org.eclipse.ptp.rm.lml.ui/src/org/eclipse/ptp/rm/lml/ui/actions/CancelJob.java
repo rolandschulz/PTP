@@ -35,7 +35,7 @@ public class CancelJob extends AbstractStatusAction {
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-		Job j = new Job(Messages.RefreshJobStatus) {
+		Job j = new Job(Messages.CancelJob) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				for (Row row : selected) {
@@ -46,7 +46,7 @@ public class CancelJob extends AbstractStatusAction {
 							break;
 						}
 					} catch (CoreException t) {
-						return CoreExceptionUtils.getErrorStatus(Messages.RefreshJobStatusError, t);
+						return CoreExceptionUtils.getErrorStatus(Messages.CancelJobError, t);
 					}
 				}
 				return Status.OK_STATUS;

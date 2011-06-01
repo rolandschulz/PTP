@@ -25,7 +25,7 @@ public class Messages extends NLS {
 	public static String UIUtils_4;
 	public static String UpdateLguiAction_0;
 	public static String JAXBRMConfigurationSelectionWizardPage_0;
-	
+
 	public static String ConsoleWriteError;
 
 	public static String JOB_ID;
@@ -46,8 +46,12 @@ public class Messages extends NLS {
 	public static String JAXBMonitorPlugin_Exception_InternalError;
 	public static String RefreshJobStatusError;
 	public static String RefreshJobStatus;
-	
-	
+	public static String ReadOutputFile;
+	public static String ReadOutputFileError;
+	public static String CancelJob;
+	public static String CancelJobError;
+	public static String ToggleColumnTitle;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
