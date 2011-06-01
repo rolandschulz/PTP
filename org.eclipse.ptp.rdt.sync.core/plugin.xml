@@ -64,10 +64,21 @@
          point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
       <builder
             commandLauncher="org.eclipse.ptp.rdt.sync.core.remotemake.SyncCommandLauncher"
-            id="org.eclipse.ptp.rdt.sync.core.remoteMakeBuilder"
+            id="org.eclipse.ptp.rdt.sync.core.CDTBuilder"
             isAbstract="false"
             isVariableCaseSensitive="false"
             name="%ManagedBuilder.name">
       </builder>
+      <toolChain
+            id="org.eclipse.ptp.rdt.sync.core.toolchain"
+            isAbstract="false"
+            supportsManagedBuild="true">
+         <builder
+               id="org.eclipse.ptp.rdt.sync.core.builder"
+               isAbstract="false"
+               isVariableCaseSensitive="false"
+               superClass="org.eclipse.ptp.rdt.sync.core.CDTBuilder">
+         </builder>
+      </toolChain>
    </extension>
 </plugin>

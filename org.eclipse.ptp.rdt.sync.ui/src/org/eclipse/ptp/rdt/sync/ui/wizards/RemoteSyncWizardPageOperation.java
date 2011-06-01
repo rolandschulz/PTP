@@ -71,11 +71,11 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			return;
 		}
 
-		try {
-			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
-		} catch (CoreException e1) {
-			StatusManager.getManager().handle(e1, RDTSyncUIPlugin.PLUGIN_ID);
-		}
+//		try {
+//			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
+//		} catch (CoreException e1) {
+//			StatusManager.getManager().handle(e1, RDTSyncUIPlugin.PLUGIN_ID);
+//		}
 
 		// BUild the service configuration
 		ServiceModelManager smm = ServiceModelManager.getInstance();
