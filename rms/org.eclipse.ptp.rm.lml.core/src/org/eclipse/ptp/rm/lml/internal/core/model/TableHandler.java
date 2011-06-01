@@ -354,34 +354,38 @@ public class TableHandler extends LguiHandler {
 		}
 		final Map<String, String> map = lguiItem.revert(lguiItem.getUserJobMap(gid));
 		getCidsToPosition();
+		Row[] tableData = new Row[0];
 		final TableType table = getTable(gid);
-		final Row[] tableData = new Row[table.getRow().size()];
-		for (int i = 0; i < tableData.length; i++) {
-			final RowType row = table.getRow().get(i);
-			tableData[i] = new Row();
-			if (row.getOid() != null) {
-				tableData[i].setOid(row.getOid());
-				tableData[i].setColor(lguiItem.getOIDToObject().getColorById(row.getOid()));
-				if (map.containsKey(row.getOid())) {
-					final JobStatusData status = LMLManager.getInstance().getJobStatusData(lguiItem.toString(),
-							map.get(row.getOid()));
-					tableData[i].setJobStatusData(status);
-				}
+		if (table != null) {
+			tableData = new Row[table.getRow().size()];
+			for (int i = 0; i < tableData.length; i++) {
+				final RowType row = table.getRow().get(i);
+				tableData[i] = new Row();
+				if (row.getOid() != null) {
+					tableData[i].setOid(row.getOid());
+					tableData[i].setColor(lguiItem.getOIDToObject().getColorById(row.getOid()));
+					if (map.containsKey(row.getOid())) {
+						final JobStatusData status = LMLManager.getInstance().getJobStatusData(lguiItem.toString(),
+								map.get(row.getOid()));
+						tableData[i].setJobStatusData(status);
+					}
 
-			}
-			final Cell[] tableDataRow = new Cell[cids.length];
-			for (int j = 0; j < cids.length; j++) {
-				for (final CellType cell : row.getCell()) {
-					if (cell.getCid().equals(cids[j])) {
-						tableDataRow[j] = new Cell(cell.getValue(), tableData[i]);
-						break;
+				}
+				final Cell[] tableDataRow = new Cell[cids.length];
+				for (int j = 0; j < cids.length; j++) {
+					for (final CellType cell : row.getCell()) {
+						if (cell.getCid().equals(cids[j])) {
+							tableDataRow[j] = new Cell(cell.getValue(), tableData[i]);
+							break;
+						}
+					}
+					if (tableDataRow[j] == null) {
+						tableDataRow[j] = new Cell("?", tableData[i]); //$NON-NLS-1$
 					}
 				}
-				if (tableDataRow[j] == null) {
-					tableDataRow[j] = new Cell("?", tableData[i]); //$NON-NLS-1$
-				}
+				tableData[i].setCells(tableDataRow);
 			}
-			tableData[i].setCells(tableDataRow);
+
 		}
 		return tableData;
 	}
