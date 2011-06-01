@@ -150,7 +150,7 @@ public class TableView extends LMLViewPart {
 			selectedOid = event.getOid();
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					if (!composite.isDisposed()) {
+					if (composite != null && !composite.isDisposed()) {
 						viewer.refresh();
 					}
 				}
@@ -161,7 +161,7 @@ public class TableView extends LMLViewPart {
 			final String oid = event.getOid();
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					if (!composite.isDisposed() && viewer.getInput() != null) {
+					if (composite != null && !composite.isDisposed() && viewer.getInput() != null) {
 						tree.deselectAll();
 
 						Row[] rows = null;
@@ -190,8 +190,10 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(ITableColumnChangeEvent e) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					disposeTable();
-					createTable();
+					if (composite != null) {
+						disposeTable();
+						createTable();
+					}
 				}
 			});
 
@@ -201,7 +203,7 @@ public class TableView extends LMLViewPart {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					selectedOid = null;
-					if (!composite.isDisposed()) {
+					if (composite != null && !composite.isDisposed()) {
 						viewer.refresh();
 					}
 				}
@@ -212,7 +214,7 @@ public class TableView extends LMLViewPart {
 		public void handleEvent(IUnselectedObjectEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					if (!composite.isDisposed()) {
+					if (composite != null && !composite.isDisposed()) {
 						tree.deselectAll();
 					}
 				}
