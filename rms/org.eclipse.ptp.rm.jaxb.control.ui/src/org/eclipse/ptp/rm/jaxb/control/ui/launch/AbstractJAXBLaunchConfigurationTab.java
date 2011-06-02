@@ -152,8 +152,9 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 *            configuration
 	 */
 	protected void refreshLocal(ILaunchConfiguration config) throws CoreException {
+		Map<String, Object> saved = parentTab.getLCMap().getStandardConfigurationProperties(config, localMap);
 		localMap.clear();
-		localMap.putAll(LCVariableMap.getStandardConfigurationProperties(config));
+		localMap.putAll(saved);
 		doRefreshLocal();
 	}
 }
