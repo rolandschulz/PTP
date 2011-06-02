@@ -411,7 +411,6 @@ public class TableHandler extends LguiHandler {
 						sortIndex, sortDirection));
 				table.getRow().clear();
 				for (final RowType element : jobTableData) {
-					System.out.println("row: " + element.getCell().get(1).getValue());
 					table.getRow().add(element);
 				}
 			}
