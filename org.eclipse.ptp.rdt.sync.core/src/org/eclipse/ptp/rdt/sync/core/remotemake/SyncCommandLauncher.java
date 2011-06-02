@@ -24,10 +24,12 @@ import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
@@ -103,23 +105,30 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
 		
 		if(projectStatus!=null){
-			projectStatus.setRuntimeBuildStatus(null);
-			
+			projectStatus.setRuntimeBuildStatus(null);	
 		}
-		
-		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
-		
-		// Determine the service model for this configuration, and use the provider of the build
-		// service to execute the build command.
 		
 		// if there is no project associated to us then we cannot function... throw an exception
 		if(getProject() == null) {
 			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.core", "RemoteCommandLauncher has not been associated with a project.")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		
-		ServiceModelManager smm = ServiceModelManager.getInstance();
+
+		// Set correct command path and command arguments
+		// For configurations other than workspace, the command path is incorrect and needs to be fixed
 		IConfiguration configuration = ManagedBuildManager.getBuildInfo(getProject()).getDefaultConfiguration();
-		IServiceConfiguration serviceConfig = BuildConfigurationManager.getInstance().getConfigurationForBuildConfiguration(configuration);
+		String projectWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString() + 
+																				getProject().getFullPath().toPortableString();
+		String projectActualRoot = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).
+																													getLocation();
+		commandPath = new Path(commandPath.toString().replaceFirst(projectWorkspaceRoot, projectActualRoot));
+		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
+
+		// Determine the service model for this configuration, and use the provider of the build
+		// service to execute the build command. Also get the sync provider to sync before and
+		// after building.
+		ServiceModelManager smm = ServiceModelManager.getInstance();
+		IServiceConfiguration serviceConfig = BuildConfigurationManager.getInstance().
+																			getConfigurationForBuildConfiguration(configuration);
 		if (serviceConfig == null) {
 			throw new RuntimeException("Cannot find service configuration for build configuration"); //$NON-NLS-1$
 		}
