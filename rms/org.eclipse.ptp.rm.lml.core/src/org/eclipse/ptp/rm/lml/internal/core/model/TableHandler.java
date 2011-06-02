@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
@@ -54,6 +55,14 @@ public class TableHandler extends LguiHandler {
 		lguiItem.addListener(tableListener);
 	}
 
+	/**
+	 * Change the table column order
+	 * 
+	 * @param gid
+	 *            ID of the table layout
+	 * @param order
+	 *            new order of columns
+	 */
 	public void changeTableColumnsOrder(String gid, int[] order) {
 		final List<ColumnlayoutType> newColumnLayouts = new ArrayList<ColumnlayoutType>();
 		final List<ColumnlayoutType> oldColumnLayouts = lguiItem.getLayoutAccess().getTableLayout(gid).getColumn();
@@ -73,8 +82,16 @@ public class TableHandler extends LguiHandler {
 		}
 	}
 
-	public void changeTableColumnsWidth(Double[] widths, String gid) {
-		BigInteger[] cids = getCidsToPosition(gid);
+	/**
+	 * Change the table column widths
+	 * 
+	 * @param gid
+	 *            ID of the table layout
+	 * @param widths
+	 *            new column widths
+	 */
+	public void changeTableColumnsWidth(String gid, Double[] widths) {
+		BigInteger[] cids = getActiveCids(gid);
 		for (int i = 0; i < widths.length; i++) {
 			for (final ColumnlayoutType column : lguiItem.getLayoutAccess().getLayoutColumsToCids(cids, gid)) {
 				if (column.getPos() != null && BigInteger.valueOf(i).equals(column.getPos())) {
@@ -85,12 +102,12 @@ public class TableHandler extends LguiHandler {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the number of table columns for this gid
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getTableColumnsNumber(
-	 * String tableType)
+	 * @param gid
+	 *            ID of the table layout
+	 * @return
 	 */
 	public int getNumberOfTableColumns(String gid) {
 		final TablelayoutType layout = lguiItem.getLayoutAccess().getTableLayout(gid);
@@ -103,10 +120,34 @@ public class TableHandler extends LguiHandler {
 		return activeColumn;
 	}
 
+	/**
+	 * Currently unused
+	 */
 	public int getNumberOfTables() {
 		return getTables().size();
 	}
 
+	/**
+	 * Getting an element(Table Type) which has an equal title to the argument
+	 * tableType.
+	 * 
+	 * @param gid
+	 *            ID of the desired table
+	 * @return Corresponding table to the desired table title
+	 */
+	public TableType getTable(String gid) {
+		for (final TableType tag : getTables()) {
+			if (tag.getId().equals(gid)) {
+				return tag;
+			}
+		}
+		LMLCorePlugin.log("No table found for gid \"" + gid + "\"!"); //$NON-NLS-1$ //$NON-NLS-2$
+		return null;
+	}
+
+	/**
+	 * Currently unused
+	 */
 	public String[] getTableColumnActive(String gid) {
 		final TablelayoutType tableLayout = lguiItem.getLayoutAccess().getTableLayout(gid);
 		final ArrayList<String> tableColumnNonActive = new ArrayList<String>();
@@ -118,12 +159,12 @@ public class TableHandler extends LguiHandler {
 		return tableColumnNonActive.toArray(new String[tableColumnNonActive.size()]);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the column layout for the table
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getJobTableColumnLayout
-	 * (String tableType)
+	 * @param gid
+	 *            ID of the table layout
+	 * @return column layout
 	 */
 	public ITableColumnLayout[] getTableColumnLayout(String gid) {
 		final TablelayoutType tableLayout = lguiItem.getLayoutAccess().getTableLayout(gid);
@@ -133,8 +174,8 @@ public class TableHandler extends LguiHandler {
 			// lguiItem.getLayoutAccess().getDefaultTableLayout(gid);
 		}
 
-		BigInteger[] cids = getCidsToPosition(gid);
-		final ColumnType[] columns = getColumnsToCids(gid);
+		BigInteger[] cids = getActiveCids(gid);
+		final ColumnType[] columns = getActiveColumns(gid);
 		final ColumnlayoutType[] layoutColumns = lguiItem.getLayoutAccess().getLayoutColumsToCids(cids, gid);
 		final ITableColumnLayout[] tableColumnLayouts = new ITableColumnLayout[cids.length];
 
@@ -162,6 +203,9 @@ public class TableHandler extends LguiHandler {
 		return tableColumnLayouts;
 	}
 
+	/**
+	 * Not currently used
+	 */
 	public String[] getTableColumnNonActive(String gid) {
 		final TablelayoutType tableLayout = lguiItem.getLayoutAccess().getTableLayout(gid);
 		final ArrayList<String> tableColumnNonActive = new ArrayList<String>();
@@ -173,15 +217,11 @@ public class TableHandler extends LguiHandler {
 		return tableColumnNonActive.toArray(new String[tableColumnNonActive.size()]);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getTableColumnsNames(String
-	 * tableType)
+	/**
+	 * Not currently used
 	 */
 	public String[] getTableColumnsName(String gid) {
-		final ColumnType[] columns = getColumnsToCids(gid);
+		final ColumnType[] columns = getActiveColumns(gid);
 		final String[] tableColumnNames = new String[columns.length];
 
 		for (int i = 0; i < columns.length; i++) {
@@ -190,15 +230,11 @@ public class TableHandler extends LguiHandler {
 		return tableColumnNames;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getTableColumnsStyle(String
-	 * tableType)
+	/**
+	 * Not currently used
 	 */
 	public String[] getTableColumnsStyle(String gid) {
-		final ColumnType[] columns = getColumnsToCids(gid);
+		final ColumnType[] columns = getActiveColumns(gid);
 		final String[] tableColumnStyles = new String[columns.length];
 
 		for (int i = 0; i < columns.length; i++) {
@@ -217,19 +253,15 @@ public class TableHandler extends LguiHandler {
 		return tableColumnStyles;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getTableColumnsWidth(String
-	 * tableType, int widthTable)
+	/**
+	 * Not currently used
 	 */
 	public int[] getTableColumnsWidth(String gid, int widthTable) {
 		TablelayoutType tableLayout = lguiItem.getLayoutAccess().getTableLayout(gid);
 		if (tableLayout.getColumn().size() <= 0) {
 			tableLayout = lguiItem.getLayoutAccess().getDefaultTableLayout(gid);
 		}
-		BigInteger[] cids = getCidsToPosition(gid);
+		BigInteger[] cids = getActiveCids(gid);
 		final ColumnlayoutType[] layoutColumns = lguiItem.getLayoutAccess().getLayoutColumsToCids(cids, gid);
 		final int[] tableColumnWidths = new int[cids.length];
 		double sumWidthColumns = 0;
@@ -242,56 +274,90 @@ public class TableHandler extends LguiHandler {
 		return tableColumnWidths;
 	}
 
+	/**
+	 * Get the table with color information added
+	 * 
+	 * @param gid
+	 *            ID of the table layout
+	 * @return rows with color information added
+	 */
 	public Row[] getTableDataWithColor(String gid) {
-		BigInteger[] cids = getCidsToPosition(gid);
+		BigInteger[] cids = getActiveCids(gid);
 		final Map<String, String> map = lguiItem.revert(lguiItem.getUserJobMap(gid));
-		Row[] tableData = new Row[0];
 		final TableType table = getTable(gid);
-		if (table != null) {
-			tableData = new Row[table.getRow().size()];
-			for (int i = 0; i < tableData.length; i++) {
-				final RowType row = table.getRow().get(i);
-				tableData[i] = new Row();
-				if (row.getOid() != null) {
-					tableData[i].setOid(row.getOid());
-					tableData[i].setColor(lguiItem.getOIDToObject().getColorById(row.getOid()));
-					if (map.containsKey(row.getOid())) {
-						final JobStatusData status = LMLManager.getInstance().getJobStatusData(lguiItem.toString(),
-								map.get(row.getOid()));
-						tableData[i].setJobStatusData(status);
-					}
+		if (table == null) {
+			return new Row[0];
+		}
+		final Row[] tableData = new Row[table.getRow().size()];
+		for (int i = 0; i < tableData.length; i++) {
+			final RowType row = table.getRow().get(i);
+			tableData[i] = new Row();
+			if (row.getOid() != null) {
+				tableData[i].setOid(row.getOid());
+				tableData[i].setColor(lguiItem.getOIDToObject().getColorById(row.getOid()));
+				if (map.containsKey(row.getOid())) {
+					final JobStatusData status = LMLManager.getInstance().getJobStatusData(lguiItem.toString(),
+							map.get(row.getOid()));
+					tableData[i].setJobStatusData(status);
+				}
 
-				}
-				final Cell[] tableDataRow = new Cell[cids.length];
-				for (int j = 0; j < cids.length; j++) {
-					for (final CellType cell : row.getCell()) {
-						if (cell.getCid().equals(cids[j])) {
-							tableDataRow[j] = new Cell(cell.getValue(), tableData[i]);
-							break;
-						}
-					}
-					if (tableDataRow[j] == null) {
-						tableDataRow[j] = new Cell("?", tableData[i]); //$NON-NLS-1$
-					}
-				}
-				tableData[i].setCells(tableDataRow);
 			}
-
+			final Cell[] tableDataRow = new Cell[cids.length];
+			for (int j = 0; j < cids.length; j++) {
+				for (final CellType cell : row.getCell()) {
+					if (cell.getCid().equals(cids[j])) {
+						tableDataRow[j] = new Cell(cell.getValue(), tableData[i]);
+						break;
+					}
+				}
+				if (tableDataRow[j] == null) {
+					tableDataRow[j] = new Cell("?", tableData[i]); //$NON-NLS-1$
+				}
+			}
+			tableData[i].setCells(tableDataRow);
 		}
 		return tableData;
 	}
 
-	public String getTableTitle(String gid) {
-		return getTable(gid).getTitle();
+	/**
+	 * Getting a list of all elements of type TableType from LguiType.
+	 * 
+	 * @return list of elements(TableType)
+	 */
+	public List<TableType> getTables() {
+		final List<TableType> tables = new LinkedList<TableType>();
+		for (final GobjectType tag : lguiItem.getOverviewAccess().getGraphicalObjects()) {
+			if (tag instanceof TableType) {
+				tables.add((TableType) tag);
+			}
+		}
+		return tables;
 	}
 
+	/**
+	 * Not currently used
+	 */
+	public String getTableTitle(String gid) {
+		final TableType table = getTable(gid);
+		if (table == null) {
+			return ""; //$NON-NLS-1$
+		}
+		return table.getTitle();
+	}
+
+	/**
+	 * Not currently used
+	 */
 	public boolean isEmpty(String gid) {
 		return (getTable(gid) == null);
 	}
 
+	/**
+	 * Not currently used
+	 */
 	public void setTableColumnActive(String gid, String text, boolean activeTableColumn) {
 		// gid correction
-		BigInteger[] cids = getCidsToPosition(gid);
+		BigInteger[] cids = getActiveCids(gid);
 		final List<ColumnlayoutType> columnLayouts = lguiItem.getLayoutAccess().getTableLayout(gid).getColumn();
 		BigInteger cid = BigInteger.valueOf(-1);
 		for (final ColumnlayoutType column : columnLayouts) {
@@ -307,8 +373,9 @@ public class TableHandler extends LguiHandler {
 				break;
 			}
 		}
-		if (activeTableColumn) {
-			for (final RowType row : getTable(gid).getRow()) {
+		TableType table = getTable(gid);
+		if (activeTableColumn && table != null) {
+			for (final RowType row : table.getRow()) {
 				boolean cellExisting = false;
 				for (final CellType cell : row.getCell()) {
 					if (cell.getCid() == cid) {
@@ -325,49 +392,39 @@ public class TableHandler extends LguiHandler {
 		}
 	}
 
+	/**
+	 * Sort the table
+	 * 
+	 * @param gid
+	 *            ID of the table layout
+	 * @param sortDirectionComparator
+	 * @param sortIndex
+	 * @param sortDirection
+	 */
 	public void sort(String gid, int sortDirectionComparator, int sortIndex, int sortDirection) {
-		final RowType[] jobTableData = getTableData(gid);
-		Arrays.sort(jobTableData, new TableSorter(getTypeTableColumn(gid, sortIndex), sortDirectionComparator, sortIndex,
-				sortDirection));
-		getTable(gid).getRow().clear();
-		for (final RowType element : jobTableData) {
-			getTable(gid).getRow().add(element);
+		TableType table = getTable(gid);
+		if (table != null) {
+			final BigInteger[] cids = getActiveCids(gid);
+			if (cids.length > sortIndex) {
+				final RowType[] jobTableData = getTableData(gid);
+				Arrays.sort(jobTableData, new TableSorter(getColumnSortProperty(table, cids, sortIndex), sortDirectionComparator,
+						sortIndex, sortDirection));
+				table.getRow().clear();
+				for (final RowType element : jobTableData) {
+					table.getRow().add(element);
+				}
+			}
 		}
 	}
 
 	/**
-	 * Getting an element(Table Type) which has an equal title to the argument
-	 * tableType.
+	 * Get column indexes of active columns for the table layout
 	 * 
-	 * @param tableType
-	 *            Title of the desired table
-	 * @return Corresponding table to the desired table title
+	 * @param gid
+	 *            ID of the table layout
+	 * @return array of column indexes
 	 */
-	TableType getTable(String gid) {
-		for (final TableType tag : getTables()) {
-			if (tag.getId().equals(gid)) {
-				return tag;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Getting a list of all elements of type TableType from LguiType.
-	 * 
-	 * @return list of elements(TableType)
-	 */
-	List<TableType> getTables() {
-		final List<TableType> tables = new LinkedList<TableType>();
-		for (final GobjectType tag : lguiItem.getOverviewAccess().getGraphicalObjects()) {
-			if (tag instanceof TableType) {
-				tables.add((TableType) tag);
-			}
-		}
-		return tables;
-	}
-
-	private BigInteger[] getCidsToPosition(String gid) {
+	private BigInteger[] getActiveCids(String gid) {
 		if (fGid != gid) {
 			fGid = gid;
 			final TablelayoutType layout = lguiItem.getLayoutAccess().getTableLayout(gid);
@@ -389,8 +446,19 @@ public class TableHandler extends LguiHandler {
 		return fCids;
 	}
 
-	private ColumnType[] getColumnsToCids(String gid) {
-		BigInteger[] cids = getCidsToPosition(gid);
+	/**
+	 * Get active columns for the table layout
+	 * 
+	 * @param gid
+	 *            ID of the table layout
+	 * @return active columns
+	 */
+	private ColumnType[] getActiveColumns(String gid) {
+		TableType table = getTable(gid);
+		if (table == null) {
+			return new ColumnType[0];
+		}
+		BigInteger[] cids = getActiveCids(gid);
 		final ColumnType[] columns = new ColumnType[cids.length];
 		for (int i = 0; i < cids.length; i++) {
 			for (final ColumnType column : getTable(gid).getColumn()) {
@@ -403,10 +471,40 @@ public class TableHandler extends LguiHandler {
 		return columns;
 	}
 
+	/**
+	 * Get the column sort property for the given column index
+	 * 
+	 * @param table
+	 *            table containing columns
+	 * @param cids
+	 *            column indexes
+	 * @param index
+	 *            index of column
+	 * @return sort property
+	 */
+	private String getColumnSortProperty(TableType table, BigInteger[] cids, int index) {
+		for (final ColumnType column : table.getColumn()) {
+			if (column != null) {
+				if (column.getId().equals(cids[index])) {
+					return column.getSort().value();
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param gid
+	 *            ID of the table layout
+	 * @return
+	 */
 	private RowType[] getTableData(String gid) {
 		final TableType table = getTable(gid);
+		if (table == null) {
+			return new RowType[0];
+		}
 		final RowType[] tableData = new RowType[table.getRow().size()];
-		BigInteger[] cids = getCidsToPosition(gid);
+		BigInteger[] cids = getActiveCids(gid);
 		for (int i = 0; i < tableData.length; i++) {
 			final RowType row = table.getRow().get(i);
 			tableData[i] = new RowType();
@@ -425,18 +523,9 @@ public class TableHandler extends LguiHandler {
 		return tableData;
 	}
 
-	private String getTypeTableColumn(String gid, int index) {
-		BigInteger[] cids = getCidsToPosition(gid);
-		for (final ColumnType column : getTable(gid).getColumn()) {
-			if (column != null && cids != null && cids.length > index) {
-				if (column.getId().equals(cids[index])) {
-					return column.getSort().value();
-				}
-			}
-		}
-		return null;
-	}
-
+	/**
+	 * Not currently used
+	 */
 	private void reduceColumnPos(String gid, int pos, int i) {
 		if (pos == i) {
 			return;
@@ -449,7 +538,6 @@ public class TableHandler extends LguiHandler {
 				break;
 			}
 		}
-
 	}
 
 }
