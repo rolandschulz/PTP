@@ -156,6 +156,25 @@ public abstract class RemoteSearchQuery implements Serializable {
 			return null;
 	}
 	
+	public void cleanupResult(){
+		if(fMatches!=null){
+			fMatches.clear();
+		}
+		if(remoteLineSearchElementMatches!=null){
+			remoteLineSearchElementMatches.clear();
+		}
+		if(localLineSearchElementMatches!=null){
+			localLineSearchElementMatches.clear();
+		}
+		if(remoteLineSearchElements!=null){
+			remoteLineSearchElements.clear();
+		}
+		if(localLineSearchElements!=null){
+			localLineSearchElements.clear();
+		}
+		
+	}
+	
 	
 	
 	
