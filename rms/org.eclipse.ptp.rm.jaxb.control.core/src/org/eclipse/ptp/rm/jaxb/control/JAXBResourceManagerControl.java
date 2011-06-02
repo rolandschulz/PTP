@@ -453,9 +453,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 			worked(progress, 20);
 
-			ICommandJob job = doJobSubmitCommand(uuid, mode);
+			ICommandJob job = null;
 
-			worked(progress, 40);
+			try {
+				job = doJobSubmitCommand(uuid, mode);
+				worked(progress, 40);
+			} finally {
+				/*
+				 * if the staged files can be removed, delete them
+				 */
+				maybeCleanupManagedFiles(uuid, files);
+				worked(progress, 5);
+			}
 
 			ICommandJobStatus status = job.getJobStatus();
 
@@ -478,12 +487,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			jobStatusMap.addJobStatus(status.getJobId(), status);
 			status.setLaunchConfig(configuration);
-			worked(progress, 5);
-
-			/*
-			 * if the staged files can be removed, delete them
-			 */
-			maybeCleanupManagedFiles(uuid, files);
 			worked(progress, 5);
 
 			/*
