@@ -194,6 +194,10 @@ public abstract class RemoteSearchQueryAdapter implements ISearchQuery {
 		RemoteSearchResult result= (RemoteSearchResult) getSearchResult();
 		result.removeAll();
 		
+		if(fQuery!=null){
+			fQuery.cleanupResult();
+		}
+		
 		// Send query to remote side for processing and get it back with matches
 		fQuery = fSubsystem.runQuery2(fScope, fQuery, monitor);
 	
