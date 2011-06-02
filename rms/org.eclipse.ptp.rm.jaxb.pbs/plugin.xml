@@ -4,16 +4,12 @@
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
-            configurationFile="data/pbs-torque-generic.xml"
-            name="PBS-Torque-Batch-Generic">
+            configurationFile="data/pbs-generic-batch.xml"
+            name="PBS-Generic-Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
-            configurationFile="data/pbs-torque-interactive.xml"
-            name="PBS-Torque-Interactive-Generic">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-            configurationFile="data/pbs-torque-basic.xml"
-            name="PBS-Torque-Batch-Basic">
+            configurationFile="data/pbs-generic-interactive.xml"
+            name="PBS-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
    </extension>
 

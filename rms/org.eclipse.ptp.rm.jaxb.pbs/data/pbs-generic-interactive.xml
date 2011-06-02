@@ -9,7 +9,7 @@
 <!-- * Albert L. Rossi - design and implementation -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-torque-interactive">
+	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-generic-interactive">
 	<control-data>
 		<property name="queues" visible="false"/>
 		<property name="mpiPrefix" visible="false">
