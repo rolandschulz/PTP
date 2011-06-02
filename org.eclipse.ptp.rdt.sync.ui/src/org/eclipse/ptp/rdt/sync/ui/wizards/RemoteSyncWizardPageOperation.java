@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
+import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
@@ -112,6 +113,8 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		String buildPath = buildScenario.getLocation();
 		for (IConfiguration config : allConfigs) {
 			config.getToolChain().getBuilder().setBuildPath(buildPath);
+			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
+			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.Syncbuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
 
