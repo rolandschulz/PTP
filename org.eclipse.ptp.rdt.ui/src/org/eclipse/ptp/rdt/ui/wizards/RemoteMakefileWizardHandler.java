@@ -124,12 +124,18 @@ public class RemoteMakefileWizardHandler extends STDWizardHandler {
 			doTemplatesPostProcess(project);
 			doCustom(project);
 			
-			//turn off append local environment variables for remote projects
-			ICConfigurationDescription c_cfgs[] = des.getConfigurations();
-			for (ICConfigurationDescription c_cfg : c_cfgs) {
-				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_cfg);
-				EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_cfg);
-			}
+			// temporarily back out fix to Bug 338595 as it's screwing up the fix for Bug 344380
+//			//turn off append local environment variables for remote projects
+//			ICConfigurationDescription c_cfgs[] = des.getConfigurations();
+//			for (ICConfigurationDescription c_cfg : c_cfgs) {
+//				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_cfg);
+//				EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_cfg);
+//			}
+			
+			StorableEnvironment vars = EnvironmentVariableManager.fUserSupplier.getWorkspaceEnvironmentCopy();
+			vars.setAppendContributedEnvironment(false);
+			vars.setAppendEnvironment(false);
+			EnvironmentVariableManager.fUserSupplier.setWorkspaceEnvironment(vars);
 			
 			
 		} finally {
