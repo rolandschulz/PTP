@@ -114,7 +114,7 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		for (IConfiguration config : allConfigs) {
 			config.getToolChain().getBuilder().setBuildPath(buildPath);
 			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
-			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.Syncbuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
+			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
 
