@@ -130,7 +130,7 @@ public class PropertyType {
 	 */
 	public String getType() {
 		if (type == null) {
-			return "java.lang.String";
+			return "java.lang.String"; //$NON-NLS-1$
 		} else {
 			return type;
 		}
