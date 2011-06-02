@@ -30,6 +30,7 @@
       <topic label="Launching Parallel Programs"  href="html/03pLaunchConfig.html"/> 
       <topic label="Monitoring Parallel Machines and Jobs" href="html/05monitoring.html"/>
       <topic label="Parallel Debugging"  href="html/06parDebugging.html"/>
+      <topic href="html/07ptpPrefs.html" label="PTP Preferences" link="href/07ptpPrefs.html"/>
       <topic label="Parallel Language Development Tools (PLDT)">
       	<anchor id="ptpPLDT"/>
       </topic>
@@ -39,7 +40,6 @@
       <topic label="Graphical Explorer of MPI Programs (GEM)">
       	<anchor id="ptpGEM"/>
       </topic>
-      <topic href="html/07ptpPrefs.html" label="PTP Preferences" link="href/07ptpPrefs.html"/>
       <topic label="New and Noteworthy"  href="html/00newNoteworthy.html"/> 
    
 </toc>
