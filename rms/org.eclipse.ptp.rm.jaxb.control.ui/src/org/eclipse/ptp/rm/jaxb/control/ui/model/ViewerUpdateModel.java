@@ -84,7 +84,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 *            a single output string
 	 */
 	public ViewerUpdateModel(String name, ValueUpdateHandler handler, ICheckable viewer, TemplateType template) {
-		super(name, null, handler);
+		super(name, handler);
 		this.viewer = viewer;
 		this.columnViewer = (ColumnViewer) viewer;
 		pattern = template.getPattern();

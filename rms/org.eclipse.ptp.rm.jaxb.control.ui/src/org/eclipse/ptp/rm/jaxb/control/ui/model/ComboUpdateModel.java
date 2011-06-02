@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
-import java.util.List;
-
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
@@ -34,17 +32,14 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	 * @param name
 	 *            name of the model, which will correspond to the name of a
 	 *            Property or Attribute if the widget value is to be saved.
-	 * @param linkUpdateTo
-	 *            if a change in this property or attribute value overwrites
-	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
 	 * @param combo
 	 *            the widget to which this model corresponds
 	 */
-	public ComboUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler, Combo combo) {
-		super(name, linkUpdateTo, handler);
+	public ComboUpdateModel(String name, ValueUpdateHandler handler, Combo combo) {
+		super(name, handler);
 		this.combo = combo;
 		this.combo.addModifyListener(this);
 		this.combo.addSelectionListener(this);

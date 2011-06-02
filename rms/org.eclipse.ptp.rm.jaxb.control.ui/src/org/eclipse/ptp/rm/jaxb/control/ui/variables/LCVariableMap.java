@@ -26,6 +26,7 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 
 /**
  * A wrapper for the LaunchConfiguration accessed through the IVariableMap
@@ -48,7 +49,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
  * map based on the specific tab doing the calling).<br>
  * <br>
  * This object also maintains the default values defined from the parent in a
- * separate map. Finally, it also searches for and parses into an index the
+ * separate map, and a map for invisible properties (i.e., those not exported to
+ * widgets). Finally, it also searches for and parses into an index the
  * currently checked values (from checkbox tables or trees). This index is used
  * when determining whether to null out the current value of a Property or
  * Attribute in the current (non-global) variable map.
@@ -62,12 +64,14 @@ public class LCVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
 
 	private Map<String, Object> globalValues;
+	private final Map<String, Object> hidden;
 	private Map<String, Object> values;
 	private final Map<String, String> defaultValues;
 
 	public LCVariableMap() {
 		this.values = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.defaultValues = Collections.synchronizedMap(new TreeMap<String, String>());
+		this.hidden = Collections.synchronizedMap(new TreeMap<String, Object>());
 	}
 
 	/*
@@ -82,10 +86,8 @@ public class LCVariableMap implements IVariableMap {
 		if (values != null) {
 			values.clear();
 		}
-		if (defaultValues != null) {
-			defaultValues.clear();
-		}
-
+		defaultValues.clear();
+		hidden.clear();
 	}
 
 	/**
@@ -131,6 +133,76 @@ public class LCVariableMap implements IVariableMap {
 	 */
 	public Map<String, Object> getDiscovered() {
 		return null;
+	}
+
+	/**
+	 * Determine the value of a hidden property. Note that the presence of a
+	 * symbolic link overrides the value which in turn overrides the default
+	 * value.
+	 * 
+	 * @param name
+	 * @param current
+	 * @return
+	 */
+	public Object getHiddenValue(String name, Map<String, Object> current) {
+		Object value = null;
+		Object o = hidden.get(name);
+		String link = null;
+		if (o instanceof PropertyType) {
+			PropertyType p = (PropertyType) o;
+			value = p.getValue();
+			link = p.getLinkValueTo();
+		} else if (o instanceof AttributeType) {
+			AttributeType a = (AttributeType) o;
+			value = a.getValue();
+			link = a.getLinkValueTo();
+		}
+		if (link != null) {
+			Object linked = current.get(link);
+			if (linked != null && !JAXBUIConstants.ZEROSTR.equals(linked)) {
+				value = linked;
+			}
+		}
+		if (value == null || JAXBUIConstants.ZEROSTR.equals(value)) {
+			value = defaultValues.get(name);
+		}
+		return value;
+	}
+
+	/**
+	 * Ensures that non-JAXB-spacific attributes and hidden variables remain in
+	 * the configuration during replace/refresh.
+	 * 
+	 * @param configuration
+	 *            current launch settings
+	 * @return map of org.eclipse.debug and org.eclipse.ptp attributes
+	 * @throws CoreException
+	 */
+	public Map<String, Object> getStandardConfigurationProperties(ILaunchConfiguration configuration, Map<String, Object> current)
+			throws CoreException {
+		Map<String, Object> standard = new TreeMap<String, Object>();
+		for (String name : hidden.keySet()) {
+			Object value = getHiddenValue(name, current);
+			if (value != null) {
+				standard.put(name, value);
+			}
+		}
+		Map<?, ?> attributes = configuration.getAttributes();
+		for (Object o : attributes.keySet()) {
+			String key = (String) o;
+			if (key.startsWith(JAXBControlConstants.DEBUG_PACKAGE) || key.startsWith(JAXBControlConstants.PTP_PACKAGE)) {
+				standard.put(key, attributes.get(key));
+			}
+		}
+		standard.put(
+				JAXBControlConstants.DIRECTORY,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR,
+						(String) standard.get(JAXBControlConstants.CONTROL_WORKING_DIR_VAR)));
+		standard.put(JAXBControlConstants.EXEC_PATH,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
+		standard.put(JAXBControlConstants.PROG_ARGS,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
+		return standard;
 	}
 
 	/**
@@ -182,8 +254,7 @@ public class LCVariableMap implements IVariableMap {
 	 * @throws Throwable
 	 */
 	public void initialize(IVariableMap rmVars) throws Throwable {
-		values.clear();
-		defaultValues.clear();
+		clear();
 		for (String s : rmVars.getVariables().keySet()) {
 			loadValues(s, rmVars.getVariables().get(s));
 		}
@@ -304,62 +375,40 @@ public class LCVariableMap implements IVariableMap {
 		String name = null;
 		String defVal = null;
 		String strVal = null;
+		boolean visible = true;
 		Object o = null;
 		if (value instanceof PropertyType) {
 			PropertyType p = (PropertyType) value;
-			if (!p.isVisible()) {
-				return;
-			}
 			name = p.getName();
 			defVal = p.getDefault();
-			o = p.getValue();
+			if (!p.isVisible()) {
+				hidden.put(name, p);
+			} else {
+				o = p.getValue();
+			}
 		} else if (value instanceof AttributeType) {
 			AttributeType ja = (AttributeType) value;
-			if (!ja.isVisible()) {
-				return;
-			}
 			name = ja.getName();
 			defVal = ja.getDefault();
-			o = ja.getValue();
-			String status = ja.getStatus();
-			put(name + JAXBControlConstants.PD + JAXBControlConstants.STATUS, status);
+			if (!ja.isVisible()) {
+				hidden.put(name, ja);
+			} else {
+				o = ja.getValue();
+				String status = ja.getStatus();
+				put(name + JAXBControlConstants.PD + JAXBControlConstants.STATUS, status);
+			}
 		} else {
 			throw new ArrayStoreException(Messages.IllegalVariableValueType + value.getClass());
 		}
 		defaultValues.put(name, defVal);
-		if (o != null) {
-			strVal = String.valueOf(o);
-		}
-		if (strVal == null) {
-			strVal = defVal;
-		}
-		put(name, strVal);
-	}
-
-	/**
-	 * Ensures that non-JAXB-spacific attributes remain in the configuration
-	 * during replace/refresh.
-	 * 
-	 * @param configuration
-	 *            current launch settings
-	 * @return map of org.eclipse.debug and org.eclipse.ptp attributes
-	 * @throws CoreException
-	 */
-	public static Map<String, Object> getStandardConfigurationProperties(ILaunchConfiguration configuration) throws CoreException {
-		Map<String, Object> standard = new TreeMap<String, Object>();
-		Map<?, ?> attributes = configuration.getAttributes();
-		for (Object o : attributes.keySet()) {
-			String key = (String) o;
-			if (key.startsWith(JAXBControlConstants.DEBUG_PACKAGE) || key.startsWith(JAXBControlConstants.PTP_PACKAGE)) {
-				standard.put(key, attributes.get(key));
+		if (visible) {
+			if (o != null) {
+				strVal = String.valueOf(o);
 			}
+			if (strVal == null) {
+				strVal = defVal;
+			}
+			put(name, strVal);
 		}
-		standard.put(JAXBControlConstants.DIRECTORY,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, JAXBControlConstants.ZEROSTR));
-		standard.put(JAXBControlConstants.EXEC_PATH,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
-		standard.put(JAXBControlConstants.PROG_ARGS,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
-		return standard;
 	}
 }

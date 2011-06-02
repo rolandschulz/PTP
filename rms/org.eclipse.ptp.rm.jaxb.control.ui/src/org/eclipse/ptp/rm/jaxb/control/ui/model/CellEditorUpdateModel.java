@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
-import java.util.List;
-
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
@@ -53,9 +51,6 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * @param name
 	 *            of the model, which will correspond to the name of a Property
 	 *            or Attribute the value is to be saved to
-	 * @param linkUpdateTo
-	 *            if a change in this property or attribute value overwrites
-	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
@@ -72,9 +67,9 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * @param status
 	 *            the attribute's status value, if any
 	 */
-	protected CellEditorUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler, CellEditor editor,
-			String[] items, boolean readOnly, String tooltip, String description, String status) {
-		super(name, linkUpdateTo, handler);
+	protected CellEditorUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
+			String tooltip, String description, String status) {
+		super(name, handler);
 		this.editor = editor;
 		this.readOnly = readOnly;
 		this.items = items;

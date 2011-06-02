@@ -15,10 +15,12 @@
 		<!-- needed by RM internals for fetch; name is fixed by convention -->
 		<property name="stdout_remote_path" visible="true">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o@jobId</default>
+			<link-value-to>Output_Path</link-value-to>
 		</property>
 		<!-- needed by RM internals for fetch; name is fixed by convention -->
 		<property name="stderr_remote_path" visible="true">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e@jobId</default>
+			<link-value-to>Error_Path</link-value-to>
 		</property>
 		<property name="remote_path_tooltip" visible="false">
 			<default><![CDATA[Not the same as the PBS attribute for stdout or stderr; 
@@ -76,7 +78,6 @@ the following form: job_name.eSeq_num where job_name is
 the name of the job, see -N option, and Seq_num
 is the job number assigned when the job is submitted; 
 default value: (job_name).e(job_number).]]></tooltip>
-			<link-update-to>stderr_remote_path</link-update-to>
 		</attribute>
 		<attribute name="export_all" type="boolean">
 			<description><![CDATA[Declares that all environment variables in the qsub command's environment are to be exported to the batch job.]]></description>
@@ -142,7 +143,6 @@ will be used. The default name has the following form: job_name.oSeq_num
 where job_name is the name of the job, see -N option, and Seq_num
 is the job number assigned when the job is submitted; 
 default value: (job_name).o(job_number).]]></tooltip>
-			<link-update-to>stdout_remote_path</link-update-to>
 		</attribute>
 		<attribute name="Priority" type="string">
 			<description>The job scheduling priority assigned by the user.</description>

@@ -50,9 +50,9 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 *            viewer. (<code>false</code> means that its value displays in a
 	 *            column whose name matches the id.
 	 */
-	public ValueTreeNodeUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler, CellEditor editor,
-			String[] items, boolean readOnly, boolean inValueCol) {
-		super(name, linkUpdateTo, handler, editor, items, readOnly, JAXBControlUIConstants.ZEROSTR, JAXBControlUIConstants.ZEROSTR,
+	public ValueTreeNodeUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
+			boolean inValueCol) {
+		super(name, handler, editor, items, readOnly, JAXBControlUIConstants.ZEROSTR, JAXBControlUIConstants.ZEROSTR,
 				JAXBControlUIConstants.ZEROSTR);
 		children = new ArrayList<InfoTreeNodeModel>();
 		generateChildren(inValueCol);
@@ -64,9 +64,6 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 * @param name
 	 *            of the model, which will correspond to the name of a Property
 	 *            or Attribute the value is to be saved to
-	 * @param linkUpdateTo
-	 *            if a change in this property or attribute value overwrites
-	 *            other property or attribute values
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
@@ -83,9 +80,9 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 * @param data
 	 *            the Attribute object
 	 */
-	public ValueTreeNodeUpdateModel(String name, List<String> linkUpdateTo, ValueUpdateHandler handler, CellEditor editor,
-			String[] items, boolean readOnly, boolean inValueCol, AttributeType data) {
-		super(name, linkUpdateTo, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus());
+	public ValueTreeNodeUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
+			boolean inValueCol, AttributeType data) {
+		super(name, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus());
 		children = new ArrayList<InfoTreeNodeModel>();
 		generateChildren(inValueCol);
 	}
