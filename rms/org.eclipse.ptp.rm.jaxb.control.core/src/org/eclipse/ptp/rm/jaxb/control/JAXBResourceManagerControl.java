@@ -110,7 +110,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	private final IJAXBResourceManagerConfiguration config;
 	private final ConnectionChangeListener connectionListener;
-	// private IResourceManagerMonitor monitor;
 	private Map<String, String> launchEnv;
 	private Map<String, ICommandJob> jobTable;
 	private ICommandJobStatusMap jobStatusMap;

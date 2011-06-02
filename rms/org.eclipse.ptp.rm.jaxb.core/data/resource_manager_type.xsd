@@ -22,8 +22,8 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="site-data" minOccurs="0" type="rm:site-type"/>
-			<xs:element name="control-data" type="rm:control-type"/>
-			<xs:element name="monitor-data" type="rm:monitor-type"/>
+			<xs:element name="control-data" minOccurs="0" type="rm:control-type"/>
+			<xs:element name="monitor-data" minOccurs="0" type="rm:monitor-type"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
 	</xs:complexType>
@@ -70,14 +70,14 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:choice>
+			<xs:choice minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
 						Currently a configuration may have only a batch or an interactive mode. Thus it may have only two submission
 						modes, a run and a debug, for the given type. In the future we may allow all four to coexist in a single configuration.
 					</xs:documentation>
 				</xs:annotation>
-				<xs:sequence>
+				<xs:sequence >
 					<xs:element name="submit-interactive" type="rm:command-type"/>
 					<xs:element name="submit-interactive-debug" type="rm:command-type" minOccurs="0"/>
 				</xs:sequence>
@@ -1166,7 +1166,7 @@
 	<xs:complexType name="monitor-type">
 		<xs:sequence>
 			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property-type"/>
-			<xs:element name="driver" type="rm:monitor-driver-type"/>
+			<xs:element name="driver" minOccurs="0" type="rm:monitor-driver-type"/>
 		</xs:sequence>
 		<xs:attribute name="schedulerType" type="xs:string"/>
 		<xs:attribute name="refreshFrequencyInSeconds" type="xs:int" default="60"/>

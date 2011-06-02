@@ -30,6 +30,7 @@ import javax.xml.validation.Validator;
 
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
+import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -158,6 +159,9 @@ public class JAXBInitializationUtils {
 	 *            JAXB data subtree for control part of resource manager
 	 */
 	private static void addAttributes(Map<String, Object> env, ControlType control) {
+		if (control == null) {
+			return;
+		}
 		List<AttributeType> jobAttributes = control.getAttribute();
 		for (AttributeType jobAttribute : jobAttributes) {
 			env.put(jobAttribute.getName(), jobAttribute);
@@ -177,6 +181,9 @@ public class JAXBInitializationUtils {
 	 *            JAXB data subtree for control part of resource manager
 	 */
 	private static void addProperties(Map<String, Object> env, ControlType control) {
+		if (control == null) {
+			return;
+		}
 		List<PropertyType> properties = control.getProperty();
 		for (PropertyType property : properties) {
 			env.put(property.getName(), property);
@@ -256,6 +263,14 @@ public class JAXBInitializationUtils {
 		source = new StreamSource(new StringReader(xml));
 		JAXBElement<?> o = (JAXBElement<?>) getUnmarshaller().unmarshal(source);
 		ResourceManagerData rmdata = (ResourceManagerData) o.getValue();
+		if (rmdata != null) {
+			if (rmdata.getControlData() == null) {
+				rmdata.setControlData(new ControlType());
+			}
+			if (rmdata.getMonitorData() == null) {
+				rmdata.setMonitorData(new MonitorType());
+			}
+		}
 		return rmdata;
 	}
 
