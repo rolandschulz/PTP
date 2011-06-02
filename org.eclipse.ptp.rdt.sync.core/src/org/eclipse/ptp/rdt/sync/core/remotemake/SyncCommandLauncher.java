@@ -113,14 +113,14 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.core", "RemoteCommandLauncher has not been associated with a project.")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		// Set correct command path and command arguments
-		// For configurations other than workspace, the command path is incorrect and needs to be fixed
+		// Set correct directory
+		// For managed projects and configurations other than workspace, the directory is incorrect and needs to be fixed.
 		IConfiguration configuration = ManagedBuildManager.getBuildInfo(getProject()).getDefaultConfiguration();
 		String projectWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString() + 
 																				getProject().getFullPath().toPortableString();
 		String projectActualRoot = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).
 																													getLocation();
-		commandPath = new Path(commandPath.toString().replaceFirst(projectWorkspaceRoot, projectActualRoot));
+		changeToDirectory = new Path(changeToDirectory.toString().replaceFirst(projectWorkspaceRoot, projectActualRoot));
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 
 		// Determine the service model for this configuration, and use the provider of the build
