@@ -97,7 +97,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * non-continuous processes and is only valid for servers in the RUNNING
 	 * state.
 	 * 
-	 * @return InputStream
+	 * @return InputStream error stream or null if the server has not been
+	 *         started
 	 */
 	public InputStream getErrorStream() {
 		if (fRemoteProcess != null) {
@@ -111,7 +112,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * non-continuous processes and is only valid for servers in the RUNNING
 	 * state.
 	 * 
-	 * @return InputStream
+	 * @return InputStream input stream or null if the server has not been
+	 *         started
 	 */
 	public InputStream getInputStream() {
 		if (fRemoteProcess != null) {
@@ -133,10 +135,14 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * Get the output stream of the remote process. This should only be used for
 	 * non-continuous processes.
 	 * 
-	 * @return OutputStream
+	 * @return OutputStream output stream or null if the server has not been
+	 *         started
 	 */
 	public OutputStream getOutputStream() {
-		return fRemoteProcess.getOutputStream();
+		if (fRemoteProcess != null) {
+			return fRemoteProcess.getOutputStream();
+		}
+		return null;
 	}
 
 	/**
@@ -670,13 +676,18 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			directory.mkdir(EFS.NONE, subMon.newChild(10));
 
 			if (checkAndUploadPayload(directory, subMon.newChild(30))) {
-				unpackPayload(directory, subMon.newChild(30));
+				if (!subMon.isCanceled()) {
+					unpackPayload(directory, subMon.newChild(30));
+				}
 			}
 
 			/*
 			 * Now launch the server.
 			 */
-			return runCommand(getLaunchCommand(), Messages.AbstractRemoteServerRunner_5, directory, false, subMon.newChild(30));
+			if (!subMon.isCanceled()) {
+				return runCommand(getLaunchCommand(), Messages.AbstractRemoteServerRunner_5, directory, false, subMon.newChild(30));
+			}
+			return null;
 		} catch (Exception e) {
 			throw new IOException(e.getMessage());
 		} finally {
@@ -719,7 +730,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Run the unpack command on the remote machine.
+	 * Run the unpack command on the remote machine. Waits for command to finish
 	 * 
 	 * @param conn
 	 *            remote connection
@@ -730,7 +741,16 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	private void unpackPayload(IFileStore directory, IProgressMonitor monitor) throws IOException {
 		String unpackCommand = getUnpackCommand();
 		if (unpackCommand != null && unpackCommand.length() != 0) {
-			runCommand(unpackCommand, Messages.AbstractRemoteServerRunner_unpackingPayload, directory, false, monitor);
+			IRemoteProcess proc = runCommand(unpackCommand, Messages.AbstractRemoteServerRunner_unpackingPayload, directory, false,
+					monitor);
+			while (!proc.isCompleted() && !monitor.isCanceled()) {
+				synchronized (this) {
+					try {
+						wait(100);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
 		}
 	}
 
@@ -800,7 +820,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 
 			fRemoteProcess = launchServer(subMon.newChild(50));
 
-			if (subMon.isCanceled()) {
+			if (fRemoteProcess == null || subMon.isCanceled()) {
 				return Status.CANCEL_STATUS;
 			}
 
