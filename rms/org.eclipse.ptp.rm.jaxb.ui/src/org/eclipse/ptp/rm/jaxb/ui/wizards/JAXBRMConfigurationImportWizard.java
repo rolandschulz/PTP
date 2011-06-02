@@ -94,8 +94,9 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 								return Status.OK_STATUS;
 							}
 
-							IFile newConfig = project.getFile(name + JAXBUIConstants.DOT_XML);
 							int createTry = 1;
+							IFile newConfig = project.getFile(name + JAXBUIConstants.SP + JAXBUIConstants.OPENP + createTry++
+									+ JAXBUIConstants.CLOSP + JAXBUIConstants.DOT_XML);
 							while (newConfig.exists()) {
 								newConfig = project.getFile(name + JAXBUIConstants.SP + JAXBUIConstants.OPENP + createTry++
 										+ JAXBUIConstants.CLOSP + JAXBUIConstants.DOT_XML);

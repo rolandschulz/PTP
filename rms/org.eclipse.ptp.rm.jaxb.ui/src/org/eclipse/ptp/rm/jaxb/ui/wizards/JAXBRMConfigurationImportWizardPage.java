@@ -39,10 +39,10 @@ import org.eclipse.swt.widgets.Label;
  */
 public class JAXBRMConfigurationImportWizardPage extends WizardPage implements SelectionListener {
 	private Combo configurations;
+
 	private String[] items;
 	private URL[] urls;
 	private int index;
-
 	private final Map<String, URL> fRMJAXBResourceManagers;
 
 	/**
@@ -94,6 +94,16 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements S
 		return items[index];
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.wizard.WizardPage#isPageComplete()
+	 */
+	@Override
+	public boolean isPageComplete() {
+		return index != 0;
+	}
+
 	/**
 	 * Populate the combo box and URL data with the available extensions.
 	 */
@@ -131,5 +141,6 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements S
 	 */
 	public void widgetSelected(SelectionEvent e) {
 		index = configurations.getSelectionIndex();
+		setPageComplete(isPageComplete());
 	}
 }
