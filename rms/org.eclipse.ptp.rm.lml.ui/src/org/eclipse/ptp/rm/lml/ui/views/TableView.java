@@ -54,7 +54,6 @@ import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -313,16 +312,23 @@ public class TableView extends LMLViewPart {
 				tree.setMenu(header ? headerMenu : menu);
 			}
 		});
-
-		tree.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				if (fSelectedLguiItem != null) {
-					fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(), gid);
-					fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, removeFirstColumn(tree.getColumnOrder()));
-				}
-			}
-		});
+		// tree.addControlListener(new ControlAdapter() {
+		// @Override
+		// public void controlMoved(ControlEvent e) {
+		// if (fSelectedLguiItem != null) {
+		// fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid,
+		// removeFirstColumn(tree.getColumnOrder()));
+		// }
+		// }
+		//
+		// @Override
+		// public void controlResized(ControlEvent e) {
+		// if (fSelectedLguiItem != null) {
+		// fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(),
+		// gid);
+		// }
+		// }
+		// });
 
 		/*
 		 * Get the selected LguiItem (if there is one) so that the table will be
@@ -355,9 +361,10 @@ public class TableView extends LMLViewPart {
 	}
 
 	private Double[] getWidths() {
-		final Double[] widths = new Double[treeColumns.length];
-		for (int i = 0; i < treeColumns.length; i++) {
-			widths[i] = Integer.valueOf(treeColumns[i].getWidth()).doubleValue();
+		TreeColumn[] columns = tree.getColumns();
+		final Double[] widths = new Double[columns.length];
+		for (int i = 0; i < columns.length; i++) {
+			widths[i] = Integer.valueOf(columns[i].getWidth()).doubleValue();
 		}
 		return widths;
 	}
@@ -453,6 +460,7 @@ public class TableView extends LMLViewPart {
 		});
 		TreeColumn treeColumn = treeViewerColumn.getColumn();
 		treeColumn.setMoveable(true);
+		treeColumn.setAlignment(SWT.LEFT);
 		createMenuItem(headerMenu, treeColumn, 0);
 		treeColumnLayout.setColumnData(treeColumn, new ColumnPixelData(40, true));
 
@@ -469,9 +477,33 @@ public class TableView extends LMLViewPart {
 			treeColumn.setMoveable(true);
 			treeColumn.setText(tableColumnLayouts[i].getTitle());
 			treeColumn.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
+			treeColumn.addControlListener(new ControlAdapter() {
+				// @Override
+				// public void controlMoved(ControlEvent e) {
+				// if (fSelectedLguiItem != null) {
+				// fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid,
+				// removeFirstColumn(tree.getColumnOrder()));
+				// }
+				// }
+				//
+				// @Override
+				// public void controlResized(ControlEvent e) {
+				// if (fSelectedLguiItem != null) {
+				// fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(),
+				// gid);
+				// }
+				// }
+			});
+
+			/*
+			 * Create the header menu for this column
+			 */
 			createMenuItem(headerMenu, treeColumn, i + 1);
-			treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(tableColumnLayouts[i].getWidth(),
-					ColumnWeightData.MINIMUM_WIDTH, true));
+
+			/*
+			 * Set the column width
+			 */
+			treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(tableColumnLayouts[i].getWidth(), 0, true));
 			treeColumns[i] = treeColumn;
 		}
 
@@ -581,6 +613,9 @@ public class TableView extends LMLViewPart {
 					savedColumnWidths[index] = column.getWidth();
 					column.setWidth(0);
 					column.setResizable(false);
+				}
+				if (fSelectedLguiItem != null) {
+					fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(gid, getWidths());
 				}
 			}
 		});

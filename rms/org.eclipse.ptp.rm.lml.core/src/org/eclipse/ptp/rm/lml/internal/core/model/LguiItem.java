@@ -498,16 +498,19 @@ public class LguiItem implements ILguiItem {
 		final Map<String, String> map = findMap(name);
 		final String oid = map.remove(name);
 
-		final List<RowType> oldRows = getTableHandler().getTable(gid).getRow();
-		final List<RowType> newRows = new ArrayList<RowType>();
-		for (final RowType row : oldRows) {
-			if (!row.getOid().equals(oid)) {
-				newRows.add(row);
+		TableType table = getTableHandler().getTable(gid);
+		if (table != null) {
+			final List<RowType> oldRows = table.getRow();
+			final List<RowType> newRows = new ArrayList<RowType>();
+			for (final RowType row : oldRows) {
+				if (!row.getOid().equals(oid)) {
+					newRows.add(row);
+				}
 			}
-		}
-		oldRows.clear();
-		for (final RowType row : newRows) {
-			oldRows.add(row);
+			oldRows.clear();
+			for (final RowType row : newRows) {
+				oldRows.add(row);
+			}
 		}
 	}
 
