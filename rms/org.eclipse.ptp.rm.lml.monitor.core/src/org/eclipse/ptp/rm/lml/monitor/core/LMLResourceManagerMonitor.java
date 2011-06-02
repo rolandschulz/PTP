@@ -49,25 +49,10 @@ import org.eclipse.ui.XMLMemento;
  * LML JAXB resource manager monitor
  */
 public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
-	public class RMListener implements IRMSelectionListener {
-		public void selectionChanged(ISelection selection) {
-			String name = null;
-			if (!selection.isEmpty()) {
-				TreePath path = ((ITreeSelection) selection).getPaths()[0];
-				Object segment = path.getFirstSegment();
-				if (segment instanceof IPResourceManager) {
-					name = ((IPResourceManager) segment).getResourceManager().getUniqueName();
-				}
-			}
-			LMLManager.getInstance().selectLgui(name);
-		}
-
-		public void setDefault(Object rm) {
-			// TODO Auto-generated method stub
-
-		}
-	}
-
+	/**
+	 * Job for running the LML DA server. This job gets run periodically based
+	 * on the JOB_SCHEDULE_FREQUENCY.
+	 */
 	private class MonitorJob extends Job {
 		private final LMLDAServer fServer;
 
@@ -108,6 +93,50 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		}
 	}
 
+	/**
+	 * Listener for resource manager selection events. These are generated when
+	 * the user selects a resource manager in the RM view. This will cause the
+	 * UI to switch to displaying the jobs/nodes for that RM.
+	 */
+	private class RMListener implements IRMSelectionListener {
+		public void selectionChanged(ISelection selection) {
+			String name = null;
+			if (!selection.isEmpty()) {
+				TreePath path = ((ITreeSelection) selection).getPaths()[0];
+				Object segment = path.getFirstSegment();
+				if (segment instanceof IPResourceManager) {
+					name = ((IPResourceManager) segment).getResourceManager().getUniqueName();
+				}
+			}
+			RMSelectionJob job = new RMSelectionJob(Messages.LMLResourceManagerMonitor_RMSelectionJob, name);
+			job.schedule();
+		}
+
+		public void setDefault(Object rm) {
+			// TODO Auto-generated method stub
+		}
+	}
+
+	/**
+	 * Job for updating the UI when a resource manager is selected. This is done
+	 * in a job since the update is a long running operation.
+	 */
+	private class RMSelectionJob extends Job {
+		private final String fRMName;
+
+		public RMSelectionJob(String jobName, String rmName) {
+			super(jobName);
+			setSystem(true);
+			fRMName = rmName;
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			LMLManager.getInstance().selectLgui(fRMName);
+			return Status.OK_STATUS;
+		}
+	}
+
 	private static final String USER_JOBS = "user-jobs";//$NON-NLS-1$ 
 
 	/*
@@ -122,6 +151,34 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	public LMLResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
+	}
+
+	/**
+	 * Get the remote connection specified by the monitor configuration. This
+	 * may be the same as the control connection (if "use same" is selected) or
+	 * an independent connection.
+	 * 
+	 * @param monitor
+	 *            progress monitor
+	 * @return connection for the monitor
+	 */
+	private IRemoteConnection getRemoteConnection(IProgressMonitor monitor) {
+		AbstractRemoteResourceManagerConfiguration conf = (AbstractRemoteResourceManagerConfiguration) getMonitorConfiguration();
+		String id;
+		String name;
+		if (conf.getUseDefault()) {
+			id = getResourceManager().getControlConfiguration().getRemoteServicesId();
+			name = getResourceManager().getControlConfiguration().getConnectionName();
+		} else {
+			id = getMonitorConfiguration().getRemoteServicesId();
+			name = getMonitorConfiguration().getConnectionName();
+		}
+		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(id, monitor);
+		if (services != null) {
+			IRemoteConnectionManager connMgr = services.getConnectionManager();
+			return connMgr.getConnection(name);
+		}
+		return null;
 	}
 
 	@Override
@@ -222,33 +279,5 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	@Override
 	protected void doUpdateJob(String jobId, IJobStatus status) {
 		fLMLManager.updateUserJob(getResourceManager().getUniqueName(), jobId, status);
-	}
-
-	/**
-	 * Get the remote connection specified by the monitor configuration. This
-	 * may be the same as the control connection (if "use same" is selected) or
-	 * an independent connection.
-	 * 
-	 * @param monitor
-	 *            progress monitor
-	 * @return connection for the monitor
-	 */
-	private IRemoteConnection getRemoteConnection(IProgressMonitor monitor) {
-		AbstractRemoteResourceManagerConfiguration conf = (AbstractRemoteResourceManagerConfiguration) getMonitorConfiguration();
-		String id;
-		String name;
-		if (conf.getUseDefault()) {
-			id = getResourceManager().getControlConfiguration().getRemoteServicesId();
-			name = getResourceManager().getControlConfiguration().getConnectionName();
-		} else {
-			id = getMonitorConfiguration().getRemoteServicesId();
-			name = getMonitorConfiguration().getConnectionName();
-		}
-		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(id, monitor);
-		if (services != null) {
-			IRemoteConnectionManager connMgr = services.getConnectionManager();
-			return connMgr.getConnection(name);
-		}
-		return null;
 	}
 }
