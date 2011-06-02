@@ -217,26 +217,6 @@
 		    </or>          
          </enabledWhen>
         </page>    
-       <!--page
-             category="org.eclipse.ptp.rdt.ui.properties.Page_head_remote"
-             class="RemoteEnvironmentPropertyPage"
-             id="org.eclipse.cdt.rdt.ui.properties.Page_Environment"
-             name="%RemoteEnvironment">
-         <filter
-               name="projectNature"
-               value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">
-         </filter>
-         <filter
-               name="projectNature"
-               value="org.eclipse.ptp.rdt.core.remoteNature">
-         </filter>
-         <enabledWhen>
-            <or>
-		     <instanceof value="org.eclipse.core.resources.IProject"/>
-		     <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
-		    </or>
-         </enabledWhen>
-      </page-->
       <page
             category="org.eclipse.ptp.rdt.ui.properties.Page_head_remote"
             class="org.eclipse.ptp.internal.rdt.ui.scannerinfo.RemoteScannerInfoPropertiesPage"
@@ -289,6 +269,10 @@
                name="projectNature"
                value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">
          </filter>
+         <filter
+               name="projectNature"
+               value="org.eclipse.ptp.rdt.core.remoteNature">
+         </filter>
          <enabledWhen>
             <or>
                <instanceof
@@ -298,6 +282,26 @@
                      value="org.eclipse.cdt.core.model.ICProject">
                </instanceof>
             </or>
+         </enabledWhen>
+      </page>
+      <!-- CDT Environment property page -->
+      <page
+            class="org.eclipse.cdt.managedbuilder.ui.properties.Page_Environment"
+            id="org.eclipse.ptp.rdt.ui.properties.Page_Environment_CDT"
+            category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
+            name="%Environment"
+            >
+         <enabledWhen>
+            <adapt type="org.eclipse.core.resources.IProject">
+            	<and>
+		           <test property="org.eclipse.core.resources.projectNature"
+		                  value="org.eclipse.cdt.managedbuilder.core.managedBuildNature"/>
+		            <not>
+		            	<test property="org.eclipse.core.resources.projectNature"
+							value="org.eclipse.ptp.rdt.core.remoteNature"/>
+					</not>
+                </and>
+            </adapt>
          </enabledWhen>
       </page>
    </extension>
@@ -326,6 +330,7 @@
             parent="org.eclipse.ptp.rdt.ui.properties.RemotePage_Environment"
             weight="005">
       </tab>
+      <!-- bug 348105
       <tab
             class="org.eclipse.ptp.rdt.ui.properties.RemoteEnvironmentTab"
             helpId="cdt_u_prop_build_environment"
@@ -333,6 +338,15 @@
             name="(Single) Environment"
             parent="org.eclipse.ptp.rdt.ui.preferences.RemotePrefPage_Env">
       </tab>
+      -->
+      <!-- CDT Environment property page tab -->
+      <tab
+           class="org.eclipse.cdt.ui.newui.EnvironmentTab"
+           icon="icons/obj16/environment.gif"
+           name="(Single) Environment - CDT"
+           weight="050"
+           helpId="cdt_u_prop_build_environment"
+           parent="org.eclipse.ptp.rdt.ui.properties.Page_Environment_CDT"/>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
@@ -427,16 +441,6 @@
                id="org.eclipse.search.menu">
          </menu>
       </actionSet>
-   </extension>
-   <extension
-         point="org.eclipse.cdt.ui.cPropertyTab">
-      <tab
-           class="org.eclipse.ptp.rdt.ui.properties.RemoteEnvironmentTab"
-           icon="icons/obj16/environment.gif"
-           name="(Single) Environment"
-           weight="005"
-           helpId="cdt_u_prop_build_environment"
-           parent="org.eclipse.cdt.rdt.ui.properties.Page_Environment"/>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
@@ -746,27 +750,22 @@
              activityId="org.eclipse.ptp.rdt.ui.cdtIndexerPropertyActivity"
              pattern="org\.eclipse\.cdt\.ui/org\.eclipse\.cdt\.ui\.indexer">
        </activityPatternBinding>
+       
+       <!-- bug 348105
        <activity
        		 id="org.eclipse.ptp.rdt.ui.EnvironmentPreferencePageActivity"
        		 name="%CDTEnvironmentPref.name">
        </activity>
-       <!--<categoryActivityBinding
-       		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPreferencePageActivity"
-       		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
-       </categoryActivityBinding>-->
        <activityPatternBinding
        		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPreferencePageActivity"
        		 pattern="org.eclipse.cdt.managedbuilder.ui/org.eclipse.cdt.managedbuilder.ui.preferences.PrefPage_Env">
        </activityPatternBinding>
-            
+       -->
+
         <activity
        		 id="org.eclipse.ptp.rdt.ui.EnvironmentPropertiesPageActivity"
        		 name="%CDTEnvironmentProp.name">
        </activity>
-       <!--<categoryActivityBinding
-       		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPropertiesPageActivity"
-       		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
-       </categoryActivityBinding>-->
        <activityPatternBinding
        		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPropertiesPageActivity"
        		 pattern="org.eclipse.cdt.managedbuilder.ui/org.eclipse.cdt.managedbuilder.ui.properties.Page_Environment">
@@ -795,6 +794,7 @@
               type="org.eclipse.core.resources.problemmarker">
         </super>
      </extension>
+     <!-- bug 348105
      <extension
            point="org.eclipse.ui.preferencePages">
         <page
@@ -804,6 +804,7 @@
               name="%Environment">
         </page>
      </extension>
+     -->
      <extension
            point="org.eclipse.ui.editorActions">
         <editorContribution
