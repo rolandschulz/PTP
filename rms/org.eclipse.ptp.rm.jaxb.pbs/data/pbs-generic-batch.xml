@@ -11,7 +11,8 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-generic-batch">
 	<control-data>
-		<property name="queues" visible="true"/>
+	   <!-- we set this to invisible because the values are not really modifiable -->
+		<property name="queues" visible="false"/>
 		<!-- needed by RM internals for fetch; name is fixed by convention -->
 		<property name="stdout_remote_path" visible="false">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o@jobId</default>
@@ -21,13 +22,6 @@
 		<property name="stderr_remote_path" visible="false">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e@jobId</default>
 			<link-value-to>Error_Path</link-value-to>
-		</property>
-		<property name="remote_path_tooltip" visible="false">
-			<default><![CDATA[Not the same as the PBS attribute for stdout or stderr; 
-used internally by the resource manager and should correspond
-to whatever path the scheduler will copy the output to at the 
-end of execution; the job id can be included in this path 
-using '@jobId'.]]></default>
 		</property>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
@@ -57,10 +51,9 @@ defaults value: "u", which is unspecified.]]></tooltip>
 			<description>The type of inter-job dependencies specified by the job owner.</description>
 			<tooltip>Format: "type:jobid[,jobid...]"; default value: no dependencies.</tooltip>
 		</attribute>
-		<attribute name="destination" type="choice">
+		<attribute name="destination" type="string">
 			<description>Designation of the queue to which to submit the job.</description>
 			<tooltip>Format: queue[@server].</tooltip>
-			<choice>normal,debug</choice>
 		</attribute>
 		<attribute name="directive" type="string">
 			<description>Defines the prefix that declares a directive to the qsub command within the script file.</description>

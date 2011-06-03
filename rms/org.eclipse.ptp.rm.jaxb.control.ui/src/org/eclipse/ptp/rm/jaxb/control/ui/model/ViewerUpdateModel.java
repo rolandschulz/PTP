@@ -306,6 +306,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		} else {
 			columnViewer.removeFilter(filter);
 		}
-		columnViewer.refresh();
+		handleUpdate(null);
 	}
 }

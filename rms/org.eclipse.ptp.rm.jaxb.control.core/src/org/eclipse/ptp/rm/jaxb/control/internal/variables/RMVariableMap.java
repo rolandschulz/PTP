@@ -16,8 +16,8 @@ import java.util.TreeMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
@@ -169,11 +169,12 @@ public class RMVariableMap implements IVariableMap {
 	public void maybeOverwrite(String key1, String key2, ILaunchConfiguration configuration) throws CoreException {
 		Object value1 = null;
 		Object value2 = null;
-		PropertyType p = (PropertyType) variables.get(key1);
+		PropertyType p = (PropertyType) get(key1);
 		if (p != null) {
-			value2 = p.getValue();
+			value1 = p.getValue();
 		}
 		value2 = configuration.getAttributes().get(key2);
+
 		if (value2 == null) {
 			maybeAddProperty(key1, value1, false);
 		} else {

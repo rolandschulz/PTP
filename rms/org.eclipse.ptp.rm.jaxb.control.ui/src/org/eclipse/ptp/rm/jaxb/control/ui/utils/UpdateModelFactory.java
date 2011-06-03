@@ -580,10 +580,8 @@ public class UpdateModelFactory {
 		}
 		if (items == null) {
 			items = new String[0];
-		} else {
-			if (items.length > 0) {
-				items = WidgetBuilderUtils.normalizeComboItems(items);
-			}
+		} else if (items.length > 0) {
+			items = WidgetBuilderUtils.normalizeComboItems(items);
 		}
 		return WidgetBuilderUtils.createCombo(parent, cd.style, cd.layoutData, items, JAXBControlUIConstants.ZEROSTR, cd.title,
 				cd.tooltip, null);

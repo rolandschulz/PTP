@@ -203,7 +203,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	public void jobStateChanged(String jobId, IJobStatus status) {
 		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
-		// getResourceManager().updateJob(jobId, status);
+		// getResourceManager().updateJob(jobId, status); XXX RESTORE THIS
 	}
 
 	/*
@@ -934,6 +934,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
 		rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 		rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
+		rmVarMap.maybeAddProperty(JAXBControlConstants.DIRECTORY, rc.getWorkingDirectory(), false);
 	}
 
 	/**
@@ -946,13 +947,16 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 40);
+
+		setFixedConfigurationProperties(progress.newChild(10));
+
 		Map lcattr = configuration.getAttributes();
 		for (Object key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
 			Object target = rmVarMap.get(key.toString());
 			if (target instanceof PropertyType) {
 				PropertyType p = (PropertyType) target;
-				p.setValue(value.toString());
+				p.setValue(value);
 			} else if (target instanceof AttributeType) {
 				AttributeType ja = (AttributeType) target;
 				ja.setValue(value);
@@ -964,9 +968,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * The non-selected variables have been excluded from the launch
 		 * configuration; but we need to null out the superset values here that
-		 * are undefined. We also need to take care of the tailF redirect
-		 * variables (which are not visible but are set in the launch tab by an
-		 * option checkbox).
+		 * are undefined. We also need to take care of the variables which are
+		 * not visible but are set in the launch tab.
 		 */
 		for (String key : rmVarMap.getVariables().keySet()) {
 			if (!lcattr.containsKey(key)) {
@@ -995,7 +998,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
 				configuration);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
-		setFixedConfigurationProperties(progress.newChild(10));
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));
