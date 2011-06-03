@@ -27,6 +27,12 @@ public class Messages extends NLS {
 	public static String MPIProjectWizardPage_browse;
 	public static String MPIProjectWizardPage_default_project_setting_better_if_prefs_set;
 	public static String MPIProjectWizardPage_include_path;
+	public static String MPIProjectWizardPage_includeFileHint_longMsg1;
+	public static String MPIProjectWizardPage_includeFileHint_longMsg2;
+	public static String MPIProjectWizardPage_includeFileHint_longMsg3;
+	public static String MPIProjectWizardPage_includeFileHint_longMsg4;
+	public static String MPIProjectWizardPage_includeFileHint_longMsg5;
+	public static String MPIProjectWizardPage_includeFileHint_longMsg6;
 	public static String MPIProjectWizardPage_library_name;
 	public static String MPIProjectWizardPage_library_search_path;
 	public static String MPIProjectWizardPage_locn_of_mpi_incl_path;
