@@ -87,8 +87,7 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 	}
 
 	/**
-	 * Called via the call to start the stream proxy for batch submissions
-	 * (startProxy) or directly during the command for interactive.
+	 * Called inside the command job sequence.
 	 */
 	public synchronized void startMonitors() {
 		if (!fClosed && !fStarted) {

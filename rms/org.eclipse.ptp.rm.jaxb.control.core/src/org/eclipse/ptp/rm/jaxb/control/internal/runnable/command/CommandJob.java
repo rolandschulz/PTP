@@ -175,6 +175,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private InputStream tokenizerErr;
 	private StreamSplitter outSplitter;
 	private StreamSplitter errSplitter;
+	private IStreamMonitor[] batchMonitors;
 	private ICommandJobStatus jobStatus;
 	private IStatus status;
 	private boolean active;
@@ -498,7 +499,8 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * Wait for any stream consumer threads to exit.
+	 * Wait for any special stream consumer threads to exit. We ignore the
+	 * stream monitors here.
 	 * 
 	 * @return CoreException
 	 */
@@ -720,6 +722,18 @@ public class CommandJob extends Job implements ICommandJob {
 
 		proxy.startMonitors();
 
+		if (isBatch()) {
+			/*
+			 * hang on to the streams for the brief life of the job itself, only
+			 * for error tracking; do not send to console
+			 */
+			batchMonitors = new IStreamMonitor[2];
+			batchMonitors[0] = proxy.getOutputStreamMonitor();
+			batchMonitors[1] = proxy.getErrorStreamMonitor();
+			proxy.setOutMonitor(null);
+			proxy.setErrMonitor(null);
+		}
+
 		if (stdoutTokenizer != null) {
 			try {
 				stdoutTokenizer.setInputStream(tokenizerOut);
@@ -729,6 +743,7 @@ public class CommandJob extends Job implements ICommandJob {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
 			}
 		}
+
 		if (stderrTokenizer != null) {
 			try {
 				stderrTokenizer.setInputStream(tokenizerErr);
