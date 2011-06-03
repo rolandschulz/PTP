@@ -44,7 +44,6 @@ import org.eclipse.ptp.rm.lml.core.events.IViewAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewDisposedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
-import org.eclipse.ptp.rm.lml.core.listeners.IListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IViewListener;
 import org.eclipse.ptp.rm.lml.core.messages.Messages;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
@@ -110,11 +109,6 @@ public class LMLManager {
 	private final ListenerList viewListeners = new ListenerList();
 
 	/*
-	 * A list of all listeners.
-	 */
-	private final Map<String, IListener> listeners = new HashMap<String, IListener>();
-
-	/*
 	 * A list of jobs started by the user.
 	 */
 	private final Map<String, Map<String, JobStatusData>> userJobList = new HashMap<String, Map<String, JobStatusData>>();
@@ -123,10 +117,6 @@ public class LMLManager {
 	 * An instance of this class.
 	 */
 	private static LMLManager manager;
-	/*
-	 * 
-	 */
-	public static final String SELECT = "selected";
 
 	/*
 	 * 
@@ -170,12 +160,10 @@ public class LMLManager {
 
 	public void addListener(IViewListener listener) {
 		viewListeners.add(listener);
-		listeners.put("ViewManager", listener);
 	}
 
 	public void addListener(IViewListener listener, String view) {
 		viewListeners.add(listener);
-		listeners.put(view, listener);
 	}
 
 	public void addUserJob(String name, String jobId, IJobStatus status) {
@@ -231,6 +219,7 @@ public class LMLManager {
 		}
 		if (fLguiItem != null && fLguiItem == item) {
 			fireRemovedLgui(item);
+			fLguiItem = null;
 		}
 
 		/*
@@ -362,14 +351,10 @@ public class LMLManager {
 		}
 	}
 
-	public IListener getListener(String view) {
-		return listeners.get(view);
-	}
-
 	public void getRequestXml() {
 		FileOutputStream os = null;
 		try {
-			os = new FileOutputStream("request.xml");
+			os = new FileOutputStream("request.xml"); //$NON-NLS-1$
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -525,7 +510,6 @@ public class LMLManager {
 
 	public void removeListener(IViewListener listener) {
 		viewListeners.remove(listener);
-		listeners.remove("ViewManager");
 	}
 
 	public void removeUserJob(String name, String jobId) {
@@ -556,7 +540,7 @@ public class LMLManager {
 				map.put(jobStatusData.getJobId(), jobStatusData);
 			}
 			for (final JobStatusData data : dataList) {
-				if (!data.getState().equals("COMPLETED")) {
+				if (!data.getState().equals("COMPLETED")) { //$NON-NLS-1$
 					refreshJobStatus(data);
 				}
 			}
