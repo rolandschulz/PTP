@@ -157,6 +157,9 @@ public class ActionUtils {
 	 */
 	public static void maybeUpdateJobState(JobStatusData job, TableView view, IProgressMonitor monitor) throws CoreException {
 		final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
+		if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
+			return;
+		}
 		final IResourceManagerControl control = rm.getControl();
 		final IJobStatus refreshed = control.getJobStatus(job.getJobId(), monitor);
 		job.updateState(refreshed);

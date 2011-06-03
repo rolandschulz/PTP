@@ -264,19 +264,16 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected IJobStatus doGetJobStatus(String jobId, IProgressMonitor monitor) throws CoreException {
 		try {
-			if (!resourceManagerIsActive() || (monitor != null && monitor.isCanceled())) {
-				return new CommandJobStatus(getResourceManager().getUniqueName(), jobId, IJobStatus.COMPLETED, null, this);
-			}
 			pinTable.pin(jobId);
-
-			SubMonitor progress = SubMonitor.convert(monitor, 100);
+			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
 
 			/*
 			 * First check to see when the last call was made; throttle requests
 			 * coming in intervals less than
 			 * ICommandJobStatus.UPDATE_REQUEST_INTERVAL
 			 */
-			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
+			SubMonitor progress = SubMonitor.convert(monitor, 100);
+
 			if (status != null) {
 				if (IJobStatus.COMPLETED.equals(status.getState())) {
 					/*
@@ -304,7 +301,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			PropertyType p = (PropertyType) rmVarMap.get(jobId);
 
 			CommandType job = controlData.getGetJobStatus();
-			if (job != null) {
+			if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
 				p = new PropertyType();
 				p.setVisible(false);
 				p.setName(jobId);
@@ -634,7 +631,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * Run the shut down commands, if any
+	 * Run the shut down commands, if any. Cancel any running interactive
+	 * processes.
 	 * 
 	 * @throws CoreException
 	 */
