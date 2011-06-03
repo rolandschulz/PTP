@@ -48,8 +48,10 @@ public class NodesView extends LMLViewPart {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					fLguiItem = lmlManager.getSelectedLguiItem();
-					nodedisplayView.update(fLguiItem);
-					nodedisplayView.setVisible(true);
+					if (!nodedisplayView.isDisposed()) {
+						nodedisplayView.update(fLguiItem);
+						nodedisplayView.setVisible(true);
+					}
 				}
 			});
 
@@ -58,7 +60,9 @@ public class NodesView extends LMLViewPart {
 		public void handleEvent(ILguiRemovedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					nodedisplayView.setVisible(false);
+					if (!nodedisplayView.isDisposed()) {
+						nodedisplayView.setVisible(false);
+					}
 					fLguiItem = null;
 				}
 			});
@@ -98,8 +102,10 @@ public class NodesView extends LMLViewPart {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					fLguiItem = lmlManager.getSelectedLguiItem();
-					nodedisplayView.update(fLguiItem);
-					nodedisplayView.setVisible(true);
+					if (!nodedisplayView.isDisposed()) {
+						nodedisplayView.update(fLguiItem);
+						nodedisplayView.setVisible(true);
+					}
 				}
 			});
 		}
