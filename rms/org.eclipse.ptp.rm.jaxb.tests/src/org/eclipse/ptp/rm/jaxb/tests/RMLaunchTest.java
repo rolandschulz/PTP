@@ -45,7 +45,6 @@ import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
-import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.lml.monitor.core.LMLResourceManagerMonitor;
 import org.eclipse.ptp.rm.lml_jaxb.core.LMLJAXBResourceManager;
@@ -285,7 +284,7 @@ public class RMLaunchTest extends TestCase {
 		rmConfig = new JAXBResourceManagerConfiguration(AbstractResourceManagerConfiguration.BASE,
 				new ResourceManagerServiceProvider());
 		// JAXBRMConfigurationSelectionWizardPage
-		rmConfig.setRMConfigurationXML(JAXBInitializationUtils.getRMConfigurationXML(JAXBTestsPlugin.getURL(xml)));
+		rmConfig.setRMConfigurationURL(JAXBTestsPlugin.getURL(xml));
 		// JAXBRMControlConfigurationWizardPage
 		rmConfig.getResourceManagerData();
 		// use remote = local

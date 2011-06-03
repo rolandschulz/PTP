@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+import java.net.URL;
+
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -74,15 +77,14 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	}
 
 	/*
-	 * Called by the service selector. (non-Javadoc)
+	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration#
 	 * setRMConfigurationURL(java.net.URL)
 	 */
-	public void setRMConfigurationXML(String xml) {
-		if (xml != null) {
-			putString(JAXBCoreConstants.RM_XML, xml);
-			clearRMData();
+	public void setRMConfigurationURL(URL url) {
+		if (url != null) {
+			putString(JAXBCoreConstants.RM_URL, url.toExternalForm());
 		}
 	}
 
@@ -97,6 +99,10 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 		setLocalAddress(JAXBCoreConstants.ZEROSTR);
 	}
 
+	/*
+	 * return JAXBInitializationUtils.getRMConfigurationXML(url);
+	 */
+
 	/**
 	 * @return the configuration XML used to construct the data tree.
 	 */
@@ -109,17 +115,41 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	}
 
 	/**
-	 * Unmarshals the XML into the JAXB data tree.
+	 * Unmarshals the XML into the JAXB data tree.<br>
+	 * <br>
+	 * If the current xml is <code>null</code>, or if the "force reload"
+	 * preference is set, a fresh attempt is made to store the xml from the
+	 * location. Otherwise, the cached xml is used.
 	 * 
 	 * @throws unmarshaling
-	 *             exceptions
+	 *             or URL exceptions
 	 */
 	private void realizeRMDataFromXML() throws Throwable {
 		String xml = getRMConfigurationXML();
-		if (xml == null) {
-			rmdata = null;
-		} else {
+		if (xml == null || Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD)) {
+			String location = getString(JAXBCoreConstants.RM_URL, JAXBCoreConstants.ZEROSTR);
+			if (location != null) {
+				xml = JAXBInitializationUtils.getRMConfigurationXML(new URL(location));
+				setRMConfigurationXML(xml);
+			}
+		}
+		if (xml != null) {
 			rmdata = JAXBInitializationUtils.initializeRMData(xml);
+		} else {
+			rmdata = null;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration#
+	 * setRMConfigurationXML(java.lang.String)
+	 */
+	private void setRMConfigurationXML(String xml) {
+		if (xml != null) {
+			putString(JAXBCoreConstants.RM_XML, xml);
+			clearRMData();
 		}
 	}
 }

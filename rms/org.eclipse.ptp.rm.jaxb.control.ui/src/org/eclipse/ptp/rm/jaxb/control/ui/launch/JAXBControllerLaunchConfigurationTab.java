@@ -240,8 +240,10 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 			}
 		}
 		RMLaunchValidation validation = super.initializeFrom(control, rm, queue, configuration);
-		AbstractJAXBLaunchConfigurationTab t = getControllers().get(0);
-		resize(t.getSize());
+		if (!getControllers().isEmpty()) {
+			AbstractJAXBLaunchConfigurationTab t = getControllers().get(0);
+			resize(t.getSize());
+		}
 		return validation;
 	}
 

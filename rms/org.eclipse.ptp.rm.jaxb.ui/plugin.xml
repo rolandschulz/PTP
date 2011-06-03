@@ -18,5 +18,14 @@
          </description>
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
+            class="org.eclipse.ptp.rm.jaxb.ui.JAXBRMPreferencesPage"
+            id="org.eclipse.ptp.rm.jaxb.ui.JAXBRMPreferencesPage"
+            name="Configurable Resource Manager (JAXB)">
+      </page>
+   </extension>
 
 </plugin>

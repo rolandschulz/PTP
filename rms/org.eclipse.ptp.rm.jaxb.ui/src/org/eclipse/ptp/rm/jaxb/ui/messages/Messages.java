@@ -25,6 +25,9 @@ public class Messages extends NLS {
 	public static String ConfigurationImportWizardPageLabel;
 	public static String ResourceManagersNotExist_title;
 
+	public static String JAXBRMPreferences;
+	public static String Preferences_options;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

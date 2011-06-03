@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+import java.net.URL;
+
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
@@ -41,10 +43,10 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	public IVariableMap getRMVariableMap() throws Throwable;
 
 	/**
-	 * @param xml
+	 * @param url
 	 *            of the JAXB configuration for this resource manager.
 	 * 
 	 * @since 5.0
 	 */
-	public void setRMConfigurationXML(String xml);
+	public void setRMConfigurationURL(URL url);
 }

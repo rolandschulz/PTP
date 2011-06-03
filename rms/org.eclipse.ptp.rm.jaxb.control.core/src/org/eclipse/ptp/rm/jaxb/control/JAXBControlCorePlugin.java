@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.osgi.framework.Bundle;
@@ -66,7 +65,7 @@ public class JAXBControlCorePlugin extends Plugin {
 			}
 
 			public void saving(ISaveContext saveContext) throws CoreException {
-				Preferences.savePreferences(getUniqueIdentifier());
+				// Nothing
 			}
 		});
 	}
@@ -80,7 +79,6 @@ public class JAXBControlCorePlugin extends Plugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		try {
-			Preferences.savePreferences(getUniqueIdentifier());
 			ResourcesPlugin.getWorkspace().removeSaveParticipant(getUniqueIdentifier());
 		} finally {
 			super.stop(context);
@@ -169,6 +167,7 @@ public class JAXBControlCorePlugin extends Plugin {
 	 * @param e
 	 */
 	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, Messages.JAXBControlCorePlugin_Exception_InternalError, e));
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, Messages.JAXBControlCorePlugin_Exception_InternalError,
+				e));
 	}
 }
