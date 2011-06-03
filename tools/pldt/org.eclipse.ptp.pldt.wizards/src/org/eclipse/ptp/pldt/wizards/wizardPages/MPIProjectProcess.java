@@ -153,14 +153,14 @@ public class MPIProjectProcess extends ProcessRunner {
 			// (if no mpi preferences are set)
 
 			// if an include path is available, set it
-			boolean setIncludeLink = !newIncludePath.isEmpty();
+			boolean setIncludeLink = newIncludePath.length() != 0;
 			if (traceOn)
 				System.out.println("MPP.process(), setIncludeLink=" + setIncludeLink);
 			if (setIncludeLink) {
 				addIncludePath(cf, newIncludePath);
 			}
 			// if a lib search path is available, set it and the lib name
-			if (!newLibSearchPath.isEmpty()) {
+			if (newLibSearchPath.length() != 0) {
 				addLinkerOpt(cf, newLib, newLibSearchPath); // add this back, if we are doing include?
 			}
 
