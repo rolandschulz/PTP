@@ -14,7 +14,6 @@ import java.net.URI;
 
 
 import org.eclipse.cdt.core.model.CoreModel;
-import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescriptionManager;
 import org.eclipse.cdt.core.settings.model.extension.CConfigurationData;
@@ -32,7 +31,6 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.CfgHolder;
 import org.eclipse.cdt.managedbuilder.ui.wizards.STDWizardHandler;
 import org.eclipse.cdt.ui.newui.UIMessages;
 import org.eclipse.cdt.utils.EFSExtensionManager;
-import org.eclipse.cdt.utils.envvar.StorableEnvironment;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -123,21 +121,7 @@ public class RemoteMakefileWizardHandler extends STDWizardHandler {
 			
 			doTemplatesPostProcess(project);
 			doCustom(project);
-			
-			// temporarily back out fix to Bug 338595 as it's screwing up the fix for Bug 344380
-//			//turn off append local environment variables for remote projects
-//			ICConfigurationDescription c_cfgs[] = des.getConfigurations();
-//			for (ICConfigurationDescription c_cfg : c_cfgs) {
-//				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_cfg);
-//				EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_cfg);
-//			}
-			
-			StorableEnvironment vars = EnvironmentVariableManager.fUserSupplier.getWorkspaceEnvironmentCopy();
-			vars.setAppendContributedEnvironment(false);
-			vars.setAppendEnvironment(false);
-			EnvironmentVariableManager.fUserSupplier.setWorkspaceEnvironment(vars);
-			
-			
+
 		} finally {
 			monitor.done();
 		}
