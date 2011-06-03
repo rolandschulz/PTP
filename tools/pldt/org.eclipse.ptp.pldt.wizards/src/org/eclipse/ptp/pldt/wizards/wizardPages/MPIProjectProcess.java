@@ -52,7 +52,6 @@ import org.eclipse.ptp.pldt.wizards.messages.Messages;
 public class MPIProjectProcess extends ProcessRunner {
 	private static final boolean traceOn = false;
 	private boolean wizTraceOn = MPIProjectWizardPage.wizardTraceOn;
-	// private static final templateID=
 
 	protected Map<String, String> valueStore;
 
@@ -69,10 +68,10 @@ public class MPIProjectProcess extends ProcessRunner {
 
 		Object obj = getNewPropValue(pageID, MPIProjectWizardPage.DO_MPI_INCLUDES, null);
 		// use the default value if nothing was set in the pageData by the user
-		boolean doMpiIncludes = MPIProjectWizardPage.getDefaultUseMpiIncludes();
+		boolean setMPIprojectInfo = MPIProjectWizardPage.getDefaultUseMpiIncludes();
 		if (obj != null)
-			doMpiIncludes = Boolean.valueOf((String) obj);
-		if (!doMpiIncludes) {
+			setMPIprojectInfo = Boolean.valueOf((String) obj);
+		if (!setMPIprojectInfo) {
 			if (traceOn)
 				System.out.println("Do not save MPI info in this project."); //$NON-NLS-1$
 			return;
@@ -90,9 +89,9 @@ public class MPIProjectProcess extends ProcessRunner {
 
 		// Collect the values that the user entered on the wizard page
 		String propID = MPIProjectWizardPage.INCLUDE_PATH_PROP_ID;
-		String newIncludePath = getNewPropValue(pageID, propID, "c:/mpich2/include"); //$NON-NLS-1$
+		String newIncludePath = getNewPropValue(pageID, propID, ""); //$NON-NLS-1$
 		if (traceOn)
-			System.out.println("Got prop: " + propID + "=" + newIncludePath); //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println("Got prop value for new include path: " + propID + "=" + newIncludePath); //$NON-NLS-1$ //$NON-NLS-2$
 
 		propID = MPIProjectWizardPage.LIB_PROP_ID;
 		String newLib = getNewPropValue(pageID, propID, "lib"); //$NON-NLS-1$
@@ -122,7 +121,28 @@ public class MPIProjectProcess extends ProcessRunner {
 		IManagedProject mProj = info.getManagedProject();
 		if (traceOn)
 			showOptions(mProj);
-
+		/*
+		 * // should this logically be in the wizard page logic instead?
+		 * // so that the user sees it before the page where they can hit 'advanced' button and get project properties?
+		 * IPreferenceStore ps = MpiPlugin.getDefault().getPreferenceStore();
+		 * REMIND_MPI_INCLUDE_PATH = ps.getBoolean(REMIND_MPI_INCLUDE_PATH_KEY);
+		 * if (REMIND_MPI_INCLUDE_PATH) {
+		 * 
+		 * String title = "MPI include path";
+		 * String msg =
+		 * "If your project shows errors and can't recognize MPI symbols, make sure your MPI header file is in the include path for the project. "
+		 * ;
+		 * msg +=
+		 * " Since mpicc may do that for you for the build, Eclipse may not know about it.  You may want to add it to Project Properties, C/C++ General, Paths and Symbols, "
+		 * ;
+		 * msg += " so that the editor and indexer can find MPI symbols.";
+		 * String toggleMsg = "Remind me about this again";
+		 * MessageDialogWithToggle
+		 * .openInformation(null, title, msg, toggleMsg, REMIND_MPI_INCLUDE_PATH, ps, REMIND_MPI_INCLUDE_PATH_KEY);
+		 * REMIND_MPI_INCLUDE_PATH = ps.getBoolean(REMIND_MPI_INCLUDE_PATH_KEY);
+		 * System.out.println("Remind include path is: " + REMIND_MPI_INCLUDE_PATH);
+		 * }
+		 */
 		// add the include path, linker, build cmd, etc. values to all the configurations
 		IConfiguration[] configs = mProj.getConfigurations();
 		for (int i = 0; i < configs.length; i++) {
@@ -130,12 +150,21 @@ public class MPIProjectProcess extends ProcessRunner {
 			if (traceOn)
 				System.out.println("Config " + i + ": " + cf.getName()); //$NON-NLS-1$ //$NON-NLS-2$
 			// mpicc should not need include or link lib info - bug 343761 - don't set it
-			boolean setIncludeLink = false;
+			// (if no mpi preferences are set)
+
+			// if an include path is available, set it
+			boolean setIncludeLink = !newIncludePath.isEmpty();
+			if (traceOn)
+				System.out.println("MPP.process(), setIncludeLink=" + setIncludeLink);
 			if (setIncludeLink) {
 				addIncludePath(cf, newIncludePath);
-				addLinkerOpt(cf, newLib, newLibSearchPath);
+			}
+			// if a lib search path is available, set it and the lib name
+			if (!newLibSearchPath.isEmpty()) {
+				addLinkerOpt(cf, newLib, newLibSearchPath); // add this back, if we are doing include?
 			}
 
+			// note: set the build commands regardless of include/linker info
 			setCompileCommand(cf, mpiCompileCommand);
 			setLinkCommand(cf, mpiLinkCommand);
 		}
@@ -215,7 +244,10 @@ public class MPIProjectProcess extends ProcessRunner {
 		if (name.startsWith("XL C")) { // special case for XL C compiler //$NON-NLS-1$
 			option = cfTool.getOptionById("xlc.c.compiler.option.include.paths"); //$NON-NLS-1$
 		} else { // otherwise we assume there is only one include path option.
+			// FIXME we want the other include path option, the one from C/C++ General -> Paths and Symbols
+
 			option = getFirstOptionByType(cf, cfTool, IOption.INCLUDE_PATH);
+
 		}
 		if (option != null) {
 			String[] includePaths = null;

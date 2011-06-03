@@ -32,12 +32,14 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -59,13 +61,24 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	private static final boolean traceOn = false;
 	public static final boolean wizardTraceOn = false;
 
+	/**
+	 * make this modifiable in preferences later?
+	 */
+	private boolean DONT_REMIND_MPI_INCLUDE_PATH = false;
+	/**
+	 * if move to preferences, must move this up to mpi.core for example.
+	 */
+	private static String DONT_REMIND_MPI_INCLUDE_PATH_KEY = "dontRemindMPIincludePath"; //$NON-NLS-1$
+
 	private Composite composite;
 	public static final String PAGE_ID = "org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectWizardPage"; //$NON-NLS-1$
 
 	// The following are IDs for storing info in MBSPageData so it can be retrieved in MpiProjectProcess (ProcessRunner)
 	// when the wizard is done.
 	/**
-	 * Store in MBSPageData (with this ID) whether user wants to include MPI info in the project.
+	 * Store in MBSPageData (with this ID) whether user wants to include MPI info in the project.<br>
+	 * Note this is a slight misnomer should be named "includeMPIprojectInfo" or something,<br>
+	 * because it includes more than just include path info
 	 */
 	public static final String DO_MPI_INCLUDES = "doMPIincludes"; //$NON-NLS-1$
 	/**
@@ -149,15 +162,33 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		defaultMpiIncludePath = mip;
 		// We only need to force MPI prefs to be set now if a prefix-only match isn't allowed.
 		// Note that if the user doesn't set include path, we can't make a guess at what the lib path etc is.
-		// However, this workaround (encourage setting of mpi include path) is used since mpi settings page
-		// in wizard dialog is blank if this value is not set.
 		if (traceOn)
-			System.out.println("MPWP: allowPrefixOnlyMatch=" + allowPrefixOnlyMatch);
+			System.out.println("MPWP: allowPrefixOnlyMatch=" + allowPrefixOnlyMatch); //$NON-NLS-1$
 		if (!allowPrefixOnlyMatch && defaultMpiIncludePath.length() == 0) {
 			// warn if no MPI preferences have been set and allow user to set them right there
 			String newMip = showNoPrefs(Messages.MPIProjectWizardPage_mpi, prefIDincludes);
 			defaultMpiIncludePath = newMip;
 		}
+		/*
+		 * else {
+		 * DONT_REMIND_MPI_INCLUDE_PATH = preferenceStore.getBoolean(DONT_REMIND_MPI_INCLUDE_PATH_KEY);
+		 * if (!DONT_REMIND_MPI_INCLUDE_PATH) {
+		 * // fixme externalize message strings
+		 * String title = "MPI include path";
+		 * StringBuffer msgBuf = new StringBuffer("If your project shows errors and can't recognize MPI symbols, ");
+		 * msgBuf.append("make sure your MPI header file is in the include path for the project. ");
+		 * msgBuf.append(" Since mpicc may do that for you for the build, Eclipse may not know about it.  ");
+		 * msgBuf.append("You may want to add it to Project Properties, C/C++ General, Paths and Symbols, ");
+		 * msgBuf.append(" so that the editor and indexer can find MPI symbols.");
+		 * String msg = msgBuf.toString();
+		 * String toggleMsg = "Don't remind me about this again";
+		 * final String key = DONT_REMIND_MPI_INCLUDE_PATH_KEY;
+		 * final boolean val = DONT_REMIND_MPI_INCLUDE_PATH;
+		 * MessageDialogWithToggle.openInformation(null, title, msg, toggleMsg, val, preferenceStore, key);
+		 * System.out.println("DONT_REMIND include path is: " + preferenceStore.getBoolean(DONT_REMIND_MPI_INCLUDE_PATH_KEY));
+		 * }
+		 * }
+		 */
 		setDefaultOtherNames(defaultMpiIncludePath);
 		// the following sets what will be remembered when we leave the page.
 		setCurrentMpiIncludePath(defaultMpiIncludePath);
@@ -170,11 +201,11 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 
 	abstract protected String getDefaultMpiBuildCommand();
 
+	private static boolean alreadyShown;
+
 	/**
 	 * Warn user that the MPI project preferences aren't set, and thus the new project wizard will not be very useful. <br>
 	 */
-	private static boolean alreadyShown;
-
 	@SuppressWarnings("unused")
 	private static void showNoPrefs1() {
 		if (!alreadyShown) {
@@ -225,7 +256,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 			setCurrentMpiIncludePath(defaultMpiIncludePath);
 		}
 		else {
-			defaultMpiLibPath = "";// must be non-null to set in text fields
+			defaultMpiLibPath = "";// must be non-null to set in text fields //$NON-NLS-1$
 		}
 
 		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
@@ -400,6 +431,8 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		if (wizardTraceOn)
 			System.out.println("MPIProjectWizardPage.createUserEntryArea() "); //$NON-NLS-1$
 
+		// set help context?
+
 		includePathLabel = new Label(composite, SWT.NONE);
 		includePathLabel.setText(Messages.MPIProjectWizardPage_include_path);
 		includePathLabel.setToolTipText(Messages.MPIProjectWizardPage_locn_of_mpi_incl_path);
@@ -444,7 +477,8 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		gd.widthHint = SIZING_TEXT_FIELD_WIDTH;
 		gd.horizontalSpan = 2;
 		libNameField.setLayoutData(gd);
-		if (defaultMpiLibName != null) {
+		// don't set libname text field if there is no libpath.
+		if (defaultMpiLibName != null && defaultMpiLibPath != null & defaultMpiLibPath.length() > 0) {
 			libNameField.setText(defaultMpiLibName);
 		}
 		libNameField.addModifyListener(new ModifyListener() {
@@ -512,7 +546,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		GridData gd4 = new GridData(GridData.FILL_HORIZONTAL);
 		gd4.widthHint = SIZING_TEXT_FIELD_WIDTH;
 		gd4.horizontalSpan = 2;
-		mpiLinkCommandField.setLayoutData(gd3);
+		mpiLinkCommandField.setLayoutData(gd4);
 		mpiLinkCommandField.setText(defaultMpiBuildCommand);
 		mpiLinkCommandField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
@@ -523,6 +557,43 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		});
 		(new Label(composite, SWT.NONE)).setText(" ");//spacer //$NON-NLS-1$
 
+		GridData gd5 = new GridData(GridData.FILL_HORIZONTAL);
+		gd5.widthHint = SIZING_TEXT_FIELD_WIDTH;
+		gd5.horizontalSpan = 4;
+		Label msg0 = new Label(composite, SWT.NONE);
+		msg0.setLayoutData(gd5);
+		msg0.setText(" "); // spacer //$NON-NLS-1$
+
+		// String str = "\nIf your project shows errors and can't recognize MPI symbols, make sure your \n"
+		// + "MPI header file is in the include path for the project.  Since mpicc may do that for you\n"
+		// + "for the build, Eclipse may not know about it.  You may want to add it to \n"
+		// + "      Project Properties, C/C++ General, Paths and Symbols\n"
+		// + "so that the editor and indexer can find MPI symbols.  On the next page, \n"
+		// + "you can access Project Properties directly with the 'Advanced settings...' button.\n";
+
+		String str = Messages.MPIProjectWizardPage_includeFileHint_longMsg1
+				+ Messages.MPIProjectWizardPage_includeFileHint_longMsg2
+				+ Messages.MPIProjectWizardPage_includeFileHint_longMsg3
+				+ Messages.MPIProjectWizardPage_includeFileHint_longMsg4
+				+ Messages.MPIProjectWizardPage_includeFileHint_longMsg5
+				+ Messages.MPIProjectWizardPage_includeFileHint_longMsg6;
+
+		// from CDTConfigWizardPage - single label w/i a group looks like grey text area
+		Group gr = new Group(composite, SWT.NONE);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		gr.setLayoutData(gd);
+		gr.setLayout(new FillLayout());
+		Label lb = new Label(gr, SWT.NONE);
+		lb.setText(str);
+
+		/*
+		 * StringBuffer msgBuf = new StringBuffer("If your project shows errors and can't recognize MPI symbols, ");
+		 * msgBuf.append("make sure your MPI header file is in the include path for the project. ");
+		 * msgBuf.append(" Since mpicc may do that for you for the build, Eclipse may not know about it.  ");
+		 * msgBuf.append("You may want to add it to Project Properties, C/C++ General, Paths and Symbols, ");
+		 * msgBuf.append(" so that the editor and indexer can find MPI symbols.");
+		 */
 	}
 
 	/**
@@ -722,6 +793,8 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	 * What's the default, do we include MPI includes or not?
 	 * If there is any difficulty getting information, use this default
 	 * setting.
+	 * This is a slight misnomer. It should be called "MPI Project info" because
+	 * it can include build command as well as include and linker info.
 	 * 
 	 * @return
 	 */
