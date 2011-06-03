@@ -58,27 +58,22 @@ public class JAXBInitializationUtils {
 	 *            location of XML resource
 	 * @return xml string
 	 */
-	public static String getRMConfigurationXML(URL url) {
+	public static String getRMConfigurationXML(URL url) throws IOException {
 		StringBuffer buffer = new StringBuffer();
 		if (url != null) {
-			try {
-				InputStreamReader reader = new InputStreamReader(url.openStream());
-				char[] chars = new char[4096];
-				int read = 0;
-				while (true) {
-					try {
-						read = reader.read(chars, 0, chars.length);
-					} catch (EOFException eof) {
-						break;
-					}
-					if (read <= 0) {
-						break;
-					}
-					buffer.append(chars, 0, read);
+			InputStreamReader reader = new InputStreamReader(url.openStream());
+			char[] chars = new char[4096];
+			int read = 0;
+			while (true) {
+				try {
+					read = reader.read(chars, 0, chars.length);
+				} catch (EOFException eof) {
+					break;
 				}
-			} catch (IOException t) {
-				JAXBCorePlugin.log(t);
-				return null;
+				if (read <= 0) {
+					break;
+				}
+				buffer.append(chars, 0, read);
 			}
 			return buffer.toString();
 		}

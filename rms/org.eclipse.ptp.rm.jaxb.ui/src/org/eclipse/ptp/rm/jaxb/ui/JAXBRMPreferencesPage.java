@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
@@ -38,7 +39,6 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 	@Override
 	public void performApply() {
 		savePreferences();
-		super.performApply();
 	}
 
 	@Override
@@ -63,8 +63,8 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 	}
 
 	public void widgetSelected(SelectionEvent e) {
-		Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD, reloadOption.getSelection());
-		setValid(true);
+		boolean b = reloadOption.getSelection();
+		Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD, b);
 	}
 
 	@Override
@@ -88,6 +88,9 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 	 * Load values from preference store
 	 */
 	private void loadSaved() {
-		reloadOption.setSelection(Preferences.getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD));
+		boolean def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD, false);
+		boolean b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(),
+				JAXBRMPreferenceConstants.FORCE_XML_RELOAD, def, null);
+		reloadOption.setSelection(b);
 	}
 }

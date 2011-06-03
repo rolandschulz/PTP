@@ -43,6 +43,7 @@ public class Messages extends NLS {
 	public static String StreamParserInconsistentPropertyWarning;
 
 	public static String JAXBServiceProvider_defaultDescription;
+	public static String CachedDefinitionFile;
 
 	static {
 		// initialize resource bundle

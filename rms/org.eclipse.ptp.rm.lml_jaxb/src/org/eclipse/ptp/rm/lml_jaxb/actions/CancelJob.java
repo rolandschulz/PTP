@@ -73,7 +73,7 @@ public class CancelJob extends AbstractStatusAction {
 				action.setEnabled(false);
 				return;
 			}
-			if (!operationSupported(status, IResourceManager.TERMINATE_OPERATION)) {
+			if (!operationSupported(status, IResourceManager.TERMINATE_OPERATION, view)) {
 				action.setEnabled(false);
 				return;
 			}

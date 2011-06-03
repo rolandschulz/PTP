@@ -26,6 +26,7 @@ import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
@@ -86,7 +87,7 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 	 * @param operation
 	 * @return
 	 */
-	protected static boolean operationSupported(JobStatusData status, String operation) {
+	protected static boolean operationSupported(JobStatusData status, String operation, IViewPart targetPart) {
 		IJAXBResourceManager rm = (IJAXBResourceManager) ModelManager.getInstance().getResourceManagerFromUniqueName(
 				status.getRmId());
 		if (rm == null) {
@@ -99,9 +100,9 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 		if (config == null) {
 			return false;
 		}
-		ResourceManagerData data;
+
 		try {
-			data = config.getResourceManagerData();
+			ResourceManagerData data = config.getResourceManagerData();
 			if (data != null) {
 				ControlType control = data.getControlData();
 				if (operation.equals(JOB_STATUS)) {

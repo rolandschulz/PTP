@@ -31,6 +31,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
+import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -75,7 +76,10 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		super(dialog);
 		rmConfig = rm.getJAXBConfiguration();
 		try {
-			script = rmConfig.getResourceManagerData().getControlData().getScript();
+			ResourceManagerData data = rmConfig.getResourceManagerData();
+			if (data != null) {
+				script = data.getControlData().getScript();
+			}
 			voidRMConfig = false;
 		} catch (Throwable t) {
 			script = null;

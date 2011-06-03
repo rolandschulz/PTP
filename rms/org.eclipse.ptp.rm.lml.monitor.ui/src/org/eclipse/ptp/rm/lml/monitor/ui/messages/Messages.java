@@ -20,6 +20,8 @@ public class Messages extends NLS {
 	public static String LMLRMMonitorConfigurationWizardPage_sameAsControl;
 	public static String LMLRMMonitorConfigurationWizardPage_Title;
 
+	public static String CachedDefinitionFile;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

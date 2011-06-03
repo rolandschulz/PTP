@@ -51,6 +51,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
@@ -672,7 +673,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		IJAXBResourceManagerConfiguration base = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
 		rmVarMap = (RMVariableMap) base.getRMVariableMap();
-		controlData = base.getResourceManagerData().getControlData();
+		ResourceManagerData data = base.getResourceManagerData();
+		if (data != null) {
+			controlData = data.getControlData();
+		}
 		setFixedConfigurationProperties(monitor);
 		launchEnv.clear();
 		appendLaunchEnv = true;

@@ -21,6 +21,9 @@ public class Messages extends NLS {
 	public static String ColumnNumber;
 	public static String Message;
 
+	public static String UsingCachedDefinition;
+	public static String CachedDefinitionWarning;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

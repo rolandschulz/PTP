@@ -29,6 +29,7 @@ public class Messages extends NLS {
 	public static String ReadOutputFileError;
 	public static String CancelJob;
 	public static String CancelJobError;
+	public static String CachedDefinitionFile;
 
 	static {
 		// initialize resource bundle

@@ -73,7 +73,7 @@ public abstract class AbstractControlAction extends AbstractStatusAction {
 			} else if (row.status.isInteractive()) {
 				action.setEnabled(false);
 				return;
-			} else if (!operationSupported(row.status, operation)) {
+			} else if (!operationSupported(row.status, operation, view)) {
 				action.setEnabled(false);
 				return;
 			} else if (!validateState(row.status)) {

@@ -11,11 +11,17 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.net.URL;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * Configuration object used for persisting values between sessions. Also
@@ -129,8 +135,19 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 		if (xml == null || Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD)) {
 			String location = getString(JAXBCoreConstants.RM_URL, JAXBCoreConstants.ZEROSTR);
 			if (location != null) {
-				xml = JAXBInitializationUtils.getRMConfigurationXML(new URL(location));
-				setRMConfigurationXML(xml);
+				try {
+					xml = JAXBInitializationUtils.getRMConfigurationXML(new URL(location));
+					setRMConfigurationXML(xml);
+				} catch (Throwable t) {
+					new UIJob(Messages.CachedDefinitionWarning) {
+						@Override
+						public IStatus runInUIThread(IProgressMonitor monitor) {
+							MessageDialog.openWarning(Display.getDefault().getActiveShell(), Messages.CachedDefinitionWarning,
+									Messages.UsingCachedDefinition);
+							return Status.OK_STATUS;
+						}
+					}.schedule();
+				}
 			}
 		}
 		if (xml != null) {
