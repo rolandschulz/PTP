@@ -84,10 +84,10 @@ public class Messages extends NLS {
 	public static String AnalysisDropdownHandler_10;
 	public static String AnalysisDropdownHandler_9;
 	public static String RunAnalyseHandlerBase_15;
-	public static String RunAnalyseHandlerBase_20;
-	public static String RunAnalyseHandlerBase_21;
-	public static String RunAnalyseHandlerBase_22;
-	public static String RunAnalyseHandlerBase_23;
+	public static String RunAnalyseHandlerBase_notfound_0;
+	public static String RunAnalyseHandlerBase_notfound_1;
+	public static String RunAnalyseHandlerBase_notfound_2;
+	public static String RunAnalyseHandlerBase_notfound_3;
 	public static String RunAnalyseHandlerBase_27;
 	public static String RunAnalyseHandlerBase_28;
 	public static String RunAnalyseHandlerBase_29;

@@ -354,9 +354,12 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 					// Note: should this perhaps be in a "Details" section of
 					// the dialog?
 					if (cumulativeArtifacts == 0) {
-						sMsg.append(Messages.RunAnalyseHandlerBase_20).append(name).append(Messages.RunAnalyseHandlerBase_21);
-						sMsg.append(name).append(Messages.RunAnalyseHandlerBase_22);
-						sMsg.append(Messages.RunAnalyseHandlerBase_23);
+						// Unless "Recognize artifacts by prefix alone" is set in the preferences (this is the default),
+						// this could be a problem with the include file for this API.
+						sMsg.append(Messages.RunAnalyseHandlerBase_notfound_0).append(name)
+								.append(Messages.RunAnalyseHandlerBase_notfound_1);
+						sMsg.append(name).append(Messages.RunAnalyseHandlerBase_notfound_2);
+						sMsg.append(Messages.RunAnalyseHandlerBase_notfound_3);
 					}
 					String togMsg = Messages.RunAnalyseHandlerBase_dont_show_this_again;
 					MessageDialogWithToggle.openInformation(shell, title, sMsg.toString(), togMsg, false, pf, key);
@@ -604,7 +607,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 
 		monitor.beginTask(Messages.RunAnalyseHandlerBase_29, count);
 		if (traceOn) {
-			System.out.println("RAHB.runResources(): using selection: " + selection);
+			System.out.println("RAHB.runResources(): using selection: " + selection); //$NON-NLS-1$
 		}
 		// Get elements of a possible multiple selection
 		IStructuredSelection lastSel = AnalysisDropdownHandler.getInstance().getLastSelection();
