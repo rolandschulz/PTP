@@ -40,7 +40,7 @@ public class RefreshJobStatus extends AbstractStatusAction {
 				for (Row row : selected) {
 					JobStatusData status = row.status;
 					try {
-						ActionUtils.maybeUpdateJobState(status, true, view, monitor);
+						ActionUtils.maybeUpdateJobState(status, view, monitor);
 					} catch (CoreException t) {
 						return CoreExceptionUtils.getErrorStatus(Messages.RefreshJobStatusError, t);
 					}

@@ -19,11 +19,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
 import org.eclipse.ptp.rm.lml_jaxb.messages.Messages;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.console.ConsolePlugin;
@@ -105,7 +107,10 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 			action.setEnabled(false);
 			return;
 		}
-		if (getReady()) {
+		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(status.getRmId());
+		if (!IResourceManager.STARTED_STATE.equals(rm.getState())) {
+			action.setEnabled(false);
+		} else if (getReady()) {
 			action.setEnabled(true);
 		} else {
 			action.setEnabled(false);

@@ -59,14 +59,12 @@ public class ActionUtils {
 	 * @param operation
 	 * @throws CoreException
 	 */
-	public static void callDoControl(JobStatusData job, boolean autoStart, String operation, TableView view,
-			IProgressMonitor monitor) throws CoreException {
+	public static void callDoControl(JobStatusData job, String operation, TableView view, IProgressMonitor monitor)
+			throws CoreException {
 		final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
 		final IResourceManagerControl control = rm.getControl();
-		if (checkControl(rm, control, autoStart)) {
-			control.control(job.getJobId(), operation, monitor);
-			maybeUpdateJobState(job, autoStart, view, monitor);
-		}
+		control.control(job.getJobId(), operation, monitor);
+		maybeUpdateJobState(job, view, monitor);
 	}
 
 	/**
@@ -95,44 +93,42 @@ public class ActionUtils {
 				final IResourceManagerControl control = rm.getControl();
 				final SubMonitor progress = SubMonitor.convert(monitor, 100);
 				try {
-					if (checkControl(rm, control, autoStart)) {
-						final String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
-						if (remoteServicesId != null) {
-							final IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
-									remoteServicesId, progress.newChild(25));
-							final IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
-							final String remoteConnectionName = control.getControlConfiguration().getConnectionName();
-							final IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
-							final IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
-							final IFileStore lres = remoteFileManager.getResource(path);
-							final BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE,
-									progress.newChild(25)));
-							final byte[] buffer = new byte[COPY_BUFFER_SIZE];
-							int rcvd = 0;
-							try {
-								while (true) {
-									try {
-										rcvd = is.read(buffer, 0, COPY_BUFFER_SIZE);
-									} catch (final EOFException eof) {
-										break;
-									}
-
-									if (rcvd == UNDEFINED) {
-										break;
-									}
-									if (progress.isCanceled()) {
-										break;
-									}
-									sb.append(new String(buffer, 0, rcvd));
-								}
-							} finally {
+					final String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
+					if (remoteServicesId != null) {
+						final IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId,
+								progress.newChild(25));
+						final IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
+						final String remoteConnectionName = control.getControlConfiguration().getConnectionName();
+						final IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
+						final IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
+						final IFileStore lres = remoteFileManager.getResource(path);
+						final BufferedInputStream is = new BufferedInputStream(
+								lres.openInputStream(EFS.NONE, progress.newChild(25)));
+						final byte[] buffer = new byte[COPY_BUFFER_SIZE];
+						int rcvd = 0;
+						try {
+							while (true) {
 								try {
-									is.close();
-								} catch (final IOException ioe) {
-									ioe.printStackTrace();
+									rcvd = is.read(buffer, 0, COPY_BUFFER_SIZE);
+								} catch (final EOFException eof) {
+									break;
 								}
-								monitor.done();
+
+								if (rcvd == UNDEFINED) {
+									break;
+								}
+								if (progress.isCanceled()) {
+									break;
+								}
+								sb.append(new String(buffer, 0, rcvd));
 							}
+						} finally {
+							try {
+								is.close();
+							} catch (final IOException ioe) {
+								ioe.printStackTrace();
+							}
+							monitor.done();
 						}
 					}
 				} catch (final Throwable t) {
@@ -159,55 +155,13 @@ public class ActionUtils {
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	public static void maybeUpdateJobState(JobStatusData job, boolean autoStart, TableView view, IProgressMonitor monitor)
-			throws CoreException {
+	public static void maybeUpdateJobState(JobStatusData job, TableView view, IProgressMonitor monitor) throws CoreException {
 		final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
 		final IResourceManagerControl control = rm.getControl();
-		if (checkControl(rm, control, autoStart)) {
-			final IJobStatus refreshed = control.getJobStatus(job.getJobId(), monitor);
-			job.updateState(refreshed);
-			maybeCheckFiles(job);
-			view.refresh();
-		}
-	}
-
-	/**
-	 * 
-	 * @param manager
-	 * @param control
-	 * @param autoStart
-	 * @return
-	 * @throws CoreException
-	 */
-	private static boolean checkControl(IResourceManager manager, final IResourceManagerControl control, boolean autoStart)
-			throws CoreException {
-		boolean ok = false;
-		if (control != null) {
-			if (manager.getState().equals(IResourceManager.STARTED_STATE)) {
-				ok = true;
-			} else if (autoStart) {
-				final Job j = new Job(IResourceManager.STARTING_STATE + JobStatusData.COSP + manager.getName()) {
-					@Override
-					protected IStatus run(IProgressMonitor monitor) {
-						try {
-							control.start(monitor);
-						} catch (final CoreException t) {
-							return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				j.schedule();
-
-				try {
-					j.join();
-				} catch (final InterruptedException ignored) {
-				}
-
-				ok = j.getResult().getSeverity() == IStatus.OK;
-			}
-		}
-		return ok;
+		final IJobStatus refreshed = control.getJobStatus(job.getJobId(), monitor);
+		job.updateState(refreshed);
+		maybeCheckFiles(job);
+		view.refresh();
 	}
 
 	/**

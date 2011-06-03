@@ -92,6 +92,9 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 		if (rm == null) {
 			return false;
 		}
+		if (!IResourceManager.STARTED_STATE.equals(rm.getState())) {
+			return false;
+		}
 		IJAXBResourceManagerConfiguration config = (IJAXBResourceManagerConfiguration) rm.getConfiguration();
 		if (config == null) {
 			return false;

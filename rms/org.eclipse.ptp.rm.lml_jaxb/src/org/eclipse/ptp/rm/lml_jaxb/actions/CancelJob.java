@@ -41,7 +41,7 @@ public class CancelJob extends AbstractStatusAction {
 				for (Row row : selected) {
 					JobStatusData status = row.status;
 					try {
-						ActionUtils.callDoControl(status, true, IResourceManager.TERMINATE_OPERATION, view, monitor);
+						ActionUtils.callDoControl(status, IResourceManager.TERMINATE_OPERATION, view, monitor);
 						if (monitor.isCanceled()) {
 							break;
 						}

@@ -42,8 +42,9 @@ public abstract class AbstractControlAction extends AbstractStatusAction {
 				for (Row row : selected) {
 					JobStatusData status = row.status;
 					try {
-						ActionUtils.callDoControl(status, true, operation, view, monitor);
+						ActionUtils.callDoControl(status, operation, view, monitor);
 						if (monitor.isCanceled()) {
+							break;
 						}
 					} catch (CoreException t) {
 						return CoreExceptionUtils.getErrorStatus(operation, t);
@@ -72,10 +73,10 @@ public abstract class AbstractControlAction extends AbstractStatusAction {
 			} else if (row.status.isInteractive()) {
 				action.setEnabled(false);
 				return;
-			} else if (!validateState(row.status)) {
+			} else if (!operationSupported(row.status, operation)) {
 				action.setEnabled(false);
 				return;
-			} else if (!operationSupported(row.status, operation)) {
+			} else if (!validateState(row.status)) {
 				action.setEnabled(false);
 				return;
 			}
