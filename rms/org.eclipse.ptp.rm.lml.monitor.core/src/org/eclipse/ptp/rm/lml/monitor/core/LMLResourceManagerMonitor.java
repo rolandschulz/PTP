@@ -76,7 +76,8 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 									fServer.getOutputStream());
 						}
 					}
-				} catch (IOException e) {
+				} catch (Exception e) {
+					fRMManager.removeRMSelectionListener(fListener);
 					fireResourceManagerError(e.getLocalizedMessage());
 					return new Status(IStatus.ERROR, LMLMonitorCorePlugin.PLUGIN_ID, e.getLocalizedMessage());
 				}
@@ -265,8 +266,8 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 			synchronized (this) {
 				if (fMonitorJob == null) {
 					fMonitorJob = new MonitorJob(Messages.LMLResourceManagerMonitor_LMLMonitorJob, conn);
-					fMonitorJob.schedule();
 				}
+				fMonitorJob.schedule();
 			}
 		}
 

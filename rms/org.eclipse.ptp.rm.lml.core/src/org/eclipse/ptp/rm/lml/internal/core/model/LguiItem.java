@@ -466,21 +466,11 @@ public class LguiItem implements ILguiItem {
 	 * @return the generated LguiType
 	 * @throws JAXBException
 	 */
-	private LguiType parseLML(InputStream stream) {
-		final LguiType old = lgui;
-		LguiType lml = null;
-		try {
-			final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
-
-			final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
-
-			lml = doc.getValue();
-		} catch (final JAXBException e) {
-			e.printStackTrace();
-			lml = old;
-		}
-
-		return lml;
+	@SuppressWarnings("unchecked")
+	private LguiType parseLML(InputStream stream) throws JAXBException {
+		final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
+		final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
+		return doc.getValue();
 	}
 
 	/**
@@ -563,7 +553,7 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	public void update(InputStream stream) {
+	public void update(InputStream stream) throws JAXBException {
 		lgui = parseLML(stream);
 		if (listeners.isEmpty()) {
 			createLguiHandlers();

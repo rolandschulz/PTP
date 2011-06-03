@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.bind.JAXBException;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -477,14 +479,19 @@ public class LMLManager {
 		j.schedule();
 	}
 
-	public void register(String name, InputStream input, OutputStream output) {
+	public void register(String name, InputStream input, OutputStream output) throws CoreException {
 		ILguiItem lguiItem = null;
 		synchronized (LGUIS) {
 			lguiItem = LGUIS.get(name);
 		}
 		if (lguiItem != null) {
 			lguiItem.getCurrentLayout(output);
-			lguiItem.update(input);
+			try {
+				lguiItem.update(input);
+			} catch (JAXBException e) {
+				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
+						.getLocalizedMessage()));
+			}
 
 			if (fLguiItem == lguiItem) {
 				if (!isDisplayed) {
@@ -623,11 +630,6 @@ public class LMLManager {
 
 	public void update() {
 		// fLguiItem.updateXML();
-		fireNewLgui();
-	}
-
-	public void update(InputStream stream) {
-		fLguiItem.update(stream);
 		fireNewLgui();
 	}
 
