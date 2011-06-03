@@ -87,6 +87,14 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 		}
 		if (status == null) {
 			status = new IJobStatus() {
+				public String getOwner() {
+					return null;
+				}
+
+				public String getQueueName() {
+					return null;
+				}
+
 				public String getErrorPath() {
 					return null;
 				}

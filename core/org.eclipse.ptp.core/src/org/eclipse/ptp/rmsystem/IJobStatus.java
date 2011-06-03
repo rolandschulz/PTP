@@ -119,6 +119,22 @@ public interface IJobStatus {
 	public String getOutputPath();
 
 	/**
+	 * Get job owner if available
+	 * 
+	 * @return job owner or null if not available
+	 */
+	public String getOwner();
+
+	/**
+	 * Get the queue name for the job if available
+	 * 
+	 * @return queue name or null if not available
+	 */
+	public String getQueueName();
+
+	/**
+	 * Get the unique name for the resource manager that launched the job
+	 * 
 	 * @return owner resource manager id
 	 */
 	public String getRmUniqueName();
