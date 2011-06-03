@@ -26,14 +26,13 @@ import java.util.HashMap;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.lml.core.util.DebugUtil;
-import org.eclipse.ptp.rm.lml.ui.managers.ViewManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-public class LMLUIPlugin extends AbstractUIPlugin{
+public class LMLUIPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.lml.ui"; //$NON-NLS-1$
 	public static final String RUNTIME_MODEL_PRESENTATION_EXTENSION_POINT_ID = "runtimeModelPresentations"; //$NON-NLS-1$
 
@@ -88,8 +87,9 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 	 * @return unique identifier
 	 */
 	public static String getUniqueIdentifier() {
-		if (getDefault() == null)
+		if (getDefault() == null) {
 			return PLUGIN_ID;
+		}
 
 		return getDefault().getBundle().getSymbolicName();
 	}
@@ -126,23 +126,13 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 
 	// Resource bundle.
 	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations = new HashMap<String, IRuntimeModelPresentation>();
-	private ViewManager viewManager = null;
 
 	public LMLUIPlugin() {
-		super();		
+		super();
 		plugin = this;
-		
+
 	}
 
-	/**
-	 * Get the RM manager instance
-	 * 
-	 * @return RM manager
-	 */
-	public ViewManager getViewManager() {
-		return viewManager;
-	}
-	
 	/**
 	 * Get the runtime model presentation for the given resource manager
 	 * 
@@ -165,7 +155,6 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		DebugUtil.configurePluginDebugOptions();
-		viewManager = new ViewManager();
 	}
 
 	/*
@@ -178,8 +167,6 @@ public class LMLUIPlugin extends AbstractUIPlugin{
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		viewManager.shutDown();
-		viewManager = null;
 		plugin = null;
 	}
 

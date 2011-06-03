@@ -51,7 +51,6 @@ import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
-import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.MouseAdapter;
@@ -75,9 +74,10 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
-public class TableView extends LMLViewPart {
+public class TableView extends ViewPart {
 
 	private final class LMLTableListListener implements ILMLListener {
 
@@ -350,7 +350,7 @@ public class TableView extends LMLViewPart {
 	}
 
 	@Override
-	public void prepareDispose() {
+	public void dispose() {
 		lmlManager.removeListener(lmlListener);
 	}
 

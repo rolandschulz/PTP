@@ -27,10 +27,10 @@ import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
-import org.eclipse.ptp.rm.lml.ui.providers.LMLViewPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.part.ViewPart;
 
 /**
  * @author Claudia Knobloch
@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Composite;
  *         Barboza
  * 
  */
-public class NodesView extends LMLViewPart {
+public class NodesView extends ViewPart {
 	private final class LguiListener implements ILMLListener {
 		public void handleEvent(IJobListSortedEvent e) {
 		}
@@ -155,7 +155,7 @@ public class NodesView extends LMLViewPart {
 	}
 
 	@Override
-	public void prepareDispose() {
+	public void dispose() {
 		lmlManager.removeListener(lguiListener);
 	}
 
