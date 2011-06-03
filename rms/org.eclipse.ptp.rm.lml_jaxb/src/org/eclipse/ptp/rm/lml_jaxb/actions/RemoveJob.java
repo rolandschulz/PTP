@@ -30,6 +30,15 @@ public class RemoveJob extends AbstractStatusAction {
 			for (Row row : selected) {
 				JobStatusData status = row.status;
 				view.removeJob(status.getJobId());
+				String rmId = status.getRmId();
+				String remotePath = status.getOutputPath();
+				if (remotePath != null) {
+					ActionUtils.removeFile(remotePath, rmId);
+				}
+				remotePath = status.getErrorPath();
+				if (remotePath != null) {
+					ActionUtils.removeFile(remotePath, rmId);
+				}
 			}
 		}
 		view.refresh();

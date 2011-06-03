@@ -339,36 +339,6 @@ public class TableView extends LMLViewPart {
 		createTable();
 	}
 
-	/**
-	 * Recompute the column order array with the first column removed (since
-	 * this is not in the table data)
-	 * 
-	 * @param order
-	 *            column order array
-	 * @return new column order array with first column removed
-	 */
-	private int[] removeFirstColumn(int[] order) {
-		final int[] orderNew = new int[order.length - 1];
-		int dif = 0;
-		for (int i = 0; i < order.length; i++) {
-			if (order[i] != 0) {
-				orderNew[i - dif] = order[i] - 1;
-			} else {
-				dif = 1;
-			}
-		}
-		return orderNew;
-	}
-
-	private Double[] getWidths() {
-		TreeColumn[] columns = tree.getColumns();
-		final Double[] widths = new Double[columns.length];
-		for (int i = 0; i < columns.length; i++) {
-			widths[i] = Integer.valueOf(columns[i].getWidth()).doubleValue();
-		}
-		return widths;
-	}
-
 	@Override
 	public void init(IViewSite site) {
 		try {
@@ -391,8 +361,10 @@ public class TableView extends LMLViewPart {
 		new UIJob(Messages.JobListUpdate) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				viewer.setInput(jobs.values());
-				viewer.refresh();
+				if (viewer != null) {
+					viewer.setInput(jobs.values());
+					viewer.refresh();
+				}
 				return Status.OK_STATUS;
 			}
 		}.schedule();
@@ -665,6 +637,36 @@ public class TableView extends LMLViewPart {
 			return SWT.TRAIL;
 		}
 		return SWT.LEAD;
+	}
+
+	private Double[] getWidths() {
+		TreeColumn[] columns = tree.getColumns();
+		final Double[] widths = new Double[columns.length];
+		for (int i = 0; i < columns.length; i++) {
+			widths[i] = Integer.valueOf(columns[i].getWidth()).doubleValue();
+		}
+		return widths;
+	}
+
+	/**
+	 * Recompute the column order array with the first column removed (since
+	 * this is not in the table data)
+	 * 
+	 * @param order
+	 *            column order array
+	 * @return new column order array with first column removed
+	 */
+	private int[] removeFirstColumn(int[] order) {
+		final int[] orderNew = new int[order.length - 1];
+		int dif = 0;
+		for (int i = 0; i < order.length; i++) {
+			if (order[i] != 0) {
+				orderNew[i - dif] = order[i] - 1;
+			} else {
+				dif = 1;
+			}
+		}
+		return orderNew;
 	}
 
 	private void setViewerInput() {

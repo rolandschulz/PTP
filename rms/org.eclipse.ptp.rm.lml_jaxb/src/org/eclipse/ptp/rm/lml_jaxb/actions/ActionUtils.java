@@ -165,6 +165,41 @@ public class ActionUtils {
 	}
 
 	/**
+	 * Delete stdout or stderr file on remote host.
+	 * 
+	 * @param path
+	 *            to file
+	 */
+	public static void removeFile(final String path, final String rmId) {
+		new Job(path) {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+				IResourceManagerControl control = rm.getControl();
+				SubMonitor progress = SubMonitor.convert(monitor, 70);
+				try {
+					String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
+					if (remoteServicesId != null) {
+						IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId,
+								progress.newChild(25));
+						IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
+						String remoteConnectionName = control.getControlConfiguration().getConnectionName();
+						IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
+						IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
+						IFileStore lres = remoteFileManager.getResource(path);
+						if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
+							lres.delete(EFS.NONE, progress.newChild(25));
+						}
+					}
+				} catch (Throwable t) {
+					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
+				}
+				return Status.OK_STATUS;
+			}
+		}.schedule();
+	}
+
+	/**
 	 * Set the flags if this update carries ready info for the output files.
 	 * 
 	 * @param job
