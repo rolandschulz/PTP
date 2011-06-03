@@ -95,6 +95,11 @@ public interface IJobStatus {
 	public static String JOB_OUTERR_READY = "JOB_OUTERR_READY"; //$NON-NLS-1$
 
 	/**
+	 * @return path to remote file
+	 */
+	public String getErrorPath();
+
+	/**
 	 * Get the job ID of the job this status is for
 	 * 
 	 * @return job ID
@@ -107,6 +112,16 @@ public interface IJobStatus {
 	 * @return
 	 */
 	public ILaunchConfiguration getLaunchConfiguration();
+
+	/**
+	 * @return path to remote file
+	 */
+	public String getOutputPath();
+
+	/**
+	 * @return owner resource manager id
+	 */
+	public String getRmUniqueName();
 
 	/**
 	 * Get job state. This is the primary state of the job, and is one of
@@ -140,19 +155,4 @@ public interface IJobStatus {
 	 * @return if the batch states do not apply to this job.
 	 */
 	public boolean isInteractive();
-
-	/**
-	 * @return path to remote file
-	 */
-	String getErrorPath();
-
-	/**
-	 * @return path to remote file
-	 */
-	String getOutputPath();
-
-	/**
-	 * @return owner resource manager id
-	 */
-	String getRmUniqueName();
 }
