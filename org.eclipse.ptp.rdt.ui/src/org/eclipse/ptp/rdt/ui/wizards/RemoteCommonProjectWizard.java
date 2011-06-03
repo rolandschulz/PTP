@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002, 2010 Rational Software Corporation and others.
+ * Copyright (c) 2002, 2011 Rational Software Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,10 +27,15 @@ import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.LanguageManager;
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescriptionManager;
+import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
 import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.newui.UIMessages;
@@ -57,7 +62,6 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
@@ -316,6 +320,19 @@ public abstract class RemoteCommonProjectWizard extends BasicNewResourceWizard i
 										
 										ICProject cProject = CModelManager.getDefault().getCModel().getCProject(newProject);
 										CCorePlugin.getIndexManager().setIndexerId(cProject, RemoteFastIndexer.ID);
+										//turn off append contributed(local) environment variables for the build configuration of the remote project
+										IManagedBuildInfo mbsInfo = ManagedBuildManager.getBuildInfo(newProject);	
+										IConfiguration[] mbcfgs = mbsInfo.getManagedProject().getConfigurations();
+										if(mbcfgs !=null){
+											for (IConfiguration mbconfiguration : mbcfgs) {
+												ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(mbconfiguration);
+												if(c_mb_confgDes!=null){
+													EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+													//EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_mb_confgDes);
+												}
+											}
+										}
+										
 									}
 									fMonitor.worked(10);
 								} catch (CoreException e) {
