@@ -15,6 +15,9 @@ import java.util.List;
 import org.eclipse.cdt.core.resources.RefreshScopeManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -45,12 +48,10 @@ public class ResourceRefreshJob extends Job {
 	protected IStatus run(IProgressMonitor arg0) {
 		RefreshScopeManager manager = RefreshScopeManager.getInstance();
 		for(IProject project : fProjectsToRefresh) {
-			try {
-				project.refreshLocal(IResource.DEPTH_INFINITE, arg0);
-				
+			try {		
 				// use refresh scope manager to refresh
-				//IWorkspaceRunnable runnable = manager.getRefreshRunnable(project);
-				//ResourcesPlugin.getWorkspace().run(runnable, arg0);
+				IWorkspaceRunnable runnable = manager.getRefreshRunnable(project);
+				ResourcesPlugin.getWorkspace().run(runnable, null, IWorkspace.AVOID_UPDATE, arg0);
 			} catch (CoreException e) {
 				return Activator.createStatus(Messages.ResourceRefreshJob_1, e);
 			}
