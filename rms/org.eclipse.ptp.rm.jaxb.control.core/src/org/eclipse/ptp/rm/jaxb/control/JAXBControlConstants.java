@@ -51,6 +51,9 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 
 	public static final String CUSTOM = "custom";//$NON-NLS-1$
 	public static final String CONTROL_USER_VAR = "control.user.name";//$NON-NLS-1$
+	public static final String CONTROL_USER_NAME = "${ptp_rm:control.user.name#value}";//$NON-NLS-1$
+	public static final String CONTROL_QUEUE_VAR = "control.queue.name";//$NON-NLS-1$
+	public static final String CONTROL_QUEUE_NAME = "${ptp_rm:control.queue.name#value}";//$NON-NLS-1$
 	public static final String CONTROL_ADDRESS_VAR = "control.address";//$NON-NLS-1$
 	public static final String CONTROL_WORKING_DIR_VAR = "control.working.dir";//$NON-NLS-1$
 	public static final String ARPA = ".in-addr.arpa";//$NON-NLS-1$

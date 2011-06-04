@@ -317,6 +317,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			if (status == null) {
 				status = new CommandJobStatus(getResourceManager().getUniqueName(), jobId, state, null, this);
+				status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
 				jobStatusMap.addJobStatus(jobId, status);
 			} else {
 				status.setState(state);
@@ -415,7 +416,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		String uuid = UUID.randomUUID().toString();
 
 		if (!resourceManagerIsActive()) {
-			return new CommandJobStatus(getResourceManager().getUniqueName(), uuid, IJobStatus.UNDETERMINED, null, this);
+			ICommandJobStatus status = new CommandJobStatus(getResourceManager().getUniqueName(), uuid, IJobStatus.UNDETERMINED,
+					null, this);
+			status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+			return status;
 		}
 
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
@@ -477,10 +481,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 * job was cancelled during waitForId
 			 */
 			if (jobId == null) {
-				return new CommandJobStatus(getResourceManager().getUniqueName(), uuid, IJobStatus.CANCELED, null, this);
+				status = new CommandJobStatus(getResourceManager().getUniqueName(), uuid, IJobStatus.CANCELED, null, this);
+				status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+				return status;
 			}
 			pinTable.pin(jobId);
 			rmVarMap.put(jobId, p);
+
+			System.out.println(p.getName() + ", " + p.getValue() + ", " + p.getDefault());
 
 			jobStatusMap.addJobStatus(status.getJobId(), status);
 			status.setLaunchConfig(configuration);

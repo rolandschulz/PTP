@@ -78,6 +78,12 @@ public interface ICommandJobStatus extends IJobStatus {
 	public void setLaunchConfig(ILaunchConfiguration configuration);
 
 	/**
+	 * @param owner
+	 *            user name of the submitter
+	 */
+	public void setOwner(String owner);
+
+	/**
 	 * @param process
 	 *            if the Job is interactive.
 	 */
@@ -87,6 +93,13 @@ public interface ICommandJobStatus extends IJobStatus {
 	 * @param proxy
 	 */
 	public void setProxy(ICommandJobStreamsProxy proxy);
+
+	/**
+	 * If a batch job, the queue submitted to.
+	 * 
+	 * @param name
+	 */
+	public void setQueueName(String name);
 
 	/**
 	 * @param state

@@ -127,6 +127,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private final ICommandJob open;
 
 	private String jobId;
+	private String owner;
+	private String queue;
 	private ILaunchConfiguration launchConfig;
 	private String state;
 	private String stateDetail;
@@ -255,6 +257,24 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return remoteOutputPath;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getOwner()
+	 */
+	public String getOwner() {
+		return owner;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getQueueName()
+	 */
+	public String getQueueName() {
+		return queue;
+	}
+
 	/**
 	 * 
 	 * @return owner resource manager id
@@ -314,6 +334,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 				path = (String) ((PropertyType) o).getValue();
 			}
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
+
+				System.out.println("RESOLVING: " + path);
+				System.out.println("ENV: " + rmVarMap.getVariables());
+				System.out.println("jobId: " + rmVarMap.getVariables().get(jobId));
+
 				path = rmVarMap.getString(path);
 				if (jobId != null) {
 					remoteOutputPath = path.replaceAll(JAXBControlConstants.JOB_ID_TAG, jobId);
@@ -408,6 +433,17 @@ public class CommandJobStatus implements ICommandJobStatus {
 		this.launchConfig = launchConfig;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#setOwner(java
+	 * .lang.String)
+	 */
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
 	/**
 	 * @param process
 	 *            object (used for interactive cancellation)
@@ -428,6 +464,17 @@ public class CommandJobStatus implements ICommandJobStatus {
 	public void setProxy(ICommandJobStreamsProxy proxy) {
 		this.proxy = proxy;
 		initialize(jobId);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#setQueueName
+	 * (java.lang.String)
+	 */
+	public void setQueueName(String name) {
+		this.queue = name;
 	}
 
 	/**

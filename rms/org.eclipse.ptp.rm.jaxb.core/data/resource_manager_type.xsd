@@ -56,6 +56,11 @@
 				executablePath
 				progArgs
 				directory
+				<!-- the following properties will usually be necessary for internal use; they should be linked to the appropriate batch-system specific 
+					attributes -->
+				control.queue.name
+				stdout_remote_path
+				stderr_remote_path
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>

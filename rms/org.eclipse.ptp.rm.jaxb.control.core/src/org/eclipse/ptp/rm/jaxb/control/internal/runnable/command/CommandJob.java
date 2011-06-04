@@ -370,12 +370,16 @@ public class CommandJob extends Job implements ICommandJob {
 					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
 				}
 
+				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+
 				if (monitor.isCanceled()) {
 					return status;
 				}
 
 				if (!isBatch()) {
 					jobStatus.setProcess(process);
+				} else {
+					jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
 				}
 				jobStatus.setProxy(getProxy());
 
