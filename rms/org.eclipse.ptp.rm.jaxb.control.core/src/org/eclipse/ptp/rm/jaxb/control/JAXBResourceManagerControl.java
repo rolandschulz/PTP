@@ -485,11 +485,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
 				return status;
 			}
+
+			/*
+			 * initialize the job status while the id property is live
+			 */
 			pinTable.pin(jobId);
 			rmVarMap.put(jobId, p);
-
-			System.out.println(p.getName() + ", " + p.getValue() + ", " + p.getDefault());
-
+			status.initialize(jobId);
 			jobStatusMap.addJobStatus(status.getJobId(), status);
 			status.setLaunchConfig(configuration);
 			worked(progress, 5);

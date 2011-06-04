@@ -308,13 +308,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/*
-	 * NOTE: since the script/job attribute defining this path is generated
-	 * prior to submission, ${rm:@jobId#name} cannot appear in the path; at the
-	 * same time, a batch variable replacement will not work, as that would not
-	 * be interpretable for the RM. One actually needs to configure two separate
-	 * strings in this case, giving one to the script and one to the resource
-	 * manager. We treat the path as requiring a possible substitution of the
-	 * "@jobId" tag.
+	 * NOTE: Initialize must be called immediately after the return of the
+	 * submit.run() method while the property for the jobId is pinned and in the
+	 * environment. Note also that batch variable replacement will not work, as
+	 * that would not be interpretable for the RM. One actually needs to
+	 * configure two separate strings in this case, giving one to the script and
+	 * one to the resource manager.
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#initialize(java.lang.String
@@ -334,17 +333,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				path = (String) ((PropertyType) o).getValue();
 			}
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
-
-				System.out.println("RESOLVING: " + path);
-				System.out.println("ENV: " + rmVarMap.getVariables());
-				System.out.println("jobId: " + rmVarMap.getVariables().get(jobId));
-
-				path = rmVarMap.getString(path);
-				if (jobId != null) {
-					remoteOutputPath = path.replaceAll(JAXBControlConstants.JOB_ID_TAG, jobId);
-				} else {
-					remoteOutputPath = path;
-				}
+				remoteOutputPath = rmVarMap.getString(jobId, path);
 			}
 		}
 		o = rmVarMap.get(JAXBControlConstants.STDERR_REMOTE_FILE);
@@ -355,12 +344,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				path = (String) ((AttributeType) o).getValue();
 			}
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
-				path = rmVarMap.getString(path);
-				if (jobId != null) {
-					remoteErrorPath = path.replaceAll(JAXBControlConstants.JOB_ID_TAG, jobId);
-				} else {
-					remoteErrorPath = path;
-				}
+				remoteErrorPath = rmVarMap.getString(jobId, path);
 			}
 		}
 	}
@@ -453,17 +437,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
-	 * We also immediately dereference any paths associated with the job by
-	 * calling intialize, as the jobId property may not be in the environment
-	 * after this initial call returns.
-	 * 
 	 * @param proxy
 	 *            Wrapper containing monitoring functionality for the associated
 	 *            output and error streams.
 	 */
 	public void setProxy(ICommandJobStreamsProxy proxy) {
 		this.proxy = proxy;
-		initialize(jobId);
 	}
 
 	/*
