@@ -163,22 +163,24 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#addUserJob(java.lang.String,
 	 * org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData)
 	 */
-	public synchronized void addUserJob(String jobId, JobStatusData status) {
+	public synchronized void addUserJob(String jobId, JobStatusData status, boolean force) {
 		JobStatusData jobStatus = fJobMap.get(jobId);
 		/*
 		 * If the job already exists, do nothing
 		 */
 		if (jobStatus == null) {
-			String oid = getOverviewAccess().getOIDByJobId(jobId);
-			if (oid == null) {
-				TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
-				if (table != null) {
-					oid = generateOid();
-					status.setOid(oid);
-					addJobToTable(table, oid, status);
-					fJobMap.put(jobId, status);
+			if (force) {
+				String oid = getOverviewAccess().getOIDByJobId(jobId);
+				if (oid == null) {
+					TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
+					if (table != null) {
+						oid = generateOid();
+						status.setOid(oid);
+						addJobToTable(table, oid, status);
+					}
 				}
 			}
+			fJobMap.put(jobId, status);
 		}
 	}
 
@@ -401,25 +403,6 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	public void restoreUserJobs(Map<String, JobStatusData> map) {
-		for (final Map.Entry<String, JobStatusData> entry : map.entrySet()) {
-			addUserJob(entry.getKey(), entry.getValue());
-		}
-	}
-
-	/**
-	 * remove
-	 */
-	public Map<String, String> revert(Map<String, String> map) {
-		final Map<String, String> revertMap = new HashMap<String, String>();
-		for (final Map.Entry<String, String> entry : map.entrySet()) {
-			if (entry.getValue() != null) {
-				revertMap.put(entry.getValue(), entry.getKey());
-			}
-		}
-		return revertMap;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -538,20 +521,10 @@ public class LguiItem implements ILguiItem {
 	}
 
 	private String getGidFromJobStatus(JobStatusData status) {
-		if (status.getState().equals("RUNNING")) { //$NON-NLS-1$
+		if (status.getState().equals(JobStatusData.RUNNING)) {
 			return RUNNING_JOB_TABLE;
 		}
 		return WAITING_JOB_TABLE;
-	}
-
-	private List<String> getListNullElements(Map<String, String> map) {
-		final List<String> list = new ArrayList<String>();
-		for (final Map.Entry<String, String> entry : map.entrySet()) {
-			if (entry.getValue() == null) {
-				list.add(entry.getKey());
-			}
-		}
-		return list;
 	}
 
 	/**

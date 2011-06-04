@@ -39,6 +39,7 @@ public class JobStatusData {
 	private static final String JOB_OUTERR_READY = "JOB_OUTERR_READY";//$NON-NLS-1$
 
 	public static final String SUBMITTED = "SUBMITTED";//$NON-NLS-1$
+	public static final String RUNNING = "RUNNING";//$NON-NLS-1$
 	public static final String COMPLETED = "COMPLETED";//$NON-NLS-1$
 	public static final String FAILED = "FAILED";//$NON-NLS-1$
 	public static final String CANCELED = "CANCELED";//$NON-NLS-1$
@@ -227,6 +228,7 @@ public class JobStatusData {
 		jobMemento.putBoolean(INTERACTIVE_ATTR, fInteractive);
 		jobMemento.putString(QUEUE_NAME_ATTR, fQueueName);
 		jobMemento.putString(OWNER_ATTR, fOwner);
+		jobMemento.putString(OID_ATTR, fOid);
 	}
 
 	/**

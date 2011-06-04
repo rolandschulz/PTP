@@ -150,7 +150,7 @@ public class LMLManager {
 	public void addUserJob(String name, String jobId, JobStatusData status) {
 		final ILguiItem item = LGUIS.get(name);
 		if (item != null) {
-			item.addUserJob(jobId, status);
+			item.addUserJob(jobId, status, true);
 		}
 		if (item == fLguiItem) {
 			fireUpdatedLgui();
@@ -556,7 +556,7 @@ public class LMLManager {
 	private void restoreJobStatusData(ILguiItem item, IMemento memento) {
 		if (memento != null) {
 			for (final JobStatusData status : JobStatusData.reload(memento)) {
-				item.addUserJob(status.getJobId(), status);
+				item.addUserJob(status.getJobId(), status, false);
 			}
 		}
 	}

@@ -48,10 +48,16 @@ public interface ILguiItem {
 	public void addListener(ILguiListener listener);
 
 	/**
-	 * @param name
+	 * Add a user job
+	 * 
+	 * @param jobId
+	 *            ID of job to add
 	 * @param status
+	 *            job status information
+	 * @param force
+	 *            force the job to be added to the table
 	 */
-	public void addUserJob(String name, JobStatusData status);
+	public void addUserJob(String jobId, JobStatusData status, boolean force);
 
 	/**
 	 * @param output
