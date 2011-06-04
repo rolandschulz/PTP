@@ -78,6 +78,13 @@ public class CommandJobStatus implements ICommandJobStatus {
 			SubMonitor progress = SubMonitor.convert(monitor, 120);
 			try {
 				d = control.getRemoteServicesDelegate(progress.newChild(20));
+				if (d.getRemoteFileManager() == null) {
+					/*
+					 * could be a call initiated by closing of resource manager,
+					 * the connection may be closed; just ignore and move on
+					 */
+					return Status.OK_STATUS;
+				}
 			} catch (CoreException ce) {
 				return CoreExceptionUtils.getErrorStatus(ce.getMessage(), ce);
 			} finally {

@@ -20,6 +20,7 @@ public class Messages extends NLS {
 	public static String StreamParserInconsistentMapValues;
 	public static String ManagedFilesJob;
 	public static String ManagedFilesJobError;
+	public static String UninitializedRemoteServices;
 
 	public static String ScriptHandlerJob;
 	public static String RMNoSuchCommandError;

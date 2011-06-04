@@ -943,10 +943,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void setFixedConfigurationProperties(IProgressMonitor monitor) throws CoreException {
 		IRemoteConnection rc = getRemoteServicesDelegate(monitor).getRemoteConnection();
-		rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
-		rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
-		rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
-		rmVarMap.maybeAddProperty(JAXBControlConstants.DIRECTORY, rc.getWorkingDirectory(), false);
+		if (rc != null) {
+			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
+			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
+			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
+			rmVarMap.maybeAddProperty(JAXBControlConstants.DIRECTORY, rc.getWorkingDirectory(), false);
+		}
 	}
 
 	/**

@@ -614,6 +614,10 @@ public class CommandJob extends Job implements ICommandJob {
 		}
 		String[] cmdArgs = ArgImpl.getArgs(uuid, args, rmVarMap);
 		RemoteServicesDelegate delegate = control.getRemoteServicesDelegate(monitor);
+		if (delegate.getRemoteConnection() == null) {
+			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, new Throwable(
+					Messages.UninitializedRemoteServices));
+		}
 		return delegate.getRemoteServices().getProcessBuilder(delegate.getRemoteConnection(), cmdArgs);
 	}
 

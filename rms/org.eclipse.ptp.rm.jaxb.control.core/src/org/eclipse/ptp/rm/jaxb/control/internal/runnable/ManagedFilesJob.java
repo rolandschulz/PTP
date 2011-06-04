@@ -108,6 +108,9 @@ public class ManagedFilesJob extends Job {
 	protected IStatus run(IProgressMonitor monitor) {
 		try {
 			delegate = control.getRemoteServicesDelegate(monitor);
+			if (delegate.getRemoteFileManager() == null) {
+				throw new Throwable(Messages.UninitializedRemoteServices);
+			}
 		} catch (Throwable t) {
 			return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
 		}

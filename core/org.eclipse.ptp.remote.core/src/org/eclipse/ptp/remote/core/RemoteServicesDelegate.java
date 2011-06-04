@@ -117,38 +117,26 @@ public class RemoteServicesDelegate {
 	public void initialize(IProgressMonitor monitor) throws CoreException {
 		try {
 			localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
-			if (localServices == null) {
-				throw new NullPointerException("localServices"); //$NON-NLS-1$
-			}
-			localConnectionManager = localServices.getConnectionManager();
-			if (localConnectionManager == null) {
-				throw new NullPointerException("localConnectionManager");//$NON-NLS-1$
-			}
-			localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
-			if (localConnection == null) {
-				throw new NullPointerException("localConnection");//$NON-NLS-1$
-			}
-			localFileManager = localServices.getFileManager(localConnection);
-			if (localFileManager == null) {
-				throw new NullPointerException("localFileManager");//$NON-NLS-1$
+			if (localServices != null) {
+				localConnectionManager = localServices.getConnectionManager();
+				if (localConnectionManager != null) {
+					localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
+				}
+				if (localConnection != null) {
+					localFileManager = localServices.getFileManager(localConnection);
+				}
 			}
 
 			if (remoteServicesId != null) {
 				remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, monitor);
-				if (remoteServices == null) {
-					throw new NullPointerException("remoteServices");//$NON-NLS-1$
-				}
-				remoteConnectionManager = remoteServices.getConnectionManager();
-				if (remoteConnectionManager == null) {
-					throw new NullPointerException("remoteConnectionManager");//$NON-NLS-1$
-				}
-				remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
-				if (remoteConnection == null) {
-					throw new NullPointerException("remoteConnection");//$NON-NLS-1$
-				}
-				remoteFileManager = remoteServices.getFileManager(remoteConnection);
-				if (remoteFileManager == null) {
-					throw new NullPointerException("remoteFileManager");//$NON-NLS-1$
+				if (remoteServices != null) {
+					remoteConnectionManager = remoteServices.getConnectionManager();
+					if (remoteConnectionManager != null) {
+						remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
+						if (remoteConnection != null) {
+							remoteFileManager = remoteServices.getFileManager(remoteConnection);
+						}
+					}
 				}
 			} else {
 				remoteServices = localServices;
@@ -156,8 +144,12 @@ public class RemoteServicesDelegate {
 				remoteConnection = localConnection;
 				remoteFileManager = localFileManager;
 			}
-			localHome = localFileManager.toURI(localConnection.getWorkingDirectory());
-			remoteHome = remoteFileManager.toURI(remoteConnection.getWorkingDirectory());
+			if (localFileManager != null) {
+				localHome = localFileManager.toURI(localConnection.getWorkingDirectory());
+			}
+			if (remoteFileManager != null) {
+				remoteHome = remoteFileManager.toURI(remoteConnection.getWorkingDirectory());
+			}
 		} catch (Throwable t) {
 			throw newException("RemoteServicesDelegate.initialize " + remoteServicesId + COSP + remoteConnection, t); //$NON-NLS-1$
 		}
