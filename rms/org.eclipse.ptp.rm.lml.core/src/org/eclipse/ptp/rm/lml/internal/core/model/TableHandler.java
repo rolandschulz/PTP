@@ -323,7 +323,7 @@ public class TableHandler extends LguiHandler {
 	 *            ID of the table layout
 	 * @return rows with color information added
 	 */
-	public Row[] getTableDataWithColor(String gid) {
+	public Row[] getTableDataWithColor(String gid, boolean addColor) {
 		BigInteger[] cids = getActiveCids(gid);
 		final TableType table = getTable(gid);
 		if (table == null) {
@@ -335,7 +335,9 @@ public class TableHandler extends LguiHandler {
 			tableData[i] = new Row();
 			if (row.getOid() != null) {
 				tableData[i].setOid(row.getOid());
-				tableData[i].setColor(lguiItem.getOIDToObject().getColorById(row.getOid()));
+				if (addColor) {
+					tableData[i].setColor(lguiItem.getOIDToObject().getColorById(row.getOid()));
+				}
 			}
 			BigInteger jobIdIndex = getColumnIndex(table, ILguiItem.JOB_ID);
 			final Cell[] tableDataRow = new Cell[cids.length];

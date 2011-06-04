@@ -39,8 +39,8 @@ public interface ILguiItem {
 	public static String JOB_STATUS = "status"; //$NON-NLS-1$
 	public static String JOB_QUEUE_NAME = "queue"; //$NON-NLS-1$
 
-	public static String RUNNING_JOB_TABLE = "joblistrun"; //$NON-NLS-1$
-	public static String WAITING_JOB_TABLE = "joblistwait"; //$NON-NLS-1$
+	public static String ACTIVE_JOB_TABLE = "joblistrun"; //$NON-NLS-1$
+	public static String INACTIVE_JOB_TABLE = "joblistwait"; //$NON-NLS-1$
 
 	/**
 	 * @param listener

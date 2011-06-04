@@ -522,9 +522,9 @@ public class LguiItem implements ILguiItem {
 
 	private String getGidFromJobStatus(JobStatusData status) {
 		if (status.getState().equals(JobStatusData.RUNNING)) {
-			return RUNNING_JOB_TABLE;
+			return ACTIVE_JOB_TABLE;
 		}
-		return WAITING_JOB_TABLE;
+		return INACTIVE_JOB_TABLE;
 	}
 
 	/**
@@ -611,7 +611,7 @@ public class LguiItem implements ILguiItem {
 		 * a "fake" entry in the jobslistwait table for these. Note that these
 		 * jobs are now considered "COMPLETED".
 		 */
-		TableType table = getTableHandler().getTable(WAITING_JOB_TABLE);
+		TableType table = getTableHandler().getTable(INACTIVE_JOB_TABLE);
 		for (JobStatusData status : fJobMap.values()) {
 			if (!status.isRemoved() && !jobsInTable.contains(status)) {
 				status.setState(JobStatusData.COMPLETED);

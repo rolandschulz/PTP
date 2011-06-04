@@ -400,7 +400,10 @@ public class TableView extends ViewPart {
 				final Image image = new Image(display, 12, 12);
 				final GC gc = new GC(image);
 				if (((Row) element).oid != null && (selectedOid == null || ((Row) element).oid.equals(selectedOid))) {
-					final LMLColor color = ((Row) element).color;
+					LMLColor color = ((Row) element).color;
+					if (color == null) {
+						color = LMLColor.LIGHT_GRAY;
+					}
 					gc.setBackground(new Color(display, color.getRed(), color.getGreen(), color.getBlue()));
 				} else {
 					gc.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
@@ -664,7 +667,7 @@ public class TableView extends ViewPart {
 		if (!isMouseDown) {
 			Row[] input = new Row[0];
 			if (fSelectedLguiItem != null && !fSelectedLguiItem.isEmpty()) {
-				input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
+				input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid, gid.equals(ILguiItem.ACTIVE_JOB_TABLE));
 			}
 			if (!composite.isDisposed()) {
 				viewer.setInput(input);
