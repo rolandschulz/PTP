@@ -390,13 +390,9 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					// modified by the user, so we'll respect the user's edits
 					// and replace the environment entirely.
 
-					// deactivated for now. Because it doesn't work that it is
-					// the one originated from the remote enviroment
-					// instead it is the local enviroment. Has to be fixed and
-					// than can be reactivated.
-					// remoteEnvMap.clear();
-					//
-					// remoteEnvMap.putAll(envMap);
+					 remoteEnvMap.clear();
+					
+					 remoteEnvMap.putAll(envMap);
 
 					// set the directory in which to run the command
 					IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
