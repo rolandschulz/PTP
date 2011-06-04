@@ -359,6 +359,7 @@ public class TableView extends ViewPart {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (viewer != null) {
+					setViewerInput();
 					viewer.refresh();
 				}
 				return Status.OK_STATUS;
@@ -499,8 +500,8 @@ public class TableView extends ViewPart {
 		tree.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				isMouseDown = true;
 				if (e.button == 1) {
+					isMouseDown = true;
 					final TreeItem item = tree.getItem(new Point(e.x, e.y));
 					if (item != null && !composite.isDisposed()) {
 						lmlManager.markObject(item.getData().toString());
@@ -515,8 +516,8 @@ public class TableView extends ViewPart {
 					if (item != null && !composite.isDisposed()) {
 						lmlManager.unmarkObject(item.getData().toString());
 					}
+					isMouseDown = false;
 				}
-				isMouseDown = false;
 			}
 
 		});
