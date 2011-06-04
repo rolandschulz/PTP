@@ -108,7 +108,7 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 			return;
 		}
 		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(status.getRmId());
-		if (!IResourceManager.STARTED_STATE.equals(rm.getState())) {
+		if (rm == null || !IResourceManager.STARTED_STATE.equals(rm.getState())) {
 			action.setEnabled(false);
 		} else if (getReady()) {
 			action.setEnabled(true);
