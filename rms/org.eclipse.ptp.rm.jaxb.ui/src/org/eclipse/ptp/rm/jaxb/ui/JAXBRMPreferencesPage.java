@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 
 public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implements SelectionListener {
 
@@ -71,15 +70,15 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 	protected Control createContents(Composite parent) {
 		Group optionsGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		optionsGroup.setText(Messages.Preferences_options);
-		optionsGroup.setLayout(new GridLayout(2, true));
+		optionsGroup.setLayout(new GridLayout(1, true));
 		GridData gd = new GridData();
-		gd.horizontalAlignment = GridData.FILL;
-		gd.horizontalIndent = 20;
-		gd.horizontalSpan = 2;
+		gd.horizontalAlignment = GridData.BEGINNING;
+		gd.horizontalSpan = 1;
+		gd.horizontalIndent = 10;
 		optionsGroup.setLayoutData(gd);
-		new Label(optionsGroup, SWT.NONE).setText(JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
-		reloadOption = new Button(optionsGroup, SWT.CHECK);
+		reloadOption = new Button(optionsGroup, SWT.CHECK | SWT.LEFT);
 		reloadOption.addSelectionListener(this);
+		reloadOption.setText(JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
 		loadSaved();
 		return optionsGroup;
 	}

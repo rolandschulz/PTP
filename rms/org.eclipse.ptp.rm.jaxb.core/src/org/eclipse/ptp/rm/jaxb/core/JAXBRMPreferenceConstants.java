@@ -13,5 +13,5 @@ package org.eclipse.ptp.rm.jaxb.core;
  * Constant definitions for plug-in preferences
  */
 public class JAXBRMPreferenceConstants {
-	public static final String FORCE_XML_RELOAD = "Always reload XML from URL: "; //$NON-NLS-1$
+	public static final String FORCE_XML_RELOAD = "Always reload XML from URL"; //$NON-NLS-1$
 }

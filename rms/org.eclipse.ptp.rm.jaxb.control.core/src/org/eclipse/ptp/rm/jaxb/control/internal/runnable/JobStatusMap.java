@@ -56,7 +56,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 			map.put(jobId, status);
 		}
 		if (notifyAdd) {
-			// rm.addJob(jobId, status); XXX RESTORE THIS
+			rm.addJob(jobId, status);
 		}
 	}
 

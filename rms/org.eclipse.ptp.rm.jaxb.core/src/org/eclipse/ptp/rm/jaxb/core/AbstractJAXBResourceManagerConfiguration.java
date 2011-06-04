@@ -132,7 +132,8 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	 */
 	private void realizeRMDataFromXML() throws Throwable {
 		String xml = getRMConfigurationXML();
-		if (xml == null || Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD)) {
+		boolean force = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
+		if (xml == null || force) {
 			String location = getString(JAXBCoreConstants.RM_URL, JAXBCoreConstants.ZEROSTR);
 			if (location != null) {
 				try {
