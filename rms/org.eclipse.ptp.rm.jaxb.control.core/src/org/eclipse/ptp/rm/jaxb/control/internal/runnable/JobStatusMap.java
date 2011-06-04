@@ -31,7 +31,6 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	private final IResourceManagerControl control;
 	private final IResourceManager rm;
 	private final Map<String, ICommandJobStatus> map;
-	private Thread t;
 	private boolean running = false;
 
 	public JobStatusMap(IResourceManagerControl control, IResourceManager rm) {
@@ -103,7 +102,6 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	public void halt() {
 		synchronized (map) {
 			running = false;
-			t.interrupt();
 			map.notifyAll();
 		}
 	}
@@ -115,7 +113,6 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	 */
 	@Override
 	public void run() {
-		t = Thread.currentThread();
 		Map<String, String> toPrune = new HashMap<String, String>();
 
 		synchronized (map) {

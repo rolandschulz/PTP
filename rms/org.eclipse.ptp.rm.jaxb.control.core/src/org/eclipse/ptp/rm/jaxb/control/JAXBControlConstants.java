@@ -25,7 +25,7 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final long MINUTE_IN_MS = 60 * 60 * 1000;
 
 	public static final long STANDARD_WAIT = 1000;
-	public static final int READY_FILE_BLOCK = 60;
+	public static final int READY_FILE_BLOCK = 5;
 
 	/* KEY WORDS */
 	public static final String BASIC = "basic";//$NON-NLS-1$

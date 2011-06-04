@@ -176,30 +176,34 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @return true if canceled during this call.
 	 */
-	public synchronized boolean cancel() {
-		if (getStateRank(stateDetail) > 4) {
+	public boolean cancel() {
+		synchronized (this) {
+			if (getStateRank(stateDetail) > 4) {
+				return false;
+			}
+
+			/*
+			 * If this process is persistent (open), call terminate on the job,
+			 * as it may still be running; the process will be killed and the
+			 * proxy closed inside the job
+			 */
+			if (open != null) {
+				open.terminate();
+				return true;
+			}
+
+			waitEnabled = false;
+			notifyAll();
+
+			if (process != null && !process.isCompleted()) {
+				process.destroy();
+				if (proxy != null) {
+					proxy.close();
+				}
+				return true;
+			}
 			return false;
 		}
-
-		/*
-		 * If this process is persistent (open), call terminate on the job, as
-		 * it may still be running; the process will be killed and the proxy
-		 * closed inside the job
-		 */
-		if (open != null) {
-			open.terminate();
-			return true;
-		}
-
-		cancelWait();
-		if (process != null && !process.isCompleted()) {
-			process.destroy();
-			if (proxy != null) {
-				proxy.close();
-			}
-			return true;
-		}
-		return false;
 	}
 
 	/**
