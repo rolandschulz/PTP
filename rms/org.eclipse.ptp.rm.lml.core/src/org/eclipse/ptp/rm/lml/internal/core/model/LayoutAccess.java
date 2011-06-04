@@ -69,15 +69,10 @@ public class LayoutAccess extends LguiHandler {
 	private final ChartlayoutType defaultChart;
 	private final TablelayoutType defaultTable;
 	private final InfoboxlayoutType defaultInfobox;
-
-	private static ObjectFactory objectFactory = new ObjectFactory();// create a
-																		// objectfactory
-																		// for
-																		// all
-																		// functions
-																		// in
-																		// this
-																		// class
+	/*
+	 * create an objectfactory for all functions in this class
+	 */
+	private static ObjectFactory objectFactory = new ObjectFactory();
 
 	/**
 	 * @param lguiItem
@@ -131,7 +126,7 @@ public class LayoutAccess extends LguiHandler {
 					if (!replaced) {
 
 						((JAXBElement<ComponentlayoutType>) aobj).setValue(newlayout);
-						lguiItem.updateData();
+						lguiItem.notifyListeners();
 						replaced = true;
 					} else {// Delete this object
 						allobjects.remove(aobj);
@@ -158,7 +153,7 @@ public class LayoutAccess extends LguiHandler {
 
 			if (newel != null) {
 				lgui.getObjectsAndRelationsAndInformation().add(newel);
-				lguiItem.updateData();
+				lguiItem.notifyListeners();
 			}
 		}
 
@@ -641,7 +636,7 @@ public class LayoutAccess extends LguiHandler {
 
 		lgui.getObjectsAndRelationsAndInformation().add(jaxbel);
 
-		lguiItem.updateData();
+		lguiItem.notifyListeners();
 
 	}
 

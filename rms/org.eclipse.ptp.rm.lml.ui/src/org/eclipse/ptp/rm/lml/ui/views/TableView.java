@@ -213,7 +213,9 @@ public class TableView extends ViewPart {
 							selectedItem = null;
 						}
 						if (componentAdded) {
-							fSelectedLguiItem.getObjectStatus().removeComponent(eventForwarder);
+							if (fSelectedLguiItem != null) {
+								fSelectedLguiItem.getObjectStatus().removeComponent(eventForwarder);
+							}
 							componentAdded = false;
 						}
 						fSelectedLguiItem = lmlManager.getSelectedLguiItem();

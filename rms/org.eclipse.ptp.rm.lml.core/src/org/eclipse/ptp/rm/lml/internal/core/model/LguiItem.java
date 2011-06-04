@@ -55,17 +55,6 @@ import org.eclipse.ptp.rm.lml.internal.core.events.LguiUpdatedEvent;
  */
 public class LguiItem implements ILguiItem {
 
-	/*
-	 * Mandatory table fields
-	 */
-	private static String JOB_ID = "step"; //$NON-NLS-1$
-	private static String JOB_OWNER = "owner"; //$NON-NLS-1$
-	private static String JOB_STATUS = "status"; //$NON-NLS-1$
-	private static String JOB_QUEUE_NAME = "queue"; //$NON-NLS-1$
-
-	private static String RUNNING_JOB_TABLE = "joblistrun"; //$NON-NLS-1$
-	private static String WAITING_JOB_TABLE = "joblistwait"; //$NON-NLS-1$
-
 	/**
 	 * Parsing an XML file. The method generates from an XML file an instance of
 	 * LguiType.
@@ -174,7 +163,7 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#addUserJob(java.lang.String,
 	 * org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData)
 	 */
-	public void addUserJob(String jobId, JobStatusData status) {
+	public synchronized void addUserJob(String jobId, JobStatusData status) {
 		JobStatusData jobStatus = fJobMap.get(jobId);
 		/*
 		 * If the job already exists, do nothing
@@ -187,13 +176,13 @@ public class LguiItem implements ILguiItem {
 					oid = generateOid();
 					status.setOid(oid);
 					addJobToTable(table, oid, status);
-					fJobMap.put(name, status);
+					fJobMap.put(jobId, status);
 				}
 			}
 		}
 	}
 
-	public void getCurrentLayout(OutputStream output) {
+	public synchronized void getCurrentLayout(OutputStream output) {
 		LguiType layoutLgui = null;
 		if (lgui == null) {
 			layoutLgui = firstRequest();
@@ -228,7 +217,7 @@ public class LguiItem implements ILguiItem {
 		return (LayoutAccess) lguiHandlers.get(LayoutAccess.class);
 	}
 
-	public LguiType getLguiType() {
+	public synchronized LguiType getLguiType() {
 		return lgui;
 	}
 
@@ -320,13 +309,36 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUserJob(java.lang.String)
+	 */
+	public synchronized JobStatusData getUserJob(String jobId) {
+		JobStatusData status = fJobMap.get(jobId);
+		if (status != null && !status.isRemoved()) {
+			return status;
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUserJobs()
+	 */
+	public synchronized JobStatusData[] getUserJobs() {
+		return fJobMap.values().toArray(new JobStatusData[0]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getVersion()
 	 */
-	public String getVersion() {
+	public synchronized String getVersion() {
 		return lgui.getVersion();
 	}
 
-	public boolean isEmpty() {
+	public synchronized boolean isEmpty() {
 		return lgui == null;
 	}
 
@@ -335,8 +347,20 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#isLayout()
 	 */
-	public boolean isLayout() {
+	public synchronized boolean isLayout() {
 		return !isEmpty() && lgui.isLayout();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#notifyListeners()
+	 */
+	public void notifyListeners() {
+		final LguiUpdatedEvent event = new LguiUpdatedEvent(this);
+		for (final ILguiListener l : listeners) {
+			l.handleEvent(event);
+		}
 	}
 
 	/**
@@ -356,7 +380,7 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#removeUserJob(java.lang.String
 	 * )
 	 */
-	public void removeUserJob(String jobId) {
+	public synchronized void removeUserJob(String jobId) {
 		JobStatusData status = fJobMap.get(jobId);
 		if (status != null) {
 			TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
@@ -413,39 +437,16 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#update(java.io.InputStream)
 	 */
 	public void update(InputStream stream) throws JAXBException {
-		lgui = parseLML(stream);
+		synchronized (this) {
+			lgui = parseLML(stream);
+		}
 		if (listeners.isEmpty()) {
 			createLguiHandlers();
 		}
 		fireUpdatedEvent();
-		setCid();
-		updateJobData();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateData()
-	 */
-	public void updateData() {
-		updateData(lgui);
-	}
-
-	/**
-	 * Call this method, if lml-model changed. The new model is passed to the
-	 * listening handlers. All getter-functions accessing the handler will then
-	 * return data, which is collected from this new model
-	 * 
-	 * @param lgui
-	 *            new lml-data-model
-	 */
-	public void updateData(LguiType lgui) {
-
-		this.lgui = lgui;
-
-		final LguiUpdatedEvent event = new LguiUpdatedEvent(this);
-		for (final ILguiListener l : listeners) {
-			l.handleEvent(event);
+		synchronized (this) {
+			setCid();
+			updateJobData();
 		}
 	}
 
@@ -456,7 +457,7 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateUserJob(java.lang.String
 	 * , java.lang.String, java.lang.String)
 	 */
-	public void updateUserJob(String jobId, String status, String detail) {
+	public synchronized void updateUserJob(String jobId, String status, String detail) {
 		JobStatusData jobStatus = fJobMap.get(jobId);
 		if (jobStatus != null) {
 			TableType table = getTableHandler().getTable(getGidFromJobStatus(jobStatus));

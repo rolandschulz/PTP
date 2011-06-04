@@ -17,7 +17,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -106,11 +105,6 @@ public class LMLManager {
 	 */
 	private static LMLManager manager;
 
-	/*
-	 * 
-	 */
-	public static final String LGUIITEM = "lguiitem";
-
 	private boolean isDisplayed = false;
 
 	private LMLManager() {
@@ -179,8 +173,7 @@ public class LMLManager {
 		/*
 		 * takes care of persisting user job state info
 		 */
-		// saveJobStatusData(userJobList.remove(name), memento);
-
+		saveJobStatusData(item, memento);
 	}
 
 	public ILguiItem[] getLguiItems() {
@@ -228,6 +221,14 @@ public class LMLManager {
 		return fLguiItem;
 	}
 
+	public JobStatusData getUserJob(String name, String jobId) {
+		final ILguiItem item = LGUIS.get(name);
+		if (item != null) {
+			return item.getUserJob(jobId);
+		}
+		return null;
+	}
+
 	public void markObject(String oid) {
 		fireMarkObject(oid);
 	}
@@ -242,7 +243,7 @@ public class LMLManager {
 			fLguiItem = item;
 		}
 
-		// restoreJobStatusData(map, memento);
+		restoreJobStatusData(fLguiItem, memento);
 
 		if (!fLguiItem.isEmpty()) {
 			fireNewLgui();
@@ -552,20 +553,10 @@ public class LMLManager {
 	 * @param memento
 	 *            may be <code>null</code>
 	 */
-	private void restoreJobStatusData(Map<String, JobStatusData> map, IMemento memento) {
+	private void restoreJobStatusData(ILguiItem item, IMemento memento) {
 		if (memento != null) {
-			final List<JobStatusData> dataList = JobStatusData.reload(memento);
-			/*
-			 * NB: This may not be what you need to do; the work done here is
-			 * just a placeholder -- Al
-			 */
-			for (final JobStatusData jobStatusData : dataList) {
-				map.put(jobStatusData.getJobId(), jobStatusData);
-			}
-			for (final JobStatusData data : dataList) {
-				if (!data.getState().equals("COMPLETED")) { //$NON-NLS-1$
-					refreshJobStatus(data);
-				}
+			for (final JobStatusData status : JobStatusData.reload(memento)) {
+				item.addUserJob(status.getJobId(), status);
 			}
 		}
 	}
@@ -575,13 +566,9 @@ public class LMLManager {
 	 * @param memento
 	 *            guaranteed by caller to be non-<code>null</code>
 	 */
-	private void saveJobStatusData(Map<String, JobStatusData> map, IMemento memento) {
-		for (final JobStatusData jobStatusData : map.values()) {
-			/*
-			 * NB: This may not be what you need to do; the work done here is
-			 * just a placeholder -- Al
-			 */
-			jobStatusData.save(memento);
+	private void saveJobStatusData(ILguiItem item, IMemento memento) {
+		for (final JobStatusData status : item.getUserJobs()) {
+			status.save(memento);
 		}
 	}
 }

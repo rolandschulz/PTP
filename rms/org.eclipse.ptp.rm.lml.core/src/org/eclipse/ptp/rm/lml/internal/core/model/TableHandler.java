@@ -20,7 +20,9 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
+import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
@@ -323,8 +325,6 @@ public class TableHandler extends LguiHandler {
 	 */
 	public Row[] getTableDataWithColor(String gid) {
 		BigInteger[] cids = getActiveCids(gid);
-		// final Map<String, String> map =
-		// lguiItem.revert(lguiItem.getUserJobMap(gid));
 		final TableType table = getTable(gid);
 		if (table == null) {
 			return new Row[0];
@@ -336,14 +336,8 @@ public class TableHandler extends LguiHandler {
 			if (row.getOid() != null) {
 				tableData[i].setOid(row.getOid());
 				tableData[i].setColor(lguiItem.getOIDToObject().getColorById(row.getOid()));
-				// if (map.containsKey(row.getOid())) {
-				// final JobStatusData status =
-				// LMLManager.getInstance().getJobStatusData(lguiItem.toString(),
-				// map.get(row.getOid()));
-				// tableData[i].setJobStatusData(status);
-				// }
-
 			}
+			BigInteger jobIdIndex = getColumnIndex(table, ILguiItem.JOB_ID);
 			final Cell[] tableDataRow = new Cell[cids.length];
 			for (int j = 0; j < cids.length; j++) {
 				for (final CellType cell : row.getCell()) {
@@ -354,6 +348,10 @@ public class TableHandler extends LguiHandler {
 				}
 				if (tableDataRow[j] == null) {
 					tableDataRow[j] = new Cell("?", tableData[i]); //$NON-NLS-1$
+				}
+				if (cids[j].equals(jobIdIndex)) {
+					final JobStatusData status = LMLManager.getInstance().getUserJob(lguiItem.toString(), tableDataRow[j].value);
+					tableData[i].setJobStatusData(status);
 				}
 			}
 			tableData[i].setCells(tableDataRow);

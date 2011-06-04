@@ -13,7 +13,6 @@ package org.eclipse.ptp.rm.lml.core.model;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
@@ -32,27 +31,83 @@ import org.eclipse.ptp.rm.lml.internal.core.model.TableHandler;
  * LguiType without knowing the exact build of LguiType.
  */
 public interface ILguiItem {
+	/*
+	 * Mandatory table fields
+	 */
+	public static String JOB_ID = "step"; //$NON-NLS-1$
+	public static String JOB_OWNER = "owner"; //$NON-NLS-1$
+	public static String JOB_STATUS = "status"; //$NON-NLS-1$
+	public static String JOB_QUEUE_NAME = "queue"; //$NON-NLS-1$
+
+	public static String RUNNING_JOB_TABLE = "joblistrun"; //$NON-NLS-1$
+	public static String WAITING_JOB_TABLE = "joblistwait"; //$NON-NLS-1$
+
+	/**
+	 * @param listener
+	 */
 	public void addListener(ILguiListener listener);
 
+	/**
+	 * @param name
+	 * @param status
+	 */
 	public void addUserJob(String name, JobStatusData status);
 
+	/**
+	 * @param output
+	 */
 	public void getCurrentLayout(OutputStream output);
 
+	/**
+	 * @return
+	 */
 	public LayoutAccess getLayoutAccess();
 
+	/**
+	 * @return
+	 */
 	public NodedisplayAccess getNodedisplayAccess();
 
+	/**
+	 * @return
+	 */
 	public ObjectStatus getObjectStatus();
 
+	/**
+	 * @return
+	 */
 	public OIDToInformation getOIDToInformation();
 
+	/**
+	 * @return
+	 */
 	public OIDToObject getOIDToObject();
 
+	/**
+	 * @return
+	 */
 	public OverviewAccess getOverviewAccess();
 
+	/**
+	 * @param output
+	 */
 	public void getRequestXml(FileOutputStream output);
 
+	/**
+	 * @return
+	 */
 	public TableHandler getTableHandler();
+
+	/**
+	 * @param jobId
+	 * @return
+	 */
+	public JobStatusData getUserJob(String jobId);
+
+	/**
+	 * @return
+	 */
+	public JobStatusData[] getUserJobs();
 
 	/**
 	 * Getting the version of the LguiType:
@@ -61,6 +116,9 @@ public interface ILguiItem {
 	 */
 	public String getVersion();
 
+	/**
+	 * @return
+	 */
 	public boolean isEmpty();
 
 	/**
@@ -70,20 +128,18 @@ public interface ILguiItem {
 	 */
 	public boolean isLayout();
 
+	/**
+	 * Inform all listeners, that something changed in the data-model. Handlers
+	 * should use this event to update their model-references. Otherwise
+	 * inconsistent return-values will be the result.
+	 */
+	public void notifyListeners();
+
+	/**
+	 * @param name
+	 */
 	public void removeUserJob(String name);
 
-	public void restoreUserJobs(Map<String, JobStatusData> map);
-
-	public Map<String, String> revert(Map<String, String> map);
-
-	//
-	// /**
-	// * Getting the source of the XML file from whcih the corresponding
-	// LguiType has been generated.
-	// * @return the source of the XML file
-	// */
-	// public URI getXmlFile();
-	//
 	/**
 	 * Getting a string representing the ILguiItem.
 	 * 
@@ -91,14 +147,16 @@ public interface ILguiItem {
 	 */
 	public String toString();
 
+	/**
+	 * @param stream
+	 * @throws JAXBException
+	 */
 	public void update(InputStream stream) throws JAXBException;
 
-	public void updateUserJob(String name, String status, String detail);
-
 	/**
-	 * Inform all listeners, that something changed in the data-model. Handlers
-	 * should use this event to update their model-references. Otherwise
-	 * inconsistent return-values will be the result.
+	 * @param name
+	 * @param status
+	 * @param detail
 	 */
-	public void updateData();
+	public void updateUserJob(String name, String status, String detail);
 }
