@@ -11,7 +11,6 @@
 package org.eclipse.ptp.rdt.sync.core;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -80,7 +79,6 @@ public class BuildConfigurationManager {
 	private static final String BUILD_SCENARIO_ELEMENT_NAME = "build-scenario"; //$NON-NLS-1$
 	private static final String CONFIG_ID_ELEMENT_NAME = "config-id-to-build-scenario"; //$NON-NLS-1$
 	private static final String TEMPLATE_SERVICE_CONFIGURATION_ELEMENT_NAME = "template-service-configuration-element-name"; //$NON-NLS-1$
-	private static final String LOCAL_CONFIGURATION_NAME = "Workspace"; //$NON-NLS-1$
 	private static final String LOCAL_CONFIGURATION_DES = Messages.BCM_WorkspaceConfigDes;
 
 	private final Map<IProject, IServiceConfiguration> fProjectToTemplateConfigurationMap =

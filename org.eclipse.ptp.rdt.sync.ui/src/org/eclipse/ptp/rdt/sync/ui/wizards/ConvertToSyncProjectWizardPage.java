@@ -217,6 +217,8 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 		} finally {
 			monitor.done();
 		}
+		
+		BuildConfigurationManager.getInstance().createLocalConfiguration(project);
 	}
 
 	/*
