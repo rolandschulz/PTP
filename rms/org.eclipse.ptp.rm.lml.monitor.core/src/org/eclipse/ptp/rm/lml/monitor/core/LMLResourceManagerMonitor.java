@@ -32,6 +32,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.server.RemoteServerManager;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
@@ -72,7 +73,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 					if (!subMon.isCanceled()) {
 						fServer.waitForServerStart(subMon.newChild(20));
 						if (!subMon.isCanceled()) {
-							LMLManager.getInstance().register(getResourceManager().getUniqueName(), fServer.getInputStream(),
+							LMLManager.getInstance().update(getResourceManager().getUniqueName(), fServer.getInputStream(),
 									fServer.getOutputStream());
 						}
 					}
@@ -184,7 +185,11 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	@Override
 	protected void doAddJob(String jobId, IJobStatus status) {
-		fLMLManager.addUserJob(getResourceManager().getUniqueName(), jobId, status);
+		JobStatusData data = new JobStatusData(status.getRmUniqueName(), status.getJobId(), status.getQueueName(),
+				status.getOwner(), status.getOutputPath(), status.getErrorPath(), status.isInteractive());
+		data.setState(status.getState());
+		data.setStateDetail(status.getStateDetail());
+		fLMLManager.addUserJob(getResourceManager().getUniqueName(), jobId, data);
 	}
 
 	@Override
@@ -279,6 +284,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	@Override
 	protected void doUpdateJob(String jobId, IJobStatus status) {
-		fLMLManager.updateUserJob(getResourceManager().getUniqueName(), jobId, status);
+		fLMLManager.updateUserJob(getResourceManager().getUniqueName(), jobId, status.getState(), status.getStateDetail());
 	}
 }

@@ -20,10 +20,13 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -32,17 +35,14 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
-import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiHandler;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
-import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.InfoType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.InfodataType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
@@ -50,22 +50,21 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiUpdatedEvent;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-
 /**
  * Class of the interface ILguiItem
  */
 public class LguiItem implements ILguiItem {
 
-	private static class LMLNamespacePrefixMapper extends NamespacePrefixMapper {
-		@Override
-		public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
-			if (lmlNamespace.equals(namespaceUri)) {
-				return "lml";
-			}
-			return suggestion;
-		}
-	}
+	/*
+	 * Mandatory table fields
+	 */
+	private static String JOB_ID = "step"; //$NON-NLS-1$
+	private static String JOB_OWNER = "owner"; //$NON-NLS-1$
+	private static String JOB_STATUS = "status"; //$NON-NLS-1$
+	private static String JOB_QUEUE_NAME = "queue"; //$NON-NLS-1$
+
+	private static String RUNNING_JOB_TABLE = "joblistrun"; //$NON-NLS-1$
+	private static String WAITING_JOB_TABLE = "joblistwait"; //$NON-NLS-1$
 
 	/**
 	 * Parsing an XML file. The method generates from an XML file an instance of
@@ -77,6 +76,7 @@ public class LguiItem implements ILguiItem {
 	 * @throws MalformedURLException
 	 * @throws JAXBException
 	 */
+	@SuppressWarnings("unchecked")
 	private static LguiType parseLML(URI xml) throws MalformedURLException {
 		LguiType lml = null;
 		try {
@@ -115,46 +115,11 @@ public class LguiItem implements ILguiItem {
 			.synchronizedMap(new HashMap<Class<? extends ILguiHandler>, ILguiHandler>());
 
 	/*
-	 * List of Jobs
+	 * Map containing jobs under our control
 	 */
-	private final Map<String, JobStatusData> jobList = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
+	private final Map<String, JobStatusData> fJobMap = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
 
-	/*
-	 * ObjectFactory
-	 */
-	private static ObjectFactory objectFactory = new ObjectFactory();
-
-	/*
-	 * 
-	 */
-	private final LMLManager lmlManager = LMLManager.getInstance();
-
-	/*
-	 * String for the to saved layout.
-	 */
-	private final String savedLayout = null;
-
-	private static String lmlNamespace = "http://www.llview.de";
-
-	/*
-	 * Map of running jobs.
-	 */
-	public Map<String, String> jobsRunningMap = new HashMap<String, String>();
-
-	/*
-	 * Map of waiting jobs.
-	 */
-	public Map<String, String> jobsWaitingMap = new HashMap<String, String>();
-
-	/*
-	 * Map of other jobs.
-	 */
-	// public Map<String, String> jobsFurtherMap = new HashMap<String,
-	// String>();
-
-	public static final String LAYOUT = "layout";
-
-	public static final String JOB = "job";
+	private static String lmlNamespace = "http://www.llview.de"; //$NON-NLS-1$
 
 	/**
 	 * Constructor with LML-model as argument
@@ -166,10 +131,6 @@ public class LguiItem implements ILguiItem {
 		this.lgui = lgui;
 		createLguiHandlers();
 	}
-
-	/**************************************************************************************************************
-	 * Parsing methods
-	 **************************************************************************************************************/
 
 	/**
 	 * Empty Constructor.
@@ -206,86 +167,30 @@ public class LguiItem implements ILguiItem {
 		listeners.add(listener);
 	}
 
-	/**************************************************************************************************************
-	 * Further methods for setting up
-	 **************************************************************************************************************/
-
-	public void addUserJob(String name, JobStatusData status) {
-		final Map<String, String> map = findMap(status);
-		final String gid = findGid(status);
-		if (status.getJobInfo() == null) {
-			map.put(name, null);
-			final List<String> list = new ArrayList<String>();
-			list.add(name);
-			updateJobDate(new HashMap<String, String>(), list, gid);
-		} else {
-			map.put(name, status.getJobInfo().getOid());
-			final Map<String, String> map2 = new HashMap<String, String>();
-			map2.put(status.getJobInfo().getOid(), name);
-			updateJobDate(map2, new ArrayList<String>(), gid);
-		}
-
-	}
-
-	/**
-	 * The instance lgui is filled with a new data-model. This method creates
-	 * all modules, which handle the data. These modules can then be accessed by
-	 * corresponding getter-functions.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#addUserJob(java.lang.String,
+	 * org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData)
 	 */
-	private void createLguiHandlers() {
-		lguiHandlers.put(OverviewAccess.class, new OverviewAccess(this, lgui));
-		lguiHandlers.put(LayoutAccess.class, new LayoutAccess(this, lgui));
-		lguiHandlers.put(OIDToObject.class, new OIDToObject(this, lgui));
-		lguiHandlers.put(ObjectStatus.class, new ObjectStatus(this, lgui));
-		lguiHandlers.put(OIDToInformation.class, new OIDToInformation(this, lgui));
-		lguiHandlers.put(TableHandler.class, new TableHandler(this, lgui));
-		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this, lgui));
-	}
-
-	private String findGid(JobStatusData status) {
-		if (status.getState().equals("RUNNING")) {
-			return "joblistrun";
-		} else {
-			return "joblistwait";
+	public void addUserJob(String jobId, JobStatusData status) {
+		JobStatusData jobStatus = fJobMap.get(jobId);
+		/*
+		 * If the job already exists, do nothing
+		 */
+		if (jobStatus == null) {
+			String oid = getOverviewAccess().getOIDByJobId(jobId);
+			if (oid == null) {
+				TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
+				if (table != null) {
+					oid = generateOid();
+					status.setOid(oid);
+					addJobToTable(table, oid, status);
+					fJobMap.put(name, status);
+				}
+			}
 		}
-	}
-
-	private String findGid(String name) {
-		if (jobsRunningMap.containsKey(name)) {
-			return "joblistrun";
-		} else {
-			return "joblistwait";
-		}
-	}
-
-	private Map<String, String> findMap(JobStatusData status) {
-		if (status.getState().equals("RUNNING")) {
-			return jobsRunningMap;
-		} else {
-			return jobsWaitingMap;
-		}
-	}
-
-	private Map<String, String> findMap(String name) {
-		if (jobsRunningMap.containsKey(name)) {
-			return jobsRunningMap;
-		} else {
-			return jobsWaitingMap;
-		}
-	}
-
-	private LguiType firstRequest() {
-		final ObjectFactory objectFactory = new ObjectFactory();
-
-		final LguiType layoutLgui = objectFactory.createLguiType();
-		layoutLgui.setVersion("1");
-		layoutLgui.setLayout(true);
-
-		final RequestType request = objectFactory.createRequestType();
-		request.setGetDefaultData(true);
-		layoutLgui.setRequest(request);
-
-		return layoutLgui;
 	}
 
 	public void getCurrentLayout(OutputStream output) {
@@ -297,9 +202,9 @@ public class LguiItem implements ILguiItem {
 		}
 		final Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
 		try {
-			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace + " lgui.xsd");
+			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			final QName tagname = new QName(lmlNamespace, "lgui", "lml");
+			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(tagname, LguiType.class, layoutLgui);
 			marshaller.marshal(rootElement, output);
@@ -325,16 +230,6 @@ public class LguiItem implements ILguiItem {
 
 	public LguiType getLguiType() {
 		return lgui;
-	}
-
-	private List<String> getListNullElements(Map<String, String> map) {
-		final List<String> list = new ArrayList<String>();
-		for (final Map.Entry<String, String> entry : map.entrySet()) {
-			if (entry.getValue() == null) {
-				list.add(entry.getKey());
-			}
-		}
-		return list;
 	}
 
 	/**
@@ -398,9 +293,9 @@ public class LguiItem implements ILguiItem {
 		}
 		final Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
 		try {
-			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace + " lgui.xsd");
+			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$//$NON-NLS-2$
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			final QName tagname = new QName(lmlNamespace, "lgui", "lml");
+			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(tagname, LguiType.class, layoutLgui);
 			marshaller.marshal(rootElement, output);
@@ -422,14 +317,6 @@ public class LguiItem implements ILguiItem {
 		return (TableHandler) lguiHandlers.get(TableHandler.class);
 	}
 
-	public Map<String, String> getUserJobMap(String gid) {
-		if (gid.equals("joblistrun")) {
-			return jobsRunningMap;
-		} else {
-			return jobsWaitingMap;
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -440,12 +327,7 @@ public class LguiItem implements ILguiItem {
 	}
 
 	public boolean isEmpty() {
-		if (lgui == null) {
-			return true;
-		} else {
-			return false;
-		}
-
+		return lgui == null;
 	}
 
 	/*
@@ -454,23 +336,7 @@ public class LguiItem implements ILguiItem {
 	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#isLayout()
 	 */
 	public boolean isLayout() {
-		return lgui.isLayout();
-	}
-
-	/**
-	 * Parsing an XML file. The method generates from an XML file an instance of
-	 * LguiType.
-	 * 
-	 * @param stream
-	 *            the input stream of the XML file
-	 * @return the generated LguiType
-	 * @throws JAXBException
-	 */
-	@SuppressWarnings("unchecked")
-	private LguiType parseLML(InputStream stream) throws JAXBException {
-		final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
-		final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
-		return doc.getValue();
+		return !isEmpty() && lgui.isLayout();
 	}
 
 	/**
@@ -483,24 +349,31 @@ public class LguiItem implements ILguiItem {
 		listeners.remove(listener);
 	}
 
-	public void removeUserJob(String name) {
-		final String gid = findGid(name);
-		final Map<String, String> map = findMap(name);
-		final String oid = map.remove(name);
-
-		TableType table = getTableHandler().getTable(gid);
-		if (table != null) {
-			final List<RowType> oldRows = table.getRow();
-			final List<RowType> newRows = new ArrayList<RowType>();
-			for (final RowType row : oldRows) {
-				if (!row.getOid().equals(oid)) {
-					newRows.add(row);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#removeUserJob(java.lang.String
+	 * )
+	 */
+	public void removeUserJob(String jobId) {
+		JobStatusData status = fJobMap.get(jobId);
+		if (status != null) {
+			TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
+			if (table != null) {
+				int index = -1;
+				for (int i = 0; i < table.getRow().size(); i++) {
+					RowType row = table.getRow().get(i);
+					if (row != null && row.getOid().equals(status.getOid())) {
+						index = i;
+						break;
+					}
+				}
+				if (index >= 0) {
+					table.getRow().remove(index);
 				}
 			}
-			oldRows.clear();
-			for (final RowType row : newRows) {
-				oldRows.add(row);
-			}
+			status.setRemoved();
 		}
 	}
 
@@ -510,6 +383,9 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
+	/**
+	 * remove
+	 */
 	public Map<String, String> revert(Map<String, String> map) {
 		final Map<String, String> revertMap = new HashMap<String, String>();
 		for (final Map.Entry<String, String> entry : map.entrySet()) {
@@ -518,22 +394,6 @@ public class LguiItem implements ILguiItem {
 			}
 		}
 		return revertMap;
-	}
-
-	private void setCid() {
-		for (final TableType table : getTableHandler().getTables()) {
-			for (final RowType row : table.getRow()) {
-				int cid = 1;
-				for (final CellType cell : row.getCell()) {
-					if (cell.getCid() == null) {
-						cell.setCid(BigInteger.valueOf(cid));
-					} else {
-						cid = cell.getCid().intValue();
-					}
-					cid++;
-				}
-			}
-		}
 	}
 
 	/*
@@ -546,39 +406,26 @@ public class LguiItem implements ILguiItem {
 		return name;
 	}
 
-	public void update() {
-		final ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
-		for (final ILguiListener listener : listeners) {
-			listener.handleEvent(e);
-		}
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#update(java.io.InputStream)
+	 */
 	public void update(InputStream stream) throws JAXBException {
 		lgui = parseLML(stream);
 		if (listeners.isEmpty()) {
 			createLguiHandlers();
 		}
-		updateJobData();
-		update();
+		fireUpdatedEvent();
 		setCid();
+		updateJobData();
 	}
 
-	public boolean update(String name, JobStatusData status) {
-		final Map<String, String> oldMap = findMap(name);
-		final Map<String, String> newMap = findMap(status);
-
-		if (oldMap != newMap) {
-			oldMap.remove(name);
-			newMap.put(name, status.getJobInfo().getOid());
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Inform all listeners, that something changed in the data-model. Handlers
-	 * should use this event to update their model-references. Otherwise
-	 * inconsistent return-values will be the result.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateData()
 	 */
 	public void updateData() {
 		updateData(lgui);
@@ -602,89 +449,199 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	private void updateJobData() {
-		// JobInfo to JobStatusData
-		updateJobData(jobsRunningMap);
-		updateJobData(jobsWaitingMap);
-		// updateJobData(jobsFurtherMap);
-
-		// JobStatusData to Table
-		updateJobDate(revert(jobsRunningMap), getListNullElements(jobsRunningMap), "joblistrun");
-		updateJobDate(revert(jobsWaitingMap), getListNullElements(jobsWaitingMap), "joblistwait");
-		// updateJobDate(revert(jobsFurtherMap), "joblistfurther");
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateUserJob(java.lang.String
+	 * , java.lang.String, java.lang.String)
+	 */
+	public void updateUserJob(String jobId, String status, String detail) {
+		JobStatusData jobStatus = fJobMap.get(jobId);
+		if (jobStatus != null) {
+			TableType table = getTableHandler().getTable(getGidFromJobStatus(jobStatus));
+			if (table != null) {
+				for (RowType row : table.getRow()) {
+					if (row.getOid().equals(jobStatus.getOid())) {
+						getTableHandler().setCellValue(table, row, JOB_STATUS, status);
+					}
+				}
+			}
+		}
 	}
 
-	private void updateJobData(Map<String, String> map) {
+	private void addCellToRow(RowType row, ColumnType column, String value) {
+		final CellType cell = new CellType();
+		cell.setCid(column.getId());
+		cell.setValue(value);
+		row.getCell().add(cell);
+	}
+
+	private void addJobToTable(TableType table, String oid, JobStatusData status) {
+		RowType row = new RowType();
+		row.setOid(oid);
+
+		for (final ColumnType column : table.getColumn()) {
+			if (column.getName().equals(JOB_ID)) {
+				addCellToRow(row, column, status.getJobId());
+			} else if (column.getName().equals(JOB_STATUS)) {
+				addCellToRow(row, column, status.getState());
+			} else if (column.getName().equals(JOB_OWNER)) {
+				addCellToRow(row, column, status.getOwner());
+			} else if (column.getName().equals(JOB_QUEUE_NAME)) {
+				addCellToRow(row, column, status.getQueueName());
+			}
+		}
+
+		table.getRow().add(row);
+	}
+
+	/**
+	 * The instance lgui is filled with a new data-model. This method creates
+	 * all modules, which handle the data. These modules can then be accessed by
+	 * corresponding getter-functions.
+	 */
+	private void createLguiHandlers() {
+		lguiHandlers.put(OverviewAccess.class, new OverviewAccess(this, lgui));
+		lguiHandlers.put(LayoutAccess.class, new LayoutAccess(this, lgui));
+		lguiHandlers.put(OIDToObject.class, new OIDToObject(this, lgui));
+		lguiHandlers.put(ObjectStatus.class, new ObjectStatus(this, lgui));
+		lguiHandlers.put(OIDToInformation.class, new OIDToInformation(this, lgui));
+		lguiHandlers.put(TableHandler.class, new TableHandler(this, lgui));
+		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this, lgui));
+	}
+
+	private void fireUpdatedEvent() {
+		final ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
+		for (final ILguiListener listener : listeners) {
+			listener.handleEvent(e);
+		}
+	}
+
+	private LguiType firstRequest() {
+		final ObjectFactory objectFactory = new ObjectFactory();
+
+		final LguiType layoutLgui = objectFactory.createLguiType();
+		layoutLgui.setVersion("1"); //$NON-NLS-1$
+		layoutLgui.setLayout(true);
+
+		final RequestType request = objectFactory.createRequestType();
+		request.setGetDefaultData(true);
+		layoutLgui.setRequest(request);
+
+		return layoutLgui;
+	}
+
+	private String generateOid() {
+		return UUID.randomUUID().toString();
+	}
+
+	private String getGidFromJobStatus(JobStatusData status) {
+		if (status.getState().equals("RUNNING")) { //$NON-NLS-1$
+			return RUNNING_JOB_TABLE;
+		}
+		return WAITING_JOB_TABLE;
+	}
+
+	private List<String> getListNullElements(Map<String, String> map) {
+		final List<String> list = new ArrayList<String>();
 		for (final Map.Entry<String, String> entry : map.entrySet()) {
-			String oid = entry.getValue();
-			if (oid == null) {
-				final String key = entry.getKey();
-				oid = getOverviewAccess().getOIDByJobName(key);
-				if (oid == null) {
-					System.out.println("Error");
-					return;
-				} else {
-					map.put(key, oid);
-				}
+			if (entry.getValue() == null) {
+				list.add(entry.getKey());
 			}
-			lmlManager.updateJobData(toString(), entry.getKey(), getOIDToInformation().getInfoByOid(oid));
 		}
+		return list;
 	}
 
-	private void updateJobDate(Map<String, String> map, List<String> list, String gid) {
-		final TableType table = getTableHandler().getTable(gid);
-		if (table == null) {
-			return;
-		}
-		for (final RowType row : table.getRow()) {
-			map.remove(row.getOid());
-		}
-		if (map.size() > 0) {
-			for (final Map.Entry<String, String> entry : map.entrySet()) {
-				final InfoType info = lmlManager.getJobStatusDataInfo(toString(), entry.getValue());
-				final RowType row = new RowType();
-				row.setOid(entry.getKey());
-				for (final ColumnType column : table.getColumn()) {
-					if (info != null) {
-						for (final InfodataType data : info.getData()) {
-							if (column.getName().equals(data.getKey())) {
-								final CellType cell = new CellType();
-								cell.setCid(column.getId());
-								cell.setValue(data.getValue());
-								row.getCell().add(cell);
-								break;
-							}
-						}
+	/**
+	 * Parsing an XML file. The method generates from an XML file an instance of
+	 * LguiType.
+	 * 
+	 * @param stream
+	 *            the input stream of the XML file
+	 * @return the generated LguiType
+	 * @throws JAXBException
+	 */
+	@SuppressWarnings("unchecked")
+	private LguiType parseLML(InputStream stream) throws JAXBException {
+		final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
+		final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
+		return doc.getValue();
+	}
+
+	private void setCid() {
+		for (final TableType table : getTableHandler().getTables()) {
+			for (final RowType row : table.getRow()) {
+				int cid = 1;
+				for (final CellType cell : row.getCell()) {
+					if (cell.getCid() == null) {
+						cell.setCid(BigInteger.valueOf(cid));
 					} else {
-						if (column.getName().equals("owner") || column.getName().equals("status")) {
-							final CellType cell = new CellType();
-							cell.setCid(column.getId());
-							cell.setValue(lmlManager.getJobStatusData(toString(), entry.getValue()).getState());
-							row.getCell().add(cell);
-							break;
-						}
+						cid = cell.getCid().intValue();
 					}
-
+					cid++;
 				}
-
-				table.getRow().add(row);
-			}
-		}
-		if (list.size() > 0) {
-			for (final String entry : list) {
-				final JobStatusData data = lmlManager.getJobStatusData(toString(), entry);
-				final RowType row = new RowType();
-				for (final ColumnType column : table.getColumn()) {
-					if (column.getName().equals("owner") || column.getName().equals("status")) {
-						final CellType cell = new CellType();
-						cell.setCid(column.getId());
-						cell.setValue(data.getState());
-						row.getCell().add(cell);
-						break;
-					}
-				}
-				table.getRow().add(row);
 			}
 		}
 	}
+
+	/**
+	 * Update the job map with the new job data. On this refresh, the new job
+	 * that was added to the table should have been "discovered" by the
+	 * scheduler, so it should appear in one of the job tables. We need to find
+	 * these jobs and update the OID and status information.
+	 */
+	private void updateJobData() {
+		Set<JobStatusData> jobsInTable = new HashSet<JobStatusData>();
+		List<RowType> rowsToRemove = new ArrayList<RowType>();
+
+		/*
+		 * First check for jobs that are in the table and update them
+		 */
+		for (TableType table : getTableHandler().getTables()) {
+			for (RowType row : table.getRow()) {
+				String jobId = getTableHandler().getCellValue(table, row, JOB_ID);
+				if (jobId != null) {
+					JobStatusData status = fJobMap.get(jobId);
+					if (status != null) {
+						jobsInTable.add(status);
+						if (!status.isRemoved()) {
+							/*
+							 * job exists in both map and LML, so update the map
+							 * with the oid and latest status
+							 */
+							status.setOid(row.getOid());
+							status.setState(getTableHandler().getCellValue(table, row, JOB_STATUS));
+						} else {
+							/*
+							 * job has been removed by the user. remove it from
+							 * the table
+							 */
+							rowsToRemove.add(row);
+						}
+					}
+				}
+			}
+
+			/*
+			 * Remove any rows for removed jobs
+			 */
+			for (RowType row : rowsToRemove) {
+				table.getRow().remove(row);
+			}
+			rowsToRemove.clear();
+		}
+
+		/*
+		 * Next find any jobs that are no longer in the table. We need to create
+		 * a "fake" entry in the jobslistwait table for these.
+		 */
+		TableType table = getTableHandler().getTable(WAITING_JOB_TABLE);
+		for (JobStatusData status : fJobMap.values()) {
+			if (!jobsInTable.contains(status)) {
+				addJobToTable(table, status.getOid(), status);
+			}
+		}
+	}
+
 }

@@ -31,6 +31,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
@@ -44,7 +45,6 @@ import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
-import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Cell;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
@@ -101,7 +101,7 @@ public class TableView extends ViewPart {
 				public void run() throws Exception {
 					if (composite != null) {
 						fSelectedLguiItem = lmlManager.getSelectedLguiItem();
-						if (fSelectedLguiItem != null) {
+						if (fSelectedLguiItem != null && !fSelectedLguiItem.isEmpty()) {
 							disposeTable();
 							createTable();
 							fSelectedLguiItem.getObjectStatus().addComponent(eventForwarder);
@@ -218,7 +218,9 @@ public class TableView extends ViewPart {
 						}
 						fSelectedLguiItem = lmlManager.getSelectedLguiItem();
 						setViewerInput();
-						fSelectedLguiItem.getObjectStatus().addComponent(eventForwarder);
+						if (fSelectedLguiItem != null) {
+							fSelectedLguiItem.getObjectStatus().addComponent(eventForwarder);
+						}
 						componentAdded = true;
 					}
 				}
@@ -595,10 +597,9 @@ public class TableView extends ViewPart {
 	}
 
 	private void createTable() {
-		if (fSelectedLguiItem == null) {
-			return;
+		if (fSelectedLguiItem != null && !fSelectedLguiItem.isEmpty()) {
+			createColumns();
 		}
-		createColumns();
 
 		// Insert the input
 		setViewerInput();
@@ -656,6 +657,7 @@ public class TableView extends ViewPart {
 	 *            column order array
 	 * @return new column order array with first column removed
 	 */
+	@SuppressWarnings("unused")
 	private int[] removeFirstColumn(int[] order) {
 		final int[] orderNew = new int[order.length - 1];
 		int dif = 0;
@@ -675,7 +677,7 @@ public class TableView extends ViewPart {
 		 */
 		if (!isMouseDown) {
 			Row[] input = new Row[0];
-			if (fSelectedLguiItem != null) {
+			if (fSelectedLguiItem != null && !fSelectedLguiItem.isEmpty()) {
 				input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid);
 			}
 			if (!composite.isDisposed()) {

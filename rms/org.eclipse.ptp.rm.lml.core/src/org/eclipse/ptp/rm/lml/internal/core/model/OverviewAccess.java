@@ -116,14 +116,21 @@ public class OverviewAccess extends LguiHandler {
 		return objects;
 	}
 
-	public String getOIDByJobName(String jobName) {
+	/**
+	 * Get the oid corresponding to the job ID
+	 * 
+	 * @param jobId
+	 *            ID of the job (sometimes known as the step)
+	 * @return Corresponding OID or null if none
+	 */
+	public String getOIDByJobId(String jobId) {
 		final List<InformationType> listInformation = getInformations();
 		for (final InformationType information : listInformation) {
 			final List<InfoType> listInfo = information.getInfo();
 			for (final InfoType info : listInfo) {
 				final List<InfodataType> listData = info.getData();
 				for (final InfodataType data : listData) {
-					if (data.getKey().equals("name") && data.getValue().indexOf(jobName) != -1) {
+					if (data.getKey().equals("step") && data.getValue().indexOf(jobId) != -1) { //$NON-NLS-1$
 						return info.getOid();
 					}
 				}

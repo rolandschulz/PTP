@@ -17,8 +17,8 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
-import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.LayoutAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.NodedisplayAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.OIDToInformation;
@@ -53,8 +53,6 @@ public interface ILguiItem {
 	public void getRequestXml(FileOutputStream output);
 
 	public TableHandler getTableHandler();
-
-	public Map<String, String> getUserJobMap(String gid);
 
 	/**
 	 * Getting the version of the LguiType:
@@ -95,7 +93,12 @@ public interface ILguiItem {
 
 	public void update(InputStream stream) throws JAXBException;
 
-	public boolean update(String name, JobStatusData status);
+	public void updateUserJob(String name, String status, String detail);
 
+	/**
+	 * Inform all listeners, that something changed in the data-model. Handlers
+	 * should use this event to update their model-references. Otherwise
+	 * inconsistent return-values will be the result.
+	 */
 	public void updateData();
 }

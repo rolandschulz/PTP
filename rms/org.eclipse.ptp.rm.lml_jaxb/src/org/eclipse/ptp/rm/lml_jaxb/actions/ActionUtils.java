@@ -28,7 +28,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
+import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -82,7 +82,7 @@ public class ActionUtils {
 	public static String doRead(final String rmId, final String path, final boolean autoStart) throws CoreException {
 
 		if (path == null) {
-			return JobStatusData.ZEROSTR;
+			return ""; //$NON-NLS-1$
 		}
 		final StringBuffer sb = new StringBuffer();
 		final Job j = new Job(path) {
@@ -162,7 +162,7 @@ public class ActionUtils {
 		}
 		final IResourceManagerControl control = rm.getControl();
 		final IJobStatus refreshed = control.getJobStatus(job.getJobId(), monitor);
-		job.updateState(refreshed);
+		job.updateState(refreshed.getState(), refreshed.getStateDetail());
 		maybeCheckFiles(job);
 		view.refresh();
 	}

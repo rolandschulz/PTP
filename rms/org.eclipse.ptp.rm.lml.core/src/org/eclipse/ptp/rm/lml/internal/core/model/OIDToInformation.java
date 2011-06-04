@@ -58,6 +58,12 @@ public class OIDToInformation extends LguiHandler {
 		});
 	}
 
+	/**
+	 * Not sure why this is needed. DO NOT USE.
+	 * 
+	 * @param oid
+	 * @return
+	 */
 	public InfoType getInfoByOid(String oid) {
 		final List<InformationType> listInformation = lguiItem.getOverviewAccess().getInformations();
 		for (final InformationType information : listInformation) {
@@ -80,7 +86,8 @@ public class OIDToInformation extends LguiHandler {
 
 		final List<JAXBElement<?>> alltags = lgui.getObjectsAndRelationsAndInformation();
 
-		for (final JAXBElement<?> jaxbtag : alltags) {// over all information-tags
+		for (final JAXBElement<?> jaxbtag : alltags) {// over all
+														// information-tags
 
 			final Object tag = jaxbtag.getValue();
 

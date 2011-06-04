@@ -1,6 +1,6 @@
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
-import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
+import org.eclipse.ptp.rm.lml.core.JobStatusData;
 
 public class Row {
 	public String oid;

@@ -21,7 +21,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
-import org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData;
+import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
 import org.eclipse.ptp.rm.lml_jaxb.messages.Messages;
