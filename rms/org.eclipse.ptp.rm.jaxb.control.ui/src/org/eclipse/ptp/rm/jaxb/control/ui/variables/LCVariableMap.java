@@ -27,7 +27,6 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 
 /**
  * A wrapper for the LaunchConfiguration accessed through the IVariableMap
@@ -276,9 +275,6 @@ public class LCVariableMap implements IVariableMap {
 	 *            of Property or Attribute
 	 */
 	public void put(String name, Object value) {
-		if (name == null) {
-			JAXBUIPlugin.log("null variable name");
-		}
 		values.put(name, value);
 	}
 
@@ -408,7 +404,7 @@ public class LCVariableMap implements IVariableMap {
 				put(name + JAXBControlConstants.PD + JAXBControlConstants.STATUS, status);
 			}
 		} else {
-			throw new ArrayStoreException(Messages.IllegalVariableValueType + value.getClass());
+			throw new ArrayStoreException(Messages.IllegalVariableValueType + value);
 		}
 		defaultValues.put(name, defVal);
 		if (visible) {
