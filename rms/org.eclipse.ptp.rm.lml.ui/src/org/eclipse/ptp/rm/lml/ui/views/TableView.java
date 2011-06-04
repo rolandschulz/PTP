@@ -11,10 +11,6 @@
 
 package org.eclipse.ptp.rm.lml.ui.views;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -31,7 +27,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
@@ -249,8 +244,6 @@ public class TableView extends ViewPart {
 
 	private final EventForwarder eventForwarder = new EventForwarder();
 
-	private final Map<String, JobStatusData> jobs = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
-
 	@Override
 	public void createPartControl(Composite parent) {
 		gid = getViewSite().getId();
@@ -366,21 +359,11 @@ public class TableView extends ViewPart {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (viewer != null) {
-					viewer.setInput(jobs.values());
 					viewer.refresh();
 				}
 				return Status.OK_STATUS;
 			}
 		}.schedule();
-	}
-
-	/**
-	 * Delete job status entry and refresh.
-	 * 
-	 * @param jobId
-	 */
-	public void removeJob(String jobId) {
-		jobs.remove(jobId);
 	}
 
 	@Override
