@@ -21,7 +21,7 @@
 		<property name="path3" visible="true"/>
 		<property name="path4" visible="true"/>
 		<property name="linked" visible="true">
-		 <default>${ptp_rm:Resource_List.walltime#value}</default>
+			<default>${ptp_rm:Resource_List.walltime#value}</default>
 		</property>
 		<attribute name="saveFiles" type="integer">
 			<description>Does nothing; for testing boolean value translation.</description>
@@ -49,6 +49,10 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<description>Maximum amount of real time during which the job can be in the running state.</description>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
+			<validator>
+            <regex expression="[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"/>
+            <error-message>must be hh:mm:ss</error-message>
+         </validator>
 		</attribute>
 		<script>
 			<line>
@@ -94,8 +98,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				<arg>path4 = ${ptp_rm:path4#value}</arg>
 			</line>
 			<line>
-            <arg>linked = ${ptp_rm:linked#value}</arg>
-         </line>
+				<arg>linked = ${ptp_rm:linked#value}</arg>
+			</line>
 		</script>
 		<submit-interactive name="submit-interactive">
 			<arg>echo</arg>

@@ -128,7 +128,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/*
-	 * Value validation is handled up front, so this just return true.
 	 * (non-Javadoc)
 	 * 
 	 * @see
@@ -263,7 +262,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/*
-	 * Value validation is now handled up front, so this just returns true.
 	 * (non-Javadoc)
 	 * 
 	 * @see
@@ -321,8 +319,9 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/*
-	 * Sets a property in the configuration marking this tab as visible. This is
-	 * mainly in order to trigger activation of the Apply button. (non-Javadoc)
+	 * If this is not the last selected tab, sets a property in the
+	 * configuration marking this tab as visible. This is mainly in order to
+	 * trigger activation of the Apply button. (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
@@ -331,6 +330,14 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	@Override
 	public void setVisible() {
 		try {
+			String lastVisited = parentTab.getLastVisited();
+			if (this.toString().equals(lastVisited)) {
+				return;
+			}
+			parentTab.setLastVisited(this.toString());
+			if (lastVisited == null) {
+				return;
+			}
 			listenerConfiguration.getWorkingCopy().setAttribute(JAXBUIConstants.VISIBLE, this.toString());
 			fireContentsChanged();
 		} catch (CoreException t) {

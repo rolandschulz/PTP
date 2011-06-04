@@ -54,6 +54,8 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 */
 	protected boolean voidRMConfig;
 	protected TabFolder tabFolder;
+	protected String lastVisited;
+	protected int lastIndex;
 
 	private final LinkedList<AbstractJAXBLaunchConfigurationTab> tabControllers = new LinkedList<AbstractJAXBLaunchConfigurationTab>();
 	private final Map<String, AbstractJAXBLaunchConfigurationTab> controllerIndex = new HashMap<String, AbstractJAXBLaunchConfigurationTab>();
@@ -65,6 +67,8 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	protected ExtensibleJAXBControllerTab(ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		voidRMConfig = false;
+		lastIndex = 0;
+		lastVisited = null;
 	}
 
 	/*
@@ -123,6 +127,13 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 */
 	public Control getControl() {
 		return control;
+	}
+
+	/**
+	 * @return the FQN of the tab which was last visible
+	 */
+	public String getLastVisited() {
+		return lastVisited;
 	}
 
 	/*
@@ -223,6 +234,14 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 			}
 		}
 		return resultValidation;
+	}
+
+	/**
+	 * @param lastVisited
+	 *            the FQN of the currently visible tab
+	 */
+	public void setLastVisited(String lastVisited) {
+		this.lastVisited = lastVisited;
 	}
 
 	/**

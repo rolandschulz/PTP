@@ -89,11 +89,15 @@ public class CommandJobStatus implements ICommandJobStatus {
 			long last = 0;
 			long elapsed = 0;
 			double increment = 0;
-			while (!ready) {
+			while (true) {
 				try {
 					ready = RemoteServicesDelegate.isStable(d.getRemoteFileManager(), path, 3, progress.newChild(20));
 				} catch (Throwable t) {
 					JAXBControlCorePlugin.log(t);
+				}
+
+				if (ready) {
+					break;
 				}
 
 				elapsed = System.currentTimeMillis() - start;
@@ -106,13 +110,6 @@ public class CommandJobStatus implements ICommandJobStatus {
 
 				if (progress.isCanceled() || this.callerMonitor.isCanceled()) {
 					break;
-				}
-
-				synchronized (this) {
-					try {
-						wait(JAXBControlConstants.STANDARD_WAIT);
-					} catch (InterruptedException ignored) {
-					}
 				}
 			}
 			if (monitor != null) {

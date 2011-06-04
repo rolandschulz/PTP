@@ -27,6 +27,7 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 
 /**
  * A wrapper for the LaunchConfiguration accessed through the IVariableMap
@@ -275,6 +276,9 @@ public class LCVariableMap implements IVariableMap {
 	 *            of Property or Attribute
 	 */
 	public void put(String name, Object value) {
+		if (name == null) {
+			JAXBUIPlugin.log("null variable name");
+		}
 		values.put(name, value);
 	}
 
@@ -380,6 +384,9 @@ public class LCVariableMap implements IVariableMap {
 		if (value instanceof PropertyType) {
 			PropertyType p = (PropertyType) value;
 			name = p.getName();
+			if (name == null) {
+				return;
+			}
 			defVal = p.getDefault();
 			if (!p.isVisible()) {
 				hidden.put(name, p);
@@ -389,6 +396,9 @@ public class LCVariableMap implements IVariableMap {
 		} else if (value instanceof AttributeType) {
 			AttributeType ja = (AttributeType) value;
 			name = ja.getName();
+			if (name == null) {
+				return;
+			}
 			defVal = ja.getDefault();
 			if (!ja.isVisible()) {
 				hidden.put(name, ja);

@@ -75,6 +75,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	public JAXBControllerLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
 		super(dialog);
 		rmConfig = rm.getJAXBConfiguration();
+
 		try {
 			ResourceManagerData data = rmConfig.getResourceManagerData();
 			if (data != null) {
@@ -87,6 +88,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 			WidgetActionUtils.errorMessage(dialog.getActiveTab().getControl().getShell(), t, Messages.VoidLaunchTabMessage,
 					Messages.VoidLaunchTabTitle, false);
 		}
+
 		if (!voidRMConfig) {
 			launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
 			updateHandler = new ValueUpdateHandler(this);
@@ -245,8 +247,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		}
 		RMLaunchValidation validation = super.initializeFrom(control, rm, queue, configuration);
 		if (!getControllers().isEmpty()) {
-			AbstractJAXBLaunchConfigurationTab t = getControllers().get(0);
-			resize(t.getSize());
+			tabFolder.setSelection(lastIndex);
 		}
 		return validation;
 	}
@@ -262,7 +263,8 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * For resizing scrolled parent.
 	 */
 	public void widgetSelected(SelectionEvent e) {
-		AbstractJAXBLaunchConfigurationTab t = getControllers().get(tabFolder.getSelectionIndex());
+		lastIndex = tabFolder.getSelectionIndex();
+		AbstractJAXBLaunchConfigurationTab t = getControllers().get(lastIndex);
 		resize(t.getSize());
 		t.setVisible();
 	}
