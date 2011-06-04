@@ -640,7 +640,7 @@ public class LguiItem implements ILguiItem {
 		 */
 		TableType table = getTableHandler().getTable(WAITING_JOB_TABLE);
 		for (JobStatusData status : fJobMap.values()) {
-			if (!jobsInTable.contains(status)) {
+			if (!status.isRemoved() && !jobsInTable.contains(status)) {
 				status.setState(JobStatusData.COMPLETED);
 				addJobToTable(table, status.getOid(), status);
 			}
