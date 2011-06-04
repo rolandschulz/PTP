@@ -17,23 +17,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
+import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
-import org.eclipse.ptp.rdt.sync.core.remotemake.RemoteMakeBuilder;
-import org.eclipse.ptp.rdt.sync.core.resources.RemoteMakeNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
@@ -71,11 +68,11 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			return;
 		}
 
-		try {
-			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
-		} catch (CoreException e1) {
-			StatusManager.getManager().handle(e1, RDTSyncUIPlugin.PLUGIN_ID);
-		}
+//		try {
+//			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
+//		} catch (CoreException e1) {
+//			StatusManager.getManager().handle(e1, RDTSyncUIPlugin.PLUGIN_ID);
+//		}
 
 		// BUild the service configuration
 		ServiceModelManager smm = ServiceModelManager.getInstance();
@@ -112,6 +109,8 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		String buildPath = buildScenario.getLocation();
 		for (IConfiguration config : allConfigs) {
 			config.getToolChain().getBuilder().setBuildPath(buildPath);
+			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
+			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
 

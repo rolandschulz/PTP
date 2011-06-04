@@ -25,19 +25,6 @@
       </builder>
    </extension>
    <extension
-         id="org.eclipse.ptp.rdt.sync.core.remoteMakeBuilder"
-         name="%RemoteMakeBuilder.name"
-         point="org.eclipse.core.resources.builders">
-      <builder
-            callOnEmptyDelta="true"
-            hasNature="true"
-            isConfigurable="true">
-         <run
-               class="org.eclipse.ptp.rdt.sync.core.remotemake.RemoteMakeBuilder">
-         </run>
-      </builder>
-   </extension>
-   <extension
          point="org.eclipse.ptp.services.core.services">
       <service
             id="org.eclipse.ptp.rdt.sync.core.SyncService"
@@ -59,5 +46,15 @@
             priority="1"
             serviceId="org.eclipse.ptp.rdt.core.BuildService">
       </provider>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
+      <builder
+            commandLauncher="org.eclipse.ptp.rdt.sync.core.remotemake.SyncCommandLauncher"
+            id="org.eclipse.ptp.rdt.sync.core.SyncBuilder"
+            isAbstract="false"
+            isVariableCaseSensitive="false"
+            name="%Builder.name">
+      </builder>
    </extension>
 </plugin>
