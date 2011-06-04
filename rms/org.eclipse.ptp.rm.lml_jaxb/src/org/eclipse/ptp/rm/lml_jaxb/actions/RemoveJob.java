@@ -57,7 +57,7 @@ public class RemoveJob extends AbstractStatusAction {
 	protected void validate(IAction action) {
 		for (Row row : selected) {
 			JobStatusData status = row.status;
-			if (status == null) {
+			if (status == null || !status.getState().equals(JobStatusData.COMPLETED)) {
 				action.setEnabled(false);
 				return;
 			}
