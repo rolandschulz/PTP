@@ -121,6 +121,7 @@ public class TableHandler extends LguiHandler {
 		final TableType table = new TableType();
 		table.setId(gid);
 		table.setTitle("title_" + gid);
+		table.setContenttype("jobs");
 
 		for (final ColumnlayoutType columnLayout : lguiItem.getLayoutAccess().getTableLayout(gid).getColumn()) {
 			if (columnLayout.isActive()) {
