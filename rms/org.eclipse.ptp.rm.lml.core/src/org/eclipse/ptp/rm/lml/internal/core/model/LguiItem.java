@@ -634,11 +634,13 @@ public class LguiItem implements ILguiItem {
 
 		/*
 		 * Next find any jobs that are no longer in the table. We need to create
-		 * a "fake" entry in the jobslistwait table for these.
+		 * a "fake" entry in the jobslistwait table for these. Note that these
+		 * jobs are now considered "COMPLETED".
 		 */
 		TableType table = getTableHandler().getTable(WAITING_JOB_TABLE);
 		for (JobStatusData status : fJobMap.values()) {
 			if (!jobsInTable.contains(status)) {
+				status.setState(JobStatusData.COMPLETED);
 				addJobToTable(table, status.getOid(), status);
 			}
 		}

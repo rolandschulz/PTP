@@ -37,9 +37,11 @@ public class JobStatusData {
 	private static final String OWNER_ATTR = "owner";//$NON-NLS-1$;
 
 	private static final String JOB_OUTERR_READY = "JOB_OUTERR_READY";//$NON-NLS-1$
-	private static final String SUBMITTED = "SUBMITTED";//$NON-NLS-1$
-	private static final String FAILED = "FAILED";//$NON-NLS-1$
-	private static final String CANCELED = "CANCELED";//$NON-NLS-1$
+
+	public static final String SUBMITTED = "SUBMITTED";//$NON-NLS-1$
+	public static final String COMPLETED = "COMPLETED";//$NON-NLS-1$
+	public static final String FAILED = "FAILED";//$NON-NLS-1$
+	public static final String CANCELED = "CANCELED";//$NON-NLS-1$
 
 	/**
 	 * Convenience method for reloading all saved job status data.
