@@ -170,9 +170,6 @@ public class ManagedFilesJob extends Job {
 			File localFile = maybeWriteFile(file);
 			progress.worked(5);
 			String fileName = localFile.getName();
-			if (file.isUniqueIdPrefix()) {
-				fileName = UUID.randomUUID() + fileName;
-			}
 			String pathSep = localTarget ? JAXBControlConstants.PATH_SEP : JAXBControlConstants.REMOTE_PATH_SEP;
 			String target = stagingDir + pathSep + fileName;
 			SubMonitor m = progress.newChild(5);
@@ -245,6 +242,9 @@ public class ManagedFilesJob extends Job {
 			return new File(path);
 		}
 		String name = rmVarMap.getString(uuid, file.getName());
+		if (file.isUniqueIdPrefix()) {
+			name = UUID.randomUUID() + name;
+		}
 		File sourceDir = new File(System.getProperty(JAXBControlConstants.JAVA_TMP_DIR));
 		File localFile = new File(sourceDir, name);
 		String contents = file.getContents();

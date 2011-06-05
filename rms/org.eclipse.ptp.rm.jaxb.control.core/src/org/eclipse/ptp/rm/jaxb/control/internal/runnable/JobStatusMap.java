@@ -177,12 +177,14 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 		ICommandJobStatus status = map.get(jobId);
 		if (status != null) {
 			String d = status.getStateDetail();
-			block = block && !IJobStatus.CANCELED.equals(d) && !IJobStatus.FAILED.equals(d);
-			if (!status.isInteractive()) {
-				if (block) {
-					status.maybeWaitForHandlerFiles(JAXBControlConstants.READY_FILE_BLOCK, monitor);
-				} else {
-					status.maybeWaitForHandlerFiles(0, monitor);
+			if (!IJobStatus.JOB_OUTERR_READY.equals(d)) {
+				block = block && !IJobStatus.CANCELED.equals(d) && !IJobStatus.FAILED.equals(d);
+				if (!status.isInteractive()) {
+					if (block) {
+						status.maybeWaitForHandlerFiles(JAXBControlConstants.READY_FILE_BLOCK, monitor);
+					} else {
+						status.maybeWaitForHandlerFiles(0, monitor);
+					}
 				}
 			}
 			status.cancel();
@@ -202,7 +204,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	}
 
 	/**
-	 * Must be called under synchronization. Also unpins the id.
+	 * Must be called under synchronization.
 	 * 
 	 * @param jobId
 	 *            either internal UUID or scheduler id for the job.

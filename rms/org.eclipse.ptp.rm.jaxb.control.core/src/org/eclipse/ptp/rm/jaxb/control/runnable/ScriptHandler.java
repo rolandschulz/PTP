@@ -145,7 +145,7 @@ public class ScriptHandler extends Job {
 	/**
 	 * An auxiliary used in the case of the LaunchTab calling this handler. A
 	 * temporary replacement Script is created, with the resolver tags changed
-	 * from ${rm:...} to ${lc:...} (the user never sees the latter).
+	 * from ${ptp_rm:...} to ${ptp_lc:...} (the user never sees the latter).
 	 */
 	private void convertScript() {
 		ScriptType ltScript = new ScriptType();
