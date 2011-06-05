@@ -474,9 +474,7 @@ public class LMLManager {
 	 */
 	private void saveJobStatusData(ILguiItem item, IMemento memento) {
 		for (final JobStatusData status : item.getUserJobs()) {
-			if (!status.isRemoved()) {
-				status.save(memento);
-			}
+			status.save(memento);
 		}
 	}
 }

@@ -148,32 +148,6 @@ public class LguiItem implements ILguiItem {
 		setCid();
 	}
 
-	private void addCellToRow(RowType row, ColumnType column, String value) {
-		final CellType cell = new CellType();
-		cell.setCid(column.getId());
-		cell.setValue(value);
-		row.getCell().add(cell);
-	}
-
-	private void addJobToTable(TableType table, String oid, JobStatusData status) {
-		final RowType row = new RowType();
-		row.setOid(oid);
-
-		for (final ColumnType column : table.getColumn()) {
-			if (column.getName().equals(JOB_ID)) {
-				addCellToRow(row, column, status.getJobId());
-			} else if (column.getName().equals(JOB_STATUS)) {
-				addCellToRow(row, column, status.getState());
-			} else if (column.getName().equals(JOB_OWNER)) {
-				addCellToRow(row, column, status.getOwner());
-			} else if (column.getName().equals(JOB_QUEUE_NAME)) {
-				addCellToRow(row, column, status.getQueueName());
-			}
-		}
-
-		table.getRow().add(row);
-	}
-
 	/**
 	 * Add a lml-data-listener. It listens for data-changes.
 	 * 
@@ -212,46 +186,6 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	/**
-	 * The instance lgui is filled with a new data-model. This method creates
-	 * all modules, which handle the data. These modules can then be accessed by
-	 * corresponding getter-functions.
-	 */
-	private void createLguiHandlers() {
-		lguiHandlers.put(OverviewAccess.class, new OverviewAccess(this, lgui));
-		lguiHandlers.put(LayoutAccess.class, new LayoutAccess(this, lgui));
-		lguiHandlers.put(OIDToObject.class, new OIDToObject(this, lgui));
-		lguiHandlers.put(ObjectStatus.class, new ObjectStatus(this, lgui));
-		lguiHandlers.put(OIDToInformation.class, new OIDToInformation(this, lgui));
-		lguiHandlers.put(TableHandler.class, new TableHandler(this, lgui));
-		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this, lgui));
-	}
-
-	private void fireUpdatedEvent() {
-		final ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
-		for (final ILguiListener listener : listeners) {
-			listener.handleEvent(e);
-		}
-	}
-
-	private LguiType firstRequest() {
-		final ObjectFactory objectFactory = new ObjectFactory();
-
-		final LguiType layoutLgui = objectFactory.createLguiType();
-		layoutLgui.setVersion("1"); //$NON-NLS-1$
-		layoutLgui.setLayout(true);
-
-		final RequestType request = objectFactory.createRequestType();
-		request.setGetDefaultData(true);
-		layoutLgui.setRequest(request);
-
-		return layoutLgui;
-	}
-
-	private String generateOid() {
-		return UUID.randomUUID().toString();
-	}
-
 	public synchronized void getCurrentLayout(OutputStream output) {
 		LguiType layoutLgui = null;
 		if (lgui == null) {
@@ -275,13 +209,6 @@ public class LguiItem implements ILguiItem {
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private String getGidFromJobStatus(JobStatusData status) {
-		if (status.getState().equals(JobStatusData.RUNNING)) {
-			return ACTIVE_JOB_TABLE;
-		}
-		return INACTIVE_JOB_TABLE;
 	}
 
 	/**
@@ -422,7 +349,7 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#isLayout()
+	 * @see org.eclipse.ptp.rm.lml.core.elemhents.ILguiItem#isLayout()
 	 */
 	public synchronized boolean isLayout() {
 		return !isEmpty() && lgui.isLayout();
@@ -438,22 +365,6 @@ public class LguiItem implements ILguiItem {
 		for (final ILguiListener l : listeners) {
 			l.handleEvent(event);
 		}
-	}
-
-	/**
-	 * Parsing an XML file. The method generates from an XML file an instance of
-	 * LguiType.
-	 * 
-	 * @param stream
-	 *            the input stream of the XML file
-	 * @return the generated LguiType
-	 * @throws JAXBException
-	 */
-	@SuppressWarnings("unchecked")
-	private LguiType parseLML(InputStream stream) throws JAXBException {
-		final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
-		final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
-		return doc.getValue();
 	}
 
 	/**
@@ -494,22 +405,6 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	private void setCid() {
-		for (final TableType table : getTableHandler().getTables()) {
-			for (final RowType row : table.getRow()) {
-				int cid = 1;
-				for (final CellType cell : row.getCell()) {
-					if (cell.getCid() == null) {
-						cell.setCid(BigInteger.valueOf(cid));
-					} else {
-						cid = cell.getCid().intValue();
-					}
-					cid++;
-				}
-			}
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -539,6 +434,133 @@ public class LguiItem implements ILguiItem {
 		fireUpdatedEvent();
 		synchronized (this) {
 			updateJobData();
+			setCid();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateUserJob(java.lang.String
+	 * , java.lang.String, java.lang.String)
+	 */
+	public synchronized void updateUserJob(String jobId, String status, String detail) {
+		final JobStatusData jobStatus = fJobMap.get(jobId);
+		if (jobStatus != null) {
+			final TableType table = getTableHandler().getTable(getGidFromJobStatus(jobStatus));
+			if (table != null) {
+				for (final RowType row : table.getRow()) {
+					if (row.getOid().equals(jobStatus.getOid())) {
+						getTableHandler().setCellValue(table, row, JOB_STATUS, status);
+					}
+				}
+			}
+		}
+	}
+
+	private void addCellToRow(RowType row, ColumnType column, String value) {
+		final CellType cell = new CellType();
+		cell.setCid(column.getId());
+		cell.setValue(value);
+		row.getCell().add(cell);
+	}
+
+	private void addJobToTable(TableType table, String oid, JobStatusData status) {
+		final RowType row = new RowType();
+		row.setOid(oid);
+
+		for (final ColumnType column : table.getColumn()) {
+			if (column.getName().equals(JOB_ID)) {
+				addCellToRow(row, column, status.getJobId());
+			} else if (column.getName().equals(JOB_STATUS)) {
+				addCellToRow(row, column, status.getState());
+			} else if (column.getName().equals(JOB_OWNER)) {
+				addCellToRow(row, column, status.getOwner());
+			} else if (column.getName().equals(JOB_QUEUE_NAME)) {
+				addCellToRow(row, column, status.getQueueName());
+			}
+		}
+
+		table.getRow().add(row);
+	}
+
+	/**
+	 * The instance lgui is filled with a new data-model. This method creates
+	 * all modules, which handle the data. These modules can then be accessed by
+	 * corresponding getter-functions.
+	 */
+	private void createLguiHandlers() {
+		lguiHandlers.put(OverviewAccess.class, new OverviewAccess(this, lgui));
+		lguiHandlers.put(LayoutAccess.class, new LayoutAccess(this, lgui));
+		lguiHandlers.put(OIDToObject.class, new OIDToObject(this, lgui));
+		lguiHandlers.put(ObjectStatus.class, new ObjectStatus(this, lgui));
+		lguiHandlers.put(OIDToInformation.class, new OIDToInformation(this, lgui));
+		lguiHandlers.put(TableHandler.class, new TableHandler(this, lgui));
+		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this, lgui));
+	}
+
+	private void fireUpdatedEvent() {
+		final ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
+		for (final ILguiListener listener : listeners) {
+			listener.handleEvent(e);
+		}
+	}
+
+	private LguiType firstRequest() {
+		final ObjectFactory objectFactory = new ObjectFactory();
+
+		final LguiType layoutLgui = objectFactory.createLguiType();
+		layoutLgui.setVersion("1"); //$NON-NLS-1$
+		layoutLgui.setLayout(true);
+
+		final RequestType request = objectFactory.createRequestType();
+		request.setGetDefaultData(true);
+		layoutLgui.setRequest(request);
+
+		return layoutLgui;
+	}
+
+	private String generateOid() {
+		return UUID.randomUUID().toString();
+	}
+
+	private String getGidFromJobStatus(JobStatusData status) {
+		if (status.getState().equals(JobStatusData.RUNNING)) {
+			return ACTIVE_JOB_TABLE;
+		}
+		return INACTIVE_JOB_TABLE;
+	}
+
+	/**
+	 * Parsing an XML file. The method generates from an XML file an instance of
+	 * LguiType.
+	 * 
+	 * @param stream
+	 *            the input stream of the XML file
+	 * @return the generated LguiType
+	 * @throws JAXBException
+	 */
+	@SuppressWarnings("unchecked")
+	private LguiType parseLML(InputStream stream) throws JAXBException {
+		final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
+		final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
+		return doc.getValue();
+	}
+
+	private void setCid() {
+		for (final TableType table : getTableHandler().getTables()) {
+			for (final RowType row : table.getRow()) {
+				int cid = 1;
+				for (final CellType cell : row.getCell()) {
+					if (cell.getCid() == null) {
+						cell.setCid(BigInteger.valueOf(cid));
+					} else {
+						cid = cell.getCid().intValue();
+					}
+					cid++;
+				}
+			}
 		}
 	}
 
@@ -603,33 +625,12 @@ public class LguiItem implements ILguiItem {
 		if (table == null) {
 			table = getTableHandler().generateDefaultTable(INACTIVE_JOB_TABLE);
 		}
-		for (JobStatusData status : fJobMap.values()) {
+		for (final JobStatusData status : fJobMap.values()) {
 			if (!status.isRemoved() && !jobsInTable.contains(status)) {
 				if (!status.isCompleted()) {
 					status.setState(JobStatusData.COMPLETED);
 				}
 				addJobToTable(table, status.getOid(), status);
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateUserJob(java.lang.String
-	 * , java.lang.String, java.lang.String)
-	 */
-	public synchronized void updateUserJob(String jobId, String status, String detail) {
-		final JobStatusData jobStatus = fJobMap.get(jobId);
-		if (jobStatus != null) {
-			final TableType table = getTableHandler().getTable(getGidFromJobStatus(jobStatus));
-			if (table != null) {
-				for (final RowType row : table.getRow()) {
-					if (row.getOid().equals(jobStatus.getOid())) {
-						getTableHandler().setCellValue(table, row, JOB_STATUS, status);
-					}
-				}
 			}
 		}
 	}

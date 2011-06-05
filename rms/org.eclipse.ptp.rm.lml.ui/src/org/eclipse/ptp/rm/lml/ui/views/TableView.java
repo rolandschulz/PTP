@@ -47,7 +47,6 @@ import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -214,11 +213,15 @@ public class TableView extends ViewPart {
 							componentAdded = false;
 						}
 						fSelectedLguiItem = lmlManager.getSelectedLguiItem();
+						if (sortIndex > -1 && sortDirection > -1) {
+							fSelectedLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, sortDirection);
+						}
 						setViewerInput();
 						if (fSelectedLguiItem != null) {
 							fSelectedLguiItem.getObjectStatus().addComponent(eventForwarder);
+							componentAdded = true;
 						}
-						componentAdded = true;
+
 					}
 				}
 			});
@@ -243,6 +246,9 @@ public class TableView extends ViewPart {
 	private boolean isMouseDown = false;
 
 	private final EventForwarder eventForwarder = new EventForwarder();
+
+	private int sortIndex = -1;
+	private int sortDirection = -1;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -378,7 +384,6 @@ public class TableView extends ViewPart {
 	 * @param fSelected
 	 */
 	private void createColumns() {
-		// Creating the columns
 		if (fSelectedLguiItem.isLayout()) {
 			return;
 		}
@@ -440,23 +445,6 @@ public class TableView extends ViewPart {
 			treeColumn.setMoveable(true);
 			treeColumn.setText(tableColumnLayouts[i].getTitle());
 			treeColumn.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
-			treeColumn.addControlListener(new ControlAdapter() {
-				// @Override
-				// public void controlMoved(ControlEvent e) {
-				// if (fSelectedLguiItem != null) {
-				// fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid,
-				// removeFirstColumn(tree.getColumnOrder()));
-				// }
-				// }
-				//
-				// @Override
-				// public void controlResized(ControlEvent e) {
-				// if (fSelectedLguiItem != null) {
-				// fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(),
-				// gid);
-				// }
-				// }
-			});
 
 			/*
 			 * Create the header menu for this column
@@ -490,7 +478,8 @@ public class TableView extends ViewPart {
 						sortIndex = i;
 					}
 				}
-				fSelectedLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, tree.getSortDirection());
+				setSortParameter(sortIndex, tree.getSortDirection());
+				fSelectedLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, sortDirection);
 				tree.setSortDirection(tree.getSortDirection());
 				lmlManager.sortLgui();
 			}
@@ -592,7 +581,6 @@ public class TableView extends ViewPart {
 
 		// Insert the input
 		setViewerInput();
-
 		composite.layout();
 	}
 
@@ -658,6 +646,11 @@ public class TableView extends ViewPart {
 			}
 		}
 		return orderNew;
+	}
+
+	private void setSortParameter(int sortIndex, int sortDirection) {
+		this.sortIndex = sortIndex;
+		this.sortDirection = sortDirection;
 	}
 
 	private void setViewerInput() {
