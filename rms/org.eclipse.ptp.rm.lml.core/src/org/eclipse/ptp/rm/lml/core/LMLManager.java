@@ -61,6 +61,13 @@ import org.eclipse.ui.IMemento;
  */
 public class LMLManager {
 
+	public static LMLManager getInstance() {
+		if (manager == null) {
+			manager = new LMLManager();
+		}
+		return manager;
+	}
+
 	/*
 	 * Map of all ILguiItems
 	 * 
@@ -469,12 +476,5 @@ public class LMLManager {
 		for (final JobStatusData status : item.getUserJobs()) {
 			status.save(memento);
 		}
-	}
-
-	public static LMLManager getInstance() {
-		if (manager == null) {
-			manager = new LMLManager();
-		}
-		return manager;
 	}
 }

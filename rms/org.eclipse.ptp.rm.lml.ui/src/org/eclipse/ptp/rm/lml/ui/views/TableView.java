@@ -337,6 +337,11 @@ public class TableView extends ViewPart {
 	}
 
 	@Override
+	public void dispose() {
+		lmlManager.removeListener(lmlListener);
+	}
+
+	@Override
 	public void init(IViewSite site) {
 		try {
 			super.init(site);
@@ -344,11 +349,6 @@ public class TableView extends ViewPart {
 			e.printStackTrace();
 		}
 		lmlManager.addListener(lmlListener, this.getClass().getName());
-	}
-
-	@Override
-	public void dispose() {
-		lmlManager.removeListener(lmlListener);
 	}
 
 	/**

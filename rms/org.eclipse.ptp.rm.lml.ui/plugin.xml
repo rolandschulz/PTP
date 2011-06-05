@@ -5,22 +5,15 @@
          point="org.eclipse.ui.views">
       <view
             allowMultiple="true"
-            category="org.eclipse.ptp.rm.lml.ui.views"
+            category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.NodesView"
             icon="icons/parallel_perspective.gif"
             id="__dummy_nd__1__"
             name="%NodediesplayView.name">
       </view>
       <view
-            category="org.eclipse.ptp.rm.lml.ui.views"
-            class="org.eclipse.ptp.rm.lml.ui.views.LMLView"
-            icon="icons/rm/rm_view.gif"
-            id="org.eclipse.ptp.rm.lml.ui.views.LMLView"
-            name="%LMLView.name">
-      </view>
-      <view
             allowMultiple="true"
-            category="org.eclipse.ptp.rm.lml.ui.views"
+            category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
             icon="icons/parallel_perspective.gif"
             id="joblistrun"
@@ -28,7 +21,7 @@
       </view>
       <view
             allowMultiple="true"
-            category="org.eclipse.ptp.rm.lml.ui.views"
+            category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
             icon="icons/parallel_perspective.gif"
             id="joblistwait"

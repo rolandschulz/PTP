@@ -210,6 +210,13 @@ public class JobStatusData {
 	}
 
 	/**
+	 * @return job is completed
+	 */
+	public boolean isCompleted() {
+		return fState.equals(COMPLETED);
+	}
+
+	/**
 	 * Save for restart.
 	 * 
 	 * @param memento

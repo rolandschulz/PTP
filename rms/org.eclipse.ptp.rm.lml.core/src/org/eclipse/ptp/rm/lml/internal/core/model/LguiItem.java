@@ -55,6 +55,33 @@ import org.eclipse.ptp.rm.lml.internal.core.events.LguiUpdatedEvent;
  */
 public class LguiItem implements ILguiItem {
 
+	/**
+	 * Parsing an XML file. The method generates from an XML file an instance of
+	 * LguiType.
+	 * 
+	 * @param xml
+	 *            the URL source of the XML file
+	 * @return the generated LguiType
+	 * @throws MalformedURLException
+	 * @throws JAXBException
+	 */
+	@SuppressWarnings("unchecked")
+	private static LguiType parseLML(URI xml) throws MalformedURLException {
+		LguiType lml = null;
+		try {
+			final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
+
+			final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(xml.toURL());
+
+			lml = doc.getValue();
+		} catch (final JAXBException e) {
+			e.printStackTrace();
+		}
+
+		return lml;
+
+	}
+
 	/*
 	 * Source of the XML-file from which the LguiType was generated.
 	 */
@@ -554,14 +581,17 @@ public class LguiItem implements ILguiItem {
 				if (jobId != null) {
 					JobStatusData status = fJobMap.get(jobId);
 					if (status != null) {
-						jobsInTable.add(status);
-						if (!status.isRemoved()) {
+						if (!status.isRemoved() && !status.isCompleted()) {
 							/*
 							 * job exists in both map and LML, so update the map
 							 * with the oid and latest status
 							 */
 							status.setOid(row.getOid());
 							status.setState(getTableHandler().getCellValue(table, row, JOB_STATUS));
+							/*
+							 * Remember this job is in the table for later
+							 */
+							jobsInTable.add(status);
 						} else {
 							/*
 							 * job has been removed by the user. remove it from
@@ -583,44 +613,19 @@ public class LguiItem implements ILguiItem {
 		}
 
 		/*
-		 * Next find any jobs that are no longer in the table. We need to create
-		 * a "fake" entry in the jobslistwait table for these. Note that these
-		 * jobs are now considered "COMPLETED".
+		 * Next find any jobs that are no longer in any of the tables. We need
+		 * to create a "fake" entry in the jobslistwait table for these. Note
+		 * that these jobs are now considered "COMPLETED".
 		 */
 		TableType table = getTableHandler().getTable(INACTIVE_JOB_TABLE);
 		for (JobStatusData status : fJobMap.values()) {
 			if (!status.isRemoved() && !jobsInTable.contains(status)) {
-				status.setState(JobStatusData.COMPLETED);
+				if (!status.isCompleted()) {
+					status.setState(JobStatusData.COMPLETED);
+				}
 				addJobToTable(table, status.getOid(), status);
 			}
 		}
-	}
-
-	/**
-	 * Parsing an XML file. The method generates from an XML file an instance of
-	 * LguiType.
-	 * 
-	 * @param xml
-	 *            the URL source of the XML file
-	 * @return the generated LguiType
-	 * @throws MalformedURLException
-	 * @throws JAXBException
-	 */
-	@SuppressWarnings("unchecked")
-	private static LguiType parseLML(URI xml) throws MalformedURLException {
-		LguiType lml = null;
-		try {
-			final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
-
-			final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(xml.toURL());
-
-			lml = doc.getValue();
-		} catch (final JAXBException e) {
-			e.printStackTrace();
-		}
-
-		return lml;
-
 	}
 
 }
