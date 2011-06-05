@@ -852,6 +852,7 @@
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
 			<xs:element name="layout" minOccurs="0" type="rm:layout-type"/>
 			<xs:element name="title" minOccurs="0" type="xs:string"/>
+			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="button" maxOccurs="unbounded" type="rm:widget-type">
 				<xs:annotation>
 					<xs:documentation>

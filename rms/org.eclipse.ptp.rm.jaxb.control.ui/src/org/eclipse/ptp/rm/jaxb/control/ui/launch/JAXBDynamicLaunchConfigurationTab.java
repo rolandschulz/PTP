@@ -331,10 +331,10 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	public void setVisible() {
 		try {
 			String lastVisited = parentTab.getLastVisited();
-			if (this.toString().equals(lastVisited)) {
+			if (title.equals(lastVisited)) {
 				return;
 			}
-			parentTab.setLastVisited(this.toString());
+			parentTab.setLastVisited(title);
 			if (lastVisited == null) {
 				return;
 			}

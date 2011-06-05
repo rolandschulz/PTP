@@ -24,9 +24,13 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	/**
 	 * Resets internal (in-memory) data objects.
 	 * 
+	 * @param all
+	 *            if false, clears only the data tree and map, not the
+	 *            connections.
+	 * 
 	 * @since 5.0
 	 */
-	public void clearReferences();
+	public void clearReferences(boolean all);
 
 	/**
 	 * @return the JAXB resource manager data element tree.

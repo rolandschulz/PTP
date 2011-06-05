@@ -54,6 +54,7 @@ public class Messages extends NLS {
 	public static String CachedDefinitionFile;
 	public static String IllegalVariableValueType;
 	public static String TabInitialization;
+	public static String UninitializedRemoteServices;
 
 	static {
 		// initialize resource bundle

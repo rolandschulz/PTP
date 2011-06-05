@@ -174,6 +174,10 @@ public class LaunchTabBuilder {
 		} else {
 			control = WidgetBuilderUtils.createComposite(parent, style, layout, data);
 		}
+		String tooltip = descriptor.getTooltip();
+		if (tooltip != null) {
+			control.setToolTipText(rmVarMap.getString(tooltip));
+		}
 		IUpdateModel model = UpdateModelFactory.createModel(descriptor, control, tab, rmVarMap);
 		if (model != null) {
 			localWidgets.put(control, model);

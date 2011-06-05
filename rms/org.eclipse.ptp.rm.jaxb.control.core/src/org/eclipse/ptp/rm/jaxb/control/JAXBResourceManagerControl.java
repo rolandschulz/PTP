@@ -361,7 +361,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected void doShutdown() throws CoreException {
 		doOnShutdown();
-		((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences();
+		((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences(true);
 		jobStatusMap.halt();
 		RemoteServicesDelegate d = getRemoteServicesDelegate(null);
 		IRemoteConnection conn = d.getRemoteConnection();
@@ -682,6 +682,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * Use the base configuration which contains the config file information
 		 */
 		IJAXBResourceManagerConfiguration base = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
+		base.clearReferences(false);
 		rmVarMap = (RMVariableMap) base.getRMVariableMap();
 		ResourceManagerData data = base.getResourceManagerData();
 		if (data != null) {

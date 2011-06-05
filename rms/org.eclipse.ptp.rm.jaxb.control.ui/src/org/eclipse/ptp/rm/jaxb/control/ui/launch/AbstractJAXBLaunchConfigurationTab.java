@@ -116,7 +116,6 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 					lcMap.swapVariables(current);
 				} catch (CoreException t) {
 					JAXBControlUIPlugin.log(t);
-					return new RMLaunchValidation(false, t.getMessage());
 				}
 			}
 		}

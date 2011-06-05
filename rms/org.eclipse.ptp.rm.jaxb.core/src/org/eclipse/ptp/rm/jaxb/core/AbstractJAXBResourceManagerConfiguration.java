@@ -60,10 +60,14 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration#
 	 * clearReferences()
 	 */
-	public void clearReferences() {
-		map.clear();
-		map = null;
-		clearRMData();
+	public void clearReferences(boolean all) {
+		if (all) {
+			map.clear();
+			map = null;
+			clearRMData();
+		} else {
+			rmdata = null;
+		}
 	}
 
 	/*

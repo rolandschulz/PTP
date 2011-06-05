@@ -32,6 +32,7 @@
 		</attribute>
 		<attribute name="mpiCores" min="1" type="integer">
 			<description>the '-np' value</description>
+			<tooltip>the -np value</tooltip>
 			<default>1</default>
 		</attribute>
 		<attribute name="destination" type="string">
@@ -172,8 +173,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 					<button-group saveValueTo="mpiCores" group="true">
 						<layout>
-							<row-layout type="SWT.HORIZONTAL" center="true" fill="true" justify="true"/>
+							<row-layout type="SWT.VERTICAL" center="true" fill="true" justify="true"/>
 						</layout>
+						<tooltip>${ptp_rm:mpiCores#tooltip}</tooltip>
 						<button type="radiobutton" title="1"/>
 						<button type="radiobutton" title="2"/>
 						<button type="radiobutton" title="3"/>

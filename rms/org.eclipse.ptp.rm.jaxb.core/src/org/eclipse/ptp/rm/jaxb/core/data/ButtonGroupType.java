@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="layout-data" type="{http://org.eclipse.ptp/rm}layout-data-type" minOccurs="0"/>
  *         &lt;element name="layout" type="{http://org.eclipse.ptp/rm}layout-type" minOccurs="0"/>
  *         &lt;element name="title" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="tooltip" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="button" type="{http://org.eclipse.ptp/rm}widget-type" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *       &lt;attribute name="background" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -52,13 +53,14 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "button-group-type", propOrder = { "layoutData", "layout", "title", "button" })
+@XmlType(name = "button-group-type", propOrder = { "layoutData", "layout", "title", "tooltip", "button" })
 public class ButtonGroupType {
 
 	@XmlElement(name = "layout-data")
 	protected LayoutDataType layoutData;
 	protected LayoutType layout;
 	protected String title;
+	protected String tooltip;
 	@XmlElement(required = true)
 	protected List<WidgetType> button;
 	@XmlAttribute
@@ -161,6 +163,16 @@ public class ButtonGroupType {
 	}
 
 	/**
+	 * Gets the value of the tooltip property.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getTooltip() {
+		return tooltip;
+	}
+
+	/**
 	 * Gets the value of the group property.
 	 * 
 	 * @return possible object is {@link Boolean }
@@ -251,4 +263,14 @@ public class ButtonGroupType {
 		this.title = value;
 	}
 
+	/**
+	 * Sets the value of the tooltip property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setTooltip(String value) {
+		this.tooltip = value;
+	}
 }

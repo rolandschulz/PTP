@@ -224,6 +224,9 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
 						delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate(monitor);
+						if (delegate.getRemoteConnection() == null) {
+							throw new Throwable(Messages.UninitializedRemoteServices);
+						}
 						lcMap.initialize(rmConfig.getRMVariableMap());
 						updateHandler.clear();
 					} catch (Throwable t) {
@@ -248,6 +251,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		RMLaunchValidation validation = super.initializeFrom(control, rm, queue, configuration);
 		if (!getControllers().isEmpty()) {
 			tabFolder.setSelection(lastIndex);
+			setVisibleOnSelected();
 		}
 		return validation;
 	}
@@ -256,17 +260,14 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * see {@link #widgetSelected(SelectionEvent)}
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
-		widgetSelected(e);
+		setVisibleOnSelected();
 	}
 
 	/**
-	 * For resizing scrolled parent.
+	 * calls {@link #setVisibleOnSelected()}
 	 */
 	public void widgetSelected(SelectionEvent e) {
-		lastIndex = tabFolder.getSelectionIndex();
-		AbstractJAXBLaunchConfigurationTab t = getControllers().get(lastIndex);
-		resize(t.getSize());
-		t.setVisible();
+		setVisibleOnSelected();
 	}
 
 	/**
@@ -277,5 +278,15 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 */
 	private void resize(Point p) {
 		scrolledParent.setMinSize(getControl().computeSize(p.x + 25, p.y + 50));
+	}
+
+	/**
+	 * resizes the tab and calls setVisible
+	 */
+	private void setVisibleOnSelected() {
+		lastIndex = tabFolder.getSelectionIndex();
+		AbstractJAXBLaunchConfigurationTab t = getControllers().get(lastIndex);
+		resize(t.getSize());
+		t.setVisible();
 	}
 }
