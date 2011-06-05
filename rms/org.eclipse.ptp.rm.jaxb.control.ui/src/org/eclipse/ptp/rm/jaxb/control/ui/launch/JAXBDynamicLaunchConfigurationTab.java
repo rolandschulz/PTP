@@ -505,9 +505,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				return;
 			}
 			parentTab.setLastVisited(title);
-			if (lastVisited == null) {
-				return;
-			}
 			listenerConfiguration.getWorkingCopy().setAttribute(JAXBUIConstants.VISIBLE, this.toString());
 			fireContentsChanged();
 		} catch (CoreException t) {
