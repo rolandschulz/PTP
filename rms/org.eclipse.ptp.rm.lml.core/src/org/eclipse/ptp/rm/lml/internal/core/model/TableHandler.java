@@ -114,7 +114,7 @@ public class TableHandler extends LguiHandler {
 				final ColumnType column = new ColumnType();
 				column.setId(columnLayout.getCid());
 				column.setName(columnLayout.getKey());
-				column.setSort(SortingType.ALPHA);
+				generateDefaultSorting(column);
 				if (columnLayout.getKey().equals("owner")) {
 					generateDefaultPattern(".*", column);
 				}
@@ -481,6 +481,18 @@ public class TableHandler extends LguiHandler {
 		pattern.getIncludeAndExclude().add(
 				new JAXBElement<PatternMatchType>(new QName("include"), PatternMatchType.class, patternMatch));
 		column.setPattern(pattern);
+	}
+
+	private void generateDefaultSorting(ColumnType column) {
+		if (column.getName().equals("step") || column.getName().equals("owner") || column.getName().equals("queue")
+				|| column.getName().equals("status")) {
+			column.setSort(SortingType.ALPHA);
+		} else if (column.getName().equals("wall") || column.getName().equals("totalcores")) {
+			column.setSort(SortingType.NUMERIC);
+		} else {
+			column.setSort(SortingType.DATE);
+		}
+
 	}
 
 	/**
