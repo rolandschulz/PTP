@@ -103,7 +103,7 @@ public class TableHandler extends LguiHandler {
 		}
 	}
 
-	public void generateDefaultTable(String gid) {
+	public TableType generateDefaultTable(String gid) {
 		final TableType table = new TableType();
 		table.setId(gid);
 		table.setTitle("title_" + gid);
@@ -130,6 +130,7 @@ public class TableHandler extends LguiHandler {
 			}
 		}
 		lgui.getObjectsAndRelationsAndInformation().add(new JAXBElement<TableType>(new QName("table"), TableType.class, table));
+		return table;
 	}
 
 	public String getCellValue(TableType table, RowType row, String colName) {

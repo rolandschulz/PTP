@@ -43,6 +43,8 @@ import org.eclipse.ptp.rm.lml.core.model.ILguiHandler;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.InfoType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.InformationType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
@@ -146,6 +148,32 @@ public class LguiItem implements ILguiItem {
 		setCid();
 	}
 
+	private void addCellToRow(RowType row, ColumnType column, String value) {
+		final CellType cell = new CellType();
+		cell.setCid(column.getId());
+		cell.setValue(value);
+		row.getCell().add(cell);
+	}
+
+	private void addJobToTable(TableType table, String oid, JobStatusData status) {
+		final RowType row = new RowType();
+		row.setOid(oid);
+
+		for (final ColumnType column : table.getColumn()) {
+			if (column.getName().equals(JOB_ID)) {
+				addCellToRow(row, column, status.getJobId());
+			} else if (column.getName().equals(JOB_STATUS)) {
+				addCellToRow(row, column, status.getState());
+			} else if (column.getName().equals(JOB_OWNER)) {
+				addCellToRow(row, column, status.getOwner());
+			} else if (column.getName().equals(JOB_QUEUE_NAME)) {
+				addCellToRow(row, column, status.getQueueName());
+			}
+		}
+
+		table.getRow().add(row);
+	}
+
 	/**
 	 * Add a lml-data-listener. It listens for data-changes.
 	 * 
@@ -164,7 +192,7 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData)
 	 */
 	public synchronized void addUserJob(String jobId, JobStatusData status, boolean force) {
-		JobStatusData jobStatus = fJobMap.get(jobId);
+		final JobStatusData jobStatus = fJobMap.get(jobId);
 		/*
 		 * If the job already exists, do nothing
 		 */
@@ -172,7 +200,7 @@ public class LguiItem implements ILguiItem {
 			if (force) {
 				String oid = getOverviewAccess().getOIDByJobId(jobId);
 				if (oid == null) {
-					TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
+					final TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
 					if (table != null) {
 						oid = generateOid();
 						status.setOid(oid);
@@ -182,6 +210,46 @@ public class LguiItem implements ILguiItem {
 			}
 			fJobMap.put(jobId, status);
 		}
+	}
+
+	/**
+	 * The instance lgui is filled with a new data-model. This method creates
+	 * all modules, which handle the data. These modules can then be accessed by
+	 * corresponding getter-functions.
+	 */
+	private void createLguiHandlers() {
+		lguiHandlers.put(OverviewAccess.class, new OverviewAccess(this, lgui));
+		lguiHandlers.put(LayoutAccess.class, new LayoutAccess(this, lgui));
+		lguiHandlers.put(OIDToObject.class, new OIDToObject(this, lgui));
+		lguiHandlers.put(ObjectStatus.class, new ObjectStatus(this, lgui));
+		lguiHandlers.put(OIDToInformation.class, new OIDToInformation(this, lgui));
+		lguiHandlers.put(TableHandler.class, new TableHandler(this, lgui));
+		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this, lgui));
+	}
+
+	private void fireUpdatedEvent() {
+		final ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
+		for (final ILguiListener listener : listeners) {
+			listener.handleEvent(e);
+		}
+	}
+
+	private LguiType firstRequest() {
+		final ObjectFactory objectFactory = new ObjectFactory();
+
+		final LguiType layoutLgui = objectFactory.createLguiType();
+		layoutLgui.setVersion("1"); //$NON-NLS-1$
+		layoutLgui.setLayout(true);
+
+		final RequestType request = objectFactory.createRequestType();
+		request.setGetDefaultData(true);
+		layoutLgui.setRequest(request);
+
+		return layoutLgui;
+	}
+
+	private String generateOid() {
+		return UUID.randomUUID().toString();
 	}
 
 	public synchronized void getCurrentLayout(OutputStream output) {
@@ -207,6 +275,13 @@ public class LguiItem implements ILguiItem {
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String getGidFromJobStatus(JobStatusData status) {
+		if (status.getState().equals(JobStatusData.RUNNING)) {
+			return ACTIVE_JOB_TABLE;
+		}
+		return INACTIVE_JOB_TABLE;
 	}
 
 	/**
@@ -315,7 +390,7 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUserJob(java.lang.String)
 	 */
 	public synchronized JobStatusData getUserJob(String jobId) {
-		JobStatusData status = fJobMap.get(jobId);
+		final JobStatusData status = fJobMap.get(jobId);
 		if (status != null && !status.isRemoved()) {
 			return status;
 		}
@@ -366,6 +441,22 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**
+	 * Parsing an XML file. The method generates from an XML file an instance of
+	 * LguiType.
+	 * 
+	 * @param stream
+	 *            the input stream of the XML file
+	 * @return the generated LguiType
+	 * @throws JAXBException
+	 */
+	@SuppressWarnings("unchecked")
+	private LguiType parseLML(InputStream stream) throws JAXBException {
+		final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
+		final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
+		return doc.getValue();
+	}
+
+	/**
 	 * Remove a lml-data-listener.
 	 * 
 	 * @param listener
@@ -383,13 +474,13 @@ public class LguiItem implements ILguiItem {
 	 * )
 	 */
 	public synchronized void removeUserJob(String jobId) {
-		JobStatusData status = fJobMap.get(jobId);
+		final JobStatusData status = fJobMap.get(jobId);
 		if (status != null) {
-			TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
+			final TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
 			if (table != null) {
 				int index = -1;
 				for (int i = 0; i < table.getRow().size(); i++) {
-					RowType row = table.getRow().get(i);
+					final RowType row = table.getRow().get(i);
 					if (row != null && row.getOid().equals(status.getOid())) {
 						index = i;
 						break;
@@ -400,6 +491,22 @@ public class LguiItem implements ILguiItem {
 				}
 			}
 			status.setRemoved();
+		}
+	}
+
+	private void setCid() {
+		for (final TableType table : getTableHandler().getTables()) {
+			for (final RowType row : table.getRow()) {
+				int cid = 1;
+				for (final CellType cell : row.getCell()) {
+					if (cell.getCid() == null) {
+						cell.setCid(BigInteger.valueOf(cid));
+					} else {
+						cid = cell.getCid().intValue();
+					}
+					cid++;
+				}
+			}
 		}
 	}
 
@@ -431,8 +538,78 @@ public class LguiItem implements ILguiItem {
 		}
 		fireUpdatedEvent();
 		synchronized (this) {
-			setCid();
 			updateJobData();
+		}
+	}
+
+	/**
+	 * Update the job map with the new job data. On this refresh, the new job
+	 * that was added to the table should have been "discovered" by the
+	 * scheduler, so it should appear in one of the job tables. We need to find
+	 * these jobs and update the OID and status information.
+	 */
+	private void updateJobData() {
+		final Set<JobStatusData> jobsInTable = new HashSet<JobStatusData>();
+		final List<String> oidsToRemove = new ArrayList<String>();
+
+		/*
+		 * First check for jobs that are in the table and update them
+		 */
+		for (final InformationType information : getOverviewAccess().getInformations()) {
+			for (final InfoType info : information.getInfo()) {
+				final String jobId = getOverviewAccess().getInfodataValue(info, JOB_ID);
+				if (jobId != null) {
+					final JobStatusData status = fJobMap.get(jobId);
+					if (status != null) {
+						if (!status.isRemoved() && !status.isCompleted()) {
+							/*
+							 * job exists in both map and LML, so update the map
+							 * with the oid and latest status
+							 */
+							status.setOid(info.getOid());
+							status.setState(getOverviewAccess().getInfodataValue(info, JOB_STATUS));
+							/*
+							 * Remember this job is in the table for later
+							 */
+							jobsInTable.add(status);
+						} else {
+							/*
+							 * job has been removed by the user. remove it from
+							 * the table
+							 */
+							oidsToRemove.add(info.getOid());
+						}
+					}
+				}
+			}
+		}
+
+		/*
+		 * Remove any rows for removed jobs
+		 */
+		for (final TableType table : getTableHandler().getTables()) {
+			for (final String row : oidsToRemove) {
+				table.getRow().remove(row);
+			}
+			oidsToRemove.clear();
+		}
+
+		/*
+		 * Next find any jobs that are no longer in any of the tables. We need
+		 * to create a "fake" entry in the jobslistwait table for these. Note
+		 * that these jobs are now considered "COMPLETED".
+		 */
+		TableType table = getTableHandler().getTable(INACTIVE_JOB_TABLE);
+		if (table == null) {
+			table = getTableHandler().generateDefaultTable(INACTIVE_JOB_TABLE);
+		}
+		for (JobStatusData status : fJobMap.values()) {
+			if (!status.isRemoved() && !jobsInTable.contains(status)) {
+				if (!status.isCompleted()) {
+					status.setState(JobStatusData.COMPLETED);
+				}
+				addJobToTable(table, status.getOid(), status);
+			}
 		}
 	}
 
@@ -444,186 +621,15 @@ public class LguiItem implements ILguiItem {
 	 * , java.lang.String, java.lang.String)
 	 */
 	public synchronized void updateUserJob(String jobId, String status, String detail) {
-		JobStatusData jobStatus = fJobMap.get(jobId);
+		final JobStatusData jobStatus = fJobMap.get(jobId);
 		if (jobStatus != null) {
-			TableType table = getTableHandler().getTable(getGidFromJobStatus(jobStatus));
+			final TableType table = getTableHandler().getTable(getGidFromJobStatus(jobStatus));
 			if (table != null) {
-				for (RowType row : table.getRow()) {
+				for (final RowType row : table.getRow()) {
 					if (row.getOid().equals(jobStatus.getOid())) {
 						getTableHandler().setCellValue(table, row, JOB_STATUS, status);
 					}
 				}
-			}
-		}
-	}
-
-	private void addCellToRow(RowType row, ColumnType column, String value) {
-		final CellType cell = new CellType();
-		cell.setCid(column.getId());
-		cell.setValue(value);
-		row.getCell().add(cell);
-	}
-
-	private void addJobToTable(TableType table, String oid, JobStatusData status) {
-		RowType row = new RowType();
-		row.setOid(oid);
-
-		for (final ColumnType column : table.getColumn()) {
-			if (column.getName().equals(JOB_ID)) {
-				addCellToRow(row, column, status.getJobId());
-			} else if (column.getName().equals(JOB_STATUS)) {
-				addCellToRow(row, column, status.getState());
-			} else if (column.getName().equals(JOB_OWNER)) {
-				addCellToRow(row, column, status.getOwner());
-			} else if (column.getName().equals(JOB_QUEUE_NAME)) {
-				addCellToRow(row, column, status.getQueueName());
-			}
-		}
-
-		table.getRow().add(row);
-	}
-
-	/**
-	 * The instance lgui is filled with a new data-model. This method creates
-	 * all modules, which handle the data. These modules can then be accessed by
-	 * corresponding getter-functions.
-	 */
-	private void createLguiHandlers() {
-		lguiHandlers.put(OverviewAccess.class, new OverviewAccess(this, lgui));
-		lguiHandlers.put(LayoutAccess.class, new LayoutAccess(this, lgui));
-		lguiHandlers.put(OIDToObject.class, new OIDToObject(this, lgui));
-		lguiHandlers.put(ObjectStatus.class, new ObjectStatus(this, lgui));
-		lguiHandlers.put(OIDToInformation.class, new OIDToInformation(this, lgui));
-		lguiHandlers.put(TableHandler.class, new TableHandler(this, lgui));
-		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this, lgui));
-	}
-
-	private void fireUpdatedEvent() {
-		final ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
-		for (final ILguiListener listener : listeners) {
-			listener.handleEvent(e);
-		}
-	}
-
-	private LguiType firstRequest() {
-		final ObjectFactory objectFactory = new ObjectFactory();
-
-		final LguiType layoutLgui = objectFactory.createLguiType();
-		layoutLgui.setVersion("1"); //$NON-NLS-1$
-		layoutLgui.setLayout(true);
-
-		final RequestType request = objectFactory.createRequestType();
-		request.setGetDefaultData(true);
-		layoutLgui.setRequest(request);
-
-		return layoutLgui;
-	}
-
-	private String generateOid() {
-		return UUID.randomUUID().toString();
-	}
-
-	private String getGidFromJobStatus(JobStatusData status) {
-		if (status.getState().equals(JobStatusData.RUNNING)) {
-			return ACTIVE_JOB_TABLE;
-		}
-		return INACTIVE_JOB_TABLE;
-	}
-
-	/**
-	 * Parsing an XML file. The method generates from an XML file an instance of
-	 * LguiType.
-	 * 
-	 * @param stream
-	 *            the input stream of the XML file
-	 * @return the generated LguiType
-	 * @throws JAXBException
-	 */
-	@SuppressWarnings("unchecked")
-	private LguiType parseLML(InputStream stream) throws JAXBException {
-		final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
-		final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
-		return doc.getValue();
-	}
-
-	private void setCid() {
-		for (final TableType table : getTableHandler().getTables()) {
-			for (final RowType row : table.getRow()) {
-				int cid = 1;
-				for (final CellType cell : row.getCell()) {
-					if (cell.getCid() == null) {
-						cell.setCid(BigInteger.valueOf(cid));
-					} else {
-						cid = cell.getCid().intValue();
-					}
-					cid++;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Update the job map with the new job data. On this refresh, the new job
-	 * that was added to the table should have been "discovered" by the
-	 * scheduler, so it should appear in one of the job tables. We need to find
-	 * these jobs and update the OID and status information.
-	 */
-	private void updateJobData() {
-		Set<JobStatusData> jobsInTable = new HashSet<JobStatusData>();
-		List<RowType> rowsToRemove = new ArrayList<RowType>();
-
-		/*
-		 * First check for jobs that are in the table and update them
-		 */
-		for (TableType table : getTableHandler().getTables()) {
-			for (RowType row : table.getRow()) {
-				String jobId = getTableHandler().getCellValue(table, row, JOB_ID);
-				if (jobId != null) {
-					JobStatusData status = fJobMap.get(jobId);
-					if (status != null) {
-						if (!status.isRemoved() && !status.isCompleted()) {
-							/*
-							 * job exists in both map and LML, so update the map
-							 * with the oid and latest status
-							 */
-							status.setOid(row.getOid());
-							status.setState(getTableHandler().getCellValue(table, row, JOB_STATUS));
-							/*
-							 * Remember this job is in the table for later
-							 */
-							jobsInTable.add(status);
-						} else {
-							/*
-							 * job has been removed by the user. remove it from
-							 * the table
-							 */
-							rowsToRemove.add(row);
-						}
-					}
-				}
-			}
-
-			/*
-			 * Remove any rows for removed jobs
-			 */
-			for (RowType row : rowsToRemove) {
-				table.getRow().remove(row);
-			}
-			rowsToRemove.clear();
-		}
-
-		/*
-		 * Next find any jobs that are no longer in any of the tables. We need
-		 * to create a "fake" entry in the jobslistwait table for these. Note
-		 * that these jobs are now considered "COMPLETED".
-		 */
-		TableType table = getTableHandler().getTable(INACTIVE_JOB_TABLE);
-		for (JobStatusData status : fJobMap.values()) {
-			if (!status.isRemoved() && !jobsInTable.contains(status)) {
-				if (!status.isCompleted()) {
-					status.setState(JobStatusData.COMPLETED);
-				}
-				addJobToTable(table, status.getOid(), status);
 			}
 		}
 	}

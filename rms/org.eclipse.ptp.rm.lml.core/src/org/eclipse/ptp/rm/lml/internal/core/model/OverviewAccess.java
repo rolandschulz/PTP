@@ -71,6 +71,15 @@ public class OverviewAccess extends LguiHandler {
 		return objects;
 	}
 
+	public String getInfodataValue(InfoType info, String key) {
+		for (final InfodataType data : info.getData()) {
+			if (data.getKey().equals(key)) {
+				return data.getValue();
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Getting a list of all elements of type InformationsType from LguiType.
 	 * 
