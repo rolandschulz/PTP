@@ -115,6 +115,12 @@ public class RemoteServicesDelegate {
 	 * @throws CoreException
 	 */
 	public void initialize(IProgressMonitor monitor) throws CoreException {
+		/*
+		 * could happen on shutdown
+		 */
+		if (PTPRemoteCorePlugin.getDefault() == null) {
+			return;
+		}
 		try {
 			localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 			if (localServices != null) {

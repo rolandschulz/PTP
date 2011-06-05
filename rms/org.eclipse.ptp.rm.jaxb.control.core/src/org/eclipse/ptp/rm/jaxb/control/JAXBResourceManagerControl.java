@@ -117,6 +117,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private JobIdPinTable pinTable;
 	private RMVariableMap rmVarMap;
 	private ControlType controlData;
+	private String servicesId;
+	private String connectionName;
+	private RemoteServicesDelegate remoteServicesDelegate;
 	private boolean appendLaunchEnv;
 
 	/**
@@ -163,7 +166,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * Reinitializes, in case the connection info has been changed on a cached
+	 * Reinitializes when the connection info has been changed on a cached
 	 * resource manager.
 	 * 
 	 * @param monitor
@@ -171,9 +174,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws CoreException
 	 */
 	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
-		RemoteServicesDelegate delegate = new RemoteServicesDelegate(config.getRemoteServicesId(), config.getConnectionName());
-		delegate.initialize(monitor);
-		return delegate;
+		String cname = config.getConnectionName();
+		String sid = config.getRemoteServicesId();
+		if (remoteServicesDelegate == null || !cname.equals(connectionName) || !sid.equals(servicesId)) {
+			connectionName = cname;
+			servicesId = sid;
+			remoteServicesDelegate = new RemoteServicesDelegate(servicesId, connectionName);
+			remoteServicesDelegate.initialize(monitor);
+		}
+		return remoteServicesDelegate;
 	}
 
 	/*
