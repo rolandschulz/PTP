@@ -353,7 +353,7 @@ public class LMLManager {
 	public void updateUserJob(String name, String jobId, String status, String detail) {
 		final ILguiItem lguiItem = LGUIS.get(name);
 		if (lguiItem != null) {
-			lguiItem.updateUserJob(name, status, detail);
+			lguiItem.updateUserJob(jobId, status, detail);
 		}
 		if (lguiItem == fLguiItem) {
 			fireUpdatedLgui();
@@ -474,7 +474,9 @@ public class LMLManager {
 	 */
 	private void saveJobStatusData(ILguiItem item, IMemento memento) {
 		for (final JobStatusData status : item.getUserJobs()) {
-			status.save(memento);
+			if (!status.isRemoved()) {
+				status.save(memento);
+			}
 		}
 	}
 }
