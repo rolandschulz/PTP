@@ -344,7 +344,7 @@ public class TableHandler extends LguiHandler {
 			final Cell[] tableDataRow = new Cell[cids.length];
 			for (int j = 0; j < cids.length; j++) {
 				for (final CellType cell : row.getCell()) {
-					if (cell.getCid().equals(cids[j])) {
+					if (cell.getCid() != null && cell.getCid().equals(cids[j])) {
 						tableDataRow[j] = new Cell(cell.getValue(), tableData[i]);
 						break;
 					}
