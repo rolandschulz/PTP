@@ -426,6 +426,9 @@ public class LguiItem implements ILguiItem {
 		if (listeners.isEmpty()) {
 			createLguiHandlers();
 		}
+		synchronized (this) {
+			setCid();
+		}
 		fireUpdatedEvent();
 		synchronized (this) {
 			setCid();
