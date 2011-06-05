@@ -55,33 +55,6 @@ import org.eclipse.ptp.rm.lml.internal.core.events.LguiUpdatedEvent;
  */
 public class LguiItem implements ILguiItem {
 
-	/**
-	 * Parsing an XML file. The method generates from an XML file an instance of
-	 * LguiType.
-	 * 
-	 * @param xml
-	 *            the URL source of the XML file
-	 * @return the generated LguiType
-	 * @throws MalformedURLException
-	 * @throws JAXBException
-	 */
-	@SuppressWarnings("unchecked")
-	private static LguiType parseLML(URI xml) throws MalformedURLException {
-		LguiType lml = null;
-		try {
-			final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
-
-			final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(xml.toURL());
-
-			lml = doc.getValue();
-		} catch (final JAXBException e) {
-			e.printStackTrace();
-		}
-
-		return lml;
-
-	}
-
 	/*
 	 * Source of the XML-file from which the LguiType was generated.
 	 */
@@ -621,6 +594,33 @@ public class LguiItem implements ILguiItem {
 				addJobToTable(table, status.getOid(), status);
 			}
 		}
+	}
+
+	/**
+	 * Parsing an XML file. The method generates from an XML file an instance of
+	 * LguiType.
+	 * 
+	 * @param xml
+	 *            the URL source of the XML file
+	 * @return the generated LguiType
+	 * @throws MalformedURLException
+	 * @throws JAXBException
+	 */
+	@SuppressWarnings("unchecked")
+	private static LguiType parseLML(URI xml) throws MalformedURLException {
+		LguiType lml = null;
+		try {
+			final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
+
+			final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(xml.toURL());
+
+			lml = doc.getValue();
+		} catch (final JAXBException e) {
+			e.printStackTrace();
+		}
+
+		return lml;
+
 	}
 
 }

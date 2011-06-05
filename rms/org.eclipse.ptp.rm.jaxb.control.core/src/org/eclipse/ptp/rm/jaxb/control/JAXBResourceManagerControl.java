@@ -435,7 +435,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		String jobId = null;
 		try {
-			pinTable.pin(uuid);
 			PropertyType p = new PropertyType();
 			p.setVisible(false);
 			rmVarMap.put(uuid, p);
@@ -513,7 +512,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			rmVarMap.remove(JAXBControlConstants.SCRIPT);
 			return status;
 		} finally {
-			pinTable.release(uuid);
 			pinTable.release(jobId);
 		}
 	}
@@ -804,13 +802,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		try {
 			runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, true);
+			rmVarMap.remove(jobId);
 		} catch (CoreException t) {
 			JAXBControlCorePlugin.log(t);
 		} finally {
 			pinTable.release(jobId);
 		}
-
-		rmVarMap.remove(jobId);
 	}
 
 	/**

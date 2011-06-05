@@ -21,10 +21,16 @@ import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
  * 
  */
 public class JobIdPinTable {
-	private final Map<String, Thread> map;
+
+	private class PinData {
+		private int count;
+		private long tid;
+	}
+
+	private final Map<String, PinData> map;
 
 	public JobIdPinTable() {
-		map = new HashMap<String, Thread>();
+		map = new HashMap<String, PinData>();
 	}
 
 	/**
@@ -38,7 +44,9 @@ public class JobIdPinTable {
 		}
 		synchronized (map) {
 			while (map.containsKey(jobId)) {
-				if (Thread.currentThread().getId() == map.get(jobId).getId()) {
+				PinData data = map.get(jobId);
+				if (Thread.currentThread().getId() == data.tid) {
+					data.count++;
 					break;
 				}
 				try {
@@ -46,12 +54,15 @@ public class JobIdPinTable {
 				} catch (InterruptedException ignored) {
 				}
 			}
-			map.put(jobId, Thread.currentThread());
+			PinData data = new PinData();
+			data.count = 1;
+			data.tid = Thread.currentThread().getId();
+			map.put(jobId, data);
 		}
 	}
 
 	/**
-	 * Removes the id to the pinned table and notifies all.
+	 * Removes the id from the pinned table and notifies all.
 	 * 
 	 * @param jobId
 	 */
@@ -60,17 +71,16 @@ public class JobIdPinTable {
 			return;
 		}
 		synchronized (map) {
-			while (map.containsKey(jobId)) {
-				if (Thread.currentThread().getId() == map.get(jobId).getId()) {
-					map.remove(jobId);
-					break;
-				}
-				try {
-					map.wait(JAXBControlConstants.STANDARD_WAIT);
-				} catch (InterruptedException ignored) {
+			if (map.containsKey(jobId)) {
+				PinData data = map.get(jobId);
+				if (Thread.currentThread().getId() == data.tid) {
+					data.count--;
+					if (data.count == 0) {
+						map.remove(jobId);
+						map.notifyAll();
+					}
 				}
 			}
-			map.notifyAll();
 		}
 	}
 }

@@ -40,8 +40,6 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	}
 
 	/*
-	 * Also unpins the id if it is pinned. (non-Javadoc)
-	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#addJobStatus(java.lang
 	 * .String, org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus)

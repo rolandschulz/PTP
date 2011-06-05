@@ -28,6 +28,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
 import org.eclipse.ptp.rmsystem.IJobStatus;
@@ -61,8 +62,8 @@ public class ActionUtils {
 	 */
 	public static void callDoControl(JobStatusData job, String operation, TableView view, IProgressMonitor monitor)
 			throws CoreException {
-		final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
-		final IResourceManagerControl control = rm.getControl();
+		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
+		IResourceManagerControl control = rm.getControl();
 		control.control(job.getJobId(), operation, monitor);
 		maybeUpdateJobState(job, view, monitor);
 	}
@@ -80,7 +81,6 @@ public class ActionUtils {
 	 * @return contents of the file, or empty string if path is undefined.
 	 */
 	public static String doRead(final String rmId, final String path, final boolean autoStart) throws CoreException {
-
 		if (path == null) {
 			return ""; //$NON-NLS-1$
 		}
@@ -89,22 +89,14 @@ public class ActionUtils {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-				final IResourceManagerControl control = rm.getControl();
-				final SubMonitor progress = SubMonitor.convert(monitor, 100);
+				IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+				IResourceManagerControl control = rm.getControl();
+				SubMonitor progress = SubMonitor.convert(monitor, 100);
 				try {
-					final String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
-					if (remoteServicesId != null) {
-						final IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId,
-								progress.newChild(25));
-						final IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
-						final String remoteConnectionName = control.getControlConfiguration().getConnectionName();
-						final IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
-						final IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
-						final IFileStore lres = remoteFileManager.getResource(path);
-						final BufferedInputStream is = new BufferedInputStream(
-								lres.openInputStream(EFS.NONE, progress.newChild(25)));
-						final byte[] buffer = new byte[COPY_BUFFER_SIZE];
+					IFileStore lres = getRemoteFile(path, control, progress);
+					if (lres != null) {
+						BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE, progress.newChild(25)));
+						byte[] buffer = new byte[COPY_BUFFER_SIZE];
 						int rcvd = 0;
 						try {
 							while (true) {
@@ -131,7 +123,7 @@ public class ActionUtils {
 							monitor.done();
 						}
 					}
-				} catch (final Throwable t) {
+				} catch (Throwable t) {
 					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
 				}
 				return Status.OK_STATUS;
@@ -156,12 +148,12 @@ public class ActionUtils {
 	 * @throws CoreException
 	 */
 	public static void maybeUpdateJobState(JobStatusData job, TableView view, IProgressMonitor monitor) throws CoreException {
-		final IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
+		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(job.getRmId());
 		if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
 			return;
 		}
-		final IResourceManagerControl control = rm.getControl();
-		final IJobStatus refreshed = control.getJobStatus(job.getJobId(), monitor);
+		IResourceManagerControl control = rm.getControl();
+		IJobStatus refreshed = control.getJobStatus(job.getJobId(), monitor);
 		job.updateState(refreshed.getState(), refreshed.getStateDetail());
 		maybeCheckFiles(job);
 		view.refresh();
@@ -181,15 +173,8 @@ public class ActionUtils {
 				IResourceManagerControl control = rm.getControl();
 				SubMonitor progress = SubMonitor.convert(monitor, 70);
 				try {
-					String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
-					if (remoteServicesId != null) {
-						IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId,
-								progress.newChild(25));
-						IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
-						String remoteConnectionName = control.getControlConfiguration().getConnectionName();
-						IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
-						IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
-						IFileStore lres = remoteFileManager.getResource(path);
+					IFileStore lres = getRemoteFile(path, control, progress);
+					if (lres != null) {
 						if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
 							lres.delete(EFS.NONE, progress.newChild(25));
 						}
@@ -200,6 +185,46 @@ public class ActionUtils {
 				return Status.OK_STATUS;
 			}
 		}.schedule();
+	}
+
+	/**
+	 * Similar to {@link RemoteServicesDelegate#initialize(IProgressMonitor)}
+	 * 
+	 * @param path
+	 * @param control
+	 * @param progress
+	 * @return file, if retrieval was successful
+	 */
+	private static IFileStore getRemoteFile(String path, IResourceManagerControl control, SubMonitor progress) {
+		String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
+		if (remoteServicesId != null) {
+			if (PTPRemoteCorePlugin.getDefault() == null) {
+				return null;
+			}
+			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId,
+					progress.newChild(25));
+			if (remoteServices == null) {
+				return null;
+			}
+			IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
+			if (remoteConnectionManager == null) {
+				return null;
+			}
+			String remoteConnectionName = control.getControlConfiguration().getConnectionName();
+			if (remoteConnectionName == null) {
+				return null;
+			}
+			IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
+			if (remoteConnection == null) {
+				return null;
+			}
+			IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
+			if (remoteFileManager == null) {
+				return null;
+			}
+			return remoteFileManager.getResource(path);
+		}
+		return null;
 	}
 
 	/**
