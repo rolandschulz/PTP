@@ -66,6 +66,9 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 			map = null;
 			clearRMData();
 		} else {
+			if (map != null) {
+				map.clear();
+			}
 			rmdata = null;
 		}
 	}
