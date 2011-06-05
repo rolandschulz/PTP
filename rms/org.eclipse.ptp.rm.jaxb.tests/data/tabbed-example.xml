@@ -51,9 +51,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
 			<validator>
-            <regex expression="[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"/>
-            <error-message>must be hh:mm:ss</error-message>
-         </validator>
+				<regex expression="[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"/>
+				<error-message>must be hh:mm:ss</error-message>
+			</validator>
 		</attribute>
 		<script>
 			<line>
@@ -185,8 +185,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<button type="radiobutton" title="7"/>
 						<button type="radiobutton" title="8"/>
 					</button-group>
-					<!-- likewise cannot seem to make new composite with row layout span two columns of its parent grid layout, so we use another empty
-						label here as filler -->
+					<!-- likewise cannot seem to make new composite with row layout span two columns of its parent grid layout, so we use another empty -->
+					<!-- label here as filler -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -200,7 +200,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 				</composite>
 			</dynamic>
-			<dynamic includeWidgetValuesFrom="Environment,Paths">
+			<dynamic includeWidgetValuesFrom="Cores,Paths">
 				<title>Settings</title>
 				<composite>
 					<layout>
@@ -282,7 +282,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 				</composite>
 			</dynamic>
-			<dynamic>
+			<dynamic includeWidgetValuesFrom="Cores">
 				<title>Paths</title>
 				<composite>
 					<layout>
@@ -351,7 +351,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</widget>
 				</composite>
 			</dynamic>
-			<dynamic includeWidgetValuesFrom="Settings">
+			<dynamic>
+				<!-- <dynamic includeWidgetValuesFrom="Settings"> -->
 				<title>Environment</title>
 				<composite group="true">
 					<layout>

@@ -91,6 +91,26 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
+	 * Calls the string substitution method on the variable manager. Under
+	 * synchronization, sets the variable resolver's map reference to this
+	 * instance.
+	 * 
+	 * @param expression
+	 *            to be resolved (recursively dereferenced from the map).
+	 * @return the resolved expression
+	 * @throws CoreException
+	 */
+	private String dereference(String expression) throws CoreException {
+		if (expression == null) {
+			return null;
+		}
+		synchronized (monitor) {
+			LCVariableResolver.setActive(this);
+			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
+		}
+	}
+
+	/**
 	 * @param name
 	 *            of widget, bound to a Property or Attribute
 	 * @return value of the Property or Attribute, or <code>null</code> if none
@@ -269,13 +289,76 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
+	 * If the value of the Property or Attribute is <code>null</code> and it has
+	 * a defined default, the value is set to the default.
+	 * 
+	 * @param key
+	 *            from the original RMVariableMap
+	 * @param value
+	 *            the Property or Attribute
+	 * @throws Throwable
+	 */
+	private void loadValues(String key, Object value) throws Throwable {
+		String name = null;
+		String defVal = null;
+		String strVal = null;
+		boolean visible = true;
+		Object o = null;
+		if (value instanceof PropertyType) {
+			PropertyType p = (PropertyType) value;
+			name = p.getName();
+			if (name == null) {
+				return;
+			}
+			defVal = p.getDefault();
+			if (!p.isVisible()) {
+				hidden.put(name, p);
+			} else {
+				o = p.getValue();
+			}
+		} else if (value instanceof AttributeType) {
+			AttributeType ja = (AttributeType) value;
+			name = ja.getName();
+			if (name == null) {
+				return;
+			}
+			defVal = ja.getDefault();
+			if (!ja.isVisible()) {
+				hidden.put(name, ja);
+			} else {
+				o = ja.getValue();
+				String status = ja.getStatus();
+				put(name + JAXBControlConstants.PD + JAXBControlConstants.STATUS, status);
+			}
+		} else {
+			throw new ArrayStoreException(Messages.IllegalVariableValueType + value);
+		}
+		defaultValues.put(name, defVal);
+		if (visible) {
+			if (o != null) {
+				strVal = String.valueOf(o);
+			}
+			if (strVal == null) {
+				strVal = defVal;
+			}
+			put(name, strVal);
+		}
+	}
+
+	/**
+	 * Does not allow <code>null</code> values.
+	 * 
 	 * @param name
 	 *            of widget, bound to a Property or Attribute
 	 * @param value
 	 *            of Property or Attribute
 	 */
 	public void put(String name, Object value) {
-		values.put(name, value);
+		if (value == null) {
+			values.remove(name);
+		} else {
+			values.put(name, value);
+		}
 	}
 
 	/**
@@ -339,82 +422,5 @@ public class LCVariableMap implements IVariableMap {
 	 */
 	public void writeToConfiguration(ILaunchConfigurationWorkingCopy configuration) throws CoreException {
 		configuration.setAttributes(values);
-	}
-
-	/**
-	 * Calls the string substitution method on the variable manager. Under
-	 * synchronization, sets the variable resolver's map reference to this
-	 * instance.
-	 * 
-	 * @param expression
-	 *            to be resolved (recursively dereferenced from the map).
-	 * @return the resolved expression
-	 * @throws CoreException
-	 */
-	private String dereference(String expression) throws CoreException {
-		if (expression == null) {
-			return null;
-		}
-		synchronized (monitor) {
-			LCVariableResolver.setActive(this);
-			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
-		}
-	}
-
-	/**
-	 * If the value of the Property or Attribute is <code>null</code> and it has
-	 * a defined default, the value is set to the default.
-	 * 
-	 * @param key
-	 *            from the original RMVariableMap
-	 * @param value
-	 *            the Property or Attribute
-	 * @throws Throwable
-	 */
-	private void loadValues(String key, Object value) throws Throwable {
-		String name = null;
-		String defVal = null;
-		String strVal = null;
-		boolean visible = true;
-		Object o = null;
-		if (value instanceof PropertyType) {
-			PropertyType p = (PropertyType) value;
-			name = p.getName();
-			if (name == null) {
-				return;
-			}
-			defVal = p.getDefault();
-			if (!p.isVisible()) {
-				hidden.put(name, p);
-			} else {
-				o = p.getValue();
-			}
-		} else if (value instanceof AttributeType) {
-			AttributeType ja = (AttributeType) value;
-			name = ja.getName();
-			if (name == null) {
-				return;
-			}
-			defVal = ja.getDefault();
-			if (!ja.isVisible()) {
-				hidden.put(name, ja);
-			} else {
-				o = ja.getValue();
-				String status = ja.getStatus();
-				put(name + JAXBControlConstants.PD + JAXBControlConstants.STATUS, status);
-			}
-		} else {
-			throw new ArrayStoreException(Messages.IllegalVariableValueType + value);
-		}
-		defaultValues.put(name, defVal);
-		if (visible) {
-			if (o != null) {
-				strVal = String.valueOf(o);
-			}
-			if (strVal == null) {
-				strVal = defVal;
-			}
-			put(name, strVal);
-		}
 	}
 }

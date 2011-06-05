@@ -67,6 +67,11 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	}
 
 	/**
+	 * Tab-specific handling of local variable map.
+	 */
+	protected abstract void doRefreshLocal();
+
+	/**
 	 * @return image to display in the folder tab for this LaunchTab
 	 */
 	public abstract Image getImage();
@@ -123,6 +128,19 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	}
 
 	/**
+	 * Subclasses should call this method, but implement doRefreshLocal().
+	 * 
+	 * @param current
+	 *            configuration
+	 */
+	protected void refreshLocal(ILaunchConfiguration config) throws CoreException {
+		Map<String, Object> saved = parentTab.getLCMap().getStandardConfigurationProperties(config, localMap);
+		localMap.clear();
+		localMap.putAll(saved);
+		doRefreshLocal();
+	}
+
+	/**
 	 * Set up shared environment, if any; adapter method which does nothing
 	 * 
 	 * @param controllers
@@ -137,23 +155,5 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 */
 	public void setVisible() {
 		// does nothing
-	}
-
-	/**
-	 * Tab-specific handling of local variable map.
-	 */
-	protected abstract void doRefreshLocal();
-
-	/**
-	 * Subclasses should call this method, but implement doRefreshLocal().
-	 * 
-	 * @param current
-	 *            configuration
-	 */
-	protected void refreshLocal(ILaunchConfiguration config) throws CoreException {
-		Map<String, Object> saved = parentTab.getLCMap().getStandardConfigurationProperties(config, localMap);
-		localMap.clear();
-		localMap.putAll(saved);
-		doRefreshLocal();
 	}
 }
