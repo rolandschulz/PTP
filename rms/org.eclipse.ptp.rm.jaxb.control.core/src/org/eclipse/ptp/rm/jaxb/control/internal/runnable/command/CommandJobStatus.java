@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -129,6 +132,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private final String rmUniqueName;
 	private final IJAXBResourceManagerControl control;
 	private final ICommandJob open;
+	private final Map<Long, Long> lastUpdateRequest;
 
 	private String jobId;
 	private String owner;
@@ -142,7 +146,6 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private IRemoteProcess process;
 
 	private boolean waitEnabled;
-	private long lastUpdateRequest;
 	private boolean dirty = false;
 	private boolean fFilesChecked = false;
 
@@ -171,7 +174,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 		this.open = open;
 		this.control = control;
 		waitEnabled = true;
-		lastUpdateRequest = 0;
+		lastUpdateRequest = new HashMap<Long, Long>();
 	}
 
 	/**
@@ -220,6 +223,13 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
+	/**
+	 * Clear out the thread map.
+	 */
+	public synchronized void clearRequests() {
+		lastUpdateRequest.clear();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -245,8 +255,17 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return jobId;
 	}
 
+	/**
+	 * On a per-thread basis, for throttling requests.
+	 */
 	public synchronized long getLastUpdateRequest() {
-		return lastUpdateRequest;
+		Long thread = Thread.currentThread().getId();
+		Long last = lastUpdateRequest.get(thread);
+		if (last == null) {
+			last = Long.valueOf(0);
+			lastUpdateRequest.put(thread, System.currentTimeMillis());
+		}
+		return last;
 	}
 
 	/**
@@ -530,10 +549,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 	/**
 	 * @param time
 	 *            in milliseconds of last update request issued to remote
-	 *            resource
+	 *            resource, on per-thread basis
 	 */
 	public synchronized void setUpdateRequestTime(long update) {
-		lastUpdateRequest = update;
+		Long thread = Thread.currentThread().getId();
+		lastUpdateRequest.put(thread, update);
 	}
 
 	/*
