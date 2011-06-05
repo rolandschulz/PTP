@@ -133,390 +133,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * @return whether to append (true) the env passed in through the
-	 *         LaunchConfiguration, or replace the current env with it.
-	 */
-	public boolean getAppendEnv() {
-		return appendLaunchEnv;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getEnvironment()
-	 */
-	public IVariableMap getEnvironment() {
-		return rmVarMap;
-	}
-
-	/**
-	 * @return table of open remote processes
-	 */
-	public Map<String, ICommandJob> getJobTable() {
-		return jobTable;
-	}
-
-	/**
-	 * @return any environment variables passed in through the
-	 *         LaunchConfiguration
-	 */
-	public Map<String, String> getLaunchEnv() {
-		return launchEnv;
-	}
-
-	/**
-	 * Reinitializes when the connection info has been changed on a cached
-	 * resource manager.
-	 * 
-	 * @param monitor
-	 * @return wrapper object for remote services, connections and file managers
-	 * @throws CoreException
-	 */
-	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
-		String cname = config.getConnectionName();
-		String sid = config.getRemoteServicesId();
-		if (remoteServicesDelegate == null || !cname.equals(connectionName) || !sid.equals(servicesId)) {
-			connectionName = cname;
-			servicesId = sid;
-			remoteServicesDelegate = new RemoteServicesDelegate(servicesId, connectionName);
-			remoteServicesDelegate.initialize(monitor);
-		}
-		return remoteServicesDelegate;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getState()
-	 */
-	public String getState() {
-		return getResourceManager().getState();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getStatusMap()
-	 */
-	public ICommandJobStatusMap getStatusMap() {
-		return jobStatusMap;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged
-	 * (java.lang.String)
-	 */
-	public void jobStateChanged(String jobId, IJobStatus status) {
-		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
-		getResourceManager().updateJob(jobId, status);
-	}
-
-	/*
-	 * For termination, pause, hold, suspension and resume requests. Resets the
-	 * environment, generates a uuid property; if the control request is
-	 * termination, calls remove on the state map. (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doControlJob(
-	 * java.lang.String, java.lang.String,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
-		if (!resourceManagerIsActive()) {
-			return;
-		}
-
-		SubMonitor progress = SubMonitor.convert(monitor, 100);
-		try {
-			pinTable.pin(jobId);
-			PropertyType p = new PropertyType();
-			p.setVisible(false);
-			p.setName(jobId);
-			rmVarMap.put(jobId, p);
-
-			worked(progress, 30);
-			doControlCommand(jobId, operation);
-
-			worked(progress, 40);
-			rmVarMap.remove(jobId);
-
-			if (TERMINATE_OPERATION.equals(operation)) {
-				jobStatusMap.cancel(jobId);
-			}
-
-			worked(progress, 30);
-		} finally {
-			pinTable.release(jobId);
-		}
-	}
-
-	@Override
-	protected void doDispose() {
-		// NOP for the moment
-	}
-
-	/*
-	 * Used by the client to refresh status on demand. (non-Javadoc) Generates a
-	 * jobId property; if the returned state is RUNNING, starts the proxy (a
-	 * rentrant call to a started proxy does nothing); if COMPLETED, the status
-	 * is removed from the map.
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doGetJobStatus
-	 * (java.lang.String)
-	 */
-	@Override
-	protected IJobStatus doGetJobStatus(String jobId, IProgressMonitor monitor) throws CoreException {
-		try {
-			pinTable.pin(jobId);
-			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
-
-			/*
-			 * First check to see when the last call was made; throttle requests
-			 * coming in intervals less than
-			 * ICommandJobStatus.UPDATE_REQUEST_INTERVAL
-			 */
-			SubMonitor progress = SubMonitor.convert(monitor, 100);
-
-			if (status != null) {
-				if (IJobStatus.COMPLETED.equals(status.getState())) {
-					/*
-					 * leave the status in the map in case there are further
-					 * calls (regarding remote file state); it will be pruned by
-					 * the daemon
-					 */
-					status = jobStatusMap.terminated(jobId, progress.newChild(50));
-					if (status.stateChanged()) {
-						jobStateChanged(jobId, status);
-					}
-					return status;
-				}
-
-				long now = System.currentTimeMillis();
-				long lapse = now - status.getLastUpdateRequest();
-				if (lapse < ICommandJobStatus.UPDATE_REQUEST_INTERVAL) {
-					return status;
-				}
-				status.setUpdateRequestTime(now);
-			}
-
-			String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
-
-			PropertyType p = (PropertyType) rmVarMap.get(jobId);
-
-			CommandType job = controlData.getGetJobStatus();
-			if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
-				p = new PropertyType();
-				p.setVisible(false);
-				p.setName(jobId);
-				rmVarMap.put(jobId, p);
-				runCommand(jobId, job, CommandJob.JobMode.STATUS, true);
-				p = (PropertyType) rmVarMap.remove(jobId);
-			}
-
-			if (p != null) {
-				state = String.valueOf(p.getValue());
-			}
-
-			if (status == null) {
-				status = new CommandJobStatus(getResourceManager().getUniqueName(), jobId, state, null, this);
-				status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
-				jobStatusMap.addJobStatus(jobId, status);
-			} else {
-				status.setState(state);
-			}
-
-			if (progress.isCanceled()) {
-				status.setState(IJobStatus.CANCELED);
-				jobStateChanged(jobId, status);
-				return status;
-			}
-
-			if (IJobStatus.COMPLETED.equals(state)) {
-				/*
-				 * leave the status in the map in case there are further calls
-				 * (regarding remote file state); it will be pruned by the
-				 * daemon
-				 */
-				status = jobStatusMap.terminated(jobId, progress.newChild(50));
-			}
-
-			if (status.stateChanged()) {
-				jobStateChanged(jobId, status);
-			}
-
-			return status;
-		} catch (CoreException ce) {
-			getResourceManager().setState(IResourceManager.ERROR_STATE);
-			throw ce;
-		} finally {
-			pinTable.release(jobId);
-		}
-	}
-
-	/*
-	 * Executes any shutdown commands, then calls halt on the status map thread.
-	 * NOTE: closing the RM does not terminate the remote connection it may be
-	 * using, but merely removes the listeners. (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doShutdown()
-	 */
-	@Override
-	protected void doShutdown() throws CoreException {
-		doOnShutdown();
-		((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences(true);
-		jobStatusMap.halt();
-		RemoteServicesDelegate d = getRemoteServicesDelegate(null);
-		IRemoteConnection conn = d.getRemoteConnection();
-		if (conn != null) {
-			conn.removeConnectionChangeListener(connectionListener);
-		}
-	}
-
-	/*
-	 * Connects and executes any startup commands. (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doStartup(org
-	 * .eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected void doStartup(IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 100);
-		try {
-			initialize(progress.newChild(30));
-		} catch (Throwable t) {
-			progress.done();
-			throw CoreExceptionUtils.newException(t.getMessage(), t);
-		}
-
-		try {
-			doConnect(progress.newChild(20));
-			doOnStartUp();
-		} catch (Throwable t) {
-			throw CoreExceptionUtils.newException(t.getMessage(), t);
-		}
-	}
-
-	/*
-	 * The main command for job submission. (non-Javadoc) A uuid tag is
-	 * generated for the submission until a resource-specific identifier is
-	 * returned (there should be a stream tokenizer associated with the job
-	 * command in this case which sets the uuid property).
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doSubmitJob(org
-	 * .eclipse.debug.core.ILaunchConfiguration, java.lang.String,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
-			throws CoreException {
-		/*
-		 * give submission a unique id which will in most cases be replaced by
-		 * the resource-generated id for the job/process
-		 */
-		String uuid = UUID.randomUUID().toString();
-
-		if (!resourceManagerIsActive()) {
-			ICommandJobStatus status = new CommandJobStatus(getResourceManager().getUniqueName(), uuid, IJobStatus.UNDETERMINED,
-					null, this);
-			status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
-			return status;
-		}
-
-		SubMonitor progress = SubMonitor.convert(monitor, 100);
-
-		String jobId = null;
-		try {
-			PropertyType p = new PropertyType();
-			p.setVisible(false);
-			rmVarMap.put(uuid, p);
-
-			/*
-			 * overwrite property/attribute values based on user choices
-			 */
-			updatePropertyValuesFromTab(configuration, progress.newChild(5));
-
-			boolean delScript = maybeHandleScript(uuid, controlData.getScript());
-			worked(progress, 20);
-
-			ManagedFilesType files = controlData.getManagedFiles();
-
-			/*
-			 * if the script is to be staged, a managed file pointing to either
-			 * its as its content (${rm:script#value}), or to its path
-			 * (SCRIPT_PATH) must exist.
-			 */
-			files = maybeAddManagedFileForScript(files, delScript);
-			worked(progress, 5);
-
-			if (!maybeTransferManagedFiles(uuid, files)) {
-				throw CoreExceptionUtils.newException(Messages.CannotCompleteSubmitFailedStaging, null);
-			}
-			worked(progress, 20);
-
-			ICommandJob job = null;
-
-			try {
-				job = doJobSubmitCommand(uuid, mode);
-				worked(progress, 40);
-			} finally {
-				/*
-				 * if the staged files can be removed, delete them
-				 */
-				maybeCleanupManagedFiles(uuid, files);
-				worked(progress, 5);
-			}
-
-			ICommandJobStatus status = job.getJobStatus();
-
-			/*
-			 * property containing actual jobId as name was set in the wait
-			 * call; we may need the new jobId mapping momentarily to resolve
-			 * proxy-specific info
-			 */
-			rmVarMap.remove(uuid);
-			jobId = p.getName();
-
-			/*
-			 * job was cancelled during waitForId
-			 */
-			if (jobId == null) {
-				status = new CommandJobStatus(getResourceManager().getUniqueName(), uuid, IJobStatus.CANCELED, null, this);
-				status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
-				return status;
-			}
-
-			/*
-			 * initialize the job status while the id property is live
-			 */
-			pinTable.pin(jobId);
-			rmVarMap.put(jobId, p);
-			status.initialize(jobId);
-			jobStatusMap.addJobStatus(status.getJobId(), status);
-			status.setLaunchConfig(configuration);
-			worked(progress, 5);
-
-			/*
-			 * to ensure the most recent script is used at the next call
-			 */
-			rmVarMap.remove(jobId);
-			rmVarMap.remove(JAXBControlConstants.SCRIPT_PATH);
-			rmVarMap.remove(JAXBControlConstants.SCRIPT);
-			return status;
-		} finally {
-			pinTable.release(jobId);
-		}
-	}
-
-	/**
 	 * Checks to see if there was an exception thrown by the run method.
 	 * 
 	 * @param job
@@ -602,6 +218,152 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, true);
 	}
 
+	/*
+	 * For termination, pause, hold, suspension and resume requests. Resets the
+	 * environment, generates a uuid property; if the control request is
+	 * termination, calls remove on the state map. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doControlJob(
+	 * java.lang.String, java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
+		if (!resourceManagerIsActive()) {
+			return;
+		}
+
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
+		try {
+			pinTable.pin(jobId);
+			PropertyType p = new PropertyType();
+			p.setVisible(false);
+			p.setName(jobId);
+			rmVarMap.put(jobId, p);
+
+			worked(progress, 30);
+			doControlCommand(jobId, operation);
+
+			worked(progress, 40);
+			rmVarMap.remove(jobId);
+
+			if (TERMINATE_OPERATION.equals(operation)) {
+				jobStatusMap.cancel(jobId);
+			}
+
+			worked(progress, 30);
+		} finally {
+			pinTable.release(jobId);
+		}
+	}
+
+	@Override
+	protected void doDispose() {
+		// NOP for the moment
+	}
+
+	/*
+	 * Used by the client to refresh status on demand. (non-Javadoc) Generates a
+	 * jobId property; if the returned state is RUNNING, starts the proxy (a
+	 * rentrant call to a started proxy does nothing); if COMPLETED, the status
+	 * is removed from the map.
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doGetJobStatus
+	 * (java.lang.String)
+	 */
+	@Override
+	protected IJobStatus doGetJobStatus(String jobId, IProgressMonitor monitor) throws CoreException {
+		try {
+			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
+
+			/*
+			 * First check to see when the last call was made; throttle requests
+			 * coming in intervals less than
+			 * ICommandJobStatus.UPDATE_REQUEST_INTERVAL
+			 */
+			SubMonitor progress = SubMonitor.convert(monitor, 100);
+
+			if (status != null) {
+				if (IJobStatus.COMPLETED.equals(status.getState())) {
+					/*
+					 * leave the status in the map in case there are further
+					 * calls (regarding remote file state); it will be pruned by
+					 * the daemon
+					 */
+					status = jobStatusMap.terminated(jobId, progress.newChild(50));
+					if (status.stateChanged()) {
+						jobStateChanged(jobId, status);
+					}
+					return status;
+				}
+
+				long now = System.currentTimeMillis();
+				long lapse = now - status.getLastUpdateRequest();
+				if (lapse < ICommandJobStatus.UPDATE_REQUEST_INTERVAL) {
+					return status;
+				}
+				status.setUpdateRequestTime(now);
+			}
+
+			String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
+
+			PropertyType p = (PropertyType) rmVarMap.get(jobId);
+
+			CommandType job = controlData.getGetJobStatus();
+			if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
+				try {
+					pinTable.pin(jobId);
+					p = new PropertyType();
+					p.setVisible(false);
+					p.setName(jobId);
+					rmVarMap.put(jobId, p);
+					runCommand(jobId, job, CommandJob.JobMode.STATUS, true);
+					p = (PropertyType) rmVarMap.remove(jobId);
+				} finally {
+					pinTable.release(jobId);
+				}
+			}
+
+			if (p != null) {
+				state = String.valueOf(p.getValue());
+			}
+
+			if (status == null) {
+				status = new CommandJobStatus(getResourceManager().getUniqueName(), jobId, state, null, this);
+				status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+				jobStatusMap.addJobStatus(jobId, status);
+			} else {
+				status.setState(state);
+			}
+
+			if (progress.isCanceled()) {
+				status.setState(IJobStatus.CANCELED);
+				jobStateChanged(jobId, status);
+				return status;
+			}
+
+			if (IJobStatus.COMPLETED.equals(state)) {
+				/*
+				 * leave the status in the map in case there are further calls
+				 * (regarding remote file state); it will be pruned by the
+				 * daemon
+				 */
+				status = jobStatusMap.terminated(jobId, progress.newChild(50));
+			}
+
+			if (status.stateChanged()) {
+				jobStateChanged(jobId, status);
+			}
+
+			return status;
+		} catch (CoreException ce) {
+			getResourceManager().setState(IResourceManager.ERROR_STATE);
+			throw ce;
+		}
+	}
+
 	/**
 	 * Run either interactive or batch job for run or debug modes.
 	 * ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the
@@ -677,6 +439,235 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		runCommands(onStartUp);
 	}
 
+	/*
+	 * Executes any shutdown commands, then calls halt on the status map thread.
+	 * NOTE: closing the RM does not terminate the remote connection it may be
+	 * using, but merely removes the listeners. (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doShutdown()
+	 */
+	@Override
+	protected void doShutdown() throws CoreException {
+		doOnShutdown();
+		((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences(true);
+		jobStatusMap.halt();
+		RemoteServicesDelegate d = getRemoteServicesDelegate(null);
+		IRemoteConnection conn = d.getRemoteConnection();
+		if (conn != null) {
+			conn.removeConnectionChangeListener(connectionListener);
+		}
+	}
+
+	/*
+	 * Connects and executes any startup commands. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doStartup(org
+	 * .eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
+		try {
+			initialize(progress.newChild(30));
+		} catch (Throwable t) {
+			progress.done();
+			throw CoreExceptionUtils.newException(t.getMessage(), t);
+		}
+
+		try {
+			doConnect(progress.newChild(20));
+			doOnStartUp();
+		} catch (Throwable t) {
+			throw CoreExceptionUtils.newException(t.getMessage(), t);
+		}
+	}
+
+	/*
+	 * The main command for job submission. (non-Javadoc) A uuid tag is
+	 * generated for the submission until a resource-specific identifier is
+	 * returned (there should be a stream tokenizer associated with the job
+	 * command in this case which sets the uuid property).
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doSubmitJob(org
+	 * .eclipse.debug.core.ILaunchConfiguration, java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
+			throws CoreException {
+		/*
+		 * give submission a unique id which will in most cases be replaced by
+		 * the resource-generated id for the job/process
+		 */
+		String uuid = UUID.randomUUID().toString();
+
+		if (!resourceManagerIsActive()) {
+			ICommandJobStatus status = new CommandJobStatus(getResourceManager().getUniqueName(), uuid, IJobStatus.UNDETERMINED,
+					null, this);
+			status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+			return status;
+		}
+
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
+
+		String jobId = null;
+
+		PropertyType p = new PropertyType();
+		p.setVisible(false);
+		rmVarMap.put(uuid, p);
+
+		/*
+		 * overwrite property/attribute values based on user choices
+		 */
+		updatePropertyValuesFromTab(configuration, progress.newChild(5));
+
+		boolean delScript = maybeHandleScript(uuid, controlData.getScript());
+		worked(progress, 20);
+
+		ManagedFilesType files = controlData.getManagedFiles();
+
+		/*
+		 * if the script is to be staged, a managed file pointing to either its
+		 * as its content (${rm:script#value}), or to its path (SCRIPT_PATH)
+		 * must exist.
+		 */
+		files = maybeAddManagedFileForScript(files, delScript);
+		worked(progress, 5);
+
+		if (!maybeTransferManagedFiles(uuid, files)) {
+			throw CoreExceptionUtils.newException(Messages.CannotCompleteSubmitFailedStaging, null);
+		}
+		worked(progress, 20);
+
+		ICommandJob job = null;
+
+		try {
+			job = doJobSubmitCommand(uuid, mode);
+			worked(progress, 40);
+		} finally {
+			/*
+			 * if the staged files can be removed, delete them
+			 */
+			maybeCleanupManagedFiles(uuid, files);
+			worked(progress, 5);
+		}
+
+		ICommandJobStatus status = job.getJobStatus();
+
+		/*
+		 * property containing actual jobId as name was set in the wait call; we
+		 * may need the new jobId mapping momentarily to resolve proxy-specific
+		 * info
+		 */
+		rmVarMap.remove(uuid);
+		jobId = p.getName();
+
+		/*
+		 * job was cancelled during waitForId
+		 */
+		if (jobId == null) {
+			status = new CommandJobStatus(getResourceManager().getUniqueName(), uuid, IJobStatus.CANCELED, null, this);
+			status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+			return status;
+		}
+
+		try {
+			/*
+			 * initialize the job status while the id property is live
+			 */
+			pinTable.pin(jobId);
+			rmVarMap.put(jobId, p);
+			status.initialize(jobId);
+			jobStatusMap.addJobStatus(status.getJobId(), status);
+			status.setLaunchConfig(configuration);
+			worked(progress, 5);
+
+			/*
+			 * to ensure the most recent script is used at the next call
+			 */
+			rmVarMap.remove(jobId);
+			rmVarMap.remove(JAXBControlConstants.SCRIPT_PATH);
+			rmVarMap.remove(JAXBControlConstants.SCRIPT);
+			return status;
+		} finally {
+			pinTable.release(jobId);
+		}
+	}
+
+	/**
+	 * @return whether to append (true) the env passed in through the
+	 *         LaunchConfiguration, or replace the current env with it.
+	 */
+	public boolean getAppendEnv() {
+		return appendLaunchEnv;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getEnvironment()
+	 */
+	public IVariableMap getEnvironment() {
+		return rmVarMap;
+	}
+
+	/**
+	 * @return table of open remote processes
+	 */
+	public Map<String, ICommandJob> getJobTable() {
+		return jobTable;
+	}
+
+	/**
+	 * @return any environment variables passed in through the
+	 *         LaunchConfiguration
+	 */
+	public Map<String, String> getLaunchEnv() {
+		return launchEnv;
+	}
+
+	/**
+	 * Reinitializes when the connection info has been changed on a cached
+	 * resource manager.
+	 * 
+	 * @param monitor
+	 * @return wrapper object for remote services, connections and file managers
+	 * @throws CoreException
+	 */
+	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
+		String cname = config.getConnectionName();
+		String sid = config.getRemoteServicesId();
+		if (remoteServicesDelegate == null || !cname.equals(connectionName) || !sid.equals(servicesId)) {
+			connectionName = cname;
+			servicesId = sid;
+			remoteServicesDelegate = new RemoteServicesDelegate(servicesId, connectionName);
+			remoteServicesDelegate.initialize(monitor);
+		}
+		return remoteServicesDelegate;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getState()
+	 */
+	public String getState() {
+		return getResourceManager().getState();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getStatusMap()
+	 */
+	public ICommandJobStatusMap getStatusMap() {
+		return jobStatusMap;
+	}
+
 	/**
 	 * Sets the maps and data tree.
 	 */
@@ -704,6 +695,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		jobStatusMap = new JobStatusMap(this, getResourceManager());
 		((Thread) jobStatusMap).start();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged
+	 * (java.lang.String)
+	 */
+	public void jobStateChanged(String jobId, IJobStatus status) {
+		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
+		getResourceManager().updateJob(jobId, status);
 	}
 
 	/**
@@ -791,16 +794,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			return;
 		}
 
-		PropertyType p = (PropertyType) rmVarMap.get(jobId);
-		if (p == null) {
-			pinTable.pin(jobId);
-			p = new PropertyType();
-			p.setVisible(false);
-			p.setName(jobId);
-			rmVarMap.put(jobId, p);
-		}
-
+		pinTable.pin(jobId);
 		try {
+			PropertyType p = (PropertyType) rmVarMap.get(jobId);
+			if (p == null) {
+				p = new PropertyType();
+				p.setVisible(false);
+				p.setName(jobId);
+				rmVarMap.put(jobId, p);
+			}
 			runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, true);
 			rmVarMap.remove(jobId);
 		} catch (CoreException t) {

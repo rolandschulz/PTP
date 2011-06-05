@@ -106,6 +106,11 @@ of the letters 'u', 's', 'o'; default value: no hold.]]></tooltip>
 			<tooltip><![CDATA[Format: string up to 15 characters, 
 first character must be alphabetic; default value: 
 the base name of the job script or STDIN.]]></tooltip>
+         <default>ptp_job</default>
+			<validator>
+				<regex expression="[0-9a-zA-Z_]+"/>
+				<error-message>must be at least one alphanumeric character</error-message>
+			</validator>
 		</attribute>
 		<attribute name="Join_Path" type="boolean">
 			<description>Merge stdout and stderr into stdout.</description>
@@ -422,9 +427,9 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					<match>
 						<expression>([\d]+)([.])(.+)[\s]+.*</expression>
 						<append field="name">
-						   <entry valueGroup="1"/>
-						   <entry valueGroup="2"/>
-						   <entry valueGroup="3"/>
+							<entry valueGroup="1"/>
+							<entry valueGroup="2"/>
+							<entry valueGroup="3"/>
 						</append>
 						<set field="default">
 							<entry valueGroup="1"/>
@@ -436,8 +441,8 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					<match>
 						<expression>([\d]+)[.].+</expression>
 						<set field="name">
-                     <entry valueGroup="0"/>
-                  </set>
+							<entry valueGroup="0"/>
+						</set>
 						<set field="default">
 							<entry valueGroup="1"/>
 						</set>

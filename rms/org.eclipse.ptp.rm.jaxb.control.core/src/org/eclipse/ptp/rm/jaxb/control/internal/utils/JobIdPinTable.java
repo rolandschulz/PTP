@@ -9,32 +9,27 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.utils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * A condition variable for job ids.
+ * A lock table for job ids.
  * 
  * @author arossi
  * 
  */
 public class JobIdPinTable {
 
-	private class PinData {
-		private int count;
-		private long tid;
-	}
-
-	private final Map<String, PinData> map;
+	private final Map<String, ReentrantLock> map;
 
 	public JobIdPinTable() {
-		map = new HashMap<String, PinData>();
+		map = Collections.synchronizedMap(new HashMap<String, ReentrantLock>());
 	}
 
 	/**
-	 * Adds the id to the pinned table.
+	 * Adds the id to the pinned table with its associated lock.
 	 * 
 	 * @param jobId
 	 */
@@ -42,23 +37,12 @@ public class JobIdPinTable {
 		if (jobId == null) {
 			return;
 		}
-		synchronized (map) {
-			while (map.containsKey(jobId)) {
-				PinData data = map.get(jobId);
-				if (Thread.currentThread().getId() == data.tid) {
-					data.count++;
-					break;
-				}
-				try {
-					map.wait(JAXBControlConstants.STANDARD_WAIT);
-				} catch (InterruptedException ignored) {
-				}
-			}
-			PinData data = new PinData();
-			data.count = 1;
-			data.tid = Thread.currentThread().getId();
-			map.put(jobId, data);
+		ReentrantLock lock = map.get(jobId);
+		if (lock == null) {
+			lock = new ReentrantLock();
 		}
+		lock.lock();
+		map.put(jobId, lock);
 	}
 
 	/**
@@ -70,16 +54,11 @@ public class JobIdPinTable {
 		if (jobId == null) {
 			return;
 		}
-		synchronized (map) {
-			if (map.containsKey(jobId)) {
-				PinData data = map.get(jobId);
-				if (Thread.currentThread().getId() == data.tid) {
-					data.count--;
-					if (data.count == 0) {
-						map.remove(jobId);
-						map.notifyAll();
-					}
-				}
+		ReentrantLock lock = map.get(jobId);
+		if (lock != null) {
+			if (lock.isHeldByCurrentThread()) {
+				lock.unlock();
+				map.remove(jobId);
 			}
 		}
 	}
