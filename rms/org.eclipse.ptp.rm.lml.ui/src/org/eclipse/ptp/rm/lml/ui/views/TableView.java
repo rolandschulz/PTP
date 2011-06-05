@@ -203,7 +203,7 @@ public class TableView extends ViewPart {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					if (composite != null) {
-						if (selectedItem != null) {
+						if (selectedItem != null && !selectedItem.isDisposed()) {
 							lmlManager.unmarkObject(selectedItem.getData().toString());
 							selectedItem = null;
 						}
@@ -532,12 +532,12 @@ public class TableView extends ViewPart {
 					return;
 				}
 				if (selectedItem != null && !selectedItem.equals(item)) {
-					if (!composite.isDisposed()) {
+					if (!selectedItem.isDisposed()) {
 						lmlManager.unselectObject(selectedItem.getData().toString());
 					}
 				}
 				selectedItem = item;
-				if (!composite.isDisposed()) {
+				if (!selectedItem.isDisposed()) {
 					lmlManager.selectObject(selectedItem.getData().toString());
 				}
 			}
@@ -550,7 +550,7 @@ public class TableView extends ViewPart {
 			}
 
 			public void mouseExit(MouseEvent e) {
-				if (selectedItem != null) {
+				if (selectedItem != null && !selectedItem.isDisposed()) {
 					lmlManager.unselectObject(selectedItem.getData().toString());
 					selectedItem = null;
 				}
