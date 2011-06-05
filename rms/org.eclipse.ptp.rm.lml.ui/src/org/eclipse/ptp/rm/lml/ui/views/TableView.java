@@ -49,8 +49,6 @@ import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -258,7 +256,7 @@ public class TableView extends ViewPart {
 		composite.setLayout(treeColumnLayout);
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		viewer = new TreeViewer(composite, SWT.SINGLE | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.VIRTUAL);
+		viewer = new TreeViewer(composite, SWT.MULTI | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.VIRTUAL);
 		viewer.getTree().setLayout(new TableLayout());
 		viewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
 		viewer.setContentProvider(new ILazyTreeContentProvider() {
@@ -489,67 +487,54 @@ public class TableView extends ViewPart {
 		}
 
 		// Mouse action (in combination with nodedisplay)
-		tree.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseDown(MouseEvent e) {
-				if (e.button == 1) {
-					isMouseDown = true;
-					final TreeItem item = tree.getItem(new Point(e.x, e.y));
-					if (item != null && !composite.isDisposed()) {
-						lmlManager.markObject(item.getData().toString());
+		if (gid.equals(ILguiItem.ACTIVE_JOB_TABLE)) {
+			tree.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseDown(MouseEvent e) {
+					if (e.button == 1) {
+						isMouseDown = true;
+						final TreeItem item = tree.getItem(new Point(e.x, e.y));
+						if (item != null && !composite.isDisposed()) {
+							lmlManager.markObject(item.getData().toString());
+						}
 					}
 				}
-			}
 
-			@Override
-			public void mouseUp(MouseEvent e) {
-				if (e.button == 1) {
-					final TreeItem item = tree.getItem(new Point(e.x, e.y));
-					if (item != null && !composite.isDisposed()) {
-						lmlManager.unmarkObject(item.getData().toString());
-					}
-					isMouseDown = false;
-				}
-			}
-
-		});
-		tree.addMouseMoveListener(new MouseMoveListener() {
-
-			public void mouseMove(MouseEvent e) {
-				final TreeItem item = tree.getItem(new Point(e.x, e.y));
-				if (item == null) {
-					return;
-				}
-				if (selectedItem != null && !selectedItem.equals(item)) {
-					if (!selectedItem.isDisposed()) {
-						lmlManager.unselectObject(selectedItem.getData().toString());
+				@Override
+				public void mouseUp(MouseEvent e) {
+					if (e.button == 1) {
+						final TreeItem item = tree.getItem(new Point(e.x, e.y));
+						if (item != null && !composite.isDisposed()) {
+							lmlManager.unmarkObject(item.getData().toString());
+						}
+						isMouseDown = false;
 					}
 				}
-				selectedItem = item;
-				if (!selectedItem.isDisposed()) {
-					lmlManager.selectObject(selectedItem.getData().toString());
-				}
-			}
 
-		});
-		tree.addMouseTrackListener(new MouseTrackListener() {
-
-			public void mouseEnter(MouseEvent e) {
-				// nothing
-			}
-
-			public void mouseExit(MouseEvent e) {
-				if (selectedItem != null && !selectedItem.isDisposed()) {
-					lmlManager.unselectObject(selectedItem.getData().toString());
-					selectedItem = null;
-				}
-			}
-
-			public void mouseHover(MouseEvent e) {
-				// nothing
-			}
-		});
-
+			});
+		}
+		/*
+		 * tree.addMouseMoveListener(new MouseMoveListener() {
+		 * 
+		 * public void mouseMove(MouseEvent e) { final TreeItem item =
+		 * tree.getItem(new Point(e.x, e.y)); if (item == null) { return; } if
+		 * (selectedItem != null && !selectedItem.equals(item)) { if
+		 * (!selectedItem.isDisposed()) {
+		 * lmlManager.unselectObject(selectedItem.getData().toString()); } }
+		 * selectedItem = item; if (!selectedItem.isDisposed()) {
+		 * lmlManager.selectObject(selectedItem.getData().toString()); } }
+		 * 
+		 * }); tree.addMouseTrackListener(new MouseTrackListener() {
+		 * 
+		 * public void mouseEnter(MouseEvent e) { // nothing }
+		 * 
+		 * public void mouseExit(MouseEvent e) { if (selectedItem != null &&
+		 * !selectedItem.isDisposed()) {
+		 * lmlManager.unselectObject(selectedItem.getData().toString());
+		 * selectedItem = null; } }
+		 * 
+		 * public void mouseHover(MouseEvent e) { // nothing } });
+		 */
 	}
 
 	private void createMenuItem(Menu parent, final TreeColumn column, final int index) {
