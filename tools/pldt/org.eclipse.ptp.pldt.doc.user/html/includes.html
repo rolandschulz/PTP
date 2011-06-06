@@ -1,0 +1,98 @@
+<html>
+<head>
+<title>
+Include Paths
+</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+	<script type="text/javascript" src="thumb.js"> </script>
+<body>
+<h1 id="top">A Word about Include Paths and MPI Preferences</h1>
+
+<h2 id=include>A Word about Include Paths</h2>
+<p>There are several places where you can set up include paths, e.g. MPI include paths, in Eclipse. 
+<ul>
+<li><a href="#prefs">PLDT Preferences</a> - used to assist in artifact location, and can be automatically added to build path of new projects
+<li><a href="#build">Build Settings</a> - added to the build path when your project is compiled
+<li><a href="#genl">General Settings</a> - used by Eclipse and CDT for indexing so the editor can find things, if the above are not available
+</ul>
+<p>For MPI projects, most MPI tools replace the build command with <code>mpicc</code> or a similar command, which sets compiler
+options including the include path.  So you don't really need the include path set for <i>building</i> an MPI project.
+<p>However, Eclipse <i>does</i> need to know where the header file is located, for the indexer to be able to calculate the
+location of the MPI APIs among other things.
+<h2>If the Indexer can't find your include file </h2>
+<p>If the indexer can't find your MPI header file, you may see problems like the following:
+<br>
+<img src="images/mpiNotFound.png">
+<p>If your MPI header file is located in a global area that automatically gets included in your project's include path location, such as
+<code>/usr/include</code> or <code>/usr/local/include</code>, then things will probably work just fine without further alteration.
+Building and indexing will probably both operate correctly.
+<p>If you do not use mpicc or a similar build command and need to specify include and libpath information on building and
+linking, you will probably want to set the PLDT preferences to point to your include path for MPI, in which case, the include
+and link arguments will be added to your build commands.
+
+<h2 id="prefs">Includes and PLDT Preferences</h2>
+<p>If you set the include files in the PLDT Preferences, then when you create a new MPI project, include and link arguments will added to the build commands, 
+the Indexer will find your header files, and new MPI projects will be automatically set up this way.
+<p>To open Preferences, use the menu
+<ul>
+<li>On a Mac, Eclipse > Preferences
+<li>On other OSs including Windows and Linux, Window > Preferences
+</ul>
+<p>In the Preferences dialog, select Parallel Tools > Parallel Language Development Tools > MPI.
+
+
+<p>
+<img src="images/pldt-prefs-mpi.png">
+<p>This preference page also lets you set the build command for new MPI projects.  If you add an include path here
+(via the "New..." button), it will be added to the build command and your Eclipse project will find it as well.  It will
+also make an estimate of the link lib location and arguments.
+<p>If you have unchecked the "Recognize MPI Artifacts by Prefix alone", then 
+the "Prompt to include MPI APIs found in other locations (C only)" indicates whether 
+it will ask you if MPI APIS found elsewhere 
+will be considered as artifacts.  For example, if you point to &lt;install-loc&gt;/include in the MPI include paths here,
+but your source files actually include header files from /usr/local/include, it will prompt you to consider these as well 
+during the analysis.
+This last option is only valid for C projects, not C++ projects.
+<p>Hit OK to close the Preferences dialog.
+<p>See also <a href="">PLDT Preferences</a>
+
+<p>However, if you use <code>mpicc</code> or another build command that does this for you, you don't need the include
+and link arguments etc., and you may not like this.  See <a href="#genl">General Settings</a> below.
+<p>&nbsp;
+<h2 id="build">Build Settings</h2>
+<p>The build settings allow you, for Managed Build projects, to set the include and link information used for the build.
+To access the project build settings, bring up the Project Properties dialog
+(In the Project Explorer view, Right mouse on the project name, and select, at the very bottom of the context menu, "Project Properties")
+<br><img src="images/project-properties-menu.png"
+
+<p>
+and select C/C++ Build > Settings.
+Under your compiler, select "Includes"  and under your Linker, select "Libraries"  to view and edit these values.
+<img src="images/cdt-build-settings.png">
+<p>To add one, select the "Add..." button
+<p><img src="images/cdt-build-settings-addInclude.png">
+<p>&nbsp;
+<p>To see how this affects the build command, select e.g. the Compiler option and
+view the arguments:
+<p><img src="images/cdt-build-settings-view-command.png">
+<p>&nbsp;
+<h2 id="genl">General Settings</h2>
+<p>If you use a build command (e.g. <code>mpicc</code>) that does includes for you,
+you don't need this information added to the build, but you do need Eclipse to be able to find
+your header file so that the Indexer, and tools that use this information, can find your header file.
+<p>In the project properties, select C/C++ General > Paths and Symbols, and add the include path there.
+This is used just within Eclipse, not for the build.
+<p>They are also used both for Managed build projects as well as Makefile projects.
+<p>&nbsp;
+<p><img src="images/project-properties-genl-pathSym.png">
+
+<p>&nbsp;<p>&nbsp;<p>&nbsp;
+<p>See <a href="setup.html">Project setup for new MPI projects</a>, including
+<a href="setup.html#manual">Add the build information manually</a> for more information.
+<p>&nbsp;
+
+
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+
+</body>
+</html>
