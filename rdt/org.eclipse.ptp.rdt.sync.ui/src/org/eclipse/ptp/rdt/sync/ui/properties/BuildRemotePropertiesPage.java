@@ -321,7 +321,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 */
 	private void saveConfig(IConfiguration config, PageSettings settings) {
 		// Set build path in build configuration to appropriate directory
-		config.getToolChain().getBuilder().setBuildPath(settings.rootLocation);
 		ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
 
         // Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
