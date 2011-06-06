@@ -25,9 +25,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
+import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
@@ -108,6 +110,9 @@ public class ManagedFilesJob extends Job {
 	protected IStatus run(IProgressMonitor monitor) {
 		try {
 			delegate = control.getRemoteServicesDelegate(monitor);
+			IRemoteConnection conn = delegate.getRemoteConnection();
+			SubMonitor progress = SubMonitor.convert(monitor, 10);
+			JAXBResourceManagerControl.checkConnection(conn, progress);
 			if (delegate.getRemoteFileManager() == null) {
 				throw new Throwable(Messages.UninitializedRemoteServices);
 			}

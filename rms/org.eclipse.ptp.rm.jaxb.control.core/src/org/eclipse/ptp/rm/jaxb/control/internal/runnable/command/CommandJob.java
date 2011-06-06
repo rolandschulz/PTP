@@ -34,9 +34,11 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
@@ -153,6 +155,33 @@ public class CommandJob extends Job implements ICommandJob {
 		}
 	}
 
+	/**
+	 * Extension-based instantiation for custom tokenizer.
+	 * 
+	 * @param type
+	 *            extension name
+	 * @return the tokenizer instance
+	 * @throws CoreException
+	 */
+	public static IStreamParserTokenizer getTokenizer(String type) throws CoreException {
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBControlCorePlugin.PLUGIN_ID,
+				JAXBControlConstants.TOKENIZER_EXT_PT);
+		IConfigurationElement[] elements = extensionPoint.getConfigurationElements();
+		for (int i = 0; i < elements.length; i++) {
+			IConfigurationElement element = elements[i];
+			try {
+				if (element.getAttribute(JAXBControlConstants.ID).equals(type)) {
+					return (IStreamParserTokenizer) element.createExecutableExtension(JAXBControlConstants.CLASS);
+				}
+			} catch (CoreException ce) {
+				throw ce;
+			} catch (Throwable t) {
+				throw CoreExceptionUtils.newException(Messages.StreamTokenizerInstantiationError + type, t);
+			}
+		}
+		return null;
+	}
+
 	private final String uuid;
 	private final CommandType command;
 	private final IJAXBResourceManager rm;
@@ -163,8 +192,8 @@ public class CommandJob extends Job implements ICommandJob {
 	private final boolean waitForId;
 	private final JobMode mode;
 	private final boolean keepOpen;
-	private final StringBuffer error;
 
+	private final StringBuffer error;
 	private Thread jobThread;
 	private IRemoteProcess process;
 	private IStreamParserTokenizer stdoutTokenizer;
@@ -179,6 +208,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private ICommandJobStatus jobStatus;
 	private IStatus status;
 	private boolean active;
+
 	private boolean ignoreExitStatus;
 
 	/**
@@ -618,7 +648,14 @@ public class CommandJob extends Job implements ICommandJob {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, new Throwable(
 					Messages.UninitializedRemoteServices));
 		}
-		return delegate.getRemoteServices().getProcessBuilder(delegate.getRemoteConnection(), cmdArgs);
+		IRemoteConnection conn = delegate.getRemoteConnection();
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		try {
+			JAXBResourceManagerControl.checkConnection(conn, progress);
+		} catch (RemoteConnectionException rce) {
+			throw CoreExceptionUtils.newException(rce.getLocalizedMessage(), rce);
+		}
+		return delegate.getRemoteServices().getProcessBuilder(conn, cmdArgs);
 	}
 
 	/**
@@ -778,32 +815,5 @@ public class CommandJob extends Job implements ICommandJob {
 			return CoreExceptionUtils.getErrorStatus(Messages.ProcessRunError, t);
 		}
 		return Status.OK_STATUS;
-	}
-
-	/**
-	 * Extension-based instantiation for custom tokenizer.
-	 * 
-	 * @param type
-	 *            extension name
-	 * @return the tokenizer instance
-	 * @throws CoreException
-	 */
-	public static IStreamParserTokenizer getTokenizer(String type) throws CoreException {
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBControlCorePlugin.PLUGIN_ID,
-				JAXBControlConstants.TOKENIZER_EXT_PT);
-		IConfigurationElement[] elements = extensionPoint.getConfigurationElements();
-		for (int i = 0; i < elements.length; i++) {
-			IConfigurationElement element = elements[i];
-			try {
-				if (element.getAttribute(JAXBControlConstants.ID).equals(type)) {
-					return (IStreamParserTokenizer) element.createExecutableExtension(JAXBControlConstants.CLASS);
-				}
-			} catch (CoreException ce) {
-				throw ce;
-			} catch (Throwable t) {
-				throw CoreExceptionUtils.newException(Messages.StreamTokenizerInstantiationError + type, t);
-			}
-		}
-		return null;
 	}
 }

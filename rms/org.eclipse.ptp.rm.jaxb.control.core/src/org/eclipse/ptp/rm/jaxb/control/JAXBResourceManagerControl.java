@@ -109,6 +109,26 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 	}
 
+	/**
+	 * tries to open connection if closed
+	 * 
+	 * @param connection
+	 * @param progress
+	 * @throws RemoteConnectionException
+	 */
+	public static void checkConnection(IRemoteConnection connection, SubMonitor progress) throws RemoteConnectionException {
+		if (connection != null) {
+			if (!connection.isOpen()) {
+				connection.open(progress.newChild(25));
+				if (!connection.isOpen()) {
+					throw new RemoteConnectionException(Messages.RemoteConnectionError + connection.getAddress());
+				}
+			}
+		} else {
+			new RemoteConnectionException(Messages.RemoteConnectionError + connection);
+		}
+	}
+
 	private final IJAXBResourceManagerConfiguration config;
 	private final ConnectionChangeListener connectionListener;
 	private Map<String, String> launchEnv;
@@ -120,6 +140,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private String servicesId;
 	private String connectionName;
 	private RemoteServicesDelegate remoteServicesDelegate;
+
 	private boolean appendLaunchEnv;
 
 	/**
@@ -558,12 +579,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		RemoteServicesDelegate d = getRemoteServicesDelegate(progress.newChild(50));
 		IRemoteConnection conn = d.getRemoteConnection();
 		if (conn != null) {
-			if (!conn.isOpen()) {
-				conn.open(progress.newChild(25));
-				if (!conn.isOpen()) {
-					throw new RemoteConnectionException(Messages.RemoteConnectionError + conn.getAddress());
-				}
-			}
+			checkConnection(conn, progress);
 			conn.addConnectionChangeListener(connectionListener);
 		}
 	}
