@@ -187,6 +187,13 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#getCurrentLayout(java.io.
+	 * OutputStream)
+	 */
 	public void getCurrentLayout(OutputStream output) {
 		LguiType layoutLgui = null;
 		if (lgui == null) {
@@ -201,7 +208,13 @@ public class LguiItem implements ILguiItem {
 			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(tagname, LguiType.class, layoutLgui);
-			marshaller.marshal(rootElement, output);
+			/*
+			 * Synchronize to avoid the dreaded
+			 * "FWK005 parse may not be called while parsing" message
+			 */
+			synchronized (this) {
+				marshaller.marshal(rootElement, output);
+			}
 			output.close(); // Must close to flush stream
 		} catch (final PropertyException e) {
 			e.printStackTrace();
@@ -222,7 +235,7 @@ public class LguiItem implements ILguiItem {
 		return (LayoutAccess) lguiHandlers.get(LayoutAccess.class);
 	}
 
-	public synchronized LguiType getLguiType() {
+	public LguiType getLguiType() {
 		return lgui;
 	}
 
@@ -395,7 +408,8 @@ public class LguiItem implements ILguiItem {
 				int index = -1;
 				for (int i = 0; i < table.getRow().size(); i++) {
 					final RowType row = table.getRow().get(i);
-					if (row != null && row.getOid().equals(status.getOid())) {
+					String rowJobId = getTableHandler().getCellValue(table, row, JOB_ID);
+					if (rowJobId.equals(jobId)) {
 						index = i;
 						break;
 					}
@@ -425,21 +439,15 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#update(java.io.InputStream)
 	 */
 	public void update(InputStream stream) throws JAXBException {
-		synchronized (this) {
-			lgui = parseLML(stream);
-		}
+		lgui = parseLML(stream);
 		if (listeners.isEmpty()) {
 			createLguiHandlers();
 		}
 		fireUpdatedEvent();
 		if (!cidSet()) {
-			synchronized (this) {
-				setCid();
-			}
+			setCid();
 		}
-		synchronized (this) {
-			updateJobData();
-		}
+		updateJobData();
 	}
 
 	/*
@@ -455,7 +463,8 @@ public class LguiItem implements ILguiItem {
 			final TableType table = getTableHandler().getTable(getGidFromJobStatus(jobStatus));
 			if (table != null) {
 				for (final RowType row : table.getRow()) {
-					if (row.getOid().equals(jobStatus.getOid())) {
+					String rowJobId = getTableHandler().getCellValue(table, row, JOB_ID);
+					if (rowJobId.equals(jobId)) {
 						getTableHandler().setCellValue(table, row, JOB_STATUS, status);
 						break;
 					}
@@ -573,7 +582,14 @@ public class LguiItem implements ILguiItem {
 	@SuppressWarnings("unchecked")
 	private LguiType parseLML(InputStream stream) throws JAXBException {
 		final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
-		final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
+		/*
+		 * Synchronize to avoid the dreaded
+		 * "FWK005 parse may not be called while parsing" message
+		 */
+		final JAXBElement<LguiType> doc;
+		synchronized (this) {
+			doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
+		}
 		return doc.getValue();
 	}
 
