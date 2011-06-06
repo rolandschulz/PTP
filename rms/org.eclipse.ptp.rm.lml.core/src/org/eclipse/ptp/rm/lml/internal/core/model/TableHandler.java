@@ -14,8 +14,10 @@ package org.eclipse.ptp.rm.lml.internal.core.model;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -44,16 +46,34 @@ public class TableHandler extends LguiHandler {
 	public class TableListener implements ILguiListener {
 
 		public void handleEvent(ILguiUpdatedEvent e) {
-			update(e.getLguiItem().getLguiType());
+			update(e.getLgui());
 		}
 
 	}
 
+	private class TableSortProperty {
+		public int sortIndex = -1;
+		public int sortDirection = -1;
+
+		public TableSortProperty() {
+		}
+
+		public void setSortPorperties(int sortIndex, int sortDirection) {
+			this.sortIndex = sortIndex;
+			this.sortDirection = sortDirection;
+		}
+	}
+
 	private final TableListener tableListener = new TableListener();
+
+	private final Map<String, TableSortProperty> sortProperty = new HashMap<String, TableSortProperty>();
 
 	public TableHandler(ILguiItem lguiItem, LguiType lgui) {
 		super(lguiItem, lgui);
 		lguiItem.addListener(tableListener);
+
+		sortProperty.put(ACTIVE_JOB_TABLE, new TableSortProperty());
+		sortProperty.put(INACTIVE_JOB_TABLE, new TableSortProperty());
 	}
 
 	/**
@@ -168,6 +188,14 @@ public class TableHandler extends LguiHandler {
 	 */
 	public int getNumberOfTables() {
 		return getTables().size();
+	}
+
+	public int[] getSortProperties(String gid) {
+		final int[] values = new int[2];
+		final TableSortProperty property = sortProperty.get(gid);
+		values[0] = property.sortIndex;
+		values[1] = property.sortDirection;
+		return values;
 	}
 
 	/**
@@ -407,6 +435,11 @@ public class TableHandler extends LguiHandler {
 			}
 		}
 		return null;
+	}
+
+	public void setSortProperties(String gid, int sortIndex, int sortDirection) {
+		final TableSortProperty property = sortProperty.get(gid);
+		property.setSortPorperties(sortIndex, sortDirection);
 	}
 
 	/**

@@ -47,6 +47,8 @@ import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
@@ -96,6 +98,7 @@ public class TableView extends ViewPart {
 						if (fSelectedLguiItem != null && !fSelectedLguiItem.isEmpty()) {
 							disposeTable();
 							createTable();
+
 							fSelectedLguiItem.getObjectStatus().addComponent(eventForwarder);
 							componentAdded = true;
 						}
@@ -113,11 +116,13 @@ public class TableView extends ViewPart {
 							fSelectedLguiItem.getObjectStatus().removeComponent(eventForwarder);
 							componentAdded = false;
 						}
+						saveColumnLayout();
 						fSelectedLguiItem = null;
 						setViewerInput();
 						disposeTable();
 					}
 				}
+
 			});
 		}
 
@@ -239,13 +244,13 @@ public class TableView extends ViewPart {
 	private final LMLManager lmlManager = LMLManager.getInstance();
 	private TreeItem selectedItem = null;
 	private String selectedOid = null;
-
 	private boolean componentAdded = false;
-	private boolean isMouseDown = false;
 
+	private boolean isMouseDown = false;
 	private final EventForwarder eventForwarder = new EventForwarder();
 
 	private int sortIndex = -1;
+
 	private int sortDirection = -1;
 
 	@Override
@@ -307,29 +312,12 @@ public class TableView extends ViewPart {
 		tree.setHeaderVisible(true);
 		tree.addListener(SWT.MenuDetect, new Listener() {
 			public void handleEvent(Event event) {
-				Point pt = tree.getDisplay().map(null, tree, new Point(event.x, event.y));
-				Rectangle clientArea = tree.getClientArea();
-				boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + tree.getHeaderHeight());
+				final Point pt = tree.getDisplay().map(null, tree, new Point(event.x, event.y));
+				final Rectangle clientArea = tree.getClientArea();
+				final boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + tree.getHeaderHeight());
 				tree.setMenu(header ? headerMenu : menu);
 			}
 		});
-		// tree.addControlListener(new ControlAdapter() {
-		// @Override
-		// public void controlMoved(ControlEvent e) {
-		// if (fSelectedLguiItem != null) {
-		// fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid,
-		// removeFirstColumn(tree.getColumnOrder()));
-		// }
-		// }
-		//
-		// @Override
-		// public void controlResized(ControlEvent e) {
-		// if (fSelectedLguiItem != null) {
-		// fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(getWidths(),
-		// gid);
-		// }
-		// }
-		// });
 
 		/*
 		 * Get the selected LguiItem (if there is one) so that the table will be
@@ -425,7 +413,7 @@ public class TableView extends ViewPart {
 			}
 		});
 		TreeColumn treeColumn = treeViewerColumn.getColumn();
-		treeColumn.setMoveable(true);
+		treeColumn.setMoveable(false);
 		treeColumn.setAlignment(SWT.LEFT);
 		createMenuItem(headerMenu, treeColumn, 0);
 		treeColumnLayout.setColumnData(treeColumn, new ColumnPixelData(40, true));
@@ -443,6 +431,18 @@ public class TableView extends ViewPart {
 			treeColumn.setMoveable(true);
 			treeColumn.setText(tableColumnLayouts[i].getTitle());
 			treeColumn.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
+			treeColumn.addControlListener(new ControlAdapter() {
+				@Override
+				public void controlMoved(ControlEvent e) {
+					if (fSelectedLguiItem != null) {
+						// fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid,
+						// removeFirstColumn(tree.getColumnOrder()));
+
+						// TODO Change of the sortIndex
+					}
+				}
+
+			});
 
 			/*
 			 * Create the header menu for this column
@@ -562,6 +562,15 @@ public class TableView extends ViewPart {
 	private void createTable() {
 		if (fSelectedLguiItem != null && !fSelectedLguiItem.isEmpty()) {
 			createColumns();
+			final int[] sortProperties = fSelectedLguiItem.getTableHandler().getSortProperties(gid);
+			sortIndex = sortProperties[0];
+			sortDirection = sortProperties[1];
+			if (sortIndex > -1 && sortDirection > -1) {
+				fSelectedLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, sortDirection);
+				final TreeColumn treeColumn = tree.getColumn(sortIndex + 1);
+				tree.setSortColumn(treeColumn);
+			}
+
 		}
 
 		// Insert the input
@@ -586,7 +595,7 @@ public class TableView extends ViewPart {
 		/*
 		 * Remove menu items
 		 */
-		for (MenuItem item : headerMenu.getItems()) {
+		for (final MenuItem item : headerMenu.getItems()) {
 			item.dispose();
 		}
 		getViewSite().getActionBars().getMenuManager().removeAll();
@@ -603,10 +612,10 @@ public class TableView extends ViewPart {
 	}
 
 	private Double[] getWidths() {
-		TreeColumn[] columns = tree.getColumns();
-		final Double[] widths = new Double[columns.length];
-		for (int i = 0; i < columns.length; i++) {
-			widths[i] = Integer.valueOf(columns[i].getWidth()).doubleValue();
+		final TreeColumn[] columns = tree.getColumns();
+		final Double[] widths = new Double[columns.length - 1];
+		for (int i = 0; i < columns.length - 1; i++) {
+			widths[i] = Integer.valueOf(columns[i + 1].getWidth()).doubleValue();
 		}
 		return widths;
 	}
@@ -619,7 +628,6 @@ public class TableView extends ViewPart {
 	 *            column order array
 	 * @return new column order array with first column removed
 	 */
-	@SuppressWarnings("unused")
 	private int[] removeFirstColumn(int[] order) {
 		final int[] orderNew = new int[order.length - 1];
 		int dif = 0;
@@ -631,6 +639,18 @@ public class TableView extends ViewPart {
 			}
 		}
 		return orderNew;
+	}
+
+	private void saveColumnLayout() {
+		if (fSelectedLguiItem != null) {
+			if (tree.getColumnOrder().length != 0) {
+				fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, removeFirstColumn(tree.getColumnOrder()));
+				fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(gid, getWidths());
+			}
+			fSelectedLguiItem.getTableHandler().setSortProperties(gid, sortIndex, sortDirection);
+		}
+		setSortParameter(-1, -1);
+
 	}
 
 	private void setSortParameter(int sortIndex, int sortDirection) {

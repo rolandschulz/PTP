@@ -56,63 +56,10 @@ public class OIDToObject extends LguiHandler {
 		this.lguiItem.addListener(new ILguiListener() {
 
 			public void handleEvent(ILguiUpdatedEvent e) {
-				update(e.getLguiItem().getLguiType());
+				update(e.getLgui());
 				updateData();
 			}
 		});
-	}
-
-	/**
-	 * Call this method, if lml-model changed. All getter-functions accessing
-	 * the handler will then return data, which is collected from this new model
-	 */
-	private void updateData() {
-
-		List<ObjectsType> allobjs = lguiItem.getOverviewAccess().getObjects();
-
-		for (ObjectsType frame : allobjs) {
-
-			List<ObjectType> objects = frame.getObject();
-
-			oidToObject = new HashMap<String, ObjectType>();
-
-			oidToColor = new HashMap<String, LMLColor>();
-
-			for (ObjectType obj : objects) {
-				oidToObject.put(obj.getId(), obj);
-				oidToColor.put(obj.getId(), LMLColor.stringToColor(obj.getColor()));
-
-				if (obj.getType() == ObjectName.SYSTEM) {
-					systemId = obj.getId();
-				}
-			}
-
-		}
-	}
-
-	/**
-	 * get an object by an Id of this object
-	 * 
-	 * example:
-	 * 
-	 * <pre>
-	 * {@code
-	 * <objects>
-	 * 		<object id="job1" type="job" color="#F00" />
-	 * 		<object id="job2" type="job" color="#0F0" />
-	 * 		<object id="job3" type="job" color="#00F" />
-	 * 	   </objects>
-	 * }
-	 * </pre>
-	 * 
-	 * getObjectById("job2") returns JAXB-instance of ObjectType with content
-	 * {@code <object id="job2" type="job" color="#0F0" />}
-	 * 
-	 * @param id
-	 * @return object with given id
-	 */
-	public ObjectType getObjectById(String id) {
-		return oidToObject.get(id);
 	}
 
 	/**
@@ -142,13 +89,37 @@ public class OIDToObject extends LguiHandler {
 		if (id == null) {
 			return notConnectedColor;
 		}
-		LMLColor res = oidToColor.get(id);
+		final LMLColor res = oidToColor.get(id);
 
 		if (res == null) {
 			return notConnectedColor;
 		} else {
 			return res;
 		}
+	}
+
+	/**
+	 * get an object by an Id of this object
+	 * 
+	 * example:
+	 * 
+	 * <pre>
+	 * {@code
+	 * <objects>
+	 * 		<object id="job1" type="job" color="#F00" />
+	 * 		<object id="job2" type="job" color="#0F0" />
+	 * 		<object id="job3" type="job" color="#00F" />
+	 * 	   </objects>
+	 * }
+	 * </pre>
+	 * 
+	 * getObjectById("job2") returns JAXB-instance of ObjectType with content {@code <object id="job2" type="job" color="#0F0" />}
+	 * 
+	 * @param id
+	 * @return object with given id
+	 */
+	public ObjectType getObjectById(String id) {
+		return oidToObject.get(id);
 	}
 
 	/**
@@ -178,6 +149,34 @@ public class OIDToObject extends LguiHandler {
 	public String getSystemObjectId() {
 
 		return systemId;
+	}
+
+	/**
+	 * Call this method, if lml-model changed. All getter-functions accessing
+	 * the handler will then return data, which is collected from this new model
+	 */
+	private void updateData() {
+
+		final List<ObjectsType> allobjs = lguiItem.getOverviewAccess().getObjects();
+
+		for (final ObjectsType frame : allobjs) {
+
+			final List<ObjectType> objects = frame.getObject();
+
+			oidToObject = new HashMap<String, ObjectType>();
+
+			oidToColor = new HashMap<String, LMLColor>();
+
+			for (final ObjectType obj : objects) {
+				oidToObject.put(obj.getId(), obj);
+				oidToColor.put(obj.getId(), LMLColor.stringToColor(obj.getColor()));
+
+				if (obj.getType() == ObjectName.SYSTEM) {
+					systemId = obj.getId();
+				}
+			}
+
+		}
 	}
 
 }

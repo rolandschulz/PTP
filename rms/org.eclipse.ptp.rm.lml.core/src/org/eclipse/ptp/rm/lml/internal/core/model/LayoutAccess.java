@@ -64,179 +64,6 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarlayoutType;
  * functions, which allow to merge layouts to one lml-model
  */
 public class LayoutAccess extends LguiHandler {
-	// DefaultLayouts
-	private final UsagebarlayoutType defaultUsagebar;
-	private final ChartlayoutType defaultChart;
-	private final TablelayoutType defaultTable;
-	private final InfoboxlayoutType defaultInfobox;
-	/*
-	 * create an objectfactory for all functions in this class
-	 */
-	private static ObjectFactory objectFactory = new ObjectFactory();
-
-	/**
-	 * @param lguiItem
-	 *            LML-data-handler, which groups this handler and others to a
-	 *            set of LMLHandler. This instance is needed to notify all
-	 *            LMLHandler, if any data of the LguiType-instance was changed.
-	 */
-	public LayoutAccess(ILguiItem lguiItem, LguiType lgui) {
-		super(lguiItem, lgui);
-		defaultUsagebar = objectFactory.createUsagebarlayoutType();
-		defaultChart = objectFactory.createChartlayoutType();
-		defaultTable = objectFactory.createTablelayoutType();
-		defaultInfobox = objectFactory.createInfoboxlayoutType();
-
-		this.lguiItem.addListener(new ILguiListener() {
-			public void handleEvent(ILguiUpdatedEvent e) {
-				update(e.getLguiItem().getLguiType());
-			}
-		});
-	}
-
-	/**
-	 * Replace all componentlayouts for a graphical object with given gid
-	 * through newlayout.getGid() with newlayout
-	 * 
-	 * @param newLayout
-	 *            new layout, which is placed into the positions of old layouts
-	 */
-	@SuppressWarnings("unchecked")
-	public void replaceComponentLayout(ComponentlayoutType newlayout) {
-		if (newlayout == null) {
-			return;
-		}
-		String gid = newlayout.getGid();
-
-		List<JAXBElement<?>> allobjects = lgui.getObjectsAndRelationsAndInformation();
-
-		boolean replaced = false;
-
-		// Over all objects in lml-file
-		for (int i = 0; i < allobjects.size(); i++) {
-			JAXBElement<?> aobj = allobjects.get(i);
-
-			// Over all Componentlayouts
-			if (aobj.getValue() instanceof ComponentlayoutType) {
-
-				ComponentlayoutType alayout = (ComponentlayoutType) aobj.getValue();
-
-				if (alayout.getGid() != null && alayout.getGid().equals(gid)) {
-
-					if (!replaced) {
-
-						((JAXBElement<ComponentlayoutType>) aobj).setValue(newlayout);
-						lguiItem.notifyListeners();
-						replaced = true;
-					} else {// Delete this object
-						allobjects.remove(aobj);
-						// One step back
-						i--;
-					}
-				}
-
-			}
-		}
-
-		if (!replaced) {// Insert new layout, if there was nothing to replace
-			// Takes any componentlayout
-			JAXBElement<?> newel = null;
-
-			// Differ between several layouts, create different JAXBElements
-			if (newlayout instanceof TablelayoutType) {
-				newel = new JAXBElement<TablelayoutType>(new QName("tablelayout"), TablelayoutType.class, //$NON-NLS-1$
-						(TablelayoutType) newlayout);
-			} else if (newlayout instanceof NodedisplaylayoutType) {
-				newel = new JAXBElement<NodedisplaylayoutType>(new QName("nodedisplaylayout"), NodedisplaylayoutType.class, //$NON-NLS-1$
-						(NodedisplaylayoutType) newlayout);
-			}
-
-			if (newel != null) {
-				lgui.getObjectsAndRelationsAndInformation().add(newel);
-				lguiItem.notifyListeners();
-			}
-		}
-
-	}
-
-	/**
-	 * Simply returns the first layout found for a usagebar with the given id or
-	 * a default-layout
-	 * 
-	 * @param usagebarID
-	 * @return defaultlayout for a usagebar or first layout for usagebar with id
-	 *         usagebarid given by lml-file
-	 */
-	public UsagebarlayoutType getUsagebarLayout(String usagebarID) {
-		List<UsagebarlayoutType> usagebarLayouts = getUsagebarLayouts();
-		// Over all objects in lml-file
-		for (UsagebarlayoutType usagebarLayout : usagebarLayouts) {
-			if (usagebarLayout.getGid().equals(usagebarID)) {
-				return usagebarLayout;
-			}
-		}
-		return defaultUsagebar;
-	}
-
-	/**
-	 * Simply returns the first layout found for a chart with the given id or a
-	 * default-layout
-	 * 
-	 * @param chartID
-	 * @return defaultlayout for a chart or first layout for chart with id
-	 *         chartid given by lml-file
-	 */
-	public ChartlayoutType getChartLayout(String chartID) {
-		List<ChartlayoutType> chartLayouts = getChartLayouts();
-		for (ChartlayoutType chartLayout : chartLayouts) {
-			if (chartLayout.getGid().equals(chartID)) {
-				return chartLayout;
-			}
-		}
-		return defaultChart;
-	}
-
-	/**
-	 * Simply returns the first layout found for a infobox with the given id or
-	 * a default-layout
-	 * 
-	 * @param infoID
-	 * @return defaultlayout for a table or first layout for table with id
-	 *         tableid given by lml-file
-	 */
-	public InfoboxlayoutType getInfoboxLayout(String infoID) {
-		List<InfoboxlayoutType> infoboxLayouts = getInfoboxLayout();
-		for (InfoboxlayoutType infoboxLayout : infoboxLayouts) {
-			if (infoboxLayout.getGid().equals(infoID)) {
-				return infoboxLayout;
-			}
-		}
-		return defaultInfobox;
-	}
-
-	private List<InfoboxlayoutType> getInfoboxLayout() {
-		List<InfoboxlayoutType> infoboxLayouts = new LinkedList<InfoboxlayoutType>();
-		for (ComponentlayoutType tag : getComponentLayouts()) {
-			if (tag instanceof InfoboxlayoutType) {
-				infoboxLayouts.add((InfoboxlayoutType) tag);
-			}
-		}
-		return infoboxLayouts;
-	}
-
-	/**
-	 * This function is only for easier understanding this class Textboxlayouts
-	 * are identical to infoboxlayouts, so you could call
-	 * getInfoboxLayout(textid) and would get the same result.
-	 * 
-	 * @param textID
-	 *            id of a textbox
-	 * @return layout for a textbox with an info-tag in it
-	 */
-	public InfoboxlayoutType getTextboxLayout(String textID) {
-		return getInfoboxLayout(textID);
-	}
-
 	/**
 	 * This method merges the layout information given by the "layout"-instance
 	 * with the layout, which is included in "data". Component-layouts in "data"
@@ -258,10 +85,10 @@ public class LayoutAccess extends LguiHandler {
 		if (data == null || layout == null) {
 			return data;
 		}
-		LguiItem lgui = new LguiItem(data);
-		LayoutAccess la = new LayoutAccess(lgui, lgui.getLguiType());
+		final LguiItem lgui = new LguiItem(data);
+		final LayoutAccess la = new LayoutAccess(lgui, lgui.getLguiType());
 		// Replace component-layouts
-		for (JAXBElement<?> el : layout.getObjectsAndRelationsAndInformation()) {
+		for (final JAXBElement<?> el : layout.getObjectsAndRelationsAndInformation()) {
 			if (el.getValue() instanceof ComponentlayoutType) {
 				la.replaceComponentLayout((ComponentlayoutType) el.getValue());
 			}
@@ -289,7 +116,7 @@ public class LayoutAccess extends LguiHandler {
 		 **/
 
 		// Overwrite layouts with the same name
-		for (JAXBElement<?> el : layout.getObjectsAndRelationsAndInformation()) {
+		for (final JAXBElement<?> el : layout.getObjectsAndRelationsAndInformation()) {
 			if (el.getValue() instanceof LayoutType) {
 				if (!replaceGlobalLayout((LayoutType) el.getValue(), data)) {// If
 																				// not
@@ -315,14 +142,14 @@ public class LayoutAccess extends LguiHandler {
 	@SuppressWarnings("unchecked")
 	public static boolean replaceGlobalLayout(LayoutType newlayout, LguiType model) {
 
-		List<JAXBElement<?>> all = model.getObjectsAndRelationsAndInformation();
+		final List<JAXBElement<?>> all = model.getObjectsAndRelationsAndInformation();
 
 		// Go through all objects, search for layouttypes with newlayout.getId
 		// as id and replace them with this layout
 		for (int i = 0; i < all.size(); i++) {
-			JAXBElement<?> aobj = all.get(i);
+			final JAXBElement<?> aobj = all.get(i);
 			if (aobj.getValue() instanceof LayoutType) {
-				LayoutType old = (LayoutType) aobj.getValue();
+				final LayoutType old = (LayoutType) aobj.getValue();
 				if (old.getId().equals(newlayout.getId())) {
 					((JAXBElement<LayoutType>) aobj).setValue(newlayout);
 					return true;
@@ -372,16 +199,16 @@ public class LayoutAccess extends LguiHandler {
 	private static JAXBElement<GobjectType> minimizeGobjectType(GobjectType gobj) {
 
 		String qname = "table"; //$NON-NLS-1$
-		Class<GobjectType> c = (Class<GobjectType>) gobj.getClass();
+		final Class<GobjectType> c = (Class<GobjectType>) gobj.getClass();
 
 		GobjectType value = objectFactory.createGobjectType();
 
 		if (gobj instanceof TableType) {
-			TableType tt = objectFactory.createTableType();
-			TableType orig = (TableType) gobj;
+			final TableType tt = objectFactory.createTableType();
+			final TableType orig = (TableType) gobj;
 			tt.setContenttype(orig.getContenttype());
 			// copy all columns with pattern to table
-			for (ColumnType col : orig.getColumn()) {
+			for (final ColumnType col : orig.getColumn()) {
 				if (col.getPattern() != null) {
 					tt.getColumn().add(col);
 				}
@@ -391,7 +218,7 @@ public class LayoutAccess extends LguiHandler {
 
 			qname = "table"; //$NON-NLS-1$
 		} else if (gobj instanceof UsagebarType) {
-			UsagebarType ut = objectFactory.createUsagebarType();
+			final UsagebarType ut = objectFactory.createUsagebarType();
 
 			ut.setCpucount(BigInteger.valueOf(0));
 
@@ -399,7 +226,7 @@ public class LayoutAccess extends LguiHandler {
 
 			qname = "usagebar"; //$NON-NLS-1$
 		} else if (gobj instanceof TextboxType) {
-			TextboxType ut = objectFactory.createTextboxType();
+			final TextboxType ut = objectFactory.createTextboxType();
 
 			ut.setText(""); //$NON-NLS-1$
 
@@ -407,37 +234,37 @@ public class LayoutAccess extends LguiHandler {
 
 			qname = "text"; //$NON-NLS-1$
 		} else if (gobj instanceof InfoboxType) {
-			InfoboxType ut = objectFactory.createInfoboxType();
+			final InfoboxType ut = objectFactory.createInfoboxType();
 
 			value = ut;
 
 			qname = "infobox"; //$NON-NLS-1$
 		} else if (gobj instanceof Nodedisplay) {// Create minimal nodedisplay
-			Nodedisplay ut = objectFactory.createNodedisplay();
+			final Nodedisplay ut = objectFactory.createNodedisplay();
 
 			value = ut;
-			SchemeType scheme = objectFactory.createSchemeType();
+			final SchemeType scheme = objectFactory.createSchemeType();
 			scheme.getEl1().add(objectFactory.createSchemeElement1());
 			ut.setScheme(scheme);
 
-			DataType dat = objectFactory.createDataType();
+			final DataType dat = objectFactory.createDataType();
 			dat.getEl1().add(objectFactory.createDataElement1());
 			ut.setData(dat);
 
 			qname = "nodedisplay"; //$NON-NLS-1$
 		} else if (gobj instanceof ChartType) {
-			ChartType ut = objectFactory.createChartType();
+			final ChartType ut = objectFactory.createChartType();
 
 			value = ut;
 
 			qname = "chart"; //$NON-NLS-1$
 		} else if (gobj instanceof ChartgroupType) {
-			ChartgroupType ut = objectFactory.createChartgroupType();
+			final ChartgroupType ut = objectFactory.createChartgroupType();
 			// Add lower chart-elements to the minimized chart-group
-			ChartgroupType orig = (ChartgroupType) gobj;
+			final ChartgroupType orig = (ChartgroupType) gobj;
 			// Go through all charts minimize them and add them to ut
-			for (ChartType chart : orig.getChart()) {
-				ChartType min = (ChartType) (minimizeGobjectType(chart).getValue());
+			for (final ChartType chart : orig.getChart()) {
+				final ChartType min = (ChartType) (minimizeGobjectType(chart).getValue());
 				ut.getChart().add(min);
 			}
 
@@ -450,104 +277,7 @@ public class LayoutAccess extends LguiHandler {
 		value.setId(gobj.getId());
 		value.setTitle(gobj.getTitle());
 
-		JAXBElement<GobjectType> res = new JAXBElement<GobjectType>(new QName(qname), c, value);
-
-		return res;
-	}
-
-	/**
-	 * Remove all real data from modell return only layout-information and data,
-	 * which is needed to make lml-model valid
-	 * 
-	 * @param modell
-	 *            lml-modell with data and layout-information
-	 * @return
-	 */
-	public LguiType getLayoutFromModel() {
-
-		final String dummystring = "__dummy_nd__";// This is gid for all //$NON-NLS-1$
-													// nodedisplaylayouts in
-													// requests => id for all
-													// nodedisplays
-
-		LguiType res = objectFactory.createLguiType();
-
-		HashSet<String> neededComponents = new HashSet<String>();
-
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
-
-			Object value = tag.getValue();
-
-			// add normal global layouts
-			if (value instanceof LayoutType) {
-				res.getObjectsAndRelationsAndInformation().add(tag);
-
-				if (value instanceof SplitlayoutType) {
-					SplitlayoutType splitlayout = (SplitlayoutType) value;
-					// Collect needed components from layout recursively
-					if (splitlayout.getLeft() != null) {
-						collectComponents(splitlayout.getLeft(), neededComponents);
-						collectComponents(splitlayout.getRight(), neededComponents);
-					}
-				} else if (value instanceof AbslayoutType) {
-
-					AbslayoutType abslayout = (AbslayoutType) value;
-					// Just traverse comp-list for gid-attributes
-					for (ComponentType comp : abslayout.getComp()) {
-						neededComponents.add(comp.getGid());
-					}
-
-				}
-
-			} else if (value instanceof ComponentlayoutType) {
-				if (((ComponentlayoutType) value).isActive()) {
-					res.getObjectsAndRelationsAndInformation().add(tag);
-
-					ComponentlayoutType complayout = (ComponentlayoutType) value;
-					neededComponents.add(complayout.getGid());
-
-					// Workaround for nodedisplay
-					if (value instanceof NodedisplaylayoutType) {
-						NodedisplaylayoutType nlayout = (NodedisplaylayoutType) value;
-						nlayout.setGid(dummystring);
-					}
-
-				}
-			}
-
-		}
-
-		HashMap<String, GobjectType> idtoGobject = new HashMap<String, GobjectType>();
-		// Search needed components in data-tag to discover, which type the
-		// needed components have
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
-
-			Object value = tag.getValue();
-			// is it a graphical object?
-			if (value instanceof GobjectType) {
-				GobjectType gobj = (GobjectType) value;
-				if (neededComponents.contains(gobj.getId())) {
-					idtoGobject.put(gobj.getId(), gobj);
-				}
-			}
-		}
-
-		// Add all gobjects in idtoGobject to the result, so that lml-modell is
-		// valid
-		for (GobjectType gobj : idtoGobject.values()) {
-			JAXBElement<GobjectType> min = minimizeGobjectType(gobj);
-
-			// Workaround for nodedisplay
-			GobjectType newgobj = min.getValue();
-			if (newgobj instanceof Nodedisplay) {
-				((Nodedisplay) newgobj).setId(dummystring);
-			}
-
-			res.getObjectsAndRelationsAndInformation().add(min);
-		}
-
-		// Set layout-attribute
-		res.setLayout(true);
+		final JAXBElement<GobjectType> res = new JAXBElement<GobjectType>(new QName(qname), c, value);
 
 		return res;
 	}
@@ -562,46 +292,53 @@ public class LayoutAccess extends LguiHandler {
 	@SuppressWarnings("unused")
 	private static void objToLML(LguiType obj, OutputStream output) throws JAXBException {
 
-		JAXBContext jc = JAXBContext.newInstance("lml"); //$NON-NLS-1$
+		final JAXBContext jc = JAXBContext.newInstance("lml"); //$NON-NLS-1$
 
-		Marshaller mar = jc.createMarshaller();
+		final Marshaller mar = jc.createMarshaller();
 
 		mar.setProperty("jaxb.schemaLocation", "http://www.llview.de lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		QName tagname = new QName("http://www.llview.de", "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final QName tagname = new QName("http://www.llview.de", "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		JAXBElement<LguiType> rootel = new JAXBElement<LguiType>(tagname, LguiType.class, obj);
+		final JAXBElement<LguiType> rootel = new JAXBElement<LguiType>(tagname, LguiType.class, obj);
 
 		mar.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
 		mar.marshal(rootel, output);
 	}
 
-	/**
-	 * Search in component-layouts for layout for the graphical object with id
-	 * gid.
-	 * 
-	 * @param gid
-	 *            id of corresponding graphical object, for which layouts are
-	 *            searched
-	 * @return list of componentlayouts corresponding to the graphical object id
-	 *         gid
+	// DefaultLayouts
+	private final UsagebarlayoutType defaultUsagebar;
+
+	private final ChartlayoutType defaultChart;
+
+	private final TablelayoutType defaultTable;
+
+	private final InfoboxlayoutType defaultInfobox;
+
+	/*
+	 * create an objectfactory for all functions in this class
 	 */
-	public List<ComponentlayoutType> getComponentLayoutByGID(String gid) {
+	private static ObjectFactory objectFactory = new ObjectFactory();
 
-		List<ComponentlayoutType> complayouts = getComponentLayouts();
+	/**
+	 * @param lguiItem
+	 *            LML-data-handler, which groups this handler and others to a
+	 *            set of LMLHandler. This instance is needed to notify all
+	 *            LMLHandler, if any data of the LguiType-instance was changed.
+	 */
+	public LayoutAccess(ILguiItem lguiItem, LguiType lgui) {
+		super(lguiItem, lgui);
+		defaultUsagebar = objectFactory.createUsagebarlayoutType();
+		defaultChart = objectFactory.createChartlayoutType();
+		defaultTable = objectFactory.createTablelayoutType();
+		defaultInfobox = objectFactory.createInfoboxlayoutType();
 
-		ArrayList<ComponentlayoutType> res = new ArrayList<ComponentlayoutType>();
-
-		for (ComponentlayoutType alayout : complayouts) {
-
-			if (alayout.getGid() != null && alayout.getGid().equals(gid)) {
-
-				res.add(alayout);
+		this.lguiItem.addListener(new ILguiListener() {
+			public void handleEvent(ILguiUpdatedEvent e) {
+				update(e.getLgui());
 			}
-		}
-
-		return res;
+		});
 	}
 
 	/**
@@ -620,13 +357,13 @@ public class LayoutAccess extends LguiHandler {
 		// Create jaxbelement corresponding to the class-type
 		if (layout instanceof AbslayoutType) {
 
-			AbslayoutType abslayout = (AbslayoutType) layout;
+			final AbslayoutType abslayout = (AbslayoutType) layout;
 
 			jaxbel = new JAXBElement<AbslayoutType>(new QName("abslayout"), AbslayoutType.class, abslayout); //$NON-NLS-1$
 
 		} else if (layout instanceof SplitlayoutType) {
 
-			SplitlayoutType splitlayout = (SplitlayoutType) layout;
+			final SplitlayoutType splitlayout = (SplitlayoutType) layout;
 
 			jaxbel = new JAXBElement<SplitlayoutType>(new QName("splitlayout"), SplitlayoutType.class, splitlayout); //$NON-NLS-1$
 
@@ -654,13 +391,13 @@ public class LayoutAccess extends LguiHandler {
 	public AbslayoutType generateDefaultAbsoluteLayout(int width, int height) {
 
 		// Collect active components
-		List<GobjectType> gobjects = lguiItem.getOverviewAccess().getGraphicalObjects();
+		final List<GobjectType> gobjects = lguiItem.getOverviewAccess().getGraphicalObjects();
 
-		ArrayList<GobjectType> activeobjects = new ArrayList<GobjectType>();
+		final ArrayList<GobjectType> activeobjects = new ArrayList<GobjectType>();
 		// Go through all graphical objects
-		for (GobjectType gobj : gobjects) {
+		for (final GobjectType gobj : gobjects) {
 			// Get layouts for this object, normally there is only one
-			List<ComponentlayoutType> layouts = getComponentLayoutByGID(gobj.getId());
+			final List<ComponentlayoutType> layouts = getComponentLayoutByGID(gobj.getId());
 
 			if (layouts.size() == 0) {// assume gobj to be active if there is no
 										// componentlayout
@@ -668,7 +405,7 @@ public class LayoutAccess extends LguiHandler {
 			}
 
 			// Search for a componentlayout which declares gobj to be active
-			for (ComponentlayoutType complayout : layouts) {
+			for (final ComponentlayoutType complayout : layouts) {
 				if (complayout.isActive()) {
 					activeobjects.add(gobj);
 					break;
@@ -679,7 +416,7 @@ public class LayoutAccess extends LguiHandler {
 		// Now activeobjects contains all active graphical objects, which have
 		// to be arranged on the screen
 
-		AbslayoutType res = objectFactory.createAbslayoutType();
+		final AbslayoutType res = objectFactory.createAbslayoutType();
 
 		res.setId("abs_default"); //$NON-NLS-1$
 
@@ -697,12 +434,12 @@ public class LayoutAccess extends LguiHandler {
 		}
 		// Calculate width and height of graphical objects
 		int index = 0;
-		int rectwidth = width / columns;
-		int rectheight = height / rows;
+		final int rectwidth = width / columns;
+		final int rectheight = height / rows;
 
-		for (GobjectType gobj : activeobjects) {
+		for (final GobjectType gobj : activeobjects) {
 
-			ComponentType pos = objectFactory.createComponentType();
+			final ComponentType pos = objectFactory.createComponentType();
 			pos.setGid(gobj.getId());
 			// Positioning the component
 			pos.setW(BigInteger.valueOf(rectwidth));
@@ -720,6 +457,98 @@ public class LayoutAccess extends LguiHandler {
 		return res;
 	}
 
+	public String[] getActiveNodedisplayLayoutGid() {
+		final ArrayList<String> nodedisplayID = new ArrayList<String>();
+		final List<NodedisplaylayoutType> nodedisplayLayouts = getNodedisplayLayouts();
+		for (final NodedisplaylayoutType nodedisplayLayout : nodedisplayLayouts) {
+			if (nodedisplayLayout.isActive()) {
+				nodedisplayID.add(nodedisplayLayout.getGid());
+			}
+		}
+		return nodedisplayID.toArray(new String[nodedisplayID.size()]);
+	}
+
+	public String[] getActiveTableLayoutsGid() {
+		final ArrayList<String> tableLayoutsId = new ArrayList<String>();
+		final List<TablelayoutType> tableLayouts = getTableLayouts();
+		for (final TablelayoutType tableLayout : tableLayouts) {
+			if (tableLayout.isActive()) {
+				tableLayoutsId.add(tableLayout.getGid());
+			}
+		}
+		return tableLayoutsId.toArray(new String[tableLayoutsId.size()]);
+	}
+
+	/**
+	 * Simply returns the first layout found for a chart with the given id or a
+	 * default-layout
+	 * 
+	 * @param chartID
+	 * @return defaultlayout for a chart or first layout for chart with id
+	 *         chartid given by lml-file
+	 */
+	public ChartlayoutType getChartLayout(String chartID) {
+		final List<ChartlayoutType> chartLayouts = getChartLayouts();
+		for (final ChartlayoutType chartLayout : chartLayouts) {
+			if (chartLayout.getGid().equals(chartID)) {
+				return chartLayout;
+			}
+		}
+		return defaultChart;
+	}
+
+	public List<ChartlayoutType> getChartLayouts() {
+		final List<ChartlayoutType> chartLayouts = new LinkedList<ChartlayoutType>();
+		for (final ComponentlayoutType tag : getComponentLayouts()) {
+			if (tag instanceof ChartlayoutType) {
+				chartLayouts.add((ChartlayoutType) tag);
+			}
+		}
+		return chartLayouts;
+	}
+
+	/**
+	 * Search in component-layouts for layout for the graphical object with id
+	 * gid.
+	 * 
+	 * @param gid
+	 *            id of corresponding graphical object, for which layouts are
+	 *            searched
+	 * @return list of componentlayouts corresponding to the graphical object id
+	 *         gid
+	 */
+	public List<ComponentlayoutType> getComponentLayoutByGID(String gid) {
+
+		final List<ComponentlayoutType> complayouts = getComponentLayouts();
+
+		final ArrayList<ComponentlayoutType> res = new ArrayList<ComponentlayoutType>();
+
+		for (final ComponentlayoutType alayout : complayouts) {
+
+			if (alayout.getGid() != null && alayout.getGid().equals(gid)) {
+
+				res.add(alayout);
+			}
+		}
+
+		return res;
+	}
+
+	/**
+	 * Getting a list of all elements of type ComponentlayoutType from LguiType.
+	 * 
+	 * @return list of elements(ComponentlayoutType)
+	 */
+	public List<ComponentlayoutType> getComponentLayouts() {
+		final List<ComponentlayoutType> layouts = new LinkedList<ComponentlayoutType>();
+		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+			if (tag.getValue() instanceof ComponentlayoutType) {
+				layouts.add((ComponentlayoutType) tag.getValue());
+			}
+		}
+		return layouts;
+	}
+
 	public TablelayoutType getDefaultTableLayout(String gid) {
 		TablelayoutType tableLayout = getTableLayout(gid);
 		if (tableLayout == null) {
@@ -730,10 +559,10 @@ public class LayoutAccess extends LguiHandler {
 		if (tableLayout.getColumn().size() <= 0) {
 			tableLayout.setId(gid + "_layout"); //$NON-NLS-1$
 			tableLayout.setGid(gid);
-			TableType table = lguiItem.getTableHandler().getTable(gid);
+			final TableType table = lguiItem.getTableHandler().getTable(gid);
 			if (table != null) {
 				for (int i = 0; i < table.getColumn().size(); i++) {
-					ColumnlayoutType column = new ColumnlayoutType();
+					final ColumnlayoutType column = new ColumnlayoutType();
 					column.setCid(BigInteger.valueOf(i + 1));
 					column.setPos(BigInteger.valueOf(i));
 					column.setWidth(Double.valueOf(1));
@@ -746,131 +575,14 @@ public class LayoutAccess extends LguiHandler {
 		return tableLayout;
 	}
 
-	/**
-	 * Getting a list of all elements of type ComponentlayoutType from LguiType.
-	 * 
-	 * @return list of elements(ComponentlayoutType)
-	 */
-	public List<ComponentlayoutType> getComponentLayouts() {
-		List<ComponentlayoutType> layouts = new LinkedList<ComponentlayoutType>();
-		for (JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
-			if (tag.getValue() instanceof ComponentlayoutType) {
-				layouts.add((ComponentlayoutType) tag.getValue());
-			}
-		}
-		return layouts;
-	}
-
-	/**
-	 * Getting a list of elements of type NodedisplaylayoutType.
-	 * 
-	 * @return list of elements(NodedisplaylayoutType)
-	 */
-	public List<NodedisplaylayoutType> getNodedisplayLayouts() {
-		List<NodedisplaylayoutType> nodedisplayLayouts = new LinkedList<NodedisplaylayoutType>();
-		for (ComponentlayoutType tag : getComponentLayouts()) {
-			if (tag instanceof NodedisplaylayoutType) {
-				nodedisplayLayouts.add((NodedisplaylayoutType) tag);
-			}
-		}
-		return nodedisplayLayouts;
-	}
-
-	/**
-	 * Getting a list of all elements of type TablelayoutType.
-	 * 
-	 * @return list of elements(TablelayoutType)
-	 */
-	public List<TablelayoutType> getTableLayouts() {
-		List<TablelayoutType> tableLayouts = new LinkedList<TablelayoutType>();
-		for (ComponentlayoutType tag : getComponentLayouts()) {
-			if (tag instanceof TablelayoutType) {
-				tableLayouts.add((TablelayoutType) tag);
-			}
-		}
-		return tableLayouts;
-	}
-
-	/**
-	 * Getting the layout of a given table, the identifier of the layout is the
-	 * shared ID of table and layout.
-	 * 
-	 * @param tablelayoutID
-	 *            ID of the desired tablelayout
-	 * @return Corresponding layout of a table
-	 */
-	public TablelayoutType getTableLayout(String tablelayoutID) {
-		for (TablelayoutType tag : getTableLayouts()) {
-			if (tag.getGid().equals(tablelayoutID)) {
-				return tag;
-			}
-		}
-		return defaultTable;
-	}
-
-	public List<UsagebarlayoutType> getUsagebarLayouts() {
-		List<UsagebarlayoutType> usagebarLayouts = new LinkedList<UsagebarlayoutType>();
-		for (ComponentlayoutType tag : getComponentLayouts()) {
-			if (tag instanceof UsagebarlayoutType) {
-				usagebarLayouts.add((UsagebarlayoutType) tag);
-			}
-		}
-		return usagebarLayouts;
-	}
-
-	public List<ChartlayoutType> getChartLayouts() {
-		List<ChartlayoutType> chartLayouts = new LinkedList<ChartlayoutType>();
-		for (ComponentlayoutType tag : getComponentLayouts()) {
-			if (tag instanceof ChartlayoutType) {
-				chartLayouts.add((ChartlayoutType) tag);
-			}
-		}
-		return chartLayouts;
-	}
-
-	public String[] getActiveTableLayoutsGid() {
-		ArrayList<String> tableLayoutsId = new ArrayList<String>();
-		List<TablelayoutType> tableLayouts = getTableLayouts();
-		for (TablelayoutType tableLayout : tableLayouts) {
-			if (tableLayout.isActive()) {
-				tableLayoutsId.add(tableLayout.getGid());
-			}
-		}
-		return tableLayoutsId.toArray(new String[tableLayoutsId.size()]);
-	}
-
-	public ColumnlayoutType[] getLayoutColumsToCids(BigInteger[] cids, String gid) {
-		ColumnlayoutType[] columns = new ColumnlayoutType[cids.length];
-		for (int i = 0; i < cids.length; i++) {
-			for (ColumnlayoutType column : getTableLayout(gid).getColumn()) {
-				if (column.getCid().equals(cids[i])) {
-					columns[i] = column;
-					break;
-				}
-			}
-		}
-		return columns;
-	}
-
-	public String[] getActiveNodedisplayLayoutGid() {
-		ArrayList<String> nodedisplayID = new ArrayList<String>();
-		List<NodedisplaylayoutType> nodedisplayLayouts = getNodedisplayLayouts();
-		for (NodedisplaylayoutType nodedisplayLayout : nodedisplayLayouts) {
-			if (nodedisplayLayout.isActive()) {
-				nodedisplayID.add(nodedisplayLayout.getGid());
-			}
-		}
-		return nodedisplayID.toArray(new String[nodedisplayID.size()]);
-	}
-
 	public Map<String, String> getInactiveComponents() {
-		List<ComponentlayoutType> objects = getComponentLayouts();
-		ArrayList<String> inactive = new ArrayList<String>();
-		Map<String, String> inactiveMap = new HashMap<String, String>();
-		for (ComponentlayoutType object : objects) {
+		final List<ComponentlayoutType> objects = getComponentLayouts();
+		final ArrayList<String> inactive = new ArrayList<String>();
+		final Map<String, String> inactiveMap = new HashMap<String, String>();
+		for (final ComponentlayoutType object : objects) {
 			if (!object.isActive()) {
 				if (object.getClass().getSimpleName().equals("TablelayoutType")) { //$NON-NLS-1$
-					TableType table = lguiItem.getTableHandler().getTable(object.getGid());
+					final TableType table = lguiItem.getTableHandler().getTable(object.getGid());
 					if (table != null) {
 						inactiveMap.put(table.getTitle(), object.getGid());
 					}
@@ -884,19 +596,298 @@ public class LayoutAccess extends LguiHandler {
 		return inactiveMap;
 	}
 
-	private ComponentlayoutType getComponent(String gid) {
-		List<ComponentlayoutType> objects = getComponentLayouts();
-		for (ComponentlayoutType object : objects) {
-			if (object.getGid().equals(gid)) {
-				return object;
+	/**
+	 * Simply returns the first layout found for a infobox with the given id or
+	 * a default-layout
+	 * 
+	 * @param infoID
+	 * @return defaultlayout for a table or first layout for table with id
+	 *         tableid given by lml-file
+	 */
+	public InfoboxlayoutType getInfoboxLayout(String infoID) {
+		final List<InfoboxlayoutType> infoboxLayouts = getInfoboxLayout();
+		for (final InfoboxlayoutType infoboxLayout : infoboxLayouts) {
+			if (infoboxLayout.getGid().equals(infoID)) {
+				return infoboxLayout;
 			}
 		}
-		return null;
+		return defaultInfobox;
+	}
+
+	public ColumnlayoutType[] getLayoutColumsToCids(BigInteger[] cids, String gid) {
+		final ColumnlayoutType[] columns = new ColumnlayoutType[cids.length];
+		for (int i = 0; i < cids.length; i++) {
+			for (final ColumnlayoutType column : getTableLayout(gid).getColumn()) {
+				if (column.getCid().equals(cids[i])) {
+					columns[i] = column;
+					break;
+				}
+			}
+		}
+		return columns;
+	}
+
+	/**
+	 * Remove all real data from modell return only layout-information and data,
+	 * which is needed to make lml-model valid
+	 * 
+	 * @param modell
+	 *            lml-modell with data and layout-information
+	 * @return
+	 */
+	public LguiType getLayoutFromModel() {
+
+		final String dummystring = "__dummy_nd__";// This is gid for all //$NON-NLS-1$
+													// nodedisplaylayouts in
+													// requests => id for all
+													// nodedisplays
+
+		final LguiType res = objectFactory.createLguiType();
+
+		final HashSet<String> neededComponents = new HashSet<String>();
+
+		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+
+			final Object value = tag.getValue();
+
+			// add normal global layouts
+			if (value instanceof LayoutType) {
+				res.getObjectsAndRelationsAndInformation().add(tag);
+
+				if (value instanceof SplitlayoutType) {
+					final SplitlayoutType splitlayout = (SplitlayoutType) value;
+					// Collect needed components from layout recursively
+					if (splitlayout.getLeft() != null) {
+						collectComponents(splitlayout.getLeft(), neededComponents);
+						collectComponents(splitlayout.getRight(), neededComponents);
+					}
+				} else if (value instanceof AbslayoutType) {
+
+					final AbslayoutType abslayout = (AbslayoutType) value;
+					// Just traverse comp-list for gid-attributes
+					for (final ComponentType comp : abslayout.getComp()) {
+						neededComponents.add(comp.getGid());
+					}
+
+				}
+
+			} else if (value instanceof ComponentlayoutType) {
+				if (((ComponentlayoutType) value).isActive()) {
+					res.getObjectsAndRelationsAndInformation().add(tag);
+
+					final ComponentlayoutType complayout = (ComponentlayoutType) value;
+					neededComponents.add(complayout.getGid());
+
+					// Workaround for nodedisplay
+					if (value instanceof NodedisplaylayoutType) {
+						final NodedisplaylayoutType nlayout = (NodedisplaylayoutType) value;
+						nlayout.setGid(dummystring);
+					}
+
+				}
+			}
+
+		}
+
+		final HashMap<String, GobjectType> idtoGobject = new HashMap<String, GobjectType>();
+		// Search needed components in data-tag to discover, which type the
+		// needed components have
+		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+
+			final Object value = tag.getValue();
+			// is it a graphical object?
+			if (value instanceof GobjectType) {
+				final GobjectType gobj = (GobjectType) value;
+				if (neededComponents.contains(gobj.getId())) {
+					idtoGobject.put(gobj.getId(), gobj);
+				}
+			}
+		}
+
+		// Add all gobjects in idtoGobject to the result, so that lml-modell is
+		// valid
+		for (final GobjectType gobj : idtoGobject.values()) {
+			final JAXBElement<GobjectType> min = minimizeGobjectType(gobj);
+
+			// Workaround for nodedisplay
+			final GobjectType newgobj = min.getValue();
+			if (newgobj instanceof Nodedisplay) {
+				((Nodedisplay) newgobj).setId(dummystring);
+			}
+
+			res.getObjectsAndRelationsAndInformation().add(min);
+		}
+
+		// Set layout-attribute
+		res.setLayout(true);
+
+		return res;
+	}
+
+	/**
+	 * Getting a list of elements of type NodedisplaylayoutType.
+	 * 
+	 * @return list of elements(NodedisplaylayoutType)
+	 */
+	public List<NodedisplaylayoutType> getNodedisplayLayouts() {
+		final List<NodedisplaylayoutType> nodedisplayLayouts = new LinkedList<NodedisplaylayoutType>();
+		for (final ComponentlayoutType tag : getComponentLayouts()) {
+			if (tag instanceof NodedisplaylayoutType) {
+				nodedisplayLayouts.add((NodedisplaylayoutType) tag);
+			}
+		}
+		return nodedisplayLayouts;
+	}
+
+	/**
+	 * Getting the layout of a given table, the identifier of the layout is the
+	 * shared ID of table and layout.
+	 * 
+	 * @param tablelayoutID
+	 *            ID of the desired tablelayout
+	 * @return Corresponding layout of a table
+	 */
+	public TablelayoutType getTableLayout(String tablelayoutID) {
+		for (final TablelayoutType tag : getTableLayouts()) {
+			if (tag.getGid().equals(tablelayoutID)) {
+				return tag;
+			}
+		}
+		return defaultTable;
+	}
+
+	/**
+	 * Getting a list of all elements of type TablelayoutType.
+	 * 
+	 * @return list of elements(TablelayoutType)
+	 */
+	public List<TablelayoutType> getTableLayouts() {
+		final List<TablelayoutType> tableLayouts = new LinkedList<TablelayoutType>();
+		for (final ComponentlayoutType tag : getComponentLayouts()) {
+			if (tag instanceof TablelayoutType) {
+				tableLayouts.add((TablelayoutType) tag);
+			}
+		}
+		return tableLayouts;
+	}
+
+	/**
+	 * This function is only for easier understanding this class Textboxlayouts
+	 * are identical to infoboxlayouts, so you could call
+	 * getInfoboxLayout(textid) and would get the same result.
+	 * 
+	 * @param textID
+	 *            id of a textbox
+	 * @return layout for a textbox with an info-tag in it
+	 */
+	public InfoboxlayoutType getTextboxLayout(String textID) {
+		return getInfoboxLayout(textID);
+	}
+
+	/**
+	 * Simply returns the first layout found for a usagebar with the given id or
+	 * a default-layout
+	 * 
+	 * @param usagebarID
+	 * @return defaultlayout for a usagebar or first layout for usagebar with id
+	 *         usagebarid given by lml-file
+	 */
+	public UsagebarlayoutType getUsagebarLayout(String usagebarID) {
+		final List<UsagebarlayoutType> usagebarLayouts = getUsagebarLayouts();
+		// Over all objects in lml-file
+		for (final UsagebarlayoutType usagebarLayout : usagebarLayouts) {
+			if (usagebarLayout.getGid().equals(usagebarID)) {
+				return usagebarLayout;
+			}
+		}
+		return defaultUsagebar;
+	}
+
+	public List<UsagebarlayoutType> getUsagebarLayouts() {
+		final List<UsagebarlayoutType> usagebarLayouts = new LinkedList<UsagebarlayoutType>();
+		for (final ComponentlayoutType tag : getComponentLayouts()) {
+			if (tag instanceof UsagebarlayoutType) {
+				usagebarLayouts.add((UsagebarlayoutType) tag);
+			}
+		}
+		return usagebarLayouts;
+	}
+
+	/**
+	 * Replace all componentlayouts for a graphical object with given gid
+	 * through newlayout.getGid() with newlayout
+	 * 
+	 * @param newLayout
+	 *            new layout, which is placed into the positions of old layouts
+	 */
+	@SuppressWarnings("unchecked")
+	public void replaceComponentLayout(ComponentlayoutType newlayout) {
+		if (newlayout == null) {
+			return;
+		}
+		final String gid = newlayout.getGid();
+
+		final List<JAXBElement<?>> allobjects = lgui.getObjectsAndRelationsAndInformation();
+
+		boolean replaced = false;
+
+		// Over all objects in lml-file
+		for (int i = 0; i < allobjects.size(); i++) {
+			final JAXBElement<?> aobj = allobjects.get(i);
+
+			// Over all Componentlayouts
+			if (aobj.getValue() instanceof ComponentlayoutType) {
+
+				final ComponentlayoutType alayout = (ComponentlayoutType) aobj.getValue();
+
+				if (alayout.getGid() != null && alayout.getGid().equals(gid)) {
+
+					if (!replaced) {
+
+						((JAXBElement<ComponentlayoutType>) aobj).setValue(newlayout);
+						lguiItem.notifyListeners();
+						replaced = true;
+					} else {// Delete this object
+						allobjects.remove(aobj);
+						// One step back
+						i--;
+					}
+				}
+
+			}
+		}
+
+		if (!replaced) {// Insert new layout, if there was nothing to replace
+			// Takes any componentlayout
+			JAXBElement<?> newel = null;
+
+			// Differ between several layouts, create different JAXBElements
+			if (newlayout instanceof TablelayoutType) {
+				newel = new JAXBElement<TablelayoutType>(new QName("tablelayout"), TablelayoutType.class, //$NON-NLS-1$
+						(TablelayoutType) newlayout);
+			} else if (newlayout instanceof NodedisplaylayoutType) {
+				newel = new JAXBElement<NodedisplaylayoutType>(new QName("nodedisplaylayout"), NodedisplaylayoutType.class, //$NON-NLS-1$
+						(NodedisplaylayoutType) newlayout);
+			}
+
+			if (newel != null) {
+				lgui.getObjectsAndRelationsAndInformation().add(newel);
+				lguiItem.notifyListeners();
+			}
+		}
+
+	}
+
+	/**
+	 * Setting Changes in the Layout.
+	 */
+	public void setChangesLayoutColumn() {
+
 	}
 
 	public String setComponentActive(String gid, boolean active) {
 		String type = null;
-		ComponentlayoutType component = getComponent(gid);
+		final ComponentlayoutType component = getComponent(gid);
 		if (component != null) {
 			if (component instanceof TablelayoutType) {
 				type = "table"; //$NON-NLS-1$
@@ -906,6 +897,26 @@ public class LayoutAccess extends LguiHandler {
 			component.setActive(active);
 		}
 		return type;
+	}
+
+	private ComponentlayoutType getComponent(String gid) {
+		final List<ComponentlayoutType> objects = getComponentLayouts();
+		for (final ComponentlayoutType object : objects) {
+			if (object.getGid().equals(gid)) {
+				return object;
+			}
+		}
+		return null;
+	}
+
+	private List<InfoboxlayoutType> getInfoboxLayout() {
+		final List<InfoboxlayoutType> infoboxLayouts = new LinkedList<InfoboxlayoutType>();
+		for (final ComponentlayoutType tag : getComponentLayouts()) {
+			if (tag instanceof InfoboxlayoutType) {
+				infoboxLayouts.add((InfoboxlayoutType) tag);
+			}
+		}
+		return infoboxLayouts;
 	}
 
 }

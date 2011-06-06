@@ -53,7 +53,7 @@ public class OIDToInformation extends LguiHandler {
 		lguiItem.addListener(new ILguiListener() {
 
 			public void handleEvent(ILguiUpdatedEvent e) {
-				updateData(e.getLguiItem().getLguiType());
+				updateData(e.getLgui());
 			}
 		});
 	}
@@ -75,47 +75,6 @@ public class OIDToInformation extends LguiHandler {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Extracts all info-tags from lml-model and saves them in oidtoinfo.
-	 */
-	private void getInformationFromModel() {
-
-		oidtoinfo = new HashMap<String, List<InfoType>>();
-
-		final List<JAXBElement<?>> alltags = lgui.getObjectsAndRelationsAndInformation();
-
-		for (final JAXBElement<?> jaxbtag : alltags) {// over all
-														// information-tags
-
-			final Object tag = jaxbtag.getValue();
-
-			if (!(tag instanceof InformationType)) {
-				continue;
-			}
-
-			final InformationType ainfos = (InformationType) tag;
-
-			final List<InfoType> realinfos = ainfos.getInfo();
-
-			for (final InfoType ainfo : realinfos) { // over all info-tags
-				// (information/info)
-
-				final String oid = ainfo.getOid();
-
-				if (oidtoinfo.containsKey(oid)) {// Already list existent
-					final List<InfoType> oldlist = oidtoinfo.get(oid);
-					oldlist.add(ainfo);
-				} else {// new list for oid
-					final ArrayList<InfoType> newlist = new ArrayList<InfoType>();
-					newlist.add(ainfo);
-					oidtoinfo.put(oid, newlist);
-				}
-			}
-
-		}
-
 	}
 
 	/**
@@ -230,6 +189,47 @@ public class OIDToInformation extends LguiHandler {
 		lgui = pmodel;
 
 		getInformationFromModel();
+	}
+
+	/**
+	 * Extracts all info-tags from lml-model and saves them in oidtoinfo.
+	 */
+	private void getInformationFromModel() {
+
+		oidtoinfo = new HashMap<String, List<InfoType>>();
+
+		final List<JAXBElement<?>> alltags = lgui.getObjectsAndRelationsAndInformation();
+
+		for (final JAXBElement<?> jaxbtag : alltags) {// over all
+														// information-tags
+
+			final Object tag = jaxbtag.getValue();
+
+			if (!(tag instanceof InformationType)) {
+				continue;
+			}
+
+			final InformationType ainfos = (InformationType) tag;
+
+			final List<InfoType> realinfos = ainfos.getInfo();
+
+			for (final InfoType ainfo : realinfos) { // over all info-tags
+				// (information/info)
+
+				final String oid = ainfo.getOid();
+
+				if (oidtoinfo.containsKey(oid)) {// Already list existent
+					final List<InfoType> oldlist = oidtoinfo.get(oid);
+					oldlist.add(ainfo);
+				} else {// new list for oid
+					final ArrayList<InfoType> newlist = new ArrayList<InfoType>();
+					newlist.add(ainfo);
+					oidtoinfo.put(oid, newlist);
+				}
+			}
+
+		}
+
 	}
 
 }

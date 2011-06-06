@@ -361,7 +361,7 @@ public class LguiItem implements ILguiItem {
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#notifyListeners()
 	 */
 	public void notifyListeners() {
-		final LguiUpdatedEvent event = new LguiUpdatedEvent(this);
+		final LguiUpdatedEvent event = new LguiUpdatedEvent(this, lgui);
 		for (final ILguiListener l : listeners) {
 			l.handleEvent(event);
 		}
@@ -428,13 +428,14 @@ public class LguiItem implements ILguiItem {
 		if (listeners.isEmpty()) {
 			createLguiHandlers();
 		}
-		synchronized (this) {
-			setCid();
-		}
 		fireUpdatedEvent();
+		if (!cidSet()) {
+			synchronized (this) {
+				setCid();
+			}
+		}
 		synchronized (this) {
 			updateJobData();
-			setCid();
 		}
 	}
 
@@ -485,6 +486,20 @@ public class LguiItem implements ILguiItem {
 		table.getRow().add(row);
 	}
 
+	private boolean cidSet() {
+		for (final TableType table : getTableHandler().getTables()) {
+			for (final RowType row : table.getRow()) {
+				for (final CellType cell : row.getCell()) {
+					if (cell.getCid() == null) {
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
 	/**
 	 * The instance lgui is filled with a new data-model. This method creates
 	 * all modules, which handle the data. These modules can then be accessed by
@@ -501,7 +516,7 @@ public class LguiItem implements ILguiItem {
 	}
 
 	private void fireUpdatedEvent() {
-		final ILguiUpdatedEvent e = new LguiUpdatedEvent(this);
+		final ILguiUpdatedEvent e = new LguiUpdatedEvent(this, lgui);
 		for (final ILguiListener listener : listeners) {
 			listener.handleEvent(e);
 		}
@@ -632,6 +647,10 @@ public class LguiItem implements ILguiItem {
 				}
 				addJobToTable(table, status.getOid(), status);
 			}
+		}
+		table = getTableHandler().getTable(ACTIVE_JOB_TABLE);
+		if (table == null) {
+			table = getTableHandler().generateDefaultTable(ACTIVE_JOB_TABLE);
 		}
 	}
 

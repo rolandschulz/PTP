@@ -36,7 +36,7 @@ public class OverviewAccess extends LguiHandler {
 
 		this.lguiItem.addListener(new ILguiListener() {
 			public void handleEvent(ILguiUpdatedEvent e) {
-				update(e.getLguiItem().getLguiType());
+				update(e.getLgui());
 			}
 		});
 	}
