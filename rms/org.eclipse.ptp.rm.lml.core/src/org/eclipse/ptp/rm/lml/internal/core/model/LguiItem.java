@@ -454,9 +454,11 @@ public class LguiItem implements ILguiItem {
 				for (final RowType row : table.getRow()) {
 					if (row.getOid().equals(jobStatus.getOid())) {
 						getTableHandler().setCellValue(table, row, JOB_STATUS, status);
+						break;
 					}
 				}
 			}
+			jobStatus.updateState(status, detail);
 		}
 	}
 

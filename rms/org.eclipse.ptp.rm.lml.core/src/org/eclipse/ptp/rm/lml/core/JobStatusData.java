@@ -296,7 +296,7 @@ public class JobStatusData {
 	public void updateState(String state, String stateDetail) {
 		if (!detailIsFinal(fStateDetail)) {
 			fState = state;
-			fStateDetail = stateDetail;
+			setStateDetail(stateDetail);
 		}
 	}
 }
