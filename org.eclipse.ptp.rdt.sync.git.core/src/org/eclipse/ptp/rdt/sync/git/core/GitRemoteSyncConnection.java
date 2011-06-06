@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -273,10 +275,9 @@ public class GitRemoteSyncConnection {
 	 * Do a "git rm <Files>" on the remote host
 	 */
 	private void deleteRemoteFiles(Set<String> filesToDelete, IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
-		String command = "git rm"; //$NON-NLS-1$
+		List<String> command = stringToList("git rm"); //$NON-NLS-1$
 		for (String fileName : filesToDelete) {
-			command = command.concat(" "); //$NON-NLS-1$
-			command = command.concat(fileName);
+			command.add(fileName);
 		}
 		
 		CommandResults commandResults = null;
@@ -292,19 +293,21 @@ public class GitRemoteSyncConnection {
 		}
 	}
 
+	private List<String> stringToList(String command) {
+		return new ArrayList<String>(Arrays.asList(command.split(" "))); //$NON-NLS-1$
+	}
 	/*
 	 * Do a "git add <Files>" on the remote host
 	 */
 	private void addRemoteFiles(Set<String> filesToAdd, IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
-		String command = "git add"; //$NON-NLS-1$
+		List<String> commandList = stringToList("git add"); //$NON-NLS-1$
 		for (String fileName : filesToAdd) {
-			command = command.concat(" "); //$NON-NLS-1$
-			command = command.concat(fileName);
+			commandList.add(fileName);
 		}
 		
 		CommandResults commandResults = null;
 		try {
-			commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, monitor);
+			commandResults = CommandRunner.executeRemoteCommand(connection, commandList, remoteDirectory, monitor);
 		} catch (final InterruptedException e) {
 			throw new RemoteExecutionException(e);
 		} catch (RemoteConnectionException e) {
@@ -343,14 +346,13 @@ public class GitRemoteSyncConnection {
 		BufferedReader statusReader = new BufferedReader(new StringReader(commandResults.getStdout()));
 		String line = null;
 		while ((line = statusReader.readLine()) != null) {
-			String[] lineParts = line.split("\\s+"); //$NON-NLS-1$
-			if (lineParts.length < 2) {
-				continue;
-			}
-			if (lineParts[0].startsWith("R")) { //$NON-NLS-1$
-				filesToDelete.add(lineParts[1]);
+			if (line.charAt(0)==' ' || line.charAt(1)!=' ' || line.charAt(2)==' ') continue;
+			char status = line.charAt(0);
+			String fn = line.substring(2);
+			if (status == 'R') { 
+				filesToDelete.add(fn);
 			} else {
-				filesToAdd.add(lineParts[1]);
+				filesToAdd.add(fn);
 			}
 		}
 		statusReader.close();
