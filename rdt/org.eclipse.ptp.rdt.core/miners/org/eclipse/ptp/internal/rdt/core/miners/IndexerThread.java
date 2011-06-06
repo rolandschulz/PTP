@@ -72,12 +72,14 @@ public abstract class IndexerThread extends Thread {
 			
 		} catch (IOException e) {
 			UniversalServerUtilities.logError(LOG_TAG, "I/O Exception while reindexing", e, miner._dataStore); //$NON-NLS-1$
+		} catch (Exception e) {
+			UniversalServerUtilities.logError(LOG_TAG, "Exception while reindexing", e, miner._dataStore); //$NON-NLS-1$
 		} catch (java.lang.VirtualMachineError e) {
 			// Kill the JVM in the event of a VirtualMachineError
 			System.exit(-1);
-	    } 
-		
-		CDTMiner.statusDone(status);
+	    } finally {
+	    	CDTMiner.statusDone(status);
+	    }
 	}
 
 	
