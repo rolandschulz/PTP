@@ -96,7 +96,6 @@ public class TableView extends ViewPart {
 						if (fSelectedLguiItem != null && !fSelectedLguiItem.isEmpty()) {
 							disposeTable();
 							createTable();
-							setPartName(fSelectedLguiItem.getNodedisplayAccess().getTitle(gid));
 							fSelectedLguiItem.getObjectStatus().addComponent(eventForwarder);
 							componentAdded = true;
 						}
@@ -116,7 +115,6 @@ public class TableView extends ViewPart {
 						}
 						saveColumnLayout();
 						fSelectedLguiItem = null;
-						setPartName("Nodedisplay");
 						setViewerInput();
 						disposeTable();
 					}

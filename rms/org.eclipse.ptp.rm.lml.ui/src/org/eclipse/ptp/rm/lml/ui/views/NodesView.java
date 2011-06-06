@@ -52,6 +52,7 @@ public class NodesView extends ViewPart {
 						nodedisplayView.update(fLguiItem);
 						nodedisplayView.setVisible(true);
 					}
+					setPartName(fLguiItem.getNodedisplayAccess().getTitle(gid));
 				}
 			});
 
@@ -64,6 +65,7 @@ public class NodesView extends ViewPart {
 						nodedisplayView.setVisible(false);
 					}
 					fLguiItem = null;
+					setPartName("System Monitoring");
 				}
 			});
 		}
@@ -106,6 +108,7 @@ public class NodesView extends ViewPart {
 						nodedisplayView.update(fLguiItem);
 						nodedisplayView.setVisible(true);
 					}
+					setPartName(fLguiItem.getNodedisplayAccess().getTitle(gid));
 				}
 			});
 		}
@@ -117,12 +120,45 @@ public class NodesView extends ViewPart {
 	public ILguiItem fLguiItem = null;
 	private final ILMLListener lguiListener = new LguiListener();
 	private final LMLManager lmlManager = LMLManager.getInstance();
+	private String gid = null;
 
 	/**
 	 * 
 	 */
 	public NodesView() {
 		super();
+	}
+
+	@Override
+	public void createPartControl(final Composite parent) {
+		gid = getViewSite().getId();
+		composite = new Composite(parent, SWT.NONE);
+		composite.setLayout(new FillLayout());
+		composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+		fLguiItem = lmlManager.getSelectedLguiItem();
+		lmlManager.addListener(lguiListener, this.getClass().getName());
+		fLguiItem = lmlManager.getSelectedLguiItem();
+		createNodedisplayView();
+	}
+
+	@Override
+	public void dispose() {
+		lmlManager.removeListener(lguiListener);
+	}
+
+	public void generateNodesdisplay() {
+		fLguiItem = lmlManager.getSelectedLguiItem();
+		createNodedisplayView();
+	}
+
+	/*
+	 * Method required so the class can extends ViewPart
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
+	@Override
+	public void setFocus() {
 	}
 
 	private void createNodedisplayView() {
@@ -135,37 +171,6 @@ public class NodesView extends ViewPart {
 			composite.layout();
 		}
 
-	}
-
-	@Override
-	public void createPartControl(final Composite parent) {
-		composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new FillLayout());
-		composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-
-		fLguiItem = lmlManager.getSelectedLguiItem();
-		lmlManager.addListener(lguiListener, this.getClass().getName());
-		fLguiItem = lmlManager.getSelectedLguiItem();
-		createNodedisplayView();
-	}
-
-	public void generateNodesdisplay() {
-		fLguiItem = lmlManager.getSelectedLguiItem();
-		createNodedisplayView();
-	}
-
-	@Override
-	public void dispose() {
-		lmlManager.removeListener(lguiListener);
-	}
-
-	/*
-	 * Method required so the class can extends ViewPart
-	 * 
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
-	@Override
-	public void setFocus() {
 	}
 
 }

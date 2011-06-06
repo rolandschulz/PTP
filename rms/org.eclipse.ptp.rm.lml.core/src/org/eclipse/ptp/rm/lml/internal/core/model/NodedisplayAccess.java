@@ -437,6 +437,11 @@ public class NodedisplayAccess extends LguiHandler {
 		return oidToTagNames.get(id);
 	}
 
+	public String getTitle(String gid) {
+		final List<Nodedisplay> displays = getNodedisplays();
+		return displays.get(0).getTitle();
+	}
+
 	/**
 	 * Inverse function to getImplicitName. Pass an implicit name and receive a
 	 * list of identifying ids within the nodedisplay-tag-tree.
