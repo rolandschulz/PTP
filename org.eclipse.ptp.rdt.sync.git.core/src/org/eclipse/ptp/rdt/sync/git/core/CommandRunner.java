@@ -189,16 +189,37 @@ public class CommandRunner {
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, String command, String remoteDirectory,
 														IProgressMonitor monitor) throws 
 																IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
-		if (!conn.isOpen()) {
-			conn.open(monitor);
-		}
-
 		// Setup a new process
 		final List<String> commandList = new LinkedList<String>();
 		commandList.add("sh"); //$NON-NLS-1$
 		commandList.add("-c"); //$NON-NLS-1$
 		commandList.add(command);
-
+		return executeRemoteCommand(conn, commandList, remoteDirectory, monitor);
+	}
+		
+	/**
+	 * Execute command on a remote host and wait for the command to complete.
+	 * 
+	 * @param conn
+	 * @param command
+	 * @return CommandResults (contains stdout, stderr, and exit code)
+	 * @throws IOException
+	 *             in several cases if there is a problem communicating with the remote host.
+	 * @throws InterruptedException
+	 *             if execution of remote command is interrupted.
+	 * @throws RemoteConnectionException
+	 * 			   if connection closed and cannot be opened. 
+	 * @throws RemoteSyncException 
+	 * 			   if other error
+	 */
+	public static CommandResults executeRemoteCommand(IRemoteConnection conn, List<String> commandList, String remoteDirectory,
+															IProgressMonitor monitor) throws 
+																	IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
+	
+		
+		if (!conn.isOpen()) {
+			conn.open(monitor);
+		}
 		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandList);
 		final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
 		rpb.directory(rfm.getResource(remoteDirectory));
