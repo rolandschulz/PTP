@@ -16,6 +16,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
+import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
 import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
@@ -111,6 +113,12 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			config.getToolChain().getBuilder().setBuildPath(buildPath);
 			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
 			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
+			//turn off append contributed(local) environment variables for the build configuration of the remote project
+			ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
+			if(c_mb_confgDes!=null){
+				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+				//EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_mb_confgDes);
+			}
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
 
