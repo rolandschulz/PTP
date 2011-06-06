@@ -46,6 +46,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.dstore.core.model.DE;
 import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
@@ -288,7 +289,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	protected String reportProblem(Scope scope, String message) {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot workspaceRoot = workspace.getRoot();
-		IProject project = workspaceRoot.getProject(scope.getName());
+		final IProject project = workspaceRoot.getProject(scope.getName());
 		
 		//parser for error message
 		int errorMessageStart = message.indexOf("Indexer: "); //$NON-NLS-1$
@@ -312,7 +313,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 		
 		int lineStart = fileEnd;
 		int lineEnd = message.indexOf(".  ", lineStart); //$NON-NLS-1$
-		String lineNumber = message.substring(lineStart + 1, lineEnd);
+		final String lineNumber = message.substring(lineStart + 1, lineEnd);
 		
 		//put error message back together
 		Object[] args = new Object[] { include, fileName, new Integer(lineNumber.replace(",", "")) }; //$NON-NLS-1$ //$NON-NLS-2$
@@ -323,13 +324,14 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 			info = ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.definitionNotFound", info); //$NON-NLS-1$
 		
 		String infoMsg = Messages.getString("RSECIndexSubsystem.11"); //$NON-NLS-1$
-		String wholeMessage = MessageFormat.format(Messages.getString("RSECIndexSubsystem.12"), new Object[] {info}) + "  " + infoMsg; //$NON-NLS-1$ //$NON-NLS-2$
+		final String wholeMessage = MessageFormat.format(Messages.getString("RSECIndexSubsystem.12"), new Object[] {info}) + "  " + infoMsg; //$NON-NLS-1$ //$NON-NLS-2$
 		
-		IFile file = null;
+		final IFile file;
 		String projectLocation = project.getLocationURI().getPath();
 		fileStart = fileName.indexOf(projectLocation);		
 		if(fileStart == -1) {
 			fileName = null;
+			file = null;
 		}
 		else {
 			fileName = fileName.substring(fileStart + projectLocation.length() + 1);
@@ -342,22 +344,43 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 		//"/home/jwsliu/defects/6721_header/header.h", then header file will be parsed as
 		//"header/header.h" under the project location, but it could be not exist. So we have to check if the file is existed or not.
 		if (file != null && file.exists()) {
-			try {
-				IMarker marker = file.createMarker("org.eclipse.ptp.rdt.ui.indexerproblemmarker"); //$NON-NLS-1$
-				marker.setAttribute(IMarker.LINE_NUMBER, Integer.parseInt(lineNumber.replace(",", ""))); //$NON-NLS-1$ //$NON-NLS-2$
-				marker.setAttribute(IMarker.MESSAGE, wholeMessage);
-				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-			} catch (CoreException e) {
-				RDTLog.logError(e);
-			}
+			Job job = new Job("createMarker") { //$NON-NLS-1$
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						IMarker marker = file.createMarker("org.eclipse.ptp.rdt.ui.indexerproblemmarker"); //$NON-NLS-1$
+						marker.setAttribute(IMarker.LINE_NUMBER, Integer.parseInt(lineNumber.replace(",", ""))); //$NON-NLS-1$ //$NON-NLS-2$
+						marker.setAttribute(IMarker.MESSAGE, wholeMessage);
+						marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+					} catch (CoreException e) {
+						RDTLog.logError(e);
+					} finally {
+						monitor.done();
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			job.setSystem(true);
+			job.schedule();
 		} else {
-			try {
-				IMarker marker =  project.createMarker("org.eclipse.ptp.rdt.ui.indexerproblemmarker"); //$NON-NLS-1$
-				marker.setAttribute(IMarker.MESSAGE, wholeMessage);
-				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-			} catch (CoreException e) {
-				RDTLog.logError(e);
-			}
+			Job job = new Job("createMarker") { //$NON-NLS-1$
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						IMarker marker =  project.createMarker("org.eclipse.ptp.rdt.ui.indexerproblemmarker"); //$NON-NLS-1$
+						marker.setAttribute(IMarker.MESSAGE, wholeMessage);
+						marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+					} catch (CoreException e) {
+						RDTLog.logError(e);
+					} finally {
+						monitor.done();
+					}
+					
+					return Status.OK_STATUS;
+				}
+			};
+			job.setSystem(true);
+			job.schedule();
 		}
 		return wholeMessage;
 	}
