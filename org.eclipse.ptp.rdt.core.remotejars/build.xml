@@ -28,9 +28,9 @@
 	
 	<!-- PLATFORM VERSIONS MUST BE UPDATED FOR NEW PLATFORM VERSION -->
 	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
-	<property name="platformVersion" value="S-3.7RC3-201105261708"/>
-	<property name="platformBaseName" value="eclipse-platform-3.7RC3"/>
-	<property name="icuBaseZip" value="com.ibm.icu.base-3.7RC3.zip"/>
+	<property name="platformVersion" value="S-3.7RC4-201106030909"/>
+	<property name="platformBaseName" value="eclipse-platform-3.7RC4"/>
+	<property name="icuBaseZip" value="com.ibm.icu.base-3.7RC4.zip"/>
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.4.2.v20110208.jar"/>
 	
 	<property name="coreRuntimeVersion" value="3.7.0.v20110110"/>
@@ -43,7 +43,7 @@
 	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
 	
 	<!-- CDT VERSIONS MUST BE UPDATED FOR NEW CDT VERSION -->
-	<property name="cdtVersion" value="201105301135"/>   
+	<property name="cdtVersion" value="201106031449"/>   
 	
 	<!-- CDT branch need to be added for PTP maintenance builds -->
 	<property name="cdtBranch" value=""/>
