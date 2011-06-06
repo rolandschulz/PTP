@@ -21,7 +21,6 @@
       
       
    </extension>
-   <!--
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
@@ -77,7 +76,6 @@
 	   </commonWizard>
       </navigatorContent>
    </extension>
-   -->
    <extension
        point="org.eclipse.ui.navigator.viewer">
        <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
