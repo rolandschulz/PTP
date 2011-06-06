@@ -370,6 +370,7 @@ public class TableHandler extends LguiHandler {
 			}
 			final BigInteger jobIdIndex = getColumnIndex(table, ILguiItem.JOB_ID);
 			final Cell[] tableDataRow = new Cell[cids.length];
+			String jobId = null;
 			for (int j = 0; j < cids.length; j++) {
 				for (final CellType cell : row.getCell()) {
 					if (cell.getCid() != null && cell.getCid().equals(cids[j])) {
@@ -381,9 +382,17 @@ public class TableHandler extends LguiHandler {
 					tableDataRow[j] = new Cell("?", tableData[i]); //$NON-NLS-1$
 				}
 				if (cids[j].equals(jobIdIndex)) {
-					final JobStatusData status = LMLManager.getInstance().getUserJob(lguiItem.toString(), tableDataRow[j].value);
-					tableData[i].setJobStatusData(status);
+					jobId = tableDataRow[j].value;
 				}
+			}
+			if (jobId != null) {
+				JobStatusData status = LMLManager.getInstance().getUserJob(lguiItem.toString(), jobId);
+				if (status == null) {
+					String queueName = getCellValue(table, row, ILguiItem.JOB_QUEUE_NAME);
+					String owner = getCellValue(table, row, ILguiItem.JOB_OWNER);
+					status = new JobStatusData(lguiItem.toString(), jobId, queueName, owner, null, null, false);
+				}
+				tableData[i].setJobStatusData(status);
 			}
 			tableData[i].setCells(tableDataRow);
 		}
