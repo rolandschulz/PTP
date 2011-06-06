@@ -46,12 +46,6 @@ public class ActionUtils {
 	private static final int UNDEFINED = -1;
 	private static final int COPY_BUFFER_SIZE = 64 * 1024;
 
-	/*
-	 * static only
-	 */
-	private ActionUtils() {
-	}
-
 	/**
 	 * Exercises a control operation on the remote job.
 	 * 
@@ -153,7 +147,7 @@ public class ActionUtils {
 			return;
 		}
 		IResourceManagerControl control = rm.getControl();
-		IJobStatus refreshed = control.getJobStatus(job.getJobId(), monitor);
+		IJobStatus refreshed = control.getJobStatus(job.getJobId(), true, monitor);
 		job.updateState(refreshed.getState(), refreshed.getStateDetail());
 		maybeCheckFiles(job);
 		view.refresh();
@@ -241,5 +235,11 @@ public class ActionUtils {
 				job.setErrReady(true);
 			}
 		}
+	}
+
+	/*
+	 * static only
+	 */
+	private ActionUtils() {
 	}
 }

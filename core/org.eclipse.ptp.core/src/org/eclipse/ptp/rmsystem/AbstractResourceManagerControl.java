@@ -79,22 +79,14 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
 	 * .String)
 	 */
-	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) {
+	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) {
 		IJobStatus status = null;
 		try {
-			status = doGetJobStatus(jobId, monitor);
+			status = doGetJobStatus(jobId, force, monitor);
 		} catch (CoreException e) {
 		}
 		if (status == null) {
 			status = new IJobStatus() {
-				public String getOwner() {
-					return null;
-				}
-
-				public String getQueueName() {
-					return null;
-				}
-
 				public String getErrorPath() {
 					return null;
 				}
@@ -108,6 +100,14 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 				}
 
 				public String getOutputPath() {
+					return null;
+				}
+
+				public String getOwner() {
+					return null;
+				}
+
+				public String getQueueName() {
 					return null;
 				}
 
@@ -133,6 +133,18 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 			};
 		}
 		return status;
+	}
+
+	/*
+	 * Equivalent to the two-parameter call (force is not implemented).
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
+	 * .String, boolean, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) {
+		return getJobStatus(jobId, false, monitor);
 	}
 
 	/*
@@ -193,7 +205,7 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 * 
 	 * @throws CoreException
 	 */
-	protected abstract IJobStatus doGetJobStatus(String jobId, IProgressMonitor monitor) throws CoreException;
+	protected abstract IJobStatus doGetJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Stop the resource manager subsystem. This must be callable at any time

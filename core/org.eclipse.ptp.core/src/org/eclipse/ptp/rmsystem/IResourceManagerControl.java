@@ -74,7 +74,37 @@ public interface IResourceManagerControl {
 	/**
 	 * Get the status of the job. The could potentially be a long running
 	 * operation. If the progress monitor is canceled, the method will return an
-	 * undetermined status.
+	 * undetermined status. <br>
+	 * <br>
+	 * Note that this call may be throttled using a predetermined timeout by the
+	 * rsource manager implementation. To avoid the throttle, set the force flag
+	 * to true.
+	 * 
+	 * @param jobId
+	 *            ID of job used to obtain status
+	 * @param force
+	 *            if true, tells the resource manager to ignore the throttling
+	 *            timeout.
+	 * @param monitor
+	 *            progress monitor for monitoring or canceling the operation
+	 * @return status of the job or undetermined status if the progress monitor
+	 *         is canceled
+	 */
+	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor);
+
+	/**
+	 * Get the status of the job. The could potentially be a long running
+	 * operation. If the progress monitor is canceled, the method will return an
+	 * undetermined status. <br>
+	 * <br>
+	 * Note that this call may be throttled using a predetermined timeout by the
+	 * rsource manager implementation. To avoid the throttle, use the overloaded
+	 * method.<br>
+	 * <br>
+	 * 
+	 * This method is equivalent to
+	 * {@link #getJobStatus(String, boolean, IProgressMonitor)} with flag set to
+	 * false.
 	 * 
 	 * @param jobId
 	 *            ID of job used to obtain status

@@ -133,89 +133,87 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * Checks to see if there was an exception thrown by the run method.
-	 * 
-	 * @param job
-	 * @throws CoreException
-	 *             if the job execution raised and exception
+	 * @return whether to append (true) the env passed in through the
+	 *         LaunchConfiguration, or replace the current env with it.
 	 */
-	private void checkJobForError(ICommandJob job) throws CoreException {
-		IStatus status = job.getRunStatus();
-		if (status != null && status.getSeverity() == IStatus.ERROR) {
-			Throwable t = status.getException();
-			if (t instanceof CoreException) {
-				throw (CoreException) t;
-			} else {
-				throw CoreExceptionUtils.newException(status.getMessage(), t);
-			}
-		}
+	public boolean getAppendEnv() {
+		return appendLaunchEnv;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getEnvironment()
+	 */
+	public IVariableMap getEnvironment() {
+		return rmVarMap;
 	}
 
 	/**
-	 * If there are special server connections to open, those need to be taken
-	 * care of by a command to be run on start-up; here we just check for an
-	 * open connection and add a change listener to it.
+	 * @return table of open remote processes
+	 */
+	public Map<String, ICommandJob> getJobTable() {
+		return jobTable;
+	}
+
+	/**
+	 * @return any environment variables passed in through the
+	 *         LaunchConfiguration
+	 */
+	public Map<String, String> getLaunchEnv() {
+		return launchEnv;
+	}
+
+	/**
+	 * Reinitializes when the connection info has been changed on a cached
+	 * resource manager.
 	 * 
 	 * @param monitor
-	 * @throws RemoteConnectionException
+	 * @return wrapper object for remote services, connections and file managers
 	 * @throws CoreException
 	 */
-	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException, CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 100);
-		RemoteServicesDelegate d = getRemoteServicesDelegate(progress.newChild(50));
-		IRemoteConnection conn = d.getRemoteConnection();
-		if (conn != null) {
-			if (!conn.isOpen()) {
-				conn.open(progress.newChild(25));
-				if (!conn.isOpen()) {
-					throw new RemoteConnectionException(Messages.RemoteConnectionError + conn.getAddress());
-				}
-			}
-			conn.addConnectionChangeListener(connectionListener);
+	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
+		String cname = config.getConnectionName();
+		String sid = config.getRemoteServicesId();
+		if (remoteServicesDelegate == null || !cname.equals(connectionName) || !sid.equals(servicesId)) {
+			connectionName = cname;
+			servicesId = sid;
+			remoteServicesDelegate = new RemoteServicesDelegate(servicesId, connectionName);
+			remoteServicesDelegate.initialize(monitor);
 		}
+		return remoteServicesDelegate;
 	}
 
-	/**
-	 * @param jobId
-	 *            resource-specific id
-	 * @param operation
-	 *            terminate, hold, suspend, release, resume.
-	 * @throws CoreException
-	 *             If the command is not supported
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getState()
 	 */
-	private void doControlCommand(String jobId, String operation) throws CoreException {
-		CoreException ce = CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + operation, null);
+	public String getState() {
+		return getResourceManager().getState();
+	}
 
-		CommandType job = null;
-		if (TERMINATE_OPERATION.equals(operation)) {
-			maybeKillInteractive(jobId);
-			job = controlData.getTerminateJob();
-			if (job == null) {
-				return;
-			}
-		} else if (SUSPEND_OPERATION.equals(operation)) {
-			job = controlData.getSuspendJob();
-			if (job == null) {
-				throw ce;
-			}
-		} else if (RESUME_OPERATION.equals(operation)) {
-			job = controlData.getResumeJob();
-			if (job == null) {
-				throw ce;
-			}
-		} else if (RELEASE_OPERATION.equals(operation)) {
-			job = controlData.getReleaseJob();
-			if (job == null) {
-				throw ce;
-			}
-		} else if (HOLD_OPERATION.equals(operation)) {
-			job = controlData.getHoldJob();
-			if (job == null) {
-				throw ce;
-			}
-		}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getStatusMap()
+	 */
+	public ICommandJobStatusMap getStatusMap() {
+		return jobStatusMap;
+	}
 
-		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, true);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged
+	 * (java.lang.String)
+	 */
+	public void jobStateChanged(String jobId, IJobStatus status) {
+		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
+		getResourceManager().updateJob(jobId, status);
 	}
 
 	/*
@@ -274,7 +272,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * (java.lang.String)
 	 */
 	@Override
-	protected IJobStatus doGetJobStatus(String jobId, IProgressMonitor monitor) throws CoreException {
+	protected IJobStatus doGetJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException {
 		try {
 			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
 
@@ -299,12 +297,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					return status;
 				}
 
-				long now = System.currentTimeMillis();
-				long lapse = now - status.getLastUpdateRequest();
-				if (lapse < ICommandJobStatus.UPDATE_REQUEST_INTERVAL) {
-					return status;
+				if (!force) {
+					long now = System.currentTimeMillis();
+					long lapse = now - status.getLastUpdateRequest();
+					if (lapse < ICommandJobStatus.UPDATE_REQUEST_INTERVAL) {
+						return status;
+					}
+					status.setUpdateRequestTime(now);
 				}
-				status.setUpdateRequestTime(now);
 			}
 
 			String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
@@ -338,8 +338,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				status.setState(state);
 			}
 
+			/*
+			 * as specified by the contract
+			 */
 			if (progress.isCanceled()) {
-				status.setState(IJobStatus.CANCELED);
+				status.setState(IJobStatus.UNDETERMINED);
 				jobStateChanged(jobId, status);
 				return status;
 			}
@@ -362,81 +365,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			getResourceManager().setState(IResourceManager.ERROR_STATE);
 			throw ce;
 		}
-	}
-
-	/**
-	 * Run either interactive or batch job for run or debug modes.
-	 * ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the
-	 * corresponding LaunchConfiguration modes; batch/interactive are currently
-	 * determined by the configuration (the configuration cannot implement
-	 * both). This may need to be modified.
-	 * 
-	 * @param uuid
-	 *            temporary internal id for as yet unsubmitted job
-	 * @param mode
-	 *            either ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE
-	 * @return job wrapper object
-	 * @throws CoreException
-	 */
-	private ICommandJob doJobSubmitCommand(String uuid, String mode) throws CoreException {
-		CommandType command = null;
-		CommandJob.JobMode jobMode = CommandJob.JobMode.INTERACTIVE;
-
-		if (ILaunchManager.RUN_MODE.equals(mode)) {
-			command = controlData.getSubmitBatch();
-			if (command != null) {
-				jobMode = CommandJob.JobMode.BATCH;
-			} else {
-				command = controlData.getSubmitInteractive();
-			}
-		} else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-			command = controlData.getSubmitBatchDebug();
-			if (command != null) {
-				jobMode = CommandJob.JobMode.BATCH;
-			} else {
-				command = controlData.getSubmitInteractiveDebug();
-			}
-		}
-
-		if (command == null) {
-			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + JAXBControlConstants.SP + uuid
-					+ JAXBControlConstants.SP + mode, null);
-		}
-
-		/*
-		 * NOTE: changed this to join, because the waitForId is now part of the
-		 * run() method of the command itself (05.01.2011)
-		 */
-		return runCommand(uuid, command, jobMode, true);
-	}
-
-	/**
-	 * Run the shut down commands, if any. Cancel any running interactive
-	 * processes.
-	 * 
-	 * @throws CoreException
-	 */
-	private void doOnShutdown() throws CoreException {
-		List<CommandType> onShutDown = controlData.getShutDownCommand();
-		runCommands(onShutDown);
-		for (ICommandJob job : jobTable.values()) {
-			job.terminate();
-			ICommandJobStatus status = job.getJobStatus();
-			status.setState(IJobStatus.CANCELED);
-			String jobId = status.getJobId();
-			maybeForceExternalTermination(jobId);
-			jobStateChanged(jobId, status);
-		}
-	}
-
-	/**
-	 * Run the start up commands, if any
-	 * 
-	 * @throws CoreException
-	 */
-	private void doOnStartUp() throws CoreException {
-		List<CommandType> onStartUp = controlData.getStartUpCommand();
-		runCommands(onStartUp);
 	}
 
 	/*
@@ -597,75 +525,164 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * @return whether to append (true) the env passed in through the
-	 *         LaunchConfiguration, or replace the current env with it.
-	 */
-	public boolean getAppendEnv() {
-		return appendLaunchEnv;
-	}
-
-	/*
-	 * (non-Javadoc)
+	 * Checks to see if there was an exception thrown by the run method.
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getEnvironment()
+	 * @param job
+	 * @throws CoreException
+	 *             if the job execution raised and exception
 	 */
-	public IVariableMap getEnvironment() {
-		return rmVarMap;
+	private void checkJobForError(ICommandJob job) throws CoreException {
+		IStatus status = job.getRunStatus();
+		if (status != null && status.getSeverity() == IStatus.ERROR) {
+			Throwable t = status.getException();
+			if (t instanceof CoreException) {
+				throw (CoreException) t;
+			} else {
+				throw CoreExceptionUtils.newException(status.getMessage(), t);
+			}
+		}
 	}
 
 	/**
-	 * @return table of open remote processes
-	 */
-	public Map<String, ICommandJob> getJobTable() {
-		return jobTable;
-	}
-
-	/**
-	 * @return any environment variables passed in through the
-	 *         LaunchConfiguration
-	 */
-	public Map<String, String> getLaunchEnv() {
-		return launchEnv;
-	}
-
-	/**
-	 * Reinitializes when the connection info has been changed on a cached
-	 * resource manager.
+	 * If there are special server connections to open, those need to be taken
+	 * care of by a command to be run on start-up; here we just check for an
+	 * open connection and add a change listener to it.
 	 * 
 	 * @param monitor
-	 * @return wrapper object for remote services, connections and file managers
+	 * @throws RemoteConnectionException
 	 * @throws CoreException
 	 */
-	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
-		String cname = config.getConnectionName();
-		String sid = config.getRemoteServicesId();
-		if (remoteServicesDelegate == null || !cname.equals(connectionName) || !sid.equals(servicesId)) {
-			connectionName = cname;
-			servicesId = sid;
-			remoteServicesDelegate = new RemoteServicesDelegate(servicesId, connectionName);
-			remoteServicesDelegate.initialize(monitor);
+	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException, CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
+		RemoteServicesDelegate d = getRemoteServicesDelegate(progress.newChild(50));
+		IRemoteConnection conn = d.getRemoteConnection();
+		if (conn != null) {
+			if (!conn.isOpen()) {
+				conn.open(progress.newChild(25));
+				if (!conn.isOpen()) {
+					throw new RemoteConnectionException(Messages.RemoteConnectionError + conn.getAddress());
+				}
+			}
+			conn.addConnectionChangeListener(connectionListener);
 		}
-		return remoteServicesDelegate;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getState()
+	/**
+	 * @param jobId
+	 *            resource-specific id
+	 * @param operation
+	 *            terminate, hold, suspend, release, resume.
+	 * @throws CoreException
+	 *             If the command is not supported
 	 */
-	public String getState() {
-		return getResourceManager().getState();
+	private void doControlCommand(String jobId, String operation) throws CoreException {
+		CoreException ce = CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + operation, null);
+
+		CommandType job = null;
+		if (TERMINATE_OPERATION.equals(operation)) {
+			maybeKillInteractive(jobId);
+			job = controlData.getTerminateJob();
+			if (job == null) {
+				return;
+			}
+		} else if (SUSPEND_OPERATION.equals(operation)) {
+			job = controlData.getSuspendJob();
+			if (job == null) {
+				throw ce;
+			}
+		} else if (RESUME_OPERATION.equals(operation)) {
+			job = controlData.getResumeJob();
+			if (job == null) {
+				throw ce;
+			}
+		} else if (RELEASE_OPERATION.equals(operation)) {
+			job = controlData.getReleaseJob();
+			if (job == null) {
+				throw ce;
+			}
+		} else if (HOLD_OPERATION.equals(operation)) {
+			job = controlData.getHoldJob();
+			if (job == null) {
+				throw ce;
+			}
+		}
+
+		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, true);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Run either interactive or batch job for run or debug modes.
+	 * ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the
+	 * corresponding LaunchConfiguration modes; batch/interactive are currently
+	 * determined by the configuration (the configuration cannot implement
+	 * both). This may need to be modified.
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getStatusMap()
+	 * @param uuid
+	 *            temporary internal id for as yet unsubmitted job
+	 * @param mode
+	 *            either ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE
+	 * @return job wrapper object
+	 * @throws CoreException
 	 */
-	public ICommandJobStatusMap getStatusMap() {
-		return jobStatusMap;
+	private ICommandJob doJobSubmitCommand(String uuid, String mode) throws CoreException {
+		CommandType command = null;
+		CommandJob.JobMode jobMode = CommandJob.JobMode.INTERACTIVE;
+
+		if (ILaunchManager.RUN_MODE.equals(mode)) {
+			command = controlData.getSubmitBatch();
+			if (command != null) {
+				jobMode = CommandJob.JobMode.BATCH;
+			} else {
+				command = controlData.getSubmitInteractive();
+			}
+		} else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
+			command = controlData.getSubmitBatchDebug();
+			if (command != null) {
+				jobMode = CommandJob.JobMode.BATCH;
+			} else {
+				command = controlData.getSubmitInteractiveDebug();
+			}
+		}
+
+		if (command == null) {
+			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + JAXBControlConstants.SP + uuid
+					+ JAXBControlConstants.SP + mode, null);
+		}
+
+		/*
+		 * NOTE: changed this to join, because the waitForId is now part of the
+		 * run() method of the command itself (05.01.2011)
+		 */
+		return runCommand(uuid, command, jobMode, true);
+	}
+
+	/**
+	 * Run the shut down commands, if any. Cancel any running interactive
+	 * processes.
+	 * 
+	 * @throws CoreException
+	 */
+	private void doOnShutdown() throws CoreException {
+		List<CommandType> onShutDown = controlData.getShutDownCommand();
+		runCommands(onShutDown);
+		for (ICommandJob job : jobTable.values()) {
+			job.terminate();
+			ICommandJobStatus status = job.getJobStatus();
+			status.setState(IJobStatus.CANCELED);
+			String jobId = status.getJobId();
+			maybeForceExternalTermination(jobId);
+			jobStateChanged(jobId, status);
+		}
+	}
+
+	/**
+	 * Run the start up commands, if any
+	 * 
+	 * @throws CoreException
+	 */
+	private void doOnStartUp() throws CoreException {
+		List<CommandType> onStartUp = controlData.getStartUpCommand();
+		runCommands(onStartUp);
 	}
 
 	/**
@@ -695,18 +712,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		jobStatusMap = new JobStatusMap(this, getResourceManager());
 		((Thread) jobStatusMap).start();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged
-	 * (java.lang.String)
-	 */
-	public void jobStateChanged(String jobId, IJobStatus status) {
-		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
-		getResourceManager().updateJob(jobId, status);
 	}
 
 	/**

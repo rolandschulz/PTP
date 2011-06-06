@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
-import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJobStatus;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
@@ -126,8 +125,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 				}
 
 				for (String jobId : map.keySet()) {
-					IJobStatus status = control.getJobStatus(jobId, null);
-					((CommandJobStatus) status).clearRequests();
+					IJobStatus status = control.getJobStatus(jobId, true, null);
 					String state = status.getState();
 					if (IJobStatus.COMPLETED.equals(state)) {
 						toPrune.put(jobId, jobId);

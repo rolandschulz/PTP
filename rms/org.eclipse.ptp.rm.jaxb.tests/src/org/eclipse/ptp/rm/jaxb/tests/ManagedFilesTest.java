@@ -100,6 +100,17 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
+	 * .String, boolean, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
 	 * .String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) {

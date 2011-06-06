@@ -608,18 +608,18 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	 */
 	@Override
 	protected void doDispose() {
-		// TODO Auto-generated method stub
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * 
+	 * 'Force' is ignored because there is no throttling here. (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doGetJobStatus
 	 * (java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected IJobStatus doGetJobStatus(String jobId, IProgressMonitor monitor) throws CoreException {
+	protected IJobStatus doGetJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException {
 		synchronized (fJobStatus) {
 			return fJobStatus.get(jobId);
 		}

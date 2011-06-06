@@ -193,6 +193,20 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
+	 * .String, boolean, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) {
+		return fResourceManagerControl.getJobStatus(jobId, force, monitor);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
 	 * .String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	/**
