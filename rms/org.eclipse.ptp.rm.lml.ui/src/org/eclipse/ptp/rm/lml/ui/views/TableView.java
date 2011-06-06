@@ -47,8 +47,6 @@ import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
@@ -431,18 +429,6 @@ public class TableView extends ViewPart {
 			treeColumn.setMoveable(true);
 			treeColumn.setText(tableColumnLayouts[i].getTitle());
 			treeColumn.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
-			treeColumn.addControlListener(new ControlAdapter() {
-				@Override
-				public void controlMoved(ControlEvent e) {
-					if (fSelectedLguiItem != null) {
-						// fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid,
-						// removeFirstColumn(tree.getColumnOrder()));
-
-						// TODO Change of the sortIndex
-					}
-				}
-
-			});
 
 			/*
 			 * Create the header menu for this column
@@ -644,10 +630,18 @@ public class TableView extends ViewPart {
 	private void saveColumnLayout() {
 		if (fSelectedLguiItem != null) {
 			if (tree.getColumnOrder().length != 0) {
-				fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, removeFirstColumn(tree.getColumnOrder()));
+				final int[] indexe = removeFirstColumn(tree.getColumnOrder());
+				fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, indexe);
 				fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(gid, getWidths());
+				int index = 0;
+				for (int i = 0; i < indexe.length; i++) {
+					if (indexe[i] == sortIndex) {
+						index = i;
+					}
+				}
+				fSelectedLguiItem.getTableHandler().setSortProperties(gid, index, sortDirection);
 			}
-			fSelectedLguiItem.getTableHandler().setSortProperties(gid, sortIndex, sortDirection);
+
 		}
 		setSortParameter(-1, -1);
 
