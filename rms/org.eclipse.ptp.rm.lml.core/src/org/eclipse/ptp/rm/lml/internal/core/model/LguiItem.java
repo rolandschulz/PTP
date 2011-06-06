@@ -92,7 +92,7 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * The generated LguiType
 	 */
-	private LguiType lgui;
+	private volatile LguiType lgui;
 
 	/**
 	 * collects listeners, which listen for changes in model
@@ -165,8 +165,9 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#addUserJob(java.lang.String,
 	 * org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData)
 	 */
-	public synchronized void addUserJob(String jobId, JobStatusData status, boolean force) {
+	public void addUserJob(String jobId, JobStatusData status, boolean force) {
 		final JobStatusData jobStatus = fJobMap.get(jobId);
+
 		/*
 		 * If the job already exists, do nothing
 		 */
@@ -186,7 +187,7 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	public synchronized void getCurrentLayout(OutputStream output) {
+	public void getCurrentLayout(OutputStream output) {
 		LguiType layoutLgui = null;
 		if (lgui == null) {
 			layoutLgui = firstRequest();
@@ -316,7 +317,7 @@ public class LguiItem implements ILguiItem {
 	 * @see
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUserJob(java.lang.String)
 	 */
-	public synchronized JobStatusData getUserJob(String jobId) {
+	public JobStatusData getUserJob(String jobId) {
 		final JobStatusData status = fJobMap.get(jobId);
 		if (status != null && !status.isRemoved()) {
 			return status;
@@ -329,8 +330,10 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUserJobs()
 	 */
-	public synchronized JobStatusData[] getUserJobs() {
-		return fJobMap.values().toArray(new JobStatusData[0]);
+	public JobStatusData[] getUserJobs() {
+		synchronized (fJobMap) {
+			return fJobMap.values().toArray(new JobStatusData[0]);
+		}
 	}
 
 	/*
@@ -338,11 +341,11 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getVersion()
 	 */
-	public synchronized String getVersion() {
+	public String getVersion() {
 		return lgui.getVersion();
 	}
 
-	public synchronized boolean isEmpty() {
+	public boolean isEmpty() {
 		return lgui == null;
 	}
 
@@ -351,7 +354,7 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.elemhents.ILguiItem#isLayout()
 	 */
-	public synchronized boolean isLayout() {
+	public boolean isLayout() {
 		return !isEmpty() && lgui.isLayout();
 	}
 
@@ -384,7 +387,7 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#removeUserJob(java.lang.String
 	 * )
 	 */
-	public synchronized void removeUserJob(String jobId) {
+	public void removeUserJob(String jobId) {
 		final JobStatusData status = fJobMap.get(jobId);
 		if (status != null) {
 			final TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
@@ -446,7 +449,7 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateUserJob(java.lang.String
 	 * , java.lang.String, java.lang.String)
 	 */
-	public synchronized void updateUserJob(String jobId, String status, String detail) {
+	public void updateUserJob(String jobId, String status, String detail) {
 		final JobStatusData jobStatus = fJobMap.get(jobId);
 		if (jobStatus != null) {
 			final TableType table = getTableHandler().getTable(getGidFromJobStatus(jobStatus));
@@ -486,6 +489,15 @@ public class LguiItem implements ILguiItem {
 		}
 
 		table.getRow().add(row);
+	}
+
+	private void checkTables() {
+		if (getTableHandler().getTable(ACTIVE_JOB_TABLE) == null) {
+			getTableHandler().generateDefaultTable(ACTIVE_JOB_TABLE);
+		}
+		if (getTableHandler().getTable(INACTIVE_JOB_TABLE) == null) {
+			getTableHandler().generateDefaultTable(INACTIVE_JOB_TABLE);
+		}
 	}
 
 	private boolean cidSet() {
@@ -633,6 +645,8 @@ public class LguiItem implements ILguiItem {
 			oidsToRemove.clear();
 		}
 
+		checkTables();
+
 		/*
 		 * Next find any jobs that are no longer in any of the tables. We need
 		 * to create a "fake" entry in the jobslistwait table for these. Note
@@ -642,17 +656,16 @@ public class LguiItem implements ILguiItem {
 		if (table == null) {
 			table = getTableHandler().generateDefaultTable(INACTIVE_JOB_TABLE);
 		}
-		for (final JobStatusData status : fJobMap.values()) {
-			if (!status.isRemoved() && !jobsInTable.contains(status)) {
-				if (!status.isCompleted()) {
-					status.setState(JobStatusData.COMPLETED);
+
+		synchronized (fJobMap) {
+			for (final JobStatusData status : fJobMap.values()) {
+				if (!status.isRemoved() && !jobsInTable.contains(status)) {
+					if (!status.isCompleted()) {
+						status.setState(JobStatusData.COMPLETED);
+					}
+					addJobToTable(table, status.getOid(), status);
 				}
-				addJobToTable(table, status.getOid(), status);
 			}
-		}
-		table = getTableHandler().getTable(ACTIVE_JOB_TABLE);
-		if (table == null) {
-			table = getTableHandler().generateDefaultTable(ACTIVE_JOB_TABLE);
 		}
 	}
 
