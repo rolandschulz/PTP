@@ -108,9 +108,7 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 		}
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
-		String buildPath = buildScenario.getLocation();
 		for (IConfiguration config : allConfigs) {
-			config.getToolChain().getBuilder().setBuildPath(buildPath);
 			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
 			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
 			//turn off append contributed(local) environment variables for the build configuration of the remote project
