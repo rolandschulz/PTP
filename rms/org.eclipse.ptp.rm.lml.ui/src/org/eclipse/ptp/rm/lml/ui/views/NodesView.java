@@ -52,7 +52,9 @@ public class NodesView extends ViewPart {
 						nodedisplayView.update(fLguiItem);
 						nodedisplayView.setVisible(true);
 					}
-					setPartName(fLguiItem.getNodedisplayAccess().getTitle(gid));
+					if (fLguiItem != null) {
+						setPartName(fLguiItem.getNodedisplayAccess().getTitle(gid));
+					}
 				}
 			});
 
@@ -65,7 +67,7 @@ public class NodesView extends ViewPart {
 						nodedisplayView.setVisible(false);
 					}
 					fLguiItem = null;
-					setPartName("System Monitoring");
+					setPartName("System Monitoring"); //$NON-NLS-1$
 				}
 			});
 		}
@@ -108,7 +110,9 @@ public class NodesView extends ViewPart {
 						nodedisplayView.update(fLguiItem);
 						nodedisplayView.setVisible(true);
 					}
-					setPartName(fLguiItem.getNodedisplayAccess().getTitle(gid));
+					if (fLguiItem != null) {
+						setPartName(fLguiItem.getNodedisplayAccess().getTitle(gid));
+					}
 				}
 			});
 		}
