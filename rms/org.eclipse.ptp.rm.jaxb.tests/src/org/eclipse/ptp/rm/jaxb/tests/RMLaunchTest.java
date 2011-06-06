@@ -217,7 +217,7 @@ public class RMLaunchTest extends TestCase {
 		}
 	}
 
-	private static final String xml = JAXBCoreConstants.DATA + "test-pbs.xml"; //$NON-NLS-1$
+	private static final String xml = JAXBCoreConstants.DATA + "tabbed-example.xml"; //$NON-NLS-1$
 	private JAXBResourceManagerConfiguration rmConfig;
 	private LMLJAXBResourceManager rm;
 	private ILaunchConfiguration launchConfig;
