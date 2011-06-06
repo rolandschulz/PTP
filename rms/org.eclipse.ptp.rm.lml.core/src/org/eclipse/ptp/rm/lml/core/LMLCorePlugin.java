@@ -151,51 +151,6 @@ public class LMLCorePlugin extends Plugin {
 		}
 	}
 
-	private void createMarshaller() throws JAXBException {
-		final URL xsd = getBundle().getEntry("/schema/lgui.xsd");
-
-		final JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements",
-				LMLCorePlugin.class.getClassLoader());
-		marshaller = jc.createMarshaller();
-	}
-
-	/**
-	 * For the generation of instances from classes by JAXB a unmarshaller is
-	 * needed. In the method the needed unmarshaller is created. It is said
-	 * where the classes for the instantiation are.
-	 * 
-	 * @throws MalformedURLException
-	 * @throws JAXBException
-	 */
-	private void createUnmarshaller() throws MalformedURLException, JAXBException {
-		final URL xsd = getBundle().getEntry("/schema/lgui.xsd");
-
-		final JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements",
-				LMLCorePlugin.class.getClassLoader());
-
-		unmarshaller = jc.createUnmarshaller();
-
-		// if xsd is null => do not check for validity
-		if (xsd != null) {
-
-			Schema mySchema;
-			final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-			try {
-
-				mySchema = sf.newSchema(xsd);
-			} catch (final SAXException saxe) {
-				// ...(error handling)
-				mySchema = null;
-
-			}
-
-			// Connect schema to unmarshaller
-			unmarshaller.setSchema(mySchema);
-
-		}
-	}
-
 	/**
 	 * Get the JAXB marshaller
 	 * 
@@ -322,6 +277,49 @@ public class LMLCorePlugin extends Plugin {
 		} finally {
 			super.stop(context);
 			fPlugin = null;
+		}
+	}
+
+	private void createMarshaller() throws JAXBException {
+		final JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements", //$NON-NLS-1$
+				LMLCorePlugin.class.getClassLoader());
+		marshaller = jc.createMarshaller();
+	}
+
+	/**
+	 * For the generation of instances from classes by JAXB a unmarshaller is
+	 * needed. In the method the needed unmarshaller is created. It is said
+	 * where the classes for the instantiation are.
+	 * 
+	 * @throws MalformedURLException
+	 * @throws JAXBException
+	 */
+	private void createUnmarshaller() throws MalformedURLException, JAXBException {
+		final URL xsd = getBundle().getEntry("/schema/lgui.xsd"); //$NON-NLS-1$
+
+		final JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements", //$NON-NLS-1$
+				LMLCorePlugin.class.getClassLoader());
+
+		unmarshaller = jc.createUnmarshaller();
+
+		// if xsd is null => do not check for validity
+		if (xsd != null) {
+
+			Schema mySchema;
+			final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+			try {
+
+				mySchema = sf.newSchema(xsd);
+			} catch (final SAXException saxe) {
+				// ...(error handling)
+				mySchema = null;
+
+			}
+
+			// Connect schema to unmarshaller
+			unmarshaller.setSchema(mySchema);
+
 		}
 	}
 
