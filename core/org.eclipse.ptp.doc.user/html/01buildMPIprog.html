@@ -24,10 +24,12 @@ Please make sure this feature is installed before continuing.
 <li><p>Create a new MPI project using the managed build facility. Select <b>File &gt; New &gt; C Project ...</b> and the <b>New Project</b> dialog should open.</p><p><br></p></li>
 <li><p>Enter a name for the project e.g. MyMPIProject.</p><p><br></p></li>
 <li><p>From the <b>Project types</b> list, expand <b>Executable</b> and select <b>MPI Hello World C Project</b></p><p><br></p>
+<p>Make sure the toolchain selected is valid for your machine.
 <p><img src="images/01newMPIproject.png"></p><p><br></p>
 </li>
 <li><p>In the <b>Basic Settings</b> dialog, fill in the author name and change any other values you like.
 The 'Source' value indicates the name of the folder in which the source file will be created.
+
 </p><p><br></p>
 <p><img src="images/01projBasicSettings.png"></p><p><br></p>
 <p>Click <b>Next</b>.</p><p><br></p></li>
@@ -39,8 +41,9 @@ The 'Source' value indicates the name of the folder in which the source file wil
 <li><p>In the <b>MPI Project Settings</b> dialog, make sure <b>Add MPI Project settings to this project</b> is checked.
 You can uncheck <b>Use default information</b> if you need to change any values for include paths, libraries or search path,
 or MPI build commands.
-<!-- fixme explain 5.0 changes here - popup about include files, lack of include files,
-     mpicc taking care of that, etc. -->
+ 
+<p>For more information see <a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.doc.user/html/includes.html">Include Paths and MPI Preferences</a>.
+
 </p><p><br></p>
 <p><img src="images/01mpiProjSettings.png"></p><p><br></p>
 <p>Click <b>Finish</b>.</p><p><br></p></li>
