@@ -6,12 +6,19 @@
 </head> 
 <body>
 <h1>Local vs Remote Projects</h1>
-<p>PTP can operate on both local and remote projects.
-<p>
-Local projects exist on the local machine (the same machine on which Eclipse is installed).
-The files of a remote project exist on a remote target machine, which may be the same machine
+<p>PTP can operate on local, remote, and synchronized projects.
+<ul>
+<li><a href="#local">
+Local projects</a> exist on the local machine (the same machine on which Eclipse is installed).
+<li><a href="#remote">Remote projects</a> consist of files that exist on a remote target machine, which may be the same machine
 on which the remote build, run, and debug happens, although this can vary.
-
+<li><a href="#sync">Synchronized projects</a> are mirrored both places
+</ul>
+<h2 id="local">Local Projects</h2>
+<p>Local projects are the original type of Eclipse and CDT project.  All files are on the local machine: the machine
+on which Eclipse is installed.  The descriptions in <a href="01buildMPIprog.html">Creating MPI Projects</a> 
+describe mostly local projects.
+<h2 id="remote">Remote Projects</h2>
 <p><a href="PLUGINS_ROOT/org.eclipse.ptp.rdt.doc.user/html/toc.html">Remote Development Tools</a> 
 (RDT) is part of the PTP Project and provides the ability for CDT projects to be located and developed
 remotely.  RDT requires a "Remote Provider" for its Remote C/C++ projects.
@@ -45,6 +52,14 @@ or you wish to use the additional functionality that RSE provides.
 &nbsp;
 
 </ul>
+<p>&nbsp;
+<h2 id="sync">Synchronized Projects</h2>
+<p>Synchronized projects consists of files that are mirrored on the local system as well as on the remote system.
+Editing occurs locally and the project may be built locally as well, enabling faster interaction with the files
+and editor, more CDT editor features since the files are local, and continued interaction for editing etc. if the network
+connection is lost.
+See <a href="sync.html">Synchronized Projects</a> for more information.<p>&nbsp;
+<p>&nbsp;<p>&nbsp;<p>&nbsp;
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 </body>
 
