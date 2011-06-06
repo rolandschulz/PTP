@@ -126,8 +126,8 @@ public class TableHandler extends LguiHandler {
 	public TableType generateDefaultTable(String gid) {
 		final TableType table = new TableType();
 		table.setId(gid);
-		table.setTitle("title_" + gid);
-		table.setContenttype("jobs");
+		table.setTitle("title_" + gid); //$NON-NLS-1$
+		table.setContenttype("jobs"); //$NON-NLS-1$
 
 		for (final ColumnlayoutType columnLayout : lguiItem.getLayoutAccess().getTableLayout(gid).getColumn()) {
 			if (columnLayout.isActive()) {
@@ -135,21 +135,21 @@ public class TableHandler extends LguiHandler {
 				column.setId(columnLayout.getCid());
 				column.setName(columnLayout.getKey());
 				generateDefaultSorting(column);
-				if (columnLayout.getKey().equals("owner")) {
-					generateDefaultPattern(".*", column);
+				if (columnLayout.getKey().equals(ILguiItem.JOB_OWNER)) {
+					generateDefaultPattern(".*", column); //$NON-NLS-1$
 				}
-				if (columnLayout.getKey().equals("status")) {
-					column.setType("mandatory");
-					if (gid.equals("joblistrun")) {
-						generateDefaultPattern("RUNNING", column);
+				if (columnLayout.getKey().equals(ILguiItem.JOB_STATUS)) {
+					column.setType("mandatory"); //$NON-NLS-1$
+					if (gid.equals(ILguiItem.ACTIVE_JOB_TABLE)) {
+						generateDefaultPattern(JobStatusData.RUNNING, column);
 					} else {
-						generateDefaultPattern("SUBMITTED", column);
+						generateDefaultPattern(JobStatusData.SUBMITTED, column);
 					}
 				}
 				table.getColumn().add(column);
 			}
 		}
-		lgui.getObjectsAndRelationsAndInformation().add(new JAXBElement<TableType>(new QName("table"), TableType.class, table));
+		lgui.getObjectsAndRelationsAndInformation().add(new JAXBElement<TableType>(new QName("table"), TableType.class, table)); //$NON-NLS-1$
 		return table;
 	}
 
@@ -512,15 +512,15 @@ public class TableHandler extends LguiHandler {
 		final PatternMatchType patternMatch = new PatternMatchType();
 		patternMatch.setRegexp(regexp);
 		pattern.getIncludeAndExclude().add(
-				new JAXBElement<PatternMatchType>(new QName("include"), PatternMatchType.class, patternMatch));
+				new JAXBElement<PatternMatchType>(new QName("include"), PatternMatchType.class, patternMatch)); //$NON-NLS-1$
 		column.setPattern(pattern);
 	}
 
 	private void generateDefaultSorting(ColumnType column) {
-		if (column.getName().equals("step") || column.getName().equals("owner") || column.getName().equals("queue")
-				|| column.getName().equals("status")) {
+		if (column.getName().equals(ILguiItem.JOB_ID) || column.getName().equals(ILguiItem.JOB_OWNER)
+				|| column.getName().equals(ILguiItem.JOB_QUEUE_NAME) || column.getName().equals(ILguiItem.JOB_STATUS)) {
 			column.setSort(SortingType.ALPHA);
-		} else if (column.getName().equals("wall") || column.getName().equals("totalcores")) {
+		} else if (column.getName().equals(ILguiItem.JOB_WALL) || column.getName().equals(ILguiItem.JOB_TOTAL_CORES)) {
 			column.setSort(SortingType.NUMERIC);
 		} else {
 			column.setSort(SortingType.DATE);
