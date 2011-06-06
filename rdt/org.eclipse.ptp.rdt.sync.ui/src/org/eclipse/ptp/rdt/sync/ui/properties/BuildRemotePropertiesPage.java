@@ -228,7 +228,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private void handleServicesSelected() {
 		int selectionIndex = fProviderCombo.getSelectionIndex();
 		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
-		fSelectedConnection = null;
 		populateConnectionCombo(fConnectionCombo);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		update();
@@ -238,6 +237,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * @param connectionCombo
 	 */
 	private void populateConnectionCombo(final Combo connectionCombo) {
+		fSelectedConnection = null;
 		connectionCombo.removeAll();
 		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
 		for (int k = 0; k < connections.length; k++) {
