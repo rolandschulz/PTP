@@ -7,82 +7,78 @@ Setup for MPI Tools within the Parallel Language Development Tools
 	<script type="text/javascript" src="thumb.js"> </script>
 <body>
 <h1 id="top">Setup for MPI Tools within the Parallel Language Development Tools</h1>
-<h2>Terminology of CDT projects</h2>
+<p>&nbsp;
+<!--  ============= -->
+<p>This section describes how to set up a C/C++ project for MPI.
+There are at several ways to do this:
+<ul><li>Managed Build Projects
+<ul>
+<li><a href="#wizard">Use the PLDT new project wizards</a>
+</li>
+<li><a href="#manual">Add the MPI build information manually</a>
+</ul>
+
+<li>Makefile projects 
+<ul>
+<li><a href="setupMakefileProject.html">Set up MPI information in a Makefile project</a>
+</ul>
+</ul>
+<p>You should see <a href="includes.html">A Word about Include Paths and MPI Preferences</a> for a discussion about the different
+ways you can set up your project, including the MPI Preferences, 
+to find the include paths for build as well as for other Eclipse tools.
+
+<!--  ============= -->
+<h2>Terminology of CDT projects: Managed Build vs. Makefile Projects</h2>
 <p>Note: the older versions of CDT (4.0 and earlier)
-refer to a C project in which it manages the makefile as  a "Managed Make Project"
-and a project which 
+refer to a C project in which it manages the makefile as  a "Managed Make Project" or a "Managed Build Project."
+They refer to a project which 
 you supply the makefile is a "Standard Make project".
 <p>The current version of CDT that works with PTP 5.0 is CDT 8.0.
 CDT 5.0 and later refers to a C project in which it manages the makefile as just a "C Project" and a project which 
 you supply the makefile is a <a href="setupMakefileProject.html">"Makefile project."</a>
 <p>Both terminologies are sometimes used in these instructions.
-<h2>Project Setup</h2>
-<p>To use  the PTP Parallel Language Development
-Tools feature for MPI development, you need to 
-<ol>
-<li><a href="#prefs">Specify the MPI include path in preferences</a>, and</li>
-<li><a href="#project">Add the MPI include files etc.  to the build information for each  project.</a>
-</ol>
 
-<h2 id="prefs">Specifying the MPI Include path in Preferences</h2>
-<p>During project creation, you will be prompted if the MPI (or OpenMP) include path hasn't been set up in PLDT Preferences.
-The first time you use the New Project Wizard to create an MPI or OpenMP project, 
-you'll be prompted to set up the preferences to point to the appropriate header files.
-<p>Or, you can set it up ahead of time as specified below.
-<p>To specify the MPI include path, use Window > Preferences. (For Mac, use Eclipse > Preferences)
-Under Parallel Tools, Parallel Language Development Tools, MPI...
-(Note: If you do not have core PTP installed, the "Parallel Language 
-Development Tools" section in the preferences will be in the main list.)
-
-<p>Add the path to MPI include paths  - this tells PLDT what symbols to look
-for in the MPI Artifact view.  You can also specify the default MPI build command.
-These values will make the MPI New Project Wizard page make more
-accurate predictions of settings for new projects.
-<p>There is now an optional checkbox to "Recognize MPI Artifacts by prefix alone" - if this
-is checked, then artifacts will be identified solely on the "MPI_" prefix, which is
-less confusing and error-prone for new users.
-<br><img src="images/pldt-prefs1.png">
-
-<p>The "Prompt to include MPI APIs found in other locations (C only)" indicates whether 
-it will ask you if MPI APIS found elsewhere 
-will be considered as artifacts.  For example, if you point to &lt;install-loc&gt;/include in the MPI include paths here,
-but your source files actually include header files from /usr/local/include, it will prompt you to consider these as well 
-during the analysis.
-This is only valid for C projects, not C++ projects.
-<p>Hit OK to close the Preferences dialog.
-
-
-
-<h2 id="project">Add MPI Include paths to each project</h2>
-<p>The MPI include paths must also be added to each project.
-There are two ways to do this.
-<ol>
-<li><a href="#wizard">Use the PLDT new project wizards</a>, or
-</li>
-<li><a href="#manual">Add the build information manually</a>.
-</ol>
 <h2 id="wizard">Use the PLDT new project wizards</h2>
-<p>Create a new "C project"
-<br>One way is to use the menu: File->New->C project (if you are already in the C/C++ perspective this may be the simplest).
-<br>There are several ways to get to this wizard (including context menu in the Project Explorer view). 
-Enter a project name; under Project types, expand 'executable' and select, e.g. "MPI Hello World C project"
+
+<p>One way to create a new MPI C project is to use the menu: File->New->C project (if you are already in the C/C++ perspective this may be the simplest).
+There are several other ways to get to this wizard (including context menu in the Project Explorer view). 
+<p>In the first wizard dialog page, "C Project,"
+enter a project name; under Project types, expand 'executable' and select, e.g. "MPI Hello World C project"
+<p>Note: be sure to select a valid toolchain on the right side of this dialog.  Your system may provide different toolchains,
+and the selection may be different from what is shown here.
 <br>
 <img src="images/mpiWizard.png">
-<p>Note: if you have not set the MPI Preferences yet, you'll be prompted at this point:
+<!--  ========================================== -->
+<p>&nbsp;
+<ul>
+<li>Note: if you have modified the MPI Preferences to <b>Uncheck</b> "Recognize MPI Artifacts by prefix (MPI) alone?"
+then the header file must be located for MPI artifacts to be recognized. 
+<p><img src="images/recognize-mpi-prefix.png">
+<p>&nbsp;
+<p>So if
+you are <i>not</i> recognizing MPI artifacts by prefix alone, then PLDT will have to use include files to
+identify MPI artifacts. If you have not set the MPI includes on the MPI Preferences page yet, 
+you'll be prompted at this point in the new project wizard dialog:
 <br><img src="images/mpiPrefsHaveNotBeenSet.png">
 <p>&nbsp;
-<p>See the above <a href="#prefs">Specify the MPI include path in preferences</a> for how to fill this in.
-<p>After specifying the preferences, or if it wasn't required, select Next to go to the next page of the New Project Wizard.
+<p>See <a href="includes.html">A word about includes and MPI preferences</a>
+for more information and how to fill this in.
+</li>
+</ul>
+<!--  ========================================== -->
+<p>&nbsp;
+<p>After specifying the include files in the preferences, or if it wasn't required, select Next to go to the next page of the New Project Wizard.
 
-<br>On the next page, the Basic Settings page of the wizard, fill in any project template values, e.g. your name.
-The name is used in a comment in the file.  The "Hello World Greeting" is used in the sample statement
+<br>On the Basic Settings page of the wizard, fill in any project template values, e.g. your name
+in the Author field.
+The Author is simply used in a comment in the file.  The "Hello World greeting" is used in the sample statement
 in the code that is generated.  The "Source" field indicates the name of the source folder that is generated in the project.
 <br>Then select Next.
 <br><img src="images/mpiWizard2.gif">
 <p>On the next page, "MPI Project Settings" page,  the "Add MPI project settings to this project" should be checked.
 If you want to change any of the default values for this project, you can do so
 here by unchecking the "Use default information" and altering the values.
-The default values were chosen based on your input to the PLDT Preferences above.
+The default values were chosen based on your input to the PLDT MPI Preferences above.
 
 <br><img src="images/mpiWizard3.gif">
 <p>Select Finish.
@@ -138,7 +134,7 @@ You probably also need to do the same for the linker tool.
 <p>Note that the above instructions describe how to add information to C projects in which the makefile is generated for you,
 previously known as "Managed Build" projects.  If you provide your own makefile, you will create a "Makefile project"
 and create the makefile within that project.
-See <a href="makefileSetup.html">Setting up project properties for a Makefile project</a>.
+See <a href="setupMakefileProject.html">Setting up project properties for a Makefile project</a>.
 <p>Now continue to set up to <a href="run.html">run the MPI tools</a>
 
 <p>&nbsp;
