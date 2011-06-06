@@ -331,11 +331,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
 
-			PropertyType p = (PropertyType) rmVarMap.get(jobId);
+			try {
+				PropertyType p = (PropertyType) rmVarMap.get(jobId);
 
-			CommandType job = controlData.getGetJobStatus();
-			if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
-				try {
+				CommandType job = controlData.getGetJobStatus();
+				if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
+
 					pinTable.pin(jobId);
 					p = new PropertyType();
 					p.setVisible(false);
@@ -343,13 +344,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					rmVarMap.put(jobId, p);
 					runCommand(jobId, job, CommandJob.JobMode.STATUS, true);
 					p = (PropertyType) rmVarMap.remove(jobId);
-				} finally {
-					pinTable.release(jobId);
-				}
-			}
 
-			if (p != null) {
-				state = String.valueOf(p.getValue());
+				}
+
+				if (p != null) {
+					state = String.valueOf(p.getValue());
+				}
+			} finally {
+				pinTable.release(jobId);
 			}
 
 			if (status == null) {

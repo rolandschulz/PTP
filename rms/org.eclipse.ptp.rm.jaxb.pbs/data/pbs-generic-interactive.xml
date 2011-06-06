@@ -64,7 +64,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<stdout-parser delim="\n">
 			   <target ref="@jobId">
                <match>
-                  <expression flags="DOTALL">qsub:.+job[\s]+([\d]+)[.][\w]+[\s]to start.*</expression>
+                  <expression flags="DOTALL">qsub:.+job[\s]+([\d]+)[.].+[\s]to start.*</expression>
                   <set field="name">
                      <entry valueGroup="1"/>
                   </set>
@@ -75,7 +75,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
             </target>
 				<target ref="@jobId">
 					<match>
-						<expression flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.][\w]+[\s]ready.*</expression>
+						<expression flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.].+[\s]ready.*</expression>
 						<set field="name">
 							<entry valueGroup="1"/>
 						</set>
@@ -84,7 +84,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</set>
 					</match>
 				</target>
-				<exit-after flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.][\w]+[\s]ready.*</exit-after>
+				<exit-after flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.].+[\s]ready.*</exit-after>
 			</stdout-parser>
 			<stderr-parser delim="\n">
 				<target ref="@jobId">
