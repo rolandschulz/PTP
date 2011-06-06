@@ -288,7 +288,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					/*
 					 * leave the status in the map in case there are further
 					 * calls (regarding remote file state); it will be pruned by
-					 * the daemon
+					 * the daemon; note that a COMPLETED state can correspond to
+					 * a COMPLETED, CANCELED, FAILED or JOB_OUTERR_READY detail
 					 */
 					status = jobStatusMap.terminated(jobId, progress.newChild(50));
 					if (status.stateChanged()) {
