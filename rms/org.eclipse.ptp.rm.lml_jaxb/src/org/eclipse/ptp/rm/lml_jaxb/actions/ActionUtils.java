@@ -33,6 +33,7 @@ import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
@@ -160,7 +161,7 @@ public class ActionUtils {
 	 *            to file
 	 */
 	public static void removeFile(final String path, final String rmId) {
-		new Job(path) {
+		Job j = new Job(path) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
@@ -178,7 +179,14 @@ public class ActionUtils {
 				}
 				return Status.OK_STATUS;
 			}
-		}.schedule();
+		};
+
+		j.schedule();
+
+		try {
+			j.join();
+		} catch (final InterruptedException ignored) {
+		}
 	}
 
 	/**
@@ -190,7 +198,8 @@ public class ActionUtils {
 	 * @return file, if retrieval was successful
 	 */
 	private static IFileStore getRemoteFile(String path, IResourceManagerControl control, SubMonitor progress) {
-		String remoteServicesId = control.getControlConfiguration().getRemoteServicesId();
+		IResourceManagerComponentConfiguration config = control.getControlConfiguration();
+		String remoteServicesId = config.getRemoteServicesId();
 		if (remoteServicesId != null) {
 			if (PTPRemoteCorePlugin.getDefault() == null) {
 				return null;
@@ -204,7 +213,7 @@ public class ActionUtils {
 			if (remoteConnectionManager == null) {
 				return null;
 			}
-			String remoteConnectionName = control.getControlConfiguration().getConnectionName();
+			String remoteConnectionName = config.getConnectionName();
 			if (remoteConnectionName == null) {
 				return null;
 			}
