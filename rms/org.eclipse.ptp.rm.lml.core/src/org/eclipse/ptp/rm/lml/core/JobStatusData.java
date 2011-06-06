@@ -89,8 +89,8 @@ public class JobStatusData {
 	 *            child node for a single fJobId
 	 */
 	public JobStatusData(IMemento memento) {
+		fJobId = memento.getID();
 		fRmId = memento.getString(RM_ID_ATTR);
-		fJobId = memento.getString(JOB_ID_ATTR);
 		fState = memento.getString(STATE_ATTR);
 		fStateDetail = memento.getString(STATE_DETAIL_ATTR);
 		fOutputPath = memento.getString(STDOUT_REMOTE_FILE_ATTR);
@@ -226,7 +226,6 @@ public class JobStatusData {
 			return;
 		}
 		IMemento jobMemento = memento.createChild(JOB_ID_ATTR, fJobId);
-		jobMemento.putString(JOB_ID_ATTR, fJobId);
 		jobMemento.putString(RM_ID_ATTR, fRmId);
 		jobMemento.putString(STATE_ATTR, fState);
 		jobMemento.putString(STATE_DETAIL_ATTR, fStateDetail);
