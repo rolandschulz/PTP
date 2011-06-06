@@ -73,7 +73,14 @@ public class LguiItem implements ILguiItem {
 		try {
 			final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
 
-			final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(xml.toURL());
+			/*
+			 * Synchronize to avoid the dreaded
+			 * "FWK005 parse may not be called while parsing" message
+			 */
+			final JAXBElement<LguiType> doc;
+			synchronized (LguiItem.class) {
+				doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(xml.toURL());
+			}
 
 			lml = doc.getValue();
 		} catch (final JAXBException e) {
@@ -173,13 +180,16 @@ public class LguiItem implements ILguiItem {
 		 */
 		if (jobStatus == null) {
 			if (force) {
-				String oid = getOverviewAccess().getOIDByJobId(jobId);
-				if (oid == null) {
-					final TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
-					if (table != null) {
-						oid = generateOid();
-						status.setOid(oid);
-						addJobToTable(table, oid, status);
+				OverviewAccess overview = getOverviewAccess();
+				if (overview != null) {
+					String oid = overview.getOIDByJobId(jobId);
+					if (oid == null) {
+						final TableType table = getTableHandler().getTable(getGidFromJobStatus(status));
+						if (table != null) {
+							oid = generateOid();
+							status.setOid(oid);
+							addJobToTable(table, oid, status);
+						}
 					}
 				}
 			}
@@ -212,7 +222,7 @@ public class LguiItem implements ILguiItem {
 			 * Synchronize to avoid the dreaded
 			 * "FWK005 parse may not be called while parsing" message
 			 */
-			synchronized (this) {
+			synchronized (LguiItem.class) {
 				marshaller.marshal(rootElement, output);
 			}
 			output.close(); // Must close to flush stream
@@ -305,7 +315,13 @@ public class LguiItem implements ILguiItem {
 			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(tagname, LguiType.class, layoutLgui);
-			marshaller.marshal(rootElement, output);
+			/*
+			 * Synchronize to avoid the dreaded
+			 * "FWK005 parse may not be called while parsing" message
+			 */
+			synchronized (LguiItem.class) {
+				marshaller.marshal(rootElement, output);
+			}
 			output.close();
 		} catch (final PropertyException e) {
 			e.printStackTrace();
@@ -587,7 +603,7 @@ public class LguiItem implements ILguiItem {
 		 * "FWK005 parse may not be called while parsing" message
 		 */
 		final JAXBElement<LguiType> doc;
-		synchronized (this) {
+		synchronized (LguiItem.class) {
 			doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
 		}
 		return doc.getValue();
