@@ -628,9 +628,19 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			// read the output from the command
-			while ((s = stdInput.readLine()) != null) {
-				sb.append(s);
+			try {
+				while ((s = stdInput.readLine()) != null) {
+					sb.append(s);
+				}
+			} catch (IOException e) {
+				/*
+				 * For some reason we're sometimes seeing a "write end dead"
+				 * message here even though the correct result is returned.
+				 * Ignore this exception for now, though the root cause needs to
+				 * be ascertained.
+				 */
 			}
+
 			// compile the pattern for search
 			Pattern pattern = Pattern.compile(verifyPattern);
 			// get a matcher object
