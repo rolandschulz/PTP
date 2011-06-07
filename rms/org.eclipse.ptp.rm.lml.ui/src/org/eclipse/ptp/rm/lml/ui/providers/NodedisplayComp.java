@@ -40,7 +40,6 @@ import org.eclipse.ptp.rm.lml.internal.core.model.NodedisplayAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.OIDToObject;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable;
 import org.eclipse.ptp.rm.lml.ui.providers.BorderLayout.BorderData;
-import org.eclipse.ptp.rm.lml.ui.views.NodedisplayView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.DisposeEvent;
@@ -55,6 +54,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -83,6 +83,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 	/**
 	 * Class for comparing integer-values in ascending or descending way.
+	 * 
+	 * @author karbach
+	 * 
 	 */
 	public static class NumberComparator implements Comparator<Integer> {
 
@@ -98,52 +101,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			}
 			else
 				return o2 - o1;
-		}
-
-	}
-
-	/**
-	 * Find maximum count of elements per level
-	 * Traverses the whole scheme
-	 * 
-	 * @param scheme
-	 *            lml-scheme
-	 * @param level
-	 *            current level (first is 1)
-	 * @param maxcounts
-	 *            array with length at least scheme.depth
-	 */
-	private static void findMaximum(Object scheme, int level, int[] maxcounts) {
-
-		final List subschemes = LMLCheck.getLowerSchemeElements(scheme);
-
-		int sum = 0;
-
-		for (final Object subscheme : subschemes) {
-
-			final SchemeElement sub = (SchemeElement) subscheme;
-
-			if (sub.getList() != null) {// list-attribute
-				sum += LMLCheck.getNumbersFromNumberlist(sub.getList()).length;
-			}
-			else {// min- max-attributes
-
-				final int min = sub.getMin().intValue();
-				int max = min;
-				if (sub.getMax() != null) {
-					max = sub.getMax().intValue();
-				}
-
-				final int step = sub.getStep().intValue();
-
-				sum += (max - min) / step + 1;
-			}
-			// Recursive call for lower level
-			findMaximum(sub, level + 1, maxcounts);
-		}
-
-		if (sum > 0 && sum > maxcounts[level - 1]) {
-			maxcounts[level - 1] = sum;
 		}
 
 	}
@@ -208,6 +165,51 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		griddata.verticalAlignment = GridData.FILL;
 
 		return griddata;
+	}
+
+	/**
+	 * Find maximum count of elements per level
+	 * Traverses the whole scheme
+	 * 
+	 * @param scheme
+	 *            lml-scheme
+	 * @param level
+	 *            current level (first is 1)
+	 * @param maxcounts
+	 *            array with length at least scheme.depth
+	 */
+	private static void findMaximum(Object scheme, int level, int[] maxcounts) {
+
+		final List subschemes = LMLCheck.getLowerSchemeElements(scheme);
+
+		int sum = 0;
+
+		for (final Object subscheme : subschemes) {
+
+			final SchemeElement sub = (SchemeElement) subscheme;
+
+			if (sub.getList() != null) {// list-attribute
+				sum += LMLCheck.getNumbersFromNumberlist(sub.getList()).length;
+			}
+			else {// min- max-attributes
+
+				final int min = sub.getMin().intValue();
+				int max = min;
+				if (sub.getMax() != null) {
+					max = sub.getMax().intValue();
+				}
+
+				final int step = sub.getStep().intValue();
+
+				sum += (max - min) / step + 1;
+			}
+			// Recursive call for lower level
+			findMaximum(sub, level + 1, maxcounts);
+		}
+
+		if (sum > 0 && sum > maxcounts[level - 1]) {
+			maxcounts[level - 1] = sum;
+		}
 
 	}
 
@@ -253,7 +255,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	private static final int httpsport = 4444;// Special port for https-access
 
 	private NodedisplayComp parentNodedisplay = null;// Reference to parent nodedisplay
-
 	private int minWidth = 0, minHeight = 0;// Minimal width and height of this nodedisplay
 
 	private int x = 0, y = 0;// Position of this nodedisplay within surrounding grid
@@ -263,6 +264,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 	// The name of the special empty job
 	private final String emptyJobName = "empty";
+
+	// assumes minimum size
+	private int minRectangleSize = 5;
 
 	/**
 	 * Call this constructor for start, maxlevel is chosen from lml-file
@@ -299,6 +303,26 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		setScrollBarPreferences();
 
 		addPaintListener();
+	}
+
+	/**
+	 * easy constructor for a nodedisplay as root-node
+	 * 
+	 * @param lgui
+	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
+	 * @param pmodel
+	 *            lml-model for the nodedisplay, which should be shown in this panel
+	 * @param lgui
+	 *            complete lml-model containing this nodedisplay
+	 * @param parent
+	 *            parameter for calling super constructor
+	 * @param style
+	 *            parameter for calling super constructor
+	 */
+	public NodedisplayComp(ILguiItem lgui, Nodedisplay pmodel, NodedisplayView pnodeview, int style) {
+
+		this(lgui, pmodel, null, pnodeview, style);
+
 	}
 
 	/**
@@ -349,270 +373,10 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * easy constructor for a nodedisplay as root-node
-	 * 
-	 * @param lgui
-	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
-	 * @param pmodel
-	 *            lml-model for the nodedisplay, which should be shown in this panel
-	 * @param lgui
-	 *            complete lml-model containing this nodedisplay
-	 * @param parent
-	 *            parameter for calling super constructor
-	 * @param style
-	 *            parameter for calling super constructor
+	 * Decrease minimal size of painted rectangles.
 	 */
-	public NodedisplayComp(ILguiItem lgui, Nodedisplay pmodel, NodedisplayView pnodeview, int style) {
-
-		this(lgui, pmodel, null, pnodeview, style);
-
-	}
-
-	/**
-	 * Adds a dispose-listener, which removes this nodedisplay and its children
-	 * from Objectstatus.
-	 */
-	private void addDisposeAction() {
-		this.addDisposeListener(new DisposeListener() {
-
-			public void widgetDisposed(DisposeEvent e) {
-				removeUpdatable();
-
-				if (titleLabel != null)
-					titleLabel.dispose();
-			}
-
-		});
-	}
-
-	/**
-	 * Adds listeners to innerPanel, which react to user interaction on
-	 * lowest level rectangles.
-	 */
-	private void addMouseListenerToInnerPanel() {
-
-		innerPanel.addMouseMoveListener(new MouseMoveListener() {
-
-			public void mouseMove(MouseEvent e) {
-
-				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
-
-				if (focussed != null && !isDisplayNodeEmpty(focussed)) {
-					lgui.getObjectStatus().mouseover(focussed.getConnectedObject());
-				}
-				else {
-					lgui.getObjectStatus().mouseExitLast();
-				}
-
-				innerPanel.setToolTipText(getToolTipText(focussed));
-
-			}
-		});
-
-		innerPanel.addMouseListener(new MouseListener() {
-
-			public void mouseDoubleClick(MouseEvent e) {
-			}
-
-			public void mouseDown(MouseEvent e) {
-				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
-
-				if (focussed != null && !isDisplayNodeEmpty(focussed))
-					lgui.getObjectStatus().mousedown(focussed.getConnectedObject());
-
-				innerPanel.setToolTipText(getToolTipText(focussed));
-			}
-
-			public void mouseUp(MouseEvent e) {
-				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
-
-				if (focussed != null && !isDisplayNodeEmpty(focussed))
-					lgui.getObjectStatus().mouseup(focussed.getConnectedObject());
-
-				innerPanel.setToolTipText(getToolTipText(focussed));
-			}
-		});
-
-		innerPanel.addListener(SWT.MouseExit, new Listener() {
-
-			public void handleEvent(Event event) {
-				lgui.getObjectStatus().mouseExitLast();
-
-				innerPanel.setToolTipText(getToolTipText(null));
-			}
-
-		});
-
-	}
-
-	/**
-	 * Adds a listener, which calls showMinRectangleSize everytime
-	 * this component is painted. This is needed to change minimum
-	 * size in surrounding ScrollPane.
-	 */
-	private void addPaintListener() {
-
-		final Listener l = new Listener() {
-
-			public void handleEvent(Event event) {
-				showMinRectangleSizes();
-			}
-		};
-
-		innerPanel.addListener(SWT.Paint, l);
-
-	}
-
-	/**
-	 * Add Listener to titlelabel, which allow to zoom in and zoom out
-	 */
-	private void addZoomFunction() {
-
-		// Zoom in by clicking on title-panels
-		titleLabel.addMouseListener(new MouseListener() {
-
-			public void mouseDoubleClick(MouseEvent e) {
-
-			}
-
-			public void mouseDown(MouseEvent e) {
-
-				titleLabel.setBackground(titleBackgroundColor);
-
-				if (node == null)
-					return;
-
-				if (nodeview.getRootNodedisplay() == NodedisplayComp.this) {
-					nodeview.zoomOut();
-				}
-				else
-					nodeview.zoomIn(node.getFullImplicitName());
-
-			}
-
-			public void mouseUp(MouseEvent e) {
-
-			}
-		});
-		// Show different background if titlelabel is covered by the mouse
-		titleLabel.addMouseMoveListener(new MouseMoveListener() {
-
-			public void mouseMove(MouseEvent e) {
-				titleLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-			}
-		});
-
-		titleLabel.addListener(SWT.MouseExit, new Listener() {
-
-			public void handleEvent(Event event) {
-				titleLabel.setBackground(titleBackgroundColor);
-			}
-		});
-
-	}
-
-	/**
-	 * Calculates current level and saves it to currentlevel
-	 * 
-	 * @param pnode
-	 */
-	private void calculateCurrentlevel(DisplayNode pnode) {
-		currentLevel = 0;
-		if (pnode != null) {
-			currentLevel = pnode.getLevel();
-		}
-	}
-
-	/**
-	 * Forward call to calculate desired minimum size to
-	 * all inner components. If this nodedisplay paints rectangles
-	 * itself, this method calls the calculateResize-function of
-	 * the rectangle-painting-listener.
-	 */
-	private void callMinSizeCalculation() {
-
-		final Point size = getSize();
-		setMinSize(size.x, size.y);
-
-		for (final NodedisplayComp icomp : innerComps) {
-			if (icomp.x == 0 || icomp.y == 0) {
-				icomp.callMinSizeCalculation();
-			}
-		}
-
-		if (rectpaintlistener != null) {
-			rectpaintlistener.calculateResize();
-		}
-
-	}
-
-	/**
-	 * Check if maxlevel is bigger than deepest possible level within this scheme-part.
-	 * Change this fault by setting maxLevel to maximum possible value.
-	 */
-	private void checkMaxLevel() {
-
-		if (node != null) {
-			// calculation of absolute maximal level within this part of tree
-			// realmax=current node level + deepest possible level
-			final int realmax = LMLCheck.getSchemeLevel(node.getScheme()) + LMLCheck.getDeepestSchemeLevel(node.getScheme()) - 1;
-			if (realmax < maxLevel) {
-				maxLevel = realmax;
-			}
-		}
-
-	}
-
-	/**
-	 * Creates borderFrame and innerPanel.
-	 * 
-	 * @param bordercolor
-	 *            the color for the border
-	 */
-	private void createFramePanels(Color bordercolor) {
-
-		// At least insert one panel with backgroundcolor as bordercomposite
-		borderFrame = new BorderComposite(mainPanel, SWT.NONE);
-
-		borderFrame.setBorderColor(bordercolor);
-		borderFrame.setBorderWidth(apref.getBorder().intValue());
-		borderFrame.setLayoutData(new BorderData(BorderLayout.MFIELD));
-
-		innerPanel = new Composite(borderFrame, SWT.NONE);
-
-		innerPanel.setBackground(backgroundColor);
-
-		if (centerPic != null) {
-			innerPanel.setBackgroundImage(centerPic);
-		}
-
-		// if( (apref.isHighestrowfirst() && !apref.isHighestcolfirst()) || (!apref.isHighestrowfirst() &&
-		// apref.isHighestcolfirst()) ){
-		// innerpanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		// }
-
-	}
-
-	/**
-	 * Initializes the surrounding pictureFrame and inserts pictures for this
-	 * nodedisplay-level.
-	 */
-	private void createPictureFrame() {
-
-		pictureFrame = new Composite(this, SWT.None);
-		pictureFrame.setLayout(new BorderLayout());
-		// Redo layout when resized
-		pictureFrame.addListener(SWT.Resize, new Listener() {
-
-			public void handleEvent(Event event) {
-				pictureFrame.layout(true);
-			}
-
-		});
-
-		insertPictures();
-
-		pictureFrame.setBackground(backgroundColor);
+	public void decreaseMinRectangleSize() {
+		setMinmalRectangleSize(minRectangleSize - 1);
 	}
 
 	/**
@@ -673,44 +437,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		}
 
 		return dispnodetocolor;
-	}
-
-	/**
-	 * @return 1 if layout defines 0 for cols, otherwise the value set by the layout
-	 */
-	private int getCols() {
-		if (apref.getCols().intValue() == 0) {
-			return 1;
-		}
-		else
-			return apref.getCols().intValue();
-	}
-
-	/**
-	 * Converts a URL given as String into a https-URL.
-	 * The standard httpsport is set in the result-URL.
-	 * 
-	 * @param lmlurl
-	 *            normal URL as String
-	 * @return HTTPS-URL
-	 */
-	private URL getHttpsURL(String lmlurl) {
-
-		URL res = null;
-
-		try {
-			// Get picture from url and put it into a panel
-			try {
-				final URL httpURL = new URL(lmlurl);
-				res = new URL("https", httpURL.getHost(), httpsport, httpURL.getFile());
-			} catch (final MalformedURLException e) {
-				return null;
-			}
-		} catch (final AccessControlException er) {
-			return null;
-		}
-
-		return res;
 	}
 
 	/**
@@ -808,6 +534,13 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
+	 * @return minimal size of painted rectangles
+	 */
+	public int getMinimalRectangleSize() {
+		return minRectangleSize;
+	}
+
+	/**
 	 * @return implicit name of node within nodedisplay, which is shown by this NodedisplayPanel
 	 */
 	public String getShownImpname() {
@@ -815,6 +548,401 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			return null;
 
 		return node.getFullImplicitName();
+	}
+
+	/**
+	 * Hide title or name for this panel
+	 */
+	public void hideTitle() {
+		titleLabel.setVisible(false);
+		apref.setShowtitle(false);
+	}
+
+	/**
+	 * Increase minimal size of painted rectangles.
+	 */
+	public void increaseMinRectangleSize() {
+		setMinmalRectangleSize(minRectangleSize + 1);
+	}
+
+	/**
+	 * Set minimal size of painted rectangles in this nodedisplay.
+	 * 
+	 * @param size
+	 *            size in pixels for painted rectangles, this parameter
+	 *            defines rectangles width as well ass rectangle height
+	 */
+	public void setMinmalRectangleSize(int size) {
+		if (size > 0) {
+
+			minRectangleSize = size;
+
+			for (final NodedisplayComp icomp : innerComps) {
+				if (icomp.x == 0 || icomp.y == 0) {
+					icomp.setMinmalRectangleSize(size);
+				}
+			}
+
+			if (rectpaintlistener != null) {
+				rectpaintlistener.setMinRectSize(size);
+			}
+
+			if (parentNodedisplay == null)
+				showMinRectangleSizes();
+		}
+	}
+
+	/**
+	 * Calculate minimum size of this nodedisplay, which
+	 * is needed to show all painted rectangles in defined
+	 * minimum size.
+	 * 
+	 * @return true, if needed size changed
+	 */
+	public boolean showMinRectangleSizes() {
+		final boolean res = callMinSizeCalculation();
+
+		final ScrolledComposite scrollpane = nodeview.getScrollPane();
+
+		scrollpane.setMinSize(minWidth, minHeight);
+
+		final Point nsize = nodeview.getSize();
+		int swidth = minWidth;
+		int sheight = minHeight;
+
+		if (swidth > nsize.x)
+			swidth = nsize.x;
+
+		if (sheight > nsize.y)
+			sheight = nsize.y;
+
+		scrollpane.setLayoutData(new RowData(swidth, sheight));
+
+		nodeview.layout();
+
+		return res;
+	}
+
+	/**
+	 * Show title or name for this panel
+	 */
+	public void showTitle() {
+		titleLabel.setVisible(true);
+		apref.setShowtitle(true);
+	}
+
+	public void updateStatus(ObjectType j, boolean mouseover, boolean mousedown) {
+
+		if (node == null) {
+			if (innerPanel != null) {
+				innerPanel.redraw();
+			}
+			return;
+		}
+
+		final ObjectType conobject = node.getConnectedObject();
+		if (currentLevel == maxLevel) {
+
+			if (lgui.getObjectStatus().isMouseover(conobject)) {
+				borderFrame.setBorderWidth(apref.getMouseborder().intValue());
+			}
+			else
+				borderFrame.setBorderWidth(apref.getBorder().intValue());
+
+			if (lgui.getObjectStatus().isAnyMousedown() && !lgui.getObjectStatus().isMousedown(conobject)) {// Change color
+				innerPanel.setBackground(ColorConversion.getColor(lgui.getOIDToObject().getColorById(null)));
+			}
+			else
+				innerPanel.setBackground(jobColor);
+		}
+		else if (currentLevel == maxLevel - 1) {// For rectangle-paint of lowest-level-elements
+			innerPanel.redraw();
+		}
+	}
+
+	/**
+	 * Adds a dispose-listener, which removes this nodedisplay and its children
+	 * from Objectstatus.
+	 */
+	private void addDisposeAction() {
+		this.addDisposeListener(new DisposeListener() {
+
+			public void widgetDisposed(DisposeEvent e) {
+				removeUpdatable();
+
+				if (titleLabel != null)
+					titleLabel.dispose();
+			}
+
+		});
+	}
+
+	/**
+	 * Adds listeners to innerPanel, which react to user interaction on
+	 * lowest level rectangles.
+	 */
+	private void addMouseListenerToInnerPanel() {
+
+		innerPanel.addMouseMoveListener(new MouseMoveListener() {
+
+			public void mouseMove(MouseEvent e) {
+
+				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
+
+				if (focussed != null && !isDisplayNodeEmpty(focussed)) {
+					lgui.getObjectStatus().mouseover(focussed.getConnectedObject());
+				}
+				else {
+					lgui.getObjectStatus().mouseExitLast();
+				}
+
+				innerPanel.setToolTipText(getToolTipText(focussed));
+
+			}
+		});
+
+		innerPanel.addMouseListener(new MouseListener() {
+
+			public void mouseDoubleClick(MouseEvent e) {
+			}
+
+			public void mouseDown(MouseEvent e) {
+				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
+
+				if (focussed != null && !isDisplayNodeEmpty(focussed))
+					lgui.getObjectStatus().mousedown(focussed.getConnectedObject());
+
+				innerPanel.setToolTipText(getToolTipText(focussed));
+			}
+
+			public void mouseUp(MouseEvent e) {
+				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
+
+				if (focussed != null && !isDisplayNodeEmpty(focussed))
+					lgui.getObjectStatus().mouseup(focussed.getConnectedObject());
+
+				innerPanel.setToolTipText(getToolTipText(focussed));
+			}
+		});
+
+		innerPanel.addListener(SWT.MouseExit, new Listener() {
+
+			public void handleEvent(Event event) {
+				lgui.getObjectStatus().mouseExitLast();
+
+				innerPanel.setToolTipText(getToolTipText(null));
+			}
+
+		});
+
+	}
+
+	/**
+	 * Adds a listener, which calls showMinRectangleSize everytime
+	 * this component is painted. This is needed to change minimum
+	 * size in surrounding ScrollPane.
+	 */
+	private void addPaintListener() {
+
+		final Listener l = new Listener() {
+
+			public void handleEvent(Event event) {
+				while (showMinRectangleSizes()) {
+				}
+				innerPanel.removeListener(SWT.Paint, this);
+			}
+		};
+
+		innerPanel.addListener(SWT.Paint, l);
+	}
+
+	/**
+	 * Add Listener to titlelabel, which allow to zoom in and zoom out
+	 */
+	private void addZoomFunction() {
+
+		// Zoom in by clicking on title-panels
+		titleLabel.addMouseListener(new MouseListener() {
+
+			public void mouseDoubleClick(MouseEvent e) {
+			}
+
+			public void mouseDown(MouseEvent e) {
+
+				titleLabel.setBackground(titleBackgroundColor);
+				if (node == null)
+					return;
+
+				if (nodeview.getRootNodedisplay() == NodedisplayComp.this) {
+					nodeview.zoomOut();
+				}
+				else
+					nodeview.zoomIn(node.getFullImplicitName());
+
+			}
+
+			public void mouseUp(MouseEvent e) {
+			}
+		});
+		// Show different background if titlelabel is covered by the mouse
+		titleLabel.addMouseMoveListener(new MouseMoveListener() {
+
+			public void mouseMove(MouseEvent e) {
+				titleLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+			}
+		});
+
+		titleLabel.addListener(SWT.MouseExit, new Listener() {
+
+			public void handleEvent(Event event) {
+				titleLabel.setBackground(titleBackgroundColor);
+			}
+		});
+	}
+
+	/**
+	 * Calculates current level and saves it to currentlevel
+	 * 
+	 * @param pnode
+	 */
+	private void calculateCurrentlevel(DisplayNode pnode) {
+		currentLevel = 0;
+		if (pnode != null) {
+			currentLevel = pnode.getLevel();
+		}
+	}
+
+	/**
+	 * Forward call to calculate desired minimum size to
+	 * all inner components. If this nodedisplay paints rectangles
+	 * itself, this method calls the calculateResize-function of
+	 * the rectangle-painting-listener.
+	 * 
+	 * @return true, if minimum size became bigger
+	 */
+	private boolean callMinSizeCalculation() {
+
+		final Point size = getSize();
+		setMinSize(size.x, size.y);
+
+		for (final NodedisplayComp icomp : innerComps) {
+			if (icomp.x == 0 || icomp.y == 0) {
+				icomp.callMinSizeCalculation();
+			}
+		}
+
+		if (rectpaintlistener != null) {
+			rectpaintlistener.calculateResize();
+		}
+
+		return size.x < minWidth || size.y < minHeight;
+	}
+
+	/**
+	 * Check if maxlevel is bigger than deepest possible level within this scheme-part.
+	 * Change this fault by setting maxLevel to maximum possible value.
+	 */
+	private void checkMaxLevel() {
+
+		if (node != null) {
+			// calculation of absolute maximal level within this part of tree
+			// realmax=current node level + deepest possible level
+			final int realmax = LMLCheck.getSchemeLevel(node.getScheme()) + LMLCheck.getDeepestSchemeLevel(node.getScheme()) - 1;
+			if (realmax < maxLevel) {
+				maxLevel = realmax;
+			}
+		}
+
+	}
+
+	/**
+	 * Creates borderFrame and innerPanel.
+	 * 
+	 * @param bordercolor
+	 *            the color for the border
+	 */
+	private void createFramePanels(Color bordercolor) {
+
+		// At least insert one panel with backgroundcolor as bordercomposite
+		borderFrame = new BorderComposite(mainPanel, SWT.NONE);
+
+		borderFrame.setBorderColor(bordercolor);
+		borderFrame.setBorderWidth(apref.getBorder().intValue());
+		borderFrame.setLayoutData(new BorderData(BorderLayout.MFIELD));
+
+		innerPanel = new Composite(borderFrame, SWT.NONE);
+
+		innerPanel.setBackground(backgroundColor);
+
+		if (centerPic != null) {
+			innerPanel.setBackgroundImage(centerPic);
+		}
+
+		// if( (apref.isHighestrowfirst() && !apref.isHighestcolfirst()) || (!apref.isHighestrowfirst() &&
+		// apref.isHighestcolfirst()) ){
+		// innerpanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		// }
+
+	}
+
+	/**
+	 * Initializes the surrounding pictureFrame and inserts pictures for this
+	 * nodedisplay-level.
+	 */
+	private void createPictureFrame() {
+
+		pictureFrame = new Composite(this, SWT.None);
+		pictureFrame.setLayout(new BorderLayout());
+		// Redo layout when resized
+		pictureFrame.addListener(SWT.Resize, new Listener() {
+
+			public void handleEvent(Event event) {
+				pictureFrame.layout(true);
+			}
+
+		});
+
+		insertPictures();
+
+		pictureFrame.setBackground(backgroundColor);
+	}
+
+	/**
+	 * @return 1 if layout defines 0 for cols, otherwise the value set by the layout
+	 */
+	private int getCols() {
+		if (apref.getCols().intValue() == 0) {
+			return 1;
+		}
+		else
+			return apref.getCols().intValue();
+	}
+
+	/**
+	 * Converts a URL given as String into a https-URL.
+	 * The standard httpsport is set in the result-URL.
+	 * 
+	 * @param lmlurl
+	 *            normal URL as String
+	 * @return HTTPS-URL
+	 */
+	private URL getHttpsURL(String lmlurl) {
+
+		URL res = null;
+
+		try {
+			// Get picture from url and put it into a panel
+			try {
+				final URL httpURL = new URL(lmlurl);
+				res = new URL("https", httpURL.getHost(), httpsport, httpURL.getFile());
+			} catch (final MalformedURLException e) {
+				return null;
+			}
+		} catch (final AccessControlException er) {
+			return null;
+		}
+
+		return res;
 	}
 
 	/**
@@ -832,46 +960,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		if (focussed.getConnectedObject().getName() != null)
 			return focussed.getConnectedObject().getName();
 		return focussed.getConnectedObject().getId();
-	}
-
-	/**
-	 * Hide title or name for this panel
-	 */
-	public void hideTitle() {
-		titleLabel.setVisible(false);
-		apref.setShowtitle(false);
-	}
-
-	/**
-	 * Add height-parameter to minHeight
-	 * 
-	 * @param height
-	 *            difference to be added
-	 */
-	public synchronized void increaseMinHeight(int height) {
-		minHeight += height;
-
-		if (parentNodedisplay != null) {
-			// Only first column sends minheight-increases to parent composites
-			if (x == 0)
-				parentNodedisplay.increaseMinHeight(height);
-		}
-	}
-
-	/**
-	 * Add width-parameter to minWidth
-	 * 
-	 * @param width
-	 *            difference to be added
-	 */
-	public synchronized void increaseMinWidth(int width) {
-		minWidth += width;
-
-		if (parentNodedisplay != null) {
-			// Only first row sends minwidth-increases to parent composites
-			if (y == 0)
-				parentNodedisplay.increaseMinWidth(width);
-		}
 	}
 
 	/**
@@ -944,6 +1032,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		rectpaintlistener.bordercolor = bordercolor;
 
+		rectpaintlistener.setMinRectSize(minRectangleSize);
+
 		innerPanel.addListener(SWT.Paint, rectpaintlistener);
 	}
 
@@ -961,7 +1051,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		// Bordercolor is defined by this parameter
 		final Color bordercolor = ColorConversion.getColor(LMLColor.stringToColor(apref.getBordercolor()));
-
 		createFramePanels(bordercolor);
 
 		// Generate all displaynodes for elements in lml-tree which are childs of the current node
@@ -971,7 +1060,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 			initRectPaintListener(dispnodes, bordercolor);
 			addMouseListenerToInnerPanel();
-
 		}
 		else { // insert lower nodedisplays, nest composites
 
@@ -1162,51 +1250,35 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Calculate minimum size of this nodedisplay, which
-	 * is needed to show all painted rectangles in defined
-	 * minimum size.
+	 * Add height-parameter to minHeight
 	 * 
+	 * @param height
+	 *            difference to be added
 	 */
-	public void showMinRectangleSizes() {
-		callMinSizeCalculation();
+	protected synchronized void increaseMinHeight(int height) {
+		minHeight += height;
 
-		nodeview.getScrollPane().setMinSize(minWidth, minHeight);
+		if (parentNodedisplay != null) {
+			// Only first column sends minheight-increases to parent composites
+			if (x == 0)
+				parentNodedisplay.increaseMinHeight(height);
+		}
 	}
 
 	/**
-	 * Show title or name for this panel
+	 * Add width-parameter to minWidth
+	 * 
+	 * @param width
+	 *            difference to be added
 	 */
-	public void showTitle() {
-		titleLabel.setVisible(true);
-		apref.setShowtitle(true);
-	}
+	protected synchronized void increaseMinWidth(int width) {
+		minWidth += width;
 
-	public void updateStatus(ObjectType j, boolean mouseover, boolean mousedown) {
-
-		if (node == null) {
-			if (innerPanel != null) {
-				innerPanel.redraw();
-			}
-			return;
-		}
-
-		final ObjectType conobject = node.getConnectedObject();
-		if (currentLevel == maxLevel) {
-
-			if (lgui.getObjectStatus().isMouseover(conobject)) {
-				borderFrame.setBorderWidth(apref.getMouseborder().intValue());
-			}
-			else
-				borderFrame.setBorderWidth(apref.getBorder().intValue());
-
-			if (lgui.getObjectStatus().isAnyMousedown() && !lgui.getObjectStatus().isMousedown(conobject)) {// Change color
-				innerPanel.setBackground(ColorConversion.getColor(lgui.getOIDToObject().getColorById(null)));
-			}
-			else
-				innerPanel.setBackground(jobColor);
-		}
-		else if (currentLevel == maxLevel - 1) {// For rectangle-paint of lowest-level-elements
-			innerPanel.redraw();
+		if (parentNodedisplay != null) {
+			// Only first row sends minwidth-increases to parent composites
+			if (y == 0)
+				parentNodedisplay.increaseMinWidth(width);
 		}
 	}
+
 }

@@ -27,16 +27,15 @@ import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
+import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayViewZoomable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * @author Claudia Knobloch
- * 
- *         Based on original work by Greg Watson, Clement Chu and Daniel (JD)
- *         Barboza
+ * Based on original work by Greg Watson, Clement Chu and Daniel (JD)
+ * Barboza
  * 
  */
 public class NodesView extends ViewPart {
@@ -119,7 +118,7 @@ public class NodesView extends ViewPart {
 	}
 
 	private Composite composite = null;
-	private NodedisplayView nodedisplayView = null;
+	private NodedisplayViewZoomable nodedisplayView = null;
 	public Viewer viewer;
 	public ILguiItem fLguiItem = null;
 	private final ILMLListener lguiListener = new LguiListener();
@@ -142,6 +141,7 @@ public class NodesView extends ViewPart {
 
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		lmlManager.addListener(lguiListener, this.getClass().getName());
+
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		createNodedisplayView();
 	}
@@ -149,11 +149,6 @@ public class NodesView extends ViewPart {
 	@Override
 	public void dispose() {
 		lmlManager.removeListener(lguiListener);
-	}
-
-	public void generateNodesdisplay() {
-		fLguiItem = lmlManager.getSelectedLguiItem();
-		createNodedisplayView();
 	}
 
 	/*
@@ -168,7 +163,7 @@ public class NodesView extends ViewPart {
 	private void createNodedisplayView() {
 
 		if (!composite.isDisposed()) {
-			nodedisplayView = new NodedisplayView(null, null, composite);
+			nodedisplayView = new NodedisplayViewZoomable(null, null, composite);
 			if (fLguiItem != null) {
 				nodedisplayView.update(fLguiItem);
 			}
