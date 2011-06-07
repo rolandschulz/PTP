@@ -13,15 +13,12 @@
 <li><a href="#defn">Resource managers</a></li>
 <li><a href="#list">List of PTP-supported Resource managers</a></li>
 <li>Steps for defining a resource manager</li>
-<ol>
+<ol style="margin:0;">
 <li><a href="#creat">Creating a resource manager</a></li>
-<li>Configuring a resource manager</li>
-<ol type="a">
+<li><a href="#config">Configuring a resource manager</li>
+<ol type="a" style="margin:0;">
 <li><a href="#local">Local resource manager</a></li>
-<li><a href="#remote">Remote resource manager</a>
-  <ul>
-  <li>Remote service providers including <a href="#remote">Remote Tools</a></li></ul>
-</li>
+<li><a href="#remote">Remote resource manager</a></li>
 </ol>
 <li><a href="#spec">Resource manager-specific configuration</a> (OpenMPI example)</li>
 <li><a href="#finish">Finishing resource manager configuration</a></li>
@@ -37,38 +34,39 @@ then the job scheduler would be considered the resource manager for the system. 
 Open MPI runtime system would be considered the resource manager.</p>
 
 <p>In order for PTP to launch, monitor, and control applications on a target system, it must know what type of resource manager 
-is being employed. PTP allows you to configure and manage resource managers that correspond to target systems. Each resource manager 
+is being employed. PTP allows you to configure and manage resource managers that correspond to target systems. Each (PTP) resource manager 
 controls one target system, although a particular target system may have more than one type of resource manager.</p>
 
-<p>Resource managers can be <i>local</i> or <i>remote</i>. A local resource manager controls resources on the local machine running 
+<p>In PTP, resource managers can be <i>local</i> or <i>remote</i>. A local resource manager controls resources on the local machine running 
 Eclipse. A remote resource manager controls resources on a physically remote system. The process of configuring a local or remote 
 resource manager is the same.</p>
 <h2 id="list">List of PTP-Supported Resource Managers</h2>
 <p>
 <ul>
-<li><a href="02resMgrGenericRemoteLaunch.html">Generic Remote Launch</a></li>
+<li><a href="02resMgrGenericRemoteLaunch.html">Remote Launch</a></li>
 <li>Open MPI - covered in examples below
 <li><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.ll.help/html/IBMLLMainHelp.html">IBM
 		Loadleveler</a>
 <li><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.pe.help/html/PEMainHelp.html">IBM
 		Parallel Environment</a>
 <li>MPICH2 - setup is similar to Open MPI (not covered separately here)
-<li><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.pbs.help/html/toc.html">PBS</a>
+<li><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.pbs.doc.user/html/toc.html">PBS</a>
 <li><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.slurm.help/html/toc.html">SLURM</a>
 
 </ul>
-<p>More information about PTP Resource Managers and what they support can be
+<p>More information about PTP resource managers and what they support can be
 found on the <a href="http://wiki.eclipse.org/PTP/release_notes">Release Notes page</a> for this version of PTP.
-<p>&nbsp;
+<p>
 <h2 id="creat">Step 1: Creating a resource manager</h2>
-<p></p>
+<p>PTP uses a wizard to create and configure a resource manager that corresponds to the target system. Most of the wizard steps are the same regardless of
+the resource manager type. In the example below, we will show how to create and configure an Open MPI resource manager.</p>
 <ol>
-<li><p>Open the <b>Parallel Runtime Perspective</b> using 
+<li><p>Open the <b>Parallel Runtime Perspective</b> (or <b>System Monitoring Perspective</b> using 
 <b>Window &gt; Open Perspective &gt; Other...</b> and then choose <b>Parallel Runtime</b> from the 
 list of perspectives.</p><p><br></p>
 <p><img src="images/02RuntimePerspEmpty.png"></p><p><br></p>
 </li>
-<li><p>Right-click in <b>Resource Managers</b> view and select 
+<li><p>To start the wizard, right-click in <b>Resource Managers</b> view and select 
 <b>Add Resource Manager...</b></p><p><br></p>
 <p><img src="images/02addResMgr.png"></p><p><br></p>
 </li>
@@ -80,63 +78,44 @@ Environment.</p><p><br></p>
 <li><p>Select <b>Next &gt;</b></p></li>
 </ol>
 
-<h2 id="local">Step 2a: Configuring a local resource manager</h2>
+<h2 id="config">Step 2: Configuring a resource manager</h2>
 <p>
-In this example, we will show how to configure PTP to use a local resource manager, for example, where Eclipse is installed on your desktop machine or
-the head node of a cluster.
+The target system controlled by a resource manager can be either local or remote. To access the target system, PTP provides a number of
+<i>remote service providers</i>. Currently supported remote service providers include <b>Remote Tools</b> (part
+of PTP) and the <b>Eclipse Remote Systems Explorer (RSE)</b> which is an optional package that can be installed at any time. 
+<b>The preferred remote service provider is Remote Tools</b> which supports all the PTP and Remote Development Tools (RDT) functionality, however
+some installations use additional features that are only available in RSE. We will only consider Remote Tools here, but the steps for configuring RSE are similar.</p>
+<p>See also <a href="localVsRemote.html">Local vs. Remote Projects</a> for more information on the differences.
 </p>
 <p>
-The <b>Open MPI connection configuration</b> dialog is used to configure how Eclipse will communicate with the Open MPI environment.
+Once you have chosen a resource manager type, the <b>Open MPI connection configuration</b>
+wizard page will be displayed to allow you to specify the location of the target system. 
 </p>
-
+<h3 id="local">Step 2a: Local resource manager</h3>
+<p>
+To configure the simple case of a local resource manager, for example where you have Open MPI installed on your local machine, use the following steps:
+</p>
 <ol>
 	<li>
-		<p>To configure the simple case of a local resource manager, select <b>Local</b> as the <b>Remote service provider</b>.
+		<p>
+		Select <b>Local</b> as the <b>Remote service provider</b>.
 		</p><p><br></p>
 		<p><img src="images/02-RM-OpenMPI-Connection-Local.png"></p>
 		<p><br></p>
 	</li>
 	
 	<li>
-		<p>For the local case, the <b>Connection name</b> will be automatically set to <b>Local</b>.
+		<p>The <b>Connection name</b> will be automatically set to <b>Local</b> and can't be changed.
 		</p>
 		<p><br></p>
 	</li>
 
-	<li>
-		<p>
-		The <b>Tunneling Options</b> allow communication to be tunneled over a single connection if necessary. 
-		For the local case, it is not required, and only <b>None</b> can be selected.
-		</p>
-		<p><br></p>
-	</li>
-
-	<li>
-		<p>The <b>Local address for proxy connection</b> should be set to the local address of your local machine (<code>localhost</code>, or its host name or IP address).
-		</p>
-		<p><br></p>
-	</li>
-
-<li><p>Select <b>Next &gt;</b></p>
+    <li><p>Select <b>Next &gt;</b></p>
 </ol>
 
-<h2 id="remote">Step 2b: Configuring a remote resource manager</h2>
-<p>This example will demonstrate configuring a remote resource manager, where
-Eclipse and PTP are on your local laptop or workstation, and PTP
-controls a remote target system.
+<h3 id="remote">Step 2b: Remote resource manager</h3>
 
-<p>A remote resource manager allows PTP to control a remote target machine. To accomplish this, PTP uses the services of
-a <i>remote service provider</i>. Currently supported remote service providers include the <b>Remote Tools</b> package (a part
-of PTP) and the <b>Eclipse Remote Systems Explorer (RSE)</b> which is an optional package that can be installed at any time. 
-<b>The preferred remote service provider is Remote Tools</b> which supports all PTP and Remote Development Tools (RDT) functionality.</p>
-<p>See also <a href="localVsRemote.html">Local vs. Remote Projects</a> for more information on the differences.
-<p>
-RSE may be used if your remote system does not use the <code>ssh</code> 
-protocol for remote connections,
-or you wish to use the additional functionality that RSE provides. See the RSE documentation
-for more information. We will only consider Remote Tools here, but the steps for configuring RSE are similar.
-
-<p></p>
+<p>To configure a remote resource manager, use the following steps:</p>
 
 <ol>
 	<li>
@@ -149,16 +128,18 @@ for more information. We will only consider Remote Tools here, but the steps for
 	
 	<li>
 		<p>
-		At this point, you either need to use an existing connection or configure new a <b>Connection name</b>.
+		The <b>Connection name</b> will be blank at this point if no connections have been previously configured.
+		If you have previously configured a connection and wish to use it, select it here (it may be selected already).
 		</p>
 		<p><br></p>
 	</li>
-	<li>If you are using an existing Connection, select it here (it may be selected already).
-	<p><br></p>
-	</li>
-	<li>Configuring a new Connection name will differ depending on the remote service provider that you selected in the 
-	    previous step. 
-		The following steps describe configuring a <b>Remote Tools</b> location.  To create a new Connection,</li>
+	<li>The process for configuring a new connection will differ depending on the remote service provider that you selected in the 
+	    previous step. The following steps describe configuring a <b>Remote Tools</b> location. 
+		<p><br></p>
+		To create a new Connection:
+		</p>
+		<p><br></p>
+		</li>
 	<ol type="a">
 		<li>
 			<p>Select <b>New...</b></p>
@@ -183,17 +164,17 @@ for more information. We will only consider Remote Tools here, but the steps for
 	</ol>
 
 	<li>
-		<p>Back in the <b>Open MPI connection configuration</b> dialog,  
-		<b>Tunneling Options</b> allow communication to be tunneled over a single connection if supported by the remote service provider. 
-		To enable tunneling, select the <b>SSH port forwarding</b> radio button.</p>
+		<p>The new connection should now be selected in the <b>Connection name</b> field.
+		<p><br></p>
+		<p><img src="images/02-RM-OpenMPI-Connection-Remote1.png"></p>
 		<p><br></p>
 	</li>
-
+	
 	<li>
-		<p>
-		If you don't wish to use port forwarding, select the <b>None</b> radio button and enter the address of your local machine (its host name, or IP address) in 
-		the <b>Local address</b> field. You may need to reconfigure or disable the firewall on your local machine if this option is selection.
-		Note that if your site does not allow outbound connections from the remote machine to your local machine, then you <i>must</i> use port forwarding.</p>
+		<p>The <b>Advanced Options</b> can be used to control how the connection is used. By default, PTP will attempt to tunnel all communication over
+		a single ssh connection, however this can be disabled if the target system does not support port forwarding. Note that you may need to reconfigure 
+		or disable the firewall on your local machine if this option is selected. Also, if your site does not allow outbound connections from the remote 
+		machine to your local machine, then you <i>must</i> use port forwarding.</p>
 		<p><br></p>
 	</li>
 
