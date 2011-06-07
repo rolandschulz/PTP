@@ -362,12 +362,11 @@ public class TableHandler extends LguiHandler {
 		for (int i = 0; i < tableData.length; i++) {
 			final RowType row = table.getRow().get(i);
 			tableData[i] = new Row();
-			if (row.getOid() != null) {
-				tableData[i].setOid(row.getOid());
-				if (addColor) {
-					tableData[i].setColor(lguiItem.getOIDToObject().getColorById(row.getOid()));
-				}
+			tableData[i].setOid(row.getOid());
+			if (addColor) {
+				tableData[i].setColor(lguiItem.getOIDToObject().getColorById(row.getOid()));
 			}
+
 			final BigInteger jobIdIndex = getColumnIndex(table, ILguiItem.JOB_ID);
 			final Cell[] tableDataRow = new Cell[cids.length];
 			String jobId = null;

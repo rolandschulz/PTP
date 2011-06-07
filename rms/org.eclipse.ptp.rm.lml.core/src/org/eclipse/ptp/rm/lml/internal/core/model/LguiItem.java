@@ -696,6 +696,7 @@ public class LguiItem implements ILguiItem {
 				if (!status.isRemoved() && !jobsInTable.contains(status)) {
 					if (!status.isCompleted()) {
 						status.setState(JobStatusData.COMPLETED);
+						status.setOid(generateOid());
 					}
 					addJobToTable(table, status.getOid(), status);
 				}
