@@ -1,0 +1,483 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=ISO-8859-1">
+  <title>How to Run PBS Jobs in PTP</title>
+  <link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+<h1>How to Run PBS Jobs in PTP</h1>
+<h2><a name="Introduction"></a>Introduction</h2>
+<p>The PBS Eclipse plug-in, part of the <a
+ href="PLUGINS_ROOT/org.eclipse.ptp.doc.user/html/toc.html">
+Parallel Tools Platform</a> (PTP), allows you to launch and monitor
+applications
+on local or remote PBS (Portable Batch System) Distributed Resource
+Managers.<br>
+</p>
+<p>This plugin consists of two parts. The first is the Eclipse PTP
+plugin code which is responsible for the PTP views presented to the
+user and the user's interaction with those views. The second part is a
+resource manager (proxy), which is
+responsible for communicating with the PTP PBS plugin code, submitting
+the application as a job to the PBS batch system, and reporting
+application
+status to the PTP PBS plugin.<br>
+</p>
+<h2><a name="Requirements"></a>Requirements</h2>
+<p>In addition to having Eclipse and PTP installed, you need to have
+the following software packages installed.</p>
+<ul>
+  <li>CDT for Helios, available from the Eclipse download site;</li>
+  <li>If you wish to run jobs locally (LINUX), you will need to have
+installed a PBS system (<a href="http://www.pbsworks.com/">PBS Pro</a>,
+    <a
+ href="http://www.clusterresources.com/products/torque-resource-manager.php">PBS
+Torque</a>) there. <br>
+  </li>
+</ul>
+<h2><a name="Installation"></a>Installation</h2>
+<br>
+Nothing need be done beyond the normal intallation of the PTP
+feature.&nbsp; The PBS plugin features a pre-built executable .jar
+(pbs_proxy.jar) containing the proxy, which is then automatically
+deployed to the chosen location (local or remote) when the
+proxy is launched; there is nothing else to do by way of copying or
+compiling/building on the target resource.
+<h2><a name="Creating_a_Resource_Manager"></a>Creating a Resource
+Manager</h2>
+<p>The PBS Resource Manager has no general preferences to be set.&nbsp;
+However, when an instance of the manager is created, the user has the
+option to pre-define which batch-script template it will use, or to
+create a custom template, as will be described below.<br>
+</p>
+<p>To create a resource manager instance, first open the <span
+ style="font-weight: bold;">Parallel Runtime perspective:</span><br>
+</p>
+<ul>
+  <li>From the <span style="font-weight: bold;">Window</span> menu,
+select "Open Perspective" &gt;&gt; "Other"; in the dialog box, choose
+"Parallel Runtime", then "OK":</li>
+</ul>
+<p style="margin-left: 40px;">
+<img alt="Choose Parallel Runtime"
+ src="images/01chooseParallelRuntime.jpg"><br>
+<br>
+</p>
+<ul>
+  <li>Within the Parallel Runtime Perspective, in the "Resource
+Managers" view, right- (control-) click and select the
+"Add Resource Manager..." action:</li>
+</ul>
+<br>
+<div style="margin-left: 40px;"><img
+  alt="Add Resource Manager"
+ src="images/02addResourceManager.jpg"><br>
+<br>
+<br>
+</div>
+<ul>
+  <li>You should now see the first of five wizard pages that appear in
+the
+dialog ("Choose Resource Manager Type"). This one allows you to select
+which type of resource manager to
+instantiate:</li>
+</ul>
+<br>
+<div style="margin-left: 40px;"><img
+ alt="Select PBS"
+ src="images/03selectPBS.jpg"><br>
+<br>
+</div>
+<div style="margin-left: 40px;"><br>
+</div>
+<ul>
+  <li>In the "Choose Resource Manager Type" dialog, choose "PBS", and
+click "Next". The following page ("PBS Proxy Configuration")
+allows you to set up the PBS provider.&nbsp;&nbsp; The location can be
+either
+local or remote; in the former case, nothing else need be done on this
+page.&nbsp; For remote PBS, you will need to configure the connection
+to the host/resource.&nbsp; For this case, next to "Remote service
+provider", select the "Remote Tools" option:</li>
+</ul>
+<br>
+<div style="margin-left: 40px;"><img
+ alt="Use Remote Tools"
+ src="images/04useRemoteTools.jpg"><br>
+<br>
+</div>
+<div style="margin-left: 40px;"><span style="font-weight: bold;"></span><br>
+Next, still in the "PBS Proxy Configuration" dialog, click the "New"
+button next to "Connection name"
+to bring up the connection dialog entitled "Target Environment
+Configuration" as shown here:
+<br>
+<br>
+<br>
+<img alt="Configure Remote Connection"
+ src="images/05configureRemoteHost.jpg"><br>
+<p>Here under "Remote Host" you can name the resource, provide its
+address, and set up the
+SSH connection with the user name and password, or choose public key
+authentication.<br>
+</p>
+<p>When you have finished entering the appropriate values, click
+"Finish" to return to the wizard page.&nbsp; </p>
+<p>Also, back in the "PBS Proxy Configuration" dialog, <b>be sure to
+choose the "SSH port forwarding"</b> option under "Tunneling Options".<br>
+<br>
+</p>
+</div>
+<ul>
+  <li>Click "Next" to bring you to the template configuration
+page.&nbsp; Here you can set up which batch template will be used to
+configure launches for this resource manager (this can, however, be
+changed in the Run Configuration; see <a href="#The_PBS_Launch_Tab">Launch
+Tab</a>).&nbsp; You can also use this page to
+create, modify, or delete templates.</li>
+</ul>
+<br>
+<div style="margin-left: 40px;"><img
+ alt="Choose Template"
+ src="images/06chooseTemplate.jpg"><br>
+<br>
+</div>
+<div style="margin-left: 40px;">
+<p>Two pre-defined templates are provided with the PTP PBS
+plugin:&nbsp; the <span style="font-style: italic;">default_template</span>
+has only a minimal set of configurable job attributes; the <span
+ style="font-style: italic;">full_template</span> provides all of the
+standard PBS job attributes, and also allows you to insert additional
+commands into the batch script.&nbsp; In this view, the configurable
+values of the template are displayed, along with the the tool tip, if
+any, that can be seen in the run configuration view by hovering over
+the attribute name.<br>
+</p>
+<p>To create a new template, click the "Edit Template" button.&nbsp;
+This pops up a dialog asking you which template to display:<br>
+<br>
+</p>
+<p><img alt="Create New Template"
+ src="images/07createNewTemplate.jpg"><br>
+<br>
+</p>
+<p>If you are modifying a pre-existing template, just choose the
+template from the drop-down list; to create a new template, choose the
+template on which you wish to base the customized one.&nbsp; This now
+opens a dialog which allows you to edit and save the changes.<br>
+<br>
+</p>
+<p><img alt="Edit Template"
+ src="images/08editTemplate.jpg"><br>
+<br>
+</p>
+<p>A fuller description of the template contents can be found below (<a
+ href="#The_PBS_Batch_Script_Template">PBS Batch Script Template</a>).<br>
+</p>
+<p>To remove a template, use the "Delete Template" button. <br>
+</p>
+<p><span style="font-weight: bold;">Note:&nbsp; the two provided
+templates can neither be edited nor deleted; attempting to do so will
+display an error message.</span><br>
+</p>
+</div>
+<ul>
+  <li>Clicking "OK" should persist the changes and add the new template
+to the drop-down list (in the current example, <span
+ style="font-style: italic;">alr_template</span> was created):<br>
+  </li>
+</ul>
+<div style="margin-left: 40px;"><br>
+<img alt="New Template Added"
+ src="images/09newTemplateAdded.jpg"><br>
+<br>
+</div>
+<br>
+<div style="margin-left: 40px;">The new template is thus available for
+use by any PBS resource manager instance.<br>
+</div>
+<br>
+<ul>
+  <li>The last two pages of this wizard allow you to name the resource
+manager and create its configuration (or add it to an empty
+pre-existing one).&nbsp;&nbsp; After you have completed the wizard
+configuration and clicked "Finish", the new resource manager should
+appear in the Resource Managers view (see next section).<br>
+  </li>
+</ul>
+<br>
+We are now ready to deploy this resource manager and submit a job to
+it.&nbsp; The following section demonstrates how to use the PBS launch
+configuration to complete this process.<br>
+<h2 style="text-align: left;"><a name="Submitting_a_Job"></a>Submitting
+a Job</h2>
+<br>
+While not strictly necessary, we will first start the PBS resource
+manager before proceeding to the creation of a run configuration.&nbsp;
+<br>
+<br>
+<ul>
+  <li>Select the PBS resource manager and choose "Start Resource
+Manager" from the context menu (right mouse):<br>
+  </li>
+</ul>
+<br>
+<div style="margin-left: 40px;"><img
+ style="width: 620px; height: 220px;" alt="Start Resource Manager"
+ src="images/11startResourceManager.jpg"><br>
+</div>
+<br>
+<br>
+The PBS resource manager should turn green indicated it has been
+started successfully.<br>
+<br>
+<br>
+<div style="margin-left: 40px;"><img
+ alt="New Resource Manager"
+ src="images/10newResourceManager.jpg"><br>
+<br>
+</div>
+<p><!--  BRT: image would be nice here with green icon --></p>
+<p>In order to launch a job, you will also have to have defined an
+appropriate project, either a C/C++ project using CDT, or a Fortran
+project using Photran, and to have compiled an executable for it.<br>
+<br>
+Next, we will create a configuration for launching jobs to this
+manager.&nbsp; The procedure is identical to that for creating any Run
+Configuration in Eclipse.<br>
+<br>
+</p>
+<ul>
+  <li>Either select <span style="font-weight: bold;">Run</span>
+&gt;&gt; "Run Configurations ..." using the menu, or click on the small
+arrow to the right of the Run icon on the toolbar:</li>
+</ul>
+<br>
+<div style="margin-left: 40px;"><img
+ alt="Select Run Configuration"
+ src="images/12selectRunConfiguration.jpg"><br>
+<br>
+</div>
+<br>
+<ul>
+  <li>From the list of configuration types displayed, right- (control-)
+click on "Parallel Application", and choose "New".&nbsp; A new
+configuration will be added and the tab viewer associated with it
+displayed.&nbsp; If only one resource manager is available from the
+list
+in the Resource Managers view, the "Resource" tab will be automatically
+configured with it; otherwise, you will need to select a resource
+manager from the drop down list at the top of the view.&nbsp; Here, we
+have selected the PBS@Local resource manager, whose template was
+defined to be
+the customized <span style="font-style: italic;">alr_template</span>;
+we have also renamed this configuration "PBS_alr":</li>
+</ul>
+<br>
+<div style="margin-left: 40px;"><img
+ style="border: 1px solid ;
+ alt="Create PBS_alr" src="images/13createPBS_alr.jpg"><br>
+<br>
+</div>
+<br>
+Note at this point several things:&nbsp; first, the "Apply" button,
+which allows you to save changes, is not yet enabled.&nbsp; This is
+because there are still "errors" to be fixed before the configuration
+is considered valid.&nbsp; These errors are displayed at the top of the
+panel proceeded by an error icon.&nbsp; In our case we see displayed
+there "[Application]: Application program is not
+specified".&nbsp;&nbsp; The <span style="font-weight: bold;">Application</span>
+tab is warning us that we need to tell the manager which application it
+will run.&nbsp; Clicking on the tab switches to that wizard page, where
+you can choose the project (at least one project in the workspace needs
+to be defined, as mentioned above) and point the "Application program"
+to the executable path (if your proxy is remote, the remote file system
+will be accessed by the "Browse" button).&nbsp; In the current release,
+you also need to define the debugger (this will be fixed in a
+subsequent release).&nbsp; However, even if there is no debugger
+available, all you need to do is open the <span
+ style="font-weight: bold;">Debugger</span> tab, select the debugger
+(usually "SDM") and give it a dummy path (any file will do).&nbsp; You
+should now be able to save the configuration by clicking "Apply".<br>
+<br>
+<h3><a name="The_PBS_Launch_Tab"></a>The PBS Launch Attributes</h3>
+<br>
+The "Launch Attributes" area of the "Resources" tab, which allows you
+to configure the job -- in more specific
+terms, generate the script to be given to the PBS batch system via the
+proxy -- is built from the chosen template, and consists of three
+sections.&nbsp; The top panel allows you to switch out the current
+template for any of the other available ones, and also allows you to
+see what the batch script to be given to the proxy will look like, on
+the basis of the actual values you have provided.&nbsp; The second
+panel allows you to choose among no MPI command and the two standard
+ones (mpiexec, mpirun).&nbsp; If the chosen template provides for
+arbitrary commands to be added to the script, the two "Edit" buttons
+will appear; clicking on these brings up a dialog in which you may
+enter any arbitrary commands that will be understood by the <span
+ style="font-style: italic;">bash</span> shell.&nbsp; The bottom panel
+exposes the "#PBS" directives included in this template, and allows you
+to provide their values:&nbsp; "spinners" are provided for integer
+values, selection boxes for values with a fixed set of choices,
+checkboxes for boolean (true/false, yes/no) values, and text boxes for
+all the other types.&nbsp;&nbsp; Hovering over the attribute name will
+often give you additional information on formatting for that particular
+attribute.<br>
+<br>
+<br>
+<img alt="Launch Tab Details"
+ src="images/14launchTabDetails.jpg"><br>
+<br>
+<br>
+<h3>Persistence</h3>
+<br>
+When you click "Apply", the values you entered are saved to persistent
+store; however, there are actually two different mappings to be aware
+of in this context.&nbsp; The template values, such as "MPI Command",
+bash commands, job attribute values, etc., belong to <span
+ style="font-style: italic;">this particular</span> <span
+ style="font-style: italic;">Run Configuration</span> (in our example, <span
+ style="font-style: italic;">PBS_alr</span>); the choice of template,
+however, belongs to the <span style="font-style: italic;">Resource
+Manager</span> (in our example, <span style="font-style: italic;">PBS@Local</span>).&nbsp;&nbsp;
+To
+illustrate
+this,
+let
+us
+suppose
+we
+had
+two
+different configurations,
+<span style="font-style: italic;">PBS_A</span> and <span
+ style="font-style: italic;">PBS_B</span>; let us further suppose they
+both use the <span style="font-style: italic;">PBS@Local</span>
+manager:<br>
+<br>
+<ul>
+  <li><span style="font-style: italic;">PBS_A</span> changes the
+template for this resource manager.&nbsp; Inside <span
+ style="font-style: italic;">PBS_A</span>, you will now see the tab
+rebuilt for that template, but with the values (e.g., <span
+ style="font-style: italic;">Account_Name</span>, etc.) that were
+originally there.&nbsp; If you switched (after saving these changes) to
+    <span style="font-style: italic;">PBS_B</span>, you would now see
+its orignal values reappear inside the new template as well.</li>
+</ul>
+<ul>
+  <li>Now let us say that <span style="font-style: italic;">PBS_B</span>
+actually swaps out its resource manager for a different (PBS)
+one.&nbsp; Again, it will see the original attribute values reappear
+inside the template associated with the new resource manager.&nbsp; <span
+ style="font-style: italic;">PBS_A, </span>however<span
+ style="font-style: italic;">,</span> will remain unaffected.</li>
+</ul>
+<br>
+<h3>Launching</h3>
+<br>
+As with other resource managers, submission to the proxy takes place
+when you click on the "Run" button at the bottom of the Run
+Configuration.&nbsp; If the launch is successful, you should see your
+job appear in the <span style="font-weight: bold;">Jobs List</span>
+view; this viewer is populated by the update events generated by the
+proxy in connection with the polling of the batch system, so when the
+job completes, it will also be removed from this list.&nbsp;&nbsp; Any
+errors in the submission should appear in an error dialog.<br>
+<br>
+<h2><a name="The_PBS_Batch_Script_Template"></a>The PBS Batch Script
+Template</h2>
+<br>
+For those wishing to create customized templates, we provide here a
+description of the template contents.<br>
+<br>
+By way of illustration, the following reproduces the full_template
+provided with the PBS plugin:<br>
+<br>
+<pre>#!/bin/bash<br><br>#####################################################################<br>## Template for PBS Batch Script Generated by PBS Resource Manager<br>## Launch Tab<br>## <br>## This template contains all the currently recognized Job Attributes.<br>## <br>## Placeholders (@NAME@) are included for the PBS Job Attribute <br>## names as specified by qsub, plus the following internal variables:<br>##<br>## - env                     : place for defining extra environment<br>##                             variables (NB: should not be removed)<br>## - prependedBash           : dynamically change arbitrary bash <br>##                             commands which should precede the <br>##                             execution of the main application code<br>## - mpiCommand mpiOptions   : run under MPI<br>## - executablePath progArgs : the actual application<br>## - postpendedBash          : dynamically change arbitrary bash <br>##                             commands which should follow the <br>##                             execution of the main application code<br>##<br>## A template can also directly contain arbitrary shell scripting (not <br>## to be replaced via the 'prepended' and 'postpended' placeholders);<br>## these lines will remain fixed and will not be exposed through<br>## the Launch Tab for modification (they can however be altered by <br>## using the Resource Manager Properties "Edit" Tab).<br>##<br>## NOTE: We advise removing either the ncpus or the nodes resource,<br>##       depending on the PBS configuration (nodes is more common);<br>##       otherwise, the correct value must be set on both redundantly<br>##       in order for the MPI computation to be correct (and <br>##       some systems might reject a script with both set).<br>#####################################################################<br><br>#PBS -A @Account_Name@<br>#PBS -c @Checkpoint@<br>#PBS -C @directive@<br>#PBS -e @Error_Path@<br>#PBS -h @Hold_Types@<br>#PBS -j @Join_Path@<br>#PBS -k @Keep_Files@<br>#PBS -l arch=@Resource_List.arch@<br>#PBS -l cput=@Resource_List.cput@<br>#PBS -l file=@Resource_List.file@<br>#PBS -l host=@Resource_List.host@<br>#PBS -l mem=@Resource_List.mem@<br>#PBS -l ncpus=@Resource_List.ncpus@<br>#PBS -l nice=@Resource_List.nice@<br>#PBS -l nodes=@Resource_List.nodes@<br>#PBS -l ompthreads=@Resource_List.ompthreads@<br>#PBS -l pcput=@Resource_List.pcput@<br>#PBS -l pmem=@Resource_List.pmem@<br>#PBS -l pvmem=@Resource_List.pvmem@<br>#PBS -l vmem=@Resource_List.vmem@<br>#PBS -l walltime=@Resource_List.walltime@<br>#PBS -m @Mail_Points@<br>#PBS -M @Mail_Users@<br>#PBS -N @Job_Name@<br>#PBS -o @Output_Path@<br>#PBS -p @Priority@<br>#PBS -q @destination@<br>#PBS -r @Rerunnable@<br>#PBS -S @Shell_Path_List@<br>#PBS -u @User_List@<br>#PBS -v @Variable_List@<br>#PBS -V @export_all@<br>#PBS -W depend=@depend@<br>#PBS -W group_list=@group_list@<br>#PBS -W stagein=@stagein@<br>#PBS -W stageout=@stageout@<br>@env@<br>@prependedBash@<br>cd @directory@<br>@mpiCommand@ @mpiOptions@ @executablePath@ @progArgs@<br>@postpendedBash@<br><br></pre>
+The PBS Launch tab (Run Configuration) uses placeholder syntax to
+generate the actual batch script; in substituting the actual values, a
+placeholder marker (or, in the case of the PBS directives, the entire
+line) is eliminated if it is unused or would be an empty string.&nbsp;
+The following placeholders are valid:<br>
+<br>
+<div style="margin-left: 40px;"><span style="font-weight: bold;">@qsubAttribute@</span><br>
+<div style="margin-left: 40px;">These are the attributes associated
+with valid <span style="font-weight: bold; font-style: italic;">qsub</span>
+flags.&nbsp; The currently recognized flags are all contained in the <span
+ style="font-style: italic;">full_template</span>.&nbsp; These are
+attributes generally accepted by all systems; future releases may add <span
+ style="font-weight: bold;">PBS Pro</span>- or <span
+ style="font-weight: bold;">Torque</span>- specific attributes to this
+list.&nbsp; If the attribute name is currently not recognized, an error
+will be reported.<br>
+<br>
+</div>
+<span style="font-weight: bold;">@env@</span><br>
+<div style="margin-left: 40px;">If the user defines environment
+variables via the Run Configuration <span style="font-weight: bold;">Environment</span>
+tab, these will be captured and inserted as bash "export" commands at
+this location in the batch script.<br>
+<br>
+</div>
+<span style="font-weight: bold;">@prependedBash@</span>, <span
+ style="font-weight: bold;">@postpendedBash@</span>
+<div style="margin-left: 40px;">Any arbitrary bash commands added via
+the "Edit ... Commands" button/dialog are inserted here.&nbsp; <span
+ style="font-weight: bold;">Note</span>: the template itself can be
+modified to carry arbitrary commands; these, however, will not appear
+in the launch tab, and will not be configurable (that is, they will be
+the same for all Run Configurations using this template); these
+placeholders allow you to use the same template but vary the additional
+commands from Run Configuration to Run Configuration, just as you can
+the attribute values.<br>
+<br>
+</div>
+<span style="font-weight: bold;">@directory@</span><br>
+<div style="margin-left: 40px;">Not all PBS systems accept the <span
+ style="font-weight: bold;">-d <span style="font-style: italic;">qsub</span></span>
+option, so any explicit directory change associated with the execution
+of the main application is taken care of here.<br>
+<br>
+</div>
+<span style="font-weight: bold;">@mpiCommand@</span><br>
+<div style="margin-left: 40px;">Placeholder for the MPI command; if
+there is no MPI command, the <span style="font-weight: bold;">mpiOptions</span>
+placeholder is also eliminated. &nbsp;&nbsp; <br>
+</div>
+<br style="font-weight: bold;">
+<span style="font-weight: bold;">@mpiOptions@</span><br>
+<div style="margin-left: 40px;">Currently, this consists of the "-n
+[mpicores]" argument.&nbsp; This is automatically computed from the
+appropriate <span style="font-weight: bold; font-style: italic;">qsub</span>
+attribute:&nbsp; if <span style="font-style: italic;">ncpus</span> is
+defined, this is used; else the <span style="font-style: italic;">nodes</span>
+value is parsed for <span style="font-style: italic;">nodes</span> X <span
+ style="font-style: italic;">ppn</span>.<br>
+<br>
+</div>
+<span style="font-weight: bold;">@executablePath@</span><br>
+<div style="margin-left: 40px;">Replaced on the basis of the Run
+Configuration <span style="font-weight: bold;">Application</span>
+tab's executable path.<br>
+<br>
+</div>
+<span style="font-weight: bold;">@progArgs@</span><br>
+<div style="margin-left: 40px;">Replaced on the basis of the Run
+Configuration <span style="font-weight: bold;">Arguments</span> tab.<br>
+<br>
+</div>
+</div>
+Customization will normally involve either the inclusion or exclusion
+of individual <span style="font-style: italic;">qsubAttribute</span>s,
+or the bash command placeholders, but probably not the elimination or
+repositioning of the others; it may also involve the inclusion of other
+fixed bash commands or directives.<br>
+<div style="margin-left: 40px;"><br>
+</div>
+<p><a href="toc.html">Back to Table of Contents</a>
+</p>
+</body>
+</html>
