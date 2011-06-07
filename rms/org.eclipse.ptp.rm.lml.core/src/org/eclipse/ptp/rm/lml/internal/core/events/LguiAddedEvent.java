@@ -23,48 +23,9 @@ import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 
 /**
  * Class of the interface ILguiAddedEvent.
- * @author Claudia Knobloch
  */
-public class LguiAddedEvent implements ILguiAddedEvent{
-	
-//	/*
-//	 * The associated LMLManager
-//	 */
-//	private final LMLManager lmlManager;
-//	
-//	/*
-//	 * The associated ILguiItem
-//	 */
-//	private final ILguiItem lguiItem;
-//	
-//	/**
-//	 * Constructor
-//	 * @param lmlManager the associated LMLManager
-//	 * @param lguiItem the associated ILguiItem
-//	 */
-	public LguiAddedEvent() {
-//		this.lmlManager = lmlManager;
-//		this.lguiItem = lguiItem;
-	}
-//
-//	/*
-//	 * (non-Javadoc)
-//	 * 
-//	 * @see
-//	 * org.eclipse.ptp.rm.lml.core.elements.ILguiAddedEvent#getLgui()
-//	 */
-//	public ILguiItem getLguiItem() {
-//		return lguiItem;
-//	}
-//	
-//	/*
-//	 * (non-Javadoc)
-//	 * 
-//	 * @see
-//	 * org.eclipse.ptp.rm.lml.core.elements.ILguiAddedEvent#getLMLManager()
-//	 */
-//	public LMLManager getLMLManager() {
-//		return lmlManager;
-//	}
+public class LguiAddedEvent implements ILguiAddedEvent {
 
+	public LguiAddedEvent() {
+	}
 }

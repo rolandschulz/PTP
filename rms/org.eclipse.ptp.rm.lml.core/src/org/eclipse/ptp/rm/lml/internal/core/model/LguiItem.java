@@ -180,7 +180,7 @@ public class LguiItem implements ILguiItem {
 		 */
 		if (jobStatus == null) {
 			if (force) {
-				OverviewAccess overview = getOverviewAccess();
+				final OverviewAccess overview = getOverviewAccess();
 				if (overview != null) {
 					String oid = overview.getOIDByJobId(jobId);
 					if (oid == null) {
@@ -424,7 +424,7 @@ public class LguiItem implements ILguiItem {
 				int index = -1;
 				for (int i = 0; i < table.getRow().size(); i++) {
 					final RowType row = table.getRow().get(i);
-					String rowJobId = getTableHandler().getCellValue(table, row, JOB_ID);
+					final String rowJobId = getTableHandler().getCellValue(table, row, JOB_ID);
 					if (rowJobId.equals(jobId)) {
 						index = i;
 						break;
@@ -455,11 +455,13 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#update(java.io.InputStream)
 	 */
 	public void update(InputStream stream) throws JAXBException {
+
 		lgui = parseLML(stream);
 		if (listeners.isEmpty()) {
 			createLguiHandlers();
 		}
 		fireUpdatedEvent();
+
 		if (!cidSet()) {
 			setCid();
 		}
@@ -479,7 +481,7 @@ public class LguiItem implements ILguiItem {
 			final TableType table = getTableHandler().getTable(getGidFromJobStatus(jobStatus));
 			if (table != null) {
 				for (final RowType row : table.getRow()) {
-					String rowJobId = getTableHandler().getCellValue(table, row, JOB_ID);
+					final String rowJobId = getTableHandler().getCellValue(table, row, JOB_ID);
 					if (rowJobId.equals(jobId)) {
 						getTableHandler().setCellValue(table, row, JOB_STATUS, status);
 						break;

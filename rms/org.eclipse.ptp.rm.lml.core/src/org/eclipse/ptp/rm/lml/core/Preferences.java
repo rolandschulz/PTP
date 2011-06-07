@@ -23,8 +23,8 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 /**
- * Convenience class to facilitate using the new {@link IEclipsePreferences}
- * story. Adapted from org.eclipse.debug.internal.core.Preferences.
+ * Convenience class to facilitate using the new {@link IEclipsePreferences} story. Adapted from
+ * org.eclipse.debug.internal.core.Preferences.
  * 
  * @since 5.0
  * @noinstantiate This class is not intended to be instantiated by clients.
@@ -37,8 +37,7 @@ public final class Preferences {
 	private static final int INSTANCE_CONTEXT = 1;
 
 	/**
-	 * Adds the given preference listener to the {@link DefaultScope} and the
-	 * {@link InstanceScope}
+	 * Adds the given preference listener to the {@link DefaultScope} and the {@link InstanceScope}
 	 * 
 	 * @param qualifier
 	 * @param listener
@@ -107,8 +106,8 @@ public final class Preferences {
 	}
 
 	/**
-	 * Returns the default byte array value stored in the {@link DefaultScope}
-	 * for the given key or the specified default value if the key does not
+	 * Returns the default byte array value stored in the {@link DefaultScope} for the given key or the specified default value if
+	 * the key does not
 	 * appear in the {@link DefaultScope}
 	 * 
 	 * @param qualifier
@@ -285,9 +284,9 @@ public final class Preferences {
 	 * @return
 	 */
 	public static boolean isDefault(String qualifier, String name) {
-		String defVal = contexts[DEFAULT_CONTEXT].getNode(qualifier).get(name, null);
+		final String defVal = contexts[DEFAULT_CONTEXT].getNode(qualifier).get(name, null);
 		if (defVal != null) {
-			String val = contexts[INSTANCE_CONTEXT].getNode(qualifier).get(name, null);
+			final String val = contexts[INSTANCE_CONTEXT].getNode(qualifier).get(name, null);
 			return (val != null && val.equals(defVal));
 		}
 		return false;
@@ -315,7 +314,7 @@ public final class Preferences {
 		try {
 			contexts[DEFAULT_CONTEXT].getNode(qualifier).flush();
 			contexts[INSTANCE_CONTEXT].getNode(qualifier).flush();
-		} catch (BackingStoreException bse) {
+		} catch (final BackingStoreException bse) {
 			LMLCorePlugin.log(bse);
 		}
 	}

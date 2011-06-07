@@ -8,6 +8,7 @@
  * Contributors:
  * 		Carsten Karbach, Claudia Knobloch, FZ Juelich
  */
+
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
 import org.eclipse.ptp.rm.lml.core.model.ILguiHandler;
@@ -17,14 +18,14 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 /**
  * The LML-Manager in class LML administrates different encapsulated classes,
  * which manage special parts of the lml-object-hierarchy. These classes, which
- * get information from the lml-tree, sort parts of the information or add 
+ * get information from the lml-tree, sort parts of the information or add
  * extra-information to the mostly redundant-free lml-tree, have some
  * functions in common. These functions are collected in this interface.
  * So every module, which handles the LML-datamodel within the LML-class
  * should extend this class.
  * 
  */
-public class LguiHandler implements ILguiHandler{
+public class LguiHandler implements ILguiHandler {
 
 	/**
 	 * instance of LML, which is the surrounding handler of this
@@ -33,20 +34,21 @@ public class LguiHandler implements ILguiHandler{
 	 * the LguiType-instance was changed.
 	 */
 	protected ILguiItem lguiItem;
-	
+
 	/**
 	 * saves current lml-model, which is partly managed by this class
 	 */
 	protected LguiType lgui;
-	
+
 	/**
-	 * @param lguiItem surrounding lml-manager needed to fire events, if this handler changed data
+	 * @param lguiItem
+	 *            surrounding lml-manager needed to fire events, if this handler changed data
 	 */
-	public LguiHandler(ILguiItem lguiItem, LguiType lgui){
+	public LguiHandler(ILguiItem lguiItem, LguiType lgui) {
 		this.lguiItem = lguiItem;
 		this.lgui = lgui;
 	}
-	
+
 	public void update(LguiType lgui) {
 		this.lgui = lgui;
 	}

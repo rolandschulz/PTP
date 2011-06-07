@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- * 		Claudia Knobloch
+ * 		Claudia Knobloch, FZ Juelich
  */
 package org.eclipse.ptp.rm.lml.core.messages;
 

@@ -20,29 +20,30 @@ import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 
 /**
  * This interface manages the handling of different events.
- * @author Claudia Knobloch
  */
 public interface ILMLListener {
-	
+
 	/**
 	 * Handles an IJobListSortedEevnt.
-	 * @param e an IJobListSortedEvent
+	 * 
+	 * @param e
+	 *            an IJobListSortedEvent
 	 */
 	public void handleEvent(IJobListSortedEvent e);
-	
-	public void handleEvent(ITableColumnChangeEvent e);
+
+	public void handleEvent(ILguiAddedEvent event);
+
+	public void handleEvent(ILguiRemovedEvent event);
+
+	public void handleEvent(IMarkObjectEvent event);
 
 	public void handleEvent(ISelectedObjectChangeEvent event);
 
-	public void handleEvent(IMarkObjectEvent event);
+	public void handleEvent(ITableColumnChangeEvent e);
 
 	public void handleEvent(IUnmarkObjectEvent event);
 
 	public void handleEvent(IUnselectedObjectEvent event);
-	
+
 	public void handleEvent(IViewUpdateEvent event);
-	
-	public void handleEvent(ILguiAddedEvent event);
-	
-	public void handleEvent(ILguiRemovedEvent event);
 }
