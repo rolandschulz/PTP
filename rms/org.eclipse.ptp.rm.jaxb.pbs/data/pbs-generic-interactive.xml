@@ -11,10 +11,10 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-generic-interactive">
 	<control-data>
-	   <!-- this is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
-      <property name="control.queue.name" visible="false">
-         <link-value-to>destination</link-value-to>
-      </property>
+		<!-- this is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
+		<property name="control.queue.name" visible="false">
+			<link-value-to>destination</link-value-to>
+		</property>
 		<property name="queues" visible="false"/>
 		<property name="mpiPrefix" visible="false">
 			<default>${ptp_rm:mpiCommand#value} -np ${ptp_rm:mpiCores#value}</default>
@@ -42,9 +42,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
 			<validator>
-            <regex expression="\d\d:\d\d:\d\d"/>
-            <error-message>format must be hh:mm:ss</error-message>
-         </validator>
+				<regex expression="\d\d:\d\d:\d\d"/>
+				<error-message>format must be hh:mm:ss</error-message>
+			</validator>
 		</attribute>
 		<start-up-command name="get-queues">
 			<arg>qstat</arg>
@@ -70,17 +70,17 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<input isUndefinedIfMatches=".+ -np">${ptp_rm:mpiPrefix#value}</input>
 			<input>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</input>
 			<stdout-parser delim="\n">
-			   <target ref="@jobId">
-               <match>
-                  <expression flags="DOTALL">qsub:.+job[\s]+([\d]+[.].+)[\s]to start.*</expression>
-                  <set field="name">
-                     <entry valueGroup="1"/>
-                  </set>
-                  <set field="value">
-                     <entry value="SUBMITTED"/>
-                  </set>
-               </match>
-            </target>
+				<target ref="@jobId">
+					<match>
+						<expression flags="DOTALL">qsub:.+job[\s]+([\d]+[.].+)[\s]to start.*</expression>
+						<set field="name">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="value">
+							<entry value="SUBMITTED"/>
+						</set>
+					</match>
+				</target>
 				<target ref="@jobId">
 					<match>
 						<expression flags="DOTALL">qsub:[\s]+job[\s]+([\d]+[.].+)[\s]ready.*</expression>
@@ -108,10 +108,76 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				</target>
 			</stderr-parser>
 		</submit-interactive>
+		<get-job-status name="get-job-status" ignoreExitStatus="true">
+			<arg>qstat</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>[\d]+[.].+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
+						<set field="value">
+							<entry valueGroup="1"/>
+						</set>
+					</match>
+					<test op="EQ">
+						<value>#value</value>
+						<value>Q</value>
+						<set field="value">
+							<entry value="QUEUED_ACTIVE"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>R</value>
+						<set field="value">
+							<entry value="RUNNING"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>S</value>
+						<set field="value">
+							<entry value="SUSPENDED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>C</value>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>E</value>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>H</value>
+						<set field="value">
+							<entry value="SYSTEM_ON_HOLD"/>
+						</set>
+					</test>
+				</target>
+			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>.+</expression>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</match>
+				</target>
+			</stderr-parser>
+		</get-job-status>
 		<terminate-job name="cancel" ignoreExitStatus="true">
-         <arg>qdel</arg>
-         <arg>${ptp_rm:@jobId#name}</arg>
-      </terminate-job>
+			<arg>qdel</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+		</terminate-job>
 		<launch-tab>
 			<dynamic>
 				<title>Basic PBS Settings</title>
@@ -237,8 +303,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		</launch-tab>
 	</control-data>
 	<monitor-data schedulerType="PBS">
-      <driver>
-         <name></name>
-      </driver>
-   </monitor-data>
+		<driver>
+			<name></name>
+		</driver>
+	</monitor-data>
 </resource-manager-builder>
