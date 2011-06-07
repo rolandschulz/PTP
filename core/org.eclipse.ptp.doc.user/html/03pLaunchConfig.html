@@ -1,13 +1,13 @@
 <html>
 <head>
-<title>Launching Parallel Programs</title>
+<title>Running Parallel Programs</title>
 <link rel="stylesheet" type="text/css" href="help.css">
 <script type="text/javascript" src="thumb.js"> </script>
 </head>
 <body>
 
-<h1 id="top">Launching Parallel Programs</h1>
-<p>This section describes how to launch a parallel program. In PTP,
+<h1 id="top">Running Parallel Programs</h1>
+<p>This section describes how to run a parallel program. In PTP,
 this is called &quot;launching a job&quot;. Launching requires the
 services of a resource manager, which should have been set up as
 described in <a href="02resMgrSetup.html">Resource Managers</a>. PTP is
@@ -26,7 +26,7 @@ used to launch subsequent normal or debug jobs.</p>
 
 <p>This section only describes how to launch a parallel program. A
 description of how to monitor the application launch is provided in the
-<a href="05monitoring.html">Monitoring Parallel Machines and Jobs</a>. A
+<a href="05monitoring.html">Monitoring Jobs and Systems</a>. A
 description of how to debug an application is provided in the <a
 	href="06parDebugging.html">Parallel Debugging</a>.</p>
 
@@ -42,7 +42,6 @@ description of how to debug an application is provided in the <a
 	tab</b></a></li>
 	<li><a href="#synchronize">Completing the <b>Synchronize
 	tab</b></a></li>
-	<li><a href="#debugger">Completing the <b>Debugger tab</b></a></li>
 	<li><a href="#launch">Launching the application </a></li>
 </ol>
 <h2 id="create">Step 1: Create a Parallel Application launch
@@ -52,7 +51,7 @@ before it is possible to create a parallel application run
 configuration.</p>
 <ol>
 	<li>
-	<p>To run the job normally, open the <b>Run Configuration</b>
+	<p>To set up a launch configuration, open the <b>Run Configuration</b>
 	dialog using <b>Run &gt; Run Configurations...</b> or click the run
 	icon menu on the tool bar and select <b>Run Configuration...</b>.</p>
 	</p>
@@ -60,18 +59,9 @@ configuration.</p>
 	</p>
 	</li>
 	<li>
-	<p>To run the job under the control of the debugger, open the <b>Debug
-	Configuration</b> dialog using <b>Run &gt; Debug Configurations...</b> or
-	click the debug icon menu on the tool bar and select <b>Debug
-	Configuration...</b>.</p>
-	<p><br>
-	</p>
-	</li>
-	<li>
 	<p>Create a new Parallel Application launch configuration by
 	clicking <b>Parallel Application</b> and then clicking on the <b>New</b>
-	button icon. For brevity, only a normal launch configuration will be
-	shown.</p>
+	button icon.</p>
 	<p><br>
 	</p>
 	<p><img src="images/03launch1.png"></p>
@@ -94,9 +84,7 @@ different resource managers. This description only applys to the Open
 MPI and MPICH2 resource managers.</p>
 <ol>
 	<li>
-	<p>Select a resource manager you wish to use from the drop-down. If
-	there is only one resource manager, then it will be automatically
-	selected. If the resource manager you have selected is not running,
+	<p>Select a resource manager you wish to use from the drop-down. If the resource manager you have selected is not running,
 	then you will see a warning message in the dialog.</p>
 	<p><br>
 	</p>
@@ -305,87 +293,12 @@ produced by the parallel application execution.</p>
 	</li>
 </ol>
 
-<h2 id="debugger">Step 7: Complete the Debugger tab</h2>
-<p>The <b>Debugger tab</b> is only required if you are planning to
-debug the application. However you must complete it now, even if you are
-only planning to launch a non-debug job.</p>
-<ol>
-	<li>
-	<p>If no debugger is visible in the <b>Debugger</b> drop-down,
-	select one. This is the debugger that will control the parallel debug
-	session. Currently only <b>SDM</b> is supported (SDM stands for
-	Scalable Debug Manager), so select this.</p>
-	<p><br>
-	</p>
-	</li>
-	<li>
-	<p>If you wish the debugger to automatically suspend the
-	application on launch, make sure <b>Stop in main() on startup</b> is
-	checked</p>
-	<p><br>
-	</p>
-	</li>
-	<li>
-	<p>Under Debugger options, make sure that the path to debugger
-	executable is correct.</p>
-	<p><br>
-	</p>
-	<p>If you are debugging on the local machine, this path should
-	point to the <code>sdm</code> executable in your Ecilpse installation's
-	<code>plugins/org.eclipse.ptp.<i>os.arch_version</i>/bin</code>
-	directory, where <code><i>os.arch_version</i></code> is your operating
-	system (<code>linux</code>, <code>macosx</code>, or <code>aix</code>),
-	architecture (<code>x86</code>, <code>x86_64</code>, or <code>ppc</code>),
-	and version number of the plugin (e.g. <code>4.0.0.201006081437</code>).</p>
-	<ul><li><b>Note:</b> This may have required an extra step during installation to build this executable.</ul>
-	<p><br>
-	</p>
-	<p>If you are debugging remotely, then this path will be the path
-	to where the <code>sdm</code> executable was installed on the remote
-	machine.</p>
-	<p><br>
-	</p>
-	</li>
-	<li>
-	<p>Set the <b>Debugger session address</b>. This is the address
-	that the debugger will connect to when it starts, and will depend on
-	where you are launching the application:</p>
-	<p><br>
-	</p>
-	<ul>
-		<li>
-		<p>If you are launching onto the local machine, or onto a remote
-		machine using port forwarding, use <code>localhost</code>. (Note that
-		you will need to have the <code>GatewayPorts</code> option set to <code>yes</code>
-		in the <code>sshd</code> configuration file on the remote system for
-		this to work with port forwarding.)</p>
-		<p><br>
-		</p>
-		</li>
-		<li>
-		<p>If you are launching onto a remote machine without using port
-		forwarding, then this should be the address of the local machine (the
-		one running Eclipse). <i>This address must be accessible from the
-		remote machine.</i>. If your local network configuration precludes the
-		remote machine accessing your local machine, you will need to
-		reconfigure the resource manager to use port forwarding.</p>
-		<p><br>
-		</p>
-		<p><img src="images/03launch5.png"></p>
-		</li>
-	</ul>
-
-	</li>
-</ol>
-
-<h2 id="launch">Step 8: Launching the application</h2>
+<h2 id="launch">Step 7: Launching the application</h2>
 <p>The launch configuration is now complete. Click on the <b>Apply</b>
-button to save the configuration. If you are running the application,
-click on the <b>Run</b> button to launch the job, and Eclipse will
-automatically switch to the <b>Parallel Runtime Perspective</b>. If you
-are debugging the application, click on the <b>Debug</b> button and
-Eclipse will automatically switch to the <b>Parallel Debug
-Perspective</b>.
+button to save the configuration and then
+click on the <b>Run</b> button to launch the job.
+Switch to the <b>Parallel Runtime</b> perspective (or <b>System Monitoring</b> perspective)
+to view the status of the job and inspect the program output.
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to
 Table of Contents</a>
 </body>
