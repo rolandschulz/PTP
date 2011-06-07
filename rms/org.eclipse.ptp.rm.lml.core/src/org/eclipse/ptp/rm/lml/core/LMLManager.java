@@ -104,8 +104,10 @@ public class LMLManager {
 	}
 
 	public void addComponent(String gid) {
-		final String type = fLguiItem.getLayoutAccess().setComponentActive(gid, true);
-		fireAddView(gid, type);
+		if (fLguiItem.getLayoutAccess() != null) {
+			final String type = fLguiItem.getLayoutAccess().setComponentActive(gid, true);
+			fireAddView(gid, type);
+		}
 	}
 
 	/*
@@ -192,6 +194,7 @@ public class LMLManager {
 		fLguiItem.getRequestXml(os);
 	}
 
+	@SuppressWarnings("unused")
 	public int getSelectedLguiIndex(String title) {
 		int index = 0;
 		int i = 0;
@@ -243,19 +246,20 @@ public class LMLManager {
 	}
 
 	public void removeComponent(String gid) {
-		fLguiItem.getLayoutAccess().setComponentActive(gid, false);
-		fireRemoveView(gid);
+		if (fLguiItem.getLayoutAccess() != null) {
+			fLguiItem.getLayoutAccess().setComponentActive(gid, false);
+			fireRemoveView(gid);
+		}
 	}
 
 	public void removeLgui(String title) {
-		final ILguiItem item = LGUIS.get(title);
 		LGUIS.remove(title);
 		if (LGUIS.isEmpty()) {
 			fLguiItem = null;
 		} else {
 			fLguiItem = LGUIS.get(getLguis()[0]);
 		}
-		fireRemovedLgui(item);
+		fireRemovedLgui(null);
 	}
 
 	public void removeListener(ILMLListener listener) {
@@ -300,13 +304,17 @@ public class LMLManager {
 	}
 
 	public void setTableColumnActive(String gid, String title) {
-		fLguiItem.getTableHandler().setTableColumnActive(gid, title, true);
-		fireChangeTableColumn();
+		if (fLguiItem.getTableHandler() != null) {
+			fLguiItem.getTableHandler().setTableColumnActive(gid, title, true);
+			fireChangeTableColumn();
+		}
 	}
 
 	public void setTableColumnNonActive(String gid, String title) {
-		fLguiItem.getTableHandler().setTableColumnActive(gid, title, false);
-		fireChangeTableColumn();
+		if (fLguiItem.getTableHandler() != null) {
+			fLguiItem.getTableHandler().setTableColumnActive(gid, title, false);
+			fireChangeTableColumn();
+		}
 	}
 
 	/*
@@ -335,7 +343,7 @@ public class LMLManager {
 			lguiItem.getCurrentLayout(output);
 			try {
 				lguiItem.update(input);
-			} catch (JAXBException e) {
+			} catch (final JAXBException e) {
 				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
 						.getLocalizedMessage()));
 			}
