@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -132,7 +132,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private final IJAXBResourceManagerConfiguration config;
 	private final ConnectionChangeListener connectionListener;
 	private Map<String, String> launchEnv;
-	private Map<String, ICommandJob> jobTable;
+	private ICommandJob pseudoTerminal;
 	private ICommandJobStatusMap jobStatusMap;
 	private JobIdPinTable pinTable;
 	private RMVariableMap rmVarMap;
@@ -172,18 +172,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * @return table of open remote processes
-	 */
-	public Map<String, ICommandJob> getJobTable() {
-		return jobTable;
-	}
-
-	/**
 	 * @return any environment variables passed in through the
 	 *         LaunchConfiguration
 	 */
 	public Map<String, String> getLaunchEnv() {
 		return launchEnv;
+	}
+
+	/**
+	 * @return open remote processe
+	 */
+	public ICommandJob getPseudoTerminal() {
+		return pseudoTerminal;
 	}
 
 	/**
@@ -235,6 +235,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	public void jobStateChanged(String jobId, IJobStatus status) {
 		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
 		getResourceManager().updateJob(jobId, status);
+	}
+
+	/**
+	 * @param pseudoTerminal
+	 *            open remote process
+	 */
+	public void setPseudoTerminal(ICommandJob pseudoTerminal) {
+		this.pseudoTerminal = pseudoTerminal;
 	}
 
 	/*
@@ -507,6 +515,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		ICommandJobStatus status = job.getJobStatus();
+		if (pseudoTerminal != null && pseudoTerminal.getJobStatus() == status) {
+			if (pseudoTerminal != job) {
+				return status;
+			}
+		}
 
 		/*
 		 * property containing actual jobId as name was set in the wait call; we
@@ -684,13 +697,16 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private void doOnShutdown() throws CoreException {
 		List<CommandType> onShutDown = controlData.getShutDownCommand();
 		runCommands(onShutDown);
-		for (ICommandJob job : jobTable.values()) {
-			job.terminate();
-			ICommandJobStatus status = job.getJobStatus();
+		new ArrayList<String>();
+
+		if (pseudoTerminal != null) {
+			ICommandJobStatus status = pseudoTerminal.getJobStatus();
 			status.setState(IJobStatus.CANCELED);
+			pseudoTerminal.terminate();
 			String jobId = status.getJobId();
 			maybeForceExternalTermination(jobId);
 			jobStateChanged(jobId, status);
+			pseudoTerminal = null;
 		}
 	}
 
@@ -709,7 +725,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void initialize(IProgressMonitor monitor) throws Throwable {
 		launchEnv = new TreeMap<String, String>();
-		jobTable = new HashMap<String, ICommandJob>();
 		pinTable = new JobIdPinTable();
 
 		/*

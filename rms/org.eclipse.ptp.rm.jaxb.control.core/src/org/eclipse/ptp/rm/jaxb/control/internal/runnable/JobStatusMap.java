@@ -47,7 +47,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	public void addJobStatus(String jobId, ICommandJobStatus status) {
 		boolean notifyAdd = false;
 		synchronized (map) {
-			if (!map.containsKey(jobId)) {
+			if (!map.containsKey(jobId) && !IJobStatus.UNDETERMINED.equals(status.getState())) {
 				notifyAdd = true;
 			}
 			map.put(jobId, status);

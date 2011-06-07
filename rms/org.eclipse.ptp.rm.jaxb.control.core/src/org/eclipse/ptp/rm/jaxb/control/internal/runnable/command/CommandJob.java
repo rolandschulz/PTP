@@ -317,7 +317,6 @@ public class CommandJob extends Job implements ICommandJob {
 				}
 			}
 			cancel();
-			control.getJobTable().remove(getName());
 		}
 	}
 
@@ -333,9 +332,9 @@ public class CommandJob extends Job implements ICommandJob {
 
 	/**
 	 * If this process has no input, execute it normally. Otherwise, if the
-	 * process is to be kept open, check for the command job in the job table;
-	 * if it is there and still alive, send the input to it; if not, start the
-	 * process, and then send the input.
+	 * process is to be kept open, check for the pseudoTerminal job; if it is
+	 * there and still alive, send the input to it; if not, start the process,
+	 * and then send the input.
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
@@ -344,14 +343,20 @@ public class CommandJob extends Job implements ICommandJob {
 			jobThread = Thread.currentThread();
 			boolean input = !command.getInput().isEmpty();
 			if (input) {
-				ICommandJob job = control.getJobTable().get(getName());
+				ICommandJob job = control.getPseudoTerminal();
 				if (job != null && job.isActive()) {
 					IRemoteProcess process = job.getProcess();
 					if (process != null && !process.isCompleted()) {
 						progress.done();
+						jobStatus = job.getJobStatus();
 						return writeInputToProcess(process);
 					} else {
 						job.terminate();
+						/*
+						 * since the process is dead, termination is just
+						 * clean-up, no need to force external termination
+						 */
+						control.setPseudoTerminal(null);
 					}
 				}
 			}
@@ -374,6 +379,7 @@ public class CommandJob extends Job implements ICommandJob {
 			if (uuid != null) {
 				if (waitForId) {
 					jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
+					jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
 					try {
 						jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap(), progress.newChild(20));
 					} catch (CoreException failed) {
@@ -398,9 +404,8 @@ public class CommandJob extends Job implements ICommandJob {
 					}
 					p.setName(uuid);
 					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
+					jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
 				}
-
-				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
 
 				if (monitor.isCanceled()) {
 					return status;
@@ -471,7 +476,7 @@ public class CommandJob extends Job implements ICommandJob {
 			}
 
 			if (keepOpen) {
-				control.getJobTable().put(getName(), this);
+				control.setPseudoTerminal(this);
 				progress.done();
 				return Status.OK_STATUS;
 			}

@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -194,6 +197,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 			 */
 			if (open != null) {
 				open.terminate();
+				open.getJobStatus().setState(IJobStatus.CANCELED);
 				return true;
 			}
 
@@ -299,7 +303,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @return state of the job (not of the submission process).
 	 */
 	public synchronized String getState() {
-		checkProcessStateForTermination();
+		if (stateDetail != IJobStatus.CANCELED) {
+			checkProcessStateForTermination();
+		}
 		return state;
 	}
 
@@ -307,7 +313,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @return more specific state identifier.
 	 */
 	public synchronized String getStateDetail() {
-		checkProcessStateForTermination();
+		if (stateDetail != IJobStatus.CANCELED) {
+			checkProcessStateForTermination();
+		}
 		return stateDetail;
 	}
 
@@ -549,6 +557,22 @@ public class CommandJobStatus implements ICommandJobStatus {
 		boolean changed = dirty && !UNDETERMINED.equals(state);
 		dirty = false;
 		return changed;
+	}
+
+	/**
+	 * Gives the string field values in list form.
+	 */
+	@Override
+	public String toString() {
+		List<String> s = new ArrayList<String>();
+		s.add(jobId);
+		s.add(owner);
+		s.add(queue);
+		s.add(state);
+		s.add(stateDetail);
+		s.add(remoteOutputPath);
+		s.add(remoteErrorPath);
+		return s.toString();
 	}
 
 	/*
