@@ -34,8 +34,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * Based on original work by Greg Watson, Clement Chu and Daniel (JD)
- * Barboza
+ * Based on original work by Greg Watson, Clement Chu and Daniel (JD) Barboza
  * 
  */
 public class NodesView extends ViewPart {
@@ -51,7 +50,7 @@ public class NodesView extends ViewPart {
 						nodedisplayView.update(fLguiItem);
 						nodedisplayView.setVisible(true);
 					}
-					if (fLguiItem != null) {
+					if (fLguiItem != null && fLguiItem.getNodedisplayAccess() != null) {
 						setPartName(fLguiItem.getNodedisplayAccess().getTitle(gid));
 					}
 				}
@@ -109,7 +108,7 @@ public class NodesView extends ViewPart {
 						nodedisplayView.update(fLguiItem);
 						nodedisplayView.setVisible(true);
 					}
-					if (fLguiItem != null) {
+					if (fLguiItem != null && fLguiItem.getNodedisplayAccess() != null) {
 						setPartName(fLguiItem.getNodedisplayAccess().getTitle(gid));
 					}
 				}
