@@ -195,7 +195,7 @@ public class DisplayNode implements Comparable<DisplayNode> {
 	 */
 	public String getImplicitName() {
 		if (scheme == null) {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 		return LMLCheck.getLevelName(scheme, level.get(level.size() - 1));
 	}
