@@ -75,30 +75,28 @@ Note that directories and files are created for new configurations the first tim
 <p>&nbsp;
 <h2 id="props">Project Properties specific to Synchronized Projects</h2>
 <p>To bring up Project Properties, In the Project Explorer view, select the Project and 
-<b>RightMouse > Project Properties</b> (bottom of context menu)
+<b>RightMouse > Properties</b> (bottom of context menu)
 <p><img src="images/sync-projProperties.png">
 <p>&nbsp;
 
+<h2 id="includes">Remote Include Paths</h2>
+<p>At the time of the PTP 5.0 release (June 2011),
+ the  mechanism for supporting remote includes in CDT  
+ does not work automatically with synchronized projects yet, as it 
+ requires some integration with the remote scanner discovery (which discovers what includes/defines 
+ are set on the remote system). 
 
+<p>You can currently manually configure remote include files as follows.
+Open the project properties, 
+ go to <b>C/C++ General > Paths and Symbols</b>. Then choose the build configuration you want to use. 
+ Click on <b>GNU C</b> and remove the existing paths. Then add new paths to the remote include directories using 
+ UNC notation (e.g. <code>//connectionName/usr/include</code> where 'connnectionName' is the name of the connection you specified 
+ for Remote Tools).  
 
-<!--  question: where to set up paths & symbols to e.g. set MPI include path? -->
+<p>See also 
+<a href="http://wiki.eclipse.org/PTP/sync-projects">Synchronized Projects usage info on the PTP Wiki page</a>
+for information available after PTP 5.0 release.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<p>&nbsp;<p>&nbsp;<p>&nbsp;
 <p>&nbsp;<p>&nbsp;<p>&nbsp;
 
 <p>See <a href="localVsRemote">Local Vs. Remote Projects</a> for more information on the different kinds of local and remote projects. <p>&nbsp;
