@@ -37,16 +37,16 @@ and in the wizard selection dialog, select <b>Remote > Synchronized Project</b>.
 <p>Or, from the context menu (right-mouse) in the Project Explorer,
 select <b>New > Synchronized Project</b>
 <p><img src="images/sync-newprojContext.png">
-<p>Then give the project a name and select a project type
+<p>Then give the project a name and select a project type. Choose <b>Makefile Project > Empty Project</b>
 <p><img src="images/sync-newprojCreate.png">
-<p>Select Next >
-<p>On the next page, select a Synchronization Provider (Git) and select an existing connection or create a new one. 
+<p>Select <b>Next > </b> and then <b>Next > </b> again.
+<p>On the "Configure Remote Synchronization" page, select a Synchronization Provider (Git) and select an existing connection or create a new one. 
 <p><img src="images/sync-newprojNewConnection.png">
 <p>Here we create a new remote connection with the <b>Remote Tools</b> Remote Provider by selecting the <b>New...</b> button.
 The Target Environment Configuration dialog is shown. Fill in host name, user, and password (or other authentication
 information).
 <p><img src="images/sync-newprojConnection.png">
-<p>Select Finish.  The connection will be tested at this
+<p>Select <b>Finish</b>.  The connection will be tested at this
 point before returning to the <b>Configure Remote Synchronization</b> page.
 
 <p>Back on the <b>Configure Remote Synchronization</b> page:
@@ -70,9 +70,12 @@ Sync'ing is done between the local workspace and the active configuration.
 Note that there is a "Workspace" configuration too, so that you can also build locally.
 (If "Workspace" is the active configuration, no sync'ing is done.)
 Note that directories and files are created for new configurations the first time they are sync'ed.
+<p>See below for Project Properties showing Configurations for the Synchronized project.
 
 <p>&nbsp;
 <h2 id="props">Project Properties specific to Synchronized Projects</h2>
+<p>To bring up Project Properties, In the Project Explorer view, select the Project and 
+<b>RightMouse > Project Properties</b> (bottom of context menu)
 <p><img src="images/sync-projProperties.png">
 <p>&nbsp;
 
