@@ -82,6 +82,7 @@ plugin@org.eclipse.ptp.rm.jaxb.control.ui=@ptpTag@,:pserver:anonymous@dev.eclips
 plugin@org.eclipse.ptp.rm.jaxb.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.core
 plugin@org.eclipse.ptp.rm.jaxb.help=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.help
 plugin@org.eclipse.ptp.rm.jaxb.pbs=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.pbs
+plugin@org.eclipse.ptp.rm.jaxb.pbs.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.pbs.doc.user
 plugin@org.eclipse.ptp.rm.jaxb.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.ui
 plugin@org.eclipse.ptp.rm.lml_jaxb=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml_jaxb
 plugin@org.eclipse.ptp.rm.lml.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rms/org.eclipse.ptp.rm.lml.core

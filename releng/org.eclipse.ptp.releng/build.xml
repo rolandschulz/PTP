@@ -572,6 +572,10 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.pbs.doc.user"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.ui"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
