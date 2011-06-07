@@ -148,7 +148,7 @@ public class TableView extends ViewPart {
 						int index = -1;
 						if (rows != null) {
 							for (int i = 0; i < rows.length; i++) {
-								if (rows[i].oid.equals(oid)) {
+								if (rows[i].oid != null && rows[i].oid.equals(oid)) {
 									index = i;
 									break;
 								}
