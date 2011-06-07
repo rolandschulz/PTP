@@ -1,25 +1,25 @@
 <html>
 <head>
-<title>Generic Remote Launch Resource Manager</title>
+<title>Remote Launch Resource Manager</title>
 <link rel="stylesheet" type="text/css" href="help.css">
 <script type="text/javascript" src="thumb.js"> </script>
 </head>
 <body>
 
-<h1 id="top">Generic Remote Launch Resource Manager</h1>
+<h1 id="top">Remote Launch Resource Manager</h1>
 <p>
-When you create a new resource manager, you are able to select a number of different types
-(Open MPI, PBS, etc.) One of these types is "Generic Remote Launch." 
-This resource manager will simply run an executable on a remote machine using ssh. 
-Using this resource manager on a simple serial program is a good way to ensure that the basic ssh functionality is working correctly.
-<p>To create a Generic Remote Launch resource manager, open the 
+The "Remote Launch" resource manager can be used to run an arbitrary executable on the local or a remote machine. It doesn't matter if the executable
+is parallel program or not, however if you want to run a parallel program it is recommended you use one of the other resource manager types.
+<p>To create a Remote Launch resource manager, open the 
 Parallel Runtime Perspective and right-click in the Resource Managers view.
 <p>
 
-<p>Select the Generic Remote Launch type of Resource Manager and click Next.
-<p><img src="images/02GenericRemLaunch01.png">
-
-<p>&nbsp;
+<ol>
+<li>
+<p>Select the Remote Launch type of resource manager and click Next.</p>
+<p><img src="images/02GenericRemLaunch01.png"></p>
+<p><br></p>
+</li>
 <p>In the Connection Configuration Dialog, fill in the connection information including the 
 Remote Service Provider (e.g. Remote Tools) and the Connection name.
 If you have not already <a href="02resMgrSetup.html#remote">configured a connection,</a> 

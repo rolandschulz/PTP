@@ -43,7 +43,7 @@ resource manager is the same.</p>
 <h2 id="list">List of PTP-Supported Resource Managers</h2>
 <p>
 <ul>
-<li><a href="02resMgrGenericRemoteLaunch.html">Remote Launch</a></li>
+<li><a href="02resMgrRemoteLaunch.html">Remote Launch</a></li>
 <li>Open MPI - covered in examples below
 <li><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.ll.help/html/IBMLLMainHelp.html">IBM
 		Loadleveler</a>
@@ -186,20 +186,26 @@ To configure the simple case of a local resource manager, for example where you 
 on the type of resource manager that was initially selected. In this section we will show how to configure an <b>Open MPI</b> resource manager.
 Please refer to the IBM PE, IBM LoadLeveler,
 PBS, or SLURM resource manager documentation for information on these systems.</p>
+<ol>
+<li>
+<p>
 In this case, the <b>Open MPI tool configuration</b> dialog is shown. 
 You will not normally need to change this information. Just leave the <b>Open MPI version</b> set to <b>Auto Detect</b>, 
 and default values will automatically loaded into the fields.</p>
+<p><br></p>
 <p><img src="images/02-RM-OpenMPI-Configuration.png">r</p>
-<ol>
-<li><p>If you wish to specify the commands for the Open MPI environment, or add extra arguments, 
-select a specific Open MPI version and uncheck the <b>Use default settings</b> checkbox.</p>
 <p><br></p></li>
-<ol>
-<li><p><b>Launch command</b>: A command line executed to launch the parallel application with Open MPI.</p><p><br></p></li>
-<li><p><b>Debug command</b>: A command line executed to use Open MPI to launch a debug session for the parallel application.</p><p><br></p></li>
-<li><p><b>Discover command</b>: A command line executed when the Resource Manager is started, to collect information about the Open MPI environment..</p><p><br></p></li>
-<li><p><b>Path to installation</b>: If not empty, then all commands are prefixed with this path.</p><p><br></p></li>
-</ol>
+<li><p>If you wish to modify the defaul configuration (for experts only!), select a specific Open MPI version and 
+uncheck the <b>Use default settings</b> checkbox.</p>
+<p><br></p></li>
+<dl>
+<dt><b>Launch command</b></dt>
+<dd>A command line executed to launch the parallel application with Open MPI</p></dd>
+<dt><b>Debug command</b></dt>
+<dd>A command line executed to use Open MPI to launch a debug session for the parallel application</p></dd>
+<dt><b>Discover command</b></dt>
+<dd>A command line executed when the Resource Manager is started, to collect information about the Open MPI environment</p></dd>
+</dl>
 <p>Only a single command is allowed on each command field.
 Several place holders (macros) are allowed, the most relevant are:</p>
 <ul>
@@ -215,28 +221,34 @@ would enter <code>/usr/local/openmpi-1.3.4/bin</code> for the location.</p></li>
 <li><p>Select <b>Next &gt;</b></p></li>
 </ol>
 
-<h2 id="name">Step 4: Naming the resource manager configuration</h2>
-<p>The next dialog is <b>Common Resource Manager Configuration</b> which provides an opportunity
-to change how the resource manager is displayed.</p>
-<p><img src="images/02ChooseResMgrNameAndDesc.png"></p>
+<h2 id="name">Step 4: Final resource manager configuration</h2>
+<p>The final wizard page is the <b>Common Resource Manager Configuration</b>, which provides an opportunity
+to change a few remaining parameters about the resource manager.</p>
 <ol>
 <li><p>If you wish to change the name or description, uncheck the <b>Use default name and 
-description</b> checkbox.</p><p><br></p></li>
-<ol>
+description</b> checkbox.</p>
+<p><br></p>
+<ol type="a">
 <li><p>Enter a new name in the <b>Name</b> field. Anything can be entered.</p><p><br></p></li>
 <li>
   <p>Enter a new description in the <b>Description</b> field. Anything can be entered.</p><p><br></p>
 </li>
 </ol>
+<p><img src="images/02ChooseResMgrNameAndDesc.png"></p>
+<p><br></p>
+</li>
 <li><p>If you want the resource manager to start automatially when you start a new Eclipse session, check the <b>Automatically start resource
-manager when Eclipse starts</b> checkbox.</p><p><br></li>
-
+manager when Eclipse starts</b> checkbox.</p>
+<p><br></p>
+<p><img src="images/02ChangeResMgrStartup.png"></p>
+<p><br></p>
+</li>
+<li><p>Select <b>Finish</b>. The new Resource Manager should appear in the list of Resource
+Managers.</p>
+<p><br></p>
+<p><img src="images/02-RM-OpenMPI-View-List.png"></p>
+</li>
 </ol>
-
-<li><p>Select <b>Finish</b></p><p><br></p></li>
-</ol>
-The new Resource Manager should appear in the list of Resource
-Managers.<p><img src="images/02-RM-OpenMPI-View-List.png"></p>
 
 <h2 id="start">Step 6: Starting the resource manager</h2>
 <p></p>
