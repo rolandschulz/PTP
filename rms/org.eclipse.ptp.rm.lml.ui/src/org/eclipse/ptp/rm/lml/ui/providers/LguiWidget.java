@@ -15,13 +15,15 @@ import org.eclipse.swt.widgets.Composite;
 
 public class LguiWidget extends Composite {
 
+	@SuppressWarnings("unused")
 	private static final long serialVersionUID = 1L;
 
-	protected ILguiItem lguiItem;// wrapper instance around LguiType-instance -- provides easy access to lml-information
+	protected ILguiItem lguiItem;// wrapper instance around LguiType-instance --
+									// provides easy access to lml-information
 
 	/**
-	 * Create the smallest possible LMLWidget by passing the lml-model
-	 * wrapper class plml, which manages all important data.
+	 * Create the smallest possible LMLWidget by passing the lml-model wrapper
+	 * class plml, which manages all important data.
 	 * 
 	 * @param lguiItem
 	 *            LML-Manager
