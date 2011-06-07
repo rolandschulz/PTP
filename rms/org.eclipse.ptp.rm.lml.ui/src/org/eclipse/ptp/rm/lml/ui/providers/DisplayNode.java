@@ -25,8 +25,8 @@ import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
 /**
  * A node which is input for the nodedisplaytreepanel
  * 
- * This DisplayNode can be implicitly or explicitly defined
- * (means there could be a data-element for this node, but must not)
+ * This DisplayNode can be implicitly or explicitly defined (means there could
+ * be a data-element for this node, but must not)
  * 
  * Collects information for one node in the NodedisplayTreePanel
  */
@@ -36,7 +36,8 @@ public class DisplayNode implements Comparable<DisplayNode> {
 	 * Generate a DisplayNode just from its implicit name
 	 * 
 	 * @param lguiItem
-	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
+	 *            wrapper instance around LguiType-instance -- provides easy
+	 *            access to lml-information
 	 * @param impName
 	 *            implicit name identifying a node within the tree
 	 * @param nodedisplay
@@ -58,7 +59,8 @@ public class DisplayNode implements Comparable<DisplayNode> {
 		final SchemeElement scheme = LMLCheck.getSchemeByLevels(LMLCheck.copyArrayList(ids), nodedisplay.getScheme());
 
 		if (schemedata == null || scheme == null) {
-			return null;// No scheme and data found for these ids => impname not allowed in this nodedisplay
+			return null;// No scheme and data found for these ids => impname not
+						// allowed in this nodedisplay
 		}
 
 		return new DisplayNode(lguiItem, scheme.getTagname(), schemedata.data, scheme, ids, nodedisplay);
@@ -66,33 +68,42 @@ public class DisplayNode implements Comparable<DisplayNode> {
 
 	private final String tagname;// What type of Node is this
 
-	private final DataElement data;// Is there an explicit data-element for this node?
+	private final DataElement data;// Is there an explicit data-element for this
+									// node?
 	// otherwise upper-level data-element is saved here
 
 	private final SchemeElement scheme;// corresponding scheme-element
 
-	private final ArrayList<Integer> level;// contains for every level the id-number of this node
+	private final ArrayList<Integer> level;// contains for every level the
+											// id-number of this node
 
-	private SchemeAndData referencedData;// null if this element is placed in a base nodedisplay
+	private SchemeAndData referencedData;// null if this element is placed in a
+											// base nodedisplay
 	// contains referenced scheme and data-elements given by refid
 
-	private final Nodedisplay nodedisplay;// model for surrounding nodedisplay, needed for full implicit name
+	private final Nodedisplay nodedisplay;// model for surrounding nodedisplay,
+											// needed for full implicit name
 
 	private final ILguiItem lguiItem;// LML-data-manager
 
 	/**
 	 * @param lguiItem
-	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
+	 *            wrapper instance around LguiType-instance -- provides easy
+	 *            access to lml-information
 	 * @param ptag
 	 *            tagname-attribute for this DisplayNode
 	 * @param pdata
-	 *            data-tag-reference, which gives information for this DisplayNode
+	 *            data-tag-reference, which gives information for this
+	 *            DisplayNode
 	 * @param pscheme
-	 *            scheme-tag-reference, which gives information for this DisplayNode
+	 *            scheme-tag-reference, which gives information for this
+	 *            DisplayNode
 	 * @param plevel
-	 *            list of ids, which identify this node on every level of the lml-tree
+	 *            list of ids, which identify this node on every level of the
+	 *            lml-tree
 	 * @param pnodedisplay
-	 *            surrounding lml-nodedisplay-instance. This DisplayNode is a physical part of the nodedisplay.
+	 *            surrounding lml-nodedisplay-instance. This DisplayNode is a
+	 *            physical part of the nodedisplay.
 	 */
 	public DisplayNode(ILguiItem lguiItem, String tagname, DataElement data, SchemeElement scheme, ArrayList<Integer> levels,
 			Nodedisplay nodedisplay) {
@@ -121,8 +132,7 @@ public class DisplayNode implements Comparable<DisplayNode> {
 		if (o.level == null) {
 			if (level == null) {
 				return 0;
-			}
-			else {
+			} else {
 				return 1;
 			}
 		}
@@ -149,7 +159,7 @@ public class DisplayNode implements Comparable<DisplayNode> {
 	 */
 	public ObjectType getConnectedObject() {
 		// Return referenced object
-		if (referencedData.data != null && lguiItem.getOIDToObject() != null) {
+		if (referencedData != null && referencedData.data != null && lguiItem.getOIDToObject() != null) {
 			return lguiItem.getOIDToObject().getObjectById(referencedData.data.getOid());
 		}
 
@@ -160,15 +170,16 @@ public class DisplayNode implements Comparable<DisplayNode> {
 	}
 
 	/**
-	 * @return referenced data-element, by which this DisplayNode's data is defined in nodedisplay
+	 * @return referenced data-element, by which this DisplayNode's data is
+	 *         defined in nodedisplay
 	 */
 	public DataElement getData() {
 		return data;
 	}
 
 	/**
-	 * Generates a name, which identifies the referenced physical element
-	 * in the whole lml-tree.
+	 * Generates a name, which identifies the referenced physical element in the
+	 * whole lml-tree.
 	 * 
 	 * @return absolute name of the element within the tree
 	 */
@@ -231,7 +242,8 @@ public class DisplayNode implements Comparable<DisplayNode> {
 	}
 
 	/**
-	 * @return referenced scheme-element, by which this DisplayNode is defined in nodedisplay
+	 * @return referenced scheme-element, by which this DisplayNode is defined
+	 *         in nodedisplay
 	 */
 	public SchemeElement getScheme() {
 		return scheme;
@@ -239,8 +251,8 @@ public class DisplayNode implements Comparable<DisplayNode> {
 
 	// Defined by refid
 	/**
-	 * Set referenced data of this DisplayNode. This is only needed
-	 * for Nodedisplay-References
+	 * Set referenced data of this DisplayNode. This is only needed for
+	 * Nodedisplay-References
 	 * 
 	 * @param pref
 	 *            collects scheme- and data in one instance
@@ -255,12 +267,12 @@ public class DisplayNode implements Comparable<DisplayNode> {
 		if (scheme != null && level.size() > 0) {
 			final String impname = String.format(scheme.getMask(), level.get(level.size() - 1));
 
-			String connection = "";
-			String refid = "";
+			String connection = ""; //$NON-NLS-1$
+			String refid = ""; //$NON-NLS-1$
 
 			if (data != null) {
 				if (data.getOid() != null) {
-					connection = data.getOid() + " ";
+					connection = data.getOid() + " "; //$NON-NLS-1$
 				}
 				if (data.getRefid() != null) {
 					refid = data.getRefid();
@@ -268,12 +280,11 @@ public class DisplayNode implements Comparable<DisplayNode> {
 			}
 
 			if (referencedData != null) {
-				connection = referencedData.data.getOid() + " ";
+				connection = referencedData.data.getOid() + " "; //$NON-NLS-1$
 			}
 
-			return impname + " " + connection + refid;
-		}
-		else {
+			return impname + " " + connection + refid; //$NON-NLS-1$
+		} else {
 			return tagname;
 		}
 	}
