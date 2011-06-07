@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.lml_jaxb.actions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
@@ -28,21 +31,16 @@ public class RemoveJob extends AbstractStatusAction {
 	 */
 	public void run(IAction action) {
 		if (MessageDialog.openQuestion(view.getSite().getShell(), Messages.CannotUndoOperation, Messages.RemoveJobWarning)) {
+			List<JobStatusData> data = new ArrayList<JobStatusData>();
 			for (Row row : selected) {
 				JobStatusData status = row.status;
+				data.add(status);
 				String rmId = status.getRmId();
 				LMLManager.getInstance().removeUserJob(rmId, status.getJobId());
-				String remotePath = status.getOutputPath();
-				if (remotePath != null) {
-					ActionUtils.removeFile(remotePath, rmId);
-				}
-				remotePath = status.getErrorPath();
-				if (remotePath != null) {
-					ActionUtils.removeFile(remotePath, rmId);
-				}
 			}
+			view.refresh();
+			ActionUtils.removeFiles(data);
 		}
-		view.refresh();
 	}
 
 	/*

@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.lml_jaxb.actions;
 import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -31,6 +32,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
+import org.eclipse.ptp.rm.lml_jaxb.messages.Messages;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
@@ -155,38 +157,52 @@ public class ActionUtils {
 	}
 
 	/**
-	 * Delete stdout or stderr file on remote host.
+	 * Delete stdout or stderr files on remote host.
 	 * 
-	 * @param path
-	 *            to file
+	 * @param selected
+	 *            list of job data objects
 	 */
-	public static void removeFile(final String path, final String rmId) {
-		Job j = new Job(path) {
+	public static void removeFiles(final List<JobStatusData> selected) {
+		Job j = new Job(Messages.RemoveFiles) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-				IResourceManagerControl control = rm.getControl();
-				SubMonitor progress = SubMonitor.convert(monitor, 70);
-				try {
-					IFileStore lres = getRemoteFile(path, control, progress);
-					if (lres != null) {
-						if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
-							lres.delete(EFS.NONE, progress.newChild(25));
+				SubMonitor progress = SubMonitor.convert(monitor, 50 * selected.size());
+				for (JobStatusData status : selected) {
+					String rmId = status.getRmId();
+					IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+					IResourceManagerControl control = rm.getControl();
+					String remotePath = status.getOutputPath();
+					if (remotePath != null) {
+						try {
+							IFileStore lres = getRemoteFile(remotePath, control, progress);
+							if (lres != null) {
+								if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
+									lres.delete(EFS.NONE, progress.newChild(25));
+								}
+							}
+						} catch (Throwable t) {
+							// continue to remove if possible
 						}
 					}
-				} catch (Throwable t) {
-					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
+					remotePath = status.getErrorPath();
+					if (remotePath != null) {
+						try {
+							IFileStore lres = getRemoteFile(remotePath, control, progress);
+							if (lres != null) {
+								if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
+									lres.delete(EFS.NONE, progress.newChild(25));
+								}
+							}
+						} catch (Throwable t) {
+							// continue to remove if possible
+						}
+					}
 				}
 				return Status.OK_STATUS;
 			}
 		};
-
+		j.setUser(true);
 		j.schedule();
-
-		try {
-			j.join();
-		} catch (final InterruptedException ignored) {
-		}
 	}
 
 	/**

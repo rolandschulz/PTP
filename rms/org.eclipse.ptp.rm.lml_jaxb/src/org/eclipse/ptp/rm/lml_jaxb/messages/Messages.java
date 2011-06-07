@@ -30,6 +30,7 @@ public class Messages extends NLS {
 	public static String CancelJob;
 	public static String CancelJobError;
 	public static String CachedDefinitionFile;
+	public static String RemoveFiles;
 
 	static {
 		// initialize resource bundle

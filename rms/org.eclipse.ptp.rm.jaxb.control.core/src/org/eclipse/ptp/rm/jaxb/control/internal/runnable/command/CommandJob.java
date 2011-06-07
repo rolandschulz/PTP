@@ -380,6 +380,7 @@ public class CommandJob extends Job implements ICommandJob {
 				if (waitForId) {
 					jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
 					jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+					jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
 					try {
 						jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap(), progress.newChild(20));
 					} catch (CoreException failed) {
@@ -405,6 +406,7 @@ public class CommandJob extends Job implements ICommandJob {
 					p.setName(uuid);
 					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
 					jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+					jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
 				}
 
 				if (monitor.isCanceled()) {
@@ -413,9 +415,8 @@ public class CommandJob extends Job implements ICommandJob {
 
 				if (!isBatch()) {
 					jobStatus.setProcess(process);
-				} else {
-					jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
 				}
+
 				jobStatus.setProxy(getProxy());
 
 				if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
