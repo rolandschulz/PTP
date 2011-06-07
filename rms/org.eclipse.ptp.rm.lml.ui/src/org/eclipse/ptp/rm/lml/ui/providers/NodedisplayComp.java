@@ -211,15 +211,15 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	// parent composite for zooming
-	private NodedisplayView nodeview;
+	private NodedisplayView fNodedisplayView;
 
 	private String title;// implicit name of this node
 	private Color jobColor;// Color of the job, to which this panel is connected
 
 	private Font fontObject;
-	private Nodedisplay model;// surrounding lml-Nodedisplay
+	private Nodedisplay fNodedisplay;// surrounding lml-Nodedisplay
 
-	private DisplayNode node;// Node-model which has to be displayed
+	private DisplayNode fDisplayNode;// Node-model which has to be displayed
 	private int maxLevel; // Deepest level, which should be displayed
 
 	private Composite pictureFrame;// this panel contains pictures as direct children and the mainpanel in center
@@ -284,8 +284,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		// get maxlevel from lml-file
 		calculateCurrentlevel(pnode);
 
-		model = pmodel;
-		node = pnode;
+		fNodedisplay = pmodel;
+		fDisplayNode = pnode;
 
 		apref = findLayout();// Searches for corresponding layout-definitions
 
@@ -374,30 +374,35 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 */
 	public Nodedisplayelement findLayout() {
 
-		final ArrayList<NodedisplaylayoutType> allnodedisplaylayouts = lguiItem.getNodedisplayAccess().getLayouts(model.getId());
+		Nodedisplayelement res = null;
 
-		// Is there any Layout for this nodedisplay?
-		if (allnodedisplaylayouts == null || allnodedisplaylayouts.size() == 0)
-			return NodedisplayAccess.getDefaultLayout();
-		// Later it should be possible to choose one of possibly multiple defined layouts
-		final NodedisplaylayoutType first = allnodedisplaylayouts.get(0);
+		if (lguiItem.getNodedisplayAccess() != null) {
+			final ArrayList<NodedisplaylayoutType> allNodedisplayLayouts = lguiItem.getNodedisplayAccess()
+					.getLayouts(fNodedisplay.getId());
 
-		if (node == null) {// Root-level => return el0-Nodedisplayelement
-			if (first.getEl0() != null) {
-				return first.getEl0();
-			}
-			else
+			// Is there any Layout for this nodedisplay?
+			if (allNodedisplayLayouts == null || allNodedisplayLayouts.size() == 0)
 				return NodedisplayAccess.getDefaultLayout();
+			// Later it should be possible to choose one of possibly multiple defined layouts
+			final NodedisplaylayoutType first = allNodedisplayLayouts.get(0);
+
+			if (fDisplayNode == null) {// Root-level => return el0-Nodedisplayelement
+				if (first.getEl0() != null) {
+					return first.getEl0();
+				}
+				else
+					return NodedisplayAccess.getDefaultLayout();
+			}
+
+			if (first.getEl0() == null)
+				return NodedisplayAccess.getDefaultLayout();
+
+			// Copy level-numbers
+			final ArrayList<Integer> levelnrs = LMLCheck.copyArrayList(fDisplayNode.getLevelNrs());
+
+			// deeper-level => traverse layout-tree
+			res = LMLCheck.getNodedisplayElementByLevels(levelnrs, first.getEl0());
 		}
-
-		if (first.getEl0() == null)
-			return NodedisplayAccess.getDefaultLayout();
-
-		// Copy level-numbers
-		final ArrayList<Integer> levelnrs = LMLCheck.copyArrayList(node.getLevelNrs());
-
-		// deeper-level => traverse layout-tree
-		final Nodedisplayelement res = LMLCheck.getNodedisplayElementByLevels(levelnrs, first.getEl0());
 
 		if (res == null)
 			return NodedisplayAccess.getDefaultLayout();
@@ -409,22 +414,24 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	/**
 	 * Generates a hashmap, which connects DisplayNodes to their SWT-colors.
 	 * 
-	 * @param dispnodes
+	 * @param displayNodes
 	 *            The DisplayNodes, which are keys from the resulting hashmap
 	 * @return hashmap, which connects DisplayNodes to their SWT-colors
 	 */
-	public HashMap<DisplayNode, Color> generateDisplayNodeToColorMap(ArrayList<DisplayNode> dispnodes) {
+	public HashMap<DisplayNode, Color> generateDisplayNodeToColorMap(ArrayList<DisplayNode> displayNodes) {
+		final OIDToObject oidToObject = lguiItem.getOIDToObject();
 
-		final OIDToObject oidtoobj = lguiItem.getOIDToObject();
-
-		final HashMap<DisplayNode, Color> dispnodetocolor = new HashMap<DisplayNode, Color>();
-		for (final DisplayNode dispnode : dispnodes) {
-			final String conOID = dispnode.getData().getOid();
-			dispnodetocolor.put(dispnode,
-					ColorConversion.getColor(oidtoobj.getColorById(conOID)));
+		final HashMap<DisplayNode, Color> displayNodeToColor = new HashMap<DisplayNode, Color>();
+		if (oidToObject != null) {
+			for (final DisplayNode displayNode : displayNodes) {
+				if (displayNode.getData() != null) {
+					final String conOID = displayNode.getData().getOid();
+					displayNodeToColor.put(displayNode, ColorConversion.getColor(oidToObject.getColorById(conOID)));
+				}
+			}
 		}
 
-		return dispnodetocolor;
+		return displayNodeToColor;
 	}
 
 	/**
@@ -438,54 +445,50 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * Generates DisplayNodes for every visible component, which
 	 * is a child of the element identified by the level-ids.
 	 * 
-	 * @param ascheme
+	 * @param aScheme
 	 *            current lml-scheme describing a node
-	 * @param adata
+	 * @param aData
 	 *            current lml-data for this node
 	 * @param levels
 	 *            ids for every level to identify a node in the lml-tree (1,1,1) means first cpu in first nodecard in first row
-	 * @param model
+	 * @param nodedisplay
 	 *            full LML-Model for a nodedisplay
 	 * @param highestRowfirst
 	 *            defines how the result will be sorted, true=> descending, false ascending
 	 * @return list of DisplayNodes
 	 */
-	public ArrayList<DisplayNode> getLowerDisplayNodes(Object ascheme, Object adata, ArrayList<Integer> levels, Nodedisplay model,
+	public ArrayList<DisplayNode> getLowerDisplayNodes(Object aScheme, Object aData, ArrayList<Integer> levels,
+			Nodedisplay nodedisplay,
 			boolean highestRowfirst) {
 
-		final int alevel = levels.size();
-		final ArrayList<DisplayNode> res = new ArrayList<DisplayNode>();
+		final int aLevel = levels.size();
+		final ArrayList<DisplayNode> result = new ArrayList<DisplayNode>();
 
 		final HashMap<Integer, SchemeElement> schemesForIds = new HashMap<Integer, SchemeElement>();
 
 		final ArrayList<Integer> numbers = new ArrayList<Integer>();// Indices within scheme of lower elements
-		final List lscheme = LMLCheck.getLowerSchemeElements(ascheme);
-		for (int i = 0; i < lscheme.size(); i++) {
-
+		final List<?> lScheme = LMLCheck.getLowerSchemeElements(aScheme);
+		for (int i = 0; i < lScheme.size(); i++) {
 			// getNumbers
-			final SchemeElement lascheme = (SchemeElement) lscheme.get(i);
-			if (lascheme.getList() != null) {// get list-elements
-
-				final int[] anumbers = LMLCheck.getNumbersFromNumberlist(lascheme.getList());
-				for (final int anumber : anumbers) {
-					numbers.add(anumber);
-					schemesForIds.put(anumber, lascheme);
+			final SchemeElement laScheme = (SchemeElement) lScheme.get(i);
+			if (laScheme.getList() != null) {// get list-elements
+				final int[] aNumbers = LMLCheck.getNumbersFromNumberlist(laScheme.getList());
+				for (final int aNumber : aNumbers) {
+					numbers.add(aNumber);
+					schemesForIds.put(aNumber, laScheme);
 				}
 
-			}
-			else {// min- max-attributes
-
-				final int min = lascheme.getMin().intValue();
+			} else {// min- max-attributes
+				final int min = laScheme.getMin().intValue();
 				int max = min;
-				if (lascheme.getMax() != null) {
-					max = lascheme.getMax().intValue();
+				if (laScheme.getMax() != null) {
+					max = laScheme.getMax().intValue();
 				}
 
-				final int step = lascheme.getStep().intValue();
-
+				final int step = laScheme.getStep().intValue();
 				for (int j = min; j <= max; j += step) {
 					numbers.add(j);
-					schemesForIds.put(j, lascheme);
+					schemesForIds.put(j, laScheme);
 				}
 
 			}
@@ -495,29 +498,31 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		// Process numbers
 		for (int j = 0; j < numbers.size(); j++) {
-			final int aid = numbers.get(j);
+			final int aId = numbers.get(j);
 			// Get all information for new DisplayNode
-			final SchemeAndData schemedata = LMLCheck.getSchemeAndDataByLevels(aid, adata, ascheme);
+			final SchemeAndData schemeData = LMLCheck.getSchemeAndDataByLevels(aId, aData, aScheme);
 
-			DataElement lowdata = schemedata.data;
+			DataElement lowData = schemeData.data;
 
-			if (LMLCheck.getDataLevel(adata) < LMLCheck.getSchemeLevel(ascheme) // Was adata already not at the right level
-																				// (inheritance of attributes) ?
-					&& adata instanceof DataElement) {
-				lowdata = (DataElement) adata;// Then do not go deeper , makes no sense
+			if (LMLCheck.getDataLevel(aData) < LMLCheck.getSchemeLevel(aScheme) && aData instanceof DataElement) {
+				lowData = (DataElement) aData;// Then do not go deeper , makes no sense
 			}
 
-			levels.add(aid);
-
-			final DisplayNode dispnode = new DisplayNode(lguiItem, lguiItem.getNodedisplayAccess().getTagname(model.getId(), alevel + 1),
-					lowdata, schemesForIds.get(aid), levels, model);
-
+			levels.add(aId);
+			DisplayNode displayNode = null;
+			if (lguiItem.getNodedisplayAccess() != null) {
+				displayNode = new DisplayNode(lguiItem,
+						lguiItem.getNodedisplayAccess().getTagname(nodedisplay.getId(), aLevel + 1),
+						lowData, schemesForIds.get(aId), levels, nodedisplay);
+			}
 			levels.remove(levels.size() - 1);
 
-			res.add(dispnode);
+			if (displayNode != null) {
+				result.add(displayNode);
+			}
 		}
 
-		return res;
+		return result;
 
 	}
 
@@ -525,10 +530,11 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * @return implicit name of node within nodedisplay, which is shown by this NodedisplayPanel
 	 */
 	public String getShownImpname() {
-		if (node == null)
+		if (fDisplayNode == null) {
 			return null;
+		}
 
-		return node.getFullImplicitName();
+		return fDisplayNode.getFullImplicitName();
 	}
 
 	/**
@@ -550,8 +556,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		if (parentNodedisplay != null) {
 			// Only first column sends minheight-increases to parent composites
-			if (x == 0)
+			if (x == 0) {
 				parentNodedisplay.increaseMinHeight(height);
+			}
 		}
 	}
 
@@ -566,8 +573,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		if (parentNodedisplay != null) {
 			// Only first row sends minwidth-increases to parent composites
-			if (y == 0)
+			if (y == 0) {
 				parentNodedisplay.increaseMinWidth(width);
+			}
 		}
 	}
 
@@ -580,7 +588,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	public void showMinRectangleSizes() {
 		callMinSizeCalculation();
 
-		nodeview.getScrollPane().setMinSize(minWidth, minHeight);
+		fNodedisplayView.getScrollPane().setMinSize(minWidth, minHeight);
 	}
 
 	/**
@@ -593,30 +601,34 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 	public void updateStatus(ObjectType j, boolean mouseover, boolean mousedown) {
 
-		if (node == null) {
+		if (fDisplayNode == null) {
 			if (innerPanel != null) {
 				innerPanel.redraw();
 			}
 			return;
 		}
 
-		final ObjectType conobject = node.getConnectedObject();
-		if (currentLevel == maxLevel) {
+		final ObjectType conobject = fDisplayNode.getConnectedObject();
+		if (lguiItem.getObjectStatus() != null) {
+			if (currentLevel == maxLevel) {
 
-			if (lguiItem.getObjectStatus().isMouseover(conobject)) {
-				borderFrame.setBorderWidth(apref.getMouseborder().intValue());
-			}
-			else
-				borderFrame.setBorderWidth(apref.getBorder().intValue());
+				if (lguiItem.getObjectStatus().isMouseover(conobject)) {
+					borderFrame.setBorderWidth(apref.getMouseborder().intValue());
+				}
+				else
+					borderFrame.setBorderWidth(apref.getBorder().intValue());
 
-			if (lguiItem.getObjectStatus().isAnyMousedown() && !lguiItem.getObjectStatus().isMousedown(conobject)) {// Change color
-				innerPanel.setBackground(ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(null)));
+				if (lguiItem.getObjectStatus().isAnyMousedown() && !lguiItem.getObjectStatus().isMousedown(conobject)) {// Change
+																														// color
+					innerPanel.setBackground(ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(null)));
+				}
+				else
+					innerPanel.setBackground(jobColor);
 			}
-			else
-				innerPanel.setBackground(jobColor);
-		}
-		else if (currentLevel == maxLevel - 1) {// For rectangle-paint of lowest-level-elements
-			innerPanel.redraw();
+			else if (currentLevel == maxLevel - 1) {// For rectangle-paint of lowest-level-elements
+				innerPanel.redraw();
+			}
+
 		}
 	}
 
@@ -649,13 +661,14 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
 
-				if (focussed != null && !isDisplayNodeEmpty(focussed)) {
-					lguiItem.getObjectStatus().mouseover(focussed.getConnectedObject());
+				if (lguiItem.getObjectStatus() != null) {
+					if (focussed != null && !isDisplayNodeEmpty(focussed)) {
+						lguiItem.getObjectStatus().mouseover(focussed.getConnectedObject());
+					}
+					else {
+						lguiItem.getObjectStatus().mouseExitLast();
+					}
 				}
-				else {
-					lguiItem.getObjectStatus().mouseExitLast();
-				}
-
 				innerPanel.setToolTipText(getToolTipText(focussed));
 
 			}
@@ -669,8 +682,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			public void mouseDown(MouseEvent e) {
 				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
 
-				if (focussed != null && !isDisplayNodeEmpty(focussed))
+				if (focussed != null && !isDisplayNodeEmpty(focussed) && lguiItem.getObjectStatus() != null) {
 					lguiItem.getObjectStatus().mousedown(focussed.getConnectedObject());
+				}
 
 				innerPanel.setToolTipText(getToolTipText(focussed));
 			}
@@ -678,8 +692,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			public void mouseUp(MouseEvent e) {
 				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
 
-				if (focussed != null && !isDisplayNodeEmpty(focussed))
+				if (focussed != null && !isDisplayNodeEmpty(focussed) && lguiItem.getObjectStatus() != null) {
 					lguiItem.getObjectStatus().mouseup(focussed.getConnectedObject());
+				}
 
 				innerPanel.setToolTipText(getToolTipText(focussed));
 			}
@@ -688,7 +703,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		innerPanel.addListener(SWT.MouseExit, new Listener() {
 
 			public void handleEvent(Event event) {
-				lguiItem.getObjectStatus().mouseExitLast();
+				if (lguiItem.getObjectStatus() != null) {
+					lguiItem.getObjectStatus().mouseExitLast();
+				}
 
 				innerPanel.setToolTipText(getToolTipText(null));
 			}
@@ -731,14 +748,14 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 				titleLabel.setBackground(titleBackgroundColor);
 
-				if (node == null)
+				if (fDisplayNode == null)
 					return;
 
-				if (nodeview.getRootNodedisplay() == NodedisplayComp.this) {
-					nodeview.zoomOut();
+				if (fNodedisplayView.getRootNodedisplay() == NodedisplayComp.this) {
+					fNodedisplayView.zoomOut();
 				}
 				else
-					nodeview.zoomIn(node.getFullImplicitName());
+					fNodedisplayView.zoomIn(fDisplayNode.getFullImplicitName());
 
 			}
 
@@ -804,10 +821,11 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 */
 	private void checkMaxLevel() {
 
-		if (node != null) {
+		if (fDisplayNode != null) {
 			// calculation of absolute maximal level within this part of tree
 			// realmax=current node level + deepest possible level
-			final int realmax = LMLCheck.getSchemeLevel(node.getScheme()) + LMLCheck.getDeepestSchemeLevel(node.getScheme()) - 1;
+			final int realmax = LMLCheck.getSchemeLevel(fDisplayNode.getScheme())
+					+ LMLCheck.getDeepestSchemeLevel(fDisplayNode.getScheme()) - 1;
 			if (realmax < maxLevel) {
 				maxLevel = realmax;
 			}
@@ -926,13 +944,13 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * Part of constructor, which is equal in two constructors
 	 * therefore outsourced
 	 * 
-	 * @param pmodel
+	 * @param nodedisplay
 	 */
-	private void init(Nodedisplay pmodel, DisplayNode pnode, NodedisplayView pnodeview) {
+	private void init(Nodedisplay nodedisplay, DisplayNode displayNode, NodedisplayView nodedisplayView) {
 		// Transfer parameters
-		nodeview = pnodeview;
-		node = pnode;
-		model = pmodel;
+		fNodedisplayView = nodedisplayView;
+		fDisplayNode = displayNode;
+		fNodedisplay = nodedisplay;
 
 		setLayout(new FillLayout());
 
@@ -940,8 +958,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		addDisposeAction();
 
-		if (apref == null)
+		if (apref == null) {
 			apref = findLayout();// Searches for corresponding layout-definitions
+		}
 
 		checkMaxLevel();
 
@@ -955,42 +974,45 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		mainPanel.setLayout(new BorderLayout());
 		mainPanel.setLayoutData(new BorderData(BorderLayout.MFIELD));
 
-		if (node != null) {// Is this nodedisplay the root-nodedisplay?
-			jobColor = ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(node.getData().getOid()));
-			title = apref.isShowfulltitle() ? node.getFullImplicitName() : node.getImplicitName();
+		if (lguiItem.getOIDToObject() != null) {
+			if (fDisplayNode != null) {// Is this nodedisplay the root-nodedisplay?
+				jobColor = ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(fDisplayNode.getData().getOid()));
+				title = apref.isShowfulltitle() ? fDisplayNode.getFullImplicitName() : fDisplayNode.getImplicitName();
 
-			insertTitleLabel();
+				insertTitleLabel();
 
-			insertInnerPanel();
+				insertInnerPanel();
+			}
+			else {
+				jobColor = ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(null));
+				title = lguiItem.getNodedisplayAccess().getNodedisplayTitel(0);
+
+				insertTitleLabel();
+
+				insertInnerPanel(0, fNodedisplay.getScheme(),
+						fNodedisplay.getData(), new ArrayList<Integer>());
+			}
+
+			lguiItem.getObjectStatus().addComponent(this);
 		}
-		else {
-			jobColor = ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(null));
-			title = lguiItem.getNodedisplayAccess().getNodedisplayTitel(0);
 
-			insertTitleLabel();
-
-			insertInnerPanel(0, model.getScheme(),
-					model.getData(), new ArrayList<Integer>());
-		}
-
-		lguiItem.getObjectStatus().addComponent(this);
 	}
 
 	/**
 	 * Adds rectangle-painting listener to innerPanel.
 	 * 
-	 * @param dispnodes
-	 * @param bordercolor
+	 * @param displayNodes
+	 * @param borderColor
 	 */
-	private void initRectPaintListener(ArrayList<DisplayNode> dispnodes, Color bordercolor) {
-		rectpaintlistener = new RectPaintListener(dispnodes, apref.getCols().intValue(), this, innerPanel);
+	private void initRectPaintListener(ArrayList<DisplayNode> displayNodes, Color borderColor) {
+		rectpaintlistener = new RectPaintListener(displayNodes, apref.getCols().intValue(), this, innerPanel);
 		rectpaintlistener.horizontalSpacing = apref.getHgap().intValue();
 		rectpaintlistener.verticalSpacing = apref.getVgap().intValue();
 
 		rectpaintlistener.normalborder = apref.getBorder().intValue();
 		rectpaintlistener.mouseborder = apref.getMouseborder().intValue();
 
-		rectpaintlistener.bordercolor = bordercolor;
+		rectpaintlistener.bordercolor = borderColor;
 
 		innerPanel.addListener(SWT.Paint, rectpaintlistener);
 	}
@@ -999,25 +1021,26 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * Call this function if displaynode != null
 	 */
 	private void insertInnerPanel() {
-		insertInnerPanel(node.getLevel(), node.getScheme(), node.getData(), node.getLevelNrs());
+		insertInnerPanel(fDisplayNode.getLevel(), fDisplayNode.getScheme(), fDisplayNode.getData(), fDisplayNode.getLevelNrs());
 	}
 
 	/**
 	 * If inner panels exist and maxlevel is greater than alevel, then insert lower level-panels
 	 */
-	private void insertInnerPanel(int alevel, Object ascheme, Object adata, ArrayList<Integer> levels) {
+	private void insertInnerPanel(int aLevel, Object aScheme, Object aData, ArrayList<Integer> levels) {
 
 		// Bordercolor is defined by this parameter
-		final Color bordercolor = ColorConversion.getColor(LMLColor.stringToColor(apref.getBordercolor()));
+		final Color borderColor = ColorConversion.getColor(LMLColor.stringToColor(apref.getBordercolor()));
 
-		createFramePanels(bordercolor);
+		createFramePanels(borderColor);
 
 		// Generate all displaynodes for elements in lml-tree which are childs of the current node
-		final ArrayList<DisplayNode> dispnodes = getLowerDisplayNodes(ascheme, adata, levels, model, apref.isHighestrowfirst());
+		final ArrayList<DisplayNode> displayNodes = getLowerDisplayNodes(aScheme, aData, levels, fNodedisplay,
+				apref.isHighestrowfirst());
 
-		if (alevel == maxLevel - 1) {// Paint rects instead of use composites for lowest-level-rectangles
+		if (aLevel == maxLevel - 1) {// Paint rects instead of use composites for lowest-level-rectangles
 
-			initRectPaintListener(dispnodes, bordercolor);
+			initRectPaintListener(displayNodes, borderColor);
 			addMouseListenerToInnerPanel();
 
 		}
@@ -1036,19 +1059,17 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 			int index = 0;
 
-			for (final DisplayNode dispnode : dispnodes) {
+			for (final DisplayNode displayNode : displayNodes) {
 
-				final NodedisplayComp ainner = new NodedisplayComp(lguiItem, model, dispnode,
-						nodeview, this,
-						index % cols, index / cols,
-						maxLevel - currentLevel - 1, innerPanel, SWT.NONE);
-				innerComps.add(ainner);
+				final NodedisplayComp inner = new NodedisplayComp(lguiItem, fNodedisplay, displayNode, fNodedisplayView, this,
+						index % cols, index / cols, maxLevel - currentLevel - 1, innerPanel, SWT.NONE);
+				innerComps.add(inner);
 
 				if (gridData == null) {
 					gridData = getDefaultGridData();
 				}
 
-				ainner.setLayoutData(gridData);
+				inner.setLayoutData(gridData);
 
 				index++;
 			}
@@ -1063,44 +1084,44 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		pictures = new ArrayList<ImageComp>();
 
 		// insert pictures
-		final List<PictureType> lmlpictures = apref.getImg();
-		for (final PictureType picture : lmlpictures) {
+		final List<PictureType> lmlPictures = apref.getImg();
+		for (final PictureType picture : lmlPictures) {
 
-			final URL aurl = getHttpsURL(picture.getSrc());
-			if (aurl == null)
+			final URL aUrl = getHttpsURL(picture.getSrc());
+			if (aUrl == null)
 				continue;
 
-			ImageComp icomp;
+			ImageComp imageComposite;
 			try {
-				icomp = new ImageComp(pictureFrame, SWT.None, aurl, picture.getWidth(), picture.getHeight());
+				imageComposite = new ImageComp(pictureFrame, SWT.None, aUrl, picture.getWidth(), picture.getHeight());
 			} catch (final IOException e) {
 				continue;
 			}
 
-			if (node == null)
-				icomp.setBackground(backgroundColor);
+			if (fDisplayNode == null)
+				imageComposite.setBackground(backgroundColor);
 			else
-				icomp.setBackground(this.getParent().getBackground());
+				imageComposite.setBackground(this.getParent().getBackground());
 
 			// Add borderpics to pictures and save center-pic in centerpic-variable
 
 			if (picture.getAlign() == AlignType.CENTER)
-				centerPic = icomp.getImage();
+				centerPic = imageComposite.getImage();
 			else
-				pictures.add(icomp);
+				pictures.add(imageComposite);
 
 			switch (picture.getAlign()) {
 			case WEST:
-				icomp.setLayoutData(new BorderData(BorderLayout.WFIELD));
+				imageComposite.setLayoutData(new BorderData(BorderLayout.WFIELD));
 				break;
 			case EAST:
-				icomp.setLayoutData(new BorderData(BorderLayout.EFIELD));
+				imageComposite.setLayoutData(new BorderData(BorderLayout.EFIELD));
 				break;
 			case NORTH:
-				icomp.setLayoutData(new BorderData(BorderLayout.NFIELD));
+				imageComposite.setLayoutData(new BorderData(BorderLayout.NFIELD));
 				break;
 			case SOUTH:
-				icomp.setLayoutData(new BorderData(BorderLayout.SFIELD));
+				imageComposite.setLayoutData(new BorderData(BorderLayout.SFIELD));
 				break;
 			}
 		}
@@ -1128,18 +1149,18 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * Check if given displaynode is connected to
 	 * empty jobs.
 	 * 
-	 * @param dnode
+	 * @param displayNode
 	 *            the displaynode, which is checked
 	 * @return true, if anything in request-chain is null or if object-id is "empty"
 	 */
-	private boolean isDisplayNodeEmpty(DisplayNode dnode) {
-		if (dnode == null)
+	private boolean isDisplayNodeEmpty(DisplayNode displayNode) {
+		if (displayNode == null)
 			return true;
-		if (dnode.getConnectedObject() == null)
+		if (displayNode.getConnectedObject() == null)
 			return true;
-		if (dnode.getConnectedObject().getId() == null)
+		if (displayNode.getConnectedObject().getId() == null)
 			return true;
-		if (dnode.getConnectedObject().getId().equals(emptyJobName))
+		if (displayNode.getConnectedObject().getId().equals(emptyJobName))
 			return true;
 
 		return false;
@@ -1151,7 +1172,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 */
 	private void removeUpdatable() {
 
-		lguiItem.getObjectStatus().removeComponent(this);
+		if (lguiItem.getObjectStatus() != null) {
+			lguiItem.getObjectStatus().removeComponent(this);
+		}
 
 		for (final NodedisplayComp nd : innerComps) {
 			nd.removeUpdatable();
@@ -1203,9 +1226,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * This function is only used for root-NodedisplayComposites.
 	 */
 	private void setScrollBarPreferences() {
-		final ScrolledComposite sc = nodeview.getScrollPane();
-		sc.setContent(this);
-		sc.setExpandHorizontal(true);
-		sc.setExpandVertical(true);
+		final ScrolledComposite scrolledComposite = fNodedisplayView.getScrollPane();
+		scrolledComposite.setContent(this);
+		scrolledComposite.setExpandHorizontal(true);
+		scrolledComposite.setExpandVertical(true);
 	}
 }

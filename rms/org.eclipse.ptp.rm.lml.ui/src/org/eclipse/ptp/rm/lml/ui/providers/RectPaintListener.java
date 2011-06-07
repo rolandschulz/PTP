@@ -1,3 +1,13 @@
+/**
+ * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ * 		Carsten Karbach, Claudia Knobloch,FZ Juelich
+ */
 package org.eclipse.ptp.rm.lml.ui.providers;
 
 import java.util.ArrayList;
@@ -20,10 +30,6 @@ import org.eclipse.swt.widgets.Listener;
  * (for example: it is more difficult to react for cursor-focus on these rectangles,
  * texts as titles have to be painted
  * and can not be inserted by using a layout-manager)
- * 
- * 
- * @author karbach
- * 
  */
 public class RectPaintListener implements Listener {
 

@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- * 		Claudia Knobloch
+ * 		Claudia Knobloch, FZ Juelich
  */
 
 package org.eclipse.ptp.rm.lml.ui.views;
@@ -92,12 +92,14 @@ public class TableView extends ViewPart {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					if (composite != null) {
-						fSelectedLguiItem = lmlManager.getSelectedLguiItem();
-						if (fSelectedLguiItem != null && !fSelectedLguiItem.isEmpty()) {
+						fLguiItem = lmlManager.getSelectedLguiItem();
+						if (fLguiItem != null && !fLguiItem.isEmpty()) {
 							disposeTable();
 							createTable();
-							fSelectedLguiItem.getObjectStatus().addComponent(eventForwarder);
-							componentAdded = true;
+							if (fLguiItem.getObjectStatus() != null) {
+								fLguiItem.getObjectStatus().addComponent(eventForwarder);
+								componentAdded = true;
+							}
 						}
 					}
 				}
@@ -110,11 +112,11 @@ public class TableView extends ViewPart {
 				public void run() throws Exception {
 					if (composite != null) {
 						if (componentAdded) {
-							fSelectedLguiItem.getObjectStatus().removeComponent(eventForwarder);
+							fLguiItem.getObjectStatus().removeComponent(eventForwarder);
 							componentAdded = false;
 						}
 						saveColumnLayout();
-						fSelectedLguiItem = null;
+						fLguiItem = null;
 						setViewerInput();
 						disposeTable();
 					}
@@ -207,18 +209,19 @@ public class TableView extends ViewPart {
 							selectedItem = null;
 						}
 						if (componentAdded) {
-							if (fSelectedLguiItem != null) {
-								fSelectedLguiItem.getObjectStatus().removeComponent(eventForwarder);
+							if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
+								fLguiItem.getObjectStatus().removeComponent(eventForwarder);
 							}
 							componentAdded = false;
 						}
-						fSelectedLguiItem = lmlManager.getSelectedLguiItem();
-						if (sortIndex > -1 && sortDirection > -1) {
-							fSelectedLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, sortDirection);
+						fLguiItem = lmlManager.getSelectedLguiItem();
+						if (fLguiItem != null && fLguiItem.getTableHandler() != null && sortIndex > -1
+								&& sortDirection > -1) {
+							fLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, sortDirection);
 						}
 						setViewerInput();
-						if (fSelectedLguiItem != null) {
-							fSelectedLguiItem.getObjectStatus().addComponent(eventForwarder);
+						if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
+							fLguiItem.getObjectStatus().addComponent(eventForwarder);
 							componentAdded = true;
 						}
 
@@ -235,7 +238,7 @@ public class TableView extends ViewPart {
 	private int[] savedColumnWidths;
 	private TreeColumnLayout treeColumnLayout;
 	private TreeViewer viewer;
-	private ILguiItem fSelectedLguiItem = null;
+	private ILguiItem fLguiItem = null;
 	private String gid = null;
 	private final ILMLListener lmlListener = new LMLTableListListener();
 	private final LMLManager lmlManager = LMLManager.getInstance();
@@ -320,7 +323,7 @@ public class TableView extends ViewPart {
 		 * Get the selected LguiItem (if there is one) so that the table will be
 		 * populated when the it is first created
 		 */
-		fSelectedLguiItem = lmlManager.getSelectedLguiItem();
+		fLguiItem = lmlManager.getSelectedLguiItem();
 
 		createTable();
 	}
@@ -367,16 +370,16 @@ public class TableView extends ViewPart {
 	 * @param fSelected
 	 */
 	private void createColumns() {
-		if (fSelectedLguiItem.isLayout()) {
+		if (fLguiItem.isLayout() || fLguiItem.getTableHandler() == null) {
 			return;
 		}
 
-		final ITableColumnLayout[] tableColumnLayouts = fSelectedLguiItem.getTableHandler().getTableColumnLayout(gid);
+		final ITableColumnLayout[] tableColumnLayouts = fLguiItem.getTableHandler().getTableColumnLayout(gid);
 		if (tableColumnLayouts == null) {
 			return;
 		}
 
-		final int numCols = fSelectedLguiItem.getTableHandler().getNumberOfTableColumns(gid);
+		final int numCols = fLguiItem.getTableHandler().getNumberOfTableColumns(gid);
 		treeColumns = new TreeColumn[numCols];
 		savedColumnWidths = new int[numCols];
 
@@ -468,7 +471,7 @@ public class TableView extends ViewPart {
 					}
 				}
 				setSortParameter(sortIndex, tree.getSortDirection());
-				fSelectedLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, sortDirection);
+				fLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, sortDirection);
 				tree.setSortDirection(tree.getSortDirection());
 				lmlManager.sortLgui();
 			}
@@ -545,8 +548,8 @@ public class TableView extends ViewPart {
 					column.setWidth(0);
 					column.setResizable(false);
 				}
-				if (fSelectedLguiItem != null) {
-					fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(gid, getWidths());
+				if (fLguiItem != null) {
+					fLguiItem.getTableHandler().changeTableColumnsWidth(gid, getWidths());
 				}
 			}
 		});
@@ -554,17 +557,18 @@ public class TableView extends ViewPart {
 	}
 
 	private void createTable() {
-		if (fSelectedLguiItem != null && !fSelectedLguiItem.isEmpty()) {
+		if (fLguiItem != null && !fLguiItem.isEmpty()) {
 			createColumns();
-			final int[] sortProperties = fSelectedLguiItem.getTableHandler().getSortProperties(gid);
-			sortIndex = sortProperties[0];
-			sortDirection = sortProperties[1];
-			if (sortIndex > -1 && sortDirection > -1) {
-				fSelectedLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, sortDirection);
-				final TreeColumn treeColumn = tree.getColumn(sortIndex + 1);
-				tree.setSortColumn(treeColumn);
+			if (fLguiItem.getTableHandler() != null) {
+				final int[] sortProperties = fLguiItem.getTableHandler().getSortProperties(gid);
+				sortIndex = sortProperties[0];
+				sortDirection = sortProperties[1];
+				if (sortIndex > -1 && sortDirection > -1) {
+					fLguiItem.getTableHandler().sort(gid, SWT.UP, sortIndex, sortDirection);
+					final TreeColumn treeColumn = tree.getColumn(sortIndex + 1);
+					tree.setSortColumn(treeColumn);
+				}
 			}
-
 		}
 
 		// Insert the input
@@ -636,18 +640,18 @@ public class TableView extends ViewPart {
 	}
 
 	private void saveColumnLayout() {
-		if (fSelectedLguiItem != null) {
+		if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
 			if (tree.getColumnOrder().length != 0) {
 				final int[] indexe = removeFirstColumn(tree.getColumnOrder());
-				fSelectedLguiItem.getTableHandler().changeTableColumnsOrder(gid, indexe);
-				fSelectedLguiItem.getTableHandler().changeTableColumnsWidth(gid, getWidths());
+				fLguiItem.getTableHandler().changeTableColumnsOrder(gid, indexe);
+				fLguiItem.getTableHandler().changeTableColumnsWidth(gid, getWidths());
 				int index = 0;
 				for (int i = 0; i < indexe.length; i++) {
 					if (indexe[i] == sortIndex) {
 						index = i;
 					}
 				}
-				fSelectedLguiItem.getTableHandler().setSortProperties(gid, index, sortDirection);
+				fLguiItem.getTableHandler().setSortProperties(gid, index, sortDirection);
 			}
 
 		}
@@ -666,8 +670,8 @@ public class TableView extends ViewPart {
 		 */
 		if (!isMouseDown) {
 			Row[] input = new Row[0];
-			if (fSelectedLguiItem != null && !fSelectedLguiItem.isEmpty()) {
-				input = fSelectedLguiItem.getTableHandler().getTableDataWithColor(gid, gid.equals(ILguiItem.ACTIVE_JOB_TABLE));
+			if (fLguiItem != null && !fLguiItem.isEmpty() && fLguiItem.getTableHandler() != null) {
+				input = fLguiItem.getTableHandler().getTableDataWithColor(gid, gid.equals(ILguiItem.ACTIVE_JOB_TABLE));
 			}
 			if (!composite.isDisposed()) {
 				viewer.setInput(input);

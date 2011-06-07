@@ -1,3 +1,13 @@
+/**
+ * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ * 		Carsten Karbach, Claudia Knobloch,FZ Juelich
+ */
 package org.eclipse.ptp.rm.lml.ui.providers;
 
 import java.util.List;
@@ -75,14 +85,7 @@ public class NodedisplayView extends LguiWidget {
 		waitcursor = new Cursor(this.getDisplay(), SWT.CURSOR_WAIT);
 
 		addResizeListenerForScrollPane();
-	}
-
-	public void checkEmptyScreen() {
-		if (lguiItem != null) {
-			setVisible(true);
-		} else {
-			setVisible(false);
-		}
+		checkEmptyScreen();
 	}
 
 	@Override
@@ -209,6 +212,7 @@ public class NodedisplayView extends LguiWidget {
 		if (nodedisplay != null) {
 			goToImpname(shownImpName, true);
 		}
+		checkEmptyScreen();
 	}
 
 	/**
@@ -287,6 +291,14 @@ public class NodedisplayView extends LguiWidget {
 			}
 		});
 
+	}
+
+	private void checkEmptyScreen() {
+		if (lguiItem != null) {
+			setVisible(true);
+		} else {
+			setVisible(false);
+		}
 	}
 
 	/**

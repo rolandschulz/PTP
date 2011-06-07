@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- * 		Claudia Knobloch
+ * 		Claudia Knobloch, FZ Juelich
  */
 
 package org.eclipse.ptp.rm.lml.ui.views;
@@ -72,13 +72,13 @@ public class NodesView extends ViewPart {
 		}
 
 		public void handleEvent(IMarkObjectEvent event) {
-			if (fLguiItem != null) {
+			if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
 				fLguiItem.getObjectStatus().mouseDown(event.getOid());
 			}
 		}
 
 		public void handleEvent(ISelectedObjectChangeEvent event) {
-			if (fLguiItem != null) {
+			if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
 				fLguiItem.getObjectStatus().mouseOver(event.getOid());
 			}
 		}
@@ -88,13 +88,13 @@ public class NodesView extends ViewPart {
 		}
 
 		public void handleEvent(IUnmarkObjectEvent event) {
-			if (fLguiItem != null) {
+			if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
 				fLguiItem.getObjectStatus().mouseUp(event.getOid());
 			}
 		}
 
 		public void handleEvent(IUnselectedObjectEvent event) {
-			if (fLguiItem != null) {
+			if (fLguiItem != null && fLguiItem.getOIDToObject() != null && fLguiItem.getObjectStatus() != null) {
 				final ObjectType object = fLguiItem.getOIDToObject().getObjectById(event.getOid());
 				fLguiItem.getObjectStatus().mouseexit(object);
 			}
@@ -142,7 +142,6 @@ public class NodesView extends ViewPart {
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		lmlManager.addListener(lguiListener, this.getClass().getName());
 
-		fLguiItem = lmlManager.getSelectedLguiItem();
 		createNodedisplayView();
 	}
 
