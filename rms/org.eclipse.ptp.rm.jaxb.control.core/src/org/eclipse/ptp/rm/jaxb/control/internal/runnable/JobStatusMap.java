@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
@@ -44,17 +45,20 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#addJobStatus(java.lang
 	 * .String, org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus)
 	 */
-	public void addJobStatus(String jobId, ICommandJobStatus status) {
+	public boolean addJobStatus(String jobId, ICommandJobStatus status) {
 		boolean notifyAdd = false;
+		boolean exists = false;
 		synchronized (map) {
-			if (!map.containsKey(jobId) && !IJobStatus.UNDETERMINED.equals(status.getState())) {
-				notifyAdd = true;
-			}
+			exists = map.containsKey(jobId);
+			notifyAdd = !exists && !IJobStatus.UNDETERMINED.equals(status.getState());
 			map.put(jobId, status);
 		}
 		if (notifyAdd) {
+			status.initialize(jobId);
+			((IJAXBResourceManager) rm).fireJobChanged(jobId);
 			rm.addJob(jobId, status);
 		}
+		return !exists;
 	}
 
 	/*

@@ -91,26 +91,6 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * Calls the string substitution method on the variable manager. Under
-	 * synchronization, sets the variable resolver's map reference to this
-	 * instance.
-	 * 
-	 * @param expression
-	 *            to be resolved (recursively dereferenced from the map).
-	 * @return the resolved expression
-	 * @throws CoreException
-	 */
-	private String dereference(String expression) throws CoreException {
-		if (expression == null) {
-			return null;
-		}
-		synchronized (monitor) {
-			LCVariableResolver.setActive(this);
-			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
-		}
-	}
-
-	/**
 	 * @param name
 	 *            of widget, bound to a Property or Attribute
 	 * @return value of the Property or Attribute, or <code>null</code> if none
@@ -153,76 +133,6 @@ public class LCVariableMap implements IVariableMap {
 	 */
 	public Map<String, Object> getDiscovered() {
 		return null;
-	}
-
-	/**
-	 * Determine the value of a hidden property. Note that the presence of a
-	 * symbolic link overrides the value which in turn overrides the default
-	 * value.
-	 * 
-	 * @param name
-	 * @param current
-	 * @return
-	 */
-	public Object getHiddenValue(String name, Map<String, Object> current) {
-		Object value = null;
-		Object o = hidden.get(name);
-		String link = null;
-		if (o instanceof PropertyType) {
-			PropertyType p = (PropertyType) o;
-			value = p.getValue();
-			link = p.getLinkValueTo();
-		} else if (o instanceof AttributeType) {
-			AttributeType a = (AttributeType) o;
-			value = a.getValue();
-			link = a.getLinkValueTo();
-		}
-		if (link != null) {
-			Object linked = current.get(link);
-			if (linked != null && !JAXBUIConstants.ZEROSTR.equals(linked)) {
-				value = linked;
-			}
-		}
-		if (value == null || JAXBUIConstants.ZEROSTR.equals(value)) {
-			value = defaultValues.get(name);
-		}
-		return value;
-	}
-
-	/**
-	 * Ensures that non-JAXB-spacific attributes and hidden variables remain in
-	 * the configuration during replace/refresh.
-	 * 
-	 * @param configuration
-	 *            current launch settings
-	 * @return map of org.eclipse.debug and org.eclipse.ptp attributes
-	 * @throws CoreException
-	 */
-	public Map<String, Object> getStandardConfigurationProperties(ILaunchConfiguration configuration, Map<String, Object> current)
-			throws CoreException {
-		Map<String, Object> standard = new TreeMap<String, Object>();
-		for (String name : hidden.keySet()) {
-			Object value = getHiddenValue(name, current);
-			if (value != null) {
-				standard.put(name, value);
-			}
-		}
-		Map<?, ?> attributes = configuration.getAttributes();
-		for (Object o : attributes.keySet()) {
-			String key = (String) o;
-			if (key.startsWith(JAXBControlConstants.DEBUG_PACKAGE) || key.startsWith(JAXBControlConstants.PTP_PACKAGE)) {
-				standard.put(key, attributes.get(key));
-			}
-		}
-		standard.put(
-				JAXBControlConstants.DIRECTORY,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR,
-						(String) standard.get(JAXBControlConstants.CONTROL_WORKING_DIR_VAR)));
-		standard.put(JAXBControlConstants.EXEC_PATH,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
-		standard.put(JAXBControlConstants.PROG_ARGS,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
-		return standard;
 	}
 
 	/**
@@ -289,6 +199,199 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
+	 * Does not allow <code>null</code> values.
+	 * 
+	 * @param name
+	 *            of widget, bound to a Property or Attribute
+	 * @param value
+	 *            of Property or Attribute
+	 */
+	public void put(String name, Object value) {
+		if (value == null) {
+			values.remove(name);
+		} else {
+			values.put(name, value);
+		}
+	}
+
+	/**
+	 * Relink the hidden variables in the current environment. Note that the
+	 * presence of a symbolic link overrides the default value only if the
+	 * linked value is not <code>null</code>
+	 * 
+	 * @param current
+	 */
+	public void relinkHidden(Map<String, Object> current) {
+		for (String name : hidden.keySet()) {
+			Object value = null;
+			Object o = hidden.get(name);
+			String link = null;
+			if (o instanceof PropertyType) {
+				PropertyType p = (PropertyType) o;
+				link = p.getLinkValueTo();
+			} else if (o instanceof AttributeType) {
+				AttributeType a = (AttributeType) o;
+				link = a.getLinkValueTo();
+			}
+			if (link != null) {
+				Object linked = current.get(link);
+				if (linked != null && !JAXBUIConstants.ZEROSTR.equals(linked)) {
+					value = linked;
+				}
+			}
+			if (value == null || JAXBUIConstants.ZEROSTR.equals(value)) {
+				value = defaultValues.get(name);
+			}
+			if (value != null) {
+				current.put(name, value);
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @param name
+	 *            of widget, bound to a Property or Attribute
+	 * @return value of Property or Attribute
+	 */
+	public Object remove(String name) {
+		return values.remove(name);
+	}
+
+	/**
+	 * Only save hidden variable values which are not linked.
+	 * 
+	 * @param current
+	 *            local map
+	 * @param saved
+	 *            to save to
+	 */
+	public void saveHiddenNonLinked(Map<String, Object> current, Map<String, Object> saved) {
+		for (String name : hidden.keySet()) {
+			Object o = hidden.get(name);
+			Object v = null;
+			if (o instanceof PropertyType) {
+				PropertyType p = (PropertyType) o;
+				if (p.getLinkValueTo() == null) {
+					v = p.getValue();
+				}
+			} else if (o instanceof AttributeType) {
+				AttributeType a = (AttributeType) o;
+				if (a.getLinkValueTo() == null) {
+					v = a.getValue();
+				}
+			}
+			if (v != null) {
+				saved.put(name, v);
+			}
+		}
+	}
+
+	/**
+	 * Ensures that non-JAXB-spacific attributes remain in the configuration
+	 * during replace/refresh.
+	 * 
+	 * @param configuration
+	 *            current launch settings
+	 * @param current
+	 *            map
+	 * @param saved
+	 *            map of saved configuration values
+	 * @throws CoreException
+	 */
+	public void saveStandardConfigurationProperties(ILaunchConfiguration configuration, Map<String, Object> current,
+			Map<String, Object> saved) throws CoreException {
+		Map<?, ?> attributes = configuration.getAttributes();
+		for (Object o : attributes.keySet()) {
+			String key = (String) o;
+			if (key.startsWith(JAXBControlConstants.DEBUG_PACKAGE) || key.startsWith(JAXBControlConstants.PTP_PACKAGE)) {
+				saved.put(key, attributes.get(key));
+			}
+		}
+		saved.put(
+				JAXBControlConstants.DIRECTORY,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR,
+						(String) saved.get(JAXBControlConstants.CONTROL_WORKING_DIR_VAR)));
+		saved.put(JAXBControlConstants.EXEC_PATH,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
+		saved.put(JAXBControlConstants.PROG_ARGS,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#setInitialized(boolean)
+	 */
+	public void setInitialized(boolean initialized) {
+		// does nothing
+	}
+
+	/**
+	 * Exchange the current volatile map for the one passed in.
+	 * 
+	 * @param newV
+	 *            map to replace current
+	 * @return current map
+	 * @throws CoreException
+	 */
+	public Map<String, Object> swapVariables(Map<String, Object> newV) throws CoreException {
+		Map<String, Object> oldV = values;
+		values = newV;
+		return oldV;
+	}
+
+	/**
+	 * Set the volatile map to the original global map, but first update the
+	 * latter with the most recent values from the configuration.
+	 * 
+	 * @throws CoreException
+	 */
+	@SuppressWarnings("rawtypes")
+	public void updateGlobal(ILaunchConfiguration configuration) throws CoreException {
+		Map attr = configuration.getAttributes();
+		for (Object k : attr.keySet()) {
+			Object val = attr.get(k);
+			if (val != null) {
+				globalValues.put((String) k, attr.get(k));
+			}
+		}
+		values = globalValues;
+	}
+
+	/**
+	 * Replace the attribute map on the configuration with the current
+	 * (volatile) map.
+	 * 
+	 * @param configuration
+	 *            working copy of Launch Tab's current configuration
+	 * @throws CoreException
+	 */
+	public void writeToConfiguration(ILaunchConfigurationWorkingCopy configuration) throws CoreException {
+		configuration.setAttributes(values);
+	}
+
+	/**
+	 * Calls the string substitution method on the variable manager. Under
+	 * synchronization, sets the variable resolver's map reference to this
+	 * instance.
+	 * 
+	 * @param expression
+	 *            to be resolved (recursively dereferenced from the map).
+	 * @return the resolved expression
+	 * @throws CoreException
+	 */
+	private String dereference(String expression) throws CoreException {
+		if (expression == null) {
+			return null;
+		}
+		synchronized (monitor) {
+			LCVariableResolver.setActive(this);
+			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
+		}
+	}
+
+	/**
 	 * If the value of the Property or Attribute is <code>null</code> and it has
 	 * a defined default, the value is set to the default.
 	 * 
@@ -343,84 +446,5 @@ public class LCVariableMap implements IVariableMap {
 			}
 			put(name, strVal);
 		}
-	}
-
-	/**
-	 * Does not allow <code>null</code> values.
-	 * 
-	 * @param name
-	 *            of widget, bound to a Property or Attribute
-	 * @param value
-	 *            of Property or Attribute
-	 */
-	public void put(String name, Object value) {
-		if (value == null) {
-			values.remove(name);
-		} else {
-			values.put(name, value);
-		}
-	}
-
-	/**
-	 * 
-	 * @param name
-	 *            of widget, bound to a Property or Attribute
-	 * @return value of Property or Attribute
-	 */
-	public Object remove(String name) {
-		return values.remove(name);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#setInitialized(boolean)
-	 */
-	public void setInitialized(boolean initialized) {
-		// does nothing
-	}
-
-	/**
-	 * Exchange the current volatile map for the one passed in.
-	 * 
-	 * @param newV
-	 *            map to replace current
-	 * @return current map
-	 * @throws CoreException
-	 */
-	public Map<String, Object> swapVariables(Map<String, Object> newV) throws CoreException {
-		Map<String, Object> oldV = values;
-		values = newV;
-		return oldV;
-	}
-
-	/**
-	 * Set the volatile map to the original global map, but first update the
-	 * latter with the most recent values from the configuration.
-	 * 
-	 * @throws CoreException
-	 */
-	@SuppressWarnings("rawtypes")
-	public void updateGlobal(ILaunchConfiguration configuration) throws CoreException {
-		Map attr = configuration.getAttributes();
-		for (Object k : attr.keySet()) {
-			Object val = attr.get(k);
-			if (val != null) {
-				globalValues.put((String) k, attr.get(k));
-			}
-		}
-		values = globalValues;
-	}
-
-	/**
-	 * Replace the attribute map on the configuration with the current
-	 * (volatile) map.
-	 * 
-	 * @param configuration
-	 *            working copy of Launch Tab's current configuration
-	 * @throws CoreException
-	 */
-	public void writeToConfiguration(ILaunchConfigurationWorkingCopy configuration) throws CoreException {
-		configuration.setAttributes(values);
 	}
 }

@@ -163,108 +163,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/**
-	 * Adds the View Script and Restore Defaults buttons to the bottom of the
-	 * control pane.
-	 * 
-	 * @param control
-	 */
-	private void createViewScriptGroup(final Composite control) {
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(3, true, 5, 5, 2, 2);
-		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 3);
-		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
-
-		if (parentTab.hasScript()) {
-			WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, this);
-		}
-
-		WidgetBuilderUtils.createPushButton(grp, Messages.ViewConfig, this);
-
-		WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				resetDefaults();
-			}
-		});
-	}
-
-	/**
-	 * Creates a contents string from the current configuration.
-	 * 
-	 * @param config
-	 *            current
-	 * @return string representing contents
-	 * @throws Throwable
-	 */
-	private synchronized String displayConfigurationContents(final ILaunchConfiguration config) throws Throwable {
-		final StringBuffer buffer = new StringBuffer();
-		refreshLocal(config);
-		Job job = new Job(JAXBControlUIConstants.ZEROSTR) {
-			@SuppressWarnings({ "rawtypes", "unchecked" })
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				try {
-					Map<Object, Object> attr = config.getAttributes();
-					for (Map.Entry e : attr.entrySet()) {
-						Object v = e.getValue();
-						if (v != null && !JAXBControlUIConstants.ZEROSTR.equals(v)) {
-							buffer.append(e.getKey()).append(JAXBControlUIConstants.EQ).append(v)
-									.append(JAXBControlUIConstants.LINE_SEP);
-						}
-					}
-				} catch (CoreException t) {
-					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
-				}
-				return Status.OK_STATUS;
-			}
-
-		};
-		job.schedule();
-		try {
-			job.join();
-		} catch (InterruptedException ignored) {
-		}
-		return buffer.toString();
-	}
-
-	/*
-	 * Writes values of local widgets or cell editors (if the viewer row is
-	 * selected) to the local map. We enforce the same exclusion of
-	 * <code>null</code> as we do on the LCVariableMap#put method (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab#
-	 * doRefreshLocal()
-	 */
-	@Override
-	protected void doRefreshLocal() {
-		Object value = null;
-		for (IUpdateModel m : getModels()) {
-			if (!m.isWritable()) {
-				continue;
-			}
-			if (m instanceof ICellEditorUpdateModel) {
-				if (((ICellEditorUpdateModel) m).isChecked()) {
-					value = m.getValueFromControl();
-					if (value != null) {
-						localMap.put(m.getName(), value);
-					}
-				}
-			} else {
-				value = m.getValueFromControl();
-				if (value != null) {
-					localMap.put(m.getName(), value);
-				}
-				if (m instanceof ViewerUpdateModel) {
-					((ViewerUpdateModel) m).putCheckedSettings(localMap);
-				}
-			}
-		}
-	}
-
-	/**
 	 * The top-level control.
 	 */
 	public Control getControl() {
@@ -292,18 +190,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 */
 	public Map<Object, IUpdateModel> getLocalWidgets() {
 		return localWidgets;
-	}
-
-	/**
-	 * Gathers widgets to include in the local mapping.
-	 * 
-	 * @return the set of widgets to be accessed for values.
-	 */
-	private Collection<IUpdateModel> getModels() {
-		Collection<IUpdateModel> models = new ArrayList<IUpdateModel>();
-		models.addAll(sharedModels);
-		models.addAll(localWidgets.values());
-		return models;
 	}
 
 	/**
@@ -399,62 +285,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		return super.performApply(configuration, rm, queue);
 	}
 
-	/**
-	 * After refreshing the local map, it swaps in the map to be the active
-	 * environment, adds any environment variables from the Environment Tab,
-	 * then schedules a script handler job. Swaps the previous map back into the
-	 * active environement when the handler returns.
-	 * 
-	 * @param config
-	 * @return the script
-	 * @throws Throwable
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private synchronized String realizeLocalScript(ILaunchConfiguration config) throws Throwable {
-		String value = JAXBControlUIConstants.ZEROSTR;
-		refreshLocal(config);
-		LCVariableMap lcMap = parentTab.getLCMap();
-		Map<String, Object> current = lcMap.swapVariables(localMap);
-		Map env = config.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
-		ScriptHandler job = new ScriptHandler(null, parentTab.getScript(), lcMap, env, true);
-		job.schedule();
-		try {
-			job.join();
-		} catch (InterruptedException ignored) {
-		}
-		value = job.getScriptValue();
-		lcMap.swapVariables(current);
-		return value;
-	}
-
-	/**
-	 * Runs only on local widgets. First resets default values from the
-	 * LCVariableMap on widgets and selected rows in the viewers, then has the
-	 * viewers rewrite their templated strings. The update handler is called to
-	 * refresh all the widgets from the map, and then the viewers are refreshed.
-	 */
-	private synchronized void resetDefaults() {
-		Collection<IUpdateModel> models = localWidgets.values();
-		for (IUpdateModel m : models) {
-			if (m instanceof ICellEditorUpdateModel) {
-				if (((ICellEditorUpdateModel) m).isChecked()) {
-					m.restoreDefault();
-				}
-			} else {
-				m.restoreDefault();
-			}
-		}
-		for (IUpdateModel m : models) {
-			if (m instanceof ViewerUpdateModel) {
-				((ViewerUpdateModel) m).storeValue();
-			}
-		}
-		updateHandler.handleUpdate(null, null);
-		for (Viewer v : viewers) {
-			v.refresh();
-		}
-	}
-
 	/*
 	 * Defaults are taken care of by the load method on the LCVariableMap
 	 * (non-Javadoc)
@@ -512,21 +342,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		}
 	}
 
-	/**
-	 * Runs the validator on the widgets, if they have one.
-	 * 
-	 * @return invalid on first failure; else valid;
-	 */
-	private RMLaunchValidation validateWidgets() {
-		for (IUpdateModel m : localWidgets.values()) {
-			String error = m.validate();
-			if (error != null) {
-				return new RMLaunchValidation(false, error);
-			}
-		}
-		return new RMLaunchValidation(true, null);
-	}
-
 	/*
 	 * Tab acts a listener for viewScript button. (non-Javadoc)
 	 * 
@@ -569,5 +384,199 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		} catch (Throwable t) {
 			WidgetActionUtils.errorMessage(shell, t, Messages.DisplayError, Messages.DisplayErrorTitle, false);
 		}
+	}
+
+	/*
+	 * Writes values of local widgets or cell editors (if the viewer row is
+	 * selected) to the local map. We enforce the same exclusion of
+	 * <code>null</code> as we do on the LCVariableMap#put method (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab#
+	 * doRefreshLocal()
+	 */
+	@Override
+	protected void doRefreshLocal() {
+		Object value = null;
+		List<ViewerUpdateModel> viewerModels = new ArrayList<ViewerUpdateModel>();
+		for (IUpdateModel m : getModels()) {
+			if (!m.isWritable()) {
+				continue;
+			}
+			if (m instanceof ViewerUpdateModel) {
+				viewerModels.add((ViewerUpdateModel) m);
+				continue;
+			}
+			if (m instanceof ICellEditorUpdateModel) {
+				if (((ICellEditorUpdateModel) m).isChecked()) {
+					value = m.getValueFromControl();
+					if (value != null) {
+						localMap.put(m.getName(), value);
+					}
+				}
+			} else {
+				value = m.getValueFromControl();
+				if (value != null) {
+					localMap.put(m.getName(), value);
+				}
+			}
+		}
+		for (ViewerUpdateModel m : viewerModels) {
+			value = m.getValueFromControl();
+			if (value != null) {
+				localMap.put(m.getName(), value);
+			}
+			m.putCheckedSettings(localMap);
+		}
+	}
+
+	/**
+	 * Adds the View Script and Restore Defaults buttons to the bottom of the
+	 * control pane.
+	 * 
+	 * @param control
+	 */
+	private void createViewScriptGroup(final Composite control) {
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(3, true, 5, 5, 2, 2);
+		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 3);
+		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
+
+		if (parentTab.hasScript()) {
+			WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, this);
+		}
+
+		WidgetBuilderUtils.createPushButton(grp, Messages.ViewConfig, this);
+
+		WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				resetDefaults();
+			}
+		});
+	}
+
+	/**
+	 * Creates a contents string from the current configuration.
+	 * 
+	 * @param config
+	 *            current
+	 * @return string representing contents
+	 * @throws Throwable
+	 */
+	private synchronized String displayConfigurationContents(final ILaunchConfiguration config) throws Throwable {
+		final StringBuffer buffer = new StringBuffer();
+		refreshLocal(config);
+		Job job = new Job(JAXBControlUIConstants.ZEROSTR) {
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					Map<Object, Object> attr = config.getAttributes();
+					for (Map.Entry e : attr.entrySet()) {
+						Object v = e.getValue();
+						if (v != null && !JAXBControlUIConstants.ZEROSTR.equals(v)) {
+							buffer.append(e.getKey()).append(JAXBControlUIConstants.EQ).append(v)
+									.append(JAXBControlUIConstants.LINE_SEP);
+						}
+					}
+				} catch (CoreException t) {
+					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
+				}
+				return Status.OK_STATUS;
+			}
+
+		};
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException ignored) {
+		}
+		return buffer.toString();
+	}
+
+	/**
+	 * Gathers widgets to include in the local mapping.
+	 * 
+	 * @return the set of widgets to be accessed for values.
+	 */
+	private Collection<IUpdateModel> getModels() {
+		Collection<IUpdateModel> models = new ArrayList<IUpdateModel>();
+		models.addAll(sharedModels);
+		models.addAll(localWidgets.values());
+		return models;
+	}
+
+	/**
+	 * After refreshing the local map, it swaps in the map to be the active
+	 * environment, adds any environment variables from the Environment Tab,
+	 * then schedules a script handler job. Swaps the previous map back into the
+	 * active environement when the handler returns.
+	 * 
+	 * @param config
+	 * @return the script
+	 * @throws Throwable
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private synchronized String realizeLocalScript(ILaunchConfiguration config) throws Throwable {
+		String value = JAXBControlUIConstants.ZEROSTR;
+		refreshLocal(config);
+		LCVariableMap lcMap = parentTab.getLCMap();
+		Map<String, Object> current = lcMap.swapVariables(localMap);
+		Map env = config.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
+		ScriptHandler job = new ScriptHandler(null, parentTab.getScript(), lcMap, env, true);
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException ignored) {
+		}
+		value = job.getScriptValue();
+		lcMap.swapVariables(current);
+		return value;
+	}
+
+	/**
+	 * Runs only on local widgets. First resets default values from the
+	 * LCVariableMap on widgets and selected rows in the viewers, then has the
+	 * viewers rewrite their templated strings. The update handler is called to
+	 * refresh all the widgets from the map, and then the viewers are refreshed.
+	 */
+	private synchronized void resetDefaults() {
+		Collection<IUpdateModel> models = localWidgets.values();
+		for (IUpdateModel m : models) {
+			if (m instanceof ICellEditorUpdateModel) {
+				if (((ICellEditorUpdateModel) m).isChecked()) {
+					m.restoreDefault();
+				}
+			} else {
+				m.restoreDefault();
+			}
+		}
+		for (IUpdateModel m : models) {
+			if (m instanceof ViewerUpdateModel) {
+				((ViewerUpdateModel) m).storeValue();
+			}
+		}
+		updateHandler.handleUpdate(null, null);
+		for (Viewer v : viewers) {
+			v.refresh();
+		}
+	}
+
+	/**
+	 * Runs the validator on the widgets, if they have one.
+	 * 
+	 * @return invalid on first failure; else valid;
+	 */
+	private RMLaunchValidation validateWidgets() {
+		for (IUpdateModel m : localWidgets.values()) {
+			String error = m.validate();
+			if (error != null) {
+				return new RMLaunchValidation(false, error);
+			}
+		}
+		return new RMLaunchValidation(true, null);
 	}
 }

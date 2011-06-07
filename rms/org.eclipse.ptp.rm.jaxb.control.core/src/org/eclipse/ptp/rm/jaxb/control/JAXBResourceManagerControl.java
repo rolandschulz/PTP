@@ -538,27 +538,19 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			return status;
 		}
 
-		try {
-			/*
-			 * initialize the job status while the id property is live
-			 */
-			pinTable.pin(jobId);
-			rmVarMap.put(jobId, p);
-			status.initialize(jobId);
-			jobStatusMap.addJobStatus(status.getJobId(), status);
-			status.setLaunchConfig(configuration);
-			worked(progress, 5);
+		/*
+		 * initialize the job status while the id property is live
+		 */
+		jobStatusMap.addJobStatus(status.getJobId(), status);
+		status.setLaunchConfig(configuration);
+		worked(progress, 5);
 
-			/*
-			 * to ensure the most recent script is used at the next call
-			 */
-			rmVarMap.remove(jobId);
-			rmVarMap.remove(JAXBControlConstants.SCRIPT_PATH);
-			rmVarMap.remove(JAXBControlConstants.SCRIPT);
-			return status;
-		} finally {
-			pinTable.release(jobId);
-		}
+		/*
+		 * to ensure the most recent script is used at the next call
+		 */
+		rmVarMap.remove(JAXBControlConstants.SCRIPT_PATH);
+		rmVarMap.remove(JAXBControlConstants.SCRIPT);
+		return status;
 	}
 
 	/**

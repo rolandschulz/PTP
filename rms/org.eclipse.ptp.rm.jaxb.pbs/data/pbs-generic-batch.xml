@@ -720,6 +720,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 							<items-from>queues</items-from>
 						</widget>
 					</composite>
+					<!-- VIEWER group -->
 					<composite group="true">
 						<layout>
 							<grid-layout numColumns="1"/>

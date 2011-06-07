@@ -144,9 +144,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private ICommandJobStreamsProxy proxy;
 	private IRemoteProcess process;
 
+	private boolean initialized;
 	private boolean waitEnabled;
-	private boolean dirty = false;
-	private boolean fFilesChecked = false;
+	private boolean dirty;
+	private boolean fFilesChecked;
 
 	private long lastRequestedUpdate;
 
@@ -176,6 +177,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 		this.control = control;
 		waitEnabled = true;
 		lastRequestedUpdate = 0;
+		initialized = false;
+		dirty = false;
+		fFilesChecked = false;
 	}
 
 	/**
@@ -340,6 +344,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * )
 	 */
 	public void initialize(String jobId) {
+		if (initialized) {
+			return;
+		}
 		this.jobId = jobId;
 		String path = null;
 		remoteOutputPath = null;
@@ -367,6 +374,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				remoteErrorPath = rmVarMap.getString(jobId, path);
 			}
 		}
+		initialized = true;
 	}
 
 	/**
@@ -624,7 +632,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 					}
 				}
 
-				if (p == null || !stateChanged()) {
+				if (!stateChanged()) {
 					continue;
 				}
 
@@ -633,8 +641,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 				 * environment
 				 */
 				env.put(jobId, p);
-				map.addJobStatus(jobId, this);
-				control.jobStateChanged(jobId, this);
+				if (!map.addJobStatus(jobId, this)) {
+					control.jobStateChanged(jobId, this);
+				}
 			}
 		}
 	}

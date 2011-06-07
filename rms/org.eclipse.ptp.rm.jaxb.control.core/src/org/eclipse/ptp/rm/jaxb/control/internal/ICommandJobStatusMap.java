@@ -21,8 +21,9 @@ public interface ICommandJobStatusMap extends Runnable {
 	 *            either internal UUID or scheduler id for the job.
 	 * @param status
 	 *            object containing status info and stream proxy
+	 * @return true if added, false if the entry already exists
 	 */
-	public void addJobStatus(String jobId, ICommandJobStatus status);
+	public boolean addJobStatus(String jobId, ICommandJobStatus status);
 
 	/**
 	 * @param jobId

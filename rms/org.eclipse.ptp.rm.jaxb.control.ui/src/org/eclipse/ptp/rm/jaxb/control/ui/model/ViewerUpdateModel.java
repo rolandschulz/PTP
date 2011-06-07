@@ -231,12 +231,13 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	}
 
 	/*
-	 * Retrieves the last value of the pattern string.(non-Javadoc)
+	 * NOP for this type; easier to keep in sync at the storeValue
+	 * call.(non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#refreshValueFromMap()
 	 */
 	public void refreshValueFromMap() {
-		mapValue = lcMap.get(name);
+		// does nothing
 	}
 
 	/**
@@ -277,6 +278,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		} else {
 			lcMap.remove(name);
 		}
+		mapValue = t;
 		return t;
 	}
 
@@ -306,6 +308,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		} else {
 			columnViewer.removeFilter(filter);
 		}
+		storeValue();
 		handleUpdate(null);
 	}
 }
