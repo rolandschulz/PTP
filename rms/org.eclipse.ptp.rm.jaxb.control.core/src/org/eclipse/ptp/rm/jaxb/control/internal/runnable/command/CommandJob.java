@@ -192,6 +192,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private final boolean waitForId;
 	private final JobMode mode;
 	private final boolean keepOpen;
+	private boolean ignoreExitStatus;
 
 	private final StringBuffer error;
 	private Thread jobThread;
@@ -208,8 +209,6 @@ public class CommandJob extends Job implements ICommandJob {
 	private ICommandJobStatus jobStatus;
 	private IStatus status;
 	private boolean active;
-
-	private boolean ignoreExitStatus;
 
 	/**
 	 * @param jobUUID

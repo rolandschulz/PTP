@@ -632,11 +632,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 				 * guarantee the presence of intermediate state in the
 				 * environment
 				 */
-				if (!isReached(state, waitUntil)) {
-					env.put(jobId, p);
-					map.addJobStatus(jobId, this);
-					control.jobStateChanged(jobId, this);
-				}
+				env.put(jobId, p);
+				map.addJobStatus(jobId, this);
+				control.jobStateChanged(jobId, this);
 			}
 		}
 	}

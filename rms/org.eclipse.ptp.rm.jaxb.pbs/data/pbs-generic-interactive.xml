@@ -11,6 +11,10 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-generic-interactive">
 	<control-data>
+	   <!-- this is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
+      <property name="control.queue.name" visible="false">
+         <link-value-to>destination</link-value-to>
+      </property>
 		<property name="queues" visible="false"/>
 		<property name="mpiPrefix" visible="false">
 			<default>${ptp_rm:mpiCommand#value} -np ${ptp_rm:mpiCores#value}</default>
@@ -64,7 +68,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<stdout-parser delim="\n">
 			   <target ref="@jobId">
                <match>
-                  <expression flags="DOTALL">qsub:.+job[\s]+([\d]+)[.].+[\s]to start.*</expression>
+                  <expression flags="DOTALL">qsub:.+job[\s]+([\d]+[.].+)[\s]to start.*</expression>
                   <set field="name">
                      <entry valueGroup="1"/>
                   </set>
@@ -75,7 +79,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
             </target>
 				<target ref="@jobId">
 					<match>
-						<expression flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.].+[\s]ready.*</expression>
+						<expression flags="DOTALL">qsub:[\s]+job[\s]+([\d]+[.].+)[\s]ready.*</expression>
 						<set field="name">
 							<entry valueGroup="1"/>
 						</set>
@@ -84,7 +88,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</set>
 					</match>
 				</target>
-				<exit-after flags="DOTALL">qsub:[\s]+job[\s]+([\d]+)[.].+[\s]ready.*</exit-after>
+				<exit-after flags="DOTALL">qsub:[\s]+job[\s]+([\d]+[.].+)[\s]ready.*</exit-after>
 			</stdout-parser>
 			<stderr-parser delim="\n">
 				<target ref="@jobId">
