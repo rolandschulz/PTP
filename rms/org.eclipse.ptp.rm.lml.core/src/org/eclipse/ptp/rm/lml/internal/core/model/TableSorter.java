@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.lml.internal.core.model;
 
 import java.util.Comparator;
 
+import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
 
 /**
@@ -61,9 +62,9 @@ public class TableSorter implements Comparator<RowType> {
 	}
 
 	/**
-	 * Compares two arguments of the RowType for order.
-	 * If their are equal, the method returns 0. Returns -1, 0 or 1 as the first argument is less than, equal to, or greater than
-	 * the second.
+	 * Compares two arguments of the RowType for order. If they are equal, the
+	 * method returns 0. Returns -1, 0 or 1 as the first argument is less than,
+	 * equal to, or greater than the second.
 	 * 
 	 * @param a
 	 *            first element
@@ -72,36 +73,43 @@ public class TableSorter implements Comparator<RowType> {
 	 * @return integer which represents the result of the comparison
 	 */
 	public int compare(RowType a, RowType b) {
-		if ((a.getCell().get(sortIndex) == null && b.getCell().get(sortIndex) == null)
-				|| (a.getCell().get(sortIndex).getValue().equals("?") && b.getCell().get(sortIndex).getValue().equals("?"))) {
+		CellType aCell = a.getCell().get(sortIndex);
+		String aValue = null;
+		if (aCell != null) {
+			aValue = aCell.getValue();
+		}
+		CellType bCell = b.getCell().get(sortIndex);
+		String bValue = null;
+		if (bCell != null) {
+			bValue = bCell.getValue();
+		}
+		if ((aCell == null && bCell == null) || ((aValue != null && aValue.equals("?")) && (bValue != null && bValue.equals("?")))) { //$NON-NLS-1$ //$NON-NLS-2$
 			return 0;
 		}
-		if (a.getCell().get(sortIndex) == null || a.getCell().get(sortIndex).getValue().equals("?")) {
+		if (aCell == null || aValue == null || aValue.equals("?")) { //$NON-NLS-1$
 			return sortDirection == up ? -1 : 1;
 		}
-		if (b.getCell().get(sortIndex) == null || b.getCell().get(sortIndex).getValue().equals("?")) {
+		if (bCell == null || bValue == null || bValue.equals("?")) { //$NON-NLS-1$
 			return sortDirection == up ? 1 : -1;
 		}
 		// The two elements are equal
-		if (a.getCell().get(sortIndex).getValue().equals(b.getCell().get(sortIndex).getValue())) {
+		if (aValue.equals(bValue)) {
 			return 0;
 		}
 		// The two elements are not equal
-		if (sortType.equals("numeric")) {
+		if (sortType.equals("numeric")) { //$NON-NLS-1$
 			// The sort type is a numeric one
 			if (sortDirection == up) {
-				return Integer.parseInt(a.getCell().get(sortIndex).getValue()) < Integer.parseInt(b.getCell().get(sortIndex)
-						.getValue()) ? -1 : 1;
+				return Integer.parseInt(aValue) < Integer.parseInt(bValue) ? -1 : 1;
 			} else {
-				return Integer.parseInt(a.getCell().get(sortIndex).getValue()) < Integer.parseInt(b.getCell().get(sortIndex)
-						.getValue()) ? 1 : -1;
+				return Integer.parseInt(aValue) < Integer.parseInt(bValue) ? 1 : -1;
 			}
 		} else {
 			// The (default) sort type is a alphabetic one
 			if (sortDirection == up) {
-				return a.getCell().get(sortIndex).getValue().compareTo(b.getCell().get(sortIndex).getValue()) < 0 ? -1 : 1;
+				return aValue.compareTo(bValue) < 0 ? -1 : 1;
 			} else {
-				return a.getCell().get(sortIndex).getValue().compareTo(b.getCell().get(sortIndex).getValue()) < 0 ? 1 : -1;
+				return aValue.compareTo(bValue) < 0 ? 1 : -1;
 			}
 		}
 	}
