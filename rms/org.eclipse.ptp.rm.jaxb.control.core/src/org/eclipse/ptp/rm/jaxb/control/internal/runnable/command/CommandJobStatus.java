@@ -561,7 +561,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#stateChanged()
 	 */
-	public boolean stateChanged() {
+	public synchronized boolean stateChanged() {
 		boolean changed = dirty && !UNDETERMINED.equals(state);
 		dirty = false;
 		return changed;
@@ -607,43 +607,43 @@ public class CommandJobStatus implements ICommandJobStatus {
 			return;
 		}
 
-		synchronized (this) {
-			while (!monitor.isCanceled() && waitEnabled && (jobId == null || !isReached(state, waitUntil))) {
+		while (!monitor.isCanceled() && waitEnabled && (jobId == null || !isReached(state, waitUntil))) {
+			synchronized (this) {
 				try {
 					wait(1000);
 				} catch (InterruptedException ignored) {
 				}
-				PropertyType p = (PropertyType) env.get(uuid);
-				if (p == null) {
+			}
+
+			PropertyType p = (PropertyType) env.get(uuid);
+			if (p == null) {
+				continue;
+			}
+
+			jobId = p.getName();
+			String v = (String) p.getValue();
+			if (v != null) {
+				setState(v);
+			}
+
+			if (jobId == null) {
+				if (stateDetail == FAILED) {
+					throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
+				} else {
 					continue;
 				}
+			}
 
-				jobId = p.getName();
-				String v = (String) p.getValue();
-				if (v != null) {
-					setState(v);
-				}
+			if (!stateChanged()) {
+				continue;
+			}
 
-				if (jobId == null) {
-					if (stateDetail == FAILED) {
-						throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
-					} else {
-						continue;
-					}
-				}
-
-				if (!stateChanged()) {
-					continue;
-				}
-
-				/*
-				 * guarantee the presence of intermediate state in the
-				 * environment
-				 */
-				env.put(jobId, p);
-				if (!map.addJobStatus(jobId, this)) {
-					control.jobStateChanged(jobId, this);
-				}
+			/*
+			 * guarantee the presence of intermediate state in the environment
+			 */
+			env.put(jobId, p);
+			if (!map.addJobStatus(jobId, this)) {
+				control.jobStateChanged(jobId, this);
 			}
 		}
 	}
