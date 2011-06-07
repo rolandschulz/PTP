@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 
-public class BorderLayout extends Layout {
+class BorderLayout extends Layout {
 	public static class BorderData {
 		public int field;
 
@@ -36,39 +36,6 @@ public class BorderLayout extends Layout {
 
 	int width;
 	int height;
-	// Maximum width and height of every column and row of this composite
-	private int westmax, centerwidthmax, eastmax, northmax, centerheightmax, southmax;
-
-	/**
-	 * Compute the preferred size of this composite excluding
-	 * the center-field.
-	 * 
-	 * @param composite
-	 * @return width and height in a Point-instance
-	 */
-	public Point computeSizeWithoutCenter(Composite composite) {
-		getControlsAndPoints(composite.getChildren(), true);
-
-		width = westmax + eastmax;
-		height = northmax + southmax;
-
-		return new Point(width, height);
-	}
-
-	/**
-	 * Sets private attributes westmax, centermax1 ...
-	 * Computes maximum widths and heights in every row and column.
-	 */
-	private void computeMaxima() {
-
-		westmax = max(points[NWFIELD].x, points[WFIELD].x, points[SWFIELD].x);
-		centerwidthmax = max(points[NFIELD].x, points[MFIELD].x, points[SFIELD].x);
-		eastmax = max(points[NEFIELD].x, points[EFIELD].x, points[SEFIELD].x);
-
-		northmax = max(points[NWFIELD].y, points[NFIELD].y, points[NEFIELD].y);
-		centerheightmax = max(points[WFIELD].y, points[MFIELD].y, points[EFIELD].y);
-		southmax = max(points[SWFIELD].y, points[SFIELD].y, points[SEFIELD].y);
-	}
 
 	private void getControlsAndPoints(Control[] children, boolean flushCache) {
 		controls = new Control[9];
@@ -80,7 +47,7 @@ public class BorderLayout extends Layout {
 				continue;
 			}
 			final BorderData borderData = (BorderData) layoutData;
-			if (borderData != null && (borderData.field >= 0 && borderData.field <= 8)) {
+			if (borderData != null || (borderData.field < 0 || borderData.field > 8)) {
 				controls[borderData.field] = element;
 				points[borderData.field] = element.computeSize(SWT.DEFAULT, SWT.DEFAULT, flushCache);
 			}
@@ -92,8 +59,6 @@ public class BorderLayout extends Layout {
 				points[i] = new Point(0, 0);
 			}
 		}
-
-		computeMaxima();
 	}
 
 	private int max(int i1, int i2, int i3) {
@@ -113,8 +78,14 @@ public class BorderLayout extends Layout {
 			getControlsAndPoints(composite.getChildren(), flushCache);
 		}
 
-		width = westmax + centerwidthmax + eastmax;
-		height = northmax + centerheightmax + southmax;
+		width = max(
+				points[NWFIELD].x + points[NFIELD].x + points[NEFIELD].x,
+				points[WFIELD].x + points[MFIELD].x + points[EFIELD].x,
+				points[SWFIELD].x + points[SFIELD].x + points[SEFIELD].x);
+		height = max(
+				points[NWFIELD].y + points[NFIELD].y + points[NEFIELD].y,
+				points[WFIELD].y + points[MFIELD].y + points[EFIELD].y,
+				points[SWFIELD].y + points[SFIELD].y + points[SEFIELD].y);
 
 		return new Point(wHint == SWT.DEFAULT ? width : wHint, hHint == SWT.DEFAULT ? height : hHint);
 	}
@@ -132,72 +103,68 @@ public class BorderLayout extends Layout {
 		}
 		final Rectangle clientArea = composite.getClientArea();
 
-		// Put the rest of space to the center-field
-		centerwidthmax = clientArea.width - westmax - eastmax;
-		centerheightmax = clientArea.height - northmax - southmax;
-
 		if (controls[NWFIELD] != null) {
 			controls[NWFIELD].setBounds(
 					clientArea.x,
 					clientArea.y,
-					westmax,
-					northmax);
+					points[WFIELD].x,
+					points[NFIELD].y);
 		}
 		if (controls[NFIELD] != null) {
 			controls[NFIELD].setBounds(
-					clientArea.x + westmax,
+					clientArea.x + points[WFIELD].x,
 					clientArea.y,
-					centerwidthmax,
-					northmax);
+					clientArea.width - points[WFIELD].x - points[EFIELD].x,
+					points[NFIELD].y);
 		}
 		if (controls[NEFIELD] != null) {
 			controls[NEFIELD].setBounds(
-					clientArea.x + westmax + centerwidthmax,
+					clientArea.x + clientArea.width - points[EFIELD].x,
 					clientArea.y,
-					eastmax,
-					northmax);
+					points[EFIELD].x,
+					points[NFIELD].y);
 		}
 		if (controls[WFIELD] != null) {
 			controls[WFIELD].setBounds(
 					clientArea.x,
-					clientArea.y + northmax,
-					westmax,
-					centerheightmax);
+					clientArea.y + points[NFIELD].y,
+					points[WFIELD].x,
+					clientArea.height - points[NFIELD].y - points[SFIELD].y);
 		}
 		if (controls[MFIELD] != null) {
 			controls[MFIELD].setBounds(
-					clientArea.x + westmax,
-					clientArea.y + northmax,
-					centerwidthmax,
-					centerheightmax);
+					clientArea.x + points[WFIELD].x,
+					clientArea.y + points[NFIELD].y,
+					clientArea.width - points[WFIELD].x - points[EFIELD].x,
+					clientArea.height - points[NFIELD].y - points[SFIELD].y);
 		}
 		if (controls[EFIELD] != null) {
 			controls[EFIELD].setBounds(
-					clientArea.x + westmax + centerwidthmax,
-					clientArea.y + northmax,
-					eastmax,
-					centerheightmax);
+					clientArea.x + clientArea.width - points[EFIELD].x,
+					clientArea.y + points[NFIELD].y,
+					points[EFIELD].x,
+					clientArea.height - points[NFIELD].y - points[SFIELD].y);
 		}
 		if (controls[SWFIELD] != null) {
 			controls[SWFIELD].setBounds(
 					clientArea.x,
-					clientArea.y + northmax + centerheightmax,
-					westmax,
-					southmax);
+					clientArea.y + clientArea.height - points[NFIELD].y,
+					points[WFIELD].x,
+					points[SFIELD].y);
 		}
 		if (controls[SFIELD] != null) {
 			controls[SFIELD].setBounds(
-					clientArea.x + westmax,
-					clientArea.y + northmax + centerheightmax,
-					centerwidthmax,
-					southmax);
+					clientArea.x + points[WFIELD].x,
+					clientArea.y + clientArea.height - points[SFIELD].y,
+					clientArea.width - points[WFIELD].x - points[EFIELD].x,
+					points[SFIELD].y);
 		}
 		if (controls[SEFIELD] != null) {
 			controls[SEFIELD].setBounds(
-					clientArea.x + westmax + centerwidthmax,
-					clientArea.y + northmax + centerheightmax,
-					eastmax,
-					southmax);
+					clientArea.x + clientArea.width - points[EFIELD].x,
+					clientArea.y + clientArea.height - points[SFIELD].y,
+					points[EFIELD].x,
+					points[SFIELD].y);
 		}
 
 	}

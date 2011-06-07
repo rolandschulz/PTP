@@ -27,7 +27,7 @@ import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
-import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayViewZoomable;
+import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -118,7 +118,7 @@ public class NodesView extends ViewPart {
 	}
 
 	private Composite composite = null;
-	private NodedisplayViewZoomable nodedisplayView = null;
+	private NodedisplayView nodedisplayView = null;
 	public Viewer viewer;
 	public ILguiItem fLguiItem = null;
 	private final ILMLListener lguiListener = new LguiListener();
@@ -163,7 +163,7 @@ public class NodesView extends ViewPart {
 	private void createNodedisplayView() {
 
 		if (!composite.isDisposed()) {
-			nodedisplayView = new NodedisplayViewZoomable(null, null, composite);
+			nodedisplayView = new NodedisplayView(null, null, composite);
 			if (fLguiItem != null) {
 				nodedisplayView.update(fLguiItem);
 			}

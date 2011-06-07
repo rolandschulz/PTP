@@ -20,6 +20,10 @@ import org.eclipse.swt.widgets.Listener;
  * (for example: it is more difficult to react for cursor-focus on these rectangles,
  * texts as titles have to be painted
  * and can not be inserted by using a layout-manager)
+ * 
+ * 
+ * @author karbach
+ * 
  */
 public class RectPaintListener implements Listener {
 
@@ -167,17 +171,6 @@ public class RectPaintListener implements Listener {
 			}
 
 		}
-	}
-
-	/**
-	 * Set minimum rectangle size. Set min-width and
-	 * min-height to size.
-	 * 
-	 * @param size
-	 */
-	public void setMinRectSize(int size) {
-		minRectWidth = size;
-		minRectHeight = size;
 	}
 
 	/**

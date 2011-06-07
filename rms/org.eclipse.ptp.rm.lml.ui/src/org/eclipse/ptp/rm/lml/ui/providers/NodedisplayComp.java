@@ -54,7 +54,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -83,9 +82,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 	/**
 	 * Class for comparing integer-values in ascending or descending way.
-	 * 
-	 * @author karbach
-	 * 
 	 */
 	public static class NumberComparator implements Comparator<Integer> {
 
@@ -165,6 +161,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		griddata.verticalAlignment = GridData.FILL;
 
 		return griddata;
+
 	}
 
 	/**
@@ -255,6 +252,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	private static final int httpsport = 4444;// Special port for https-access
 
 	private NodedisplayComp parentNodedisplay = null;// Reference to parent nodedisplay
+
 	private int minWidth = 0, minHeight = 0;// Minimal width and height of this nodedisplay
 
 	private int x = 0, y = 0;// Position of this nodedisplay within surrounding grid
@@ -264,9 +262,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 	// The name of the special empty job
 	private final String emptyJobName = "empty";
-
-	// assumes minimum size
-	private int minRectangleSize = 5;
 
 	/**
 	 * Call this constructor for start, maxlevel is chosen from lml-file
@@ -370,13 +365,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		y = py;
 
 		init(pmodel, pnode, pnodeview);
-	}
-
-	/**
-	 * Decrease minimal size of painted rectangles.
-	 */
-	public void decreaseMinRectangleSize() {
-		setMinmalRectangleSize(minRectangleSize - 1);
 	}
 
 	/**
@@ -534,13 +522,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * @return minimal size of painted rectangles
-	 */
-	public int getMinimalRectangleSize() {
-		return minRectangleSize;
-	}
-
-	/**
 	 * @return implicit name of node within nodedisplay, which is shown by this NodedisplayPanel
 	 */
 	public String getShownImpname() {
@@ -559,36 +540,34 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Increase minimal size of painted rectangles.
+	 * Add height-parameter to minHeight
+	 * 
+	 * @param height
+	 *            difference to be added
 	 */
-	public void increaseMinRectangleSize() {
-		setMinmalRectangleSize(minRectangleSize + 1);
+	public synchronized void increaseMinHeight(int height) {
+		minHeight += height;
+
+		if (parentNodedisplay != null) {
+			// Only first column sends minheight-increases to parent composites
+			if (x == 0)
+				parentNodedisplay.increaseMinHeight(height);
+		}
 	}
 
 	/**
-	 * Set minimal size of painted rectangles in this nodedisplay.
+	 * Add width-parameter to minWidth
 	 * 
-	 * @param size
-	 *            size in pixels for painted rectangles, this parameter
-	 *            defines rectangles width as well ass rectangle height
+	 * @param width
+	 *            difference to be added
 	 */
-	public void setMinmalRectangleSize(int size) {
-		if (size > 0) {
+	public synchronized void increaseMinWidth(int width) {
+		minWidth += width;
 
-			minRectangleSize = size;
-
-			for (final NodedisplayComp icomp : innerComps) {
-				if (icomp.x == 0 || icomp.y == 0) {
-					icomp.setMinmalRectangleSize(size);
-				}
-			}
-
-			if (rectpaintlistener != null) {
-				rectpaintlistener.setMinRectSize(size);
-			}
-
-			if (parentNodedisplay == null)
-				showMinRectangleSizes();
+		if (parentNodedisplay != null) {
+			// Only first row sends minwidth-increases to parent composites
+			if (y == 0)
+				parentNodedisplay.increaseMinWidth(width);
 		}
 	}
 
@@ -597,30 +576,11 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * is needed to show all painted rectangles in defined
 	 * minimum size.
 	 * 
-	 * @return true, if needed size changed
 	 */
-	public boolean showMinRectangleSizes() {
-		final boolean res = callMinSizeCalculation();
+	public void showMinRectangleSizes() {
+		callMinSizeCalculation();
 
-		final ScrolledComposite scrollpane = nodeview.getScrollPane();
-
-		scrollpane.setMinSize(minWidth, minHeight);
-
-		final Point nsize = nodeview.getSize();
-		int swidth = minWidth;
-		int sheight = minHeight;
-
-		if (swidth > nsize.x)
-			swidth = nsize.x;
-
-		if (sheight > nsize.y)
-			sheight = nsize.y;
-
-		scrollpane.setLayoutData(new RowData(swidth, sheight));
-
-		nodeview.layout();
-
-		return res;
+		nodeview.getScrollPane().setMinSize(minWidth, minHeight);
 	}
 
 	/**
@@ -747,13 +707,12 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		final Listener l = new Listener() {
 
 			public void handleEvent(Event event) {
-				while (showMinRectangleSizes()) {
-				}
-				innerPanel.removeListener(SWT.Paint, this);
+				showMinRectangleSizes();
 			}
 		};
 
 		innerPanel.addListener(SWT.Paint, l);
+
 	}
 
 	/**
@@ -765,11 +724,13 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		titleLabel.addMouseListener(new MouseListener() {
 
 			public void mouseDoubleClick(MouseEvent e) {
+
 			}
 
 			public void mouseDown(MouseEvent e) {
 
 				titleLabel.setBackground(titleBackgroundColor);
+
 				if (node == null)
 					return;
 
@@ -782,6 +743,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			}
 
 			public void mouseUp(MouseEvent e) {
+
 			}
 		});
 		// Show different background if titlelabel is covered by the mouse
@@ -798,6 +760,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 				titleLabel.setBackground(titleBackgroundColor);
 			}
 		});
+
 	}
 
 	/**
@@ -817,10 +780,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * all inner components. If this nodedisplay paints rectangles
 	 * itself, this method calls the calculateResize-function of
 	 * the rectangle-painting-listener.
-	 * 
-	 * @return true, if minimum size became bigger
 	 */
-	private boolean callMinSizeCalculation() {
+	private void callMinSizeCalculation() {
 
 		final Point size = getSize();
 		setMinSize(size.x, size.y);
@@ -835,7 +796,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			rectpaintlistener.calculateResize();
 		}
 
-		return size.x < minWidth || size.y < minHeight;
 	}
 
 	/**
@@ -1032,8 +992,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		rectpaintlistener.bordercolor = bordercolor;
 
-		rectpaintlistener.setMinRectSize(minRectangleSize);
-
 		innerPanel.addListener(SWT.Paint, rectpaintlistener);
 	}
 
@@ -1051,6 +1009,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		// Bordercolor is defined by this parameter
 		final Color bordercolor = ColorConversion.getColor(LMLColor.stringToColor(apref.getBordercolor()));
+
 		createFramePanels(bordercolor);
 
 		// Generate all displaynodes for elements in lml-tree which are childs of the current node
@@ -1060,6 +1019,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 			initRectPaintListener(dispnodes, bordercolor);
 			addMouseListenerToInnerPanel();
+
 		}
 		else { // insert lower nodedisplays, nest composites
 
@@ -1248,37 +1208,4 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 	}
-
-	/**
-	 * Add height-parameter to minHeight
-	 * 
-	 * @param height
-	 *            difference to be added
-	 */
-	protected synchronized void increaseMinHeight(int height) {
-		minHeight += height;
-
-		if (parentNodedisplay != null) {
-			// Only first column sends minheight-increases to parent composites
-			if (x == 0)
-				parentNodedisplay.increaseMinHeight(height);
-		}
-	}
-
-	/**
-	 * Add width-parameter to minWidth
-	 * 
-	 * @param width
-	 *            difference to be added
-	 */
-	protected synchronized void increaseMinWidth(int width) {
-		minWidth += width;
-
-		if (parentNodedisplay != null) {
-			// Only first row sends minwidth-increases to parent composites
-			if (y == 0)
-				parentNodedisplay.increaseMinWidth(width);
-		}
-	}
-
 }
