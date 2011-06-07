@@ -6,14 +6,77 @@
 </head> 
 <body>
 <h1 id="top">Synchronized Projects</h1>
-
-<p>Synchronized projects consists of files that are mirrored on the local system as well as on the remote system.
-Editing occurs locally and the project may be built locally as well, enabling faster interaction with the files
+<ul>
+<li><a href="#prereq">Requirements for Synchronized Projects</a>
+<li><a href="#create">Creating a new Synchronized Project</a>
+<li><a href="#work">Working with a Synchronized Project</a>
+</ul>
+<p>Synchronized projects consist of files that are mirrored on the local system as well as on the remote system.
+Editing occurs locally and each file is sync'd with the remote system when it is changed, created, or deleted.  
+This enables faster interaction with the files
 and editor, more CDT editor features since the files are local, and continued interaction for editing etc. if the network
 connection is lost.
 <p>
+<h2 id=prereq>Requirements for Synchronized Projects</h2>
+<p>To host a synchronized project, the remote system must:
+<ul>
+<li>Support the <a href="http://git-scm.com/">Git</a> distributed version control system</li>
+<li>Support Java (1.5 or later) to allow Remote Tools (or RSE) as Remote Provider
+    <ul><li>
+    More information about Remote Tools as a remote service provider is in the section about
+    <a href="02resMgrSetup.html#remote">remote Resource Managers</a>.
+    </li>
+    </ul>
+</li>
+</ul>
+<h2 id=create>Creating a new Synchronized Project</h2>
+<p>To create a new Synchronized Project, Select <b>File > New > Other...</b>
+and in the wizard selection dialog, select <b>Remote > Synchronized Project</b>.
+<p><img src="images/sync-newproj.png">
+<p>Or, from the context menu (right-mouse) in the Project Explorer,
+select <b>New > Synchronized Project</b>
+<p><img src="images/sync-newprojContext.png">
+<p>Then give the project a name and select a project type
+<p><img src="images/sync-newprojCreate.png">
+<p>Select Next >
+<p>On the next page, select a Synchronization Provider (Git) and selected an existing connection or create a new one. 
+<p><img src="images/sync-newprojNewConnection.png">
+<p>Here we create a new remote connection with the <b>Remote Tools</b> Remote Provider by selecting the <b>New...</b> button.
+The Target Environment Configuration dialog is shown. Fill in host name, user, and password (or other authentication
+information).
+<p><img src="images/sync-newprojConnection.png">
+<p>Select Finish.  The connection will be tested at this
+point before returning to the <b>Configure Remote Synchronization</b> page.
 
-<!--  more info needed here! -->
+<p>Back on the the <b>Configure Remote Synchronization</b> page:
+<p><img src="images/sync-newprojConfigLocn.png">
+<p>Specify a remote location by selecting <b>Browse...</b>
+<p>A <b>Browse Directory</b> dialog appears in which you can navigate to find the directory
+in which your new project's files will be contained on the remote system.
+<p>Hit <b>OK</b> to return.
+<p>The <b>Configure Remote Synchronization</b> page now contains the location of the remote files:
+<p><img src="images/sync-newprojLocn.png">
+<p>Hit <b>Finish</b> to complete project creation.
+<p>&nbsp;
+
+<h2 id="work">Working with a Synchronized Project</h2>
+<p>Edit the files as you would any local project.
+Each time you save a file, the remote copy of the file is saved on the remote system.
+If you create or delete files, the remote system is updated appropriately.
+
+<p>&nbsp;
+<h2 id="prefs">Project Properties </h2>
+<p><img src="images/sync-projProperties.png">
+<p>&nbsp;
+
+
+
+<!--  question: where to set up paths & symbols to e.g. set MPI include path? -->
+
+
+
+
+
 
 
 
