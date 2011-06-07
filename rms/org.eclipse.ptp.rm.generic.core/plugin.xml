@@ -6,7 +6,7 @@
       <provider
             class="org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider"
             id="org.eclipse.ptp.rm.generic.GenericResourceManager"
-            name="Generic Remote Launch"
+            name="Remote Launch"
             serviceId="org.eclipse.ptp.core.LaunchService">
       </provider>
    </extension>
