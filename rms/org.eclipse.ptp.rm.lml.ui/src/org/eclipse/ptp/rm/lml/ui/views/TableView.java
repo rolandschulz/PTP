@@ -429,6 +429,12 @@ public class TableView extends ViewPart {
 			treeColumn.setText(tableColumnLayouts[i].getTitle());
 			treeColumn.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
 
+			boolean resizable = true;
+			if (tableColumnLayouts[i].getWidth() == 0) {
+				resizable = false;
+			}
+			treeColumn.setResizable(resizable);
+
 			/*
 			 * Create the header menu for this column
 			 */
@@ -437,7 +443,7 @@ public class TableView extends ViewPart {
 			/*
 			 * Set the column width
 			 */
-			treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(tableColumnLayouts[i].getWidth(), 0, true));
+			treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(tableColumnLayouts[i].getWidth(), 0, resizable));
 			treeColumns[i] = treeColumn;
 		}
 
@@ -529,6 +535,9 @@ public class TableView extends ViewPart {
 		itemName.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
 				if (itemName.getSelection()) {
+					if (savedColumnWidths[index] == 0) {
+						savedColumnWidths[index] = 50;
+					}
 					column.setWidth(savedColumnWidths[index]);
 					column.setResizable(true);
 				} else {
