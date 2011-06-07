@@ -374,7 +374,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 */
 	public Nodedisplayelement findLayout() {
 
-		final ArrayList<NodedisplaylayoutType> allnodedisplaylayouts = lgui.getNodedisplayAccess().getLayouts(model.getId());
+		final ArrayList<NodedisplaylayoutType> allnodedisplaylayouts = lguiItem.getNodedisplayAccess().getLayouts(model.getId());
 
 		// Is there any Layout for this nodedisplay?
 		if (allnodedisplaylayouts == null || allnodedisplaylayouts.size() == 0)
@@ -415,7 +415,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 */
 	public HashMap<DisplayNode, Color> generateDisplayNodeToColorMap(ArrayList<DisplayNode> dispnodes) {
 
-		final OIDToObject oidtoobj = lgui.getOIDToObject();
+		final OIDToObject oidtoobj = lguiItem.getOIDToObject();
 
 		final HashMap<DisplayNode, Color> dispnodetocolor = new HashMap<DisplayNode, Color>();
 		for (final DisplayNode dispnode : dispnodes) {
@@ -431,7 +431,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * @return lml-data-access to data shown by this nodedisplay
 	 */
 	public ILguiItem getLguiItem() {
-		return lgui;
+		return lguiItem;
 	}
 
 	/**
@@ -509,7 +509,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 			levels.add(aid);
 
-			final DisplayNode dispnode = new DisplayNode(lgui, lgui.getNodedisplayAccess().getTagname(model.getId(), alevel + 1),
+			final DisplayNode dispnode = new DisplayNode(lguiItem, lguiItem.getNodedisplayAccess().getTagname(model.getId(), alevel + 1),
 					lowdata, schemesForIds.get(aid), levels, model);
 
 			levels.remove(levels.size() - 1);
@@ -603,14 +603,14 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		final ObjectType conobject = node.getConnectedObject();
 		if (currentLevel == maxLevel) {
 
-			if (lgui.getObjectStatus().isMouseover(conobject)) {
+			if (lguiItem.getObjectStatus().isMouseover(conobject)) {
 				borderFrame.setBorderWidth(apref.getMouseborder().intValue());
 			}
 			else
 				borderFrame.setBorderWidth(apref.getBorder().intValue());
 
-			if (lgui.getObjectStatus().isAnyMousedown() && !lgui.getObjectStatus().isMousedown(conobject)) {// Change color
-				innerPanel.setBackground(ColorConversion.getColor(lgui.getOIDToObject().getColorById(null)));
+			if (lguiItem.getObjectStatus().isAnyMousedown() && !lguiItem.getObjectStatus().isMousedown(conobject)) {// Change color
+				innerPanel.setBackground(ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(null)));
 			}
 			else
 				innerPanel.setBackground(jobColor);
@@ -650,10 +650,10 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
 
 				if (focussed != null && !isDisplayNodeEmpty(focussed)) {
-					lgui.getObjectStatus().mouseover(focussed.getConnectedObject());
+					lguiItem.getObjectStatus().mouseover(focussed.getConnectedObject());
 				}
 				else {
-					lgui.getObjectStatus().mouseExitLast();
+					lguiItem.getObjectStatus().mouseExitLast();
 				}
 
 				innerPanel.setToolTipText(getToolTipText(focussed));
@@ -670,7 +670,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
 
 				if (focussed != null && !isDisplayNodeEmpty(focussed))
-					lgui.getObjectStatus().mousedown(focussed.getConnectedObject());
+					lguiItem.getObjectStatus().mousedown(focussed.getConnectedObject());
 
 				innerPanel.setToolTipText(getToolTipText(focussed));
 			}
@@ -679,7 +679,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
 
 				if (focussed != null && !isDisplayNodeEmpty(focussed))
-					lgui.getObjectStatus().mouseup(focussed.getConnectedObject());
+					lguiItem.getObjectStatus().mouseup(focussed.getConnectedObject());
 
 				innerPanel.setToolTipText(getToolTipText(focussed));
 			}
@@ -688,7 +688,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		innerPanel.addListener(SWT.MouseExit, new Listener() {
 
 			public void handleEvent(Event event) {
-				lgui.getObjectStatus().mouseExitLast();
+				lguiItem.getObjectStatus().mouseExitLast();
 
 				innerPanel.setToolTipText(getToolTipText(null));
 			}
@@ -956,7 +956,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		mainPanel.setLayoutData(new BorderData(BorderLayout.MFIELD));
 
 		if (node != null) {// Is this nodedisplay the root-nodedisplay?
-			jobColor = ColorConversion.getColor(lgui.getOIDToObject().getColorById(node.getData().getOid()));
+			jobColor = ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(node.getData().getOid()));
 			title = apref.isShowfulltitle() ? node.getFullImplicitName() : node.getImplicitName();
 
 			insertTitleLabel();
@@ -964,8 +964,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			insertInnerPanel();
 		}
 		else {
-			jobColor = ColorConversion.getColor(lgui.getOIDToObject().getColorById(null));
-			title = lgui.getNodedisplayAccess().getNodedisplayTitel(0);
+			jobColor = ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(null));
+			title = lguiItem.getNodedisplayAccess().getNodedisplayTitel(0);
 
 			insertTitleLabel();
 
@@ -973,7 +973,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 					model.getData(), new ArrayList<Integer>());
 		}
 
-		lgui.getObjectStatus().addComponent(this);
+		lguiItem.getObjectStatus().addComponent(this);
 	}
 
 	/**
@@ -1038,7 +1038,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 			for (final DisplayNode dispnode : dispnodes) {
 
-				final NodedisplayComp ainner = new NodedisplayComp(lgui, model, dispnode,
+				final NodedisplayComp ainner = new NodedisplayComp(lguiItem, model, dispnode,
 						nodeview, this,
 						index % cols, index / cols,
 						maxLevel - currentLevel - 1, innerPanel, SWT.NONE);
@@ -1151,7 +1151,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 */
 	private void removeUpdatable() {
 
-		lgui.getObjectStatus().removeComponent(this);
+		lguiItem.getObjectStatus().removeComponent(this);
 
 		for (final NodedisplayComp nd : innerComps) {
 			nd.removeUpdatable();
