@@ -229,6 +229,10 @@ in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 			<description>Maximum amount of real time during which the job can be in the running state.</description>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
+			<validator>
+            <regex expression="\d\d:\d\d:\d\d"/>
+            <error-message>format must be hh:mm:ss</error-message>
+         </validator>
 		</attribute>
 		<attribute name="Shell_Path_List" type="string">
 			<description>A set of absolute paths of the program to process the job's script file.</description>
