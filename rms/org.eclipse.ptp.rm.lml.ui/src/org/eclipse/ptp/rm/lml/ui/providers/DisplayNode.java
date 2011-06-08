@@ -159,14 +159,17 @@ public class DisplayNode implements Comparable<DisplayNode> {
 	 */
 	public ObjectType getConnectedObject() {
 		// Return referenced object
-		if (referencedData != null && referencedData.data != null && lguiItem.getOIDToObject() != null) {
-			return lguiItem.getOIDToObject().getObjectById(referencedData.data.getOid());
-		}
+		if (lguiItem.getOIDToObject() != null) {
+			if (referencedData != null && referencedData.data != null) {
+				return lguiItem.getOIDToObject().getObjectById(referencedData.data.getOid());
+			}
 
-		if (data == null || lguiItem.getOIDToObject() == null) {
-			return null;
+			if (data == null || lguiItem.getOIDToObject() == null) {
+				return null;
+			}
+			return lguiItem.getOIDToObject().getObjectById(data.getOid());
 		}
-		return lguiItem.getOIDToObject().getObjectById(data.getOid());
+		return null;
 	}
 
 	/**
