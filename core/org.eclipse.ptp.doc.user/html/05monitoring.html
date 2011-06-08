@@ -1,53 +1,82 @@
 <html>
 <head>
-<title>Monitoring Parallel Machines and Jobs</title>
+<title>Monitoring Jobs and Systems</title>
 <link rel="stylesheet" type="text/css" href="help.css">
 <script type="text/javascript" src="thumb.js"> </script>
 <head>
 <body>
-<h1 id="top">Monitoring Parallel Machines and Jobs</h1>
-<p>This section describes the features of PTP the enable the developer to monitor activity on target parallel machines, to monitor job status, and to terminate jobs. It will cover the following topics:</p>
-<ul>
+<h1 id="top">Monitoring Jobs and Systems</h1>
+<p>This section describes the features of PTP the enable the developer to monitor activity on target parallel machines, to monitor job status, and to control jobs. 
+It will cover the following topics:</p>
 
+<ul>
 <li><a href="#persp">Parallel Runtime perspective</a></li>
+<ul style="margin:0;">
 <li><a href="#resMgr">Resource Managers view</a></li>
 <li><a href="#machines">Machines view</a></li>
 <li><a href="#jobs">Jobs view</a></li>
-<li><a href="#output">Console view</a></li>
 <li><a href="#legend">Icon Legend</a></li>
 </ul>
+<li><a href="#sysMonPersp">System Monitoring perspective</a> (new for 5.0)</li>
+<ul style="margin:0;">
+<li><a href="#sysMonView">System Monitoring view</a></li>
+<li><a href="#active">Active Jobs view</a></li>
+<li><a href="#inactive">Inactive Jobs view</a></li>
+</ul>
+<li><a href="#output">Console view</a></li>
+</ul>
 
+<p>
+PTP provides two perspectives for job and system monitoring: the <a href="#persp">Parallel Runtime perspective</a> and the 
+<a href="#sysMonPersp">System Monitoring perspective</a>. The Parallel Runtime perspective is the original perspective provided
+by PTP and is used for most of the current resource managers. The System Monitoring perspective is new for PTP 5.0 and provides 
+scalable monitoring of large remote systems. It is currently only used by the PBS resource manager, but addition resource managers
+will be transitioned over to this perspective in future releases.
+</p>
 
 <h2 id="persp">Parallel Runtime Perspective</h2>
-<p>The <b>Parallel Runtime perspective</b> is used to monitor the status of target parallel systems and the parallel jobs that are running on these systems. At least one resource manager must be active to see anything in the views. See <a href="02resMgrSetup.html">configuring resource managers</a> for information on setting up resource managers and <a href="03pLaunchConfig.html">launching parallel programs</a> for how to launch a parallel program.</p>
+<p>The Parallel Runtime perspective is used to monitor the status of target parallel systems and the parallel jobs that are running on these systems. 
+At least one resource manager must be active to see anything in the views. See <a href="02resMgrSetup.html">configuring resource managers</a> for 
+information on setting up resource managers and <a href="03pLaunchConfig.html">running parallel programs</a> for how to launch a parallel program.</p>
 
-<p>The perspective provides four main views for monitoring systems and jobs: <b>Resource Managers view</b>; <b>Machines view</b>; <b>Jobs view</b>; and <b>Process Details view</b>. Each of these views will be discussed in more detail below.</p>
+<p>The perspective provides four main views for monitoring systems and jobs: <b>Resource Managers view</b>; <b>Machines view</b>; <b>Jobs view</b>; 
+and <b>Process Details view</b>. Each of these views will be discussed in more detail below.</p>
 
-<p>To open the <b>Parallel Runtime perspective</b>,
+<p>To open the Parallel Runtime perspective,
 select <b>Window &gt; Open Perspective &gt; Other ...</b> and choose <b>Parallel Runtime</b> from the list.</p>
 <p><img src="images/05runtimePerspAnn.png"></p>
 
-<h2 id="resMgr">Resource Managers View</h2>
-<p>The <b>Resource Managers view</b> shows all resource managers that have been configured, and is used to manage and control these resource managers. Each resource manager has an icon and a name. The icon color indicates the current state of the resource manager. The following image shows two resource managers, one that is <i>stopped</i> and one that is <i>running</i>. A stopped resource manager is know to the system, but is not providing any information to PTP. A running resource manager is the normal state, and indicates that PTP is receiving information and can launch jobs using the resource manager.</p>
+<h3 id="resMgr">Resource Managers View</h3>
+<p>The <b>Resource Managers view</b> shows all resource managers that have been configured, and is used to manage and control these resource managers. 
+Each resource manager has an icon and a name. The icon color indicates the current state of the resource manager. The following image shows two resource 
+managers, one that is <i>stopped</i> and one that is <i>running</i>. A stopped resource manager is know to the system, but is not providing any information 
+to PTP. A running resource manager is the normal state, and indicates that PTP is receiving information and can launch jobs using the resource manager.</p>
 
 <table><tr>
 <td><img src="images/05runtimeResMgrView.png"></td>
 <td><img src="images/05ptpLegendResMgr.png"></td>
 </tr></table>
 
-<p>The view can also be used to create new resource managers, edit or remove resource managers, and control resource manager opertaion. Right-click in the view to access these functions.</p>
+<p>The view can also be used to create new resource managers, edit or remove resource managers, and control resource manager opertaion. Right-click in the 
+view to access these functions.</p>
 <p>Note that if a resource manager is removed and re-added, the launch configurations using the original resource
 manager must be changed to use the new one, even if it has the same name.</p>  
 
-<h2 id="machines"><img src="images/05parallel_perspective.png">Machines View</h2>
-<p>The <b>Machines view</b> shows the status of all machines being controlled by running resource managers. The upper left-hand panel of this view shows a collective list of all machines known by all the resource managers. A machine is represented by an icon and an address. The icon represents the state of the machine, and the address is typically the hostname of the machine.</p>
+<h3 id="machines"><img src="images/05parallel_perspective.png">Machines View</h3>
+<p>The <b>Machines view</b> shows the status of all machines being controlled by running resource managers. The upper left-hand panel of this view shows a 
+collective list of all machines known by all the resource managers. A machine is represented by an icon and an address. The icon represents the state of the 
+machine, and the address is typically the hostname of the machine.</p>
 
-<p>Selecting one of the machines in the upper left-handle panel will show the nodes of that machine in the upper right-hand panel of this view. Nodes are represented by an icon only. The icon shows the state of the node. The following image shows a typical view:</p>
+<p>Selecting one of the machines in the upper left-handle panel will show the nodes of that machine in the upper right-hand panel of this view. Nodes are 
+represented by an icon only. The icon shows the state of the node. The following image shows a typical view:</p>
 <p><img src="images/05runtimeMachinesView.png"></p>
 
-<p>The left edge of the node panel displays the node number of the first node in the row. This is useful for quickly locating a particular node. Also, if there are too many nodes to fit in the display the zoom buttons in the view toolbar can be used to zoom the display.</p>
+<p>The left edge of the node panel displays the node number of the first node in the row. This is useful for quickly locating a particular node. Also, if 
+there are too many nodes to fit in the display the zoom buttons in the view toolbar can be used to zoom the display.</p>
 
-<p>The machine and node icons indicate the state of each machine and node, as shown in the following image. There are icons representing most typical states. There are also node states that indicate access to the nodes that could be controlled by a job scheduler (user excusive, user shared, etc.) These states are only used by certain types of resource managers.</p>
+<p>The machine and node icons indicate the state of each machine and node, as shown in the following image. There are icons representing most typical 
+states. There are also node states that indicate access to the nodes that could be controlled by a job scheduler (user excusive, user shared, etc.) 
+These states are only used by certain types of resource managers.</p>
 <p><img src="images/05ptpLegendMachines.png"></p>
 
 <h3>Node details</h3>
@@ -57,7 +86,7 @@ The lower left-hand pane will show the detailed attributes of the node, and the 
 that are running, or have recently run, on the node.</p>
 <p><img src="images/05runtimeNodeDetails.png"></p>
 
-<h2 id="jobs"><img src="images/05parallel_perspective.png">Jobs View</h2>
+<h3 id="jobs"><img src="images/05parallel_perspective.png">Jobs View</h3>
 <p>This view shows the current status of jobs in the system. Pending, running, and completed jobs are shown. The actual jobs displayed in this 
 view are resource manager dependent, but will typically be the user's jobs that have been launched by PTP. Some resource managers may show jobs 
 that have been launched using other means, or jobs for all users on the system.</p>
@@ -68,7 +97,63 @@ that have been launched using other means, or jobs for all users on the system.<
 <p><img src="images/05ptpLegendJobProcess.png"></p>
 
 <h3>Job Termination</h3>
-<p>Usually a job will terminate when it finishes executing. However the user can also terminate a job using the <b>terminate button</b> on the toolbar. This button will become enabled when a running job is selected. Clickin on the button will instruct the resource manager to terminate the job. If the job is pending in a queue, then it will normally be removed from the queue.</p>
+<p>Usually a job will terminate when it finishes executing. However the user can also terminate a job using the <b>terminate button</b> on the toolbar. 
+This button will become enabled when a running job is selected. Clickin on the button will instruct the resource manager to terminate the job. If the 
+job is pending in a queue, then it will normally be removed from the queue.</p>
+
+<h3 id="legend">Icon Legend</h3>
+
+<p>There are many different icons representing the state of the various components of the parallel system. If you need to identify a particular icon, 
+click on the legend icon <img src="images/05legendIcon.png"> in the toolbar.  This will open a dialog that shows all the icons and their meanings. 
+An example is shown below.</p>
+
+<p><img src="images/05ptpLegend.png"></p>
+
+<h2 id="sysMonPersp">System Monitoring Perspective (new for 5.0)</h2>
+<p>The System Monitoring perspective provides scalable job and system monitoring for large-scale systems. It is based on the LLview monitoring system
+(http://www2.fz-juelich.de/jsc/llview) but has been extended to support monitoring of any type of system. It is currently only used for the PBS
+resource manager, but will be extended to other resource managers in the future.
+</p>
+<p>
+Like the Parallel Runtime perspective, at least one resource manager must be active to see anything in the views. 
+See <a href="02resMgrSetup.html">configuring resource managers</a> for 
+information on setting up resource managers and <a href="03pLaunchConfig.html">running parallel programs</a> for how to launch a parallel program.</p>
+
+
+<p>To open the System Monitoring perspective,
+select <b>Window &gt; Open Perspective &gt; Other ...</b> and choose <b>System Monitoring</b> from the list.</p>
+<p><img src="images/05sysMonPersp.png"></p>
+<p>The perspective provides four main views for monitoring systems and jobs: <b><a href="#resMgr">Resource Managers view</a></b>, <b>System Monitoring view</b>, 
+<b>Active Jobs view</b>, 
+and <b>Inactive Jobs view</b>. The Resource Managers view is the same view used for the Parallel Runtime perspective. Each of the other
+ views will be discussed in more detail below.</p>
+
+<h3 id="sysMonView">System Monitoring View</h3>
+
+The Systems Monitoring view provides an overall view of the activity on the target remote system. The view tab will contain the name of the remote system
+(as provided by the resource manager). The layout of this view will depend on the configuration of
+the target system, but will generally consist of a number of boxes that represent aggregations of computing resources (such as racks). These boxes may in turn 
+contain other elements that represent the computing resources (such as nodes). The color of the boxes is used to indicate which jobs are running on the nodes.
+<p>
+The view currently supports two mouse actions. Hovering over an element in the view will display a tooltip box with information about that element, including
+which jobs are associated with the element. Clicking on an element will highlight all associated elements (those with the same color) in the display. This
+shows the user where a particular job is running on the system.
+
+<h3 id="active">Active Jobs View</h3>
+
+The Active Jobs view shows a list of all the jobs that are running on the system. The exact columns displayed in the view will depend on the capabilities of
+the remote system. Each job in the table is assigned a color in the first column. This color corresponds to the colors displayed in the System Monitoring view.
+Clicking on a row in the table will highlight the row and also the location of the jobs in the System Monitoring view.
+<p><img src="images/05activeJobs1.png"></p>
+<p>
+Rows in the table can be sorted by clicking on the column heading. This will cycle though a sort sequence of "ascending", "descending", and none.
+Columns can also be removed from the view by right-clicking on the column heading and unselecting the column name.
+<p><img src="images/05activeJobs2.png"></p>
+
+<h3 id="inactive">Inactive Jobs View</h3>
+
+The Inactive Jobs view is essentially the same as the Active Jobs view, but displays jobs that are not currently running on the system. As these jobs don't
+have associated nodes in the System Monitoring view, they are not assigned a color.
 
 <h2 id="output">Console View</h2>
 <p>Depending on the functionality of the resource manager, PTP can also display standard output from the parallel program. This output
@@ -76,16 +161,6 @@ is displayed in a <b>Console View</b> as shown below. Output is only displayed i
 view</b> option was selected in the job launch configuration (see <a href="03pLaunchConfig.html">Launching Parallel Programs</a>).</p>
 
 <p><img src="images/05ptpRuntimeConsoleView.png"></p>
-
-Output from individual processes can also be viewed by double-clicking on a process icon in the 
-<b>Machines view</b>. This will open another view showing the process output. An example is shown below.</p>
-<p><img src="images/05ptpRuntimeProcessDetails.png"></p>
-
-<h2 id="legend">Icon Legend</h2>
-
-<p>There are many different icons representing the state of the various components of the parallel system. If you need to identify a particular icon, click on the legend icon <img src="images/05legendIcon.png"> in the toolbar.  This will open a dialog that shows all the icons and their meanings. An example is shown below.</p>
-
-<p><img src="images/05ptpLegend.png"></p>
 
 
 
