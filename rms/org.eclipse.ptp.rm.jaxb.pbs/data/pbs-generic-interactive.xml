@@ -92,6 +92,14 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</set>
 					</match>
 				</target>
+				<target ref="@jobId">
+               <match>
+                  <expression flags="DOTALL">.*Job not submitted.*</expression>
+                  <set field="value">
+                     <entry value="FAILED"/>
+                  </set>
+               </match>
+            </target>
 				<exit-after flags="DOTALL">qsub:[\s]+job[\s]+([\d]+[.].+)[\s]ready.*</exit-after>
 			</stdout-parser>
 			<stderr-parser delim="\n">

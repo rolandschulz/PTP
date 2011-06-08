@@ -32,6 +32,7 @@ public class Messages extends NLS {
 	public static String StderrParserError;
 	public static String ProcessExitValueError;
 	public static String CannotCompleteSubmitFailedStaging;
+	public static String FailedJobSubmission;
 	public static String ReadSegmentError;
 	public static String StreamTokenizerInstantiationError;
 	public static String MalformedExpressionError;

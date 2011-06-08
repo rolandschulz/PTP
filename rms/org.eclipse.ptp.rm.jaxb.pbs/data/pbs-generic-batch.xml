@@ -455,6 +455,14 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</set>
 					</match>
 				</target>
+				<target ref="@jobId">
+               <match>
+                  <expression flags="DOTALL">.*Job not submitted.*</expression>
+                  <set field="value">
+                     <entry value="FAILED"/>
+                  </set>
+               </match>
+            </target>
 			</stdout-parser>
 			<stderr-parser delim="\n">
 				<target ref="@jobId">

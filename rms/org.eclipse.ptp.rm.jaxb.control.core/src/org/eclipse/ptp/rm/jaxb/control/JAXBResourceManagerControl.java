@@ -260,6 +260,16 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			return;
 		}
 
+		if (jobId == null) {
+			synchronized (this) {
+				if (interactiveJob != null) {
+					interactiveJob.terminate();
+					interactiveJob = null;
+				}
+			}
+			return;
+		}
+
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		try {
 			pinTable.pin(jobId);
@@ -698,10 +708,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				}
 			}
 		}
-
-		if (iJobId != null) {
-			doControlJob(iJobId, TERMINATE_OPERATION, null);
-		}
+		doControlJob(iJobId, TERMINATE_OPERATION, null);
 
 		List<CommandType> onShutDown = controlData.getShutDownCommand();
 		runCommands(onShutDown);
