@@ -82,7 +82,6 @@ public class CancelJob extends AbstractStatusAction {
 				action.setEnabled(false);
 				return;
 			}
-
 		}
 		action.setEnabled(true);
 	}

@@ -108,7 +108,7 @@ first character must be alphabetic; default value:
 the base name of the job script or STDIN.]]></tooltip>
          <default>ptp_job</default>
 			<validator>
-				<regex expression="[0-9a-zA-Z_]+"/>
+				<regex expression="[a-zA-Z_][0-9a-zA-Z_]*"/>
 				<error-message>must be at least one alphanumeric character</error-message>
 			</validator>
 		</attribute>
