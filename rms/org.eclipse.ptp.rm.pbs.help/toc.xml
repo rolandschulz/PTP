@@ -11,10 +11,10 @@
 <toc label="Running PBS Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpPBS" topic="html/toc.html">
       <topic href="html/toc.html" label="Contents"/> 
       <topic label="Introduction" href="html/PBSHelpPage.html#Introduction"/>
-      <topic label="Requirements" href="html/PBSHelpPage.html#Requirements"/>
-      <topic label="Installation" href="html/PBSHelpPage.html#Installation"/>
-      <topic label="Creating a Resource Manager" href="html/PBSHelpPage.html#Creating_a_Resource_Manager"/>
-      <topic label="Submitting a Job" href="html/PBSHelpPage.html#Submitting_a_Job"/>
-      <topic label="The PBS Batch Script Template" href="html/PBSHelpPage.html#The_PBS_Batch_Script_Template"/>
+      <topic label="Preferences" href="html/PBSHelpPage.html#Preferences"/>
+      <topic label="Preconfigured PBS Resource Manager Types" href="html/PBSHelpPage.html#ProvidedTypes"/>
+      <topic label="Submission Using the PBS Batch Resource Manager" href="html/PBSHelpPage.html#BatchSubmission"/>
+      <topic label="Submission Using the PBS Interactive Resource Manager" href="html/PBSHelpPage.html#InteractiveSubmission"/>
+      <topic label="Customizing the Configuration" href="html/PBSHelpPage.html#Customizing"/>
 </toc>
 
