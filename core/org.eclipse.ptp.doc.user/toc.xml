@@ -20,13 +20,10 @@
       	<topic label="Running PBS Jobs">
        		<anchor id="ptpPBS"/>
       </topic>
-         <topic href="../org.eclipse.ptp.rm.jaxb.help/html/toc.html" label="Configuring and Using the JAXB Resource Managers">
-            <anchor id="ptpJAXB"/>
      	</topic>
       	<topic label="Running SLURM Jobs">
        		<anchor id="ptpSLURM"/>
      	</topic>
-      </topic>
       <topic label="Launching Parallel Programs"  href="html/03pLaunchConfig.html"/> 
       <topic label="Monitoring Parallel Machines and Jobs" href="html/05monitoring.html"/>
       <topic label="Parallel Debugging"  href="html/06parDebugging.html"/>
