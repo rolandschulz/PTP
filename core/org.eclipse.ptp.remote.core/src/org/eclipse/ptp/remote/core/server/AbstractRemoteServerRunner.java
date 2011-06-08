@@ -639,6 +639,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				 * Ignore this exception for now, though the root cause needs to
 				 * be ascertained.
 				 */
+				PTPRemoteCorePlugin.log(e);
 			}
 
 			// compile the pattern for search
