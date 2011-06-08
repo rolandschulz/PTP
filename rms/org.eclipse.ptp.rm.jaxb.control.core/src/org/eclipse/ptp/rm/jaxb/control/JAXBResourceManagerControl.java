@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -132,7 +131,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private final IJAXBResourceManagerConfiguration config;
 	private final ConnectionChangeListener connectionListener;
 	private Map<String, String> launchEnv;
-	private ICommandJob pseudoTerminal;
+	private ICommandJob interactiveJob;
 	private ICommandJobStatusMap jobStatusMap;
 	private JobIdPinTable pinTable;
 	private RMVariableMap rmVarMap;
@@ -172,18 +171,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
+	 * @return open remote process
+	 */
+	public synchronized ICommandJob getInteractiveJob() {
+		return interactiveJob;
+	}
+
+	/**
 	 * @return any environment variables passed in through the
 	 *         LaunchConfiguration
 	 */
 	public Map<String, String> getLaunchEnv() {
 		return launchEnv;
-	}
-
-	/**
-	 * @return open remote processe
-	 */
-	public ICommandJob getPseudoTerminal() {
-		return pseudoTerminal;
 	}
 
 	/**
@@ -238,11 +237,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * @param pseudoTerminal
+	 * @param interactiveJob
 	 *            open remote process
 	 */
-	public void setPseudoTerminal(ICommandJob pseudoTerminal) {
-		this.pseudoTerminal = pseudoTerminal;
+	public synchronized void setInteractiveJob(ICommandJob interactiveJob) {
+		this.interactiveJob = interactiveJob;
 	}
 
 	/*
@@ -268,17 +267,20 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			p.setVisible(false);
 			p.setName(jobId);
 			rmVarMap.put(jobId, p);
-
 			worked(progress, 30);
 			doControlCommand(jobId, operation);
-
-			worked(progress, 40);
 			rmVarMap.remove(jobId);
-
+			worked(progress, 40);
 			if (TERMINATE_OPERATION.equals(operation)) {
-				jobStatusMap.cancel(jobId);
+				IJobStatus canceledStatus = jobStatusMap.cancel(jobId);
+				synchronized (this) {
+					if (interactiveJob != null) {
+						if (canceledStatus == interactiveJob.getJobStatus()) {
+							interactiveJob = null;
+						}
+					}
+				}
 			}
-
 			worked(progress, 30);
 		} finally {
 			pinTable.release(jobId);
@@ -515,8 +517,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		ICommandJobStatus status = job.getJobStatus();
-		if (pseudoTerminal != null && pseudoTerminal.getJobStatus() == status) {
-			if (pseudoTerminal != job) {
+		if (interactiveJob != null && interactiveJob.getJobStatus() == status) {
+			if (interactiveJob != job) {
 				return status;
 			}
 		}
@@ -606,7 +608,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (TERMINATE_OPERATION.equals(operation)) {
 			maybeKillInteractive(jobId);
 			job = controlData.getTerminateJob();
-			if (job == null) {
+			if (job == null) { // there may not be an external cancel
 				return;
 			}
 		} else if (SUSPEND_OPERATION.equals(operation)) {
@@ -682,24 +684,27 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 	/**
 	 * Run the shut down commands, if any. Cancel any running interactive
-	 * processes.
+	 * process.
 	 * 
 	 * @throws CoreException
 	 */
 	private void doOnShutdown() throws CoreException {
+		String iJobId = null;
+		synchronized (this) {
+			if (interactiveJob != null) {
+				ICommandJobStatus status = interactiveJob.getJobStatus();
+				if (status != null) {
+					iJobId = status.getJobId();
+				}
+			}
+		}
+
+		if (iJobId != null) {
+			doControlJob(iJobId, TERMINATE_OPERATION, null);
+		}
+
 		List<CommandType> onShutDown = controlData.getShutDownCommand();
 		runCommands(onShutDown);
-		new ArrayList<String>();
-
-		if (pseudoTerminal != null) {
-			ICommandJobStatus status = pseudoTerminal.getJobStatus();
-			status.setState(IJobStatus.CANCELED);
-			pseudoTerminal.terminate();
-			String jobId = status.getJobId();
-			maybeForceExternalTermination(jobId);
-			jobStateChanged(jobId, status);
-			pseudoTerminal = null;
-		}
 	}
 
 	/**
@@ -806,40 +811,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		try {
 			job.join();
 		} catch (InterruptedException ignored) {
-		}
-	}
-
-	/**
-	 * Some interactive jobs are launched as pseudo-terminals; in this case, an
-	 * external call may be necessary to terminate them cleanly.
-	 * 
-	 * @param jobId
-	 */
-	private void maybeForceExternalTermination(String jobId) {
-		if (jobId == null) {
-			return;
-		}
-
-		CommandType job = controlData.getTerminateJob();
-		if (job == null) {
-			return;
-		}
-
-		pinTable.pin(jobId);
-		try {
-			PropertyType p = (PropertyType) rmVarMap.get(jobId);
-			if (p == null) {
-				p = new PropertyType();
-				p.setVisible(false);
-				p.setName(jobId);
-				rmVarMap.put(jobId, p);
-			}
-			runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, true);
-			rmVarMap.remove(jobId);
-		} catch (CoreException t) {
-			JAXBControlCorePlugin.log(t);
-		} finally {
-			pinTable.release(jobId);
 		}
 	}
 

@@ -342,7 +342,7 @@ public class CommandJob extends Job implements ICommandJob {
 			jobThread = Thread.currentThread();
 			boolean input = !command.getInput().isEmpty();
 			if (input) {
-				ICommandJob job = control.getPseudoTerminal();
+				ICommandJob job = control.getInteractiveJob();
 				if (job != null && job.isActive()) {
 					IRemoteProcess process = job.getProcess();
 					if (process != null && !process.isCompleted()) {
@@ -355,7 +355,7 @@ public class CommandJob extends Job implements ICommandJob {
 						 * since the process is dead, termination is just
 						 * clean-up, no need to force external termination
 						 */
-						control.setPseudoTerminal(null);
+						control.setInteractiveJob(null);
 					}
 				}
 			}
@@ -476,7 +476,7 @@ public class CommandJob extends Job implements ICommandJob {
 			}
 
 			if (keepOpen) {
-				control.setPseudoTerminal(this);
+				control.setInteractiveJob(this);
 				progress.done();
 				return Status.OK_STATUS;
 			}
