@@ -9,6 +9,7 @@
 <h1>Parallel Debugging</h1>
 <p>This section describes the features of PTP that enable a developer to debug a parallel application. The topics that will be covered, include:</p>
 <ul>
+<li><a href="#launch">Creating a Debug Launch Configuration</a></li>
 <li><a href="#feat">The Parallel Debug Perspective </a></li>
 <li><a href="#pSets">Process Sets</a></li>
 <li><a href="#pSetsOper">Operations on Process Sets</a></li>
@@ -17,21 +18,99 @@
 <li><a href="#cip">Current Instruction Pointer</a></li>
 <li><a href="#reg">Process Registration </a> and the Debug view (including stack traces)</li>
 <li><a href="#finish">Terminating Execution</a></li>
-
 </ul>
 
+<h2 id="launch">Creating a Debug Launch Configuration</h2>
+In order to launch a debug job, the user must first create a Debug Configuration. The process for doing this is identical to that used to 
+<a href="03pLaunchConfig.html">run a parallel program</a>,
+with the exception of a single extra tab that needs to be completed. Only this extra tab will be described here.
+<p>
+To create a debug configuration, use the following steps:
+<ol>
+<li>Select the <b>Run &gt; Debug Configurations...</b> menu.
+<p><br></p>
+</li>
+<li>Follow the same steps as described in <a href="03pLaunchConfig.html">running parallel programs</a> for completing the launch tabs.
+<p><br></p>
+</li>
+<li>Switch to the <b>Debugger</b> tab.
+<p><br></p>
+<p><img src="images/06launchConfig.png"></p>
+<p><br></p>
+</li>
+<li>If no debugger is visible in the <b>Debugger</b> drop-down,
+	select one. This is the debugger that will control the parallel debug
+	session. Currently only <b>SDM</b> is supported (SDM stands for
+	Scalable Debug Manager), so select this.
+	<p><br></p>
+	</li>
+	<li>
+	If you wish the debugger to automatically suspend the
+	application on launch, make sure <b>Stop in main() on startup</b> is
+	checked
+	<p><br></p>
+	</li>
+	<li>
+	Under <b>Debugger Options</b>, leave the <b>Debugger backend</b> set to <code>gdb-mi</code>.
+	<p><br></p>
+	</li>
+	<li>Make sure that the <b>Path to debugger
+	executable</b> is correct.
+	<p><br></p>
+	<p>If you are debugging on the local machine, this path should
+	point to the <code>sdm</code> executable in your Ecilpse installation's
+	<code>plugins/org.eclipse.ptp.<i>os.arch_version</i>/bin</code>
+	directory, where <code><i>os.arch_version</i></code> is your operating
+	system (<code>linux</code>, <code>macosx</code>, or <code>aix</code>),
+	architecture (<code>x86</code>, <code>x86_64</code>, or <code>ppc</code>),
+	and version number of the plugin (e.g. <code>5.0.0.201106080812</code>).</p>
+	<p><br></p>
+	<b>Note: This may have required an extra step during installation to build this executable.</b>
+	<p><br></p>
+	<p>If you are debugging remotely, then this path will be the path
+	to where the <code>sdm</code> executable was installed on the remote
+	machine.</p>
+	<p><br></p>
+	</li>
+	<li>
+	<p>Set the <b>Debugger session address</b>. This is the address
+	that the debugger will connect to when it starts, and will depend on
+	where you are launching the application:</p>
+	<p><br></p>
+	<p>If you are launching onto the local machine, or onto a remote
+	machine using port forwarding, use <code>localhost</code>. (Note that
+	you will need to have the <code>GatewayPorts</code> option set to <code>yes</code>
+	in the <code>sshd</code> configuration file on the remote system for
+	this to work with port forwarding.)</p>
+	<p><br></p>
+	<p>If you are launching onto a remote machine without using port
+	forwarding, then this should be the address of the local machine (the
+	one running Eclipse). <i>This address must be accessible from the
+	remote machine.</i>. If your local network configuration precludes the
+	remote machine accessing your local machine, you will need to
+	reconfigure the resource manager to use port forwarding.</p>
+	</li>
+	</ol>
+
+
 <h2 id="feat">The Parallel Debug perspective</h2>
-<p>The <b>Parallel Debug perspective</b> is used when debugging a parallel application. The default behavior is to switch to the 
-perspective when a <a href="04pLaunchConfigDebug.html">debug session is launched</a>. Experienced Eclipse users will notice that many 
-of the views are similar to those available in the CDT <b>Debug perspective</b>. Please refer to the <b>C/C++ Development User Guide</b> for
+<p>The Parallel Debug perspective is used when debugging a parallel application. The default behavior is to switch to the 
+perspective when a debug session is launched. Experienced Eclipse users will notice that many 
+of the views are similar to those available in the CDT Debug perspective. Please refer to the <b>C/C++ Development User Guide</b> for
 a description of these views.</p>
 
 <p><img src="images/06ptpDebugPersp.png"></p>
-<p>This image shows a typical debug session. In the upper left of the perspective is the <b>Parallel Debug view</b> which shows the processes associated with the job, and allows bulk control of the processes. Underneath this is the <b>Debug view</b> which is the standard view showing process threads and stack frames. The source window shows a current line marker, which represents the current location of all 64 processes. In the upper right, the <b>Variables view</b> is showing the variables from the processes currently selected in the <b>Debug view</b>. There are also a number of other views available for setting breakpoints, manipulating signals, etc. Below this is the standard <b>Outline view</b>. At the very bottom are the standard <b>Problems</b>, <b>Console</b>, and <b>Memory</b> views.</p>
+<p>This image shows a typical debug session. In the upper left of the perspective is the <b>Parallel Debug view</b> which shows the processes associated with the job, 
+and allows bulk control of the processes. Underneath this is the <b>Debug view</b> which is the standard view showing process threads and stack frames. The 
+source window shows a current line marker, which represents the current location of all 64 processes. In the upper right, the Variables view
+ is showing the variables from the processes currently selected in the Debug view. There are also a number of other views available for setting breakpoints, 
+ manipulating signals, etc. Below this is the standard <b>Outline view</b>. At the very bottom are the standard <b>Problems</b>, <b>Console</b>, and <b>Memory</b> 
+ views.</p>
 
 <h2 id="pSets">Process Sets</h2>
 <p>A key concept for debugging parallel programs with PTP is the notion of a <i>process set</i>. Traditional debuggers apply operations to a single
-process.  Parallel debugging operations apply to arbitrary collections of processes (including a single process). The PTP debugger calls these arbitrary collections process sets, and uses them as a means of simultaneously referring to one or more processes.</p>
+process.  Parallel debugging operations apply to arbitrary collections of processes (including a single process). The PTP debugger calls these arbitrary 
+collections process sets, and uses them as a means of simultaneously referring to one or more processes.</p>
 
 <p>When a parallel debug session is first started, all processes are contained
 in a set, called the <b>Root</b> set.  Sets are always associated with a single Job.
@@ -41,13 +120,13 @@ shown in the following diagram.</p>
 
 <p><img src="images/06pSets.png"></p>
 
-<p>Debug commands on the <b>Parallel Debug view</b> toolbar always apply to the <i>current process set</i>, which is the set of processes that is visible in the view.</p>
+<p>Debug commands on the Parallel Debug view toolbar always apply to the <i>current process set</i>, which is the set of processes that is visible in the view.</p>
 
 <p><img src="images/06parallelDebugViewCmds.png"></p>
 
 <h2 id="pSetsOper">Operations on Process sets</h2>
 
-<p>PTP provides buttons on the toolbar of the <b>Parallel Debug view</b>
+<p>PTP provides buttons on the toolbar of the Parallel Debug view
 to create, modify, and delete process sets, and to change
 the current process set.</p>
 
@@ -93,19 +172,24 @@ as described above, and click the
 <p><img src="images/06pSetDelete.png"></p>
 
 <h2 id="bkpt">Breakpoints</h2>
-<p>PTP has a special type of breakpoint known as a <i>parallel breakpoint</i>. These breakpoints differ from normal breakpoints because they apply to a set of processes instead of a single process (or thread). There are two types of parallel breakpoints:</p>
+<p>PTP has a special type of breakpoint known as a <i>parallel breakpoint</i>. These breakpoints differ from normal breakpoints 
+because they apply to a set of processes instead of a single process (or thread). There are two types of parallel breakpoints:</p>
 
 <ul>
-<li><p><i>Global breakpoints</i> apply to <i>all</i> processes in <i>any</i> job. A global breakpoint remains in effect between job launches. Typically, a global breakpoint is used for gaining control of an application at a predetermined point. Global breakpoints are identified by a parallel breakpoint icon with a small <code>G</code> in the upper left corner:</p>
-
+<li><p><i>Global breakpoints</i> apply to <i>all</i> processes in <i>any</i> job. A global breakpoint remains in effect between job launches. 
+Typically, a global breakpoint is used for gaining control of an application at a predetermined point. Global breakpoints are identified by a 
+parallel breakpoint icon with a small <code>G</code> in the upper left corner:</p>
+<p><br></p>
 <p><img src="images/06globalBreakpoint.png"></p> 
+<p><br></p>
 </li>
 
 <li><p><i>Set Breakpoints </i> apply only to a <i>specific set</i> of processes
 (which can include the root set) for a <i>single</i> job. When the job completes,
 these breakpoints are removed.</p>
-
+<p><br></p>
 <p><img src="images/06setBreakpoint.png"></p> 
+<p><br></p>
 </li>
 <p>Set breakpoints can be one of three colors:<p>
 <ul>
@@ -122,12 +206,13 @@ You can also right-click and use the <b>Parallel Breakpoint &gt; Toggle breakpoi
 
 <p><img src="images/06bkptSetContext.png"></p> 
 
-<p>A global breakpoint is created if no jobs are selected in the <b>Parallel Debug view</b>.
+<p>A global breakpoint is created if no jobs are selected in the Parallel Debug view.
 If a job is selected, the breakpoint will apply to the current set.</p>
 
 <h3>Breakpoint information</h3>
 
-<p>There are a number of ways to find out more information about a breakpoint, such as the source file, line and process set it applies to. Placing the mouse over a breakpoint will display a tooltip popup:</p>
+<p>There are a number of ways to find out more information about a breakpoint, such as the source file, line and process set it applies to. 
+Placing the mouse over a breakpoint will display a tooltip popup:</p>
 
 <p><img src="images/06bkptHover.png"></p> 
 
@@ -135,7 +220,7 @@ If a job is selected, the breakpoint will apply to the current set.</p>
 
 <p><img src="images/06bkptsView.png"></p> 
 
-<p>Use <b>Show &gt; Parallel Breakpoint Set</b> in the menu on the <b>Breakpoints view</b> toolbar to group breakpoints
+<p>Use <b>Show &gt; Parallel Breakpoint Set</b> in the menu on the Breakpoints view toolbar to group breakpoints
 by the process set they apply to:</p>
 
 <p><img src="images/06bkptsViewMenu.png"></p> 
@@ -172,18 +257,25 @@ is not necessarily the same as a process set.</i></p>
 
 <h2 id="reg">Process Registration and the Debug View</h2> 
 
-<p>Once processes of a parallel job have been suspended, it is often desirable to obtain more detailed information about an individual process. In order to do this, a particular process must first be <i>registered</i>. Once a process is registered it's threads and stack frames appear in the <b>Debug view</b>. By selecting the stack frame in this view, detailed information about the local variables can be obtained in the <b>Variables view</b>.</p>
+<p>Once processes of a parallel job have been suspended, it is often desirable to obtain more detailed information about an individual process. 
+In order to do this, a particular process must first be <i>registered</i>. Once a process is registered it's threads and stack frames appear in 
+the Debug view. By selecting the stack frame in this view, detailed information about the local variables can be obtained in the Variables view.</p>
 
-<p>Any number of processes can be registered, and processes can be registered or un-registered at any time. To register a process, double-click its process icon in the <b>Parallel Debug view</b>. A black box will be shown around the process icon to indicate that it has been registered. At the sime time, the process will appear in the <b>Debug view</b>.</p>
+<p>Any number of processes can be registered, and processes can be registered or un-registered at any time. To register a process, double-click its 
+process icon in the Parallel Debug view. A black box will be shown around the process icon to indicate that it has been registered. At the same time, 
+the process will appear in the Debug view.</p>
 
 <p><img src="images/06reg1.png"></p>
 
 <p>To un-register a process, double-click on the same process icon. The box disappears, and the process is removed from the debug view.</p>
 
-<p>The <b>Debug view</b> also provides a set of debug commands (resume, pause, step over, etc.) that apply to the <i>currently selected process</i> in the view. This provides a convenient means of controlling individual processes.</p>
+<p>The Debug view also provides a set of debug commands (resume, pause, step over, etc.) that apply to the <i>currently selected process</i> in the view. 
+This provides a convenient means of controlling individual processes.</p>
 
 <h2 id="finish">Terminating Execution</h2>
-<p>At the end of a debug session, it is necessary to terminate the execution of the job. To do this, click on the terminate icon <img src="images/06terminateAll.png"> in the <b>Parallel Debug view</b>.  Note that the terminate icon in the <b>Debug view</b> <img src="images/06terminate.png"> will only terminate the currently selected process in that view.</p>
+At the end of a debug session, it is necessary to terminate the execution of the job. To do this, click on the terminate icon 
+<img src="images/06terminateAll.png"> in the Parallel Debug view.  Note that the terminate icon in the Debug view
+ <img src="images/06terminate.png"> will only terminate the currently selected process in that view.
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 
