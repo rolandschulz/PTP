@@ -72,10 +72,6 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp.rm.pbs"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.ptp.rm.slurm"
          version="0.0.0"/>
 

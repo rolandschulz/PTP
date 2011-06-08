@@ -378,10 +378,6 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.rm.pbs-feature"/>
-			<param name="tagbranch" value="${ptpTagBranch}"/>
-		</antcall>		
-		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.external-feature"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
@@ -625,26 +621,6 @@
 		</antcall>		
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.mpi.openmpi.ui"/>
-			<param name="tagbranch" value="${ptpTagBranch}"/>
-		</antcall>
-		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.core"/>
-			<param name="tagbranch" value="${ptpTagBranch}"/>
-		</antcall>		
-		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.core.server"/>
-			<param name="tagbranch" value="${ptpTagBranch}"/>
-		</antcall>		
-		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.jproxy"/>
-			<param name="tagbranch" value="${ptpTagBranch}"/>
-		</antcall>		
-		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.help"/>
-			<param name="tagbranch" value="${ptpTagBranch}"/>
-		</antcall>		
-		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.ui"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
