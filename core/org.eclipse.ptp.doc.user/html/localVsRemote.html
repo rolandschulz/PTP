@@ -62,6 +62,7 @@ manually by the user.
 Local projects can only be built locally, but the executable can be run either locally or remotely. However, an executable built locally can
 be run remotely only if both the local and remote machines have the same architecture, or the executable was built using a cross compiler. 
 </p>
+
 <h2 id="remote">Remote Projects</h2>
 <p><a href="PLUGINS_ROOT/org.eclipse.ptp.rdt.doc.user/html/toc.html">Remote Development Tools</a> 
 (RDT) is part of PTP and provides the ability for C and C++ projects to be located and developed
@@ -82,14 +83,28 @@ Remote projects have a number of limitations. In order to work on the remote pro
 which precludes off-line development. Some Eclipse features are also not available on remote projects. Remote projects can only be checked out or cloned from
 a version control system on the remote system, and the user will have no access to the normal Team functionality through the Eclipse user interface.
 Remote projects do have the advantage that a copy of the source code is not required on the user's system, which may be a requirement in some environments.
+
 <h2 id="sync">Synchronized Projects (new for 5.0)</h2>
 <p>Synchronized projects maintain a copy of the source code and other project files on both the local system and the remote system.
-Editing and other Eclipse functions happen locally, then each file is synchronized with the remote system when it is changed, created, or deleted.
+The user edits the local copy of a file, then each file is synchronized with the remote system when it is saved. Files that are created or deleted
+are also synchronized with the remote system. In addition, if files are changed on the remote system, these will be synchronized with the local system on a regular 
+basis. A single project can be synchronized with multiple remote systems. Projects that are checked out or cloned from a version control system can also 
+be synchronized, as Team operations are independent of the 
+synchronization process.
 </p>
 <p>
-This enables faster interaction with the files
-and editor, more editor features since the files are local, and continued interaction for editing etc. if the network
-connection is lost.
+Synchronized projects support multiple build configurations, so the build can happen either locally or on one or more remote systems. The user can select
+which system will be used to build the project. A launch configuration can then be created to to run the application on the target machine.
+</p>
+<p>
+When creating a synchronized project, the <b>New Synchronized Project</b> wizard provides a page to choose the service provider to use:
+</p>
+<img src="images/sync-project-provider.png">
+<p>
+Synchronized projects offer a number of advantages over remote projects. Keeping a local copy of the source code enables faster interaction during
+editing, and all the normal C, C++ and Fortran editor, content assist, and search features are available. Synchronized projects do not require a
+constant network connection, so development can continue off-line, then the project can be re-synchronized when a network is available. One disadvantage
+of synchronized projects is that a copy of the source code is kept on the user's local machine, which may not be permitted by some organizations.
 </p>
 <p>
 See the <a href="sync.html">Synchronized Projects</a> section for more information.
