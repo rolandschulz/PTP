@@ -39,6 +39,9 @@ public class ReleaseJob extends AbstractControlAction {
 		if (!IJobStatus.USER_ON_HOLD.equals(detail) && !IJobStatus.SYSTEM_ON_HOLD.equals(detail)) {
 			return false;
 		}
+		if (!ActionUtils.isAuthorised(status)) {
+			return false;
+		}
 		return true;
 	}
 }

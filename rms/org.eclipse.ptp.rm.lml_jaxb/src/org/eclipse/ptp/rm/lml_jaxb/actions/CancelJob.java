@@ -69,7 +69,7 @@ public class CancelJob extends AbstractStatusAction {
 	protected void validate(IAction action) {
 		for (Row row : selected) {
 			JobStatusData status = row.status;
-			if (status == null) {
+			if (status == null || !ActionUtils.isAuthorised(status)) {
 				action.setEnabled(false);
 				return;
 			}

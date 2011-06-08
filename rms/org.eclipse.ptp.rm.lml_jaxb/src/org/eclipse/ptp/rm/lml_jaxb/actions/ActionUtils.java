@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -30,6 +31,8 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
 import org.eclipse.ptp.rm.lml_jaxb.messages.Messages;
@@ -149,6 +152,36 @@ public class ActionUtils {
 		IResourceManagerControl control = rm.getControl();
 		control.control(job.getJobId(), operation, monitor);
 		maybeUpdateJobState(job, view, monitor);
+	}
+
+	/**
+	 * @param status
+	 * @return
+	 */
+	public static boolean isAuthorised(JobStatusData status) {
+		IJAXBResourceManager rm = (IJAXBResourceManager) ModelManager.getInstance().getResourceManagerFromUniqueName(
+				status.getRmId());
+		if (rm == null) {
+			return false;
+		}
+		if (!IResourceManager.STARTED_STATE.equals(rm.getState())) {
+			return false;
+		}
+		IJAXBResourceManagerConfiguration config = (IJAXBResourceManagerConfiguration) rm.getControlConfiguration();
+		if (config == null) {
+			return false;
+		}
+		String servicesId = config.getRemoteServicesId();
+		String connName = config.getConnectionName();
+		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(servicesId);
+		if (!services.isInitialized()) {
+			return false;
+		}
+		IRemoteConnection connection = services.getConnectionManager().getConnection(connName);
+		if (connection == null || !connection.getUsername().equals(status.getOwner())) {
+			return false;
+		}
+		return true;
 	}
 
 	/**

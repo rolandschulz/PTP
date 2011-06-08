@@ -39,6 +39,9 @@ public class ResumeJob extends AbstractControlAction {
 		if (!IJobStatus.SUSPENDED.equals(state)) {
 			return false;
 		}
+		if (!ActionUtils.isAuthorised(status)) {
+			return false;
+		}
 		return true;
 	}
 }

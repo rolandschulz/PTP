@@ -42,6 +42,9 @@ public class SuspendJob extends AbstractControlAction {
 		} else if (IJobStatus.SUSPENDED.equals(state)) {
 			return false;
 		}
+		if (!ActionUtils.isAuthorised(status)) {
+			return false;
+		}
 		return true;
 	}
 }

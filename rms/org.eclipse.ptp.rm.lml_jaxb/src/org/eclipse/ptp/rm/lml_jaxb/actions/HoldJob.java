@@ -44,6 +44,9 @@ public class HoldJob extends AbstractControlAction {
 		} else if (IJobStatus.USER_ON_HOLD.equals(detail)) {
 			return false;
 		}
+		if (!ActionUtils.isAuthorised(status)) {
+			return false;
+		}
 		return true;
 	}
 }
