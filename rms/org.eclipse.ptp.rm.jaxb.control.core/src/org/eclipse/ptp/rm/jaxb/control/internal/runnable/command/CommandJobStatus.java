@@ -646,6 +646,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 				control.jobStateChanged(jobId, this);
 			}
 		}
+
+		if (!waitEnabled) {
+			monitor.done();
+		}
 	}
 
 	/**
