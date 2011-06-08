@@ -8,10 +8,10 @@
 <h1>Local vs Remote Projects</h1>
 <p>Projects comprise the source code, build rules (e.g. makefiles),
 and build results (e.g. object files and executables) for a particular application. These projects can reside in a number of different
-locations, including on the user's local machine, on a remote systems, or in a source code repository. The target systems on which these 
-applications run are also typically located at remote sites, though user's may also want to run the applications on their local machines.
+locations, including on the user's local machine, on a remote system, or in a source code repository. The target systems on which these 
+applications run are also typically located at remote sites, though users may also want to run the applications on their local machines.
 <p>
-To cater for as many situations as possible, PTP supports a variety of project and target system configurations. In addition to normal
+To cater to as many situations as possible, PTP supports a variety of project and target system configurations. In addition to normal
 Eclipse projects, PTP adds two new project types. With PTP installed, the user has the choice of the following project types:
 <dl>
 <dt><a href="#local">Local projects</a><dt>
@@ -64,11 +64,12 @@ be run remotely only if both the local and remote machines have the same archite
 </p>
 <h2 id="remote">Remote Projects</h2>
 <p><a href="PLUGINS_ROOT/org.eclipse.ptp.rdt.doc.user/html/toc.html">Remote Development Tools</a> 
-(RDT) is part of PTP that provides the ability for C and C++ projects to be located and developed
+(RDT) is part of PTP and provides the ability for C and C++ projects to be located and developed
 remotely. Fortran projects can also be developed using RDT, but certain functionality (such as content assist and searching) will not be available.
 In a remote project, the source code and other files are located on a remote system but appear to the user as if they
-are on the local machine. When the project is built, the build happens on the remote system and the resulting executable will be
-located on the remote system also. Launching the executable requires a resource manager that has been configured to use
+are on the local machine. They are brought to the local machine only when opened in an editor.
+When the project is built, the build happens on the remote system and the resulting executable will be
+located on the remote system also. Launching the executable requires a <a href="02resMgrSetup.html#defn">resource manager</a> that has been configured to use
 the remote target system.
 </p>
 <p>
