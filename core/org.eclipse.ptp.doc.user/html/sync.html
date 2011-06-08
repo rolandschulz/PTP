@@ -6,6 +6,7 @@
 </head> 
 <body>
 <h1 id="top">Synchronized Projects</h1>
+<p>
 <ul>
 <li><a href="#prereq">Requirements for Synchronized Projects</a>
 <li><a href="#create">Creating a new Synchronized Project</a>
@@ -13,71 +14,101 @@
 <li><a href="#props">Project Properties specific to Synchronized Projects</a>
 </ul>
 <p>Synchronized projects consist of files that are mirrored on the local system as well as on one or more remote systems.
-Editing occurs locally and each file is sync'ed with the currently active remote system when it is changed, created, or deleted.  
+Editing occurs locally and each file is synchronized with the currently active remote system when it is changed, created, or deleted.  
 This enables faster interaction with the files
 and editor, more CDT editor features since the files are local, and continued interaction for editing etc. if the network
 connection is lost.
 <p>
 <h2 id=prereq>Requirements for Synchronized Projects</h2>
-<p>To host a synchronized project, the remote system must:
-<ul>
-<li>Support the <a href="http://git-scm.com/">Git</a> distributed version control system</li>
-<li>Support Java (1.5 or later) to allow Remote Tools (or RSE) as Remote Provider
-    <ul><li>
-    More information about Remote Tools as a remote service provider is in the section about
-    <a href="02resMgrSetup.html#remote">remote Resource Managers</a>.
-    </li>
-    </ul>
-</li>
-</ul>
+<p>To host a synchronized project, the remote system must support the <a href="http://git-scm.com/">Git</a> distributed version control system.
+
 <h2 id=create>Creating a new Synchronized Project</h2>
-<p>To create a new Synchronized Project, Select <b>File > New > Other...</b>
-and in the wizard selection dialog, select <b>Remote > Synchronized Project</b>.
+<p>To create a new Synchronized Project, use the following steps:</p>
+<ol>
+<li>
+Select <b>File > New > Other...</b>
+and in the wizard selection dialog, then select <b>Remote > Synchronized Project</b>.
+<p><br></p>
 <p><img src="images/sync-newproj.png">
+<p><br></p>
 <p>Or, from the context menu (right-mouse) in the Project Explorer,
 select <b>New > Synchronized Project</b>
+<p><br></p>
 <p><img src="images/sync-newprojContext.png">
-<p>Then give the project a name and select a project type. Choose <b>Makefile Project > Empty Project</b>
+<p><br></p>
+</li>
+<li>
+Enter a name for the project
+<p><br></p>
+</li>
+<li>Choose <b>Makefile Project > Empty Project</b> for the <b>Project type</b>
+<p><br></p>
 <p><img src="images/sync-newprojCreate.png">
-<p>Select <b>Next > </b> and then <b>Next > </b> again.
-<p>On the "Configure Remote Synchronization" page, select a Synchronization Provider (Git) and select an existing connection or create a new one. 
+<p><br></p>
+</li>
+<li>
+<p>Select <b>Next > </b> and then <b>Next > </b> again.</p>
+<p><br></p>
+</li>
+<li>
+On the "Configure Remote Synchronization" page, you should see the Git Synchronization Provider is already selected (different providers
+may be available in the future). Select an existing connection or create a new one. 
+<p><br></p>
 <p><img src="images/sync-newprojNewConnection.png">
-<p>Here we create a new remote connection with the <b>Remote Tools</b> Remote Provider by selecting the <b>New...</b> button.
+<p><br></p>
+<li>
+Select the <b>New...</b> button to create a new remote connection with the <b>Remote Tools</b> remote service provider.
 The Target Environment Configuration dialog is shown. Fill in host name, user, and password (or other authentication
 information).
+<p><br></p>
 <p><img src="images/sync-newprojConnection.png">
-<p>Select <b>Finish</b>.  The connection will be tested at this
+<p><br></p>
+</li>
+<li>
+Select <b>Finish</b>.  The connection will be tested at this
 point before returning to the <b>Configure Remote Synchronization</b> page.
-
-<p>Back on the <b>Configure Remote Synchronization</b> page:
+<p><br></p>
+</li>
+<li>
+Specify a remote location by selecting <b>Browse...</b>
+<p><br></p>
 <p><img src="images/sync-newprojConfigLocn.png">
-<p>Specify a remote location by selecting <b>Browse...</b>
-<p>A <b>Browse Directory</b> dialog appears in which you can navigate to find the directory
-in which your new project's files will be contained on the remote system.
-<p>Hit <b>OK</b> to return.
-<p>The <b>Configure Remote Synchronization</b> page now contains the location of the remote files:
+<p><br></p>
+<li>
+A <b>Browse Directory</b> dialog appears in which you can navigate to find the directory
+in which your new project's files will be contained on the remote system. Hit <b>OK</b> to finish.
+The <b>Configure Remote Synchronization</b> page now contains the location of the remote files:
+<p><br></p>
 <p><img src="images/sync-newprojLocn.png">
-<p>Hit <b>Finish</b> to complete project creation. If the remote location does not exist, it is
-created. Otherwise, the files in that directory will be sync'ed to the local workspace.
-<p>&nbsp;
+<p><br></p>
+</li>
+<li>
+Hit <b>Finish</b> to complete project creation. If the remote location does not exist, it is
+created. Otherwise, the files in that directory will be synchronized to the local workspace.
+</li>
+</ol>
 
 <h2 id="work">Working with a Synchronized Project</h2>
 <p>Edit the files as you would any local project.
-Each time you save a file, the remote copy of the file is saved on the remote system.
-If you create or delete files, the remote system is updated appropriately.
-You can set other configurations to refer to other remote sites.
-Sync'ing is done between the local workspace and the active configuration.
-Note that there is a "Workspace" configuration too, so that you can also build locally.
-(If "Workspace" is the active configuration, no sync'ing is done.)
-Note that directories and files are created for new configurations the first time they are sync'ed.
-<p>See below for Project Properties showing Configurations for the Synchronized project.
-
-<p>&nbsp;
-<h2 id="props">Project Properties specific to Synchronized Projects</h2>
-<p>To bring up Project Properties, In the Project Explorer view, select the Project and 
-<b>RightMouse > Properties</b> (bottom of context menu)
+Each time you save a file, it will be synchronized with the remote system. If you create or delete files, the remote system will be updated appropriately.
+</p>
+<p>
+By default, a synchronized project is configured to build on the same remote host used for synchronization. To build the project (assuming you have already 
+created a makefile), make sure the project is selected in the <b>Project Explorer</b> view, then click on the build icon (the icon that looks like a hammer).
+A build configuration called "Workspace" is also available to build on the local machine if this is required.
+</p>
+<p>
+You can create configurations to synchronize and build on other remote systems using the <b>C/C++ Build > Synchronize</b> project properties.
+To bring up the Synchronize project properties, in the <b>Project Explorer</b> view, select the project and choose <b>Properties</b> from the context
+menu (right click).
+</p>
 <p><img src="images/sync-projProperties.png">
-<p>&nbsp;
+<p>
+Synchronization is done between the local workspace and the active configuration. You can change the active configuration by using the 
+<b>Build Configurations > Set Active...</b> context menu on the project or via the <b>Manage Configurations</b> button on the <b>Synchronize</b>
+properties page. If "Workspace" is the active configuration, no synchronization is done.
+</p>
+
 
 <h2 id="includes">Remote Include Paths</h2>
 <p>At the time of the PTP 5.0 release (June 2011),
@@ -86,12 +117,28 @@ Note that directories and files are created for new configurations the first tim
  requires some integration with the remote scanner discovery (which discovers what includes/defines 
  are set on the remote system). 
 
-<p>You can currently manually configure remote include files as follows.
-Open the project properties, 
- go to <b>C/C++ General > Paths and Symbols</b>. Then choose the build configuration you want to use. 
- Click on <b>GNU C</b> and remove the existing paths. Then add new paths to the remote include directories using 
- UNC notation (e.g. <code>//connectionName/usr/include</code> where 'connnectionName' is the name of the connection you specified 
- for Remote Tools).  
+<p>You can currently manually configure remote include files as follows:
+<ol>
+<li>Open the project properties
+<p><br></p></li>
+<li>Open the <b>C/C++ General > Paths and Symbols</b> page
+<p><br></p></li>
+<li>Choose the build configuration you want to use
+<p><br></p></li>
+<li>Click on <b>GNU C</b> and remove the existing paths
+<p><br></p>
+</li>
+<li>Add new paths to the remote include directories using 
+ UNC notation <code>//connection_name/usr/include</code> where 'connnection_name' is the name of the connection you specified 
+ for the Remote Tools service provider
+ <p><br></p>
+ For example, to add the include path <code>/usr/include</code> using the connection <code>abe.ncsa.uiuc.edu</code> that you
+ previously configured, you would use the path <code>//abe.ncsa.uiuc.edu/usr/include</code>
+ <p><br></p>
+</li>
+<li>Click OK then OK again. You may be asked if you want to rebuild the index. Click Yes.
+</li>
+</ol> 
 
 <p>See also 
 <a href="http://wiki.eclipse.org/PTP/sync-projects">Synchronized Projects usage info on the PTP Wiki page</a>
