@@ -58,7 +58,7 @@ public class InfoboxType
      */
     public String getType() {
         if (type == null) {
-            return "notype";
+            return "notype"; //$NON-NLS-1$
         } else {
             return type;
         }

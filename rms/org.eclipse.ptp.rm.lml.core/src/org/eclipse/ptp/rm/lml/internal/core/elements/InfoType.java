@@ -156,7 +156,7 @@ public class InfoType  implements Serializable {
      */
     public String getType() {
         if (type == null) {
-            return "notype";
+            return "notype"; //$NON-NLS-1$
         } else {
             return type;
         }

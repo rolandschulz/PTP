@@ -207,7 +207,7 @@ public class ColumnType  implements Serializable {
      */
     public String getType() {
         if (type == null) {
-            return "optional";
+            return Messages.ColumnType_0;
         } else {
             return type;
         }

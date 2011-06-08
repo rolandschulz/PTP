@@ -261,7 +261,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	private RectPaintListener rectpaintlistener = null;
 
 	// The name of the special empty job
-	private final String emptyJobName = "empty";
+	private final String emptyJobName = "empty"; //$NON-NLS-1$
 
 	/**
 	 * Call this constructor for start, maxlevel is chosen from lml-file
@@ -912,7 +912,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			// Get picture from url and put it into a panel
 			try {
 				final URL httpURL = new URL(lmlurl);
-				res = new URL("https", httpURL.getHost(), httpsport, httpURL.getFile());
+				res = new URL("https", httpURL.getHost(), httpsport, httpURL.getFile()); //$NON-NLS-1$
 			} catch (final MalformedURLException e) {
 				return null;
 			}

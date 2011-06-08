@@ -40,23 +40,23 @@ import javax.xml.bind.annotation.XmlType;
 public enum ObjectName {
 
     @XmlEnumValue("job")
-    JOB("job"),
+    JOB("job"), //$NON-NLS-1$
     @XmlEnumValue("node")
-    NODE("node"),
+    NODE("node"), //$NON-NLS-1$
     @XmlEnumValue("system")
-    SYSTEM("system"),
+    SYSTEM("system"), //$NON-NLS-1$
     @XmlEnumValue("queue")
-    QUEUE("queue"),
+    QUEUE("queue"), //$NON-NLS-1$
     @XmlEnumValue("scheduler")
-    SCHEDULER("scheduler"),
+    SCHEDULER("scheduler"), //$NON-NLS-1$
     @XmlEnumValue("class")
-    CLASS("class"),
+    CLASS("class"), //$NON-NLS-1$
     @XmlEnumValue("partition")
-    PARTITION("partition"),
+    PARTITION("partition"), //$NON-NLS-1$
     @XmlEnumValue("partmap")
-    PARTMAP("partmap"),
+    PARTMAP("partmap"), //$NON-NLS-1$
     @XmlEnumValue("smallpartition")
-    SMALLPARTITION("smallpartition");
+    SMALLPARTITION("smallpartition"); //$NON-NLS-1$
     private final String value;
 
     ObjectName(String v) {

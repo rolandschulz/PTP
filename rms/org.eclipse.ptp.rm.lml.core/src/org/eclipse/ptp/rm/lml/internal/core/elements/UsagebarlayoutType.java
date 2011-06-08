@@ -70,7 +70,7 @@ public class UsagebarlayoutType
      */
     public String getScale() {
         if (scale == null) {
-            return "nodes";
+            return Messages.UsagebarlayoutType_0;
         } else {
             return scale;
         }
@@ -98,7 +98,7 @@ public class UsagebarlayoutType
      */
     public BigInteger getInterval() {
         if (interval == null) {
-            return new BigInteger("4");
+            return new BigInteger(Messages.UsagebarlayoutType_1);
         } else {
             return interval;
         }

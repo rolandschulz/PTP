@@ -25,7 +25,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement;
  */
 public class Mask {
 
-	private static final String number = "\\s*(-|\\+)?(0x|0X)?([a-fA-F\\d]+)";// Regular expression for a printed integer
+	private static final String number = "\\s*(-|\\+)?(0x|0X)?([a-fA-F\\d]+)";// Regular expression for a printed integer //$NON-NLS-1$
 
 	public static void main(String[] args) {
 
@@ -35,10 +35,10 @@ public class Mask {
 		scheme.setMin(BigInteger.valueOf(5));
 		scheme.setMax(BigInteger.valueOf(10));
 		scheme.setStep(BigInteger.valueOf(1));
-		scheme.setMap("hans,peter,jupp");
+		scheme.setMap("hans,peter,jupp"); //$NON-NLS-1$
 
 		final Mask m = new Mask(scheme);
-		System.out.println(m.getNumberOfLevelstring("peter"));
+		System.out.println(m.getNumberOfLevelstring("peter")); //$NON-NLS-1$
 	}
 
 	private String maskstring;
@@ -64,14 +64,14 @@ public class Mask {
 		scheme = pscheme;
 
 		if (pscheme.getMap() != null) {
-			names = pscheme.getMap().split(",");
+			names = pscheme.getMap().split(","); //$NON-NLS-1$
 
 			outputlength = -1;// variable, because name lengths can be variable
 
 			regularMask = pscheme.getMap().replace(',', '|');
-			pre = "";
-			post = "";
-			maskstring = "";
+			pre = ""; //$NON-NLS-1$
+			post = ""; //$NON-NLS-1$
+			maskstring = ""; //$NON-NLS-1$
 
 		}
 		else {
@@ -79,7 +79,7 @@ public class Mask {
 
 			maskstring = pscheme.getMask();
 			// regular expression in xsd (([^%])*%(\-|\+|\s|\#)*0(\-|\+|\s|\#)*(\d)+d([^%])*)|(([^%])*%(\-|\+|\s|\#)*d([^%])+)
-			if (maskstring.matches("([^%])*%(\\-|\\+|\\s|\\#)*d([^%])+")) {// length is unknown but there is a separator specified
+			if (maskstring.matches("([^%])*%(\\-|\\+|\\s|\\#)*d([^%])+")) {// length is unknown but there is a separator specified //$NON-NLS-1$
 				outputlength = -1;
 			}
 			else {// there must be given a length within the mask

@@ -305,12 +305,12 @@ public class FastImpCheck {
 				// ArrayList<Integer> level=impnameToLevel(refname, masks);
 				final ArrayList<Integer> level = impnameToOneLevel(refname, scheme, new ArrayList<Integer>());
 				if (level == null) {
-					res.addError("\tError refid " + refname + " is not allowed corresponding to the scheme-tag");
+					res.addError(Messages.FastImpCheck_0 + refname + Messages.FastImpCheck_1);
 				}
 				else {
 					if (LMLCheck.getSchemeByLevels(level, scheme) == null) {
 
-						res.addError("\tError refid " + refname + " is not allowed corresponding to the scheme-tag");
+						res.addError(Messages.FastImpCheck_2 + refname + Messages.FastImpCheck_3);
 					}
 				}
 			}

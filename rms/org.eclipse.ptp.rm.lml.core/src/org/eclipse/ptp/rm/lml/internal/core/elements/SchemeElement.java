@@ -118,7 +118,7 @@ public class SchemeElement
      */
     public String getMask() {
         if (mask == null) {
-            return "%d-";
+            return "%d-"; //$NON-NLS-1$
         } else {
             return mask;
         }
@@ -146,7 +146,7 @@ public class SchemeElement
      */
     public BigInteger getStep() {
         if (step == null) {
-            return new BigInteger("1");
+            return new BigInteger("1"); //$NON-NLS-1$
         } else {
             return step;
         }

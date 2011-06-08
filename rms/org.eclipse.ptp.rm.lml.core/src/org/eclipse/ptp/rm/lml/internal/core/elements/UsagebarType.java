@@ -127,7 +127,7 @@ public class UsagebarType
      */
     public BigInteger getCpupernode() {
         if (cpupernode == null) {
-            return new BigInteger("1");
+            return new BigInteger("1"); //$NON-NLS-1$
         } else {
             return cpupernode;
         }

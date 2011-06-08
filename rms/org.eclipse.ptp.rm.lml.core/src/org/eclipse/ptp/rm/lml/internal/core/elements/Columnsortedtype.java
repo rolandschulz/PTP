@@ -34,11 +34,11 @@ import javax.xml.bind.annotation.XmlType;
 public enum Columnsortedtype {
 
     @XmlEnumValue("asc")
-    ASC("asc"),
+    ASC("asc"), //$NON-NLS-1$
     @XmlEnumValue("desc")
-    DESC("desc"),
+    DESC("desc"), //$NON-NLS-1$
     @XmlEnumValue("false")
-    FALSE("false");
+    FALSE("false"); //$NON-NLS-1$
     private final String value;
 
     Columnsortedtype(String v) {

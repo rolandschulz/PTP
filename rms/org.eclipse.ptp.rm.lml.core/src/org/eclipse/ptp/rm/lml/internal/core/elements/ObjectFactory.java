@@ -34,27 +34,27 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory  implements Serializable {
 
-    private final static QName _Lgui_QNAME = new QName("http://www.llview.de", "lgui");
-    private final static QName _LguiTypeInformation_QNAME = new QName("", "information");
-    private final static QName _LguiTypeText_QNAME = new QName("", "text");
-    private final static QName _LguiTypeUsagebarlayout_QNAME = new QName("", "usagebarlayout");
-    private final static QName _LguiTypeTablelayout_QNAME = new QName("", "tablelayout");
-    private final static QName _LguiTypeTable_QNAME = new QName("", "table");
-    private final static QName _LguiTypeNodedisplay_QNAME = new QName("", "nodedisplay");
-    private final static QName _LguiTypeSplitlayout_QNAME = new QName("", "splitlayout");
-    private final static QName _LguiTypeInfoboxlayout_QNAME = new QName("", "infoboxlayout");
-    private final static QName _LguiTypeUsagebar_QNAME = new QName("", "usagebar");
-    private final static QName _LguiTypeAbslayout_QNAME = new QName("", "abslayout");
-    private final static QName _LguiTypeRelations_QNAME = new QName("", "relations");
-    private final static QName _LguiTypeChartlayout_QNAME = new QName("", "chartlayout");
-    private final static QName _LguiTypeChart_QNAME = new QName("", "chart");
-    private final static QName _LguiTypeObjects_QNAME = new QName("", "objects");
-    private final static QName _LguiTypeNodedisplaylayout_QNAME = new QName("", "nodedisplaylayout");
-    private final static QName _LguiTypeChartgroup_QNAME = new QName("", "chartgroup");
-    private final static QName _LguiTypeTextlayout_QNAME = new QName("", "textlayout");
-    private final static QName _LguiTypeInfobox_QNAME = new QName("", "infobox");
-    private final static QName _PatternTypeExclude_QNAME = new QName("", "exclude");
-    private final static QName _PatternTypeInclude_QNAME = new QName("", "include");
+    private final static QName _Lgui_QNAME = new QName("http://www.llview.de", "lgui"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeInformation_QNAME = new QName("", "information"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeText_QNAME = new QName("", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeUsagebarlayout_QNAME = new QName("", "usagebarlayout"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeTablelayout_QNAME = new QName("", "tablelayout"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeTable_QNAME = new QName("", "table"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeNodedisplay_QNAME = new QName("", "nodedisplay"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeSplitlayout_QNAME = new QName("", "splitlayout"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeInfoboxlayout_QNAME = new QName("", "infoboxlayout"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeUsagebar_QNAME = new QName("", "usagebar"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeAbslayout_QNAME = new QName("", "abslayout"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeRelations_QNAME = new QName("", "relations"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeChartlayout_QNAME = new QName("", "chartlayout"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeChart_QNAME = new QName("", "chart"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeObjects_QNAME = new QName("", "objects"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeNodedisplaylayout_QNAME = new QName("", "nodedisplaylayout"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeChartgroup_QNAME = new QName("", "chartgroup"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeTextlayout_QNAME = new QName("", "textlayout"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _LguiTypeInfobox_QNAME = new QName("", "infobox"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _PatternTypeExclude_QNAME = new QName("", "exclude"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final static QName _PatternTypeInclude_QNAME = new QName("", "include"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.eclipse.ptp.rm.lml.internal.core.elements

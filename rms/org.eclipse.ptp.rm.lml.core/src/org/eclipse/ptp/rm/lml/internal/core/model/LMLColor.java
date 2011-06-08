@@ -269,7 +269,7 @@ public class LMLColor {
 	
 	@Override
 	public String toString() {
-		return "#" + Integer.toHexString(r) + Integer.toHexString(g) + Integer.toHexString(b);
+		return "#" + Integer.toHexString(r) + Integer.toHexString(g) + Integer.toHexString(b); //$NON-NLS-1$
 	}
 
 }

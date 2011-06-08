@@ -134,7 +134,7 @@ public class NodedisplayAccess extends LguiHandler {
 	 */
 	public String getImplicitName(String nodedisplayId, ArrayList<Integer> ids) {
 		if (ids == null || ids.size() == 0) {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 
 		final ArrayList<Integer> copy = LMLCheck.copyArrayList(ids);
@@ -142,7 +142,7 @@ public class NodedisplayAccess extends LguiHandler {
 		final Nodedisplay nodedisplay = getNodedisplayById(nodedisplayId);
 
 		if (nodedisplay == null) {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 
 		// Use LMLCheck-function for details
@@ -503,7 +503,7 @@ public class NodedisplayAccess extends LguiHandler {
 		if (nodedisplays.size() > 0) {
 			return getNodedisplays().get(0).getTitle();
 		} else {
-			return "NodedisplayAccess: no nodedisplays available";
+			return Messages.NodedisplayAccess_2;
 		}
 	}
 

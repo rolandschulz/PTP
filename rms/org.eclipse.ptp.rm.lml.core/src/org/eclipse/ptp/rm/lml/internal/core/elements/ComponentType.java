@@ -141,7 +141,7 @@ public class ComponentType  implements Serializable {
      */
     public BigInteger getW() {
         if (w == null) {
-            return new BigInteger("100");
+            return new BigInteger("100"); //$NON-NLS-1$
         } else {
             return w;
         }
@@ -169,7 +169,7 @@ public class ComponentType  implements Serializable {
      */
     public BigInteger getH() {
         if (h == null) {
-            return new BigInteger("100");
+            return new BigInteger("100"); //$NON-NLS-1$
         } else {
             return h;
         }

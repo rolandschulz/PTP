@@ -94,7 +94,7 @@ public class LMLCheck {
 
 	}
 
-	private static final String line = "-----------------------------------";
+	private static final String line = "-----------------------------------"; //$NON-NLS-1$
 
 	/**
 	 * Searches for allowed implicitly defined names from a name schema.
@@ -131,7 +131,7 @@ public class LMLCheck {
 				final int step = el.getStep().intValue();
 
 				if (min > max) {
-					errlist.addError("A min-value is bigger then the appropriate max-value." + aname + " min= " + min + " max= "
+					errlist.addError(Messages.LMLCheck_1 + aname + Messages.LMLCheck_2 + min + Messages.LMLCheck_3
 							+ max);
 				}
 
@@ -195,7 +195,7 @@ public class LMLCheck {
 				if (first == null) {// Minimum of given data-node is not in scheme
 					final String levelstring = getLevelString(upperlevelnumbers);
 
-					errl.addError("\tDatanode with tree-path " + levelstring + " is not allowed in scheme");
+					errl.addError(Messages.LMLCheck_4 + levelstring + Messages.LMLCheck_5);
 				}
 				else {
 
@@ -217,7 +217,7 @@ public class LMLCheck {
 
 							final String levelstring = getLevelString(upperlevelnumbers);
 
-							errl.addError("\tDatanode with tree-path " + levelstring + " is not allowed in scheme");
+							errl.addError(Messages.LMLCheck_6 + levelstring + Messages.LMLCheck_7);
 						}
 						else {
 							// Check inner Nodes
@@ -245,7 +245,7 @@ public class LMLCheck {
 					if (asad == null) {
 						final String levelstring = getLevelString(upperlevelnumbers);
 
-						errl.addError("\tDatanode with tree-path " + levelstring + " is not allowed in scheme");
+						errl.addError(Messages.LMLCheck_8 + levelstring + Messages.LMLCheck_9);
 					}
 					else {// current number is allowed, check lower elements
 
@@ -288,7 +288,7 @@ public class LMLCheck {
 
 			if (refname != null) {
 				if (!names.contains(refname)) {
-					errlist.addError("\t\tImplicit name " + refname + " is not allowed");
+					errlist.addError(Messages.LMLCheck_10 + refname + Messages.LMLCheck_11);
 				}
 			}
 
@@ -319,7 +319,7 @@ public class LMLCheck {
 
 				final Nodedisplay dis = (Nodedisplay) gobj;
 
-				res.addMessage("Errors for Nodedisplay " + dis.getId());
+				res.addMessage(Messages.LMLCheck_12 + dis.getId());
 				// This part is now done by xsl-file
 				// checkAttributesAllowedForNodedisplay(dis.getRefto()!=null, res, dis.getData(), new ArrayList<Integer>());
 
@@ -452,7 +452,7 @@ public class LMLCheck {
 	public static String getImplicitName(ArrayList<Integer> ids, Object scheme) {
 
 		if (ids == null || ids.size() == 0) {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 
 		final ArrayList<Integer> id = new ArrayList<Integer>();
@@ -461,7 +461,7 @@ public class LMLCheck {
 		final SchemeElement subscheme = getSchemeByLevels(copyArrayList(id), scheme);
 
 		if (subscheme == null) {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 
 		final String subname = getLevelName(subscheme, id.get(0));
@@ -508,7 +508,7 @@ public class LMLCheck {
 			return String.format(scheme.getMask(), levelid);
 		}
 
-		final String[] names = scheme.getMap().split(",");
+		final String[] names = scheme.getMap().split(","); //$NON-NLS-1$
 		if (scheme.getMin() != null) {// min-max-attributes
 			final int min = scheme.getMin().intValue();
 			int max = min;
@@ -536,7 +536,7 @@ public class LMLCheck {
 			}
 		}
 
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -545,10 +545,10 @@ public class LMLCheck {
 	 */
 	public static String getLevelString(ArrayList<Integer> levels) {
 
-		String levelstring = "";
+		String levelstring = ""; //$NON-NLS-1$
 
 		for (int j = 1; j <= levels.size(); j++) {
-			levelstring += "el" + j + "=" + levels.get(j - 1) + " ";
+			levelstring += "el" + j + "=" + levels.get(j - 1) + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 
 		return levelstring;
@@ -778,7 +778,7 @@ public class LMLCheck {
 	 */
 	public static int[] getNumbersFromNumberlist(String numberlist) {
 
-		final String[] parts = numberlist.split(",");
+		final String[] parts = numberlist.split(","); //$NON-NLS-1$
 
 		final int[] res = new int[parts.length];
 
@@ -1158,7 +1158,7 @@ public class LMLCheck {
 	public static LguiType parseLML(URL xml, URL xsd) throws JAXBException {
 		// Causes errors while used in applet
 
-		final JAXBContext jc = JAXBContext.newInstance("lml");
+		final JAXBContext jc = JAXBContext.newInstance("lml"); //$NON-NLS-1$
 
 		final Unmarshaller unmar = jc.createUnmarshaller();
 

@@ -165,7 +165,7 @@ public class Nodedisplayelement
      */
     public BigInteger getRows() {
         if (rows == null) {
-            return new BigInteger("0");
+            return new BigInteger("0"); //$NON-NLS-1$
         } else {
             return rows;
         }
@@ -193,7 +193,7 @@ public class Nodedisplayelement
      */
     public BigInteger getCols() {
         if (cols == null) {
-            return new BigInteger("8");
+            return new BigInteger("8"); //$NON-NLS-1$
         } else {
             return cols;
         }
@@ -221,7 +221,7 @@ public class Nodedisplayelement
      */
     public BigInteger getHgap() {
         if (hgap == null) {
-            return new BigInteger("1");
+            return new BigInteger("1"); //$NON-NLS-1$
         } else {
             return hgap;
         }
@@ -249,7 +249,7 @@ public class Nodedisplayelement
      */
     public BigInteger getVgap() {
         if (vgap == null) {
-            return new BigInteger("1");
+            return new BigInteger("1"); //$NON-NLS-1$
         } else {
             return vgap;
         }
@@ -277,7 +277,7 @@ public class Nodedisplayelement
      */
     public BigInteger getFontsize() {
         if (fontsize == null) {
-            return new BigInteger("10");
+            return new BigInteger("10"); //$NON-NLS-1$
         } else {
             return fontsize;
         }
@@ -305,7 +305,7 @@ public class Nodedisplayelement
      */
     public BigInteger getBorder() {
         if (border == null) {
-            return new BigInteger("1");
+            return new BigInteger("1"); //$NON-NLS-1$
         } else {
             return border;
         }
@@ -333,7 +333,7 @@ public class Nodedisplayelement
      */
     public String getFontfamily() {
         if (fontfamily == null) {
-            return "Monospaced";
+            return "Monospaced"; //$NON-NLS-1$
         } else {
             return fontfamily;
         }
@@ -389,7 +389,7 @@ public class Nodedisplayelement
      */
     public String getTitlebackground() {
         if (titlebackground == null) {
-            return "#EFEFEF";
+            return "#EFEFEF"; //$NON-NLS-1$
         } else {
             return titlebackground;
         }
@@ -417,7 +417,7 @@ public class Nodedisplayelement
      */
     public String getBackground() {
         if (background == null) {
-            return "#FFF";
+            return "#FFF"; //$NON-NLS-1$
         } else {
             return background;
         }
@@ -469,7 +469,7 @@ public class Nodedisplayelement
      */
     public BigInteger getMouseborder() {
         if (mouseborder == null) {
-            return new BigInteger("2");
+            return new BigInteger("2"); //$NON-NLS-1$
         } else {
             return mouseborder;
         }
@@ -525,7 +525,7 @@ public class Nodedisplayelement
      */
     public String getBordercolor() {
         if (bordercolor == null) {
-            return "#000";
+            return "#000"; //$NON-NLS-1$
         } else {
             return bordercolor;
         }

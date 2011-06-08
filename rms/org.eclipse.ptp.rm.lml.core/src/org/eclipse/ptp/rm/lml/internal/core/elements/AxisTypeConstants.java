@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 public enum AxisTypeConstants {
 
     @XmlEnumValue("linear")
-    LINEAR("linear"),
+    LINEAR("linear"), //$NON-NLS-1$
     @XmlEnumValue("log")
-    LOG("log");
+    LOG("log"); //$NON-NLS-1$
     private final String value;
 
     AxisTypeConstants(String v) {

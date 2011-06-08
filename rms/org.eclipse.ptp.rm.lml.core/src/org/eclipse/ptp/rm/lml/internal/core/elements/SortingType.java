@@ -34,11 +34,11 @@ import javax.xml.bind.annotation.XmlType;
 public enum SortingType {
 
     @XmlEnumValue("numeric")
-    NUMERIC("numeric"),
+    NUMERIC(Messages.SortingType_0),
     @XmlEnumValue("alpha")
-    ALPHA("alpha"),
+    ALPHA(Messages.SortingType_1),
     @XmlEnumValue("date")
-    DATE("date");
+    DATE(Messages.SortingType_2);
     private final String value;
 
     SortingType(String v) {

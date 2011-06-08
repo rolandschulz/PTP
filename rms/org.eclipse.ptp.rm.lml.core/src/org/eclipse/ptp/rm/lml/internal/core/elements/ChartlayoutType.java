@@ -81,7 +81,7 @@ public class ChartlayoutType
      */
     public BigInteger getBorder() {
         if (border == null) {
-            return new BigInteger("0");
+            return new BigInteger("0"); //$NON-NLS-1$
         } else {
             return border;
         }
@@ -137,7 +137,7 @@ public class ChartlayoutType
      */
     public String getBackgroundcolor() {
         if (backgroundcolor == null) {
-            return "#FFF";
+            return "#FFF"; //$NON-NLS-1$
         } else {
             return backgroundcolor;
         }
@@ -165,7 +165,7 @@ public class ChartlayoutType
      */
     public String getInnerbackgroundcolor() {
         if (innerbackgroundcolor == null) {
-            return "#AAA";
+            return "#AAA"; //$NON-NLS-1$
         } else {
             return innerbackgroundcolor;
         }
@@ -193,7 +193,7 @@ public class ChartlayoutType
      */
     public String getAxescolor() {
         if (axescolor == null) {
-            return "#555";
+            return "#555"; //$NON-NLS-1$
         } else {
             return axescolor;
         }
@@ -221,7 +221,7 @@ public class ChartlayoutType
      */
     public String getBordercolor() {
         if (bordercolor == null) {
-            return "#000";
+            return "#000"; //$NON-NLS-1$
         } else {
             return bordercolor;
         }
@@ -249,7 +249,7 @@ public class ChartlayoutType
      */
     public String getGridcolor() {
         if (gridcolor == null) {
-            return "#555";
+            return "#555"; //$NON-NLS-1$
         } else {
             return gridcolor;
         }

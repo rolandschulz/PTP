@@ -118,7 +118,7 @@ public class ObjectType  implements Serializable {
      */
     public String getColor() {
         if (color == null) {
-            return "#FFF";
+            return "#FFF"; //$NON-NLS-1$
         } else {
             return color;
         }

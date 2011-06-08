@@ -140,7 +140,7 @@ public class TableType
      */
     public String getContenttype() {
         if (contenttype == null) {
-            return "other";
+            return "other"; //$NON-NLS-1$
         } else {
             return contenttype;
         }

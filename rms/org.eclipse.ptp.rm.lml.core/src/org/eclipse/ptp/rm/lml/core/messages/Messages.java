@@ -16,8 +16,6 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.lml.core.messages.messages"; //$NON-NLS-1$
 
 	public static String LMLCorePlugin_0;
-	public static String RefreshJobStatusError;
-	public static String RefreshJobStatus;
 
 	static {
 		// initialize resource bundle

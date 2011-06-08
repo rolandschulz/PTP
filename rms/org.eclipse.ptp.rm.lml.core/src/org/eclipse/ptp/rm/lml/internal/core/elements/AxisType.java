@@ -236,7 +236,7 @@ public class AxisType  implements Serializable {
      */
     public BigInteger getTiccount() {
         if (ticcount == null) {
-            return new BigInteger("10");
+            return new BigInteger("10"); //$NON-NLS-1$
         } else {
             return ticcount;
         }

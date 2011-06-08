@@ -56,16 +56,16 @@ public class ErrorList {
 	@Override
 	public String toString() {
 
-		String res = "";
+		String res = ""; //$NON-NLS-1$
 
 		if (realerror) {
-			res = "Following errors occurred: \n";
+			res = Messages.ErrorList_1;
 		}
 		else
-			res = "No errors: \n";
+			res = Messages.ErrorList_2;
 
 		for (int i = 0; i < errors.size(); i++) {
-			res += errors.get(i) + "\n";
+			res += errors.get(i) + "\n"; //$NON-NLS-1$
 		}
 
 		return res;
