@@ -37,6 +37,10 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ui.console.ConsolePlugin;
+import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.IOConsole;
+import org.eclipse.ui.console.IOConsoleOutputStream;
 
 /**
  * Executes various control and status calls on the resource manager initiated
@@ -46,6 +50,88 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  * 
  */
 public class ActionUtils {
+
+	/**
+	 * Does reads from an EFS file store to an IOConsole. Used to fetch the
+	 * stdout and stderr from batch jobs.
+	 * 
+	 * @author arossi
+	 * 
+	 */
+	private static class FileReadConsoleAppender extends Job {
+		private IOConsole console;
+		private IOConsoleOutputStream stream;
+		private IResourceManagerControl control;
+		private int read;
+
+		/**
+		 * @param name
+		 *            path of file to read
+		 */
+		public FileReadConsoleAppender(String path) {
+			super(path);
+			read = 0;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
+		 * IProgressMonitor)
+		 */
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			try {
+				console = new IOConsole(getName(), null);
+				ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
+				console.activate();
+				stream = console.newOutputStream();
+				SubMonitor progress = SubMonitor.convert(monitor, 1000);
+				IFileStore lres = getRemoteFile(getName(), control, progress);
+				if (lres != null) {
+					BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE, progress.newChild(25)));
+					byte[] buffer = new byte[COPY_BUFFER_SIZE];
+					try {
+						while (!progress.isCanceled()) {
+							try {
+								read = is.read(buffer, 0, COPY_BUFFER_SIZE);
+							} catch (final EOFException t) {
+								break;
+							}
+							if (read == UNDEFINED) {
+								break;
+							}
+							if (progress.isCanceled()) {
+								read = UNDEFINED;
+								break;
+							}
+							progress.worked(5);
+							stream.write(buffer, 0, read);
+						}
+					} finally {
+						try {
+							if (stream != null) {
+								stream.flush();
+								stream.close();
+							}
+							if (is != null) {
+								is.close();
+							}
+						} catch (IOException t) {
+							t.printStackTrace();
+						}
+						monitor.done();
+					}
+				}
+			} catch (Throwable t) {
+				if (!monitor.isCanceled()) {
+					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
+				}
+			}
+			return Status.OK_STATUS;
+		}
+	}
+
 	private static final int UNDEFINED = -1;
 	private static final int COPY_BUFFER_SIZE = 64 * 1024;
 
@@ -66,78 +152,6 @@ public class ActionUtils {
 	}
 
 	/**
-	 * Fetches the remote stdout/stderr contents. This is functionality imported
-	 * from JAXB core to avoid dependencies.
-	 * 
-	 * @param rmId
-	 *            resource manager unique name
-	 * @param path
-	 *            of remote file.
-	 * @param autoStart
-	 *            start the resource manager if it is not started
-	 * @return contents of the file, or empty string if path is undefined.
-	 */
-	public static String doRead(final String rmId, final String path, final boolean autoStart) throws CoreException {
-		if (path == null) {
-			return ""; //$NON-NLS-1$
-		}
-		final StringBuffer sb = new StringBuffer();
-		final Job j = new Job(path) {
-
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-				IResourceManagerControl control = rm.getControl();
-				SubMonitor progress = SubMonitor.convert(monitor, 100);
-				try {
-					IFileStore lres = getRemoteFile(path, control, progress);
-					if (lres != null) {
-						BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE, progress.newChild(25)));
-						byte[] buffer = new byte[COPY_BUFFER_SIZE];
-						int rcvd = 0;
-						try {
-							while (true) {
-								try {
-									rcvd = is.read(buffer, 0, COPY_BUFFER_SIZE);
-								} catch (final EOFException eof) {
-									break;
-								}
-
-								if (rcvd == UNDEFINED) {
-									break;
-								}
-								if (progress.isCanceled()) {
-									break;
-								}
-								sb.append(new String(buffer, 0, rcvd));
-							}
-						} finally {
-							try {
-								is.close();
-							} catch (final IOException ioe) {
-								ioe.printStackTrace();
-							}
-							monitor.done();
-						}
-					}
-				} catch (Throwable t) {
-					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
-				}
-				return Status.OK_STATUS;
-			}
-		};
-
-		j.schedule();
-
-		try {
-			j.join();
-		} catch (final InterruptedException ignored) {
-		}
-
-		return sb.toString();
-	}
-
-	/**
 	 * 
 	 * @param job
 	 * @param autoStart
@@ -154,6 +168,21 @@ public class ActionUtils {
 		job.updateState(refreshed.getState(), refreshed.getStateDetail());
 		maybeCheckFiles(job);
 		view.refresh();
+	}
+
+	/**
+	 * Streamed read from EFS stream to Console. Uses
+	 * {@link FileReadConsoleAppender}
+	 * 
+	 * @param resourceManagerId
+	 * @param path
+	 */
+	public static void readRemoteFile(String resourceManagerId, String path) {
+		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(resourceManagerId);
+		FileReadConsoleAppender reader = new FileReadConsoleAppender(path);
+		reader.control = rm.getControl();
+		reader.setUser(true);
+		reader.schedule();
 	}
 
 	/**

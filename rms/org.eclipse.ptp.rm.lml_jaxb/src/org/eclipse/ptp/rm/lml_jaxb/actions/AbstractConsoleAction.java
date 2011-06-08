@@ -9,29 +9,16 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.lml_jaxb.actions;
 
-import java.io.IOException;
-
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
-import org.eclipse.ptp.rm.lml_jaxb.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.console.ConsolePlugin;
-import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IOConsole;
-import org.eclipse.ui.console.IOConsoleOutputStream;
 
 /**
  * Base class for actions on the job status object which read remote file output
@@ -47,41 +34,14 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	protected TableView view;
 
 	/*
-	 * (non-Javadoc)
+	 * Calls {@link ActionUtils#readRemoteFile(String, String)} (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
 		if (status != null) {
-			Job j = new Job(Messages.ReadOutputFile) {
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					IOConsoleOutputStream stream = null;
-					try {
-						String contents = getContents();
-						IOConsole console = new IOConsole(getPath(), null);
-						ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
-						console.activate();
-						stream = console.newOutputStream();
-						stream.write(contents.getBytes());
-					} catch (Throwable t) {
-						return CoreExceptionUtils.getErrorStatus(Messages.ReadOutputFileError, t);
-					} finally {
-						try {
-							if (stream != null) {
-								stream.flush();
-								stream.close();
-							}
-						} catch (IOException t) {
-						}
-					}
-					return Status.OK_STATUS;
-				}
-
-			};
-
-			j.setUser(true);
-			j.schedule();
+			String path = error ? status.getErrorPath() : status.getOutputPath();
+			ActionUtils.readRemoteFile(status.getRmId(), path);
 		}
 	}
 
@@ -126,17 +86,6 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	 */
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		view = (TableView) targetPart;
-	}
-
-	/**
-	 * @return correct file contents
-	 * @throws CoreException
-	 */
-	protected String getContents() throws CoreException {
-		if (error) {
-			return ActionUtils.doRead(status.getRmId(), status.getErrorPath(), true);
-		}
-		return ActionUtils.doRead(status.getRmId(), status.getOutputPath(), true);
 	}
 
 	/**
