@@ -9,6 +9,7 @@
        <topic label="Local vs. Remote Projects"  href="html/localVsRemote.html"/>
 
       <topic label="Creating an MPI Project" href="html/01buildMPIprog.html"/> 
+      <topic href="html/sync.html" label="Synchronized Projects"/>
       <topic label="Resource Managers">
       	<topic label="Configuring Resource Managers" href="html/02resMgrSetup.html"/>
       	<topic label="Running IBM LoadLeveler Batch Jobs">
@@ -27,11 +28,8 @@
       <topic label="Running Parallel Programs"  href="html/03pLaunchConfig.html"/> 
       <topic label="Monitoring Jobs and Systems" href="html/05monitoring.html"/>
       <topic label="Parallel Debugging"  href="html/06parDebugging.html"/>
-      <topic href="html/07ptpPrefs.html" label="PTP Preferences">
-      </topic>
-      <topic href="html/sync.html" label="Synchronized Projects">
-      </topic>
-      <topic label="Parallel Language Development Tools (PLDT)">
+      <topic href="html/07ptpPrefs.html" label="PTP Preferences"/>
+       <topic label="Parallel Language Development Tools (PLDT)">
       	<anchor id="ptpPLDT"/>
       </topic>
       <topic label="External Tools Framework (ETFw)">
