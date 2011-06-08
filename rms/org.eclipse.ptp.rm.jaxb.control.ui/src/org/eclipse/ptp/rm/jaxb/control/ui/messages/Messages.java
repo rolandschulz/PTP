@@ -44,14 +44,11 @@ public class Messages extends NLS {
 	public static String CreateControlConfigurableError;
 	public static String ReadOnlyWarning;
 	public static String ReadOnlyWarning_title;
-	public static String ValidationError;
-	public static String ValidationError_title;
 	public static String EnableStdoutFetch;
 	public static String EnableStderrFetch;
 	public static String RemotePathTooltip;
 	public static String VoidLaunchTabMessage;
 	public static String VoidLaunchTabTitle;
-	public static String CachedDefinitionFile;
 	public static String IllegalVariableValueType;
 	public static String TabInitialization;
 	public static String UninitializedRemoteServices;

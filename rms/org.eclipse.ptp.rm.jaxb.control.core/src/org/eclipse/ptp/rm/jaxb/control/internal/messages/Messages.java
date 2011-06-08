@@ -32,7 +32,6 @@ public class Messages extends NLS {
 	public static String StderrParserError;
 	public static String ProcessExitValueError;
 	public static String CannotCompleteSubmitFailedStaging;
-	public static String FailedJobSubmission;
 	public static String ReadSegmentError;
 	public static String StreamTokenizerInstantiationError;
 	public static String MalformedExpressionError;
@@ -41,11 +40,8 @@ public class Messages extends NLS {
 	public static String CommandJobStreamMonitor_label;
 	public static String CommandJobNullMonitorStreamError;
 	public static String RemoteConnectionError;
-	public static String LocalConnectionError;
 	public static String StreamParserInconsistentPropertyWarning;
-
 	public static String JAXBServiceProvider_defaultDescription;
-	public static String CachedDefinitionFile;
 
 	static {
 		// initialize resource bundle

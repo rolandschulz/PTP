@@ -25,11 +25,8 @@ public class Messages extends NLS {
 
 	public static String RefreshJobStatusError;
 	public static String RefreshJobStatus;
-	public static String ReadOutputFile;
-	public static String ReadOutputFileError;
 	public static String CancelJob;
 	public static String CancelJobError;
-	public static String CachedDefinitionFile;
 	public static String RemoveFiles;
 
 	static {
