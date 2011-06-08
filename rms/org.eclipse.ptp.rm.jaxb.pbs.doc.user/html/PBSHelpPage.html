@@ -29,6 +29,7 @@
 		requirements and set-up.
 	</p>
 	<h2 style="text-align: left;">
+
 		<a name="ProvidedTypes"></a>Preconfigured PBS Resource Manager Types
 	</h2>
 	<p>
@@ -153,7 +154,7 @@
 		<a name="ImportTab"></a>Importing a Predefined Batch Script
 	</h3>
 	<p>If you wish to use a custom script that does more than just
-		launch the application selected from you local or remote workspace,
+		launch the application selected from your local or remote workspace,
 		this tab is where you do it. The "Browse Workspace" button at the top
 		right takes you first to your current workspace, in case you have
 		imported a batch script there from either your local machine or a
@@ -178,26 +179,26 @@
 
 	<p>The JAXB/PBS manager has the capability of allowing you to
 		stream in to the console the output and error files associated with a
-		batch job when the job has completed. This is done in XML definition
+		batch job when the job has completed. This is done in the XML definition
 		file for the Basic and Advanced tabs by creating a link from the PBS
-		batch attributes defining Output Path and Error Path to special
-		variables understood by the resource manager. If you set those
-		variables, the change will be conveyed through this linked variable.
+		batch attributes defining Output Path and Error Path to special (hidden)
+		variables understood by the resource manager. If you set the
+		PBS attributes, the change will be conveyed through the linked variables.
 		If they are not set, the configuration provides a value corresponding
 		to the default location where PBS would put them.</p>
 	<p>
 		<b>NOTE: </b>If you are using the Import Script tab, the two paths
 		must be manually adjusted to correspond to whatever you have done
 		inside the script; the default definitions are provided, but these can
-		be adjusted as necessary. You can also turn off this feature for this
+		be adjusted as necessary. You can also turn off this feature on this
 		tab by unchecking the "Enable remote output file read" to the left of
 		the text box.
 	</p>
 	<p>If there are files associated with this job, and the job
 		completes, the "Get Job Error" and "Get Job Output" actions, activated
-		by clicking row for the job in the monitor job table, can be used to
+		by clicking the row associated with the job in the monitor job table, can be used to
 		issue a streaming command which will write the file contents to the
-		console. If the files do no exist, these actions will be disabled.</p>
+		console. If the files do not exist, these actions will be disabled.</p>
 	<br>
 	<br>
 	<div style="margin-left: 40px;">
@@ -216,7 +217,7 @@
 		RUNNING (this can be seen both from the reported state in monitor job
 		table views, as well as by the disappearance of the progress bars for
 		the submission), the job will then be streamed to the qsub terminal's
-		standard input, just as you would submit from a shell command-line.
+		standard input, just as it would when you submit from a shell command-line.
 		Subsequent submissions will also be streamed to the same interactive
 		terminal process, for as long as it is running. If the time limit
 		expires, the next submission will resubmit the terminal request (qsub
@@ -241,7 +242,7 @@
 	<br>
 	<br>
 	<h2 style="text-align: left;">
-		<a name="Preferences"></a>Preferences
+			<a name="Preferences"></a>Preferences
 	</h2>
 	<p>There is currently only one preference option. Since the PBS
 		Resource Manager is configured from an XML definition file, the file
