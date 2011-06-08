@@ -70,7 +70,7 @@ public interface ILguiItem {
 	/**
 	 * @param output
 	 */
-	public void getCurrentLayout(OutputStream output);
+	public void getCurrentLayout(OutputStream output) throws JAXBException;
 
 	/**
 	 * @return

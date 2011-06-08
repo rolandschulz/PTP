@@ -340,7 +340,12 @@ public class LMLManager {
 			lguiItem = LGUIS.get(name);
 		}
 		if (lguiItem != null) {
-			lguiItem.getCurrentLayout(output);
+			try {
+				lguiItem.getCurrentLayout(output);
+			} catch (final JAXBException e) {
+				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
+						.getLocalizedMessage()));
+			}
 			try {
 				lguiItem.update(input);
 			} catch (final JAXBException e) {

@@ -204,7 +204,7 @@ public class LguiItem implements ILguiItem {
 	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#getCurrentLayout(java.io.
 	 * OutputStream)
 	 */
-	public void getCurrentLayout(OutputStream output) {
+	public void getCurrentLayout(OutputStream output) throws JAXBException {
 		LguiType layoutLgui = null;
 		if (lgui == null) {
 			layoutLgui = firstRequest();
@@ -227,11 +227,9 @@ public class LguiItem implements ILguiItem {
 			}
 			output.close(); // Must close to flush stream
 		} catch (final PropertyException e) {
-			e.printStackTrace();
-		} catch (final JAXBException e) {
-			e.printStackTrace();
+			LMLCorePlugin.log(e);
 		} catch (final IOException e) {
-			e.printStackTrace();
+			LMLCorePlugin.log(e);
 		}
 	}
 
