@@ -62,6 +62,8 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  * 
  */
 public class GitRemoteSyncConnection {
+
+	private final int MAX_FILES = 100;
 	private final static String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 	private final static String commitMessage = Messages.GRSC_CommitMessage;
 	private final static String remotePushBranch = "ptp-push"; //$NON-NLS-1$
@@ -341,8 +343,6 @@ public class GitRemoteSyncConnection {
 	private List<String> stringToList(String command) {
 		return new ArrayList<String>(Arrays.asList(command.split(" "))); //$NON-NLS-1$
 	}
-
-	private final int MAX_FILES = 100;
 
 	/*
 	 * Do a "git add <Files>" on the remote host
