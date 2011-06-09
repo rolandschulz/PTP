@@ -407,7 +407,7 @@ public class GitRemoteSyncConnection {
 				throw new RemoteExecutionException(e);
 			}
 			if (commandResults.getExitCode() != 0) {
-				throw new RemoteExecutionException(Messages.GRSC_GitLsFilesFailure + commandResults.getStderr());
+				throw new RemoteExecutionException(Messages.GRSC_GitLsFilesFailure + commandResults.getStdout());
 			}
 
 			BufferedReader statusReader = new BufferedReader(new StringReader(commandResults.getStdout()));
