@@ -24,6 +24,10 @@
       <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
    </url>
 
+   <requires>
+      <import plugin="org.eclipse.jgit" version="1.0.0" match="greaterOrEqual"/>
+   </requires>
+
    <plugin
          id="org.eclipse.ptp.rdt.sync.core"
          download-size="0"
