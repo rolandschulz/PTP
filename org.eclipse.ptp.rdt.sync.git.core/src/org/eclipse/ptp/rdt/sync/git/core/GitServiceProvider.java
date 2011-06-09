@@ -10,16 +10,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.git.core;
 
-import java.util.ArrayList;
+import java.io.ByteArrayInputStream;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -183,6 +185,44 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 100);
+		
+		// Make a visitor that explores the delta. At the moment, this visitor is responsible for two tasks (the list may grow in the future):
+		// 1) Find out if there are any "relevant" resource changes (changes that need to be mirrored remotely)
+		// 2) Add an empty ".gitignore" file to new directories so that Git will sync them
+		class SyncResourceDeltaVisitor implements IResourceDeltaVisitor {
+			private boolean relevantChangeFound = false;
+
+			public boolean visit(IResourceDelta delta) throws CoreException {
+				if (irrelevantPath(delta)) {
+					return false;
+				} else {
+					if (delta.getAffectedChildren().length == 0) {
+						relevantChangeFound = true;
+					}
+				}
+
+				// Add .gitignore to empty directories
+				if (delta.getResource().getType() == IResource.FOLDER && delta.getKind() == IResourceDelta.ADDED) {
+					IFile emptyFile = getProject().getFile(delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore");  //$NON-NLS-1$
+					emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+				}
+				
+				return true;
+			}
+
+			public boolean isRelevant() {
+				return relevantChangeFound;
+			}
+		}
+
+		// Explore delta only if it is not null
+		boolean hasRelevantChangedResources = false;
+		if (delta != null) {
+			SyncResourceDeltaVisitor visitor = new SyncResourceDeltaVisitor();
+			delta.accept(visitor);
+			hasRelevantChangedResources = visitor.isRelevant();
+		}
+
 		try {
 			/* A synchronize with SyncFlag.FORCE guarantees that both directories are in sync.
 			 * 
@@ -196,7 +236,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			 *  In some cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
 			 */
 			// TODO: We are not using the individual "sync to local" and "sync to remote" flags yet.
-			if ((syncFlags == SyncFlag.NO_FORCE) && (!(hasRelevantChangedResources(delta)))) {
+			if ((syncFlags == SyncFlag.NO_FORCE) && (!(hasRelevantChangedResources))) {
 				return;
 			}
 			
@@ -301,43 +341,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		message = Messages.GSP_SyncErrorMessage + this.getProject().getName() + message;
 		status = new Status(severity, Activator.PLUGIN_ID, message, e);
 		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
-	}
-
-	// Are any of the changes in delta relevant for sync'ing?
-	private boolean hasRelevantChangedResources(IResourceDelta delta) {
-		if (delta == null) {
-			return false;
-		}
-		String[] relevantChangedResources = getRelevantChangedResources(delta);
-		if (relevantChangedResources.length == 0) {
-			return false;
-		}
-		return true;
-	}
-	
-	// This function and the next recursively compile a list of relevant resources that have changed.
-	private String[] getRelevantChangedResources(IResourceDelta delta) {
-		ArrayList<String> res = new ArrayList<String>();
-		getRelevantChangedResourcesRecursive(delta, res);
-		return res.toArray(new String[0]);
-	}
-	
-	private void getRelevantChangedResourcesRecursive(IResourceDelta delta, ArrayList<String> res) {
-		// Prune recursion if this is a directory or file of no interest (such as the ".git" directory)
-		if (irrelevantPath(delta)) {
-			return;
-		}
-		
-		// Recursion logic
-		IResourceDelta[] resChildren = delta.getAffectedChildren();
-		if (resChildren.length == 0) {
-			res.add(delta.getFullPath().toString());
-			return;
-		} else {
-			for (IResourceDelta resChild : resChildren) {
-				getRelevantChangedResourcesRecursive(resChild, res);
-			}
-		}
 	}
 	
 	// Paths that the Git sync provider can ignore.
