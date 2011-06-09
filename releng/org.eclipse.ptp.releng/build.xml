@@ -78,7 +78,7 @@
 		<unzip src="${rseDist}" dest="${buildDirectory}"/>
 		<unzip src="${cdtDist}" dest="${buildDirectory}/eclipse"/>
 		<unzip src="${mylynDist}" dest="${buildDirectory}/eclipse"/>
-		<copy file="${jgitDist}/plugins/org.eclipse.jgit_1.0.0.201106090707-r.jar" tofile="${buildDirectory}/eclipse/plugins"/>
+		<copy file="${jgitDist}/plugins/org.eclipse.jgit_1.0.0.201106090707-r.jar" todir="${buildDirectory}/eclipse/plugins"/>
 	</target>
 	
 	<target name="zips" depends="init,unzip">
