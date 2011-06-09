@@ -26,7 +26,8 @@
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/tm/downloads/drops/S-3.3RC3-201106011145/RSE-SDK-3.3RC3.zip"/>
 		<!-- Update for new Mylyn version -->
 		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/mylyn-3.4.3-e3.4.zip"/>
-		<property name="jgitDist" value="/home/data/httpd/download.eclipse.org/egit/staging/v1.0.0.201106090707-r"/>
+		<!-- Update for new jgit version -->
+		<property name="jgitDist" value="/home/data/httpd/download.eclipse.org/egit/staging/v1.0.0.201106090707-r/plugins/org.eclipse.jgit_1.0.0.201106090707-r.jar"/>
 		<!-- Properties below here shouldn't need to be changed -->
 		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 		<property name="buildType" value="I" />
@@ -78,7 +79,7 @@
 		<unzip src="${rseDist}" dest="${buildDirectory}"/>
 		<unzip src="${cdtDist}" dest="${buildDirectory}/eclipse"/>
 		<unzip src="${mylynDist}" dest="${buildDirectory}/eclipse"/>
-		<copy file="${jgitDist}/plugins/org.eclipse.jgit_1.0.0.201106090707-r.jar" todir="${buildDirectory}/eclipse/plugins"/>
+		<copy file="${jgitDist}" todir="${buildDirectory}/eclipse/plugins"/>
 	</target>
 	
 	<target name="zips" depends="init,unzip">
