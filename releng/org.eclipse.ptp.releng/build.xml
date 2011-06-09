@@ -114,8 +114,6 @@
 		<copy file="pack.properties" todir="${buildDirectory}/site/eclipse"/>
 
 		<!-- for some reason Orbit bundles aren't getting picked up-->		
-		<copy file="${buildDirectory}/plugins/org.eclipse.jgit_0.12.1.jar"
-			todir="${buildDirectory}/site/eclipse/plugins"/>
 		<copy file="${buildDirectory}/plugins/javax.xml_1.3.4.v201005080400.jar"
 			todir="${buildDirectory}/site/eclipse/plugins"/>
 		<copy file="${buildDirectory}/plugins/javax.xml.stream_1.0.1.v201004272200.jar"
