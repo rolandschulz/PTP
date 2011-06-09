@@ -428,7 +428,7 @@ public final class AuthenticationFrame extends Frame {
 	}
 
 	public String getHostAddress() {
-		return hostAddressTextGroup.getString();
+		return hostAddressTextGroup.getString().trim();
 	}
 
 	public void setHostAddress(String s) {
@@ -437,7 +437,7 @@ public final class AuthenticationFrame extends Frame {
 
 	public int getHostPort() {
 		try {
-			return Integer.parseInt(hostPortTextGroup.getString());
+			return Integer.parseInt(hostPortTextGroup.getString().trim());
 		} catch (NumberFormatException e) {
 			return 22;
 		}
@@ -476,7 +476,7 @@ public final class AuthenticationFrame extends Frame {
 	}
 
 	public String getPassword() {
-		return passwordTextGroup.getString();
+		return passwordTextGroup.getString().trim();
 	}
 
 	public void setPassword(String s) {
@@ -484,7 +484,7 @@ public final class AuthenticationFrame extends Frame {
 	}
 
 	public String getUserName() {
-		return usernameTextGroup.getString();
+		return usernameTextGroup.getString().trim();
 	}
 
 	public void setUserName(String s) {
@@ -492,7 +492,7 @@ public final class AuthenticationFrame extends Frame {
 	}
 
 	public String getPassphrase() {
-		return passphraseTextGroup.getString();
+		return passphraseTextGroup.getString().trim();
 	}
 
 	public void setPassphrase(String s) {
@@ -501,7 +501,7 @@ public final class AuthenticationFrame extends Frame {
 
 	public int getTimeout() {
 		try {
-			return Integer.parseInt(timeoutTextGroup.getString());
+			return Integer.parseInt(timeoutTextGroup.getString().trim());
 		} catch (NumberFormatException e) {
 			return 5000;
 		}
@@ -512,7 +512,7 @@ public final class AuthenticationFrame extends Frame {
 	}
 
 	public String getPublicKeyPath() {
-		return privateKeyPathGroup.getString();
+		return privateKeyPathGroup.getString().trim();
 	}
 
 	public void setPublicKeyPath(String s) {
