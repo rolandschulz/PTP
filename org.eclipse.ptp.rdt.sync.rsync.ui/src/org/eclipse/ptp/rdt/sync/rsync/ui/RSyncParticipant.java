@@ -533,7 +533,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	 */
 	public boolean isConfigComplete() {
 		// TODO Auto-generated method stub
-		return false;
+		return true; //TODO check whether really complete
 	}
 
 	/**
