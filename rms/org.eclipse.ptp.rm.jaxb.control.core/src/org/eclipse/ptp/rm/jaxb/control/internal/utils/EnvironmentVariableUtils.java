@@ -9,11 +9,14 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.utils;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.jaxb.control.data.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
@@ -26,9 +29,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
  * 
  */
 public class EnvironmentVariableUtils {
-
-	private EnvironmentVariableUtils() {
-	}
 
 	/**
 	 * Add variable to env after resolving against the resource-manager
@@ -45,7 +45,15 @@ public class EnvironmentVariableUtils {
 	 */
 	public static void addVariable(String uuid, NameValuePairType var, Map<String, String> env, IVariableMap map) {
 		String key = var.getValue();
-		String value = map.getString(uuid, key);
+		String value = null;
+		if (key == null) {
+			List<ArgType> args = var.getArg();
+			if (args != null) {
+				value = ArgImpl.toString(uuid, var.getArg(), map);
+			}
+		} else {
+			value = map.getString(uuid, key);
+		}
 		if (value != null && !JAXBControlConstants.ZEROSTR.equals(value)) {
 			env.put(var.getName(), value);
 		}
@@ -142,5 +150,8 @@ public class EnvironmentVariableUtils {
 		buffer.append(JAXBControlConstants.SETENV).append(JAXBControlConstants.SP).append(name).append(JAXBControlConstants.SP)
 				.append(JAXBControlConstants.QT).append(value).append(JAXBControlConstants.QT)
 				.append(JAXBControlConstants.REMOTE_LINE_SEP);
+	}
+
+	private EnvironmentVariableUtils() {
 	}
 }

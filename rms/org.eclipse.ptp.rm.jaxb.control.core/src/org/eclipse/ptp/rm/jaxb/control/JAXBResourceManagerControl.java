@@ -439,16 +439,16 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 100);
+		SubMonitor progress = SubMonitor.convert(monitor, 60);
 		try {
-			initialize(progress.newChild(30));
+			doConnect(progress.newChild(20));
 		} catch (Throwable t) {
 			progress.done();
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
 		}
 
 		try {
-			doConnect(progress.newChild(20));
+			initialize(progress.newChild(30));
 			doOnStartUp();
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
@@ -502,7 +502,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		/*
 		 * if the script is to be staged, a managed file pointing to either its
-		 * as its content (${rm:script#value}), or to its path (SCRIPT_PATH)
+		 * as its content (${ptp_rm:script#value}), or to its path (SCRIPT_PATH)
 		 * must exist.
 		 */
 		files = maybeAddManagedFileForScript(files, delScript);
@@ -926,7 +926,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		ICommandJob job = new CommandJob(uuid, command, mode, (IJAXBResourceManager) getResourceManager());
 		((Job) job).setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 		job.schedule();
-
 		if (join) {
 			try {
 				job.join();

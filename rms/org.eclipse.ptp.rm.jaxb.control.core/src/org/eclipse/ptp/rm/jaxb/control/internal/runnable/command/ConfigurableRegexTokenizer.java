@@ -70,6 +70,21 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 
 	public static final String EXT_ID = "org.eclipse.ptp.rm.jaxb.configurableRegexTokenizer"; //$NON-NLS-1$
 
+	/**
+	 * Compensation for escaping.
+	 * 
+	 * @param delim
+	 * @return the non-escaped char
+	 */
+	private static char getChar(String delim) {
+		if (delim.indexOf(JAXBControlConstants.RTESC) >= 0 || delim.indexOf(JAXBControlConstants.LNESC) >= 0) {
+			return JAXBControlConstants.LINE_SEP.charAt(0);
+		} else if (delim.indexOf(JAXBControlConstants.TBESC) >= 0) {
+			return JAXBControlConstants.TAB.charAt(0);
+		}
+		return delim.charAt(0);
+	}
+
 	private char delim;
 	private final int maxLen;
 	private final Integer save;
@@ -81,10 +96,11 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	private RegexImpl exitAfter;
 	private boolean includeDelim;
 	private Throwable error;
-	private InputStream in;
 
+	private InputStream in;
 	private char[] chars;
 	private LinkedList<String> saved;
+
 	private final StringBuffer segment;
 
 	private boolean endOfStream;
@@ -364,20 +380,5 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 		} else if (segment.length() == chars.length) {
 			segment.delete(0, maxLen);
 		}
-	}
-
-	/**
-	 * Compensation for escaping.
-	 * 
-	 * @param delim
-	 * @return the non-escaped char
-	 */
-	private static char getChar(String delim) {
-		if (delim.indexOf(JAXBControlConstants.RTESC) >= 0 || delim.indexOf(JAXBControlConstants.LNESC) >= 0) {
-			return JAXBControlConstants.LINE_SEP.charAt(0);
-		} else if (delim.indexOf(JAXBControlConstants.TBESC) >= 0) {
-			return JAXBControlConstants.TAB.charAt(0);
-		}
-		return delim.charAt(0);
 	}
 }

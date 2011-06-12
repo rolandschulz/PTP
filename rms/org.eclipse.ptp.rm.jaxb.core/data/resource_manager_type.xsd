@@ -56,7 +56,7 @@
 				executablePath
 				progArgs
 				directory
-				<!-- the following properties will usually be necessary for internal use; they should be linked to the appropriate batch-system specific 
+				<!-- the following properties will usually be necessary for internal use; they should be linked to the appropriate batch-system specific
 					attributes -->
 				control.queue.name
 				stdout_remote_path
@@ -425,13 +425,16 @@
 		<xs:attribute name="isDirectory" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="name-value-pair-type">
+		<xs:sequence>
+			<xs:element name="arg" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
+		</xs:sequence>
 		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="value" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="tab-controller-type">
 		<xs:sequence>
 			<xs:element name="title" type="xs:string"/>
-			<xs:choice maxOccurs="unbounded">
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="composite" type="rm:composite-type"/>
 			</xs:choice>
@@ -603,7 +606,7 @@
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
 			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:element name="title" minOccurs="0" type="xs:string"/>
-			<xs:choice maxOccurs="unbounded">
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="composite" type="rm:composite-type"/>
 				<xs:element name="widget" type="rm:widget-type"/>
@@ -620,7 +623,7 @@
 			<xs:element name="title" type="xs:string"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
-			<xs:choice maxOccurs="unbounded">
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
 				<xs:element name="composite" type="rm:composite-type"/>
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="widget" type="rm:widget-type"/>

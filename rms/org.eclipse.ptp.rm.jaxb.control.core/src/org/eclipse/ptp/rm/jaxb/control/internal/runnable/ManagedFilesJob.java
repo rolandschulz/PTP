@@ -244,6 +244,10 @@ public class ManagedFilesJob extends Job {
 	private File maybeWriteFile(ManagedFileType file) throws IOException, CoreException {
 		String path = file.getPath();
 		if (path != null) {
+			/*
+			 * We need to dereference here; added 06/11/2011
+			 */
+			path = rmVarMap.getString(uuid, path);
 			return new File(path);
 		}
 		String name = rmVarMap.getString(uuid, file.getName());

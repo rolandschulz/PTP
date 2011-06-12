@@ -11,6 +11,14 @@
             configurationFile="data/pbs-test-local.xml"
             name="PBS Local Test">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/browse-example.xml"
+            name="Browse Example">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/demo-example.xml"
+            name="Demo Example">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>
