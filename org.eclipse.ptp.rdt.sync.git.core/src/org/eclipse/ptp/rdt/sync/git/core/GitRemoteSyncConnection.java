@@ -58,7 +58,8 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 /**
  * 
- * This class implements a remote sync tool using git, as accessed through the jgit library.
+ * This class implements a remote sync tool using git, as accessed through the
+ * jgit library.
  * 
  */
 public class GitRemoteSyncConnection {
@@ -75,14 +76,16 @@ public class GitRemoteSyncConnection {
 	private TransportGitSsh transport;
 
 	/**
-	 * Create a remote sync connection using git. Assumes that the local directory exists but not necessarily the remote directory.
-	 * It is created if not.
+	 * Create a remote sync connection using git. Assumes that the local
+	 * directory exists but not necessarily the remote directory. It is created
+	 * if not.
 	 * 
 	 * @param conn
 	 * @param localDir
 	 * @param remoteDir
 	 * @throws RemoteSyncException
-	 *             on problems building the remote repository. Specific exception nested. Upon such an exception, the instance is
+	 *             on problems building the remote repository. Specific
+	 *             exception nested. Upon such an exception, the instance is
 	 *             invalid and should not be used.
 	 */
 	public GitRemoteSyncConnection(IRemoteConnection conn, String localDir, String remoteDir, SyncFileFilter filter,
@@ -114,14 +117,15 @@ public class GitRemoteSyncConnection {
 	}
 
 	/**
-	 * Builds the remote configuration for the connection, setting up fetch and push operations between local and remote master
-	 * branches.
+	 * Builds the remote configuration for the connection, setting up fetch and
+	 * push operations between local and remote master branches.
 	 * 
 	 * @param config
 	 *            configuration for the local repository
 	 * @return the remote configuration
 	 * @throws RuntimeException
-	 *             if the URI in the passed configuration is not properly formatted.
+	 *             if the URI in the passed configuration is not properly
+	 *             formatted.
 	 */
 	private RemoteConfig buildRemoteConfig(StoredConfig config) {
 		RemoteConfig rconfig = null;
@@ -152,19 +156,23 @@ public class GitRemoteSyncConnection {
 	 * @throws RemoteExecutionException
 	 *             on failure to run remote commands.
 	 * @throws RemoteSyncException
-	 *             on problems with initial local commit. TODO: Consider the consequences of exceptions that occur at various
-	 *             points, which can leave the repo in a partial state. For example, if the repo is created but the initial commit
-	 *             fails. TODO: Consider evaluating the output of "git init".
+	 *             on problems with initial local commit. TODO: Consider the
+	 *             consequences of exceptions that occur at various points,
+	 *             which can leave the repo in a partial state. For example, if
+	 *             the repo is created but the initial commit fails. TODO:
+	 *             Consider evaluating the output of "git init".
 	 */
 	private Git buildRepo(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		subMon.subTask(Messages.GitRemoteSyncConnection_building_repo);
 		try {
 			final File localDir = new File(localDirectory);
 			final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
 			Repository repository = repoBuilder.setWorkTree(localDir).build();
 			git = new Git(repository);
 
-			// Create and configure local repository if it is not already present. Set the git instance.
+			// Create and configure local repository if it is not already
+			// present. Set the git instance.
 			if (repoReady() == false) {
 				repository.create(false);
 
@@ -182,9 +190,10 @@ public class GitRemoteSyncConnection {
 			// Initialize remote directory if necessary
 			boolean existingGitRepo = doRemoteInit(subMon.newChild(5));
 
-			// Prepare remote site for committing (stage files using git) and then commit remote files if necessary
-			boolean needToCommitRemote = prepareRemoteForCommit(subMon.newChild(90), !existingGitRepo); // Include untracked files
-																										// for new git
+			// Prepare remote site for committing (stage files using git) and
+			// then commit remote files if necessary
+			// Include untracked files for new git
+			boolean needToCommitRemote = prepareRemoteForCommit(subMon.newChild(90), !existingGitRepo);
 			// repos
 			if (needToCommitRemote) {
 				commitRemoteFiles(subMon.newChild(5));
@@ -199,8 +208,9 @@ public class GitRemoteSyncConnection {
 	}
 
 	/**
-	 * Create and configure remote repository if it is not already present. Note that "git init" is "safe" on a repo already
-	 * created, so we can simply rerun it each time.
+	 * Create and configure remote repository if it is not already present. Note
+	 * that "git init" is "safe" on a repo already created, so we can simply
+	 * rerun it each time.
 	 * 
 	 * @param monitor
 	 * @throws IOException
@@ -226,8 +236,10 @@ public class GitRemoteSyncConnection {
 				throw new RemoteExecutionException(Messages.GRSC_GitInitFailure + commandResults.getStderr());
 			}
 
-			// Pattern matching is error prone, of course, so make this more likely to return false. This will cause all files to be
-			// added, which is better than leaving all files untracked. This is better for users without knowledge of git, who would
+			// Pattern matching is error prone, of course, so make this more
+			// likely to return false. This will cause all files to be
+			// added, which is better than leaving all files untracked. This is
+			// better for users without knowledge of git, who would
 			// likely not be connecting to a previous git repo.
 			if (commandResults.getStdout().contains("existing")) { //$NON-NLS-1$
 				return true;
@@ -242,15 +254,20 @@ public class GitRemoteSyncConnection {
 	}
 
 	/*
-	 * Run "git add" and "git rm" as needed to prepare remote repo for commit. Return whether or not anything needs to be committed.
-	 * TODO: Modified files already added by "git add" will not be found by "getRemoteFileStatus". Thus, this may return false even
-	 * though there are outstanding changes. Note that this can only occur by accessing the repo outside of Eclipse.
+	 * Run "git add" and "git rm" as needed to prepare remote repo for commit.
+	 * Return whether or not anything needs to be committed. TODO: Modified
+	 * files already added by "git add" will not be found by
+	 * "getRemoteFileStatus". Thus, this may return false even though there are
+	 * outstanding changes. Note that this can only occur by accessing the repo
+	 * outside of Eclipse.
 	 * 
 	 * @return whether or not there are changes to be committed.
 	 */
 	private boolean prepareRemoteForCommit(IProgressMonitor monitor) throws IOException, RemoteExecutionException,
 			RemoteSyncException {
-		return prepareRemoteForCommit(monitor, false); // Default to not including untracked files
+		return prepareRemoteForCommit(monitor, false); // Default to not
+														// including untracked
+														// files
 	}
 
 	private boolean prepareRemoteForCommit(IProgressMonitor monitor, boolean includeUntrackedFiles) throws IOException,
@@ -289,6 +306,7 @@ public class GitRemoteSyncConnection {
 	 */
 	private void commitRemoteFiles(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		subMon.subTask(Messages.GitRemoteSyncConnection_committing_remote);
 		try {
 			final String command = "git commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = null;
@@ -350,6 +368,7 @@ public class GitRemoteSyncConnection {
 	private void addRemoteFiles(Set<String> filesToAdd, IProgressMonitor monitor) throws IOException, RemoteExecutionException,
 			RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, filesToAdd.size());
+		subMon.subTask(Messages.GitRemoteSyncConnection_adding_files);
 		try {
 			while (!filesToAdd.isEmpty()) {
 				List<String> commandList = stringToList("git add"); //$NON-NLS-1$
@@ -384,12 +403,13 @@ public class GitRemoteSyncConnection {
 	}
 
 	/*
-	 * Use "git ls-files" to obtain a list of files that need to be added or deleted from the git index.
+	 * Use "git ls-files" to obtain a list of files that need to be added or
+	 * deleted from the git index.
 	 */
 	private void getRemoteFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, IProgressMonitor monitor,
-			boolean includeUntrackedFiles)
-			throws IOException, RemoteExecutionException, RemoteSyncException {
+			boolean includeUntrackedFiles) throws IOException, RemoteExecutionException, RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		subMon.subTask(Messages.GitRemoteSyncConnection_getting_remote_file_status);
 		try {
 			final String command;
 			if (includeUntrackedFiles) {
@@ -420,7 +440,7 @@ public class GitRemoteSyncConnection {
 				String fn = line.substring(2);
 				if (status == 'R') {
 					filesToDelete.add(fn);
-				} else if (!fn.matches(".cproject") && !fn.matches(".project") && !fn.matches(".settings")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				} else if (!fn.equals(".cproject") && !fn.equals(".project") && !fn.startsWith(".settings")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					filesToAdd.add(fn);
 				}
 			}
@@ -433,7 +453,8 @@ public class GitRemoteSyncConnection {
 	}
 
 	/*
-	 * Use "git ls-files" to obtain a list of files that need to be added or deleted from the git index.
+	 * Use "git ls-files" to obtain a list of files that need to be added or
+	 * deleted from the git index.
 	 */
 	private void getFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, boolean includeUntrackedFiles)
 			throws RemoteSyncException {
@@ -462,7 +483,8 @@ public class GitRemoteSyncConnection {
 		filesToAdd.removeAll(filesToBeIgnored);
 	}
 
-	// Subclass JGit's generic RemoteSession to set up running of remote commands using the available process builder.
+	// Subclass JGit's generic RemoteSession to set up running of remote
+	// commands using the available process builder.
 	public class PTPSession implements RemoteSession {
 		private final URIish uri;
 
@@ -496,7 +518,8 @@ public class GitRemoteSyncConnection {
 	}
 
 	/**
-	 * Creates the transport object that JGit uses for executing commands remotely.
+	 * Creates the transport object that JGit uses for executing commands
+	 * remotely.
 	 * 
 	 * @param remoteConfig
 	 *            the remote configuration for our local Git repo
@@ -526,15 +549,17 @@ public class GitRemoteSyncConnection {
 	}
 
 	/**
-	 * Build the URI for the remote host as needed by the transport. Since the transport will use an external SSH session, we do not
-	 * need to provide user, host, or password. However, the function for opening a transport throws an exception if the host is
-	 * null or empty length. So we set it to a dummy string.
+	 * Build the URI for the remote host as needed by the transport. Since the
+	 * transport will use an external SSH session, we do not need to provide
+	 * user, host, or password. However, the function for opening a transport
+	 * throws an exception if the host is null or empty length. So we set it to
+	 * a dummy string.
 	 * 
 	 * @return URIish
 	 */
 	private URIish buildURI() {
 		return new URIish()
-				// .setUser(connection.getUsername())
+		// .setUser(connection.getUsername())
 				.setHost("none") //$NON-NLS-1$
 				// .setPass("")
 				.setScheme("ssh") //$NON-NLS-1$
@@ -546,9 +571,11 @@ public class GitRemoteSyncConnection {
 	}
 
 	/**
-	 * Commits files in working directory. For now, we just commit all files. So adding ".", handles all files, including newly
-	 * created files, and setting the all flag (-a) ensures that deleted files are updated. TODO: Figure out how to do this more
-	 * efficiently, as was done remotely (using git ls-files)
+	 * Commits files in working directory. For now, we just commit all files. So
+	 * adding ".", handles all files, including newly created files, and setting
+	 * the all flag (-a) ensures that deleted files are updated. TODO: Figure
+	 * out how to do this more efficiently, as was done remotely (using git
+	 * ls-files)
 	 * 
 	 * @throws RemoteSyncException
 	 *             on problems committing.
@@ -609,8 +636,10 @@ public class GitRemoteSyncConnection {
 	/**
 	 * 
 	 * @param localDirectory
-	 * @return If the repo has actually been initialized TODO: Consider the ways this could go wrong. What if the directory name
-	 *         already ends in a slash? What if ".git" is a file or does not contain the appropriate files?
+	 * @return If the repo has actually been initialized TODO: Consider the ways
+	 *         this could go wrong. What if the directory name already ends in a
+	 *         slash? What if ".git" is a file or does not contain the
+	 *         appropriate files?
 	 */
 	private boolean repoReady() {
 		final String repoDirectory = localDirectory + "/.git"; //$NON-NLS-1$
@@ -619,16 +648,20 @@ public class GitRemoteSyncConnection {
 	}
 
 	/**
-	 * Many of the listed exceptions appear to be unrecoverable, caused by errors in the initial setup. It is vital, though, that
-	 * failed syncs are reported and handled. So all exceptions are checked exceptions, embedded in a RemoteSyncException.
+	 * Many of the listed exceptions appear to be unrecoverable, caused by
+	 * errors in the initial setup. It is vital, though, that failed syncs are
+	 * reported and handled. So all exceptions are checked exceptions, embedded
+	 * in a RemoteSyncException.
 	 * 
 	 * @param monitor
 	 * @throws RemoteSyncException
-	 *             for various problems sync'ing. The specific exception is nested within the RemoteSyncException. TODO: Consider
+	 *             for various problems sync'ing. The specific exception is
+	 *             nested within the RemoteSyncException. TODO: Consider
 	 *             possible platform dependency.
 	 */
 	public void syncLocalToRemote(IProgressMonitor monitor) throws RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		subMon.subTask(Messages.GitRemoteSyncConnection_sync_local_to_remote);
 		try {
 			// First commit changes to the local repository.
 			doCommit();
@@ -644,8 +677,8 @@ public class GitRemoteSyncConnection {
 				mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
 
 				if (mergeResults.getExitCode() != 0) {
-					throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure +
-							mergeResults.getStderr()));
+					throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
+							+ mergeResults.getStdout()));
 				}
 			} catch (final IOException e) {
 				throw new RemoteSyncException(e);
@@ -664,14 +697,17 @@ public class GitRemoteSyncConnection {
 	/**
 	 * @param monitor
 	 * @throws RemoteSyncException
-	 *             for various problems sync'ing. The specific exception is nested within the RemoteSyncException. Many of the
-	 *             listed exceptions appear to be unrecoverable, caused by errors in the initial setup. It is vital, though, that
-	 *             failed syncs are reported and handled. So all exceptions are checked exceptions, embedded in a
-	 *             RemoteSyncException.
+	 *             for various problems sync'ing. The specific exception is
+	 *             nested within the RemoteSyncException. Many of the listed
+	 *             exceptions appear to be unrecoverable, caused by errors in
+	 *             the initial setup. It is vital, though, that failed syncs are
+	 *             reported and handled. So all exceptions are checked
+	 *             exceptions, embedded in a RemoteSyncException.
 	 */
 	public void syncRemoteToLocal(IProgressMonitor monitor) throws RemoteSyncException {
 
-		// TODO: Figure out why pull doesn't work and why we have to fetch and merge instead.
+		// TODO: Figure out why pull doesn't work and why we have to fetch and
+		// merge instead.
 		// PullCommand pullCommand = gitConnection.getGit().pull().
 		// try {
 		// pullCommand.call();
@@ -687,6 +723,7 @@ public class GitRemoteSyncConnection {
 		// throw new RemoteSyncException(e);
 		// }
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		subMon.subTask(Messages.GitRemoteSyncConnection_sync_remote_to_local);
 		try {
 			// First, commit in case any changes have occurred remotely.
 			prepareRemoteForCommit(subMon.newChild(5));
@@ -695,8 +732,7 @@ public class GitRemoteSyncConnection {
 			transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
 
 			// Now merge. Before merging we set the head for merging to master.
-			Ref masterRef =
-					git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+			Ref masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			final MergeCommand mergeCommand = git.merge().include(masterRef);
 
