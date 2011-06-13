@@ -84,6 +84,7 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final String CANON_EQ = "CANON_EQ";//$NON-NLS-1$
 	public static final String LITERAL = "LITERAL";//$NON-NLS-1$
 	public static final String COMMENTS = "COMMENTS";//$NON-NLS-1$
+	public static final String UNIX_LINES = "UNIX_LINES";//$NON-NLS-1$
 
 	public static final String TOKENIZER_EXT_PT = "streamParserTokenizer";//$NON-NLS-1$
 	public static final String TAIL = "tail";//$NON-NLS-1$

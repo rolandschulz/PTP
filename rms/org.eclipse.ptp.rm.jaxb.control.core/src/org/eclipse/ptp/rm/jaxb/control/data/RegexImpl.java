@@ -110,6 +110,8 @@ public class RegexImpl {
 				f |= Pattern.LITERAL;
 			} else if (JAXBControlConstants.COMMENTS.equals(s.trim())) {
 				f |= Pattern.COMMENTS;
+			} else if (JAXBControlConstants.UNIX_LINES.equals(s.trim())) {
+				f |= Pattern.UNIX_LINES;
 			}
 		}
 		return f;
