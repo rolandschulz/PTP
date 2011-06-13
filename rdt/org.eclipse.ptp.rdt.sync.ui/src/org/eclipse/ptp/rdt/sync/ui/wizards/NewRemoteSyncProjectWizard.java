@@ -13,6 +13,7 @@ package org.eclipse.ptp.rdt.sync.ui.wizards;
 
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
+import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -34,6 +35,7 @@ import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
  * 
  */
 public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
+	private static final String PREFIX = "CProjectWizard"; //$NON-NLS-1$
 	private static final String wz_title = Messages.NewRemoteSyncProjectWizard_title;
 	private static final String wz_desc = Messages.NewRemoteSyncProjectWizard_description;
 
@@ -47,21 +49,23 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard#addPages()
+	 */
+	@Override
+	public void addPages() {
+		fMainPage = new SyncMainWizardPage(CUIPlugin.getResourceString(PREFIX));
+		fMainPage.setTitle(wz_title);
+		fMainPage.setDescription(wz_desc);
+		addPage(fMainPage);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard#continueCreation(org
 	 * .eclipse.core.resources.IProject)
 	 */
-
-	@Override
-	protected IProject continueCreation(IProject prj) {
-		try {
-			CProjectNature.addCNature(prj, new NullProgressMonitor());
-			CCProjectNature.addCCNature(prj, new NullProgressMonitor());
-			RemoteSyncNature.addNature(prj, new NullProgressMonitor());
-		} catch (CoreException e) {
-		}
-		return prj;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -76,14 +80,8 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ui.wizards.newresource.BasicNewResourceWizard#
-	 * initializeDefaultPageImageDescriptor()
+	 * @see org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard#performFinish()
 	 */
-	@Override
-	protected void initializeDefaultPageImageDescriptor() {
-		setDefaultPageImageDescriptor(RDTPluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
-	}
-
 	@Override
 	public boolean performFinish() {
 		boolean success = super.performFinish();
@@ -92,5 +90,34 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 		}
 
 		return success;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard#continueCreation(org
+	 * .eclipse.core.resources.IProject)
+	 */
+	@Override
+	protected IProject continueCreation(IProject prj) {
+		try {
+			CProjectNature.addCNature(prj, new NullProgressMonitor());
+			CCProjectNature.addCCNature(prj, new NullProgressMonitor());
+			RemoteSyncNature.addNature(prj, new NullProgressMonitor());
+		} catch (CoreException e) {
+		}
+		return prj;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.wizards.newresource.BasicNewResourceWizard#
+	 * initializeDefaultPageImageDescriptor()
+	 */
+	@Override
+	protected void initializeDefaultPageImageDescriptor() {
+		setDefaultPageImageDescriptor(RDTPluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
 	}
 }
