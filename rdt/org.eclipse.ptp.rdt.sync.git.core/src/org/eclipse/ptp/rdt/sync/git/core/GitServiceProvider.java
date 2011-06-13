@@ -50,8 +50,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private GitRemoteSyncConnection fSyncConnection = null;
 
 	private final ReentrantLock syncLock = new ReentrantLock();
-	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
-	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
+	private Integer syncTaskId = -1; // ID for most recent synchronization task,
+										// functions as a time-stamp
+	private int finishedSyncTaskId = -1; // all synchronizations up to this ID
+											// (including it) have finished
 
 	/**
 	 * Get the remote directory that will be used for synchronization
@@ -126,7 +128,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @param location
 	 *            directory path
 	 * @throws RuntimeException
-	 *             if already set. Changing these local parameters is not currently supported but should be possible.
+	 *             if already set. Changing these local parameters is not
+	 *             currently supported but should be possible.
 	 */
 	public void setLocation(String location) {
 		if (fLocation != null) {
@@ -156,7 +159,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @param conn
 	 *            remote connection
 	 * @throws RuntimeException
-	 *             if already set. Changing these local parameters is not currently supported but should be possible.
+	 *             if already set. Changing these local parameters is not
+	 *             currently supported but should be possible.
 	 */
 	public void setRemoteConnection(IRemoteConnection conn) {
 		if (fConnection != null) {
@@ -172,7 +176,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @param services
 	 *            remote services
 	 * @throws RuntimeException
-	 *             if already set. Changing these local parameters is not currently supported but should be possible.
+	 *             if already set. Changing these local parameters is not
+	 *             currently supported but should be possible.
 	 */
 	public void setRemoteServices(IRemoteServices services) {
 		putString(GIT_SERVICES_ID, services.getId());
@@ -182,24 +187,32 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#
-	 * synchronize(org.eclipse.core.resources.IResourceDelta, org.eclipse.core.runtime.IProgressMonitor, boolean)
+	 * synchronize(org.eclipse.core.resources.IResourceDelta,
+	 * org.eclipse.core.runtime.IProgressMonitor, boolean)
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
 		try {
 			/*
-			 * A synchronize with SyncFlag.FORCE guarantees that both directories are in sync.
+			 * A synchronize with SyncFlag.FORCE guarantees that both
+			 * directories are in sync.
 			 * 
-			 * More precise: it guarantees that all changes written to disk at the moment of the call are guaranteed to be
-			 * synchronized between both directories. No guarantees are given for changes occurring during the synchronize call.
+			 * More precise: it guarantees that all changes written to disk at
+			 * the moment of the call are guaranteed to be synchronized between
+			 * both directories. No guarantees are given for changes occurring
+			 * during the synchronize call.
 			 * 
-			 * To satisfy this guarantee, this call needs to make sure that both the current delta and all outstanding sync requests
-			 * finish before this call returns.
+			 * To satisfy this guarantee, this call needs to make sure that both
+			 * the current delta and all outstanding sync requests finish before
+			 * this call returns.
 			 * 
-			 * Example: Why sync if current delta is empty? The RemoteMakeBuilder forces a sync before and after building. In some
-			 * cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
+			 * Example: Why sync if current delta is empty? The
+			 * RemoteMakeBuilder forces a sync before and after building. In
+			 * some cases, we want to ensure repos are synchronized regardless
+			 * of the passed delta, which can be set to null.
 			 */
-			// TODO: We are not using the individual "sync to local" and "sync to remote" flags yet.
+			// TODO: We are not using the individual "sync to local" and
+			// "sync to remote" flags yet.
 			if ((syncFlags == SyncFlag.NO_FORCE) && (!(hasRelevantChangedResources(delta)))) {
 				return;
 			}
@@ -211,9 +224,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// suggestion for Deltas: add delta to list of deltas
 			}
 
-			if (syncLock.hasQueuedThreads() && syncFlags == SyncFlag.NO_FORCE)
-			{
-				return; // the queued Thread will do the work for us. And we don't have to wait because of NO_FORCE
+			if (syncLock.hasQueuedThreads() && syncFlags == SyncFlag.NO_FORCE) {
+				return; // the queued Thread will do the work for us. And we
+						// don't have to wait because of NO_FORCE
 			}
 
 			// lock syncLock. interruptible by progress monitor
@@ -228,16 +241,17 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			}
 
 			try {
-				if (mySyncTaskId <= finishedSyncTaskId) { // some other thread has already done the work for us
+				if (mySyncTaskId <= finishedSyncTaskId) { // some other thread
+															// has already done
+															// the work for us
 					return;
 				}
 
 				// TODO: Review exception handling
 				if (fSyncConnection == null) {
 					// Open a remote sync connection
-					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(),
-							this.getProject().getLocation().toString(), this.getLocation(),
-							new FileFilter(), progress.newChild(40));
+					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation()
+							.toString(), this.getLocation(), new FileFilter(), progress.newChild(40));
 				}
 
 				// Open remote connection if necessary
@@ -245,18 +259,24 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					this.getRemoteConnection().open(progress.newChild(10));
 				}
 
-				// This synchronization operation will include all tasks up to current syncTaskId
-				// syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
-				// we might synchronize even more than that if a file is already saved but syncTaskId wasn't increased yet
-				// thus we cannot guarantee a maximum but we can guarantee syncTaskId as a minimum
-				// suggestion for Deltas: make local copy of list of deltas, remove list of deltas
+				// This synchronization operation will include all tasks up to
+				// current syncTaskId
+				// syncTaskId can be larger than mySyncTaskId (than we do also
+				// the work for other threads)
+				// we might synchronize even more than that if a file is already
+				// saved but syncTaskId wasn't increased yet
+				// thus we cannot guarantee a maximum but we can guarantee
+				// syncTaskId as a minimum
+				// suggestion for Deltas: make local copy of list of deltas,
+				// remove list of deltas
 				int willFinishTaskId;
 				synchronized (syncTaskId) {
 					willFinishTaskId = syncTaskId;
 				}
 
 				// Sync local and remote. For now, do both ways each time.
-				// TODO: Sync more efficiently and appropriately to the situation.
+				// TODO: Sync more efficiently and appropriately to the
+				// situation.
 				fSyncConnection.syncLocalToRemote(progress.newChild(40));
 				fSyncConnection.syncRemoteToLocal(progress.newChild(40));
 
@@ -283,8 +303,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	}
 
 	/**
-	 * Error handler. There are several reasons why a sync operation may fail. This function is responsible for handling each case
-	 * appropriately. For now we simply report any errors to the user.
+	 * Error handler. There are several reasons why a sync operation may fail.
+	 * This function is responsible for handling each case appropriately. For
+	 * now we simply report any errors to the user.
 	 * 
 	 * @param e
 	 *            the remote sync exception
@@ -294,8 +315,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		int severity = e.getStatus().getSeverity();
 		String message = null;
 
-		// RemoteSyncException is generally used by either creating a new exception with a message describing the problem or by
-		// embedding another type of error. So we need to decide which message to use.
+		// RemoteSyncException is generally used by either creating a new
+		// exception with a message describing the problem or by
+		// embedding another type of error. So we need to decide which message
+		// to use.
 		if (e.getMessage() != null || e.getCause() == null) {
 			message = e.getMessage();
 		} else {
@@ -319,7 +342,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		return true;
 	}
 
-	// This function and the next recursively compile a list of relevant resources that have changed.
+	// This function and the next recursively compile a list of relevant
+	// resources that have changed.
 	private String[] getRelevantChangedResources(IResourceDelta delta) {
 		ArrayList<String> res = new ArrayList<String>();
 		getRelevantChangedResourcesRecursive(delta, res);
@@ -327,7 +351,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	}
 
 	private void getRelevantChangedResourcesRecursive(IResourceDelta delta, ArrayList<String> res) {
-		// Prune recursion if this is a directory or file of no interest (such as the ".git" directory)
+		// Prune recursion if this is a directory or file of no interest (such
+		// as the ".git" directory)
 		if (irrelevantPath(delta)) {
 			return;
 		}
@@ -358,7 +383,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 	private class FileFilter implements SyncFileFilter {
 		public boolean shouldIgnore(String fileName) {
-			if (fileName.endsWith(".cproject") || fileName.endsWith(".project") || fileName.endsWith(".settings")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (fileName.equals(".cproject") || fileName.equals(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
+				return true;
+			}
+
+			if (fileName.startsWith(".settings")) { //$NON-NLS-1$
 				return true;
 			}
 
@@ -378,7 +407,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					return false;
 				}
 			} catch (NullPointerException e) {
-				// CDT throws this exception for files not recognized. For now, be conservative and allow these files.
+				// CDT throws this exception for files not recognized. For now,
+				// be conservative and allow these files.
 				return false;
 			}
 		}
@@ -387,7 +417,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConnection()
+	 * @see
+	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
+	 * #getConnection()
 	 */
 	public IRemoteConnection getConnection() {
 		return fConnection;
@@ -396,7 +428,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConfigLocation()
+	 * @see
+	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
+	 * #getConfigLocation()
 	 */
 	public String getConfigLocation() {
 		return fLocation;
@@ -405,14 +439,17 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection()
+	 * @see
+	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
+	 * #setRemoteToolsConnection()
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		syncLock.lock();
 		try {
 			fConnection = connection;
 			putString(GIT_CONNECTION_NAME, connection.getName());
-			fSyncConnection = null; // get reinitialized by next synchronize call
+			fSyncConnection = null; // get reinitialized by next synchronize
+									// call
 		} finally {
 			syncLock.unlock();
 		}
@@ -421,14 +458,17 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setConfigLocation()
+	 * @see
+	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
+	 * #setConfigLocation()
 	 */
 	public void setConfigLocation(String configLocation) {
 		syncLock.lock();
 		try {
 			fLocation = configLocation;
 			putString(GIT_LOCATION, configLocation);
-			fSyncConnection = null; // get reinitialized by next synchronize call
+			fSyncConnection = null; // get reinitialized by next synchronize
+									// call
 		} finally {
 			syncLock.unlock();
 		}
