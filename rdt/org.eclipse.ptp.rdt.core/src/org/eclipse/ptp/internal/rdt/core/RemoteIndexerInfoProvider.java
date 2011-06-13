@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,6 +49,7 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 	private Set<String> indexerPreferences; // (preference key -> boolean)
 	private List<String> filesToParseUpFront;
 	private FileEncodingRegistry fFileEncodingRegistry;
+	private Set<String> fValidSourceUnitNames;
 
 	//
 	RemoteIndexerInfoProvider() {
@@ -56,7 +57,7 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 
 	RemoteIndexerInfoProvider(Map<String, RemoteScannerInfo> pathMap, Map<Integer, RemoteScannerInfo> linkageMap,
 			Map<String, String> languageMap, Map<String, Map<String, String>> languagePropertyMap, Set<String> headerSet,
-			Set<String> indexerPreferences, List<String> filesToParseUpFront, FileEncodingRegistry fileEncodingRegistry) {
+			Set<String> indexerPreferences, List<String> filesToParseUpFront, FileEncodingRegistry fileEncodingRegistry, Set<String> fValidSourceUnitNames) {
 
 		this.pathMap = pathMap;
 		this.linkageMap = linkageMap;
@@ -66,8 +67,9 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 		this.indexerPreferences = indexerPreferences;
 		this.filesToParseUpFront = filesToParseUpFront;
 		this.fFileEncodingRegistry = fileEncodingRegistry;
+		this.fValidSourceUnitNames = fValidSourceUnitNames;
 	}
-
+	
 	// send as little over the wire as possible
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		if (empty(pathMap))
@@ -141,6 +143,13 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 	public FileEncodingRegistry getFileEncodingRegistry() {
 		return fFileEncodingRegistry;
 	}
+	/**
+	 * @return a set of source files extension (without dot)
+	 * @since 3.1
+	 */
+	public Set<String> getFValidSourceUnitNames() {
+		return fValidSourceUnitNames;
+	}
 
 	@Override
 	public String toString() {
@@ -151,7 +160,8 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 				" isHeaderMap:" + headerSet + //$NON-NLS-1$
 				" preferences: " + indexerPreferences + //$NON-NLS-1$
 				" filesToParseUpFront: " + filesToParseUpFront + //$NON-NLS-1$
-				" fFileEncodingRegistry: " + fFileEncodingRegistry; //$NON-NLS-1$
+				" fFileEncodingRegistry: " + fFileEncodingRegistry +  //$NON-NLS-1$
+				" fValidSourceUnitNames: " + fValidSourceUnitNames; //$NON-NLS-1$
 	}
 
 }
