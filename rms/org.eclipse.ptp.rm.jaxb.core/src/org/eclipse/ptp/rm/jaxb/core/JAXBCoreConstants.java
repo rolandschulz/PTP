@@ -66,6 +66,8 @@ public class JAXBCoreConstants {
 	public static final String TBESCESC = "\\\\t";//$NON-NLS-1$
 	public static final String LNESC = "\\n";//$NON-NLS-1$
 	public static final String RTESC = "\\r";//$NON-NLS-1$
+	public static final String LN = "\n";//$NON-NLS-1$
+	public static final String RT = "\r";//$NON-NLS-1$
 
 	/* JAXB */
 	public static final String XMLSchema = "http://www.w3.org/2001/XMLSchema"; //$NON-NLS-1$

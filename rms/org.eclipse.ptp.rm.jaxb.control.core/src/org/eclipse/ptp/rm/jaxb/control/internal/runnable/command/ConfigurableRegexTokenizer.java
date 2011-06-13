@@ -77,9 +77,13 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	 * @return the non-escaped char
 	 */
 	private static char getChar(String delim) {
-		if (delim.indexOf(JAXBControlConstants.RTESC) >= 0 || delim.indexOf(JAXBControlConstants.LNESC) >= 0) {
-			return JAXBControlConstants.LINE_SEP.charAt(0);
-		} else if (delim.indexOf(JAXBControlConstants.TBESC) >= 0) {
+		if (delim.indexOf(JAXBControlConstants.LNESC) >= 0) {
+			return JAXBControlConstants.LN.charAt(0);
+		}
+		if (delim.indexOf(JAXBControlConstants.RTESC) >= 0) {
+			return JAXBControlConstants.RT.charAt(0);
+		}
+		if (delim.indexOf(JAXBControlConstants.TBESC) >= 0) {
 			return JAXBControlConstants.TAB.charAt(0);
 		}
 		return delim.charAt(0);
@@ -92,17 +96,15 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	private final boolean applyToAll;
 	private final List<IMatchable> toMatch;
 	private final IProgressMonitor commandMonitor;
+	private final StringBuffer segment;
+
 	private RegexImpl exitOn;
 	private RegexImpl exitAfter;
 	private boolean includeDelim;
 	private Throwable error;
-
 	private InputStream in;
 	private char[] chars;
 	private LinkedList<String> saved;
-
-	private final StringBuffer segment;
-
 	private boolean endOfStream;
 
 	/**
@@ -233,8 +235,10 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	private void findNextSegment(BufferedReader in) throws CoreException {
 		endOfStream = false;
 		int len = chars.length == 1 ? 1 : chars.length - segment.length();
+		char[] lookAhead = new char[1];
 		while (true) {
 			int read = 0;
+			int peek = 0;
 			try {
 				read = in.read(chars, 0, len);
 				if (read == JAXBControlConstants.EOF) {
@@ -252,6 +256,21 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 				if (chars[0] == delim) {
 					if (includeDelim) {
 						segment.append(delim);
+					}
+					if (delim == '\r') {
+						try {
+							in.mark(1);
+							peek = in.read(lookAhead, 0, 1);
+							if (peek == 1 && lookAhead[0] == '\n') {
+								if (includeDelim) {
+									segment.append('\n');
+								}
+							} else {
+								in.reset();
+							}
+						} catch (IOException t) {
+							throw CoreExceptionUtils.newException(Messages.ReadSegmentError, t);
+						}
 					}
 					break;
 				}

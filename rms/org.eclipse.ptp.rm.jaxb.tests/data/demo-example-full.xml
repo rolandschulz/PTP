@@ -9,7 +9,7 @@
 <!-- * Albert L. Rossi - design and implementation -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-generic-batch">
+	xsi:schemaLocation="resource_manager_type.xsd" name="demo-example-full">
 	<control-data>
 		<!-- this is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
 		<property name="control.queue.name" visible="false">
