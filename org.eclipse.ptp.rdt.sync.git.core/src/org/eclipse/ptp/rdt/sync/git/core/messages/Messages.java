@@ -29,6 +29,12 @@ public class Messages extends NLS {
 	public static String GSP_ChangeProjectError;
 	public static String GSP_SyncErrorMessage;
 	public static String GSP_SyncTaskName;
+	public static String GitRemoteSyncConnection_adding_files;
+	public static String GitRemoteSyncConnection_building_repo;
+	public static String GitRemoteSyncConnection_committing_remote;
+	public static String GitRemoteSyncConnection_getting_remote_file_status;
+	public static String GitRemoteSyncConnection_sync_local_to_remote;
+	public static String GitRemoteSyncConnection_sync_remote_to_local;
 	public static String GitServiceProvider_1;
 	public static String GitServiceProvider_2;
 
