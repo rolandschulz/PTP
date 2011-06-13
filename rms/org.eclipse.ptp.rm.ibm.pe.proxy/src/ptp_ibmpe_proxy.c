@@ -3547,9 +3547,6 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
         add_environment_variable("MP_RESD=yes");
         print_message(TRACE_DETAIL_MESSAGE, "PE Job uses LoadLeveler resource management\n");
     }
-    else {
-        add_environment_variable("MP_RESD=no");
-    }
       /*
        * If env_sh_path is not null, this indicates that the user has 
        * specified a 'setup script' to run to set the PE environment variables.
@@ -3780,8 +3777,8 @@ void update_nodes(char *hostlist_path)
      * Multiple consecutive spaces in the message will cause parsing errors
      * in the Java code handling the response.
      */
-	int i;
-	int len;
+    int i;
+    int len;
     char *res;
     char *valstr;
     char hostname[256];
@@ -3812,7 +3809,7 @@ void update_nodes(char *hostlist_path)
     current_hostlist = malloc(current_hostlist_limit * sizeof(char *));
     malloc_check(current_hostlist, __FUNCTION__, __LINE__);
     while (res != NULL) {
-        unsigned char *cp;
+        char *cp;
 
             /*
              * Process only non-blank, non-comment lines
@@ -3827,10 +3824,10 @@ void update_nodes(char *hostlist_path)
                 current_hostlist = realloc(current_hostlist, current_hostlist_size * sizeof(char *));
                 malloc_check(current_hostlist, __FUNCTION__, __LINE__);
             }
-            len = strlen(cp);
-            for (i = 0; i < len; i++) {
-            	cp[i] = tolower(cp[i]);
-            }
+	    len = strlen(cp);
+	    for (i = 0; i < len; i++) {
+		cp[i] = tolower(cp[i]);
+	    }
             current_hostlist[current_hostlist_size++] = strdup(cp);
             if (find_node(hostname) == NULL) {
                 node_refcount *node;
