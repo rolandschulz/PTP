@@ -20,7 +20,7 @@ import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
  * @author crecoskie
  * 
  */
-public class RDTPluginImages {
+public class SyncPluginImages {
 	// Subdirectory (under the package containing this class) where 16 color
 	// images are
 	private static URL fgIconBaseURL;
