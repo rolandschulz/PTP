@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ptp.internal.rdt.core;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.internal.core.indexer.FileEncodingRegistry;
@@ -82,4 +83,11 @@ public interface IRemoteIndexerInfoProvider extends IStandaloneScannerInfoProvid
 	 * @since 2.0
 	 */
 	FileEncodingRegistry getFileEncodingRegistry();
+	
+	/**
+	 * 
+	 * @return a set of source files extension (without dot)
+	 * @since 3.1
+	 */
+	Set<String> getFValidSourceUnitNames();
 }

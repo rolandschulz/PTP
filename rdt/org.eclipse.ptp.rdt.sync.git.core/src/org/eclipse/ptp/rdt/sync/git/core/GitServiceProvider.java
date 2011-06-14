@@ -357,7 +357,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	
 	private class FileFilter implements SyncFileFilter {
 		public boolean shouldIgnore(String fileName) {
-			if (fileName.endsWith(".cproject") || fileName.endsWith(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
+			if (fileName.equals(".cproject") || fileName.equals(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
+				return true;
+			}
+
+			if (fileName.startsWith(".settings")) { //$NON-NLS-1$
 				return true;
 			}
 

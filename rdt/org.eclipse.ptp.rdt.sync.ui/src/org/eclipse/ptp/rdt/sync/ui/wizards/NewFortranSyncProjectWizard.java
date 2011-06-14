@@ -11,38 +11,33 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
-import org.eclipse.cdt.core.CCProjectNature;
-import org.eclipse.cdt.core.CProjectNature;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.cdt.ui.CUIPlugin;
-import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.photran.internal.cdtinterface.ui.FortranProjectWizard;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTPluginImages;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 
 /**
- * A wizard for creating new Remote C/C++ Projects
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
- * of a work in progress. There is no guarantee that this API will work or that
- * it will remain the same. Please do not use this API without consulting with
- * the RDT team.
- * 
- * @author crecoskie
- * @since 2.0
+ * A wizard for creating new Fortran synchronized projects
  * 
  */
-public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
+public class NewFortranSyncProjectWizard extends FortranProjectWizard {
 	private static final String PREFIX = "CProjectWizard"; //$NON-NLS-1$
-	private static final String wz_title = Messages.NewRemoteSyncProjectWizard_title;
-	private static final String wz_desc = Messages.NewRemoteSyncProjectWizard_description;
+	private static final String wz_title = Messages.NewFortranSyncProjectWizard_new_sync_fortran_project;
+	private static final String wz_desc = Messages.NewFortranSyncProjectWizard_create_sync_fortran_project;
 
 	/**
 	 * 
 	 */
-	public NewRemoteSyncProjectWizard() {
+	public NewFortranSyncProjectWizard() {
 		super(wz_title, wz_desc);
 	}
 
@@ -74,7 +69,10 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	 */
 	@Override
 	public String[] getNatures() {
-		return new String[] { CProjectNature.C_NATURE_ID, CCProjectNature.CC_NATURE_ID, RemoteSyncNature.NATURE_ID };
+		List<String> natures = new ArrayList<String>();
+		natures.addAll(Arrays.asList(super.getNatures()));
+		natures.add(RemoteSyncNature.NATURE_ID);
+		return natures.toArray(new String[0]);
 	}
 
 	/*
@@ -95,15 +93,13 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard#continueCreation(org
-	 * .eclipse.core.resources.IProject)
+	 * @see org.eclipse.photran.internal.cdtinterface.ui.FortranProjectWizard#
+	 * continueCreation(org.eclipse.core.resources.IProject)
 	 */
 	@Override
 	protected IProject continueCreation(IProject prj) {
+		super.continueCreation(prj);
 		try {
-			CProjectNature.addCNature(prj, new NullProgressMonitor());
-			CCProjectNature.addCCNature(prj, new NullProgressMonitor());
 			RemoteSyncNature.addNature(prj, new NullProgressMonitor());
 		} catch (CoreException e) {
 		}

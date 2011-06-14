@@ -16,10 +16,10 @@ Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.ptp.remote.ui,
  org.eclipse.ptp.services.core,
  org.eclipse.ptp.rdt.sync.core,
- org.eclipse.ptp.rdt.core
+ org.eclipse.ptp.rdt.core,
+ org.eclipse.photran.cdtinterface;bundle-version="7.0.0";resolution:=optional
 Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.rdt.sync.ui,
- org.eclipse.ptp.rdt.sync.ui.messages,
  org.eclipse.ptp.rdt.sync.ui.preferences,
  org.eclipse.ptp.rdt.sync.ui.properties,
  org.eclipse.ptp.rdt.sync.ui.wizards
