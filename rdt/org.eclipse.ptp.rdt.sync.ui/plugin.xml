@@ -18,21 +18,6 @@
              	%remoteCCPPproject.desc
          	</description>
       </wizard>
-      <wizard
-            canFinishEarly="false"
-            category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
-            class="org.eclipse.ptp.rdt.sync.ui.wizards.NewFortranSyncProjectWizard"
-            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
-            hasPages="true"
-            icon="icons/etool16/newremote_c_proj.gif"
-            id="org.eclipse.ptp.rdt.sync.ui.newFortranProjectWizard"
-            name="%wizard.name.1"
-            project="true">
-         <description>
-            %remoteCCPPproject.desc
-         </description>
-      </wizard>
-      
       
    </extension>
    <extension
@@ -88,13 +73,6 @@
 	         wizardId="org.eclipse.ptp.rdt.sync.ui.newRemoteProjectWizard">
 		 <enablement/>
 	   </commonWizard>
-       <commonWizard
-             associatedExtensionId="org.eclipse.ptp.rdt.sync.ui.navigator.content"
-             menuGroupId="org.eclipse.ptp.rdt.ui.newProject"
-             type="new"
-             wizardId="org.eclipse.ptp.rdt.sync.ui.newFortranProjectWizard">
-          <enablement></enablement>
-       </commonWizard>
       </navigatorContent>
    </extension>
    <extension
