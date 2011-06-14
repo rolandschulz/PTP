@@ -36,6 +36,7 @@ public class Messages extends NLS {
 	public static String GitParticipant_1;
 	public static String GitParticipant_2;
 	public static String GitParticipant_3;
+	public static String WorkspaceConfigName;
 
 	static {
 		// initialize resource bundle
