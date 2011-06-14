@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="../../help.css">
+<title>C/C++ Indexing Service</title>
+</head>
+
+   <body>
+      <h2>
+         Code Indexing Service
+      </h2>
+      <p>
+         The C/C++ Indexing Service is the underlying backbone behind RDT's C/C++ source analysis features.  This feature parses your source code,
+         analyzes its structure, and creates an index (database) of named entities in your code for fast lookups.  The index stores information such
+         as the relationships of declarations to their references, and location information.
+      </p>
+      <p>Some of the features driven by the C/C++ Indexing Service are:</p>
+      <UL type="disc">
+      <li><a href=../tasks/remote_content_assist.html>Content Assist</a></li>
+      <li><a href=../reference/remote_c_search.html>Search</a></li>
+      <li>Navigation</li>
+      <li><a href=../reference/remote_call_hierarchy.html>Call Hierarchy View</a></li>
+      <li><a href=../reference/remote_type_hierarchy.html>Type Hierarchy View</a></li>
+      </UL>
+      
+      The RSE C/C++ Indexing Service is supplied by RDT.  This implementation uses the <a href="PLUGINS_ROOT/org.eclipse.rse.doc.user/gettingstarted/g_start.html">Remote Systems Explorer</a>'s dstore protocol to access a server that you
+      deploy on the remote machine where your project resides.  The actual parsing and indexing are done on the remote machine in order to reduce
+      network traffic, and only the results of the queries are sent back to populate the user interface.</li>
+
+   </body>
+</html>

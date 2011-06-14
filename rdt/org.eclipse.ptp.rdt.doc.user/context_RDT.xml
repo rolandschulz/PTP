@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="orge.eclipse.help.contexts"?>
+<contexts>
+   <context id="converting_to_remote_project_context" title="Converting To A Remote Project">
+      <description>Click below for help.</description>
+      <topic href="html/tasks/converting_to_remote_project.html" label="Converting To Remote Project"/>
+   </context>
+   <context id="creating_a_remote_project_context" title="Create a New Remote Project">
+      <description>Click below for help</description>
+      <topic href="html/gettingstarted/creating_a_remote_project.html" label="Creating A Remote Project"/>
+   </context>
+   <context id="service_model_wizard_context">
+      <description>Click below for help.</description>
+      <topic href="html/concepts/service_model.html" label="Service Model"/>
+      <topic href="html/concepts/services.html" label="Services"/>
+      <topic href="html/concepts/providers.html" label="Providers"/>
+      <topic href="html/concepts/c_indexing_service.html" label="C Indexing Service"/>
+      <topic href="html/reference/remote_c_new_project_wizard_3.html" label="New Remote C Project Wizard"/>
+   </context>
+   <context id="service_model_context">
+      <description>This dialog allows you to configure remote services.</description>
+	  <topic href="html/concepts/c_indexing_service.html" label="C Indexing Service"/>
+      <topic href="html/concepts/build_service.html" label="Build Service"/>
+      <topic href="html/concepts/service_model.html" label="Service Model"/>
+      <topic href="html/concepts/services.html" label="Services"/>
+      <topic href="html/concepts/providers.html" label="Providers"/>
+   </context>
+   <context id="service_model_properties_context">
+      <description>This dialog allows you to configure remote services.</description>
+	  <topic href="html/reference/remote_services.html" label="Remote Services Properties"/>
+	  <topic href="html/concepts/c_indexing_service.html" label="C Indexing Service"/>
+      <topic href="html/concepts/build_service.html" label="Build Service"/>
+      <topic href="html/concepts/service_model.html" label="Service Model"/>
+      <topic href="html/concepts/services.html" label="Services"/>
+      <topic href="html/concepts/providers.html" label="Providers"/>
+   </context>
+   <context id="remote_call_hierarchy_view_context">
+      <topic href="html/reference/remote_call_hierarchy.html" label="Remote Call Hierarchy View"/>
+   </context>
+   <context id="remote_type_hierarchy_view_context">
+      <topic href="html/reference/remote_type_hierarchy.html" label="Remote Type Hierarchy"/>
+   </context>
+   <context id="remote_include_browser_view_context">
+  	<topic href="html/reference/remote_include_browser_view.html" label="Remote Include Browser"/>
+   </context>
+   <context id="remote_C_CPP_editor_context">
+      <description>Click below for help</description>
+      <topic href="html/reference/remote_c_editor.html" label="Remote C/C++ Editor"/>
+   </context>
+   <context id ="remote_C_CPP_outline_view_context">
+	   <description>Click below to see help.</description>
+	   <topic href="html/reference/outline_view.html" label="Remote C/C++ Editor Outline view"/>
+	</context>
+   <context id="remote_C_CPP_search_context">
+      <topic href="html/reference/remote_c_search.html" label="Remote C/C++ Search"/>
+   </context>
+   <context id="remote_include_tab_context">
+   	   <topic href="html/reference/remote_properties_paths.html" label="Remote Paths and Symbols, Includes"/>
+   </context>
+   <context id="remote_symbol_tab_context">
+   	   <topic href="html/reference/remote_properties_symbols.html" label="Remote Paths and Symbols, Symbols"/>
+   </context>
+</contexts>

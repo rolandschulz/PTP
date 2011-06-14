@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="../../help.css">
+<title>Creating a connection</title>
+</head>
+
+<body>
+<h1>Connecting to a Remote RDT Server</h1>
+
+<p><span class="bold">Creating a connection from the Remote Systems view</span></p>
+
+<p>
+The <strong>Remote Systems</strong> view is by default part of the <strong>Remote C/C++</strong> perspective. 
+To open this perspective from the workbench menu, click <strong>Window &gt; Open Perspective &gt; Remote C/C++</strong>.
+</p>
+
+<p>
+Alternatively, to open the <strong>Remote Systems</strong> view regardless of which perspective is active;
+from the workbench menu click <strong>Window &gt; Open View &gt; Remote Systems</strong>.
+</p>
+
+<p> 
+In the <strong>Remote Systems</strong> view, click the <strong>New Connection</strong> toolbar button.
+</p>
+ 
+<img src="../../images/remote_systems_new_connection.png" alt="Remote Systems View">
+
+
+<p><span class="bold">Creating a connection from the RSE Browse Dialog</span></p>
+
+<p>
+Alternatively it is also possible to create a connection from the RSE 
+remote system file browse dialog. This dialog can be launched from the
+<strong>New Remote C/C++ Project Wizard</strong>.
+</p>
+
+<img src="../../images/rse_browse_new_connection.png" alt="RSE Browse Dialog">
+
+<p><span class="bold">Creating a Connection</span></p>
+
+<!-- TODO link to the RSE SSH page -->
+<p>
+Either action will launch the <strong>Select Remote System Type</strong> dialog. From this dialog you may 
+create a new connection. 
+</p>
+
+<ul>
+<li>
+Choose either Linux, Unix or Windows as
+the server type depending on the operating system that is hosting the RDT sever. For MacOS X choose
+Unix as the system type. Do not choose SSH, Telnet or FTP as the RDT server will not work with these
+connection types (RDT requires a dstore connection). 
+To connect to an RDT server over an SSH connection see here.
+</li>
+<li>
+Enter a name for your first profile and click <strong>Next</strong>. (This step only occurs if you have never defined a connection before.) 
+</li>
+<li>
+Enter a connection name. This name displays in your tree view and must be unique to the profile.
+</li>
+<li> 
+Enter the name or TCP/IP address of your server in the <strong>Host name</strong> field.
+</li>
+<li> 
+(Optional) Enter a Description. The description appears in the Properties view after the connection is created.
+</li>
+<li>
+Click <strong>Next</strong>.
+</li>
+<li>
+On the second page of the New Connection Wizard click <strong>Launcher Properties</strong> under the <strong>Available Services</strong>
+section. The properties section of the dialog can be used to specify if the connection is to a
+daemon server or to a standalone (manually started) server.
+</li>
+<li> 
+Click <strong>Finish</strong> to define your system. The new connection will appear in the Remote Systems View.
+</li>
+<li>
+To activate the connection right click on the connection name in the Remote Systems view
+and select <strong>Connect</strong>. You may be prompted for a username and password.
+</li>
+</ul>
+
+<p>
+Once a connection has been created it may still be necessary to define the port
+and other <a href="editing_connection_properties.html">properties for the connection</a>. 
+</p>
+
+</body>
+
+</html>

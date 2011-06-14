@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="../../help.css">
+<title>Remote Paths and Symbols, Symbols</title>
+</head>
+
+<body>
+<h1>Remote Paths and Symbols, Symbols</h1>
+
+<p>
+Symbols are passed to the remote indexer and are used during preprocessing.
+A symbol is essentially the same thing as an object-like macro. For example:
+<br><br>
+<code>
+#define SYMBOL 1
+</code>
+</p>
+
+<p>
+If the remote builder has been configured properly then 
+RDT may be able to automatically determine the symbols that are "built-in"
+to the compiler on the remote machine.
+</p>
+
+<p>
+Additional symbols may be provided in order to have the preprocessor
+behave differently for different build configurations. For example if 
+there is a "Debug" build configuration it may be desirable to define a symbol
+named <strong>DEBUG</strong>. Preprocessor branches controlled by this symbol will
+then become active. For example:
+<br><br>
+<code>
+#ifdef DEBUG<br>
+   // debugging code, becomes active if DEBUG is defined</br>
+#endif
+</code>
+</p>
+<p>
+It may take some time to initially set up the symbols and other
+project settings. To avoid having to perform this task for
+multiple RDT installations, use the <a href="settings_wizard_export.html">import/export mechanism </a>
+to easily share these settings.
+</p>
+
+
+<h2>The Symbols properties page</h2>
+<p>
+<img src="../../images/remote_symbols_dialog.png" 
+        alt="Remote Symbols Properties Page">
+</p>
+
+<dl>
+	<dt>Languages (left pane)</dt>
+        <dd>Displays languages related to this project. 
+            Select one to see corresponding symbols.
+        </dd>
+	<dt>Symbol / Value</dt>
+        <dd>List of symbols related to given language.</dd>
+	<dt>Add</dt>
+        <dd>Add new symbol</dd>
+	<dt>Edit</dt>
+        <dd>Modify selected symbol value/dd>
+	<dt>Delete</dt>
+        <dd>Remove selected symbol</dd>
+	<dt>Export / Unexport</dt>
+        <dd>Toggle selected symbol exported or not</dd>
+	<dt>Show built-in values</dt>
+        <dd>Check to display system (built-in) includes.</dd>
+</dl>
+
+<h2>Adding a Symbol</h2>
+<p>
+<img src="../../images/add_symbol_dialog.png" 
+        alt="Add Symbol dialog">
+</p>
+
+<p>
+Click <strong>Add</strong> on the Symbols properties page. 
+The <strong>Add Symbol</strong> dialog appears. Enter the name of the symbol
+and optionally a value. The name must be a valid identifier as understood
+by the C/C++ preprocessor.
+</p>
+
+<p>
+Check the <strong>Add to all configurations</strong> checkbox to add the symbol
+to all build configurations. Otherwise, the symbol will only be added
+to the build configuration selected on the properties page.
+</p>
+
+<p>
+Check the <strong>Add to all languages</strong> checkbox to add the include path
+to all languages. Otherwise, the symbol will only be added
+to the language selected on the properties page.
+</p>
+
+</body>
+</html>

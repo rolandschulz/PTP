@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="WINDOWS-1252"?>
+<jardesc>
+    <jar path="c:/remote_deploy_rdt/xlcparser.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/org.eclipse.ptp.rdt.core.remotejars/xlcparser.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.lrparser.xlc/parser&lt;org.eclipse.cdt.core.lrparser.xlc.ast"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.lrparser.xlc/parser&lt;org.eclipse.cdt.internal.core.lrparser.xlc.c"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.lrparser.xlc/parser&lt;org.eclipse.cdt.internal.core.lrparser.xlc.cpp"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.lrparser.xlc/parser&lt;org.eclipse.cdt.core.lrparser.xlc{XlcCScannerExtensionConfiguration.java"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.lrparser.xlc/parser&lt;org.eclipse.cdt.core.lrparser.xlc{XlcCPPScannerExtensionConfiguration.java"/>
+        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.xlc/remote"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.lrparser.xlc/parser&lt;org.eclipse.cdt.internal.core.lrparser.xlc.ast"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.lrparser.xlc/parser&lt;org.eclipse.cdt.core.lrparser.xlc{XlcCTokenMap.java"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.lrparser.xlc/parser&lt;org.eclipse.cdt.core.lrparser.xlc{XlcCPPTokenMap.java"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.lrparser.xlc/parser&lt;org.eclipse.cdt.core.lrparser.xlc{XlcKeywords.java"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.lrparser.xlc/parser&lt;org.eclipse.cdt.core.lrparser.xlc.preferences{XlcPref.java"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.lrparser.xlc/parser&lt;org.eclipse.cdt.core.lrparser.xlc.action"/>
+    </selectedElements>
+</jardesc>

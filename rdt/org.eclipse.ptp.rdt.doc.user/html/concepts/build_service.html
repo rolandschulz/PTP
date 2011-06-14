@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="../../help.css">
+<title>Build Service</title>
+</head>
+
+   <body>
+      <h2>
+         Build Service
+      </h2>
+      <p>
+         The Build Service represents the execution and file manipulation services required by a builder to execute external build commands on
+         the target system.  A <em>builder</em> is still required which utilizes the build service to execute the commands to perform the build.
+      </p>
+      The <strong>Remote Build Service</strong> provider is supplied with RDT.  This implementation uses the PTP Remote Services API to provide build services.
+      	Currently there are three possible sub-choices for these services:
+      	<UL type="circle">
+      	<li>Local - Services are executed on the local machine.</li>
+      	<li>Remote Tools - A lightweight SSH-based implementation.</li>
+      	<li>RSE - An implementation based on the <a href="PLUGINS_ROOT/org.eclipse.rse.doc.user/gettingstarted/g_start.html">Remote Systems Explorer.</a></li>
+      	</UL>
+   </body>
+</html>

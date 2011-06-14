@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="../../help.css">
+<title>Creating a Remote C/C++ Project</title>
+</head>
+
+<body>
+<h1>Creating a Remote C/C++ Project</h1>
+
+<p>
+Before creating a Remote C/C++ Project it is recommended that you
+have already established a connection to a remote RDT server.
+<ul>
+<li><a href="server_installation.html">RDT Server Installation</a></li>
+<li><a href="creating_a_connection.html">Connecting to a Remote RDT Server</a></li>
+</ul>
+</p>
+
+<h3>Remote C/C++ Project Wizard</h3>
+
+<p>
+Disclaimer: The Remote C/C++ Project Wizard is based on the CDT new project wizard which
+was originally designed to create local projects. Therefore some aspects of the wizard
+interface are not ideal for the scenario of creating a remote project. The remote project
+must be set up correctly or it will not work properly. The following steps describe in
+detail what must be done to correctly set up a remote project.
+</p>
+
+
+<ol>
+	<li>
+		To create a new Remote C/C++ Project begin by opening the 
+		<strong>New Remote C/C++ Project Wizard</strong> by going to 
+		<strong>File &gt; New &gt; Remote C/C++ Project</strong>.
+		<br><br>
+		<img src="../../images/new_project_wizard/menu_create_project.png" alt="File > New > Remote C/C++ Project">
+		<br><br><br>
+	</li>
+
+	<li>
+		Enter the project name.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_enter_project_name.png" alt="Enter Project Name">
+		<br><br><br>
+	</li>
+	
+	<li>
+		Choose a remote provider for hosting the remote project. RDT currently ships with the <strong>RSE
+		file system</strong>, so it is recommended that you choose that.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_choose_file_system.png" alt="Choose Remote Provider">
+		<br><br><br>
+	</li>
+
+	<li>
+		Select a remote connection associated with the remote provider.  Create one if one did not
+		already exist by clicking <strong>New</strong>.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_choose_remote_connection.png" alt="Choose Remote Provider">
+		<br><br><br>
+	</li>
+
+	
+
+	<li>
+		Now the location of the project root folder must be entered into the <strong>Location</strong> field.
+		If you do not know the
+		URI of the project folder then it is recommended that you use the <strong>Browse...</strong> button.  
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_browse_file_system.png" alt="Browse File System">
+		<br><br><br>
+	</li>
+
+	<li>
+		If you have chosen RSE as the file system then the RSE <strong>Browse for Folder</strong> dialog will appear.
+		In this dialog first choose a connection to a running RDT server.
+		<br><br>
+		<img src="../../images/new_project_wizard/browse_connection.png" alt="Choose a Connection">
+		<br><br><br>
+	</li>
+
+	<li>
+		Choose a folder and click OK.
+		<br><br>
+		<img src="../../images/new_project_wizard/browse_folder.png" alt="Choose a Folder">
+		<br><br><br>
+	</li>
+	
+	<li>
+		The URI of the chosen folder will appear in the <strong>Location</strong> field.
+		You may create a sub-folder by editing the URI and adding the name of the sub-folder 
+		at the end.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_uri.png" alt="Enter URI">
+		<br><br><br>
+	</li>
+
+	<li>
+		Under the <strong>Project type</strong> field, select a project type.  For the purpose of this
+		tutorial, expand <strong>Remote Makefile Project</strong> and select 
+		<strong>Empty Project</strong>.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_select_makefile_project.png" alt="Select Makefile Project">
+		<br><br><br>
+	</li>
+
+	<li>
+		At the bottom of the wizard uncheck the checkbox that says <strong>Show project types and toolchains
+		only if they are supported on the platform</strong>. If this checkbox is checked then the wizard
+		will filter out what it thinks are unsupported toolchains. Unfortunately the wizard only examines
+		the local machine for supported toolchains and does not examine the remote machine where the project
+		will be located. 
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_uncheck_toolchains.png" alt="Uncheck Toolchains">
+		<br><br><br>
+	</li>
+
+	<li>
+		Select a toolchain. A toolchain is a set of tools (such as a compiler, linker, and assembler) 
+		intended to build your project.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_select_toolchain.png" alt="Select a Toolchain">
+		<br><br><br>
+	</li>
+	
+	<li>
+		Click <strong>Next</strong>.
+	</li>
+	
+	<li>
+		The next page of the wizard allows you to select available build configurations.
+		It is not necessary to make any changes on this page because additional build 
+		configurations can be created after the project has been created.
+		Click <strong>Next</strong>.
+		<br><br>
+		<img src="../../images/new_project_wizard/wizard_page_2.png" alt="Configurations">
+		<br><br><br>
+	</li>
+
+
+	<li>
+		The next page of the wizard allows you to configure remote services associated with
+		the new remote project.  You can create a new configuration or add the new project
+		to an existing configuration.  Click on <strong>Advanced Settings</strong> to configure
+		RDT services.
+		<br><br>
+		<img src="../../images/new_project_wizard/configure_services.png" alt="Configure Remote Services">
+		<br><br><br>
+	</li>
+	
+	<li>
+		Select <strong>Code Indexing</strong> service under <strong>C/C++ Development</strong>.
+		Make sure the <strong>Enable Service</strong> checkbox is checked.  Accept the default
+		settings.
+		<br><br>
+		<img src="../../images/new_project_wizard/services_indexing.png" alt="Configure indexing service">
+		<br><br><br>
+	</li>
+	
+	<li>
+		Select <strong>Build</strong> service under <strong>C/C++ Development</strong>.
+		Make sure the <strong>Enable Service</strong> checkbox is checked.  Accept the default
+		settings.  Click <strong>OK</strong>.
+		<br><br>
+		<img src="../../images/new_project_wizard/services_build.png" alt="Configure build service">
+		<br><br><br>
+	</li>
+	
+	
+	<li>
+		Click <strong>Finish</strong>. Creating the project may take a few minutes. Once the project has been 
+		created it will appear in the <strong>Project Explorer</strong> view.
+	</li>
+
+</ol>
+<br><br><br>
+</body>
+</html>

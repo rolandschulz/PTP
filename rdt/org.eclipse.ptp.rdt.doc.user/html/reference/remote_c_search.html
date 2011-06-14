@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">		
+<html lang="en">		
+   <head>		
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">		
+	  <link rel="stylesheet" type="text/css" href="../../help.css">	
+	  <title>Remote C/C++ search</title>	
+   </head>		
+
+   <body>		
+      <h1>Remote C/C++ search</h1>		
+		<p><img alt="Search Dialog Box" src="../../images/remote_search.png"></p>
+		<p> </p>
+		<dl>
+		<dt>Search string</dt>
+		<dd>Specifies a search string.</dd>
+		<dd>The search functions support the following wildcards:</dd>
+		<ul>
+		  <dd><li>Use * to represent any series of characters</li>
+		  </dd>
+		  <dd><li>Use ? to represent any single character</li>
+		  </dd>
+		  <dd><li>Use \* to find an asterisk character (*)</li>
+		  </dd>
+		</ul>
+		<dt>Case sensitive</dt>
+		<dd>Searches will return results which match capitalization specified
+		in the search string precisely.<br>
+		&nbsp;</dd>
+		<br>
+		<dt>Search for</dt>
+		<dd>Specify the types of elements to include in the search:</dd>
+		<dd><br>
+		</dd>
+		<dd>
+		  <table cellspacing="0" border="1">
+		    <tbody>
+		      <tr>
+		        <th>Search for</th>
+		        <th>Description</th>
+		      </tr>
+		      <tr>
+		        <td><strong>Class/Struct</strong></td>
+		        <td>Includes classes and structs in your search.</td>
+		      </tr>
+		      <tr>
+		        <td><strong>Function</strong></td>
+		        <td>Searches for global functions or functions in a namespace
+		(functions that are not members of a class, struct, or union).</td>
+		      </tr>
+		      <tr>
+		        <td><strong>Variable</strong></td>
+		        <td>Searches for variables that are not members of a class,
+		struct, or union.</td>
+		      </tr>
+		      <tr>
+		        <td><strong>Union</strong></td>
+		        <td>Searches for unions.</td>
+		      </tr>
+		      <tr>
+		        <td><strong>Method</strong></td>
+		        <td>Searches for methods that are members of a class, struct,
+		or union.</td>
+		      </tr>
+		      <tr>
+		        <td><strong>Field</strong></td>
+		        <td>Searches for fields that are members of a class, struct, or
+		union.</td>
+		      </tr>
+		      <tr>
+		        <td><strong>Enumeration</strong></td>
+		        <td>Searches for enumerations.</td>
+		      </tr>
+		      <tr>
+		        <td><strong>Enumerator</strong></td>
+		        <td>Searches for enumerators.</td>
+		      </tr>
+		      <tr>
+		        <td><strong>Namespace</strong></td>
+		        <td>Searches for namespaces.</td>
+		      </tr>
+		      <tr>
+		        <td style="vertical-align: top;"><span
+		 style="font-weight: bold;">Typedef</span><br>
+		        </td>
+		        <td style="vertical-align: top;">Searches for typedef.<br>
+		        </td>
+		      </tr>
+		      <tr>
+		        <td style="vertical-align: top;"><span
+		 style="font-weight: bold;">Macro</span><br>
+		        </td>
+		        <td style="vertical-align: top;">Searches for macro.<br>
+		        </td>
+		      </tr>
+		      <tr>
+		        <td><strong>Any Element</strong></td>
+		        <td>Includes all elements in the search.</td>
+		      </tr>
+		    </tbody>
+		  </table>
+		</dd>
+		<br>
+		<dt>Limit to</dt>
+		<dd>Specify the types of context to search:</dd>
+		<dd><br>
+		</dd>
+		<dd>
+		  <table cellspacing="0" border="1">
+		    <tbody>
+		      <tr>
+		        <th>Limit to</th>
+		        <th>Description</th>
+		      </tr>
+		      <tr>
+		        <td><strong>Declarations</strong></td>
+		        <td>Limits the search to declarations.</td>
+		      </tr>
+		      <tr>
+		        <td><strong>Definitions</strong></td>
+		        <td>Limits the search to definitions (for functions, methods,
+		variables, and fields).</td>
+		      </tr>
+		      <tr>
+		        <td><strong>References</strong></td>
+		        <td>Limits the search to references.</td>
+		      </tr>
+		      <tr>
+		        <td><strong>All Occurrences</strong></td>
+		        <td>Includes declarations, definitions, and references in the
+		search.</td>
+		      </tr>
+		    </tbody>
+		  </table>
+		</dd>
+		<br>
+		<dt>Scope</dt>
+		<dd>Choose the scope of the search:</dd>
+		<dd><br>
+		</dd>
+		<dd>
+		  <table cellspacing="0" border="1">
+		    <tbody>
+		      <tr>
+		        <th>Scope</th>
+		        <th>Availability</th>
+		        <th>Description</th>
+		      </tr>
+		      <tr>
+		        <td><strong>Workspace</strong></td>
+		        <td>all elements</td>
+		        <td>Searches in the full workspace</td>
+		      </tr>
+		      <tr>
+		        <td><strong>Selected Resources</strong></td>
+		        <td>all elements</td>
+		        <td>Searches the resources selected in the <strong>Projects</strong> view</td>
+		      </tr>
+		      <tr>
+		        <td style="vertical-align: top;"><span
+		 style="font-weight: bold;">Enclosing Projects</span><br>
+		        </td>
+		        <td style="vertical-align: top;">all elements<br>
+		        </td>
+		        <td style="vertical-align: top;">Searches in the enclosing
+		projects (plus the include paths) of the selected resource <br>
+		        </td>
+		      </tr>
+		      <tr>
+		        <td><strong>Workings Set</strong></td>
+		        <td>all elements</td>
+		        <td>Searches in a working set</td>
+		      </tr>
+		    </tbody>
+		  </table>
+		</dd>
+		<br>
+		<dd>Working sets can be created and used from within the search dialog.</dd>
+		</dl>
+		<br>
+   </body>		
+</html>		
