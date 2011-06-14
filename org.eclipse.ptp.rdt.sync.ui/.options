@@ -1,7 +1,0 @@
-# Debugging options for the org.eclipse.ptp.rdt.sync.ui
-
-# Also displays overall startup time.
-org.eclipse.ptp.rdt.sync.ui/debug=false
-
-# Enables dstore server tracing
-org.eclipse.ptp.rdt.sync.ui/debug/dstore/tracing=false

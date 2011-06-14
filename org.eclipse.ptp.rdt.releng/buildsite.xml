@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<site>
-	<category-def name="RDT Features" label="RDT Features"/>
-	
-	<feature id="org.eclipse.ptp.rdt" url="features/org.eclipse.ptp.rdt_@buildVersion@.jar" version="@buildVersion@">
-		<category name="RDT Features"/>
-	</feature>
-</site>

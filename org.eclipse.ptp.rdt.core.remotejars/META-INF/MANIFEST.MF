@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Remotejars
-Bundle-SymbolicName: org.eclipse.ptp.rdt.core.remotejars
-Bundle-Version: 1.0.0.qualifier
-Require-Bundle: org.eclipse.ptp.rdt.core;bundle-version="1.1.0"
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
