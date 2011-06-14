@@ -18,7 +18,7 @@ import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.internal.rdt.sync.ui.RDTPluginImages;
+import org.eclipse.ptp.internal.rdt.sync.ui.SyncPluginImages;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
@@ -118,6 +118,6 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	 */
 	@Override
 	protected void initializeDefaultPageImageDescriptor() {
-		setDefaultPageImageDescriptor(RDTPluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
+		setDefaultPageImageDescriptor(SyncPluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
 	}
 }
