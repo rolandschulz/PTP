@@ -72,7 +72,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
-						<expression flags="DOTALL | UNIX_LINES">qsub:.+job[\s]+([\d]+[.].+)[\s]to start.*</expression>
+						<expression>qsub:.+job[\s]+([\d]+[.].+)[\s]to start[\s]*</expression>
 						<set field="name">
 							<entry valueGroup="1"/>
 						</set>
@@ -83,7 +83,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				</target>
 				<target ref="@jobId">
 					<match>
-						<expression flags="DOTALL | UNIX_LINES">qsub:[\s]+job[\s]+([\d]+[.].+)[\s]ready.*</expression>
+						<expression>qsub:[\s]+job[\s]+([\d]+[.].+)[\s]ready[\s]*</expression>
 						<set field="name">
 							<entry valueGroup="1"/>
 						</set>
@@ -94,13 +94,13 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				</target>
 				<target ref="@jobId">
 					<match>
-						<expression flags="DOTALL | UNIX_LINES">.*Job not submitted.*</expression>
+						<expression>.*Job not submitted[\s]*</expression>
 						<set field="value">
 							<entry value="FAILED"/>
 						</set>
 					</match>
 				</target>
-				<exit-after flags="DOTALL | UNIX_LINES">qsub:[\s]+job[\s]+([\d]+[.].+)[\s]ready.*</exit-after>
+				<exit-after>qsub:[\s]+job[\s]+([\d]+[.].+)[\s]ready[\s]*</exit-after>
 			</stdout-parser>
 			<stderr-parser delim="\n">
 				<target ref="@jobId">
