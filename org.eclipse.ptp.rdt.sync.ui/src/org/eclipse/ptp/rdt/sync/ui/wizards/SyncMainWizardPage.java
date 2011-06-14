@@ -19,7 +19,7 @@ import org.eclipse.cdt.ui.wizards.CDTMainWizardPage;
 import org.eclipse.cdt.ui.wizards.EntryDescriptor;
 
 public class SyncMainWizardPage extends CDTMainWizardPage {
-	private static String MAKEFILE_PROJECT_TYPE = "org.eclipse.cdt.build.makefile.projectType"; //$NON-NLS-1$
+	private static String RDT_PROJECT_TYPE = "org.eclipse.ptp.rdt"; //$NON-NLS-1$
 
 	/**
 	 * Creates a new project creation wizard page.
@@ -41,8 +41,8 @@ public class SyncMainWizardPage extends CDTMainWizardPage {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List filterItems(List items) {
 		/*
-		 * Limit visible project types to makefile projects for now. Needs to be
-		 * reviewed when managed projects are supported
+		 * Remove RDT project types as these will not work with synchronized
+		 * projects
 		 */
 		Iterator iterator = items.iterator();
 
@@ -50,8 +50,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage {
 
 		while (iterator.hasNext()) {
 			EntryDescriptor ed = (EntryDescriptor) iterator.next();
-			String pid = ed.getParentId();
-			if (ed.getId().startsWith(MAKEFILE_PROJECT_TYPE) || (pid != null && pid.startsWith(MAKEFILE_PROJECT_TYPE))) {
+			if (!ed.getId().startsWith(RDT_PROJECT_TYPE)) {
 				filteredList.add(ed);
 			}
 		}
