@@ -4,3 +4,4 @@ config.status
 config.h
 Makefile
 a.out.dSYM
+libtool
