@@ -9,7 +9,7 @@
  * IBM - Initial API and implementation
  * Roland Schulz, University of Tennessee
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.ui.wizards;
+package org.eclipse.ptp.rdt.sync.ui.fortran.wizards;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,10 +20,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.photran.internal.cdtinterface.ui.FortranProjectWizard;
-import org.eclipse.ptp.internal.rdt.sync.ui.RDTPluginImages;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
-import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
+import org.eclipse.ptp.rdt.sync.ui.fortran.PluginImages;
+import org.eclipse.ptp.rdt.sync.ui.fortran.messages.Messages;
+import org.eclipse.ptp.rdt.sync.ui.wizards.SyncMainWizardPage;
 
 /**
  * A wizard for creating new Fortran synchronized projects
@@ -114,6 +115,6 @@ public class NewFortranSyncProjectWizard extends FortranProjectWizard {
 	 */
 	@Override
 	protected void initializeDefaultPageImageDescriptor() {
-		setDefaultPageImageDescriptor(RDTPluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
+		setDefaultPageImageDescriptor(PluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
 	}
 }
