@@ -175,6 +175,9 @@ public class ManagedFilesJob extends Job {
 			File localFile = maybeWriteFile(file);
 			progress.worked(5);
 			String fileName = localFile.getName();
+			if (fileName == null || fileName.length() == 0) {
+				continue;
+			}
 			String pathSep = localTarget ? JAXBControlConstants.PATH_SEP : JAXBControlConstants.REMOTE_PATH_SEP;
 			String target = stagingDir + pathSep + fileName;
 			SubMonitor m = progress.newChild(5);

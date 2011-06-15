@@ -7,6 +7,10 @@
             configurationFile="data/demo-example.xml"
             name="Demo Example">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/tabbed-example.xml"
+            name="Working Examples">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>
