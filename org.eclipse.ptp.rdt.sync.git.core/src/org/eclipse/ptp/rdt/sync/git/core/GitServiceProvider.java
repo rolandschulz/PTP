@@ -202,9 +202,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 
 				// Add .gitignore to empty directories
-				if (delta.getResource().getType() == IResource.FOLDER && delta.getKind() == IResourceDelta.ADDED) {
+				if (delta.getResource().getType() == IResource.FOLDER && (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
 					IFile emptyFile = getProject().getFile(delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore");  //$NON-NLS-1$
-					emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+					if (!(emptyFile.exists())) {
+						emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+					}
 				}
 				
 				return true;
