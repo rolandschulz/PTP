@@ -1,5 +1,4 @@
+SUBDIRS = common libsci scid scia usecase
 if OPEN_SSL
-    SUBDIRS=secmod common libsci scid scia
-else
-    SUBDIRS=common libsci scid scia
+    SUBDIRS += secmod
 endif
