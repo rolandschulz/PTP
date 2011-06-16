@@ -27,34 +27,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
  */
 public class ArgImpl {
 
-	private final String uuid;
-	private final ArgType arg;
-	private final IVariableMap map;
-
-	/**
-	 * @param uuid
-	 *            unique id associated with this resource manager operation (can
-	 *            be <code>null</code>).
-	 * @param arg
-	 *            JAXB data element.
-	 * @param map
-	 *            environment in which to resolve content of the arg
-	 */
-	public ArgImpl(String uuid, ArgType arg, IVariableMap map) {
-		this.uuid = uuid;
-		this.arg = arg;
-		this.map = map;
-	}
-
-	/**
-	 * Will not return <code>null</code>.
-	 * 
-	 * @return argument resolved in the provided environment
-	 */
-	public String getResolved() {
-		return getResolved(uuid, arg, map);
-	}
-
 	/**
 	 * Auxiliary iterator.
 	 * 
@@ -127,17 +99,45 @@ public class ArgImpl {
 			return arg.getContent();
 		}
 		String dereferenced = map.getString(uuid, arg.getContent());
-		if (dereferenced != null) {
-			dereferenced = dereferenced.trim();
-		}
 		String undefined = arg.getIsUndefinedIfMatches();
-		if (undefined != null) {
+		if (undefined != null && dereferenced != null) {
+			dereferenced = dereferenced.trim();
 			undefined = undefined.trim();
 			undefined = map.getString(uuid, undefined);
-			if (dereferenced != null && dereferenced.matches(undefined)) {
+			if (dereferenced.matches(undefined)) {
 				return JAXBCoreConstants.ZEROSTR;
 			}
 		}
 		return dereferenced;
+	}
+
+	private final String uuid;
+
+	private final ArgType arg;
+
+	private final IVariableMap map;
+
+	/**
+	 * @param uuid
+	 *            unique id associated with this resource manager operation (can
+	 *            be <code>null</code>).
+	 * @param arg
+	 *            JAXB data element.
+	 * @param map
+	 *            environment in which to resolve content of the arg
+	 */
+	public ArgImpl(String uuid, ArgType arg, IVariableMap map) {
+		this.uuid = uuid;
+		this.arg = arg;
+		this.map = map;
+	}
+
+	/**
+	 * Will not return <code>null</code>.
+	 * 
+	 * @return argument resolved in the provided environment
+	 */
+	public String getResolved() {
+		return getResolved(uuid, arg, map);
 	}
 }
