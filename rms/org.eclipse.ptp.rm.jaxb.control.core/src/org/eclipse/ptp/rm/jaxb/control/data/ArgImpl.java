@@ -101,10 +101,10 @@ public class ArgImpl {
 		String dereferenced = map.getString(uuid, arg.getContent());
 		String undefined = arg.getIsUndefinedIfMatches();
 		if (undefined != null && dereferenced != null) {
-			dereferenced = dereferenced.trim();
-			undefined = undefined.trim();
-			undefined = map.getString(uuid, undefined);
-			if (dereferenced.matches(undefined)) {
+			String dtrim = dereferenced.trim();
+			String utrim = undefined.trim();
+			utrim = map.getString(uuid, utrim);
+			if (dtrim.matches(utrim)) {
 				return JAXBCoreConstants.ZEROSTR;
 			}
 		}
