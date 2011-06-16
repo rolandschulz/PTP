@@ -28,8 +28,6 @@
 #include <unistd.h>
 #include "sci.h"
 
-extern "C" {
-
 int filter_initialize(void **user_param)
 {
     // do nothing
@@ -65,6 +63,4 @@ int filter_input(void *user_param, sci_group_t group, void *buf, int size)
     } 
 
     return SCI_SUCCESS;
-}
-
 }

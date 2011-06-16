@@ -90,7 +90,7 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    ::gethostname(hostname, sizeof(hostname));
+    gethostname(hostname, sizeof(hostname));
 
     be.id = num_bes;
     be.hostname = hostname;
