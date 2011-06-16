@@ -22,8 +22,9 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
+import org.eclipse.ptp.rdt.sync.git.core.GitRemoteSyncConnection;
 import org.eclipse.ptp.rdt.sync.git.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.SyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -281,12 +282,13 @@ public class GitParticipant implements ISynchronizeParticipant {
 	public ISyncServiceProvider getProvider(IProject project) {
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		GitServiceProvider provider = (GitServiceProvider) smm.getServiceProvider(syncService
-				.getProviderDescriptor(GitServiceProvider.ID));
+		SyncServiceProvider provider = (SyncServiceProvider) smm.getServiceProvider(syncService
+				.getProviderDescriptor(SyncServiceProvider.ID));
 		provider.setLocation(fLocationText.getText());
 		provider.setRemoteConnection(fSelectedConnection);
 		provider.setRemoteServices(fSelectedProvider);
 		provider.setProject(project);
+		provider.setClassType(GitRemoteSyncConnection.class);
 		return provider;
 	}
 

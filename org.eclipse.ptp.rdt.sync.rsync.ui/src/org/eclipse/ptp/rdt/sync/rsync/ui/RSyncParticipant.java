@@ -37,7 +37,8 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
-import org.eclipse.ptp.rdt.sync.rsync.core.RSyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.SyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.rsync.core.RsyncRemoteSyncConnection;
 import org.eclipse.ptp.rdt.sync.rsync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -516,12 +517,13 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	public ISyncServiceProvider getProvider(IProject project) {
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		RSyncServiceProvider provider = (RSyncServiceProvider) smm.getServiceProvider(syncService
-				.getProviderDescriptor(RSyncServiceProvider.ID));
+		SyncServiceProvider provider = (SyncServiceProvider) smm.getServiceProvider(syncService
+				.getProviderDescriptor(SyncServiceProvider.ID));
 		provider.setLocation(fLocationText.getText());
 		provider.setRemoteConnection(fSelectedConnection);
 		provider.setRemoteServices(fSelectedProvider);
 		provider.setProject(project);
+		provider.setClassType(RsyncRemoteSyncConnection.class);
 		return provider;
 	}
 
