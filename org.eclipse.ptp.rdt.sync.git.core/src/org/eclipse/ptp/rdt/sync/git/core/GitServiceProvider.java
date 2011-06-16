@@ -376,7 +376,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 		private boolean isBinaryFile(String fileName) {
 			try {
-				int resType = CoreModel.getDefault().create(getProject().getFile(fileName)).getElementType();
+				ICElement fileElement = CoreModel.getDefault().create(getProject().getFile(fileName));
+				if (fileElement == null) {
+					return false;
+				}
+				int resType = fileElement.getElementType();
 				if (resType == ICElement.C_BINARY) {
 					return true;
 				} else {
