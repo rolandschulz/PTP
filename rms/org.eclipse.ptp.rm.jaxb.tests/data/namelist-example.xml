@@ -1,0 +1,1043 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- ****************************************************************************** -->
+<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="resource_manager_type.xsd" name="demo-example">
+	<control-data>
+		<!-- this is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
+		<property name="control.queue.name" visible="false">
+			<link-value-to>destination</link-value-to>
+		</property>
+		<!-- we set this to invisible because the values are not really modifiable -->
+		<property name="queues" visible="false"/>
+		<!-- needed by RM internals for fetch; name is fixed by convention -->
+		<property name="stdout_remote_path" visible="false">
+			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o${ptp_rm:@jobId#default}</default>
+			<link-value-to>Output_Path</link-value-to>
+		</property>
+		<!-- needed by RM internals for fetch; name is fixed by convention -->
+		<property name="stderr_remote_path" visible="false">
+			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
+			<link-value-to>Error_Path</link-value-to>
+		</property>
+
+		<attribute name="mpiCommand" type="string">
+			<description>Which mpi command to use.</description>
+		</attribute>
+		<attribute name="mpiCores" min="1" type="integer">
+			<description>the '-np' value</description>
+		</attribute>
+		<attribute name="destination" type="string">
+			<description>Designation of the queue to which to submit the job.</description>
+			<tooltip>Format: queue[@server].</tooltip>
+		</attribute>
+		<attribute name="Error_Path" type="string">
+			<description>The final path name for the file containing the job's standard error stream.</description>
+			<tooltip><![CDATA[Format: "[hostname:]pathname". If 
+the option is not specified, the default file name for the 
+standard error stream will be used. The default name has 
+the following form: job_name.eSeq_num where job_name is 
+the name of the job, see -N option, and Seq_num
+is the job number assigned when the job is submitted; 
+default value: (job_name).e(job_number).]]></tooltip>
+		</attribute>
+		<attribute name="Job_Name" type="string">
+			<description>The name assigned to the job by the qsub or qalter command.</description>
+			<tooltip><![CDATA[Format: string up to 15 characters, 
+first character must be alphabetic; default value: 
+the base name of the job script or STDIN.]]></tooltip>
+			<default>ptp_job</default>
+			<validator>
+				<regex expression="[a-zA-Z_][0-9a-zA-Z_]*"/>
+				<error-message>must be at least one alphanumeric character</error-message>
+			</validator>
+		</attribute>
+		<attribute name="Output_Path" type="string">
+			<description>The final path name for the file containing the job's standard output stream.</description>
+			<tooltip><![CDATA[Format: "[hostname:]pathname". If the option
+is not specified, the default file name for the standard error stream 
+will be used. The default name has the following form: job_name.oSeq_num
+where job_name is the name of the job, see -N option, and Seq_num
+is the job number assigned when the job is submitted; 
+default value: (job_name).o(job_number).]]></tooltip>
+		</attribute>
+		<attribute name="Resource_List.mem" type="string">
+			<description>Maximum amount of memory used by all concurrent processes in the job.</description>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier 
+in bytes or words (word size of the host): b (bytes), 
+w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
+		</attribute>
+		<attribute name="Resource_List.nodes" type="string">
+			<description>Number and/or type of nodes to be reserved for exclusive use by the job.</description>
+			<tooltip><![CDATA[The value is one or more node_specs joined with 
+the '+' character, "node_spec[+node_spec...]. Each node_spec is
+a number of nodes required of the type declared in the node_spec
+and a name or one or more properity or properities desired for 
+the nodes. The number, the name, and each properity in the 
+node_spec are separated by a colon ':'. If no number is specified, 
+one (1) is assumed. Units: string. The name of a node is its 
+hostname. The properties of nodes are: ppn=# requested; defaults 
+to 1; or an arbitrary string defined by system administrator. 
+Example: To ask for 2 processors on each of two blue nodes and 
+three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
+			<default>1</default>
+		</attribute>
+		<attribute name="Resource_List.walltime" type="string">
+			<description>Maximum amount of real time during which the job can be in the running state.</description>
+			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
+			<default>00:30:00</default>
+			<validator>
+				<regex expression="\d\d:\d\d:\d\d"/>
+				<error-message>format must be hh:mm:ss</error-message>
+			</validator>
+		</attribute>
+
+		<!--RUN PARAMETERS -->
+		<attribute name="runname" type="string">
+			<description>Name of run (Used for filenames)</description>
+			<default>cloud2d</default>
+			<validator>
+				<regex expression="[\w\d]+"/>
+				<error-message>value cannot be empty</error-message>
+			</validator>
+		</attribute>
+		<attribute name="runlabel" type="string">
+			<description>Plotting label of run </description>
+			<default>cloud2d</default>
+			<validator>
+				<regex expression="[\w\d]+"/>
+				<error-message>value cannot be empty</error-message>
+			</validator>
+		</attribute>
+		<attribute name="simtime" type="string">
+			<description>Simulation time</description>
+			<default>7200</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="dt" type="string">
+			<description>Time step in seconds</description>
+			<default>10</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="nsmall" type="string">
+			<description>No. of small time steps (must be 6,12,18..)</description>
+			<default>12</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="nx" type="string">
+			<description>No. of grid cells in r + 1</description>
+			<default>181</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="nz" type="string">
+			<description>No. of grid cells in z + 1</description>
+			<default>36</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="xdomain" type="string">
+			<description>Length of domain in meters</description>
+			<default>180000</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="zdomain" type="string">
+			<description>Height of domain in meters</description>
+			<default>17500</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="ugrid" type="string">
+			<description>U-grid motion in m/s</description>
+			<default>14</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+
+		<!--OUTPUT PARAMETERS -->
+		<attribute name="tprint" type="string">
+			<description>Printing interval</description>
+			<default>100</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="tplot" type="string">
+			<description>Plotting interval</description>
+			<default>300</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="tsave" type="string">
+			<description>History dump interval</description>
+			<default>600</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+
+		<!--INITIALIZATION PARAMETERS -->
+		<attribute name="tbble" type="string">
+			<description>Perturbation theta for bubble</description>
+			<default>-15</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="xrad" type="string">
+			<description>X-radius of bubble</description>
+			<default>4000</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="zrad" type="string">
+			<description>Z-radius of bubble</description>
+			<default>2000</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="xcntr" type="string">
+			<description>X-center of bubble</description>
+			<default>18000</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="zcntr" type="string">
+			<description>Z-center of bubble</description>
+			<default>3000</default>
+			<validator>
+				<regex expression="[-\d]+"/>
+				<error-message>value must be an integer</error-message>
+			</validator>
+		</attribute>
+		<attribute name="sndtype" type="string">
+			<description>SND_TYPE = [0,1,2] :: [dry adiabatic,Weisman snd,WK+shear]</description>
+			<default>0</default>
+			<validator>
+				<regex expression="[012]"/>
+				<error-message>value must be 0, 1 or 2</error-message>
+			</validator>
+		</attribute>
+		<attribute name="inittype" type="string">
+			<description>INIT_TYPE = [0,1] :: [workshop bble, cloud bble]</description>
+			<default>0</default>
+			<validator>
+				<regex expression="[01]"/>
+				<error-message>value must be 0 or 1</error-message>
+			</validator>
+		</attribute>
+		<managed-files>
+			<file-staging-location>input</file-staging-location>
+			<file name="namelist.input">
+				<line>
+					<arg>&amp;run</arg>
+				</line>
+				<line>
+					<arg> runname = '${ptp_rm:runname#value}',</arg>
+				</line>
+				<line>
+					<arg> runlabel = '${ptp_rm:runlabel#value}',</arg>
+				</line>
+				<line>
+					<arg> simtime = ${ptp_rm:simtime#value}.,</arg>
+				</line>
+				<line>
+					<arg> dt = ${ptp_rm:dt#value}.,</arg>
+				</line>
+				<line>
+					<arg> nsmall = ${ptp_rm:nsmall#value}.,</arg>
+				</line>
+				<line>
+					<arg> nx = ${ptp_rm:nx#value}.,</arg>
+				</line>
+				<line>
+					<arg> nz = ${ptp_rm:nz#value}.,</arg>
+				</line>
+				<line>
+					<arg> xdomain = ${ptp_rm:xdomain#value}.,</arg>
+				</line>
+				<line>
+					<arg> zdomain = ${ptp_rm:zdomain#value}.,</arg>
+				</line>
+				<line>
+					<arg> ugrid = ${ptp_rm:ugrid#value}.,</arg>
+				</line>
+				<line>
+					<arg>&amp;end</arg>
+				</line>
+				<line>
+					<arg>c</arg>
+				</line>
+				<line>
+					<arg>&amp;dump</arg>
+				</line>
+				<line>
+					<arg> tprint = ${ptp_rm:tprint#value}.,</arg>
+				</line>
+				<line>
+					<arg> tplot = ${ptp_rm:tplot#value}.,</arg>
+				</line>
+				<line>
+					<arg> tsave = ${ptp_rm:tsave#value}.,</arg>
+				</line>
+				<line>
+					<arg>&amp;end</arg>
+				</line>
+				<line>
+					<arg>c</arg>
+				</line>
+				<line>
+					<arg>&amp;init_params</arg>
+				</line>
+				<line>
+					<arg> tbble = ${ptp_rm:tbble#value}.,</arg>
+				</line>
+				<line>
+					<arg> xcntr = ${ptp_rm:xcntr#value}.,</arg>
+				</line>
+				<line>
+					<arg> zcntr = ${ptp_rm:zcntr#value}.,</arg>
+				</line>
+				<line>
+					<arg> xrad = ${ptp_rm:xrad#value}.,</arg>
+				</line>
+				<line>
+					<arg> zrad = ${ptp_rm:zrad#value}.,</arg>
+				</line>
+				<line>
+					<arg> sndtype = ${ptp_rm:sndtype#value},</arg>
+				</line>
+				<line>
+					<arg> inittype = ${ptp_rm:inittype#value},</arg>
+				</line>
+				<line>
+					<arg>&amp;end</arg>
+				</line>
+
+			</file>
+		</managed-files>
+		<script>
+			<line>
+				<arg>#!/bin/bash</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#PBS -q">#PBS -q ${ptp_rm:destination#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#PBS -e">#PBS -e ${ptp_rm:Error_Path#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#PBS -N">#PBS -N ${ptp_rm:Job_Name#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#PBS -o">#PBS -o ${ptp_rm:Output_Path#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#PBS -l mem=">#PBS -l mem=${ptp_rm:Resource_List.mem#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#PBS -l nodes=">#PBS -l nodes=${ptp_rm:Resource_List.nodes#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#PBS -l walltime=">#PBS -l walltime=${ptp_rm:Resource_List.walltime#value}</arg>
+			</line>
+			<line>
+				<arg>#PBS -V</arg>
+			</line>
+			<line>
+				<arg>MPI_ARGS="-np ${ptp_rm:mpiCores#value}"</arg>
+			</line>
+			<line>
+				<arg resolve="false">if [ "-np" == "${MPI_ARGS}" ] ; then</arg>
+			</line>
+			<line>
+				<arg resolve="false"> MPI_ARGS=</arg>
+			</line>
+			<line>
+				<arg resolve="false">fi</arg>
+			</line>
+			<line>
+				<arg>COMMAND=${ptp_rm:mpiCommand#value}</arg>
+			</line>
+			<line>
+				<arg resolve="false">if [ -n "${COMMAND}" ] ; then</arg>
+			</line>
+			<line>
+				<arg resolve="false"> COMMAND="${COMMAND} ${MPI_ARGS}</arg>
+				<arg>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</arg>
+				<arg resolve="false">${INPUT}"</arg>
+			</line>
+			<line>
+				<arg resolve="false">else</arg>
+			</line>
+			<line>
+				<arg> COMMAND="${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</arg>
+				<arg resolve="false">${INPUT}"</arg>
+			</line>
+			<line>
+				<arg resolve="false">fi</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="cd">cd ${ptp_rm:directory#value}</arg>
+			</line>
+			<line>
+				<arg resolve="false">${COMMAND}</arg>
+			</line>
+		</script>
+		<start-up-command name="get-queues">
+			<arg>qstat</arg>
+			<arg>-Q</arg>
+			<arg>-f</arg>
+			<stdout-parser delim="\n">
+				<target ref="queues">
+					<match>
+						<expression>Queue: ([\w\d]+)</expression>
+						<add field="value">
+							<entry valueGroup="1"/>
+						</add>
+					</match>
+				</target>
+			</stdout-parser>
+		</start-up-command>
+		<submit-batch name="submit-batch" waitForId="true">
+			<arg>qsub</arg>
+			<arg>${ptp_rm:managed_file_for_script#value}</arg>
+			<environment name="INPUT">
+				<arg isUndefinedIfMatches="-f">-f ${ptp_rm:namelist.input#value}</arg>
+			</environment>
+			<stdout-parser delim="\n" all="true" save="1">
+				<target ref="@jobId">
+					<match>
+						<expression>([\d]+)([.])(.+)[\s]+.*</expression>
+						<append field="name">
+							<entry valueGroup="1"/>
+							<entry valueGroup="2"/>
+							<entry valueGroup="3"/>
+						</append>
+						<set field="default">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="value">
+							<entry value="SUBMITTED"/>
+						</set>
+					</match>
+					<match>
+						<expression>([\d]+)[.].+</expression>
+						<set field="name">
+							<entry valueGroup="0"/>
+						</set>
+						<set field="default">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="value">
+							<entry value="SUBMITTED"/>
+						</set>
+					</match>
+				</target>
+				<target ref="@jobId">
+					<match>
+						<expression flags="DOTALL">.*Job not submitted.*</expression>
+						<set field="value">
+							<entry value="FAILED"/>
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>.*Job not submitted.*</expression>
+						<throw message="Job Submit Failed"/>
+					</match>
+				</target>
+			</stderr-parser>
+		</submit-batch>
+		<get-job-status name="get-job-status" ignoreExitStatus="true">
+			<arg>qstat</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>[\d]+[.].+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
+						<set field="value">
+							<entry valueGroup="1"/>
+						</set>
+					</match>
+					<test op="EQ">
+						<value>#value</value>
+						<value>Q</value>
+						<set field="value">
+							<entry value="QUEUED_ACTIVE"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>R</value>
+						<set field="value">
+							<entry value="RUNNING"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>S</value>
+						<set field="value">
+							<entry value="SUSPENDED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>C</value>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>E</value>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>H</value>
+						<set field="value">
+							<entry value="SYSTEM_ON_HOLD"/>
+						</set>
+					</test>
+				</target>
+			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>.+</expression>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</match>
+				</target>
+			</stderr-parser>
+		</get-job-status>
+		<terminate-job name="cancel" ignoreExitStatus="true">
+			<arg>qdel</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+		</terminate-job>
+		<launch-tab>
+			<dynamic includeWidgetValuesFrom="Input">
+				<title>Job</title>
+				<composite>
+					<layout>
+						<fill-layout type="SWT.HORIZONTAL"/>
+					</layout>
+					<composite group="true">
+						<layout>
+							<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+						</layout>
+						<!-- row 1 -->
+						<widget type="label" style="SWT.LEFT">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							</layout-data>
+							<tooltip>${ptp_rm:Job_Name#tooltip}</tooltip>
+							<fixed-text>Job Name: </fixed-text>
+						</widget>
+						<widget type="text" style="SWT.BORDER" saveValueTo="Job_Name">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+							</layout-data>
+						</widget>
+						<!-- row 2 -->
+						<widget type="label" style="SWT.LEFT">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							</layout-data>
+							<tooltip>${ptp_rm:destination#tooltip}</tooltip>
+							<fixed-text>Queue: </fixed-text>
+						</widget>
+						<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
+							</layout-data>
+							<items-from>queues</items-from>
+						</widget>
+						<!-- row 3 -->
+						<widget type="label" style="SWT.LEFT">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							</layout-data>
+							<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
+							<fixed-text>Wallclock Time: </fixed-text>
+						</widget>
+						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+							</layout-data>
+						</widget>
+						<!-- row 4 -->
+						<widget type="label" style="SWT.LEFT">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							</layout-data>
+							<tooltip>${ptp_rm:Resource_List.nodes#tooltip}</tooltip>
+							<fixed-text>Number of nodes: </fixed-text>
+						</widget>
+						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.nodes">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+							</layout-data>
+						</widget>
+						<!-- row 5 -->
+						<widget type="label" style="SWT.LEFT">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							</layout-data>
+							<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
+							<fixed-text>Total Memory Needed: </fixed-text>
+						</widget>
+						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+							</layout-data>
+						</widget>
+					</composite>
+					<composite group="true">
+						<layout>
+							<grid-layout numColumns="2" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+						</layout>
+						<!-- row 1 -->
+						<widget type="label" style="SWT.LEFT">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							</layout-data>
+							<fixed-text>MPI Command: </fixed-text>
+						</widget>
+						<button-group saveValueTo="mpiCommand" group="true">
+							<layout>
+								<row-layout type="SWT.HORIZONTAL" center="true" fill="true" justify="true"/>
+							</layout>
+							<button type="radiobutton" title=""/>
+							<button type="radiobutton" title="mpiexec"/>
+							<button type="radiobutton" title="mpirun"/>
+						</button-group>
+						<!-- row 2 -->
+						<widget type="label" style="SWT.LEFT">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							</layout-data>
+							<fixed-text>MPI Number of Cores: </fixed-text>
+						</widget>
+						<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="1" grabExcessHorizontal="false" widthHint="100"/>
+							</layout-data>
+						</widget>
+					</composite>
+				</composite>
+			</dynamic>
+			<dynamic includeWidgetValuesFrom="Job">
+			   <title>Input</title>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<title>Run Parameters</title>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>runname:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="runname">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:runname#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>runlabel:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="runlabel">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:runlabel#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>simtime:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="simtime">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:simtime#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>dt:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="dt">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:dt#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>nsmall:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="nsmall">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:nsmall#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>nx:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="nx">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:nx#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>nz:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="nz">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:nz#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>xdomain:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="xdomain">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:xdomain#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>zdomain:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="zdomain">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:zdomain#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>ugrid:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="ugrid">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:ugrid#description}</fixed-text>
+					</widget>
+				</composite>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<title>Output Parameters</title>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>tprint:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="tprint">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:tprint#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>tplot:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="tplot">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:tplot#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>tsave:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="tsave">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:tsave#description}</fixed-text>
+					</widget>
+				</composite>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<title>Initialization Parameters</title>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>tbble:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="tbble">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:tbble#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>xcntr:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="xcntr">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:xcntr#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>zcntr:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="zcntr">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:zcntr#description}</fixed-text>
+					</widget>
+					    <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>xrad:</fixed-text>
+               </widget>
+               <widget type="text" style="SWT.BORDER" saveValueTo="xrad">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>${ptp_rm:xrad#description}</fixed-text>
+               </widget>
+                     <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>zrad:</fixed-text>
+               </widget>
+               <widget type="text" style="SWT.BORDER" saveValueTo="zrad">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>${ptp_rm:zrad#description}</fixed-text>
+               </widget>
+                     <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>sndtype:</fixed-text>
+               </widget>
+               <widget type="text" style="SWT.BORDER" saveValueTo="sndtype">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>${ptp_rm:sndtype#description}</fixed-text>
+               </widget>
+                     <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>inittype:</fixed-text>
+               </widget>
+               <widget type="text" style="SWT.BORDER" saveValueTo="inittype">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>${ptp_rm:inittype#description}</fixed-text>
+               </widget>
+				</composite>
+			</dynamic>
+		</launch-tab>
+	</control-data>
+	<monitor-data schedulerType="PBS">
+		<driver>
+			<name></name>
+		</driver>
+	</monitor-data>
+</resource-manager-builder>

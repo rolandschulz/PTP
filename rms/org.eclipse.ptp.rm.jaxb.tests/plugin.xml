@@ -11,6 +11,10 @@
             configurationFile="data/tabbed-example.xml"
             name="Working Examples">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/namelist-example.xml"
+            name="Namelist Example">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>

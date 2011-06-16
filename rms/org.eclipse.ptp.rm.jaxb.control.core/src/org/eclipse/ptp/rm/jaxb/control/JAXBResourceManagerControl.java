@@ -498,14 +498,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		boolean delScript = maybeHandleScript(uuid, controlData.getScript());
 		worked(progress, 20);
 
-		ManagedFilesType files = controlData.getManagedFiles();
+		List<ManagedFilesType> files = controlData.getManagedFiles();
 
 		/*
 		 * if the script is to be staged, a managed file pointing to either its
-		 * as its content (${ptp_rm:script#value}), or to its path (SCRIPT_PATH)
-		 * must exist.
+		 * content (${ptp_rm:script#value}), or to its path (SCRIPT_PATH) must
+		 * exist.
 		 */
-		files = maybeAddManagedFileForScript(files, delScript);
+		maybeAddManagedFileForScript(files, delScript);
 		worked(progress, 5);
 
 		if (!maybeTransferManagedFiles(uuid, files)) {
@@ -757,19 +757,27 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * script path. In either case, either replaces contents of the
 	 * corresponding managed file object or creates one.
 	 * 
-	 * @param files
-	 *            the set of managed files for this submission
+	 * @param lists
+	 *            the lists of managed files for this submission
 	 * @param delete
 	 *            whether the script target should be deleted after submission
-	 * @return the set of managed files, possibly with the script file added
 	 */
-	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files, boolean delete) {
+	private void maybeAddManagedFileForScript(List<ManagedFilesType> lists, boolean delete) {
+		ManagedFilesType files = null;
+		for (ManagedFilesType f : lists) {
+			if (JAXBControlConstants.ECLIPSESETTINGS.equals(f.getFileStagingLocation())) {
+				files = f;
+				break;
+			}
+		}
+
 		PropertyType scriptVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT);
 		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
 				files.setFileStagingLocation(JAXBControlConstants.ECLIPSESETTINGS);
+				lists.add(files);
 			}
 			List<ManagedFileType> fileList = files.getFile();
 			ManagedFileType scriptFile = null;
@@ -798,26 +806,30 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 			scriptFile.setDeleteTargetAfterUse(delete);
 		}
-		return files;
 	}
 
 	/**
 	 * Looks for cleanup flag and removes the remote file if indicated.
 	 * 
 	 * @param uuid
-	 * @param files
+	 * @param lists
 	 * @throws CoreException
 	 */
-	private void maybeCleanupManagedFiles(String uuid, ManagedFilesType files) throws CoreException {
-		if (files == null || files.getFile().isEmpty()) {
+	private void maybeCleanupManagedFiles(String uuid, List<ManagedFilesType> lists) throws CoreException {
+		if (lists == null || lists.isEmpty()) {
 			return;
 		}
-		ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
-		job.setOperation(Operation.DELETE);
-		job.schedule();
-		try {
-			job.join();
-		} catch (InterruptedException ignored) {
+		for (ManagedFilesType files : lists) {
+			if (files.getFile().isEmpty()) {
+				continue;
+			}
+			ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
+			job.setOperation(Operation.DELETE);
+			job.schedule();
+			try {
+				job.join();
+			} catch (InterruptedException ignored) {
+			}
 		}
 	}
 
@@ -871,23 +883,34 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * 
 	 * @param uuid
 	 *            temporary internal id for as yet unsubmitted job
-	 * @param files
+	 * @param lists
 	 *            the set of managed files for this submission
 	 * @return whether the necessary staging completed without error
 	 * @throws CoreException
 	 */
-	private boolean maybeTransferManagedFiles(String uuid, ManagedFilesType files) throws CoreException {
-		if (files == null || files.getFile().isEmpty()) {
+	private boolean maybeTransferManagedFiles(String uuid, List<ManagedFilesType> lists) throws CoreException {
+		if (lists == null || lists.isEmpty()) {
 			return true;
 		}
-		ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
-		job.setOperation(Operation.COPY);
-		job.schedule();
-		try {
-			job.join();
-		} catch (InterruptedException ignored) {
+		/*
+		 * one job to a staging location
+		 */
+		for (ManagedFilesType files : lists) {
+			if (files.getFile().isEmpty()) {
+				continue;
+			}
+			ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
+			job.setOperation(Operation.COPY);
+			job.schedule();
+			try {
+				job.join();
+			} catch (InterruptedException ignored) {
+			}
+			if (!job.getSuccess()) {
+				return false;
+			}
 		}
-		return job.getSuccess();
+		return true;
 	}
 
 	/**

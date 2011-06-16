@@ -221,7 +221,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 				System.out.println(contents.getValue());
 			}
 		}
-		ManagedFilesType files = controlData.getManagedFiles();
+		ManagedFilesType files = controlData.getManagedFiles().get(0);
 		files = maybeAddManagedFileForScript(files);
 		assertNotNull(files);
 		try {

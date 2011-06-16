@@ -66,7 +66,7 @@
 		<xs:sequence>
 			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property-type"/>
 			<xs:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="rm:attribute-type"/>
-			<xs:element name="managed-files" minOccurs="0" type="rm:managed-files-type"/>
+			<xs:element name="managed-files" minOccurs="0" maxOccurs="unbounded" type="rm:managed-files-type"/>
 			<xs:element name="script" minOccurs="0" type="rm:script-type"/>
 			<xs:element name="start-up-command" minOccurs="0" maxOccurs="unbounded" type="rm:command-type">
 				<xs:annotation>
@@ -370,11 +370,16 @@
 	<xs:complexType name="managed-file-type">
 		<xs:annotation>
 			<xs:documentation>
-				If 'contents' is present, the file is written.
+				If 'contents' or 'line' (s) are present, the file is written.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:choice>
+			<xs:sequence>
+				<xs:element name="line" maxOccurs="unbounded" type="rm:line-type"/>
+			</xs:sequence>
+			<!-- use only as a reference to a property or attribute -->
 			<xs:element name="contents" type="xs:string"/>
+			<!-- external pre-existent local file -->
 			<xs:element name="path" type="xs:string"/>
 		</xs:choice>
 		<xs:attribute name="name" use="required"/>

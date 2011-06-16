@@ -10,7 +10,6 @@
 package org.eclipse.ptp.rm.jaxb.control.internal.runnable;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -30,10 +29,12 @@ import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.control.internal.data.LineImpl;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.LineType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
@@ -236,7 +237,8 @@ public class ManagedFilesJob extends Job {
 	 * VariableResolver can be bypassed by setting <code>resolveContents</code>
 	 * to false; this avoids recursive resolution which might falsely interpret
 	 * shell symbols (${...}) as referring to the Eclipse default string
-	 * resolver.
+	 * resolver. Otherwise, the &lt;line&gt; arguments are processed as in the
+	 * script.
 	 * 
 	 * @param file
 	 *            JAXB data element
@@ -260,41 +262,46 @@ public class ManagedFilesJob extends Job {
 		File sourceDir = new File(System.getProperty(JAXBControlConstants.JAVA_TMP_DIR));
 		File localFile = new File(sourceDir, name);
 		String contents = file.getContents();
+		List<LineType> lines = file.getLine();
 		FileWriter fw = null;
 		try {
-			if (contents == null) {
-				if (!localFile.exists() || !localFile.isFile()) {
-					throw new FileNotFoundException(localFile.getAbsolutePath());
-				}
-			} else {
-				if (file.isResolveContents()) {
-					contents = rmVarMap.getString(uuid, contents);
-				} else {
-					/*
-					 * magic to avoid attempted resolution of unknown shell
-					 * variables
-					 */
-					int start = contents.indexOf(JAXBControlConstants.OPENVRM);
-					int end = contents.length();
-					if (start >= 0) {
-						start += JAXBControlConstants.OPENVRM.length();
-						end = contents.indexOf(JAXBControlConstants.PD);
-						if (end < 0) {
-							end = contents.indexOf(JAXBControlConstants.CLOSV);
-						}
-						String key = contents.substring(start, end);
-						Object o = rmVarMap.get(key);
-						if (o instanceof PropertyType) {
-							contents = String.valueOf(((PropertyType) o).getValue());
-						} else if (o instanceof AttributeType) {
-							contents = String.valueOf(((AttributeType) o).getValue());
-						}
+			if (!lines.isEmpty()) {
+				StringBuffer buffer = new StringBuffer();
+				String s = null;
+				for (LineType line : lines) {
+					s = new LineImpl(uuid, line, rmVarMap).getResolved();
+					if (!JAXBControlConstants.ZEROSTR.equals(s)) {
+						buffer.append(s).append(JAXBControlConstants.REMOTE_LINE_SEP);
 					}
 				}
-				fw = new FileWriter(localFile, false);
-				fw.write(contents);
-				fw.flush();
+				contents = buffer.toString();
+			} else if (file.isResolveContents()) {
+				contents = rmVarMap.getString(uuid, contents);
+			} else {
+				/*
+				 * magic to avoid attempted resolution of unknown shell
+				 * variables
+				 */
+				int start = contents.indexOf(JAXBControlConstants.OPENVRM);
+				int end = contents.length();
+				if (start >= 0) {
+					start += JAXBControlConstants.OPENVRM.length();
+					end = contents.indexOf(JAXBControlConstants.PD);
+					if (end < 0) {
+						end = contents.indexOf(JAXBControlConstants.CLOSV);
+					}
+					String key = contents.substring(start, end);
+					Object o = rmVarMap.get(key);
+					if (o instanceof PropertyType) {
+						contents = String.valueOf(((PropertyType) o).getValue());
+					} else if (o instanceof AttributeType) {
+						contents = String.valueOf(((AttributeType) o).getValue());
+					}
+				}
 			}
+			fw = new FileWriter(localFile, false);
+			fw.write(contents);
+			fw.flush();
 		} finally {
 			try {
 				if (fw != null) {
