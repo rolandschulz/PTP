@@ -404,3 +404,9 @@ ChangeLog:
    - bug fixes:	
       - generates now no data cells for not active columns
       - LL-drives handles now job status correctly
+
+1.09:
+   - LML_da_driver manages now a permanent directory (./perm) 
+   - persistent color management
+     - color db will be stored in a file in the perm-directory
+   - first driver for PBSpro controlled systems

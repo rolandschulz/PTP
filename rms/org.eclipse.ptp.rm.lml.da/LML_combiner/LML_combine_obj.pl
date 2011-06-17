@@ -73,11 +73,13 @@ foreach $filename (@filenames) {
 
 # determine system type
 my $system_type = "unknown";
+my $system_type_ref;
 {
+    keys(%{$filehandler->{DATA}->{OBJECT}}); # reset iterator
     my($key,$ref);
     while(($key,$ref)=each(%{$filehandler->{DATA}->{OBJECT}})) {
 	if($ref->{type} eq 'system') {
-	    $ref=$filehandler->{DATA}->{INFODATA}->{$key};
+	    $system_type_ref=$ref=$filehandler->{DATA}->{INFODATA}->{$key};
 	    if($ref->{type}) {
 		$system_type=$ref->{type};
 		printf("scan system: type is %s\n",$system_type);
@@ -92,6 +94,24 @@ if($system_type eq "BG/P") {
     &LML_combine_obj_bgp::update($filehandler->get_data_ref(),$opt_dbdir);
 }
 
+# check if Cluster is a PBS controlled Altix SMP Cluster
+if($system_type eq "Cluster") {
+    keys(%{$filehandler->{DATA}->{OBJECT}}); # reset iterator
+    my($key,$ref);
+    while(($key,$ref)=each(%{$filehandler->{DATA}->{OBJECT}})) {
+	if($ref->{type} eq 'node') {
+	    $ref=$filehandler->{DATA}->{INFODATA}->{$key};
+	    if(exists($ref->{ntype})) {
+		if($ref->{ntype} eq "PBS") {
+		    $system_type="PBS";
+		    $system_type_ref->{type}="PBS";
+		    printf("scan system: type reset to %s\n",$system_type);
+		}
+	    }
+	    last; 
+	}
+    }
+}
 
 &LML_combine_obj_check::check_jobs($filehandler->get_data_ref());
 

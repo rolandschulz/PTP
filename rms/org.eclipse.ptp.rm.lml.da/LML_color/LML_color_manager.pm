@@ -397,6 +397,63 @@ sub reset_idcache {
 
 }
 
+# save current mapping in DB
+sub save_db {
+    my($self) = shift;
+    my($dbfile)=@_;
+    my($color,$id,$cat);
+
+    if(open(OUT,"> $dbfile")) {
+
+	for($cat=0;$cat<=$#{$self->{CATEGORIES}};$cat++) {
+	    foreach $id (keys(%{$self->{KNOWNIDS}[$cat]})) {
+		$color=$self->{KNOWNIDS}[$cat]->{$id};
+		print OUT "$cat;$id;$color\n";
+	    }
+	}
+
+	close(OUT);
+    } else {
+	print STDERR "ERROR: could not open $dbfile for writing\n";
+    }
+
+}
+
+# save current mapping in DB
+sub load_db {
+    my($self) = shift;
+    my($dbfile)=@_;
+    my($color,$id,$cat,$line,$c);
+
+    if(open(IN," $dbfile")) {
+	while($line=<IN>) {
+	    chomp($line);
+	    ($cat,$id,$color)=split(/;/,$line);
+	    $self->{KNOWNIDS}[$cat]->{$id}=$color;
+	    $self->{USEDCOLORS}[$cat]->{$color}=$id;
+#	    print STDERR "load color entry: $cat,$id,$color \n";
+	}
+	close(IN);
+	
+	# remove used colors from corresponding color buffer
+	for($cat=0;$cat<=$#{$self->{CATEGORIES}};$cat++) {
+	    $c=0;
+	    while($c<=$#{$self->{BUFFER}[$cat]}) {
+		$color=$self->{BUFFER}[$cat][$c];
+		if(exists($self->{USEDCOLORS}[$cat]->{$color})) {
+		    $color=splice(@{$self->{BUFFER}[$cat]},$c,1);
+#		    print STDERR "removed color entry: $cat,$id,$color $c of $#{$self->{BUFFER}[$cat]}\n";
+		} else {
+		    $c++;
+		}
+	    }
+	}
+    } else {
+	print STDERR "WARNING: could not open $dbfile for reading\n";
+    }
+
+}
+
 # search in BUFFER for a color with maximum distance to colors in USEDCOLORS
 sub find_opt_color {
     my($self) = shift;

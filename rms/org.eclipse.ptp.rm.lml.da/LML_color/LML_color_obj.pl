@@ -42,12 +42,14 @@ my $opt_colorconfigfile="./default.conf";
 my $opt_verbose=0;
 my $opt_timings=0;
 my $opt_dump=0;
-my $opt_dbdir="./";
+my $opt_dbdir="";
+my $db_file;
 usage($0) if( ! GetOptions( 
 			    'verbose'          => \$opt_verbose,
 			    'timings'          => \$opt_timings,
 			    'dump'             => \$opt_dump,
 			    'colordefs=s'      => \$opt_colorconfigfile,
+			    'dbdir=s'          => \$opt_dbdir,
 			    'output=s'         => \$opt_outfile
 			    ) );
 
@@ -61,11 +63,24 @@ my $filehandler;
 
 $filehandler=LML_file_obj->new($opt_verbose,$opt_timings);
 
-print "reading file: $filename  ...\n" if($opt_verbose); 
+print STDERR "reading file: $filename  ...\n" if($opt_verbose); 
 $filehandler->read_lml_fast($filename);
 
 my $colormanager=LML_color_manager->new($opt_colorconfigfile);
 
+my %knownids;
+
+# load db file
+if( $opt_dbdir ne "" ) {
+    $db_file=sprintf("%s/colormap.db",$opt_dbdir);
+    if(-f $db_file) {
+	print STDERR "reading db file: $db_file  ...\n" if($opt_verbose); 
+	$colormanager->load_db($db_file);
+    }
+}
+
+
+print STDERR "processing objs  ...\n" if($opt_verbose); 
 {
     my ($key,$type,$color);
     foreach $key (keys(%{$filehandler->{DATA}->{OBJECT}})) {
@@ -74,8 +89,17 @@ my $colormanager=LML_color_manager->new($opt_colorconfigfile);
 	if($color) {
 	    $filehandler->{DATA}->{OBJECT}->{$key}->{color}=$color;
 	}
+	push(@{$knownids{$type}},$key);
     }
 
+}
+
+if( $opt_dbdir ne "" ) {
+    my ($key,$type);
+    foreach $type (keys(%knownids)) {
+	$colormanager->free_unused($type,@{$knownids{$type}});
+    }
+    $colormanager->save_db($db_file);
 }
 
 if($opt_verbose) {

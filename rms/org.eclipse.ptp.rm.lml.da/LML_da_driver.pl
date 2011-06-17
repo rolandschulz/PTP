@@ -26,7 +26,7 @@ my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
 
-my $version="1.08";
+my $version="1.09";
  
 my ($tstart,$tdiff,$rc);
 
@@ -64,7 +64,9 @@ my $opt_quiet=0;
 my $hostname = `hostname`;chomp($hostname);
 my $ppid = $$;
 my $opt_tmpdir=sprintf("./tmp_%s_%d",$hostname,$ppid);
+my $opt_permdir=sprintf("./perm_%s",$hostname);
 my $opt_keeptmp=0;
+my $opt_keepperm=1;
 my $opt_dump=0;
 my $opt_demo=0;
 usage($0) if( ! GetOptions( 
@@ -72,6 +74,7 @@ usage($0) if( ! GetOptions(
 			    'quiet'            => \$opt_quiet,
 			    'rawfile=s'        => \$opt_rawfile,
 			    'tmpdir=s'         => \$opt_tmpdir,
+			    'permdir=s'        => \$opt_permdir,
 			    'keeptmp'          => \$opt_keeptmp,
 			    'demo'             => \$opt_demo,
 			    'dump'             => \$opt_dump
@@ -103,6 +106,7 @@ if( ($#ARGV > 1) || ($#ARGV == 0 ) ) {
 }
 
 my $tmpdir       = $opt_tmpdir;
+my $permdir       = $opt_permdir;
 my $rawfile      = undef;
 my $removetmpdir = 0; # remove only if directory was create 
 
@@ -115,6 +119,16 @@ if(! -d $tmpdir) {
 	print STDERR "$0: tmpdir created ($tmpdir)\n"  if($opt_verbose);
     }
     $removetmpdir=1;
+}
+
+# check permanent directory
+if(! -d $permdir) {
+    printf(STDERR "$0: permanent directory not found, create new directory $permdir ...\n") if($opt_verbose);
+    if(!mkdir($permdir,0755)) {
+	&exit_witherror($outputfile,"$0: could not create $permdir ...$!\n");
+    } else {
+	print STDERR "$0: permdir created ($permdir)\n"  if($opt_verbose);
+    }
 }
 
 # check request input file
@@ -152,7 +166,7 @@ chomp($pwd);
 #########################
 # create workflow
 #########################
-my $workflowxml=&create_workflow($tmpdir);
+my $workflowxml=&create_workflow($tmpdir,$permdir);
 my $laststep = "";
 my $step     = "";
 
@@ -191,18 +205,23 @@ if($rawfile) {
 	    }
 	}
     } 
-    &check_rms_torque(\$rms,\%cmds) if(($rms eq "undef") || ($rms eq "torque"));
+    &check_rms_torque_or_pbs(\$rms,\%cmds) if(($rms eq "undef") || ($rms eq "torque")|| ($rms eq "pbs"));
     &check_rms_LL(\$rms,\%cmds)     if(($rms eq "undef") || ($rms eq "ll"));
     &check_rms_OpenMPI(\$rms,\%cmds)if(($rms eq "undef") || ($rms eq "openmpi"));
+    if($rms eq "undef") {
+	&exit_witherror($outputfile,"$0: could not determine rms (not one of: torque, pbs, LL, OpenMPI), exiting ...\n");
+    }
 
     $laststep=&generate_step_rms_torque($workflowxml, $laststep, \%cmds)  if($rms eq "torque");
+    $laststep=&generate_step_rms_pbs($workflowxml, $laststep, \%cmds)  if($rms eq "pbs");
     $laststep=&generate_step_rms_LL($workflowxml, $laststep, \%cmds)      if($rms eq "ll");
     $laststep=&generate_step_rms_OpenMPI($workflowxml, $laststep, \%cmds) if($rms eq "openmpi");
 
     $step="addcolor";
     &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$^X \$instdir/LML_color/LML_color_obj.pl -colordefs \$instdir/LML_color/default.conf ".
-			       "-o         \$stepoutfile \$stepinfile");
+			       "$^X \$instdir/LML_color/LML_color_obj.pl -colordefs \$instdir/LML_color/default.conf " .
+			       "-dbdir \$permdir " .
+			       "-o     \$stepoutfile \$stepinfile");
     $laststep=$step;
 
 }
@@ -342,6 +361,8 @@ sub usage {
                                            (default: query system)
                 -tmpdir  <dir>           : use this directory for temporary data
                                            (default: ./tmp) 
+                -permdir  <dir>          : use this directory for permanent data 
+                                           (e.g., databases, default: ./tmp) 
                 -keeptmp                 : keep temporary directory
                 -verbose                 : verbose mode
                 -quiet                   : prints no messages on stderr
@@ -385,7 +406,7 @@ sub exit_witherror {
 }
 
 sub create_workflow {
-    my($tmpdir)=@_;
+    my($tmpdir,$permdir)=@_;
     my($datastructref, $vardefsref);
 
     $vardefsref={};
@@ -395,7 +416,7 @@ sub create_workflow {
 
     $vardefsref={};
     $vardefsref->{key}  ="permdir";
-    $vardefsref->{value}="$tmpdir";
+    $vardefsref->{value}="$permdir";
     push(@{$datastructref->{vardefs}->[0]->{var}},$vardefsref);
 
     return($datastructref);
@@ -449,7 +470,7 @@ sub create_layout_from_request {
 #########################
 # rms: Torque
 #########################
-sub check_rms_torque {
+sub check_rms_torque_or_pbs {
     my($rmsref,$cmdsref)=@_;
     my($key);
     my $rc=1;
@@ -475,7 +496,7 @@ sub check_rms_torque {
 	    if(!$?) {
 		chomp($cmdpath);
 		$cmd=$cmdpath;
-		print STDERR "$0: check_rms_torque: found $cmdname{$key} by which ($cmd)\n" if($opt_verbose);
+		print STDERR "$0: check_rms_torque_or_pbs: found $cmdname{$key} by which ($cmd)\n" if($opt_verbose);
 	    } else {
 		last;
 	    }
@@ -485,13 +506,36 @@ sub check_rms_torque {
 	    $cmdsref->{"cmd_${key}info"}=$cmd;
 	}
     }
+    # check if it is not a PBSpro system
     if($$rmsref eq "torque") {
-	print STDERR "$0: check_rms_torque: found torque commands (",
-	join(",",(values(%{$cmdsref}))),")\n" if($opt_verbose);
-    } else {
-	print STDERR "$0: check_rms_torque: seems not to be a torque system\n" if($opt_verbose);
+	
+	if(exists($cmdsref->{"cmd_jobinfo"})) {
+	    $cmd=$cmdsref->{"cmd_jobinfo"}." --version";
+	    my $cmdversion=`$cmd 2>/dev/null`; 	
+	    chomp($cmdversion);
+	    if($cmdversion=~/version/) {
+		if($cmdversion=~/PBSPro/) {
+		    print STDERR "$0: check_rms_torque_or_pbs: PBSpro found, not torque ($cmdversion)\n" if($opt_verbose);
+		    $$rmsref="pbs"; 
+	    	}
+	    } else {
+		print STDERR "$0: check_rms_torque_or_pbs: could not obtain version info from command $cmd\n" if($opt_verbose);
+	    }
+	    
+	}
     }
 
+    if($$rmsref eq "torque")  {
+	print STDERR "$0: check_rms_torque_or_pbs: found torque commands (",
+	join(",",(values(%{$cmdsref}))),")\n" if($opt_verbose);
+    } elsif($$rmsref eq "pbs")  {
+	print STDERR "$0: check_rms_torque_or_pbs: found PBSpro commands (",
+	join(",",(values(%{$cmdsref}))),")\n" if($opt_verbose);
+    } else {
+	print STDERR "$0: check_rms_torque_or_pbs: seems not to be a torque or pbs system\n" if($opt_verbose);
+    }
+
+    
     return($rc);
 }
 
@@ -510,6 +554,33 @@ sub generate_step_rms_torque {
 			       "$envs $^X rms/TORQUE/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
 			       "$envs $^X rms/TORQUE/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
 			       "$envs $^X rms/TORQUE/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
+    $laststep=$step;
+
+    $step="combineLML";
+    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
+			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
+			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_LML.xml \$tmpdir/nodes_LML.xml");
+    $laststep=$step;
+
+    return($laststep);
+
+}
+
+
+sub generate_step_rms_pbs {
+    my($workflowxml, $laststep, $cmdsref)=@_;
+    my($step,$envs,$key,$ukey);
+
+    $envs="";
+    foreach $key (keys(%{$cmdsref})) {
+	$ukey=uc($key);
+	$envs.="$ukey=$cmdsref->{$key} ";
+    }
+    $step="getdata";
+    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
+			       "$envs $^X rms/PBS/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
+			       "$envs $^X rms/PBS/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
+			       "$envs $^X rms/PBS/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
     $laststep=$step;
 
     $step="combineLML";
