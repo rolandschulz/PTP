@@ -71,9 +71,8 @@ public class LMLManager {
 	/*
 	 * Map of all ILguiItems
 	 * 
-	 * For every created Resource Manager instance there is an entry in this
-	 * map; as long as the Resource Manager instance is not removed an
-	 * associates entry keeps in this map
+	 * For every created Resource Manager instance there is an entry in this map; as long as the Resource Manager instance is not
+	 * removed an associates entry keeps in this map
 	 */
 	protected final Map<String, ILguiItem> LGUIS = new HashMap<String, ILguiItem>();
 
@@ -194,7 +193,6 @@ public class LMLManager {
 		fLguiItem.getRequestXml(os);
 	}
 
-	@SuppressWarnings("unused")
 	public int getSelectedLguiIndex(String title) {
 		int index = 0;
 		int i = 0;

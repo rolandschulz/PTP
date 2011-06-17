@@ -31,7 +31,7 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public final class Preferences {
 
-	private static final IScopeContext[] contexts = new IScopeContext[] { new DefaultScope(), new InstanceScope() };
+	private static final IScopeContext[] contexts = new IScopeContext[] { DefaultScope.INSTANCE, InstanceScope.INSTANCE };
 
 	private static final int DEFAULT_CONTEXT = 0;
 	private static final int INSTANCE_CONTEXT = 1;
@@ -60,9 +60,8 @@ public final class Preferences {
 	}
 
 	/**
-	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the default value. Use the canonical scope
-	 * lookup order for finding the preference value.
+	 * Returns the value in the preference store for the given key. If the key is not defined then return the default value. Use the
+	 * canonical scope lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -75,9 +74,8 @@ public final class Preferences {
 	}
 
 	/**
-	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the default value. Use the canonical scope
-	 * lookup order for finding the preference value.
+	 * Returns the value in the preference store for the given key. If the key is not defined then return the default value. Use the
+	 * canonical scope lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -90,16 +88,14 @@ public final class Preferences {
 	}
 
 	/**
-	 * Returns the default boolean value stored in the {@link DefaultScope} for
-	 * the given key or the specified default value if the key does not appear
-	 * in the {@link DefaultScope}
+	 * Returns the default boolean value stored in the {@link DefaultScope} for the given key or the specified default value if the
+	 * key does not appear in the {@link DefaultScope}
 	 * 
 	 * @param qualifier
 	 * @param key
 	 * @param defaultvalue
 	 * 
-	 * @return the boolean value set in the {@link DefaultScope} for the given
-	 *         key, or the specified default value.
+	 * @return the boolean value set in the {@link DefaultScope} for the given key, or the specified default value.
 	 */
 	public static synchronized boolean getDefaultBoolean(String qualifier, String key, boolean defaultvalue) {
 		return contexts[DEFAULT_CONTEXT].getNode(qualifier).getBoolean(key, defaultvalue);
@@ -107,104 +103,91 @@ public final class Preferences {
 
 	/**
 	 * Returns the default byte array value stored in the {@link DefaultScope} for the given key or the specified default value if
-	 * the key does not
-	 * appear in the {@link DefaultScope}
+	 * the key does not appear in the {@link DefaultScope}
 	 * 
 	 * @param qualifier
 	 * @param key
 	 * @param defaultvalue
 	 * 
-	 * @return the byte array value set in the {@link DefaultScope} for the
-	 *         given key, or the specified default value.
+	 * @return the byte array value set in the {@link DefaultScope} for the given key, or the specified default value.
 	 */
 	public static synchronized byte[] getDefaultByteArray(String qualifier, String key, byte[] defaultvalue) {
 		return contexts[DEFAULT_CONTEXT].getNode(qualifier).getByteArray(key, defaultvalue);
 	}
 
 	/**
-	 * Returns the default double value stored in the {@link DefaultScope} for
-	 * the given key or the specified default value if the key does not appear
-	 * in the {@link DefaultScope}
+	 * Returns the default double value stored in the {@link DefaultScope} for the given key or the specified default value if the
+	 * key does not appear in the {@link DefaultScope}
 	 * 
 	 * @param qualifier
 	 * @param key
 	 * @param defaultvalue
 	 * 
-	 * @return the double value set in the {@link DefaultScope} for the given
-	 *         key, or the specified default value.
+	 * @return the double value set in the {@link DefaultScope} for the given key, or the specified default value.
 	 */
 	public static synchronized double getDefaultDouble(String qualifier, String key, double defaultvalue) {
 		return contexts[DEFAULT_CONTEXT].getNode(qualifier).getDouble(key, defaultvalue);
 	}
 
 	/**
-	 * Returns the default float value stored in the {@link DefaultScope} for
-	 * the given key or the specified default value if the key does not appear
-	 * in the {@link DefaultScope}
+	 * Returns the default float value stored in the {@link DefaultScope} for the given key or the specified default value if the
+	 * key does not appear in the {@link DefaultScope}
 	 * 
 	 * @param qualifier
 	 * @param key
 	 * @param defaultvalue
 	 * 
-	 * @return the float value set in the {@link DefaultScope} for the given
-	 *         key, or the specified default value.
+	 * @return the float value set in the {@link DefaultScope} for the given key, or the specified default value.
 	 */
 	public static synchronized float getDefaultFloat(String qualifier, String key, float defaultvalue) {
 		return contexts[DEFAULT_CONTEXT].getNode(qualifier).getFloat(key, defaultvalue);
 	}
 
 	/**
-	 * Returns the default integer value stored in the {@link DefaultScope} for
-	 * the given key or the specified default value if the key does not appear
-	 * in the {@link DefaultScope}
+	 * Returns the default integer value stored in the {@link DefaultScope} for the given key or the specified default value if the
+	 * key does not appear in the {@link DefaultScope}
 	 * 
 	 * @param qualifier
 	 * @param key
 	 * @param defaultvalue
 	 * 
-	 * @return the integer value set in the {@link DefaultScope} for the given
-	 *         key, or the specified default value.
+	 * @return the integer value set in the {@link DefaultScope} for the given key, or the specified default value.
 	 */
 	public static synchronized int getDefaultInt(String qualifier, String key, int defaultvalue) {
 		return contexts[DEFAULT_CONTEXT].getNode(qualifier).getInt(key, defaultvalue);
 	}
 
 	/**
-	 * Returns the default long value stored in the {@link DefaultScope} for the
-	 * given key or the specified default value if the key does not appear in
-	 * the {@link DefaultScope}
+	 * Returns the default long value stored in the {@link DefaultScope} for the given key or the specified default value if the key
+	 * does not appear in the {@link DefaultScope}
 	 * 
 	 * @param qualifier
 	 * @param key
 	 * @param defaultvalue
 	 * 
-	 * @return the long value set in the {@link DefaultScope} for the given key,
-	 *         or the specified default value.
+	 * @return the long value set in the {@link DefaultScope} for the given key, or the specified default value.
 	 */
 	public static synchronized long getDefaultLong(String qualifier, String key, long defaultvalue) {
 		return contexts[DEFAULT_CONTEXT].getNode(qualifier).getLong(key, defaultvalue);
 	}
 
 	/**
-	 * Returns the default string value stored in the {@link DefaultScope} for
-	 * the given key or the specified default value if the key does not appear
-	 * in the {@link DefaultScope}
+	 * Returns the default string value stored in the {@link DefaultScope} for the given key or the specified default value if the
+	 * key does not appear in the {@link DefaultScope}
 	 * 
 	 * @param qualifier
 	 * @param key
 	 * @param defaultvalue
 	 * 
-	 * @return the string value set in the {@link DefaultScope} for the given
-	 *         key, or the specified default value.
+	 * @return the string value set in the {@link DefaultScope} for the given key, or the specified default value.
 	 */
 	public static synchronized String getDefaultString(String qualifier, String key, String defaultvalue) {
 		return contexts[DEFAULT_CONTEXT].getNode(qualifier).get(key, defaultvalue);
 	}
 
 	/**
-	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the default value. Use the canonical scope
-	 * lookup order for finding the preference value.
+	 * Returns the value in the preference store for the given key. If the key is not defined then return the default value. Use the
+	 * canonical scope lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -217,9 +200,8 @@ public final class Preferences {
 	}
 
 	/**
-	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the default value. Use the canonical scope
-	 * lookup order for finding the preference value.
+	 * Returns the value in the preference store for the given key. If the key is not defined then return the default value. Use the
+	 * canonical scope lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -232,9 +214,8 @@ public final class Preferences {
 	}
 
 	/**
-	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the default value. Use the canonical scope
-	 * lookup order for finding the preference value.
+	 * Returns the value in the preference store for the given key. If the key is not defined then return the default value. Use the
+	 * canonical scope lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -247,9 +228,8 @@ public final class Preferences {
 	}
 
 	/**
-	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the default value. Use the canonical scope
-	 * lookup order for finding the preference value.
+	 * Returns the value in the preference store for the given key. If the key is not defined then return the default value. Use the
+	 * canonical scope lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -262,9 +242,8 @@ public final class Preferences {
 	}
 
 	/**
-	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the default value. Use the canonical scope
-	 * lookup order for finding the preference value.
+	 * Returns the value in the preference store for the given key. If the key is not defined then return the default value. Use the
+	 * canonical scope lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -293,8 +272,7 @@ public final class Preferences {
 	}
 
 	/**
-	 * Removes the given preference listener from the {@link DefaultScope} and
-	 * the {@link InstanceScope}
+	 * Removes the given preference listener from the {@link DefaultScope} and the {@link InstanceScope}
 	 * 
 	 * @param qualifier
 	 * @param listener
@@ -305,8 +283,8 @@ public final class Preferences {
 	}
 
 	/**
-	 * Save the preferences for the given plugin identifier. It should be noted
-	 * that all pending preference changes will be flushed with this method.
+	 * Save the preferences for the given plugin identifier. It should be noted that all pending preference changes will be flushed
+	 * with this method.
 	 * 
 	 * @param qualifier
 	 */
@@ -502,9 +480,8 @@ public final class Preferences {
 	}
 
 	/**
-	 * Sets the given preference to its default value. This is done by removing
-	 * any set value from the {@link InstanceScope}. Has no effect if the given
-	 * key is <code>null</code>.
+	 * Sets the given preference to its default value. This is done by removing any set value from the {@link InstanceScope}. Has no
+	 * effect if the given key is <code>null</code>.
 	 * 
 	 * @param qualifier
 	 * @param key
