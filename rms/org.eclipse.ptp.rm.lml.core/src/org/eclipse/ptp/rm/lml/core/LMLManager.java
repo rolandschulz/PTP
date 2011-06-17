@@ -281,11 +281,13 @@ public class LMLManager {
 	}
 
 	public void selectLgui(String name) {
+		if (name != null && fLguiItem.toString().equals(name)) {
+			return;
+		}
 		fireRemovedLgui(null);
 		if (name != null) {
 			final ILguiItem item = LGUIS.get(name);
 			if (item != null) {
-				fLguiItem = item;
 				fireNewLgui();
 				return;
 			}
