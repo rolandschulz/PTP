@@ -9,11 +9,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.sync.rsync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
 public class RsyncRemoteSyncConnection{
 //	private final static String remoteProjectName = "eclipse_auto";
+	public final static String ID = "org.eclipse.ptp.rdt.sync.rsync.core.RsyncRemoteSyncConnection";//$NON-NLS-1$
 	private final IRemoteConnection connection;
 	private final String localDirectory;
 	private final String remoteDirectory;

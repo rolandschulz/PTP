@@ -50,6 +50,9 @@ import org.eclipse.jgit.transport.Transport;
 import org.eclipse.jgit.transport.TransportGitSsh;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.util.FS;
+import org.eclipse.ptp.rdt.sync.core.IRemoteSyncConnection;
+import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
@@ -62,8 +65,8 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  * jgit library.
  * 
  */
-public class GitRemoteSyncConnection {
-
+public class GitRemoteSyncConnection implements IRemoteSyncConnection{
+	public final static String ID = "org.eclipse.ptp.rdt.sync.git.core.GitRemoteSyncConnection";  //$NON-NLS-1$
 	private final int MAX_FILES = 100;
 	private final static String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 	private final static String commitMessage = Messages.GRSC_CommitMessage;
@@ -74,6 +77,7 @@ public class GitRemoteSyncConnection {
 	private final String remoteDirectory;
 	private Git git;
 	private TransportGitSsh transport;
+	
 
 	/**
 	 * Create a remote sync connection using git. Assumes that the local

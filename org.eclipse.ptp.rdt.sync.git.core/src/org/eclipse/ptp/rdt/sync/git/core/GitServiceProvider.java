@@ -28,6 +28,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.ptp.rdt.sync.core.IRemoteSyncConnection;
+import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
@@ -49,7 +52,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private IProject fProject = null;
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
-	private GitRemoteSyncConnection fSyncConnection = null;
+	private IRemoteSyncConnection fSyncConnection = null;
 	
 	private final ReentrantLock syncLock = new ReentrantLock();
 	private Integer syncTaskId = -1;  //ID for most recent synchronization task, functions as a time-stamp 
