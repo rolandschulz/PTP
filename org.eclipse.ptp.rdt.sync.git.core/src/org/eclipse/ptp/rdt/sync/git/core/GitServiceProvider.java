@@ -202,9 +202,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 
 				// Add .gitignore to empty directories
-				if (delta.getResource().getType() == IResource.FOLDER && delta.getKind() == IResourceDelta.ADDED) {
+				if (delta.getResource().getType() == IResource.FOLDER && (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
 					IFile emptyFile = getProject().getFile(delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore");  //$NON-NLS-1$
-					emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+					if (!(emptyFile.exists())) {
+						emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+					}
 				}
 				
 				return true;
@@ -357,7 +359,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	
 	private class FileFilter implements SyncFileFilter {
 		public boolean shouldIgnore(String fileName) {
-			if (fileName.endsWith(".cproject") || fileName.endsWith(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
+			if (fileName.equals(".cproject") || fileName.equals(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
+				return true;
+			}
+
+			if (fileName.startsWith(".settings")) { //$NON-NLS-1$
 				return true;
 			}
 
@@ -370,7 +376,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 		private boolean isBinaryFile(String fileName) {
 			try {
-				int resType = CoreModel.getDefault().create(getProject().getFile(fileName)).getElementType();
+				ICElement fileElement = CoreModel.getDefault().create(getProject().getFile(fileName));
+				if (fileElement == null) {
+					return false;
+				}
+				int resType = fileElement.getElementType();
 				if (resType == ICElement.C_BINARY) {
 					return true;
 				} else {

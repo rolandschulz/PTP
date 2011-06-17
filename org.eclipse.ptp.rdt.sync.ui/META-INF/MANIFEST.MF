@@ -19,7 +19,6 @@ Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.ptp.rdt.core
 Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.rdt.sync.ui,
- org.eclipse.ptp.rdt.sync.ui.messages,
  org.eclipse.ptp.rdt.sync.ui.preferences,
  org.eclipse.ptp.rdt.sync.ui.properties,
  org.eclipse.ptp.rdt.sync.ui.wizards

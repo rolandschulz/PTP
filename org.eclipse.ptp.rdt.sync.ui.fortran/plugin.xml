@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension-point id="synchronizeParticipants" name="Synchronize Participant" schema="schema/synchronizeParticipants.exsd"/>
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
             canFinishEarly="false"
             category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
-            class="org.eclipse.ptp.rdt.sync.ui.wizards.NewRemoteSyncProjectWizard"
-            finalPerspective="org.eclipse.cdt.ui.CPerspective"
+            class="org.eclipse.ptp.rdt.sync.ui.fortran.wizards.NewFortranSyncProjectWizard"
+            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
             hasPages="true"
             icon="icons/etool16/newremote_c_proj.gif"
-            id="org.eclipse.ptp.rdt.sync.ui.newRemoteProjectWizard"
-            name="%wizard.name.0"
+            id="org.eclipse.ptp.rdt.sync.ui.newFortranProjectWizard"
+            name="%wizard.name.1"
             project="true">
-            <description>
-             	%remoteCCPPproject.desc
-         	</description>
+         <description>
+            %remoteCCPPproject.desc
+         </description>
       </wizard>
+      
       
    </extension>
    <extension
@@ -25,7 +25,7 @@
       <navigatorContent
             activeByDefault="true"
             contentProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorContentProvider"
-            id="org.eclipse.ptp.rdt.sync.ui.navigator.content"
+            id="org.eclipse.ptp.rdt.sync.ui.fortran.navigator.content"
             labelProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorLabelProvider"
             name="Synchronize Elements"
             priority="highest">
@@ -67,45 +67,20 @@
                suppressedExtensionId="org.eclipse.cdt.ui.navigator.content">
          </override>
        <commonWizard
-	         associatedExtensionId="org.eclipse.ptp.rdt.sync.ui.navigator.content"
-	         menuGroupId="org.eclipse.ptp.rdt.ui.newProject"
-	         type="new"
-	         wizardId="org.eclipse.ptp.rdt.sync.ui.newRemoteProjectWizard">
-		 <enablement/>
-	   </commonWizard>
+             associatedExtensionId="org.eclipse.ptp.rdt.sync.ui.fortran.navigator.content"
+             menuGroupId="org.eclipse.ptp.rdt.ui.newProject"
+             type="new"
+             wizardId="org.eclipse.ptp.rdt.sync.ui.newFortranProjectWizard">
+          <enablement></enablement>
+       </commonWizard>
       </navigatorContent>
    </extension>
    <extension
        point="org.eclipse.ui.navigator.viewer">
        <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
           <includes>
-              <contentExtension pattern="org.eclipse.ptp.rdt.sync.ui.navigator.content"/>
+              <contentExtension pattern="org.eclipse.ptp.rdt.sync.ui.fortran.navigator.content"/>
           </includes>
        </viewerContentBinding>
    </extension>
-   
-     <extension
-           point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
-        <wizardPage
-              ID="org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage"
-              operationClass="org.eclipse.ptp.rdt.sync.ui.wizards.RemoteSyncWizardPageOperation"
-              pageClass="org.eclipse.ptp.rdt.sync.ui.wizards.NewRemoteSyncProjectWizardPage">
-           <nature
-                 natureID="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-           </nature>
-        </wizardPage>
-     </extension>
-     <extension
-           point="org.eclipse.ui.propertyPages">
-        <page
-              category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
-              class="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesPage"
-              id="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesPage"
-              name="Synchronize">
-		<filter
-			name="projectNature"
-			value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-		</filter>
-        </page>
-     </extension>
 </plugin>
