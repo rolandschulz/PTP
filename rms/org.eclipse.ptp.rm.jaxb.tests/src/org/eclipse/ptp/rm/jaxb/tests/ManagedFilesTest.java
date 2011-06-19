@@ -158,6 +158,17 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	public void jobStateChanged(String jobId, IJobStatus status) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#runActionCommand
+	 * (java.lang.String)
+	 */
+	public void runActionCommand(String action) throws CoreException {
+
+	}
+
 	@Override
 	public void setUp() {
 		try {

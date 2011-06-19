@@ -257,6 +257,7 @@ public class UpdateModelFactory {
 		private String tooltip;
 		private String choice;
 		private String fixedText;
+		private String action;
 		private List<String> valueList;
 
 		/**
@@ -297,6 +298,7 @@ public class UpdateModelFactory {
 			font = widget.getFont();
 			tooltip = widget.getTooltip();
 			fixedText = widget.getFixedText();
+			action = widget.getButtonAction();
 		}
 
 		/**
@@ -311,7 +313,6 @@ public class UpdateModelFactory {
 				choice = a.getChoice();
 				min = a.getMin();
 				max = a.getMax();
-			} else if (data instanceof PropertyType) {
 			}
 		}
 
@@ -446,7 +447,7 @@ public class UpdateModelFactory {
 			IVariableMap rmVarMap) {
 		ControlDescriptor cd = new ControlDescriptor(widget, rmVarMap);
 		Control control = createControl(parent, cd, tab);
-		if (control instanceof Label) {
+		if (control instanceof Label || JAXBControlUIConstants.ACTION.equals(widget.getType())) {
 			return null;
 		}
 
@@ -508,6 +509,36 @@ public class UpdateModelFactory {
 		}
 		maybeAddValidator(model, data, tab.getParent());
 		return model;
+	}
+
+	/**
+	 * Creates a push-button and connects it to the command through a listener.
+	 * 
+	 * @see org.eclipse.swt.widgets.Text
+	 * @see org.eclipse.swt.widgets.Button
+	 * 
+	 * @param parent
+	 * @param cd
+	 * @param tab
+	 * @return
+	 */
+	private static Control createActionButton(Composite parent, final ControlDescriptor cd,
+			final JAXBDynamicLaunchConfigurationTab tab) {
+		WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, SWT.PUSH, new SelectionListener() {
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					tab.run(cd.action);
+				} catch (Throwable t) {
+					JAXBControlUIPlugin.log(t);
+				}
+			}
+		});
+		return null;
 	}
 
 	/**
@@ -628,6 +659,8 @@ public class UpdateModelFactory {
 			c = createCombo(parent, cd);
 		} else if (JAXBControlUIConstants.BROWSE.equals(cd.widgetType)) {
 			c = createBrowse(parent, cd, tab);
+		} else if (JAXBControlUIConstants.ACTION.equals(cd.widgetType)) {
+			c = createActionButton(parent, cd, tab);
 		}
 
 		if (c != null) {

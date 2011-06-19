@@ -128,7 +128,27 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 	}
 
+	/**
+	 * Checks to see if there was an exception thrown by the run method.
+	 * 
+	 * @param job
+	 * @throws CoreException
+	 *             if the job execution raised and exception
+	 */
+	private static void checkJobForError(ICommandJob job) throws CoreException {
+		IStatus status = job.getRunStatus();
+		if (status != null && status.getSeverity() == IStatus.ERROR) {
+			Throwable t = status.getException();
+			if (t instanceof CoreException) {
+				throw (CoreException) t;
+			} else {
+				throw CoreExceptionUtils.newException(status.getMessage(), t);
+			}
+		}
+	}
+
 	private final IJAXBResourceManagerConfiguration config;
+
 	private final ConnectionChangeListener connectionListener;
 	private Map<String, String> launchEnv;
 	private ICommandJob interactiveJob;
@@ -138,6 +158,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private ControlType controlData;
 	private String servicesId;
 	private String connectionName;
+
 	private RemoteServicesDelegate remoteServicesDelegate;
 
 	private boolean appendLaunchEnv;
@@ -234,6 +255,46 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	public void jobStateChanged(String jobId, IJobStatus status) {
 		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
 		getResourceManager().updateJob(jobId, status);
+	}
+
+	/**
+	 * First checks for the command definition, then calls
+	 * {@link #runCommand(String, CommandType, org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJob.JobMode, boolean)}
+	 * .
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#runActionCommand(java.lang.String)
+	 */
+	public void runActionCommand(String action) throws CoreException {
+		CommandType command = null;
+
+		for (CommandType cmd : controlData.getButtonAction()) {
+			if (cmd.getName().equals(action)) {
+				command = cmd;
+				break;
+			}
+		}
+
+		if (command == null) {
+			for (CommandType cmd : controlData.getStartUpCommand()) {
+				if (cmd.getName().equals(action)) {
+					command = cmd;
+					break;
+				}
+			}
+		}
+
+		if (command == null) {
+			for (CommandType cmd : controlData.getShutDownCommand()) {
+				if (cmd.getName().equals(action)) {
+					command = cmd;
+					break;
+				}
+			}
+		}
+
+		if (command != null) {
+			runCommand(null, command, CommandJob.JobMode.INTERACTIVE, true);
+		}
 	}
 
 	/**
@@ -442,6 +503,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		SubMonitor progress = SubMonitor.convert(monitor, 60);
 		try {
 			doConnect(progress.newChild(20));
+		} catch (CoreException ce) {
+			progress.done();
+			throw ce;
 		} catch (Throwable t) {
 			progress.done();
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
@@ -450,6 +514,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		try {
 			initialize(progress.newChild(30));
 			doOnStartUp();
+		} catch (CoreException ce) {
+			throw ce;
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
 		}
@@ -563,25 +629,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.remove(JAXBControlConstants.SCRIPT_PATH);
 		rmVarMap.remove(JAXBControlConstants.SCRIPT);
 		return status;
-	}
-
-	/**
-	 * Checks to see if there was an exception thrown by the run method.
-	 * 
-	 * @param job
-	 * @throws CoreException
-	 *             if the job execution raised and exception
-	 */
-	private void checkJobForError(ICommandJob job) throws CoreException {
-		IStatus status = job.getRunStatus();
-		if (status != null && status.getSeverity() == IStatus.ERROR) {
-			Throwable t = status.getException();
-			if (t instanceof CoreException) {
-				throw (CoreException) t;
-			} else {
-				throw CoreExceptionUtils.newException(status.getMessage(), t);
-			}
-		}
 	}
 
 	/**

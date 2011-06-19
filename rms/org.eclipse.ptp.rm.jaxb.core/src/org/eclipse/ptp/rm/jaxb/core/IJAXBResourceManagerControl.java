@@ -59,4 +59,13 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	 * For callbacks to the resource manager from internal jobs.
 	 */
 	public void jobStateChanged(String jobId, IJobStatus status);
+
+	/**
+	 * Runs an action command.
+	 * 
+	 * @param action
+	 *            name of action or command
+	 * 
+	 */
+	public void runActionCommand(String action) throws CoreException;
 }

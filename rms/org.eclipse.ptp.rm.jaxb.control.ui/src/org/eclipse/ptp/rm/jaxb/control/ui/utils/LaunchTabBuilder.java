@@ -71,8 +71,86 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class LaunchTabBuilder {
 
+	/**
+	 * Create the layout data object. Calls
+	 * {@link WidgetBuilderUtils#createRowData(Integer, Integer, Boolean)},
+	 * {@link WidgetBuilderUtils#createGridData(Integer, Boolean, Boolean, Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer)}
+	 * , or
+	 * {@link WidgetBuilderUtils#createFormAttachment(String, Integer, Integer, Integer)}
+	 * and
+	 * {@link WidgetBuilderUtils#createFormData(Integer, Integer, FormAttachment, FormAttachment, FormAttachment, FormAttachment)}
+	 * .
+	 * 
+	 * @param layoutData
+	 *            JAXB data element describing the layout data object
+	 * @return the data object
+	 */
+	static Object createLayoutData(LayoutDataType layoutData) {
+		if (layoutData != null) {
+			if (layoutData.getRowData() != null) {
+				RowDataType rowData = layoutData.getRowData();
+				return WidgetBuilderUtils.createRowData(rowData.getHeight(), rowData.getWidth(), rowData.isExclude());
+			} else if (layoutData.getGridData() != null) {
+				GridDataType gridData = layoutData.getGridData();
+				int style = WidgetBuilderUtils.getStyle(gridData.getStyle());
+				int hAlign = WidgetBuilderUtils.getStyle(gridData.getHorizontalAlign());
+				int vAlign = WidgetBuilderUtils.getStyle(gridData.getVerticalAlign());
+				return WidgetBuilderUtils.createGridData(style, gridData.isGrabExcessHorizontal(), gridData.isGrabExcessVertical(),
+						gridData.getWidthHint(), gridData.getHeightHint(), gridData.getMinWidth(), gridData.getMinHeight(),
+						gridData.getHorizontalSpan(), gridData.getVerticalSpan(), hAlign, vAlign, gridData.getHorizontalIndent(),
+						gridData.getVerticalIndent());
+
+			} else if (layoutData.getFormData() != null) {
+				FormDataType formData = layoutData.getFormData();
+				FormAttachment top = null;
+				FormAttachment bottom = null;
+				FormAttachment left = null;
+				FormAttachment right = null;
+				FormAttachmentType fad = formData.getTop();
+				if (fad != null) {
+					top = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+							fad.getOffset());
+				}
+				fad = formData.getBottom();
+				if (fad != null) {
+					bottom = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+							fad.getOffset());
+				}
+				fad = formData.getLeft();
+				if (fad != null) {
+					left = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+							fad.getOffset());
+				}
+				fad = formData.getRight();
+				if (fad != null) {
+					right = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
+							fad.getOffset());
+				}
+				return WidgetBuilderUtils.createFormData(formData.getHeight(), formData.getWidth(), top, bottom, left, right);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param data
+	 *            Attribute or Property
+	 * @return whether it is visible to the user (and thus used to generate a
+	 *         widget and update model)
+	 */
+	private static boolean isVisible(Object data) {
+		if (data instanceof AttributeType) {
+			return ((AttributeType) data).isVisible();
+		} else if (data instanceof PropertyType) {
+			return ((PropertyType) data).isVisible();
+		}
+		return false;
+	}
+
 	private final JAXBDynamicLaunchConfigurationTab tab;
+
 	private final IVariableMap rmVarMap;
+
 	private final Map<Object, IUpdateModel> localWidgets;
 
 	/**
@@ -382,8 +460,16 @@ public class LaunchTabBuilder {
 	 */
 	private void addItem(CTabFolder folder, TabItemType descriptor, int index) {
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
+		Layout layout = createLayout(descriptor.getLayout());
+		if (layout != null) {
+			folder.setLayout(layout);
+		}
+		Object data = createLayoutData(descriptor.getLayoutData());
+		if (data != null) {
+			folder.setLayoutData(data);
+		}
 		CTabItem item = WidgetBuilderUtils.createTabItem(folder, style, descriptor.getTitle(), descriptor.getTooltip(), index);
-		Composite control = WidgetBuilderUtils.createComposite(folder, 1);
+		Composite control = WidgetBuilderUtils.createComposite(folder, style, layout, data);
 		item.setControl(control);
 		String tt = descriptor.getTooltip();
 		if (tt != null) {
@@ -399,7 +485,6 @@ public class LaunchTabBuilder {
 		}
 
 		addChildren(descriptor.getCompositeOrTabFolderOrWidget(), control);
-
 	}
 
 	/**
@@ -547,81 +632,5 @@ public class LaunchTabBuilder {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Create the layout data object. Calls
-	 * {@link WidgetBuilderUtils#createRowData(Integer, Integer, Boolean)},
-	 * {@link WidgetBuilderUtils#createGridData(Integer, Boolean, Boolean, Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer)}
-	 * , or
-	 * {@link WidgetBuilderUtils#createFormAttachment(String, Integer, Integer, Integer)}
-	 * and
-	 * {@link WidgetBuilderUtils#createFormData(Integer, Integer, FormAttachment, FormAttachment, FormAttachment, FormAttachment)}
-	 * .
-	 * 
-	 * @param layoutData
-	 *            JAXB data element describing the layout data object
-	 * @return the data object
-	 */
-	static Object createLayoutData(LayoutDataType layoutData) {
-		if (layoutData != null) {
-			if (layoutData.getRowData() != null) {
-				RowDataType rowData = layoutData.getRowData();
-				return WidgetBuilderUtils.createRowData(rowData.getHeight(), rowData.getWidth(), rowData.isExclude());
-			} else if (layoutData.getGridData() != null) {
-				GridDataType gridData = layoutData.getGridData();
-				int style = WidgetBuilderUtils.getStyle(gridData.getStyle());
-				int hAlign = WidgetBuilderUtils.getStyle(gridData.getHorizontalAlign());
-				int vAlign = WidgetBuilderUtils.getStyle(gridData.getVerticalAlign());
-				return WidgetBuilderUtils.createGridData(style, gridData.isGrabExcessHorizontal(), gridData.isGrabExcessVertical(),
-						gridData.getWidthHint(), gridData.getHeightHint(), gridData.getMinWidth(), gridData.getMinHeight(),
-						gridData.getHorizontalSpan(), gridData.getVerticalSpan(), hAlign, vAlign, gridData.getHorizontalIndent(),
-						gridData.getVerticalIndent());
-
-			} else if (layoutData.getFormData() != null) {
-				FormDataType formData = layoutData.getFormData();
-				FormAttachment top = null;
-				FormAttachment bottom = null;
-				FormAttachment left = null;
-				FormAttachment right = null;
-				FormAttachmentType fad = formData.getTop();
-				if (fad != null) {
-					top = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
-							fad.getOffset());
-				}
-				fad = formData.getBottom();
-				if (fad != null) {
-					bottom = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
-							fad.getOffset());
-				}
-				fad = formData.getLeft();
-				if (fad != null) {
-					left = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
-							fad.getOffset());
-				}
-				fad = formData.getRight();
-				if (fad != null) {
-					right = WidgetBuilderUtils.createFormAttachment(fad.getAlignment(), fad.getDenominator(), fad.getNumerator(),
-							fad.getOffset());
-				}
-				return WidgetBuilderUtils.createFormData(formData.getHeight(), formData.getWidth(), top, bottom, left, right);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * @param data
-	 *            Attribute or Property
-	 * @return whether it is visible to the user (and thus used to generate a
-	 *         widget and update model)
-	 */
-	private static boolean isVisible(Object data) {
-		if (data instanceof AttributeType) {
-			return ((AttributeType) data).isVisible();
-		} else if (data instanceof PropertyType) {
-			return ((PropertyType) data).isVisible();
-		}
-		return false;
 	}
 }

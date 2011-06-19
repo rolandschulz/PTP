@@ -19,13 +19,13 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.rm.jaxb.control,
  org.eclipse.ptp.rm.jaxb.control.data;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.lml_jaxb,org.eclipse.ptp.rm.jaxb.tests",
  org.eclipse.ptp.rm.jaxb.control.exceptions;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.lml_jaxb,org.eclipse.ptp.rm.jaxb.tests",
- org.eclipse.ptp.rm.jaxb.control.internal;x-friends:="org.eclipse.ptp.rm.jaxb.tests",
- org.eclipse.ptp.rm.jaxb.control.internal.data;x-friends:="org.eclipse.ptp.rm.jaxb.tests",
- org.eclipse.ptp.rm.jaxb.control.internal.messages;x-friends:="org.eclipse.ptp.rm.jaxb.tests",
- org.eclipse.ptp.rm.jaxb.control.internal.runnable;x-friends:="org.eclipse.ptp.rm.jaxb.tests",
- org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;x-friends:="org.eclipse.ptp.rm.jaxb.tests",
- org.eclipse.ptp.rm.jaxb.control.internal.utils;x-friends:="org.eclipse.ptp.rm.jaxb.tests",
- org.eclipse.ptp.rm.jaxb.control.internal.variables;x-friends:="org.eclipse.ptp.rm.jaxb.tests",
+ org.eclipse.ptp.rm.jaxb.control.internal;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
+ org.eclipse.ptp.rm.jaxb.control.internal.data;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
+ org.eclipse.ptp.rm.jaxb.control.internal.messages;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
+ org.eclipse.ptp.rm.jaxb.control.internal.runnable;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
+ org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
+ org.eclipse.ptp.rm.jaxb.control.internal.utils;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
+ org.eclipse.ptp.rm.jaxb.control.internal.variables;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
  org.eclipse.ptp.rm.jaxb.control.runnable;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.lml_jaxb,org.eclipse.ptp.rm.jaxb.tests"
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin

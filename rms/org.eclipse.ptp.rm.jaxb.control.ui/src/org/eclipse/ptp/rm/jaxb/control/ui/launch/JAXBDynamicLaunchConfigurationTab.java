@@ -42,6 +42,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
@@ -87,6 +88,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener {
 
+	private final IJAXBResourceManagerControl rmControl;
 	private final TabControllerType controller;
 	private final ValueUpdateHandler updateHandler;
 	private final List<Viewer> viewers;
@@ -110,6 +112,10 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	public JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog,
 			TabControllerType controller, JAXBControllerLaunchConfigurationTab parentTab) {
 		super(parentTab, dialog);
+		/*
+		 * get the implementation, in order to run actions
+		 */
+		rmControl = rm.getControl();
 		this.controller = controller;
 		String s = controller.getIncludeWidgetValuesFrom();
 		if (s == null) {
@@ -283,6 +289,21 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			}
 		}
 		return super.performApply(configuration, rm, queue);
+	}
+
+	/**
+	 * Invokes a command on the resource manager. This may be called by action
+	 * button listeners.
+	 * 
+	 * @param action
+	 *            a command from the control data type
+	 * 
+	 */
+	public void run(String action) throws CoreException {
+		/*
+		 * delegate to rmControl
+		 */
+		rmControl.runActionCommand(action);
 	}
 
 	/*

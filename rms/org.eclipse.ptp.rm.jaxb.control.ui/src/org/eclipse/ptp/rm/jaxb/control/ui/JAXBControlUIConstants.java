@@ -46,5 +46,6 @@ public class JAXBControlUIConstants extends JAXBUIConstants {
 	public static final String COMBO = "combo";//$NON-NLS-1$
 	public static final String RADIOBUTTON = "radiobutton";//$NON-NLS-1$
 	public static final String BROWSE = "browse";//$NON-NLS-1$
+	public static final String ACTION = "action";//$NON-NLS-1$
 
 }

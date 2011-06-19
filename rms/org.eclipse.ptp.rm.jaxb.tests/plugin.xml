@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
-            configurationFile="data/demo-example.xml"
+            configurationFile="data/demo-example-full.xml"
             name="Demo Example">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
