@@ -144,8 +144,8 @@
 		</code>
 		, e.g.,
 		<code>${ptp_rm:queues#value}</code>
-		(see further below on the specific fields for properties and
-		attributes).
+		(see further <a href="#PropertyAttributeType">below</a> on the
+		specific fields for properties and attributes).
 	</p>
 	<p>
 		All properties and attributes defined in the configuration are mapped.
@@ -162,11 +162,11 @@
 		<code>progArgs</code>
 		<br>
 		<code>directory</code>
-		<br> <br> In addition, these properties may be linked (see
-		below) to other attributes to furnish the resource manager with an
-		implementation-independent variable for the queue and for any remote
-		output files produced in connection with the job submission. <br>
-		<br>
+		<br> <br> In addition, these properties may be linked (see <a
+			href="#PropertyAttributeType">below</a>) to other attributes to
+		furnish the resource manager with an implementation-independent
+		variable for the queue and for any remote output files produced in
+		connection with the job submission. <br> <br>
 		<code>control.queue.name</code>
 		<br>
 		<code>stdout_remote_path</code>
@@ -205,7 +205,7 @@
 		termination externally. Finally, a <b>button-action</b> is an
 		arbitrary command associated with a button exposed through the
 		<code>Launch Tab</code>
-		(see further below).
+		(see further <a href="#Widget">below</a>).
 	</p>
 
 	<h3>
@@ -323,15 +323,16 @@
 	<p>
 		The validator makes use of the
 		<code>regex</code>
-		type (also used in the parser or tokenizer; see below), along with a
-		special
+		type (also used in the parser or tokenizer; see <a
+			href="#StreamParsers">below</a>), along with a special
 		<code>file-match</code>
 		type. A regex can be used to match by setting the <i>expression</i>
 		field; to split the segment into tokens on the basis of the
 		expression, set the <i>split</i> field to true (this applies only to
 		the
 		<code>match</code>
-		type discussed below). The expression should follow the grammar in
+		type discussed <a href="#MatchType">below</a>). The expression should
+		follow the grammar in
 		<code>java.util.regex</code>
 		; the <i>flags</i> are those made available in the
 		<code>java.util.regex.Pattern</code>
@@ -437,8 +438,8 @@
 			dereferencing.</li>
 		<li>The preferred, and most flexible way to represent the
 			contents of a file to be generated, however, is to use the <code>line</code>
-			type which is discussed below in connection with the <code>script</code>
-			type.</li>
+			type which is discussed <a href="#LineArg">below</a> in connection
+			with the <code>script</code> type.</li>
 
 	</ol>
 
@@ -497,10 +498,10 @@
 	<p>
 		<b>Note</b>: If the
 		<code>import</code>
-		tab (see below) is used to provide an external or workspace edited
-		batch script to the run, nothing extra need be done in the definition
-		XML, as the presence of any external path for the script is handled
-		under the covers.
+		tab (see <a href="#LaunchTab">below</a>) is used to provide an
+		external or workspace edited batch script to the run, nothing extra
+		need be done in the definition XML, as the presence of any external
+		path for the script is handled under the covers.
 	</p>
 
 	<p>
@@ -520,8 +521,9 @@
 	<p>
 		The
 		<code>line</code>
-		element was mentioned above in connection with managed file content;
-		it is essentially a wrapper around a series of
+		element was mentioned <a href="#Files">above</a> in connection
+		with managed file content; it is essentially a wrapper around a series
+		of
 		<code>arg</code>
 		elements, all of which are placed on a single line (that is, the group
 		is terminated by a line separator).
@@ -611,7 +613,7 @@
 	</h4>
 
 	<p>
-		As mentioned above, the resource manager
+		As mentioned <a href="#CommandTypes">above</a>, the resource manager
 		<code>command</code>
 		denotes a [UNIX-type] system call made on the resource manager's
 		remote (target) connection (PTP does not generally support execution
@@ -662,16 +664,16 @@
 		execution should not return until it sees this id. Very often the
 		submit commands will have these semantics. The latter field indicates
 		that the command should be held open for potentially repeated
-		redirection of input (see below). There can only be one such process
-		open inside the resource manager at a time (these semantics will
-		usually pertain to interactive managers using a pseudo-terminal mode
-		to control job submission).
+		redirection of input (see next paragraph). There can only be one such
+		process open inside the resource manager at a time (these semantics
+		will usually pertain to interactive managers using a pseudo-terminal
+		mode to control job submission).
 	</p>
 
 	<p>
 		We have discussed the
 		<code>arg</code>
-		type above. Note that the command arguments, input and even
+		type <a href="#LineArg">above</a>. Note that the command arguments, input and even
 		environment variables make use of this element. For the
 		<code>name-value-pair</code>
 		type comprising the latter one can as simple alternative set the <i>value</i>
@@ -729,7 +731,7 @@
 		should only be one character in length (escaped or non-escaped).
 		Provision is made for the '\r\n' (Windows) two-character delimiter
 		internally; in this case the delimiter should be set to "\r" (however,
-		as mentioned above, PTP does not generally guarantee that system calls
+		as already mentioned, PTP does not generally guarantee that system calls
 		will work on Windows). Setting <i>includeDelim</i> means that the
 		delimiter will appear as the last char on the returned stream segment.
 	</p>
@@ -823,8 +825,7 @@
 						<li>if the match is positive, process each of the actions,
 							and go to (1).</li>
 					</ul>
-			</ul>
-		</li>
+			</ul></li>
 	</ol>
 
 	<p>
@@ -872,30 +873,25 @@
 
 	<table align="center" rules="all">
 		<tr>
-			<td><code>set</code>
-			</td>
+			<td><code>set</code></td>
 			<td>sets the value of that field</td>
 		</tr>
 		<tr>
-			<td><code>append</code>
-			</td>
+			<td><code>append</code></td>
 			<td>adds to a string buffer, whose string value will be set on
 				the field</td>
 		</tr>
 		<tr>
-			<td><code>add</code>
-			</td>
+			<td><code>add</code></td>
 			<td>adds to a trst to which the value of that field will be set</td>
 		</tr>
 		<tr>
-			<td><code>put</code>
-			</td>
+			<td><code>put</code></td>
 			<td>places a key-value pair in a map to which the value of that
 				field will be set</td>
 		</tr>
 		<tr>
-			<td><code>throw</code>
-			</td>
+			<td><code>throw</code></td>
 			<td>throws an exception and (optionally) also sets the value of
 				the field</td>
 		</tr>
@@ -932,7 +928,7 @@
 	<img alt="TestType" src="images/12test.jpeg" />
 
 	<p>
-		As mentioned above, the
+		As mentioned <a href="#TargetType">above</a>, the
 		<code>test-type</code>
 		elements are all run after the tokenization has reached the end of the
 		stream. This class of actions is useful for setting values based on
@@ -1210,7 +1206,7 @@
 	<p>
 		As with
 		<code>composite</code>
-		(see below), the tab folder and tab item take
+		(see <a href="#Composite">below</a>), the tab folder and tab item take
 		<code>layout</code>
 		and
 		<code>layout-data</code>
@@ -1264,45 +1260,36 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><code>label</code>
-			</td>
+			<td><code>label</code></td>
 			<td>fixed text for display</td>
 		</tr>
 		<tr>
-			<td><code>text</code>
-			</td>
+			<td><code>text</code></td>
 			<td>area for entering/editing text</td>
 		</tr>
 		<tr>
-			<td><code>checkbox</code>
-			</td>
+			<td><code>checkbox</code></td>
 			<td>corresponds to a boolean choice</td>
 		</tr>
 		<tr>
-			<td><code>radiobutton</code>
-			</td>
-			<td>usually used in connection with <code>button-group</code>
-			</td>
+			<td><code>radiobutton</code></td>
+			<td>usually used in connection with <code>button-group</code></td>
 		</tr>
 		<tr>
-			<td><code>spinner</code>
-			</td>
+			<td><code>spinner</code></td>
 			<td>provides a continuous range of integer values</td>
 		</tr>
 		<tr>
-			<td><code>combo</code>
-			</td>
+			<td><code>combo</code></td>
 			<td>select from a list of items</td>
 		</tr>
 		<tr>
-			<td><code>browse</code>
-			</td>
+			<td><code>browse</code></td>
 			<td>a text widget followed by a push button allowing the user to
 				browse for directory or file.</td>
 		</tr>
 		<tr>
-			<td><code>action</code>
-			</td>
+			<td><code>action</code></td>
 			<td>a push button associated with a <code>button-action</code>
 				command</td>
 		</tr>
@@ -1316,36 +1303,43 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><i>title</i></td>
+			<td><i>title</i>
+			</td>
 			<td>used with <code>checkbox</code> and <code>push button</code>
 				widgets (<code>browse, action</code>) for the button label</td>
 		</tr>
 		<tr>
-			<td><i>style</i></td>
+			<td><i>style</i>
+			</td>
 			<td>carries the <code>SWT</code> style constants appropriate to
 				the widget type</td>
 		</tr>
 		<tr>
-			<td><i>directory</i></td>
+			<td><i>directory</i>
+			</td>
 			<td>limit the <code>browse</code> widget to directories</td>
 		</tr>
 		<tr>
-			<td><i>uri</i></td>
+			<td><i>uri</i>
+			</td>
 			<td>have the <code>browse</code> widget set a URI as the text
 				(default is false, in which case the text is an absolute path)</td>
 		</tr>
 		<tr>
-			<td><i>localOnly</i></td>
+			<td><i>localOnly</i>
+			</td>
 			<td>limit the <code>browse</code> widget to the local file
 				system (otherwise, the choice of local or remote is enabled)</td>
 		</tr>
 		<tr>
-			<td><i>readOnly</i></td>
+			<td><i>readOnly</i>
+			</td>
 			<td>applies to <code>text</code> and <code>combo</code> widgets;
 				the text area in this case is not editable</td>
 		</tr>
 		<tr>
-			<td><i>saveValueTo</i></td>
+			<td><i>saveValueTo</i>
+			</td>
 			<td>applies to all widgets except <code>label</code> and <code>action</code>;
 				the name of the property or attribute whose value should be set on
 				the basis of the widget's "selected" value or text<br> <b>Note:</b>
@@ -1353,7 +1347,8 @@
 				and <code>dynamic-text</code> elements.</td>
 		</tr>
 		<tr>
-			<td><i>translateBooleanAs</i></td>
+			<td><i>translateBooleanAs</i>
+			</td>
 			<td>applies to the <code>checkbox</code> widget; a
 				comma-delimited pair indicating a string equivalent for the boolean
 				to be used as the actual value for the property or attribute set by
@@ -1361,13 +1356,15 @@
 				the first string and false the second</td>
 		</tr>
 		<tr>
-			<td><code>sub-layout-data</code></td>
+			<td><code>sub-layout-data</code>
+			</td>
 			<td>applies to the <code>browse</code> widget; applies to the
 				button component, whereas <code>layout-data</code> applies to the
 				text area</td>
 		</tr>
 		<tr>
-			<td><code>items-from</code></td>
+			<td><code>items-from</code>
+			</td>
 			<td>applies to the <code>combo</code> widget; indicates a
 				property or attribute <i>value</i> (of type <code>java.util.Collection</code>)
 				to use to populate the items<br> <b>Note:</b> if a combo widget
@@ -1380,18 +1377,21 @@
 				choices)</td>
 		</tr>
 		<tr>
-			<td><code>fixed-text</code></td>
+			<td><code>fixed-text</code>
+			</td>
 			<td>applies to the <code>label</code> and (read-only)<code>text</code>
 				widgets; text is resolved once and remains constant thereafter</td>
 		</tr>
 		<tr>
-			<td><code>dynamic-text</code></td>
+			<td><code>dynamic-text</code>
+			</td>
 			<td>applies only to (read-only)<code>text</code> widgets; text
 				is resolved each time there is an update of a value from the Launch
 				Tab</td>
 		</tr>
 		<tr>
-			<td><code>button-action</code></td>
+			<td><code>button-action</code>
+			</td>
 			<td>applies to the <code>action</code> widget; the <code>button-action-type</code>
 				specifies the name of a command (<code>action</code>) defined in the
 				XML; this can be one of the <code>start-up</code>, <code>shut-down</code>,
@@ -1470,8 +1470,8 @@
 		viewer to allow for filtering the unchecked items. The viewer outputs
 		its checked values to the environment (and on update removes
 		unselected ones). The name of the viewer is also stored against a
-		string of all selected values, constructed from a template (see
-		below).</p>
+		string of all selected values, constructed from a template ( further
+		discussion at the end of this section).</p>
 
 	<p>
 		The viewer <i>type</i> can be either "table" or "tree"; in the case of
