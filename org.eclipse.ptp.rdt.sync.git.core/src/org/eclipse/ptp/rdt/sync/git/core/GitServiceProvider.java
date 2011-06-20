@@ -44,11 +44,11 @@ import org.eclipse.ui.statushandlers.StatusManager;
 public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider {
 	public static final String ID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
 
-	private static final String GIT_LOCATION = "location"; //$NON-NLS-1$
+	private static final String LOCATION = "location"; //$NON-NLS-1$
 
-	private static final String GIT_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
-	private static final String GIT_SERVICES_ID = "servicesId"; //$NON-NLS-1$
-	private static final String GIT_PROJECT_NAME = "projectName"; //$NON-NLS-1$
+	private static final String CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
+	private static final String SERVICES_ID = "servicesId"; //$NON-NLS-1$
+	private static final String PROJECT_NAME = "projectName"; //$NON-NLS-1$
 	private IProject fProject = null;
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
@@ -65,7 +65,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public String getLocation() {
 		if (fLocation == null) {
-			fLocation = getString(GIT_LOCATION, null);
+			fLocation = getString(LOCATION, null);
 		}
 		return fLocation;
 	}
@@ -77,7 +77,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public IProject getProject() {
 		if (fProject == null) {
-			final String name = getString(GIT_PROJECT_NAME, null);
+			final String name = getString(PROJECT_NAME, null);
 			if (name != null) {
 				fProject = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 			}
@@ -92,7 +92,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public IRemoteConnection getRemoteConnection() {
 		if (fConnection == null) {
-			final String name = getString(GIT_CONNECTION_NAME, null);
+			final String name = getString(CONNECTION_NAME, null);
 			if (name != null) {
 				final IRemoteServices services = getRemoteServices();
 				if (services != null) {
@@ -109,7 +109,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @return remote services
 	 */
 	public IRemoteServices getRemoteServices() {
-		final String id = getString(GIT_SERVICES_ID, null);
+		final String id = getString(SERVICES_ID, null);
 		if (id != null) {
 			return PTPRemoteCorePlugin.getDefault().getRemoteServices(id);
 		}
@@ -137,7 +137,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			throw new RuntimeException(Messages.GSP_ChangeLocationError);
 		}
 		fLocation = location;
-		putString(GIT_LOCATION, location);
+		putString(LOCATION, location);
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			throw new RuntimeException(Messages.GSP_ChangeProjectError);
 		}
 		fProject = project;
-		putString(GIT_PROJECT_NAME, project.getName());
+		putString(PROJECT_NAME, project.getName());
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			throw new RuntimeException(Messages.GSP_ChangeConnectionError);
 		}
 		fConnection = conn;
-		putString(GIT_CONNECTION_NAME, conn.getName());
+		putString(CONNECTION_NAME, conn.getName());
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @throws RuntimeException if already set. Changing these local parameters is not currently supported but should be possible.
 	 */
 	public void setRemoteServices(IRemoteServices services) {
-		putString(GIT_SERVICES_ID, services.getId());
+		putString(SERVICES_ID, services.getId());
 	}
 
 	/*
@@ -261,11 +261,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			try {
 				while (!syncLock.tryLock(50, TimeUnit.MILLISECONDS)) {
 					if (progress.isCanceled()) {
-						throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.GitServiceProvider_1));
+						throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.ServiceProvider_1));
 					}
 				}
 			} catch (InterruptedException e1) {
-				throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.GitServiceProvider_2));
+				throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.ServiceProvider_2));
 			}
 				
 				
@@ -425,7 +425,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		syncLock.lock();
 		try {
 			fConnection = connection;
-			putString(GIT_CONNECTION_NAME, connection.getName());
+			putString(CONNECTION_NAME, connection.getName());
 			fSyncConnection = null;  //get reinitialized by next synchronize call
 		} finally {
 			syncLock.unlock();
@@ -441,7 +441,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		syncLock.lock();
 		try {
 			fLocation = configLocation;
-			putString(GIT_LOCATION, configLocation);
+			putString(LOCATION, configLocation);
 			fSyncConnection = null;  //get reinitialized by next synchronize call
 		} finally {
 			syncLock.unlock();
