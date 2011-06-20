@@ -202,9 +202,8 @@
 		as the process termination will be handled internally. However, in
 		some cases (such as PBS -I) which require the interactive job to run
 		as a pseudo-terminal, one may need this command in order to force its
-		termination externally. Finally, a
-		<code>button-action</code>
-		is an arbitrary command associated with a button exposed through the
+		termination externally. Finally, a <b>button-action</b> is an
+		arbitrary command associated with a button exposed through the
 		<code>Launch Tab</code>
 		(see further below).
 	</p>
@@ -283,7 +282,9 @@
 		comma-delimited and will appear as the items of a combo-box.
 		<code>items-from</code>
 		instead links the combo items (choice) to another property or
-		attribute value.
+		attribute value (whose type must be
+		<code>java.util.Collection</code>
+		).
 	</p>
 
 	<h4 align="center">
@@ -822,7 +823,8 @@
 						<li>if the match is positive, process each of the actions,
 							and go to (1).</li>
 					</ul>
-			</ul></li>
+			</ul>
+		</li>
 	</ol>
 
 	<p>
@@ -870,25 +872,30 @@
 
 	<table align="center" rules="all">
 		<tr>
-			<td><code>set</code></td>
+			<td><code>set</code>
+			</td>
 			<td>sets the value of that field</td>
 		</tr>
 		<tr>
-			<td><code>append</code></td>
+			<td><code>append</code>
+			</td>
 			<td>adds to a string buffer, whose string value will be set on
 				the field</td>
 		</tr>
 		<tr>
-			<td><code>add</code></td>
+			<td><code>add</code>
+			</td>
 			<td>adds to a trst to which the value of that field will be set</td>
 		</tr>
 		<tr>
-			<td><code>put</code></td>
+			<td><code>put</code>
+			</td>
 			<td>places a key-value pair in a map to which the value of that
 				field will be set</td>
 		</tr>
 		<tr>
-			<td><code>throw</code></td>
+			<td><code>throw</code>
+			</td>
 			<td>throws an exception and (optionally) also sets the value of
 				the field</td>
 		</tr>
@@ -1257,36 +1264,45 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><code>label</code></td>
+			<td><code>label</code>
+			</td>
 			<td>fixed text for display</td>
 		</tr>
 		<tr>
-			<td><code>text</code></td>
+			<td><code>text</code>
+			</td>
 			<td>area for entering/editing text</td>
 		</tr>
 		<tr>
-			<td><code>checkbox</code></td>
+			<td><code>checkbox</code>
+			</td>
 			<td>corresponds to a boolean choice</td>
 		</tr>
 		<tr>
-			<td><code>radiobutton</code></td>
-			<td>usually used in connection with <code>button-group</code></td>
+			<td><code>radiobutton</code>
+			</td>
+			<td>usually used in connection with <code>button-group</code>
+			</td>
 		</tr>
 		<tr>
-			<td><code>spinner</code></td>
+			<td><code>spinner</code>
+			</td>
 			<td>provides a continuous range of integer values</td>
 		</tr>
 		<tr>
-			<td><code>combo</code></td>
+			<td><code>combo</code>
+			</td>
 			<td>select from a list of items</td>
 		</tr>
 		<tr>
-			<td><code>browse</code></td>
+			<td><code>browse</code>
+			</td>
 			<td>a text widget followed by a push button allowing the user to
 				browse for directory or file.</td>
 		</tr>
 		<tr>
-			<td><code>action</code></td>
+			<td><code>action</code>
+			</td>
 			<td>a push button associated with a <code>button-action</code>
 				command</td>
 		</tr>
@@ -1300,43 +1316,36 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><i>title</i>
-			</td>
+			<td><i>title</i></td>
 			<td>used with <code>checkbox</code> and <code>push button</code>
 				widgets (<code>browse, action</code>) for the button label</td>
 		</tr>
 		<tr>
-			<td><i>style</i>
-			</td>
+			<td><i>style</i></td>
 			<td>carries the <code>SWT</code> style constants appropriate to
 				the widget type</td>
 		</tr>
 		<tr>
-			<td><i>directory</i>
-			</td>
+			<td><i>directory</i></td>
 			<td>limit the <code>browse</code> widget to directories</td>
 		</tr>
 		<tr>
-			<td><i>uri</i>
-			</td>
+			<td><i>uri</i></td>
 			<td>have the <code>browse</code> widget set a URI as the text
 				(default is false, in which case the text is an absolute path)</td>
 		</tr>
 		<tr>
-			<td><i>localOnly</i>
-			</td>
+			<td><i>localOnly</i></td>
 			<td>limit the <code>browse</code> widget to the local file
 				system (otherwise, the choice of local or remote is enabled)</td>
 		</tr>
 		<tr>
-			<td><i>readOnly</i>
-			</td>
+			<td><i>readOnly</i></td>
 			<td>applies to <code>text</code> and <code>combo</code> widgets;
 				the text area in this case is not editable</td>
 		</tr>
 		<tr>
-			<td><i>saveValueTo</i>
-			</td>
+			<td><i>saveValueTo</i></td>
 			<td>applies to all widgets except <code>label</code> and <code>action</code>;
 				the name of the property or attribute whose value should be set on
 				the basis of the widget's "selected" value or text<br> <b>Note:</b>
@@ -1344,8 +1353,7 @@
 				and <code>dynamic-text</code> elements.</td>
 		</tr>
 		<tr>
-			<td><i>translateBooleanAs</i>
-			</td>
+			<td><i>translateBooleanAs</i></td>
 			<td>applies to the <code>checkbox</code> widget; a
 				comma-delimited pair indicating a string equivalent for the boolean
 				to be used as the actual value for the property or attribute set by
@@ -1353,18 +1361,16 @@
 				the first string and false the second</td>
 		</tr>
 		<tr>
-			<td><code>sub-layout-data</code>
-			</td>
+			<td><code>sub-layout-data</code></td>
 			<td>applies to the <code>browse</code> widget; applies to the
 				button component, whereas <code>layout-data</code> applies to the
 				text area</td>
 		</tr>
 		<tr>
-			<td><code>items-from</code>
-			</td>
+			<td><code>items-from</code></td>
 			<td>applies to the <code>combo</code> widget; indicates a
-				property or attribute <i>value</i> (of type <code>List</code>) to
-				use to populate the items<br> <b>Note:</b> if a combo widget
+				property or attribute <i>value</i> (of type <code>java.util.Collection</code>)
+				to use to populate the items<br> <b>Note:</b> if a combo widget
 				saves its value to an attribute and the present element on the
 				widget descriptor is not set, the attribute will be checked for
 				non-empty <code>choice</code> and <code>items-from</code> values,
@@ -1374,21 +1380,18 @@
 				choices)</td>
 		</tr>
 		<tr>
-			<td><code>fixed-text</code>
-			</td>
+			<td><code>fixed-text</code></td>
 			<td>applies to the <code>label</code> and (read-only)<code>text</code>
 				widgets; text is resolved once and remains constant thereafter</td>
 		</tr>
 		<tr>
-			<td><code>dynamic-text</code>
-			</td>
+			<td><code>dynamic-text</code></td>
 			<td>applies only to (read-only)<code>text</code> widgets; text
 				is resolved each time there is an update of a value from the Launch
 				Tab</td>
 		</tr>
 		<tr>
-			<td><code>button-action</code>
-			</td>
+			<td><code>button-action</code></td>
 			<td>applies to the <code>action</code> widget; the name of a <code>command</code>
 				defined in the XML; this can be one of the <code>start-up</code>, <code>shut-down</code>,
 				commands, or a special <code>button-action</code> command (<b>note
@@ -1443,9 +1446,9 @@
 	<img alt="AttributeViewer" src="images/21attribute-viewer.jpeg" />
 
 	<p>
-		We come the last of the widget types, the
+		The last of the widget types, the
 		<code>attribute-viewer</code>
-		, which displays visible properties and attributes in a table or tree
+		, displays visible properties and attributes in a table or tree
 		viewer, with the value columns as editable widgets. The type of cell
 		editor is determined implicitly here by the type of the property or
 		attribute; the presence of a combo editor is determined by an
