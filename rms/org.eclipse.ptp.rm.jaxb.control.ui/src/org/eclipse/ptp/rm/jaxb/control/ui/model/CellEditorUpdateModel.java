@@ -98,6 +98,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 		this.editor = editor;
 		this.readOnly = readOnly;
 		this.items = items;
+		this.itemsFrom = itemsFrom;
 		this.tooltip = tooltip;
 		this.description = description;
 		this.status = status;
@@ -271,6 +272,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 */
 	@Override
 	public void initialize(RMVariableMap rmMap, LCVariableMap lcMap) {
+		this.lcMap = lcMap;
 		if (editor instanceof ComboBoxCellEditor) {
 			if (itemsFrom != null) {
 				items = WidgetActionUtils.getItemsFrom(rmMap, itemsFrom);
@@ -279,7 +281,6 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 			}
 		}
 		super.initialize(rmMap, lcMap);
-		this.lcMap = lcMap;
 	}
 
 	/*

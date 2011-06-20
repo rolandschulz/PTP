@@ -28,8 +28,10 @@
 			<link-value-to>Error_Path</link-value-to>
 		</property>
 		<property name="local.input.file" visible="false"/>
-		<property name="remote.input.file" visible="true"/>
 		<property name="remote.input.files" visible="false"/>
+		<attribute name="remote.input.file" type="choice">
+			<items-from>remote.input.files</items-from>
+		</attribute>
 		<attribute name="mpiCommand" type="string">
 			<description>Which mpi command to use.</description>
 		</attribute>
@@ -461,7 +463,6 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
-						<items-from>remote.input.files</items-from>
 					</widget>
 					<widget type="action" style="SWT.BORDER" title="Refresh">
 						<layout-data>
@@ -486,9 +487,14 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
 						</sub-layout-data>
 					</widget>
+				</composite>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="1" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
 					<viewer name="environment" style="SWT.BORDER | SWT.MULTI" sort="true" type="table">
                   <layout-data>
-                     <grid-data widthHint="600" heightHint="200" horizontalSpan="1"/>
+                     <grid-data widthHint="600" heightHint="40" horizontalSpan="1"/>
                   </layout-data>
                   <column-data name="Name" width="175">
                      <tooltip>Double-click on selected rows toggles their checked value.</tooltip>

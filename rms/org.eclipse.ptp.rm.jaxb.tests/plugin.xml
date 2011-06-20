@@ -4,12 +4,8 @@
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
-            configurationFile="data/demo-example-full.xml"
+            configurationFile="data/demo-example.xml"
             name="Demo Example">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-            configurationFile="data/tabbed-example.xml"
-            name="Working Examples">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/namelist-example.xml"

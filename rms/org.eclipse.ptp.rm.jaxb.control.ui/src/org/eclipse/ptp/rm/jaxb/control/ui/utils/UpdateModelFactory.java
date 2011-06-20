@@ -11,7 +11,6 @@ package org.eclipse.ptp.rm.jaxb.control.ui.utils;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
@@ -108,6 +107,7 @@ public class UpdateModelFactory {
 				AttributeType a = (AttributeType) data;
 				name = a.getName();
 				choice = a.getChoice();
+				itemsFrom = a.getItemsFrom();
 				min = a.getMin();
 				max = a.getMax();
 				readOnly = a.isReadOnly();
@@ -181,10 +181,9 @@ public class UpdateModelFactory {
 				if (value != null) {
 					return getType(value);
 				}
-				return TEXT;
 			} else if (object instanceof AttributeType) {
 				AttributeType a = (AttributeType) object;
-				if (a.getChoice() != null) {
+				if (a.getChoice() != null || a.getItemsFrom() != null) {
 					return COMBO;
 				}
 				String clzz = a.getType();
@@ -195,16 +194,8 @@ public class UpdateModelFactory {
 				if (value != null) {
 					return getType(value);
 				}
-				return TEXT;
-			} else if (object instanceof Collection) {
-				return COMBO;
-			} else if (object instanceof Integer) {
-				return SPINNER;
-			} else if (object instanceof Boolean) {
-				return CHECK;
-			} else {
-				return TEXT;
 			}
+			return TEXT;
 		}
 
 		/**
@@ -221,15 +212,6 @@ public class UpdateModelFactory {
 			}
 			if (clzz.indexOf(JAXBControlUIConstants.BOOL) >= 0) {
 				return CHECK;
-			}
-			if (clzz.indexOf(JAXBControlUIConstants.IST) > 0) {
-				return COMBO;
-			}
-			if (clzz.indexOf(JAXBControlUIConstants.ET) > 0) {
-				return COMBO;
-			}
-			if (clzz.indexOf(JAXBControlUIConstants.ECTOR) > 0) {
-				return COMBO;
 			}
 			return TEXT;
 		}
@@ -271,6 +253,14 @@ public class UpdateModelFactory {
 		private ControlDescriptor(WidgetType widget, IVariableMap rmMap) {
 			setControlData(widget);
 			setMapDependentData(widget, rmMap);
+			/*
+			 * NOTE: this will override the attribute field, so check for null
+			 * first
+			 */
+			String s = widget.getItemsFrom();
+			if (s != null) {
+				itemsFrom = s;
+			}
 		}
 
 		/**
@@ -313,6 +303,7 @@ public class UpdateModelFactory {
 			if (data instanceof AttributeType) {
 				AttributeType a = (AttributeType) data;
 				choice = a.getChoice();
+				itemsFrom = a.getItemsFrom();
 				min = a.getMin();
 				max = a.getMax();
 			}
@@ -343,7 +334,6 @@ public class UpdateModelFactory {
 					setData(data);
 				}
 			}
-			itemsFrom = widget.getItemsFrom();
 		}
 	}
 
@@ -666,7 +656,6 @@ public class UpdateModelFactory {
 	 *            Table or Tree to which the editor belongs
 	 * @return the editor of appropriate type
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static CellEditor createEditor(CellDescriptor cd, Object data, Composite parent) {
 		CellEditor editor = null;
 		if (cd.type == CellEditorType.TEXT) {
@@ -676,20 +665,10 @@ public class UpdateModelFactory {
 		} else if (cd.type == CellEditorType.SPINNER) {
 			editor = new SpinnerCellEditor(parent, cd.min, cd.max);
 		} else if (cd.type == CellEditorType.COMBO) {
-			Object o = null;
 			if (data instanceof AttributeType) {
 				if (cd.choice != null) {
 					cd.choice = cd.choice.trim();
 					cd.items = cd.choice.split(JAXBControlUIConstants.CM);
-				} else {
-					o = ((AttributeType) data).getValue();
-				}
-			} else {
-				o = ((PropertyType) data).getValue();
-			}
-			if (cd.items == null) {
-				if (o instanceof Collection) {
-					cd.items = (String[]) ((Collection) o).toArray(new String[0]);
 				} else {
 					cd.items = new String[0];
 				}
