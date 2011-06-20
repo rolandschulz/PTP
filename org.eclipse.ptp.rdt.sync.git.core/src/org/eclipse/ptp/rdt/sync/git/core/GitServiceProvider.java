@@ -50,7 +50,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
 	private GitRemoteSyncConnection fSyncConnection = null;
-	
+
 	private final ReentrantLock syncLock = new ReentrantLock();
 	private Integer syncTaskId = -1;  //ID for most recent synchronization task, functions as a time-stamp 
 	private int finishedSyncTaskId = -1; //all synchronizations up to this ID (including it) have finished
@@ -184,7 +184,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * synchronize(org.eclipse.core.resources.IResourceDelta, org.eclipse.core.runtime.IProgressMonitor, boolean)
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 100);
+		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
 		
 		// Make a visitor that explores the delta. At the moment, this visitor is responsible for two tasks (the list may grow in the future):
 		// 1) Find out if there are any "relevant" resource changes (changes that need to be mirrored remotely)
@@ -241,36 +241,33 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			if ((syncFlags == SyncFlag.NO_FORCE) && (!(hasRelevantChangedResources))) {
 				return;
 			}
-			
+
 			int mySyncTaskId;
 			synchronized (syncTaskId) {
-				syncTaskId++;    
-				mySyncTaskId=syncTaskId;
-				//suggestion for Deltas: add delta to list of deltas
+				syncTaskId++;
+				mySyncTaskId = syncTaskId;
+				// suggestion for Deltas: add delta to list of deltas
 			}
 			
 			if (syncLock.hasQueuedThreads() && syncFlags == SyncFlag.NO_FORCE)
 				return;   //the queued Thread will do the work for us. And we don't have to wait because of NO_FORCE
-			
-			
-			
-			//lock syncLock. interruptible by progress monitor
+
+			// lock syncLock. interruptible by progress monitor
 			try {
 				while (!syncLock.tryLock(50, TimeUnit.MILLISECONDS)) {
 					if (progress.isCanceled()) {
-						throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.GitServiceProvider_1));
+						throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, Messages.GitServiceProvider_1));
 					}
 				}
 			} catch (InterruptedException e1) {
-				throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.GitServiceProvider_2));
+				throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, Messages.GitServiceProvider_2));
 			}
-				
-				
+
 			try {
 				if (mySyncTaskId<=finishedSyncTaskId) {  //some other thread has already done the work for us 
 					return;
 				}
-	
+
 				// TODO: Review exception handling
 				if (fSyncConnection == null) {
 					// Open a remote sync connection
@@ -278,10 +275,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 															this.getProject().getLocation().toString(),	this.getLocation(),
 															new FileFilter(), progress);
 				}
-	
+
 				// Open remote connection if necessary
 				if (this.getRemoteConnection().isOpen() == false) {
-					this.getRemoteConnection().open(progress);
+					this.getRemoteConnection().open(progress.newChild(10));
 				}
 	
 				// This synchronization operation will include all tasks up to current syncTaskId
@@ -293,12 +290,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				synchronized (syncTaskId) {
 					willFinishTaskId = syncTaskId;
 				}
-	
+
 				// Sync local and remote. For now, do both ways each time.
 				// TODO: Sync more efficiently and appropriately to the situation.
 				fSyncConnection.syncLocalToRemote(progress.newChild(40));
 				fSyncConnection.syncRemoteToLocal(progress.newChild(40));
-	
+
 				finishedSyncTaskId = willFinishTaskId;
 			} catch (final RemoteSyncException e) {
 				this.handleRemoteSyncException(e);
@@ -309,7 +306,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			} finally {
 				syncLock.unlock();
 			}
-			
+
 			IProject project = this.getProject();
 			if (project != null) {
 				project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(20));
@@ -319,7 +316,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				monitor.done();
 		}
 	}
-	
+
 	/**
 	 * Error handler. There are several reasons why a sync operation may fail. This function is responsible for handling each case
 	 * appropriately. For now we simply report any errors to the user.
@@ -331,7 +328,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		IStatus status = null;
 		int severity = e.getStatus().getSeverity();
 		String message = null;
-		
+
 		// RemoteSyncException is generally used by either creating a new exception with a message describing the problem or by
 		// embedding another type of error. So we need to decide which message to use.
 		if (e.getMessage() != null || e.getCause() == null) {
@@ -344,19 +341,19 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		status = new Status(severity, Activator.PLUGIN_ID, message, e);
 		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
 	}
-	
+
 	// Paths that the Git sync provider can ignore.
 	private boolean irrelevantPath(IResourceDelta delta) {
 		String path = delta.getFullPath().toString();
 		if (path.endsWith("/.git")) { //$NON-NLS-1$
 			return true;
-		} else if (path.endsWith("/.settings")){ //$NON-NLS-1$
+		} else if (path.endsWith("/.settings")) { //$NON-NLS-1$
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	private class FileFilter implements SyncFileFilter {
 		public boolean shouldIgnore(String fileName) {
 			if (fileName.equals(".cproject") || fileName.equals(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -392,8 +389,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			}
 		}
 	}
-
-
 
 	/*
 	 * (non-Javadoc)
