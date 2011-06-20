@@ -23,9 +23,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.ui,
  org.eclipse.search,
  org.eclipse.help,
- org.eclipse.ptp.pldt.common,
- org.eclipse.photran.cdtinterface;resolution:=optional,
- org.eclipse.photran.core;resolution:=optional,
- org.eclipse.photran.core.vpg;resolution:=optional
+ org.eclipse.ptp.pldt.common
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
