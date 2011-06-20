@@ -66,7 +66,9 @@
 			definition. Those interested only in using the JAXB resource managers
 			already provided with the PTP distribution should consult the User
 			pages under the relevant scheduler (currently only the PBS resource
-			managers are JAXB-configurable).</b>
+			managers are JAXB-configurable; please see the <a
+			href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.pbs.doc.user/html/toc.html">PBS
+				Res Mgr help</a>).</b>
 	</p>
 	<hr>
 	<h2>
@@ -521,9 +523,8 @@
 	<p>
 		The
 		<code>line</code>
-		element was mentioned <a href="#Files">above</a> in connection
-		with managed file content; it is essentially a wrapper around a series
-		of
+		element was mentioned <a href="#Files">above</a> in connection with
+		managed file content; it is essentially a wrapper around a series of
 		<code>arg</code>
 		elements, all of which are placed on a single line (that is, the group
 		is terminated by a line separator).
@@ -673,8 +674,8 @@
 	<p>
 		We have discussed the
 		<code>arg</code>
-		type <a href="#LineArg">above</a>. Note that the command arguments, input and even
-		environment variables make use of this element. For the
+		type <a href="#LineArg">above</a>. Note that the command arguments,
+		input and even environment variables make use of this element. For the
 		<code>name-value-pair</code>
 		type comprising the latter one can as simple alternative set the <i>value</i>
 		attribute to a string (which will be resolved first in the current
@@ -731,9 +732,10 @@
 		should only be one character in length (escaped or non-escaped).
 		Provision is made for the '\r\n' (Windows) two-character delimiter
 		internally; in this case the delimiter should be set to "\r" (however,
-		as already mentioned, PTP does not generally guarantee that system calls
-		will work on Windows). Setting <i>includeDelim</i> means that the
-		delimiter will appear as the last char on the returned stream segment.
+		as already mentioned, PTP does not generally guarantee that system
+		calls will work on Windows). Setting <i>includeDelim</i> means that
+		the delimiter will appear as the last char on the returned stream
+		segment.
 	</p>
 
 	<p>
@@ -825,7 +827,8 @@
 						<li>if the match is positive, process each of the actions,
 							and go to (1).</li>
 					</ul>
-			</ul></li>
+			</ul>
+		</li>
 	</ol>
 
 	<p>
@@ -873,25 +876,30 @@
 
 	<table align="center" rules="all">
 		<tr>
-			<td><code>set</code></td>
+			<td><code>set</code>
+			</td>
 			<td>sets the value of that field</td>
 		</tr>
 		<tr>
-			<td><code>append</code></td>
+			<td><code>append</code>
+			</td>
 			<td>adds to a string buffer, whose string value will be set on
 				the field</td>
 		</tr>
 		<tr>
-			<td><code>add</code></td>
+			<td><code>add</code>
+			</td>
 			<td>adds to a trst to which the value of that field will be set</td>
 		</tr>
 		<tr>
-			<td><code>put</code></td>
+			<td><code>put</code>
+			</td>
 			<td>places a key-value pair in a map to which the value of that
 				field will be set</td>
 		</tr>
 		<tr>
-			<td><code>throw</code></td>
+			<td><code>throw</code>
+			</td>
 			<td>throws an exception and (optionally) also sets the value of
 				the field</td>
 		</tr>
@@ -1260,36 +1268,45 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><code>label</code></td>
+			<td><code>label</code>
+			</td>
 			<td>fixed text for display</td>
 		</tr>
 		<tr>
-			<td><code>text</code></td>
+			<td><code>text</code>
+			</td>
 			<td>area for entering/editing text</td>
 		</tr>
 		<tr>
-			<td><code>checkbox</code></td>
+			<td><code>checkbox</code>
+			</td>
 			<td>corresponds to a boolean choice</td>
 		</tr>
 		<tr>
-			<td><code>radiobutton</code></td>
-			<td>usually used in connection with <code>button-group</code></td>
+			<td><code>radiobutton</code>
+			</td>
+			<td>usually used in connection with <code>button-group</code>
+			</td>
 		</tr>
 		<tr>
-			<td><code>spinner</code></td>
+			<td><code>spinner</code>
+			</td>
 			<td>provides a continuous range of integer values</td>
 		</tr>
 		<tr>
-			<td><code>combo</code></td>
+			<td><code>combo</code>
+			</td>
 			<td>select from a list of items</td>
 		</tr>
 		<tr>
-			<td><code>browse</code></td>
+			<td><code>browse</code>
+			</td>
 			<td>a text widget followed by a push button allowing the user to
 				browse for directory or file.</td>
 		</tr>
 		<tr>
-			<td><code>action</code></td>
+			<td><code>action</code>
+			</td>
 			<td>a push button associated with a <code>button-action</code>
 				command</td>
 		</tr>
@@ -1303,43 +1320,36 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><i>title</i>
-			</td>
+			<td><i>title</i></td>
 			<td>used with <code>checkbox</code> and <code>push button</code>
 				widgets (<code>browse, action</code>) for the button label</td>
 		</tr>
 		<tr>
-			<td><i>style</i>
-			</td>
+			<td><i>style</i></td>
 			<td>carries the <code>SWT</code> style constants appropriate to
 				the widget type</td>
 		</tr>
 		<tr>
-			<td><i>directory</i>
-			</td>
+			<td><i>directory</i></td>
 			<td>limit the <code>browse</code> widget to directories</td>
 		</tr>
 		<tr>
-			<td><i>uri</i>
-			</td>
+			<td><i>uri</i></td>
 			<td>have the <code>browse</code> widget set a URI as the text
 				(default is false, in which case the text is an absolute path)</td>
 		</tr>
 		<tr>
-			<td><i>localOnly</i>
-			</td>
+			<td><i>localOnly</i></td>
 			<td>limit the <code>browse</code> widget to the local file
 				system (otherwise, the choice of local or remote is enabled)</td>
 		</tr>
 		<tr>
-			<td><i>readOnly</i>
-			</td>
+			<td><i>readOnly</i></td>
 			<td>applies to <code>text</code> and <code>combo</code> widgets;
 				the text area in this case is not editable</td>
 		</tr>
 		<tr>
-			<td><i>saveValueTo</i>
-			</td>
+			<td><i>saveValueTo</i></td>
 			<td>applies to all widgets except <code>label</code> and <code>action</code>;
 				the name of the property or attribute whose value should be set on
 				the basis of the widget's "selected" value or text<br> <b>Note:</b>
@@ -1347,8 +1357,7 @@
 				and <code>dynamic-text</code> elements.</td>
 		</tr>
 		<tr>
-			<td><i>translateBooleanAs</i>
-			</td>
+			<td><i>translateBooleanAs</i></td>
 			<td>applies to the <code>checkbox</code> widget; a
 				comma-delimited pair indicating a string equivalent for the boolean
 				to be used as the actual value for the property or attribute set by
@@ -1356,15 +1365,13 @@
 				the first string and false the second</td>
 		</tr>
 		<tr>
-			<td><code>sub-layout-data</code>
-			</td>
+			<td><code>sub-layout-data</code></td>
 			<td>applies to the <code>browse</code> widget; applies to the
 				button component, whereas <code>layout-data</code> applies to the
 				text area</td>
 		</tr>
 		<tr>
-			<td><code>items-from</code>
-			</td>
+			<td><code>items-from</code></td>
 			<td>applies to the <code>combo</code> widget; indicates a
 				property or attribute <i>value</i> (of type <code>java.util.Collection</code>)
 				to use to populate the items<br> <b>Note:</b> if a combo widget
@@ -1377,21 +1384,18 @@
 				choices)</td>
 		</tr>
 		<tr>
-			<td><code>fixed-text</code>
-			</td>
+			<td><code>fixed-text</code></td>
 			<td>applies to the <code>label</code> and (read-only)<code>text</code>
 				widgets; text is resolved once and remains constant thereafter</td>
 		</tr>
 		<tr>
-			<td><code>dynamic-text</code>
-			</td>
+			<td><code>dynamic-text</code></td>
 			<td>applies only to (read-only)<code>text</code> widgets; text
 				is resolved each time there is an update of a value from the Launch
 				Tab</td>
 		</tr>
 		<tr>
-			<td><code>button-action</code>
-			</td>
+			<td><code>button-action</code></td>
 			<td>applies to the <code>action</code> widget; the <code>button-action-type</code>
 				specifies the name of a command (<code>action</code>) defined in the
 				XML; this can be one of the <code>start-up</code>, <code>shut-down</code>,
