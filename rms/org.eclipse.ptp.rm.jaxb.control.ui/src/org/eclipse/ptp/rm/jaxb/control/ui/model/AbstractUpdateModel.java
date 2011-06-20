@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
@@ -98,7 +99,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	 * the map, and if the value is <code>null</code>, the default value is
 	 * restored to the map and another refresh is called on the actual value.
 	 */
-	public void initialize(LCVariableMap lcMap) {
+	public void initialize(RMVariableMap rmMap, LCVariableMap lcMap) {
 		this.lcMap = lcMap;
 		if (name != null) {
 			defaultValue = lcMap.getDefault(name);

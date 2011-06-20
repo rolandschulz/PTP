@@ -352,7 +352,7 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="button-action" minOccurs="0" type="rm:button-action"/>
+			<xs:element name="button-action" minOccurs="0" type="rm:button-action-type"/>
 		</xs:sequence>
 		<xs:attribute name="type" default="text">
 			<xs:simpleType>
@@ -379,7 +379,7 @@
 		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
-	<xs:complexType name="button-action">
+	<xs:complexType name="button-action-type">
 	  <xs:sequence>
 	     <xs:element name="action" type="xs:string"/>
 	  </xs:sequence>

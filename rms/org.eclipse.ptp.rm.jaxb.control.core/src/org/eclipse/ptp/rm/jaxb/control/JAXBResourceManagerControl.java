@@ -136,6 +136,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 *             if the job execution raised and exception
 	 */
 	private static void checkJobForError(ICommandJob job) throws CoreException {
+		job.joinConsumers();
 		IStatus status = job.getRunStatus();
 		if (status != null && status.getSeverity() == IStatus.ERROR) {
 			Throwable t = status.getException();
@@ -258,13 +259,25 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * First checks for the command definition, then calls
+	 * First clears the value, if indicated, then checks for the command
+	 * definition, and calls
 	 * {@link #runCommand(String, CommandType, org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJob.JobMode, boolean)}
 	 * .
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#runActionCommand(java.lang.String)
 	 */
-	public void runActionCommand(String action) throws CoreException {
+	public Object runActionCommand(String action, String resetValue) throws CoreException {
+		Object changedValue = null;
+
+		if (resetValue != null) {
+			changedValue = rmVarMap.get(resetValue);
+			if (changedValue instanceof PropertyType) {
+				((PropertyType) changedValue).setValue(null);
+			} else if (changedValue instanceof AttributeType) {
+				((AttributeType) changedValue).setValue(null);
+			}
+		}
+
 		CommandType command = null;
 
 		for (CommandType cmd : controlData.getButtonAction()) {
@@ -295,6 +308,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (command != null) {
 			runCommand(null, command, CommandJob.JobMode.INTERACTIVE, true);
 		}
+
+		return changedValue;
 	}
 
 	/**

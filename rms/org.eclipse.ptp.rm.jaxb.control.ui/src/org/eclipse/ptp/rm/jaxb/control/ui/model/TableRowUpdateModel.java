@@ -34,13 +34,17 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 * @param editor
 	 *            the cell editor for the value cell
 	 * @param items
-	 *            if this is a combo editor, the selection items
+	 *            if this is a combo editor, the preset selection items
+	 * @param itemsFrom
+	 *            if this is a combo editor, the property or attribute value to
+	 *            get the items from
 	 * @param readOnly
 	 *            if this is a text box, whether it is editable
 	 */
-	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly) {
+	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, String itemsFrom,
+			boolean readOnly) {
 		super(name, handler, editor, items, readOnly, JAXBControlUIConstants.ZEROSTR, JAXBControlUIConstants.ZEROSTR,
-				JAXBControlUIConstants.ZEROSTR);
+				JAXBControlUIConstants.ZEROSTR, itemsFrom);
 	}
 
 	/**
@@ -56,14 +60,17 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 *            the cell editor for the value cell
 	 * @param items
 	 *            if this is a combo editor, the selection items
+	 * @param itemsFrom
+	 *            if this is a combo editor, the property or attribute value to
+	 *            get the items from
 	 * @param readOnly
 	 *            if this is a text box, whether it is editable
 	 * @param data
 	 *            the Attribute object
 	 */
-	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
-			AttributeType data) {
-		super(name, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus());
+	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, String itemsFrom,
+			boolean readOnly, AttributeType data) {
+		super(name, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus(), itemsFrom);
 	}
 
 	/*

@@ -165,8 +165,8 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#runActionCommand
 	 * (java.lang.String)
 	 */
-	public void runActionCommand(String action) throws CoreException {
-
+	public Object runActionCommand(String action, String resetValue) throws CoreException {
+		return null;
 	}
 
 	@Override

@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 
@@ -53,6 +54,11 @@ public interface ICommandJob {
 	 * Job/Thread interface
 	 */
 	public void join() throws InterruptedException;
+
+	/**
+	 * @return any error recorded on the streams.
+	 */
+	public CoreException joinConsumers();
 
 	/**
 	 * Job/Thread interface

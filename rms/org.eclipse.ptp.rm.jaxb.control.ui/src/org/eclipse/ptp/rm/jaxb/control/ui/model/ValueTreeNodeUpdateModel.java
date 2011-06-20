@@ -43,6 +43,9 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 *            the cell editor for the value cell
 	 * @param items
 	 *            if this is a combo editor, the selection items
+	 * @param itemsFrom
+	 *            if this is a combo editor, the property or attribute value to
+	 *            get the items from
 	 * @param readOnly
 	 *            if this is a text box, whether it is editable
 	 * @param inValueCol
@@ -50,10 +53,10 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 *            viewer. (<code>false</code> means that its value displays in a
 	 *            column whose name matches the id.
 	 */
-	public ValueTreeNodeUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
-			boolean inValueCol) {
+	public ValueTreeNodeUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, String itemsFrom,
+			boolean readOnly, boolean inValueCol) {
 		super(name, handler, editor, items, readOnly, JAXBControlUIConstants.ZEROSTR, JAXBControlUIConstants.ZEROSTR,
-				JAXBControlUIConstants.ZEROSTR);
+				JAXBControlUIConstants.ZEROSTR, itemsFrom);
 		children = new ArrayList<InfoTreeNodeModel>();
 		generateChildren(inValueCol);
 	}
@@ -71,6 +74,9 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 *            the cell editor for the value cell
 	 * @param items
 	 *            if this is a combo editor, the selection items
+	 * @param itemsFrom
+	 *            if this is a combo editor, the property or attribute value to
+	 *            get the items from
 	 * @param readOnly
 	 *            if this is a text box, whether it is editable
 	 * @param inValueCol
@@ -80,9 +86,9 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 * @param data
 	 *            the Attribute object
 	 */
-	public ValueTreeNodeUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
-			boolean inValueCol, AttributeType data) {
-		super(name, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus());
+	public ValueTreeNodeUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, String itemsFrom,
+			boolean readOnly, boolean inValueCol, AttributeType data) {
+		super(name, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus(), itemsFrom);
 		children = new ArrayList<InfoTreeNodeModel>();
 		generateChildren(inValueCol);
 	}

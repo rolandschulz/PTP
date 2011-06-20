@@ -14,11 +14,14 @@ import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.cell.SpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -31,20 +34,40 @@ import org.eclipse.swt.graphics.Image;
  */
 public abstract class CellEditorUpdateModel extends AbstractUpdateModel implements ICellEditorUpdateModel {
 
+	private static String replaceAll(String sequence, String tag, String with) {
+		int i = 0;
+		int j = 0;
+		int ln = sequence.length();
+		StringBuffer buffer = new StringBuffer();
+		while (i < ln) {
+			j = sequence.indexOf(tag, i);
+			if (j < 0) {
+				j = ln;
+				break;
+			}
+			buffer.append(sequence.substring(i, j)).append(with);
+			i = j + tag.length();
+		}
+		buffer.append(sequence.substring(i, j));
+		return buffer.toString();
+	}
+
 	protected boolean readOnly;
 	protected String tooltip;
 	protected String description;
 	protected String status;
+	protected String itemsFrom;
 	protected Color[] foreground;
 	protected Color[] background;
 	protected Font[] font;
 	protected CellEditor editor;
-	protected ViewerUpdateModel viewer;
 
+	protected ViewerUpdateModel viewer;
 	protected String stringValue;
 	protected int index;
 	protected String[] items;
 	protected boolean booleanValue;
+
 	protected int integerValue;
 
 	/**
@@ -66,9 +89,11 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 *            to display
 	 * @param status
 	 *            the attribute's status value, if any
+	 * @param itemsFrom
+	 *            for combo box
 	 */
 	protected CellEditorUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
-			String tooltip, String description, String status) {
+			String tooltip, String description, String status, String itemsFrom) {
 		super(name, handler);
 		this.editor = editor;
 		this.readOnly = readOnly;
@@ -236,16 +261,24 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	}
 
 	/*
-	 * Also sets whether this model is currently on a checked viewer item.
-	 * (non-Javadoc)
+	 * possibly calls {@link
+	 * WidgetActionUtils#getItemsFrom(org.eclipse.ptp.rm.jaxb.core.IVariableMap,
+	 * String)} (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#initialize(org.eclipse
 	 * .ptp.rm.jaxb.core.variables.LCVariableMap)
 	 */
 	@Override
-	public void initialize(LCVariableMap lcMap) {
-		super.initialize(lcMap);
+	public void initialize(RMVariableMap rmMap, LCVariableMap lcMap) {
+		if (editor instanceof ComboBoxCellEditor) {
+			if (itemsFrom != null) {
+				items = WidgetActionUtils.getItemsFrom(rmMap, itemsFrom);
+				items = WidgetBuilderUtils.normalizeComboItems(items);
+				((ComboBoxCellEditor) editor).setItems(items);
+			}
+		}
+		super.initialize(rmMap, lcMap);
 		this.lcMap = lcMap;
 	}
 
@@ -417,23 +450,5 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 			return String.valueOf(integerValue);
 		}
 		return JAXBControlUIConstants.ZEROSTR;
-	}
-
-	private static String replaceAll(String sequence, String tag, String with) {
-		int i = 0;
-		int j = 0;
-		int ln = sequence.length();
-		StringBuffer buffer = new StringBuffer();
-		while (i < ln) {
-			j = sequence.indexOf(tag, i);
-			if (j < 0) {
-				j = ln;
-				break;
-			}
-			buffer.append(sequence.substring(i, j)).append(with);
-			i = j + tag.length();
-		}
-		buffer.append(sequence.substring(i, j));
-		return buffer.toString();
 	}
 }

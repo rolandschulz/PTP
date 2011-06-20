@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
@@ -42,7 +43,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.core.data.ButtonActionType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
@@ -88,7 +89,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener {
 
-	private final IJAXBResourceManagerControl rmControl;
+	private final IJAXBResourceManager rm;
 	private final TabControllerType controller;
 	private final ValueUpdateHandler updateHandler;
 	private final List<Viewer> viewers;
@@ -112,10 +113,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	public JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog,
 			TabControllerType controller, JAXBControllerLaunchConfigurationTab parentTab) {
 		super(parentTab, dialog);
-		/*
-		 * get the implementation, in order to run actions
-		 */
-		rmControl = rm.getControl();
+		this.rm = rm;
 		this.controller = controller;
 		String s = controller.getIncludeWidgetValuesFrom();
 		if (s == null) {
@@ -216,10 +214,11 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/*
-	 * 1. resets the configuation. 2. clears viewers and repopulate that list.
-	 * 3. repopulates the handler with local widgets. 4. initializes the (new)
-	 * widgets from the original global map. 5. initializes the checked state on
-	 * any checkbox viewers and then refreshes them. (non-Javadoc)
+	 * Resets the configuation then re-initializes all widgets: 1. clears
+	 * viewers and repopulate that list. 2. repopulates the handler with local
+	 * widgets. 3. initializes the (new) widgets from the original global map.
+	 * 4. initializes the checked state on any checkbox viewers and then
+	 * refreshes them.(non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
@@ -229,9 +228,9 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+		listenerConfiguration = configuration;
 		try {
 			ValueUpdateHandler handler = getParent().getUpdateHandler();
-			listenerConfiguration = configuration;
 
 			viewers.clear();
 			for (Map.Entry<Object, IUpdateModel> e : localWidgets.entrySet()) {
@@ -244,10 +243,11 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			}
 
 			LCVariableMap lcMap = parentTab.getLCMap();
-			lcMap.updateGlobal(configuration);
+			lcMap.updateGlobal(listenerConfiguration);
+			RMVariableMap rmMap = (RMVariableMap) this.rm.getJAXBConfiguration().getRMVariableMap();
 
 			for (IUpdateModel m : localWidgets.values()) {
-				m.initialize(lcMap);
+				m.initialize(rmMap, lcMap);
 			}
 
 			for (IUpdateModel m : localWidgets.values()) {
@@ -259,7 +259,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			for (Viewer v : viewers) {
 				v.refresh();
 			}
-
 		} catch (Throwable t) {
 			JAXBControlUIPlugin.log(t);
 			return new RMLaunchValidation(false, t.getMessage());
@@ -299,11 +298,15 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 *            a command from the control data type
 	 * 
 	 */
-	public void run(String action) throws CoreException {
-		/*
-		 * delegate to rmControl
-		 */
-		rmControl.runActionCommand(action);
+	public void run(ButtonActionType action) throws CoreException {
+		rm.getControl().runActionCommand(action.getAction(), action.getClearValue());
+		if (action.isRefresh()) {
+			try {
+				parentTab.initializeFrom(null, rm, null, listenerConfiguration);
+			} catch (Throwable t) {
+				throw CoreExceptionUtils.newException(t.getLocalizedMessage(), t);
+			}
+		}
 	}
 
 	/*

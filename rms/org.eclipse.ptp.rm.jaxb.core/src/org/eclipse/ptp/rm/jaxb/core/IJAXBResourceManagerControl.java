@@ -65,7 +65,10 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	 * 
 	 * @param action
 	 *            name of action or command
+	 * @param resetValue
+	 *            name of property or attribute
+	 * @return result of the action on resetValue, if any
 	 * 
 	 */
-	public void runActionCommand(String action) throws CoreException;
+	public Object runActionCommand(String action, String resetValue) throws CoreException;
 }

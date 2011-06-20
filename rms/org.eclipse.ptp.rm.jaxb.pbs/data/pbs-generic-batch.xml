@@ -757,7 +757,6 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 								<tooltip>Click to activate value widget.</tooltip>
 							</column-data>
 							<items allPredefined="true">
-								<exclude>queues</exclude>
 								<exclude>destination</exclude>
 							</items>
 							<value pattern="@name='@value'"/>

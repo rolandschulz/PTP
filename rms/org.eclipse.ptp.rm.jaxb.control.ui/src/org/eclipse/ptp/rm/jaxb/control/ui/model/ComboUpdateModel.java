@@ -9,9 +9,12 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
+import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
+import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -27,20 +30,24 @@ import org.eclipse.swt.widgets.Combo;
 public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListener, SelectionListener {
 
 	private final Combo combo;
+	private final String itemsFrom;
 
 	/**
 	 * @param name
 	 *            name of the model, which will correspond to the name of a
 	 *            Property or Attribute if the widget value is to be saved.
+	 * @param itemsFrom
+	 *            property or attribute having combo items
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
 	 * @param combo
 	 *            the widget to which this model corresponds
 	 */
-	public ComboUpdateModel(String name, ValueUpdateHandler handler, Combo combo) {
+	public ComboUpdateModel(String name, String itemsFrom, ValueUpdateHandler handler, Combo combo) {
 		super(name, handler);
 		this.combo = combo;
+		this.itemsFrom = itemsFrom;
 		this.combo.addModifyListener(this);
 		this.combo.addSelectionListener(this);
 	}
@@ -57,6 +64,19 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	 */
 	public Object getValueFromControl() {
 		return WidgetActionUtils.getSelected(combo);
+	}
+
+	/*
+	 * calls {@link #refreshItemsFrom(RMVariableMap)} (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#initialize(org.eclipse
+	 * .ptp.rm.jaxb.core.variables.LCVariableMap)
+	 */
+	@Override
+	public void initialize(RMVariableMap rmMap, LCVariableMap lcMap) {
+		refreshItemsFrom(rmMap);
+		super.initialize(rmMap, lcMap);
 	}
 
 	/*
@@ -121,5 +141,19 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 		}
 		Object value = storeValue();
 		handleUpdate(value);
+	}
+
+	/**
+	 * Calls
+	 * {@link WidgetActionUtils#getItemsFrom(org.eclipse.ptp.rm.jaxb.core.IVariableMap, String)}
+	 * 
+	 * @param rmMap
+	 */
+	private void refreshItemsFrom(RMVariableMap rmMap) {
+		if (itemsFrom != null) {
+			String[] items = WidgetActionUtils.getItemsFrom(rmMap, itemsFrom);
+			items = WidgetBuilderUtils.normalizeComboItems(items);
+			combo.setItems(items);
+		}
 	}
 }

@@ -43,6 +43,7 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
+import org.eclipse.ptp.rm.jaxb.core.data.ButtonActionType;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonGroupType;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
@@ -85,6 +86,7 @@ public class UpdateModelFactory {
 		private String tooltip;
 		private String description;
 		private String choice;
+		private String itemsFrom;
 		private Integer min;
 		private Integer max;
 		private boolean readOnly;
@@ -257,8 +259,8 @@ public class UpdateModelFactory {
 		private String tooltip;
 		private String choice;
 		private String fixedText;
-		private String action;
-		private List<String> valueList;
+		private ButtonActionType action;
+		private String itemsFrom;
 
 		/**
 		 * @param widget
@@ -341,37 +343,7 @@ public class UpdateModelFactory {
 					setData(data);
 				}
 			}
-			s = widget.getItemsFrom();
-			if (s != null) {
-				Object data = rmMap.get(s);
-				if (data != null) {
-					setValueListData(data);
-				}
-			}
-		}
-
-		/**
-		 * Get Combo items from a reference to another Attribute or Property
-		 * with a List as its value.
-		 * 
-		 * @param data
-		 *            Property or Attribute
-		 */
-		@SuppressWarnings("unchecked")
-		private void setValueListData(Object data) {
-			if (data instanceof AttributeType) {
-				AttributeType a = (AttributeType) data;
-				Object value = a.getValue();
-				if (value instanceof List<?>) {
-					valueList = (List<String>) value;
-				}
-			} else {
-				PropertyType p = (PropertyType) data;
-				Object value = p.getValue();
-				if (value instanceof List<?>) {
-					valueList = (List<String>) value;
-				}
-			}
+			itemsFrom = widget.getItemsFrom();
 		}
 	}
 
@@ -469,7 +441,7 @@ public class UpdateModelFactory {
 				model = new TextUpdateModel(dynamic, handler, (Text) control);
 			}
 		} else if (control instanceof Combo) {
-			model = new ComboUpdateModel(name, handler, (Combo) control);
+			model = new ComboUpdateModel(name, cd.itemsFrom, handler, (Combo) control);
 		} else if (control instanceof Spinner) {
 			model = new SpinnerUpdateModel(name, handler, (Spinner) control);
 		} else if (control instanceof Button) {
@@ -604,9 +576,7 @@ public class UpdateModelFactory {
 	 */
 	private static Combo createCombo(Composite parent, final ControlDescriptor cd) {
 		String[] items = null;
-		if (cd.valueList != null) {
-			items = cd.valueList.toArray(new String[0]);
-		} else if (cd.choice != null) {
+		if (cd.choice != null) {
 			items = cd.choice.split(JAXBControlUIConstants.CM);
 		}
 		if (items == null) {
@@ -754,9 +724,9 @@ public class UpdateModelFactory {
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		ICellEditorUpdateModel model = null;
 		if (data instanceof AttributeType) {
-			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, (AttributeType) data);
+			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.readOnly, (AttributeType) data);
 		} else if (data instanceof PropertyType) {
-			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly);
+			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.readOnly);
 		}
 		if (model != null) {
 			model.setBackground(cd.background);
@@ -793,9 +763,10 @@ public class UpdateModelFactory {
 		Object[] properties = viewer.getColumnProperties();
 		boolean inValueCol = properties.length == 2;
 		if (data instanceof AttributeType) {
-			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, inValueCol, (AttributeType) data);
+			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.readOnly, inValueCol,
+					(AttributeType) data);
 		} else if (data instanceof PropertyType) {
-			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.readOnly, inValueCol);
+			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.readOnly, inValueCol);
 		}
 		if (model != null) {
 			model.setBackground(cd.background);

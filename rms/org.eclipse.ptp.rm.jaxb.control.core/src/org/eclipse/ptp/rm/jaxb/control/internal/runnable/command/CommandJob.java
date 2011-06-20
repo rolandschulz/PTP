@@ -287,6 +287,56 @@ public class CommandJob extends Job implements ICommandJob {
 		return mode == JobMode.BATCH;
 	}
 
+	/**
+	 * Wait for any special stream consumer threads to exit. We ignore the
+	 * stream monitors here.
+	 * 
+	 * @return CoreException
+	 */
+	public CoreException joinConsumers() {
+		if (!isActive()) {
+			return null;
+		}
+
+		Throwable t = null;
+
+		if (outSplitter != null) {
+			try {
+				outSplitter.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
+
+		if (errSplitter != null) {
+			try {
+				errSplitter.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
+
+		if (stdoutT != null) {
+			try {
+				stdoutT.join();
+			} catch (InterruptedException ignored) {
+			}
+			t = stdoutTokenizer.getInternalError();
+		}
+
+		if (stderrT != null) {
+			try {
+				stderrT.join();
+			} catch (InterruptedException ignored) {
+			}
+			t = stderrTokenizer.getInternalError();
+		}
+
+		if (t != null) {
+			return CoreExceptionUtils.newException(t.getMessage(), t);
+		}
+
+		return null;
+	}
+
 	/*
 	 * First unblock any wait; this will allow the run method to return. Destroy
 	 * the process and close streams, interrupt the thread and cancel with
@@ -536,52 +586,6 @@ public class CommandJob extends Job implements ICommandJob {
 			}
 		}
 		return f;
-	}
-
-	/**
-	 * Wait for any special stream consumer threads to exit. We ignore the
-	 * stream monitors here.
-	 * 
-	 * @return CoreException
-	 */
-	private CoreException joinConsumers() {
-		Throwable t = null;
-
-		if (outSplitter != null) {
-			try {
-				outSplitter.join();
-			} catch (InterruptedException ignored) {
-			}
-		}
-
-		if (errSplitter != null) {
-			try {
-				errSplitter.join();
-			} catch (InterruptedException ignored) {
-			}
-		}
-
-		if (stdoutT != null) {
-			try {
-				stdoutT.join();
-			} catch (InterruptedException ignored) {
-			}
-			t = stdoutTokenizer.getInternalError();
-		}
-
-		if (stderrT != null) {
-			try {
-				stderrT.join();
-			} catch (InterruptedException ignored) {
-			}
-			t = stderrTokenizer.getInternalError();
-		}
-
-		if (t != null) {
-			return CoreExceptionUtils.newException(t.getMessage(), t);
-		}
-
-		return null;
 	}
 
 	/**

@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui;
 
+import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
@@ -39,10 +40,12 @@ public interface IUpdateModel {
 	/**
 	 * Load values and settings from Launch Tab environment.
 	 * 
+	 * @param rmMap
+	 *            ResourceManager environment
 	 * @param lcMap
 	 *            Launch Tab environment
 	 */
-	public void initialize(LCVariableMap lcMap);
+	public void initialize(RMVariableMap rmMap, LCVariableMap lcMap);
 
 	/**
 	 * Whether the value of the associated control can be written to the

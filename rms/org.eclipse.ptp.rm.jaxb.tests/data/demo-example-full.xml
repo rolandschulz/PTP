@@ -28,7 +28,7 @@
 			<link-value-to>Error_Path</link-value-to>
 		</property>
 		<property name="local.input.file" visible="false"/>
-		<property name="remote.input.file" visible="false"/>
+		<property name="remote.input.file" visible="true"/>
 		<property name="remote.input.files" visible="false"/>
 		<attribute name="mpiCommand" type="string">
 			<description>Which mpi command to use.</description>
@@ -467,7 +467,9 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
 						</layout-data>
-						<button-action>get-input</button-action>
+						<button-action clearValue="remote.input.files" refresh="true">
+							<action>get-input</action>
+						</button-action>
 					</widget>
 					<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
@@ -484,6 +486,21 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
 						</sub-layout-data>
 					</widget>
+					<viewer name="environment" style="SWT.BORDER | SWT.MULTI" sort="true" type="table">
+                  <layout-data>
+                     <grid-data widthHint="600" heightHint="200" horizontalSpan="1"/>
+                  </layout-data>
+                  <column-data name="Name" width="175">
+                     <tooltip>Double-click on selected rows toggles their checked value.</tooltip>
+                  </column-data>
+                  <column-data name="Value" width="400">
+                     <tooltip>Click to activate value widget.</tooltip>
+                  </column-data>
+                  <items>
+                     <include>remote.input.file</include>
+                  </items>
+                  <value pattern="export @name='@value'" separator="; "/>
+               </viewer>
 				</composite>
 			</dynamic>
 		</launch-tab>

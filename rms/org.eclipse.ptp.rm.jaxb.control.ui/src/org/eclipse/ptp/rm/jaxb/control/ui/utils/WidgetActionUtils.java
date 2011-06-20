@@ -37,7 +37,10 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.rm.jaxb.control.data.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.control.exceptions.UnsatisfiedMatchException;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.FileMatchType;
+import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 import org.eclipse.swt.SWT;
@@ -52,9 +55,6 @@ import org.eclipse.swt.widgets.Shell;
  * 
  */
 public class WidgetActionUtils {
-
-	private WidgetActionUtils() {
-	}
 
 	/**
 	 * Create a dialog that allows the user to select a file in the workspace.
@@ -93,6 +93,44 @@ public class WidgetActionUtils {
 			append = t.getMessage();
 		}
 		MessageDialog.openError(shell, title, message + lineSep + lineSep + append);
+	}
+
+	/**
+	 * Get Combo items from a reference to another Attribute or Property with a
+	 * List as its value.
+	 * 
+	 * @param map
+	 *            resource manager environment
+	 * @param itemsFrom
+	 *            name of Property or Attribute
+	 */
+	@SuppressWarnings("unchecked")
+	public static String[] getItemsFrom(IVariableMap map, String itemsFrom) {
+		if (itemsFrom == null) {
+			return new String[0];
+		}
+		Object data = map.get(itemsFrom);
+		if (data == null) {
+			return new String[0];
+		}
+		List<String> valueList = null;
+		if (data instanceof AttributeType) {
+			AttributeType a = (AttributeType) data;
+			Object value = a.getValue();
+			if (value instanceof List<?>) {
+				valueList = (List<String>) value;
+			}
+		} else {
+			PropertyType p = (PropertyType) data;
+			Object value = p.getValue();
+			if (value instanceof List<?>) {
+				valueList = (List<String>) value;
+			}
+		}
+		if (valueList != null) {
+			return valueList.toArray(new String[0]);
+		}
+		return new String[0];
 	}
 
 	/**
@@ -362,5 +400,8 @@ public class WidgetActionUtils {
 		}
 
 		return true;
+	}
+
+	private WidgetActionUtils() {
 	}
 }
