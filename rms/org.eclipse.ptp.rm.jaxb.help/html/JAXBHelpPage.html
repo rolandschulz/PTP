@@ -1392,11 +1392,15 @@
 		</tr>
 		<tr>
 			<td><code>button-action</code></td>
-			<td>applies to the <code>action</code> widget; the name of a <code>command</code>
-				defined in the XML; this can be one of the <code>start-up</code>, <code>shut-down</code>,
+			<td>applies to the <code>action</code> widget; the <code>button-action-type</code>
+				specifies the name of a command (<code>action</code>) defined in the
+				XML; this can be one of the <code>start-up</code>, <code>shut-down</code>,
 				commands, or a special <code>button-action</code> command (<b>note
 			</b>that it cannot, however, be a <code>-job</code> command, as the
-				Launch Tab has no link to submitted jobs).</td>
+				Launch Tab is not coupled to any submitted jobs); the <code>button-action-type</code>
+				also indicates whether the variable affected by the command should
+				be cleared prior to the command execution, and whether the launch
+				tab should be refreshed (default is true) afterwards</td>
 		</tr>
 	</table>
 	<br>
