@@ -533,7 +533,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 
 			return ast;
 		} catch (Exception e) {
-			String msg = "RunAnalyseHandlerBase.getAST(): Error getting AST (from index) for project " + tu.getCProject();//$NON-NLS-1$
+			String msg = "RunAnalyseHandlerBase.getAST(): Error getting AST (from index) for project " + tu.getCProject() + " " + e.getMessage();//$NON-NLS-1$
 			CommonPlugin.log(IStatus.ERROR, msg);
 			return null;
 		}
