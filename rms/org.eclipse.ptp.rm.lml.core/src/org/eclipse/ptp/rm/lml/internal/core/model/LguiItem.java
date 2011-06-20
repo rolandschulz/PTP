@@ -10,10 +10,13 @@
  */
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -34,6 +37,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.transform.stream.StreamSource;
 
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
@@ -454,16 +458,37 @@ public class LguiItem implements ILguiItem {
 	 */
 	public void update(InputStream stream) throws JAXBException {
 
-		lgui = parseLML(stream);
-		if (listeners.isEmpty()) {
-			createLguiHandlers();
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+		String string = new String();
+		String s;
+		try {
+			while (null != (s = reader.readLine())) {
+				string = string.concat(s);
+			}
+		} catch (final IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (final IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-		fireUpdatedEvent();
 
-		if (!cidSet()) {
-			setCid();
+		if (string.length() > 0) {
+			lgui = parseLML(string);
+			if (listeners.isEmpty()) {
+				createLguiHandlers();
+			}
+			fireUpdatedEvent();
+
+			if (!cidSet()) {
+				setCid();
+			}
+			updateJobData();
 		}
-		updateJobData();
 	}
 
 	/*
@@ -596,7 +621,7 @@ public class LguiItem implements ILguiItem {
 	 * @throws JAXBException
 	 */
 	@SuppressWarnings("unchecked")
-	private LguiType parseLML(InputStream stream) throws JAXBException {
+	private LguiType parseLML(String string) throws JAXBException {
 		final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
 		/*
 		 * Synchronize to avoid the dreaded
@@ -604,7 +629,7 @@ public class LguiItem implements ILguiItem {
 		 */
 		final JAXBElement<LguiType> doc;
 		synchronized (LguiItem.class) {
-			doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(stream);
+			doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(new StreamSource(new StringReader(string)));
 		}
 		return doc.getValue();
 	}
