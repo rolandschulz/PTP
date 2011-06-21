@@ -41,6 +41,7 @@ feature@org.eclipse.ptp.rdt.xlc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvs
 feature@org.eclipse.ptp.rdt.remotetools=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.remotetools-feature
 feature@org.eclipse.ptp.rdt.remotejars=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.remotejars-feature
 feature@org.eclipse.ptp.rdt.sync=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.sync-feature
+feature@org.eclipse.ptp.rdt.sync.fortran=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.sync.fortran-feature
 
 ! GEM feature
 feature@org.eclipse.ptp.gem=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.gem-feature
@@ -167,6 +168,7 @@ plugin@org.eclipse.ptp.rdt.sync.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org
 plugin@org.eclipse.ptp.rdt.sync.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.ui
 plugin@org.eclipse.ptp.rdt.sync.git.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.git.core
 plugin@org.eclipse.ptp.rdt.sync.git.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.git.ui
+plugin@org.eclipse.ptp.rdt.sync.ui.fortran=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.sync.ui.fortran
 
 ! GEM Plugins
 plugin@org.eclipse.ptp.gem=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/gem/org.eclipse.ptp.gem

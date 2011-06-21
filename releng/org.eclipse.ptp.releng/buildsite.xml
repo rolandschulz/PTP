@@ -78,6 +78,9 @@
    <feature url="features/org.eclipse.ptp.pldt.upc_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.pldt.upc" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
+   <feature url="features/org.eclipse.ptp.pldt.fortran_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.pldt.fortran" version="@ptpBranchVersion@.@timeStamp@">
+      <category name="Parallel Tools Platform"/>
+   </feature>
    <feature url="features/org.eclipse.ptp.etfw.tau_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.etfw.tau" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
