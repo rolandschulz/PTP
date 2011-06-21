@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ptp.pldt.fortran"
+      label="%featureName"
+      version="5.0.0.qualifier"
+      provider-name="%providerName"
+      plugin="org.eclipse.ptp.pldt.common"
+      license-feature="org.eclipse.ptp.license"
+      license-feature-version="1.0.0.qualifier">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license>
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.cdt.core" version="4.0.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.ptp.pldt.common"/>
+      <import plugin="org.eclipse.photran.cdtinterface" version="7.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.photran.core.vpg" version="7.0.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.ptp.pldt.mpi.fortran"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.pldt.openmp.fortran"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
