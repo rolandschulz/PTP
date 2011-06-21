@@ -102,6 +102,9 @@
    <feature url="features/org.eclipse.ptp.rdt.sync_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rdt.sync" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Remote Development Tools"/>
    </feature>
+   <feature url="features/org.eclipse.ptp.rdt.sync.fortran_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rdt.sync.fortran" version="@ptpBranchVersion@.@timeStamp@">
+      <category name="Remote Development Tools"/>
+   </feature>
    <feature url="features/org.eclipse.ptp.rdt.remotetools_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rdt.remotetools" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Remote Development Tools"/>
    </feature>

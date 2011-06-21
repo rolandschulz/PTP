@@ -89,4 +89,12 @@
          id="org.eclipse.ptp.sdk"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp.rdt.sync.fortran"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.pldt.fortran"
+         version="0.0.0"/>
+
 </feature>
