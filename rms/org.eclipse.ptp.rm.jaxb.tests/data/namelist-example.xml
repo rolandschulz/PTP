@@ -265,7 +265,7 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 			</validator>
 		</attribute>
 		<managed-files>
-			<file-staging-location>input</file-staging-location>
+			<file-staging-location>${ptp_rm:directory#value}/input2</file-staging-location>
 			<file name="namelist.input">
 				<line>
 					<arg>&amp;run</arg>
@@ -355,6 +355,7 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 			</file>
 		</managed-files>
 		<script>
+		   <file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 			<line>
 				<arg>#!/bin/bash</arg>
 			</line>

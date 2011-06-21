@@ -61,7 +61,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				</target>
 			</stdout-parser>
 		</start-up-command>
-		<submit-interactive name="submit-interactive" waitForId="true" keepOpen="true" flags="ALLOCATE_PTY">
+		<submit-interactive name="submit-interactive" directory="${ptp_rm:directory#value}" waitForId="true" keepOpen="true"
+			flags="ALLOCATE_PTY">
 			<arg>qsub</arg>
 			<arg>-I</arg>
 			<arg>-q ${ptp_rm:destination#value}</arg>

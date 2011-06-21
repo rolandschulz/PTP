@@ -154,8 +154,8 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 
 		Map<String, Object> saved = new TreeMap<String, Object>();
 		LCVariableMap lcMap = parentTab.getLCMap();
-		lcMap.saveStandardConfigurationProperties(config, localMap, saved);
 		lcMap.saveHiddenNonLinked(localMap, saved);
+		lcMap.saveStandardConfigurationProperties(config, localMap, saved);
 		localMap.clear();
 		localMap.putAll(saved);
 		doRefreshLocal();

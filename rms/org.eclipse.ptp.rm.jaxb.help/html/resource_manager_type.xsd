@@ -91,6 +91,7 @@
 	</xs:complexType>
 	<xs:complexType name="script-type">
 		<xs:sequence>
+		   <xs:element name="file-staging-location" minOccurs="0" type="xs:string"/>
 			<xs:element name="line" maxOccurs="unbounded" type="rm:line-type"/>
 		</xs:sequence>
 		<xs:attribute name="insertEnvironmentAfter" type="xs:int" default="-1"/>

@@ -262,6 +262,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<description>This is the list of environment variables passed with the Queue Job batch request.</description>
 		</attribute>
 		<script insertEnvironmentAfter="35">
+		   <file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 			<line>
 				<arg>#!/bin/bash</arg>
 			</line>
@@ -423,7 +424,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				</target>
 			</stdout-parser>
 		</start-up-command>
-		<submit-batch name="submit-batch" waitForId="true">
+		<submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
 			<arg>qsub</arg>
 			<arg>${ptp_rm:managed_file_for_script#value}</arg>
 			<stdout-parser delim="\n" all="true" save="1">

@@ -312,6 +312,12 @@ public class LCVariableMap implements IVariableMap {
 		if (dir == null) {
 			dir = JAXBControlConstants.ZEROSTR;
 		}
+		saved.put(JAXBControlConstants.CONTROL_WORKING_DIR_VAR,
+				configuration.getAttribute(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, dir));
+		dir = (String) saved.get(JAXBControlConstants.DIRECTORY);
+		if (dir == null) {
+			dir = JAXBControlConstants.ZEROSTR;
+		}
 		saved.put(JAXBControlConstants.DIRECTORY,
 				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, dir));
 		saved.put(JAXBControlConstants.EXEC_PATH,

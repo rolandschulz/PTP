@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -641,7 +642,8 @@ public class CommandJob extends Job implements ICommandJob {
 
 	/**
 	 * Resolves the command arguments against the current environment, then gets
-	 * the process builder from the remote connection.
+	 * the process builder from the remote connection. Also sets the directory
+	 * if it is defined (otherwise it defaults to the connection dir).
 	 * 
 	 * @param monitor
 	 * @return the process builder
@@ -665,7 +667,14 @@ public class CommandJob extends Job implements ICommandJob {
 		} catch (RemoteConnectionException rce) {
 			throw CoreExceptionUtils.newException(rce.getLocalizedMessage(), rce);
 		}
-		return delegate.getRemoteServices().getProcessBuilder(conn, cmdArgs);
+		IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, cmdArgs);
+		String directory = command.getDirectory();
+		if (directory != null && !JAXBControlConstants.ZEROSTR.equals(directory)) {
+			directory = rmVarMap.getString(uuid, directory);
+			IFileStore dir = delegate.getRemoteFileManager().getResource(directory);
+			builder.directory(dir);
+		}
+		return builder;
 	}
 
 	/**

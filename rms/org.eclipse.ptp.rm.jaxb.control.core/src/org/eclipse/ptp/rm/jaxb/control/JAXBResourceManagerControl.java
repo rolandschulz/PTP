@@ -576,7 +576,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		updatePropertyValuesFromTab(configuration, progress.newChild(5));
 
-		boolean delScript = maybeHandleScript(uuid, controlData.getScript());
+		/*
+		 * process script
+		 */
+		ScriptType script = controlData.getScript();
+		boolean delScript = maybeHandleScript(uuid, script);
 		worked(progress, 20);
 
 		List<ManagedFilesType> files = controlData.getManagedFiles();
@@ -586,7 +590,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * content (${ptp_rm:script#value}), or to its path (SCRIPT_PATH) must
 		 * exist.
 		 */
-		maybeAddManagedFileForScript(files, delScript);
+		maybeAddManagedFileForScript(files, script.getFileStagingLocation(), delScript);
 		worked(progress, 5);
 
 		if (!maybeTransferManagedFiles(uuid, files)) {
@@ -821,13 +825,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * 
 	 * @param lists
 	 *            the lists of managed files for this submission
+	 * @param stagingLocation
+	 *            for the script (may be <code>null</null>
 	 * @param delete
 	 *            whether the script target should be deleted after submission
 	 */
-	private void maybeAddManagedFileForScript(List<ManagedFilesType> lists, boolean delete) {
+	private void maybeAddManagedFileForScript(List<ManagedFilesType> lists, String stagingLocation, boolean delete) {
 		ManagedFilesType files = null;
+		if (stagingLocation == null) {
+			stagingLocation = JAXBControlConstants.ECLIPSESETTINGS;
+		}
 		for (ManagedFilesType f : lists) {
-			if (JAXBControlConstants.ECLIPSESETTINGS.equals(f.getFileStagingLocation())) {
+			if (stagingLocation.equals(f.getFileStagingLocation())) {
 				files = f;
 				break;
 			}
@@ -838,7 +847,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
-				files.setFileStagingLocation(JAXBControlConstants.ECLIPSESETTINGS);
+				files.setFileStagingLocation(stagingLocation);
 				lists.add(files);
 			}
 			List<ManagedFileType> fileList = files.getFile();
