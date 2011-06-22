@@ -35,23 +35,12 @@
 		</attribute>
 		<attribute name="destination" type="string">
 			<description>Designation of the queue to which to submit the job.</description>
-			<tooltip>Format: queue[@server].</tooltip>
 		</attribute>
 		<attribute name="Error_Path" type="string">
 			<description>The final path name for the file containing the job's standard error stream.</description>
-			<tooltip><![CDATA[Format: "[hostname:]pathname". If 
-the option is not specified, the default file name for the 
-standard error stream will be used. The default name has 
-the following form: job_name.eSeq_num where job_name is 
-the name of the job, see -N option, and Seq_num
-is the job number assigned when the job is submitted; 
-default value: (job_name).e(job_number).]]></tooltip>
 		</attribute>
 		<attribute name="Job_Name" type="string">
 			<description>The name assigned to the job by the qsub or qalter command.</description>
-			<tooltip><![CDATA[Format: string up to 15 characters, 
-first character must be alphabetic; default value: 
-the base name of the job script or STDIN.]]></tooltip>
 			<default>ptp_job</default>
 			<validator>
 				<regex expression="[a-zA-Z_][0-9a-zA-Z_]*"/>
@@ -60,37 +49,16 @@ the base name of the job script or STDIN.]]></tooltip>
 		</attribute>
 		<attribute name="Output_Path" type="string">
 			<description>The final path name for the file containing the job's standard output stream.</description>
-			<tooltip><![CDATA[Format: "[hostname:]pathname". If the option
-is not specified, the default file name for the standard error stream 
-will be used. The default name has the following form: job_name.oSeq_num
-where job_name is the name of the job, see -N option, and Seq_num
-is the job number assigned when the job is submitted; 
-default value: (job_name).o(job_number).]]></tooltip>
 		</attribute>
 		<attribute name="Resource_List.mem" type="string">
 			<description>Maximum amount of memory used by all concurrent processes in the job.</description>
-			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier 
-in bytes or words (word size of the host): b (bytes), 
-w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		</attribute>
 		<attribute name="Resource_List.nodes" type="string">
 			<description>Number and/or type of nodes to be reserved for exclusive use by the job.</description>
-			<tooltip><![CDATA[The value is one or more node_specs joined with 
-the '+' character, "node_spec[+node_spec...]. Each node_spec is
-a number of nodes required of the type declared in the node_spec
-and a name or one or more properity or properities desired for 
-the nodes. The number, the name, and each properity in the 
-node_spec are separated by a colon ':'. If no number is specified, 
-one (1) is assumed. Units: string. The name of a node is its 
-hostname. The properties of nodes are: ppn=# requested; defaults 
-to 1; or an arbitrary string defined by system administrator. 
-Example: To ask for 2 processors on each of two blue nodes and 
-three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 			<default>1</default>
 		</attribute>
 		<attribute name="Resource_List.walltime" type="string">
 			<description>Maximum amount of real time during which the job can be in the running state.</description>
-			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
 			<validator>
 				<regex expression="\d\d:\d\d:\d\d"/>
@@ -314,7 +282,6 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 							<layout-data>
 								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 							</layout-data>
-							<tooltip>${ptp_rm:Job_Name#tooltip}</tooltip>
 							<fixed-text>Job Name: </fixed-text>
 						</widget>
 						<widget type="text" style="SWT.BORDER" saveValueTo="Job_Name">
@@ -327,7 +294,6 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 							<layout-data>
 								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 							</layout-data>
-							<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 							<fixed-text>Queue: </fixed-text>
 						</widget>
 						<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
@@ -341,7 +307,6 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 							<layout-data>
 								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 							</layout-data>
-							<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
 							<fixed-text>Wallclock Time: </fixed-text>
 						</widget>
 						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
@@ -354,7 +319,6 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 							<layout-data>
 								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 							</layout-data>
-							<tooltip>${ptp_rm:Resource_List.nodes#tooltip}</tooltip>
 							<fixed-text>Number of nodes: </fixed-text>
 						</widget>
 						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.nodes">
@@ -367,7 +331,6 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 							<layout-data>
 								<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 							</layout-data>
-							<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
 							<fixed-text>Total Memory Needed: </fixed-text>
 						</widget>
 						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">

@@ -9,7 +9,7 @@
 <!-- * Albert L. Rossi - design and implementation -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="tabbed-example">
+	xsi:schemaLocation="resource_manager_type.xsd" name="miscellaneous-example">
 	<control-data>
 		<property name="e1" visible="true"/>
 		<property name="e2" visible="true"/>
@@ -32,23 +32,17 @@
 		</attribute>
 		<attribute name="mpiCores" min="1" type="integer">
 			<description>the '-np' value</description>
-			<tooltip>the -np value</tooltip>
 			<default>1</default>
 		</attribute>
 		<attribute name="destination" type="string">
 			<description>Designation of the queue to which to submit the job.</description>
-			<tooltip>Format: queue[@server].</tooltip>
 		</attribute>
 		<attribute name="Resource_List.mem" type="string">
 			<description>Maximum amount of memory used by all concurrent processes in the job.</description>
-			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier 
-in bytes or words (word size of the host): b (bytes), 
-w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<default>20gb</default>
 		</attribute>
 		<attribute name="Resource_List.walltime" type="string">
 			<description>Maximum amount of real time during which the job can be in the running state.</description>
-			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
 			<validator>
 				<regex expression="[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"/>
@@ -175,7 +169,6 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout>
 							<row-layout type="SWT.VERTICAL" center="true" fill="true" justify="true"/>
 						</layout>
-						<tooltip>${ptp_rm:mpiCores#tooltip}</tooltip>
 						<button type="radiobutton" title="1"/>
 						<button type="radiobutton" title="2"/>
 						<button type="radiobutton" title="3"/>
@@ -229,7 +222,6 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
 						<fixed-text>Total Memory Needed: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
@@ -248,7 +240,6 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
 						<fixed-text>Wallclock Time: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
@@ -362,12 +353,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data widthHint="600" heightHint="200" horizontalSpan="1"/>
 						</layout-data>
-						<column-data name="Name" width="175">
-							<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
-						</column-data>
-						<column-data name="Value" width="400">
-							<tooltip>Click to activate value widget.</tooltip>
-						</column-data>
+						<column-data name="Name" width="175"/>
+						<column-data name="Value" width="400"/>
 						<items>
 							<include>e1</include>
 							<include>e2</include>

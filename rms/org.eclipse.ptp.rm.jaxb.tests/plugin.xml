@@ -11,6 +11,14 @@
             configurationFile="data/namelist-example.xml"
             name="Namelist Example">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/demo-example-with-action.xml"
+            name="Demo Full (with Action) Example">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/miscellaneous-example.xml"
+            name="Miscellaneous Example">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>
