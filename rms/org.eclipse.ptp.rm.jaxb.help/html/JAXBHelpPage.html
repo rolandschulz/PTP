@@ -1382,7 +1382,7 @@
 				to use to populate the items<br> <b>Note:</b> if a combo widget
 				saves its value to an attribute and the present element on the
 				widget descriptor is not set, the attribute will be checked for
-				non-empty <code>choice</code> and <code>items-from</code> values,
+				non-empty <code>choice</code> or <code>items-from</code> values,
 				which then will be used to populate the combo items; the <code>items-from</code>
 				field on the widget is for added flexibility (for instance, linking
 				up a target property with another property providing the list of
@@ -1391,13 +1391,13 @@
 		<tr>
 			<td><code>fixed-text</code>
 			</td>
-			<td>applies to the <code>label</code> and (read-only)<code>text</code>
+			<td>applies to the <code>label</code> and (read-only) <code>text</code>
 				widgets; text is resolved once and remains constant thereafter</td>
 		</tr>
 		<tr>
 			<td><code>dynamic-text</code>
 			</td>
-			<td>applies only to (read-only)<code>text</code> widgets; text
+			<td>applies only to (read-only) <code>text</code> widgets; text
 				is resolved each time there is an update of a value from the Launch
 				Tab</td>
 		</tr>
@@ -1406,7 +1406,7 @@
 			</td>
 			<td>applies to the <code>action</code> widget; the <code>button-action-type</code>
 				specifies the name of a command (<code>action</code>) defined in the
-				XML; this can be one of the <code>start-up</code>, <code>shut-down</code>,
+				XML; this can be one of the <code>start-up</code> or <code>shut-down</code>,
 				commands, or a special <code>button-action</code> command (<b>note
 			</b>that it cannot, however, be a <code>-job</code> command, as the
 				Launch Tab is not coupled to any submitted jobs); the <code>button-action-type</code>
