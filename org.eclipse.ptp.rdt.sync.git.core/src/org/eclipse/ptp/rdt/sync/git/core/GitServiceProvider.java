@@ -187,7 +187,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * synchronize(org.eclipse.core.resources.IResourceDelta, org.eclipse.core.runtime.IProgressMonitor, boolean)
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 100);
+		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
 		
 		// Make a visitor that explores the delta. At the moment, this visitor is responsible for two tasks (the list may grow in the future):
 		// 1) Find out if there are any "relevant" resource changes (changes that need to be mirrored remotely)
@@ -284,7 +284,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	
 				// Open remote connection if necessary
 				if (this.getRemoteConnection().isOpen() == false) {
-					this.getRemoteConnection().open(progress);
+					this.getRemoteConnection().open(progress.newChild(10));
 				}
 	
 				// This synchronization operation will include all tasks up to current syncTaskId
