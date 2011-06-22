@@ -697,31 +697,31 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.core"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.core"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.environment.core"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.environment.core"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.environment.generichost"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.environment.generichost"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.environment.launcher"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.environment.launcher"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.environment.ui"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.environment.ui"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.preferences"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.preferences"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.utils"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.utils"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
@@ -737,55 +737,55 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.common"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.common"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.doc.user"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.doc.user"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.lapi"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.lapi"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.mpi.analysis"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.mpi.analysis"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>			
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.mpi.analysis.cdt"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.mpi.analysis.cdt"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.mpi.core"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.mpi.core"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.mpi.fortran"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.mpi.fortran"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.analysis"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.openmp.analysis"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.core"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.openmp.core"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.fortran"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.openmp.fortran"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.ui.pv"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.openmp.ui.pv"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.upc"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.upc"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/org.eclipse.ptp.pldt.wizards"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.wizards"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">

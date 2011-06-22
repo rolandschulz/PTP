@@ -120,26 +120,26 @@ plugin@org.eclipse.ptp.services.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org
 plugin@org.eclipse.ptp.services.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.services.ui
 
 ! Remote Tools Plugins
-plugin@org.eclipse.ptp.remotetools.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.core
-plugin@org.eclipse.ptp.remotetools.environment.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.environment.core
-plugin@org.eclipse.ptp.remotetools.environment.generichost=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.environment.generichost
-plugin@org.eclipse.ptp.remotetools.environment.launcher=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.environment.launcher
-plugin@org.eclipse.ptp.remotetools.environment.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.environment.ui
-plugin@org.eclipse.ptp.remotetools.preferences=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.preferences
-plugin@org.eclipse.ptp.remotetools.utils=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.remotetools.utils
+plugin@org.eclipse.ptp.remotetools.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.core
+plugin@org.eclipse.ptp.remotetools.environment.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.environment.core
+plugin@org.eclipse.ptp.remotetools.environment.generichost=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.environment.generichost
+plugin@org.eclipse.ptp.remotetools.environment.launcher=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.environment.launcher
+plugin@org.eclipse.ptp.remotetools.environment.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.environment.ui
+plugin@org.eclipse.ptp.remotetools.preferences=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.preferences
+plugin@org.eclipse.ptp.remotetools.utils=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/remotetools/org.eclipse.ptp.remotetools.utils
 
 ! PLDT Plugins
-plugin@org.eclipse.ptp.pldt.common=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.common
-plugin@org.eclipse.ptp.pldt.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.doc.user
-plugin@org.eclipse.ptp.pldt.lapi=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.lapi
-plugin@org.eclipse.ptp.pldt.mpi.analysis=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.mpi.analysis
-plugin@org.eclipse.ptp.pldt.mpi.analysis.cdt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.mpi.analysis.cdt
-plugin@org.eclipse.ptp.pldt.mpi.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.mpi.core
-plugin@org.eclipse.ptp.pldt.openmp.analysis=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.analysis
-plugin@org.eclipse.ptp.pldt.openmp.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.core
-plugin@org.eclipse.ptp.pldt.openmp.ui.pv=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.openmp.ui.pv
-plugin@org.eclipse.ptp.pldt.upc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.upc
-plugin@org.eclipse.ptp.pldt.wizards=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.wizards
+plugin@org.eclipse.ptp.pldt.common=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.common
+plugin@org.eclipse.ptp.pldt.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.doc.user
+plugin@org.eclipse.ptp.pldt.lapi=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.lapi
+plugin@org.eclipse.ptp.pldt.mpi.analysis=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.mpi.analysis
+plugin@org.eclipse.ptp.pldt.mpi.analysis.cdt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.mpi.analysis.cdt
+plugin@org.eclipse.ptp.pldt.mpi.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.mpi.core
+plugin@org.eclipse.ptp.pldt.openmp.analysis=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.openmp.analysis
+plugin@org.eclipse.ptp.pldt.openmp.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.openmp.core
+plugin@org.eclipse.ptp.pldt.openmp.ui.pv=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.openmp.ui.pv
+plugin@org.eclipse.ptp.pldt.upc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.upc
+plugin@org.eclipse.ptp.pldt.wizards=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.wizards
 
 ! ETF Plugins
 plugin@org.eclipse.ptp.etfw=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw
