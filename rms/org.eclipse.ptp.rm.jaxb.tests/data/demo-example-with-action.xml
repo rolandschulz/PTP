@@ -404,7 +404,7 @@
 							</layout-data>
 							<fixed-text>MPI Number of Cores: </fixed-text>
 						</widget>
-						<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
+						<widget type="spinner" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCores">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="1" grabExcessHorizontal="false" widthHint="100"/>
 							</layout-data>

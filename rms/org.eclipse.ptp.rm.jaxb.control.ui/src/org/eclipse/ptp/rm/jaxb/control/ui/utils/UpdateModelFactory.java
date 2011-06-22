@@ -614,7 +614,7 @@ public class UpdateModelFactory {
 		} else if (JAXBControlUIConstants.CHECKBOX.equals(cd.widgetType)) {
 			c = WidgetBuilderUtils.createCheckButton(parent, cd.title, null);
 		} else if (JAXBControlUIConstants.SPINNER.equals(cd.widgetType)) {
-			c = WidgetBuilderUtils.createSpinner(parent, cd.layoutData, cd.title, cd.min, cd.max, cd.min, null);
+			c = WidgetBuilderUtils.createSpinner(parent, cd.style, cd.layoutData, cd.title, cd.min, cd.max, cd.min, null);
 		} else if (JAXBControlUIConstants.COMBO.equals(cd.widgetType)) {
 			c = createCombo(parent, cd);
 		} else if (JAXBControlUIConstants.BROWSE.equals(cd.widgetType)) {

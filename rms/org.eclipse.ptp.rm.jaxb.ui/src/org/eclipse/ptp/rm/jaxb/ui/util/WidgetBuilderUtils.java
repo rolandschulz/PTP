@@ -60,9 +60,6 @@ public class WidgetBuilderUtils {
 
 	private static final FontRegistry fonts = new FontRegistry();
 
-	private WidgetBuilderUtils() {
-	}
-
 	public static TableColumn addTableColumn(final TableViewer viewer, String columnName, int style, int width,
 			final SelectionAdapter s) {
 		Table t = viewer.getTable();
@@ -714,13 +711,13 @@ public class WidgetBuilderUtils {
 	 * @param listener
 	 * @return spinner
 	 */
-	public static Spinner createSpinner(Composite parent, Object layoutData, String label, Integer minimum, Integer maximum,
-			Integer initialValue, ModifyListener listener) {
+	public static Spinner createSpinner(Composite parent, int style, Object layoutData, String label, Integer minimum,
+			Integer maximum, Integer initialValue, ModifyListener listener) {
 		if (label != null) {
 			createLabel(parent, label, SWT.RIGHT, 1);
 		}
 
-		Spinner s = new Spinner(parent, SWT.NONE);
+		Spinner s = new Spinner(parent, style);
 		if (maximum == null) {
 			maximum = Integer.MAX_VALUE;
 		}
@@ -1307,5 +1304,8 @@ public class WidgetBuilderUtils {
 			}
 		}
 		return swt;
+	}
+
+	private WidgetBuilderUtils() {
 	}
 }
