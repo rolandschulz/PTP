@@ -11,6 +11,7 @@ package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	private final String separator;
 	private final ICheckable viewer;
 	private final ColumnViewer columnViewer;
+	private final Map<String, Object> deselected;
 	private Button showOnlySelected;
 
 	/**
@@ -94,6 +96,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		templatedValue = new StringBuffer();
 		viewer.addCheckStateListener(this);
 		columnViewer.addDoubleClickListener(this);
+		deselected = new HashMap<String, Object>();
 	}
 
 	/*
@@ -109,8 +112,15 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		Object target = event.getElement();
 		if (!(target instanceof ICellEditorUpdateModel)) {
 			viewer.setChecked(target, false);
-		} else if (!viewer.getChecked(target)) {
-			lcMap.remove(((ICellEditorUpdateModel) target).getName());
+		} else {
+			ICellEditorUpdateModel model = (ICellEditorUpdateModel) target;
+			String name = model.getName();
+			if (!viewer.getChecked(target)) {
+				deselected.put(name, lcMap.remove(name));
+			} else if (lcMap.get(name) == null) {
+				lcMap.put(name, deselected.remove(name));
+				model.refreshValueFromMap();
+			}
 		}
 		storeValue();
 		handleUpdate(null);
