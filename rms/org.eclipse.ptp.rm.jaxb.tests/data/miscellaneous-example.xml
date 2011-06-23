@@ -119,6 +119,30 @@
 				<arg>linked = ${ptp_rm:linked#value}</arg>
 			</line>
 		</script>
+		<start-up-command name="get-input">
+			<arg>ls</arg>
+			<arg>-l</arg>
+			<arg>${ptp_rm:directory#value}/input</arg>
+			<stdout-parser delim="\n">
+				<target type="property">
+					<match>
+						<expression>[-rwx+@]+.+[\d:]+[\s]+(.+)</expression>
+						<set field="name">
+						   <entry valueGroup="1"/>
+						</set>
+						<set field="readOnly">
+                     <entry value="true"/>
+                  </set>
+                  <set field="visible">
+                      <entry value="true"/>
+                  </set>
+						<set field="value">
+							<entry valueGroup="1"/>
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+		</start-up-command>
 		<submit-interactive name="submit-interactive">
 			<arg>echo</arg>
 			<arg>$VAR_1</arg>
@@ -437,7 +461,7 @@
 						</layout-data>
 						<column-data name="Name" width="100"/>
 						<column-data name="Value" width="100"/>
-						<items>
+						<items allDiscovered="true">
 							<include>e1</include>
 							<include>e2</include>
 							<include>e3</include>

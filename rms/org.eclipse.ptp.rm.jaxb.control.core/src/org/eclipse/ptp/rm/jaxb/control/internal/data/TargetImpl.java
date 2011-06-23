@@ -10,6 +10,7 @@
 package org.eclipse.ptp.rm.jaxb.control.internal.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -258,8 +259,8 @@ public class TargetImpl implements IMatchable {
 		if (v0 == null) {
 			previous.setValue(v1);
 		} else if (v1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ v1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + v1);
 		}
 
 		String s0 = previous.getDefault();
@@ -267,8 +268,8 @@ public class TargetImpl implements IMatchable {
 		if (s0 == null) {
 			previous.setDefault(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + s1);
 		}
 
 		s0 = previous.getType();
@@ -276,8 +277,8 @@ public class TargetImpl implements IMatchable {
 		if (s0 == null) {
 			previous.setType(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + s1);
 		}
 
 		s0 = previous.getStatus();
@@ -285,8 +286,8 @@ public class TargetImpl implements IMatchable {
 		if (s0 == null) {
 			previous.setStatus(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + s1);
 		}
 
 		boolean b0 = previous.isReadOnly();
@@ -306,8 +307,8 @@ public class TargetImpl implements IMatchable {
 		if (i0 == null) {
 			previous.setMax(i1);
 		} else if (i1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ i1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + i1);
 		}
 
 		i0 = previous.getMin();
@@ -315,8 +316,8 @@ public class TargetImpl implements IMatchable {
 		if (i0 == null) {
 			previous.setMin(i1);
 		} else if (i1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ i1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + i1);
 		}
 
 		s0 = previous.getDescription();
@@ -324,8 +325,8 @@ public class TargetImpl implements IMatchable {
 		if (s0 == null) {
 			previous.setDescription(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + s1);
 		}
 
 		s0 = previous.getChoice();
@@ -333,8 +334,8 @@ public class TargetImpl implements IMatchable {
 		if (s0 == null) {
 			previous.setChoice(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + s1);
 		}
 
 		s0 = previous.getTooltip();
@@ -342,8 +343,8 @@ public class TargetImpl implements IMatchable {
 		if (s0 == null) {
 			previous.setTooltip(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + s1);
 		}
 	}
 
@@ -359,14 +360,21 @@ public class TargetImpl implements IMatchable {
 	 *            Property
 	 * @throws Throwable
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void merge(PropertyType previous, PropertyType current) throws Throwable {
 		Object v0 = previous.getValue();
 		Object v1 = current.getValue();
 		if (v0 == null) {
 			previous.setValue(v1);
 		} else if (v1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ v1);
+			if (v0 instanceof Collection && v1 instanceof Collection) {
+				((Collection) v0).addAll((Collection) v1);
+			} else if (v0 instanceof Map && v1 instanceof Map) {
+				((Map) v0).putAll((Map) v1);
+			} else {
+				throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM
+						+ JAXBControlConstants.SP + v1);
+			}
 		}
 
 		String s0 = previous.getDefault();
@@ -374,17 +382,17 @@ public class TargetImpl implements IMatchable {
 		if (s0 == null) {
 			previous.setDefault(s1);
 		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ s1);
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + s1);
 		}
 
 		s0 = previous.getType();
 		s1 = current.getType();
 		if (s0 == null) {
 			previous.setType(s1);
-		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM + JAXBControlConstants.SP
-					+ s1);
+		} else if (s1 != null && !s1.equals(s0)) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + s1);
 		}
 
 		boolean b0 = previous.isReadOnly();
