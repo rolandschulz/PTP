@@ -101,7 +101,10 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 
 	/*
 	 * Model serves as CheckStateListener for the viewer. When check state
-	 * changes, the checked values are stored, and the update handler notified.
+	 * changes to checked, the checked values are stored, and the update handler
+	 * notified. Unchecked values get removed from the current environment and
+	 * placed in a temporary map; when rechecked, the current value in the
+	 * deselected map is removed and replaced into the environment.
 	 * (non-Javadoc)
 	 * 
 	 * @see
