@@ -21,6 +21,9 @@ import java.util.Set;
 
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
+import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
+import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
@@ -28,7 +31,9 @@ import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
@@ -154,11 +159,11 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 		
 		// Add project natures
 		RemoteSyncNature.addNature(project, new NullProgressMonitor());
-		try {
-			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
-		} catch (CoreException e) {
-			StatusManager.getManager().handle(e, RDTSyncUIPlugin.PLUGIN_ID);
-		}
+//		try {
+//			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
+//		} catch (CoreException e) {
+//			StatusManager.getManager().handle(e, RDTSyncUIPlugin.PLUGIN_ID);
+//		}
 
 		try {
 			ISynchronizeParticipant participant = fSelectedProvider.getParticipant();
@@ -197,9 +202,15 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 				throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 			}
 			IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
-			String buildPath = buildScenario.getLocation();
 			for (IConfiguration config : allConfigs) {
-				config.getToolChain().getBuilder().setBuildPath(buildPath);
+				IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
+				config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
+				//turn off append contributed(local) environment variables for the build configuration of the remote project
+				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
+				if(c_mb_confgDes!=null){
+					EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+					//EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_mb_confgDes);
+				}
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
 
@@ -211,13 +222,14 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 			try {
 				BuildConfigurationManager.getInstance().saveConfigurationData();
 			} catch (IOException e) {
-				// TODO: What to do in this case?
+				StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
+						StatusManager.SHOW);
 			}
 			monitor.done();
 		} finally {
 			monitor.done();
 		}
-		
+
 		BuildConfigurationManager.getInstance().createLocalConfiguration(project);
 	}
 
