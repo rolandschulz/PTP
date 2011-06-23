@@ -277,13 +277,7 @@
 					</widget>
 					<widget type="checkbox" saveValueTo="saveFiles" style="SWT.LEFT" translateBooleanAs="1,0">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false"/>
-						</layout-data>
-					</widget>
-					<!-- it seems that SWT will not spread a single button over more than one grid column, so we need an empty label filler here -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false"  horizontalSpan="2"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">

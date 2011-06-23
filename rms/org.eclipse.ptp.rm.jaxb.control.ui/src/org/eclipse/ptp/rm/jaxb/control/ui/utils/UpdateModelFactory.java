@@ -585,8 +585,8 @@ public class UpdateModelFactory {
 	 * ,
 	 * {@link WidgetBuilderUtils#createLabel(Composite, String, Integer, Object)}
 	 * ,
-	 * {@link WidgetBuilderUtils#createRadioButton(Composite, String, String, SelectionListener)}
-	 * , {@link WidgetBuilderUtils#createButton(Composite, String, Integer)},
+	 * {@link WidgetBuilderUtils#createButton(Composite, Object, String, Integer, SelectionListener)}
+	 * ,
 	 * {@link WidgetBuilderUtils#createSpinner(Composite, Object, String, Integer, Integer, Integer, org.eclipse.swt.events.ModifyListener)}
 	 * .
 	 * 
@@ -609,10 +609,17 @@ public class UpdateModelFactory {
 		} else if (JAXBControlUIConstants.RADIOBUTTON.equals(cd.widgetType)) {
 			if (cd.style == SWT.NONE) {
 				cd.style = SWT.RADIO | SWT.LEFT;
+			} else {
+				cd.style |= SWT.RADIO;
 			}
-			c = WidgetBuilderUtils.createRadioButton(parent, cd.style, cd.title, null, null);
+			c = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, cd.style, null);
 		} else if (JAXBControlUIConstants.CHECKBOX.equals(cd.widgetType)) {
-			c = WidgetBuilderUtils.createCheckButton(parent, cd.title, null);
+			if (cd.style == SWT.NONE) {
+				cd.style = SWT.CHECK | SWT.LEFT;
+			} else {
+				cd.style |= SWT.CHECK;
+			}
+			c = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, cd.style, null);
 		} else if (JAXBControlUIConstants.SPINNER.equals(cd.widgetType)) {
 			c = WidgetBuilderUtils.createSpinner(parent, cd.style, cd.layoutData, cd.title, cd.min, cd.max, cd.min, null);
 		} else if (JAXBControlUIConstants.COMBO.equals(cd.widgetType)) {

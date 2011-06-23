@@ -606,21 +606,6 @@ public class WidgetBuilderUtils {
 	}
 
 	/**
-	 * @param parent
-	 * @param style
-	 * @param label
-	 * @param initialValue
-	 * @param listener
-	 * @return radio button
-	 */
-	public static Button createRadioButton(Composite parent, int style, String label, String initialValue,
-			SelectionListener listener) {
-		Button button = createButton(parent, label, style, listener);
-		button.setData((null == initialValue) ? label : initialValue);
-		return button;
-	}
-
-	/**
 	 * @param height
 	 * @param width
 	 * @param exclude
