@@ -115,14 +115,118 @@ public class StreamParserTest extends TestCase {
 
 	private static final String tokxml = JAXBControlConstants.DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
 
+	private static InputStream getImplicitOrdering() {
+		String content = "jobAttribute_1" + JAXBControlConstants.LINE_SEP + "java.lang.String" + JAXBControlConstants.LINE_SEP + JAXBControlConstants.LINE_SEP + JAXBControlConstants.LINE_SEP + "value_1" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ "jobAttribute_2" + JAXBControlConstants.LINE_SEP + "java.lang.String" + JAXBControlConstants.LINE_SEP + "meaingless attribute" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ "ignore this attribute" + JAXBControlConstants.LINE_SEP + "value_2" //$NON-NLS-1$ //$NON-NLS-2$
+				+ JAXBControlConstants.LINE_SEP;
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getImplicitWithTags() {
+		String content = "JAXBRMConstants.PROPERTY" + JAXBControlConstants.LINE_SEP + "value:423.4" + JAXBControlConstants.LINE_SEP + "name:x" + JAXBControlConstants.LINE_SEP + "JAXBRMConstants.ATTRIBUTE" + JAXBControlConstants.LINE_SEP + "name:y" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				+ JAXBControlConstants.LINE_SEP
+				+ "value:-130.42" + JAXBControlConstants.LINE_SEP + "JAXBRMConstants.PROPERTY" + JAXBControlConstants.LINE_SEP + "name:z" + JAXBControlConstants.LINE_SEP + "value:-1.7" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getJobStates() {
+		String content = "blah blah xxxx blah blah xxxx blah blah xxxx blah blah xx" //$NON-NLS-1$
+				+ "<job>304823:RUNNING</job>fooblah blah xxxx\n  blah blah xxxx blah blah xxxx blah " //$NON-NLS-1$
+				+ " blah x\nx<job>312042:DONE</job>blah xxxx blah blah xxxx blah b" //$NON-NLS-1$
+				+ "blah blah xxxx foobarfoobr 231028388 <job>338831:SUJAXBRMConstants.SPENDED" //$NON-NLS-1$
+				+ "</job>fooroiqEXIT\npoiewmr<job>318388:QUEUED</job>blah blah xxxx"; //$NON-NLS-1$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getMergedOrdering() {
+		String content = "name:foo0;value:bar0" + JAXBControlConstants.LINE_SEP + "name:foo1;value:bar1" + JAXBControlConstants.LINE_SEP + "name:foo0;default:baz0" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ JAXBControlConstants.LINE_SEP;
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getNoiseBeforeJobId() {
+		String content = "abe and lincoln will be down for 3 hours Saturday May 14, 2013 from 00:00:00 to 03:00:00" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$
+				+ "There is currently no way to know what your shell is.  Please look in /etc/passwd" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$
+				+ "To get your default account, click your heels three times and say, 'There's no place like home!'" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$
+				+ "429324.honest1" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getOpenMPIOut() {
+		String content = "mca:mca:base:param:mca_component_disable_dlopen:status:writable" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mca:base:param:mca_component_disable_dlopen:help:Whether to attempt to disable opening dynamic components or not" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mca:base:param:mca_component_disable_dlopen:deprecated:no" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mpi:base:param:mpi_param_check:value:1" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mpi:base:param:mpi_param_check:data_source:default value" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mpi:base:param:mpi_param_check:status:read-only" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mpi:base:param:mpi_param_check:help:Whether you want MPI API parameters checked at run-time or not.  Possible values are 0 (no checking) and 1 (perform checking at run-time)" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mpi:base:param:mpi_param_check:deprecated:no" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mpi:base:param:mpi_yield_when_idle:value:-1" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mpi:base:param:mpi_yield_when_idle:data_source:default value" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mpi:base:param:mpi_yield_when_idle:status:writable" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mpi:base:param:mpi_yield_when_idle:help:Yield the processor when waiting for MPI communication (for MPI processes, will default to 1 when oversubscribing nodes)" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mpi:base:param:mpi_yield_when_idle:deprecated:no" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$
+				+ "mca:mpi:base:param:mpi_event_tick_rate:value:-1" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getPropertyDefs() {
+		String content = "<name>pnameA</name><value>pvalueA</value>" + JAXBControlConstants.LINE_SEP + "<name>pnameB</name><value>pvalueB</value>" //$NON-NLS-1$ //$NON-NLS-2$
+				+ JAXBControlConstants.LINE_SEP
+				+ "<name>pnameC</name><value>pvalueC</value>" + JAXBControlConstants.LINE_SEP + "<name>pnameD</name><value>pvalueD</value>" //$NON-NLS-1$ //$NON-NLS-2$
+				+ JAXBControlConstants.LINE_SEP + "<value>pvalueW</value><name>pnameW</name>" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getQstat() {
+		String content = "42226.ember       g_zn_ph2         enoey             665:51:4 R normal  \n";//$NON-NLS-1$ 
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getQstatOut() {
+		String content = "normal" + JAXBControlConstants.LINE_SEP + "iacat2" + JAXBControlConstants.LINE_SEP + "indprio" + JAXBControlConstants.LINE_SEP + "lincoln_nomss" + JAXBControlConstants.LINE_SEP + "cap1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				+ JAXBControlConstants.LINE_SEP
+				+ "lincoln_debug" + JAXBControlConstants.LINE_SEP + "long" + JAXBControlConstants.LINE_SEP + "iacat" + JAXBControlConstants.LINE_SEP + "industrial" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ "lincoln" + JAXBControlConstants.LINE_SEP + "wide" + JAXBControlConstants.LINE_SEP + "nomss" + JAXBControlConstants.LINE_SEP + "debug" + JAXBControlConstants.LINE_SEP + "iacat3" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				+ "lincoln_cuda3.2" + JAXBControlConstants.LINE_SEP + "fernsler" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	private static InputStream getStaggered() {
+		String content = "value:1" + JAXBControlConstants.LINE_SEP + "value:2" + JAXBControlConstants.LINE_SEP + "name:1" + JAXBControlConstants.LINE_SEP + "name:2" + JAXBControlConstants.LINE_SEP + "name:3" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				+ "name:4" + JAXBControlConstants.LINE_SEP + "value:3" + JAXBControlConstants.LINE_SEP + "value:4" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
 	private String uuid;
+
 	private String lineRange;
+
 	private boolean[] oracle;
+
 	private String[] values;
+
 	private final boolean verbose = true;
+
 	private String target;
+
 	private List<CommandType> startup;
+
 	private CommandType getStatus;
+
 	private RMVariableMap rmVarMap;
 
 	@Override
@@ -159,7 +263,7 @@ public class StreamParserTest extends TestCase {
 	}
 
 	public void test00ParseQstat() {
-		target = "available_queues"; //$NON-NLS-1$
+		target = "queues"; //$NON-NLS-1$
 		PropertyType p = new PropertyType();
 		p.setName(target);
 		rmVarMap.getVariables().put(target, p);
@@ -419,101 +523,5 @@ public class StreamParserTest extends TestCase {
 			throwable.printStackTrace();
 		}
 		assertNull(throwable);
-	}
-
-	private static InputStream getImplicitOrdering() {
-		String content = "jobAttribute_1" + JAXBControlConstants.LINE_SEP + "java.lang.String" + JAXBControlConstants.LINE_SEP + JAXBControlConstants.LINE_SEP + JAXBControlConstants.LINE_SEP + "value_1" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ "jobAttribute_2" + JAXBControlConstants.LINE_SEP + "java.lang.String" + JAXBControlConstants.LINE_SEP + "meaingless attribute" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ "ignore this attribute" + JAXBControlConstants.LINE_SEP + "value_2" //$NON-NLS-1$ //$NON-NLS-2$
-				+ JAXBControlConstants.LINE_SEP;
-		return new ByteArrayInputStream(content.getBytes());
-	}
-
-	private static InputStream getImplicitWithTags() {
-		String content = "JAXBRMConstants.PROPERTY" + JAXBControlConstants.LINE_SEP + "value:423.4" + JAXBControlConstants.LINE_SEP + "name:x" + JAXBControlConstants.LINE_SEP + "JAXBRMConstants.ATTRIBUTE" + JAXBControlConstants.LINE_SEP + "name:y" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-				+ JAXBControlConstants.LINE_SEP
-				+ "value:-130.42" + JAXBControlConstants.LINE_SEP + "JAXBRMConstants.PROPERTY" + JAXBControlConstants.LINE_SEP + "name:z" + JAXBControlConstants.LINE_SEP + "value:-1.7" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		return new ByteArrayInputStream(content.getBytes());
-	}
-
-	private static InputStream getJobStates() {
-		String content = "blah blah xxxx blah blah xxxx blah blah xxxx blah blah xx" //$NON-NLS-1$
-				+ "<job>304823:RUNNING</job>fooblah blah xxxx\n  blah blah xxxx blah blah xxxx blah " //$NON-NLS-1$
-				+ " blah x\nx<job>312042:DONE</job>blah xxxx blah blah xxxx blah b" //$NON-NLS-1$
-				+ "blah blah xxxx foobarfoobr 231028388 <job>338831:SUJAXBRMConstants.SPENDED" //$NON-NLS-1$
-				+ "</job>fooroiqEXIT\npoiewmr<job>318388:QUEUED</job>blah blah xxxx"; //$NON-NLS-1$
-		return new ByteArrayInputStream(content.getBytes());
-	}
-
-	private static InputStream getMergedOrdering() {
-		String content = "name:foo0;value:bar0" + JAXBControlConstants.LINE_SEP + "name:foo1;value:bar1" + JAXBControlConstants.LINE_SEP + "name:foo0;default:baz0" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ JAXBControlConstants.LINE_SEP;
-		return new ByteArrayInputStream(content.getBytes());
-	}
-
-	private static InputStream getNoiseBeforeJobId() {
-		String content = "abe and lincoln will be down for 3 hours Saturday May 14, 2013 from 00:00:00 to 03:00:00" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$
-				+ "There is currently no way to know what your shell is.  Please look in /etc/passwd" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$
-				+ "To get your default account, click your heels three times and say, 'There's no place like home!'" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$
-				+ "429324.honest1" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$
-		return new ByteArrayInputStream(content.getBytes());
-	}
-
-	private static InputStream getOpenMPIOut() {
-		String content = "mca:mca:base:param:mca_component_disable_dlopen:status:writable" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mca:base:param:mca_component_disable_dlopen:help:Whether to attempt to disable opening dynamic components or not" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mca:base:param:mca_component_disable_dlopen:deprecated:no" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mpi:base:param:mpi_param_check:value:1" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mpi:base:param:mpi_param_check:data_source:default value" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mpi:base:param:mpi_param_check:status:read-only" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mpi:base:param:mpi_param_check:help:Whether you want MPI API parameters checked at run-time or not.  Possible values are 0 (no checking) and 1 (perform checking at run-time)" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mpi:base:param:mpi_param_check:deprecated:no" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mpi:base:param:mpi_yield_when_idle:value:-1" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mpi:base:param:mpi_yield_when_idle:data_source:default value" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mpi:base:param:mpi_yield_when_idle:status:writable" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mpi:base:param:mpi_yield_when_idle:help:Yield the processor when waiting for MPI communication (for MPI processes, will default to 1 when oversubscribing nodes)" //$NON-NLS-1$
-				+ JAXBControlConstants.LINE_SEP
-				+ "mca:mpi:base:param:mpi_yield_when_idle:deprecated:no" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$
-				+ "mca:mpi:base:param:mpi_event_tick_rate:value:-1" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$
-		return new ByteArrayInputStream(content.getBytes());
-	}
-
-	private static InputStream getPropertyDefs() {
-		String content = "<name>pnameA</name><value>pvalueA</value>" + JAXBControlConstants.LINE_SEP + "<name>pnameB</name><value>pvalueB</value>" //$NON-NLS-1$ //$NON-NLS-2$
-				+ JAXBControlConstants.LINE_SEP
-				+ "<name>pnameC</name><value>pvalueC</value>" + JAXBControlConstants.LINE_SEP + "<name>pnameD</name><value>pvalueD</value>" //$NON-NLS-1$ //$NON-NLS-2$
-				+ JAXBControlConstants.LINE_SEP + "<value>pvalueW</value><name>pnameW</name>" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$
-		return new ByteArrayInputStream(content.getBytes());
-	}
-
-	private static InputStream getQstat() {
-		String content = "42226.ember       g_zn_ph2         enoey             665:51:4 R normal  \n";//$NON-NLS-1$ 
-		return new ByteArrayInputStream(content.getBytes());
-	}
-
-	private static InputStream getQstatOut() {
-		String content = "normal" + JAXBControlConstants.LINE_SEP + "iacat2" + JAXBControlConstants.LINE_SEP + "indprio" + JAXBControlConstants.LINE_SEP + "lincoln_nomss" + JAXBControlConstants.LINE_SEP + "cap1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-				+ JAXBControlConstants.LINE_SEP
-				+ "lincoln_debug" + JAXBControlConstants.LINE_SEP + "long" + JAXBControlConstants.LINE_SEP + "iacat" + JAXBControlConstants.LINE_SEP + "industrial" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				+ "lincoln" + JAXBControlConstants.LINE_SEP + "wide" + JAXBControlConstants.LINE_SEP + "nomss" + JAXBControlConstants.LINE_SEP + "debug" + JAXBControlConstants.LINE_SEP + "iacat3" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-				+ "lincoln_cuda3.2" + JAXBControlConstants.LINE_SEP + "fernsler" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$
-		return new ByteArrayInputStream(content.getBytes());
-	}
-
-	private static InputStream getStaggered() {
-		String content = "value:1" + JAXBControlConstants.LINE_SEP + "value:2" + JAXBControlConstants.LINE_SEP + "name:1" + JAXBControlConstants.LINE_SEP + "name:2" + JAXBControlConstants.LINE_SEP + "name:3" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-				+ "name:4" + JAXBControlConstants.LINE_SEP + "value:3" + JAXBControlConstants.LINE_SEP + "value:4" + JAXBControlConstants.LINE_SEP; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		return new ByteArrayInputStream(content.getBytes());
 	}
 }

@@ -54,12 +54,18 @@ public class Messages extends NLS {
 	public static String AbstractAssign_2;
 	public static String AbstractAssign_3;
 	public static String AbstractAssign_4;
+	public static String AbstractAssign_5;
+	public static String AbstractAssign_6;
+	public static String AbstractAssign_7;
+	public static String AbstractAssign_8;
+	public static String AbstractAssign_9;
 	public static String MatchImpl_0;
 	public static String MatchImpl_1;
 	public static String MatchImpl_2;
 	public static String MatchImpl_3;
 	public static String MatchImpl_4;
 	public static String MatchImpl_5;
+	public static String BadEntryIndex;
 
 	static {
 		// initialize resource bundle

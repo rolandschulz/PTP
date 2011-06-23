@@ -15,17 +15,24 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.IAssign;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.internal.utils.TokenizerLogger;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AddType;
 import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 import org.eclipse.ptp.rm.jaxb.core.data.PutType;
 import org.eclipse.ptp.rm.jaxb.core.data.SetType;
 import org.eclipse.ptp.rm.jaxb.core.data.ThrowType;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * Base class for the wrappers around the data objects providing information as
@@ -309,13 +316,26 @@ public abstract class AbstractAssign implements IAssign {
 	 * @return key
 	 * @throws Throwable
 	 */
-	protected String getKey(EntryType entry, String[] values) throws Throwable {
+	protected String getKey(final EntryType entry, final String[] values) throws Throwable {
 		String k = entry.getKey();
 		if (k != null) {
 			return (String) normalizedValue(target, uuid, k, false, rmVarMap);
 		}
 		int index = determineKeyIndex(entry);
 		if (values != null) {
+			if (index >= values.length) {
+				new UIJob(Messages.BadEntryIndex) {
+					@Override
+					public IStatus runInUIThread(IProgressMonitor monitor) {
+						MessageDialog.openError(Display.getDefault().getActiveShell(), Messages.BadEntryIndex, entryKeyInfo(entry)
+								+ JAXBCoreConstants.CM + JAXBCoreConstants.SP + Arrays.asList(values));
+						return Status.OK_STATUS;
+					}
+				}.schedule();
+				/*
+				 * go ahead and throw the exception
+				 */
+			}
 			return values[index];
 		}
 		return null;
@@ -332,13 +352,27 @@ public abstract class AbstractAssign implements IAssign {
 	 * @return value
 	 * @throws Throwable
 	 */
-	protected Object getValue(EntryType entry, String[] values) throws Throwable {
+	protected Object getValue(final EntryType entry, final String[] values) throws Throwable {
 		String v = entry.getValue();
 		if (v != null) {
 			return normalizedValue(target, uuid, v, true, rmVarMap);
 		}
 		int index = determineValueIndex(entry);
 		if (values != null) {
+			if (index >= values.length) {
+				new UIJob(Messages.BadEntryIndex) {
+					@Override
+					public IStatus runInUIThread(IProgressMonitor monitor) {
+						MessageDialog.openError(Display.getDefault().getActiveShell(), Messages.BadEntryIndex,
+								entryValueInfo(entry) + JAXBCoreConstants.CM + JAXBCoreConstants.LINE_SEP + values.length
+										+ Messages.AbstractAssign_9 + Arrays.asList(values));
+						return Status.OK_STATUS;
+					}
+				}.schedule();
+				/*
+				 * go ahead and throw the exception
+				 */
+			}
 			return values[index];
 		}
 		return null;
@@ -357,4 +391,26 @@ public abstract class AbstractAssign implements IAssign {
 	 * @throws Throwable
 	 */
 	protected abstract Object[] getValue(Object previous, String[] values) throws Throwable;
+
+	/**
+	 * Prints indices for key.
+	 * 
+	 * @param entry
+	 * @return message
+	 */
+	private String entryKeyInfo(EntryType entry) {
+		return JAXBCoreConstants.OPENP + Messages.AbstractAssign_5 + entry.getKeyGroup() + Messages.AbstractAssign_6
+				+ entry.getKeyIndex() + JAXBCoreConstants.CLOSP;
+	}
+
+	/**
+	 * Prints indices for value.
+	 * 
+	 * @param entry
+	 * @return message
+	 */
+	private String entryValueInfo(EntryType entry) {
+		return JAXBCoreConstants.OPENP + Messages.AbstractAssign_7 + entry.getValueGroup() + Messages.AbstractAssign_8
+				+ entry.getValueIndex() + JAXBCoreConstants.CLOSP;
+	}
 }

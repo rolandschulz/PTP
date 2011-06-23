@@ -128,7 +128,7 @@
 					<match>
 						<expression>[-rwx+@]+.+[\d:]+[\s]+(.+)</expression>
 						<set field="name">
-						   <entry valueGroup="1"/>
+						   <entry valueGroup="4"/>
 						</set>
 						<set field="readOnly">
                      <entry value="true"/>
